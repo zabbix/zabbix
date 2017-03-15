@@ -373,7 +373,7 @@ function zbx_num2bitstr($num, $rev = false) {
 	$strbin = '';
 
 	$len = 32;
-	if ($num > 2147483647) {
+	if (bccomp($num, ZBX_MAX_INT32) > 0) {
 		$len = 64;
 	}
 

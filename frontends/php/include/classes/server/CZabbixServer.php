@@ -188,33 +188,33 @@ class CZabbixServer {
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'template stats' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147483647']
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
 			]],
 			'host stats' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])]
 				]],
-				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147483647']
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
 			]],
 			'item stats' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 					'state' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED])]
 				]],
-				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147483647']
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
 			]],
 			'trigger stats' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])],
 					'value' =>					['type' => API_INT32, 'in' => implode(',', [TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE])]
 				]],
-				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147483647']
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
 			]],
 			'user stats' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SESSION_ACTIVE, ZBX_SESSION_PASSIVE])]
 				]],
-				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147483647']
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
 			]],
 			'required performance' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'count' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]	// API_FLOAT 0-n

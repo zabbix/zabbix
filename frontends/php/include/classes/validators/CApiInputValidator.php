@@ -231,7 +231,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (bccomp($data, '-2147483648') < 0 || bccomp($data, '2147483647') > 0) {
+		if (bccomp($data, ZBX_MIN_INT32) < 0 || bccomp($data, ZBX_MAX_INT32) > 0) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -766,7 +766,7 @@ class CApiInputValidator {
 
 		$seconds = timeUnitToSeconds($data);
 
-		if (bccomp($seconds, '2147483647') > 0) {
+		if (bccomp($seconds, ZBX_MAX_INT32) > 0) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
