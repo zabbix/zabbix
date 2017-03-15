@@ -423,6 +423,13 @@ static int	DBpatch_3030032(void)
 
 static int	DBpatch_3030033(void)
 {
+	const ZBX_FIELD	field = {"sysmapid", NULL, "sysmaps", "sysmapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_shape", 1, &field);
+}
+
+static int	DBpatch_3030034(void)
+{
 	DB_ROW		row;
 	DB_RESULT	result;
 	unsigned char	value_type, data_type, delta;
