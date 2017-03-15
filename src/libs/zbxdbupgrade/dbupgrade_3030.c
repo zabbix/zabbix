@@ -417,7 +417,7 @@ static int	DBpatch_3030034(void)
 {
 	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("sysmap_element_trigger", 1, &field);
+	return DBadd_foreign_key("sysmap_element_trigger", 2, &field);
 }
 
 static int	DBpatch_3030035(void)
