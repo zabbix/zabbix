@@ -404,7 +404,7 @@ static int	DBpatch_3030031(void)
 					{"text_halign", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"text_valign", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"border_type", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"border_width", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"border_width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"border_color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL,0},
 					{"background_color", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"zindex", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -431,7 +431,8 @@ static int	DBpatch_3030033(void)
 	const char	*formula;
 	int		width, ret;
 
-	zbx_db_insert_prepare(&db_insert, "sysmap_shape", "shapeid", "sysmapid", "width", "height", "text", NULL);
+	zbx_db_insert_prepare(&db_insert, "sysmap_shape", "shapeid", "sysmapid", "width", "height", "text",
+			"border_width", NULL);
 
 	result = DBselect("select sysmapid,width from sysmaps");
 
@@ -440,7 +441,7 @@ static int	DBpatch_3030033(void)
 		ZBX_STR2UINT64(mapid, row[0]);
 		width = atoi(row[1]);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mapid, width, 15, "{MAP.NAME}");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mapid, width, 15, "{MAP.NAME}", 0);
 	}
 
 	DBfree_result(result);
