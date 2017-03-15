@@ -1623,7 +1623,24 @@ class CMap extends CMapElement {
 	 */
 	public function delete(array $sysmapids) {
 		$this->validateDelete($sysmapids);
+		$maps = API::Map()->get([
+			'output' => [],
+			'selectSelements' => ['selementid', 'elementtype'],
+			'sysmapids' => $sysmapids
+		]);
 
+		$selementids = [];
+		foreach ($maps as $map) {
+			foreach ($map['selements'] as $selement) {
+				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+					$selementids[] = $selement['selementid'];
+				}
+			}
+		}
+
+		DB::delete('sysmap_element_trigger', [
+			'selementid' => $selementids
+		]);
 		DB::delete('sysmaps_elements', [
 			'elementid' => $sysmapids,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP

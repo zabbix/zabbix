@@ -462,6 +462,20 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="selementFormTriggers">
+	<?= (new CRow([
+			(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('jQuery("#triggerrow_#{selementtriggerid}").remove();')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setId('triggerrow_#{selementtriggerid}')
+			->toString()
+	?>
+</script>
+
 <script type="text/javascript">
 	/**
 	 * @see init.js add.popup event

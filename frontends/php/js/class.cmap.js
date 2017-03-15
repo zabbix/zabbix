@@ -1342,7 +1342,14 @@ ZABBIX.apps.map = (function($) {
 			 * Add triggers to the list.
 			 */
 			addTriggers: function() {
-				var triggers = $('#elementNameTriggers').multiSelect('getData');
+				var tpl = new Template($('#selementFormTriggers').html()),
+					triggers = $('#elementNameTriggers').multiSelect('getData');
+
+				triggers.each(function(trigger) {
+					$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+				});
+
+				$('#elementNameTriggers').multiSelect('clean');
 			},
 
 			/**
