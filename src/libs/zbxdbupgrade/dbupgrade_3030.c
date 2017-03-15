@@ -385,6 +385,74 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3030031(void)
+{
+	const ZBX_TABLE table =
+			{"sysmap_element_trigger", "selement_triggerid", 0,
+				{
+					{"selement_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"selementid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030032(void)
+{
+	return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_1", "selementid", 0);
+}
+
+static int	DBpatch_3030033(void)
+{
+	const ZBX_FIELD	field = {"selementid", NULL, "sysmaps_elements", "selementid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_element_trigger", 1, &field);
+}
+
+static int	DBpatch_3030034(void)
+{
+	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_element_trigger", 1, &field);
+}
+
+static int	DBpatch_3030035(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	unsigned char	value_type, data_type, delta;
+	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	selementid, triggerid;
+	const char	*formula;
+	int		width, ret;
+
+	zbx_db_insert_prepare(&db_insert, "sysmap_element_trigger", "selement_triggerid", "selementid", "triggerid",
+			NULL);
+
+	/* sysmaps_elements.elementid for trigger map elements (2) should be migrated to table sysmap_element_trigger */
+	result = DBselect("select selementid, elementid from sysmaps_elements where elementtype=2");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(selementid, row[0]);
+		ZBX_STR2UINT64(triggerid, row[1]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), selementid, triggerid);
+	}
+
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "selement_triggerid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -422,5 +490,10 @@ DBPATCH_ADD(3030027, 0, 1)
 DBPATCH_ADD(3030028, 0, 1)
 DBPATCH_ADD(3030029, 0, 1)
 DBPATCH_ADD(3030030, 0, 1)
+DBPATCH_ADD(3030031, 0, 1)
+DBPATCH_ADD(3030032, 0, 1)
+DBPATCH_ADD(3030033, 0, 1)
+DBPATCH_ADD(3030034, 0, 1)
+DBPATCH_ADD(3030035, 0, 1)
 
 DBPATCH_END()

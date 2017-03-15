@@ -1454,7 +1454,13 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|params		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|itemid,step
 
+TABLE|sysmap_element_trigger|selement_triggerid|ZBX_DATA
+FIELD		|selement_triggerid	|t_id	|	|NOT NULL	|0
+FIELD		|selementid		|t_id	|	|NOT NULL	|0			|1|sysmaps_elements
+FIELD		|triggerid		|t_id	|	|NOT NULL	|0			|1|triggers
+INDEX		|1			|selementid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030030	|3030030
+ROW		|3030035	|3030035
