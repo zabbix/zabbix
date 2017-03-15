@@ -952,7 +952,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != CONFIG_VMWARE_FORKS && SUCCEED != zbx_vmware_init(&error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware support: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
