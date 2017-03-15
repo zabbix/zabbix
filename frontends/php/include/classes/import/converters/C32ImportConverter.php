@@ -145,7 +145,7 @@ class C32ImportConverter extends CConverter {
 			unset($discovery_rule['delay_flex']);
 
 			// Convert to days.
-			if (strpos($discovery_rule['lifetime'], '{') === false && $discovery_rule['lifetime'] != 0) {
+			if (ctype_digit($discovery_rule['lifetime']) && $discovery_rule['lifetime'] != 0) {
 				$discovery_rule['lifetime'] .= 'd';
 			}
 		}

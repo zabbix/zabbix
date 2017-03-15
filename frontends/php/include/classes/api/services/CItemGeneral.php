@@ -267,7 +267,7 @@ abstract class CItemGeneral extends CApiService {
 				$delay = $update_interval_parser->getDelay();
 
 				// Check if not macros. If delay is a macro, skip this step, otherwise check if delay is valid.
-				if (strpos($delay, '{') === false) {
+				if ($delay[0] !== '{') {
 					$delay_ = timeUnitToSeconds($delay);
 					$intervals = $update_interval_parser->getIntervals();
 

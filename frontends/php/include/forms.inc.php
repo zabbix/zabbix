@@ -494,6 +494,9 @@ function getItemFilterForm(&$items) {
 		'interval' => []
 	];
 
+	$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+	$simple_interval_parser = new CSimpleIntervalParser();
+
 	// generate array with values for subfilters of selected items
 	foreach ($items as $item) {
 		// hosts
@@ -681,7 +684,7 @@ function getItemFilterForm(&$items) {
 			$trends = $item['trends'];
 			$value = $trends;
 
-			if (strpos($trends, '{') === false) {
+			if ($simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS) {
 				$value = timeUnitToSeconds($trends);
 				$trends = convertUnitsS($value);
 			}
@@ -713,7 +716,7 @@ function getItemFilterForm(&$items) {
 			$history = $item['history'];
 			$value = $history;
 
-			if (strpos($history, '{') === false) {
+			if ($simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS) {
 				$value = timeUnitToSeconds($history);
 				$history = convertUnitsS($value);
 			}
@@ -747,13 +750,11 @@ function getItemFilterForm(&$items) {
 			$delay = $item['delay'];
 			$value = $delay;
 
-			$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
-
 			if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 				$delay = $update_interval_parser->getDelay();
 
 				// "value" is delay represented in seconds and it is used for sorting the subfilter.
-				if (strpos($delay, '{') === false) {
+				if ($delay[0] !== '{') {
 					$value = timeUnitToSeconds($delay);
 					$delay = convertUnitsS($value);
 				}
@@ -1073,7 +1074,7 @@ function getItemFormData(array $item = [], array $options = []) {
 			if ($update_interval_parser->parse($data['delay']) == CParser::PARSE_SUCCESS) {
 				$data['delay'] = $update_interval_parser->getDelay();
 
-				if (strpos($data['delay'], '{') === false) {
+				if ($data['delay'][0] !== '{') {
 					$delay = timeUnitToSeconds($data['delay']);
 
 					if (($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP) && $delay == 0) {
