@@ -202,7 +202,7 @@ SVGMap.prototype.updateBackground = function (background) {
 			y: 0,
 			width: image.naturalWidth,
 			height: image.naturalHeight,
-			href: this.getImageUrl(background)
+			'xlink:href': this.getImageUrl(background)
 		});
 	}
 
@@ -581,8 +581,8 @@ SVGMapElement.prototype.updateImage = function() {
 	if (this.options.icon !== undefined) {
 		var href = this.map.getImageUrl(this.options.icon);
 
-		if (this.image === null || this.image.attributes.href !== href) {
-			options.href = href;
+		if (this.image === null || this.image.attributes['xlink:href'] !== href) {
+			options['xlink:href'] = href;
 
 			var image = this.map.layers.elements.add('image', options);
 			this.removeItem('image');

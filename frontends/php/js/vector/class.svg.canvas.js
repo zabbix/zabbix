@@ -45,6 +45,10 @@ function SVGCanvas(options, shadowBuffer) {
 	}
 }
 
+SVGCanvas.NAMESPACES = {
+	xlink: 'http://www.w3.org/1999/xlink'
+};
+
 SVGCanvas.getUniqueId = function () {
 	if (SVGCanvas.uniqueId === undefined) {
 		SVGCanvas.uniqueId = 0;
@@ -387,7 +391,14 @@ SVGElement.prototype.clear = function () {
 
 SVGElement.prototype.update = function (attributes) {
 	Object.keys(attributes).forEach(function (name) {
-		this.element.setAttribute(name, attributes[name]);
+		var attribute = name.split(':');
+
+		if (attribute.length === 1) {
+			this.element.setAttributeNS(null, name, attributes[name]);
+		}
+		else if (attribute.length === 2 && SVGCanvas.NAMESPACES[attribute[0]] !== undefined) {
+			this.element.setAttributeNS(SVGCanvas.NAMESPACES[attribute[0]], name, attributes[name]);
+		}
 	}, this);
 
 	return this;
@@ -439,25 +450,15 @@ SVGElement.prototype.replace = function (target) {
 	return this;
 };
 
-
 SVGElement.prototype.create = function () {
-	var element = document.createElementNS('http://www.w3.org/2000/svg', this.type),
-		names = Object.keys(this.attributes);
-
-	/* direct mapping */
-	for (var i = 0; i < names.length; i++) {
-		if (typeof this.attributes[names[i]] === 'function') {
-			continue;
-		}
-
-		element.setAttributeNS(null, names[i], this.attributes[names[i]]);
-	}
+	var element = document.createElementNS('http://www.w3.org/2000/svg', this.type);
 
 	if (this.element !== null) {
 		this.element.remove();
 	}
 
 	this.element = element;
+	this.update(this.attributes);
 
 	if (Array.isArray(this.content)) {
 		this.content.forEach(function (element) {
