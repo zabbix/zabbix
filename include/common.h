@@ -1043,9 +1043,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 		char *severity, size_t severity_len);
 
 /* misc functions */
-#ifdef HAVE_IPV6
 int	is_ip6(const char *ip);
-#endif
 int	is_ip4(const char *ip);
 int	is_ip(const char *ip);
 
