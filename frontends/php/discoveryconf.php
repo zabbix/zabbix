@@ -35,7 +35,7 @@ $fields = [
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'proxy_hostid' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({add}) || isset({update})'],
 	'iprange' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'delay' =>			[T_ZBX_PERIOD_MACRO, O_OPT, null,	null,		'isset({add}) || isset({update})',
+	'delay' =>			[T_ZBX_TU_MACRO, O_OPT, null,	null,		'isset({add}) || isset({update})',
 		_('Update interval')
 	],
 	'status' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],

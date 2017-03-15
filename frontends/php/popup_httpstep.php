@@ -40,7 +40,7 @@ $fields = [
 	'headers' =>		[T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
 	'retrieve_mode' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'follow_redirects' => [T_ZBX_STR, O_OPT, null,	null,				null],
-	'timeout' =>		[T_ZBX_PERIOD_MACRO, O_OPT, null,				null,	'isset({add}) || isset({update})',
+	'timeout' =>		[T_ZBX_TU_MACRO, O_OPT, null,				null,	'isset({add}) || isset({update})',
 		_('Timeout')
 	],
 	'required' =>		[T_ZBX_STR, O_OPT, null,	null,				null],

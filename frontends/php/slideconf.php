@@ -34,7 +34,7 @@ $fields = [
 	'shows' =>			[T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null],
 	'slideshowid' =>	[T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
 	'name' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
-	'delay' =>			[T_ZBX_PERIOD, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')],
+	'delay' =>			[T_ZBX_TU, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')],
 	'slides' =>			[null,		 O_OPT, null,		null,	null],
 	'userid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'private' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
