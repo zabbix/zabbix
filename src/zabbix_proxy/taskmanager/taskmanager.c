@@ -53,7 +53,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	parent_taskid, hostid;
-	zbx_tm_task_t	*task;
+	zbx_tm_task_t	*task = NULL;
 	int		ret = FAIL;
 	zbx_script_t	script;
 	char		*info = NULL, error[MAX_STRING_LEN];
@@ -65,54 +65,54 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)))
+		goto finish;
+
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+
+	if (0 != ttl && clock + ttl < now)
 	{
-		task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
+				"The remote command has been expired.");
+		goto finish;
+	}
 
-		if (0 != ttl && clock + ttl < now)
-		{
-			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
-					"The remote command has been expired.");
-			goto finish;
-		}
+	ZBX_STR2UINT64(hostid, row[10]);
+	if (FAIL == DCget_host_by_hostid(&host, hostid))
+	{
+		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, "Unknown host.");
+		goto finish;
+	}
 
-		ZBX_STR2UINT64(hostid, row[10]);
-		if (FAIL == DCget_host_by_hostid(&host, hostid))
-		{
-			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, "Unknown host.");
-			goto finish;
-		}
+	zbx_script_init(&script);
 
-		zbx_script_init(&script);
+	ZBX_STR2UCHAR(script.type, row[0]);
+	ZBX_STR2UCHAR(script.execute_on, row[1]);
+	script.port = (0 == atoi(row[2]) ? "" : row[2]);
+	ZBX_STR2UCHAR(script.authtype, row[3]);
+	script.username = row[4];
+	script.password = row[5];
+	script.publickey = row[6];
+	script.privatekey = row[7];
+	script.command = row[8];
+	ZBX_STR2UINT64(parent_taskid, row[9]);
 
-		ZBX_STR2UCHAR(script.type, row[0]);
-		ZBX_STR2UCHAR(script.execute_on, row[1]);
-		script.port = (0 == atoi(row[2]) ? "" : row[2]);
-		ZBX_STR2UCHAR(script.authtype, row[3]);
-		script.username = row[4];
-		script.password = row[5];
-		script.publickey = row[6];
-		script.privatekey = row[7];
-		script.command = row[8];
-		ZBX_STR2UINT64(parent_taskid, row[9]);
+	if (SUCCEED != (ret = zbx_script_execute(&script, &host, &info, error, sizeof(error))))
+		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
+	else
+		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
 
-		if (SUCCEED != (ret = zbx_script_execute(&script, &host, &info, error, sizeof(error))))
-			task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
-		else
-			task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
+	zbx_free(info);
+finish:
+	DBfree_result(result);
 
-		zbx_free(info);
+	DBbegin();
 
-		DBbegin();
-
+	if (NULL != task)
+	{
 		zbx_tm_save_task(task);
 		zbx_tm_task_free(task);
-finish:;
 	}
-	else
-		DBbegin();
-
-	DBfree_result(result);
 
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
