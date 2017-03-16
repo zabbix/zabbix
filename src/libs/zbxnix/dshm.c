@@ -57,7 +57,7 @@ int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, ZBX_MUTEX_NAME mutex,
 
 	if (0 < shm_size)
 	{
-		if (-1 == (shm->shmid = zbx_shmget(ZBX_NONEXISTENT_SHMID, shm_size)))
+		if (-1 == (shm->shmid = zbx_shm_create(shm_size)))
 		{
 			*errmsg = zbx_strdup(*errmsg, "cannot allocate shared memory");
 			goto out;
@@ -235,20 +235,11 @@ int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 		goto out;
 	}
 
-	/* zbx_shmget() will:                                          */
-	/*	- see that a shared memory segment with this id exists */
-	/*	- create a new segment with a different id             */
-	/*	- mark the old segment for deletion                    */
-
-
-	if (-1 == (shmid = zbx_shmget(shm->shmid, shm_size)))
+	if (-1 == (shmid = zbx_shm_create(shm_size)))
 	{
 		*errmsg = zbx_strdup(NULL, "cannot allocate shared memory");
 		goto out;
 	}
-
-	shm->size = shm_size;
-	shm->shmid = shmid;
 
 	if ((void *)(-1) == (addr = shmat(shmid, NULL, 0)))
 	{
@@ -269,11 +260,14 @@ int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 	}
 
 	/* delete the old segment */
-	if (NULL != addr_old && -1 == shmdt((void *)addr_old))
+	if (NULL != addr_old && -1 == zbx_shm_destroy(shm->shmid))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot detach from old shared memory");
 		goto out;
 	}
+
+	shm->size = shm_size;
+	shm->shmid = shmid;
 
 	ret = SUCCEED;
 out:

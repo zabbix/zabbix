@@ -23,27 +23,21 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_shmget                                                       *
+ * Function: zbx_shm_create                                                   *
  *                                                                            *
  * Purpose: Create block of shared memory                                     *
  *                                                                            *
- * Parameters:  shmid - Shared memory segment id to delete                    *
- *              size - size                                                   *
+ * Parameters:  size - size                                                   *
  *                                                                            *
  * Return value: If the function succeeds, then return SHM ID                 *
  *               -1 on an error                                               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- * - The shmid parameter can be set to ZBX_NONEXISTENT_SHMID if no            *
- *     shared memory segments must be destroyed                               *
- *                                                                            *
  ******************************************************************************/
-int	zbx_shmget(int shmid, size_t size)
+int	zbx_shm_create(size_t size)
 {
 	int	shm_id;
-	void	*addr;
 
 	if (-1 == (shm_id = shmget(IPC_PRIVATE, size, IPC_CREAT | IPC_EXCL | 0600)))
 	{
@@ -52,11 +46,30 @@ int	zbx_shmget(int shmid, size_t size)
 		return -1;
 	}
 
-	if (ZBX_NONEXISTENT_SHMID != shmid && -1 == shmctl(shmid, IPC_RMID, 0))
+	return shm_id;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_shm_destroy                                                  *
+ *                                                                            *
+ * Purpose: Destroy block of shared memory                                    *
+ *                                                                            *
+ * Parameters:  shmid - Shared memory identifier                              *
+ *                                                                            *
+ * Return value: If the function succeeds, then return 0                      *
+ *               -1 on an error                                               *
+ *                                                                            *
+ * Author: Andrea Biscuola                                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_shm_destroy(int shmid)
+{
+	if (-1 == shmctl(shmid, IPC_RMID, 0))
 	{
 		zbx_error("cannot remove existing shared memory: %s", zbx_strerror(errno));
 		return -1;
 	}
 
-	return shm_id;
+	return 0;
 }

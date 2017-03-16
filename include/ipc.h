@@ -28,7 +28,8 @@
 
 #define ZBX_NONEXISTENT_SHMID		(-1)
 
-int	zbx_shmget(int shmid, size_t size);
+int	zbx_shm_create(size_t size);
+int	zbx_shm_destroy(int shmid);
 
 /* data copying callback function prototype */
 typedef void (*zbx_shm_copy_func_t)(void *dst, size_t size_dst, const void *src);

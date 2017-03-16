@@ -167,7 +167,7 @@ int	init_collector_data(char **error)
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
-	if (-1 == (shm_id = zbx_shmget(ZBX_NONEXISTENT_SHMID, sz + sz_cpu)))
+	if (-1 == (shm_id = zbx_shm_create(sz + sz_cpu)))
 	{
 		*error = zbx_strdup(*error, "cannot allocate shared memory for collector");
 		goto out;
@@ -256,7 +256,7 @@ void	diskstat_shm_init()
 	/* initially allocate memory for collecting statistics for only 1 disk */
 	shm_size = sizeof(ZBX_DISKDEVICES_DATA);
 
-	if (-1 == (collector->diskstat_shmid = zbx_shmget(ZBX_NONEXISTENT_SHMID, shm_size)))
+	if (-1 == (collector->diskstat_shmid = zbx_shm_create(shm_size)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for disk statistics collector");
 		exit(EXIT_FAILURE);
@@ -351,13 +351,7 @@ void	diskstat_shm_extend()
 	old_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (old_max - 1);
 	new_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (new_max - 1);
 
-	/* zbx_shmget() will:                                          */
-	/*	- see that a shared memory segment with this id exists */
-	/*	- create a new segment with a different id             */
-	/*	- mark the old segment for deletion                    */
-
-
-	if (-1 == (new_shmid = zbx_shmget(collector->diskstat_shmid, new_shm_size)))
+	if (-1 == (new_shmid = zbx_shm_create(new_shm_size)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for extending disk statistics collector");
 		exit(EXIT_FAILURE);
@@ -378,6 +372,12 @@ void	diskstat_shm_extend()
 	if (-1 == shmdt((void *) diskdevices))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot detach from disk statistics collector shared memory");
+		exit(EXIT_FAILURE);
+	}
+
+	if (-1 == zbx_shm_destroy(collector->diskstat_shmid))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot destroy old disk statistics collector shared memory");
 		exit(EXIT_FAILURE);
 	}
 
