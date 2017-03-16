@@ -79,6 +79,8 @@ void	zbx_tm_task_clear(zbx_tm_task_t *task)
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				tm_remote_command_result_clear(task->data);
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
 
@@ -242,7 +244,7 @@ int	tm_save_remote_command_tasks(zbx_tm_task_t **tasks, int tasks_num)
 				zbx_db_insert_add_values(&db_insert, task->taskid, data->command_type, data->execute_on,
 						data->port, data->authtype, data->username, data->password,
 						data->publickey, data->privatekey, data->command, data->alertid,
-						data->parent_taskid, data->hostid);;
+						data->parent_taskid, data->hostid);
 		}
 	}
 
@@ -317,6 +319,9 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 
 	for (i = 0; i < tasks_num; i++)
 	{
+		if (0 == tasks[i]->taskid)
+			continue;
+
 		zbx_db_insert_add_values(&db_insert, tasks[i]->taskid, (int)tasks[i]->type, (int)tasks[i]->status,
 				tasks[i]->clock, tasks[i]->ttl, tasks[i]->proxy_hostid);
 	}
@@ -363,9 +368,6 @@ int	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 	{
 		zbx_tm_task_t	*task = (zbx_tm_task_t *)tasks->values[i];
 
-		if (0 == task->taskid)
-			task->taskid = taskid++;
-
 		switch (task->type)
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
@@ -374,7 +376,13 @@ int	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				remote_command_result_num++;
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
 		}
+
+		if (0 == task->taskid)
+			task->taskid = taskid++;
 	}
 
 	ret = tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
@@ -406,25 +414,28 @@ int	zbx_tm_save_task(zbx_tm_task_t *task)
 {
 	const char	*__function_name = "zbx_tm_save_task";
 	int		ret;
+	int		(*save_task_data_func)(zbx_tm_task_t **tasks, int tasks_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	switch (task->type)
+	{
+		case ZBX_TM_TASK_REMOTE_COMMAND:
+			save_task_data_func = tm_save_remote_command_tasks;
+			break;
+		case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
+			save_task_data_func = tm_save_remote_command_result_tasks;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
 
 	if (0 == task->taskid)
 		task->taskid = DBget_maxid("task");
 
 	if (SUCCEED == tm_save_tasks(&task, 1))
-	{
-		switch (task->type)
-		{
-			case ZBX_TM_TASK_REMOTE_COMMAND:
-				ret = tm_save_remote_command_tasks(&task, 1);
-				break;
-			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
-				ret = tm_save_remote_command_result_tasks(&task, 1);
-				break;
-		}
-
-	}
+		ret = save_task_data_func(&task, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -562,6 +573,9 @@ void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				tm_json_serialize_remote_command_result(json, task->data);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 				break;
 		}
 
@@ -775,6 +789,9 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				task->data = tm_json_deserialize_remote_command_result(&jp_task);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 				break;
 		}
 
