@@ -1878,7 +1878,7 @@ static void	dc_interface_snmpitems_remove(ZBX_DC_ITEM *item)
 		return;
 
 	if (FAIL == (index = zbx_vector_uint64_search(&ifitem->itemids, item->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		return
+		return;
 
 	zbx_vector_uint64_remove_noorder(&ifitem->itemids, index);
 
