@@ -32,7 +32,14 @@
 function getUserFormData($userId, array $config, $isProfile = false) {
 	$data = [
 		'is_profile' => $isProfile,
-		'config' => $config
+		'config' => [
+			'severity_name_0' => $config['severity_name_0'],
+			'severity_name_1' => $config['severity_name_1'],
+			'severity_name_2' => $config['severity_name_2'],
+			'severity_name_3' => $config['severity_name_3'],
+			'severity_name_4' => $config['severity_name_4'],
+			'severity_name_5' => $config['severity_name_5']
+		]
 	];
 
 	if ($userId != 0 && (!hasRequest('form_refresh') || hasRequest('register'))) {
@@ -45,20 +52,21 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		]);
 		$user = reset($users);
 
-		$data['alias']			= $user['alias'];
-		$data['name']			= $user['name'];
-		$data['surname']		= $user['surname'];
-		$data['password1']		= null;
-		$data['password2']		= null;
-		$data['url']			= $user['url'];
-		$data['autologin']		= $user['autologin'];
-		$data['autologout']		= $user['autologout'];
-		$data['lang']			= $user['lang'];
-		$data['theme']			= $user['theme'];
-		$data['refresh']		= $user['refresh'];
-		$data['rows_per_page']	= $user['rows_per_page'];
-		$data['user_type']		= $user['type'];
-		$data['messages'] 		= getMessageSettings();
+		$data['alias']				= $user['alias'];
+		$data['name']				= $user['name'];
+		$data['surname']			= $user['surname'];
+		$data['password1']			= null;
+		$data['password2']			= null;
+		$data['url']				= $user['url'];
+		$data['autologin']			= $user['autologin'];
+		$data['autologout']			= $user['autologout'];
+		$data['autologout_visible']	= (bool) timeUnitToSeconds($data['autologout']);
+		$data['lang']				= $user['lang'];
+		$data['theme']				= $user['theme'];
+		$data['refresh']			= $user['refresh'];
+		$data['rows_per_page']		= $user['rows_per_page'];
+		$data['user_type']			= $user['type'];
+		$data['messages'] 			= getMessageSettings();
 
 		$userGroups = API::UserGroup()->get([
 			'output' => ['usrgrpid'],
@@ -70,22 +78,23 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['user_medias'] = $user['medias'];
 	}
 	else {
-		$data['alias']			= getRequest('alias', '');
-		$data['name']			= getRequest('name', '');
-		$data['surname']		= getRequest('surname', '');
-		$data['password1']		= getRequest('password1', '');
-		$data['password2']		= getRequest('password2', '');
-		$data['url']			= getRequest('url', '');
-		$data['autologin']		= getRequest('autologin', 0);
-		$data['autologout']		= getRequest('autologout', DB::getDefault('users', 'autologout'));
-		$data['lang']			= getRequest('lang', 'en_gb');
-		$data['theme']			= getRequest('theme', THEME_DEFAULT);
-		$data['refresh']		= getRequest('refresh', DB::getDefault('users', 'refresh'));
-		$data['rows_per_page']	= getRequest('rows_per_page', 50);
-		$data['user_type']		= getRequest('user_type', USER_TYPE_ZABBIX_USER);
-		$data['user_groups']	= getRequest('user_groups', []);
-		$data['change_password']= getRequest('change_password');
-		$data['user_medias']	= getRequest('user_medias', []);
+		$data['alias']				= getRequest('alias', '');
+		$data['name']				= getRequest('name', '');
+		$data['surname']			= getRequest('surname', '');
+		$data['password1']			= getRequest('password1', '');
+		$data['password2']			= getRequest('password2', '');
+		$data['url']				= getRequest('url', '');
+		$data['autologin']			= getRequest('autologin', 0);
+		$data['autologout']			= getRequest('autologout', DB::getDefault('users', 'autologout'));
+		$data['autologout_visible']	= hasRequest('autologout_visible');
+		$data['lang']				= getRequest('lang', 'en_gb');
+		$data['theme']				= getRequest('theme', THEME_DEFAULT);
+		$data['refresh']			= getRequest('refresh', DB::getDefault('users', 'refresh'));
+		$data['rows_per_page']		= getRequest('rows_per_page', 50);
+		$data['user_type']			= getRequest('user_type', USER_TYPE_ZABBIX_USER);
+		$data['user_groups']		= getRequest('user_groups', []);
+		$data['change_password']	= getRequest('change_password');
+		$data['user_medias']		= getRequest('user_medias', []);
 
 		// set messages
 		$data['messages'] = getRequest('messages', []);
