@@ -854,17 +854,21 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 
 			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, error, sizeof(error))))
 			{
-				if (0 == host.proxy_hostid)
+				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
+				{
 					rc = zbx_script_execute(&script, &host, NULL, error, sizeof(error));
+					status = ALERT_STATUS_SENT;
+				}
 				else
+				{
 					rc = zbx_script_create_task(&script, &host, alertid, time(NULL));
+					status = ALERT_STATUS_NOT_SENT;
+				}
 			}
 		}
 
-		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
-			status = (SUCCEED == rc ? ALERT_STATUS_SENT : ALERT_STATUS_FAILED);
-		else
-			status = (SUCCEED == rc ? ALERT_STATUS_NOT_SENT : ALERT_STATUS_FAILED);
+		if (FAIL == rc)
+			status = ALERT_STATUS_FAILED;
 
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event->eventid, actionid, esc_step,
 				script.command, status, error);
