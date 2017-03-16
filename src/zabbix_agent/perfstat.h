@@ -31,8 +31,8 @@ void			remove_perf_counter(PERF_COUNTER_DATA *counter);
 
 typedef enum
 {
-	ZBX_SINGLE_THREADED;
-	ZBX_MULTI_THREADED;
+	ZBX_SINGLE_THREADED,
+	ZBX_MULTI_THREADED
 }
 zbx_threadedness_t;
 

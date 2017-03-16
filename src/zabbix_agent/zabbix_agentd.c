@@ -1119,6 +1119,7 @@ int	main(int argc, char **argv)
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 #ifdef _WINDOWS
 	int		ret;
+	char		*error
 
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
