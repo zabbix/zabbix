@@ -384,6 +384,15 @@ static int	DBpatch_3030033(void)
 
 	return DBadd_foreign_key("task_remote_command_result", 1, &field);
 }
+
+static int	DBpatch_3030034(void)
+{
+	/* 1 - ZBX_TM_STATUS_NEW */
+	if (ZBX_DB_OK > DBexecute("update task set status=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(3030)
@@ -424,5 +433,6 @@ DBPATCH_ADD(3030030, 0, 1)
 DBPATCH_ADD(3030031, 0, 1)
 DBPATCH_ADD(3030032, 0, 1)
 DBPATCH_ADD(3030033, 0, 1)
+DBPATCH_ADD(3030034, 0, 1)
 
 DBPATCH_END()
