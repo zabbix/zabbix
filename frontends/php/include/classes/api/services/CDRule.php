@@ -119,6 +119,10 @@ class CDRule extends CApiService {
 
 // filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('delay', $options['filter']) && $options['filter']['delay'] !== null) {
+				$options['filter']['delay'] = getTimeUnitFilters($options['filter']['delay']);
+			}
+
 			$this->dbFilter('drules dr', $options, $sqlParts);
 		}
 

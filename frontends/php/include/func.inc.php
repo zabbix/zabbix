@@ -2313,3 +2313,76 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	// Don't show the call to this handler function.
 	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
 }
+
+/**
+ * Creates an array with all possible variations of time units.
+ * For example: '14d' => ['1209600', '1209600s', '20160m', '336h', '14d', '2w']
+ *
+ * @param string|array $values
+ *
+ * @return array
+ */
+function getTimeUnitFilters($values) {
+	if (is_array($values)) {
+		$res = [];
+
+		foreach ($values as $value) {
+			$res = array_merge($res, getTimeUnitFilters($value));
+		}
+
+		return array_unique($res, SORT_STRING);
+	}
+
+	$simple_interval_parser = new CSimpleIntervalParser();
+
+	if ($simple_interval_parser->parse($values) != CParser::PARSE_SUCCESS) {
+		return [$values];
+	}
+
+	$sec = timeUnitToSeconds($values);
+
+	$res = [$sec, $sec.'s'];
+
+	if (bcmod($sec, SEC_PER_MIN) == 0) {
+		$res[] = bcdiv($sec, SEC_PER_MIN, 0).'m';
+	}
+
+	if (bcmod($sec, SEC_PER_HOUR) == 0) {
+		$res[] = bcdiv($sec, SEC_PER_HOUR, 0).'h';
+	}
+
+	if (bcmod($sec, SEC_PER_DAY) == 0) {
+		$res[] = bcdiv($sec, SEC_PER_DAY, 0).'d';
+	}
+
+	if (bcmod($sec, SEC_PER_WEEK) == 0) {
+		$res[] = bcdiv($sec, SEC_PER_WEEK, 0).'w';
+	}
+
+	return $res;
+}
+
+/**
+ * Creates SQL filter to search all possible variations of time units.
+ *
+ * @param string       $field_name
+ * @param string|array $values
+ *
+ * @return string
+ */
+function makeUpdateIntervalFilter($field_name, $values) {
+	$filters = [];
+
+	foreach (getTimeUnitFilters($values) as $filter) {
+		$filters[] = $field_name.' LIKE '.zbx_dbstr($filter);
+		$filters[] = $field_name.' LIKE '.zbx_dbstr($filter.';%');
+	}
+
+	$res = $filters ? implode(' OR ', $filters) : '';
+
+	if (count($filters) > 1) {
+		$res = '('.$res.')';
+	}
+
+	return $res;
+}

@@ -234,6 +234,10 @@ class CAction extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('esc_period', $options['filter']) && $options['filter']['esc_period'] !== null) {
+				$options['filter']['esc_period'] = getTimeUnitFilters($options['filter']['esc_period']);
+			}
+
 			$this->dbFilter('actions a', $options, $sqlParts);
 		}
 

@@ -135,6 +135,14 @@ class CUser extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
+				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
+			}
+
+			if (array_key_exists('refresh', $options['filter']) && $options['filter']['refresh'] !== null) {
+				$options['filter']['refresh'] = getTimeUnitFilters($options['filter']['refresh']);
+			}
+
 			if (isset($options['filter']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password.'));
 			}
