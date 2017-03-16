@@ -1451,7 +1451,6 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 	{
 		if (FAIL != zbx_vector_uint64_bsearch(triggerids_lock, queue->objectid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-
 		{
 			/* trigger already locked by this process, add to locked triggerids */
 			zbx_vector_uint64_append(&triggerids, queue->objectid);
