@@ -1147,19 +1147,21 @@ class CConfigurationExport {
 			foreach ($sysmap['selements'] as $selement) {
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$sysmapIds[$selement['elementid']] = $selement['elementid'];
+						$sysmapIds[$selement['elements'][0]['sysmapid']] = $selement['elements'][0]['sysmapid'];
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$groupIds[$selement['elementid']] = $selement['elementid'];
+						$groupIds[$selement['elements'][0]['groupid']] = $selement['elements'][0]['groupid'];
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						$hostIds[$selement['elementid']] = $selement['elementid'];
+						$hostIds[$selement['elements'][0]['hostid']] = $selement['elements'][0]['hostid'];
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$triggerIds[$selement['elementid']] = $selement['elementid'];
+						foreach ($selement['elements'] as $element) {
+							$triggerIds[$element['triggerid']] = $element['triggerid'];
+						}
 						break;
 				}
 
@@ -1208,16 +1210,18 @@ class CConfigurationExport {
 			foreach ($sysmap['selements'] as &$selement) {
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$selement['elementid'] = $sysmaps[$selement['elementid']];
+						$selement['elements'][] = ['sysmapid' => $sysmaps[$selement['elements'][0]['sysmapid']]];
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$selement['elementid'] = $groups[$selement['elementid']];
+						$selement['elements'][] = ['groupids' => $groups[$selement['elements'][0]['groupid']]];
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						$selement['elementid'] = $hosts[$selement['elementid']];
+						$selement['elements'][] = ['hostids' => $hosts[$selement['elements'][0]['hostid']]];
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$selement['elementid'] = $triggers[$selement['elementid']];
+						foreach ($selement['elements'] as $element) {
+							$selement['elements'][] = ['triggerid' => $triggers[$element['triggerid']]];
+						}
 						break;
 				}
 
