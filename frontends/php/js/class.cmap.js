@@ -567,7 +567,7 @@ ZABBIX.apps.map = (function($) {
 								}
 							]
 						}
-					]);
+					], event);
 				});
 
 				/*

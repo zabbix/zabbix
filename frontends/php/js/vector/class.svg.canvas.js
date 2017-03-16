@@ -60,15 +60,12 @@ SVGCanvas.getUniqueId = function () {
 SVGCanvas.prototype.createElement = function (type, attributes, parent, content) {
 	var element;
 
-	switch (type.toLowerCase()) {
-		case 'textarea':
-			element = this.createTextarea(attributes, parent, content);
-		break;
-
-		default:
-			element = new SVGElement(this, type, attributes, parent, content);
-			this.elements.push(element);
-		break;
+	if(type.toLowerCase() === 'textarea') {
+		element = this.createTextarea(attributes, parent, content);
+	}
+	else {
+		element = new SVGElement(this, type, attributes, parent, content);
+		this.elements.push(element);
 	}
 
 	return element;
@@ -374,7 +371,9 @@ SVGElement.prototype.add = function (type, attributes, content) {
 	}
 
 	var element = this.canvas.createElement(type, attributes, this, content);
-	this.items.push(element);
+	if (type.toLowerCase() !== 'textarea') {
+		this.items.push(element);
+	}
 
 	return element;
 };
@@ -407,7 +406,7 @@ SVGElement.prototype.update = function (attributes) {
 SVGElement.prototype.moveTo = function (target) {
 	this.parent.items = this.parent.items.filter(function (item) {
 		return item.id !== this.id;
-	});
+	}, this);
 
 	this.parent = target;
 	this.parent.items.push(this);
@@ -437,10 +436,10 @@ SVGElement.prototype.remove = function () {
 		this.element = null;
 	}
 
-	if (this.parent !== null) {
+	if (this.parent !== null && this.parent.items !== undefined) {
 		this.parent.items = this.parent.items.filter(function (item) {
 			return item.id !== this.id;
-		});
+		}, this);
 	}
 
 	return this;
