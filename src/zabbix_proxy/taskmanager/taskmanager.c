@@ -70,6 +70,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
 
+	ZBX_STR2UINT64(parent_taskid, row[9]);
+
 	if (0 != ttl && clock + ttl < now)
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
@@ -95,7 +97,6 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	script.publickey = row[6];
 	script.privatekey = row[7];
 	script.command = row[8];
-	ZBX_STR2UINT64(parent_taskid, row[9]);
 
 	if (SUCCEED != (ret = zbx_script_execute(&script, &host, &info, error, sizeof(error))))
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
