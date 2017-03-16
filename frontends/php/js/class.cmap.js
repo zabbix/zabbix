@@ -755,46 +755,76 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			reorderShapes: function(id, position) {
-				var keys = Object.keys(this.shapes),
-					index = -1,
-					zindex = 0;
+				var shapes = [],
+					shape = null;
 
-				switch (position.toLowerCase()) {
-					case 'first':
-						index = 0;
-					break;
+				Object.keys(this.shapes).forEach(function(key) {
+					shapes.push(this.shapes[key]);
+				}, this);
 
-					case 'last':
-						index = keys.length;
-					break;
+				shapes = shapes.sort(function (a,b) {
+					return a.data.zindex - b.data.zindex;
+				});
 
-					case 'next':
-						index = keys.indexOf(id.toString()) + 1;
-					break;
+				shapes.forEach(function(value, index) {
+					if (value.id == id) {
+						shape = index;
+					}
+				});
 
-					case 'previous':
-						index = keys.indexOf(id.toString()) - 1;
-					break;
-				}
-
-				if (index < 0 || index > keys.length) {
+				// shape was not found
+				if (shape === null) {
 					return;
 				}
 
-				keys.forEach(function (key, i){
-					if (i === index) {
-						zindex++;
-					}
+				switch (position.toLowerCase()) {
+					case 'first':
+						// no need to update
+						if (shape === 0) {
+							return;
+						}
 
-					this.shapes[key].data.zindex = zindex++;
-				}, this);
+						$(shapes[shape].domNode).insertBefore(shapes[0].domNode);
+						shapes.splice(0, 0, shapes.splice(shape, 1)[0]);
+						shapes.forEach(function(shape, index) {
+							shape.data.zindex = index;
+						});
+					break;
 
-				this.shapes[id].data.zindex = index;
-				if(index === keys.length) {
-					this.shapes[id].domNode.parent().append(this.shapes[id].domNode);
-				}
-				else {
-					$(this.shapes[id].domNode).insertBefore($('.sysmap_shape[data-id=' + keys[index] + ']'));
+					case 'last':
+						// no need to update
+						if (shape === shapes.length - 1) {
+							return;
+						}
+
+						$(shapes[shape].domNode).insertAfter(shapes[shapes.length - 1].domNode);
+						shapes.splice(shapes.length-1, 0, shapes.splice(shape, 1)[0]);
+						shapes.forEach(function(shape, index) {
+							shape.data.zindex = index;
+						});
+					break;
+
+					case 'next':
+						// no need to update
+						if (shape === shapes.length - 1) {
+							return;
+						}
+
+						$(shapes[shape].domNode).insertBefore(shapes[shape + 1].domNode);
+						shapes[shape + 1].data.zindex--;
+						shapes[shape].data.zindex++;
+					break;
+
+					case 'previous':
+						// no need to update
+						if (shape === 0) {
+							return;
+						}
+
+						$(shapes[shape].domNode).insertBefore(shapes[shape - 1].domNode);
+						shapes[shape - 1].data.zindex++;
+						shapes[shape].data.zindex--;
+					break;
 				}
 
 				this.map.invalidate('shapes');
