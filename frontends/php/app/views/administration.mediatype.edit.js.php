@@ -10,8 +10,10 @@
 </script>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
+		var initialized = false;
 		// type of media
 		$('#type').change(function() {
+			setMaxSessionsTypeOther();
 			switch ($(this).val()) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication').closest('li').show();
@@ -39,6 +41,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
+					setMaxSessionsTypeSMS();
 					break;
 
 				case '<?= MEDIA_TYPE_JABBER ?>':
@@ -69,14 +72,24 @@
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
 		$('#media_type_form').submit(function() {
+			var attempts = $('#maxattempts');
+			if ($.trim(attempts.val()) == '') {
+				attempts.val(0);
+			}
+			setMaxSessionsBeforeSubmit();
 			$(this).trimValues([
 				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
-				'#jabber_username', '#eztext_username', '#smtp_username'
+				'#jabber_username', '#eztext_username', '#smtp_username', '#maxsessions'
 			]);
+		});
+
+		$('#maxsessionsType :radio').change(function() {
+			toggleMaxSessionsType(this);
 		});
 
 		// Refresh field visibility on document load.
 		$('#type').trigger('change');
+		$('#maxsessionsType :radio:checked').trigger('change');
 
 		$('input[name=smtp_security]').change(function() {
 			toggleSecurityOptions();
@@ -110,6 +123,63 @@
 			}
 		}
 
+		/**
+		 * Set maxsessions value according selected radio button.
+		 * Set readonly status according #maxsessionType value
+		 */
+		function toggleMaxSessionsType(radio) {
+			var mstype = $(radio).val();
+			var inputBox = $('#maxsessions');
+			switch(mstype) {
+				case 'one' :
+					inputBox.hide();
+					break;
+				case 'unlimited' :
+					inputBox.hide();
+					break;
+				default :
+					inputBox.show();
+					if (initialized == true) {
+						inputBox.select().focus();
+					}
+					break;
+			}
+		}
+
+		/**
+		 * Set maxsessionsType for MEDIA_TYPE_SMS
+		 */
+		function setMaxSessionsTypeSMS() {
+			$('#maxsessionsType :radio')
+				.attr('disabled', true)
+				.filter('[value=one]')
+					.attr('disabled', false)
+					.click();
+		}
+
+		/**
+		 * Set maxsessionsType for other media types
+		 */
+		function setMaxSessionsTypeOther() {
+			$('#maxsessionsType :radio')
+				.attr('disabled', false);
+		}
+
+		/**
+		 * Set #maxsessions value according #maxsessionsType to be submited to server
+		 */
+		function setMaxSessionsBeforeSubmit() {
+			var mstype = $('#maxsessionsType :radio:checked').val();
+			var inputBox = $('#maxsessions');
+			if (mstype != 'custom') {
+				inputBox.val(mstype == 'one' ? 1 : 0);
+			}
+			if (mstype == 'custom' && $.trim(inputBox.val()) == '') {
+				inputBox.val(0);
+			}
+		}
+
 		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
+		initialized = true;
 	});
 </script>

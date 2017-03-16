@@ -17,11 +17,16 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
+// $data['maxattempts'] = 5;
+// $data['attempt_interval'] = '10s';
+// $data['maxsessions'] = 25;
+// $data['maxsessionsType'] = 3;
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Media types'));
+
+$tabs = new CTabView();
 
 // create form
 $mediaTypeForm = (new CForm())
@@ -140,9 +145,52 @@ $mediaTypeFormList
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
 	);
+$tabs->addTab('mediaTab', _('Media type'), $mediaTypeFormList);
 
-// append form list to tab
-$mediaTypeTab = (new CTabView())->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
+// media options tab
+$maxSessions = (int) $data['maxsessions'] > 1 ? (int) $data['maxsessions'] : 0;
+if ($data['type'] == MEDIA_TYPE_SMS) {
+	$maxSessions = 1;
+}
+switch($data['maxsessions']) {
+	case 1 :
+		$data['maxsessionsType'] = 'one';
+		break;
+	case 0 :
+		$data['maxsessionsType'] = 'unlimited';
+		break;
+	default :
+		$data['maxsessionsType'] = 'custom';
+		break;
+}
+$mediaOptionsForm = (new CFormList('options'))
+	->addRow(_('Concurrent sessions'),
+		(new CDiv())
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addItem([
+				(new CRadioButtonList('maxsessionsType', $data['maxsessionsType']))
+					->addValue(_('One'), 'one')
+					->addValue(_('Unlimited'), 'unlimited')
+					->addValue(_('Custom'), 'custom')
+					// @TODO: find Zabbix build in css class for inline-block
+					->setAttribute('style', 'display: inline-block;')
+					->setModern(true),
+				(new CCol(
+					(new CNumericBox('maxsessions', $maxSessions, 3, false, false, false))
+						->setAttribute('style', 'text-align: left;')
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				))
+			])
+	)
+	->addRow(_('Attempts'),
+		(new CNumericBox('maxattempts', $data['maxattempts'], 3, false, false, false))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	)
+	->addRow(_('Attempt interval'),
+		(new CTextBox('attempt_interval', $data['attempt_interval'], false, 12))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	);
+$tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
 
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list'))->setId('cancel');
@@ -150,7 +198,7 @@ $cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.l
 if ($data['mediatypeid'] == 0) {
 	$addButton = (new CSubmitButton(_('Add'), 'action', 'mediatype.create'))->setId('add');
 
-	$mediaTypeTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		$addButton,
 		[$cancelButton]
 	));
@@ -164,7 +212,7 @@ else {
 	))
 		->setId('delete');
 
-	$mediaTypeTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		$updateButton,
 		[
 			$cloneButton,
@@ -175,7 +223,7 @@ else {
 }
 
 // append tab to form
-$mediaTypeForm->addItem($mediaTypeTab);
+$mediaTypeForm->addItem($tabs);
 
 // append form to widget
 $widget->addItem($mediaTypeForm)->show();

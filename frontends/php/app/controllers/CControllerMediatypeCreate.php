@@ -42,6 +42,9 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'maxsessions' =>			'not_empty|db media_type.maxsessions|int32',
+			'maxattempts' =>			'not_empty|db media_type.maxattempts|int32',
+			'attempt_interval' =>		'not_empty|db media_type.attempt_interval|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -81,7 +84,7 @@ class CControllerMediatypeCreate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['type', 'description', 'status']);
+		$this->getInputs($mediatype, ['type', 'description', 'status', 'maxsessions', 'maxattempts', 'attempt_interval']);
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
@@ -110,6 +113,7 @@ class CControllerMediatypeCreate extends CController {
 
 			case MEDIA_TYPE_SMS:
 				$this->getInputs($mediatype, ['gsm_modem']);
+				$mediatype['maxsessions'] = 1;
 				break;
 
 			case MEDIA_TYPE_JABBER:

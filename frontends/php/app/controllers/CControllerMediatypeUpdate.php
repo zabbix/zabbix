@@ -42,7 +42,10 @@ class CControllerMediatypeUpdate extends CController {
 			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
+			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'maxsessions' =>			'not_empty|db media_type.maxsessions',
+			'maxattempts' =>			'not_empty|db media_type.maxattempts',
+			'attempt_interval' =>		'not_empty|db media_type.attempt_interval'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -90,7 +93,7 @@ class CControllerMediatypeUpdate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['mediatypeid', 'type', 'description']);
+		$this->getInputs($mediatype, ['mediatypeid', 'type', 'description', 'maxsessions', 'maxattempts', 'attempt_interval']);
 		$mediatype['status'] = $this->getInput('status', MEDIA_TYPE_STATUS_DISABLED);
 
 		switch ($mediatype['type']) {
@@ -124,6 +127,7 @@ class CControllerMediatypeUpdate extends CController {
 
 			case MEDIA_TYPE_SMS:
 				$this->getInputs($mediatype, ['gsm_modem']);
+				$mediatype['maxsessions'] = 1;
 				break;
 
 			case MEDIA_TYPE_JABBER:
