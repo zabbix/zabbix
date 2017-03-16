@@ -1182,7 +1182,24 @@ static int	am_db_update_mediatypes(zbx_am_t *manager, zbx_uint64_t *mediatypeids
 		ZBX_STR2UCHAR(smtp_authentication, row[14]);
 		maxsessions = atoi(row[16]);
 		maxattempts = atoi(row[17]);
-		attempt_interval = atoi(row[18]);
+
+		if (FAIL == is_time_suffix(row[18], &attempt_interval))
+		{
+			const ZBX_TABLE	*table;
+			const ZBX_FIELD	*field;
+
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid attempt interval for media type \"%s\": %s",
+					row[2], row[18]);
+
+			if (NULL == (table = DBget_table("media_type")) ||
+					NULL == (field = DBget_field(table, "attempt_interval")))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
+			}
+
+			attempt_interval = atoi(field->default_value);
+		}
 
 		am_update_mediatype(manager, mediatypeid, type, row[2], row[3], row[4], row[5], row[6], row[7], row[8],
 				row[9], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
