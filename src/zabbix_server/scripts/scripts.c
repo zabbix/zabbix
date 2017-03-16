@@ -488,14 +488,13 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
  *                                                                            *
  * Purpose: creates remote command task from a script                         *
  *                                                                            *
- * Return value:  SUCCEED - the task was created successfully                 *
- *                FAIL    - otherwise                                         *
+ * Return value:  the identifier of the created task or 0 in the case of      *
+ *                error                                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now)
+zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now)
 {
 	zbx_tm_task_t	*task;
-	int		ret;
 	unsigned short	port;
 	zbx_uint64_t	taskid;
 
@@ -513,9 +512,10 @@ int	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_
 			script->authtype, script->username, script->password, script->publickey, script->privatekey,
 			taskid, host->hostid, alertid);
 
-	ret = zbx_tm_save_task(task);
+	if (FAIL == zbx_tm_save_task(task))
+		taskid = 0;
 
 	zbx_tm_task_free(task);
 
-	return ret;
+	return taskid;
 }

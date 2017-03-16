@@ -861,7 +861,9 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 				}
 				else
 				{
-					rc = zbx_script_create_task(&script, &host, alertid, time(NULL));
+					if (0 == zbx_script_create_task(&script, &host, alertid, time(NULL)))
+						rc = FAIL;
+
 					status = ALERT_STATUS_NOT_SENT;
 				}
 			}
