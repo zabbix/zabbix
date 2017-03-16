@@ -28,15 +28,15 @@ $page['type'] = PAGE_TYPE_JSON;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$mapData = CMapHelper::get(getRequest('sysmapid'), getRequest('severity_min'));
+$map_data = CMapHelper::get(getRequest('sysmapid'), getRequest('severity_min'));
 
 /* no need to get all data */
 $options = [
-	'background' => $mapData['background'],
-	'elements' => $mapData['elements'],
-	'links' => $mapData['links'],
-	'shapes' => $mapData['shapes'],
-	'timestamp' => $mapData['timestamp']
+	'background' => $map_data['background'],
+	'elements' => $map_data['elements'],
+	'links' => $map_data['links'],
+	'shapes' => $map_data['shapes'],
+	'timestamp' => $map_data['timestamp']
 ];
 
 echo CJs::encodeJson($options);

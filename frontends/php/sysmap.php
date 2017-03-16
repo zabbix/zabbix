@@ -209,26 +209,7 @@ if ($data['iconList']) {
 	$data['iconList'] = array_values($data['iconList']);
 }
 
-$data['theme'] = [
-	'theme' => 'blue-theme',
-	'textcolor' => '1F2C33',
-	'highlightcolor' => 'E33734',
-	'backgroundcolor' => 'FFFFFF',
-	'graphcolor' => 'FFFFFF',
-	'gridcolor' => 'CCD5D9',
-	'maingridcolor' => 'ACBBC2',
-	'gridbordercolor' => 'ACBBC2',
-	'nonworktimecolor' => 'EBEBEB',
-	'leftpercentilecolor' => '429E47',
-	'righttpercentilecolor' => 'E33734'
-];
-
-$themes = DB::find('graph_theme', [
-	'theme' => getUserTheme(CWebUser::$data)
-]);
-if ($themes) {
-	$data['theme'] = $themes[0];
-}
+$data['theme'] = CMapHelper::getGraphTheme();
 
 // render view
 $sysmapView = new CView('monitoring.sysmap.constructor', $data);
