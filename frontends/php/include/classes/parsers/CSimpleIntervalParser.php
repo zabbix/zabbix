@@ -62,7 +62,7 @@ class CSimpleIntervalParser extends CParser {
 
 		$p = $pos;
 
-		if (preg_match('/^([0-9]+['.ZBX_TIME_SUFFIXES.']?)/', substr($source, $p), $matches)) {
+		if (preg_match('/^((0|[1-9][0-9]*)['.ZBX_TIME_SUFFIXES.']?)/', substr($source, $p), $matches)) {
 			$p += strlen($matches[0]);
 		}
 		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {

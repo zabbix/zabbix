@@ -95,6 +95,15 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 			],
 			// partial success
 			[
+				'00h;5m/1-5,09:00-18:00;wd6-7h9', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '0',
+					'delay' => '0',
+					'intervals' => []
+				]
+			],
+			[
 				'random text.....10s....text', 16, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,

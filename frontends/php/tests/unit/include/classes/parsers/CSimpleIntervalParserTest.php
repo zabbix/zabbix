@@ -70,27 +70,6 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'02', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '02'
-				]
-			],
-			[
-				'00', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '00'
-				]
-			],
-			[
-				'00h', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '00h'
-				]
-			],
-			[
 				'2w', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -112,6 +91,27 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			// partial success
+			[
+				'02', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '0'
+				]
+			],
+			[
+				'00', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '0'
+				]
+			],
+			[
+				'00h', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '0'
+				]
+			],
 			[
 				'random text.....10s....text', 16, [],
 				[
