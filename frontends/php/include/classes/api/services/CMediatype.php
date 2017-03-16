@@ -371,6 +371,15 @@ class CMediatype extends CApiService {
 					));
 				}
 			}
+
+			$optionalNotEmpty = ['maxsessions', 'maxattempts', 'attempt_interval'];
+			foreach($optionalNotEmpty as $field) {
+				if (array_key_exists($field, $mediatype) && $mediatype[$field] == '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
+					);
+				}
+			}
 		}
 	}
 
@@ -674,6 +683,15 @@ class CMediatype extends CApiService {
 					));
 				}
 			}
+
+			$optionalNotEmpty = ['maxsessions', 'maxattempts', 'attempt_interval'];
+			foreach($optionalNotEmpty as $field) {
+				if (array_key_exists($field, $mediatype) && $mediatype[$field] == '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
+					);
+				}
+			}
 		}
 	}
 
@@ -697,6 +715,9 @@ class CMediatype extends CApiService {
 	 * @param string	$mediatypes['username']				username
 	 * @param string	$mediatypes['passwd']				password
 	 * @param int		$mediatypes['status']				media type status
+	 * @param int		$mediatypes['maxsessions']			limit of simultaneously processed alerts
+	 * @param int		$mediatypes['maxattempts']			max attempts to delivery alert successfully
+	 * @param string	$mediatypes['attempt_interval']		interval between alert delivery attempts
 	 *
 	 * @return array
 	 */
@@ -731,6 +752,9 @@ class CMediatype extends CApiService {
 	 * @param string	$mediatypes['username']				username
 	 * @param string	$mediatypes['passwd']				password
 	 * @param int		$mediatypes['status']				media type status
+	 * @param int		$mediatypes['maxsessions']			limit of simultaneously processed alerts
+	 * @param int		$mediatypes['maxattempts']			max attempts to delivery alert successfully
+	 * @param string	$mediatypes['attempt_interval']		interval between alert delivery attempts
 	 *
 	 * @return array
 	 */
