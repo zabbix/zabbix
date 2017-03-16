@@ -1222,6 +1222,7 @@ class CMap extends CMapElement {
 		$shared_users = [];
 		$shared_user_groups = [];
 		$urls = [];
+		$shapes = [];
 		$selements = [];
 		$links = [];
 
@@ -1261,6 +1262,14 @@ class CMap extends CMapElement {
 				}
 
 				$selements += $maps[$key]['selements'];
+			}
+
+			if (array_key_exists('shapes', $maps[$key])) {
+				foreach ($maps[$key]['shapes'] as $snum => $shape) {
+					$maps[$key]['shapes'][$snum]['sysmapid'] = $sysmapid;
+				}
+
+				$shapes += $maps[$key]['shapes'];
 			}
 
 			if (array_key_exists('links', $maps[$key])) {
@@ -1309,6 +1318,10 @@ class CMap extends CMapElement {
 					$this->createLinkTriggers($link_triggers);
 				}
 			}
+		}
+
+		if ($shapes) {
+			$this->createShapes($shapes);
 		}
 
 		return ['sysmapids' => $sysmapids];
