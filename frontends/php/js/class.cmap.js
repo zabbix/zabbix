@@ -1081,6 +1081,15 @@ ZABBIX.apps.map = (function($) {
 					this.data[key] = data[key];
 				}
 
+				this.domNode
+					.css({
+						width: this.data.width + 'px',
+						height: this.data.height + 'px'
+					});
+
+				this.align(false);
+				this.trigger('afterMove', this);
+
 				sysmap.updateImage();
 			},
 
