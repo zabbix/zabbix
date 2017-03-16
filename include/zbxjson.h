@@ -93,7 +93,6 @@
 #define ZBX_PROTO_VALUE_DISCOVERY_DATA		"discovery data"
 #define ZBX_PROTO_VALUE_HOST_AVAILABILITY	"host availability"
 #define ZBX_PROTO_VALUE_HISTORY_DATA		"history data"
-#define ZBX_PROTO_VALUE_TASK_DATA		"task data"
 #define ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA	"auto registration"
 #define ZBX_PROTO_VALUE_SENDER_DATA		"sender data"
 #define ZBX_PROTO_VALUE_AGENT_DATA		"agent data"
