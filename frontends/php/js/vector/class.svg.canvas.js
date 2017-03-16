@@ -426,8 +426,8 @@ SVGElement.prototype.remove = function () {
 	if (this.element !== null) {
 		/* .remove() does not work in IE */
 		if (typeof this.element.remove !== 'function') {
-			if (this.element.parentElement !== undefined) {
-				this.element.parentElement.removeChild(this.element);
+			if (this.element.parentNode !== undefined) {
+				this.element.parentNode.removeChild(this.element);
 			}
 		}
 		else {
