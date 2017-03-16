@@ -259,6 +259,9 @@ typedef struct
 	/* (see ZBX_FLAG_INTERFACE_* defines)                             */
 	unsigned char	used_interfaces;
 
+	/* flag to force update for all items */
+	unsigned char	update_items;
+
 	/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;

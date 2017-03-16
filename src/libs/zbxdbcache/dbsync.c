@@ -665,17 +665,25 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dbsync_compare_host(const ZBX_DC_HOST *host, const DB_ROW dbrow)
+static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 {
 	signed char	ipmi_authtype;
 	unsigned char	ipmi_privilege;
 	ZBX_DC_IPMIHOST	*ipmihost;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], host->proxy_hostid))
+	{
+		host->update_items = 1;
 		return FAIL;
+	}
 
 	if (FAIL == dbsync_compare_uchar(dbrow[22], host->status))
+	{
+		host->update_items = 1;
 		return FAIL;
+	}
+
+	host->update_items = 0;
 
 	if (FAIL == dbsync_compare_str(dbrow[2], host->host))
 		return FAIL;
@@ -1404,9 +1412,16 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
+	ZBX_DC_HOST		*host;
 	unsigned char		value_type, type;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
+		return FAIL;
+
+	if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&dbsync_env.cache->hosts, &item->hostid)))
+		return FAIL;
+
+	if (0 != host->update_items)
 		return FAIL;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[2], item->status))

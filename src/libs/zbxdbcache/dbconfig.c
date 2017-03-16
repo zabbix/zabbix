@@ -1076,6 +1076,7 @@ done:
 			host->maintenance_type = (unsigned char)atoi(row[8]);
 			host->maintenance_from = atoi(row[9]);
 			host->data_expected_from = now;
+			host->update_items = 0;
 
 			host->errors_from = atoi(row[10]);
 			host->available = (unsigned char)atoi(row[11]);
