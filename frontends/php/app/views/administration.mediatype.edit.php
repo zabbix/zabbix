@@ -17,10 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-// $data['maxattempts'] = 5;
-// $data['attempt_interval'] = '10s';
-// $data['maxsessions'] = 25;
-// $data['maxsessionsType'] = 3;
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 

@@ -343,6 +343,17 @@ class CMediatype extends CApiService {
 						}
 					}
 					break;
+
+				case MEDIA_TYPE_SMS:
+					if (array_key_exists('maxsessions', $mediatype) && $mediatype['maxsessions'] > 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+							$mediatype['maxsessions'],
+							'maxsessions',
+							$mediatype['description']
+						));
+					}
+					break;
 			}
 
 			// Validate optional 'status' field.
@@ -633,6 +644,17 @@ class CMediatype extends CApiService {
 								$mediatype['description']
 							));
 						}
+					}
+					break;
+
+				case MEDIA_TYPE_SMS:
+					if (array_key_exists('maxsessions', $mediatype) && $mediatype['maxsessions'] > 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+							$mediatype['maxsessions'],
+							'maxsessions',
+							$mediatype['description']
+						));
 					}
 					break;
 			}
