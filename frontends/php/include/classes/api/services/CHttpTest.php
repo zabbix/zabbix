@@ -196,21 +196,21 @@ class CHttpTest extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$headersRequested = (is_array($options['output']) && in_array('headers', $options['output']))
+		$headers_requested = (is_array($options['output']) && in_array('headers', $options['output']))
 					|| $options['output'] == API_OUTPUT_EXTEND;
 
-		$variablesRequested = (is_array($options['output']) && in_array('variables', $options['output']))
+		$variables_requested = (is_array($options['output']) && in_array('variables', $options['output']))
 					|| $options['output'] == API_OUTPUT_EXTEND;
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($httpTest = DBfetch($res)) {
-			if ($headersRequested) {
+			if ($headers_requested) {
 				$httpTest['headers'] = [];
 			}
 
-			if ($variablesRequested) {
+			if ($variables_requested) {
 				$httpTest['variables'] = [];
 			}
 
@@ -231,16 +231,16 @@ class CHttpTest extends CApiService {
 			return $result;
 		}
 
-		if ($headersRequested || $variablesRequested) {
+		if ($headers_requested || $variables_requested) {
 			$db_httpfields = DB::select('httptest_field', [
 				'output' => ['httptest_fieldid', 'httptestid', 'type', 'name', 'value'],
 				'filter' => ['httptestid' => array_keys($result)]
 			]);
 
 			foreach ($db_httpfields as $db_httpfield) {
-				if (HTTPFIELD_TYPE_HEADER == $db_httpfield['type'] && $headersRequested) {
+				if ($db_httpfield['type'] == HTTPFIELD_TYPE_HEADER && $headers_requested) {
 					$type = 'headers';
-				} elseif(HTTPFIELD_TYPE_VARIABLE == $db_httpfield['type'] && $variablesRequested) {
+				} elseif($db_httpfield['type'] == HTTPFIELD_TYPE_VARIABLE && $variables_requested) {
 					$type = 'variables';
 				} else {
 					continue;
@@ -292,139 +292,15 @@ class CHttpTest extends CApiService {
 		$this->validateCreate($httptests);
 
 		$httptests = Manager::HttpTest()->persist($httptests);
-
+		foreach ($httptests as &$httptest) {
+			foreach (['headers', 'variables', 'steps'] as $field) {
+				unset($httptest[$field]);
+			}
+		}
+		unset($httptest);
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCENARIO, $httptests);
 
 		return ['httptestids' => zbx_objectValues($httptests, 'httptestid')];
-	}
-
-	protected static function formatHttpPairError($path, $error) {
-		if (mb_strpos($path, '/1/steps/') === 0 ) {
-			$path = mb_substr($path, mb_strlen('/1/steps/'));
-			$step = mb_substr($path, 0, mb_strpos($path, '/'));
-			$target = _s('step #%1$s of web scenario', $step);
-		}
-		else {
-			$target = _('web scenario');
-		}
-
-		return _s('Incorrect parameter of #%1$s: %2$s.', $target, $error);
-	}
-
-	/**
-	 * HTTP pair validator.
-	 *
-	 * @param mixed  $data
-	 * @param array  $type
-	 * @param string $error
-	 * @param string $path
-	 *
-	 * @return bool
-	 */
-	public static function validateHTTPPairs(&$data = null, $type, &$error, $path) {
-		// $data can be NULL when API_ALLOW_NULL is set
-		if ($data === null) {
-			return true;
-		}
-
-		/* converts to pair array */
-		if (!is_array($data)) {
-			$delimiter = ($type === HTTPFIELD_TYPE_HEADER)?':':'=';
-
-			$pairs = array_filter(explode("\n", str_replace("\r", "\n", $data)));
-			foreach ($pairs as &$pair) {
-				$pos = mb_strpos($pair, $delimiter);
-				if (false !== $pos) {
-					$pair = [
-						'name' => mb_substr($pair, 0, $delimiter),
-						'value' => mb_substr($pair, $delimiter+1),
-					];
-				}
-				else {
-					$pair = [
-						'name' => $pair,
-						'value' => '',
-					];
-				}
-			}
-			unset($pair);
-
-			$data = $pairs;
-		}
-
-		$typeNames = [
-			HTTPFIELD_TYPE_HEADER => _('header'),
-			HTTPFIELD_TYPE_VARIABLE => _('variable'),
-			HTTPFIELD_TYPE_POST => _('post field'),
-			HTTPFIELD_TYPE_QUERY => _('query field')
-		];
-
-		$names = [];
-		foreach ($data as &$pair) {
-			if (!array_key_exists('name', $pair) || empty($pair['name'])) {
-				$error = self::formatHttpPairError($path, _s('%1$s name cannot be empty', $typeNames[$type]));
-				return false;
-			}
-
-			if (mb_strlen($pair['name']) > 255) {
-				$error = self::formatHttpPairError($path, _s('%1$s is too long', $typeNames[$type]));
-				return false;
-			}
-
-			if (HTTPFIELD_TYPE_VARIABLE === $type && 1 !== preg_match('/^{[^{}]+}$/', $pair['name'])) {
-				$error = self::formatHttpPairError($path, _s('%1$s name "%2$s" is not enclosed in {} or is malformed', $typeNames[$type], $pair['name']));
-				return false;
-			}
-
-			if ((HTTPFIELD_TYPE_HEADER === $type) && (!array_key_exists('value', $pair) || empty($pair['value']))) {
-				$error = self::formatHttpPairError($path, _s('%1$s value cannot be empty', $typeNames[$type]));
-				return false;
-			}
-
-			/* normalize pair */
-			$pair = [
-				'name' => $pair['name'],
-				'value' => $pair['value'],
-				'type' => $type
-			];
-
-			if (HTTPFIELD_TYPE_VARIABLE !== $type) {
-				continue;
-			}
-
-			/* variable names should be unique */
-			if (in_array($pair['name'], $names)) {
-				$error = self::formatHttpPairError($path, $path, _s('%1$s name "%2$s" already exists', $typeNames[$type], $pair['name']));
-				return false;
-			}
-			$names[] = $pair['name'];
-		}
-		unset($pair);
-
-		return true;
-	}
-
-	/**
-	 * HTTP POST validator. Posts can be set to string (raw post) or to http pairs (form fields)
-	 *
-	 * @param mixed  &$data
-	 * @param string &$error
-	 * @param string $path
-	 *
-	 * @return bool
-	 */
-	public static function validatePosts(&$data = null, &$error, $path) {
-		// $data can be NULL when API_ALLOW_NULL is set
-		if ($data === null) {
-			return true;
-		}
-
-		if (is_array($data)) {
-			return self::validateHTTPPairs($data, HTTPFIELD_TYPE_POST, $error, $path);
-		}
-
-		$rule = ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'posts')];
-		return CApiInputValidator::validate($rule, $data, $path, $error);
 	}
 
 	/**
@@ -441,8 +317,8 @@ class CHttpTest extends CApiService {
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
-			'variables' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_VARIABLE]],
-			'headers' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_HEADER]],
+			'variables' =>			['type' => API_HTTP_VARIABLES],
+			'headers' =>			['type' => API_HTTP_HEADERS],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED])],
 			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM])],
 			'http_user' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_user')],
@@ -456,11 +332,11 @@ class CHttpTest extends CApiService {
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'name')],
 				'no' =>					['type' => API_INT32, 'flags' => API_REQUIRED],
 				'url' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'url')],
-				'query_fields' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_QUERY]],
-				'posts' =>				['type' => API_CUSTOM, 'validator' => [$this,'validatePosts']],
-				'post_fields' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_POST]],
-				'variables' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_VARIABLE]],
-				'headers' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_HEADER]],
+				'query_fields' =>			['type' => API_HTTP_QUERY_FIELDS],
+				'posts' =>				['type' => API_HTTP_POST],
+				'post_fields' =>			['type' => API_HTTP_POST_FIELDS],
+				'variables' =>			['type' => API_HTTP_VARIABLES],
+				'headers' =>			['type' => API_HTTP_HEADERS],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
 				'timeout' =>			['type' => API_INT32, 'in' => '0:65535'],
@@ -497,7 +373,9 @@ class CHttpTest extends CApiService {
 		Manager::HttpTest()->persist($httptests);
 
 		foreach ($db_httptests as &$db_httptest) {
-			unset($db_httptest['steps']);
+			foreach (['headers', 'variables', 'steps'] as $field) {
+				unset($db_httptest[$field]);
+			}
 		}
 		unset($db_httptest);
 
@@ -521,8 +399,8 @@ class CHttpTest extends CApiService {
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
-			'variables' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_VARIABLE]],
-			'headers' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_HEADER]],
+			'variables' =>			['type' => API_HTTP_VARIABLES],
+			'headers' =>			['type' => API_HTTP_HEADERS],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED])],
 			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM])],
 			'http_user' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_user')],
@@ -537,11 +415,11 @@ class CHttpTest extends CApiService {
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'name')],
 				'no' =>					['type' => API_INT32],
 				'url' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'url')],
-				'query_fields' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_QUERY]],
-				'posts' =>				['type' => API_CUSTOM, 'validator' => [$this,'validatePosts']],
-				'post_fields' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_POST]],
-				'variables' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_VARIABLE]],
-				'headers' =>			['type' => API_CUSTOM, 'validator' => [$this,'validateHTTPPairs'], 'params' => ['type' => HTTPFIELD_TYPE_HEADER]],
+				'query_fields' =>			['type' => API_HTTP_QUERY_FIELDS],
+				'posts' =>				['type' => API_HTTP_POST],
+				'post_fields' =>			['type' => API_HTTP_POST_FIELDS],
+				'variables' =>			['type' => API_HTTP_VARIABLES],
+				'headers' =>			['type' => API_HTTP_HEADERS],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
 				'timeout' =>			['type' => API_INT32, 'in' => '0:65535'],
@@ -976,11 +854,13 @@ class CHttpTest extends CApiService {
 
 				$requestedFields = [];
 				foreach (['headers', 'variables', 'query_fields'] as $field) {
-					if ((is_array($options['selectSteps']) && in_array($field, $options['selectSteps'])) || $options['selectSteps'] == API_OUTPUT_EXTEND) {
+					if ((is_array($options['selectSteps']) && in_array($field, $options['selectSteps'])) ||
+							$options['selectSteps'] == API_OUTPUT_EXTEND) {
 						$requestedFields[] = $field;
 					}
 				}
-				if ((is_array($options['selectSteps']) && in_array('posts', $options['selectSteps'])) || $options['selectSteps'] == API_OUTPUT_EXTEND) {
+				if ((is_array($options['selectSteps']) && in_array('posts', $options['selectSteps'])) ||
+						$options['selectSteps'] == API_OUTPUT_EXTEND) {
 					$requestedFields[] = 'post_fields';
 				}
 

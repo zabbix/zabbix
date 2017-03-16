@@ -53,9 +53,9 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 		'name' => getRequest('name'),
 		'timeout' => getRequest('timeout'),
 		'url' => getRequest('url'),
-		'post_type' => getRequest('post_type',HTTPSTEP_POST_TYPE_FORM),
+		'post_type' => getRequest('post_type', HTTPSTEP_POST_TYPE_FORM),
 		'posts' => getRequest('posts'),
-		'pairs' => array_values(getRequest('pairs',[])),
+		'pairs' => array_values(getRequest('pairs', [])),
 		'required' => getRequest('required'),
 		'status_codes' => getRequest('status_codes'),
 		'follow_redirects' => getRequest('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF),
@@ -99,7 +99,7 @@ else {
 		);
 
 	$switch = (new CDiv(
-		(new CRadioButtonList('post_type', getRequest('post_type',HTTPSTEP_POST_TYPE_FORM)))
+		(new CRadioButtonList('post_type', getRequest('post_type', HTTPSTEP_POST_TYPE_FORM)))
 			->addValue(_('Form data'), HTTPSTEP_POST_TYPE_FORM, null, 'return switchToPostType(this.value);')
 			->addValue(_('Raw data'), HTTPSTEP_POST_TYPE_RAW, null, 'return switchToPostType(this.value);')
 			->setModern(true))
@@ -113,16 +113,16 @@ else {
 		->setId('post_raw')
 		->setAttribute('style', 'display: none;');
 
-	$pairTables = [
+	$pair_tables = [
 		['id' => 'query_fields', 'label' => _('Query fields')],
 		['id' => 'post_fields', 'label' => _('Post'), 'header' => $switch, 'footer' => $footer],
 		['id' => 'variables', 'label' => _('Variables')],
 		['id' => 'headers', 'label' => _('Headers')]
 	];
 
-	foreach ($pairTables as $pairTable) {
-		$pairTab = (new CTable())
-			->setId($pairTable['id'])
+	foreach ($pair_tables as $pair_table) {
+		$pair_tab = (new CTable())
+			->setId($pair_table['id'])
 			->addClass('pair-container')
 			->setAttribute('style', 'width: 100%;')
 			->setHeader([
@@ -136,26 +136,26 @@ else {
 				(new CCol(
 					(new CButton(null, _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
-						->setAttribute('data-type', $pairTable['id'])
+						->setAttribute('data-type', $pair_table['id'])
 						->addClass('pairs-control-add')
 				))->setColSpan(5)
-			]))->setId($pairTable['id'] . '_footer'));
+			]))->setId($pair_table['id'] . '_footer'));
 
 		$items = [];
-		if (array_key_exists('header', $pairTable)) {
-			$items[] = $pairTable['header'];
+		if (array_key_exists('header', $pair_table)) {
+			$items[] = $pair_table['header'];
 		}
 
-		$items[] = $pairTab;
-		if (array_key_exists('footer', $pairTable)) {
-			$items[] = $pairTable['footer'];
+		$items[] = $pair_tab;
+		if (array_key_exists('footer', $pair_table)) {
+			$items[] = $pair_table['footer'];
 		}
 
-		$httpPopupFormList->addRow($pairTable['label'],
+		$httpPopupFormList->addRow($pair_table['label'],
 			(new CDiv($items))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('data-type', $pairTable['id'])
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				->setAttribute('data-type', $pair_table['id'])
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 		);
 	}
 
@@ -194,7 +194,7 @@ else {
 	$httpPopupWidget->addItem($httpPopupForm);
 }
 
-zbx_add_post_js('pairManager.add('.CJs::encodeJson(array_values(getRequest('pairs',[]))).');');
-zbx_add_post_js('setPostType('.CJs::encodeJson(getRequest('post_type',HTTPSTEP_POST_TYPE_FORM)).');');
+zbx_add_post_js('pairManager.add(' . CJs::encodeJson(array_values(getRequest('pairs', []))) . ');');
+zbx_add_post_js('setPostType(' . CJs::encodeJson(getRequest('post_type', HTTPSTEP_POST_TYPE_FORM)) . ');');
 
 return $httpPopupWidget;

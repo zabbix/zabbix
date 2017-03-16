@@ -65,7 +65,7 @@
 		}
 
 		function addPair(pair) {
-			if ('true' === pair.isNew) {
+			if (pair.isNew === 'true') {
 				pair.isNew = true;
 			}
 			allPairs[pair.id] = pair;
@@ -95,11 +95,11 @@
 				} );
 
 				var rows = jQuery(this).find('.pairRow').length;
-				if (0 === rows) {
+				if (rows === 0) {
 					renderPairRow(createNewPair(this.id));
 				}
 
-				if (1 >= rows) {
+				if (rows <= 1) {
 					updatePairControls(allPairs[jQuery(this).find('.pairRow').data('pairid')]);
 				}
 				else {
@@ -208,7 +208,7 @@
 			jQuery('#current_step_' + step).attr('id', 'tmp_current_step_' + step);
 
 			jQuery('input[id^=steps_' + step + '_]').each( function() {
-				var	input = jQuery(this),
+				var input = jQuery(this),
 					id = input.attr('id').replace(/^steps_[0-9]+_/, 'tmp_steps_' + step + '_');
 
 				input.attr('id', id);
@@ -327,7 +327,7 @@
 					+ '<?= url_param($step['url'], false, 'url') ?>'
 					+ '<?= url_param($step['posts'], false, 'posts') ?>'
 					+ '<?= url_param($step['post_type'], false, 'post_type') ?>'
-					+ '<?= url_param(array_key_exists('pairs', $step)?$step['pairs']:[], false, 'pairs') ?>'
+					+ '<?= url_param(array_key_exists('pairs', $step) ? $step['pairs'] : [], false, 'pairs') ?>'
 					+ '<?= url_param($step['timeout'], false, 'timeout') ?>'
 					+ '<?= url_param($step['required'], false, 'required') ?>'
 					+ '<?= url_param($step['status_codes'], false, 'status_codes') ?>'

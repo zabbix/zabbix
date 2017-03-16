@@ -218,8 +218,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$steps = getRequest('steps', []);
-		$pairNames = ['headers', 'variables', 'post_fields', 'query_fields'];
+		$pair_names = ['headers', 'variables', 'post_fields', 'query_fields'];
 		$i = 1;
+
 		foreach ($steps as &$step) {
 			$step['no'] = $i++;
 			$step['follow_redirects'] = $step['follow_redirects']
@@ -229,19 +230,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
 				: HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 
-			foreach ($pairNames as $pairName) {
-				$step[$pairName] = [];
+			foreach ($pair_names as $pair_name) {
+				$step[$pair_name] = [];
 			}
 
 			if (array_key_exists('pairs', $step)) {
-				$pairs = array_filter(array_values($step['pairs']), function($pair) {
-					return (array_key_exists('name', $pair) && '' !== trim($pair['name'])) ||
-						(array_key_exists('value', $pair) && '' !== trim($pair['value']));
-				});
-				foreach ($pairNames as $pairName) {
-					$step[$pairName] = array_filter($pairs, function($pair) use ($pairName){
-						return array_key_exists('type', $pair) && $pairName === $pair['type'];
-					});
+				$pairs = [];
+				foreach ($step['pairs'] as $pair) {
+					if ((array_key_exists('name', $pair) && '' !== trim($pair['name'])) ||
+						(array_key_exists('value', $pair) && '' !== trim($pair['value']))) {
+						$pairs[] = $pair;
+					}
+				}
+
+				foreach ($pair_names as $pair_name) {
+					$step[$pair_name] = [];
+					foreach ($step['pairs'] as $pair) {
+						if (array_key_exists('type', $pair) && $pair_name === $pair['type']) {
+							$step[$pair_name][] = $pair;
+						}
+					}
 				}
 				unset($step['pairs']);
 			}
@@ -254,10 +262,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		unset($step);
 
-		$pairs = array_filter(array_values(getRequest('pairs', [])), function($pair) {
-			return (array_key_exists('name', $pair) && '' !== trim($pair['name'])) ||
-				(array_key_exists('value', $pair) && '' !== trim($pair['value']));
-		});
+		$pairs = [];
+		foreach (getRequest('pairs', []) as $pair) {
+			if ((array_key_exists('name', $pair) && '' !== trim($pair['name'])) ||
+				(array_key_exists('value', $pair) && '' !== trim($pair['value']))) {
+				$pairs[] = $pair;
+			}
+		}
 
 		$httpTest = [
 			'hostid' => $_REQUEST['hostid'],
@@ -534,7 +545,7 @@ if (isset($_REQUEST['form'])) {
 			}
 		}
 
-		$dbHttpTestFields = DBselect(
+		$db_http_test_fields = DBselect(
 			'SELECT htf.*'.
 			' FROM httptest_field htf'.
 			' WHERE htf.httptestid='.zbx_dbstr($_REQUEST['httptestid']).
@@ -542,20 +553,23 @@ if (isset($_REQUEST['form'])) {
 		);
 
 		$data['pairs'] = [];
-		while (false !== ($field = DBfetch($dbHttpTestFields))) {
-			if (HTTPFIELD_TYPE_HEADER == $field['type']) {
-				$pairType = 'headers';
-			}
-			else if (HTTPFIELD_TYPE_VARIABLE == $field['type']) {
-				$pairType = 'variables';
-			}
-			else {
-				continue;
+		while (false !== ($field = DBfetch($db_http_test_fields))) {
+			switch($field['type']) {
+				case HTTPFIELD_TYPE_HEADER:
+					$pair_type = 'headers';
+				break;
+
+				case HTTPFIELD_TYPE_VARIABLE:
+					$pair_type = 'variables';
+				break;
+
+				default:
+					continue 2;
 			}
 
 			$data['pairs'][] = [
 				'id' => $field['httptest_fieldid'],
-				'type' => $pairType,
+				'type' => $pair_type,
 				'name' => $field['name'],
 				'value' => $field['value']
 			];
@@ -574,7 +588,7 @@ if (isset($_REQUEST['form'])) {
 		$data['ssl_key_password'] = $dbHttpTest['ssl_key_password'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.zbx_dbstr($_REQUEST['httptestid']).' ORDER BY h.no'));
 
-		$dbHttpStepFields = DBfetchArray(DBselect(
+		$db_http_step_fields = DBfetchArray(DBselect(
 			'SELECT htf.*'.
 			' FROM httpstep_field htf'.
 			' WHERE htf.httpstepid IN'.
@@ -587,30 +601,38 @@ if (isset($_REQUEST['form'])) {
 		foreach($data['steps'] as &$step) {
 			$step['pairs'] = [];
 
-			$stepFields = array_filter($dbHttpStepFields, function($field) use ($step) {
-				return $field['httpstepid'] === $step['httpstepid'];
-			});
+			$stepFields = [];
+			foreach ($db_http_step_fields as $field) {
+				if ($field['httpstepid'] === $step['httpstepid']) {
+					$stepFields[] = $field;
+				}
+			}
 
 			foreach ($stepFields as $field) {
-				if (HTTPFIELD_TYPE_HEADER == $field['type']) {
-					$pairType = 'headers';
-				}
-				else if (HTTPFIELD_TYPE_VARIABLE == $field['type']) {
-					$pairType = 'variables';
-				}
-				else if (HTTPFIELD_TYPE_QUERY == $field['type']) {
-					$pairType = 'query_fields';
-				}
-				else if (HTTPFIELD_TYPE_POST == $field['type']) {
-					$pairType = 'post_fields';
-				}
-				else {
-					continue;
+				switch($field['type']) {
+					case HTTPFIELD_TYPE_HEADER:
+						$pair_type = 'headers';
+					break;
+
+					case HTTPFIELD_TYPE_VARIABLE:
+						$pair_type = 'variables';
+					break;
+
+					case HTTPFIELD_TYPE_QUERY:
+						$pair_type = 'query_fields';
+					break;
+
+					case HTTPFIELD_TYPE_POST:
+						$pair_type = 'post_fields';
+					break;
+
+					default:
+						continue 2;
 				}
 
 				$step['pairs'][] = [
 					'id' => $field['httpstep_fieldid'],
-					'type' => $pairType,
+					'type' => $pair_type,
 					'name' => $field['name'],
 					'value' => $field['value']
 				];

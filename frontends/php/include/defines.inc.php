@@ -999,26 +999,29 @@ define('XML_STRING',		0x01);
 define('XML_ARRAY',			0x02);
 define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
-define('XML_ANY',		0x10);
 
 // API validation
 // scalar data types
-define('API_STRING_UTF8',	1);
-define('API_INT32',			2);
-define('API_ID',			3);
-define('API_BOOLEAN',		4);
-define('API_FLAG',			5);
+define('API_STRING_UTF8',		1);
+define('API_INT32',				2);
+define('API_ID',				3);
+define('API_BOOLEAN',			4);
+define('API_FLAG',				5);
 // arrays
-define('API_OBJECT',		6);
-define('API_IDS',			7);
-define('API_OBJECTS',		8);
+define('API_OBJECT',			6);
+define('API_IDS',				7);
+define('API_OBJECTS',			8);
 // specific types
-define('API_HG_NAME',		9);
-define('API_SCRIPT_NAME',	10);
-define('API_USER_MACRO',	11);
-define('API_TIME_PERIOD',	12);
-define('API_REGEX',			13);
-define('API_CUSTOM',		14);
+define('API_HG_NAME',			9);
+define('API_SCRIPT_NAME',		10);
+define('API_USER_MACRO',		11);
+define('API_TIME_PERIOD',		12);
+define('API_REGEX',				13);
+define('API_HTTP_HEADERS',		14);
+define('API_HTTP_VARIABLES',	15);
+define('API_HTTP_QUERY_FIELDS',	16);
+define('API_HTTP_POST_FIELDS',	17);
+define('API_HTTP_POST',			18);
 
 // flags
 define('API_REQUIRED',		0x01);

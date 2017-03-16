@@ -125,13 +125,7 @@ class CAudit {
 			$resourceid = $object[$field_name_resourceid];
 
 			if ($action == AUDIT_ACTION_UPDATE) {
-				/* TODO: recursive solution is required as objects can be more complex */
-				$object_old = array_filter($objects_old[$resourceid], function ($item) {
-					return !is_array($item);
-				});
-				$object = array_filter($object, function ($item) {
-					return !is_array($item);
-				});
+				$object_old = $objects_old[$resourceid];
 
 				$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
 

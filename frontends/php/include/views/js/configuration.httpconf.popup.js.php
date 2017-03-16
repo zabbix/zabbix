@@ -66,7 +66,7 @@
 		}
 
 		function addPair(pair) {
-			if ('true' === pair.isNew) {
+			if (pair.isNew === 'true') {
 				pair.isNew = true;
 			}
 			allPairs[pair.id] = pair;
@@ -104,11 +104,11 @@
 				} );
 
 				var rows = jQuery(this).find('.pairRow').length;
-				if (0 === rows) {
+				if (rows === 0) {
 					renderPairRow(createNewPair(this.id));
 				}
 
-				if (1 >= rows) {
+				if (rows <= 1) {
 					updatePairControls(allPairs[jQuery(this).find('.pairRow').data('pairid')]);
 				}
 				else {
@@ -227,7 +227,7 @@
 	}());
 
 	function parseUrl() {
-		var	i,
+		var i,
 			query,
 			index,
 			fields,
@@ -238,23 +238,23 @@
 			url = target.val();
 
 		index = url.indexOf("#");
-		if (-1 !== index)
+		if (index !== -1)
 			url = url.substring(0, index);
 
 		index = url.indexOf("?");
-		if (-1 !== index) {
+		if (index !== -1) {
 			query = url.substring(index + 1);
 			url = url.substring(0, index);
 
 			fields = query.split('&');
 			for (i = 0; i < fields.length; i++) {
 				fields[i] = fields[i].trim();
-				if (0 === fields[i].length)
+				if (fields[i].length === 0)
 					continue;
 
 				pair = {};
 				index = fields[i].indexOf("=");
-				if (0 < index) {
+				if (index > 0) {
 					pair.name = fields[i].substring(0, index).trim();
 					pair.value = fields[i].substring(index + 1).trim();
 				}
@@ -325,19 +325,19 @@
 				pair,
 				pairs = [];
 
-			if ('' !== posts) {
+			if (posts !== '') {
 				fields = posts.split('&');
 
 				try {
 					for (var i = 0; i < fields.length; i++) {
 						parts = fields[i].split('=');
-						if (1 === parts.length) {
+						if (parts.length === 1) {
 							parts.push('');
 						}
 
 						pair = {};
 						try {
-							if (2 < parts.length) {
+							if (parts.length > 2) {
 								throw null;
 							}
 
@@ -345,25 +345,25 @@
 								throw null; /* non-printable characters in data */
 							}
 
-							pair.name = decodeURIComponent(parts[0].replace(/\+/g,  " "));
-							pair.value = decodeURIComponent(parts[1].replace(/\+/g,  " "));
+							pair.name = decodeURIComponent(parts[0].replace(/\+/g, " "));
+							pair.value = decodeURIComponent(parts[1].replace(/\+/g, " "));
 						}
-						catch( e ) {
+						catch(e) {
 							throw '<?= _('Data is not properly encoded.'); ?>';
 						}
 
-						if ('' ===  pair.name.trim()) {
+						if (pair.name.trim() === '') {
 							throw '<?= _('Values without names are not allowed in form fields.'); ?>';
 						}
 
-						if (255 < pair.name.length) {
+						if (pair.name.length > 255) {
 							throw '<?= _('Name of the form field should not exceed 255 characters.'); ?>';
 						}
 
 						pairs.push(pair);
 					}
 				}
-				catch( e ) {
+				catch(e) {
 					jQuery('input[name="post_type"][value="<?= HTTPSTEP_POST_TYPE_RAW ?>"]').prop("checked", true);
 
 					overlayDialogue({
@@ -392,19 +392,19 @@
 			pairManager.refresh();
 		}
 		else {
-			var	fields = [],
+			var fields = [],
 				parts,
 				pairs = pairManager.getPairsByType('post_fields');
 
 			for (var p = 0; p < pairs.length; p++) {
 				parts = [];
-				if ('' !== pairs[p].name) {
+				if (pairs[p].name !== '') {
 					parts.push(encodeURIComponent(pairs[p].name.replace(/'/g,"%27").replace(/"/g,"%22")));
 				}
-				if ('' !== pairs[p].value) {
+				if (pairs[p].value !== '') {
 					parts.push(encodeURIComponent(pairs[p].value.replace(/'/g,"%27").replace(/"/g,"%22")));
 				}
-				if (0 < parts.length) {
+				if (parts.length > 0) {
 					fields.push(parts.join('='));
 				}
 			}
@@ -451,7 +451,7 @@
 					jQuery('#post_fields').toggleClass('disabled',this.checked);
 					jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link, #post_type input').attr('disabled', this.checked);
 
-					if (false === this.checked) {
+					if (this.checked === false) {
 						pairManager.refresh();
 					}
 				})
@@ -469,7 +469,7 @@
 	}
 
 	function addPairsToOpenerObject(obj, name, stepPairs) {
-		var	prefix,
+		var prefix,
 			keys,
 			pairs,
 			inputs;
@@ -490,7 +490,7 @@
 			prefix = name + '[' + pair.id + ']';
 
 			/* empty values are ignored */
-			if (undefined === pair.name || (undefined !== pair.isNew && '' === pair.name.trim() && '' === pair.value.trim())) {
+			if (pair.name === undefined|| (pair.isNew !== undefined && pair.name.trim() === '' && pair.value.trim() === '')) {
 				continue;
 			}
 
@@ -526,7 +526,7 @@
 	}
 
 	function update_httpstep(formname, list_name, httpstep) {
-		var	prefix,
+		var prefix,
 			form = window.opener.document.forms[formname];
 
 		if (!form) {

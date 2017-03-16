@@ -108,8 +108,20 @@ class CApiInputValidator {
 			case API_REGEX:
 				return self::validateRegex($rule, $data, $path, $error);
 
-			case API_CUSTOM:
-				return self::validateCustom($rule, $data, $path, $error);
+			case API_HTTP_HEADERS:
+				return self::validateHttpHeaders($rule, $data, $path, $error);
+
+			case API_HTTP_VARIABLES:
+				return self::validateHttpVariables($rule, $data, $path, $error);
+
+			case API_HTTP_QUERY_FIELDS:
+				return self::validateHttpQueryFields($rule, $data, $path, $error);
+
+			case API_HTTP_POST_FIELDS:
+				return self::validateHttpPostFields($rule, $data, $path, $error);
+
+			case API_HTTP_POST:
+				return self::validateHttpPosts($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -141,7 +153,11 @@ class CApiInputValidator {
 			case API_USER_MACRO:
 			case API_TIME_PERIOD:
 			case API_REGEX:
-			case API_CUSTOM:
+			case API_HTTP_HEADERS:
+			case API_HTTP_VARIABLES:
+			case API_HTTP_QUERY_FIELDS:
+			case API_HTTP_POST_FIELDS:
+			case API_HTTP_POST:
 				return true;
 
 			case API_IDS:
@@ -825,88 +841,191 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Helper to create array of params for method / function invocation
+	 * Helper to create uniform error messages for http pair errors
 	 *
-	 * @param ReflectionFunctionAbstract $reflection
-	 * @param array $params
-	 * @param mixed $data
-	 * @param string   $path
+	 * @param string $path
 	 * @param string $error
 	 *
-	 * @return array - matched params
+	 * @return string
 	 */
-	protected static function getCallbackParams($reflection, $params, &$data, $path, &$error) {
-		$values = [];
-
-		foreach ($reflection->getParameters() as $param) {
-			if ('data' === $param->getName()) {
-				$values[] = &$data;
-			}
-			elseif ('path' === $param->getName()) {
-				$values[] = $path;
-			}
-			elseif ('error' === $param->getName()) {
-				$values[] = &$error;
-			}
-			elseif (array_key_exists($param->getName(), $params)) {
-				$values[] = $params[$param->getName()];
-			}
-			elseif ($param->isDefaultValueAvailable()) {
-				$values[] = $param->getDefaultValue();
-			}
-			else {
-				$values[] = null;
-			}
+	protected static function formatHttpPairError($path, $error) {
+		if (mb_strpos($path, '/1/steps/') === 0 ) {
+			$path = mb_substr($path, mb_strlen('/1/steps/'));
+			$step = mb_substr($path, 0, mb_strpos($path, '/'));
+			$target = _s('step #%1$s of web scenario', $step);
+		}
+		else {
+			$target = _('web scenario');
 		}
 
-		return $values;
+		return _s('Incorrect parameter of %1$s: %2$s.', $target, $error);
 	}
 
 	/**
-	 * Custom validator based on reflection
+	 * HTTP pair validator.
 	 *
-	 * @param array    $rule
-	 * @param callable $rule['validator']
-	 * @param array    $rule['params']  (optional)
-	 * @param mixed    $data
-	 * @param string   $path
-	 * @param string   $error
+	 * @param mixed  $data
+	 * @param array  $type
+	 * @param string $error
+	 * @param string $path
 	 *
 	 * @return bool
 	 */
-	private static function validateCustom($rule, &$data = null, $path, &$error) {
-		if (!array_key_exists('validator', $rule)) {
-			// This message can be untranslated because warn about incorrect validation rules at a development stage.
-			$error = 'Incorrect validation rules.';
+	public static function validateHTTPPairs(&$data, $type, &$error, $path) {
+		/* converts to pair array */
+		if (!is_array($data)) {
+			$delimiter = ($type === HTTPFIELD_TYPE_HEADER) ? ':' : '=';
 
-			return false;
+			$pairs = array_filter(explode("\n", str_replace("\r", "\n", $data)));
+			foreach ($pairs as &$pair) {
+				$pos = strpos($pair, $delimiter);
+				if (false !== $pos) {
+					$pair = [
+						'name' => substr($pair, 0, $delimiter),
+						'value' => substr($pair, $delimiter + 1),
+					];
+				}
+				else {
+					$pair = [
+						'name' => $pair,
+						'value' => '',
+					];
+				}
+			}
+			unset($pair);
+
+			$data = $pairs;
 		}
 
-		$callable = $rule['validator'];
-		$params = [];
+		$type_names = [
+			HTTPFIELD_TYPE_HEADER => _('header'),
+			HTTPFIELD_TYPE_VARIABLE => _('variable'),
+			HTTPFIELD_TYPE_POST => _('post field'),
+			HTTPFIELD_TYPE_QUERY => _('query field')
+		];
 
-		if (array_key_exists('params', $rule)) {
-			$params = $rule['params'];
-		}
-
-		if (is_array($callable)) {
-			$reflection = new ReflectionMethod($callable[0], $callable[1]);
-		}
-		else {
-			$reflection = new ReflectionFunction($callable);
-		}
-
-		$argument = self::getCallbackParams($reflection, $params, $data, $path, $error);
-
-		if (is_array($callable)) {
-			if($reflection->isStatic()) {
-				// for static methods object should be set to null
-				$callable[0] = null;
+		$names = [];
+		foreach ($data as &$pair) {
+			if (!array_key_exists('name', $pair) || empty($pair['name'])) {
+				$error = self::formatHttpPairError($path, _s('%1$s name cannot be empty',
+					$type_names[$type]));
+				return false;
 			}
 
-			return $reflection->invokeArgs($callable[0], $argument);
+			if (mb_strlen($pair['name']) > 255) {
+				$error = self::formatHttpPairError($path, _s('%1$s is too long', $type_names[$type]));
+				return false;
+			}
+
+			if ($type === HTTPFIELD_TYPE_VARIABLE && preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
+				$error = self::formatHttpPairError($path,
+					_s('%1$s name "%2$s" is not enclosed in {} or is malformed', $type_names[$type], $pair['name']));
+				return false;
+			}
+
+			if (($type === HTTPFIELD_TYPE_HEADER) && (!array_key_exists('value', $pair) ||
+				$pair['value'] === '')) {
+				$error = self::formatHttpPairError($path, _s('%1$s value cannot be empty', $type_names[$type]));
+				return false;
+			}
+
+			/* normalize pair */
+			$pair = [
+				'name' => $pair['name'],
+				'value' => $pair['value'],
+				'type' => $type
+			];
+
+			if ($type !== HTTPFIELD_TYPE_VARIABLE) {
+				continue;
+			}
+
+			/* variable names should be unique */
+			if (in_array($pair['name'], $names)) {
+				$error = self::formatHttpPairError($path, $path, _s('%1$s name "%2$s" already exists',
+						$type_names[$type], $pair['name']));
+				return false;
+			}
+			$names[] = $pair['name'];
+		}
+		unset($pair);
+
+		return true;
+	}
+
+	/**
+	 * HTTP variable field validator.
+	 *
+	 * @param mixed  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	public static function validateHttpVariables($rule, &$data, $path, &$error) {
+		return self::validateHTTPPairs($data, HTTPFIELD_TYPE_VARIABLE, $error, $path);
+	}
+
+	/**
+	 * HTTP header field validator.
+	 *
+	 * @param mixed  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	public static function validateHttpHeaders($rule, &$data, $path, &$error) {
+		return self::validateHTTPPairs($data, HTTPFIELD_TYPE_HEADER, $error, $path);
+	}
+
+	/**
+	 * HTTP GET field validator.
+	 *
+	 * @param mixed  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	public static function validateHttpQueryFields($rule, &$data, $path, &$error) {
+		return self::validateHTTPPairs($data, HTTPFIELD_TYPE_QUERY, $error, $path);
+	}
+
+	/**
+	 * HTTP POST field validator.
+	 *
+	 * @param mixed  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	public static function validateHttpPostFields($rule, &$data, $path, &$error) {
+		return self::validateHTTPPairs($data, HTTPFIELD_TYPE_POST, $error, $path);
+	}
+
+	/**
+	 * HTTP POST validator. Posts can be set to string (raw post) or to http pairs (form fields)
+	 *
+	 * @param mixed  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	public static function validateHttpPosts($rule, &$data, $path, &$error) {
+		if (is_array($data)) {
+			return self::validateHTTPPairs($data, HTTPFIELD_TYPE_POST, $error, $path);
 		}
 
-		return $reflection->invokeArgs($argument);
+		$rule = ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'posts')];
+
+		return CApiInputValidator::validate($rule, $data, $path, $error);
 	}
 }

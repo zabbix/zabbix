@@ -138,7 +138,6 @@ class CHttpTestManager {
 		$steps_create = [];
 		$steps_update = [];
 
-		$deleteFieldsIds = [];
 		$fields_create = [];
 
 		foreach ($httpTests as $key => $httpTest) {
@@ -224,19 +223,19 @@ class CHttpTestManager {
 				}
 			}
 
-			$sourceFields = [];
+			$source_fields = [];
 
-			$fieldTypes = ['headers' => HTTPFIELD_TYPE_HEADER, 'variables' => HTTPFIELD_TYPE_VARIABLE];
-			foreach ($fieldTypes as $fieldName => $field_type) {
-				if (array_key_exists($fieldName, $httpTest)) {
+			$field_types = ['headers' => HTTPFIELD_TYPE_HEADER, 'variables' => HTTPFIELD_TYPE_VARIABLE];
+			foreach ($field_types as $field_name => $field_type) {
+				if (array_key_exists($field_name, $httpTest)) {
 					/* Same values in same order should not be changed */
-					$source = array_values($db_http_test[$fieldName]);
-					$target = array_values($httpTest[$fieldName]);
+					$source = array_values($db_http_test[$field_name]);
+					$target = array_values($httpTest[$field_name]);
 
 					$invalidate = false;
-					$pairCount = count($source);
-					if ($pairCount === count($target)) {
-						for ($i = 0; $i < $pairCount; $i++) {
+					$pair_count = count($source);
+					if ($pair_count === count($target)) {
+						for ($i = 0; $i < $pair_count; $i++) {
 							if ($source[$i]['name'] !== $target[$i]['name'] ||
 								$source[$i]['value'] !== $target[$i]['value']) {
 								$invalidate = true;
@@ -250,21 +249,21 @@ class CHttpTestManager {
 						}
 					}
 
-					$sourceFields[] = $field_type;
+					$source_fields[] = $field_type;
 				}
 			}
 
-			if (!empty($sourceFields)) {
-				foreach ($fieldTypes as $fieldName => $fieldType) {
-					if (in_array($fieldType, $sourceFields)) {
-						foreach ($httpTest[$fieldName] as $field) {
+			if (!empty($source_fields)) {
+				foreach ($field_types as $field_name => $fieldType) {
+					if (in_array($fieldType, $source_fields)) {
+						foreach ($httpTest[$field_name] as $field) {
 							$field['type'] = $fieldType;
 							$fields_create[$key][] = $field;
 						}
 					}
 				}
 
-				DB::delete('httptest_field', ['httptestid' => $httpTest['httptestid'], 'type' => $sourceFields]);
+				DB::delete('httptest_field', ['httptestid' => $httpTest['httptestid'], 'type' => $source_fields]);
 			}
 		}
 
@@ -337,10 +336,6 @@ class CHttpTestManager {
 			'preservekeys' => true
 		]);
 
-		$presetType = function (&$field, $index, $type) {
-			$field['type'] = $type;
-		};
-
 		$types = [
 			'headers' => HTTPFIELD_TYPE_HEADER,
 			'variables' => HTTPFIELD_TYPE_VARIABLE,
@@ -351,14 +346,20 @@ class CHttpTestManager {
 		foreach ($httpTests as &$httpTest) {
 			foreach ($types as $field => $type) {
 				if (array_key_exists($field, $httpTest) && is_array($httpTest[$field])) {
-					array_walk($httpTest[$field], $presetType, $type);
+					foreach ($httpTest[$field] as &$pair) {
+						$pair['type'] = $type;
+					}
+					unset($pair);
 				}
 			}
 
 			foreach ($httpTest['steps'] as &$httpStep) {
 				foreach ($types as $field => $type) {
 					if (array_key_exists($field, $httpStep) && is_array($httpStep[$field])) {
-						array_walk($httpStep[$field], $presetType, $type);
+						foreach ($httpStep[$field] as &$pair) {
+							$pair['type'] = $type;
+						}
+						unset($pair);
 					}
 				}
 			}
@@ -797,19 +798,19 @@ class CHttpTestManager {
 	/**
 	 * Create web scenario fields.
 	 *
-	 * @param $httpTest
-	 * @param $httpfields
+	 * @param $http_test
+	 * @param $http_fields
 	 *
 	 * @throws Exception
 	 */
-	protected function createTestFieldsReal($httpTest, $httpfields) {
+	protected function createTestFieldsReal($http_test, $http_fields) {
 		$fields = [];
-		foreach ($httpfields as $httpfield) {
+		foreach ($http_fields as $http_field) {
 			$fields[] = [
-				'httptestid' => $httpTest['httptestid'],
-				'type' => $httpfield['type'],
-				'name' => $httpfield['name'],
-				'value' => $httpfield['value']
+				'httptestid' => $http_test['httptestid'],
+				'type' => $http_field['type'],
+				'name' => $http_field['name'],
+				'value' => $http_field['value']
 			];
 		}
 
@@ -819,20 +820,20 @@ class CHttpTestManager {
 	/**
 	 * Create web scenario fields.
 	 *
-	 * @param $httpstepid
+	 * @param $http_step_id
 	 * @param $httpfields
 	 *
 	 * @throws Exception
 	 */
-	protected function createStepFieldsReal($httpstepid, $httpfields) {
+	protected function createStepFieldsReal($http_step_id, $http_fields) {
 		$fields = [];
 
-		foreach ($httpfields as $httpfield) {
+		foreach ($http_fields as $http_field) {
 			$fields[] = [
-				'httpstepid' => $httpstepid,
-				'type' => $httpfield['type'],
-				'name' => $httpfield['name'],
-				'value' => $httpfield['value']
+				'httpstepid' => $http_step_id,
+				'type' => $http_field['type'],
+				'name' => $http_field['name'],
+				'value' => $http_field['value']
 			];
 		}
 
@@ -985,7 +986,7 @@ class CHttpTestManager {
 		);
 
 		$fields_create = [];
-		$fieldTypes = [
+		$field_types = [
 			'headers' => HTTPFIELD_TYPE_HEADER,
 			'variables' => HTTPFIELD_TYPE_VARIABLE,
 			'post_fields' => HTTPFIELD_TYPE_POST,
@@ -1009,18 +1010,18 @@ class CHttpTestManager {
 			/* step should exist as it was checked before*/
 			$dbStep = $dbSteps[$webstep['httpstepid']];
 
-			$sourceFields = [];
-			foreach ($fieldTypes as $fieldName => $field_type) {
-				if (array_key_exists($fieldName, $webstep)) {
-					if (array_key_exists($fieldName, $dbStep)) {
+			$source_fields = [];
+			foreach ($field_types as $field_name => $field_type) {
+				if (array_key_exists($field_name, $webstep)) {
+					if (array_key_exists($field_name, $dbStep)) {
 						// Same values in same order should not be changed
-						$source = array_values($dbStep[$fieldName]);
-						$target = array_values($webstep[$fieldName]);
+						$source = array_values($dbStep[$field_name]);
+						$target = array_values($webstep[$field_name]);
 
 						$invalidate = false;
-						$pairCount = count($source);
-						if ($pairCount === count($target)) {
-							for ($i = 0; $i < $pairCount; $i++) {
+						$pair_count = count($source);
+						if ($pair_count === count($target)) {
+							for ($i = 0; $i < $pair_count; $i++) {
 								if ($source[$i]['name'] !== $target[$i]['name'] ||
 									$source[$i]['value'] !== $target[$i]['value']) {
 									$invalidate = true;
@@ -1034,21 +1035,21 @@ class CHttpTestManager {
 						}
 					}
 
-					$sourceFields[] = $field_type;
+					$source_fields[] = $field_type;
 				}
 			}
 
-			if (!empty($sourceFields)) {
-				foreach ($fieldTypes as $fieldName => $fieldType) {
-					if (in_array($fieldType, $sourceFields)) {
-						foreach ($webstep[$fieldName] as $field) {
+			if (!empty($source_fields)) {
+				foreach ($field_types as $field_name => $fieldType) {
+					if (in_array($fieldType, $source_fields)) {
+						foreach ($webstep[$field_name] as $field) {
 							$field['type'] = $fieldType;
 							$fields_create[$webstep['httpstepid']][] = $field;
 						}
 					}
 				}
 
-				DB::delete('httpstep_field', ['httpstepid' => $webstep['httpstepid'], 'type' => $sourceFields]);
+				DB::delete('httpstep_field', ['httpstepid' => $webstep['httpstepid'], 'type' => $source_fields]);
 			}
 		}
 		unset($webstep);

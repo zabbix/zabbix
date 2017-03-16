@@ -98,20 +98,20 @@ $httpFormList->addRow(_('User agent string'),
 );
 
 // append HTTP proxy to form list
-$httpFormList->addRow(_('HTTP proxy'),
-	(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]')
-);
+$httpFormList
+	->addRow(_('HTTP proxy'),
+		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'));
 
-$pairTables = [
+$pair_tables = [
 	['id' => 'variables', 'label' => _('Variables')],
 	['id' => 'headers', 'label' => _('Headers')]
 ];
 
-foreach ($pairTables as $pairTable){
-	$pairTab = (new CTable())
-		->setId($pairTable['id'])
+foreach ($pair_tables as $pair_table){
+	$pair_tab = (new CTable())
+		->setId($pair_table['id'])
 		->addClass('pair-container')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([
@@ -125,16 +125,16 @@ foreach ($pairTables as $pairTable){
 			(new CCol(
 				(new CButton(null, _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-type', $pairTable['id'])
+					->setAttribute('data-type', $pair_table['id'])
 					->addClass('pairs-control-add')
 			))->setColSpan(5)
-		]))->setId($pairTable['id'] . '_footer'));
+		]))->setId($pair_table['id'] . '_footer'));
 
-	$httpFormList->addRow($pairTable['label'],
-		(new CDiv($pairTab))
+	$httpFormList->addRow($pair_table['label'],
+		(new CDiv($pair_tab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', $pairTable['id'])
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setAttribute('data-type', $pair_table['id'])
+			->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 	);
 }
 
