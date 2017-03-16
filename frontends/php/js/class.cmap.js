@@ -810,7 +810,7 @@ ZABBIX.apps.map = (function($) {
 							return;
 						}
 
-						$(shapes[shape].domNode).insertBefore(shapes[shape + 1].domNode);
+						$(shapes[shape].domNode).insertAfter(shapes[shape + 1].domNode);
 						shapes[shape + 1].data.zindex--;
 						shapes[shape].data.zindex++;
 					break;
