@@ -379,9 +379,11 @@ SVGElement.prototype.add = function (type, attributes, content) {
 };
 
 SVGElement.prototype.clear = function () {
-	for (var i = 0; i < this.items.length; i++) {
-		this.items[i].remove();
-	}
+	var items = this.items;
+
+	items.forEach(function (item) {
+		item.remove();
+	});
 
 	this.items = [];
 
