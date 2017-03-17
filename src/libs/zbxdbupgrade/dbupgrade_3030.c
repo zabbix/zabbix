@@ -362,11 +362,12 @@ static int 	DBpatch_3030030_pair_cmp_func(const void *d1, const void *d2)
 static void	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t parentid, int type,
 		const char *source, const char separator, int unique, int allow_empty)
 {
-	char			*buffer = zbx_strdup(NULL, source), *key = buffer, *value, replace;
+	char			*buffer, *key = buffer, *value, replace;
 	zbx_vector_ptr_pair_t	pairs;
-	zbx_ptr_pair_t		pair = {NULL, NULL};
+	zbx_ptr_pair_t		pair;
 	int			index;
 
+	buffer = zbx_strdup(NULL, source);
 	zbx_vector_ptr_pair_create(&pairs);
 
 	while ('\0' != *key)
