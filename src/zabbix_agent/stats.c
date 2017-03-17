@@ -179,6 +179,13 @@ int	init_collector_data(char **error)
 		goto out;
 	}
 
+	/* Immediately mark the new shared memory for destruction after attaching to it */
+	if (-1 == zbx_shm_destroy(shm_id))
+	{
+		*error = zbx_strdup(*error, "cannot mark the new shared memory for destruction.");
+		goto out;
+	}
+
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)((char *)collector + sz);
 	collector->cpus.count = cpu_count;
 	collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
@@ -266,6 +273,13 @@ void	diskstat_shm_init()
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
 				zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	/* Immediately mark the new shared memory for destruction after attaching to it */
+	if (-1 == zbx_shm_destroy(collector->diskstat_shmid))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot mark the new shared memory for destruction");
 		exit(EXIT_FAILURE);
 	}
 
@@ -364,6 +378,13 @@ void	diskstat_shm_extend()
 		exit(EXIT_FAILURE);
 	}
 
+	/* Immediately mark the new shared memory for destruction after attaching to it */
+	if (-1 == zbx_shm_destroy(new_shmid))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot mark the new shared memory for destruction.");
+		exit(EXIT_FAILURE);
+	}
+
 	/* copy data from the old segment */
 	memcpy(new_diskdevices, diskdevices, old_shm_size);
 	new_diskdevices->max_diskdev = new_max;
@@ -372,12 +393,6 @@ void	diskstat_shm_extend()
 	if (-1 == shmdt((void *) diskdevices))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot detach from disk statistics collector shared memory");
-		exit(EXIT_FAILURE);
-	}
-
-	if (-1 == zbx_shm_destroy(collector->diskstat_shmid))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot destroy old disk statistics collector shared memory");
 		exit(EXIT_FAILURE);
 	}
 
