@@ -110,35 +110,26 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 
 	if (typeof content === 'string') {
 		content.split("\n").forEach(function (line, index) {
-			if (index === 0) {
-				lines.push( {
-					type: 'tspan',
-					attributes: {
-						x: offset,
-						dy: '0.9em',
-						'text-anchor': 'middle'
-					},
-					content: line
-				});
-			}
-			else {
-				lines.push( {
-					type: 'tspan',
-					attributes: {
-						x: offset,
-						dy: '1.2em',
-						'text-anchor': 'middle'
-					},
-					content: line
-				});
-			}
+			lines.push( {
+				type: 'tspan',
+				attributes: {
+					x: offset,
+					dy: (index === 0 ? '0.9em' : '1.2em'),
+					'text-anchor': 'middle'
+				},
+				content: line
+			});
 		});
 	}
 	else {
-		content.forEach(function (line) {
+		content.forEach(function (line, index) {
 			lines.push( {
 				type: 'tspan',
-				attributes: SVGElement.mergeAttributes(lineOptions, line.attributes),
+				attributes: SVGElement.mergeAttributes({
+					x: offset,
+					dy: (index === 0 ? '0.9em' : '1.2em'),
+					'text-anchor': 'middle'
+				}, line.attributes),
 				content: line.content
 			});
 		});

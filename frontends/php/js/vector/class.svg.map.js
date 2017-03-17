@@ -635,7 +635,12 @@ SVGMapElement.prototype.updateLabel = function() {
 			'x': x,
 			'y': y,
 			fill: '#' + this.map.options.theme.textcolor,
-			'anchor': anchor
+			'anchor': anchor,
+			background: {
+				fill: '#' + this.map.options.theme.backgroundcolor,
+				'shape-rendering':'crispEdges',
+				opacity: 0.5
+			}
 		}, this.options.label);
 
 		this.removeItem('label');
