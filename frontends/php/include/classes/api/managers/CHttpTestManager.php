@@ -225,7 +225,7 @@ class CHttpTestManager {
 
 			$source_fields = [];
 
-			$field_types = ['headers' => HTTPFIELD_TYPE_HEADER, 'variables' => HTTPFIELD_TYPE_VARIABLE];
+			$field_types = ['headers' => ZBX_HTTPFIELD_HEADER, 'variables' => ZBX_HTTPFIELD_VARIABLE];
 			foreach ($field_types as $field_name => $field_type) {
 				if (array_key_exists($field_name, $httpTest)) {
 					/* Same values in same order should not be changed */
@@ -337,10 +337,10 @@ class CHttpTestManager {
 		]);
 
 		$types = [
-			'headers' => HTTPFIELD_TYPE_HEADER,
-			'variables' => HTTPFIELD_TYPE_VARIABLE,
-			'posts' => HTTPFIELD_TYPE_POST,
-			'query_fields' => HTTPFIELD_TYPE_QUERY
+			'headers' => ZBX_HTTPFIELD_HEADER,
+			'variables' => ZBX_HTTPFIELD_VARIABLE,
+			'posts' => ZBX_HTTPFIELD_POST_FIELD,
+			'query_fields' => ZBX_HTTPFIELD_QUERY_FIELD
 		];
 
 		foreach ($httpTests as &$httpTest) {
@@ -856,11 +856,11 @@ class CHttpTestManager {
 			if (is_array($webstep['posts'])) {
 				$webstep['post_fields'] = $webstep['posts'];
 				$webstep['posts'] = '';
-				$webstep['post_type'] = HTTPSTEP_POST_TYPE_FORM;
+				$webstep['post_type'] = ZBX_POSTTYPE_FORM;
 			}
 			else {
 				$webstep['post_fields'] = [];
-				$webstep['post_type'] = HTTPSTEP_POST_TYPE_RAW;
+				$webstep['post_type'] = ZBX_POSTTYPE_RAW;
 			}
 		}
 		unset($webstep);
@@ -987,10 +987,10 @@ class CHttpTestManager {
 
 		$fields_create = [];
 		$field_types = [
-			'headers' => HTTPFIELD_TYPE_HEADER,
-			'variables' => HTTPFIELD_TYPE_VARIABLE,
-			'post_fields' => HTTPFIELD_TYPE_POST,
-			'query_fields' => HTTPFIELD_TYPE_QUERY,
+			'headers' => ZBX_HTTPFIELD_HEADER,
+			'variables' => ZBX_HTTPFIELD_VARIABLE,
+			'post_fields' => ZBX_HTTPFIELD_POST_FIELD,
+			'query_fields' => ZBX_HTTPFIELD_QUERY_FIELD,
 		];
 
 		$dbSteps = zbx_toHash($dbTest['steps'], 'httpstepid');
@@ -999,11 +999,11 @@ class CHttpTestManager {
 				if (is_array($webstep['posts'])) {
 					$webstep['post_fields'] = $webstep['posts'];
 					$webstep['posts'] = '';
-					$webstep['post_type'] = HTTPSTEP_POST_TYPE_FORM;
+					$webstep['post_type'] = ZBX_POSTTYPE_FORM;
 				}
 				else {
 					$webstep['post_fields'] = [];
-					$webstep['post_type'] = HTTPSTEP_POST_TYPE_RAW;
+					$webstep['post_type'] = ZBX_POSTTYPE_RAW;
 				}
 			}
 

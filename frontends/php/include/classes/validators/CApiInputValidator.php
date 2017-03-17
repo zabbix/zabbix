@@ -874,7 +874,7 @@ class CApiInputValidator {
 	public static function validateHTTPPairs(&$data, $type, &$error, $path) {
 		/* converts to pair array */
 		if (!is_array($data)) {
-			$delimiter = ($type === HTTPFIELD_TYPE_HEADER) ? ':' : '=';
+			$delimiter = ($type === ZBX_HTTPFIELD_HEADER) ? ':' : '=';
 
 			$pairs = array_filter(explode("\n", str_replace("\r", "\n", $data)));
 			foreach ($pairs as &$pair) {
@@ -898,10 +898,10 @@ class CApiInputValidator {
 		}
 
 		$type_names = [
-			HTTPFIELD_TYPE_HEADER => _('header'),
-			HTTPFIELD_TYPE_VARIABLE => _('variable'),
-			HTTPFIELD_TYPE_POST => _('post field'),
-			HTTPFIELD_TYPE_QUERY => _('query field')
+			ZBX_HTTPFIELD_HEADER => _('header'),
+			ZBX_HTTPFIELD_VARIABLE => _('variable'),
+			ZBX_HTTPFIELD_POST_FIELD => _('post field'),
+			ZBX_HTTPFIELD_QUERY_FIELD => _('query field')
 		];
 
 		$names = [];
@@ -917,13 +917,13 @@ class CApiInputValidator {
 				return false;
 			}
 
-			if ($type === HTTPFIELD_TYPE_VARIABLE && preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
+			if ($type === ZBX_HTTPFIELD_VARIABLE && preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
 				$error = self::formatHttpPairError($path,
 					_s('%1$s name "%2$s" is not enclosed in {} or is malformed', $type_names[$type], $pair['name']));
 				return false;
 			}
 
-			if (($type === HTTPFIELD_TYPE_HEADER) && (!array_key_exists('value', $pair) ||
+			if (($type === ZBX_HTTPFIELD_HEADER) && (!array_key_exists('value', $pair) ||
 				$pair['value'] === '')) {
 				$error = self::formatHttpPairError($path, _s('%1$s value cannot be empty', $type_names[$type]));
 				return false;
@@ -936,7 +936,7 @@ class CApiInputValidator {
 				'type' => $type
 			];
 
-			if ($type !== HTTPFIELD_TYPE_VARIABLE) {
+			if ($type !== ZBX_HTTPFIELD_VARIABLE) {
 				continue;
 			}
 
@@ -964,7 +964,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	public static function validateHttpVariables($rule, &$data, $path, &$error) {
-		return self::validateHTTPPairs($data, HTTPFIELD_TYPE_VARIABLE, $error, $path);
+		return self::validateHTTPPairs($data, ZBX_HTTPFIELD_VARIABLE, $error, $path);
 	}
 
 	/**
@@ -978,7 +978,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	public static function validateHttpHeaders($rule, &$data, $path, &$error) {
-		return self::validateHTTPPairs($data, HTTPFIELD_TYPE_HEADER, $error, $path);
+		return self::validateHTTPPairs($data, ZBX_HTTPFIELD_HEADER, $error, $path);
 	}
 
 	/**
@@ -992,7 +992,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	public static function validateHttpQueryFields($rule, &$data, $path, &$error) {
-		return self::validateHTTPPairs($data, HTTPFIELD_TYPE_QUERY, $error, $path);
+		return self::validateHTTPPairs($data, ZBX_HTTPFIELD_QUERY_FIELD, $error, $path);
 	}
 
 	/**
@@ -1006,7 +1006,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	public static function validateHttpPostFields($rule, &$data, $path, &$error) {
-		return self::validateHTTPPairs($data, HTTPFIELD_TYPE_POST, $error, $path);
+		return self::validateHTTPPairs($data, ZBX_HTTPFIELD_POST_FIELD, $error, $path);
 	}
 
 	/**
@@ -1021,7 +1021,7 @@ class CApiInputValidator {
 	 */
 	public static function validateHttpPosts($rule, &$data, $path, &$error) {
 		if (is_array($data)) {
-			return self::validateHTTPPairs($data, HTTPFIELD_TYPE_POST, $error, $path);
+			return self::validateHTTPPairs($data, ZBX_HTTPFIELD_POST_FIELD, $error, $path);
 		}
 
 		$rule = ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'posts')];

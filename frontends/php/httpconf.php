@@ -254,7 +254,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($step['pairs']);
 			}
 
-			if (HTTPSTEP_POST_TYPE_FORM == $step['post_type']) {
+			if (ZBX_POSTTYPE_FORM == $step['post_type']) {
 				$step['posts'] = $step['post_fields'];
 			}
 			unset($step['post_fields']);
@@ -555,11 +555,11 @@ if (isset($_REQUEST['form'])) {
 		$data['pairs'] = [];
 		while (false !== ($field = DBfetch($db_http_test_fields))) {
 			switch($field['type']) {
-				case HTTPFIELD_TYPE_HEADER:
+				case ZBX_HTTPFIELD_HEADER:
 					$pair_type = 'headers';
 				break;
 
-				case HTTPFIELD_TYPE_VARIABLE:
+				case ZBX_HTTPFIELD_VARIABLE:
 					$pair_type = 'variables';
 				break;
 
@@ -610,19 +610,19 @@ if (isset($_REQUEST['form'])) {
 
 			foreach ($stepFields as $field) {
 				switch($field['type']) {
-					case HTTPFIELD_TYPE_HEADER:
+					case ZBX_HTTPFIELD_HEADER:
 						$pair_type = 'headers';
 					break;
 
-					case HTTPFIELD_TYPE_VARIABLE:
+					case ZBX_HTTPFIELD_VARIABLE:
 						$pair_type = 'variables';
 					break;
 
-					case HTTPFIELD_TYPE_QUERY:
+					case ZBX_HTTPFIELD_QUERY_FIELD:
 						$pair_type = 'query_fields';
 					break;
 
-					case HTTPFIELD_TYPE_POST:
+					case ZBX_HTTPFIELD_POST_FIELD:
 						$pair_type = 'post_fields';
 					break;
 

@@ -53,7 +53,7 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 		'name' => getRequest('name'),
 		'timeout' => getRequest('timeout'),
 		'url' => getRequest('url'),
-		'post_type' => getRequest('post_type', HTTPSTEP_POST_TYPE_FORM),
+		'post_type' => getRequest('post_type', ZBX_POSTTYPE_FORM),
 		'posts' => getRequest('posts'),
 		'pairs' => array_values(getRequest('pairs', [])),
 		'required' => getRequest('required'),
@@ -99,9 +99,9 @@ else {
 		);
 
 	$switch = (new CDiv(
-		(new CRadioButtonList('post_type', getRequest('post_type', HTTPSTEP_POST_TYPE_FORM)))
-			->addValue(_('Form data'), HTTPSTEP_POST_TYPE_FORM, null, 'return switchToPostType(this.value);')
-			->addValue(_('Raw data'), HTTPSTEP_POST_TYPE_RAW, null, 'return switchToPostType(this.value);')
+		(new CRadioButtonList('post_type', getRequest('post_type', ZBX_POSTTYPE_FORM)))
+			->addValue(_('Form data'), ZBX_POSTTYPE_FORM, null, 'return switchToPostType(this.value);')
+			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW, null, 'return switchToPostType(this.value);')
 			->setModern(true))
 		)
 		->setAttribute('style', 'padding: 5px; margin: 5px 0px 10px 0px;');
@@ -195,6 +195,6 @@ else {
 }
 
 zbx_add_post_js('pairManager.add(' . CJs::encodeJson(array_values(getRequest('pairs', []))) . ');');
-zbx_add_post_js('setPostType(' . CJs::encodeJson(getRequest('post_type', HTTPSTEP_POST_TYPE_FORM)) . ');');
+zbx_add_post_js('setPostType(' . CJs::encodeJson(getRequest('post_type', ZBX_POSTTYPE_FORM)) . ');');
 
 return $httpPopupWidget;

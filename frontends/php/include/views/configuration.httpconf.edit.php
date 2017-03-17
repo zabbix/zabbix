@@ -215,10 +215,10 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['posts'] = '';
 	}
 	if (is_array($step['posts'])) {
-		$step['post_type'] = HTTPSTEP_POST_TYPE_FORM;
+		$step['post_type'] = ZBX_POSTTYPE_FORM;
 	}
 	else {
-		$step['post_type'] = HTTPSTEP_POST_TYPE_RAW;
+		$step['post_type'] = ZBX_POSTTYPE_RAW;
 	}
 	if (!isset($step['pairs'])) {
 		$step['pairs'] = [];

@@ -305,7 +305,7 @@
 	}
 
 	function setPostType(type) {
-		if (type == <?= HTTPSTEP_POST_TYPE_FORM ?>) {
+		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
 			jQuery('#post_fields').css("display", 'table');
 			jQuery('#post_raw').css("display", "none");
 		}
@@ -318,7 +318,7 @@
 	}
 
 	function switchToPostType(type) {
-		if (type == <?= HTTPSTEP_POST_TYPE_FORM ?>) {
+		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
 			var	posts = jQuery('#posts').val().trim(),
 				fields,
 				parts,
@@ -364,7 +364,7 @@
 					}
 				}
 				catch(e) {
-					jQuery('input[name="post_type"][value="<?= HTTPSTEP_POST_TYPE_RAW ?>"]').prop("checked", true);
+					jQuery('input[name="post_type"][value="<?= ZBX_POSTTYPE_RAW ?>"]').prop("checked", true);
 
 					overlayDialogue({
 						'title': '<?= _('Error'); ?>',

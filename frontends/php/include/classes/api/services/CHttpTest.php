@@ -238,9 +238,9 @@ class CHttpTest extends CApiService {
 			]);
 
 			foreach ($db_httpfields as $db_httpfield) {
-				if ($db_httpfield['type'] == HTTPFIELD_TYPE_HEADER && $headers_requested) {
+				if ($db_httpfield['type'] == ZBX_HTTPFIELD_HEADER && $headers_requested) {
 					$type = 'headers';
-				} elseif($db_httpfield['type'] == HTTPFIELD_TYPE_VARIABLE && $variables_requested) {
+				} elseif($db_httpfield['type'] == ZBX_HTTPFIELD_VARIABLE && $variables_requested) {
 					$type = 'variables';
 				} else {
 					continue;
@@ -884,16 +884,16 @@ class CHttpTest extends CApiService {
 						});
 
 						foreach ($stepFields as $field) {
-							if (HTTPFIELD_TYPE_HEADER == $field['type']) {
+							if (ZBX_HTTPFIELD_HEADER == $field['type']) {
 								$pairType = 'headers';
 							}
-							else if (HTTPFIELD_TYPE_VARIABLE == $field['type']) {
+							else if (ZBX_HTTPFIELD_VARIABLE == $field['type']) {
 								$pairType = 'variables';
 							}
-							else if (HTTPFIELD_TYPE_QUERY == $field['type']) {
+							else if (ZBX_HTTPFIELD_QUERY_FIELD == $field['type']) {
 								$pairType = 'query_fields';
 							}
-							else if (HTTPFIELD_TYPE_POST == $field['type']) {
+							else if (ZBX_HTTPFIELD_POST_FIELD == $field['type']) {
 								$pairType = 'post_fields';
 							}
 							else {
@@ -911,7 +911,7 @@ class CHttpTest extends CApiService {
 						}
 
 						if (in_array('post_fields', $requestedFields)) {
-							if (HTTPSTEP_POST_TYPE_FORM == $step['post_type']) {
+							if (ZBX_POSTTYPE_FORM == $step['post_type']) {
 								$step['posts'] = $step['post_fields'];
 							}
 							unset($step['post_fields']);
