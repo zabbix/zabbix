@@ -375,13 +375,13 @@ typedef struct
 	char		*name;
 	char		*url;
 	char		*posts;
-	int		post_type;
 	char		*required;
 	char		*status_codes;
 	int		no;
 	int		timeout;
 	int		follow_redirects;
 	int		retrieve_mode;
+	int		post_type;
 }
 DB_HTTPSTEP;
 
