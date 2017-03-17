@@ -117,7 +117,7 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 					dy: (index === 0 ? '0.9em' : '1.2em'),
 					'text-anchor': 'middle'
 				},
-				content: line
+				content: line.replace("\r",'')
 			});
 		});
 	}
@@ -130,7 +130,7 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 					dy: (index === 0 ? '0.9em' : '1.2em'),
 					'text-anchor': 'middle'
 				}, line.attributes),
-				content: line.content
+				content: line.content.replace(/[\r\n]/g,"")
 			});
 		});
 	}
