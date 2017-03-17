@@ -143,7 +143,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		pair.second = value_str;
 
 	/* get macro name */
-	zbx_strncpy_alloc((char**)&pair.first, &key_size, &key_offset, pkey, nkey);
+	zbx_strncpy_alloc((char **)&pair.first, &key_size, &key_offset, pkey, nkey);
 
 	/* remove existing macro if necessary */
 	index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_cmp_func);
@@ -160,7 +160,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s macro:'%s'='%s'",
-			__function_name, zbx_result_string(ret), (char*)pair.first, (char*)pair.second);
+			__function_name, zbx_result_string(ret), (char *)pair.first, (char *)pair.second);
 
 	return ret;
 }
@@ -240,7 +240,6 @@ static int	http_variable_urldecode(const char *source, char **result)
 			}
 			else
 				source += 2;
-
 		}
 		else if ('+' == *source)
 			*target = ' ';
@@ -291,10 +290,7 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 		if ('{' != (*data)[left])
 			continue;
 
-		if ('{' == (*data)[left+1])
-			offset = 1;
-		else
-			offset = 0;
+		offset = ('{' == (*data)[left + 1] ? 1 : 0);
 
 		for (right = left + 1; '\0' != (*data)[right] && '}' != (*data)[right]; right++)
 			;
@@ -354,7 +350,7 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 			left += offset;
 
 		zbx_replace_string(data, left, &right, substitute);
-		if (substitute != (char*)httptest->macros.values[index].second)
+		if (substitute != (char *)httptest->macros.values[index].second)
 			zbx_free(substitute);
 
 		left = right;
@@ -394,21 +390,21 @@ int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *vari
 {
 	const char	*__function_name = "http_process_variables";
 	char		*key, *value;
-	int		i, rc = FAIL;
+	int		i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %d variables", __function_name, variables->values_num);
 
 	for (i = 0; i < variables->values_num; i++)
 	{
-		key = (char*)variables->values[i].first;
-		value = (char*)variables->values[i].second;
+		key = (char *)variables->values[i].first;
+		value = (char *)variables->values[i].second;
 		if (FAIL == httpmacro_append_pair(httptest, key, strlen(key), value, strlen(value), data, err_str))
 			goto out;
 	}
 
-	rc = SUCCEED;
+	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(rc));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return rc;
+	return ret;
 }

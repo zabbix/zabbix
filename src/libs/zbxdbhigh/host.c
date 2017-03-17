@@ -4239,11 +4239,12 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select s.httptestid,f.httpstepid,f.type,f.name,f.value"
 				" from httpstep_field f"
-				" join httpstep s"
-					" on");
+					" join httpstep s"
+						" on f.httpstepid=s.httpstepid"
+							" and");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "s.httptestid",
 				httptestids.values, httptestids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and f.httpstepid=s.httpstepid"
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				" order by s.httptestid,f.httpstepid,f.httpstep_fieldid");
 
 		result = DBselect("%s", sql);
@@ -4300,8 +4301,8 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 				"select t.applicationid,h.applicationid"
 				" from applications t"
 					" join applications h"
-						" on h.hostid=" ZBX_FS_UI64
-							" and h.name=t.name"
+						" on t.name=h.name"
+							" and h.hostid=" ZBX_FS_UI64
 				" where", hostid);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.applicationid",
 				applications.values, applications.values_num);
