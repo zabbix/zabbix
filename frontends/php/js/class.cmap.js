@@ -891,7 +891,7 @@ ZABBIX.apps.map = (function($) {
 			update: function(data, unsetUndefined) {
 				var fieldName,
 					dataFelds = [
-						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
+						'elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
 						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
 						'application'
@@ -1341,9 +1341,15 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Add triggers to the list.
 			 */
-			addTriggers: function() {
+			addTriggers: function(triggers) {
 				var tpl = new Template($('#selementFormTriggers').html()),
-					triggers = $('#elementNameTriggers').multiSelect('getData');
+					selected_triggers = $('#elementNameTriggers').multiSelect('getData');
+
+				if (typeof triggers === 'undefined' || $.isEmptyObject(triggers)) {
+					triggers = [];
+				}
+
+				triggers = triggers.concat(selected_triggers);
 
 				triggers.each(function(trigger) {
 					$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
@@ -1399,18 +1405,21 @@ ZABBIX.apps.map = (function($) {
 							$('#elementNameHost').multiSelect('addData', item);
 							break;
 
-						// triggers
-						case '2':
-							$('#elementNameTriggers').multiSelect('addData', item);
-							break;
-
 						// host group
 						case '3':
 							$('#elementNameHostGroup').multiSelect('addData', item);
 							break;
 					}
 				}
+				else if (selement.elementtype == 2) {
+					var triggers = [];
 
+					for (i in selement.elements) {
+						triggers[i] = {'id': selement.elements[i].triggerid, 'name': selement.elements[i].elementName};
+					}
+
+					this.addTriggers(triggers);
+				}
 			},
 
 			/**
@@ -1871,15 +1880,15 @@ ZABBIX.apps.map = (function($) {
 				// clear triggers
 				this.triggerids = {};
 				$('#linkTriggerscontainer tbody tr').remove();
-				this.addTriggers(link.linktriggers);
+				this.addLinkTriggers(link.linktriggers);
 			},
 
 			/**
-			 * Add triggers to link form.
+			 * Add link triggers to link form.
 			 *
 			 * @param {Object} triggers
 			 */
-			addTriggers: function(triggers) {
+			addLinkTriggers: function(triggers) {
 				var tpl = new Template($('#linkTriggerRow').html()),
 					linkTrigger;
 

@@ -930,7 +930,9 @@ class C34XmlValidator {
 						'selement' =>				['type' => XML_ARRAY, 'rules' => [
 							// The tag 'elementtype' should be validated before the 'element' because it is used in 'ex_required' and 'ex_validate' methods.
 							'elementtype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'element' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElement']],
+							'elements' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'element', 'rules' => [
+								'element' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement']]
+							]],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],

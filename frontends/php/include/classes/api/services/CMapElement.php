@@ -372,11 +372,13 @@ abstract class CMapElement extends CApiService {
 			}
 
 			$selement_triggers = API::getApiService()->select('sysmap_element_trigger', [
-				'output' => ['selementid', 'triggerid'],
+				'output' => ['selement_triggerid', 'selementid', 'triggerid'],
 				'filter' => ['selementid' => $selementIds]
 			]);
+
 			foreach ($selement_triggers as $selement_trigger) {
 				$selements[$selement_trigger['selementid']]['elements'][] = [
+					'selement_triggerid' => $selement_trigger['selement_triggerid'],
 					'triggerid' => $selement_trigger['triggerid']
 				];
 			}
@@ -505,13 +507,13 @@ abstract class CMapElement extends CApiService {
 		}
 		unset($selement);
 
-		$selementIds = DB::insert('sysmaps_elements', $selements);
+		$selementids = DB::insert('sysmaps_elements', $selements);
 
 		$triggers = [];
-		foreach ($selementIds as $key => $selementId) {
+		foreach ($selementids as $key => $selementid) {
 			if ($selements[$key]['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
 				foreach ($selements[$key]['elements'] as $element) {
-					$triggers[] = ['selementid' => $selementId, 'triggerid' => $element['triggerid']];
+					$triggers[] = ['selementid' => $selementid, 'triggerid' => $element['triggerid']];
 				}
 			}
 		}
@@ -520,9 +522,9 @@ abstract class CMapElement extends CApiService {
 
 		$insertUrls = [];
 
-		foreach ($selementIds as $key => $selementId) {
+		foreach ($selementids as $key => $selementid) {
 			foreach ($selements[$key]['urls'] as $url) {
-				$url['selementid'] = $selementId;
+				$url['selementid'] = $selementid;
 
 				$insertUrls[] = $url;
 			}
@@ -530,7 +532,7 @@ abstract class CMapElement extends CApiService {
 
 		DB::insert('sysmap_element_url', $insertUrls);
 
-		return ['selementids' => $selementIds];
+		return ['selementids' => $selementids];
 	}
 
 	/**
@@ -553,17 +555,66 @@ abstract class CMapElement extends CApiService {
 		$selements = zbx_toArray($selements);
 		$selementIds = [];
 
-		$dbSelements = $this->checkSelementInput($selements, __FUNCTION__);
+		$db_selements = $this->checkSelementInput($selements, __FUNCTION__);
 
 		$update = [];
 		$urlsToDelete = [];
 		$urlsToUpdate = [];
 		$urlsToAdd = [];
 		$triggers_to_add = [];
-		$triggers_to_update = [];
 		$triggers_to_delete = [];
 
-		foreach ($selements as $selement) {
+		foreach ($selements as &$selement) {
+			$db_selement = $db_selements[$selement['selementid']];
+
+			// Change type from something to trigger.
+			if ($selement['elementtype'] != $db_selement['elementtype']
+					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$selement['elementid'] = 0;
+
+				foreach ($selement['elements'] as $element) {
+					$triggers_to_add[] = [
+						'selementid' => $selement['selementid'],
+						'triggerid' => $element['triggerid']
+					];
+				}
+			}
+
+			// Change type from trigger to something.
+			if ($selement['elementtype'] != $db_selement['elementtype']
+					&& $db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+
+				foreach ($selement['elements'] as $element) {
+					$triggers_to_delete[] = $element['triggerid'];
+				}
+
+				if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE) {
+					$selement['elementid'] = reset($selement['elements'][0]);
+				}
+			}
+
+			$db_elements = $db_selement['elements'];
+
+			foreach ($db_selement['elements'] as &$element) {
+				unset($element['selement_triggerid']);
+			}
+			unset($element);
+
+			if ($selement['elementtype'] == $db_selement['elementtype']
+					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
+					&& $selement['elements'] != $db_selement['elements']) {
+				foreach ($db_elements as $element) {
+					$triggers_to_delete[] = $element['selement_triggerid'];
+				}
+
+				foreach ($selement['elements'] as $element) {
+					$triggers_to_add[] = [
+						'selementid' => $selement['selementid'],
+						'triggerid' => $element['triggerid']
+					];
+				}
+			}
+
 			$update[] = [
 				'values' => $selement,
 				'where' => ['selementid' => $selement['selementid']],
@@ -574,7 +625,7 @@ abstract class CMapElement extends CApiService {
 				continue;
 			}
 
-			$diffUrls = zbx_array_diff($selement['urls'], $dbSelements[$selement['selementid']]['urls'], 'name');
+			$diffUrls = zbx_array_diff($selement['urls'], $db_selement['urls'], 'name');
 
 			// add
 			foreach ($diffUrls['first'] as $newUrl) {
@@ -596,6 +647,7 @@ abstract class CMapElement extends CApiService {
 			// delete url
 			$urlsToDelete = array_merge($urlsToDelete, zbx_objectValues($diffUrls['second'], 'sysmapelementurlid'));
 		}
+		unset($selement);
 
 		DB::update('sysmaps_elements', $update);
 
@@ -612,15 +664,11 @@ abstract class CMapElement extends CApiService {
 		}
 
 		if ($triggers_to_delete) {
-			DB::delete('sysmap_element_url', ['sysmapelementurlid' => $triggers_to_delete]);
-		}
-
-		if ($triggers_to_update) {
-			DB::update('sysmap_element_url', $triggers_to_update);
+			DB::delete('sysmap_element_trigger', ['selement_triggerid' => $triggers_to_delete]);
 		}
 
 		if ($triggers_to_add) {
-			DB::insert('sysmap_element_url', $triggers_to_add);
+			DB::insert('sysmap_element_trigger', $triggers_to_add);
 		}
 
 		return ['selementids' => $selementIds];

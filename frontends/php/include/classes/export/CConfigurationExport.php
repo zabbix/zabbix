@@ -1210,18 +1210,19 @@ class CConfigurationExport {
 			foreach ($sysmap['selements'] as &$selement) {
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$selement['elements'][] = ['sysmapid' => $sysmaps[$selement['elements'][0]['sysmapid']]];
+						$selement['elements'][] = $sysmaps[$selement['elements'][0]['sysmapid']];
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$selement['elements'][] = ['groupids' => $groups[$selement['elements'][0]['groupid']]];
+						$selement['elements'][] = $groups[$selement['elements'][0]['groupid']];
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						$selement['elements'][] = ['hostids' => $hosts[$selement['elements'][0]['hostid']]];
+						$selement['elements'][] = $hosts[$selement['elements'][0]['hostid']];
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						foreach ($selement['elements'] as $element) {
-							$selement['elements'][] = ['triggerid' => $triggers[$element['triggerid']]];
+						foreach ($selement['elements'] as &$element) {
+							$element = $triggers[$element['triggerid']];
 						}
+						unset($element);
 						break;
 				}
 

@@ -150,7 +150,7 @@ if (getRequest('nocalculations', false)) {
 
 		$mapInfo[$selement['selementid']]['name'] = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
 			? _('Image')
-			: $selement['elementName'];
+			: $selement['elements'][0]['elementName'];
 	}
 
 	$allLinks = true;

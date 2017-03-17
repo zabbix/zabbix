@@ -9,7 +9,7 @@
 			->cleanItems()
 			->setName('selementForm')
 			->setId('selementForm')
-			->addVar('elementid', '')
+			->addVar('elements[]', '')
 			->addItem(
 				(new CFormList())
 					->addRow(_('Type'),
@@ -465,11 +465,12 @@
 <script type="text/x-jquery-tmpl" id="selementFormTriggers">
 	<?= (new CRow([
 			(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			(new CCol(
+			(new CCol([
+				(new CVar('elements[][#{id}]', '#{id}')),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->onClick('jQuery("#triggerrow_#{selementtriggerid}").remove();')
-			))->addClass(ZBX_STYLE_NOWRAP)
+			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setId('triggerrow_#{selementtriggerid}')
 			->toString()

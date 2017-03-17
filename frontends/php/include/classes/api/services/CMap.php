@@ -223,6 +223,8 @@ class CMap extends CMapElement {
 					' WHERE '.dbConditionInt('se.sysmapid', $sysmapids)
 				);
 
+				$trigger_selementids = [];
+				$selements_maps = [];
 				while ($selement = DBfetch($dbSelements)) {
 					$selements[$selement['selementid']] = $selement;
 
@@ -234,12 +236,23 @@ class CMap extends CMapElement {
 							$mapsToCheck[$selement['elementid']] = $selement['elementid'];
 							break;
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							$triggersToCheck[$selement['elementid']] = $selement['elementid'];
+							$trigger_selementids[$selement['selementid']] = true;
+							$selements_maps[$selement['selementid']] = $selement['sysmapid'];
 							break;
 						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 							$hostGroupsToCheck[$selement['elementid']] = $selement['elementid'];
 							break;
 					}
+				}
+
+				$db_element_triggers = DBselect(
+					'SELECT et.triggerid'.
+					' FROM sysmap_element_trigger et'.
+					' WHERE '.dbConditionInt('et.selementid', array_keys($trigger_selementids))
+				);
+
+				while ($db_element_trigger = DBfetch($db_element_triggers)) {
+					$triggersToCheck[$db_element_trigger['triggerid']] = $db_element_trigger['triggerid'];
 				}
 
 				if ($hostsToCheck) {
@@ -290,10 +303,7 @@ class CMap extends CMapElement {
 					foreach ($triggersToCheck as $elementid) {
 						if (!isset($allowedTriggers[$elementid])) {
 							foreach ($selements as $selementid => $selement) {
-								if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
-										&& bccomp($selement['elementid'], $elementid) == 0) {
-									unset($result[$selement['sysmapid']], $selements[$selementid]);
-								}
+								unset($result[$selements_maps[$selementid]], $selements[$selementid]);
 							}
 						}
 					}
@@ -1787,7 +1797,9 @@ class CMap extends CMapElement {
 				}
 				unset($selement);
 			}
-			if (in_array('elementtype', $options['selectSelements'])) {
+
+			if ($options['selectSelements'] != API_OUTPUT_EXTEND
+					&& !in_array('elementtype', $options['selectSelements'])) {
 				foreach ($selements as &$selement) {
 					unset($selement['elementtype']);
 				}
