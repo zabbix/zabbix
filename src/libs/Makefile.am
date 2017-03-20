@@ -32,6 +32,7 @@ SERVER_SUBDIRS = \
 	zbxdbupgrade \
 	zbxdbcache \
 	zbxdbhigh \
+	zbxhttp \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
@@ -45,6 +46,7 @@ PROXY_SUBDIRS = \
 	zbxdbupgrade \
 	zbxdbcache \
 	zbxdbhigh \
+	zbxhttp \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
@@ -64,6 +66,7 @@ SUBDIRS = \
 	zbxalgo \
 	zbxnix \
 	zbxconf \
+	zbxhttp \
 	zbxsysinfo \
 	zbxsys \
 	zbxcomms \

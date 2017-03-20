@@ -21,6 +21,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxregexp.h"
+#include "zbxhttp.h"
 
 #include "httpmacro.h"
 
@@ -167,103 +168,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: http_variable_urlencode                                          *
- *                                                                            *
- * Purpose: replaces unsafe characters with a '%' followed by two hexadecimal *
- *          digits (the only allowed exception is a space character that can  *
- *          be replaced with a plus (+) sign or with %20).to url encode       *
- *                                                                            *
- * Parameters:  source  - [IN] the value to encode                            *
- *              result  - [OUT] encoded string                                *
- *                                                                            *
- ******************************************************************************/
-void	http_variable_urlencode(const char *source, char **result)
-{
-	char		*target, *buffer;
-	const char	*hex = "0123456789ABCDEF";
-
-	buffer = zbx_malloc(NULL, strlen(source) * 3 + 1);
-	target = buffer;
-
-	while ('\0' != *source)
-	{
-		if (0 == isalnum(*source) && NULL == strchr("-._~", *source))
-		{
-			/* Percent-encoding */
-			*target++ = '%';
-			*target++ = hex[(unsigned char)*source >> 4];
-			*target++ = hex[(unsigned char)*source & 15];
-		}
-		else
-			*target++ = *source;
-
-		source++;
-	}
-
-	*target = '\0';
-	zbx_free(*result);
-	*result = buffer;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: http_variable_urldecode                                          *
- *                                                                            *
- * Purpose: replaces URL escape sequences ('+' or '%' followed by two         *
- *          hexadecimal digits) with matching characters.                     *
- *                                                                            *
- * Parameters:  source  - [IN] the value to decode                            *
- *              result  - [OUT] decoded string                                *
- *                                                                            *
- * Return value: SUCCEED - the source string was decoded successfully         *
- *               FAIL    - source string contains malformed percent-encoding  *
- *                                                                            *
- ******************************************************************************/
-static int	http_variable_urldecode(const char *source, char **result)
-{
-	const char	*url = source;
-	char		*target, *buffer = zbx_malloc(NULL, strlen(source) + 1);
-
-	target = buffer;
-
-	while ('\0' != *source)
-	{
-		if ('%' == *source)
-		{
-			/* Percent-decoding */
-			if (FAIL == is_hex_n_range(source + 1, 2, target, sizeof(char), 0, 0xff))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot perform URL decode of '%s' part of string '%s'",
-						source, url);
-				zbx_free(buffer);
-				break;
-			}
-			else
-				source += 2;
-		}
-		else if ('+' == *source)
-			*target = ' ';
-		else
-			*target = *source;
-
-		target++;
-		source++;
-	}
-
-	if (NULL != buffer)
-	{
-		*target = '\0';
-		zbx_free(*result);
-		*result = buffer;
-
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: http_substitute_variables                                        *
  *                                                                            *
  * Purpose: substitute variables in input string with their values from http  *
@@ -329,14 +233,14 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 				/* http_variable_urlencode cannot fail (except for "out of memory") */
 				/* so no check is needed */
 				substitute = NULL;
-				http_variable_urlencode(httptest->macros.values[index].second, &substitute);
+				zbx_http_url_encode(httptest->macros.values[index].second, &substitute);
 			}
 			else if (ZBX_CONST_STRLEN("urldecode()") == len &&
 					0 == strncmp(*data + offset, "urldecode()", len))
 			{
 				/* on error substitute will remain unchanged */
 				substitute = NULL;
-				if (FAIL == (ret = http_variable_urldecode(httptest->macros.values[index].second,
+				if (FAIL == (ret = zbx_http_url_decode(httptest->macros.values[index].second,
 						&substitute)))
 				{
 					break;
