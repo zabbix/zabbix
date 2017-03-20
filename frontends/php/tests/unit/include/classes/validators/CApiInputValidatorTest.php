@@ -1103,18 +1103,15 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				[
 					[
 						'name' => 'Host',
-						'value' => 'www.zabbix.com',
-						'type' => ZBX_HTTPFIELD_HEADER
+						'value' => 'www.zabbix.com'
 					],
 					[
 						'name' => 'Connection',
-						'value' => 'keep-alive',
-						'type' => ZBX_HTTPFIELD_HEADER
+						'value' => 'keep-alive'
 					],
 					[
 						'name' => 'Pragma',
-						'value' => 'no-cache',
-						'type' => ZBX_HTTPFIELD_HEADER
+						'value' => 'no-cache'
 					]
 				]
 			],
@@ -1125,21 +1122,170 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				[
 					[
 						'name' => 'Host',
-						'value' => 'zabbix.com:8080',
-						'type' => ZBX_HTTPFIELD_HEADER
+						'value' => 'zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => 'v:a:l:u:e'
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'values' => 'v:a:l:u:e'
+					]
+				],
+				'/1/headers',
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => 'v:a:l:u:e'
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+					]
+				],
+				'/1/headers',
+				'Invalid parameter "/1/headers/2": the parameter "name" is missing.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom'
+					]
+				],
+				'/1/headers',
+				'Invalid parameter "/1/headers/2": the parameter "value" is missing.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
 					],
 					[
 						'name' => 'Custom',
 						'value' => 'v:a:l:u:e',
-						'type' => ZBX_HTTPFIELD_HEADER
+						'type' => 1
 					]
-				]
+				],
+				'/1/headers',
+				'Invalid parameter "/1/headers/2": unexpected parameter "type".'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => null,
+						'value' => 'v:a:l:u:e'
+					]
+				],
+				'/1/headers',
+				'Invalid parameter "/1/headers/2/name": a character string is expected.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => true
+					]
+				],
+				'/1/headers',
+				'Invalid parameter "/1/headers/2/value": a character string is expected.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => '',
+						'value' => 'v:a:l:u:e'
+					]
+				],
+				'/1/headers',
+				'Invalid parameter "/1/headers/2/name": cannot be empty.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => ''
+					]
+				],
+				'/1/headers',
+				'Invalid parameter "/1/headers/2/value": cannot be empty.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				true,
+				'/1/headers',
+				'Invalid parameter "/1/headers": an array is expected.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				null,
+				'/1/headers',
+				'Invalid parameter "/1/headers": an array is expected.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				['a', 'b'],
+				'/1/headers',
+				'Invalid parameter "/1/headers/1": an array is expected.'
 			],
 			[
 				['type' => API_HTTP_HEADERS],
 				"Header",
 				'/1/headers',
 				'Invalid parameter "/1/headers/1/value": cannot be empty.'
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				"Header",
+				'/',
+				'Invalid parameter "/1/value": cannot be empty.'
 			],
 			[
 				['type' => API_HTTP_VARIABLES],
