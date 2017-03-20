@@ -198,7 +198,6 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
  * Parameters: proxy - [IN]                                                   *
- *             j     - [IN/OUT] buffer for parsing json data                  *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
