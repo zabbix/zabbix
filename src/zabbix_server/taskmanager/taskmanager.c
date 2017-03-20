@@ -309,7 +309,7 @@ static int	tm_process_tasks(int now)
 	}
 	DBfree_result(result);
 
-	return 0;
+	return processed_num;
 }
 
 /******************************************************************************
