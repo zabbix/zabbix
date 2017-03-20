@@ -65,8 +65,8 @@ static int	proxy_data_sender(int *more, int now)
 	zbx_socket_t		sock;
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_tasks;
-	int			ret = FAIL, availability_ts, history_records, discovery_records, areg_records,
-				more_history, more_discovery, more_areg;
+	int			ret = FAIL, availability_ts, history_records = 0, discovery_records = 0,
+				areg_records = 0, more_history, more_discovery, more_areg;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL;

@@ -770,7 +770,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 		char			error[ALERT_ERROR_LEN_MAX];
 		DC_HOST			host;
 		zbx_script_t		script;
-		zbx_alert_status_t	status;
+		zbx_alert_status_t	status = ALERT_STATUS_NOT_SENT;
 		zbx_uint64_t		alertid;
 
 		*error = '\0';
@@ -863,8 +863,6 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 				{
 					if (0 == zbx_script_create_task(&script, &host, alertid, time(NULL)))
 						rc = FAIL;
-
-					status = ALERT_STATUS_NOT_SENT;
 				}
 			}
 		}
