@@ -1274,10 +1274,10 @@ class C34XmlValidator {
 	public function validateHttpPosts($data, array $parent_data = null, $path) {
 		if (is_array($data)) {
 			/* posts can be an HTTP pair array */
-			$rules = ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'post_field', 'rules' => [
-				'post_field' =>				['type' => XML_ARRAY, 'rules' => [
-					'name' =>				['type' => XML_STRING | XML_REQUIRED],
-					'value' =>				['type' => XML_STRING]
+			$rules = ['type' => XML_INDEXED_ARRAY, 'prefix' => 'post_field', 'rules' => [
+				'post_field' =>	['type' => XML_ARRAY, 'rules' => [
+					'name' =>		['type' => XML_STRING | XML_REQUIRED],
+					'value' =>		['type' => XML_STRING]
 				]]
 			]];
 		}
