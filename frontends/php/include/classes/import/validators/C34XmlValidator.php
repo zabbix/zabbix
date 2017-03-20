@@ -347,13 +347,13 @@ class C34XmlValidator {
 							'attempts' =>				['type' => XML_STRING | XML_REQUIRED],
 							'agent' =>					['type' => XML_STRING | XML_REQUIRED],
 							'http_proxy' =>				['type' => XML_STRING | XML_REQUIRED],
-							'variables' =>				['type' => XML_INDEXED_ARRAY, 'preprocessor' => [$this, 'transformFields2Array'], 'prefix' => 'variable', 'rules' => [
+							'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
 								'variable' =>				['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+									'value' =>					['type' => XML_STRING]
 								]]
 							]],
-							'headers' =>				['type' => XML_INDEXED_ARRAY, 'preprocessor' => [$this, 'transformHeaders2Array'], 'prefix' => 'header', 'rules' => [
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
 								'header' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'value' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -372,20 +372,20 @@ class C34XmlValidator {
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED],
-									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'preprocessor' => [$this, 'transformFields2Array'], 'prefix' => 'query_field', 'rules' => [
+									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+											'value' =>					['type' => XML_STRING]
 										]]
 									]],
-									'posts' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateHttpPosts']],
-									'variables' =>				['type' => XML_INDEXED_ARRAY, 'preprocessor' => [$this, 'transformFields2Array'], 'prefix' => 'variable', 'rules' => [
+									'posts' =>					['ex_validate' => [$this, 'validateHttpPosts']],
+									'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
 										'variable' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+											'value' =>					['type' => XML_STRING]
 										]]
 									]],
-									'headers' =>				['type' => XML_INDEXED_ARRAY, 'preprocessor' => [$this, 'transformHeaders2Array'], 'prefix' => 'header', 'rules' => [
+									'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
 										'header' =>					['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -745,13 +745,13 @@ class C34XmlValidator {
 							'attempts' =>				['type' => XML_STRING | XML_REQUIRED],
 							'agent' =>					['type' => XML_STRING | XML_REQUIRED],
 							'http_proxy' =>				['type' => XML_STRING | XML_REQUIRED],
-							'variables' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformFields2Array'], 'prefix' => 'variable', 'rules' => [
+							'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
 								'variable' =>				['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+									'value' =>					['type' => XML_STRING]
 								]]
 							]],
-							'headers' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformHeaders2Array'], 'prefix' => 'header', 'rules' => [
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
 								'header' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'value' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -770,20 +770,20 @@ class C34XmlValidator {
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED],
-									'query_fields' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformFields2Array'], 'prefix' => 'query_field', 'rules' => [
+									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+											'value' =>					['type' => XML_STRING]
 										]]
 									]],
-									'posts' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateHttpPosts']],
-									'variables' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformFields2Array'], 'prefix' => 'variable', 'rules' => [
+									'posts' =>					['ex_validate' => [$this, 'validateHttpPosts']],
+									'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
 										'variable' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+											'value' =>					['type' => XML_STRING]
 										]]
 									]],
-									'headers' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformHeaders2Array'], 'prefix' => 'header', 'rules' => [
+									'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
 										'header' =>					['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -1263,50 +1263,6 @@ class C34XmlValidator {
 	}
 
 	/**
-	 * Transforms fields into http pair array
-	 *
-	 * @param mixed $value
-	 *
-	 * @return array converted value
-	 */
-	public function transformFields2Array($value, $delimiter = '=') {
-		if (!is_array($value)) {
-			$pairs = array_filter(explode("\n", str_replace("\r", "\n", $value)));
-			foreach ($pairs as &$pair) {
-				$pos = mb_strpos($pair, $delimiter);
-				if (false !== $pos) {
-					$pair = [
-						'name' => mb_substr($pair, 0, $delimiter),
-						'value' => mb_substr($pair, $delimiter+1),
-					];
-				}
-				else {
-					$pair = [
-						'name' => $pair,
-						'value' => '',
-					];
-				}
-			}
-			unset($pair);
-
-			return $pairs;
-		}
-
-		return $value;
-	}
-
-	/**
-	 * Transforms headers into http pair array
-	 *
-	 * @param mixed $value
-	 *
-	 * @return array converted value
-	 */
-	public function transformHeaders2Array($value) {
-		return $this->transformFields2Array($value, ':');
-	}
-
-	/**
 	 * Validate "posts" tag of http test step.
 	 *
 	 * @param string $data			import data
@@ -1321,13 +1277,13 @@ class C34XmlValidator {
 			$rules = ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'post_field', 'rules' => [
 				'post_field' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>				['type' => XML_STRING | XML_REQUIRED],
-					'value' =>				['type' => XML_STRING | XML_REQUIRED]
+					'value' =>				['type' => XML_STRING]
 				]]
 			]];
 		}
 		else {
 			/* posts can be string */
-			$rules = ['type' => XML_STRING | XML_REQUIRED];
+			$rules = ['type' => XML_STRING];
 		}
 
 		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
