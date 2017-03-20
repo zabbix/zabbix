@@ -1096,6 +1096,185 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/1/expression',
 				'@^[a-z$'
 			],
+			[
+				['type' => API_HTTP_HEADERS],
+				"Host:www.zabbix.com\nConnection:keep-alive\nPragma:no-cache",
+				'/1/headers',
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com',
+						'type' => ZBX_HTTPFIELD_HEADER
+					],
+					[
+						'name' => 'Connection',
+						'value' => 'keep-alive',
+						'type' => ZBX_HTTPFIELD_HEADER
+					],
+					[
+						'name' => 'Pragma',
+						'value' => 'no-cache',
+						'type' => ZBX_HTTPFIELD_HEADER
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				"Host:zabbix.com:8080\n\r\r\n\nCustom:v:a:l:u:e\r\n\r\n",
+				'/1/headers',
+				[
+					[
+						'name' => 'Host',
+						'value' => 'zabbix.com:8080',
+						'type' => ZBX_HTTPFIELD_HEADER
+					],
+					[
+						'name' => 'Custom',
+						'value' => 'v:a:l:u:e',
+						'type' => ZBX_HTTPFIELD_HEADER
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_HEADERS],
+				"Header",
+				'/1/headers',
+				'Invalid parameter "/1/headers/1/value": cannot be empty.'
+			],
+			[
+				['type' => API_HTTP_VARIABLES],
+				"{a}=1\n{b}=2",
+				'/1/variables',
+				[
+					[
+						'name' => '{a}',
+						'value' => '1',
+						'type' => ZBX_HTTPFIELD_VARIABLE
+					],
+					[
+						'name' => '{b}',
+						'value' => '2',
+						'type' => ZBX_HTTPFIELD_VARIABLE
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_VARIABLES],
+				[
+					[
+						'name' => '{var1}',
+						'value' => 'value1'
+					],
+					[
+						'name' => '{var2}',
+						'value' => ''
+					]
+				],
+				'/1/variables',
+				[
+					[
+						'name' => '{var1}',
+						'value' => 'value1',
+						'type' => ZBX_HTTPFIELD_VARIABLE
+					],
+					[
+						'name' => '{var2}',
+						'value' => '',
+						'type' => ZBX_HTTPFIELD_VARIABLE
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_VARIABLES],
+				[
+					[
+						'name' => '{var}1',
+						'value' => 'value1'
+					]
+				],
+				'/1/variables',
+				'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+			],
+			[
+				['type' => API_HTTP_VARIABLES],
+				[
+					[
+						'name' => '{var}',
+						'value' => 'value1'
+					],
+					[
+						'name' => '{var}',
+						'value' => 'value2'
+					]
+				],
+				'/1/variables',
+				'Invalid parameter "/1/variables/2": value ({var}) already exists.'
+			],
+			[
+				['type' => API_HTTP_QUERY_FIELDS],
+				[
+					[
+						'value' => 'value'
+					]
+				],
+				'/1/query_fields',
+				'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
+			],
+			[
+				['type' => API_HTTP_QUERY_FIELDS],
+				[
+					[
+						'name' => str_repeat('Long ', 95) . 'Name',
+						'value' => 'value'
+					]
+				],
+				'/1/query_fields',
+				'Invalid parameter "/1/query_fields/1/name": value is too long.'
+			],
+			[
+				['type' => API_HTTP_POST_FIELDS],
+				'a=form field post\r post that\n should : be altered',
+				'/1/post_fields',
+				[
+					[
+						'name' => 'a',
+						'value' => 'form field post\r post that\n should : be altered',
+						'type' => ZBX_HTTPFIELD_POST_FIELD
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_POST],
+				'a=raw\r post that\n should : not be altered',
+				'/1/posts',
+				'a=raw\r post that\n should : not be altered'
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'p1',
+						'value' => 'value1'
+					],
+					[
+						'name' => 'p2',
+						'value' => 'value2'
+					]
+				],
+				'/1/posts',
+				[
+					[
+						'name' => 'p1',
+						'value' => 'value1',
+						'type' => ZBX_HTTPFIELD_POST_FIELD
+					],
+					[
+						'name' => 'p2',
+						'value' => 'value2',
+						'type' => ZBX_HTTPFIELD_POST_FIELD
+					]
+				]
+			]
 		];
 	}
 
