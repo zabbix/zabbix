@@ -454,6 +454,8 @@ SVGMapElement.prototype.remove = function () {
 	['highlight', 'image', 'label', 'markers'].forEach(function (name) {
 		this.removeItem(name);
 	}, this);
+
+	delete this.map.elements[this.options.selementid];
 };
 
 SVGMapElement.prototype.updateHighlight = function() {
@@ -798,6 +800,8 @@ SVGMapLink.prototype.update = function(options) {
 
 SVGMapLink.prototype.remove = function () {
 	if (this.element !== null) {
+		delete this.map.links[this.options.linkid];
+
 		this.element.remove();
 		this.element = null;
 	}
@@ -1003,6 +1007,8 @@ SVGMapShape.prototype.replace = function (element) {
 
 SVGMapShape.prototype.remove = function () {
 	if (this.element !== null) {
+		delete this.map.shapes[this.options.shapeid];
+
 		this.element.remove();
 		this.element = null;
 	}
