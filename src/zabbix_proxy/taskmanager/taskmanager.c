@@ -139,7 +139,6 @@ static int	tm_process_tasks(int now)
 	zbx_uint64_t	taskid;
 	unsigned char	type;
 
-
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
 				" where status=%d"

@@ -35,6 +35,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_agent";
+
 	int		ret;
 	AGENT_RESULT	agent_result;
 	char		*param = NULL, *port = NULL;
@@ -103,6 +104,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_terminal";
+
 	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
 	DC_ITEM		item;
@@ -193,6 +195,7 @@ fail:
 static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script, zbx_uint64_t *groupid)
 {
 	const char	*__function_name = "DBget_script_by_scriptid";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
@@ -224,6 +227,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
 	const char		*__function_name = "check_script_permissions";
+
 	DB_RESULT		result;
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	groupids;
@@ -267,6 +271,7 @@ exit:
 static int	check_user_permissions(zbx_uint64_t userid, const DC_HOST *host, zbx_script_t *script)
 {
 	const char	*__function_name = "check_user_permissions";
+
 	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -339,6 +344,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 		size_t max_error_len)
 {
 	const char	*__function_name = "zbx_script_prepare";
+
 	int		ret = FAIL;
 	zbx_uint64_t	groupid;
 
@@ -426,6 +432,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 		size_t max_error_len)
 {
 	const char	*__function_name = "zbx_script_execute";
+
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

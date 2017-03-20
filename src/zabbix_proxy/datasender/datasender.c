@@ -64,13 +64,13 @@ static int	proxy_data_sender(int *more, int now)
 
 	zbx_socket_t		sock;
 	struct zbx_json		j;
+	struct zbx_json_parse	jp, jp_tasks;
 	int			ret = FAIL, availability_ts, history_records, discovery_records, areg_records,
 				more_history, more_discovery, more_areg;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL;
 	zbx_vector_ptr_t	tasks;
-	struct zbx_json_parse	jp, jp_tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

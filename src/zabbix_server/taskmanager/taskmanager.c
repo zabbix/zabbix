@@ -203,9 +203,8 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	alertid, parent_taskid = 0;
-	char		*error;
 	int		status, ret = FAIL;
-	char		*sql = NULL;
+	char		*error, *sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
 	DBbegin();
@@ -226,8 +225,7 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 		if (SUCCEED == status)
 		{
-			DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64,
-					ALERT_STATUS_SENT, alertid);
+			DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64, ALERT_STATUS_SENT, alertid);
 		}
 		else
 		{

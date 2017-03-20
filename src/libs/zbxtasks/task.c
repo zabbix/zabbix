@@ -728,8 +728,8 @@ out:
  ******************************************************************************/
 static zbx_tm_task_t	*tm_json_deserialize_task(const struct zbx_json_parse *jp)
 {
-	char		value[MAX_STRING_LEN];
-	int		type, clock, ttl;
+	char	value[MAX_STRING_LEN];
+	int	type, clock, ttl;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, value, sizeof(value)))
 		return NULL;
@@ -761,7 +761,7 @@ static zbx_tm_task_t	*tm_json_deserialize_task(const struct zbx_json_parse *jp)
  ******************************************************************************/
 void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_ptr_t *tasks)
 {
-	const char	*pnext = NULL;
+	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_task;
 
 	while (NULL != (pnext = zbx_json_next(jp, pnext)))

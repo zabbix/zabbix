@@ -41,6 +41,7 @@ extern int		server_num, process_num;
 static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
 	const char	*__function_name = "connect_to_proxy";
+
 	int		ret = FAIL;
 	char		*tls_arg1, *tls_arg2;
 
@@ -82,6 +83,7 @@ out:
 static int	send_data_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, const char *data)
 {
 	const char	*__function_name = "send_data_to_proxy";
+
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, data);
@@ -148,6 +150,7 @@ static void	disconnect_proxy(zbx_socket_t *sock)
 static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts, int tasks)
 {
 	const char	*__function_name = "get_data_from_proxy";
+
 	zbx_socket_t	s;
 	struct zbx_json	j;
 	int		ret;
@@ -636,6 +639,7 @@ out:
 static int	proxy_get_data(DC_PROXY *proxy, int *more)
 {
 	const char	*__function_name = "proxy_get_data";
+
 	char		*answer = NULL;
 	int		ret = FAIL, version;
 	zbx_timespec_t	ts;
@@ -704,6 +708,7 @@ out:
 static int	proxy_get_tasks(DC_PROXY *proxy)
 {
 	const char	*__function_name = "proxy_get_tasks";
+
 	char		*answer = NULL;
 	int		ret = FAIL, more;
 	zbx_timespec_t	ts;
@@ -743,6 +748,7 @@ out:
 static int	process_proxy(void)
 {
 	const char		*__function_name = "process_proxy";
+
 	DC_PROXY		proxy;
 	int			num, i, more;
 	char			*port = NULL;
