@@ -1277,7 +1277,7 @@ class C34XmlValidator {
 			$rules = ['type' => XML_INDEXED_ARRAY, 'prefix' => 'post_field', 'rules' => [
 				'post_field' =>	['type' => XML_ARRAY, 'rules' => [
 					'name' =>		['type' => XML_STRING | XML_REQUIRED],
-					'value' =>		['type' => XML_STRING]
+					'value' =>		['type' => XML_STRING | XML_REQUIRED]
 				]]
 			]];
 		}
