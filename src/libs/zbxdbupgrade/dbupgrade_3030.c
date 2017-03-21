@@ -389,13 +389,14 @@ static int	DBpatch_3030031(void)
 {
 	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (FAIL == DBmodify_field_type("triggers", &field))
-		return FAIL;
+	return DBmodify_field_type("triggers", &field);
+}
 
-	if (FAIL == DBmodify_field_type("alerts", &field))
-		return FAIL;
+static int	DBpatch_3030032(void)
+{
+	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return SUCCEED;
+	return DBmodify_field_type("alerts", &field);
 }
 
 #endif
@@ -436,5 +437,6 @@ DBPATCH_ADD(3030028, 0, 1)
 DBPATCH_ADD(3030029, 0, 1)
 DBPATCH_ADD(3030030, 0, 1)
 DBPATCH_ADD(3030031, 0, 1)
+DBPATCH_ADD(3030032, 0, 1)
 
 DBPATCH_END()
