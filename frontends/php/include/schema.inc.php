@@ -1842,7 +1842,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '1',
+				'default' => '2',
 			],
 		],
 	],
@@ -6680,7 +6680,7 @@ return [
 				'default' => '',
 			],
 			'alertid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'alerts',
