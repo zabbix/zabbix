@@ -113,8 +113,14 @@ abstract class CMapElement extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape type is not correct.'));
 			}
 
-			foreach (['x', 'y', 'width', 'height'] as $field) {
+			foreach (['x', 'y'] as $field) {
 				if (array_key_exists($field, $shape) && $shape[$field] < 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape position is not correct.'));
+				}
+			}
+
+			foreach (['width', 'height'] as $field) {
+				if (array_key_exists($field, $shape) && $shape[$field] < 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape dimensions are not correct.'));
 				}
 			}
