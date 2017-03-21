@@ -1044,7 +1044,7 @@ ZABBIX.apps.map = (function($) {
 					y: 10,
 					width: 50,
 					height: 50,
-					border_color: '2D2D2D',
+					border_color: 'DD0000',
 					background_color: '',
 					border_width: 2,
 					font: 9, // Helvetica
