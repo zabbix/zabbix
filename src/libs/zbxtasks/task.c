@@ -340,14 +340,11 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
  *                                                                            *
  * Parameters: tasks - [IN] the tasks                                         *
  *                                                                            *
- * Return value: SUCCEED - the tasks were saved successfully                  *
- *               FAIL    - otherwise                                          *
- *                                                                            *
  ******************************************************************************/
-int	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
+void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 {
 	const char	*__function_name = "zbx_tm_save_tasks";
-	int		i, ret, remote_command_num = 0, remote_command_result_num = 0, ids_num = 0;
+	int		i, saved, remote_command_num = 0, remote_command_result_num = 0, ids_num = 0;
 	zbx_uint64_t	taskid;
 	zbx_tm_task_t	*task;
 
@@ -385,17 +382,16 @@ int	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 			task->taskid = taskid++;
 	}
 
-	ret = tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	saved = tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
 
-	if (SUCCEED == ret && 0 != remote_command_num)
-		ret = tm_save_remote_command_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	if (SUCCEED == saved && 0 != remote_command_num)
+		saved = tm_save_remote_command_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
 
-	if (SUCCEED == ret && 0 != remote_command_result_num)
-		ret = tm_save_remote_command_result_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	if (SUCCEED == saved && 0 != remote_command_result_num)
+		saved = tm_save_remote_command_result_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
-	return ret;
 }
 
 /******************************************************************************

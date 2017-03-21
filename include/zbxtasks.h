@@ -100,7 +100,7 @@ zbx_tm_remote_command_t *zbx_tm_remote_command_create(int commandtype, const cha
 zbx_tm_remote_command_result_t	*zbx_tm_remote_command_result_create(zbx_uint64_t parent_taskid, int status,
 		const char *error);
 
-int	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks);
+void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks);
 int	zbx_tm_save_task(zbx_tm_task_t *task);
 
 void	zbx_tm_get_proxy_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid);

@@ -3661,29 +3661,20 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
  * Purpose: parse tasks contents and saves the received tasks                 *
  *                                                                            *
  * Parameters: jp_tasks - [IN] JSON with tasks data                           *
- *             error    - [OUT] address of a pointer to the info string       *
- *                        (should be freed by the caller)                     *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL    - an error occurred                                 *
  *                                                                            *
  ******************************************************************************/
-static int	process_tasks_contents(struct zbx_json_parse *jp_tasks, char **error)
+static void	process_tasks_contents(struct zbx_json_parse *jp_tasks)
 {
-	int			ret;
 	zbx_vector_ptr_t	tasks;
 
 	zbx_vector_ptr_create(&tasks);
 
 	zbx_tm_json_deserialize_tasks(jp_tasks, &tasks);
 
-	if (SUCCEED != (ret = zbx_tm_save_tasks(&tasks)))
-		*error = zbx_strdup(*error, "Cannot save tasks");
+	zbx_tm_save_tasks(&tasks);
 
 	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 	zbx_vector_ptr_destroy(&tasks);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -3770,10 +3761,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_TASKS, &jp_data))
-	{
-		if (SUCCEED != process_tasks_contents(&jp_data, &error_step))
-			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
-	}
+		process_tasks_contents(&jp_data);
 
 	zbx_free(error_step);
 	ret = SUCCEED;
