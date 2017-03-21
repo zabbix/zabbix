@@ -846,7 +846,7 @@ class CApiInputValidator {
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
-	 * @param array  $type
+	 * @param int    $type
 	 *
 	 * @return bool
 	 */
