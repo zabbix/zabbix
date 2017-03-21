@@ -344,7 +344,7 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 {
 	const char	*__function_name = "zbx_tm_save_tasks";
-	int		i, saved, remote_command_num = 0, remote_command_result_num = 0, ids_num = 0;
+	int		i, rc, remote_command_num = 0, remote_command_result_num = 0, ids_num = 0;
 	zbx_uint64_t	taskid;
 	zbx_tm_task_t	*task;
 
@@ -382,13 +382,13 @@ void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 			task->taskid = taskid++;
 	}
 
-	saved = tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	rc = tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
 
-	if (SUCCEED == saved && 0 != remote_command_num)
-		saved = tm_save_remote_command_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	if (SUCCEED == rc && 0 != remote_command_num)
+		rc = tm_save_remote_command_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
 
-	if (SUCCEED == saved && 0 != remote_command_result_num)
-		saved = tm_save_remote_command_result_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	if (SUCCEED == rc && 0 != remote_command_result_num)
+		tm_save_remote_command_result_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
