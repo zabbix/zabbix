@@ -901,7 +901,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 
 	static int		lastsent;
 	int			now;
-	zbx_am_media_t	*media;
+	zbx_am_media_t		*media;
 	zbx_am_mediatype_t	*mediatype;
 	zbx_am_alertpool_t	*alertpool;
 	zbx_am_alert_t		*alert;
@@ -1084,7 +1084,6 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts, int now)
 		if (ALERT_STATUS_NEW == alert->status)
 			zbx_vector_uint64_append(&alertids, alert->alertid);
 	}
-
 	DBfree_result(result);
 
 	if (0 != alertids.values_num)
@@ -1130,18 +1129,18 @@ out:
  *               FAIL    - database connection error                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_db_update_mediatypes(zbx_am_t *manager, zbx_uint64_t *mediatypeids, int mediatypeids_num)
+static int	am_db_update_mediatypes(zbx_am_t *manager, const zbx_uint64_t *mediatypeids, int mediatypeids_num)
 {
-	const char		*__function_name = "am_db_update_mediatypes";
+	const char	*__function_name = "am_db_update_mediatypes";
 
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	int			type, maxsessions, maxattempts, attempt_interval, ret = SUCCEED;
-	zbx_uint64_t		mediatypeid;
-	unsigned short		smtp_port;
-	unsigned char		smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		type, maxsessions, maxattempts, attempt_interval, ret = SUCCEED;
+	zbx_uint64_t	mediatypeid;
+	unsigned short	smtp_port;
+	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1205,7 +1204,6 @@ static int	am_db_update_mediatypes(zbx_am_t *manager, zbx_uint64_t *mediatypeids
 				row[9], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
 				smtp_authentication, row[15], maxsessions, maxattempts, attempt_interval);
 	}
-
 	DBfree_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() mediatypes:%d", __function_name, mediatypeids_num);
@@ -1372,7 +1370,7 @@ static int	am_db_flush_alert_updates(zbx_am_t *manager)
 
 	DBbegin();
 
-	for (i = 0; i < updates.values_num; i+= 100)
+	for (i = 0; i < updates.values_num; i += 100)
 	{
 		sql_offset = 0;
 
@@ -1444,7 +1442,7 @@ static int	am_db_sync_watchdog(zbx_am_t *manager)
 	int			i, ret = SUCCEED;
 	zbx_hashset_t		mediaids;
 	zbx_uint64_t		mediaid;
-	zbx_am_media_t	*media, media_local;
+	zbx_am_media_t		*media, media_local;
 	zbx_hashset_iter_t	iter;
 	zbx_vector_uint64_t	mediatypeids;
 	zbx_vector_ptr_t	media_new;
@@ -1726,7 +1724,7 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 	zbx_am_alerter_t	*alerter;
 	zbx_uint64_t		alertid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == (alerter = am_get_alerter_by_client(manager, client)))
 	{
@@ -1774,7 +1772,6 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 	zbx_free(errmsg);
 
 	zbx_queue_ptr_push(&manager->free_alerters, alerter);
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
