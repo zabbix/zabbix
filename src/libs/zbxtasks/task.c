@@ -348,7 +348,7 @@ int	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 {
 	const char	*__function_name = "zbx_tm_save_tasks";
 	int		i, ret, remote_command_num = 0, remote_command_result_num = 0, ids_num = 0;
-	zbx_uint64_t	taskid = 0;
+	zbx_uint64_t	taskid;
 	zbx_tm_task_t	*task;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, tasks->values_num);
@@ -361,7 +361,7 @@ int	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 			ids_num++;
 	}
 
-	if (ids_num != 0)
+	if (0 != ids_num)
 		taskid = DBget_maxid_num("task", ids_num);
 
 	for (i = 0; i < tasks->values_num; i++)
