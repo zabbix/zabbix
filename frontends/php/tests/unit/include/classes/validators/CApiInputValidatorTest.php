@@ -1097,41 +1097,30 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'@^[a-z$'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
-				"Host:www.zabbix.com\nConnection:keep-alive\nPragma:no-cache",
-				'/1/headers',
-				[
-					[
-						'name' => 'Host',
-						'value' => 'www.zabbix.com'
-					],
-					[
-						'name' => 'Connection',
-						'value' => 'keep-alive'
-					],
-					[
-						'name' => 'Pragma',
-						'value' => 'no-cache'
-					]
-				]
+				['type' => API_VARIABLE_NAME],
+				'{var1}',
+				'/1/variables',
+				'{var1}'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
-				"Host:zabbix.com:8080\n\r\r\n\nCustom:v:a:l:u:e\r\n\r\n",
-				'/1/headers',
-				[
-					[
-						'name' => 'Host',
-						'value' => 'zabbix.com:8080'
-					],
-					[
-						'name' => 'Custom',
-						'value' => 'v:a:l:u:e'
-					]
-				]
+				['type' => API_VARIABLE_NAME],
+				'{var',
+				'/1/variables',
+				'Invalid parameter "/1/variables": is not enclosed in {} or is malformed.'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
+				['type' => API_HTTP_POST, 'name-length' => 255],
+				[
+					[
+						'name' => str_repeat('Long ', 95) . 'Name',
+						'value' => 'value'
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/1/name": value is too long.'
+			],
+			[
+				['type' => API_HTTP_POST],
 				[
 					[
 						'name' => 'Host',
@@ -1139,10 +1128,10 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 					],
 					[
 						'name' => 'Custom',
-						'values' => 'v:a:l:u:e'
+						'value' => 'v:a:l:u:e'
 					]
 				],
-				'/1/headers',
+				'/1/posts',
 				[
 					[
 						'name' => 'Host',
@@ -1155,7 +1144,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				['type' => API_HTTP_HEADERS],
+				['type' => API_HTTP_POST],
 				[
 					[
 						'name' => 'Host',
@@ -1164,11 +1153,11 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 					[
 					]
 				],
-				'/1/headers',
-				'Invalid parameter "/1/headers/2": the parameter "name" is missing.'
+				'/1/posts',
+				'Invalid parameter "/1/posts/2": the parameter "name" is missing.'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
+				['type' => API_HTTP_POST],
 				[
 					[
 						'name' => 'Host',
@@ -1178,11 +1167,11 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						'name' => 'Custom'
 					]
 				],
-				'/1/headers',
-				'Invalid parameter "/1/headers/2": the parameter "value" is missing.'
+				'/1/posts',
+				'Invalid parameter "/1/posts/2": the parameter "value" is missing.'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
+				['type' => API_HTTP_POST],
 				[
 					[
 						'name' => 'Host',
@@ -1194,11 +1183,11 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						'type' => 1
 					]
 				],
-				'/1/headers',
-				'Invalid parameter "/1/headers/2": unexpected parameter "type".'
+				'/1/posts',
+				'Invalid parameter "/1/posts/2": unexpected parameter "type".'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
+				['type' => API_HTTP_POST],
 				[
 					[
 						'name' => 'Host',
@@ -1209,11 +1198,11 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						'value' => 'v:a:l:u:e'
 					]
 				],
-				'/1/headers',
-				'Invalid parameter "/1/headers/2/name": a character string is expected.'
+				'/1/posts',
+				'Invalid parameter "/1/posts/2/name": a character string is expected.'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
+				['type' => API_HTTP_POST],
 				[
 					[
 						'name' => 'Host',
@@ -1224,11 +1213,11 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						'value' => true
 					]
 				],
-				'/1/headers',
-				'Invalid parameter "/1/headers/2/value": a character string is expected.'
+				'/1/posts',
+				'Invalid parameter "/1/posts/2/value": a character string is expected.'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
+				['type' => API_HTTP_POST],
 				[
 					[
 						'name' => 'Host',
@@ -1239,11 +1228,11 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						'value' => 'v:a:l:u:e'
 					]
 				],
-				'/1/headers',
-				'Invalid parameter "/1/headers/2/name": cannot be empty.'
+				'/1/posts',
+				'Invalid parameter "/1/posts/2/name": cannot be empty.'
 			],
 			[
-				['type' => API_HTTP_HEADERS],
+				['type' => API_HTTP_POST],
 				[
 					[
 						'name' => 'Host',
@@ -1254,140 +1243,35 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						'value' => ''
 					]
 				],
-				'/1/headers',
-				'Invalid parameter "/1/headers/2/value": cannot be empty.'
-			],
-			[
-				['type' => API_HTTP_HEADERS],
-				true,
-				'/1/headers',
-				'Invalid parameter "/1/headers": an array is expected.'
-			],
-			[
-				['type' => API_HTTP_HEADERS],
-				null,
-				'/1/headers',
-				'Invalid parameter "/1/headers": an array is expected.'
-			],
-			[
-				['type' => API_HTTP_HEADERS],
-				['a', 'b'],
-				'/1/headers',
-				'Invalid parameter "/1/headers/1": an array is expected.'
-			],
-			[
-				['type' => API_HTTP_HEADERS],
-				"Header",
-				'/1/headers',
-				'Invalid parameter "/1/headers/1/value": cannot be empty.'
-			],
-			[
-				['type' => API_HTTP_HEADERS],
-				"Header",
-				'/',
-				'Invalid parameter "/1/value": cannot be empty.'
-			],
-			[
-				['type' => API_HTTP_VARIABLES],
-				"{a}=1\n{b}=2",
-				'/1/variables',
+				'/1/posts',
 				[
 					[
-						'name' => '{a}',
-						'value' => '1',
-						'type' => ZBX_HTTPFIELD_VARIABLE
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
 					],
 					[
-						'name' => '{b}',
-						'value' => '2',
-						'type' => ZBX_HTTPFIELD_VARIABLE
-					]
-				]
-			],
-			[
-				['type' => API_HTTP_VARIABLES],
-				[
-					[
-						'name' => '{var1}',
-						'value' => 'value1'
-					],
-					[
-						'name' => '{var2}',
+						'name' => 'Custom',
 						'value' => ''
 					]
-				],
-				'/1/variables',
-				[
-					[
-						'name' => '{var1}',
-						'value' => 'value1',
-						'type' => ZBX_HTTPFIELD_VARIABLE
-					],
-					[
-						'name' => '{var2}',
-						'value' => '',
-						'type' => ZBX_HTTPFIELD_VARIABLE
-					]
 				]
 			],
 			[
-				['type' => API_HTTP_VARIABLES],
-				[
-					[
-						'name' => '{var}1',
-						'value' => 'value1'
-					]
-				],
-				'/1/variables',
-				'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+				['type' => API_HTTP_POST],
+				true,
+				'/1/posts',
+				'Invalid parameter "/1/posts": a character string is expected.'
 			],
 			[
-				['type' => API_HTTP_VARIABLES],
-				[
-					[
-						'name' => '{var}',
-						'value' => 'value1'
-					],
-					[
-						'name' => '{var}',
-						'value' => 'value2'
-					]
-				],
-				'/1/variables',
-				'Invalid parameter "/1/variables/2": value ({var}) already exists.'
+				['type' => API_HTTP_POST],
+				null,
+				'/1/posts',
+				'Invalid parameter "/1/posts": a character string is expected.'
 			],
 			[
-				['type' => API_HTTP_QUERY_FIELDS],
-				[
-					[
-						'value' => 'value'
-					]
-				],
-				'/1/query_fields',
-				'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
-			],
-			[
-				['type' => API_HTTP_QUERY_FIELDS],
-				[
-					[
-						'name' => str_repeat('Long ', 95) . 'Name',
-						'value' => 'value'
-					]
-				],
-				'/1/query_fields',
-				'Invalid parameter "/1/query_fields/1/name": value is too long.'
-			],
-			[
-				['type' => API_HTTP_POST_FIELDS],
-				'a=form field post\r post that\n should : be altered',
-				'/1/post_fields',
-				[
-					[
-						'name' => 'a',
-						'value' => 'form field post\r post that\n should : be altered',
-						'type' => ZBX_HTTPFIELD_POST_FIELD
-					]
-				]
+				['type' => API_HTTP_POST],
+				['a', 'b'],
+				'/1/posts',
+				'Invalid parameter "/1/posts/1": an array is expected.'
 			],
 			[
 				['type' => API_HTTP_POST],
@@ -1411,13 +1295,11 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				[
 					[
 						'name' => 'p1',
-						'value' => 'value1',
-						'type' => ZBX_HTTPFIELD_POST_FIELD
+						'value' => 'value1'
 					],
 					[
 						'name' => 'p2',
-						'value' => 'value2',
-						'type' => ZBX_HTTPFIELD_POST_FIELD
+						'value' => 'value2'
 					]
 				]
 			]
