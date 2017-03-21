@@ -588,9 +588,13 @@ function create_color_picker() {
 }
 
 function set_color(color) {
+	var background = color;
 	if (curr_lbl) {
-		curr_lbl.style.background = curr_lbl.style.color = '#' + color;
-		curr_lbl.title = '#' + color;
+		if (color.trim() !== '') {
+			background = '#' + color;
+		}
+		curr_lbl.style.background = curr_lbl.style.color = background;
+		curr_lbl.title = background;
 	}
 	if (curr_txt) {
 		curr_txt.value = color.toString().toUpperCase();

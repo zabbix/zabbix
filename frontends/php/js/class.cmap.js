@@ -735,7 +735,7 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// changes for color inputs
-				this.linkForm.domNode.on('change', '.input-color-picker input', function() {
+				$('.input-color-picker input').on('change', function() {
 					var id = $(this).attr('id');
 
 					set_color_by_name(id, this.value);
