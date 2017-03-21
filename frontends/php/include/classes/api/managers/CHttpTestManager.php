@@ -107,8 +107,15 @@ class CHttpTestManager {
 
 		foreach ($httpTests as $hnum => $httpTest) {
 			$httpTests[$hnum]['httptestid'] = $httpTestIds[$hnum];
-
 			$httpTest['httptestid'] = $httpTestIds[$hnum];
+
+			$field_types = [ZBX_HTTPFIELD_VARIABLE => 'variables', ZBX_HTTPFIELD_HEADER => 'headers'];
+			foreach ($field_types as $field_type => $field_name) {
+				foreach($httpTest[$field_name] as &$field) {
+					$field['type'] = $field_type;
+				}
+				unset($field);
+			}
 			$this->createTestFieldsReal($httpTest, array_merge($httpTest['variables'], $httpTest['headers']));
 			$this->createHttpTestItems($httpTest);
 			$this->createStepsReal($httpTest, $httpTest['steps']);
@@ -849,10 +856,8 @@ class CHttpTestManager {
 	 * @throws Exception
 	 */
 	protected function createStepsReal($httpTest, $websteps) {
-		foreach ($websteps as $snum => $webstep) {
-			$websteps[$snum]['httptestid'] = $httpTest['httptestid'];
-		}
 		foreach ($websteps as $snum => &$webstep) {
+			$websteps[$snum]['httptestid'] = $httpTest['httptestid'];
 			if (is_array($webstep['posts'])) {
 				$webstep['post_fields'] = $webstep['posts'];
 				$webstep['posts'] = '';
@@ -883,9 +888,25 @@ class CHttpTestManager {
 			$webstepid = $webstepids[$snum];
 
 			$fields = [];
-			foreach (['variables', 'headers', 'post_fields', 'query_fields'] as $field) {
-				if (array_key_exists($field, $webstep)) {
-					$fields = array_merge($fields, $webstep[$field]);
+			$field_types = [
+				'headers' => ZBX_HTTPFIELD_HEADER,
+				'variables' => ZBX_HTTPFIELD_VARIABLE,
+				'query_fields' => ZBX_HTTPFIELD_QUERY_FIELD
+			];
+
+			if ($webstep['post_type'] === ZBX_POSTTYPE_FORM) {
+				$webstep['posts'] = $webstep['post_fields'];
+				$field_types['posts'] = ZBX_HTTPFIELD_POST_FIELD;
+				unset($webstep['post_fields']);
+			}
+
+			foreach ($field_types as $field_name => $field_type) {
+				if (array_key_exists($field_name, $webstep)) {
+					foreach ($webstep[$field_name] as &$field) {
+						$field['type'] = $field_type;
+					}
+					unset($field);
+					$fields = array_merge($fields, $webstep[$field_name]);
 				}
 			}
 

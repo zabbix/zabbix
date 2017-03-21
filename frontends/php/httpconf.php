@@ -235,19 +235,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			if (array_key_exists('pairs', $step)) {
-				$pairs = [];
-				foreach ($step['pairs'] as $pair) {
-					if ((array_key_exists('name', $pair) && '' !== trim($pair['name'])) ||
-						(array_key_exists('value', $pair) && '' !== trim($pair['value']))) {
-						$pairs[] = $pair;
-					}
-				}
-
 				foreach ($pair_names as $pair_name) {
 					$step[$pair_name] = [];
 					foreach ($step['pairs'] as $pair) {
-						if (array_key_exists('type', $pair) && $pair_name === $pair['type']) {
-							$step[$pair_name][] = $pair;
+						if (array_key_exists('type', $pair) && $pair_name === $pair['type'] &&
+							((array_key_exists('name', $pair) && trim($pair['name']) !== '') ||
+							(array_key_exists('value', $pair) && trim($pair['value']) !== ''))) {
+							$step[$pair_name][] = [
+								'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
+								'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
+							];
 						}
 					}
 				}
@@ -262,14 +259,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		unset($step);
 
-		$pairs = [];
-		foreach (getRequest('pairs', []) as $pair) {
-			if ((array_key_exists('name', $pair) && '' !== trim($pair['name'])) ||
-				(array_key_exists('value', $pair) && '' !== trim($pair['value']))) {
-				$pairs[] = $pair;
-			}
-		}
-
 		$httpTest = [
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
@@ -279,9 +268,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'retries' => $_REQUEST['retries'],
 			'status' => hasRequest('status') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED,
 			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),
-			'variables' => array_filter($pairs, function($pair) {
-				return array_key_exists('type', $pair) && 'variables' === $pair['type'];
-			}),
+			'variables' => [],
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps,
 			'http_user' => ($_REQUEST['authentication'] == HTTPTEST_AUTH_NONE) ? '' : $_REQUEST['http_user'],
@@ -291,10 +278,20 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ssl_cert_file' => getRequest('ssl_cert_file'),
 			'ssl_key_file' => getRequest('ssl_key_file'),
 			'ssl_key_password' => getRequest('ssl_key_password'),
-			'headers' => array_filter($pairs, function($pair) {
-				return array_key_exists('type', $pair) && 'headers' === $pair['type'];
-			})
+			'headers' => []
 		];
+
+		foreach (getRequest('pairs', []) as $pair) {
+			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers']) &&
+				((array_key_exists('name', $pair) && trim($pair['name']) !== '') ||
+				(array_key_exists('value', $pair) && trim($pair['value']) !== ''))) {
+
+				$httpTest[$pair['type']][] = [
+					'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
+					'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
+				];
+			}
+		}
 
 		if ($new_application) {
 			$exApp = API::Application()->get([

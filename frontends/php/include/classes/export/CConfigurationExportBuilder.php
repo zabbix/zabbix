@@ -410,6 +410,7 @@ class CConfigurationExportBuilder {
 			$result[] = [
 				'name' => $httpstep['name'],
 				'url' => $httpstep['url'],
+				'query_fields' => $httpstep['query_fields'],
 				'posts' => $httpstep['posts'],
 				'variables' => $httpstep['variables'],
 				'headers' => $httpstep['headers'],

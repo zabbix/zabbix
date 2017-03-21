@@ -108,20 +108,11 @@ class CApiInputValidator {
 			case API_REGEX:
 				return self::validateRegex($rule, $data, $path, $error);
 
-			case API_HTTP_HEADERS:
-				return self::validateHttpHeaders($rule, $data, $path, $error);
-
-			case API_HTTP_VARIABLES:
-				return self::validateHttpVariables($rule, $data, $path, $error);
-
-			case API_HTTP_QUERY_FIELDS:
-				return self::validateHttpQueryFields($rule, $data, $path, $error);
-
-			case API_HTTP_POST_FIELDS:
-				return self::validateHttpPostFields($rule, $data, $path, $error);
-
 			case API_HTTP_POST:
 				return self::validateHttpPosts($rule, $data, $path, $error);
+
+			case API_VARIABLE_NAME:
+				return self::validateVariableName($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -153,11 +144,8 @@ class CApiInputValidator {
 			case API_USER_MACRO:
 			case API_TIME_PERIOD:
 			case API_REGEX:
-			case API_HTTP_HEADERS:
-			case API_HTTP_VARIABLES:
-			case API_HTTP_QUERY_FIELDS:
-			case API_HTTP_POST_FIELDS:
 			case API_HTTP_POST:
+			case API_VARIABLE_NAME:
 				return true;
 
 			case API_IDS:
@@ -841,147 +829,6 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * HTTP pair validator.
-	 *
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 * @param int    $type
-	 *
-	 * @return bool
-	 */
-	private static function validateHTTPPairs(&$data, $path, &$error, $type) {
-		/* converts to pair array */
-		if (!is_array($data)) {
-			$delimiter = ($type === ZBX_HTTPFIELD_HEADER) ? ':' : '=';
-
-			$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $data))));
-			foreach ($pairs as &$pair) {
-				$pair = explode($delimiter, $pair, 2);
-				$pair = [
-					'name' => $pair[0],
-					'value' => array_key_exists(1, $pair) ? $pair[1] : ''
-				];
-			}
-			unset($pair);
-
-			$data = $pairs;
-		}
-
-		$names = [];
-		foreach ($data as $i => &$pair) {
-			$index = $i + 1;
-
-			if (!array_key_exists('name', $pair)) {
-				$pair['name'] = '';
-			}
-
-			$rule = [
-				'flags' => API_NOT_EMPTY,
-				'length' => DB::getFieldLength('httpstep_field', 'name')
-			];
-
-			if (!self::validateStringUtf8($rule, $pair['name'], "{$path}/{$index}/name", $error)) {
-				return false;
-			}
-
-			if ($type === ZBX_HTTPFIELD_VARIABLE && preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', "{$path}/{$index}/name",
-						_('is not enclosed in {} or is malformed'));
-				return false;
-			}
-
-			if (!array_key_exists('value', $pair)) {
-				$pair['value'] = '';
-			}
-
-			$rule = [
-				'flags' => ($type === ZBX_HTTPFIELD_HEADER) ? API_NOT_EMPTY : 0,
-				'length' => DB::getFieldLength('httpstep_field', 'value')
-			];
-
-			if (!self::validateStringUtf8($rule, $pair['value'], "{$path}/{$index}/value", $error)) {
-				return false;
-			}
-
-			/* normalize pair */
-			$pair = [
-				'name' => $pair['name'],
-				'value' => $pair['value'],
-				'type' => $type
-			];
-
-			$names[] = $pair['name'];
-		}
-		unset($pair);
-
-		/* variable names should be unique */
-		if ($type === ZBX_HTTPFIELD_VARIABLE) {
-			$rule = ['uniq' => true, 'fields' => 'name'];
-
-			return self::validateIdsUniqueness($rule, $names, $path, $error);
-		}
-
-		return true;
-	}
-
-	/**
-	 * HTTP variable field validator.
-	 *
-	 * @param array  $rule
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateHttpVariables($rule, &$data, $path, &$error) {
-		return self::validateHTTPPairs($data, $path, $error, ZBX_HTTPFIELD_VARIABLE);
-	}
-
-	/**
-	 * HTTP header field validator.
-	 *
-	 * @param array  $rule
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateHttpHeaders($rule, &$data, $path, &$error) {
-		return self::validateHTTPPairs($data, $path, $error, ZBX_HTTPFIELD_HEADER);
-	}
-
-	/**
-	 * HTTP GET field validator.
-	 *
-	 * @param array  $rule
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateHttpQueryFields($rule, &$data, $path, &$error) {
-		return self::validateHTTPPairs($data, $path, $error, ZBX_HTTPFIELD_QUERY_FIELD);
-	}
-
-	/**
-	 * HTTP POST field validator.
-	 *
-	 * @param array  $rule
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateHttpPostFields($rule, &$data, $path, &$error) {
-		return self::validateHTTPPairs($data, $path, $error, ZBX_HTTPFIELD_POST_FIELD);
-	}
-
-	/**
 	 * HTTP POST validator. Posts can be set to string (raw post) or to http pairs (form fields)
 	 *
 	 * @param array  $rule
@@ -993,11 +840,46 @@ class CApiInputValidator {
 	 */
 	private static function validateHttpPosts($rule, &$data, $path, &$error) {
 		if (is_array($data)) {
-			return self::validateHTTPPairs($data, $path, $error, ZBX_HTTPFIELD_POST_FIELD);
+			$rules = ['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+			]];
+
+			if (array_key_exists('name-length', $rule)) {
+				$rules['fields']['name']['length'] = $rule['name-length'];
+			}
+
+			if (array_key_exists('value-length', $rule)) {
+				$rules['fields']['value']['length'] = $rule['value-length'];
+			}
+
+			return self::validateData($rules, $data, $path, $error);
 		}
 
-		$rule = ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'posts')];
-
 		return self::validateStringUtf8($rule, $data, $path, $error);
+	}
+
+	/**
+	 * HTTP variable validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateVariableName($rule, &$data, $path, &$error) {
+		$rule['type'] = API_STRING_UTF8;
+		if (self::validateStringUtf8($rule, $data, $path, $error)) {
+			if (preg_match('/^{[^{}]+}$/', $data) === 1) {
+				return true;
+			}
+			else {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('is not enclosed in {} or is malformed'));
+			}
+		}
+
+		return false;
 	}
 }

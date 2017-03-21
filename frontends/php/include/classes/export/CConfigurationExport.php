@@ -679,8 +679,8 @@ class CConfigurationExport {
 				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
 				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password'
 			],
-			'selectSteps' => ['no', 'name', 'url', 'query_fields', 'posts', 'variables', 'headers', 'follow_redirects', 'retrieve_mode',
-				'timeout', 'required', 'status_codes'
+			'selectSteps' => ['no', 'name', 'url', 'query_fields', 'posts', 'variables', 'headers', 'follow_redirects',
+				'retrieve_mode', 'timeout', 'required', 'status_codes'
 			],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,

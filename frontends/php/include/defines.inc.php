@@ -1017,11 +1017,8 @@ define('API_SCRIPT_NAME',		10);
 define('API_USER_MACRO',		11);
 define('API_TIME_PERIOD',		12);
 define('API_REGEX',				13);
-define('API_HTTP_HEADERS',		14);
-define('API_HTTP_VARIABLES',	15);
-define('API_HTTP_QUERY_FIELDS',	16);
-define('API_HTTP_POST_FIELDS',	17);
-define('API_HTTP_POST',			18);
+define('API_HTTP_POST',			14);
+define('API_VARIABLE_NAME',		15);
 
 // flags
 define('API_REQUIRED',		0x01);
