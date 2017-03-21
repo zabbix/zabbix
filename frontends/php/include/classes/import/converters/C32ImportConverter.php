@@ -136,21 +136,17 @@ class C32ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHttpFields($value, $delimiter) {
-		if (is_string($value)) {
-			$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $value))));
-			foreach ($pairs as &$pair) {
-				$pair = explode($delimiter, $pair, 2);
-				$pair = [
-					'name' => $pair[0],
-					'value' => array_key_exists(1, $pair) ? $pair[1] : ''
-				];
-			}
-			unset($pair);
-
-			return $pairs;
+		$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $value))));
+		foreach ($pairs as &$pair) {
+			$pair = explode($delimiter, $pair, 2);
+			$pair = [
+				'name' => $pair[0],
+				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
+			];
 		}
+		unset($pair);
 
-		return $value;
+		return $pairs;
 	}
 
 	/**
