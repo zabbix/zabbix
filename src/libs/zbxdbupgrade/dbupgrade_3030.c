@@ -393,6 +393,14 @@ static int	DBpatch_3030034(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_3030035(void)
+{
+	/* 2 - ZBX_SCRIPT_EXECUTE_ON_PROXY */
+	const ZBX_FIELD field = {"execute_on", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("scripts", &field);
+}
 #endif
 
 DBPATCH_START(3030)
@@ -434,5 +442,6 @@ DBPATCH_ADD(3030031, 0, 1)
 DBPATCH_ADD(3030032, 0, 1)
 DBPATCH_ADD(3030033, 0, 1)
 DBPATCH_ADD(3030034, 0, 1)
+DBPATCH_ADD(3030035, 0, 0)
 
 DBPATCH_END()
