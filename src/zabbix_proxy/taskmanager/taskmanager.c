@@ -192,7 +192,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	static int	cleanup_time = 0;
 
 	double	sec1, sec2;
-	int	tasks_num = 0, sleeptime, nextcheck;
+	int	tasks_num, sleeptime, nextcheck;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
