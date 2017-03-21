@@ -832,6 +832,9 @@ class CApiInputValidator {
 	 * HTTP POST validator. Posts can be set to string (raw post) or to http pairs (form fields)
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['length']        (optional)
+	 * @param int    $rule['name-length']   (optional)
+	 * @param int    $rule['value-length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -840,9 +843,9 @@ class CApiInputValidator {
 	 */
 	private static function validateHttpPosts($rule, &$data, $path, &$error) {
 		if (is_array($data)) {
-			$rules = ['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
-				'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+			$rules = ['type' => API_OBJECTS, 'fields' => [
+				'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]];
 
 			if (array_key_exists('name-length', $rule)) {
@@ -852,17 +855,23 @@ class CApiInputValidator {
 			if (array_key_exists('value-length', $rule)) {
 				$rules['fields']['value']['length'] = $rule['value-length'];
 			}
+		}
+		else {
+			$rules = ['type' => API_STRING_UTF8];
 
-			return self::validateData($rules, $data, $path, $error);
+			if (array_key_exists('length', $rule)) {
+				$rules['length'] = $rule['length'];
+			}
 		}
 
-		return self::validateStringUtf8($rule, $data, $path, $error);
+		return self::validateData($rules, $data, $path, $error);
 	}
 
 	/**
 	 * HTTP variable validator.
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -870,16 +879,31 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateVariableName($rule, &$data, $path, &$error) {
-		$rule['type'] = API_STRING_UTF8;
-		if (self::validateStringUtf8($rule, $data, $path, $error)) {
-			if (preg_match('/^{[^{}]+}$/', $data) === 1) {
-				return true;
-			}
-			else {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('is not enclosed in {} or is malformed'));
-			}
+		if (!is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
+			return false;
 		}
 
-		return false;
+		if (mb_check_encoding($data, 'UTF-8') !== true) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+			return false;
+		}
+
+		if ($data === '') {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if (preg_match('/^{[^{}]+}$/', $data) !== 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('is not enclosed in {} or is malformed'));
+			return false;
+		}
+
+		return true;
 	}
 }

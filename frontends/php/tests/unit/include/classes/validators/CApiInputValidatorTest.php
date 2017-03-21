@@ -1097,10 +1097,28 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'@^[a-z$'
 			],
 			[
-				['type' => API_VARIABLE_NAME],
+				['type' => API_VARIABLE_NAME, 'length' => 6],
 				'{var1}',
 				'/1/variables',
 				'{var1}'
+			],
+			[
+				['type' => API_VARIABLE_NAME, 'length' => 5],
+				'{var1}',
+				'/1/variables',
+				'Invalid parameter "/1/variables": value is too long.'
+			],
+			[
+				['type' => API_VARIABLE_NAME],
+				'',
+				'/1/variables',
+				'Invalid parameter "/1/variables": cannot be empty.'
+			],
+			[
+				['type' => API_VARIABLE_NAME],
+				null,
+				'/1/variables',
+				'Invalid parameter "/1/variables": a character string is expected.'
 			],
 			[
 				['type' => API_VARIABLE_NAME],
@@ -1112,7 +1130,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_HTTP_POST, 'name-length' => 255],
 				[
 					[
-						'name' => str_repeat('Long ', 95) . 'Name',
+						'name' => str_repeat('Long ', 95).'name',
 						'value' => 'value'
 					]
 				],
@@ -1120,7 +1138,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/posts/1/name": value is too long.'
 			],
 			[
-				['type' => API_HTTP_POST],
+				['type' => API_HTTP_POST, 'value-length' => 255],
+				[
+					[
+						'name' => 'name',
+						'value' => str_repeat('Long ', 95).'value'
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/1/value": value is too long.'
+			],
+			[
+				['type' => API_HTTP_POST, 'name-length' => 6, 'value-length' => 19],
 				[
 					[
 						'name' => 'Host',
@@ -1278,6 +1307,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'a=raw\r post that\n should : not be altered',
 				'/1/posts',
 				'a=raw\r post that\n should : not be altered'
+			],
+			[
+				['type' => API_HTTP_POST, 'length' => 10],
+				'12345678901',
+				'/1/posts',
+				'Invalid parameter "/1/posts": value is too long.'
 			],
 			[
 				['type' => API_HTTP_POST],
