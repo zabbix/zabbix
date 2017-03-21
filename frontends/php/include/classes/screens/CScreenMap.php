@@ -27,12 +27,6 @@ class CScreenMap extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$output = [(new CDiv())->setId('map_'.$this->screenitem['screenitemid'])];
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			$output += [BR(), new CLink(_('Change'), $this->action)];
-		}
-
 		$severity = null;
 		if (array_key_exists('severity_min', $this->screenitem)) {
 			$severity = $this->screenitem['severity_min'];
@@ -41,6 +35,18 @@ class CScreenMap extends CScreenBase {
 		$mapData = CMapHelper::get($this->screenitem['resourceid'], $severity);
 		$mapData['container'] = "#map_{$this->screenitem['screenitemid']}";
 		$this->insertFlickerfreeJs($mapData);
+
+		$output = [
+			(new CDiv())
+				->setId('map_'.$this->screenitem['screenitemid'])
+				->addStyle('width:'.$mapData['canvas']['width'].'px;')
+				->addStyle('height:'.$mapData['canvas']['height'].'px;')
+				->addStyle('overflow:hidden;')
+		];
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$output += [BR(), new CLink(_('Change'), $this->action)];
+		}
 
 		$div = (new CDiv($output))
 			->addClass('map-container')
