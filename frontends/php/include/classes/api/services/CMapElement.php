@@ -123,6 +123,10 @@ abstract class CMapElement extends CApiService {
 				if (array_key_exists($field, $shape) && $shape[$field] < 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape dimensions are not correct.'));
 				}
+				else {
+					// default shape size
+					$shape[$field] = 200;
+				}
 			}
 
 			if (array_key_exists('font', $shape) && !in_array($shape['font'], range(0,12))) {
