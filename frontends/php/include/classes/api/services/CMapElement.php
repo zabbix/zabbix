@@ -130,7 +130,7 @@ abstract class CMapElement extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape font is not correct.'));
 			}
 
-			if (array_key_exists('font_size', $shape) && $shape['font_size'] < 1 || $shape['font_size'] > 250) {
+			if (array_key_exists('font_size', $shape) && ($shape['font_size'] < 1 || $shape['font_size'] > 250)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape font size is not correct.'));
 			}
 
