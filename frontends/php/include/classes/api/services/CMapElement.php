@@ -110,7 +110,7 @@ abstract class CMapElement extends CApiService {
 				$dbShape = $shape;
 			}
 
-			if (array_key_exists('type', $shape) && !in_array($shape['type'], range(0,1))) {
+			if (!array_key_exists('type', $shape) || !in_array($shape['type'], range(0,1))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape type is not correct.'));
 			}
 
