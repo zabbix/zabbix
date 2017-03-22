@@ -100,7 +100,8 @@ abstract class CMapElement extends CApiService {
 		foreach ($shapes as &$shape) {
 			if ($update || $delete) {
 				if (!isset($dbShapes[$shape['shapeid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!'));
 				}
 
 				$dbShape = array_merge($dbShapes[$shape['shapeid']], $shape);
@@ -123,10 +124,6 @@ abstract class CMapElement extends CApiService {
 				if (array_key_exists($field, $shape) && $shape[$field] < 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape dimensions are not correct.'));
 				}
-				else {
-					// default shape size
-					$shape[$field] = 200;
-				}
 			}
 
 			if (array_key_exists('font', $shape) && !in_array($shape['font'], range(0,12))) {
@@ -142,7 +139,8 @@ abstract class CMapElement extends CApiService {
 					$colorValidator = new CColorValidator();
 
 					if (!$colorValidator->validate($shape[$field])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $field));
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $field));
 					}
 				}
 			}
