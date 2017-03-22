@@ -385,6 +385,120 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3030031(void)
+{
+	const ZBX_FIELD	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("task", &field);
+}
+
+static int	DBpatch_3030032(void)
+{
+	const ZBX_FIELD	field = {"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("task", &field);
+}
+
+static int	DBpatch_3030033(void)
+{
+	const ZBX_FIELD	field = {"ttl", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("task", &field);
+}
+
+static int	DBpatch_3030034(void)
+{
+	const ZBX_FIELD	field = {"proxy_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("task", &field);
+}
+
+static int	DBpatch_3030035(void)
+{
+	return DBcreate_index("task", "task_1", "status,proxy_hostid", 0);
+}
+
+static int	DBpatch_3030036(void)
+{
+	const ZBX_FIELD	field = {"proxy_hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task", 1, &field);
+}
+
+static int	DBpatch_3030037(void)
+{
+	const ZBX_TABLE table =
+			{"task_remote_command", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"command_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"execute_on", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"port", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"publickey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"privatekey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"alertid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030038(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_remote_command", 1, &field);
+}
+
+static int	DBpatch_3030039(void)
+{
+	const ZBX_TABLE table =
+			{"task_remote_command_result", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030040(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_remote_command_result", 1, &field);
+}
+
+static int	DBpatch_3030041(void)
+{
+	/* 1 - ZBX_TM_STATUS_NEW */
+	if (ZBX_DB_OK > DBexecute("update task set status=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030042(void)
+{
+	/* 2 - ZBX_SCRIPT_EXECUTE_ON_PROXY */
+	const ZBX_FIELD field = {"execute_on", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("scripts", &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -422,5 +536,17 @@ DBPATCH_ADD(3030027, 0, 1)
 DBPATCH_ADD(3030028, 0, 1)
 DBPATCH_ADD(3030029, 0, 1)
 DBPATCH_ADD(3030030, 0, 1)
+DBPATCH_ADD(3030031, 0, 1)
+DBPATCH_ADD(3030032, 0, 1)
+DBPATCH_ADD(3030033, 0, 1)
+DBPATCH_ADD(3030034, 0, 1)
+DBPATCH_ADD(3030035, 0, 1)
+DBPATCH_ADD(3030036, 0, 1)
+DBPATCH_ADD(3030037, 0, 1)
+DBPATCH_ADD(3030038, 0, 1)
+DBPATCH_ADD(3030039, 0, 1)
+DBPATCH_ADD(3030040, 0, 1)
+DBPATCH_ADD(3030041, 0, 1)
+DBPATCH_ADD(3030042, 0, 1)
 
 DBPATCH_END()

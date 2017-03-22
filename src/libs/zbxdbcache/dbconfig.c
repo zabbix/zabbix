@@ -32,6 +32,7 @@
 #include "dbcache.h"
 #include "zbxregexp.h"
 #include "cfg.h"
+#include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
 static int	sync_in_progress = 0;
@@ -350,6 +351,8 @@ typedef struct
 	zbx_uint64_t	hostid;
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
+	int		proxy_tasks_nextcheck;
+	int		nextcheck;
 	int		timediff;
 	int		lastaccess;
 	int		version;
@@ -1103,6 +1106,12 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 	if (ZBX_LOC_POLLER == proxy->location)
 		return;
 
+	proxy->nextcheck = proxy->proxy_tasks_nextcheck;
+	if (proxy->proxy_data_nextcheck < proxy->nextcheck)
+		proxy->nextcheck = proxy->proxy_data_nextcheck;
+	if (proxy->proxy_config_nextcheck < proxy->nextcheck)
+		proxy->nextcheck = proxy->proxy_config_nextcheck;
+
 	elem.key = proxy->hostid;
 	elem.data = (const void *)proxy;
 
@@ -1757,6 +1766,8 @@ done:
 						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
 				proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+				proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
 
 				DCupdate_proxy_queue(proxy);
 			}
@@ -5293,14 +5304,7 @@ static int	__config_proxy_compare(const void *d1, const void *d2)
 	const ZBX_DC_PROXY		*p1 = (const ZBX_DC_PROXY *)e1->data;
 	const ZBX_DC_PROXY		*p2 = (const ZBX_DC_PROXY *)e2->data;
 
-	int				nextcheck1, nextcheck2;
-
-	nextcheck1 = (p1->proxy_config_nextcheck < p1->proxy_data_nextcheck) ?
-			p1->proxy_config_nextcheck : p1->proxy_data_nextcheck;
-	nextcheck2 = (p2->proxy_config_nextcheck < p2->proxy_data_nextcheck) ?
-			p2->proxy_config_nextcheck : p2->proxy_data_nextcheck;
-
-	ZBX_RETURN_IF_NOT_EQUAL(nextcheck1, nextcheck2);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->nextcheck, p2->nextcheck);
 
 	return 0;
 }
@@ -8360,6 +8364,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->hostid = src_proxy->hostid;
 	dst_proxy->proxy_config_nextcheck = src_proxy->proxy_config_nextcheck;
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
+	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->version = src_proxy->version;
 
 	if (NULL != (host = zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
@@ -8456,7 +8461,7 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
 		min = zbx_binary_heap_find_min(queue);
 		dc_proxy = (ZBX_DC_PROXY *)min->data;
 
-		if (dc_proxy->proxy_config_nextcheck > now && dc_proxy->proxy_data_nextcheck > now)
+		if (dc_proxy->nextcheck > now)
 			break;
 
 		zbx_binary_heap_remove_min(queue);
@@ -8505,8 +8510,7 @@ int	DCconfig_get_proxypoller_nextcheck(void)
 		min = zbx_binary_heap_find_min(queue);
 		dc_proxy = (const ZBX_DC_PROXY *)min->data;
 
-		nextcheck = (dc_proxy->proxy_config_nextcheck < dc_proxy->proxy_data_nextcheck) ?
-				dc_proxy->proxy_config_nextcheck : dc_proxy->proxy_data_nextcheck;
+		nextcheck = dc_proxy->nextcheck;
 	}
 	else
 		nextcheck = FAIL;
@@ -8549,6 +8553,11 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 			{
 				dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+			}
+			if (0 != (update_nextcheck & ZBX_PROXY_TASKS_NEXTCHECK))
+			{
+				dc_proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
 			}
 
 			DCupdate_proxy_queue(dc_proxy);

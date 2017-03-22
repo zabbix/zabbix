@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-936] implemented remote command execution via proxy (wiper)
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 ..F....... [ZBXNEXT-3654] implemented a feature to apply host group permissions to all existing subgroups (Ivo, Sasha)
 ..F....... [ZBXNEXT-3660] renamed "IT services" to "Services" (Ivo)
