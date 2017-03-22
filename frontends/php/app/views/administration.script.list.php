@@ -74,6 +74,9 @@ foreach ($data['scripts'] as $script) {
 			case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				$scriptExecuteOn = _('Server');
 				break;
+			case ZBX_SCRIPT_EXECUTE_ON_PROXY:
+				$scriptExecuteOn = _('Server (proxy)');
+				break;
 		}
 	}
 	else {
