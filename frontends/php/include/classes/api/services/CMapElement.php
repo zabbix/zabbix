@@ -134,7 +134,7 @@ abstract class CMapElement extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape font size is not correct.'));
 			}
 
-			foreach (['border_color', 'background_color', 'text_color'] as $field) {
+			foreach (['border_color', 'background_color', 'font_color'] as $field) {
 				if (array_key_exists($field, $shape) && !empty($shape[$field])) {
 					$colorValidator = new CColorValidator();
 
