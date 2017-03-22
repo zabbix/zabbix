@@ -565,8 +565,11 @@ function show_color_picker(id) {
 		return;
 	}
 
-	curr_lbl = document.getElementById('lbl_' + id);
 	curr_txt = document.getElementById(id);
+	if (curr_txt.hasAttribute('disabled')) {
+		return;
+	}
+	curr_lbl = document.getElementById('lbl_' + id);
 	var pos = getPosition(curr_lbl);
 	color_picker.x = pos.left;
 	color_picker.y = pos.top;

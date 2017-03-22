@@ -455,7 +455,7 @@
 						(new CTextBox('mass_border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 					)
 					->addRow((new CCheckBox('chkbox_border_color'))
-							->setId('chkboBorderColor')
+							->setId('chkboxBorderColor')
 							->setLabel(_('Border colour')),
 						new CColor('mass_border_color', '#{color}', false)
 					)

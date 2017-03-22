@@ -733,6 +733,18 @@ ZABBIX.apps.map = (function($) {
 
 					set_color_by_name(id, this.value);
 				});
+
+				$('#border_type').on('change', function() {
+					$(this).parent().find('input').prop("disabled", this.value === '-1');
+				});
+
+				$('#mass_border_type, #chkboxBorderType').on('change', function() {
+					var disable = $('#mass_border_type').val() === '-1' && $('#chkboxBorderType').is(":checked");
+
+					$('#chkboxBorderWidth, #chkboxBorderColor').prop("disabled", disable);
+					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));
+					$('#mass_border_color').prop("disabled", disable || !$('#chkboxBorderColor').is(":checked"));
+				});
 			},
 
 			clearSelection: function() {
@@ -1049,7 +1061,7 @@ ZABBIX.apps.map = (function($) {
 					border_type: 0
 				};
 
-				// generate unique linkid
+				// generate unique shapeid
 				shapeData.shapeid = getUniqueId();
 				shapeData.zindex = Object.keys(sysmap.shapes).length;
 			}
@@ -2135,6 +2147,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				$('.input-color-picker input', this.domNode).change();
+				$('#border_type').change();
 			},
 
 			/**
@@ -2176,7 +2189,7 @@ ZABBIX.apps.map = (function($) {
 				chkboxBackground: '#mass_background_color',
 				chkboxBorderType: '#mass_border_type',
 				chkboxBorderWidth: '#mass_border_width',
-				chkboBorderColor: '#mass_border_color'
+				chkboxBorderColor: '#mass_border_color'
 			};
 
 			Object.keys(mapping).forEach(function (key) {
