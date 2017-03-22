@@ -50,6 +50,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)
 ..F....... [ZBX-11905] fixed redirect to original requested page after login (vmurzins)
 ..F....... [ZBX-11907] fixed undefined index in event details page (miks)
 ........S. [ZBX-11931] fixed trigger lastchange update (wiper)
@@ -403,6 +404,7 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)
 ..F....... [ZBX-11905] fixed redirect to original requested page after login (vmurzins)
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
@@ -2042,6 +2044,7 @@ Changes for 2.2.18rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)
 ..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
