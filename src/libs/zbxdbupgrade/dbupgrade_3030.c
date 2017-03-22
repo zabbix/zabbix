@@ -501,7 +501,7 @@ static int	DBpatch_3030042(void)
 
 #endif
 
-DBPATCH_START(3042)
+DBPATCH_START(3030)
 
 /* version, duplicates flag, mandatory flag */
 
