@@ -2042,6 +2042,7 @@ Changes for 2.2.18rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
 .......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)
