@@ -1145,7 +1145,6 @@ ZABBIX.apps.map = (function($) {
 				if (enable) {
 					var handles = {};
 
-					var div = $('<div style="margin: -6px;width: calc(100% + 12px);height: calc(100% + 12px);position: relative;">');
 					$.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, key) {
 						var handle = $('<div>').addClass('ui-resizable-handle').addClass('ui-resizable-' + key);
 
@@ -1155,11 +1154,11 @@ ZABBIX.apps.map = (function($) {
 								.append($('<div>', {'class': 'ui-resizable-border-' + key}));
 						}
 
-						div.append(handle);
+						node.append(handle);
 						handles[key] = handle;
 					});
-					node.append(div);
 
+					node.addClass('ui-inner-handles');
 					node.resizable({
 						handles: handles,
 						autoHide: true,
@@ -1172,6 +1171,7 @@ ZABBIX.apps.map = (function($) {
 					});
 				}
 				else {
+					node.removeClass('ui-inner-handles');
 					node.resizable("destroy");
 				}
 			},
