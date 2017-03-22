@@ -1070,7 +1070,10 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.shapes[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {style: 'position:absolute; z-index: 1'})
+			this.domNode = $('<div></div>', {
+					style: 'position:absolute; z-index: 1;\
+						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
+				})
 				.appendTo(this.sysmap.container)
 				.addClass('pointer sysmap_shape')
 				.attr('data-id', this.id)
