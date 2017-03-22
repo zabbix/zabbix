@@ -88,6 +88,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	CONFIG_ERROR	-7
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
+const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
 
 #define MAX_ID_LEN		21
@@ -1040,9 +1041,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 		char *severity, size_t severity_len);
 
 /* misc functions */
-#ifdef HAVE_IPV6
 int	is_ip6(const char *ip);
-#endif
 int	is_ip4(const char *ip);
 int	is_ip(const char *ip);
 
@@ -1130,7 +1129,6 @@ int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
-int	zbx_is_utf8(const char *text);
 
 void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);

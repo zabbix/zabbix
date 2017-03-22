@@ -564,9 +564,9 @@ FIELD		|snmptrap_logging|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|server_check_interval|t_integer|'10'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_trigger|t_integer	|'365'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_internal|t_integer	|'365'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_discovery|t_integer	|'365'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_autoreg|t_integer	|'365'	|NOT NULL	|ZBX_NODATA
+FIELD		|hk_events_internal|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
+FIELD		|hk_events_discovery|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
+FIELD		|hk_events_autoreg|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_services_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_services	|t_integer	|'365'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_audit_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
@@ -961,12 +961,14 @@ FIELD		|retries	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|alerttype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|p_eventid	|t_id		|	|NULL		|0			|5|events	|eventid
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|eventid
 INDEX		|4		|status,retries
 INDEX		|5		|mediatypeid
 INDEX		|6		|userid
+INDEX		|7		|p_eventid
 
 TABLE|history||0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
@@ -1481,4 +1483,4 @@ FIELD		|info		|t_shorttext	|''	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030035	|3030035
+ROW		|3030042	|3030042
