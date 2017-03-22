@@ -166,13 +166,6 @@ ZABBIX.apps.map = (function($) {
 				overflow: 'hidden'
 			});
 
-			// make better icon displaying in IE
-			if (IE) {
-				this.container.css({
-					filter: 'alpha(opacity=0)'
-				});
-			}
-
 			this.container.css('position', 'relative');
 			this.base64image = true;
 			$('#sysmap_img').remove();
