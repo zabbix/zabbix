@@ -144,7 +144,6 @@ class C32ImportConverter extends CConverter {
 				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
 			];
 		}
-		unset($pair);
 
 		return $pairs;
 	}
@@ -160,6 +159,7 @@ class C32ImportConverter extends CConverter {
 		foreach ($http_test_steps as &$http_test_step) {
 			$http_test_step['headers'] = $this->convertHttpFields($http_test_step['headers'], ':');
 			$http_test_step['variables'] = $this->convertHttpFields($http_test_step['variables'], '=');
+			$http_test_step['query_fields'] = [];
 		}
 		unset($http_test_step);
 
