@@ -82,7 +82,7 @@ abstract class CMapElement extends CApiService {
 
 	protected function checkShapeInput(&$shapes, $method) {
 		$update = ($method == 'updateShapes');
-		$delete = ($method == 'updateShapes');
+		$delete = ($method == 'deleteShapes');
 
 		// permissions
 		if ($update || $delete) {
@@ -104,10 +104,9 @@ abstract class CMapElement extends CApiService {
 						_('No permissions to referred object or it does not exist!'));
 				}
 
-				$dbShape = array_merge($dbShapes[$shape['shapeid']], $shape);
-			}
-			else {
-				$dbShape = $shape;
+				if ($delete) {
+					continue;
+				}
 			}
 
 			if (!array_key_exists('type', $shape) || !in_array($shape['type'], range(0,1))) {
