@@ -336,7 +336,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'name' => '{var3}',
 													'value' => 'value3'
 												]
-											]
+											],
+											'query_fields' => []
 										]
 									]
 								]
@@ -462,7 +463,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'value' => 'no-cache'
 												]
 											],
-											'variables' => []
+											'variables' => [],
+											'query_fields' => []
 										]
 									]
 								]
