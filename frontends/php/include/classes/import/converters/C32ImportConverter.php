@@ -144,6 +144,7 @@ class C32ImportConverter extends CConverter {
 				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
 			];
 		}
+		unset($pair);
 
 		return $pairs;
 	}
