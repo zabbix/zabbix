@@ -140,6 +140,10 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 		width = Math.ceil(size.width),
 		height = Math.ceil(size.height);
 
+	if (Prototype.Browser.IE && attributes['font-size'] !== undefined) {
+		height = lines.length * parseInt(attributes['font-size']);
+	}
+
 	switch (anchor.horizontal) {
 		case 'center':
 			pos[0] -= Math.floor(width/2);
