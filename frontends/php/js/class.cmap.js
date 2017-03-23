@@ -1049,11 +1049,11 @@ ZABBIX.apps.map = (function($) {
 					y: 10,
 					width: 50,
 					height: 50,
-					border_color: 'DD0000',
+					border_color: '000000',
 					background_color: '',
 					border_width: 2,
 					font: 9, // Helvetica
-					font_size: 10,
+					font_size: 11,
 					font_color: '000000',
 					text_valign: -1,
 					text_halign: -1,
