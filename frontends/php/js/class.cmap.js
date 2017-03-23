@@ -121,7 +121,7 @@ ZABBIX.apps.map = (function($) {
 			this.links = {}; // map links array
 			this.selection = {
 				count: 0, // number of selected elements
-				selements: {} // selected elements { elementid: elementid, ... }
+				selements: {} // selected elements
 			};
 			this.currentLinkId = '0'; // linkid of currently edited link
 			this.allLinkTriggerIds = {};
@@ -510,7 +510,6 @@ ZABBIX.apps.map = (function($) {
 						// others types
 						default:
 							$('input[name=elementName]').val('');
-							$('#elementid').val('0');
 					}
 				});
 
@@ -810,7 +809,7 @@ ZABBIX.apps.map = (function($) {
 		 * @property {Object} sysmap reference to Map object
 		 * @property {Object} data selement db values
 		 * @property {Boolean} selected if element is now selected by user
-		 * @property {String} id elementid
+		 * @property {Object} id elements
 		 * @property {Object} domNode reference to related DOM element
 		 *
 		 * @param {Object} sysmap reference to Map object
@@ -824,7 +823,7 @@ ZABBIX.apps.map = (function($) {
 				selementData = {
 					selementid: getUniqueId(),
 					elementtype: '4', // image
-					elementid: 0,
+					elements: {},
 					iconid_off: this.sysmap.defaultIconId, // first imageid
 					label: locale['S_NEW_ELEMENT'],
 					label_location: -1, // set default map label location
@@ -1352,7 +1351,9 @@ ZABBIX.apps.map = (function($) {
 				triggers = triggers.concat(selected_triggers);
 
 				triggers.each(function(trigger) {
-					$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+					if (!$('input[name^="element_id[' + trigger.id + ']"]').length != 0) {
+						$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+					}
 				});
 
 				$('#elementNameTriggers').multiSelect('clean');
@@ -1435,7 +1436,8 @@ ZABBIX.apps.map = (function($) {
 					i,
 					urlPattern = /^url_(\d+)_(name|url)$/,
 					url,
-					urlNames = {};
+					urlNames = {},
+					elementsData = {};
 
 				for (i = 0; i < values.length; i++) {
 					url = urlPattern.exec(values[i].name);
@@ -1452,47 +1454,44 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 
+				data.elements = {};
+
 				// set element id and name
 				switch (data.elementtype) {
 					// host
 					case '0':
-						var elementData = $('#elementNameHost').multiSelect('getData');
+						elementsData = $('#elementNameHost').multiSelect('getData');
 
-						if (empty(elementData)) {
-							data.elementid = '0';
-							data.elementName = '';
-						}
-						else {
-							data.elementid = elementData[0].id;
-							data.elementName = elementData[0].name;
+						if (elementsData) {
+							data.elements[0] = {
+								hostid: elementsData[0].id,
+								elementName: elementsData[0].name
+							};
 						}
 						break;
 
 					// triggers
 					case '2':
-						var elementData = $('#elementNameTriggers').multiSelect('getData');
-
-						if (empty(elementData)) {
-							data.elementid = '0';
-							data.elementName = '';
-						}
-						else {
-							data.elementid = elementData[0].id;
-							data.elementName = elementData[0].name;
-						}
+						i = 0;
+						$('input[name^="element_id"]').each(function() {
+							data.elements[i] = {
+								triggerid: $(this).val(),
+								elementName: $('input[name^="element_name[' + $(this).val() + ']"]').val(),
+								priority: $('input[name^="element_priority[' + $(this).val() + ']"]').val()
+							};
+							i++;
+						});
 						break;
 
 					// host group
 					case '3':
-						var elementData = $('#elementNameHostGroup').multiSelect('getData');
+						elementsData = $('#elementNameHostGroup').multiSelect('getData');
 
-						if (empty(elementData)) {
-							data.elementid = '0';
-							data.elementName = '';
-						}
-						else {
-							data.elementid = elementData[0].id;
-							data.elementName = elementData[0].name;
+						if (elementsData) {
+							data.elements[0] = {
+								groupid: elementsData[0].id,
+								elementName: elementsData[0].name
+							};
 						}
 						break;
 				}
@@ -1520,7 +1519,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// validate element id
-				if (data.elementid === '0' && data.elementtype !== '4') {
+				if (!data.elements && data.elementtype !== '4') {
 					switch (data.elementtype) {
 						case '0': alert('Host is not selected.');
 							return false;

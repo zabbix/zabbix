@@ -9,7 +9,6 @@
 			->cleanItems()
 			->setName('selementForm')
 			->setId('selementForm')
-			->addVar('elements[]', '')
 			->addItem(
 				(new CFormList())
 					->addRow(_('Type'),
@@ -466,13 +465,15 @@
 	<?= (new CRow([
 			(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CCol([
-				(new CVar('elements[][#{id}]', '#{id}')),
+				(new CVar('element_id[#{id}]', '#{id}')),
+				(new CVar('element_name[#{id}]', '#{name}')),
+				(new CVar('element_priority[#{id}]', '#{priority}')),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('jQuery("#triggerrow_#{selementtriggerid}").remove();')
+					->onClick('jQuery("#triggerrow_#{id}").remove();')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->setId('triggerrow_#{selementtriggerid}')
+			->setId('triggerrow_#{id}')
 			->toString()
 	?>
 </script>
