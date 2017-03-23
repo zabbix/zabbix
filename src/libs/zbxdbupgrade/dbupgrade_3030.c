@@ -432,10 +432,8 @@ static int	DBpatch_3030034(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	unsigned char	value_type, data_type, delta;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	mapid;
-	const char	*formula;
 	int		width, ret;
 
 	zbx_db_insert_prepare(&db_insert, "sysmap_shape", "shapeid", "sysmapid", "width", "height", "text",
