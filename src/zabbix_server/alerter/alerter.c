@@ -204,7 +204,6 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 	zbx_free(sendto);
 	zbx_free(message);
 	zbx_free(gsm_modem);
-
 }
 
 /******************************************************************************

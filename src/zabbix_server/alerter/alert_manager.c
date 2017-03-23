@@ -31,9 +31,9 @@
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
 
-#define ZBX_UPDATE_STR(dst, src)		if (NULL == dst || 0 != strcmp(dst, src)) dst = zbx_strdup(dst, src);
+#define ZBX_UPDATE_STR(dst, src)	if (NULL == dst || 0 != strcmp(dst, src)) dst = zbx_strdup(dst, src);
 
-#define ZBX_WATCHDOG_ALERT_FREQUENCY		(15 * SEC_PER_MIN)
+#define ZBX_WATCHDOG_ALERT_FREQUENCY	(15 * SEC_PER_MIN)
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -213,7 +213,7 @@ static zbx_hash_t	alerter_hash_func(const void *d)
 {
 	const zbx_am_alerter_t	*alerter = *(const zbx_am_alerter_t **)d;
 
-	zbx_hash_t hash =  ZBX_DEFAULT_PTR_HASH_FUNC(&alerter->client);
+	zbx_hash_t hash = ZBX_DEFAULT_PTR_HASH_FUNC(&alerter->client);
 
 	return hash;
 }
@@ -224,6 +224,7 @@ static int	alerter_compare_func(const void *d1, const void *d2)
 	const zbx_am_alerter_t	*p2 = *(const zbx_am_alerter_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->client, p2->client);
+
 	return 0;
 }
 
@@ -233,7 +234,7 @@ static zbx_hash_t	am_alertpool_hash_func(const void *data)
 {
 	const zbx_am_alertpool_t	*pool = (const zbx_am_alertpool_t *)data;
 
-	zbx_hash_t		hash;
+	zbx_hash_t			hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&pool->id);
 	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pool->mediatypeid, sizeof(pool->mediatypeid), hash);
@@ -626,7 +627,7 @@ static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediat
 		zbx_uint64_t objectid, const char *sendto, const char *subject, const char *message, int status,
 		int retries, int nextsend)
 {
-	zbx_am_alert_t		*alert;
+	zbx_am_alert_t	*alert;
 
 	alert = (zbx_am_alert_t *)zbx_malloc(NULL, sizeof(zbx_am_alert_t));
 	alert->alertid = alertid;
@@ -791,7 +792,6 @@ static int	am_retry_alert(zbx_am_t *manager, zbx_am_alert_t *alert)
 	am_push_mediatype(manager, mediatype);
 
 	ret = SUCCEED;
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -855,7 +855,6 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -985,7 +984,7 @@ static void	am_destroy(zbx_am_t *manager)
 {
 	zbx_am_alert_t		*alert;
 	zbx_hashset_iter_t	iter;
-	zbx_am_media_t	*media;
+	zbx_am_media_t		*media;
 
 	zbx_hashset_destroy(&manager->alerters_client);
 	zbx_queue_ptr_destroy(&manager->free_alerters);
