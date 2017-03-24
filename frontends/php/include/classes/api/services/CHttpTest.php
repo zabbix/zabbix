@@ -348,9 +348,7 @@ class CHttpTest extends CApiService {
 		Manager::HttpTest()->persist($httptests);
 
 		foreach ($db_httptests as &$db_httptest) {
-			foreach (['headers', 'variables', 'steps'] as $field) {
-				unset($db_httptest[$field]);
-			}
+			unset($db_httptest['headers'], $db_httptest['variables'], $db_httptest['steps']);
 		}
 		unset($db_httptest);
 
