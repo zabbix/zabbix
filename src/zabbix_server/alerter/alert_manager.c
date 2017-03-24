@@ -632,7 +632,7 @@ static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediat
 	alert = (zbx_am_alert_t *)zbx_malloc(NULL, sizeof(zbx_am_alert_t));
 	alert->alertid = alertid;
 	alert->mediatypeid = mediatypeid;
-	alert->alertpoolid = am_calc_alertpoolid(source, object, objectid);;
+	alert->alertpoolid = am_calc_alertpoolid(source, object, objectid);
 
 	alert->sendto = zbx_strdup(NULL, sendto);
 	alert->subject = zbx_strdup(NULL, subject);

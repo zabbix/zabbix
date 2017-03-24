@@ -279,7 +279,7 @@ int	__zbx_DBexecute(const char *fmt, ...)
  *                                                                            *
  * Purpose: execute a non-select statement                                    *
  *                                                                            *
- * Comments: retry until DB is up                                             *
+ * Comments: don't retry if DB is down                                        *
  *                                                                            *
  ******************************************************************************/
 int	__zbx_DBexecute_once(const char *fmt, ...)
