@@ -1834,20 +1834,21 @@ ZABBIX.apps.map = (function($) {
 
 				// set multiselect values
 				if (selement.elementtype == 0 || selement.elementtype == 3) {
-					var item = {
-						'id': selement.elementid,
-						'name': selement.elementName
-					};
-
 					switch (selement.elementtype) {
 						// host
 						case '0':
-							$('#elementNameHost').multiSelect('addData', item);
+							$('#elementNameHost').multiSelect('addData', {
+								'id': selement.elements[0].hostid,
+								'name': selement.elements[0].elementName
+							});
 							break;
 
 						// host group
 						case '3':
-							$('#elementNameHostGroup').multiSelect('addData', item);
+							$('#elementNameHostGroup').multiSelect('addData', {
+								'id': selement.elements[0].groupid,
+								'name': selement.elements[0].elementName
+							});
 							break;
 					}
 				}
