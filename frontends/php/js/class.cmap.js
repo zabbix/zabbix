@@ -1793,8 +1793,9 @@ ZABBIX.apps.map = (function($) {
 						$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
 					}
 				});
-				this.recalculateSortOrder();
 				$('#elementNameTriggers').multiSelect('clean');
+				this.recalculateSortOrder();
+				this.initSortable();
 			},
 
 			/**
@@ -1858,7 +1859,6 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					this.addTriggers(triggers);
-					this.initSortable();
 				}
 			},
 
