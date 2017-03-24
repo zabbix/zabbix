@@ -670,10 +670,11 @@ abstract class CMapElement extends CApiService {
 				foreach ($selement['elements'] as $element) {
 					$triggers_to_delete[] = $element['triggerid'];
 				}
+			}
 
-				if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE) {
-					$selement['elementid'] = reset($selement['elements'][0]);
-				}
+			if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE
+					&& $selement['elementtype'] != SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$selement['elementid'] = reset($selement['elements'][0]);
 			}
 
 			$db_elements = $db_selement['elements'];
