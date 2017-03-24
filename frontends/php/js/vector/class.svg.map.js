@@ -820,8 +820,6 @@ SVGMapLink.prototype.update = function(options) {
 
 SVGMapLink.prototype.remove = function () {
 	if (this.element !== null) {
-		delete this.map.links[this.options.linkid];
-
 		this.element.remove();
 		this.element = null;
 	}
