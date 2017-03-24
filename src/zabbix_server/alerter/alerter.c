@@ -162,7 +162,7 @@ static void	alerter_process_jabber(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 	zbx_alerter_deserialize_jabber(ipc_message->data, &alertid, &sendto, &subject, &message, &username, &password);
 
 	/* Jabber uses its own timeouts */
-	ret = send_jabber(username, password, sendto, subject, message, error, max_error_len);
+	ret = send_jabber(username, password, sendto, subject, message, error, sizeof(error));
 	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
 
 	zbx_free(sendto);
@@ -170,7 +170,6 @@ static void	alerter_process_jabber(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 	zbx_free(message);
 	zbx_free(username);
 	zbx_free(password);
-
 #else
 	ZBX_UNUSED(ipc_message);
 	alerter_send_result(socket, FAIL, "Zabbix server was compiled without Jabber support");
