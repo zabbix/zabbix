@@ -72,6 +72,10 @@ SVGCanvas.prototype.createElement = function (type, attributes, parent, content)
 };
 
 SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
+	if (typeof content === 'string' && content.trim() === '') {
+		return;
+	}
+
 	var group = this.createElement('g', null, parent),
 		x = attributes.x,
 		y = attributes.y,
@@ -88,10 +92,6 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 		delete attributes[key];
 	});
 
-	if (typeof content === 'string' && content.trim() === '') {
-		return;
-	}
-
 	if (typeof anchor !== 'object') {
 		anchor = {};
 	}
@@ -105,45 +105,35 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 	}
 
 	if (typeof content === 'string') {
+		var items = [];
 		content.split("\n").forEach(function (line) {
-			if (line.trim() !== '') {
-				lines.push( {
-					type: 'tspan',
-					attributes: {
-						x: offset,
-						dy: skip + 'em',
-						'text-anchor': 'middle'
-					},
-					content: line.replace("\r",'')
-				});
-
-				skip = 1.2;
-			}
-			else {
-				skip += 1.2;
-			}
+			items.push({
+				content: line,
+				attributes: {}
+			});
 		});
-	}
-	else {
-		content.forEach(function (line, index) {
-			if (line.content.trim() !== '') {
-				lines.push( {
-					type: 'tspan',
-					attributes: SVGElement.mergeAttributes({
-						x: offset,
-						dy: skip + 'em',
-						'text-anchor': 'middle'
-					}, line.attributes),
-					content: line.content.replace(/[\r\n]/g,"")
-				});
 
-				skip = 1.2;
-			}
-			else {
-				skip += 1.2;
-			}
-		});
+		content = items;
 	}
+
+	content.forEach(function (line) {
+		if (line.content.trim() !== '') {
+			lines.push( {
+				type: 'tspan',
+				attributes: SVGElement.mergeAttributes({
+					x: offset,
+					dy: skip + 'em',
+					'text-anchor': 'middle'
+				}, line.attributes),
+				content: line.content.replace(/[\r\n]/g, '')
+			});
+
+			skip = 1.2;
+		}
+		else {
+			skip += 1.2;
+		}
+	});
 
 	var text = group.add('text', attributes, lines),
 		size = text.element.getBBox(),
