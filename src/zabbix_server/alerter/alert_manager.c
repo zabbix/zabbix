@@ -1635,8 +1635,8 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 	char			*cmd = NULL, *error = NULL;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64, __function_name,
-			alert->alertid, alert->mediatypeid);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:"
+			ZBX_FS_UI64, __function_name, alert->alertid, alert->mediatypeid, alert->alertpoolid);
 
 	if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 	{
@@ -1739,8 +1739,9 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64, __function_name,
-				alerter->alert->alertid, alerter->alert->mediatypeid);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:"
+			ZBX_FS_UI64, __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
+			alerter->alert->alertpoolid);
 
 	retries = alerter->alert->retries;
 	alertid = alerter->alert->alertid;
