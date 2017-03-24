@@ -77,6 +77,7 @@ class CMapImporter extends CImporter {
 					$map = [
 						'sysmapid' => $maps[$mapItem['name']]['sysmapid'],
 						'name' => $mapItem['name'],
+						'shapes' => $maps[$mapItem['name']]['shapes'],
 						'selements' => $maps[$mapItem['name']]['selements'],
 						'links' => $maps[$mapItem['name']]['links']
 					];

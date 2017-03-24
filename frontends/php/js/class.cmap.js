@@ -112,21 +112,28 @@ ZABBIX.apps.map = (function($) {
 	function createMap(containerId, mapData) {
 		var CMap = function(containerId, mapData) {
 			var selementid,
+				shapeid,
 				linkid,
 				setContainer;
 
 			this.reupdateImage = false; // if image should be updated again after last update is finished
 			this.imageUpdating = false; // if ajax request for image updating is processing
 			this.selements = {}; // element objects
+			this.shapes = {}; // shape objects
 			this.links = {}; // map links array
 			this.selection = {
-				count: 0, // number of selected elements
-				selements: {} // selected elements { elementid: elementid, ... }
+				count: { // number of selected items
+					selements: 0,
+					shapes: 0
+				},
+				selements: {}, // selected elements { elementid: elementid, ... }
+				shapes: {} // selected shapes
 			};
 			this.currentLinkId = '0'; // linkid of currently edited link
 			this.allLinkTriggerIds = {};
 			this.sysmapid = mapData.sysmap.sysmapid;
 			this.data = mapData.sysmap;
+			this.background = null;
 			this.iconList = mapData.iconList;
 			this.defaultAutoIconId = mapData.defaultAutoIconId;
 			this.defaultIconId = mapData.defaultIconId;
@@ -137,56 +144,52 @@ ZABBIX.apps.map = (function($) {
 				this.container = $(document.body);
 			}
 
+			this.images = {};
+			Object.keys(this.iconList).forEach(function (id) {
+				var item = this.iconList[id];
+				this.images[item.imageid] = item;
+			}, this);
+
+			this.map = new SVGMap({
+				theme: mapData.theme,
+				canvas: {
+					width: this.data.width,
+					height: this.data.height,
+					mask: true
+				},
+				container: this.container[0]
+			});
+
 			this.container.css({
 				width: this.data.width + 'px',
 				height: this.data.height + 'px',
 				overflow: 'hidden'
 			});
 
-			// make better icon displaying in IE
-			if (IE) {
-				this.container.css({
-					filter: 'alpha(opacity=0)'
-				});
-			}
-
-			if (IE || GK) {
-				this.base64image = false;
-				this.mapimg = $('#sysmap_img');
-				this.container.css('position', 'absolute');
-
-				// resize div on window resize
-				setContainer = function() {
-					var sysmapPosition = this.mapimg.position(),
-						sysmapHeight = this.mapimg.height(),
-						sysmapWidth = this.mapimg.width(),
-						containerPosition = this.container.position();
-
-					if (containerPosition.top !== sysmapPosition.top || containerPosition.left !== sysmapPosition.left || this.container.height() !== sysmapHeight || this.container.width() !== sysmapWidth) {
-						this.container.css({
-							top: sysmapPosition.top + 'px',
-							left: sysmapPosition.left + 'px',
-							height: sysmapHeight + 'px',
-							width: sysmapWidth + 'px'
-						});
-					}
-				};
-
-				$(window).resize($.proxy(setContainer, this));
-
-				this.mapimg.load($.proxy(setContainer, this));
-			}
-			else {
-				this.container.css('position', 'relative');
-				this.base64image = true;
-				$('#sysmap_img').remove();
-			}
+			this.container.css('position', 'relative');
+			this.base64image = true;
+			$('#sysmap_img').remove();
 
 			for (selementid in this.data.selements) {
 				if (this.data.selements.hasOwnProperty(selementid)) {
 					this.selements[selementid] = new Selement(this, this.data.selements[selementid]);
 				}
 			}
+
+			var shapes = [];
+			for (shapeid in this.data.shapes) {
+				if (this.data.shapes.hasOwnProperty(shapeid)) {
+					shapes.push(this.data.shapes[shapeid]);
+				}
+			}
+
+			shapes = shapes.sort(function (a,b) {
+				return a.zindex - b.zindex;
+			});
+
+			shapes.forEach(function (shape) {
+				this.shapes[shape.shapeid] = new Shape(this, shape);
+			}, this);
 
 			for (linkid in this.data.links) {
 				if (this.data.selements.hasOwnProperty(selementid)) {
@@ -208,23 +211,30 @@ ZABBIX.apps.map = (function($) {
 			this.form = new SelementForm(this.formContainer, this);
 			this.massForm = new MassForm(this.formContainer, this);
 			this.linkForm = new LinkForm(this.formContainer, this);
+			this.shapeForm = new ShapeForm(this.formContainer, this);
+			this.massShapeForm = new MassShapeForm(this.formContainer, this);
 			this.bindActions();
 
 			// initialize selectable
 			this.container.selectable({
 				start: $.proxy(function(event) {
+					this.hideContextMenus();
+
 					if (!event.ctrlKey && !event.metaKey) {
 						this.clearSelection();
 					}
 				}, this),
 				stop: $.proxy(function(event) {
-					var selected = $('.ui-selected', this.container),
+					var selected = this.container.children('.ui-selected'),
 						ids = [],
 						i,
 						ln;
 
 					for (i = 0, ln = selected.length; i < ln; i++) {
-						ids.push($(selected[i]).data('id'));
+						ids.push({
+							id: $(selected[i]).data('id'),
+							type: $(selected[i]).data('type')
+						});
 
 						// remove ui-selected class, to not confuse next selection
 						selected.removeClass('ui-selected');
@@ -255,75 +265,79 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			updateImage: function() {
-				var url = new Curl(),
-					urlText = 'map.php?sid=' + url.getArgument('sid'),
-					ajaxRequest;
-
-				// is image is updating, set reupdate flag and exit
-				if (this.imageUpdating === true) {
-					this.reupdateImage = true;
-
-					return;
-				}
-
-				// grid
 				if (this.data.grid_show === '1') {
-					urlText += '&grid=' + this.data.grid_size;
+					this.map.setGrid(parseInt(this.data.grid_size));
+				}
+				else {
+					this.map.setGrid(0);
 				}
 
-				this.imageUpdating = true;
+				var elements = [];
+				Object.keys(this.selements).forEach(function(key) {
+					var element = {};
+					['selementid', 'x', 'y', 'label', 'label_location'].forEach(function (name) {
+						element[name] = this.selements[key].data[name];
+					}, this);
 
-				ajaxRequest = $.ajax({
-					url: urlText,
-					type: 'post',
-					data: {
-						output: 'json',
-						sysmapid: this.sysmapid,
-						expand_macros: this.data.expand_macros,
-						noselements: 1,
-						nolinks: 1,
-						nocalculations: 1,
-						selements: Object.toJSON(this.data.selements),
-						links: Object.toJSON(this.data.links),
-						base64image: (this.base64image ? 1 : 0)
-					},
-					success: $.proxy(function(data) {
-						if (this.base64image) {
-							this.container.css({
-								'background-image': 'url("data:image/png;base64,' + data.result + '")',
-								width: this.data.width + 'px',
-								height: this.data.height + 'px'
-							});
-						}
-						else {
-							this.mapimg.attr('src', 'imgstore.php?imageid=' + data.result);
-						}
-
-						this.imageUpdating = false;
-					}, this),
-					error: $.proxy(function() {
-						alert('Map image update failed');
-
-						this.imageUpdating = false;
-					}, this)
-				});
-
-				$.when(ajaxRequest).always($.proxy(function() {
-					if (this.reupdateImage === true) {
-						this.reupdateImage = false;
-						this.updateImage();
+					// host group elements
+					if (this.selements[key].data.elementtype == '3' && this.selements[key].data.elementsubtype == '1') {
+						element.width = this.selements[key].data.width;
+						element.height = this.selements[key].data.height;
 					}
-				}, this));
+
+					element.icon = this.selements[key].data.iconid_off;
+					elements.push(element);
+				}, this);
+
+				var links = [];
+				Object.keys(this.links).forEach(function(key) {
+					var link = {};
+					['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'].forEach(function (name) {
+						link[name] = this.links[key].data[name];
+					}, this);
+
+					links.push(link);
+				}, this);
+
+				var shapes = [];
+				Object.keys(this.shapes).forEach(function(key) {
+					var shape = {};
+					Object.keys(this.shapes[key].data).forEach(function (name) {
+						shape[name] = this.shapes[key].data[name];
+					}, this);
+					shapes.push(shape);
+				}, this);
+
+				this.map.update({
+					'background': this.data.backgroundid,
+					'elements': elements,
+					'links': links,
+					'shapes': shapes
+				});
 			},
 
 			// elements
 			deleteSelectedElements: function() {
 				var selementid;
 
-				if (this.selection.count && confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])) {
+				if (this.selection.count.selements && confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])) {
 					for (selementid in this.selection.selements) {
 						this.selements[selementid].remove();
 						this.removeLinksBySelementId(selementid);
+					}
+
+					this.toggleForm();
+					this.updateImage();
+				}
+			},
+
+			// shapes
+			deleteSelectedShapes: function() {
+				var shapeid;
+
+				if (this.selection.count.shapes && confirm(locale['S_DELETE_SELECTED_SHAPES_Q'])) {
+					for (shapeid in this.selection.shapes) {
+						this.shapes[shapeid].remove();
 					}
 
 					this.toggleForm();
@@ -375,13 +389,6 @@ ZABBIX.apps.map = (function($) {
 				/*
 				 * Map panel events
 				 */
-				// toggle expand macros
-				$('#expand_macros').click(function() {
-					that.data.expand_macros = (that.data.expand_macros === '1') ? '0' : '1';
-					$(this).html((that.data.expand_macros === '1') ? locale['S_ON'] : locale['S_OFF']);
-					that.updateImage();
-				});
-
 				// change grid size
 				$('#gridsize').change(function() {
 					var value = $(this).val();
@@ -438,11 +445,22 @@ ZABBIX.apps.map = (function($) {
 				// remove element
 				$('#selementRemove').click($.proxy(this.deleteSelectedElements, this));
 
+				// add shape
+				$('#shapeAdd').click(function() {
+					var shape = new Shape(that);
+
+					that.shapes[shape.id] = shape;
+					that.updateImage();
+				});
+
+				// remove shapes
+				$('#shapeRemove, #shapesRemove, #shapeMassRemove').click($.proxy(this.deleteSelectedShapes, this));
+
 				// add link
 				$('#linkAdd').click(function() {
 					var link;
 
-					if (that.selection.count !== 2) {
+					if (that.selection.count.selements !== 2) {
 						alert(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
 
 						return false;
@@ -458,7 +476,7 @@ ZABBIX.apps.map = (function($) {
 				$('#linkRemove').click(function() {
 					var linkids;
 
-					if (that.selection.count !== 2) {
+					if (that.selection.count.selements !== 2) {
 						alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
 
 						return false;
@@ -481,8 +499,68 @@ ZABBIX.apps.map = (function($) {
 				 * Selements events
 				 */
 				// delegate selements icons clicks
-				$(this.container).on('click', '.sysmap_element', function(event) {
-					that.selectElements([$(this).attr('data-id')], event.ctrlKey || event.metaKey);
+				$(this.container).on('click', '.sysmap_element, .sysmap_shape', function(event) {
+					that.selectElements([{
+							id: $(this).attr('data-id'),
+							type: $(this).attr('data-type')
+					}], event.ctrlKey || event.metaKey);
+				});
+
+				$(this.container).on('contextmenu', '.sysmap_shape', function(event) {
+					event.preventDefault();
+					var item = $(this).data('id');
+					$(this).menuPopup([
+						{
+							'items': [
+								{
+									label: locale['S_BRING_TO_FRONT'],
+									clickCallback: function()
+									{
+										that.reorderShapes(item, 'last');
+										that.hideContextMenus();
+									}
+								},
+								{
+									label: locale['S_BRING_FORWARD'],
+									clickCallback: function()
+									{
+										that.reorderShapes(item, 'next');
+										that.hideContextMenus();
+									}
+								},
+								{
+									label: locale['S_SEND_BACKWARD'],
+									clickCallback: function()
+									{
+										that.reorderShapes(item, 'previous');
+										that.hideContextMenus();
+									}
+								},
+								{
+									label: locale['S_SEND_TO_BACK'],
+									clickCallback: function()
+									{
+										that.reorderShapes(item, 'first');
+										that.hideContextMenus();
+									}
+								}
+							]
+						},
+						{
+							'items': [
+								{
+									label: locale['S_REMOVE'],
+									clickCallback: function()
+									{
+										that.shapes[item].remove();
+										that.hideContextMenus();
+										that.toggleForm();
+										that.updateImage();
+									}
+								}
+							]
+						}
+					], event);
 				});
 
 				/*
@@ -517,7 +595,7 @@ ZABBIX.apps.map = (function($) {
 				$('#elementRemove').click($.proxy(this.deleteSelectedElements, this));
 
 				$('#elementApply').click($.proxy(function() {
-					if (this.selection.count !== 1) {
+					if (this.selection.count.selements !== 1) {
 						throw 'Try to single update element, when more than one selected.';
 					}
 
@@ -525,7 +603,36 @@ ZABBIX.apps.map = (function($) {
 
 					if (values) {
 						for (var selementid in this.selection.selements) {
-							this.selements[selementid].update(values, true);
+							this.selements[selementid].update(values);
+						}
+					}
+				}, this));
+
+				$('#shapeApply').click($.proxy(function() {
+					if (this.selection.count.shapes !== 1) {
+						throw 'Trying to single update shape, when more than one selected.';
+					}
+
+					var values = this.shapeForm.getValues();
+
+					if (values) {
+						for (var id in this.selection.shapes) {
+							this.shapes[id].update(values);
+						}
+					}
+				}, this));
+
+				$('#shapeClose, #shapeMassClose').click(function() {
+					that.clearSelection();
+					that.toggleForm();
+				});
+
+				$('#shapeMassApply').click($.proxy(function() {
+					var values = this.massShapeForm.getValues();
+
+					if (values) {
+						for (var shapeid in this.selection.shapes) {
+							this.shapes[shapeid].update(values);
 						}
 					}
 				}, this));
@@ -621,21 +728,118 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// changes for color inputs
-				this.linkForm.domNode.on('change', '.input-color-picker input', function() {
+				$('.input-color-picker input').on('change', function() {
 					var id = $(this).attr('id');
 
 					set_color_by_name(id, this.value);
+				});
+
+				$('#border_type').on('change', function() {
+					$(this).parent().find('input').prop("disabled", this.value === '-1');
+				});
+
+				$('#mass_border_type, #chkboxBorderType').on('change', function() {
+					var disable = $('#mass_border_type').val() === '-1' && $('#chkboxBorderType').is(":checked");
+
+					$('#chkboxBorderWidth, #chkboxBorderColor').prop("disabled", disable);
+					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));
+					$('#mass_border_color').prop("disabled", disable || !$('#chkboxBorderColor').is(":checked"));
 				});
 			},
 
 			clearSelection: function() {
 				var id;
 
-				for (id in this.selection.selements) {
-					this.selection.count--;
-					this.selements[id].toggleSelect(false);
-					delete this.selection.selements[id];
+				['selements', 'shapes'].forEach(function (type) {
+					for (id in this.selection[type]) {
+						this.selection.count[type]--;
+						this[type][id].toggleSelect(false);
+						delete this.selection[type][id];
+					}
+				}, this);
+			},
+
+			reorderShapes: function(id, position) {
+				var shapes = [],
+					shape = null;
+
+				Object.keys(this.shapes).forEach(function(key) {
+					shapes.push(this.shapes[key]);
+				}, this);
+
+				shapes = shapes.sort(function (a,b) {
+					return a.data.zindex - b.data.zindex;
+				});
+
+				shapes.forEach(function(value, index) {
+					if (value.id == id) {
+						shape = index;
+					}
+				});
+
+				// shape was not found
+				if (shape === null) {
+					return;
 				}
+
+				switch (position.toLowerCase()) {
+					case 'first':
+						// no need to update
+						if (shape === 0) {
+							return;
+						}
+
+						$(shapes[shape].domNode).insertBefore(shapes[0].domNode);
+						shapes.splice(0, 0, shapes.splice(shape, 1)[0]);
+						shapes.forEach(function(shape, index) {
+							shape.data.zindex = index;
+						});
+					break;
+
+					case 'last':
+						// no need to update
+						if (shape === shapes.length - 1) {
+							return;
+						}
+
+						$(shapes[shape].domNode).insertAfter(shapes[shapes.length - 1].domNode);
+						shapes.splice(shapes.length-1, 0, shapes.splice(shape, 1)[0]);
+						shapes.forEach(function(shape, index) {
+							shape.data.zindex = index;
+						});
+					break;
+
+					case 'next':
+						// no need to update
+						if (shape === shapes.length - 1) {
+							return;
+						}
+
+						$(shapes[shape].domNode).insertAfter(shapes[shape + 1].domNode);
+						shapes[shape + 1].data.zindex--;
+						shapes[shape].data.zindex++;
+					break;
+
+					case 'previous':
+						// no need to update
+						if (shape === 0) {
+							return;
+						}
+
+						$(shapes[shape].domNode).insertBefore(shapes[shape - 1].domNode);
+						shapes[shape - 1].data.zindex++;
+						shapes[shape].data.zindex--;
+					break;
+				}
+
+				this.map.invalidate('shapes');
+				this.updateImage();
+			},
+
+			hideContextMenus: function () {
+				$('.action-menu').each(function() {
+					$(this).data('is-active', false).fadeOut(0);
+				});
 			},
 
 			selectElements: function(ids, addSelection) {
@@ -646,16 +850,17 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				for (i = 0, ln = ids.length; i < ln; i++) {
-					var selementid = ids[i],
-						selected = this.selements[selementid].toggleSelect();
+					var id = ids[i].id,
+						type = ids[i].type,
+						selected = this[type][id].toggleSelect();
 
 					if (selected) {
-						this.selection.count++;
-						this.selection.selements[selementid] = selementid;
+						this.selection.count[type]++;
+						this.selection[type][id] = id;
 					}
 					else {
-						this.selection.count--;
-						delete this.selection.selements[selementid];
+						this.selection.count[type]--;
+						delete this.selection[type][id];
 					}
 				}
 
@@ -663,23 +868,27 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			toggleForm: function() {
-				var selementid;
+				var id;
 
+				this.shapeForm.hide();
 				this.linkForm.hide();
 
-				if (this.selection.count == 0) {
+				if (this.selection.count.selements + this.selection.count.shapes === 0 ||
+					(this.selection.count.selements > 0 && this.selection.count.shapes > 0)) {
 					$('#map-window').hide();
 				}
 				else {
 					this.linkForm.updateList(this.selection.selements);
 
 					// only one element selected
-					if (this.selection.count == 1) {
-						for (selementid in this.selection.selements) {
-							this.form.setValues(this.selements[selementid].getData());
+					if (this.selection.count.selements === 1) {
+						for (id in this.selection.selements) {
+							this.form.setValues(this.selements[id].getData());
 						}
 
 						this.massForm.hide();
+						this.massShapeForm.hide();
+
 						$('#link-connect-to').show();
 						this.form.show();
 
@@ -687,11 +896,34 @@ ZABBIX.apps.map = (function($) {
 						$('.multiselect').multiSelect('resize');
 					}
 
-					// multiple elements selected
-					else {
+					// only one shape is selected
+					else if (this.selection.count.shapes === 1) {
 						this.form.hide();
+						this.massForm.hide();
+						this.massShapeForm.hide();
+
+						for (id in this.selection.shapes) {
+							this.shapeForm.setValues(this.shapes[id].getData());
+						}
+
+						this.shapeForm.show();
+					}
+
+					// multiple elements selected
+					else if (this.selection.count.selements > 1) {
+						this.form.hide();
+						this.massShapeForm.hide();
 						$('#link-connect-to').hide();
 						this.massForm.show();
+					}
+
+					// multiple shapes selected
+					else {
+						this.form.hide();
+						this.massForm.hide();
+						$('#link-connect-to').hide();
+
+						this.massShapeForm.show();
 					}
 				}
 			}
@@ -796,54 +1028,61 @@ ZABBIX.apps.map = (function($) {
 		Observer.makeObserver(Link.prototype);
 
 		/**
-		 * @class Creates a new Selement.
+		 * Creates a new Shape.
+		 *
+		 * @class represents shape (static) element
 		 *
 		 * @property {Object} sysmap reference to Map object
-		 * @property {Object} data selement db values
-		 * @property {Boolean} selected if element is now selected by user
-		 * @property {String} id elementid
-		 * @property {Object} domNode reference to related DOM element
+		 * @property {Object} data shape db values
+		 * @property {String} id shapeid
 		 *
-		 * @param {Object} sysmap reference to Map object
-		 * @param {Object} selementData element db values
+		 * @param {Object} sysmap Map object
+		 * @param {Object} [shapeData] shape data from db
 		 */
-		function Selement(sysmap, selementData) {
+		function Shape(sysmap, shapeData) {
 			this.sysmap = sysmap;
-			this.selected = false;
 
-			if (!selementData) {
-				selementData = {
-					selementid: getUniqueId(),
-					elementtype: '4', // image
-					elementid: 0,
-					iconid_off: this.sysmap.defaultIconId, // first imageid
-					label: locale['S_NEW_ELEMENT'],
-					label_location: -1, // set default map label location
-					x: 0,
-					y: 0,
-					urls: {},
-					elementName: this.sysmap.defaultIconName, // first image name
-					use_iconmap: '1',
-					application: ''
+			if (!shapeData) {
+				shapeData = {
+					type: 0,
+					x: 10,
+					y: 10,
+					width: 50,
+					height: 50,
+					border_color: '000000',
+					background_color: '',
+					border_width: 2,
+					font: 9, // Helvetica
+					font_size: 11,
+					font_color: '000000',
+					text_valign: -1,
+					text_halign: -1,
+					text: '',
+					border_type: 0
 				};
-			}
-			else {
-				if ($.isArray(selementData.urls)) {
-					selementData.urls = {};
-				}
+
+				// generate unique shapeid
+				shapeData.shapeid = getUniqueId();
+				shapeData.zindex = Object.keys(sysmap.shapes).length;
 			}
 
-			this.data = selementData;
-			this.id = this.data.selementid;
+			shapeData.elementsubtype = '1';
+
+			this.data = shapeData;
+			this.id = this.data.shapeid;
 
 			// assign by reference
-			this.sysmap.data.selements[this.id] = this.data;
+			this.sysmap.data.shapes[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {style: 'position:absolute'})
+			this.domNode = $('<div></div>', {
+					style: 'position:absolute; z-index: 1;\
+						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
+				})
 				.appendTo(this.sysmap.container)
-				.addClass('pointer sysmap_element')
-				.attr('data-id', this.id);
+				.addClass('pointer sysmap_shape')
+				.attr('data-id', this.id)
+				.attr('data-type', 'shapes');
 
 			this.domNode.draggable({
 				containment: 'parent',
@@ -857,111 +1096,88 @@ ZABBIX.apps.map = (function($) {
 				}, this)
 			});
 
-			this.updateIcon();
+			this.makeResizable(true);
 
 			this.domNode.css({
 				top: this.data.y + 'px',
-				left: this.data.x + 'px'
+				left: this.data.x + 'px',
+				width: this.data.width + 'px',
+				height: this.data.height + 'px'
 			});
 		}
 
-		Selement.prototype = {
+		Shape.prototype = {
 			/**
-			 * Returns element data.
-			 */
-			getData: function() {
-				return this.data;
-			},
-
-			/**
-			 * Updates element fields.
+			 * Updades values in property data.
 			 *
 			 * @param {Object} data
-			 * @param {Boolean} unsetUndefined if true, all fields that are not in data parameter will be removed from element
 			 */
-			update: function(data, unsetUndefined) {
-				var fieldName,
-					dataFelds = [
-						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
-						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
-						'application'
-					],
-					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
-					i,
-					ln;
+			update: function(data) {
+				var key;
 
-				unsetUndefined = unsetUndefined || false;
-
-				// update elements fields, if not massupdate, remove fields that are not in new values
-				for (i = 0, ln = dataFelds.length; i < ln; i++) {
-					fieldName = dataFelds[i];
-
-					if (typeof data[fieldName] !== 'undefined') {
-						this.data[fieldName] = data[fieldName];
-					}
-					else if (unsetUndefined && (fieldsUnsettable.indexOf(fieldName) === -1)) {
-						delete this.data[fieldName];
-					}
+				for (key in data) {
+					this.data[key] = data[key];
 				}
 
-				// if elementsubtype is not set, it should be 0
-				if (unsetUndefined && typeof this.data.elementsubtype === 'undefined') {
-					this.data.elementsubtype = '0';
-				}
+				this.domNode
+					.css({
+						width: this.data.width + 'px',
+						height: this.data.height + 'px'
+					});
 
-				if (unsetUndefined && typeof this.data.use_iconmap === 'undefined') {
-					this.data.use_iconmap = '0';
-				}
-
-				// if element is image we unset advanced icons
-				if (this.data.elementtype === '4') {
-					this.data.iconid_on = '0';
-					this.data.iconid_maintenance = '0';
-					this.data.iconid_disabled = '0';
-
-					// if image element, set elementName to image name
-					for (i in this.sysmap.iconList) {
-						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
-							this.data.elementName = this.sysmap.iconList[i].name;
-						}
-					}
-				}
-
-				this.updateIcon();
 				this.align(false);
 				this.trigger('afterMove', this);
+
+				sysmap.updateImage();
 			},
 
 			/**
-			 * Updates element position.
-			 *
-			 * @param {Object} coords
+			 * Allows resizing of shape
 			 */
-			updatePosition: function(coords) {
-				this.data.x = coords.x;
-				this.data.y = coords.y;
-				this.align();
-				this.trigger('afterMove', this);
-			},
+			makeResizable: function(enable) {
+				var node = this.domNode,
+					isEnabled = node.hasClass('ui-resizable');
 
-			/**
-			 * Remove element.
-			 */
-			remove: function() {
-				this.domNode.remove();
-				delete this.sysmap.data.selements[this.id];
-				delete this.sysmap.selements[this.id];
-
-				if (typeof this.sysmap.selection.selements[this.id] !== 'undefined') {
-					this.sysmap.selection.count--;
+				if (enable === isEnabled) {
+					return;
 				}
 
-				delete this.sysmap.selection.selements[this.id];
+				if (enable) {
+					var handles = {};
+
+					$.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, key) {
+						var handle = $('<div>').addClass('ui-resizable-handle').addClass('ui-resizable-' + key);
+
+						if ($.inArray(key, ['n', 'e', 's', 'w']) >= 0) {
+							handle
+								.append($('<div>', {'class': 'ui-resize-dot'}))
+								.append($('<div>', {'class': 'ui-resizable-border-' + key}));
+						}
+
+						node.append(handle);
+						handles[key] = handle;
+					});
+
+					node.addClass('ui-inner-handles');
+					node.resizable({
+						handles: handles,
+						autoHide: true,
+						stop: $.proxy(function(event, data) {
+							this.updatePosition({
+								x: parseInt(data.position.left, 10),
+								y: parseInt(data.position.top, 10)
+							});
+						}, this)
+					});
+				}
+				else {
+					node.removeClass('ui-inner-handles');
+					node.resizable("destroy");
+				}
 			},
 
 			/**
-			 * Toggle element selection.
+			 * Toggle shape selection.
 			 *
 			 * @param {Boolean} state
 			 */
@@ -980,7 +1196,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Align element to map or map grid.
+			 * Align shape to map or map grid.
 			 *
 			 * @param {Boolean} doAutoAlign if we should align element to grid
 			 */
@@ -1061,6 +1277,227 @@ ZABBIX.apps.map = (function($) {
 					height: newHeight
 				});
 			},
+
+			/**
+			 * Updates element position.
+			 *
+			 * @param {Object} coords
+			 */
+			updatePosition: function(coords) {
+				this.data.x = coords.x;
+				this.data.y = coords.y;
+				this.align();
+				this.trigger('afterMove', this);
+			},
+
+			/**
+			 * Removes Shape object, delete all reference to it.
+			 */
+			remove: function() {
+				this.domNode.remove();
+				delete this.sysmap.data.shapes[this.id];
+				delete this.sysmap.shapes[this.id];
+
+				if (typeof this.sysmap.selection.shapes[this.id] !== 'undefined') {
+					this.sysmap.selection.count.shapes--;
+				}
+
+				delete this.sysmap.selection.shapes[this.id];
+			},
+
+			/**
+			 * Gets Shape data.
+			 *
+			 * @returns {Object}
+			 */
+			getData: function() {
+				return this.data;
+			}
+		};
+
+		Observer.makeObserver(Shape.prototype);
+
+		/**
+		 * @class Creates a new Selement.
+		 *
+		 * @property {Object} sysmap reference to Map object
+		 * @property {Object} data selement db values
+		 * @property {Boolean} selected if element is now selected by user
+		 * @property {String} id elementid
+		 * @property {Object} domNode reference to related DOM element
+		 *
+		 * @param {Object} sysmap reference to Map object
+		 * @param {Object} selementData element db values
+		 */
+		function Selement(sysmap, selementData) {
+			this.sysmap = sysmap;
+			this.selected = false;
+
+			if (!selementData) {
+				selementData = {
+					selementid: getUniqueId(),
+					elementtype: '4', // image
+					elementid: 0,
+					iconid_off: this.sysmap.defaultIconId, // first imageid
+					label: locale['S_NEW_ELEMENT'],
+					label_location: -1, // set default map label location
+					x: 0,
+					y: 0,
+					urls: {},
+					elementName: this.sysmap.defaultIconName, // first image name
+					use_iconmap: '1',
+					application: ''
+				};
+			}
+			else {
+				if ($.isArray(selementData.urls)) {
+					selementData.urls = {};
+				}
+			}
+
+			this.data = selementData;
+			this.id = this.data.selementid;
+
+			// assign by reference
+			this.sysmap.data.selements[this.id] = this.data;
+
+			// create dom
+			this.domNode = $('<div></div>', {style: 'position:absolute; z-index: 100'})
+				.appendTo(this.sysmap.container)
+				.addClass('pointer sysmap_element')
+				.attr('data-id', this.id)
+				.attr('data-type', 'selements');
+
+			this.domNode.draggable({
+				containment: 'parent',
+				opacity: 0.5,
+				helper: 'clone',
+				stop: $.proxy(function(event, data) {
+					this.updatePosition({
+						x: parseInt(data.position.left, 10),
+						y: parseInt(data.position.top, 10)
+					});
+				}, this)
+			});
+
+			this.makeResizable(selementData.elementtype == 3 && selementData.elementsubtype == 1);
+
+			this.updateIcon();
+
+			this.domNode.css({
+				top: this.data.y + 'px',
+				left: this.data.x + 'px'
+			});
+		}
+
+		Selement.prototype = {
+			/**
+			 * Returns element data.
+			 */
+			getData: Shape.prototype.getData,
+
+			/**
+			 * Allows resizing of element
+			 */
+			makeResizable: Shape.prototype.makeResizable,
+
+			/**
+			 * Updates element fields.
+			 *
+			 * @param {Object} data
+			 * @param {Boolean} unsetUndefined if true, all fields that are not in data parameter will be removed from element
+			 */
+			update: function(data, unsetUndefined) {
+				var fieldName,
+					dataFelds = [
+						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
+						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
+						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
+						'application'
+					],
+					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
+					i,
+					ln;
+
+				unsetUndefined = unsetUndefined || false;
+
+				// update elements fields, if not massupdate, remove fields that are not in new values
+				for (i = 0, ln = dataFelds.length; i < ln; i++) {
+					fieldName = dataFelds[i];
+
+					if (typeof data[fieldName] !== 'undefined') {
+						this.data[fieldName] = data[fieldName];
+					}
+					else if (unsetUndefined && (fieldsUnsettable.indexOf(fieldName) === -1)) {
+						delete this.data[fieldName];
+					}
+				}
+
+				// if elementsubtype is not set, it should be 0
+				if (unsetUndefined && typeof this.data.elementsubtype === 'undefined') {
+					this.data.elementsubtype = '0';
+				}
+
+				if (unsetUndefined && typeof this.data.use_iconmap === 'undefined') {
+					this.data.use_iconmap = '0';
+				}
+
+				this.makeResizable(this.data.elementtype == 3 && this.data.elementsubtype == 1);
+
+				// if element is image we unset advanced icons
+				if (this.data.elementtype === '4') {
+					this.data.iconid_on = '0';
+					this.data.iconid_maintenance = '0';
+					this.data.iconid_disabled = '0';
+
+					// if image element, set elementName to image name
+					for (i in this.sysmap.iconList) {
+						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
+							this.data.elementName = this.sysmap.iconList[i].name;
+						}
+					}
+				}
+
+				this.updateIcon();
+				this.align(false);
+				this.trigger('afterMove', this);
+			},
+
+			/**
+			 * Updates element position.
+			 *
+			 * @param {Object} coords
+			 */
+			updatePosition: Shape.prototype.updatePosition,
+
+			/**
+			 * Remove element.
+			 */
+			remove: function() {
+				this.domNode.remove();
+				delete this.sysmap.data.selements[this.id];
+				delete this.sysmap.selements[this.id];
+
+				if (typeof this.sysmap.selection.selements[this.id] !== 'undefined') {
+					this.sysmap.selection.count.selements--;
+				}
+
+				delete this.sysmap.selection.selements[this.id];
+			},
+
+			/**
+			 * Toggle element selection.
+			 *
+			 * @param {Boolean} state
+			 */
+			toggleSelect: Shape.prototype.toggleSelect,
+
+			/**
+			 * Align element to map or map grid.
+			 *
+			 * @param {Boolean} doAutoAlign if we should align element to grid
+			 */
+			align: Shape.prototype.align,
 
 			/**
 			 * Updates element icon and height/witdh in case element is area type.
@@ -1368,7 +1805,6 @@ ZABBIX.apps.map = (function($) {
 							break;
 					}
 				}
-
 			},
 
 			/**
@@ -1669,6 +2105,163 @@ ZABBIX.apps.map = (function($) {
 		};
 
 		/**
+		 * Form for shape editing.
+		 *
+		 * @param {Object} formContainer jQuery object
+		 * @param {Object} sysmap
+		 */
+		function ShapeForm(formContainer, sysmap) {
+			this.sysmap = sysmap;
+			this.formContainer = formContainer;
+			this.triggerids = {};
+			this.domNode = $(new Template($('#mapShapeFormTpl').html()).evaluate()).appendTo(formContainer);
+		}
+
+		ShapeForm.prototype = {
+			/**
+			 * Show form.
+			 */
+			show: function() {
+				this.formContainer.draggable('option', 'handle', '#shapeDragHandler');
+				this.formContainer.show();
+				this.domNode.show();
+				this.active = true;
+			},
+
+			/**
+			 * Hides element form.
+			 */
+			hide: function() {
+				this.domNode.toggle(false);
+				this.active = false;
+			},
+
+			/**
+			 * Set form controls with shape fields values.
+			 *
+			 * @param {Object} shape
+			 */
+			setValues: function(shape) {
+				for (var field in shape) {
+					$('[name=' + field + ']', this.domNode).val([shape[field]]);
+				}
+
+				$('.input-color-picker input', this.domNode).change();
+				$('#border_type').change();
+			},
+
+			/**
+			 * Get values from shape update form that should be updated
+			 *
+			 * @return array
+			 */
+			getValues: function() {
+				var values = $('#shapeForm').serializeArray(),
+					data = {},
+					i,
+					ln;
+
+				for (i = 0, ln = values.length; i < ln; i++) {
+					data[values[i].name] = values[i].value.toString();
+				}
+
+				return data;
+			}
+		};
+
+		/**
+		 * Form for shape editing.
+		 *
+		 * @param {Object} formContainer jQuery object
+		 * @param {Object} sysmap
+		 */
+		function MassShapeForm(formContainer, sysmap) {
+			var formActions = [];
+
+			var mapping = {
+				chkboxType: '[name="mass_type"]',
+				chkboxText: '#mass_text',
+				chkboxFont: '#mass_font',
+				chkboxFontSize: '#mass_font_size',
+				chkboxFontColor: '#mass_font_color',
+				chkboxTextHalign: '#mass_text_halign',
+				chkboxTextValign: '#mass_text_valign',
+				chkboxBackground: '#mass_background_color',
+				chkboxBorderType: '#mass_border_type',
+				chkboxBorderWidth: '#mass_border_width',
+				chkboxBorderColor: '#mass_border_color'
+			};
+
+			Object.keys(mapping).forEach(function (key) {
+				var condition = {};
+				condition[key] = 'checked';
+
+				formActions.push(
+					{
+						action: 'enable',
+						value: mapping[key],
+						cond: [condition]
+					}
+				);
+			});
+
+			this.sysmap = sysmap;
+			this.formContainer = formContainer;
+			this.triggerids = {};
+			this.domNode = $(new Template($('#mapMassShapeFormTpl').html()).evaluate()).appendTo(formContainer);
+
+			this.actionProcessor = new ActionProcessor(formActions);
+			this.actionProcessor.process();
+		}
+
+		MassShapeForm.prototype = {
+			/**
+			 * Show form.
+			 */
+			show: function() {
+				this.formContainer.draggable('option', 'handle', '#massShapeDragHandler');
+				this.formContainer.show();
+				this.domNode.show();
+				this.active = true;
+			},
+
+			/**
+			 * Hides element form.
+			 */
+			hide: function() {
+				this.domNode.toggle(false);
+				this.active = false;
+				$(':checkbox', this.domNode).prop('checked', false);
+				$('select', this.domNode).each(function() {
+					var select = $(this);
+					select.val($('option:first', select).val());
+				});
+				$('textarea', this.domNode).val('');
+				this.actionProcessor.process();
+			},
+
+			/**
+			 * Get values from mass update form that should be updated in all selected shapes.
+			 *
+			 * @return array
+			 */
+			getValues: function() {
+				var values = $('#massShapeForm').serializeArray(),
+					data = {},
+					i,
+					ln;
+
+				for (i = 0, ln = values.length; i < ln; i++) {
+					if (values[i].name.match(/^mass_/) !== null) {
+						data[values[i].name.substring("mass_".length)] = values[i].value.toString();
+					}
+				}
+
+				return data;
+			}
+		};
+
+		/**
 		 * Form for editin links.
 		 *
 		 * @param {Object} formContainer jQuesry object
@@ -1758,7 +2351,7 @@ ZABBIX.apps.map = (function($) {
 
 				// if only one element is selected, make sure that element1 is equal to the selected element and
 				// element2 - to the connected
-				if (this.sysmap.selection.count === 1) {
+				if (this.sysmap.selection.count.selements === 1 && this.sysmap.selection.count.shapes === 0) {
 					// get currently selected element
 					for (selementid in this.sysmap.selection.selements) {
 						selement1 = this.sysmap.selements[selementid];
@@ -1995,8 +2588,28 @@ ZABBIX.apps.map = (function($) {
 
 		var sysmap = new CMap(containerId, mapData);
 
+		Shape.prototype.bind('afterMove', function(event, element) {
+			if (sysmap.selection.count.shapes === 1 && sysmap.selection.count.selements === 0
+				&& sysmap.selection.shapes[element.id] !== void(0)) {
+
+				$('#shapeForm input[name=x]').val(element.data.x);
+				$('#shapeForm input[name=y]').val(element.data.y);
+
+				if (typeof element.data.width !== 'undefined') {
+					$('#shapeForm input[name=width]').val(element.data.width);
+				}
+				if (typeof element.data.height !== 'undefined') {
+					$('#shapeForm input[name=height]').val(element.data.height);
+				}
+			}
+
+			sysmap.updateImage();
+		});
+
 		Selement.prototype.bind('afterMove', function(event, element) {
-			if (sysmap.selection.count === 1 && sysmap.selection.selements[element.id] !== void(0)) {
+			if (sysmap.selection.count.selements === 1 && sysmap.selection.count.shapes === 0
+				&& sysmap.selection.selements[element.id] !== void(0)) {
+
 				$('#x').val(element.data.x);
 				$('#y').val(element.data.y);
 
