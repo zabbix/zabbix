@@ -196,11 +196,8 @@ class CHttpTest extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$headers_requested = (is_array($options['output']) && in_array('headers', $options['output']))
-					|| $options['output'] == API_OUTPUT_EXTEND;
-
-		$variables_requested = (is_array($options['output']) && in_array('variables', $options['output']))
-					|| $options['output'] == API_OUTPUT_EXTEND;
+		$headers_requested = $this->outputIsRequested('headers', $options['output']);
+		$variables_requested = $this->outputIsRequested('variables', $options['output']);
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -229,28 +226,6 @@ class CHttpTest extends CApiService {
 
 		if (!is_null($options['countOutput'])) {
 			return $result;
-		}
-
-		if ($headers_requested || $variables_requested) {
-			$db_httpfields = DB::select('httptest_field', [
-				'output' => ['httptest_fieldid', 'httptestid', 'type', 'name', 'value'],
-				'filter' => ['httptestid' => array_keys($result)]
-			]);
-
-			foreach ($db_httpfields as $db_httpfield) {
-				if ($db_httpfield['type'] == ZBX_HTTPFIELD_HEADER && $headers_requested) {
-					$type = 'headers';
-				} elseif($db_httpfield['type'] == ZBX_HTTPFIELD_VARIABLE && $variables_requested) {
-					$type = 'variables';
-				} else {
-					continue;
-				}
-
-				$result[$db_httpfield['httptestid']][$type][$db_httpfield['httptest_fieldid']] = [
-					'name' => $db_httpfield['name'],
-					'value' => $db_httpfield['value']
-				];
-			}
 		}
 
 		if ($result) {
@@ -858,6 +833,42 @@ class CHttpTest extends CApiService {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$httpTestIds = array_keys($result);
+
+		// adding headers
+		if ($this->outputIsRequested('headers', $options['output'])) {
+			$db_httpfields = DB::select('httptest_field', [
+				'output' => ['httptestid', 'name', 'value'],
+				'filter' => [
+					'httptestid' => $httpTestIds,
+					'type' => ZBX_HTTPFIELD_HEADER
+				]
+			]);
+
+			foreach ($db_httpfields as $db_httpfield) {
+				$result[$db_httpfield['httptestid']]['headers'][] = [
+					'name' => $db_httpfield['name'],
+					'value' => $db_httpfield['value']
+				];
+			}
+		}
+
+		// adding variables
+		if ($this->outputIsRequested('variables', $options['output'])) {
+			$db_httpfields = DB::select('httptest_field', [
+				'output' => ['httptestid', 'name', 'value'],
+				'filter' => [
+					'httptestid' => $httpTestIds,
+					'type' => ZBX_HTTPFIELD_VARIABLE
+				]
+			]);
+
+			foreach ($db_httpfields as $db_httpfield) {
+				$result[$db_httpfield['httptestid']]['variables'][] = [
+					'name' => $db_httpfield['name'],
+					'value' => $db_httpfield['value']
+				];
+			}
+		}
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
