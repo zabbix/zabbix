@@ -82,11 +82,7 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 		pos = [x, y],
 		rect = null,
 		offset = 0;
-		lineOptions = {
-			x: 0,
-			dy: '1.2em',
-			'text-anchor': 'middle'
-		};
+		skip = 0.9;
 
 	['x', 'y', 'anchor', 'background', 'clip'].forEach(function (key) {
 		delete attributes[key];
@@ -109,36 +105,55 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 	}
 
 	if (typeof content === 'string') {
-		content.split("\n").forEach(function (line, index) {
-			lines.push( {
-				type: 'tspan',
-				attributes: {
-					x: offset,
-					dy: (index === 0 ? '0.9em' : '1.2em'),
-					'text-anchor': 'middle'
-				},
-				content: line.replace("\r",'')
-			});
+		content.split("\n").forEach(function (line) {
+			if (line.trim() !== '') {
+				lines.push( {
+					type: 'tspan',
+					attributes: {
+						x: offset,
+						dy: skip + 'em',
+						'text-anchor': 'middle'
+					},
+					content: line.replace("\r",'')
+				});
+
+				skip = 1.2;
+			}
+			else {
+				skip += 1.2;
+			}
 		});
 	}
 	else {
 		content.forEach(function (line, index) {
-			lines.push( {
-				type: 'tspan',
-				attributes: SVGElement.mergeAttributes({
-					x: offset,
-					dy: (index === 0 ? '0.9em' : '1.2em'),
-					'text-anchor': 'middle'
-				}, line.attributes),
-				content: line.content.replace(/[\r\n]/g,"")
-			});
+			if (line.content.trim() !== '') {
+				lines.push( {
+					type: 'tspan',
+					attributes: SVGElement.mergeAttributes({
+						x: offset,
+						dy: skip + 'em',
+						'text-anchor': 'middle'
+					}, line.attributes),
+					content: line.content.replace(/[\r\n]/g,"")
+				});
+
+				skip = 1.2;
+			}
+			else {
+				skip += 1.2;
+			}
 		});
 	}
 
 	var text = group.add('text', attributes, lines),
-		size = group.element.getBBox(),
+		size = text.element.getBBox(),
 		width = Math.ceil(size.width),
 		height = Math.ceil(size.height);
+
+	if ((IE || ED) && lines.length > 0 &&
+		attributes['font-size'] !== undefined && parseInt(attributes['font-size']) > 16) {
+		height = Math.ceil(lines.length * parseInt(attributes['font-size']) * 1.2);
+	}
 
 	switch (anchor.horizontal) {
 		case 'center':
