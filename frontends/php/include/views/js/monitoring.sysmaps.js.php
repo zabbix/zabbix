@@ -87,9 +87,10 @@
 					->addRow(_('Triggers'), [
 						(new CDiv([
 							(new CTable())
-								->setHeader([_('Name'), _('Action')])
+								->setHeader(['', _('Name'), _('Action')])
 								->setId('triggerContainer')
-								->setAttribute('style', 'width: 100%;'),
+								->setAttribute('style', 'width: 100%;')
+								->addClass('ui-sortable')
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -463,6 +464,10 @@
 
 <script type="text/x-jquery-tmpl" id="selementFormTriggers">
 	<?= (new CRow([
+			(new CCol([
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
+			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CCol([
 				(new CVar('element_id[#{id}]', '#{id}')),
@@ -473,6 +478,7 @@
 					->onClick('jQuery("#triggerrow_#{id}").remove();')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
+			->addClass('sortable')
 			->setId('triggerrow_#{id}')
 			->toString()
 	?>

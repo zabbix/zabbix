@@ -500,6 +500,7 @@ ZABBIX.apps.map = (function($) {
 						// triggers
 						case '2':
 							jQuery('#elementNameTriggers').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
 							break;
 
 						// host group
@@ -1355,7 +1356,7 @@ ZABBIX.apps.map = (function($) {
 						$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
 					}
 				});
-
+				this.recalculateSortOrder();
 				$('#elementNameTriggers').multiSelect('clean');
 			},
 
@@ -1420,6 +1421,7 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					this.addTriggers(triggers);
+					this.initSortable();
 				}
 			},
 
@@ -1533,6 +1535,33 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				return data;
+			},
+
+			/**
+			 * Drag and drop trigger sorting.
+			 */
+			initSortable: function() {
+				var triggerContainer = $('#triggerContainer');
+
+				triggerContainer.sortable({
+					disabled: (triggerContainer.find('tr.sortable').length < 2),
+					items: 'tbody tr.sortable',
+					axis: 'y',
+					cursor: 'move',
+					handle: 'div.drag-icon',
+					tolerance: 'pointer',
+					opacity: 0.6,
+					update: this.recalculateSortOrder,
+					start: function(e, ui) {
+						$(ui.placeholder).height($(ui.helper).height());
+					}
+				});
+			},
+
+			/**
+			 * Sorting triggers by severity.
+			 */
+			recalculateSortOrder: function() {
 			}
 		};
 
