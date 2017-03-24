@@ -1142,7 +1142,7 @@ class CHttpTest extends CApiService {
 				}
 			}
 
-			if (array_key_exists('steps', $httptest)) {
+			if (array_key_exists('steps', $httptest) && is_array($httptest['steps'])) {
 				foreach ($httptest['steps'] as &$step) {
 					foreach ($fields as $field => $delimiter) {
 						if (array_key_exists($field, $step)) {
