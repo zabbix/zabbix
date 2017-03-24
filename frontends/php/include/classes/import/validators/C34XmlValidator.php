@@ -963,6 +963,26 @@ class C34XmlValidator {
 							]]
 						]]
 					]],
+					'shapes' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'shape', 'rules' => [
+						'shape' =>				['type' => XML_ARRAY, 'rules' => [
+							'type' =>				['type' => XML_STRING | XML_REQUIRED],
+							'x' =>					['type' => XML_STRING | XML_REQUIRED],
+							'y' =>					['type' => XML_STRING | XML_REQUIRED],
+							'width' =>				['type' => XML_STRING | XML_REQUIRED],
+							'height' =>				['type' => XML_STRING | XML_REQUIRED],
+							'text' =>				['type' => XML_STRING | XML_REQUIRED],
+							'font' =>				['type' => XML_STRING | XML_REQUIRED],
+							'font_size' =>				['type' => XML_STRING | XML_REQUIRED],
+							'font_color' =>				['type' => XML_STRING | XML_REQUIRED],
+							'text_halign' =>			['type' => XML_STRING | XML_REQUIRED],
+							'text_valign' =>			['type' => XML_STRING | XML_REQUIRED],
+							'border_type' =>			['type' => XML_STRING | XML_REQUIRED],
+							'border_width' =>			['type' => XML_STRING | XML_REQUIRED],
+							'border_color' =>			['type' => XML_STRING | XML_REQUIRED],
+							'background_color' =>			['type' => XML_STRING | XML_REQUIRED],
+							'zindex' =>				['type' => XML_STRING | XML_REQUIRED],
+						]]
+					]],
 					'links' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'link', 'rules' => [
 						'link' =>					['type' => XML_ARRAY, 'rules' => [
 							'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],

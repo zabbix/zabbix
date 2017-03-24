@@ -1,6 +1,8 @@
 Changes for 3.4.0alpha1
 
 New features:
+A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)
+..F....... [ZBXNEXT-34] implemented vector graphics for maps (vjaceslavs)
 A.F....PS. [ZBXNEXT-936] implemented remote command execution via proxy (wiper)
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 ..F....... [ZBXNEXT-3654] implemented a feature to apply host group permissions to all existing subgroups (Ivo, Sasha)
