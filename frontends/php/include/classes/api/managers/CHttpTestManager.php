@@ -109,12 +109,15 @@ class CHttpTestManager {
 			$httpTests[$hnum]['httptestid'] = $httpTestIds[$hnum];
 			$httpTest['httptestid'] = $httpTestIds[$hnum];
 
-			$field_types = [ZBX_HTTPFIELD_VARIABLE => 'variables', ZBX_HTTPFIELD_HEADER => 'headers'];
-			foreach ($field_types as $field_type => $field_name) {
-				foreach($httpTest[$field_name] as &$field) {
-					$field['type'] = $field_type;
+			$fields = [
+				ZBX_HTTPFIELD_VARIABLE => 'variables',
+				ZBX_HTTPFIELD_HEADER => 'headers'
+			];
+			foreach ($fields as $type => $field) {
+				foreach ($httpTest[$field] as &$value) {
+					$value['type'] = $type;
 				}
-				unset($field);
+				unset($value);
 			}
 			$this->createTestFieldsReal($httpTest, array_merge($httpTest['variables'], $httpTest['headers']));
 			$this->createHttpTestItems($httpTest);
