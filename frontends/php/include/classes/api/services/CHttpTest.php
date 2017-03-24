@@ -272,7 +272,7 @@ class CHttpTest extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
-			'applicationid' =>		['type' => API_ID, 'flags' => API_ALLOW_NULL],
+			'applicationid' =>		['type' => API_ID],
 			'delay' =>				['type' => API_INT32, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
@@ -369,7 +369,7 @@ class CHttpTest extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['httptestid']], 'fields' => [
 			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
-			'applicationid' =>		['type' => API_ID, 'flags' => API_ALLOW_NULL],
+			'applicationid' =>		['type' => API_ID],
 			'delay' =>				['type' => API_INT32, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
