@@ -196,21 +196,10 @@ class CHttpTest extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$headers_requested = $this->outputIsRequested('headers', $options['output']);
-		$variables_requested = $this->outputIsRequested('variables', $options['output']);
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($httpTest = DBfetch($res)) {
-			if ($headers_requested) {
-				$httpTest['headers'] = [];
-			}
-
-			if ($variables_requested) {
-				$httpTest['variables'] = [];
-			}
-
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
 					$result[] = $httpTest;
@@ -844,6 +833,11 @@ class CHttpTest extends CApiService {
 				]
 			]);
 
+			foreach ($result as &$httptest) {
+				$httptest['headers'] = [];
+			}
+			unset($httptest);
+
 			foreach ($db_httpfields as $db_httpfield) {
 				$result[$db_httpfield['httptestid']]['headers'][] = [
 					'name' => $db_httpfield['name'],
@@ -861,6 +855,11 @@ class CHttpTest extends CApiService {
 					'type' => ZBX_HTTPFIELD_VARIABLE
 				]
 			]);
+
+			foreach ($result as &$httptest) {
+				$httptest['variables'] = [];
+			}
+			unset($httptest);
 
 			foreach ($db_httpfields as $db_httpfield) {
 				$result[$db_httpfield['httptestid']]['variables'][] = [
