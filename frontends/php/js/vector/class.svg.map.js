@@ -32,7 +32,7 @@ function SVGMap(options) {
 	/* extra group for font styles */
 	var container = this.canvas.add('g', {
 		class: 'map-container',
-		'font-family': 'Dejavu Sans',
+		'font-family': SVGMap.FONTS[9],
 		'font-size': '10px'
 	});
 
