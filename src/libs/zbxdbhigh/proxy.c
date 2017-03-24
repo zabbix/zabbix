@@ -22,6 +22,7 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "zbxserver.h"
+#include "zbxtasks.h"
 
 #include "proxy.h"
 #include "dbcache.h"
@@ -3349,7 +3350,7 @@ out:
  *             proxy_hostid    - [IN] proxy identifier from database          *
  *             client_timediff - [IN] time difference between sending and     *
  *                                    receiving parties                       *
- *             info            - [OUT] address of a pointer to the info       *
+ *             error           - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
@@ -3655,6 +3656,29 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 
 /******************************************************************************
  *                                                                            *
+ * Function: process_tasks_contents                                           *
+ *                                                                            *
+ * Purpose: parse tasks contents and saves the received tasks                 *
+ *                                                                            *
+ * Parameters: jp_tasks - [IN] JSON with tasks data                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_tasks_contents(struct zbx_json_parse *jp_tasks)
+{
+	zbx_vector_ptr_t	tasks;
+
+	zbx_vector_ptr_create(&tasks);
+
+	zbx_tm_json_deserialize_tasks(jp_tasks, &tasks);
+
+	zbx_tm_save_tasks(&tasks);
+
+	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+	zbx_vector_ptr_destroy(&tasks);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_strcatnl_alloc                                               *
  *                                                                            *
  * Purpose: appends text to the string on a new line                          *
@@ -3735,6 +3759,9 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 		}
 	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_TASKS, &jp_data))
+		process_tasks_contents(&jp_data);
 
 	zbx_free(error_step);
 	ret = SUCCEED;

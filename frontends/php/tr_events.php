@@ -77,7 +77,7 @@ $alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'us
 	'clock', 'subject', 'message', 'p_eventid'
 ];
 $options = [
-	'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'value'],
+	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value'],
 	'select_alerts' => $alert_options,
 	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,

@@ -71,7 +71,8 @@ $this->addJsFile("class.svg.map.js");
 						'resourceid' => $data['map']['sysmapid'],
 						'width' => null,
 						'height' => null,
-						'severity_min' => $data['severity_min']
+						'severity_min' => $data['severity_min'],
+						'fullscreen' => $data['fullscreen']
 					]
 				])->get()
 			)

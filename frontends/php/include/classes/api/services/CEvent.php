@@ -483,7 +483,11 @@ class CEvent extends CApiService {
 			$ack_count = count($acknowledgeids);
 
 			for ($i = 0; $i < $ack_count; $i++) {
-				$tasks[] = ['type' => ZBX_TM_TASK_CLOSE_PROBLEM];
+				$tasks[] = [
+					'type' => ZBX_TM_TASK_CLOSE_PROBLEM,
+					'status' => ZBX_TM_STATUS_NEW,
+					'clock' => $time
+				];
 			}
 
 			$taskids = DB::insert('task', $tasks);

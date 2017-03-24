@@ -159,7 +159,8 @@ function getActionsBySysmap($sysmap, array $options = []) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
 				$gotos['submap'] = [
 					'sysmapid' => $elem['elementid'],
-					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
+					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null,
+					'fullscreen' => array_key_exists('fullscreen', $options) ? $options['fullscreen'] : 0
 				];
 				break;
 

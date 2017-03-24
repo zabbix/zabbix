@@ -1762,10 +1762,6 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 			}
 		}
 		foreach ($messages as $message) {
-			$iSqlError = array_key_exists('sql_error', $message) && ($message['sql_error'] === true);
-			if ($iSqlError && ZBX_SHOW_SQL_ERRORS === false) {
-				$message['message'] = _('SQL error, please contact with Zabbix administrator.');
-			}
 			foreach (explode("\n", $message['message']) as $message_part) {
 				$list->addItem($message_part);
 			}
@@ -1930,21 +1926,6 @@ function error($msgs) {
 
 	foreach ($msgs as $msg) {
 		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg];
-	}
-}
-
-
-function sqlError($msgs) {
-	global $ZBX_MESSAGES;
-
-	if (!isset($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = [];
-	}
-
-	$msgs = zbx_toArray($msgs);
-
-	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg, 'sql_error' => true];
 	}
 }
 
