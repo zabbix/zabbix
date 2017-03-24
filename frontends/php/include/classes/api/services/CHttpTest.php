@@ -277,11 +277,11 @@ class CHttpTest extends CApiService {
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
-			'variables' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['name']], 'fields' => [
+			'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
-			'headers' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+			'headers' =>			['type' => API_OBJECTS, 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
@@ -298,16 +298,16 @@ class CHttpTest extends CApiService {
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'name')],
 				'no' =>					['type' => API_INT32, 'flags' => API_REQUIRED],
 				'url' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'url')],
-				'query_fields' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'query_fields' =>		['type' => API_OBJECTS, 'fields' => [
 					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
-				'posts' =>				['type' => API_HTTP_POST, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep', 'posts'), 'name-length' => DB::getFieldLength('httpstep_field', 'name'), 'value-length' => DB::getFieldLength('httpstep_field', 'value')],
-				'variables' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['name']], 'fields' => [
+				'posts' =>				['type' => API_HTTP_POST, 'length' => DB::getFieldLength('httpstep', 'posts'), 'name-length' => DB::getFieldLength('httpstep_field', 'name'), 'value-length' => DB::getFieldLength('httpstep_field', 'value')],
+				'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 					'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
-				'headers' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'headers' =>			['type' => API_OBJECTS, 'fields' => [
 					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
@@ -374,11 +374,11 @@ class CHttpTest extends CApiService {
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
-			'variables' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['name']], 'fields' => [
+			'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
-			'headers' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+			'headers' =>			['type' => API_OBJECTS, 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
@@ -396,16 +396,16 @@ class CHttpTest extends CApiService {
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'name')],
 				'no' =>					['type' => API_INT32],
 				'url' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'url')],
-				'query_fields' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'query_fields' =>		['type' => API_OBJECTS, 'fields' => [
 					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
-				'posts' =>				['type' => API_HTTP_POST, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep', 'posts'), 'name-length' => DB::getFieldLength('httpstep_field', 'name'), 'value-length' => DB::getFieldLength('httpstep_field', 'value')],
-				'variables' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['name']], 'fields' => [
+				'posts' =>				['type' => API_HTTP_POST, 'length' => DB::getFieldLength('httpstep', 'posts'), 'name-length' => DB::getFieldLength('httpstep_field', 'name'), 'value-length' => DB::getFieldLength('httpstep_field', 'value')],
+				'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 					'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
-				'headers' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'headers' =>			['type' => API_OBJECTS, 'fields' => [
 					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
