@@ -257,12 +257,7 @@ class CHttpTest extends CApiService {
 		$this->validateCreate($httptests);
 
 		$httptests = Manager::HttpTest()->persist($httptests);
-		foreach ($httptests as &$httptest) {
-			foreach (['headers', 'variables', 'steps'] as $field) {
-				unset($httptest[$field]);
-			}
-		}
-		unset($httptest);
+
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCENARIO, $httptests);
 
 		return ['httptestids' => zbx_objectValues($httptests, 'httptestid')];
