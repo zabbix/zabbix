@@ -1841,6 +1841,27 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .dashbrd-grid-widget-foot ul li {
       padding: 0 0 0 13px; }
 
+.ui-inner-handles .ui-resizable-n {
+  top: 0px; }
+.ui-inner-handles .ui-resizable-ne {
+  top: -4px;
+  right: -4px; }
+.ui-inner-handles .ui-resizable-nw {
+  top: -4px;
+  left: -4px; }
+.ui-inner-handles .ui-resizable-e {
+  right: 0px; }
+.ui-inner-handles .ui-resizable-s {
+  bottom: 0px; }
+.ui-inner-handles .ui-resizable-se {
+  bottom: -4px;
+  right: -4px; }
+.ui-inner-handles .ui-resizable-sw {
+  bottom: -4px;
+  left: -4px; }
+.ui-inner-handles .ui-resizable-w {
+  left: 0px; }
+
 .ui-resizable-border-n {
   border-top: 1px solid #768d99;
   height: 5px;

@@ -1705,11 +1705,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 		}
 
 		if (EVENT_SOURCE_INTERNAL == event->source)
-		{
-			diff->lastchange = event->clock;
-			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE;
 			continue;
-		}
 
 		if (TRIGGER_VALUE_OK == event->value && 0 == (event->flags & ZBX_FLAGS_DB_EVENT_LINKED))
 		{
@@ -1727,8 +1723,9 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT;
 		}
 
-		/* remember the clock of the last event in the case we must update trigger lastchange */
+		/* always update trigger last change whenever a trigger event has been created */
 		diff->lastchange = event->clock;
+		diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE;
 	}
 
 	/* recalculate trigger value from problem_count and mark for updating if necessary */
@@ -1744,7 +1741,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 		if (new_value != diff->value)
 		{
 			diff->value = new_value;
-			diff->flags |= (ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE);
+			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE;
 		}
 	}
 }

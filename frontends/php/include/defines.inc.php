@@ -68,6 +68,7 @@ define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
 
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
+define('ZBX_SCRIPT_EXECUTE_ON_PROXY',	2);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
@@ -103,8 +104,6 @@ define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
-
-define('ZBX_SHOW_SQL_ERRORS',	true);
 
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
@@ -316,6 +315,10 @@ define('REPORT_PERIOD_LAST_YEAR',		7);
 define('SYSMAP_LABEL_ADVANCED_OFF',	0);
 define('SYSMAP_LABEL_ADVANCED_ON',	1);
 
+define('SYSMAP_PROBLEMS_NUMBER',			0);
+define('SYSMAP_SINGLE_PROBLEM',				1);
+define('SYSMAP_PROBLEMS_NUMBER_CRITICAL',	2);
+
 define('MAP_LABEL_TYPE_LABEL',		0);
 define('MAP_LABEL_TYPE_IP',			1);
 define('MAP_LABEL_TYPE_NAME',		2);
@@ -403,10 +406,6 @@ define('ZBX_DEFAULT_KEY_JMX',					'jmx[<object name>,<attribute name>]');
 
 define('SYSMAP_ELEMENT_USE_ICONMAP_ON',		1);
 define('SYSMAP_ELEMENT_USE_ICONMAP_OFF',	0);
-
-define('SYSMAP_PROBLEMS_NUMBER',			0);
-define('SYSMAP_SINGLE_PROBLEM',				1);
-define('SYSMAP_PROBLEMS_NUMBER_CRITICAL',	2);
 
 define('ZBX_ICON_PREVIEW_HEIGHT',	24);
 define('ZBX_ICON_PREVIEW_WIDTH',	24);
@@ -777,6 +776,8 @@ define('ZBX_ACKNOWLEDGE_ACTION_NONE',			0x00);
 define('ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM',	0x01);
 
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
+
+define('ZBX_TM_STATUS_NEW', 1);
 
 define('EVENT_SOURCE_TRIGGERS',				0);
 define('EVENT_SOURCE_DISCOVERY',			1);
