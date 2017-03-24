@@ -24,6 +24,7 @@ function SVGMap(options) {
 	this.shapes = {};
 	this.links = {};
 	this.background = null;
+	this.container = null;
 
 	this.imageUrl = 'imgstore.php?iconid=';
 	this.imageCache = new ImageCache();
@@ -99,7 +100,7 @@ function SVGMap(options) {
 				{
 					type: 'text',
 					attributes: {
-						class: 'map-date',
+						class: 'map-timestamp',
 						x: options.canvas.width - 107,
 						y: options.canvas.height - 6
 					}
@@ -108,6 +109,7 @@ function SVGMap(options) {
 				{
 					type: 'text',
 					attributes: {
+						class: 'map-homepage',
 						x: options.canvas.width,
 						y: options.canvas.height - 50,
 						transform: 'rotate(270 ' + (options.canvas.width) + ', ' + (options.canvas.height - 50) + ')'
@@ -133,6 +135,16 @@ function SVGMap(options) {
 	if (this.options.container) {
 		this.render(this.options.container);
 	}
+
+	['timestamp', 'homepage'].forEach(function (attribute) {
+		var elements = this.canvas.getElementsByAttributes({class: 'map-' + attribute});
+		if (elements.length === 1) {
+			this[attribute] = elements[0];
+		}
+		else {
+			throw attribute + " element is missing";
+		}
+	}, this);
 
 	this.update(this.options);
 }
@@ -319,21 +331,6 @@ SVGMap.prototype.updateOrderedItems = function (type, idField, className, items,
 	}, this);
 };
 
-SVGMap.prototype.updateTimestamp = function (timestamp) {
-	if (this.timestamp === undefined) {
-		var elements = this.canvas.getElementsByAttributes({class: 'map-date'});
-
-		if (elements.length === 1) {
-			this.timestamp = elements[0];
-		}
-		else {
-			throw "Timestamp element is missing";
-		}
-	}
-
-	this.timestamp.element.textContent = timestamp;
-};
-
 SVGMap.prototype.update = function (options, incremental) {
 	var images = {};
 	var rules = [
@@ -376,6 +373,28 @@ SVGMap.prototype.update = function (options, incremental) {
 		images[options.background] = this.getImageUrl(options.background);
 	}
 
+	if (options.canvas !== undefined && options.canvas.width !== undefined && options.canvas.height !== undefined &&
+		this.canvas.resize(options.canvas.width, options.canvas.height)) {
+
+		this.options.canvas = options.canvas;
+
+		if (this.container !== null) {
+			this.container.style.width = options.canvas.width + 'px';
+			this.container.style.height = options.canvas.height + 'px';
+		}
+
+		this.timestamp.update({
+			x: options.canvas.width - 107,
+			y: options.canvas.height - 6
+		});
+
+		this.homepage.update({
+			x: options.canvas.width,
+			y: options.canvas.height - 50,
+			transform: 'rotate(270 ' + (options.canvas.width) + ', ' + (options.canvas.height - 50) + ')'
+		});
+	}
+
 	this.imageCache.preload(images, function () {
 		this.updateItems('elements', 'SVGMapElement', options.elements, incremental);
 		this.updateOrderedItems('shapes', 'shapeid', 'SVGMapShape', options.shapes, incremental);
@@ -386,7 +405,7 @@ SVGMap.prototype.update = function (options, incremental) {
 	}, this);
 
 	if (options.timestamp) {
-		this.updateTimestamp(options.timestamp);
+		this.timestamp.element.textContent = options.timestamp;
 	}
 };
 
@@ -402,6 +421,7 @@ SVGMap.prototype.render = function (container) {
 		container = jQuery(container)[0];
 	}
 	this.canvas.render(container);
+	this.container = container;
 };
 
 SVGMap.isChanged = function (source, target) {

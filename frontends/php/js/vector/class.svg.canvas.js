@@ -239,6 +239,18 @@ SVGCanvas.prototype.render = function (container) {
 	container.appendChild(this.root.element);
 };
 
+SVGCanvas.prototype.resize = function (width, height) {
+	if (this.options.width !== width || this.options.height !== height) {
+		this.options.width = width;
+		this.options.height = height;
+		this.root.update({'width': width, 'height': height});
+
+		return true;
+	}
+
+	return false;
+};
+
 function ImageCache() {
 	this.lock = 0;
 	this.images = {};

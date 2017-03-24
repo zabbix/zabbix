@@ -32,6 +32,7 @@ $map_data = CMapHelper::get(getRequest('sysmapid'), getRequest('severity_min'));
 
 /* no need to get all data */
 $options = [
+	'canvas' => $map_data['canvas'],
 	'background' => $map_data['background'],
 	'elements' => $map_data['elements'],
 	'links' => $map_data['links'],

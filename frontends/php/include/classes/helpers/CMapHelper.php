@@ -42,16 +42,39 @@ class CMapHelper {
 		]);
 		$map = reset($maps);
 
-		if (empty($map)) {
-			access_deny();
-		}
-
-		if ($min_severity !== null) {
-			$map['severity_min'] = $min_severity;
-		}
-
 		$theme = self::getGraphTheme();
-		self::resolveMapState($map, $map['severity_min'], $theme);
+
+		if (empty($map)) {
+			$map = [
+				'sysmapid' => -1,
+				'width' => 320,
+				'height' => 150,
+				'backgroundid' => null,
+				'severity_min' => 0,
+				'selements' => [],
+				'links' => [],
+				'shapes' => [
+					[
+						'type' => 0,
+						'x' => 0,
+						'y' => 0,
+						'width' => 320,
+						'height' => 150,
+						'font' => 9,
+						'font_size' => 11,
+						'font_color' => 'D00000',
+						'text' => _('No permissions to referred object or it does not exist!')
+					]
+				]
+			];
+		}
+		else {
+			if ($min_severity !== null) {
+				$map['severity_min'] = $min_severity;
+			}
+
+			self::resolveMapState($map, $map['severity_min'], $theme);
+		}
 
 		return [
 			'id' => $map['sysmapid'],
