@@ -1130,13 +1130,13 @@ class CHttpTest extends CApiService {
 			$httptests = [$httptests];
 		}
 
-		$field_types = [
-				'headers' => ':',
-				'variables' => '='
+		$fields = [
+			'headers' => ':',
+			'variables' => '='
 		];
 
 		foreach ($httptests as &$httptest) {
-			foreach ($field_types as $field => $delimiter) {
+			foreach ($fields as $field => $delimiter) {
 				if (array_key_exists($field, $httptest)) {
 					$httptest[$field] = $this->convertHTTPPairString($httptest[$field], $delimiter);
 				}
@@ -1144,7 +1144,7 @@ class CHttpTest extends CApiService {
 
 			if (array_key_exists('steps', $httptest)) {
 				foreach ($httptest['steps'] as &$step) {
-					foreach ($field_types as $field => $delimiter) {
+					foreach ($fields as $field => $delimiter) {
 						if (array_key_exists($field, $step)) {
 							$step[$field] = $this->convertHTTPPairString($step[$field], $delimiter);
 						}
