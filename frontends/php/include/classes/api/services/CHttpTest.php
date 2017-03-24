@@ -652,7 +652,9 @@ class CHttpTest extends CApiService {
 		$applicationids = [];
 
 		foreach ($httptests as $index => $httptest) {
-			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0) {
+			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
+					&& ($method === 'validateCreate'
+						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
 				$applicationids[$httptest['applicationid']] = true;
 			}
 		}
@@ -668,7 +670,9 @@ class CHttpTest extends CApiService {
 		]);
 
 		foreach ($httptests as $index => $httptest) {
-			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0) {
+			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
+					&& ($method === 'validateCreate'
+						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
 				if (!array_key_exists($httptest['applicationid'], $db_applications)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Application with applicationid "%1$s" does not exist.', $httptest['applicationid'])
@@ -705,8 +709,6 @@ class CHttpTest extends CApiService {
 	 */
 	protected function validateSteps(array &$httptests, $method, array $db_httptests = null) {
 		if ($method === 'validateUpdate') {
-			$_httptests = [];
-
 			foreach ($httptests as $httptest) {
 				if (!array_key_exists('steps', $httptest)) {
 					continue;
