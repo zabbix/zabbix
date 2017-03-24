@@ -823,46 +823,35 @@ class CHttpTest extends CApiService {
 
 		$httpTestIds = array_keys($result);
 
-		// adding headers
-		if ($this->outputIsRequested('headers', $options['output'])) {
-			$db_httpfields = DB::select('httptest_field', [
-				'output' => ['httptestid', 'name', 'value'],
-				'filter' => [
-					'httptestid' => $httpTestIds,
-					'type' => ZBX_HTTPFIELD_HEADER
-				]
-			]);
-
-			foreach ($result as &$httptest) {
-				$httptest['headers'] = [];
-			}
-			unset($httptest);
-
-			foreach ($db_httpfields as $db_httpfield) {
-				$result[$db_httpfield['httptestid']]['headers'][] = [
-					'name' => $db_httpfield['name'],
-					'value' => $db_httpfield['value']
-				];
+		// adding headers and variables
+		$fields = [
+			ZBX_HTTPFIELD_HEADER => 'headers',
+			ZBX_HTTPFIELD_VARIABLE => 'variables'
+		];
+		foreach ($fields as $type => $field) {
+			if (!$this->outputIsRequested($field, $options['output'])) {
+				unset($fields[$type]);
 			}
 		}
 
-		// adding variables
-		if ($this->outputIsRequested('variables', $options['output'])) {
+		if ($fields) {
 			$db_httpfields = DB::select('httptest_field', [
-				'output' => ['httptestid', 'name', 'value'],
+				'output' => ['httptestid', 'name', 'value', 'type'],
 				'filter' => [
 					'httptestid' => $httpTestIds,
-					'type' => ZBX_HTTPFIELD_VARIABLE
+					'type' => array_keys($fields)
 				]
 			]);
 
 			foreach ($result as &$httptest) {
-				$httptest['variables'] = [];
+				foreach ($fields as $field) {
+					$httptest[$field] = [];
+				}
 			}
 			unset($httptest);
 
 			foreach ($db_httpfields as $db_httpfield) {
-				$result[$db_httpfield['httptestid']]['variables'][] = [
+				$result[$db_httpfield['httptestid']][$fields[$db_httpfield['type']]][] = [
 					'name' => $db_httpfield['name'],
 					'value' => $db_httpfield['value']
 				];
@@ -885,83 +874,61 @@ class CHttpTest extends CApiService {
 		// adding steps
 		if ($options['selectSteps'] !== null) {
 			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
-				$httpSteps = API::getApiService()->select('httpstep', [
+				$fields = [
+					ZBX_HTTPFIELD_HEADER => 'headers',
+					ZBX_HTTPFIELD_VARIABLE => 'variables',
+					ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields',
+					ZBX_HTTPFIELD_POST_FIELD => 'posts',
+				];
+				foreach ($fields as $type => $field) {
+					if (!$this->outputIsRequested($field, $options['selectSteps'])) {
+						unset($fields[$type]);
+					}
+				}
+
+				$db_httpsteps = API::getApiService()->select('httpstep', [
 					'output' => $this->outputExtend($options['selectSteps'], ['httptestid', 'httpstepid', 'post_type']),
 					'filters' => ['httptestid' => $httpTestIds],
 					'preservekeys' => true
 				]);
-				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
+				$relationMap = $this->createRelationMap($db_httpsteps, 'httptestid', 'httpstepid');
 
-				$requestedFields = [];
-				foreach (['headers', 'variables', 'query_fields'] as $field) {
-					if ((is_array($options['selectSteps']) && in_array($field, $options['selectSteps'])) ||
-							$options['selectSteps'] == API_OUTPUT_EXTEND) {
-						$requestedFields[] = $field;
-					}
-				}
-				if ((is_array($options['selectSteps']) && in_array('posts', $options['selectSteps'])) ||
-						$options['selectSteps'] == API_OUTPUT_EXTEND) {
-					$requestedFields[] = 'post_fields';
-				}
-
-				if (!empty($requestedFields)) {
-					$dbHttpStepFields = DBfetchArray(DBselect(
-						'SELECT htf.*'.
-						' FROM httpstep_field htf'.
-						' WHERE htf.httpstepid IN'.
-						' (SELECT h.httpstepid'.
-						' FROM httpstep h WHERE '.dbConditionInt('h.httptestid', $httpTestIds).')'.
-						' ORDER BY type, htf.httpstep_fieldid'
-					));
-
-					foreach($httpSteps as &$step) {
-						foreach ($requestedFields as $field) {
-							$step[$field] = [];
+				if ($fields) {
+					foreach ($db_httpsteps as &$db_httpstep) {
+						foreach ($fields as $type => $field) {
+							if ($type != ZBX_HTTPFIELD_POST_FIELD || $db_httpstep['post_type'] == ZBX_POSTTYPE_FORM) {
+								$db_httpstep[$field] = [];
+							}
 						}
+					}
+					unset($db_httpstep);
 
-						$stepFields = array_filter($dbHttpStepFields, function($field) use ($step) {
-							return $field['httpstepid'] === $step['httpstepid'];
-						});
+					$db_httpstep_fields = DB::select('httpstep_field', [
+						'output' => ['httpstepid', 'name', 'value', 'type'],
+						'filter' => [
+							'httpstepid' => array_keys($db_httpsteps),
+							'type' => array_keys($fields)
+						]
+					]);
 
-						foreach ($stepFields as $field) {
-							if (ZBX_HTTPFIELD_HEADER == $field['type']) {
-								$pairType = 'headers';
-							}
-							else if (ZBX_HTTPFIELD_VARIABLE == $field['type']) {
-								$pairType = 'variables';
-							}
-							else if (ZBX_HTTPFIELD_QUERY_FIELD == $field['type']) {
-								$pairType = 'query_fields';
-							}
-							else if (ZBX_HTTPFIELD_POST_FIELD == $field['type']) {
-								$pairType = 'post_fields';
-							}
-							else {
-								continue;
-							}
+					foreach ($db_httpstep_fields as $db_httpstep_field) {
+						$db_httpstep = &$db_httpsteps[$db_httpstep_field['httpstepid']];
 
-							if (!in_array($pairType, $requestedFields)) {
-								continue;
-							}
-
-							$step[$pairType][] = [
-								'name' => $field['name'],
-								'value' => $field['value']
+						if ($db_httpstep_field['type'] != ZBX_HTTPFIELD_POST_FIELD
+								|| $db_httpstep['post_type'] == ZBX_POSTTYPE_FORM) {
+							$db_httpstep[$fields[$db_httpstep_field['type']]][] = [
+								'name' => $db_httpstep_field['name'],
+								'value' => $db_httpstep_field['value']
 							];
 						}
-
-						if (in_array('post_fields', $requestedFields)) {
-							if (ZBX_POSTTYPE_FORM == $step['post_type']) {
-								$step['posts'] = $step['post_fields'];
-							}
-							unset($step['post_fields']);
-						}
 					}
-					unset($step);
+					unset($db_httpstep);
 				}
 
-				$httpSteps = $this->unsetExtraFields($httpSteps, ['httptestid', 'httpstepid', 'post_type'], $options['selectSteps']);
-				$result = $relationMap->mapMany($result, $httpSteps, 'steps');
+				$db_httpsteps = $this->unsetExtraFields($db_httpsteps, ['httptestid', 'httpstepid', 'post_type'],
+					$options['selectSteps']
+				);
+				$result = $relationMap->mapMany($result, $db_httpsteps, 'steps');
 			}
 			else {
 				$dbHttpSteps = DBselect(
