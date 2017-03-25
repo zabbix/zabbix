@@ -105,13 +105,13 @@ class CHttpTestManager {
 	public function create(array $httpTests) {
 		$httpTestIds = DB::insert('httptest', $httpTests);
 
-		foreach ($httpTests as $hnum => $httpTest) {
-			$httpTests[$hnum]['httptestid'] = $httpTestIds[$hnum];
-
+		foreach ($httpTests as $hnum => &$httpTest) {
 			$httpTest['httptestid'] = $httpTestIds[$hnum];
+
 			$this->createHttpTestItems($httpTest);
 			$this->createStepsReal($httpTest, $httpTest['steps']);
 		}
+		unset($httpTest);
 
 		$this->updateHttpTestFields($httpTests, 'create');
 
@@ -182,9 +182,8 @@ class CHttpTestManager {
 				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 
-			$db_http_test = $dbHttpTest[$httpTest['httptestid']];
-
 			if (array_key_exists('steps', $httpTest)) {
+				$db_http_test = $dbHttpTest[$httpTest['httptestid']];
 				$dbSteps = zbx_toHash($db_http_test['steps'], 'httpstepid');
 
 				foreach ($httpTest['steps'] as $webstep) {
@@ -233,7 +232,7 @@ class CHttpTestManager {
 		foreach ($httpTests as $key => $httpTest) {
 			if (array_key_exists('steps', $httpTest)) {
 				if (array_key_exists($key, $steps_update)) {
-					$this->updateStepsReal($httpTest, $dbHttpTest[$httpTest['httptestid']], $steps_update[$key]);
+					$this->updateStepsReal($httpTest, $steps_update[$key]);
 				}
 
 				if (array_key_exists($key, $steps_create)) {
@@ -847,26 +846,100 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Create web scenario fields.
+	 * Create web scenario step fields.
 	 *
-	 * @param $http_step_id
-	 * @param $httpfields
-	 *
-	 * @throws Exception
+	 * @param array  $httpsteps
+	 * @param string $httpsteps['httpstepid']
+	 * @param array  $httpsteps['variables']           (optional)
+	 * @param string $httpsteps['variables']['name']
+	 * @param string $httpsteps['variables']['value']
+	 * @param array  $httpsteps['headers']             (optional)
+	 * @param string $httpsteps['headers']['name']
+	 * @param string $httpsteps['headers']['value']
+	 * @param string $method
 	 */
-	protected function createStepFieldsReal($http_step_id, $http_fields) {
-		$fields = [];
+	private function updateHttpStepFields(array $httpsteps, $method) {
+		$fields = [
+			ZBX_HTTPFIELD_VARIABLE => 'variables',
+			ZBX_HTTPFIELD_HEADER => 'headers',
+			ZBX_HTTPFIELD_POST_FIELD => 'post_fields',
+			ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields'
+		];
+		$httpstep_fields = [];
 
-		foreach ($http_fields as $http_field) {
-			$fields[] = [
-				'httpstepid' => $http_step_id,
-				'type' => $http_field['type'],
-				'name' => $http_field['name'],
-				'value' => $http_field['value']
-			];
+		foreach ($httpsteps as $httpstep) {
+			foreach ($fields as $type => $field) {
+				if (array_key_exists($field, $httpstep)) {
+					$httpstep_fields[$httpstep['httpstepid']][$type] = $httpstep[$field];
+				}
+			}
 		}
 
-		DB::insert('httpstep_field', $fields);
+		if (!$httpstep_fields) {
+			return;
+		}
+
+		$db_httpstep_fields = ($method === 'update')
+			? DB::select('httpstep_field', [
+				'output' => ['httpstep_fieldid', 'httpstepid', 'type', 'name', 'value'],
+				'filter' => ['httpstepid' => array_keys($httpstep_fields)],
+				'sortfield' => ['httpstep_fieldid']
+			])
+			: [];
+
+		$ins_httpstep_fields = [];
+		$upd_httpstep_fields = [];
+		$del_httpstep_fieldids = [];
+
+		foreach ($db_httpstep_fields as $index =>  $db_httpstep_field) {
+			if (array_key_exists($db_httpstep_field['type'], $httpstep_fields[$db_httpstep_field['httpstepid']])) {
+				$httpstep_field =
+					array_shift($httpstep_fields[$db_httpstep_field['httpstepid']][$db_httpstep_field['type']]);
+
+				if ($httpstep_field !== null) {
+					$upd_httpstep_field = [];
+
+					foreach (['name', 'value'] as $field_name) {
+						if ($httpstep_field[$field_name] !== $db_httpstep_field[$field_name]) {
+							$upd_httpstep_field[$field_name] = $httpstep_field[$field_name];
+						}
+					}
+
+					if ($upd_httpstep_field) {
+						$upd_httpstep_fields[] = [
+							'values' => $upd_httpstep_field,
+							'where' => ['httpstep_fieldid' => $db_httpstep_field['httpstep_fieldid']]
+						];
+					}
+				}
+				else {
+					$del_httpstep_fieldids[] = $db_httpstep_field['httpstep_fieldid'];
+				}
+			}
+		}
+
+		foreach ($httpstep_fields as $httpstepid => $httpstep_fields_by_httpstep) {
+			foreach ($httpstep_fields_by_httpstep as $type => $httpstep_fields_by_type) {
+				foreach ($httpstep_fields_by_type as $httpstep_field) {
+					$ins_httpstep_fields[] = [
+						'httpstepid' => $httpstepid,
+						'type' => $type
+					] + $httpstep_field;
+				}
+			}
+		}
+
+		if ($ins_httpstep_fields) {
+			DB::insertBatch('httpstep_field', $ins_httpstep_fields);
+		}
+
+		if ($upd_httpstep_fields) {
+			DB::update('httpstep_field', $upd_httpstep_fields);
+		}
+
+		if ($del_httpstep_fieldids) {
+			DB::delete('httpstep_field', ['httpstep_fieldid' => $del_httpstep_fieldids]);
+		}
 	}
 
 	/**
@@ -881,14 +954,16 @@ class CHttpTestManager {
 		foreach ($websteps as &$webstep) {
 			$webstep['httptestid'] = $httpTest['httptestid'];
 
-			if (is_array($webstep['posts'])) {
-				$webstep['post_fields'] = $webstep['posts'];
-				$webstep['posts'] = '';
-				$webstep['post_type'] = ZBX_POSTTYPE_FORM;
-			}
-			else {
-				$webstep['post_fields'] = [];
-				$webstep['post_type'] = ZBX_POSTTYPE_RAW;
+			if (array_key_exists('posts', $webstep)) {
+				if (is_array($webstep['posts'])) {
+					$webstep['post_fields'] = $webstep['posts'];
+					$webstep['posts'] = '';
+					$webstep['post_type'] = ZBX_POSTTYPE_FORM;
+				}
+				else {
+					$webstep['post_fields'] = [];
+					$webstep['post_type'] = ZBX_POSTTYPE_RAW;
+				}
 			}
 		}
 		unset($webstep);
@@ -907,33 +982,8 @@ class CHttpTestManager {
 			), 'key_');
 		}
 
-		foreach ($websteps as $snum => $webstep) {
-			$webstepid = $webstepids[$snum];
-
-			$fields = [];
-			$field_types = [
-				'headers' => ZBX_HTTPFIELD_HEADER,
-				'variables' => ZBX_HTTPFIELD_VARIABLE,
-				'query_fields' => ZBX_HTTPFIELD_QUERY_FIELD
-			];
-
-			if ($webstep['post_type'] === ZBX_POSTTYPE_FORM) {
-				$webstep['posts'] = $webstep['post_fields'];
-				$field_types['posts'] = ZBX_HTTPFIELD_POST_FIELD;
-				unset($webstep['post_fields']);
-			}
-
-			foreach ($field_types as $field_name => $field_type) {
-				if (array_key_exists($field_name, $webstep)) {
-					foreach ($webstep[$field_name] as &$field) {
-						$field['type'] = $field_type;
-					}
-					unset($field);
-					$fields = array_merge($fields, $webstep[$field_name]);
-				}
-			}
-
-			$this->createStepFieldsReal($webstepid, $fields);
+		foreach ($websteps as $snum => &$webstep) {
+			$webstep['httpstepid'] = $webstepids[$snum];
 
 			$stepitems = [
 				[
@@ -998,25 +1048,27 @@ class CHttpTestManager {
 			$webstepitems = [];
 			foreach ($stepitems as $inum => $item) {
 				$webstepitems[] = [
-					'httpstepid' => $webstepid,
+					'httpstepid' => $webstep['httpstepid'],
 					'itemid' => $stepItemids[$inum],
 					'type' => $item['httpstepitemtype']
 				];
 			}
 			DB::insert('httpstepitem', $webstepitems);
 		}
+		unset($webstep);
+
+		$this->updateHttpStepFields($websteps, 'create');
 	}
 
 	/**
 	 * Update web scenario steps.
 	 *
 	 * @param $httpTest
-	 * @param $dbTest
 	 * @param $websteps
 	 *
 	 * @throws Exception
 	 */
-	protected function updateStepsReal($httpTest, $dbTest, $websteps) {
+	protected function updateStepsReal($httpTest, $websteps) {
 		$item_key_parser = new CItemKey();
 
 		// get all used keys
@@ -1029,15 +1081,6 @@ class CHttpTestManager {
 			, 'key_'
 		);
 
-		$fields_create = [];
-		$field_types = [
-			'headers' => ZBX_HTTPFIELD_HEADER,
-			'variables' => ZBX_HTTPFIELD_VARIABLE,
-			'post_fields' => ZBX_HTTPFIELD_POST_FIELD,
-			'query_fields' => ZBX_HTTPFIELD_QUERY_FIELD,
-		];
-
-		$dbSteps = zbx_toHash($dbTest['steps'], 'httpstepid');
 		foreach ($websteps as &$webstep) {
 			if (array_key_exists('posts', $webstep)) {
 				if (is_array($webstep['posts'])) {
@@ -1050,65 +1093,14 @@ class CHttpTestManager {
 					$webstep['post_type'] = ZBX_POSTTYPE_RAW;
 				}
 			}
-
-			/* step should exist as it was checked before*/
-			$dbStep = $dbSteps[$webstep['httpstepid']];
-
-			$source_fields = [];
-			foreach ($field_types as $field_name => $field_type) {
-				if (array_key_exists($field_name, $webstep)) {
-					if (array_key_exists($field_name, $dbStep)) {
-						// Same values in same order should not be changed
-						$source = array_values($dbStep[$field_name]);
-						$target = array_values($webstep[$field_name]);
-
-						$invalidate = false;
-						$pair_count = count($source);
-						if ($pair_count === count($target)) {
-							for ($i = 0; $i < $pair_count; $i++) {
-								if ($source[$i]['name'] !== $target[$i]['name'] ||
-									$source[$i]['value'] !== $target[$i]['value']) {
-									$invalidate = true;
-									break;
-								}
-							}
-
-							if(!$invalidate) {
-								continue;
-							}
-						}
-					}
-
-					$source_fields[] = $field_type;
-				}
-			}
-
-			if (!empty($source_fields)) {
-				foreach ($field_types as $field_name => $fieldType) {
-					if (in_array($fieldType, $source_fields)) {
-						foreach ($webstep[$field_name] as $field) {
-							$field['type'] = $fieldType;
-							$fields_create[$webstep['httpstepid']][] = $field;
-						}
-					}
-				}
-
-				DB::delete('httpstep_field', ['httpstepid' => $webstep['httpstepid'], 'type' => $source_fields]);
-			}
 		}
 		unset($webstep);
 
 		foreach ($websteps as $webstep) {
-			$key = $webstep['httpstepid'];
-
 			DB::update('httpstep', [
 				'values' => $webstep,
-				'where' => ['httpstepid' => $key]
+				'where' => ['httpstepid' => $webstep['httpstepid']]
 			]);
-
-			if (array_key_exists($key, $fields_create)) {
-				$this->createStepFieldsReal($key, $fields_create[$key]);
-			}
 
 			// update item keys
 			$itemids = [];
@@ -1160,6 +1152,8 @@ class CHttpTestManager {
 				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 		}
+
+		$this->updateHttpStepFields($websteps, 'update');
 	}
 
 	/**
