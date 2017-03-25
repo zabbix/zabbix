@@ -130,9 +130,12 @@ class CHttpTestManager {
 		$dbHttpTest = API::HttpTest()->get([
 			'output' => ['httptestid', 'name', 'applicationid', 'delay', 'status', 'agent', 'authentication',
 				'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file',
-				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host'],
+				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host'
+			],
 			'httptestids' => $httpTestIds,
-			'selectSteps' => API_OUTPUT_EXTEND,
+			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
+				'follow_redirects', 'retrieve_mode', 'post_type'
+			],
 			'editable' => true,
 			'preservekeys' => true
 		]);
