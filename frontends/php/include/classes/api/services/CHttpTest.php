@@ -835,7 +835,8 @@ class CHttpTest extends CApiService {
 				'filter' => [
 					'httptestid' => $httpTestIds,
 					'type' => array_keys($fields)
-				]
+				],
+				'sortfield' => ['httptest_fieldid']
 			]);
 
 			foreach ($result as &$httptest) {
@@ -903,7 +904,8 @@ class CHttpTest extends CApiService {
 						'filter' => [
 							'httpstepid' => array_keys($db_httpsteps),
 							'type' => array_keys($fields)
-						]
+						],
+						'sortfield' => ['httpstep_fieldid']
 					]);
 
 					foreach ($db_httpstep_fields as $db_httpstep_field) {

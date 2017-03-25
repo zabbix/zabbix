@@ -107,22 +107,13 @@ class CHttpTestManager {
 
 		foreach ($httpTests as $hnum => $httpTest) {
 			$httpTests[$hnum]['httptestid'] = $httpTestIds[$hnum];
-			$httpTest['httptestid'] = $httpTestIds[$hnum];
 
-			$fields = [
-				ZBX_HTTPFIELD_VARIABLE => 'variables',
-				ZBX_HTTPFIELD_HEADER => 'headers'
-			];
-			foreach ($fields as $type => $field) {
-				foreach ($httpTest[$field] as &$value) {
-					$value['type'] = $type;
-				}
-				unset($value);
-			}
-			$this->createTestFieldsReal($httpTest, array_merge($httpTest['variables'], $httpTest['headers']));
+			$httpTest['httptestid'] = $httpTestIds[$hnum];
 			$this->createHttpTestItems($httpTest);
 			$this->createStepsReal($httpTest, $httpTest['steps']);
 		}
+
+		$this->updateHttpTestFields($httpTests, 'create');
 
 		return $httpTests;
 	}
@@ -137,7 +128,9 @@ class CHttpTestManager {
 	public function update(array $httpTests) {
 		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 		$dbHttpTest = API::HttpTest()->get([
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['httptestid', 'name', 'applicationid', 'delay', 'status', 'agent', 'authentication',
+				'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file',
+				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host'],
 			'httptestids' => $httpTestIds,
 			'selectSteps' => API_OUTPUT_EXTEND,
 			'editable' => true,
@@ -147,8 +140,6 @@ class CHttpTestManager {
 		$deleteStepItemIds = [];
 		$steps_create = [];
 		$steps_update = [];
-
-		$fields_create = [];
 
 		foreach ($httpTests as $key => $httpTest) {
 			DB::update('httptest', [
@@ -232,49 +223,6 @@ class CHttpTestManager {
 					unset($httpTest['applicationid']);
 				}
 			}
-
-			$source_fields = [];
-
-			$field_types = ['headers' => ZBX_HTTPFIELD_HEADER, 'variables' => ZBX_HTTPFIELD_VARIABLE];
-			foreach ($field_types as $field_name => $field_type) {
-				if (array_key_exists($field_name, $httpTest)) {
-					/* Same values in same order should not be changed */
-					$source = array_values($db_http_test[$field_name]);
-					$target = array_values($httpTest[$field_name]);
-
-					$invalidate = false;
-					$pair_count = count($source);
-					if ($pair_count === count($target)) {
-						for ($i = 0; $i < $pair_count; $i++) {
-							if ($source[$i]['name'] !== $target[$i]['name'] ||
-								$source[$i]['value'] !== $target[$i]['value']) {
-								$invalidate = true;
-
-								break;
-							}
-						}
-
-						if(!$invalidate) {
-							continue;
-						}
-					}
-
-					$source_fields[] = $field_type;
-				}
-			}
-
-			if (!empty($source_fields)) {
-				foreach ($field_types as $field_name => $fieldType) {
-					if (in_array($fieldType, $source_fields)) {
-						foreach ($httpTest[$field_name] as $field) {
-							$field['type'] = $fieldType;
-							$fields_create[$key][] = $field;
-						}
-					}
-				}
-
-				DB::delete('httptest_field', ['httptestid' => $httpTest['httptestid'], 'type' => $source_fields]);
-			}
 		}
 
 		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
@@ -283,10 +231,6 @@ class CHttpTestManager {
 		}
 
 		foreach ($httpTests as $key => $httpTest) {
-			if (array_key_exists($key, $fields_create)) {
-				$this->createTestFieldsReal($httpTest, $fields_create[$key]);
-			}
-
 			if (array_key_exists('steps', $httpTest)) {
 				if (array_key_exists($key, $steps_update)) {
 					$this->updateStepsReal($httpTest, $dbHttpTest[$httpTest['httptestid']], $steps_update[$key]);
@@ -325,6 +269,8 @@ class CHttpTestManager {
 				}
 			}
 		}
+
+		$this->updateHttpTestFields($httpTests, 'update');
 
 		return $httpTests;
 	}
@@ -808,23 +754,96 @@ class CHttpTestManager {
 	/**
 	 * Create web scenario fields.
 	 *
-	 * @param $http_test
-	 * @param $http_fields
-	 *
-	 * @throws Exception
+	 * @param array  $httptests
+	 * @param string $httptests['httptestid']
+	 * @param array  $httptests['variables']           (optional)
+	 * @param string $httptests['variables']['name']
+	 * @param string $httptests['variables']['value']
+	 * @param array  $httptests['headers']             (optional)
+	 * @param string $httptests['headers']['name']
+	 * @param string $httptests['headers']['value']
+	 * @param string $method
 	 */
-	protected function createTestFieldsReal($http_test, $http_fields) {
-		$fields = [];
-		foreach ($http_fields as $http_field) {
-			$fields[] = [
-				'httptestid' => $http_test['httptestid'],
-				'type' => $http_field['type'],
-				'name' => $http_field['name'],
-				'value' => $http_field['value']
-			];
+	private function updateHttpTestFields(array $httptests, $method) {
+		$fields = [
+			ZBX_HTTPFIELD_VARIABLE => 'variables',
+			ZBX_HTTPFIELD_HEADER => 'headers'
+		];
+		$httptest_fields = [];
+
+		foreach ($httptests as $httptest) {
+			foreach ($fields as $type => $field) {
+				if (array_key_exists($field, $httptest)) {
+					$httptest_fields[$httptest['httptestid']][$type] = $httptest[$field];
+				}
+			}
 		}
 
-		DB::insert('httptest_field', $fields);
+		if (!$httptest_fields) {
+			return;
+		}
+
+		$db_httptest_fields = ($method === 'update')
+			? DB::select('httptest_field', [
+				'output' => ['httptest_fieldid', 'httptestid', 'type', 'name', 'value'],
+				'filter' => ['httptestid' => array_keys($httptest_fields)],
+				'sortfield' => ['httptest_fieldid']
+			])
+			: [];
+
+		$ins_httptest_fields = [];
+		$upd_httptest_fields = [];
+		$del_httptest_fieldids = [];
+
+		foreach ($db_httptest_fields as $index =>  $db_httptest_field) {
+			if (array_key_exists($db_httptest_field['type'], $httptest_fields[$db_httptest_field['httptestid']])) {
+				$httptest_field =
+					array_shift($httptest_fields[$db_httptest_field['httptestid']][$db_httptest_field['type']]);
+
+				if ($httptest_field !== null) {
+					$upd_httptest_field = [];
+
+					foreach (['name', 'value'] as $field_name) {
+						if ($httptest_field[$field_name] !== $db_httptest_field[$field_name]) {
+							$upd_httptest_field[$field_name] = $httptest_field[$field_name];
+						}
+					}
+
+					if ($upd_httptest_field) {
+						$upd_httptest_fields[] = [
+							'values' => $upd_httptest_field,
+							'where' => ['httptest_fieldid' => $db_httptest_field['httptest_fieldid']]
+						];
+					}
+				}
+				else {
+					$del_httptest_fieldids[] = $db_httptest_field['httptest_fieldid'];
+				}
+			}
+		}
+
+		foreach ($httptest_fields as $httptestid => $httptest_fields_by_httptest) {
+			foreach ($httptest_fields_by_httptest as $type => $httptest_fields_by_type) {
+				foreach ($httptest_fields_by_type as $httptest_field) {
+					$ins_httptest_fields[] = [
+						'httptestid' => $httptestid,
+						'type' => $type
+					] + $httptest_field;
+				}
+			}
+		}
+
+		if ($ins_httptest_fields) {
+			DB::insertBatch('httptest_field', $ins_httptest_fields);
+		}
+
+		if ($upd_httptest_fields) {
+			DB::update('httptest_field', $upd_httptest_fields);
+		}
+
+		if ($del_httptest_fieldids) {
+			DB::delete('httptest_field', ['httptest_fieldid' => $del_httptest_fieldids]);
+		}
 	}
 
 	/**
@@ -859,8 +878,9 @@ class CHttpTestManager {
 	 * @throws Exception
 	 */
 	protected function createStepsReal($httpTest, $websteps) {
-		foreach ($websteps as $snum => &$webstep) {
-			$websteps[$snum]['httptestid'] = $httpTest['httptestid'];
+		foreach ($websteps as &$webstep) {
+			$webstep['httptestid'] = $httpTest['httptestid'];
+
 			if (is_array($webstep['posts'])) {
 				$webstep['post_fields'] = $webstep['posts'];
 				$webstep['posts'] = '';
