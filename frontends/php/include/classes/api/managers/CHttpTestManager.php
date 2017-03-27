@@ -294,37 +294,6 @@ class CHttpTestManager {
 			'preservekeys' => true
 		]);
 
-		$types = [
-			'headers' => ZBX_HTTPFIELD_HEADER,
-			'variables' => ZBX_HTTPFIELD_VARIABLE,
-			'posts' => ZBX_HTTPFIELD_POST_FIELD,
-			'query_fields' => ZBX_HTTPFIELD_QUERY_FIELD
-		];
-
-		foreach ($httpTests as &$httpTest) {
-			foreach ($types as $field => $type) {
-				if (array_key_exists($field, $httpTest) && is_array($httpTest[$field])) {
-					foreach ($httpTest[$field] as &$pair) {
-						$pair['type'] = $type;
-					}
-					unset($pair);
-				}
-			}
-
-			foreach ($httpTest['steps'] as &$httpStep) {
-				foreach ($types as $field => $type) {
-					if (array_key_exists($field, $httpStep) && is_array($httpStep[$field])) {
-						foreach ($httpStep[$field] as &$pair) {
-							$pair['type'] = $type;
-						}
-						unset($pair);
-					}
-				}
-			}
-			unset($httpStep);
-		}
-		unset($httpTest);
-
 		$this->inherit($httpTests, $hostIds);
 	}
 
