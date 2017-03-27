@@ -210,12 +210,14 @@ if (hasRequest('add') || hasRequest('update')) {
 					'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
 					'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
 				],
+				'selectShapes' => API_OUTPUT_EXTEND,
 				'selectLinks' => ['selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
 				'sysmapids' => $sysmap['sysmapid']
 			]);
 
 			if ($clone_maps) {
 				$map['selements'] = $clone_maps[0]['selements'];
+				$map['shapes'] = $clone_maps[0]['shapes'];
 				$map['links'] = $clone_maps[0]['links'];
 			}
 		}
