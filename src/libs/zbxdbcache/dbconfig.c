@@ -1161,6 +1161,7 @@ done:
 				proxy->timediff = 0;
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
+				proxy->lastaccess = atoi(row[24]);
 			}
 
 			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
