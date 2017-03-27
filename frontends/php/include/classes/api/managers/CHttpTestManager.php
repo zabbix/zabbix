@@ -287,9 +287,14 @@ class CHttpTestManager {
 		$hostIds = zbx_toArray($hostIds);
 
 		$httpTests = API::HttpTest()->get([
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['httptestid', 'name', 'applicationid', 'delay', 'status', 'agent', 'authentication',
+				'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file',
+				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'variables', 'headers'
+			],
 			'hostids' => $templateId,
-			'selectSteps' => API_OUTPUT_EXTEND,
+			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
+				'follow_redirects', 'retrieve_mode', 'post_type', 'variables', 'headers', 'query_fields'
+			],
 			'editable' => true,
 			'preservekeys' => true
 		]);
