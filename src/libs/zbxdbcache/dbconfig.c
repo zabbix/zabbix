@@ -4091,7 +4091,10 @@ void	DCsync_configuration(unsigned char mode)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_dbsync_init_env(config);
-	zbx_dbsync_init(&config_sync, mode);
+
+	/* global configuration must be synchronized directly with database */
+	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
+
 	zbx_dbsync_init(&hosts_sync, mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
