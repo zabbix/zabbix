@@ -77,7 +77,6 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	const char		*key;
 	const char		*port;
-	const char		*units;
 	const char		*db_error;
 	ZBX_DC_TRIGGER		**triggers;
 	int			delay;
