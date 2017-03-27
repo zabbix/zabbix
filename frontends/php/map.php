@@ -42,5 +42,4 @@ $options = [
 
 echo CJs::encodeJson($options);
 
-			: $selement['elements'][0]['elementName'];
 require_once dirname(__FILE__).'/include/page_footer.php';

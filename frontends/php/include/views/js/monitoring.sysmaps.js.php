@@ -755,18 +755,19 @@
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CCol([(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)]))
+				->addStyle('background: ##{color}'),
 			(new CCol([
-				(new CVar('element_id[#{id}]', '#{id}')),
-				(new CVar('element_name[#{id}]', '#{name}')),
-				(new CVar('element_priority[#{id}]', '#{priority}')),
+				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),
+				(new CVar('element_name[#{triggerid}]', '#{name}')),
+				(new CVar('element_priority[#{triggerid}]', '#{priority}')),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('jQuery("#triggerrow_#{id}").remove();')
+					->onClick('jQuery("#triggerrow_#{triggerid}").remove();')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
-			->setId('triggerrow_#{id}')
+			->setId('triggerrow_#{triggerid}')
 			->toString()
 	?>
 </script>

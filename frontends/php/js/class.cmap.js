@@ -1780,7 +1780,9 @@ ZABBIX.apps.map = (function($) {
 			 */
 			addTriggers: function(triggers) {
 				var tpl = new Template($('#selementFormTriggers').html()),
-					selected_triggers = $('#elementNameTriggers').multiSelect('getData');
+					selected_triggers = $('#elementNameTriggers').multiSelect('getData'),
+					triggerids = [],
+					triggers_to_insert = [];
 
 				if (typeof triggers === 'undefined' || $.isEmptyObject(triggers)) {
 					triggers = [];
@@ -1788,14 +1790,46 @@ ZABBIX.apps.map = (function($) {
 
 				triggers = triggers.concat(selected_triggers);
 
-				triggers.each(function(trigger) {
-					if (!$('input[name^="element_id[' + trigger.id + ']"]').length != 0) {
-						$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+				if (triggers) {
+					triggers.each(function(trigger) {
+						if ($('input[name^="element_id[' + trigger.id + ']"]').length == 0) {
+							triggerids.push(trigger.id);
+							triggers_to_insert[trigger.id] = {
+								id: trigger.id,
+								name: trigger.name
+							};
+						}
+					});
+
+					if (triggerids.length != 0) {
+						// get priority
+						var ajaxUrl = new Curl('jsrpc.php');
+						ajaxUrl.setArgument('type', 11);
+						ajaxUrl.setArgument('method', 'trigget.get');
+						$.ajax({
+							url: ajaxUrl.getUrl(),
+							type: 'post',
+							dataType: 'html',
+							data: {
+								method: 'trigger.get',
+								triggerids: triggerids
+							},
+							success: function(data) {
+								data = JSON.parse(data);
+								for (var i in data.result) {
+									if ($('input[name^="element_id[' + data.result[i].triggerid + ']"]').length == 0) {
+										data.result[i].name = triggers_to_insert[data.result[i].triggerid].name;
+										$(tpl.evaluate(data.result[i])).appendTo('#triggerContainer tbody');
+									}
+								}
+							}
+						});
 					}
-				});
-				$('#elementNameTriggers').multiSelect('clean');
-				this.recalculateSortOrder();
-				this.initSortable();
+
+					$('#elementNameTriggers').multiSelect('clean');
+					this.recalculateSortOrder();
+					this.initSortable();
+				}
 			},
 
 			/**
