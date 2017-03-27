@@ -1098,23 +1098,17 @@ class CHttpTest extends CApiService {
 	 */
 	private function convertHTTPPairString($data, $delimiter) {
 		/* converts to pair array */
-		if (is_string($data)) {
-			$this->deprecated('using string format for http fields is deprecated.');
-
-			$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $data))));
-			foreach ($pairs as &$pair) {
-				$pair = explode($delimiter, $pair, 2);
-				$pair = [
-					'name' => $pair[0],
-					'value' => array_key_exists(1, $pair) ? $pair[1] : ''
-				];
-			}
-			unset($pair);
-
-			$data = $pairs;
+		$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $data))));
+		foreach ($pairs as &$pair) {
+			$pair = explode($delimiter, $pair, 2);
+			$pair = [
+				'name' => $pair[0],
+				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
+			];
 		}
+		unset($pair);
 
-		return $data;
+		return $pairs;
 	}
 
 	/**
@@ -1139,7 +1133,9 @@ class CHttpTest extends CApiService {
 
 		foreach ($httptests as &$httptest) {
 			foreach ($fields as $field => $delimiter) {
-				if (array_key_exists($field, $httptest)) {
+				if (array_key_exists($field, $httptest) && is_string($httptest[$field])) {
+					$this->deprecated('Incorrect value for field "'.$field.
+							'": using string format for http fields is deprecated.');
 					$httptest[$field] = $this->convertHTTPPairString($httptest[$field], $delimiter);
 				}
 			}
@@ -1147,7 +1143,9 @@ class CHttpTest extends CApiService {
 			if (array_key_exists('steps', $httptest) && is_array($httptest['steps'])) {
 				foreach ($httptest['steps'] as &$step) {
 					foreach ($fields as $field => $delimiter) {
-						if (array_key_exists($field, $step)) {
+						if (array_key_exists($field, $step) && is_string($step[$field])) {
+							$this->deprecated('Incorrect value for field "'.$field.
+									'": using string format for http fields is deprecated.');
 							$step[$field] = $this->convertHTTPPairString($step[$field], $delimiter);
 						}
 					}
