@@ -1133,7 +1133,7 @@ class CHttpTest extends CApiService {
 
 		foreach ($httptests as &$httptest) {
 			foreach ($fields as $field => $delimiter) {
-				if (array_key_exists($field, $httptest) && is_string($httptest[$field])) {
+				if (is_array($httptest) && array_key_exists($field, $httptest) && is_string($httptest[$field])) {
 					$this->deprecated('using string format for field "'.$field.'" is deprecated.');
 					$httptest[$field] = $this->convertHTTPPairString($httptest[$field], $delimiter);
 				}
@@ -1142,7 +1142,7 @@ class CHttpTest extends CApiService {
 			if (array_key_exists('steps', $httptest) && is_array($httptest['steps'])) {
 				foreach ($httptest['steps'] as &$step) {
 					foreach ($fields as $field => $delimiter) {
-						if (array_key_exists($field, $step) && is_string($step[$field])) {
+						if (is_array($step) && array_key_exists($field, $step) && is_string($step[$field])) {
 							$this->deprecated('using string format for field "'.$field.'" is deprecated.');
 							$step[$field] = $this->convertHTTPPairString($step[$field], $delimiter);
 						}
