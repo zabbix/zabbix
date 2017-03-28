@@ -879,9 +879,11 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'privatekey' => getRequest('privatekey'),
 				'ipmi_sensor' => getRequest('ipmi_sensor'),
 				'applications' => $applications,
-				'status' => getRequest('status'),
-				'preprocessing' => $preprocessing
+				'status' => getRequest('status')
 			];
+			if (hasRequest('preprocessing')) {
+				$item['preprocessing'] = $preprocessing;
+			}
 			foreach ($item as $key => $field) {
 				if ($field === null) {
 					unset($item[$key]);
