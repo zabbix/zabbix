@@ -517,122 +517,94 @@ if (isset($_REQUEST['form'])) {
 		array_shift($data['templates']);
 	}
 
-	if ((isset($_REQUEST['httptestid']) && !isset($_REQUEST['form_refresh']))) {
-		$dbHttpTest = DBfetch(DBselect(
-			'SELECT ht.*'.
-			' FROM httptest ht'.
-			' WHERE ht.httptestid='.zbx_dbstr($_REQUEST['httptestid'])
-		));
+	if (hasRequest('httptestid') && !hasRequest('form_refresh')) {
+		$db_httptests = API::HttpTest()->get([
+			'output' => ['name', 'applicationid', 'delay', 'retries', 'status', 'agent', 'authentication',
+				'http_user', 'http_password', 'http_proxy', 'templateid', 'verify_peer', 'verify_host', 'ssl_cert_file',
+				'ssl_key_file', 'ssl_key_password', 'headers', 'variables'
+			],
+			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
+				'follow_redirects', 'retrieve_mode', 'headers', 'variables', 'query_fields', 'post_type'
+			],
+			'httptestids' => getRequest('httptestid')
+		]);
 
-		$data['name'] = $dbHttpTest['name'];
-		$data['applicationid'] = $dbHttpTest['applicationid'];
+		$db_httptest = $db_httptests[0];
+
+		$data['name'] = $db_httptest['name'];
+		$data['applicationid'] = $db_httptest['applicationid'];
 		$data['new_application'] = '';
-		$data['delay'] = $dbHttpTest['delay'];
-		$data['retries'] = $dbHttpTest['retries'];
-		$data['status'] = $dbHttpTest['status'];
+		$data['delay'] = $db_httptest['delay'];
+		$data['retries'] = $db_httptest['retries'];
+		$data['status'] = $db_httptest['status'];
 
 		$data['agent'] = ZBX_AGENT_OTHER;
-		$data['agent_other'] = $dbHttpTest['agent'];
+		$data['agent_other'] = $db_httptest['agent'];
 
 		foreach (userAgents() as $userAgents) {
-			if (array_key_exists($dbHttpTest['agent'], $userAgents)) {
-				$data['agent'] = $dbHttpTest['agent'];
+			if (array_key_exists($db_httptest['agent'], $userAgents)) {
+				$data['agent'] = $db_httptest['agent'];
 				$data['agent_other'] = '';
 				break;
 			}
 		}
 
-		$db_http_test_fields = DBselect(
-			'SELECT htf.*'.
-			' FROM httptest_field htf'.
-			' WHERE htf.httptestid='.zbx_dbstr($_REQUEST['httptestid']).
-			' ORDER BY htf.httptest_fieldid'
-		);
-
+		$id = 1;
 		$data['pairs'] = [];
-		while (false !== ($field = DBfetch($db_http_test_fields))) {
-			switch($field['type']) {
-				case ZBX_HTTPFIELD_HEADER:
-					$pair_type = 'headers';
-				break;
 
-				case ZBX_HTTPFIELD_VARIABLE:
-					$pair_type = 'variables';
-				break;
+		$fields = [
+			'headers' => 'headers',
+			'variables' => 'variables'
+		];
 
-				default:
-					continue 2;
+		foreach ($fields as $type => $field_name) {
+			foreach ($db_httptest[$field_name] as $pair) {
+				$data['pairs'][] = [
+					'id' => $id++,
+					'type' => $type,
+					'name' => $pair['name'],
+					'value' => $pair['value']
+				];
 			}
-
-			$data['pairs'][] = [
-				'id' => $field['httptest_fieldid'],
-				'type' => $pair_type,
-				'name' => $field['name'],
-				'value' => $field['value']
-			];
 		}
 
-		$data['authentication'] = $dbHttpTest['authentication'];
-		$data['http_user'] = $dbHttpTest['http_user'];
-		$data['http_password'] = $dbHttpTest['http_password'];
-		$data['http_proxy'] = $dbHttpTest['http_proxy'];
-		$data['templated'] = (bool) $dbHttpTest['templateid'];
+		$data['authentication'] = $db_httptest['authentication'];
+		$data['http_user'] = $db_httptest['http_user'];
+		$data['http_password'] = $db_httptest['http_password'];
+		$data['http_proxy'] = $db_httptest['http_proxy'];
+		$data['templated'] = (bool) $db_httptest['templateid'];
 
-		$data['verify_peer'] = $dbHttpTest['verify_peer'];
-		$data['verify_host'] = $dbHttpTest['verify_host'];
-		$data['ssl_cert_file'] = $dbHttpTest['ssl_cert_file'];
-		$data['ssl_key_file'] = $dbHttpTest['ssl_key_file'];
-		$data['ssl_key_password'] = $dbHttpTest['ssl_key_password'];
-		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.zbx_dbstr($_REQUEST['httptestid']).' ORDER BY h.no'));
+		$data['verify_peer'] = $db_httptest['verify_peer'];
+		$data['verify_host'] = $db_httptest['verify_host'];
+		$data['ssl_cert_file'] = $db_httptest['ssl_cert_file'];
+		$data['ssl_key_file'] = $db_httptest['ssl_key_file'];
+		$data['ssl_key_password'] = $db_httptest['ssl_key_password'];
+		$data['steps'] = $db_httptest['steps'];
+		CArrayHelper::sort($data['steps'], ['no']);
 
-		$db_http_step_fields = DBfetchArray(DBselect(
-			'SELECT htf.*'.
-			' FROM httpstep_field htf'.
-			' WHERE htf.httpstepid IN'.
-			' (SELECT h.httpstepid'.
-			' FROM httpstep h'.
-			' WHERE h.httptestid='.zbx_dbstr($_REQUEST['httptestid']).')'.
-			' ORDER BY type, htf.httpstep_fieldid'
-		));
+		$fields = [
+			'headers' => 'headers',
+			'variables' => 'variables',
+			'query_fields' => 'query_fields',
+			'post_fields' => 'posts'
+		];
 
-		foreach($data['steps'] as &$step) {
+		foreach ($data['steps'] as &$step) {
+			$id = 0;
 			$step['pairs'] = [];
 
-			$stepFields = [];
-			foreach ($db_http_step_fields as $field) {
-				if ($field['httpstepid'] === $step['httpstepid']) {
-					$stepFields[] = $field;
+			foreach ($fields as $type => $field_name) {
+				if ($field_name !== 'posts' || $step['post_type'] == ZBX_POSTTYPE_FORM) {
+					foreach ($step[$field_name] as $pair) {
+						$step['pairs'][] = [
+							'id' => $id++,
+							'type' => $type,
+							'name' => $pair['name'],
+							'value' => $pair['value']
+						];
+					}
 				}
-			}
-
-			foreach ($stepFields as $field) {
-				switch($field['type']) {
-					case ZBX_HTTPFIELD_HEADER:
-						$pair_type = 'headers';
-					break;
-
-					case ZBX_HTTPFIELD_VARIABLE:
-						$pair_type = 'variables';
-					break;
-
-					case ZBX_HTTPFIELD_QUERY_FIELD:
-						$pair_type = 'query_fields';
-					break;
-
-					case ZBX_HTTPFIELD_POST_FIELD:
-						$pair_type = 'post_fields';
-					break;
-
-					default:
-						continue 2;
-				}
-
-				$step['pairs'][] = [
-					'id' => $field['httpstep_fieldid'],
-					'type' => $pair_type,
-					'name' => $field['name'],
-					'value' => $field['value']
-				];
+				unset($step[$field_name]);
 			}
 		}
 		unset($step);
