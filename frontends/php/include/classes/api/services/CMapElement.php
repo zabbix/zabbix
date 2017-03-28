@@ -80,28 +80,37 @@ abstract class CMapElement extends CApiService {
 		return ($update || $delete) ? $dbSelements : true;
 	}
 
+	/**
+	 * Checks that shape color attributes are valid and that user have a permission on given shapes
+	 *
+	 * @throws APIException if attributes are not valid
+	 *
+	 * @param mixed
+	 */
 	protected function checkShapeInput(&$shapes, $method) {
-		$update = ($method == 'updateShapes');
-		$delete = ($method == 'deleteShapes');
+		$update = ($method === 'updateShapes');
+		$delete = ($method === 'deleteShapes');
 
 		// permissions
 		if ($update || $delete) {
-			$dbShapes = API::getApiService()->select('sysmap_shape', [
+			$db_shapes = API::getApiService()->select('sysmap_shape', [
 				'output' => API_OUTPUT_EXTEND,
 				'filter' => ['selementid' => zbx_objectValues($shapes, 'sysmap_shapeid')],
 				'preservekeys' => true
 			]);
 
 			if ($update) {
-				$shapes = $this->extendFromObjects($shapes, $dbShapes, ['type', 'sysmap_shapeid']);
+				$shapes = $this->extendFromObjects($shapes, $db_shapes, ['type', 'sysmap_shapeid']);
 			}
 		}
 
+		$colorValidator = new CColorValidator();
 		foreach ($shapes as &$shape) {
 			if ($update || $delete) {
-				if (!isset($dbShapes[$shape['sysmap_shapeid']])) {
+				if (!array_key_exists($shape['sysmap_shapeid'], $db_shapes)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!'));
+						_('No permissions to referred object or it does not exist!')
+					);
 				}
 
 				if ($delete) {
@@ -109,58 +118,16 @@ abstract class CMapElement extends CApiService {
 				}
 			}
 
-			if (!array_key_exists('type', $shape) || !in_array($shape['type'], range(0,1))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape type is not correct.'));
-			}
-
-			foreach (['x', 'y'] as $field) {
-				if (array_key_exists($field, $shape) && $shape[$field] < 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape position is not correct.'));
-				}
-			}
-
-			foreach (['width', 'height'] as $field) {
-				if (array_key_exists($field, $shape) && $shape[$field] < 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape dimensions are not correct.'));
-				}
-			}
-
-			if (array_key_exists('font', $shape) && !in_array($shape['font'], range(0,12))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape font is not correct.'));
-			}
-
-			if (array_key_exists('font_size', $shape) && ($shape['font_size'] < 1 || $shape['font_size'] > 250)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape font size is not correct.'));
-			}
-
 			foreach (['border_color', 'background_color', 'font_color'] as $field) {
-				if (array_key_exists($field, $shape) && !empty($shape[$field])) {
-					$colorValidator = new CColorValidator();
-
-					if (!$colorValidator->validate($shape[$field])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $field));
-					}
+				if (array_key_exists($field, $shape) && $shape[$field] !== ''
+						&& !$colorValidator->validate($shape[$field])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
 				}
-			}
-
-			foreach (['text_halign', 'text_valign'] as $field) {
-				if (array_key_exists($field, $shape) && !in_array($shape[$field], range(0,2))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape text alignment is not correct.'));
-				}
-			}
-
-			if (array_key_exists('border_type', $shape) && !in_array($shape['border_type'], range(0,3))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape border type is not correct.'));
-			}
-
-			if (array_key_exists('border_width', $shape) && $shape['border_width'] < 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape border width is not correct.'));
 			}
 		}
 		unset($shape);
 
-		return ($update || $delete) ? $dbShapes : true;
+		return ($update || $delete) ? $db_shapes : true;
 	}
 
 	/**
@@ -534,9 +501,9 @@ abstract class CMapElement extends CApiService {
 
 		$this->checkShapeInput($shapes, __FUNCTION__);
 
-		$shapeIds = DB::insert('sysmap_shape', $shapes);
+		$shape_ids = DB::insert('sysmap_shape', $shapes);
 
-		return ['shapeids' => $shapeIds];
+		return ['shapeids' => $shape_ids];
 	}
 
 	/**
@@ -544,7 +511,7 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function updateShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
-		$shapeIds = [];
+		$shape_ids = [];
 
 		$this->checkShapeInput($shapes, __FUNCTION__);
 
@@ -554,12 +521,12 @@ abstract class CMapElement extends CApiService {
 				'values' => $shape,
 				'where' => ['sysmap_shapeid' => $shape['sysmap_shapeid']],
 			];
-			$shapeIds[] = $shape['sysmap_shapeid'];
+			$shape_ids[] = $shape['sysmap_shapeid'];
 		}
 
 		DB::update('sysmap_shape', $update);
 
-		return ['shapeids' => $shapeIds];
+		return ['shapeids' => $shape_ids];
 	}
 
 	/**
@@ -567,13 +534,13 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function deleteShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
-		$shapeIds = zbx_objectValues($shapes, 'sysmap_shapeid');
+		$shape_ids = zbx_objectValues($shapes, 'sysmap_shapeid');
 
 		$this->checkShapeInput($shapes, __FUNCTION__);
 
-		DB::delete('sysmap_shape', ['shapeid' => $shapeIds]);
+		DB::delete('sysmap_shape', ['sysmap_shapeid' => $shape_ids]);
 
-		return $shapeIds;
+		return $shape_ids;
 	}
 
 	/**

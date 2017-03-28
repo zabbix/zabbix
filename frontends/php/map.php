@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 $map_data = CMapHelper::get(getRequest('sysmapid'), getRequest('severity_min'));
 
-/* no need to get all data */
+// No need to get all data.
 $options = [
 	'canvas' => $map_data['canvas'],
 	'background' => $map_data['background'],

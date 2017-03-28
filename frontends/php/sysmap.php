@@ -77,6 +77,15 @@ if (isset($_REQUEST['favobj'])) {
 			$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
 			$sysmapUpdate['sysmapid'] = $sysmapid;
 
+			if (array_key_exists('shapes', $sysmapUpdate)) {
+				foreach ($sysmapUpdate['shapes'] as &$shape) {
+					if (array_key_exists('sysmap_shapeid', $shape) && !is_numeric($shape['sysmap_shapeid'])) {
+						unset($shape['sysmap_shapeid']);
+					}
+				}
+				unset($shape);
+			}
+
 			$result = API::Map()->update($sysmapUpdate);
 
 			if ($result !== false) {

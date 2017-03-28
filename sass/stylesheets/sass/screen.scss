@@ -2773,7 +2773,7 @@ $form-icon-btn: (
 
 .ui-inner-handles {
 	.ui-resizable-n {
-		top: 0px;
+		top: 0;
 	}
 
 	.ui-resizable-ne {
@@ -2787,11 +2787,11 @@ $form-icon-btn: (
 	}
 
 	.ui-resizable-e {
-		right: 0px;
+		right: 0;
 	}
 
 	.ui-resizable-s {
-		bottom: 0px;
+		bottom: 0;
 	}
 
 	.ui-resizable-se {
@@ -2805,7 +2805,7 @@ $form-icon-btn: (
 	}
 
 	.ui-resizable-w {
-		left: 0px;
+		left: 0;
 	}
 }
 

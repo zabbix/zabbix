@@ -592,11 +592,14 @@ function create_color_picker() {
 
 function set_color(color) {
 	var background = color;
+
 	if (curr_lbl) {
 		if (color.trim() !== '') {
 			background = '#' + color;
 		}
-		curr_lbl.style.background = curr_lbl.style.color = background;
+
+		curr_lbl.style.color = background;
+		curr_lbl.style.background = background;
 		curr_lbl.title = background;
 	}
 	if (curr_txt) {

@@ -17,6 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/*
+ * SVGCanvas class.
+ *
+ * Implements basic functionality needed to render SVG from JS.
+ *
+ * @param {object}  options       Canvas options.
+ * @param {number}     .width     Canvas width (width attribute of a SVG image).
+ * @param {number}     .height    Canvas height (height attribute of a SVG image).
+ * @param {boolean}    .mask      Masking option for textarea elements (@see SVGCanvas.prototype.createTextarea)
+ * @param {boolean} shadowBuffer  Shadow buffer (double buffering) support.
+ *                                If set to true, additional hidden group element is created within SVG.
+ */
 function SVGCanvas(options, shadowBuffer) {
 	this.id = 0;
 
@@ -39,16 +52,23 @@ function SVGCanvas(options, shadowBuffer) {
 
 	if (shadowBuffer === true) {
 		this.buffer = this.root.add('g', {
-			id: 'shadow-buffer',
+			class: 'shadow-buffer',
 			style: 'visibility: hidden;'
 		});
 	}
 }
 
+// Predefined namespaces for SVG as key => value
 SVGCanvas.NAMESPACES = {
 	xlink: 'http://www.w3.org/1999/xlink'
 };
 
+/**
+ * Generate unique id.
+ * Id is unique within page context.
+ *
+ * @return {number} Unique id.
+ */
 SVGCanvas.getUniqueId = function () {
 	if (SVGCanvas.uniqueId === undefined) {
 		SVGCanvas.uniqueId = 0;
@@ -57,6 +77,17 @@ SVGCanvas.getUniqueId = function () {
 	return SVGCanvas.uniqueId++;
 };
 
+/**
+ * Create new SVG element.
+ * Additional workaround is added to implement textarea element as a text element with a set of tspan subelements.
+ *
+ * @param {string}     type             Element type (SVG tag).
+ * @param {object}     attributes       Element attributes (SVG tag attributes) as key => value pairs.
+ * @param {SVGElement} parent           Parent element if any (or null if none).
+ * @param {mixed}      content          Element textContent of a set of subelements.
+ *
+ * @return {SVGElement} Created element.
+ */
 SVGCanvas.prototype.createElement = function (type, attributes, parent, content) {
 	var element;
 
@@ -71,6 +102,26 @@ SVGCanvas.prototype.createElement = function (type, attributes, parent, content)
 	return element;
 };
 
+/**
+ * Create new textarea element.
+ *
+ * Textarea element has poor support in supported browsers so following workaround is used. Textarea element is a text
+ * element with a set of tspan subelements and additional logic for text background and masking / clipping.
+ *
+ * @param {string}     type                 Element type (SVG tag).
+ * @param {object}     attributes           Element attributes (SVG tag attributes).
+ * @param {number}        .x                Element position on x axis.
+ * @param {number}        .y                Element position on y axis.
+ * @param {object}         .anchor          Anchor used for text placement.
+ * @param {string}             .horizontal  Horizontal anchor used for text placement.
+ * @param {string}             .vertical    Vertical anchor used for text placement.
+ * @param {object}         .background      Attributes of rectangle placed behind text (text background).
+ * @param {object}         .clip            SVG element used for clipping or masking (depends on canvas mask option).
+ * @param {SVGElement} parent               Parent element if any (or null if none).
+ * @param {mixed}      content              Element textContent of a set of subelements.
+ *
+ * @return {SVGElement} Created element.
+ */
 SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 	if (typeof content === 'string' && content.trim() === '') {
 		return;
@@ -140,8 +191,9 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 		width = Math.ceil(size.width),
 		height = Math.ceil(size.height);
 
-	if ((IE || ED) && lines.length > 0 &&
-		attributes['font-size'] !== undefined && parseInt(attributes['font-size']) > 16) {
+	// Workaround for IE/EDGE for proper text height calculation
+	if ((IE || ED) && lines.length > 0
+			&& attributes['font-size'] !== undefined && parseInt(attributes['font-size']) > 16) {
 		height = Math.ceil(lines.length * parseInt(attributes['font-size']) * 1.2);
 	}
 
@@ -172,6 +224,7 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 
 	if (clip !== undefined)
 	{
+		// Clipping shape should be applied to the text. Clipping mode (clip or mask) depends on mask attribute
 		if (clip.attributes.x !== undefined && clip.attributes.y !== undefined) {
 			clip.attributes.x -= (pos[0] + Math.floor(width/2));
 			clip.attributes.y -= pos[1];
@@ -217,6 +270,13 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 	return group;
 };
 
+/**
+ * Get elements by specified attributes.
+ *
+ * SVG elements with specified attributes are returned as array of SVGElement (if any).
+ *
+ * @return {array} Elements that match specified attributes.
+ */
 SVGCanvas.prototype.getElementsByAttributes = function (attributes) {
 	var names = Object.keys(attributes),
 		elements = this.elements.filter(function (item) {
@@ -232,10 +292,20 @@ SVGCanvas.prototype.getElementsByAttributes = function (attributes) {
 	return elements;
 };
 
+/**
+ * Add element to the SVG root element (svg tag).
+ *
+ * @return {SVGElement} Created element.
+ */
 SVGCanvas.prototype.add = function (type, attributes, content) {
 	return this.root.add(type, attributes, content);
 };
 
+/**
+ * Attach SVG element to the specified container in DOM.
+ *
+ * @param {object}     container       DOM node.
+ */
 SVGCanvas.prototype.render = function (container) {
 	if (this.root.element.parentNode) {
 		this.root.element.parentNode.removeChild(this.root.element);
@@ -244,6 +314,14 @@ SVGCanvas.prototype.render = function (container) {
 	container.appendChild(this.root.element);
 };
 
+/**
+ * Resize canvas.
+ *
+ * @param {number}     width       New width.
+ * @param {number}     height      New height.
+ *
+ * @return {boolean} true if size is changed and false if size is the same as previous.
+ */
 SVGCanvas.prototype.resize = function (width, height) {
 	if (this.options.width !== width || this.options.height !== height) {
 		this.options.width = width;
@@ -256,6 +334,11 @@ SVGCanvas.prototype.resize = function (width, height) {
 	return false;
 };
 
+/*
+ * ImageCache class.
+ *
+ * Implements basic functionality needed to preload images, get image attributes and avoid flickering.
+ */
 function ImageCache() {
 	this.lock = 0;
 	this.images = {};
@@ -265,36 +348,65 @@ function ImageCache() {
 	this.queue = [];
 }
 
+/**
+ * Invoke callback (if any), update image preload task queue.
+ */
 ImageCache.prototype.invokeCallback = function () {
 	if (typeof this.callback === 'function') {
 		this.callback.call(this.context);
 	}
 
+	// Preloads next image list if any
 	var task = this.queue.pop();
 	if (task !== undefined) {
 		this.preload(task.urls, task.callback, task.context);
 	}
 };
 
+/**
+ * Handle image processing event (loaded or error).
+ */
 ImageCache.prototype.handleCallback = function () {
 	this.lock--;
 
+	// If all images are loaded (error is treated as "loaded"), invoke callback.
 	if (this.lock === 0) {
 		this.invokeCallback();
 	}
 };
 
+/**
+ * Callback for sucessful image load.
+ *
+ * @param {string}     id       Image id.
+ * @param {object}     image    Loaded image.
+ */
 ImageCache.prototype.onImageLoaded = function (id, image) {
 	this.images[id] = image;
 	this.handleCallback();
 };
 
+/**
+ * Callback for image loading errors.
+ *
+ * @param {string}     id       Image id.
+ */
 ImageCache.prototype.onImageError = function (id) {
 	this.images[id] = null;
 	this.handleCallback();
 };
 
+/**
+ * Preload images.
+ *
+ * @param {object}     urls       Urls of images to be preloaded (urls are provided in key=>value format).
+ * @param {function}   callback   Callback to be called when loading is finished. Can be null if no callback is needed.
+ * @param {object}     context    Context of a callback. (@see first argument of Function.prototype.apply)
+ *
+ * @return {boolean} true if preloader started loading images and false if preloader is busy.
+ */
 ImageCache.prototype.preload = function (urls, callback, context) {
+	// If preloader is busy, new preloading task is pushed to queue
 	if (this.lock !== 0) {
 		this.queue.push({
 			'urls':  urls,
@@ -318,7 +430,8 @@ ImageCache.prototype.preload = function (urls, callback, context) {
 		}
 
 		if (object.images[key] !== undefined) {
-			return; /* preloaded */
+			// Image is preloaded already.
+			return true;
 		}
 
 		var image = new Image();
@@ -341,6 +454,17 @@ ImageCache.prototype.preload = function (urls, callback, context) {
 	return true;
 };
 
+/*
+ * SVGElement class.
+ *
+ * Implements basic functionality needed to create SVG elements. (@see SVGCanvas.prototype.createElement)
+ *
+ * @param {SVGCanvas}  renderer    SVGCanvas used to render elements.
+ * @param {string}     type        Type of svg element.
+ * @param {object}     attributes  Element attributes (SVG tag attributes) as key => value pairs.
+ * @param {SVGElement} parent      Parent element if any (or null if none).
+ * @param {mixed}      content     Element textContent of a set of subelements.
+ */
 function SVGElement(renderer, type, attributes, parent, content) {
 	this.id = renderer.id++;
 	this.type = type;
@@ -359,8 +483,18 @@ function SVGElement(renderer, type, attributes, parent, content) {
 	}
 }
 
+/*
+ * Add clild SVG element. (@see SVGCanvas.prototype.createElement)
+ *
+ * @param {mixed}      type        Type of svg element
+ *                                 or array of objects containing type, attribute and content fields.
+ * @param {object}     attributes  Element attributes (SVG tag attributes) as key => value pairs.
+ * @param {mixed}      content     Element textContent of a set of subelements.
+ *
+ * @return {mixed} SVGElement created or array of SVGElement is type was Array.
+ */
 SVGElement.prototype.add = function (type, attributes, content) {
-	/* multiple items to add */
+	// Multiple items to add.
 	if (Array.isArray(type)) {
 		var items = [];
 		type.forEach(function (element) {
@@ -386,6 +520,11 @@ SVGElement.prototype.add = function (type, attributes, content) {
 	return element;
 };
 
+/*
+ * Remove all children elements.
+ *
+ * @return {SVGElement} this
+ */
 SVGElement.prototype.clear = function () {
 	var items = this.items;
 
@@ -398,6 +537,13 @@ SVGElement.prototype.clear = function () {
 	return this;
 };
 
+/*
+ * Update attributes of SVG element.
+ *
+ * @param {object}     attributes  New element attributes (SVG tag attributes) as key => value pairs.
+ *
+ * @return {SVGElement} this
+ */
 SVGElement.prototype.update = function (attributes) {
 	Object.keys(attributes).forEach(function (name) {
 		var attribute = name.split(':');
@@ -413,6 +559,13 @@ SVGElement.prototype.update = function (attributes) {
 	return this;
 };
 
+/*
+ * Moves element from one parent to another.
+ *
+ * @param {object}     target  New parent element.
+ *
+ * @return {SVGElement} this
+ */
 SVGElement.prototype.moveTo = function (target) {
 	this.parent.items = this.parent.items.filter(function (item) {
 		return item.id !== this.id;
@@ -425,16 +578,26 @@ SVGElement.prototype.moveTo = function (target) {
 	return this;
 };
 
+/*
+ * Mark element as invalid (flag used to force redraw of element).
+ *
+ * @return {SVGElement} this
+ */
 SVGElement.prototype.invalidate = function () {
 	this.invalid = true;
 	return this;
 };
 
+/*
+ * Remove element from parent and from DOM.
+ *
+ * @return {SVGElement} this
+ */
 SVGElement.prototype.remove = function () {
 	this.clear();
 
 	if (this.element !== null) {
-		/* .remove() does not work in IE */
+		// Workaround for IE as .remove() does not work in IE.
 		if (typeof this.element.remove !== 'function') {
 			if (this.element.parentNode !== undefined) {
 				this.element.parentNode.removeChild(this.element);
@@ -455,6 +618,13 @@ SVGElement.prototype.remove = function () {
 	return this;
 };
 
+/*
+ * Replace existing DOM element with a new one.
+ *
+ * @param {object}     target  New DOM element.
+ *
+ * @return {SVGElement} this
+ */
 SVGElement.prototype.replace = function (target) {
 	if (this.element !== null && this.invalid === false) {
 		this.element.parentNode.insertBefore(target.element, this.element);
@@ -469,6 +639,11 @@ SVGElement.prototype.replace = function (target) {
 	return this;
 };
 
+/*
+ * Create SVG DOM element.
+ *
+ * @return {object} DOM element.
+ */
 SVGElement.prototype.create = function () {
 	var element = document.createElementNS('http://www.w3.org/2000/svg', this.type);
 
@@ -499,6 +674,15 @@ SVGElement.prototype.create = function () {
 	return element;
 };
 
+/*
+ * Merge source and target attributes.
+ * If both source and attributes contain the same set of keys, values from attributes are used.
+ *
+ * @param {object}     source      Source object attributes.
+ * @param {object}     attributes  New object attributes.
+ *
+ * @return {object} Merged set of attributes.
+ */
 SVGElement.mergeAttributes = function (source, attributes) {
 	var merged = {};
 	if (typeof source === 'object') {

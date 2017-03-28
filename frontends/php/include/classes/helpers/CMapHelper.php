@@ -22,10 +22,10 @@
 class CMapHelper {
 
 	/**
-	 * Get map data with resolved element / link states
+	 * Get map data with resolved element / link states.
 	 *
-	 * @param array $ids				map ids
-	 * @param int   $min_severity		minimum severity
+	 * @param array $ids				Map ids.
+	 * @param int   $min_severity		Minimum severity.
 	 *
 	 * @return array
 	 */
@@ -33,7 +33,10 @@ class CMapHelper {
 		$maps = API::Map()->get([
 			'sysmapids' => $ids,
 			'output' => API_OUTPUT_EXTEND,
-			'selectShapes' => API_OUTPUT_EXTEND,
+			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
+				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
+				'background_color', 'zindex'
+			],
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'expandUrls' => true,
@@ -62,7 +65,7 @@ class CMapHelper {
 						'height' => 150,
 						'font' => 9,
 						'font_size' => 11,
-						'font_color' => 'D00000',
+						'font_color' => 'FF0000',
 						'text' => _('No permissions to referred object or it does not exist!')
 					]
 				]
@@ -95,7 +98,7 @@ class CMapHelper {
 	}
 
 	/**
-	 * Get graphic theme for map elements based on user configuration
+	 * Get graphic theme for map elements based on user configuration.
 	 *
 	 * @return array
 	 */
@@ -124,48 +127,45 @@ class CMapHelper {
 	}
 
 	/**
-	 * Resolve map element (selements and links) state
-	 * TODO: corrent solution relies heavily on existing functions from maps.inc.php.
-	 *		 refactoring is required for those functions to improve performance and to simplify the solution
+	 * Resolve map element (selements and links) state.
 	 *
-	 * @param array $sysmap				map data
-	 * @param int   $min_severity		minimum severity
-	 * @param int   $theme				theme used to create missing elements (like hostgroup frame)
+	 * @param array $sysmap				Map data.
+	 * @param int   $min_severity		Minimum severity.
+	 * @param int   $theme				Theme used to create missing elements (like hostgroup frame).
 	 *
 	 * @return array
 	 */
 	protected static function resolveMapState(&$sysmap, $min_severity, $theme) {
 		$severity = ['severity_min' => $min_severity];
 		$areas = populateFromMapAreas($sysmap, $theme);
-		$map_Info = getSelementsInfo($sysmap, $severity);
-		processAreasCoordinates($sysmap, $areas, $map_Info);
+		$map_info = getSelementsInfo($sysmap, $severity);
+		processAreasCoordinates($sysmap, $areas, $map_info);
 
 		add_elementNames($sysmap['selements']);
 		foreach ($sysmap['selements'] as $id => $element) {
-			$map_Info[$id]['name'] = ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
+			$map_info[$id]['name'] = ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
 				? _('Image')
 				: $element['elementName'];
 		}
 
-		$labels = getMapLabels($sysmap, $map_Info, true);
-		$highlights = getMapHighligts($sysmap, $map_Info);
+		$labels = getMapLabels($sysmap, $map_info, true);
+		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $severity);
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			$icon = null;
-			if (array_key_exists($id, $map_Info) && array_key_exists('iconid', $map_Info[$id])) {
-				$icon = $map_Info[$id]['iconid'];
+			if (array_key_exists($id, $map_info) && array_key_exists('iconid', $map_info[$id])) {
+				$icon = $map_info[$id]['iconid'];
 			}
 
-			unset($element['width']);
-			unset($element['height']);
+			unset($element['width'], $element['height']);
 
 			$element['icon'] = $icon;
 			$element['label'] = $labels[$id];
 			$element['highlight'] = $highlights[$id];
 			$element['actions'] = $actions[$id];
 			if ($sysmap['markelements']) {
-				$element['latelyChanged'] = $map_Info[$id]['latelyChanged'];
+				$element['latelyChanged'] = $map_info[$id]['latelyChanged'];
 			}
 		}
 		unset($element);
@@ -199,13 +199,12 @@ class CMapHelper {
 				$id = $link_trigger['linktriggerid'];
 
 				$triggers[$id] = zbx_array_merge($link_trigger, get_trigger_by_triggerid($link_trigger['triggerid']));
-				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED &&
-						$triggers[$id]['value'] == TRIGGER_VALUE_TRUE) {
-					if ($triggers[$id]['priority'] >= $max_severity) {
-						$drawtype = $triggers[$id]['drawtype'];
-						$color = $triggers[$id]['color'];
-						$max_severity = $triggers[$id]['priority'];
-					}
+				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED
+						&& $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
+						&& $triggers[$id]['priority'] >= $max_severity) {
+					$drawtype = $triggers[$id]['drawtype'];
+					$color = $triggers[$id]['color'];
+					$max_severity = $triggers[$id]['priority'];
 				}
 			}
 

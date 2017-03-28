@@ -216,6 +216,13 @@ if (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($clone_maps) {
+				foreach ($clone_maps[0]['shapes'] as &$shape) {
+					if (array_key_exists('sysmap_shapeid', $shape) && !is_numeric($shape['sysmap_shapeid'])) {
+						unset($shape['sysmap_shapeid']);
+					}
+				}
+				unset($shape);
+
 				$map['selements'] = $clone_maps[0]['selements'];
 				$map['shapes'] = $clone_maps[0]['shapes'];
 				$map['links'] = $clone_maps[0]['links'];

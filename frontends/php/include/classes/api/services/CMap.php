@@ -1225,6 +1225,24 @@ class CMap extends CMapElement {
 		$shapes = [];
 		$selements = [];
 		$links = [];
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:1'],
+			'x' =>					['type' => API_INT32],
+			'y' =>					['type' => API_INT32],
+			'width' =>				['type' => API_INT32],
+			'height' =>				['type' => API_INT32],
+			'font' =>				['type' => API_INT32, 'in' => '0:12'],
+			'font_size' =>			['type' => API_INT32, 'in' => '1:250'],
+			'text_halign' =>		['type' => API_INT32, 'in' => '0:2'],
+			'text_valign' =>		['type' => API_INT32, 'in' => '0:2'],
+			'border_type' =>		['type' => API_INT32, 'in' => '0:3'],
+			'border_width' =>		['type' => API_INT32, 'in' => '0:2'],
+			'border_color' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'border_color')],
+			'background_color' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'background_color')],
+			'font_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'font_color')],
+			'text' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'text')],
+			'zindex' =>				['type' => API_INT32],
+		]];
 
 		foreach ($sysmapids as $key => $sysmapid) {
 			// Map user shares.
@@ -1265,6 +1283,16 @@ class CMap extends CMapElement {
 			}
 
 			if (array_key_exists('shapes', $maps[$key])) {
+				$path = '/'.($key+1).'/shape';
+				$api_input_rules['fields']['x']['in'] = '0:'.$maps[$key]['width'];
+				$api_input_rules['fields']['y']['in'] = '0:'.$maps[$key]['height'];
+				$api_input_rules['fields']['width']['in'] = '1:'.$maps[$key]['width'];
+				$api_input_rules['fields']['height']['in'] = '1:'.$maps[$key]['height'];
+
+				if (!CApiInputValidator::validate($api_input_rules, $maps[$key]['shapes'], $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
 				foreach ($maps[$key]['shapes'] as $snum => $shape) {
 					$maps[$key]['shapes'][$snum]['sysmapid'] = $sysmapid;
 				}
@@ -1382,8 +1410,27 @@ class CMap extends CMapElement {
 		$shared_user_groupids_to_delete = [];
 		$shared_user_groups_to_update = [];
 		$shared_user_groups_to_add = [];
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+			'sysmap_shapeid' =>		['type' => API_ID],
+			'type' =>				['type' => API_INT32, 'in' => '0:1'],
+			'x' =>					['type' => API_INT32],
+			'y' =>					['type' => API_INT32],
+			'width' =>				['type' => API_INT32],
+			'height' =>				['type' => API_INT32],
+			'font' =>				['type' => API_INT32, 'in' => '0:12'],
+			'font_size' =>			['type' => API_INT32, 'in' => '1:250'],
+			'text_halign' =>		['type' => API_INT32, 'in' => '0:2'],
+			'text_valign' =>		['type' => API_INT32, 'in' => '0:2'],
+			'border_type' =>		['type' => API_INT32, 'in' => '0:3'],
+			'border_width' =>		['type' => API_INT32, 'in' => '0:2'],
+			'border_color' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'border_color')],
+			'background_color' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'background_color')],
+			'font_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'font_color')],
+			'text' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'text')],
+			'zindex' =>				['type' => API_INT32],
+		]];
 
-		foreach ($maps as $map) {
+		foreach ($maps as $index => $map) {
 			$update_maps[] = [
 				'values' => $map,
 				'where' => ['sysmapid' => $map['sysmapid']],
@@ -1472,16 +1519,38 @@ class CMap extends CMapElement {
 
 			// Map shapes.
 			if (array_key_exists('shapes', $map)) {
+				$map['shapes'] = array_values($map['shapes']);
 				$shape_diff = zbx_array_diff($map['shapes'], $db_map['shapes'], 'sysmap_shapeid');
-
-				// We need sysmapid for add operations.
-				foreach ($shape_diff['first'] as $new_shape) {
-					$new_shape['sysmapid'] = $map['sysmapid'];
-					$shapes_to_add[] = $new_shape;
-				}
 
 				$shapes_to_update = array_merge($shapes_to_update, $shape_diff['both']);
 				$shapes_to_delete = array_merge($shapes_to_delete, $shape_diff['second']);
+				foreach ($shape_diff['first'] as $new_shape) {
+					$shapes_to_add[] = $new_shape;
+				}
+
+				$path = '/'.($index+1).'/shape';
+				$api_input_rules['fields']['sysmap_shapeid']['flags'] = API_REQUIRED;
+				$api_input_rules['fields']['type']['flags'] = 0;
+				$api_input_rules['fields']['x']['in'] = '0:'.$map['width'];
+				$api_input_rules['fields']['y']['in'] = '0:'.$map['height'];
+				$api_input_rules['fields']['width']['in'] = '1:'.$map['width'];
+				$api_input_rules['fields']['height']['in'] = '1:'.$map['height'];
+
+				if (!CApiInputValidator::validate($api_input_rules, $shapes_to_add, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				$api_input_rules['fields']['sysmap_shapeid']['flags'] = 0;
+				$api_input_rules['fields']['type']['flags'] = API_REQUIRED;
+				if (!CApiInputValidator::validate($api_input_rules, $shapes_to_update, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				// We need sysmapid for add operations.
+				foreach ($shapes_to_add as &$shape) {
+					$shape['sysmapid'] = $map['sysmapid'];
+				}
+				unset($shape);
 			}
 
 			// Links.
@@ -1540,10 +1609,8 @@ class CMap extends CMapElement {
 			$this->deleteSelements($selements_to_delete);
 		}
 
-		// Shapes.
-		$new_shapeids = ['shapeids' => []];
 		if ($shapes_to_add) {
-			$new_shapeids = $this->createShapes($shapes_to_add);
+			$this->createShapes($shapes_to_add);
 		}
 
 		if ($shapes_to_update) {
@@ -1779,7 +1846,7 @@ class CMap extends CMapElement {
 			$result = $relation_map->mapMany($result, $selements, 'selements');
 		}
 
-		// adding shapes
+		// Adding shapes.
 		if ($options['selectShapes'] !== null && $options['selectShapes'] != API_OUTPUT_COUNT) {
 			$shapes = API::getApiService()->select('sysmap_shape', [
 				'output' => $this->outputExtend($options['selectShapes'], ['sysmap_shapeid', 'sysmapid']),
@@ -1788,7 +1855,8 @@ class CMap extends CMapElement {
 			]);
 			$relation_map = $this->createRelationMap($shapes, 'sysmapid', 'sysmap_shapeid');
 
-			$shapes = $this->unsetExtraFields($shapes, ['sysmapid', 'sysmap_shapeid'], $options['selectShapes']);
+			$shapes = $this->unsetExtraFields($shapes, ['sysmap_shapeid'], $options['selectShapes']);
+			$shapes = $this->unsetExtraFields($shapes, ['sysmapid'], null);
 			$result = $relation_map->mapMany($result, $shapes, 'shapes');
 		}
 

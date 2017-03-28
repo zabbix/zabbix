@@ -1066,8 +1066,6 @@ ZABBIX.apps.map = (function($) {
 				shapeData.zindex = Object.keys(sysmap.shapes).length;
 			}
 
-			shapeData.elementsubtype = '1';
-
 			this.data = shapeData;
 			this.id = this.data.sysmap_shapeid;
 
@@ -1132,7 +1130,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Allows resizing of shape
+			 * Allow resizing of shape.
 			 */
 			makeResizable: function(enable) {
 				var node = this.domNode,
@@ -1265,7 +1263,7 @@ ZABBIX.apps.map = (function($) {
 				this.data.y = newY;
 				this.data.x = newX;
 
-				if (this.data.elementsubtype === '1') {
+				if (this instanceof Shape || this.data.elementsubtype === '1') {
 					this.data.width = newWidth;
 					this.data.height = newHeight;
 				}
