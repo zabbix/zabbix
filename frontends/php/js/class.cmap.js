@@ -1816,19 +1816,19 @@ ZABBIX.apps.map = (function($) {
 							},
 							success: function(data) {
 								data = JSON.parse(data);
-								for (var i in data.result) {
-									if ($('input[name^="element_id[' + data.result[i].triggerid + ']"]').length == 0) {
-										data.result[i].name = triggers_to_insert[data.result[i].triggerid].name;
-										$(tpl.evaluate(data.result[i])).appendTo('#triggerContainer tbody');
+								data.result.each(function(trigger) {
+									if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
+										trigger.name = triggers_to_insert[trigger.triggerid].name;
+										$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
 									}
-								}
+								});
+
+								$('#elementNameTriggers').multiSelect('clean');
+								SelementForm.prototype.recalculateSortOrder();
+								SelementForm.prototype.initSortable();
 							}
 						});
 					}
-
-					$('#elementNameTriggers').multiSelect('clean');
-					this.recalculateSortOrder();
-					this.initSortable();
 				}
 			},
 
@@ -2034,6 +2034,31 @@ ZABBIX.apps.map = (function($) {
 			 * Sorting triggers by severity.
 			 */
 			recalculateSortOrder: function() {
+				if ($('input[name^="element_id"]').length != 0) {
+					var triggers = [],
+						priority;
+					$('input[name^="element_id"]').each(function() {
+						priority = $('input[name^="element_priority[' + $(this).val() + ']"]').val()
+						if (!triggers[priority]) {
+							triggers[priority] = {
+								'priority': priority,
+								'html':	$('#triggerrow_' + $(this).val())[0].outerHTML
+							}
+						}
+						else {
+							triggers[priority].html += $('#triggerrow_' + $(this).val())[0].outerHTML;
+						}
+					});
+
+					triggers.sort(function (a, b) {
+						return b.priority - a.priority;
+					});
+
+					$('#triggerContainer tbody').html('');
+					triggers.each(function(trigger) {
+						$('#triggerContainer tbody').append(trigger.html);
+					});
+				}
 			}
 		};
 
