@@ -1091,8 +1091,8 @@ class CHttpTest extends CApiService {
 	/**
 	 * Convert string to HTTP pair array.
 	 *
-	 * @param mixed  $data
-	 * @param string  $delimiter
+	 * @param string $data
+	 * @param string $delimiter
 	 *
 	 * @return mixed
 	 */
