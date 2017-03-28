@@ -2890,15 +2890,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 		item->update_triggers = 1;
 		if (NULL != item->triggers)
-		{
-			if (ZBX_DBSYNC_ROW_REMOVE == tag)
-			{
-				config->items.mem_free_func(item->triggers);
-				item->triggers = NULL;
-			}
-			else
-				item->triggers[0] = NULL;
-		}
+			item->triggers[0] = NULL;
 	}
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
