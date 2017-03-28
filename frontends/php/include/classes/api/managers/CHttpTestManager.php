@@ -134,7 +134,7 @@ class CHttpTestManager {
 			],
 			'httptestids' => $httpTestIds,
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
-				'follow_redirects', 'retrieve_mode', 'post_type'
+				'follow_redirects', 'retrieve_mode'
 			],
 			'editable' => true,
 			'preservekeys' => true
@@ -293,7 +293,7 @@ class CHttpTestManager {
 			],
 			'hostids' => $templateId,
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
-				'follow_redirects', 'retrieve_mode', 'post_type', 'variables', 'headers', 'query_fields'
+				'follow_redirects', 'retrieve_mode', 'variables', 'headers', 'query_fields'
 			],
 			'editable' => true,
 			'preservekeys' => true
