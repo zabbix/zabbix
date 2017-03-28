@@ -608,7 +608,10 @@ if (isset($_REQUEST['form'])) {
 						];
 					}
 				}
-				if ($field_name !== 'posts') {
+				if ($field_name === 'posts') {
+					$step['posts'] = '';
+				}
+				else {
 					unset($step[$field_name]);
 				}
 			}
