@@ -458,8 +458,17 @@ class CHttpTest extends CApiService {
 
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
-			if (array_key_exists('name', $httptest) && $httptest['name'] !== $db_httptest['name']) {
-				$names_by_hostid[$db_httptest['hostid']][] = $httptest['name'];
+			if (array_key_exists('name', $httptest)) {
+				if ($db_httptest['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot a templated web scenario "%1$s": %2$s.', $httptest['name'],
+						_s('unexpected parameter "%1$s"', 'name')
+					));
+				}
+
+				if ($httptest['name'] !== $db_httptest['name']) {
+					$names_by_hostid[$db_httptest['hostid']][] = $httptest['name'];
+				}
 			}
 		}
 
@@ -470,6 +479,20 @@ class CHttpTest extends CApiService {
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
 			if (array_key_exists('steps', $httptest)) {
+				// unexpected patameters for templated web scenario steps
+				if ($db_httptest['templateid'] != 0) {
+					foreach ($httptest['steps'] as $httpstep) {
+						foreach (['name', 'no'] as $field_name) {
+							if (array_key_exists($field_name, $httpstep)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Cannot update step for a templated web scenario "%1$s": %2$s.', $httptest['name'],
+									_s('unexpected parameter "%1$s"', $field_name)
+								));
+							}
+						}
+					}
+				}
+
 				$httptest['steps'] =
 					$this->extendObjectsByKey($httptest['steps'], $db_httptest['steps'], 'httpstepid', ['name']);
 			}
@@ -721,25 +744,14 @@ class CHttpTest extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
 					}
 
-					foreach ($httptest['steps'] as &$httpstep) {
+					foreach ($httptest['steps'] as $httpstep) {
 						if (!array_key_exists('httpstepid', $httpstep)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 								'Cannot update step for a templated web scenario "%1$s": %2$s.', $httptest['name'],
 								_s('the parameter "%1$s" is missing', 'httpstepid')
 							));
 						}
-
-						foreach (['name', 'no'] as $field) {
-							if (array_key_exists($field, $httpstep)) {
-								unset($httpstep[$field]);
-							}
-						}
-					}
-					unset ($httpstep);
-
-					foreach ($httptest['steps'] as $httpstep) {
-						if (array_key_exists('httpstepid', $httpstep)
-								&& !array_key_exists($httpstep['httpstepid'], $db_httptest['steps'])) {
+						elseif (!array_key_exists($httpstep['httpstepid'], $db_httptest['steps'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_('No permissions to referred object or it does not exist!')
 							);
