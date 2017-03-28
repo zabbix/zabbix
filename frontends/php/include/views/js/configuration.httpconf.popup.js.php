@@ -11,7 +11,7 @@
 		<input type="text" id="pair_name_#{pair.id}" name="pairs[#{pair.id}][name]" data-type="name" value="#{pair.name}" maxlength="255" style="width: <?= ZBX_TEXTAREA_TAG_WIDTH ?>px" placeholder="<?= _('name') ?>">
 	</td>
 
-	<td> = </td>
+	<td> ⇒ </td>
 
 	<td>
 		<input type="text" id="pair_value_#{pair.id}" name="pairs[#{pair.id}][value]" data-type="value" value="#{pair.value}" style="width: <?= ZBX_TEXTAREA_TAG_WIDTH ?>px" placeholder="<?= _('value') ?>">
@@ -30,16 +30,6 @@
 		var rowTemplate = new Template(jQuery('#stepPairRow').html()),
 			allPairs = {};
 
-		function updatePairControls(pair) {
-			var parent = jQuery('#pairRow_' + pair.id);
-			if (pair.isNew === true && pair.name === '' && pair.value === '') {
-				parent.find("button").attr('disabled','disabled');
-			}
-			else {
-				parent.find("button").removeAttr('disabled');
-			}
-		}
-
 		function renderPairRow(pair) {
 			var	parent,
 				domId = getDomTargetIdForRowInsert(pair.type);
@@ -51,12 +41,9 @@
 				var	target = jQuery(this),
 					parent = target.parents('.pairRow'),
 					id = parent.data('pairid'),
-					pair = allPairs[id],
-					value = target.val().trim();
+					pair = allPairs[id];
 
-				target.val(value);
-				pair[target.data('type')] = value;
-				updatePairControls(pair);
+				pair[target.data('type')] = target.val();
 				allPairs[id] = pair;
 			});
 		}
@@ -99,21 +86,9 @@
 
 		function refreshContainers() {
 			jQuery('.pair-container:not(.disabled)').each(function() {
-				jQuery(this).sortable( {
+				jQuery(this).sortable({
 					disabled: (jQuery(this).find('tr.sortable').length < 2)
-				} );
-
-				var rows = jQuery(this).find('.pairRow').length;
-				if (rows === 0) {
-					renderPairRow(createNewPair(this.id));
-				}
-
-				if (rows <= 1) {
-					updatePairControls(allPairs[jQuery(this).find('.pairRow').data('pairid')]);
-				}
-				else {
-					jQuery(this).find('button').removeAttr('disabled');
-				}
+				});
 			});
 		}
 
@@ -129,6 +104,13 @@
 				for (var i = 0; i < pairs.length; i++) {
 					renderPairRow(addPair(pairs[i]));
 				}
+
+				jQuery('.pair-container').each(function() {
+					var rows = jQuery(this).find('.pairRow').length;
+					if (rows === 0) {
+						renderPairRow(createNewPair(this.id));
+					}
+				});
 
 				refreshContainers();
 			},
@@ -248,15 +230,14 @@
 
 			fields = query.split('&');
 			for (i = 0; i < fields.length; i++) {
-				fields[i] = fields[i].trim();
 				if (fields[i].length === 0)
 					continue;
 
 				pair = {};
 				index = fields[i].indexOf("=");
 				if (index > 0) {
-					pair.name = fields[i].substring(0, index).trim();
-					pair.value = fields[i].substring(index + 1).trim();
+					pair.name = fields[i].substring(0, index);
+					pair.value = fields[i].substring(index + 1);
 				}
 				else {
 					pair.name = fields[i];
@@ -319,7 +300,7 @@
 
 	function switchToPostType(type) {
 		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
-			var	posts = jQuery('#posts').val().trim(),
+			var	posts = jQuery('#posts').val(),
 				fields,
 				parts,
 				pair,
@@ -490,7 +471,7 @@
 			prefix = name + '[' + pair.id + ']';
 
 			/* empty values are ignored */
-			if (pair.name === undefined|| (pair.isNew !== undefined && pair.name.trim() === '' && pair.value.trim() === '')) {
+			if (pair.name === undefined || (pair.isNew !== undefined && pair.name === '' && pair.value === '')) {
 				continue;
 			}
 
