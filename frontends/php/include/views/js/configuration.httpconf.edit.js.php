@@ -32,9 +32,14 @@
 
 		function renderPairRow(pair) {
 			var parent,
-				domId = getDomTargetIdForRowInsert(pair.type);
+				target = jQuery(getDomTargetIdForRowInsert(pair.type)),
+				pair_row = jQuery(rowTemplate.evaluate({'pair': pair}));
 
-			jQuery(domId).before(rowTemplate.evaluate({'pair': pair}));
+			if (!target.parents('.pair-container').hasClass('pair-container-sortable')) {
+				pair_row.find('.<?= ZBX_STYLE_DRAG_ICON ?>').remove();
+			}
+
+			target.before(pair_row);
 			parent = jQuery('#pairRow_' + pair.id);
 			parent.find("input[data-type]").on('change', function() {
 				var	target = jQuery(this),
@@ -76,7 +81,7 @@
 		}
 
 		function refreshContainers() {
-			jQuery('.pair-container').each(function() {
+			jQuery('.pair-container-sortable').each(function() {
 				jQuery(this).sortable({
 					disabled: (jQuery(this).find('tr.sortable').length < 2)
 				});
@@ -138,7 +143,7 @@
 			pairManager.remove(pairId);
 		});
 
-		jQuery('.pair-container').sortable({
+		jQuery('.pair-container-sortable').sortable({
 			disabled: (jQuery(this).find('tr.sortable').length < 2),
 			items: 'tr.sortable',
 			axis: 'y',

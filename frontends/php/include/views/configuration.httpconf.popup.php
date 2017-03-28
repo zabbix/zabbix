@@ -114,16 +114,34 @@ else {
 		->setAttribute('style', 'display: none;');
 
 	$pair_tables = [
-		['id' => 'query_fields', 'label' => _('Query fields')],
-		['id' => 'post_fields', 'label' => _('Post'), 'header' => $switch, 'footer' => $footer],
-		['id' => 'variables', 'label' => _('Variables')],
-		['id' => 'headers', 'label' => _('Headers')]
+		[
+			'id' => 'query_fields',
+			'label' => _('Query fields'),
+			'class' => 'pair-container pair-container-sortable'
+		],
+		[
+			'id' => 'post_fields',
+			'label' => _('Post'),
+			'header' => $switch,
+			'footer' => $footer,
+			'class' => 'pair-container pair-container-sortable'
+		],
+		[
+			'id' => 'variables',
+			'label' => _('Variables'),
+			'class' => 'pair-container'
+		],
+		[
+			'id' => 'headers',
+			'label' => _('Headers'),
+			'class' => 'pair-container pair-container-sortable'
+		]
 	];
 
 	foreach ($pair_tables as $pair_table) {
 		$pair_tab = (new CTable())
 			->setId($pair_table['id'])
-			->addClass('pair-container')
+			->addClass($pair_table['class'])
 			->setAttribute('style', 'width: 100%;')
 			->setHeader([
 				new CColHeader(),

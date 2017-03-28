@@ -105,14 +105,14 @@ $httpFormList
 			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'));
 
 $pair_tables = [
-	['id' => 'variables', 'label' => _('Variables')],
-	['id' => 'headers', 'label' => _('Headers')]
+	['id' => 'variables', 'label' => _('Variables'), 'class' => 'pair-container'],
+	['id' => 'headers', 'label' => _('Headers'), 'class' => 'pair-container pair-container-sortable']
 ];
 
 foreach ($pair_tables as $pair_table){
 	$pair_tab = (new CTable())
 		->setId($pair_table['id'])
-		->addClass('pair-container')
+		->addClass($pair_table['class'])
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([
 			new CColHeader(),
