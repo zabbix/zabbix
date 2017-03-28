@@ -607,16 +607,18 @@ if (isset($_REQUEST['form'])) {
 							'value' => $pair['value']
 						];
 					}
-				}
-				if ($field_name === 'posts') {
-					$step['posts'] = '';
-				}
-				else {
-					unset($step[$field_name]);
+
+					if ($field_name === 'posts') {
+						$step['posts'] = '';
+					}
+					else {
+						unset($step[$field_name]);
+					}
 				}
 			}
 		}
 		unset($step);
+
 	}
 	else {
 		if (isset($_REQUEST['form_refresh'])) {
