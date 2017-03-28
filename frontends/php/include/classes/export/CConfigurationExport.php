@@ -955,6 +955,7 @@ class CConfigurationExport {
 	protected function gatherMaps(array $mapIds) {
 		$sysmaps = API::Map()->get([
 			'sysmapids' => $mapIds,
+			'selectShapes' => API_OUTPUT_EXTEND,
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectIconMap' => API_OUTPUT_EXTEND,

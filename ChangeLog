@@ -1,6 +1,9 @@
 Changes for 3.4.0alpha1
 
 New features:
+A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)
+..F....... [ZBXNEXT-34] implemented vector graphics for maps (vjaceslavs)
+A.F....PS. [ZBXNEXT-936] implemented remote command execution via proxy (wiper)
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 ..F....... [ZBXNEXT-3654] implemented a feature to apply host group permissions to all existing subgroups (Ivo, Sasha)
 ..F....... [ZBXNEXT-3660] renamed "IT services" to "Services" (Ivo)
@@ -49,6 +52,10 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11877] fixed undefined index when trigger.lastEvent was not set (gcalenko)
+A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
+..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
+A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)
 ..F....... [ZBX-11905] fixed redirect to original requested page after login (vmurzins)
 ..F....... [ZBX-11907] fixed undefined index in event details page (miks)
 ........S. [ZBX-11931] fixed trigger lastchange update (wiper)
@@ -402,6 +409,9 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
+..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
+A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)
 ..F....... [ZBX-11905] fixed redirect to original requested page after login (vmurzins)
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
@@ -2041,6 +2051,9 @@ Changes for 2.2.18rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
+A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)
+..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
 .......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)

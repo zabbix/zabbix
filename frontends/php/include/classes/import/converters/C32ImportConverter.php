@@ -33,6 +33,9 @@ class C32ImportConverter extends CConverter {
 		if (array_key_exists('templates', $data['zabbix_export'])) {
 			$data['zabbix_export']['templates'] = $this->convertHosts($data['zabbix_export']['templates']);
 		}
+		if (array_key_exists('maps', $data['zabbix_export'])) {
+			$data['zabbix_export']['maps'] = $this->convertMaps($data['zabbix_export']['maps']);
+		}
 
 		return $data;
 	}
@@ -122,5 +125,21 @@ class C32ImportConverter extends CConverter {
 		unset($discovery_rule);
 
 		return $discovery_rules;
+	}
+
+	/**
+	 * Convert maps.
+	 *
+	 * @param array $maps
+	 *
+	 * @return array
+	 */
+	protected function convertMaps(array $maps) {
+		foreach ($maps as &$map) {
+			$map['shapes'] = [];
+		}
+		unset($map);
+
+		return $maps;
 	}
 }

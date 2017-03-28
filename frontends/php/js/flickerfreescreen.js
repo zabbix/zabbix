@@ -38,6 +38,11 @@ jQuery(function($) {
 			this.screens[screen.id].isReRefreshRequire = false;
 			this.screens[screen.id].error = 0;
 
+			// SCREEN_RESOURCE_MAP
+			if (screen.resourcetype == 2) {
+				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
+			}
+
 			// init refresh plan
 			if (screen.isFlickerfree && screen.interval > 0) {
 				this.screens[screen.id].timeoutHandler = window.setTimeout(
@@ -124,7 +129,7 @@ jQuery(function($) {
 
 			// SCREEN_RESOURCE_MAP
 			else if (screen.resourcetype == 2) {
-				this.refreshImg(id);
+				this.refreshMap(id);
 			}
 
 			// SCREEN_RESOURCE_CHART
@@ -278,6 +283,38 @@ jQuery(function($) {
 						screen.isReRefreshRequire = false;
 						window.flickerfreeScreen.refresh(id, true);
 					}
+				});
+			}
+		},
+
+		refreshMap: function(id) {
+			var screen = this.screens[id];
+
+			if (screen.isRefreshing) {
+				this.calculateReRefresh(id);
+			}
+			else {
+				screen.isRefreshing = true;
+				screen.error = 0;
+				screen.timestampResponsiveness = new CDate().getTime();
+
+				window.flickerfreeScreenShadow.start(id);
+
+				var url = new Curl(screen.data.options.refresh);
+				url.setArgument('curtime', new CDate().getTime());
+
+				jQuery.ajax( {
+					'url': url.getUrl()
+				})
+				.error(function() {
+					screen.error++;
+					window.flickerfreeScreen.calculateReRefresh(id);
+				})
+				.done(function(data) {
+					screen.isRefreshing = false;
+					screen.data.update(data);
+					screen.timestamp = screen.timestampActual;
+					window.flickerfreeScreenShadow.end(id);
 				});
 			}
 		},

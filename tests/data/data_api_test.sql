@@ -28,7 +28,7 @@ INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (1
 INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'API discovery application',4);
 INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (2,40066,'API discovery application');
 INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,2,'API discovery application');
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (5896,375,40068);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
 INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (2,2,40067);
 
 -- valuemap
