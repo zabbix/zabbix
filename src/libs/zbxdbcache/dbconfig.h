@@ -243,6 +243,12 @@ typedef struct
 	int		jmx_errors_from;
 	int		jmx_disable_until;
 
+	/* item statistics per interface type */
+	int		items_num;
+	int		snmp_items_num;
+	int		ipmi_items_num;
+	int		jmx_items_num;
+
 	/* timestamp of last availability status (available/error) field change on any interface */
 	int		availability_ts;
 
@@ -254,9 +260,8 @@ typedef struct
 	unsigned char	jmx_available;
 	unsigned char	status;
 
-	/* specifies which interfaces are being used (have enabled items) */
-	/* (see ZBX_FLAG_INTERFACE_* defines)                             */
-	unsigned char	used_interfaces;
+	/* flag to reset host availability to uknown */
+	unsigned char	reset_availability;
 
 	/* flag to force update for all items */
 	unsigned char	update_items;

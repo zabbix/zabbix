@@ -553,14 +553,6 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 
-/* flags to specify which host interfaces have enabled items */
-#define ZBX_FLAG_INTERFACE_NONE		0x00
-#define ZBX_FLAG_INTERFACE_ZABBIX	(0x01 << (INTERFACE_TYPE_AGENT - 1))
-#define ZBX_FLAG_INTERFACE_SNMP		(0x01 << (INTERFACE_TYPE_SNMP - 1))
-#define ZBX_FLAG_INTERFACE_IPMI		(0x01 << (INTERFACE_TYPE_IPMI - 1))
-#define ZBX_FLAG_INTERFACE_JMX		(0x01 << (INTERFACE_TYPE_JMX - 1))
-#define ZBX_FLAG_INTERFACE_UNKNOWN	0x80
-
 int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
