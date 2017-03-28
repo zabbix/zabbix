@@ -595,6 +595,7 @@ ZABBIX.apps.map = (function($) {
 				$('#elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
+					$('#triggerContainer tbody').html('');
 				});
 
 				$('#elementRemove').click($.proxy(this.deleteSelectedElements, this));
