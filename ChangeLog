@@ -1,7 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
-....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors
+....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors (abs)
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)
 ..F....... [ZBXNEXT-34] implemented vector graphics for maps (vjaceslavs)
 A.F....PS. [ZBXNEXT-936] implemented remote command execution via proxy (wiper)
