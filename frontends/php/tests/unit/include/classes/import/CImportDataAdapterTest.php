@@ -1171,7 +1171,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'iconmap' => [],
 				'urls' => [],
 				'selements' => [],
-				'links' => []
+				'links' => [],
+				'shapes' => []
 			],
 			[
 				'name' => 'map',
@@ -1319,7 +1320,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'selementid2' => '34',
 						'linktriggers' => []
 					]
-				]
+				],
+				'shapes' => []
 			]
 		]);
 	}

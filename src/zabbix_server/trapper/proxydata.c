@@ -24,6 +24,41 @@
 
 #include "proxydata.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
+#include "zbxtasks.h"
+
+int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info)
+{
+	struct zbx_json		json;
+	zbx_vector_ptr_t	tasks;
+	int			ret;
+
+	zbx_vector_ptr_create(&tasks);
+
+	zbx_tm_get_remote_tasks(&tasks, proxy->hostid);
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+
+	if (NULL != info && '\0' != *info)
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, info, ZBX_JSON_TYPE_STRING);
+
+	if (0 != tasks.values_num)
+		zbx_tm_json_serialize_tasks(&json, &tasks);
+
+	if (SUCCEED == (ret = zbx_tcp_send_raw(sock, json.buffer)))
+	{
+		if (0 != tasks.values_num)
+			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_INPROGRESS);
+	}
+
+	zbx_json_clean(&json);
+
+	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+	zbx_vector_ptr_destroy(&tasks);
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -40,20 +75,20 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 {
 	const char	*__function_name = "zbx_recv_proxy_data";
 
-	int		ret;
+	int		ret = FAIL, status;
 	char		*error = NULL;
 	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_from_request(jp, &proxy, &error)))
+	if (SUCCEED != (status = get_active_proxy_from_request(jp, &proxy, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy data from active proxy at \"%s\": %s",
 				sock->peer, error);
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_proxy_check_permissions(&proxy, sock, &error)))
+	if (SUCCEED != (status = zbx_proxy_check_permissions(&proxy, sock, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
@@ -62,15 +97,17 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	if (SUCCEED != process_proxy_data(&proxy, jp, ts, &error))
+	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
+		goto out;
 	}
 
-	ret = SUCCEED;
+	zbx_send_proxy_data_respose(&proxy, sock, error);
 out:
-	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+	if (FAIL == ret)
+		zbx_send_response(sock, status, error, CONFIG_TIMEOUT);
 
 	zbx_free(error);
 
@@ -114,12 +151,14 @@ static int	send_data_to_server(zbx_socket_t *sock, const char *data, char **erro
  ******************************************************************************/
 void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "zbx_send_proxy_data";
+	const char		*__function_name = "zbx_send_proxy_data";
 
-	struct zbx_json	j;
-	zbx_uint64_t	areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
-	char		*error = NULL;
-	int		availability_ts, more_history, more_discovery, more_areg;
+	struct zbx_json		j;
+	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
+	char			*error = NULL;
+	int			availability_ts, more_history, more_discovery, more_areg;
+	zbx_vector_ptr_t	tasks;
+	struct zbx_json_parse	jp, jp_tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -135,6 +174,12 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	proxy_get_hist_data(&j, &history_lastid, &more_history);
 	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
 	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+
+	zbx_vector_ptr_create(&tasks);
+	zbx_tm_get_remote_tasks(&tasks, 0);
+
+	if (0 != tasks.values_num)
+		zbx_tm_json_serialize_tasks(&j, &tasks);
 
 	if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 			ZBX_PROXY_DATA_MORE == more_areg)
@@ -161,6 +206,21 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 		if (0 != areg_lastid)
 			proxy_set_areg_lastid(areg_lastid);
 
+		if (0 != tasks.values_num)
+		{
+			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
+			zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+		}
+
+		if (SUCCEED == zbx_json_open(sock->buffer, &jp))
+		{
+			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
+			{
+				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+				zbx_tm_save_tasks(&tasks);
+			}
+		}
+
 		DBcommit();
 	}
 	else
@@ -168,6 +228,84 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy data to server at \"%s\": %s", sock->peer, error);
 		zbx_free(error);
 	}
+
+	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+	zbx_vector_ptr_destroy(&tasks);
+
+	zbx_json_free(&j);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_send_task_data                                               *
+ *                                                                            *
+ * Purpose: sends 'proxy data' request to server                              *
+ *                                                                            *
+ * Parameters: sock - [IN] the connection socket                              *
+ *             ts   - [IN] the connection timestamp                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
+{
+	const char		*__function_name = "zbx_send_task_data";
+
+	struct zbx_json		j;
+	char			*error = NULL;
+	zbx_vector_ptr_t	tasks;
+	struct zbx_json_parse	jp, jp_tasks;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request"))
+	{
+		/* do not send any reply to server in this case as the server expects proxy data */
+		goto out;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_vector_ptr_create(&tasks);
+	zbx_tm_get_remote_tasks(&tasks, 0);
+
+	if (0 != tasks.values_num)
+		zbx_tm_json_serialize_tasks(&j, &tasks);
+
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
+
+	if (SUCCEED == send_data_to_server(sock, j.buffer, &error))
+	{
+		DBbegin();
+
+		if (0 != tasks.values_num)
+		{
+			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
+			zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+		}
+
+		if (SUCCEED == zbx_json_open(sock->buffer, &jp))
+		{
+			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
+			{
+				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+				zbx_tm_save_tasks(&tasks);
+			}
+		}
+
+		DBcommit();
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send task data to server at \"%s\": %s", sock->peer, error);
+		zbx_free(error);
+	}
+
+	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+	zbx_vector_ptr_destroy(&tasks);
 
 	zbx_json_free(&j);
 out:

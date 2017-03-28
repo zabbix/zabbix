@@ -2771,6 +2771,44 @@ $form-icon-btn: (
 	}
 }
 
+.ui-inner-handles {
+	.ui-resizable-n {
+		top: 0px;
+	}
+
+	.ui-resizable-ne {
+		top: -4px;
+		right: -4px;
+	}
+
+	.ui-resizable-nw {
+		top: -4px;
+		left: -4px;
+	}
+
+	.ui-resizable-e {
+		right: 0px;
+	}
+
+	.ui-resizable-s {
+		bottom: 0px;
+	}
+
+	.ui-resizable-se {
+		bottom: -4px;
+		right: -4px;
+	}
+
+	.ui-resizable-sw {
+		bottom: -4px;
+		left: -4px;
+	}
+
+	.ui-resizable-w {
+		left: 0px;
+	}
+}
+
 %ui-resize-dot {
 	z-index: 90;
 	width: 7px;

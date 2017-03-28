@@ -892,13 +892,18 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 
 					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 						if ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-							$result[$key][] = [bold(_('Run custom commands on Zabbix agent').': '), BR(),
-								italic(zbx_nl2br($operation['opcommand']['command']))
+							$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix agent')).': '),
+								BR(), italic(zbx_nl2br($operation['opcommand']['command']))
+							];
+						}
+						elseif ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY) {
+							$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server (proxy)')).': '),
+								BR(), italic(zbx_nl2br($operation['opcommand']['command']))
 							];
 						}
 						else {
-							$result[$key][] = [bold(_('Run custom commands on Zabbix server').': '), BR(),
-								italic(zbx_nl2br($operation['opcommand']['command']))
+							$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server')).': '),
+								BR(), italic(zbx_nl2br($operation['opcommand']['command']))
 							];
 						}
 						break;
