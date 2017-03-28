@@ -188,7 +188,7 @@ ZABBIX.apps.map = (function($) {
 			});
 
 			shapes.forEach(function (shape) {
-				this.shapes[shape.shapeid] = new Shape(this, shape);
+				this.shapes[shape.sysmap_shapeid] = new Shape(this, shape);
 			}, this);
 
 			for (linkid in this.data.links) {
@@ -1055,21 +1055,21 @@ ZABBIX.apps.map = (function($) {
 					font: 9, // Helvetica
 					font_size: 11,
 					font_color: '000000',
-					text_valign: -1,
-					text_halign: -1,
+					text_valign: 0,
+					text_halign: 0,
 					text: '',
-					border_type: 0
+					border_type: 1
 				};
 
-				// generate unique shapeid
-				shapeData.shapeid = getUniqueId();
+				// generate unique sysmap_shapeid
+				shapeData.sysmap_shapeid = getUniqueId();
 				shapeData.zindex = Object.keys(sysmap.shapes).length;
 			}
 
 			shapeData.elementsubtype = '1';
 
 			this.data = shapeData;
-			this.id = this.data.shapeid;
+			this.id = this.data.sysmap_shapeid;
 
 			// assign by reference
 			this.sysmap.data.shapes[this.id] = this.data;

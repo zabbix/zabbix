@@ -88,18 +88,18 @@ abstract class CMapElement extends CApiService {
 		if ($update || $delete) {
 			$dbShapes = API::getApiService()->select('sysmap_shape', [
 				'output' => API_OUTPUT_EXTEND,
-				'filter' => ['selementid' => zbx_objectValues($shapes, 'shapeid')],
+				'filter' => ['selementid' => zbx_objectValues($shapes, 'sysmap_shapeid')],
 				'preservekeys' => true
 			]);
 
 			if ($update) {
-				$shapes = $this->extendFromObjects($shapes, $dbShapes, ['type', 'shapeid']);
+				$shapes = $this->extendFromObjects($shapes, $dbShapes, ['type', 'sysmap_shapeid']);
 			}
 		}
 
 		foreach ($shapes as &$shape) {
 			if ($update || $delete) {
-				if (!isset($dbShapes[$shape['shapeid']])) {
+				if (!isset($dbShapes[$shape['sysmap_shapeid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('No permissions to referred object or it does not exist!'));
 				}
@@ -145,12 +145,12 @@ abstract class CMapElement extends CApiService {
 			}
 
 			foreach (['text_halign', 'text_valign'] as $field) {
-				if (array_key_exists($field, $shape) && !in_array($shape[$field], range(-1,1))) {
+				if (array_key_exists($field, $shape) && !in_array($shape[$field], range(0,2))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape text alignment is not correct.'));
 				}
 			}
 
-			if (array_key_exists('border_type', $shape) && !in_array($shape['border_type'], range(-1,2))) {
+			if (array_key_exists('border_type', $shape) && !in_array($shape['border_type'], range(0,3))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape border type is not correct.'));
 			}
 
@@ -552,9 +552,9 @@ abstract class CMapElement extends CApiService {
 		foreach ($shapes as $shape) {
 			$update[] = [
 				'values' => $shape,
-				'where' => ['shapeid' => $shape['shapeid']],
+				'where' => ['sysmap_shapeid' => $shape['sysmap_shapeid']],
 			];
-			$shapeIds[] = $shape['shapeid'];
+			$shapeIds[] = $shape['sysmap_shapeid'];
 		}
 
 		DB::update('sysmap_shape', $update);
@@ -567,7 +567,7 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function deleteShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
-		$shapeIds = zbx_objectValues($shapes, 'shapeid');
+		$shapeIds = zbx_objectValues($shapes, 'sysmap_shapeid');
 
 		$this->checkShapeInput($shapes, __FUNCTION__);
 

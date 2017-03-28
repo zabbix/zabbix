@@ -166,10 +166,10 @@ SVGMap.FONTS = [
 ];
 
 SVGMap.BORDER_TYPES = {
-	'-1': '',
-	'0': 'none',
-	'1': '1,2',
-	'2': '4,4'
+	'0': '',
+	'1': 'none',
+	'2': '1,2',
+	'3': '4,4'
 };
 
 SVGMap.toHashmap = function (array, key) {
@@ -397,7 +397,7 @@ SVGMap.prototype.update = function (options, incremental) {
 
 	this.imageCache.preload(images, function () {
 		this.updateItems('elements', 'SVGMapElement', options.elements, incremental);
-		this.updateOrderedItems('shapes', 'shapeid', 'SVGMapShape', options.shapes, incremental);
+		this.updateOrderedItems('shapes', 'sysmap_shapeid', 'SVGMapShape', options.shapes, incremental);
 		this.updateItems('links', 'SVGMapLink', options.links, incremental);
 		this.updateBackground(options.background, incremental);
 
@@ -974,24 +974,24 @@ SVGMapShape.prototype.update = function(options) {
 			};
 
 		switch (parseInt(options['text_halign'])) {
-			case 0:
+			case 1:
 				x = this.x + this.map.canvas.textPadding;
 				anchor.horizontal = 'left';
 			break;
 
-			case 1:
+			case 2:
 				x = this.x + this.width - this.map.canvas.textPadding;
 				anchor.horizontal = 'right';
 			break;
 		}
 
 		switch (parseInt(options['text_valign'])) {
-			case 0:
+			case 1:
 				y = this.y + this.map.canvas.textPadding;
 				anchor.vertical = 'top';
 			break;
 
-			case 1:
+			case 2:
 				y = this.y + this.height - this.map.canvas.textPadding;
 				anchor.vertical = 'bottom';
 			break;

@@ -150,7 +150,7 @@ $data = [
 add_elementNames($data['sysmap']['selements']);
 
 $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
-$data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'shapeid');
+$data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'sysmap_shapeid');
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 
 // get links

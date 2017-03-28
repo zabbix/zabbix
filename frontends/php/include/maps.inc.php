@@ -1378,7 +1378,7 @@ function populateFromMapAreas(array &$map, $theme) {
 				$area['y'] = $selement['y'];
 
 				$map['shapes'][] = [
-					'shapeid' => 'e-' . $selement['selementid'],
+					'sysmap_shapeid' => 'e-' . $selement['selementid'],
 					'type' => 0,
 					'x' => $selement['x'],
 					'y' => $selement['y'],

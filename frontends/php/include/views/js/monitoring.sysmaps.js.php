@@ -205,7 +205,7 @@
 			->cleanItems()
 			->setName('shapeForm')
 			->setId('shapeForm')
-			->addVar('shapeid', '')
+			->addVar('sysmap_shapeid', '')
 			->addItem(
 				(new CFormList())
 					->addRow(_('Shape'),
@@ -256,18 +256,18 @@
 							BR(),
 							_('Horizontal align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('text_halign', -1, null, [
-								'0'	=> _('Left'),
-								'-1'	=> _('Center'),
-								'1'	=> _('Right')
+							(new CComboBox('text_halign', 0, null, [
+								'1'	=> _('Left'),
+								'0'	=> _('Center'),
+								'2'	=> _('Right')
 							]))->setAttribute('style', 'margin-top:4px'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Vertical align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('text_valign', -1, null, [
-								'0'	=> _('Top'),
-								'-1'	=> _('Middle'),
-								'1'	=> _('Bottom')
+							(new CComboBox('text_valign', 0, null, [
+								'1'	=> _('Top'),
+								'0'	=> _('Middle'),
+								'2'	=> _('Bottom')
 							])),
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -285,10 +285,10 @@
 							_('Type'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CComboBox('border_type', null, null, [
-								'-1'	=> _('None'),
-								'0'	=> '———',
-								'1'	=> '· · · ·',
-								'2'	=> '- - - -',
+								'0'	=> _('None'),
+								'1'	=> '———',
+								'2'	=> '· · · ·',
+								'3'	=> '- - - -',
 							])),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Width'),

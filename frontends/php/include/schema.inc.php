@@ -6740,9 +6740,9 @@ return [
 		],
 	],
 	'sysmap_shape' => [
-		'key' => 'shapeid',
+		'key' => 'sysmap_shapeid',
 		'fields' => [
-			'shapeid' => [
+			'sysmap_shapeid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -6811,19 +6811,19 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'text_valign' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'border_type' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'border_width' => [
 				'null' => false,
@@ -6847,7 +6847,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 		],
 	],

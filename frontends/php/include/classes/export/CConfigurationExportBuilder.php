@@ -177,7 +177,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($maps as $map) {
 			foreach ($map['shapes'] as &$shape) {
-				unset($shape['shapeid']);
+				unset($shape['sysmap_shapeid']);
 				unset($shape['sysmapid']);
 			}
 			unset($shape);

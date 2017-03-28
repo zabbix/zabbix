@@ -1472,7 +1472,7 @@ class CMap extends CMapElement {
 
 			// Map shapes.
 			if (array_key_exists('shapes', $map)) {
-				$shape_diff = zbx_array_diff($map['shapes'], $db_map['shapes'], 'shapeid');
+				$shape_diff = zbx_array_diff($map['shapes'], $db_map['shapes'], 'sysmap_shapeid');
 
 				// We need sysmapid for add operations.
 				foreach ($shape_diff['first'] as $new_shape) {
@@ -1782,13 +1782,13 @@ class CMap extends CMapElement {
 		// adding shapes
 		if ($options['selectShapes'] !== null && $options['selectShapes'] != API_OUTPUT_COUNT) {
 			$shapes = API::getApiService()->select('sysmap_shape', [
-				'output' => $this->outputExtend($options['selectShapes'], ['shapeid', 'sysmapid']),
+				'output' => $this->outputExtend($options['selectShapes'], ['sysmap_shapeid', 'sysmapid']),
 				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
 			]);
-			$relation_map = $this->createRelationMap($shapes, 'sysmapid', 'shapeid');
+			$relation_map = $this->createRelationMap($shapes, 'sysmapid', 'sysmap_shapeid');
 
-			$shapes = $this->unsetExtraFields($shapes, ['sysmapid', 'shapeid'], $options['selectShapes']);
+			$shapes = $this->unsetExtraFields($shapes, ['sysmapid', 'sysmap_shapeid'], $options['selectShapes']);
 			$result = $relation_map->mapMany($result, $shapes, 'shapes');
 		}
 
