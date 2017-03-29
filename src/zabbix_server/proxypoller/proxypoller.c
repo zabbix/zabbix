@@ -396,7 +396,7 @@ static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid history data:"
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
@@ -467,7 +467,7 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid discovery data:"
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
@@ -539,7 +539,7 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid auto registration data:"
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
