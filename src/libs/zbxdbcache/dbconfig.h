@@ -607,6 +607,9 @@ typedef struct
 }
 ZBX_DC_CONFIG;
 
+#define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
+#define ZBX_IPMI_DEFAULT_PRIVILEGE	2
+
 /* validator function optionally used to validate macro values when expanding user macros */
 
 /******************************************************************************

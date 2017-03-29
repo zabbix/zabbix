@@ -58,9 +58,6 @@ static int	sync_in_progress = 0;
 #define TRIGGER_FUNCTIONAL_TRUE		0
 #define TRIGGER_FUNCTIONAL_FALSE	1
 
-#define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
-#define ZBX_IPMI_DEFAULT_PRIVILEGE	2
-
 /* shorthand macro for calling in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
@@ -4407,7 +4404,7 @@ void	DCsync_configuration(unsigned char mode)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
 			__function_name, csec, csec2, config_sync.add_num, config_sync.update_num,
 			config_sync.remove_num);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec. (%d/%d/%d)",
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
 			__function_name, hsec, hsec2, hosts_sync.add_num, hosts_sync.update_num,
 			hosts_sync.remove_num);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
@@ -4623,7 +4620,7 @@ out:
 /******************************************************************************
  *                                                                            *
  * Helper functions for configuration cache data structure element comparison *
- * and hash value calculatiif_statson.                                                *
+ * and hash value calculation.                                                *
  *                                                                            *
  * The __config_mem_XXX_func(), __config_XXX_hash and __config_XXX_compare    *
  * functions are used only inside init_configuration_cache() function to      *

@@ -625,7 +625,8 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 	ipmi_authtype = (signed char)atoi(dbrow[3]);
 	ipmi_privilege = (unsigned char)atoi(dbrow[4]);
 
-	if (0 != ipmi_authtype || 2 != ipmi_privilege || '\0' != *dbrow[5] || '\0' != *dbrow[6])	/* useipmi */
+	if (ZBX_IPMI_DEFAULT_AUTHTYPE != ipmi_authtype || ZBX_IPMI_DEFAULT_PRIVILEGE != ipmi_privilege ||
+			'\0' != *dbrow[5] || '\0' != *dbrow[6])	/* useipmi */
 	{
 		if (NULL == (ipmihost = (ZBX_DC_IPMIHOST *)zbx_hashset_search(&dbsync_env.cache->ipmihosts,
 				&host->hostid)))
@@ -2861,7 +2862,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dbsync_compare_item_preproc(const zbx_dc_item_preproc_t *preproc, const DB_ROW dbrow)
 {
-	if (FAIL == dbsync_compare_uint64(dbrow[1], preproc->item_preprocid))
+	if (FAIL == dbsync_compare_uint64(dbrow[1], preproc->itemid))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[2], preproc->type))
@@ -2899,8 +2900,17 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	zbx_dc_item_preproc_t	*preproc;
 
 	if (NULL == (result = DBselect(
-			"select item_preprocid,itemid,type,params,step from item_preproc order by itemid")))
+			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step"
+			" from item_preproc pp,items i,hosts h"
+			" where pp.itemid=i.itemid"
+				" and i.hostid=h.hostid"
+				" and h.status in (%d,%d)"
+				" and i.flags<>%d"
+			" order by pp.itemid",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE)))
+	{
 		return FAIL;
+	}
 
 	dbsync_prepare(sync, 5, NULL);
 
