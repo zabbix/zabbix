@@ -306,6 +306,7 @@ sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text
 src/libs/zbxcommon/variant.c -text
 src/libs/zbxdbcache/dbconfig.h -text
+src/libs/zbxdbcache/dbconfig_dump.c -text
 src/libs/zbxdbcache/dbsync.c -text
 src/libs/zbxdbcache/dbsync.h -text
 src/libs/zbxdbcache/item_preproc.c -text
