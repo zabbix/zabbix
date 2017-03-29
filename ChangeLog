@@ -53,6 +53,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
 ..F....... [ZBX-11877] fixed undefined index when trigger.lastEvent was not set (gcalenko)
 A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
@@ -411,6 +412,7 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
 A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
 ..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
