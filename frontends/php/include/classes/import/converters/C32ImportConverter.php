@@ -136,22 +136,8 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertMaps(array $maps) {
 		foreach ($maps as &$map) {
-			$map['shapes'] = [];
-		}
-		unset($map);
-
-		return $maps;
-	}
-	/**
-	 * Convert maps.
-	 *
-	 * @param array $maps
-	 *
-	 * @return array
-	 */
-	protected function convertMaps(array $maps) {
-		foreach ($maps as &$map) {
 			$map['selements'] = $this->convertMapElements($map['selements']);
+			$map['shapes'] = [];
 		}
 		unset($map);
 
