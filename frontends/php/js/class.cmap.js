@@ -593,9 +593,13 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				$('#elementClose').click(function() {
+					// Clean trigger selement.
+					if ($('#elementType').val() == 2) {
+						jQuery('#elementNameTriggers').multiSelect('clean');
+						$('#triggerContainer tbody').html('');
+					}
 					that.clearSelection();
 					that.toggleForm();
-					$('#triggerContainer tbody').html('');
 				});
 
 				$('#elementRemove').click($.proxy(this.deleteSelectedElements, this));
