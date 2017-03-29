@@ -1937,7 +1937,7 @@ ZABBIX.apps.map = (function($) {
 					case '0':
 						elementsData = $('#elementNameHost').multiSelect('getData');
 
-						if (elementsData) {
+						if (elementsData.length != 0) {
 							data.elements[0] = {
 								hostid: elementsData[0].id,
 								elementName: elementsData[0].name
@@ -1962,7 +1962,7 @@ ZABBIX.apps.map = (function($) {
 					case '3':
 						elementsData = $('#elementNameHostGroup').multiSelect('getData');
 
-						if (elementsData) {
+						if (elementsData.length != 0) {
 							data.elements[0] = {
 								groupid: elementsData[0].id,
 								elementName: elementsData[0].name
@@ -1994,7 +1994,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// validate element id
-				if (!data.elements && data.elementtype !== '4') {
+				if ($.isEmptyObject(data.elements) && data.elementtype !== '4') {
 					switch (data.elementtype) {
 						case '0': alert('Host is not selected.');
 							return false;
