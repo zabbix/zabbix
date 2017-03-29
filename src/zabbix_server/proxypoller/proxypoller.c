@@ -329,7 +329,6 @@ static int	proxy_get_host_availability(DC_PROXY *proxy, time_t *last_access)
 		goto out;
 	}
 
-	*last_access = time(NULL);
 	zbx_proxy_update_version(proxy, &jp);
 
 	if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -338,6 +337,8 @@ static int	proxy_get_host_availability(DC_PROXY *proxy, time_t *last_access)
 				" %s", proxy->host, proxy->addr, error);
 		goto out;
 	}
+
+	*last_access = time(NULL);
 
 	if (SUCCEED != process_host_availability(&jp, &error))
 	{
@@ -391,7 +392,6 @@ static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
 			break;
 		}
 
-		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -400,6 +400,8 @@ static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
+
+		*last_access = time(NULL);
 
 		if (SUCCEED != process_proxy_history_data(proxy, &jp, &ts, &error))
 		{
@@ -462,7 +464,6 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
 			break;
 		}
 
-		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -471,6 +472,8 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
+
+		*last_access = time(NULL);
 
 		if (SUCCEED != process_discovery_data(&jp, &ts, &error))
 		{
@@ -534,7 +537,6 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
 			break;
 		}
 
-		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -543,6 +545,8 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
+
+		*last_access = time(NULL);
 
 		if (SUCCEED != process_auto_registration(&jp, proxy->hostid, &ts, &error))
 		{
