@@ -56,7 +56,7 @@ Bug fixes:
 ...G...... [ZBX-11959] fix memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 ..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
-..F....... [ZBX-11877] fixed undefined index when trigger.lastEvent was not set (gcalenko)
+..F....... [ZBX-11877] fixed undefined index error in screens for triggers without events data (gcalenko)
 A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
 ..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
 A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)
