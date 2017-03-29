@@ -1529,19 +1529,22 @@ class CMap extends CMapElement {
 				}
 
 				$path = '/'.($index+1).'/shape';
-				$api_input_rules['fields']['sysmap_shapeid']['flags'] = API_REQUIRED;
-				$api_input_rules['fields']['type']['flags'] = 0;
-				$api_input_rules['fields']['x']['in'] = '0:'.$map['width'];
-				$api_input_rules['fields']['y']['in'] = '0:'.$map['height'];
-				$api_input_rules['fields']['width']['in'] = '1:'.$map['width'];
-				$api_input_rules['fields']['height']['in'] = '1:'.$map['height'];
+				$width = array_key_exists('width', $map) ? $map['width'] : $db_map['width'];
+				$height = array_key_exists('height', $map) ? $map['height'] : $db_map['height'];
+
+				$api_input_rules['fields']['sysmap_shapeid']['flags'] = 0;
+				$api_input_rules['fields']['type']['flags'] = API_REQUIRED;
+				$api_input_rules['fields']['x']['in'] = '0:'.$width;
+				$api_input_rules['fields']['y']['in'] = '0:'.$height;
+				$api_input_rules['fields']['width']['in'] = '1:'.$width;
+				$api_input_rules['fields']['height']['in'] = '1:'.$height;
 
 				if (!CApiInputValidator::validate($api_input_rules, $shapes_to_add, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				$api_input_rules['fields']['sysmap_shapeid']['flags'] = 0;
-				$api_input_rules['fields']['type']['flags'] = API_REQUIRED;
+				$api_input_rules['fields']['sysmap_shapeid']['flags'] = API_REQUIRED;
+				$api_input_rules['fields']['type']['flags'] = 0;
 				if (!CApiInputValidator::validate($api_input_rules, $shapes_to_update, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
