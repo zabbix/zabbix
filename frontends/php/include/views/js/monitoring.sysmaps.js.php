@@ -199,9 +199,8 @@
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
 			->addClass(ZBX_STYLE_CURSOR_MOVE)
 			->setId('shapeDragHandler')
-			->toString()
-	?>
-	<?= (new CForm())
+			->toString().
+		(new CForm())
 			->cleanItems()
 			->setName('shapeForm')
 			->setId('shapeForm')
@@ -260,7 +259,7 @@
 								'1'	=> _('Left'),
 								'0'	=> _('Center'),
 								'2'	=> _('Right')
-							]))->setAttribute('style', 'margin-top:4px'),
+							]))->setAttribute('style', 'margin-top: 4px'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Vertical align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -356,9 +355,8 @@
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
 			->addClass(ZBX_STYLE_CURSOR_MOVE)
 			->setId('massShapeDragHandler')
-			->toString()
-	?>
-	<?= (new CForm())
+			->toString().
+		(new CForm())
 			->cleanItems()
 			->setName('shapeForm')
 			->setId('massShapeForm')

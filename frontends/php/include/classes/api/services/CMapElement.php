@@ -104,7 +104,7 @@ abstract class CMapElement extends CApiService {
 			}
 		}
 
-		$colorValidator = new CColorValidator();
+		$color_validator = new CColorValidator();
 		foreach ($shapes as &$shape) {
 			if ($update || $delete) {
 				if (!array_key_exists($shape['sysmap_shapeid'], $db_shapes)) {
@@ -120,8 +120,8 @@ abstract class CMapElement extends CApiService {
 
 			foreach (['border_color', 'background_color', 'font_color'] as $field) {
 				if (array_key_exists($field, $shape) && $shape[$field] !== ''
-						&& !$colorValidator->validate($shape[$field])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
+						&& !$color_validator->validate($shape[$field])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $color_validator->getError());
 				}
 			}
 		}
@@ -494,24 +494,22 @@ abstract class CMapElement extends CApiService {
 	/**
 	 * Add shape to sysmap.
 	 *
-	 * @return array
+	 * @param array $shapes							Multidimensional array with shape properties.
 	 */
 	protected function createShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
 
 		$this->checkShapeInput($shapes, __FUNCTION__);
-
-		$shape_ids = DB::insert('sysmap_shape', $shapes);
-
-		return ['shapeids' => $shape_ids];
+		DB::insert('sysmap_shape', $shapes);
 	}
 
 	/**
 	 * Update shapes to sysmap.
+	 *
+	 * @param array $shapes							Multidimensional array with shape properties.
 	 */
 	protected function updateShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
-		$shape_ids = [];
 
 		$this->checkShapeInput($shapes, __FUNCTION__);
 
@@ -521,26 +519,22 @@ abstract class CMapElement extends CApiService {
 				'values' => $shape,
 				'where' => ['sysmap_shapeid' => $shape['sysmap_shapeid']],
 			];
-			$shape_ids[] = $shape['sysmap_shapeid'];
 		}
 
 		DB::update('sysmap_shape', $update);
-
-		return ['shapeids' => $shape_ids];
 	}
 
 	/**
 	 * Delete shapes from map.
+	 *
+	 * @param array $shapes							Multidimensional array with shape properties.
 	 */
 	protected function deleteShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
 		$shape_ids = zbx_objectValues($shapes, 'sysmap_shapeid');
 
 		$this->checkShapeInput($shapes, __FUNCTION__);
-
 		DB::delete('sysmap_shape', ['sysmap_shapeid' => $shape_ids]);
-
-		return $shape_ids;
 	}
 
 	/**

@@ -32,13 +32,22 @@ class CMapHelper {
 	public static function get($ids, $min_severity = null) {
 		$maps = API::Map()->get([
 			'sysmapids' => $ids,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['sysmapid', 'name', 'width', 'height', 'backgroundid', 'label_type', 'label_location',
+				'highlight', 'expandproblem', 'markelements', 'show_unack', 'label_format', 'label_type_host',
+				'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
+				'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image', 'iconmapid',
+				'severity_min'
+			],
 			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
 				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
 				'background_color', 'zindex'
 			],
-			'selectSelements' => API_OUTPUT_EXTEND,
-			'selectLinks' => API_OUTPUT_EXTEND,
+			'selectSelements' => ['selementid', 'elementid', 'elementtype', 'iconid_off', 'iconid_on', 'label',
+				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
+				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
+			],
+			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'],
+			'selectUrls' => ['sysmapurlid', 'name', 'url'],
 			'expandUrls' => true,
 			'nopermissions' => true,
 			'preservekeys' => true

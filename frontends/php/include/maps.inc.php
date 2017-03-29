@@ -61,6 +61,16 @@ function sysmapElementLabel($label = null) {
 	}
 }
 
+/**
+ * Get actions (data for popup menu) for map elements.
+ *
+ * @param array $sysmap
+ * @param array $options                  Options used to retrieve actions.
+ * @param int   $options['severity_min']  Minimal severity used.
+ * @param int   $options['fullscreen']    Fullscreen flag.
+ *
+ * @return array
+ */
 function getActionsBySysmap($sysmap, array $options = []) {
 	$sysmap['links'] = zbx_toHash($sysmap['links'], 'linkid');
 
@@ -1349,10 +1359,12 @@ function separateMapElements($sysmap) {
  */
 function populateFromMapAreas(array &$map, $theme) {
 	$areas = [];
+	$new_selement_id = ((count($map['selements']) > 0) ? (int)max(array_keys($map['selements'])) : 0) + 1;
+	$new_link_id = ((count($map['links']) > 0) ? (int)max(array_keys($map['links'])) : 0) + 1;
 
 	foreach ($map['selements'] as $selement) {
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP &&
-			$selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 
 			$area = ['selementids' => []];
 
@@ -1403,14 +1415,13 @@ function populateFromMapAreas(array &$map, $theme) {
 				$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
 				$selement['elementid'] = $host['hostid'];
 
-				$newSelementid = array_keys($map['selements'])[count($map['selements']) - 1] + 1;
-				while (isset($map['selements'][$newSelementid])) {
-					$newSelementid += 1;
+				while (array_key_exists($new_selement_id, $map['selements'])) {
+					$new_selement_id += 1;
 				}
-				$selement['selementid'] = -$newSelementid;
+				$selement['selementid'] = -$new_selement_id;
 
-				$area['selementids'][$newSelementid] = $newSelementid;
-				$map['selements'][$newSelementid] = $selement;
+				$area['selementids'][$new_selement_id] = $new_selement_id;
+				$map['selements'][$new_selement_id] = $selement;
 			}
 
 			$areas[] = $area;
@@ -1434,25 +1445,29 @@ function populateFromMapAreas(array &$map, $theme) {
 				}
 
 				if ($idNumber) {
-					foreach ($area['selementids'] as $newSelementid) {
-						$newLinkid = array_keys($map['links'])[count($map['links']) - 1] + 1;
-						while (isset($map['links'][$newLinkid])) {
-							$newLinkid += 1;
+					foreach ($area['selementids'] as $selement_id) {
+						while (array_key_exists($new_link_id, $map['links'])) {
+							$new_link_id += 1;
 						}
 
-						$link['linkid'] = -$newLinkid;
-						$link[$idNumber] = -$newSelementid;
-						$map['links'][$newLinkid] = $link;
+						$link['linkid'] = -$new_link_id;
+						$link[$idNumber] = -$selement_id;
+						$map['links'][$new_link_id] = $link;
 					}
 				}
 			}
 		}
 	}
 
-	$map['selements'] = array_filter($map['selements'], function ($element) {
-		return ($element['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP ||
-			$element['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS);
-	});
+	$selements = [];
+	foreach ($map['selements'] as $key => $element) {
+		if (($element['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				|| $element['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)) {
+			$selements[$key] = $element;
+		}
+	}
+
+	$map['selements'] = $selements;
 
 	return $areas;
 }
@@ -1634,8 +1649,15 @@ function get_parent_sysmaps($sysmapid) {
 	return [];
 }
 
-/* TODO: refactor much */
-function getMapLabels($map, $mapInfo, $resolveMacros) {
+/**
+ * Get labels for map elements.
+ *
+ * @param array $map        Sysmap data array.
+ * @param array $map_info   Array of selements (@see getSelementsInfo).
+ *
+ * @return array
+ */
+function getMapLabels($map, $map_info, $resolveMacros) {
 	if ($map['label_type'] == MAP_LABEL_TYPE_NOTHING && $map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {
 		return;
 	}
@@ -1704,7 +1726,7 @@ function getMapLabels($map, $mapInfo, $resolveMacros) {
 			$labelLines[$selementId][] = ['content' => $msg];
 		}
 
-		$elementInfo = $mapInfo[$selementId];
+		$elementInfo = $map_info[$selementId];
 
 		foreach (['problem', 'unack', 'maintenance', 'ok', 'status'] as $caption) {
 			if (!isset($elementInfo['info'][$caption]) || zbx_empty($elementInfo['info'][$caption]['msg'])) {
@@ -1746,7 +1768,7 @@ function getMapLabels($map, $mapInfo, $resolveMacros) {
 			continue;
 		}
 
-		$elementInfo = $mapInfo[$selementId];
+		$elementInfo = $map_info[$selementId];
 
 		$hl_color = null;
 		$st_color = null;
@@ -1800,7 +1822,15 @@ function getMapLabels($map, $mapInfo, $resolveMacros) {
 	return $labels;
 }
 
-function getMapHighligts($map, $mapInfo) {
+/**
+ * Get map element highlights (information about elements with marks or background).
+ *
+ * @param array $map        Sysmap data array.
+ * @param array $map_info   Array of selements (@see getSelementsInfo).
+ *
+ * @return array
+ */
+function getMapHighligts($map, $map_info) {
 	$config = select_config();
 
 	$highlights = [];
@@ -1814,7 +1844,7 @@ function getMapHighligts($map, $mapInfo) {
 
 		$hl_color = null;
 		$st_color = null;
-		$elementInfo = $mapInfo[$id];
+		$elementInfo = $map_info[$id];
 
 		switch ($elementInfo['icon_type']) {
 			case SYSMAP_ELEMENT_ICON_ON:
