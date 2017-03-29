@@ -2419,8 +2419,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		if (NULL == (item = zbx_hashset_search(&config->items, &rowid)))
 			continue;
 
-		if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+		if (ITEM_STATUS_ACTIVE == item->status &&
+				NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+		{
 			dc_host_update_agent_stats(host, item->type, -1);
+		}
 
 		itemid = item->itemid;
 
