@@ -236,7 +236,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if (array_key_exists('pairs', $step)) {
 				foreach ($pair_names as $pair_name) {
-					$step[$pair_name] = [];
 					foreach ($step['pairs'] as $pair) {
 						if (array_key_exists('type', $pair) && $pair_name === $pair['type'] &&
 							((array_key_exists('name', $pair) && trim($pair['name']) !== '') ||
@@ -251,7 +250,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($step['pairs']);
 			}
 
-			if (ZBX_POSTTYPE_FORM == $step['post_type']) {
+			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
 				$step['posts'] = $step['post_fields'];
 			}
 			unset($step['post_fields']);
