@@ -306,7 +306,7 @@ static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **er
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_host_availability(DC_PROXY *proxy)
+static int	proxy_get_host_availability(DC_PROXY *proxy, time_t *last_access)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp;
@@ -329,6 +329,7 @@ static int	proxy_get_host_availability(DC_PROXY *proxy)
 		goto out;
 	}
 
+	*last_access = time(NULL);
 	zbx_proxy_update_version(proxy, &jp);
 
 	if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -366,7 +367,7 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(DC_PROXY *proxy)
+static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
@@ -390,6 +391,7 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 			break;
 		}
 
+		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -435,7 +437,7 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_discovery_data(DC_PROXY *proxy)
+static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
@@ -460,6 +462,7 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 			break;
 		}
 
+		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -505,7 +508,7 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_auto_registration(DC_PROXY *proxy)
+static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
@@ -531,6 +534,7 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 			break;
 		}
 
+		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -635,7 +639,7 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_data(DC_PROXY *proxy, int *more)
+static int	proxy_get_data(DC_PROXY *proxy, int *more, time_t *last_access)
 {
 	const char	*__function_name = "proxy_get_data";
 
@@ -656,16 +660,16 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 
 	if (ZBX_COMPONENT_VERSION(3, 2) == version)
 	{
-		if (SUCCEED != proxy_get_host_availability(proxy))
+		if (SUCCEED != proxy_get_host_availability(proxy, last_access))
 			goto out;
 
-		if (SUCCEED != proxy_get_history_data(proxy))
+		if (SUCCEED != proxy_get_history_data(proxy, last_access))
 			goto out;
 
-		if (SUCCEED != proxy_get_discovery_data(proxy))
+		if (SUCCEED != proxy_get_discovery_data(proxy, last_access))
 			goto out;
 
-		if (SUCCEED != proxy_get_auto_registration(proxy))
+		if (SUCCEED != proxy_get_auto_registration(proxy, last_access))
 			goto out;
 
 		/* the above functions will retrieve all available data for 3.2 and older proxies */
@@ -694,7 +698,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_get_data                                                   *
+ * Function: proxy_get_tasks                                                   *
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
@@ -751,7 +755,7 @@ static int	process_proxy(void)
 	DC_PROXY		proxy;
 	int			num, i, more;
 	char			*port = NULL;
-	time_t			now;
+	time_t			now, last_access;
 	unsigned char		update_nextcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -764,6 +768,7 @@ static int	process_proxy(void)
 	for (i = 0; i < num; i++)
 	{
 		update_nextcheck = 0;
+		last_access = 0;
 
 		if (proxy.proxy_config_nextcheck <= now)
 			update_nextcheck |= ZBX_PROXY_CONFIG_NEXTCHECK;
@@ -787,13 +792,15 @@ static int	process_proxy(void)
 		{
 			if (SUCCEED != proxy_send_configuration(&proxy))
 				goto network_error;
+
+			last_access = time(NULL);
 		}
 
 		if (proxy.proxy_data_nextcheck <= now)
 		{
 			do
 			{
-				if (SUCCEED != proxy_get_data(&proxy, &more))
+				if (SUCCEED != proxy_get_data(&proxy, &more, &last_access))
 					goto network_error;
 			}
 			while (ZBX_PROXY_DATA_MORE == more);
@@ -802,12 +809,17 @@ static int	process_proxy(void)
 		{
 			if (SUCCEED != proxy_get_tasks(&proxy))
 				goto network_error;
+
+			last_access = time(NULL);
+		}
+network_error:
+		if (0 != last_access)
+		{
+			DBbegin();
+			update_proxy_lastaccess(proxy.hostid, last_access);
+			DBcommit();
 		}
 
-		DBbegin();
-		update_proxy_lastaccess(proxy.hostid);
-		DBcommit();
-network_error:
 		DCrequeue_proxy(proxy.hostid, update_nextcheck);
 	}
 
