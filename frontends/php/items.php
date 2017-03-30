@@ -820,27 +820,6 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			API::Application()->massAdd($linkApp);
 		}
 
-		$preprocessing = getRequest('preprocessing', []);
-
-		foreach ($preprocessing as &$step) {
-			switch ($step['type']) {
-				case ZBX_PREPROC_MULTIPLIER:
-				case ZBX_PREPROC_RTRIM:
-				case ZBX_PREPROC_LTRIM:
-				case ZBX_PREPROC_TRIM:
-					$step['params'] = $step['params'][0];
-					break;
-
-				case ZBX_PREPROC_REGSUB:
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				default:
-					$step['params'] = '';
-			}
-		}
-		unset($step);
-
 		$items = API::Item()->get([
 			'output' => ['itemid', 'flags'],
 			'itemids' => $itemids,
@@ -882,6 +861,27 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'status' => getRequest('status')
 			];
 			if (hasRequest('preprocessing')) {
+				$preprocessing = getRequest('preprocessing');
+
+				foreach ($preprocessing as &$step) {
+					switch ($step['type']) {
+						case ZBX_PREPROC_MULTIPLIER:
+						case ZBX_PREPROC_RTRIM:
+						case ZBX_PREPROC_LTRIM:
+						case ZBX_PREPROC_TRIM:
+							$step['params'] = $step['params'][0];
+							break;
+
+						case ZBX_PREPROC_REGSUB:
+							$step['params'] = implode("\n", $step['params']);
+							break;
+
+						default:
+							$step['params'] = '';
+					}
+				}
+				unset($step);
+
 				$item['preprocessing'] = $preprocessing;
 			}
 			foreach ($item as $key => $field) {
