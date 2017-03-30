@@ -229,113 +229,68 @@ static void	dbsync_add_row(zbx_dbsync_t *sync, zbx_uint64_t rowid, unsigned char
  *                                    synchronization process)                *
  *                                                                            *
  ******************************************************************************/
-static void	dbsync_prepare(zbx_dbsync_t *sync, int columns_num, zbx_dbsync_get_row_hostids_t get_hostids_func)
+static void	dbsync_prepare(zbx_dbsync_t *sync, int columns_num, zbx_dbsync_preproc_row_func_t preproc_row_func)
 {
 	sync->columns_num = columns_num;
-	sync->get_hostids_func = get_hostids_func;
+	sync->preproc_row_func = preproc_row_func;
+
 	sync->row = (char **)zbx_malloc(NULL, sizeof(char *) * columns_num);
 	memset(sync->row, 0, sizeof(char *) * columns_num);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_prepare_column                                            *
- *                                                                            *
- * Purpose: prepares to expand user macros for the specified column           *
- *                                                                            *
- * Parameter: sync           - [IN] the changeset                             *
- *            column_num     - [IN] the column to process                     *
- *            validator_func - [IN] a validator function to validate expanded *
- *                                  macro values (can be NULL)                *
- *                                                                            *
- ******************************************************************************/
-static void	dbsync_prepare_column(zbx_dbsync_t *sync, int column_num,
-		zbx_macro_value_validator_func_t validator_func)
-{
-	zbx_dbsync_column_t	*column;
-
-	column = (zbx_dbsync_column_t *)zbx_malloc(NULL, sizeof(zbx_dbsync_column_t));
-
-	column->index = column_num;
-	column->validator_func = validator_func;
-	zbx_vector_ptr_append(&sync->columns, column);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dbsync_check_row_macros                                          *
  *                                                                            *
- * Purpose: checks if the prepared columns in row contains any user macros    *
+ * Purpose: checks if the specified column in the row contains user macros    *
  *                                                                            *
- * Parameter: sync - [IN] the changeset                                       *
- *            row  - [IN] the row to check                                    *
+ * Parameter: row    - [IN] the row to check                                  *
+ *            column - [IN] the column index                                  *
  *                                                                            *
  * Comments: While not definite, this check is used to filter out rows before *
  *           doing more precise (and resource intense) checks.                *
  *                                                                            *
  ******************************************************************************/
-static int	dbsync_check_row_macros(zbx_dbsync_t *sync, char **row)
+static int	dbsync_check_row_macros(char **row, int column)
 {
-	zbx_dbsync_column_t	*column;
-	int				i;
-
-	for (i = 0; i < sync->columns.values_num; i++)
-	{
-		column = (zbx_dbsync_column_t *)sync->columns.values[i];
-		if (NULL != strstr(row[column->index], "{$"))
-			return SUCCEED;
-	}
+	if (NULL != strstr(row[column], "{$"))
+		return SUCCEED;
 
 	return FAIL;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_expand_row_macros                                         *
+ * Function: dbsync_preproc_row                                               *
  *                                                                            *
- * Purpose: returns database row with expanded user macros in the prepared    *
- *          columns                                                           *
+ * Purpose: applies necessary pre-processing before row is compared/used      *
  *                                                                            *
  * Parameter: sync - [IN] the changeset                                       *
- *            row  - [IN] the row to process                                  *
+ *            row  - [IN/OUT] the data row                                    *
  *                                                                            *
- * Return value: The row with expanded user macros. This can be the original  *
- *               row if no user macros are found in the prepared columns.     *
+ * Return value: the resulting row                                            *
  *                                                                            *
  ******************************************************************************/
-static char	**dbsync_expand_row_macros(zbx_dbsync_t *sync, char **row)
+static char	**dbsync_preproc_row(zbx_dbsync_t *sync, char **row)
 {
-	zbx_dbsync_column_t	*column;
-	int				i;
-	zbx_vector_uint64_t		hostids;
+	int	i;
 
-	/* return the original row if no columns are prepared or no macros are found */
-	if (0 == sync->columns.values_num || FAIL == dbsync_check_row_macros(sync, row))
+	if (NULL == sync->preproc_row_func)
 		return row;
 
-	zbx_vector_uint64_create(&hostids);
-	sync->get_hostids_func(row, &hostids);
+	/* free the resources allocated by last preprocessing call */
+	zbx_vector_ptr_clear_ext(&sync->columns, zbx_ptr_free);
 
-	/* free the old data */
-	for (i = 0; i < sync->columns.values_num; i++)
-	{
-		column = (zbx_dbsync_column_t *)sync->columns.values[i];
-		zbx_free(sync->row[column->index]);
-	}
-
-	/* copy the orignal data */
+	/* copy the original data */
 	memcpy(sync->row, row, sizeof(char *) * sync->columns_num);
 
-	/* overwrite the prepared columns with resolved values */
-	for (i = 0; i < sync->columns.values_num; i++)
+	sync->row = sync->preproc_row_func(sync->row);
+
+	for (i = 0; i < sync->columns_num; i++)
 	{
-		column = (zbx_dbsync_column_t *)sync->columns.values[i];
-
-		sync->row[column->index] = zbx_dc_expand_user_macros(row[column->index], hostids.values,
-				hostids.values_num, column->validator_func);
+		if (sync->row[i] != row[i])
+			zbx_vector_ptr_append(&sync->columns, sync->row[i]);
 	}
-
-	zbx_vector_uint64_destroy(&hostids);
 
 	return sync->row;
 }
@@ -377,8 +332,9 @@ void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
 	sync->update_num = 0;
 	sync->remove_num = 0;
 
-	zbx_vector_ptr_create(&sync->columns);
 	sync->row = NULL;
+	sync->preproc_row_func = NULL;
+	zbx_vector_ptr_create(&sync->columns);
 
 	if (ZBX_DBSYNC_UPDATE == sync->mode)
 	{
@@ -398,24 +354,11 @@ void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
  ******************************************************************************/
 void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 {
-	int	i;
-
-	/* free the resources allocated by user macro resolving */
-	if (NULL != sync->row)
-	{
-		zbx_dbsync_column_t	*column;
-
-		for (i = 0; i < sync->columns.values_num; i++)
-		{
-			column = (zbx_dbsync_column_t *)sync->columns.values[i];
-			zbx_free(sync->row[column->index]);
-		}
-
-		zbx_free(sync->row);
-	}
-
+	/* free the resources allocated by row pre-processing */
 	zbx_vector_ptr_clear_ext(&sync->columns, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&sync->columns);
+
+	zbx_free(sync->row);
 
 	if (ZBX_DBSYNC_UPDATE == sync->mode)
 	{
@@ -487,18 +430,16 @@ int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsign
 			return FAIL;
 		}
 
-		*row = dbsync_expand_row_macros(sync, dbrow);
+		*row = dbsync_preproc_row(sync, dbrow);
 
 		*rowid = 0;
 		*tag = ZBX_DBSYNC_ROW_ADD;
 
 		sync->add_num++;
-
 	}
 
 	return SUCCEED;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -533,7 +474,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare_column(sync, 27, NULL);
+	dbsync_prepare(sync, 27, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -1695,36 +1636,72 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
 	return SUCCEED;
 }
 
+#define ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION		0x01
+#define ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION	0x02
+
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_trigger_get_hostids                                       *
+ * Function: dbsync_trigger_preproc_row                                       *
  *                                                                            *
- * Purpose: retrieve host identifiers of items used in trigger exprsssions    *
+ * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
- * Parameter: row     - [IN] the data row                                     *
- *            hostids - [IN] the associated host identifiers                  *
+ * Parameter: row - [IN] the row to preprocess                                *
  *                                                                            *
- * Return value: SUCCEED - the row matches configuration data                 *
- *               FAIL    - otherwise                                          *
+ * Return value: the preprocessed row                                         *
+ *                                                                            *
+ * Comments: The row preprocessing can be used to expand user macros in       *
+ *           some columns.                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	dbsync_trigger_get_hostids(char **dbrow, zbx_vector_uint64_t *hostids)
+static char **dbsync_trigger_preproc_row(char **row)
 {
-	zbx_vector_uint64_t	functionids, itemids;
+	zbx_vector_uint64_t	hostids, functionids, itemids;
+	unsigned char		flags = 0;
 
+	/* return the original row if user macros are not used in target columns */
+
+	if (SUCCEED == dbsync_check_row_macros(row, 2))
+		flags |= ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION;
+
+	if (SUCCEED == dbsync_check_row_macros(row, 11))
+		flags |= ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION;
+
+	if (0 == flags)
+		return row;
+
+	/* get associated host identifiers */
+
+	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&functionids);
 	zbx_vector_uint64_create(&itemids);
 
-	get_functionids(&functionids, dbrow[2]);
-	get_functionids(&functionids, dbrow[11]);
+	get_functionids(&functionids, row[2]);
+	get_functionids(&functionids, row[11]);
 
 	zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, hostids);
+	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
+
+	/* expand user macros */
+
+	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
+	{
+		row[2] = zbx_dc_expand_user_macros(row[2], hostids.values, hostids.values_num,
+				dbsync_numeric_validator);
+	}
+
+	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
+	{
+		row[11] = zbx_dc_expand_user_macros(row[11], hostids.values, hostids.values_num,
+				dbsync_numeric_validator);
+	}
 
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&functionids);
+	zbx_vector_uint64_destroy(&hostids);
+
+	return row;
 }
 
 /******************************************************************************
@@ -1766,11 +1743,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 14, dbsync_trigger_get_hostids);
-	/* triggers.expression column */
-	dbsync_prepare_column(sync, 2, dbsync_numeric_validator);
-	/* triggers.recovery_expression column */
-	dbsync_prepare_column(sync, 11, dbsync_numeric_validator);
+	dbsync_prepare(sync, 14, dbsync_trigger_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -1786,13 +1759,14 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
 
+		row = dbsync_preproc_row(sync, dbrow);
+
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&dbsync_env.cache->triggers, &rowid)))
 		{
 			dbsync_add_row(sync, rowid, ZBX_DBSYNC_ROW_ADD, dbrow);
 		}
 		else
 		{
-			row = dbsync_expand_row_macros(sync, dbrow);
 			if (FAIL == dbsync_compare_trigger(trigger, row))
 				dbsync_add_row(sync, rowid, ZBX_DBSYNC_ROW_UPDATE, row);
 		}

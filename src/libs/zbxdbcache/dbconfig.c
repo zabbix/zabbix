@@ -6141,7 +6141,7 @@ void	DCconfig_unlock_all_triggers(void)
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num)
+		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num)
 {
 	int			i, j, found;
 	const ZBX_DC_ITEM	*dc_item;
@@ -6180,9 +6180,6 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 					trigger->timespec.ns < timespecs[i].ns))
 			{
 				trigger->timespec = timespecs[i];
-
-				if (NULL != errors)
-					trigger->new_error = zbx_strdup(trigger->new_error, errors[i]);
 			}
 		}
 	}

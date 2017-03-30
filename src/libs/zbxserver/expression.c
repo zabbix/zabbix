@@ -3520,7 +3520,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 								*data + token.token.l);
 					}
 
-					ret = FAIL;
+					res = FAIL;
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
@@ -4342,7 +4342,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 	DB_EVENT		event;
 	DC_TRIGGER		*tr;
-	int			i;
+	int			i, ret;
 	double			expr_result;
 	zbx_vector_ptr_t	unknown_msgs;		/* pointers to messages about origins of 'unknown' values */
 	char			err[MAX_STRING_LEN];
@@ -4357,21 +4357,20 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		event.value = tr->value;
 
-		if (NULL == tr->new_error)
+		if (SUCCEED == (ret = substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
+				&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err))))
 		{
-			substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, &tr->expression,
-					MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
-
 			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
 			{
-				substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
-						&tr->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+				ret = substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
+						&tr->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, err,
+						sizeof(err));
 			}
 		}
-		else
+
+		if (SUCCEED != ret)
 		{
-			zbx_snprintf(err, sizeof(err), "Cannot evaluate expression: %s.", tr->new_error);
-			tr->new_error = zbx_strdup(tr->new_error, err);
+			tr->new_error = zbx_dsprintf(tr->new_error, "Cannot evaluate expression: %s", err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
 		}
 	}

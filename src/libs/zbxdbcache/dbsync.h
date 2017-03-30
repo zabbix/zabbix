@@ -40,22 +40,24 @@
 #define ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY	__UINT64_C(0x0040)
 #define ZBX_DBSYNC_UPDATE_HOST_GROUPS		__UINT64_C(0x0080)
 
+struct zbx_dbsync;
+
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dbsync_get_row_hostids_t                                     *
+ * Function: zbx_dbsync_preproc_row_func_t                                    *
  *                                                                            *
- * Purpose: retrieves host identifiers associated with the data row           *
+ * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
- * Parameter: row     - [IN] the data row                                     *
- *            hostids - [IN] the associated host identifiers                  *
+ * Parameter: row - [IN] the row to preprocess                                *
  *                                                                            *
- * Comments: For example for host it would be the host identifier,            *
- *                           item - the item.hostid,                          *
- *                           trigger - host identifiers of items used         *
- *                                     in trigger expressions                 *
+ * Return value: the preprocessed row                                         *
+ *                                                                            *
+ * Comments: The row preprocessing can be used to expand user macros in       *
+ *           some columns.                                                    *
+ *                                                                            *
  *                                                                            *
  ******************************************************************************/
-typedef void (*zbx_dbsync_get_row_hostids_t)(char **row, zbx_vector_uint64_t *hostids);
+typedef char **(*zbx_dbsync_preproc_row_func_t)(char **row);
 
 typedef struct
 {
@@ -70,7 +72,7 @@ typedef struct
 }
 zbx_dbsync_row_t;
 
-typedef struct
+typedef struct zbx_dbsync
 {
 	/* the synchronization mode (see ZBX_DBSYNC_* defines) */
 	unsigned char			mode;
@@ -87,14 +89,14 @@ typedef struct
 	/* the database result set for ZBX_DBSYNC_ALL mode */
 	DB_RESULT			dbresult;
 
-	/* a list of columns with user macros that will expanded during synchronization process */
-	zbx_vector_ptr_t		columns;
+	/* the row preprocessing function */
+	zbx_dbsync_preproc_row_func_t	preproc_row_func;
 
-	/* row with expanded macros */
+	/* the pre-processed row */
 	char				**row;
 
-	/* function to retrieve associated hostids to resolve user macros */
-	zbx_dbsync_get_row_hostids_t	get_hostids_func;
+	/* the preprocessed columns  */
+	zbx_vector_ptr_t		columns;
 
 	/* statistics */
 	zbx_uint64_t	add_num;
