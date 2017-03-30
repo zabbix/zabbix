@@ -86,7 +86,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	int		auth_pw = 0, rc, ret = NOTSUPPORTED,
 			exitcode, bytecount = 0;
 	char		buffer[MAX_BUFFER_LEN], buf[16], *userauthlist,
-			*publickey = NULL, *privatekey = NULL, *ssherr, *output;
+			*publickey = NULL, *privatekey = NULL, *ssherr;
 	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -291,11 +291,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 
 	buffer[bytecount] = '\0';
-	output = convert_to_utf8(buffer, bytecount, encoding);
-	if (SUCCEED == set_result_type(result, item->value_type, item->data_type, output))
-		ret = SYSINFO_RET_OK;
+	SET_STR_RESULT(result, convert_to_utf8(buffer, bytecount, encoding));
 
-	zbx_free(output);
+	ret = SYSINFO_RET_OK;
 
 channel_close:
 	/* close an active data channel */
