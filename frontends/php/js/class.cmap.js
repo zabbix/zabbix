@@ -593,11 +593,6 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				$('#elementClose').click(function() {
-					// Clean trigger selement.
-					if ($('#elementType').val() == 2) {
-						jQuery('#elementNameTriggers').multiSelect('clean');
-						$('#triggerContainer tbody').html('');
-					}
 					that.clearSelection();
 					that.toggleForm();
 				});
@@ -771,6 +766,12 @@ ZABBIX.apps.map = (function($) {
 						delete this.selection[type][id];
 					}
 				}, this);
+
+				// Clean trigger selement.
+				if ($('#elementType').val() == 2) {
+					jQuery('#elementNameTriggers').multiSelect('clean');
+					$('#triggerContainer tbody').html('');
+				}
 			},
 
 			reorderShapes: function(id, position) {
