@@ -1894,12 +1894,8 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 		$evStr .= ' '.$value;
 	}
 
-	$result = null;
-
 	// execute expression
-	ob_start();
 	eval('$result = ('.trim($evStr).');');
-	ob_get_clean();
 
 	return $result;
 }
