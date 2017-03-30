@@ -1,26 +1,37 @@
 <script type="text/x-jquery-tmpl" id="scenarioPairRow">
-<tr class="pairRow sortable" id="pairRow_#{pair.id}" data-pairid="#{pair.id}">
-	<td class="pair-drag-control <?= ZBX_STYLE_TD_DRAG_ICON ?>">
-		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-		<input type="hidden" name="pairs[#{pair.id}][isNew]" value="#{pair.isNew}">
-		<input type="hidden" name="pairs[#{pair.id}][id]" value="#{pair.id}">
-		<input type="hidden" id="pair_type_#{pair.id}" name="pairs[#{pair.id}][type]" value="#{pair.type}">
-	</td>
-
-	<td>
-		<input type="text" id="pair_name_#{pair.id}" name="pairs[#{pair.id}][name]" data-type="name" value="#{pair.name}" maxlength="255" style="width: <?= ZBX_TEXTAREA_TAG_WIDTH ?>px" placeholder="<?= _('name') ?>">
-	</td>
-
-	<td> ⇒ </td>
-
-	<td>
-		<input type="text" id="pair_value_#{pair.id}" name="pairs[#{pair.id}][value]" data-type="value" value="#{pair.value}" style="width: <?= ZBX_TEXTAREA_TAG_WIDTH ?>px" placeholder="<?= _('value') ?>">
-	</td>
-
-	<td class="<?= ZBX_STYLE_NOWRAP ?> pair-control">
-		<button class="<?= ZBX_STYLE_BTN_LINK ?> remove" type="button" id="removePair_#{pair.id}" data-pairid="#{pair.id}"><?= _('Remove') ?></button>
-	</td>
-</tr>
+	<?= (new CRow([
+			(new CCol([
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+				new CInput('hidden', 'pairs[#{pair.id}][isNew]', '#{pair.isNew}'),
+				new CInput('hidden', 'pairs[#{pair.id}][id]', '#{pair.id}'),
+				(new CInput('hidden', 'pairs[#{pair.id}][type]', '#{pair.type}'))->setId('pair_type_#{pair.id}'),
+			]))
+				->addClass('pair-drag-control')
+				->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CTextBox('pairs[#{pair.id}][name]', '#{pair.name}'))
+				->setAttribute('data-type', 'name')
+				->setAttribute('placeholder', _('name'))
+				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+			'⇒',
+			(new CTextBox('pairs[#{pair.id}][value]', '#{pair.value}'))
+				->setAttribute('data-type', 'value')
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+			(new CCol(
+				(new CButton('removePair_#{pair.id}', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('remove')
+					->setAttribute('data-pairid', '#{pair.id}')
+			))
+				->addClass(ZBX_STYLE_NOWRAP)
+				->addClass('pair-control')
+		]))
+			->setId('pairRow_#{pair.id}')
+			->addClass('pairRow')
+			->addClass('sortable')
+			->setAttribute('data-pairid', '#{pair.id}')
+			->toString()
+	?>
 </script>
 
 <script type="text/javascript">
