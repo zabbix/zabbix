@@ -1683,9 +1683,9 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			break;
 		default:
 			am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, "unsupported media type");
-			am_remove_alert(manager, alert);
 			zabbix_log(LOG_LEVEL_ERR, "cannot process alertid:" ZBX_FS_UI64 ": unsupported media type: %d",
 					alert->alertid, mediatype->type);
+			am_remove_alert(manager, alert);
 			goto out;
 	}
 
