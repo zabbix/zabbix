@@ -204,6 +204,9 @@ typedef struct
 
 	/* mediatype queue */
 	zbx_binary_heap_t	queue;
+
+	/* the database status */
+	int			dbstatus;
 }
 zbx_am_t;
 
@@ -1352,12 +1355,15 @@ static int	am_db_flush_alert_updates(zbx_am_t *manager)
 	zbx_am_alertstatus_t	*update;
 	char			*sql = NULL, *error_esc;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	int			i, j, ret = SUCCEED, limit;
+	int			i, j, ret = FAIL, limit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() updates:%d", __function_name, manager->alertupdates.num_data);
 
 	if (0 == manager->alertupdates.num_data)
+	{
+		ret = SUCCEED;
 		goto out;
+	}
 
 	zbx_vector_ptr_create(&updates);
 
@@ -1367,7 +1373,8 @@ static int	am_db_flush_alert_updates(zbx_am_t *manager)
 
 	zbx_vector_ptr_sort(&updates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	DBbegin();
+	if (ZBX_DB_DOWN == zbx_db_begin())
+		goto cleanup;
 
 	for (i = 0; i < updates.values_num; i += 100)
 	{
@@ -1397,13 +1404,11 @@ static int	am_db_flush_alert_updates(zbx_am_t *manager)
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (ZBX_DB_DOWN == DBexecute_once("%s", sql))
-		{
-			ret = FAIL;
 			goto cleanup;
-		}
 	}
 
-	DBcommit();
+	if (ZBX_DB_DOWN == zbx_db_commit())
+		goto cleanup;
 
 	zbx_hashset_iter_reset(&manager->alertupdates, &iter);
 	while (NULL != (update = (zbx_am_alertstatus_t *)zbx_hashset_iter_next(&iter)))
@@ -1833,7 +1838,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	zbx_am_alerter_t	*alerter;
-	int			ret, sent_num, failed_num, now, time_db, time_watchdog, freq_watchdog;
+	int			ret, sent_num, failed_num, now, time_db, time_watchdog, freq_watchdog, time_connect;
 	double			time_stat, time_idle, time_now;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -1852,13 +1857,14 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	am_init(&manager);
+
+	manager.dbstatus = DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
 	time_now = time_stat;
+	time_connect = time_now;
 	time_idle = 0;
 	sent_num = 0;
 	failed_num = 0;
@@ -1877,6 +1883,25 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		time_now = zbx_time();
 		now = time_now;
 
+		if (ZBX_DB_DOWN == manager.dbstatus && time_connect + ZBX_DB_WAIT_DOWN <= now)
+		{
+			if (ZBX_DB_DOWN == (manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds",
+						ZBX_DB_WAIT_DOWN);
+			}
+			else
+			{
+				if (0 != zbx_db_txn_level())
+					manager.dbstatus = zbx_db_rollback();
+			}
+
+			if (ZBX_DB_OK == manager.dbstatus)
+				zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
+
+			time_connect = now;
+		}
+
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
 			zbx_setproctitle("%s #%d [sent %d, failed %d alerts, idle " ZBX_FS_DBL " sec during "
@@ -1891,23 +1916,27 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 		zbx_handle_log();
 
-		if (now - time_db >= CONFIG_SENDER_FREQUENCY)
+		if (ZBX_DB_OK == manager.dbstatus && now - time_db >= CONFIG_SENDER_FREQUENCY)
 		{
 			if (SUCCEED == (ret = am_db_queue_alerts(&manager, now)))
 				ret = am_db_flush_alert_updates(&manager);
 
 			if (FAIL == ret)
-				am_queue_watchdog_alerts(&manager);
+				manager.dbstatus = ZBX_DB_DOWN;
 
 			time_db = now;
 		}
 
-		if (now - time_watchdog >= freq_watchdog)
+		if (ZBX_DB_OK == manager.dbstatus && now - time_watchdog >= freq_watchdog)
 		{
 			if (FAIL == am_db_sync_watchdog(&manager))
-				am_queue_watchdog_alerts(&manager);
+				manager.dbstatus = ZBX_DB_DOWN;
+
 			time_watchdog = now;
 		}
+
+		if (ZBX_DB_DOWN == manager.dbstatus)
+			am_queue_watchdog_alerts(&manager);
 
 		now = time(NULL);
 

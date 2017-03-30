@@ -26,8 +26,6 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
-#define ZBX_DB_WAIT_DOWN	10
-
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
