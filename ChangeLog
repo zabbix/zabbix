@@ -53,6 +53,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11951] fix TRIGGER.VALUE macro expansion in trigger expressions (abs)
 ...G...... [ZBX-11959] fix memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 ..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
