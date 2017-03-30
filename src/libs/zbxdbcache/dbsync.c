@@ -333,8 +333,6 @@ static char	**dbsync_expand_row_macros(zbx_dbsync_t *sync, char **row)
 
 		sync->row[column->index] = zbx_dc_expand_user_macros(row[column->index], hostids.values,
 				hostids.values_num, column->validator_func);
-
-		zbx_vector_uint64_clear(&hostids);
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
