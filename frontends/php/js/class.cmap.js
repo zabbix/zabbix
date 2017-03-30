@@ -1871,34 +1871,39 @@ ZABBIX.apps.map = (function($) {
 
 				this.actionProcessor.process();
 
-				// set multiselect values
-				if (selement.elementtype == 0 || selement.elementtype == 3) {
-					switch (selement.elementtype) {
-						// host
-						case '0':
-							$('#elementNameHost').multiSelect('addData', {
-								'id': selement.elements[0].hostid,
-								'name': selement.elements[0].elementName
-							});
-							break;
+				switch (selement.elementtype) {
+					// host
+					case '0':
+						$('#elementNameHost').multiSelect('addData', {
+							'id': selement.elements[0].hostid,
+							'name': selement.elements[0].elementName
+						});
+						break;
 
-						// host group
-						case '3':
-							$('#elementNameHostGroup').multiSelect('addData', {
-								'id': selement.elements[0].groupid,
-								'name': selement.elements[0].elementName
-							});
-							break;
-					}
-				}
-				else if (selement.elementtype == 2) {
-					var triggers = [];
+					// map
+					case '1':
+						$('#sysmapid').val(selement.elements[0].sysmapid);
+						$('#elementNameMap').val(selement.elements[0].elementName);
+						break;
 
-					for (i in selement.elements) {
-						triggers[i] = {'id': selement.elements[i].triggerid, 'name': selement.elements[i].elementName};
-					}
+					// trigger
+					case '2':
+						var triggers = [];
 
-					this.addTriggers(triggers);
+						for (i in selement.elements) {
+							triggers[i] = {'id': selement.elements[i].triggerid, 'name': selement.elements[i].elementName};
+						}
+
+						this.addTriggers(triggers);
+						break;
+
+					// host group
+					case '3':
+						$('#elementNameHostGroup').multiSelect('addData', {
+							'id': selement.elements[0].groupid,
+							'name': selement.elements[0].elementName
+						});
+						break;
 				}
 			},
 
@@ -1945,6 +1950,16 @@ ZABBIX.apps.map = (function($) {
 							data.elements[0] = {
 								hostid: elementsData[0].id,
 								elementName: elementsData[0].name
+							};
+						}
+						break;
+
+					// map
+					case '1':
+						if ($('#elementNameMap').val() !== '') {
+							data.elements[0] = {
+								sysmapid: $('#sysmapid').val(),
+								elementName: $('#elementNameMap').val()
 							};
 						}
 						break;

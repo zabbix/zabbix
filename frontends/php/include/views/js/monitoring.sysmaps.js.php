@@ -116,11 +116,12 @@
 							->setReadonly(true)
 							->setId('elementNameMap')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
 							->onClick('PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
-								'&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap'.
+								'&dstfrm=selementForm&dstfld1=sysmapid&dstfld2=elementNameMap'.
 								'&excludeids[]=#{sysmapid}")'
 							)
 					], 'mapSelectRow')
