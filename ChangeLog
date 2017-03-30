@@ -414,6 +414,7 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11980] fix incorrect type handling in SSH checks (abs)
 ...G...... [ZBX-11959] fix memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 ..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
