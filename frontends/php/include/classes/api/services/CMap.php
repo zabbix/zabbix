@@ -1757,7 +1757,9 @@ class CMap extends CMapElement {
 		// adding elements
 		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
 			$selements = API::getApiService()->select('sysmaps_elements', [
-				'output' => $this->outputExtend($options['selectSelements'], ['selementid', 'sysmapid', 'elementtype']),
+				'output' => $this->outputExtend($options['selectSelements'], ['selementid', 'sysmapid', 'elementtype',
+					'elementid'
+				]),
 				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
 			]);
