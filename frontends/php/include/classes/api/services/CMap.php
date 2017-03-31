@@ -224,6 +224,8 @@ class CMap extends CMapElement {
 					' WHERE '.dbConditionInt('se.sysmapid', $sysmapids)
 				);
 
+				$trigger_selementids = [];
+				$selements_maps = [];
 				while ($selement = DBfetch($dbSelements)) {
 					$selements[$selement['selementid']] = $selement;
 
@@ -235,12 +237,23 @@ class CMap extends CMapElement {
 							$mapsToCheck[$selement['elementid']] = $selement['elementid'];
 							break;
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							$triggersToCheck[$selement['elementid']] = $selement['elementid'];
+							$trigger_selementids[$selement['selementid']] = true;
+							$selements_maps[$selement['selementid']] = $selement['sysmapid'];
 							break;
 						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 							$hostGroupsToCheck[$selement['elementid']] = $selement['elementid'];
 							break;
 					}
+				}
+
+				$db_element_triggers = DBselect(
+					'SELECT et.selementid,et.triggerid'.
+					' FROM sysmap_element_trigger et'.
+					' WHERE '.dbConditionInt('et.selementid', array_keys($trigger_selementids))
+				);
+
+				while ($db_element_trigger = DBfetch($db_element_triggers)) {
+					$triggersToCheck[$db_element_trigger['selementid']] = $db_element_trigger['triggerid'];
 				}
 
 				if ($hostsToCheck) {
@@ -288,14 +301,9 @@ class CMap extends CMapElement {
 						'output' => ['triggerid']
 					]);
 
-					foreach ($triggersToCheck as $elementid) {
-						if (!isset($allowedTriggers[$elementid])) {
-							foreach ($selements as $selementid => $selement) {
-								if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
-										&& bccomp($selement['elementid'], $elementid) == 0) {
-									unset($result[$selement['sysmapid']], $selements[$selementid]);
-								}
-							}
+					foreach ($triggersToCheck as $selementid => $triggerid) {
+						if (!array_key_exists($triggerid, $allowedTriggers)) {
+							unset($result[$selements_maps[$selementid]], $selements[$selementid]);
 						}
 					}
 				}
@@ -421,6 +429,9 @@ class CMap extends CMapElement {
 			'values' => [PERM_READ, PERM_READ_WRITE]
 		]);
 
+		$expandproblem_types = [SYSMAP_PROBLEMS_NUMBER, SYSMAP_SINGLE_PROBLEM, SYSMAP_PROBLEMS_NUMBER_CRITICAL];
+		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
+
 		// Continue to check 2 more mandatory fields and other optional fields.
 		foreach ($maps as $map) {
 			// Check mandatory fields "width" and "height".
@@ -454,6 +465,12 @@ class CMap extends CMapElement {
 						_s('Incorrect "private" value "%1$s" for map "%2$s".', $map['private'], $map['name'])
 					);
 				}
+			}
+
+			if (array_key_exists('expandproblem', $map) && !$expandproblem_validator->validate($map['expandproblem'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'expandproblem',
+					_s('value must be one of %1$s', implode(', ', $expandproblem_types))
+				));
 			}
 
 			$userids = [];
@@ -843,6 +860,9 @@ class CMap extends CMapElement {
 			'values' => [PERM_READ, PERM_READ_WRITE]
 		]);
 
+		$expandproblem_types = [SYSMAP_PROBLEMS_NUMBER, SYSMAP_SINGLE_PROBLEM, SYSMAP_PROBLEMS_NUMBER_CRITICAL];
+		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
+
 		foreach ($maps as $map) {
 			// Check if owner can be set.
 			if (array_key_exists('userid', $map)) {
@@ -877,6 +897,12 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect "private" value "%1$s" for map "%2$s".', $map['private'], $map['name'])
 				);
+			}
+
+			if (array_key_exists('expandproblem', $map) && !$expandproblem_validator->validate($map['expandproblem'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'expandproblem',
+					_s('value must be one of %1$s', implode(', ', $expandproblem_types))
+				));
 			}
 
 			$userids = [];
@@ -1729,7 +1755,9 @@ class CMap extends CMapElement {
 		// adding elements
 		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
 			$selements = API::getApiService()->select('sysmaps_elements', [
-				'output' => $this->outputExtend($options['selectSelements'], ['selementid', 'sysmapid']),
+				'output' => $this->outputExtend($options['selectSelements'], ['selementid', 'sysmapid', 'elementtype',
+					'elementid'
+				]),
 				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
 			]);
@@ -1773,6 +1801,55 @@ class CMap extends CMapElement {
 						? $selementUrl
 						: $this->expandUrlMacro($selementUrl, $selements[$selementUrl['selementid']]);
 				}
+			}
+
+			if ($this->outputIsRequested('elements', $options['selectSelements']) && $selements) {
+				$selementids = [];
+				foreach ($selements as &$selement) {
+					$selement['elements'] = [];
+				}
+				unset($selement);
+
+				$selement_triggers = API::getApiService()->select('sysmap_element_trigger', [
+					'output' => ['selementid', 'triggerid'],
+					'filter' => ['selementid' => array_keys($selements)]
+				]);
+				foreach ($selement_triggers as $selement_trigger) {
+					$selements[$selement_trigger['selementid']]['elements'][] = [
+						'triggerid' => $selement_trigger['triggerid']
+					];
+				}
+
+				$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP, SYSMAP_ELEMENT_TYPE_HOST_GROUP];
+				foreach ($selements as &$selement) {
+					if (in_array($selement['elementtype'], $single_element_types)) {
+						switch ($selement['elementtype']) {
+							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+								$field = 'groupid';
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_HOST:
+								$field = 'hostid';
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_MAP:
+								$field = 'sysmapid';
+								break;
+						}
+						$selement['elements'][] = [$field => $selement['elementid']];
+					}
+
+					unset($selement['elementid']);
+				}
+				unset($selement);
+			}
+
+			if ($options['selectSelements'] != API_OUTPUT_EXTEND
+					&& !in_array('elementtype', $options['selectSelements'])) {
+				foreach ($selements as &$selement) {
+					unset($selement['elementtype']);
+				}
+				unset($selement);
 			}
 
 			$selements = $this->unsetExtraFields($selements, ['sysmapid', 'selementid'], $options['selectSelements']);

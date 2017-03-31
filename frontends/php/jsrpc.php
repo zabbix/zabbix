@@ -196,6 +196,28 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'trigger.get':
+		$config = select_config();
+		$result = [];
+
+		$triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'priority'],
+			'triggerids' => $data['triggerids'],
+			'limit' => $config['search_limit']
+		]);
+
+		if ($triggers) {
+			CArrayHelper::sort($triggers, [
+				['field' => 'priority', 'order' => ZBX_SORT_DOWN]
+			]);
+
+			foreach ($triggers as $trigger) {
+				$trigger['color'] = getSeverityColor($trigger['priority']);
+				$result[] = $trigger;
+			}
+		}
+		break;
+
 	/**
 	 * Create multi select data.
 	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers"

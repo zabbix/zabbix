@@ -21,55 +21,190 @@
 
 /**
  * Class containing methods for operations with map elements.
+ *
+ * @return mixed
  */
 abstract class CMapElement extends CApiService {
 
 	protected function checkSelementInput(&$selements, $method) {
-		$update = ($method == 'updateSelements');
-		$delete = ($method == 'deleteSelements');
+		$create = ($method === 'createSelements');
+		$update = ($method === 'updateSelements');
 
-		// permissions
-		if ($update || $delete) {
-			$selementDbFields = ['selementid' => null];
+		$element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP, SYSMAP_ELEMENT_TYPE_TRIGGER,
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP, SYSMAP_ELEMENT_TYPE_IMAGE
+		];
 
-			$dbSelements = $this->fetchSelementsByIds(zbx_objectValues($selements, 'selementid'));
+		$elementtype_validator = new CLimitedSetValidator(['values' => $element_types]);
 
-			if ($update) {
-				$selements = $this->extendFromObjects($selements, $dbSelements, ['elementtype', 'elementid']);
-			}
-		}
-		else {
-			$selementDbFields = [
-				'sysmapid' => null,
-				'elementid' => null,
-				'elementtype' => null,
-				'iconid_off' => null,
-				'urls' => []
-			];
+		if ($update) {
+			$db_selements = $this->fetchSelementsByIds(zbx_objectValues($selements, 'selementid'));
+			$selements = $this->extendFromObjects(zbx_toHash($selements, 'selementid'), $db_selements, ['elementtype', 'elements']);
 		}
 
 		foreach ($selements as &$selement) {
-			if (!check_db_fields($selementDbFields, $selement)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for element.'));
+			if (!is_array($selement)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			if ($update || $delete) {
-				if (!isset($dbSelements[$selement['selementid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			if ($create) {
+				// Check required parameters.
+				$missing_keys = array_diff(['sysmapid', 'elementtype', 'iconid_off'], array_keys($selement));
+
+				if ($missing_keys) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Map element is missing parameters: %1$s', implode(', ', $missing_keys))
+					);
+				}
+			}
+
+			/*
+			 * @deprecated  As of version 3.4, use elements data array.
+			 */
+			if (array_key_exists('elementid', $selement)) {
+				$this->deprecated('elementid is deprecated parameter.');
+
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+						$selement['elements'][0]['groupid'] = $selement['elementid'];
+						break;
+
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						$selement['elements'][0]['hostid'] = $selement['elementid'];
+						break;
+
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$selement['elements'][0]['triggerid'] = $selement['elementid'];
+						break;
+
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$selement['elements'][0]['sysmapid'] = $selement['elementid'];
+						break;
 				}
 
-				$dbSelement = array_merge($dbSelements[$selement['selementid']], $selement);
+				unset($selement['elementid']);
+			}
+
+			if ($update && array_key_exists('selementid', $selement)
+						&& array_key_exists($selement['selementid'], $db_selements)) {
+				$db_selement = $db_selements[$selement['selementid']];
+			}
+
+			if (!$elementtype_validator->validate($selement['elementtype'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'expandproblem', _s('value must be one of %1$s', implode(', ', $element_types))
+				));
+			}
+
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE) {
+				unset($selement['elements']);
 			}
 			else {
-				$dbSelement = $selement;
+				if (!array_key_exists('elements', $selement)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Map element is missing parameters: %1$s', 'elements')
+					);
+				}
+
+				if (!is_array($selement['elements'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
+				if (!$selement['elements']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'elements', _('cannot be empty'))
+					);
+				}
+			}
+
+			if (array_key_exists('elements', $selement)) {
+				if (!is_array($selement['elements'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+			}
+
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				foreach ($selement['elements'] as $element) {
+					if (!array_key_exists('triggerid', $element)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map element is missing parameters: %1$s', 'triggerid')
+						);
+					}
+
+					if (is_array($element['triggerid'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+					}
+					elseif ($element['triggerid'] === '' || $element['triggerid'] === null
+							|| $element['triggerid'] === false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', 'triggerid', _('cannot be empty'))
+						);
+					}
+				}
+			}
+			else {
+				if (array_key_exists('elements', $selement)) {
+					switch ($selement['elementtype']) {
+						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+							$field = 'groupid';
+							break;
+
+						case SYSMAP_ELEMENT_TYPE_HOST:
+							$field = 'hostid';
+							break;
+
+						case SYSMAP_ELEMENT_TYPE_MAP:
+							$field = 'sysmapid';
+							break;
+					}
+
+					$elements = reset($selement['elements']);
+
+					if (!is_array($elements)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+					}
+
+					if (!array_key_exists($field, $elements)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map element is missing parameters: %1$s', $field)
+						);
+					}
+
+					if (is_array($elements[$field])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+					}
+					elseif ($elements[$field] === '' || $elements[$field] === null || $elements[$field] === false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
+						);
+					}
+
+					if (count($selement['elements']) > 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', 'elements', _('incorrect element count'))
+						);
+					}
+				}
 			}
 
 			if (isset($selement['iconid_off']) && $selement['iconid_off'] == 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No icon for map element "%s".', $selement['label']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No icon for map element "%s".',
+						array_key_exists('label', $selement) ? $selement['label'] : '')
+				);
 			}
 
-			if ($this->checkCircleSelementsLink($dbSelement['sysmapid'], $dbSelement['elementid'], $dbSelement['elementtype'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular link cannot be created for map element "%s".', $dbSelement['label']));
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+				$label = array_key_exists('label', $selement) ? $selement['label'] : '';
+				foreach ($selement['elements'] as $element) {
+					if ($this->checkCircleSelementsLink($selement['sysmapid'], $element['sysmapid'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Circular link cannot be created for map element "%s".', $label)
+						);
+					}
+				}
+			}
+
+			if ($create) {
+				$selement['urls'] = array_key_exists('urls', $selement) ? $selement['urls'] : [];
 			}
 		}
 		unset($selement);
@@ -77,7 +212,7 @@ abstract class CMapElement extends CApiService {
 		// check permissions to used objects
 		$this->checkSelementPermissions($selements);
 
-		return ($update || $delete) ? $dbSelements : true;
+		return $update ? $db_selements : true;
 	}
 
 	protected function checkShapeInput(&$shapes, $method) {
@@ -171,10 +306,6 @@ abstract class CMapElement extends CApiService {
 	 * @param array $selements
 	 */
 	protected function checkSelementPermissions(array $selements) {
-		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
-			return;
-		}
-
 		$groupids = [];
 		$hostids = [];
 		$triggerids = [];
@@ -183,19 +314,21 @@ abstract class CMapElement extends CApiService {
 		foreach ($selements as $selement) {
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$groupids[$selement['elementid']] = true;
+					$groupids[$selement['elements'][0]['groupid']] = true;
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_HOST:
-					$hostids[$selement['elementid']] = true;
+					$hostids[$selement['elements'][0]['hostid']] = true;
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$triggerids[$selement['elementid']] = true;
+					foreach ($selement['elements'] as $element) {
+						$triggerids[$element['triggerid']] = true;
+					}
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_MAP:
-					$sysmapids[$selement['elementid']] = true;
+					$sysmapids[$selement['elements'][0]['sysmapid']] = true;
 					break;
 			}
 		}
@@ -311,6 +444,7 @@ abstract class CMapElement extends CApiService {
 		if ($selements) {
 			foreach ($selements as &$selement) {
 				$selement['urls'] = [];
+				$selement['elements'] = [];
 			}
 			unset($selement);
 
@@ -321,6 +455,41 @@ abstract class CMapElement extends CApiService {
 			foreach ($selementUrls as $selementUrl) {
 				$selements[$selementUrl['selementid']]['urls'][] = $selementUrl;
 			}
+
+			$selement_triggers = API::getApiService()->select('sysmap_element_trigger', [
+				'output' => ['selement_triggerid', 'selementid', 'triggerid'],
+				'filter' => ['selementid' => $selementIds]
+			]);
+
+			foreach ($selement_triggers as $selement_trigger) {
+				$selements[$selement_trigger['selementid']]['elements'][] = [
+					'selement_triggerid' => $selement_trigger['selement_triggerid'],
+					'triggerid' => $selement_trigger['triggerid']
+				];
+			}
+
+			$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP, SYSMAP_ELEMENT_TYPE_HOST_GROUP];
+			foreach ($selements as &$selement) {
+				if (in_array($selement['elementtype'], $single_element_types)) {
+					switch ($selement['elementtype']) {
+						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+							$field = 'groupid';
+							break;
+
+						case SYSMAP_ELEMENT_TYPE_HOST:
+							$field = 'hostid';
+							break;
+
+						case SYSMAP_ELEMENT_TYPE_MAP:
+							$field = 'sysmapid';
+							break;
+					}
+					$selement['elements'][] = [$field => $selement['elementid']];
+				}
+
+				unset($selement['elementid']);
+			}
+			unset($selement);
 		}
 
 		return $selements;
@@ -369,11 +538,7 @@ abstract class CMapElement extends CApiService {
 		return true;
 	}
 
-	public function checkCircleSelementsLink($sysmapId, $elementId, $elementType) {
-		if ($elementType != SYSMAP_ELEMENT_TYPE_MAP) {
-			return false;
-		}
-
+	public function checkCircleSelementsLink($sysmapId, $elementId) {
 		if (bccomp($sysmapId, $elementId) == 0) {
 			return true;
 		}
@@ -385,7 +550,8 @@ abstract class CMapElement extends CApiService {
 				' AND se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP
 		);
 		while ($element = DBfetch($dbElements)) {
-			if ($this->checkCircleSelementsLink($sysmapId, $element['elementid'], $element['elementtype'])) {
+			// get data from sysmap_element_trigger if type trigger
+			if ($this->checkCircleSelementsLink($sysmapId, $element['elementid'])) {
 				return true;
 			}
 		}
@@ -415,13 +581,67 @@ abstract class CMapElement extends CApiService {
 
 		$this->checkSelementInput($selements, __FUNCTION__);
 
-		$selementIds = DB::insert('sysmaps_elements', $selements);
+		$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP, SYSMAP_ELEMENT_TYPE_HOST_GROUP];
+		foreach ($selements as &$selement) {
+			if (in_array($selement['elementtype'], $single_element_types)) {
+				$selement['elementid'] = reset($selement['elements'][0]);
+			}
+			elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				unset($selement['elementid']);
+			}
+		}
+		unset($selement);
+
+		$selementids = DB::insert('sysmaps_elements', $selements);
+
+		$triggerids = [];
+
+		foreach ($selementids as $key => $selementid) {
+			if ($selements[$key]['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				foreach ($selements[$key]['elements'] as $element) {
+					$triggerids[$element['triggerid']] = true;
+				}
+			}
+		}
+
+		$db_triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'priority'],
+			'triggerids' => array_keys($triggerids),
+			'preservekeys' => true
+		]);
+
+		$triggers = [];
+
+		foreach ($selementids as $key => $selementid) {
+			if ($selements[$key]['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				foreach ($selements[$key]['elements'] as $element) {
+					$priority = $db_triggers[$element['triggerid']]['priority'];
+					$triggers[$selementid][$priority][] = [
+						'selementid' => $selementid,
+						'triggerid' => $element['triggerid']
+					];
+				}
+				krsort($triggers[$selementid]);
+			}
+		}
+
+		$triggers_to_add = [];
+
+		foreach ($triggers as $selement_triggers) {
+			foreach ($selement_triggers as $selement_trigger_priorities) {
+				foreach ($selement_trigger_priorities as $selement_trigger_priority) {
+					$triggers_to_add[] = $selement_trigger_priority;
+				}
+			}
+		}
+
+		DB::insert('sysmap_element_trigger', $triggers_to_add);
 
 		$insertUrls = [];
 
-		foreach ($selementIds as $key => $selementId) {
+		foreach ($selementids as $key => $selementid) {
 			foreach ($selements[$key]['urls'] as $url) {
-				$url['selementid'] = $selementId;
+				$url['selementid'] = $selementid;
 
 				$insertUrls[] = $url;
 			}
@@ -429,7 +649,7 @@ abstract class CMapElement extends CApiService {
 
 		DB::insert('sysmap_element_url', $insertUrls);
 
-		return ['selementids' => $selementIds];
+		return ['selementids' => $selementids];
 	}
 
 	/**
@@ -452,11 +672,60 @@ abstract class CMapElement extends CApiService {
 		$selements = zbx_toArray($selements);
 		$selementIds = [];
 
-		$dbSelements = $this->checkSelementInput($selements, __FUNCTION__);
+		$db_selements = $this->checkSelementInput($selements, __FUNCTION__);
 
 		$update = [];
-		$urlsToDelete = $urlsToUpdate = $urlsToAdd = [];
-		foreach ($selements as $selement) {
+		$urlsToDelete = [];
+		$urlsToUpdate = [];
+		$urlsToAdd = [];
+		$triggers_to_add = [];
+		$triggers_to_delete = [];
+		$triggerids = [];
+
+		foreach ($selements as &$selement) {
+			$db_selement = $db_selements[$selement['selementid']];
+
+			// Change type from something to trigger.
+			if ($selement['elementtype'] != $db_selement['elementtype']
+					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$selement['elementid'] = 0;
+
+				foreach ($selement['elements'] as $element) {
+					$triggerids[$element['triggerid']] = true;
+				}
+			}
+
+			// Change type from trigger to something.
+			if ($selement['elementtype'] != $db_selement['elementtype']
+					&& $db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				foreach ($selement['elements'] as $element) {
+					$triggers_to_delete[] = $element['triggerid'];
+				}
+			}
+
+			if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE
+					&& $selement['elementtype'] != SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$selement['elementid'] = reset($selement['elements'][0]);
+			}
+
+			$db_elements = $db_selement['elements'];
+
+			foreach ($db_selement['elements'] as &$element) {
+				unset($element['selement_triggerid']);
+			}
+			unset($element);
+
+			if ($selement['elementtype'] == $db_selement['elementtype']
+					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				foreach ($db_elements as $element) {
+					$triggers_to_delete[] = $element['selement_triggerid'];
+				}
+
+				foreach ($selement['elements'] as $element) {
+					$triggerids[$element['triggerid']] = true;
+				}
+			}
+
 			$update[] = [
 				'values' => $selement,
 				'where' => ['selementid' => $selement['selementid']],
@@ -467,7 +736,7 @@ abstract class CMapElement extends CApiService {
 				continue;
 			}
 
-			$diffUrls = zbx_array_diff($selement['urls'], $dbSelements[$selement['selementid']]['urls'], 'name');
+			$diffUrls = zbx_array_diff($selement['urls'], $db_selement['urls'], 'name');
 
 			// add
 			foreach ($diffUrls['first'] as $newUrl) {
@@ -489,6 +758,40 @@ abstract class CMapElement extends CApiService {
 			// delete url
 			$urlsToDelete = array_merge($urlsToDelete, zbx_objectValues($diffUrls['second'], 'sysmapelementurlid'));
 		}
+		unset($selement);
+
+		$db_triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'priority'],
+			'triggerids' => array_keys($triggerids),
+			'preservekeys' => true
+		]);
+
+		$triggers = [];
+
+		foreach ($selements as $key => $selement) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$selementid = $selement['selementid'];
+
+				foreach ($selement['elements'] as $element) {
+					$priority = $db_triggers[$element['triggerid']]['priority'];
+					$triggers[$selementid][$priority][] = [
+						'selementid' => $selementid,
+						'triggerid' => $element['triggerid']
+					];
+				}
+				krsort($triggers[$selementid]);
+			}
+		}
+
+		$triggers_to_add = [];
+
+		foreach ($triggers as $selement_triggers) {
+			foreach ($selement_triggers as $selement_trigger_priorities) {
+				foreach ($selement_trigger_priorities as $selement_trigger_priority) {
+					$triggers_to_add[] = $selement_trigger_priority;
+				}
+			}
+		}
 
 		DB::update('sysmaps_elements', $update);
 
@@ -504,6 +807,14 @@ abstract class CMapElement extends CApiService {
 			DB::insert('sysmap_element_url', $urlsToAdd);
 		}
 
+		if ($triggers_to_delete) {
+			DB::delete('sysmap_element_trigger', ['selement_triggerid' => $triggers_to_delete]);
+		}
+
+		if ($triggers_to_add) {
+			DB::insert('sysmap_element_trigger', $triggers_to_add);
+		}
+
 		return ['selementids' => $selementIds];
 	}
 
@@ -516,8 +827,6 @@ abstract class CMapElement extends CApiService {
 	protected function deleteSelements(array $selements) {
 		$selements = zbx_toArray($selements);
 		$selementIds = zbx_objectValues($selements, 'selementid');
-
-		$this->checkSelementInput($selements, __FUNCTION__);
 
 		DB::delete('sysmaps_elements', ['selementid' => $selementIds]);
 

@@ -1501,8 +1501,13 @@ FIELD		|background_color|t_varchar(6)	|''	|NOT NULL	|0
 FIELD		|zindex		|t_integer	|'-1'	|NOT NULL	|0
 INDEX		|1		|sysmapid
 
+TABLE|sysmap_element_trigger|selement_triggerid|ZBX_DATA
+FIELD		|selement_triggerid	|t_id	|	|NOT NULL	|0
+FIELD		|selementid		|t_id	|	|NOT NULL	|0			|1|sysmaps_elements
+FIELD		|triggerid		|t_id	|	|NOT NULL	|0			|2|triggers
+INDEX		|1			|selementid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030048	|3030048
-
+ROW		|3030053	|3030053

@@ -930,7 +930,7 @@ class C34XmlValidator {
 						'selement' =>				['type' => XML_ARRAY, 'rules' => [
 							// The tag 'elementtype' should be validated before the 'element' because it is used in 'ex_required' and 'ex_validate' methods.
 							'elementtype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'element' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElement']],
+							'elements' =>				['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateMapElements']],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],
@@ -1060,15 +1060,15 @@ class C34XmlValidator {
 	}
 
 	/**
-	 * Validate map element.
+	 * Validate map elements.
 	 *
 	 * @param string $data			import data
 	 * @param array  $parent_data	data's parent array
 	 * @param string $path			XML path
 	 *
-	 * @throws Exception			if the map element is invalid
+	 * @throws Exception			if the map elements are invalid
 	 */
-	public function validateMapElement($data, array $parent_data = null, $path) {
+	public function validateMapElements($data, array $parent_data = null, $path) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
@@ -1101,6 +1101,9 @@ class C34XmlValidator {
 					return $data;
 			}
 
+			$rules = ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'element', 'rules' => [
+				'element' => $rules
+			]];
 			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 		}
 
