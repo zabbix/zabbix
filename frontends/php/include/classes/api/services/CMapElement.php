@@ -594,16 +594,48 @@ abstract class CMapElement extends CApiService {
 
 		$selementids = DB::insert('sysmaps_elements', $selements);
 
-		$triggers = [];
+		$triggerids = [];
+
 		foreach ($selementids as $key => $selementid) {
 			if ($selements[$key]['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
 				foreach ($selements[$key]['elements'] as $element) {
-					$triggers[] = ['selementid' => $selementid, 'triggerid' => $element['triggerid']];
+					$triggerids[$element['triggerid']] = true;
 				}
 			}
 		}
 
-		DB::insert('sysmap_element_trigger', $triggers);
+		$db_triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'priority'],
+			'triggerids' => array_keys($triggerids),
+			'preservekeys' => true
+		]);
+
+		$triggers = [];
+
+		foreach ($selementids as $key => $selementid) {
+			if ($selements[$key]['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				foreach ($selements[$key]['elements'] as $element) {
+					$priority = $db_triggers[$element['triggerid']]['priority'];
+					$triggers[$selementid][$priority][] = [
+						'selementid' => $selementid,
+						'triggerid' => $element['triggerid']
+					];
+				}
+				krsort($triggers[$selementid]);
+			}
+		}
+
+		$triggers_to_add = [];
+
+		foreach ($triggers as $selement_triggers) {
+			foreach ($selement_triggers as $selement_trigger_priorities) {
+				foreach ($selement_trigger_priorities as $selement_trigger_priority) {
+					$triggers_to_add[] = $selement_trigger_priority;
+				}
+			}
+		}
+
+		DB::insert('sysmap_element_trigger', $triggers_to_add);
 
 		$insertUrls = [];
 
@@ -648,6 +680,7 @@ abstract class CMapElement extends CApiService {
 		$urlsToAdd = [];
 		$triggers_to_add = [];
 		$triggers_to_delete = [];
+		$triggerids = [];
 
 		foreach ($selements as &$selement) {
 			$db_selement = $db_selements[$selement['selementid']];
@@ -658,17 +691,13 @@ abstract class CMapElement extends CApiService {
 				$selement['elementid'] = 0;
 
 				foreach ($selement['elements'] as $element) {
-					$triggers_to_add[] = [
-						'selementid' => $selement['selementid'],
-						'triggerid' => $element['triggerid']
-					];
+					$triggerids[$element['triggerid']] = true;
 				}
 			}
 
 			// Change type from trigger to something.
 			if ($selement['elementtype'] != $db_selement['elementtype']
 					&& $db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-
 				foreach ($selement['elements'] as $element) {
 					$triggers_to_delete[] = $element['triggerid'];
 				}
@@ -687,17 +716,13 @@ abstract class CMapElement extends CApiService {
 			unset($element);
 
 			if ($selement['elementtype'] == $db_selement['elementtype']
-					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
-					&& $selement['elements'] != $db_selement['elements']) {
+					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
 				foreach ($db_elements as $element) {
 					$triggers_to_delete[] = $element['selement_triggerid'];
 				}
 
 				foreach ($selement['elements'] as $element) {
-					$triggers_to_add[] = [
-						'selementid' => $selement['selementid'],
-						'triggerid' => $element['triggerid']
-					];
+					$triggerids[$element['triggerid']] = true;
 				}
 			}
 
@@ -734,6 +759,39 @@ abstract class CMapElement extends CApiService {
 			$urlsToDelete = array_merge($urlsToDelete, zbx_objectValues($diffUrls['second'], 'sysmapelementurlid'));
 		}
 		unset($selement);
+
+		$db_triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'priority'],
+			'triggerids' => array_keys($triggerids),
+			'preservekeys' => true
+		]);
+
+		$triggers = [];
+
+		foreach ($selements as $key => $selement) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$selementid = $selement['selementid'];
+
+				foreach ($selement['elements'] as $element) {
+					$priority = $db_triggers[$element['triggerid']]['priority'];
+					$triggers[$selementid][$priority][] = [
+						'selementid' => $selementid,
+						'triggerid' => $element['triggerid']
+					];
+				}
+				krsort($triggers[$selementid]);
+			}
+		}
+
+		$triggers_to_add = [];
+
+		foreach ($triggers as $selement_triggers) {
+			foreach ($selement_triggers as $selement_trigger_priorities) {
+				foreach ($selement_trigger_priorities as $selement_trigger_priority) {
+					$triggers_to_add[] = $selement_trigger_priority;
+				}
+			}
+		}
 
 		DB::update('sysmaps_elements', $update);
 
