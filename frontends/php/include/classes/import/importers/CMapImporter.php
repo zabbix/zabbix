@@ -137,7 +137,7 @@ class CMapImporter extends CImporter {
 			return false;
 		}
 
-		$elementMapName = $element['element']['name'];
+		$elementMapName = $element['elements'][0]['name'];
 
 		// If current element map name is already in list of checked map names, circular reference exists.
 		if (in_array($elementMapName, $checked)) {
