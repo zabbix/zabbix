@@ -115,6 +115,7 @@ typedef struct
 	zbx_binary_heap_t	queue;
 
 	int			location;
+	int			alerts_num;
 
 	/* the number of alert objects for this alert pool */
 	int			refcount;
@@ -347,15 +348,13 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, int
 
 	if (NULL == (mediatype = am_get_mediatype(manager, mediatypeid)))
 	{
-		zbx_am_mediatype_t	mediatype_local = {mediatypeid, ZBX_AM_LOCATION_NOWHERE};
+		zbx_am_mediatype_t	mediatype_local = {mediatypeid, ZBX_AM_LOCATION_NOWHERE, 0, 0};
 
 		mediatype = (zbx_am_mediatype_t *)zbx_hashset_insert(&manager->mediatypes, &mediatype_local,
 				sizeof(mediatype_local));
 
 		zbx_binary_heap_create(&mediatype->queue, am_alertpool_queue_compare,
 				ZBX_BINARY_HEAP_OPTION_DIRECT);
-
-		mediatype->refcount = 0;
 	}
 
 	mediatype->type = type;
@@ -531,6 +530,7 @@ static zbx_am_alertpool_t	*am_get_alertpool(zbx_am_t *manager, zbx_uint64_t medi
 
 		alertpool->location = ZBX_AM_LOCATION_NOWHERE;
 		alertpool->refcount = 0;
+		alertpool->alerts_num = 0;
 	}
 
 	return alertpool;
@@ -555,8 +555,11 @@ static void	am_push_alertpool(zbx_am_mediatype_t *mediatype, zbx_am_alertpool_t 
 
 	if (ZBX_AM_LOCATION_NOWHERE == alertpool->location)
 	{
-		zbx_binary_heap_insert(&mediatype->queue, &elem);
-		alertpool->location = ZBX_AM_LOCATION_QUEUE;
+		if (0 == alertpool->alerts_num)
+		{
+			zbx_binary_heap_insert(&mediatype->queue, &elem);
+			alertpool->location = ZBX_AM_LOCATION_QUEUE;
+		}
 	}
 	else
 		zbx_binary_heap_update_direct(&mediatype->queue, &elem);
@@ -711,6 +714,7 @@ static zbx_am_alert_t	*am_pop_alert(zbx_am_t *manager)
 
 	/* requeue media type if the number of parallel alerts has not yet reached */
 	mediatype->alerts_num++;
+	alertpool->alerts_num++;
 	if (0 == mediatype->maxsessions || mediatype->alerts_num < mediatype->maxsessions)
 		am_push_mediatype(manager, mediatype);
 
@@ -738,6 +742,7 @@ static void	am_remove_alert(zbx_am_t *manager, zbx_am_alert_t *alert)
 
 		if (NULL != (alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid)))
 		{
+			alertpool->alerts_num--;
 			if (SUCCEED != am_release_alertpool(manager, alertpool))
 				am_push_alertpool(mediatype, alertpool);
 		}
@@ -787,8 +792,10 @@ static int	am_retry_alert(zbx_am_t *manager, zbx_am_alert_t *alert)
 
 	alert->nextsend = time(NULL) + mediatype->attempt_interval;
 
-	mediatype->alerts_num--;
 	alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
+
+	mediatype->alerts_num--;
+	alertpool->alerts_num--;
 
 	am_push_alert(alertpool, alert);
 	am_push_alertpool(mediatype, alertpool);
@@ -1279,11 +1286,12 @@ static int	am_db_queue_alerts(zbx_am_t *manager, int now)
 
 			alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
 
+			alertpool->refcount++;
+			mediatype->refcount++;
+
 			am_push_alert(alertpool, alert);
 			am_push_alertpool(mediatype, alertpool);
 			am_push_mediatype(manager, mediatype);
-			alertpool->refcount++;
-			mediatype->refcount++;
 		}
 	}
 out:
