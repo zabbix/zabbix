@@ -161,7 +161,6 @@ int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
-int	CONFIG_SENDER_FREQUENCY		= 5;
 int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
@@ -564,8 +563,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			24},
 		{"MaxHousekeeperDelete",	&CONFIG_MAX_HOUSEKEEPER_DELETE,		TYPE_INT,
 			PARM_OPT,	0,			1000000},
-		{"SenderFrequency",		&CONFIG_SENDER_FREQUENCY,		TYPE_INT,
-			PARM_OPT,	5,			SEC_PER_HOUR},
 		{"TmpDir",			&CONFIG_TMPDIR,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"FpingLocation",		&CONFIG_FPING_LOCATION,			TYPE_STRING,

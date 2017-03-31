@@ -35,11 +35,12 @@
 
 #define ZBX_WATCHDOG_ALERT_FREQUENCY	(15 * SEC_PER_MIN)
 
+#define ZBX_AM_DB_POLL_DELAY	1
+
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 extern int	CONFIG_ALERTER_FORKS;
-extern int	CONFIG_SENDER_FREQUENCY;
 extern int	CONFIG_CONFSYNCER_FREQUENCY;
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 
@@ -1930,7 +1931,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 		zbx_handle_log();
 
-		if (ZBX_DB_OK == manager.dbstatus && now - time_db >= CONFIG_SENDER_FREQUENCY)
+		if (ZBX_DB_OK == manager.dbstatus && now - time_db >= ZBX_AM_DB_POLL_DELAY)
 		{
 			if (SUCCEED == (ret = am_db_queue_alerts(&manager, now)))
 				ret = am_db_flush_alert_updates(&manager);
