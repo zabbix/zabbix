@@ -415,6 +415,16 @@ static int	DBpatch_3030034(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3030035(void)
+{
+	return DBdrop_index("alerts", "alerts_4");
+}
+
+static int	DBpatch_3030036(void)
+{
+	return DBcreate_index("alerts", "alerts_4", "status", 0);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -456,5 +466,7 @@ DBPATCH_ADD(3030031, 0, 1)
 DBPATCH_ADD(3030032, 0, 1)
 DBPATCH_ADD(3030033, 0, 1)
 DBPATCH_ADD(3030034, 0, 1)
+DBPATCH_ADD(3030035, 0, 1)
+DBPATCH_ADD(3030036, 0, 1)
 
 DBPATCH_END()
