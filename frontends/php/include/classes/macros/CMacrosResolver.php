@@ -1732,7 +1732,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				// Get all function ids from expression and link host data against position in expression.
-				preg_match_all('/\{([0-9]+)\}/', $selement['elementExpressionTrigger'], $matches);
+				preg_match_all('/\{([0-9]+)\}/', $selement['elements'][0]['elementExpressionTrigger'], $matches);
 
 				$hostsByNr = [];
 
