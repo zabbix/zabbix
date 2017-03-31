@@ -262,6 +262,7 @@ static int	am_alertpool_compare_func(const void *d1, const void *d2)
 static int	am_alert_compare(const zbx_am_alert_t *alert1, const zbx_am_alert_t *alert2)
 {
 	ZBX_RETURN_IF_NOT_EQUAL(alert1->nextsend, alert2->nextsend);
+	ZBX_RETURN_IF_NOT_EQUAL(alert1->alertid, alert2->alertid);
 
 	return 0;
 }
