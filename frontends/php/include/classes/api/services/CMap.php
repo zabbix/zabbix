@@ -247,13 +247,13 @@ class CMap extends CMapElement {
 				}
 
 				$db_element_triggers = DBselect(
-					'SELECT et.triggerid'.
+					'SELECT et.selementid,et.triggerid'.
 					' FROM sysmap_element_trigger et'.
 					' WHERE '.dbConditionInt('et.selementid', array_keys($trigger_selementids))
 				);
 
 				while ($db_element_trigger = DBfetch($db_element_triggers)) {
-					$triggersToCheck[$db_element_trigger['triggerid']] = $db_element_trigger['triggerid'];
+					$triggersToCheck[$db_element_trigger['selementid']] = $db_element_trigger['triggerid'];
 				}
 
 				if ($hostsToCheck) {
@@ -301,11 +301,9 @@ class CMap extends CMapElement {
 						'output' => ['triggerid']
 					]);
 
-					foreach ($triggersToCheck as $elementid) {
-						if (!isset($allowedTriggers[$elementid])) {
-							foreach ($selements as $selementid => $selement) {
-								unset($result[$selements_maps[$selementid]], $selements[$selementid]);
-							}
+					foreach ($triggersToCheck as $selementid => $triggerid) {
+						if (!array_key_exists($triggerid, $allowedTriggers)) {
+							unset($result[$selements_maps[$selementid]], $selements[$selementid]);
 						}
 					}
 				}
