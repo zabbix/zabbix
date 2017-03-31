@@ -574,6 +574,20 @@ static int	DBpatch_3030046(void)
 
 static int	DBpatch_3030047(void)
 {
+	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field);
+}
+
+static int	DBpatch_3030048(void)
+{
+	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("alerts", &field);
+}
+
+static int	DBpatch_3030049(void)
+{
 	const ZBX_TABLE table =
 			{"sysmap_element_trigger", "selement_triggerid", 0,
 				{
@@ -588,26 +602,26 @@ static int	DBpatch_3030047(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3030048(void)
+static int	DBpatch_3030050(void)
 {
 	return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_1", "selementid", 0);
 }
 
-static int	DBpatch_3030049(void)
+static int	DBpatch_3030051(void)
 {
 	const ZBX_FIELD	field = {"selementid", NULL, "sysmaps_elements", "selementid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sysmap_element_trigger", 1, &field);
 }
 
-static int	DBpatch_3030050(void)
+static int	DBpatch_3030052(void)
 {
 	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sysmap_element_trigger", 2, &field);
 }
 
-static int	DBpatch_3030051(void)
+static int	DBpatch_3030053(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -698,5 +712,7 @@ DBPATCH_ADD(3030048, 0, 1)
 DBPATCH_ADD(3030049, 0, 1)
 DBPATCH_ADD(3030050, 0, 1)
 DBPATCH_ADD(3030051, 0, 1)
+DBPATCH_ADD(3030052, 0, 1)
+DBPATCH_ADD(3030053, 0, 1)
 
 DBPATCH_END()

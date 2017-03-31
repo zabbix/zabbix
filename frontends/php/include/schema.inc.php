@@ -2737,7 +2737,7 @@ return [
 			'error' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 2048,
 				'default' => '',
 			],
 			'templateid' => [
@@ -4362,7 +4362,7 @@ return [
 			'error' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 2048,
 				'default' => '',
 			],
 			'esc_step' => [
