@@ -921,9 +921,11 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 		if (NULL == (mediatype = am_get_mediatype(manager, media->mediatypeid)))
 			continue;
 
+		mediatype->refcount++;
 		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, message, message, 0, 0, 0);
 
 		alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
+		alertpool->refcount++;
 
 		am_push_alert(alertpool, alert);
 		am_push_alertpool(mediatype, alertpool);
@@ -1287,7 +1289,7 @@ static int	am_db_queue_alerts(zbx_am_t *manager, int now)
 out:
 	zbx_vector_ptr_destroy(&alerts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1415,11 +1417,13 @@ static int	am_db_flush_alert_updates(zbx_am_t *manager)
 		zbx_free(update->error);
 
 	zbx_hashset_clear(&manager->alertupdates);
+
+	ret = SUCCEED;
 cleanup:
 	zbx_free(sql);
 	zbx_vector_ptr_destroy(&updates);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1545,7 +1549,8 @@ static int	am_db_sync_watchdog(zbx_am_t *manager)
 
 	old_count = manager->watchdog.num_data;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __function_name, manager->watchdog.num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s recipients:%d", __function_name, zbx_result_string(ret),
+			manager->watchdog.num_data);
 
 	return ret;
 }
