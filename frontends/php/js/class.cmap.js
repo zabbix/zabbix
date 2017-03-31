@@ -2225,7 +2225,8 @@ ZABBIX.apps.map = (function($) {
 					element,
 					elementTypeText,
 					i,
-					ln;
+					ln,
+					name;
 
 				$('#massList tbody').empty();
 
@@ -2240,9 +2241,26 @@ ZABBIX.apps.map = (function($) {
 						case '4': elementTypeText = locale['S_IMAGE']; break;
 					}
 
+					name = element.data.elementName;
+					if (name === undefined) {
+						if (typeof element.data.elements === 'object') {
+							var names = [],
+								keys = Object.keys(element.data.elements);
+
+							for (i = 0; i < keys.length; i++) {
+								names.push(element.data.elements[keys[i]].elementName.escapeHTML());
+							}
+
+							name = names.join("<br>");
+						}
+					}
+					else {
+						name = name.escapeHTML();
+					}
+
 					list.push({
 						elementType: elementTypeText,
-						elementName: element.data.elementName
+						elementName: name
 					});
 				}
 

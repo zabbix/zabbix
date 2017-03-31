@@ -591,7 +591,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="mapMassFormListRow">
-	<?= (new CRow(['#{elementType}', '#{elementName}']))->toString() ?>
+	<?= (new CRow(['#{elementType}', '#{*elementName}']))->toString() ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="linkFormTpl">
