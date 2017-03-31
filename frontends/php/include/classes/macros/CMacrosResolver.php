@@ -1712,7 +1712,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					' WHERE h.hostid=hi.hostid'.
 						' AND hi.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
-						' AND hi.main=1 AND f.triggerid='.zbx_dbstr($selement['elementid']).
+						' AND hi.main=1 AND f.triggerid='.zbx_dbstr($selement['elements'][0]['triggerid']).
 					' ORDER BY f.functionid'
 				);
 
