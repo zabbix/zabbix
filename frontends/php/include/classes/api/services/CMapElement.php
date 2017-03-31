@@ -65,19 +65,19 @@ abstract class CMapElement extends CApiService {
 
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$selement['elements']['groupid'] = $selement['elementid'];
+						$selement['elements'][0]['groupid'] = $selement['elementid'];
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						$selement['elements']['hostid'] = $selement['elementid'];
+						$selement['elements'][0]['hostid'] = $selement['elementid'];
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$selement['elements']['triggerid'] = $selement['elementid'];
+						$selement['elements'][0]['triggerid'] = $selement['elementid'];
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$selement['elements']['sysmapid'] = $selement['elementid'];
+						$selement['elements'][0]['sysmapid'] = $selement['elementid'];
 						break;
 				}
 
