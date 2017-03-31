@@ -1933,8 +1933,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 		if (ZBX_DB_OK == manager.dbstatus && now - time_db >= ZBX_AM_DB_POLL_DELAY)
 		{
-			if (SUCCEED == (ret = am_db_queue_alerts(&manager, now)))
-				ret = am_db_flush_alert_updates(&manager);
+			if (SUCCEED == (ret = am_db_flush_alert_updates(&manager)))
+				ret = am_db_queue_alerts(&manager, now);
 
 			if (FAIL == ret)
 				manager.dbstatus = ZBX_DB_DOWN;
