@@ -126,7 +126,7 @@ ZABBIX.apps.map = (function($) {
 					selements: 0,
 					shapes: 0
 				},
-				selements: {}, // selected elements { elementid: elementid, ... }
+				selements: {}, // selected elements
 				shapes: {} // selected shapes
 			};
 			this.currentLinkId = '0'; // linkid of currently edited link
@@ -575,6 +575,12 @@ ZABBIX.apps.map = (function($) {
 							jQuery('#elementNameHost').multiSelect('clean');
 							break;
 
+						// triggers
+						case '2':
+							jQuery('#elementNameTriggers').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
+							break;
+
 						// host group
 						case '3':
 							jQuery('#elementNameHostGroup').multiSelect('clean');
@@ -583,7 +589,6 @@ ZABBIX.apps.map = (function($) {
 						// others types
 						default:
 							$('input[name=elementName]').val('');
-							$('#elementid').val('0');
 					}
 				});
 
@@ -639,6 +644,10 @@ ZABBIX.apps.map = (function($) {
 
 				$('#newSelementUrl').click($.proxy(function() {
 					this.form.addUrls();
+				}, this));
+
+				$('#newSelementTriggers').click($.proxy(function() {
+					this.form.addTriggers();
 				}, this));
 
 				$('#x, #y', this.form.domNode).change(function() {
@@ -757,6 +766,12 @@ ZABBIX.apps.map = (function($) {
 						delete this.selection[type][id];
 					}
 				}, this);
+
+				// Clean trigger selement.
+				if ($('#elementType').val() == 2) {
+					jQuery('#elementNameTriggers').multiSelect('clean');
+					$('#triggerContainer tbody').html('');
+				}
 			},
 
 			reorderShapes: function(id, position) {
@@ -1323,7 +1338,7 @@ ZABBIX.apps.map = (function($) {
 		 * @property {Object} sysmap reference to Map object
 		 * @property {Object} data selement db values
 		 * @property {Boolean} selected if element is now selected by user
-		 * @property {String} id elementid
+		 * @property {Object} id elements
 		 * @property {Object} domNode reference to related DOM element
 		 *
 		 * @param {Object} sysmap reference to Map object
@@ -1337,7 +1352,7 @@ ZABBIX.apps.map = (function($) {
 				selementData = {
 					selementid: getUniqueId(),
 					elementtype: '4', // image
-					elementid: 0,
+					elements: {},
 					iconid_off: this.sysmap.defaultIconId, // first imageid
 					label: locale['S_NEW_ELEMENT'],
 					label_location: -1, // set default map label location
@@ -1410,7 +1425,7 @@ ZABBIX.apps.map = (function($) {
 			update: function(data, unsetUndefined) {
 				var fieldName,
 					dataFelds = [
-						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
+						'elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
 						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
 						'application'
@@ -1578,7 +1593,7 @@ ZABBIX.apps.map = (function($) {
 					},
 					{
 						action: 'show',
-						value: '#triggerSelectRow',
+						value: '#triggerSelectRow, #triggerListRow',
 						cond: [{
 							elementType: '2'
 						}]
@@ -1688,6 +1703,20 @@ ZABBIX.apps.map = (function($) {
 				}
 			});
 
+			// triggers
+			$('#elementNameTriggers').multiSelectHelper({
+				id: 'elementNameTriggers',
+				objectName: 'triggers',
+				name: 'elementValue',
+				objectOptions: {
+					editable: true
+				},
+				popup: {
+					parameters: 'srctbl=triggers&dstfrm=selementForm&dstfld1=elementNameTriggers' +
+						'&srcfld1=triggerid&multiselect=1'
+				}
+			});
+
 			// host group
 			$('#elementNameHostGroup').multiSelectHelper({
 				id: 'elementNameHostGroup',
@@ -1753,6 +1782,63 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Add triggers to the list.
+			 */
+			addTriggers: function(triggers) {
+				var tpl = new Template($('#selementFormTriggers').html()),
+					selected_triggers = $('#elementNameTriggers').multiSelect('getData'),
+					triggerids = [],
+					triggers_to_insert = [];
+
+				if (typeof triggers === 'undefined' || $.isEmptyObject(triggers)) {
+					triggers = [];
+				}
+
+				triggers = triggers.concat(selected_triggers);
+
+				if (triggers) {
+					triggers.each(function(trigger) {
+						if ($('input[name^="element_id[' + trigger.id + ']"]').length == 0) {
+							triggerids.push(trigger.id);
+							triggers_to_insert[trigger.id] = {
+								id: trigger.id,
+								name: trigger.name
+							};
+						}
+					});
+
+					if (triggerids.length != 0) {
+						// get priority
+						var ajaxUrl = new Curl('jsrpc.php');
+						ajaxUrl.setArgument('type', 11);
+						ajaxUrl.setArgument('method', 'trigget.get');
+						$.ajax({
+							url: ajaxUrl.getUrl(),
+							type: 'post',
+							dataType: 'html',
+							data: {
+								method: 'trigger.get',
+								triggerids: triggerids
+							},
+							success: function(data) {
+								data = JSON.parse(data);
+								data.result.each(function(trigger) {
+									if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
+										trigger.name = triggers_to_insert[trigger.triggerid].name;
+										$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+									}
+								});
+
+								$('#elementNameTriggers').multiSelect('clean');
+								SelementForm.prototype.recalculateSortOrder();
+								SelementForm.prototype.initSortable();
+							}
+						});
+					}
+				}
+			},
+
+			/**
 			 * Set form controls with element fields values.
 			 *
 			 * @param {Object} selement
@@ -1786,24 +1872,39 @@ ZABBIX.apps.map = (function($) {
 
 				this.actionProcessor.process();
 
-				// set multiselect values
-				if (selement.elementtype == 0 || selement.elementtype == 3) {
-					var item = {
-						'id': selement.elementid,
-						'name': selement.elementName
-					};
+				switch (selement.elementtype) {
+					// host
+					case '0':
+						$('#elementNameHost').multiSelect('addData', {
+							'id': selement.elements[0].hostid,
+							'name': selement.elements[0].elementName
+						});
+						break;
 
-					switch (selement.elementtype) {
-						// host
-						case '0':
-							$('#elementNameHost').multiSelect('addData', item);
-							break;
+					// map
+					case '1':
+						$('#sysmapid').val(selement.elements[0].sysmapid);
+						$('#elementNameMap').val(selement.elements[0].elementName);
+						break;
 
-						// host group
-						case '3':
-							$('#elementNameHostGroup').multiSelect('addData', item);
-							break;
-					}
+					// trigger
+					case '2':
+						var triggers = [];
+
+						for (i in selement.elements) {
+							triggers[i] = {'id': selement.elements[i].triggerid, 'name': selement.elements[i].elementName};
+						}
+
+						this.addTriggers(triggers);
+						break;
+
+					// host group
+					case '3':
+						$('#elementNameHostGroup').multiSelect('addData', {
+							'id': selement.elements[0].groupid,
+							'name': selement.elements[0].elementName
+						});
+						break;
 				}
 			},
 
@@ -1820,7 +1921,8 @@ ZABBIX.apps.map = (function($) {
 					i,
 					urlPattern = /^url_(\d+)_(name|url)$/,
 					url,
-					urlNames = {};
+					urlNames = {},
+					elementsData = {};
 
 				for (i = 0; i < values.length; i++) {
 					url = urlPattern.exec(values[i].name);
@@ -1837,33 +1939,54 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 
+				data.elements = {};
+
 				// set element id and name
 				switch (data.elementtype) {
 					// host
 					case '0':
-						var elementData = $('#elementNameHost').multiSelect('getData');
+						elementsData = $('#elementNameHost').multiSelect('getData');
 
-						if (empty(elementData)) {
-							data.elementid = '0';
-							data.elementName = '';
+						if (elementsData.length != 0) {
+							data.elements[0] = {
+								hostid: elementsData[0].id,
+								elementName: elementsData[0].name
+							};
 						}
-						else {
-							data.elementid = elementData[0].id;
-							data.elementName = elementData[0].name;
+						break;
+
+					// map
+					case '1':
+						if ($('#elementNameMap').val() !== '') {
+							data.elements[0] = {
+								sysmapid: $('#sysmapid').val(),
+								elementName: $('#elementNameMap').val()
+							};
 						}
+						break;
+
+					// triggers
+					case '2':
+						i = 0;
+						$('input[name^="element_id"]').each(function() {
+							data.elements[i] = {
+								triggerid: $(this).val(),
+								elementName: $('input[name^="element_name[' + $(this).val() + ']"]').val(),
+								priority: $('input[name^="element_priority[' + $(this).val() + ']"]').val()
+							};
+							i++;
+						});
 						break;
 
 					// host group
 					case '3':
-						var elementData = $('#elementNameHostGroup').multiSelect('getData');
+						elementsData = $('#elementNameHostGroup').multiSelect('getData');
 
-						if (empty(elementData)) {
-							data.elementid = '0';
-							data.elementName = '';
-						}
-						else {
-							data.elementid = elementData[0].id;
-							data.elementName = elementData[0].name;
+						if (elementsData.length != 0) {
+							data.elements[0] = {
+								groupid: elementsData[0].id,
+								elementName: elementsData[0].name
+							};
 						}
 						break;
 				}
@@ -1891,7 +2014,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// validate element id
-				if (data.elementid === '0' && data.elementtype !== '4') {
+				if ($.isEmptyObject(data.elements) && data.elementtype !== '4') {
 					switch (data.elementtype) {
 						case '0': alert('Host is not selected.');
 							return false;
@@ -1905,6 +2028,58 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				return data;
+			},
+
+			/**
+			 * Drag and drop trigger sorting.
+			 */
+			initSortable: function() {
+				var triggerContainer = $('#triggerContainer');
+
+				triggerContainer.sortable({
+					disabled: (triggerContainer.find('tr.sortable').length < 2),
+					items: 'tbody tr.sortable',
+					axis: 'y',
+					cursor: 'move',
+					handle: 'div.drag-icon',
+					tolerance: 'pointer',
+					opacity: 0.6,
+					update: this.recalculateSortOrder,
+					start: function(e, ui) {
+						$(ui.placeholder).height($(ui.helper).height());
+					}
+				});
+			},
+
+			/**
+			 * Sorting triggers by severity.
+			 */
+			recalculateSortOrder: function() {
+				if ($('input[name^="element_id"]').length != 0) {
+					var triggers = [],
+						priority;
+					$('input[name^="element_id"]').each(function() {
+						priority = $('input[name^="element_priority[' + $(this).val() + ']"]').val()
+						if (!triggers[priority]) {
+							triggers[priority] = {
+								'priority': priority,
+								'html':	$('#triggerrow_' + $(this).val())[0].outerHTML
+							}
+						}
+						else {
+							triggers[priority].html += $('#triggerrow_' + $(this).val())[0].outerHTML;
+						}
+					});
+
+					triggers.sort(function (a, b) {
+						return b.priority - a.priority;
+					});
+
+					$('#triggerContainer tbody').html('');
+					triggers.each(function(trigger) {
+						$('#triggerContainer tbody').append(trigger.html);
+					});
+				}
 			}
 		};
 
@@ -2050,7 +2225,8 @@ ZABBIX.apps.map = (function($) {
 					element,
 					elementTypeText,
 					i,
-					ln;
+					ln,
+					name;
 
 				$('#massList tbody').empty();
 
@@ -2065,9 +2241,26 @@ ZABBIX.apps.map = (function($) {
 						case '4': elementTypeText = locale['S_IMAGE']; break;
 					}
 
+					name = element.data.elementName;
+					if (name === undefined) {
+						if (typeof element.data.elements === 'object') {
+							var names = [],
+								keys = Object.keys(element.data.elements);
+
+							for (i = 0; i < keys.length; i++) {
+								names.push(element.data.elements[keys[i]].elementName.escapeHTML());
+							}
+
+							name = names.join("<br>");
+						}
+					}
+					else {
+						name = name.escapeHTML();
+					}
+
 					list.push({
 						elementType: elementTypeText,
-						elementName: element.data.elementName
+						elementName: name
 					});
 				}
 
@@ -2408,15 +2601,15 @@ ZABBIX.apps.map = (function($) {
 				// clear triggers
 				this.triggerids = {};
 				$('#linkTriggerscontainer tbody tr').remove();
-				this.addTriggers(link.linktriggers);
+				this.addLinkTriggers(link.linktriggers);
 			},
 
 			/**
-			 * Add triggers to link form.
+			 * Add link triggers to link form.
 			 *
 			 * @param {Object} triggers
 			 */
-			addTriggers: function(triggers) {
+			addLinkTriggers: function(triggers) {
 				var tpl = new Template($('#linkTriggerRow').html()),
 					linkTrigger;
 

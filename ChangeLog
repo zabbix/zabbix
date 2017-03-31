@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
+A.F.I..... [ZBXNEXT-2694] implemented multiple triggers support for map elements (Oleg)
 ....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors (abs)
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)
 ..F....... [ZBXNEXT-34] implemented vector graphics for maps (vjaceslavs)

@@ -111,6 +111,7 @@ class CXmlExportWriter extends CExportWriter {
 			'maps' => 'map',
 			'urls' => 'url',
 			'selements' => 'selement',
+			'elements' => 'element',
 			'links' => 'link',
 			'linktriggers' => 'linktrigger',
 			'value_maps' => 'value_map',

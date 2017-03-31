@@ -3928,6 +3928,30 @@ return [
 			],
 		],
 	],
+	'sysmap_element_trigger' => [
+		'key' => 'selement_triggerid',
+		'fields' => [
+			'selement_triggerid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'selementid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'sysmaps_elements',
+				'ref_field' => 'selementid',
+			],
+			'triggerid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'triggers',
+				'ref_field' => 'triggerid',
+			],
+		],
+	],
 	'sysmap_element_url' => [
 		'key' => 'sysmapelementurlid',
 		'fields' => [
