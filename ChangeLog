@@ -53,6 +53,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
 ........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
 ........S. [ZBX-11951] fixed TRIGGER.VALUE macro expansion in trigger expressions (abs)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
@@ -415,6 +416,7 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
 ........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 ..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
