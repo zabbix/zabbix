@@ -401,7 +401,7 @@ static int	DBpatch_3030032(void)
 
 static int	DBpatch_3030033(void)
 {
-	const ZBX_FIELD field = {"attempt_interval", "10", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"attempt_interval", "10s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
