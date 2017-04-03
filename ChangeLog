@@ -56,7 +56,6 @@ New features:
 Bug fixes:
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
 ........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
-........S. [ZBX-11951] fixed TRIGGER.VALUE macro expansion in trigger expressions (abs)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 ..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
@@ -70,7 +69,7 @@ A......... [ZBX-11893] fixed permission issue, when importing hosts that are mon
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
 ........S. [ZBX-11738] fixed performing actions for problemas that have started and resolved while another problems escalation is executed (vikotrs)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
-........S. [ZBX-11829] fixed generation of problems in multiple event mode (Sergejs)
+........S. [ZBX-11829] fixed generation of problems in multiple event mode (Sergejs, abs)
 ..F....... [ZBX-11624] fixed undefined index error for regular expressions form (vmurzins)
 .......PS. [ZBX-11855] fixed data truncation when escaping strings that contain carriage return (vso)
 ........S. [ZBX-11444] fixed incorrect check for time functions in recovery expressions (abs)
