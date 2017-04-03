@@ -38,6 +38,7 @@ A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 b
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 .......PS. [ZBX-11867] fixed memory leak in history cache and history cache statistics (wiper)
 ...G...... [ZBX-11671] added register information and backtrace to log when metric thread crashes (viktors)
 ..F.....S. [ZBX-11381] fixed displaying list of recovery actions in "Problems" and "Event details" (Sergejs)
@@ -54,6 +55,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
 ........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
@@ -416,6 +418,7 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
 ........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
@@ -2063,6 +2066,7 @@ Changes for 2.2.18rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
 A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
