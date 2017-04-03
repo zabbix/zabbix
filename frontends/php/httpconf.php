@@ -309,7 +309,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, ['applicationid']);
 			foreach ($httpTest['steps'] as $snum => $step) {
-				if (isset($step['httpstepid']) && isset($dbHttpSteps[$step['httpstepid']])) {
+				if (array_key_exists('httpstepid', $step) && array_key_exists($step['httpstepid'], $dbHttpSteps)) {
 					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], ['httpstepid']);
 					$httpTest['steps'][$snum] = $newStep;
 				}
