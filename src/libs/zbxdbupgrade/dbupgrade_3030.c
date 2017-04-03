@@ -633,7 +633,10 @@ static int	DBpatch_3030053(void)
 			NULL);
 
 	/* sysmaps_elements.elementid for trigger map elements (2) should be migrated to table sysmap_element_trigger */
-	result = DBselect("select selementid,elementid from sysmaps_elements where elementtype=2");
+	result = DBselect("select e.selementid,e.elementid"
+			" from sysmaps_elements e,triggers t"
+			" where e.elementtype=2"
+				" and e.elementid=t.triggerid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
