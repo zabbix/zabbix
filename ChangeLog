@@ -38,6 +38,7 @@ A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 b
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-11925] fixed parsing of nested host groups (gcalenko, Sasha)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 .......PS. [ZBX-11867] fixed memory leak in history cache and history cache statistics (wiper)
 ...G...... [ZBX-11671] added register information and backtrace to log when metric thread crashes (viktors)
@@ -55,6 +56,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11925] fixed parsing of nested host groups (gcalenko, Sasha)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
 ........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
