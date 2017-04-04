@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[3.3.0])
+AC_INIT([Zabbix],[3.4.0alpha1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE
 
@@ -1602,6 +1602,7 @@ AC_OUTPUT([
 	src/libs/zbxself/Makefile
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxregexp/Makefile
+	src/libs/zbxtasks/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
@@ -1624,11 +1625,13 @@ AC_OUTPUT([
 	src/zabbix_server/vmware/Makefile
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/ipmi/Makefile
+	src/zabbix_server/scripts/Makefile
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/datasender/Makefile
+	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
 	upgrades/Makefile
 	man/Makefile

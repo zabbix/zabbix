@@ -559,6 +559,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			{
 				recv_senderhistory(sock, &jp, ts);
 			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+					zbx_send_task_data(sock, ts);
+			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))

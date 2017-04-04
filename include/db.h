@@ -73,7 +73,6 @@ struct	_DC_TRIGGER;
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
-#define TRIGGER_ERROR_LEN		128
 #if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
 #	define TRIGGER_COMMENTS_LEN	2048
 #else
@@ -156,7 +155,7 @@ struct	_DC_TRIGGER;
 #define HISTORY_LOG_SOURCE_LEN		64
 #define HISTORY_LOG_SOURCE_LEN_MAX	(HISTORY_LOG_SOURCE_LEN + 1)
 
-#define ALERT_ERROR_LEN			128
+#define ALERT_ERROR_LEN			2048
 #define ALERT_ERROR_LEN_MAX		(ALERT_ERROR_LEN + 1)
 
 #define GRAPH_NAME_LEN			128
@@ -501,6 +500,7 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_field(const char *table_name, const char *field_name, const char *src);
 char	*DBdyn_escape_string(const char *src);
+char	*DBdyn_escape_string_len(const char *src, size_t length);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);

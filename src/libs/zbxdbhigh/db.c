@@ -463,6 +463,20 @@ static size_t	get_string_field_size(unsigned char type)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBdyn_escape_string_len                                          *
+ *                                                                            *
+ ******************************************************************************/
+char	*DBdyn_escape_string_len(const char *src, size_t length)
+{
+#if HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
+	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
+#else
+	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdyn_escape_string                                              *
  *                                                                            *
  ******************************************************************************/
@@ -673,7 +687,9 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host"))
+			0 == strcmp(tablename, "autoreg_host") ||
+			0 == strcmp(tablename, "task_remote_command") ||
+			0 == strcmp(tablename, "task_remote_command_result"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -2039,6 +2055,8 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 	{
 		if (NULL == (pfield = DBget_field(ptable, field)))
 		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot locate table \"%s\" field \"%s\" in database schema",
+					table, field);
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}

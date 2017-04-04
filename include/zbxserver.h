@@ -52,13 +52,15 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 		char **error);
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ALERT *alert,
-		char **data, int macro_type, char *error, int maxerrlen);
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, DC_ITEM *dc_item,
+		DB_ALERT *alert, char **data, int macro_type, char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
+
+void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
 
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_USER_MACRO)

@@ -1657,7 +1657,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param array  $selement
 	 * @param string $selement['label']						label to expand
 	 * @param int    $selement['elementtype']				element type
-	 * @param int    $selement['elementid']					element id
+	 * @param array    $selement['elements']				elements
 	 * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
 	 *
 	 * @return string
@@ -1689,7 +1689,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'SELECT hi.ip,hi.dns,hi.useip,h.host,h.name,h.description,hi.type AS interfacetype'.
 					' FROM interface hi,hosts h'.
 					' WHERE hi.hostid=h.hostid'.
-						' AND hi.main=1 AND hi.hostid='.zbx_dbstr($selement['elementid'])
+						' AND hi.main=1 AND hi.hostid='.zbx_dbstr($selement['elements'][0]['hostid'])
 				);
 
 				// Process interface priorities.
@@ -1712,7 +1712,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					' WHERE h.hostid=hi.hostid'.
 						' AND hi.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
-						' AND hi.main=1 AND f.triggerid='.zbx_dbstr($selement['elementid']).
+						' AND hi.main=1 AND f.triggerid='.zbx_dbstr($selement['elements'][0]['triggerid']).
 					' ORDER BY f.functionid'
 				);
 
@@ -1732,7 +1732,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				// Get all function ids from expression and link host data against position in expression.
-				preg_match_all('/\{([0-9]+)\}/', $selement['elementExpressionTrigger'], $matches);
+				preg_match_all('/\{([0-9]+)\}/', $selement['elements'][0]['elementExpressionTrigger'], $matches);
 
 				$hostsByNr = [];
 

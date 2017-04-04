@@ -35,7 +35,6 @@
 #	include <sqlite3.h>
 #endif
 
-#include "db.h"
 #include "dbschema.h"
 #include "log.h"
 #if defined(HAVE_SQLITE3)
@@ -115,7 +114,7 @@ static ub4	OCI_DBserver_status();
 
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
-static int			ZBX_PG_BYTEAOID = 0;
+static unsigned int		ZBX_PG_BYTEAOID = 0;
 static int			ZBX_PG_SVERSION = 0;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
@@ -377,7 +376,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = DBdyn_escape_string(dbschema);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 		if (0 < (ret = zbx_db_execute("set current schema='%s'", dbschema_esc)))
 			ret = ZBX_DB_OK;
 		zbx_free(dbschema_esc);
@@ -549,7 +548,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = DBdyn_escape_string(dbschema);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 		if (ZBX_DB_DOWN == (rc = zbx_db_execute("set schema '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
 			ret = rc;
 		zbx_free(dbschema_esc);
@@ -804,11 +803,19 @@ int	zbx_db_begin(void)
 		rc = ZBX_DB_DOWN;
 	}
 
+	if (ZBX_DB_OK == rc)
+	{
+		/* create savepoint for correct rollback on DB2 */
+		if (0 <= (rc = zbx_db_execute("savepoint zbx_begin_savepoint unique on rollback retain cursors;")))
+			rc = ZBX_DB_OK;
+	}
+
 	if (ZBX_DB_OK != rc)
 	{
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<begin>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
+
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "begin;");
 #elif defined(HAVE_SQLITE3)
@@ -856,7 +863,6 @@ int	zbx_db_commit(void)
 	{
 		rc = ZBX_DB_DOWN;
 	}
-
 	if (ZBX_DB_OK != rc)
 	{
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<commit>");
@@ -915,8 +921,11 @@ int	zbx_db_rollback(void)
 	txn_error = 0;
 
 #if defined(HAVE_IBM_DB2)
-	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
-		rc = ZBX_DB_DOWN;
+
+	/* Rollback to begin that is marked with savepoint. This move undo all transactions. */
+	if (0 <= (rc = zbx_db_execute("rollback to savepoint zbx_begin_savepoint;")))
+		rc = ZBX_DB_OK;
+
 	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
 			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
 	{
@@ -2263,12 +2272,6 @@ static size_t	zbx_db_get_escape_string_len(const char *s, size_t max_bytes, size
 
 	while ('\0' != *s && 0 < max_chars)
 	{
-		if ('\r' == *s)
-		{
-			s++;
-			continue;
-		}
-
 		csize = zbx_utf8_char_len(s);
 
 		/* process non-UTF-8 characters as single byte characters */

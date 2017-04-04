@@ -171,10 +171,11 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	}
 	zbx_vector_ptr_pair_append(&httptest->macros, pair);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "append macro '%s'='%s' in cache", pair.first, pair.second);
+
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s macro:'%s'='%s'",
-			__function_name, zbx_result_string(ret), (char*)pair.first, (char*)pair.second);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

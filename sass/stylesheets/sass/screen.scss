@@ -1113,6 +1113,7 @@ footer {
 	position: relative;
 	vertical-align: top;
 	display: inline-block;
+	white-space: nowrap;
 }
 
 .multiselect {
@@ -2767,6 +2768,44 @@ $form-icon-btn: (
 		right: 0;
 		top: 50%;
 		@include transform(translateY(-50%));
+	}
+}
+
+.ui-inner-handles {
+	.ui-resizable-n {
+		top: 0px;
+	}
+
+	.ui-resizable-ne {
+		top: -4px;
+		right: -4px;
+	}
+
+	.ui-resizable-nw {
+		top: -4px;
+		left: -4px;
+	}
+
+	.ui-resizable-e {
+		right: 0px;
+	}
+
+	.ui-resizable-s {
+		bottom: 0px;
+	}
+
+	.ui-resizable-se {
+		bottom: -4px;
+		right: -4px;
+	}
+
+	.ui-resizable-sw {
+		bottom: -4px;
+		left: -4px;
+	}
+
+	.ui-resizable-w {
+		left: 0px;
 	}
 }
 
@@ -5016,7 +5055,7 @@ Main navigation is used to jump between high level sections of the application.
          <li><a href="#">Screens</a></li>
          <li><a href="#">Maps</a></li>
          <li><a href="#">Discovery</a></li>
-         <li><a href="#">IT services</a></li>
+         <li><a href="#">Services</a></li>
       </ul>
       <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
    </div>
