@@ -375,7 +375,7 @@ $sharing_tab = (new CFormList('sharing_form'))
 $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
 
 // Append buttons to form.
-if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
+if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'full_clone') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
