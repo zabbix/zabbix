@@ -186,13 +186,6 @@ int	zbx_dshm_validate_ref(const zbx_dshm_t *shm, zbx_dshm_ref_t *shm_ref, char *
 			goto out;
 		}
 
-		/* Immediately mark the new shared memory for destruction after attaching to it */
-		if (-1 == zbx_shm_destroy(shm->shmid))
-		{
-			*errmsg = zbx_strdup(*errmsg, "cannot mark the new shared memory for destruction.");
-			goto out;
-		}
-
 		shm_ref->shmid = shm->shmid;
 	}
 
@@ -263,6 +256,13 @@ int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 	if (-1 == shmdt((void *)addr))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot detach from new shared memory");
+		goto out;
+	}
+
+	/* delete the old segment */
+	if (NULL != addr_old && -1 == zbx_shm_destroy(shm->shmid))
+	{
+		*errmsg = zbx_strdup(*errmsg, "cannot detach from old shared memory");
 		goto out;
 	}
 
