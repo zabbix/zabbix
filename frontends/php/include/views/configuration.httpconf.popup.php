@@ -98,21 +98,6 @@ else {
 			])
 		);
 
-	$switch = (new CDiv(
-		(new CRadioButtonList('post_type', getRequest('post_type', ZBX_POSTTYPE_FORM)))
-			->addValue(_('Form data'), ZBX_POSTTYPE_FORM, null, 'return switchToPostType(this.value);')
-			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW, null, 'return switchToPostType(this.value);')
-			->setModern(true))
-		)
-		->setAttribute('style', 'padding: 5px; margin: 5px 0px 10px 0px;');
-
-	$footer = (new CDiv(
-			(new CTextArea('posts', getRequest('posts', '')))
-				->setAttribute('style', 'width: 100%')
-		))
-		->setId('post_raw')
-		->setAttribute('style', 'display: none;');
-
 	$pair_tables = [
 		[
 			'id' => 'query_fields',
@@ -121,9 +106,20 @@ else {
 		],
 		[
 			'id' => 'post_fields',
-			'label' => _('Post'),
-			'header' => $switch,
-			'footer' => $footer,
+			'label' => _('Post fields'),
+			'header' => [
+				'label' => _('Post type'),
+				'items' => (new CRadioButtonList('post_type', getRequest('post_type', ZBX_POSTTYPE_FORM)))
+					->addValue(_('Form data'), ZBX_POSTTYPE_FORM, null, 'return switchToPostType(this.value);')
+					->addValue(_('Raw data'), ZBX_POSTTYPE_RAW, null, 'return switchToPostType(this.value);')
+					->setModern(true)
+			],
+			'footer' => [
+				'id' => 'post_raw_row',
+				'label' => _('Raw post'),
+				'items' => (new CTextArea('posts', getRequest('posts', '')))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			],
 			'class' => 'pair-container pair-container-sortable'
 		],
 		[
@@ -139,42 +135,37 @@ else {
 	];
 
 	foreach ($pair_tables as $pair_table) {
+		if (array_key_exists('header', $pair_table)) {
+			$httpPopupFormList->addRow($pair_table['header']['label'], $pair_table['header']['items'],
+				array_key_exists('id', $pair_table['header']) ? $pair_table['header']['id'] : null);
+		}
+
 		$pair_tab = (new CTable())
 			->setId($pair_table['id'])
 			->addClass($pair_table['class'])
 			->setAttribute('style', 'width: 100%;')
-			->setHeader([
-				new CColHeader(),
-				new CColHeader(_('Name')),
-				new CColHeader(),
-				new CColHeader(_('Value')),
-				new CColHeader()
-			])
+			->setHeader(['', _('Name'), '', _('Value'), ''])
 			->addRow((new CRow([
 				(new CCol(
 					(new CButton(null, _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
-						->setAttribute('data-type', $pair_table['id'])
 						->addClass('pairs-control-add')
+						->setAttribute('data-type', $pair_table['id'])
 				))->setColSpan(5)
-			]))->setId($pair_table['id'] . '_footer'));
-
-		$items = [];
-		if (array_key_exists('header', $pair_table)) {
-			$items[] = $pair_table['header'];
-		}
-
-		$items[] = $pair_tab;
-		if (array_key_exists('footer', $pair_table)) {
-			$items[] = $pair_table['footer'];
-		}
+			]))->setId($pair_table['id'].'_footer'));
 
 		$httpPopupFormList->addRow($pair_table['label'],
-			(new CDiv($items))
+			(new CDiv($pair_tab))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('data-type', $pair_table['id'])
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
+			$pair_table['id'].'_row'
 		);
+
+		if (array_key_exists('footer', $pair_table)) {
+			$httpPopupFormList->addRow($pair_table['footer']['label'], $pair_table['footer']['items'],
+				array_key_exists('id', $pair_table['footer']) ? $pair_table['footer']['id'] : null);
+		}
 	}
 
 	$httpPopupFormList

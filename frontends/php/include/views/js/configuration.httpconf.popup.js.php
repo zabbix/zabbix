@@ -303,12 +303,12 @@
 
 	function setPostType(type) {
 		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
-			jQuery('#post_fields').css("display", 'table');
-			jQuery('#post_raw').css("display", "none");
+			jQuery('#post_fields_row').css("display", 'table-row');
+			jQuery('#post_raw_row').css("display", "none");
 		}
 		else {
-			jQuery('#post_fields').css("display", "none");
-			jQuery('#post_raw').css("display", 'block');
+			jQuery('#post_fields_row').css("display", "none");
+			jQuery('#post_raw_row').css("display", 'table-row');
 		}
 
 		jQuery('input[name="post_type"][value="' + type + '"]').prop("checked", true);

@@ -114,21 +114,15 @@ foreach ($pair_tables as $pair_table){
 		->setId($pair_table['id'])
 		->addClass($pair_table['class'])
 		->setAttribute('style', 'width: 100%;')
-		->setHeader([
-			new CColHeader(),
-			new CColHeader(_('Name')),
-			new CColHeader(),
-			new CColHeader(_('Value')),
-			new CColHeader()
-		])
+		->setHeader(['', _('Name'), '', _('Value'), ''])
 		->addRow((new CRow([
 			(new CCol(
 				(new CButton(null, _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-type', $pair_table['id'])
 					->addClass('pairs-control-add')
+					->setAttribute('data-type', $pair_table['id'])
 			))->setColSpan(5)
-		]))->setId($pair_table['id'] . '_footer'));
+		]))->setId($pair_table['id'].'_footer'));
 
 	$httpFormList->addRow($pair_table['label'],
 		(new CDiv($pair_tab))
@@ -140,9 +134,6 @@ foreach ($pair_tables as $pair_table){
 
 $httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
-if (FALSE === array_key_exists('pairs', $this->data)) {
-	$this->data['pairs'] = [];
-}
 zbx_add_post_js('pairManager.add('.CJs::encodeJson($this->data['pairs']).');');
 
 /*
@@ -210,21 +201,6 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 	if (!isset($step['url'])) {
 		$step['url'] = '';
-	}
-	if (!isset($step['posts'])) {
-		$step['posts'] = '';
-	}
-	if (is_array($step['posts'])) {
-		$step['post_type'] = ZBX_POSTTYPE_FORM;
-	}
-	else {
-		$step['post_type'] = ZBX_POSTTYPE_RAW;
-	}
-	if (!isset($step['pairs'])) {
-		$step['pairs'] = [];
-	}
-	if (!isset($step['required'])) {
-		$step['required'] = '';
 	}
 
 	$numSpan = (new CSpan($i++.':'))
