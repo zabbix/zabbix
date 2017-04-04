@@ -218,7 +218,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$steps = getRequest('steps', []);
-		$pair_names = ['headers', 'variables', 'post_fields', 'query_fields'];
+		$field_names = ['headers', 'variables', 'post_fields', 'query_fields'];
 		$i = 1;
 
 		foreach ($steps as &$step) {
@@ -230,17 +230,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
 				: HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 
-			foreach ($pair_names as $pair_name) {
-				$step[$pair_name] = [];
+			foreach ($field_names as $field_name) {
+				$step[$field_name] = [];
 			}
 
 			if (array_key_exists('pairs', $step)) {
-				foreach ($pair_names as $pair_name) {
+				foreach ($field_names as $field_name) {
 					foreach ($step['pairs'] as $pair) {
-						if (array_key_exists('type', $pair) && $pair_name === $pair['type'] &&
+						if (array_key_exists('type', $pair) && $field_name === $pair['type'] &&
 							((array_key_exists('name', $pair) && trim($pair['name']) !== '') ||
 							(array_key_exists('value', $pair) && trim($pair['value']) !== ''))) {
-							$step[$pair_name][] = [
+							$step[$field_name][] = [
 								'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
 								'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
 							];
@@ -335,11 +335,49 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
 			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, ['applicationid']);
+			foreach (['headers', 'variables'] as $field_name) {
+				if (count($httpTest[$field_name]) !== count($dbHttpTest[$field_name])) {
+					continue;
+				}
+
+				$changed = false;
+				foreach ($httpTest[$field_name] as $key => $field) {
+					if ($dbHttpTest[$field_name][$key]['name'] !== $field['name']
+							|| $dbHttpTest[$field_name][$key]['value'] !== $field['value']) {
+						$changed = true;
+						break;
+					}
+				}
+
+				if (!$changed) {
+					unset($httpTest[$field_name]);
+				}
+			}
 
 			foreach ($httpTest['steps'] as $snum => $step) {
 				if (isset($step['httpstepid']) && isset($dbHttpSteps[$step['httpstepid']])) {
-					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], ['httpstepid']);
-					$httpTest['steps'][$snum] = $newStep;
+					$db_step = $dbHttpSteps[$step['httpstepid']];
+					$new_step = CArrayHelper::unsetEqualValues($step, $db_step, ['httpstepid']);
+					foreach (['headers', 'variables', 'posts', 'query_fields'] as $field_name) {
+						if (!array_key_exists($field_name, $new_step)
+								|| count($new_step[$field_name]) !== count($db_step[$field_name])) {
+							continue;
+						}
+
+						$changed = false;
+						foreach ($new_step[$field_name] as $key => $field) {
+							if ($db_step[$field_name][$key]['name'] !== $field['name']
+									|| $db_step[$field_name][$key]['value'] !== $field['value']) {
+								$changed = true;
+								break;
+							}
+						}
+
+						if (!$changed) {
+							unset($new_step[$field_name]);
+						}
+					}
+					$httpTest['steps'][$snum] = $new_step;
 				}
 			}
 
