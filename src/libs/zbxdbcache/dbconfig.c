@@ -710,7 +710,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *refresh_unsupported_changed)
 	}
 	else
 	{
-		int			refresh_unsupported;
+		int	refresh_unsupported;
 
 		/* store the config data */
 
@@ -772,28 +772,28 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *refresh_unsupported_changed)
 
 static void	DCsync_hosts(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_hosts";
+	const char	*__function_name = "DCsync_hosts";
 
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
 
-	ZBX_DC_HOST		*host;
-	ZBX_DC_IPMIHOST		*ipmihost;
-	ZBX_DC_PROXY		*proxy;
-	ZBX_DC_HOST_H		*host_h, host_h_local, *host_p, host_p_local;
+	ZBX_DC_HOST	*host;
+	ZBX_DC_IPMIHOST	*ipmihost;
+	ZBX_DC_PROXY	*proxy;
+	ZBX_DC_HOST_H	*host_h, host_h_local, *host_p, host_p_local;
 
-	int			found;
-	int			update_index_h, update_index_p, ret;
-	zbx_uint64_t		hostid, proxy_hostid;
-	unsigned char		status;
-	time_t			now;
-	signed char		ipmi_authtype;
-	unsigned char		ipmi_privilege;
+	int		found;
+	int		update_index_h, update_index_p, ret;
+	zbx_uint64_t	hostid, proxy_hostid;
+	unsigned char	status;
+	time_t		now;
+	signed char	ipmi_authtype;
+	unsigned char	ipmi_privilege;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	ZBX_DC_PSK		*psk_i, psk_i_local;
-	zbx_ptr_pair_t		*psk_owner, psk_owner_local;
-	zbx_hashset_t		psk_owners;
+	ZBX_DC_PSK	*psk_i, psk_i_local;
+	zbx_ptr_pair_t	*psk_owner, psk_owner_local;
+	zbx_hashset_t	psk_owners;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1299,7 +1299,6 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		/* removed rows will be always added at the end */
@@ -1421,17 +1420,17 @@ static void	DCsync_htmpls(zbx_dbsync_t *sync)
 
 static void	DCsync_gmacros(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_gmacros";
+	const char	*__function_name = "DCsync_gmacros";
 
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
 
-	ZBX_DC_GMACRO		*gmacro;
+	ZBX_DC_GMACRO	*gmacro;
 
-	int			found, context_existed, update_index, ret;
-	zbx_uint64_t		globalmacroid;
-	char			*macro = NULL, *context = NULL;
+	int		found, context_existed, update_index, ret;
+	zbx_uint64_t	globalmacroid;
+	char		*macro = NULL, *context = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1512,17 +1511,17 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 
 static void	DCsync_hmacros(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_hmacros";
+	const char	*__function_name = "DCsync_hmacros";
 
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
 
-	ZBX_DC_HMACRO		*hmacro;
+	ZBX_DC_HMACRO	*hmacro;
 
-	int			found, context_existed, update_index, ret;
-	zbx_uint64_t		hostmacroid, hostid;
-	char			*macro = NULL, *context = NULL;
+	int		found, context_existed, update_index, ret;
+	zbx_uint64_t	hostmacroid, hostid;
+	char		*macro = NULL, *context = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1718,7 +1717,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(bulk, row[8]);
 
 		interface = DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
-
 		zbx_vector_ptr_append(&interfaces, interface);
 
 		/* remove old address->interfaceid index */
@@ -2602,16 +2600,18 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 
 static void	DCsync_triggers(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_triggers";
+	const char	*__function_name = "DCsync_triggers";
 
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
 
-	ZBX_DC_TRIGGER		*trigger;
+	ZBX_DC_TRIGGER	*trigger;
 
-	int			found, ret;
-	zbx_uint64_t		triggerid;
+	int		found, ret;
+	zbx_uint64_t	triggerid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -2766,17 +2766,9 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 	int			found, index, ret;
 	zbx_uint64_t		triggerid_down, triggerid_up;
-	zbx_vector_ptr_t	dependencies;
-	zbx_vector_uint64_t	ids_down;
-	zbx_vector_uint64_t	ids_up;
 	ZBX_DC_TRIGGER		*trigger_up, *trigger_down;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_ptr_create(&dependencies);
-
-	zbx_vector_uint64_create(&ids_down);
-	zbx_vector_uint64_create(&ids_up);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -2846,17 +2838,17 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 static void	DCsync_functions(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_functions";
+	const char	*__function_name = "DCsync_functions";
 
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
 
-	ZBX_DC_ITEM		*item;
-	ZBX_DC_FUNCTION		*function;
+	ZBX_DC_ITEM	*item;
+	ZBX_DC_FUNCTION	*function;
 
-	int			found, ret;
-	zbx_uint64_t		itemid, functionid, triggerid;
+	int		found, ret;
+	zbx_uint64_t	itemid, functionid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3061,14 +3053,14 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_actions(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_actions";
+	const char	*__function_name = "DCsync_actions";
 
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
-	zbx_uint64_t		actionid;
-	zbx_dc_action_t		*action;
-	int			found, ret;
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
+	zbx_uint64_t	actionid;
+	zbx_dc_action_t	*action;
+	int		found, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3897,7 +3889,6 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 				}
 				else
 					zbx_vector_ptr_append(&items, item);
-
 			}
 		}
 
@@ -7693,7 +7684,7 @@ static unsigned char	DCconfig_sort_triggers_topologically_rec(const ZBX_DC_TRIGG
 	{
 		next_trigdep = (const ZBX_DC_TRIGGER_DEPLIST *)trigdep->dependencies.values[i];
 
-		if (1 < (next_topoindex =  next_trigdep->trigger->topoindex))
+		if (1 < (next_topoindex = next_trigdep->trigger->topoindex))
 			goto next;
 
 		if (0 == next_trigdep->dependencies.values_num)

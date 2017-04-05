@@ -661,6 +661,8 @@ static void	DCdump_triggers(ZBX_DC_CONFIG *config)
 				trigger->recovery_expression);
 		zabbix_log(LOG_LEVEL_TRACE, "  value:%u state:%u error:'%s' lastchange:%d", trigger->value,
 				trigger->state, ZBX_NULL2EMPTY_STR(trigger->error), trigger->lastchange);
+		zabbix_log(LOG_LEVEL_TRACE, "  correlation_tag:'%s' recovery_mode:'%u' correlation_mode:'%u'",
+				trigger->correlation_tag, trigger->recovery_mode, trigger->correlation_mode);
 		zabbix_log(LOG_LEVEL_TRACE, "  topoindex:%u functional:%u locked:%u", trigger->topoindex,
 				trigger->functional, trigger->locked);
 
@@ -723,7 +725,7 @@ static void	DCdump_expressions(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&index);
-	zbx_hashset_iter_reset(&config->trigdeps, &iter);
+	zbx_hashset_iter_reset(&config->expressions, &iter);
 
 	while (NULL != (expression = (ZBX_DC_EXPRESSION *)zbx_hashset_iter_next(&iter)))
 		zbx_vector_ptr_append(&index, expression);

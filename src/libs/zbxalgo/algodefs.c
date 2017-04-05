@@ -243,7 +243,7 @@ zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data)
 {
 	const zbx_uint64_pair_t	*pair = (const zbx_uint64_pair_t *)data;
 
-	zbx_hash_t	hash;
+	zbx_hash_t		hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&pair->first);
 	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pair->second, sizeof(pair->second), hash);

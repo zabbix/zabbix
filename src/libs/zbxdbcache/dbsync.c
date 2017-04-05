@@ -33,16 +33,6 @@ typedef struct
 }
 zbx_dbsync_env_t;
 
-/* column with user macros that will be expanded during synchronization */
-typedef struct
-{
-	/* the column index */
-	int					index;
-	/* the validator function (can be NULL) */
-	zbx_macro_value_validator_func_t	validator_func;
-}
-zbx_dbsync_column_t;
-
 static zbx_dbsync_env_t	dbsync_env;
 
 /* string pool support */
@@ -458,8 +448,6 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	DB_RESULT	result;
 
-	sync->columns_num = 27;
-
 	if (NULL == (result = DBselect("select refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5,"
@@ -486,6 +474,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 
 	/* global configuration will be always synchronized directly with database */
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -838,7 +827,6 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 			zbx_hashset_insert(&htmpls, &ht_local, sizeof(ht_local));
 		}
 	}
-
 
 	/* add new rows, remove existing rows from index */
 	while (NULL != (dbrow = DBfetch(result)))
@@ -1653,7 +1641,7 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
  *           some columns.                                                    *
  *                                                                            *
  ******************************************************************************/
-static char **dbsync_trigger_preproc_row(char **row)
+static char	**dbsync_trigger_preproc_row(char **row)
 {
 	zbx_vector_uint64_t	hostids, functionids;
 	unsigned char		flags = 0;
