@@ -1404,6 +1404,10 @@ static void	DCsync_htmpls(zbx_dbsync_t *sync)
 	}
 
 	/* sort the changed template lists */
+
+	zbx_vector_ptr_sort(&sort, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&sort, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
 	for (i = 0; i < sort.values_num; i++)
 	{
 		htmpl = (ZBX_DC_HTMPL *)sort.values[i];
