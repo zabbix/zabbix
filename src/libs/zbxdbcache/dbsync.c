@@ -1655,7 +1655,7 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
  ******************************************************************************/
 static char **dbsync_trigger_preproc_row(char **row)
 {
-	zbx_vector_uint64_t	hostids, functionids, itemids;
+	zbx_vector_uint64_t	hostids, functionids;
 	unsigned char		flags = 0;
 
 	/* return the original row if user macros are not used in target columns */
@@ -1673,13 +1673,9 @@ static char **dbsync_trigger_preproc_row(char **row)
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&functionids);
-	zbx_vector_uint64_create(&itemids);
 
 	get_functionids(&functionids, row[2]);
 	get_functionids(&functionids, row[11]);
-
-	zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
@@ -1697,7 +1693,6 @@ static char **dbsync_trigger_preproc_row(char **row)
 				dbsync_numeric_validator);
 	}
 
-	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);
 
