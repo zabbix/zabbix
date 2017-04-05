@@ -136,8 +136,7 @@ else {
 
 	foreach ($pair_tables as $pair_table) {
 		if (array_key_exists('header', $pair_table)) {
-			$httpPopupFormList->addRow($pair_table['header']['label'], $pair_table['header']['items'],
-				array_key_exists('id', $pair_table['header']) ? $pair_table['header']['id'] : null);
+			$httpPopupFormList->addRow($pair_table['header']['label'], $pair_table['header']['items']);
 		}
 
 		$pair_tab = (new CTable())
@@ -164,7 +163,8 @@ else {
 
 		if (array_key_exists('footer', $pair_table)) {
 			$httpPopupFormList->addRow($pair_table['footer']['label'], $pair_table['footer']['items'],
-				array_key_exists('id', $pair_table['footer']) ? $pair_table['footer']['id'] : null);
+				$pair_table['footer']['id']
+			);
 		}
 	}
 
