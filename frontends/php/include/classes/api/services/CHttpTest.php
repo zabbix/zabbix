@@ -461,7 +461,7 @@ class CHttpTest extends CApiService {
 			if (array_key_exists('name', $httptest)) {
 				if ($db_httptest['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot a templated web scenario "%1$s": %2$s.', $httptest['name'],
+						'Cannot update a templated web scenario "%1$s": %2$s.', $httptest['name'],
 						_s('unexpected parameter "%1$s"', 'name')
 					));
 				}
