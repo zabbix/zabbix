@@ -3206,6 +3206,12 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			goto json_parse_error;
 
+		if (SUCCEED != is_ip(ip))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "\"%s\" is not a valid IP address", ip);
+			continue;
+		}
+
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 			port = atoi(tmp);
 		else
