@@ -735,11 +735,11 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				$('#border_type').on('change', function() {
-					$(this).parent().find('input').prop("disabled", this.value === '-1');
+					$(this).parent().find('input').prop("disabled", this.value === '0');
 				});
 
 				$('#mass_border_type, #chkboxBorderType').on('change', function() {
-					var disable = $('#mass_border_type').val() === '-1' && $('#chkboxBorderType').is(":checked");
+					var disable = ($('#mass_border_type').val() === '0' && $('#chkboxBorderType').is(":checked"));
 
 					$('#chkboxBorderWidth, #chkboxBorderColor').prop("disabled", disable);
 					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));

@@ -417,19 +417,19 @@
 					->addRow((new CCheckBox('chkbox_text_halign'))
 							->setId('chkboxTextHalign')
 							->setLabel(_('Horizontal align')),
-						new CComboBox('mass_text_halign', -1, null, [
-								'0'	=> _('Left'),
-								'-1'	=> _('Center'),
-								'1'	=> _('Right')
+						new CComboBox('mass_text_halign', 0, null, [
+								'1'	=> _('Left'),
+								'0'	=> _('Center'),
+								'2'	=> _('Right')
 							])
 					)
 					->addRow((new CCheckBox('chkbox_text_valign'))
 							->setId('chkboxTextValign')
 							->setLabel(_('Vertical align')),
-						new CComboBox('mass_text_valign', -1, null, [
-								'0'	=> _('Top'),
-								'-1'	=> _('Middle'),
-								'1'	=> _('Bottom')
+						new CComboBox('mass_text_valign', 0, null, [
+								'1'	=> _('Top'),
+								'0'	=> _('Middle'),
+								'2'	=> _('Bottom')
 							])
 					)
 					->addRow((new CCheckBox('chkbox_background'))
@@ -441,10 +441,10 @@
 							->setId('chkboxBorderType')
 							->setLabel(_('Border type')),
 						new CComboBox('mass_border_type', null, null, [
-								'-1'	=> _('None'),
-								'0'	=> '———',
-								'1'	=> '· · · ·',
-								'2'	=> '- - - -',
+								'0'	=> _('None'),
+								'1'	=> '———',
+								'2'	=> '· · · ·',
+								'3'	=> '- - - -',
 							])
 					)
 					->addRow((new CCheckBox('chkbox_border_width'))
