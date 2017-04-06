@@ -2229,7 +2229,7 @@ ZABBIX.apps.map = (function($) {
 			hide: function() {
 				this.domNode.toggle(false);
 				this.active = false;
-				$(':checkbox', this.domNode).prop('checked', false);
+				$(':checkbox', this.domNode).prop('checked', false).prop("disabled", false);
 				$('select', this.domNode).each(function() {
 					var select = $(this);
 					select.val($('option:first', select).val());
