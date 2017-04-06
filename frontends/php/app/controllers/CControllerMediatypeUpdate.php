@@ -43,7 +43,7 @@ class CControllerMediatypeUpdate extends CController {
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
-			'maxsessions' =>			'not_empty|db media_type.maxsessions',
+			'maxsessions' =>			'not_empty|int32|le 100|db media_type.maxsessions',
 			'maxattempts' =>			'not_empty|db media_type.maxattempts',
 			'attempt_interval' =>		'not_empty|db media_type.attempt_interval'
 		];
