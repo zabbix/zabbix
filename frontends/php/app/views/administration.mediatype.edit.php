@@ -24,6 +24,10 @@ $widget = (new CWidget())->setTitle(_('Media types'));
 
 $tabs = new CTabView();
 
+if ($data['form_refresh'] == 0) {
+	$tabs->setSelected(0);
+}
+
 // create form
 $mediaTypeForm = (new CForm())
 	->setId('media_type_form')

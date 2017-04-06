@@ -51,7 +51,8 @@ class CControllerMediatypeEdit extends CController {
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
-			'attempt_interval' =>		'db media_type.attempt_interval'
+			'attempt_interval' =>		'db media_type.attempt_interval',
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -125,7 +126,8 @@ class CControllerMediatypeEdit extends CController {
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
 			'maxsessions' => '1',
 			'maxattempts' => '1',
-			'attempt_interval' => '10s'
+			'attempt_interval' => '10s',
+			'form_refresh' => 0
 		];
 
 		// get values from the dabatase
@@ -202,7 +204,8 @@ class CControllerMediatypeEdit extends CController {
 			'maxsessions',
 			'maxattempts',
 			'attempt_interval',
-			'maxsessionsType'
+			'maxsessionsType',
+			'form_refresh'
 		]);
 
 		$response = new CControllerResponseData($data);
