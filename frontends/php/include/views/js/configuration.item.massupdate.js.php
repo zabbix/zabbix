@@ -25,19 +25,16 @@
 </script>
 <script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
 	<?php
-		$preproc_types = [];
 		$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
 
-		foreach (get_preprocessing_types() as $key => $preproc_type) {
-			$preproc_types[$key] = new COptGroup($preproc_type['label']);
+		foreach (get_preprocessing_types() as $group) {
+			$cb_group = new COptGroup($group['label']);
 
-			foreach ($preproc_type['values'] as $value => $label) {
-				$preproc_types[$key]->addItem(new CComboItem($value, $label));
+			foreach ($group['types'] as $type => $label) {
+				$cb_group->addItem(new CComboItem($type, $label));
 			}
-		}
 
-		foreach ($preproc_types as $preproc_type) {
-			$preproc_types_cbbox->addItem($preproc_type);
+			$preproc_types_cbbox->addItem($cb_group);
 		}
 
 		echo (new CRow([

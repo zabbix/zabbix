@@ -1288,31 +1288,31 @@ function getParamFieldLabelByType($itemType) {
  * no specific type is found.
  *
  * Usage examples:
- *    - get_preprocessing_types()					Returns array as defined.
- *    - get_preprocessing_types(4)					Returns string: 'Trim'.
- *    - get_preprocessing_types('wrong')			Returns an empty string: ''.
- *    - get_preprocessing_types(null, false)		Returns subarrays in one array maintaining index:
- *														[5] => Regular expression
- *														[4] => Trim
- *														[2] => Right trim
- *														[3] => Left trim
- *														[1] => Custom multiplier
- *														[9] => Simple change
- *														[10] => Speed per second
- *														[6] => Boolean to decimal
- *														[7] => Octal to decimal
- *														[8] => Hexadecimal to decimal
+ *    - get_preprocessing_types()              Returns array as defined.
+ *    - get_preprocessing_types(4)             Returns string: 'Trim'.
+ *    - get_preprocessing_types(<wrong type>)  Returns an empty string: ''.
+ *    - get_preprocessing_types(null, false)   Returns subarrays in one array maintaining index:
+ *                                               [5] => Regular expression
+ *                                               [4] => Trim
+ *                                               [2] => Right trim
+ *                                               [3] => Left trim
+ *                                               [1] => Custom multiplier
+ *                                               [9] => Simple change
+ *                                               [10] => Speed per second
+ *                                               [6] => Boolean to decimal
+ *                                               [7] => Octal to decimal
+ *                                               [8] => Hexadecimal to decimal
  *
- * @param int  $type			Item preprocessing type.
- * @param bool $grouped			Group label flag.
+ * @param int  $type     Item preprocessing type.
+ * @param bool $grouped  Group label flag.
  *
  * @return mixed
  */
 function get_preprocessing_types($type = null, $grouped = true) {
-	$types = [
+	$groups = [
 		[
 			'label' => _('Text'),
-			'values' => [
+			'types' => [
 				ZBX_PREPROC_REGSUB => _('Regular expression'),
 				ZBX_PREPROC_TRIM => _('Trim'),
 				ZBX_PREPROC_RTRIM => _('Right trim'),
@@ -1321,20 +1321,20 @@ function get_preprocessing_types($type = null, $grouped = true) {
 		],
 		[
 			'label' => _('Arithmetic'),
-			'values' => [
+			'types' => [
 				ZBX_PREPROC_MULTIPLIER => _('Custom multiplier')
 			]
 		],
 		[
 			'label' => _('Delta'),
-			'values' => [
+			'types' => [
 				ZBX_PREPROC_DELTA_VALUE => _('Simple change'),
 				ZBX_PREPROC_DELTA_SPEED => _('Change per second')
 			]
 		],
 		[
 			'label' => _('Numeral systems'),
-			'values' => [
+			'types' => [
 				ZBX_PREPROC_BOOL2DEC => _('Boolean to decimal'),
 				ZBX_PREPROC_OCT2DEC => _('Octal to decimal'),
 				ZBX_PREPROC_HEX2DEC => _('Hexadecimal to decimal')
@@ -1343,27 +1343,25 @@ function get_preprocessing_types($type = null, $grouped = true) {
 	];
 
 	if ($type !== null) {
-		foreach ($types as $groups) {
-			if (array_key_exists($type, $groups['values'])) {
-				return $groups['values'][$type];
+		foreach ($groups as $group) {
+			if (array_key_exists($type, $group['types'])) {
+				return $group['types'][$type];
 			}
 		}
 
 		return '';
 	}
+	elseif ($grouped) {
+		return $groups;
+	}
 	else {
-		if ($grouped) {
-			return $types;
-		}
-		else {
-			$out = [];
+		$types = [];
 
-			foreach ($types as $groups) {
-				$out += $groups['values'];
-			}
-
-			return $out;
+		foreach ($groups as $group) {
+			$types += $group['types'];
 		}
+
+		return $types;
 	}
 }
 
