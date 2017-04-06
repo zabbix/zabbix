@@ -1794,13 +1794,15 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 	int			i;
 
 	if (NULL == (result = DBselect(
-			"select d.triggerid_down,d.triggerid_up"
-			" from trigger_depends d,hosts h,items i,functions f"
-			" where h.hostid=i.hostid"
+			"select distinct d.triggerid_down,d.triggerid_up"
+			" from trigger_depends d,triggers t,hosts h,items i,functions f"
+			" where t.triggerid=d.triggerid_down"
+				" and t.flags<>%d"
+				" and h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
 				" and f.triggerid=d.triggerid_down"
 				" and h.status in (%d,%d)",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)))
+				ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)))
 	{
 		return FAIL;
 	}
@@ -2323,8 +2325,15 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 	zbx_dc_trigger_tag_t	*trigger_tag;
 
 	if (NULL == (result = DBselect(
-			"select triggertagid,triggerid,tag,value"
-			" from trigger_tag")))
+			"select distinct tt.triggertagid,tt.triggerid,tt.tag,tt.value"
+			" from trigger_tag tt,triggers t,hosts h,items i,functions f"
+			" where t.triggerid=tt.triggerid"
+				" and t.flags<>%d"
+				" and h.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.triggerid=tt.triggerid"
+				" and h.status in (%d,%d)",
+				ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)))
 	{
 		return FAIL;
 	}
