@@ -898,7 +898,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 {
 	const char		*__function_name = "process_proxyconfig_table";
 
-	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0, move_out = 0,
+	int			f, fields_count, insert, is_null, i, ret = FAIL, id_field_nr = 0, move_out = 0,
 				move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -974,11 +974,18 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	p = NULL;
 	/* iterate column names (lines 4-6 in T1) */
-	while (NULL != (p = zbx_json_next_value_dyn(&jp_data, p, &buf, &buf_alloc, NULL)))
+	for (fields_count = 0; NULL != (p = zbx_json_next_value_dyn(&jp_data, p, &buf, &buf_alloc, NULL)); fields_count++)
 	{
-		if (NULL == (fields[fields_count++] = DBget_field(table, buf)))
+		if (NULL == (fields[fields_count] = DBget_field(table, buf)))
 		{
 			*error = zbx_dsprintf(*error, "invalid field name \"%s.%s\"", table->table, buf);
+			goto out;
+		}
+
+		if (0 == (fields[fields_count]->flags & ZBX_PROXY) &&
+				(0 != strcmp(table->recid, buf) || ZBX_TYPE_ID != fields[fields_count]->type))
+		{
+			*error = zbx_dsprintf(*error, "unexpected field \"%s.%s\"", table->table, buf);
 			goto out;
 		}
 	}
@@ -3204,6 +3211,12 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			goto json_parse_error;
+
+		if (SUCCEED != is_ip(ip))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "\"%s\" is not a valid IP address", ip);
+			continue;
+		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 			port = atoi(tmp);
