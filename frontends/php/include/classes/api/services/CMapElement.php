@@ -515,10 +515,15 @@ abstract class CMapElement extends CApiService {
 
 		$update = [];
 		foreach ($shapes as $shape) {
-			$update[] = [
-				'values' => $shape,
-				'where' => ['sysmap_shapeid' => $shape['sysmap_shapeid']],
-			];
+			$shapeid = $shape['sysmap_shapeid'];
+			unset($shape['sysmap_shapeid']);
+
+			if ($shape) {
+				$update[] = [
+					'values' => $shape,
+					'where' => ['sysmap_shapeid' => $shapeid],
+				];
+			}
 		}
 
 		DB::update('sysmap_shape', $update);
