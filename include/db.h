@@ -401,8 +401,10 @@ typedef struct
 }
 DB_ESCALATION;
 
+int	DBinit(char **error);
+void	DBdeinit(void);
+
 int	DBconnect(int flag);
-void	DBinit(void);
 void	DBclose(void);
 
 #ifdef HAVE_ORACLE
@@ -523,8 +525,8 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
 
-void	zbx_create_itservices_lock();
-void	zbx_destroy_itservices_lock();
+int	zbx_create_itservices_lock(char **error);
+void	zbx_destroy_itservices_lock(void);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);

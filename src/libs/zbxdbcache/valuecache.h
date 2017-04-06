@@ -83,7 +83,7 @@ typedef struct
 }
 zbx_vc_stats_t;
 
-void	zbx_vc_init(void);
+int	zbx_vc_init(char **error);
 
 void	zbx_vc_destroy(void);
 

@@ -5354,12 +5354,11 @@ static int	__config_psk_compare(const void *d1, const void *d2)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	init_configuration_cache(void)
+int	init_configuration_cache(char **error)
 {
 	const char	*__function_name = "init_configuration_cache";
 
-	int		i;
-	key_t		shm_key;
+	int		i, ret;
 	size_t		config_size;
 	size_t		strpool_size;
 
@@ -5368,19 +5367,14 @@ void	init_configuration_cache(void)
 	strpool_size = (size_t)(CONFIG_CONF_CACHE_SIZE * 0.15);
 	config_size = CONFIG_CONF_CACHE_SIZE - strpool_size;
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_CONFIG_ID)))
-	{
-		zbx_error("Can't create IPC key for configuration cache");
-		exit(EXIT_FAILURE);
-	}
+	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG, error)))
+		goto out;
 
-	if (FAIL == zbx_mutex_create_force(&config_lock, ZBX_MUTEX_CONFIG))
-	{
-		zbx_error("Unable to create mutex for configuration cache");
-		exit(EXIT_FAILURE);
-	}
+	if (SUCCEED != (ret = zbx_mem_create(&config_mem, config_size, "configuration cache", "CacheSize", 0, error)))
+		goto out;
 
-	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize", 0);
+	if (SUCCEED != (ret = zbx_strpool_create(strpool_size, error)))
+		goto out;
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
@@ -5499,10 +5493,10 @@ void	init_configuration_cache(void)
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
-
-	zbx_strpool_create(strpool_size);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -5523,9 +5517,6 @@ void	free_configuration_cache(void)
 	LOCK_CACHE;
 
 	config = NULL;
-	zbx_mem_destroy(config_mem);
-
-	zbx_strpool_destroy();
 
 	UNLOCK_CACHE;
 

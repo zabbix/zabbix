@@ -865,6 +865,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
+	char		*error = NULL;
 	int		i, j = 0;
 #ifdef _WINDOWS
 	DWORD		res;
@@ -876,7 +877,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
-	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
+	{
+		zbx_error("cannot open log: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #ifdef HAVE_IPV6
 #	define IPV6_FEATURE_STATUS	"YES"
@@ -922,10 +928,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	init_collector_data();
+	if (SUCCEED != init_collector_data(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #ifdef _WINDOWS
-	init_perf_collector(1);
+	if (SUCCEED != init_perf_collector(ZBX_MULTI_THREADED, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize performance counter collector: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
 	zbx_free_config();
@@ -1102,6 +1119,7 @@ int	main(int argc, char **argv)
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 #ifdef _WINDOWS
 	int		ret;
+	char		*error;
 
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
@@ -1161,7 +1179,13 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 #ifdef _WINDOWS
-			init_perf_collector(0);
+			if (SUCCEED != init_perf_collector(ZBX_SINGLE_THREADED, &error))
+			{
+				zbx_error("cannot initialize performance counter collector: %s", error);
+				zbx_free(error);
+				exit(EXIT_FAILURE);
+			}
+
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #else
 			zbx_set_common_signal_handlers();

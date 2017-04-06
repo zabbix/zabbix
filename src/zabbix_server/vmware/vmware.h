@@ -210,7 +210,7 @@ zbx_vmware_stats_t;
 
 ZBX_THREAD_ENTRY(vmware_thread, args);
 
-void	zbx_vmware_init(void);
+int	zbx_vmware_init(char **error);
 void	zbx_vmware_destroy(void);
 
 void	zbx_vmware_lock(void);

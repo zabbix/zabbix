@@ -417,7 +417,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 				if (NULL == (stats = zbx_hashset_search(&queue_stats, &id)))
 				{
-					zbx_queue_stats_t	data = {id};
+					zbx_queue_stats_t	data = {.id = id};
 
 					stats = zbx_hashset_insert(&queue_stats, &data, sizeof(data));
 				}
@@ -442,7 +442,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 				if (NULL == (stats = zbx_hashset_search(&queue_stats, &id)))
 				{
-					zbx_queue_stats_t	data = {id};
+					zbx_queue_stats_t	data = {.id = id};
 
 					stats = zbx_hashset_insert(&queue_stats, &data, sizeof(data));
 				}

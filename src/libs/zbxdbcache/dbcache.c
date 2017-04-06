@@ -3271,29 +3271,24 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 
 ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
 
-static void	init_trend_cache(void)
+static int	init_trend_cache(char **error)
 {
 	const char	*__function_name = "init_trend_cache";
-	key_t		trend_shm_key;
 	size_t		sz;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for trend cache");
-		exit(EXIT_FAILURE);
-	}
-
-	if (FAIL == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
-	{
-		zbx_error("cannot create mutex for trend cache");
-		exit(EXIT_FAILURE);
-	}
+	if (SUCCEED != (ret = zbx_mutex_create(&trends_lock, ZBX_MUTEX_TRENDS, error)))
+		goto out;
 
 	sz = zbx_mem_required_size(1, "trend cache", "TrendCacheSize");
-	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, CONFIG_TRENDS_CACHE_SIZE,
-			"trend cache", "TrendCacheSize", 0);
+	if (SUCCEED != (ret = zbx_mem_create(&trend_mem, CONFIG_TRENDS_CACHE_SIZE, "trend cache", "TrendCacheSize", 0,
+			error)))
+	{
+		goto out;
+	}
+
 	CONFIG_TRENDS_CACHE_SIZE -= sz;
 
 	cache->trends_num = 0;
@@ -3308,8 +3303,10 @@ static void	init_trend_cache(void)
 			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
 
 #undef INIT_HASHSET_SIZE
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -3321,39 +3318,31 @@ static void	init_trend_cache(void)
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	init_database_cache(void)
+int	init_database_cache(char **error)
 {
 	const char	*__function_name = "init_database_cache";
-	key_t		hc_shm_key, hc_index_shm_key;
+
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (hc_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_ID)) ||
-			-1 == (hc_index_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_INDEX_ID)))
+	if (SUCCEED != (ret = zbx_mutex_create(&cache_lock, ZBX_MUTEX_CACHE, error)))
+		goto out;
+
+	if (SUCCEED != (ret = zbx_mutex_create(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS, error)))
+		goto out;
+
+	if (SUCCEED != (ret = zbx_mem_create(&hc_mem, CONFIG_HISTORY_CACHE_SIZE, "history cache",
+			"HistoryCacheSize", 1, error)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history cache");
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
-	if (FAIL == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
+	if (SUCCEED != (ret = zbx_mem_create(&hc_index_mem, CONFIG_HISTORY_INDEX_CACHE_SIZE, "history index cache",
+			"HistoryIndexCacheSize", 0, error)))
 	{
-		zbx_error("cannot create mutex for history cache");
-		exit(EXIT_FAILURE);
+		goto out;
 	}
-
-	if (FAIL == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
-	{
-		zbx_error("cannot create mutex for IDs cache");
-		exit(EXIT_FAILURE);
-	}
-
-	/* history cache */
-	zbx_mem_create(&hc_mem, hc_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_CACHE_SIZE, "history cache",
-			"HistoryCacheSize", 1);
-
-	/* history index cache */
-	zbx_mem_create(&hc_index_mem, hc_index_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_INDEX_CACHE_SIZE,
-			"history index cache", "HistoryIndexCacheSize", 0);
 
 	cache = (ZBX_DC_CACHE *)__hc_index_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 	memset(cache, 0, sizeof(ZBX_DC_CACHE));
@@ -3368,14 +3357,18 @@ void	init_database_cache(void)
 	zbx_binary_heap_create_ext(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY,
 			__hc_index_mem_malloc_func, __hc_index_mem_realloc_func, __hc_index_mem_free_func);
 
-	/* trend cache */
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		init_trend_cache();
+	{
+		if (SUCCEED != (ret = init_trend_cache(error)))
+			goto out;
+	}
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_alloc);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -3418,12 +3411,6 @@ void	free_database_cache(void)
 	DCsync_all();
 
 	cache = NULL;
-
-	zbx_mem_destroy(hc_mem);
-	zbx_mem_destroy(hc_index_mem);
-
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		zbx_mem_destroy(trend_mem);
 
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);

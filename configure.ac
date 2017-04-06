@@ -1185,6 +1185,10 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Checking for SQLite3 support
 	AX_LIB_SQLITE3()
 	if test "x$want_sqlite3" = "xyes"; then
+		if test "x$server" = "xyes"; then
+			AC_MSG_ERROR([SQLite is not supported as a main Zabbix database backend.])
+		fi
+
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi

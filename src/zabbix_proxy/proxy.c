@@ -845,6 +845,7 @@ int	main(int argc, char **argv)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
+	char		*error = NULL;
 	int		i, db_type;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
@@ -854,7 +855,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
-	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
+	{
+		zbx_error("cannot open log:%s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS 	"YES"
@@ -929,25 +935,50 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_free_config();
 
-	init_database_cache();
-	init_configuration_cache();
-	init_selfmon_collector();
+	if (SUCCEED != init_database_cache(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
-	/* initialize vmware support */
-	if (0 != CONFIG_VMWARE_FORKS)
-		zbx_vmware_init();
+	if (SUCCEED != init_configuration_cache(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
-	DBinit();
+	if (SUCCEED != init_selfmon_collector(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (0 != CONFIG_VMWARE_FORKS && SUCCEED != zbx_vmware_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != DBinit(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": database is not a Zabbix database",
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
 	else if (ZBX_DB_PROXY != db_type)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": Zabbix proxy cannot work with a"
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
 				" Zabbix server database", CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
@@ -1123,9 +1154,7 @@ void	zbx_on_exit(void)
 	free_configuration_cache();
 	DBclose();
 
-#ifdef HAVE_SQLITE3
-	zbx_remove_sqlite3_mutex();
-#endif
+	DBdeinit();
 
 	/* free vmware support */
 	if (0 != CONFIG_VMWARE_FORKS)

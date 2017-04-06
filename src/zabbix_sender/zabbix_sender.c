@@ -1002,7 +1002,7 @@ int	main(int argc, char **argv)
 {
 	FILE			*in;
 	char			*in_line = NULL, hostname[MAX_STRING_LEN], key[MAX_STRING_LEN], *key_value = NULL,
-				clock[32];
+				clock[32], *error = NULL;
 	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL,
 				timestamp;
 	size_t			in_line_alloc = MAX_BUFFER_LEN, key_value_alloc = 0;
@@ -1017,7 +1017,12 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(CONFIG_FILE);
 
-	zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL);
+	if (SUCCEED != zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL, &error))
+	{
+		zbx_error("cannot open log: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #if !defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
