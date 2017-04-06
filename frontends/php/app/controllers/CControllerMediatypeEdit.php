@@ -123,7 +123,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
-			'maxsessions' => '0',
+			'maxsessions' => '1',
 			'maxattempts' => '1',
 			'attempt_interval' => '10s'
 		];
