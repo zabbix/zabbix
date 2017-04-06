@@ -40,6 +40,11 @@ $options = [
 	'timestamp' => $map_data['timestamp']
 ];
 
+if ($map_data['id'] == -1) {
+	$options['timestamp'] = null;
+	$options['homepage'] = null;
+}
+
 echo CJs::encodeJson($options);
 
 require_once dirname(__FILE__).'/include/page_footer.php';

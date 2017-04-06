@@ -56,7 +56,7 @@ class CMapHelper {
 
 		$theme = self::getGraphTheme();
 
-		if (empty($map)) {
+		if (!$map) {
 			$map = [
 				'sysmapid' => -1,
 				'width' => 320,
