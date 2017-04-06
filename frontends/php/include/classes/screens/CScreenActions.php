@@ -142,7 +142,7 @@ class CScreenActions extends CScreenBase {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
 				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
 			}
-			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
+			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
 				$status = (new CSpan([
 					_('In progress').':',
 					BR(),

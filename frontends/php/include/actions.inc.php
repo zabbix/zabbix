@@ -1303,8 +1303,9 @@ function getActionMessages(array $alerts, array $r_alerts) {
 			}
 
 			$mediaType = array_pop($alert['mediatypes']);
+			$status = $alert['status'] === ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
 
-			switch ($alert['status']) {
+			switch ($status) {
 				case ALERT_STATUS_SENT:
 					$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
 					$retries = '';
@@ -1396,7 +1397,9 @@ function getActionCommands(array $alerts, array $r_alerts) {
 				continue;
 			}
 
-			switch ($alert['status']) {
+			$status = $alert['status'] === ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
+
+			switch ($status) {
 				case ALERT_STATUS_SENT:
 					$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 					break;
@@ -1447,7 +1450,9 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 		$show_header = $display_recovery_alerts;
 
 		foreach ($alerts_data as $alert) {
-			switch ($alert['status']) {
+			$status = $alert['status'] === ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
+
+			switch ($status) {
 				case ALERT_STATUS_SENT:
 					$status_str = (new CSpan($alert['alerttype'] == ALERT_TYPE_COMMAND ? _('Executed') : _('Sent')))
 						->addClass(ZBX_STYLE_GREEN);
@@ -1620,7 +1625,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 			$status = ALERT_STATUS_SENT;
 			foreach ([$event_alerts, $r_event_alerts] as $alerts_data) {
 				foreach ($alerts_data as $alert) {
-					if ($alert['status'] == ALERT_STATUS_NOT_SENT) {
+					if ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
 						$status = ALERT_STATUS_NOT_SENT;
 					}
 					elseif ($alert['status'] == ALERT_STATUS_FAILED && $status != ALERT_STATUS_NOT_SENT) {

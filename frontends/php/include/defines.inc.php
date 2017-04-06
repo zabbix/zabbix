@@ -512,6 +512,7 @@ define('ALERT_MAX_RETRIES', 3);
 define('ALERT_STATUS_NOT_SENT', 0);
 define('ALERT_STATUS_SENT',		1);
 define('ALERT_STATUS_FAILED',	2);
+define('ALERT_STATUS_NEW',		3);
 
 define('ALERT_TYPE_MESSAGE',	0);
 define('ALERT_TYPE_COMMAND',	1);

@@ -61,7 +61,7 @@ foreach ($this->data['alerts'] as $alert) {
 			? (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 	}
-	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
+	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
 		$status = (new CSpan([
 			_('In progress').':',
 			BR(),
