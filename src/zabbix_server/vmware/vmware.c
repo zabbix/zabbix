@@ -63,7 +63,6 @@
  * performance data updates.
  */
 
-extern char		*CONFIG_FILE;
 extern int		CONFIG_VMWARE_FREQUENCY;
 extern int		CONFIG_VMWARE_PERF_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
@@ -4201,36 +4200,38 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
  * Comments: This function must be called before worker threads are forked.   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vmware_init(void)
+int	zbx_vmware_init(char **error)
 {
 	const char	*__function_name = "zbx_vmware_init";
 
-	key_t		shm_key;
+	int		ret = FAIL;
 	zbx_uint64_t	size_reserved;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE);
-
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_VMWARE_ID)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for vmware cache");
-		exit(EXIT_FAILURE);
-	}
+	if (SUCCEED != zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE, error))
+		goto out;
 
 	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMwareCacheSize");
 
 	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
 
-	zbx_mem_create(&vmware_mem, shm_key, ZBX_NO_MUTEX, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size",
-			"VMwareCacheSize", 0);
+	if (SUCCEED != zbx_mem_create(&vmware_mem, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size", "VMwareCacheSize", 0,
+			error))
+	{
+		goto out;
+	}
 
 	vmware = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
 	memset(vmware, 0, sizeof(zbx_vmware_t));
 
 	VMWARE_VECTOR_CREATE(&vmware->services, ptr);
 
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -4246,7 +4247,6 @@ void	zbx_vmware_destroy(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_mem_destroy(vmware_mem);
 	zbx_mutex_destroy(&vmware_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -4409,6 +4409,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	}
 #undef STAT_INTERVAL
 #else
+	ZBX_UNUSED(args);
+	THIS_SHOULD_NEVER_HAPPEN;
 	zbx_thread_exit(EXIT_SUCCESS);
 #endif
 }

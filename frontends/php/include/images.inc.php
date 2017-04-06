@@ -50,9 +50,6 @@ function zbx_unescape_image($image) {
 	if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 		$result = pg_unescape_bytea($image);
 	}
-	elseif ($DB['TYPE'] == ZBX_DB_SQLITE3) {
-		$result = pack('H*', $image);
-	}
 	return $result;
 }
 

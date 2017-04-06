@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
+...G...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite support for frontend and server (abs)
 A.F.I..... [ZBXNEXT-2694] implemented multiple triggers support for map elements (Oleg)
 ....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors (abs)
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)

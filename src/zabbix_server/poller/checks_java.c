@@ -25,7 +25,7 @@
 
 #include "checks_java.h"
 
-static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, char *response,
+static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *response,
 		char *error, int max_error_len)
 {
 	const char		*p;
@@ -209,7 +209,7 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]", s.buffer);
 
-				err = parse_response(items, results, errcodes, num, s.buffer, error, sizeof(error));
+				err = parse_response(results, errcodes, num, s.buffer, error, sizeof(error));
 			}
 		}
 
