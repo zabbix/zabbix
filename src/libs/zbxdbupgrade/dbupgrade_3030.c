@@ -625,17 +625,18 @@ static int	DBpatch_3030053(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	unsigned char	value_type, data_type, delta;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	selementid, triggerid;
-	const char	*formula;
-	int		width, ret;
+	int		ret;
 
 	zbx_db_insert_prepare(&db_insert, "sysmap_element_trigger", "selement_triggerid", "selementid", "triggerid",
 			NULL);
 
 	/* sysmaps_elements.elementid for trigger map elements (2) should be migrated to table sysmap_element_trigger */
-	result = DBselect("select selementid, elementid from sysmaps_elements where elementtype=2");
+	result = DBselect("select e.selementid,e.elementid"
+			" from sysmaps_elements e,triggers t"
+			" where e.elementtype=2"
+				" and e.elementid=t.triggerid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
