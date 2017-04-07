@@ -708,7 +708,7 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_tasks(DC_PROXY *proxy)
+static int	proxy_get_tasks(DC_PROXY *proxy, time_t *last_access)
 {
 	const char	*__function_name = "proxy_get_tasks";
 
@@ -723,6 +723,8 @@ static int	proxy_get_tasks(DC_PROXY *proxy)
 
 	if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_TASKS, &answer, &ts, ZBX_TASKS_SEND))
 		goto out;
+
+	*last_access = time(NULL);
 
 	ret = proxy_process_proxy_data(proxy, answer, &ts, &more);
 
@@ -807,10 +809,8 @@ static int	process_proxy(void)
 		}
 		else if (proxy.proxy_tasks_nextcheck <= now)
 		{
-			if (SUCCEED != proxy_get_tasks(&proxy))
+			if (SUCCEED != proxy_get_tasks(&proxy, &last_access))
 				goto network_error;
-
-			last_access = time(NULL);
 		}
 network_error:
 		if (0 != last_access)
