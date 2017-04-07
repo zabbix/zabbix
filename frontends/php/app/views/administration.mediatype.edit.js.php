@@ -162,7 +162,9 @@
 		 */
 		function setMaxSessionsTypeOther() {
 			$('#maxsessionsType :radio')
-				.attr('disabled', false);
+				.attr('disabled', false)
+				.filter('[value=one]')
+					.click();
 		}
 
 		/**
