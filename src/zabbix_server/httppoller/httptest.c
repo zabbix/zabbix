@@ -124,12 +124,12 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	types[3], states[3];
+	unsigned char	types[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
-	int		lastclocks[3], errcodes[3];
+	int		errcodes[3];
 	size_t		i, num = 0;
-	AGENT_RESULT	value;
+	AGENT_RESULT    value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -199,31 +199,27 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		items[i].state = ITEM_STATE_NORMAL;
 		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
 
-		states[i] = items[i].state;
-		lastclocks[i] = ts->sec;
-
 		free_result(&value);
 	}
-
-	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+#ifdef HAVE_LIBCURL
 static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "process_step_data";
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	types[3], states[3];
+	unsigned char	types[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
-	int		lastclocks[3], errcodes[3];
+	int		errcodes[3];
 	size_t		i, num = 0;
-	AGENT_RESULT    value;
+	AGENT_RESULT	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_FS_DBL,
 			__function_name, stat->rspcode, stat->total_time, stat->speed_download);
@@ -287,20 +283,14 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		items[i].state = ITEM_STATE_NORMAL;
 		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
 
-		states[i] = items[i].state;
-		lastclocks[i] = ts->sec;
-
 		free_result(&value);
 	}
-
-	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#ifdef HAVE_LIBCURL
 static void	add_headers(char *headers, struct curl_slist **headers_slist)
 {
 	char      *p_begin;
@@ -708,16 +698,16 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	const char	*__function_name = "process_httptest";
 
 	DB_RESULT	result;
-	DB_ROW		row;
 	DB_HTTPSTEP	db_httpstep;
 	zbx_httpstep_t	httpstep;
 	char		*err_str = NULL;
 	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
-	zbx_httpstat_t	stat;
 	double		speed_download = 0;
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
+	DB_ROW		row;
+	zbx_httpstat_t	stat;
 	int		err;
 	char		*auth = NULL, errbuf[CURL_ERROR_SIZE];
 	size_t		auth_alloc = 0, auth_offset;
@@ -734,6 +724,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			" where httptestid=" ZBX_FS_UI64
 			" order by no",
 			httptest->httptest.httptestid);
+
+	/* Explicitly initialize the name. If we compile without libCURL support, */
+	/* we avoid the potential usage of unititialized values. */
+	db_httpstep.name = NULL;
 
 #ifdef HAVE_LIBCURL
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -1112,31 +1106,12 @@ clean:
 			/* or we have been compiled without cURL library */
 
 			lastfailedstep = 1;
-
-			/* we don't have name of the step, try to fetch it */
-
-			if (NULL != (row = DBfetch(result)))
-			{
-				ZBX_STR2UINT64(db_httpstep.httpstepid, row[0]);
-				db_httpstep.name = row[2];
-
-				memset(&stat, 0, sizeof(stat));
-
-				process_step_data(db_httpstep.httpstepid, &stat, &ts);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot process web scenario \"%s\" on host \"%s\": %s",
-						httptest->httptest.name, host->name, err_str);
-				db_httpstep.name = NULL;
-				THIS_SHOULD_NEVER_HAPPEN;
-			}
 		}
 
 		if (NULL != db_httpstep.name)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\""
-					": %s", db_httpstep.name, httptest->httptest.name, host->name, err_str);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": %s",
+					db_httpstep.name, httptest->httptest.name, host->name, err_str);
 		}
 	}
 	DBfree_result(result);

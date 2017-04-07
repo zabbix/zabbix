@@ -236,6 +236,9 @@ src/libs/zbxsysinfo/unknown/.deps
 src/libs/zbxsysinfo/unknown/.dirstamp
 src/libs/zbxsysinfo/unknown/Makefile
 src/libs/zbxsysinfo/unknown/Makefile.in
+src/libs/zbxtasks/.deps
+src/libs/zbxtasks/Makefile
+src/libs/zbxtasks/Makefile.in
 src/zabbix_agent/.deps
 src/zabbix_agent/Makefile
 src/zabbix_agent/Makefile.in
@@ -265,6 +268,9 @@ src/zabbix_proxy/housekeeper/Makefile.in
 src/zabbix_proxy/proxyconfig/.deps
 src/zabbix_proxy/proxyconfig/Makefile
 src/zabbix_proxy/proxyconfig/Makefile.in
+src/zabbix_proxy/taskmanager/.deps
+src/zabbix_proxy/taskmanager/Makefile
+src/zabbix_proxy/taskmanager/Makefile.in
 src/zabbix_proxy/zabbix_proxy
 src/zabbix_sender/.deps
 src/zabbix_sender/Makefile
@@ -306,6 +312,9 @@ src/zabbix_server/poller/Makefile.in
 src/zabbix_server/proxypoller/.deps
 src/zabbix_server/proxypoller/Makefile
 src/zabbix_server/proxypoller/Makefile.in
+src/zabbix_server/scripts/.deps
+src/zabbix_server/scripts/Makefile
+src/zabbix_server/scripts/Makefile.in
 src/zabbix_server/selfmon/.deps
 src/zabbix_server/selfmon/Makefile
 src/zabbix_server/selfmon/Makefile.in

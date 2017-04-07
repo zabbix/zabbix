@@ -259,16 +259,15 @@ int	get_process_type_by_name(const char *proc_type_str)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	init_selfmon_collector(void)
+int	init_selfmon_collector(char **error)
 {
 	const char	*__function_name = "init_selfmon_collector";
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
-	key_t		shm_key;
 	char		*p;
 	clock_t		ticks;
 	struct tms	buf;
 	unsigned char	proc_type;
-	int		proc_num, process_forks;
+	int		proc_num, process_forks, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -280,30 +279,27 @@ void	init_selfmon_collector(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)sz_total);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_SELFMON_ID)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for a self-monitoring collector");
-		exit(EXIT_FAILURE);
-	}
-
-	if (FAIL == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
+	if (SUCCEED != zbx_mutex_create(&sm_lock, ZBX_MUTEX_SELFMON, error))
 	{
 		zbx_error("unable to create mutex for a self-monitoring collector");
 		exit(EXIT_FAILURE);
 	}
 
-	if (-1 == (shm_id = zbx_shmget(shm_key, sz_total)))
+	if (-1 == (shm_id = shmget(IPC_PRIVATE, sz_total, 0600)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for a self-monitoring collector");
-		exit(EXIT_FAILURE);
+		*error = zbx_strdup(*error, "cannot allocate shared memory for a self-monitoring collector");
+		goto out;
 	}
 
 	if ((void *)(-1) == (p = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for a self-monitoring collector: %s",
+		*error = zbx_dsprintf(*error, "cannot attach shared memory for a self-monitoring collector: %s",
 				zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		goto out;
 	}
+
+	if (-1 == shmctl(shm_id, IPC_RMID, NULL))
+		zbx_error("cannot mark shared memory %d for destruction: %s", shm_id, zbx_strerror(errno));
 
 	collector = (zbx_selfmon_collector_t *)p; p += sz;
 	collector->process = (zbx_stat_process_t **)p; p += sz_array;
@@ -323,7 +319,11 @@ void	init_selfmon_collector(void)
 		}
 	}
 
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector:%p", __function_name, collector);
+
+	return ret;
 }
 
 /******************************************************************************

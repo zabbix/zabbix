@@ -262,6 +262,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
 		$this->zbxTestCheckboxSelect('show_work_period', false);
 		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
@@ -487,8 +488,11 @@ class testTemplateInheritance extends CWebTest {
 		}
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
 		$this->zbxTestCheckboxSelect('show_work_period', false);
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->zbxTestCheckboxSelect('show_triggers', false);
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
 		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->zbxTestInputType('percent_left', '4');
@@ -496,14 +500,12 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClick('add_protoitem');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_protoitem']");
 		$this->zbxTestClickLinkTextWait('itemDiscovery');
 		$this->zbxTestWaitWindowClose();
 		$this->zbxTestTextPresent($this->templateName.': itemDiscovery');
 
-		$this->zbxTestClickWait('add_item');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_item']");
 		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
 		$this->zbxTestWaitWindowClose();
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');

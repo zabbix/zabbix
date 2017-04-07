@@ -179,7 +179,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Delete() {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestClickLinkText($this->regexp2);
+		$this->zbxTestClickLinkTextWait($this->regexp2);
 
 		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();

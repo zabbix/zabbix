@@ -1068,8 +1068,7 @@ class CImportReferencer {
 			$dbProxy = API::Proxy()->get([
 				'filter' => ['host' => $this->proxies],
 				'output' => ['hostid', 'host'],
-				'preservekeys' => true,
-				'editable' => true
+				'preservekeys' => true
 			]);
 			foreach ($dbProxy as $proxy) {
 				$this->proxiesRefs[$proxy['host']] = $proxy['proxyid'];

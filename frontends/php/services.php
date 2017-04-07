@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 
-$page['title'] = _('Configuration of IT services');
+$page['title'] = _('Configuration of services');
 $page['file'] = 'services.php';
 $page['scripts'] = ['class.calendar.js'];
 

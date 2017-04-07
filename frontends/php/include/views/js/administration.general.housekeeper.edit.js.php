@@ -61,7 +61,7 @@ $schema = DB::getSchema('config');
 							jQuery('#hk_events_autoreg')
 								.val("<?= $schema['fields']['hk_events_autoreg']['default'] ?>");
 
-							// IT services
+							// Services
 							jQuery('#hk_services_mode')
 								.prop('checked',
 									<?= ($schema['fields']['hk_services_mode']['default'] == 1) ? 'true' : 'false' ?>

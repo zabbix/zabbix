@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Configuration of screens');
 $page['file'] = 'screenedit.php';
-$page['scripts'] = ['class.cscreen.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js'];
+$page['scripts'] = ['class.cscreen.js', 'class.calendar.js', 'gtlc.js', 'class.svg.canvas.js', 'class.svg.map.js', 'flickerfreescreen.js', 'multiselect.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';

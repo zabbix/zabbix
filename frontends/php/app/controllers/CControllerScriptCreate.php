@@ -25,7 +25,7 @@ class CControllerScriptCreate extends CController {
 		$fields = [
 			'name' =>					'db scripts.name',
 			'type' =>					'db scripts.type        |in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI,
-			'execute_on' =>				'db scripts.execute_on  |in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER,
+			'execute_on' =>				'db scripts.execute_on  |in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER.','.ZBX_SCRIPT_EXECUTE_ON_PROXY,
 			'command' =>				'db scripts.command',
 			'commandipmi' =>			'db scripts.command',
 			'description' =>			'db scripts.description',

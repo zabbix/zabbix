@@ -990,7 +990,7 @@ void	zbx_procstat_init(void)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED != zbx_dshm_create(&collector->procstat, ZBX_IPC_COLLECTOR_PROC_ID, 0, ZBX_MUTEX_PROCSTAT,
+	if (SUCCEED != zbx_dshm_create(&collector->procstat, 0, ZBX_MUTEX_PROCSTAT,
 			procstat_copy_data, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize process data collector: %s", errmsg);
@@ -1101,8 +1101,7 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 
 	/* 1e9 (nanoseconds) * 1e2 (percent) * 1e1 (one digit decimal place) */
 	ticks_diff *= __UINT64_C(1000000000000);
-	ticks_diff /= time_diff * sysconf(_SC_CLK_TCK);
-	*value = (double)ticks_diff / 10;
+	*value = round((double)ticks_diff / (time_diff * sysconf(_SC_CLK_TCK))) / 10;
 
 	ret = SUCCEED;
 out:

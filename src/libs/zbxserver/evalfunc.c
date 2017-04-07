@@ -2725,7 +2725,7 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
 		value_double /= base * base * base * base;
 	}
 
-	if (SUCCEED != zbx_double_compare((int)(value_double + 0.5), value_double))
+	if (SUCCEED != zbx_double_compare(round(value_double), value_double))
 	{
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
 		del_zeroes(tmp);

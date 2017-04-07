@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,28 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "dbcache.h"
+#ifndef ZABBIX_TASKMANAGER_H
+#define ZABBIX_TASKMANAGER_H
 
-void	zbx_script_init(zbx_script_t *script)
-{
-	ZBX_UNUSED(script);
-}
+#include "threads.h"
 
-void	zbx_script_clean(zbx_script_t *script)
-{
-	ZBX_UNUSED(script);
-}
+ZBX_THREAD_ENTRY(taskmanager_thread, args);
 
-int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, char **result, char *error,
-		size_t max_error_len)
-{
-	ZBX_UNUSED(host);
-	ZBX_UNUSED(script);
-	ZBX_UNUSED(user);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(max_error_len);
-
-	return SUCCEED;
-}
+#endif

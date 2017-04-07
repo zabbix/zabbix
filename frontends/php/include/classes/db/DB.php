@@ -68,9 +68,6 @@ class DB {
 				case ZBX_DB_DB2:
 					self::$dbBackend = new Db2DbBackend();
 					break;
-				case ZBX_DB_SQLITE3:
-					self::$dbBackend = new SqliteDbBackend();
-					break;
 			}
 		}
 
@@ -104,12 +101,8 @@ class DB {
 		$sql = 'SELECT nextid'.
 				' FROM ids'.
 				' WHERE table_name='.zbx_dbstr($table).
-					' AND field_name='.zbx_dbstr($id_name);
-
-		// SQLite3 does not support this syntax. Since we are in transaction, it can be ignored.
-		if ($DB['TYPE'] != ZBX_DB_SQLITE3) {
-			$sql = $sql.' FOR UPDATE';
-		}
+					' AND field_name='.zbx_dbstr($id_name).
+				' FOR UPDATE';
 
 		$res = DBfetch(DBselect($sql));
 

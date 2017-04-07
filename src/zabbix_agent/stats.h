@@ -61,10 +61,10 @@ extern int			my_diskstat_shmid;
 
 ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
 
-void	init_collector_data();
-void	free_collector_data();
-void	diskstat_shm_init();
-void	diskstat_shm_reattach();
-void	diskstat_shm_extend();
+int	init_collector_data(char **error);
+void	free_collector_data(void);
+void	diskstat_shm_init(void);
+void	diskstat_shm_reattach(void);
+void	diskstat_shm_extend(void);
 
 #endif	/* ZABBIX_STATS_H */
