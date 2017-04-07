@@ -261,7 +261,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
-			'applicationid' => getRequest('applicationid'),
+			'applicationid' => getRequest('applicationid', 0),
 			'delay' => $_REQUEST['delay'],
 			'retries' => $_REQUEST['retries'],
 			'status' => hasRequest('status') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED,
