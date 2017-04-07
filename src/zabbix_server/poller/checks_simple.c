@@ -194,6 +194,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 		if (SYSINFO_RET_OK == check_vcenter_eventlog(&request, item, result, add_results))
 			ret = SUCCEED;
 #else
+		ZBX_UNUSED(add_results);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
 #endif
 	}

@@ -3886,6 +3886,30 @@ zbx_trigger_func_position_t;
 
 /******************************************************************************
  *                                                                            *
+ * Function: expand_trigger_macros                                            *
+ *                                                                            *
+ * Purpose: expand macros in a trigger expression                             *
+ *                                                                            *
+ * Parameters: event - The trigger event structure                            *
+ *             trigger - The trigger where to expand macros in                *
+ *                                                                            *
+ * Author: Andrea Biscuola                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	expand_trigger_macros(DB_EVENT *event, DC_TRIGGER *trigger)
+{
+	substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, &trigger->expression,
+			MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
+	{
+		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+				&trigger->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_link_triggers_with_functions                                 *
  *                                                                            *
  * Purpose: triggers links with functions                                     *
@@ -3904,12 +3928,15 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 
 	zbx_vector_uint64_t	funcids;
 	DC_TRIGGER		*tr;
+	DB_EVENT		ev;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trigger_order_num:%d", __function_name, trigger_order->values_num);
 
 	zbx_vector_uint64_create(&funcids);
 	zbx_vector_uint64_reserve(&funcids, functionids->values_num);
+
+	ev.object = EVENT_OBJECT_TRIGGER;
 
 	for (i = 0; i < trigger_order->values_num; i++)
 	{
@@ -3919,6 +3946,10 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 
 		if (NULL != tr->new_error)
 			continue;
+
+		ev.value = tr->value;
+
+		expand_trigger_macros(&ev, tr);
 
 		if (SUCCEED == extract_expression_functionids(&funcids, tr->expression))
 		{
@@ -4455,7 +4486,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	DC_TRIGGER		*tr;
 	int			i;
 	double			expr_result;
-	zbx_vector_ptr_t	unknown_msgs;		/* pointers to messages about origins of 'unknown' values */
+	zbx_vector_ptr_t	unknown_msgs;	    /* pointers to messages about origins of 'unknown' values */
 	char			err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, triggers->values_num);
@@ -4470,14 +4501,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		if (NULL == tr->new_error)
 		{
-			substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, &tr->expression,
-					MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
-
-			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
-			{
-				substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
-						&tr->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
-			}
+			expand_trigger_macros(&event, tr);
 		}
 		else
 		{

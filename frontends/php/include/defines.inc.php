@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.4.0alpha1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030114);
+define('ZABBIX_DB_VERSION',		3030119);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -103,7 +103,6 @@ define('ZBX_DB_DB2',		'IBM_DB2');
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
-define('ZBX_DB_SQLITE3',	'SQLITE3');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
@@ -319,6 +318,10 @@ define('REPORT_PERIOD_LAST_YEAR',		7);
 
 define('SYSMAP_LABEL_ADVANCED_OFF',	0);
 define('SYSMAP_LABEL_ADVANCED_ON',	1);
+
+define('SYSMAP_PROBLEMS_NUMBER',			0);
+define('SYSMAP_SINGLE_PROBLEM',				1);
+define('SYSMAP_PROBLEMS_NUMBER_CRITICAL',	2);
 
 define('MAP_LABEL_TYPE_LABEL',		0);
 define('MAP_LABEL_TYPE_IP',			1);

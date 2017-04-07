@@ -421,7 +421,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 				if (NULL == (stats = zbx_hashset_search(&queue_stats, &id)))
 				{
-					zbx_queue_stats_t	data = {id};
+					zbx_queue_stats_t	data = {.id = id};
 
 					stats = zbx_hashset_insert(&queue_stats, &data, sizeof(data));
 				}
@@ -446,7 +446,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 				if (NULL == (stats = zbx_hashset_search(&queue_stats, &id)))
 				{
-					zbx_queue_stats_t	data = {id};
+					zbx_queue_stats_t	data = {.id = id};
 
 					stats = zbx_hashset_insert(&queue_stats, &data, sizeof(data));
 				}
@@ -705,7 +705,6 @@ void	status_required_performance(struct zbx_json *json)
 	status_entry_end(json);
 
 	status_section_end(json);
-
 	zbx_free(tmp);
 }
 
@@ -918,7 +917,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 			{
-				ret = node_process_command(sock, s, &jp);
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = node_process_command(sock, s, &jp);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
 			{

@@ -368,5 +368,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_free(&j);
 
+	if_freenameindex(interfaces);
+
 	return SYSINFO_RET_OK;
 }

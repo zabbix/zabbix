@@ -1,6 +1,8 @@
 Changes for 3.4.0alpha1
 
 New features:
+...G...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite support for frontend and server (abs)
+A.F.I..... [ZBXNEXT-2694] implemented multiple triggers support for map elements (Oleg)
 ....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors (abs)
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)
 ..F....... [ZBXNEXT-34] implemented vector graphics for maps (vjaceslavs)
@@ -12,10 +14,10 @@ A.F....PS. [ZBXNEXT-936] implemented remote command execution via proxy (wiper)
 ..F.I..... [ZBXNEXT-3679] implemented a new design for Dashboard page (Pavel, Sasha)
 ....I..PS. [ZBXNEXT-3386] added IPMI manager and reworked IPMI pollers to avoid connecting to one host from multiple pollers (wiper)
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
-..FGI..... [ZBXNEXT-491] added vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>] check (vjaceslavs, Andris)
+..FGI..... [ZBXNEXT-491] added vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>] check (Andris, vjaceslavs)
 ...G....S. [ZBXNEXT-1380] added check for exit code of scripts (vjaceslavs)
 A......... [ZBX-3783] deprecated mappings.sortorder parameter by iconmap.create() and iconmap.update() methods (Sasha)
-A.F.I..PS. [ZBXNEXT-1443] added item pre-processing options (wiper, Ivo)
+A.F.I..PS. [ZBXNEXT-1443] added item pre-processing options (Ivo, wiper)
 ..F....... [ZBXNEXT-830] implemented full clone of maps (Cemeris, Sasha)
 ...G...... [ZBXNEXT-12] added support of CIDR subnet mask notations for Server option on agent config (vso)
 A.F....PS. [ZBXNEXT-12] added support of CIDR subnet mask notations for Allowed hosts of trapper items (Sasha, vso)
@@ -53,8 +55,14 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11925] fixed parsing of nested host groups (gcalenko, Sasha)
+..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
+..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
+........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
+...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
+..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
-..F....... [ZBX-11877] fixed undefined index when trigger.lastEvent was not set (gcalenko)
+..F....... [ZBX-11877] fixed undefined index error in screens for triggers without events data (gcalenko)
 A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
 ..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
 A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)
@@ -64,7 +72,7 @@ A......... [ZBX-11893] fixed permission issue, when importing hosts that are mon
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
 ........S. [ZBX-11738] fixed performing actions for problemas that have started and resolved while another problems escalation is executed (vikotrs)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
-........S. [ZBX-11829] fixed generation of problems in multiple event mode (Sergejs)
+........S. [ZBX-11829] fixed generation of problems in multiple event mode (Sergejs, abs)
 ..F....... [ZBX-11624] fixed undefined index error for regular expressions form (vmurzins)
 .......PS. [ZBX-11855] fixed data truncation when escaping strings that contain carriage return (vso)
 ........S. [ZBX-11444] fixed incorrect check for time functions in recovery expressions (abs)
@@ -411,6 +419,11 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
+..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
+........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
+...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
+..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
 A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
 ..F....... [ZBX-11933] added fullscreen parameter in link to submap in maps (vmurzins)
@@ -2054,6 +2067,8 @@ Changes for 2.2.18rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
+...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
 A......... [ZBX-9358] improved randomness in session ID generation (vmurzins)
 A......... [ZBX-11893] fixed permission issue, when importing hosts that are monitored by proxy by Zabbix Admin type user (vmurzins)

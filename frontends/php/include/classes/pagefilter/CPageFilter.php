@@ -384,41 +384,43 @@ class CPageFilter {
 	private function _initGroups($groupId, array $options, $hostId) {
 		$defaultOptions = [
 			'output' => ['groupid', 'name'],
-			'preservekeys' => true,
-			'sortfield' => ['name']
+			'preservekeys' => true
 		];
 		$options = zbx_array_merge($defaultOptions, $options);
 		$this->data['groups'] = API::HostGroup()->get($options);
 
 		$parents = [];
-		$parent_name = '';
 		foreach ($this->data['groups'] as $group) {
 			$parent = explode('/', $group['name']);
-			if (count($parent) > 1) {
-				array_pop($parent);
-				foreach ($parent as $sub_parent) {
-					if ($parent_name === '') {
-						$parent_name = $sub_parent;
-					}
-					else {
-						$parent_name .= '/'.$sub_parent;
-					}
-					$parents[] = $parent_name;
+			$count = count($parent) - 1;
+
+			if ($count !== 0) {
+				$parent_name = '';
+
+				for ($i = 0; $i < $count; $i++) {
+					$parent_name .= ($parent_name === '') ? '' : '/';
+					$parent_name .= $parent[$i];
+					$parents[$parent_name] = true;
 				}
 			}
 		}
 
+		// removing already selected parent groups
+		foreach ($this->data['groups'] as $group) {
+			if (array_key_exists($group['name'], $parents)) {
+				unset($parents[$group['name']]);
+			}
+		}
+
 		if ($parents) {
-			$parent_groups = API::HostGroup()->get([
+			$this->data['groups'] += API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'filter' => ['name' => $parents],
+				'filter' => ['name' => array_keys($parents)],
 				'preservekeys' => true
 			]);
-
-			$this->data['groups'] = array_replace($this->data['groups'], $parent_groups);
-
-			CArrayHelper::sort($this->data['groups'], ['name']);
 		}
+
+		CArrayHelper::sort($this->data['groups'], ['name']);
 
 		// select remembered selection
 		if ($groupId === null && $this->_profileIds['groupid'] > 0) {

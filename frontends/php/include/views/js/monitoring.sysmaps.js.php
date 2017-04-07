@@ -9,7 +9,6 @@
 			->cleanItems()
 			->setName('selementForm')
 			->setId('selementForm')
-			->addVar('elementid', '')
 			->addItem(
 				(new CFormList())
 					->addRow(_('Type'),
@@ -85,30 +84,44 @@
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 						'hostSelectRow'
 					)
-					->addRow(_('Trigger'), [
-						new CVar('elementExpressionTrigger', ''),
-						(new CTextBox('elementName'))
-							->setReadonly(true)
-							->setId('elementNameTrigger')
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CButton(null, _('Select')))
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('PopUp("popup.php?dstfrm=selementForm&dstfld1=elementid'.
-								'&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers'.
-								'&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1'.
-								'&real_hosts=1&noempty=1")')
-					], 'triggerSelectRow')
+					->addRow(_('Triggers'), [
+						(new CDiv([
+							(new CTable())
+								->setHeader(['', _('Name'), _('Action')])
+								->setId('triggerContainer')
+								->setAttribute('style', 'width: 100%;')
+								->addClass('ui-sortable')
+						]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+					], 'triggerListRow')
+					->addRow(_('New triggers'),
+						(new CDiv([
+							new CVar('elementExpressionTrigger', ''),
+							(new CMultiSelect([
+								'name' => 'elementNameTriggers',
+								'objectName' => 'triggers'
+							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+							new CDiv(
+								(new CButton(null, _('Add')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->setId('newSelementTriggers')
+						)]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+						'triggerSelectRow'
+					)
 					->addRow(_('Map'), [
 						(new CTextBox('elementName'))
 							->setReadonly(true)
 							->setId('elementNameMap')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
 							->onClick('PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
-								'&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap'.
+								'&dstfrm=selementForm&dstfld1=sysmapid&dstfld2=elementNameMap'.
 								'&excludeids[]=#{sysmapid}")'
 							)
 					], 'mapSelectRow')
@@ -578,7 +591,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="mapMassFormListRow">
-	<?= (new CRow(['#{elementType}', '#{elementName}']))->toString() ?>
+	<?= (new CRow(['#{elementType}', '#{*elementName}']))->toString() ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="linkFormTpl">
@@ -733,6 +746,29 @@
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setId('urlrow_#{selementurlid}')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="selementFormTriggers">
+	<?= (new CRow([
+			(new CCol([
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
+			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol([(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)]))
+				->addStyle('background: ##{color}'),
+			(new CCol([
+				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),
+				(new CVar('element_name[#{triggerid}]', '#{name}')),
+				(new CVar('element_priority[#{triggerid}]', '#{priority}')),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('jQuery("#triggerrow_#{triggerid}").remove();')
+			]))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('sortable')
+			->setId('triggerrow_#{triggerid}')
 			->toString()
 	?>
 </script>

@@ -144,7 +144,7 @@ class CImage extends CApiService {
 		if (!is_null($options['select_image'])) {
 			$dbImg = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.dbConditionInt('i.imageid', $imageids));
 			while ($img = DBfetch($dbImg)) {
-				// PostgreSQL and SQLite images are stored escaped in the DB
+				// PostgreSQL images are stored escaped in the DB
 				$img['image'] = zbx_unescape_image($img['image']);
 				$result[$img['imageid']]['image'] = base64_encode($img['image']);
 			}
@@ -227,13 +227,6 @@ class CImage extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 					}
 				break;
-				case ZBX_DB_SQLITE3:
-					$values['image'] = zbx_dbstr(bin2hex($image['image']));
-					$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-					if (!DBexecute($sql)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
-				break;
 				case ZBX_DB_MYSQL:
 						$values['image'] = zbx_dbstr($image['image']);
 						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
@@ -287,10 +280,6 @@ class CImage extends CApiService {
 				switch ($DB['TYPE']) {
 					case ZBX_DB_POSTGRESQL:
 						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-						break;
-
-					case ZBX_DB_SQLITE3:
-						$values['image'] = zbx_dbstr(bin2hex($image['image']));
 						break;
 
 					case ZBX_DB_MYSQL:
