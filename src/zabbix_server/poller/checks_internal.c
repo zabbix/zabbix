@@ -87,8 +87,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		trigger_stats = DCget_trigger_stats();
-		SET_UI64_RESULT(result, trigger_stats.enabled_ok + trigger_stats.enabled_problem);
+		DCget_trigger_stats(&trigger_stats);
+		SET_UI64_RESULT(result, trigger_stats.enabled_ok.ui64 + trigger_stats.enabled_problem.ui64);
 	}
 	else if (0 == strcmp(tmp, "items"))			/* zabbix["items"] */
 	{
@@ -120,8 +120,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		host_stats = DCget_host_stats();
-		SET_UI64_RESULT(result, host_stats.monitored);
+		DCget_host_stats(&host_stats);
+		SET_UI64_RESULT(result, host_stats.monitored.ui64);
 	}
 	else if (0 == strcmp(tmp, "history") ||			/* zabbix["history"] */
 			0 == strcmp(tmp, "history_log") ||	/* zabbix["history_log"] */

@@ -9268,9 +9268,9 @@ int	DCget_item_unsupported_count(zbx_uint64_t hostid)
  * Purpose: count enabled, not supported and disabled items                   *
  *                                                                            *
  ******************************************************************************/
-zbx_item_stats_t	DCget_item_stats(void)
+void	DCget_item_stats(zbx_item_stats_t *item_stats)
 {
-	static zbx_item_stats_t	item_stats = {0, 0, 0};
+	static zbx_uint64_t	items_active_normal = 0, items_active_notsupported = 0, items_disabled = 0;
 	static time_t		last_counted = 0;
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
@@ -9278,9 +9278,9 @@ zbx_item_stats_t	DCget_item_stats(void)
 	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
 		goto out;
 
-	item_stats.active_normal = 0;
-	item_stats.active_notsupported = 0;
-	item_stats.disabled = 0;
+	items_active_normal = 0;
+	items_active_notsupported = 0;
+	items_disabled = 0;
 
 	LOCK_CACHE;
 
@@ -9292,7 +9292,7 @@ zbx_item_stats_t	DCget_item_stats(void)
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 		{
-			item_stats.disabled++;
+			items_disabled++;
 			continue;
 		}
 
@@ -9305,17 +9305,19 @@ zbx_item_stats_t	DCget_item_stats(void)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		item_stats.active_normal++;
+		items_active_normal++;
 
 		if (ITEM_STATE_NOTSUPPORTED == dc_item->state)
-			item_stats.active_notsupported++;
+			items_active_notsupported++;
 	}
 
 	UNLOCK_CACHE;
 
 	last_counted = time(NULL);
 out:
-	return item_stats;
+	item_stats->active_normal.ui64 = items_active_normal;
+	item_stats->active_notsupported.ui64 = items_active_notsupported;
+	item_stats->disabled.ui64 = items_disabled;
 }
 
 /******************************************************************************
@@ -9325,24 +9327,24 @@ out:
  * Purpose: count active (OK and PROBLEM) and inactive triggers               *
  *                                                                            *
  ******************************************************************************/
-zbx_trigger_stats_t	DCget_trigger_stats(void)
+void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats)
 {
-	static zbx_trigger_stats_t	trigger_stats = {0, 0, 0};
-	static time_t			last_counted = 0;
-	zbx_hashset_iter_t		iter;
-	zbx_uint64_t			functionid;
-	const ZBX_DC_ITEM		*dc_item;
-	const ZBX_DC_FUNCTION		*dc_function;
-	const ZBX_DC_TRIGGER		*dc_trigger;
-	const ZBX_DC_HOST		*dc_host;
-	const char			*p, *q;
+	static zbx_uint64_t	triggers_enabled_ok = 0, triggers_enabled_problem = 0, triggers_disabled = 0;
+	static time_t		last_counted = 0;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		functionid;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_TRIGGER	*dc_trigger;
+	const ZBX_DC_HOST	*dc_host;
+	const char		*p, *q;
 
 	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
 		goto out;
 
-	trigger_stats.enabled_ok = 0;
-	trigger_stats.enabled_problem = 0;
-	trigger_stats.disabled = 0;
+	triggers_enabled_ok = 0;
+	triggers_enabled_problem = 0;
+	triggers_disabled = 0;
 
 	LOCK_CACHE;
 
@@ -9352,7 +9354,7 @@ zbx_trigger_stats_t	DCget_trigger_stats(void)
 	{
 		if (TRIGGER_STATUS_ENABLED != dc_trigger->status)
 		{
-			trigger_stats.disabled++;
+			triggers_disabled++;
 			continue;
 		}
 
@@ -9394,10 +9396,10 @@ zbx_trigger_stats_t	DCget_trigger_stats(void)
 		switch (dc_trigger->value)
 		{
 			case TRIGGER_VALUE_OK:
-				trigger_stats.enabled_ok++;
+				triggers_enabled_ok++;
 				break;
 			case TRIGGER_VALUE_PROBLEM:
-				trigger_stats.enabled_problem++;
+				triggers_enabled_problem++;
 				break;
 		}
 next:;
@@ -9407,7 +9409,9 @@ next:;
 
 	last_counted = time(NULL);
 out:
-	return trigger_stats;
+	trigger_stats->enabled_ok.ui64 = triggers_enabled_ok;
+	trigger_stats->enabled_problem.ui64 = triggers_enabled_problem;
+	trigger_stats->disabled.ui64 = triggers_disabled;
 }
 
 /******************************************************************************
@@ -9417,9 +9421,9 @@ out:
  * Purpose: count monitored and not monitored hosts                           *
  *                                                                            *
  ******************************************************************************/
-zbx_host_stats_t	DCget_host_stats(void)
+void	DCget_host_stats(zbx_host_stats_t *host_stats)
 {
-	static zbx_host_stats_t	host_stats = {0, 0};
+	static zbx_uint64_t	hosts_monitored = 0, hosts_not_monitored = 0;
 	static time_t		last_counted = 0;
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_HOST	*dc_host;
@@ -9427,8 +9431,8 @@ zbx_host_stats_t	DCget_host_stats(void)
 	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
 		goto out;
 
-	host_stats.monitored = 0;
-	host_stats.not_monitored = 0;
+	hosts_monitored = 0;
+	hosts_not_monitored = 0;
 
 	LOCK_CACHE;
 
@@ -9439,10 +9443,10 @@ zbx_host_stats_t	DCget_host_stats(void)
 		switch (dc_host->status)
 		{
 			case HOST_STATUS_MONITORED:
-				host_stats.monitored++;
+				hosts_monitored++;
 				break;
 			case HOST_STATUS_NOT_MONITORED:
-				host_stats.not_monitored++;
+				hosts_not_monitored++;
 				break;
 		}
 	}
@@ -9451,7 +9455,8 @@ zbx_host_stats_t	DCget_host_stats(void)
 
 	last_counted = time(NULL);
 out:
-	return host_stats;
+	host_stats->monitored.ui64 = hosts_monitored;
+	host_stats->not_monitored.ui64 = hosts_not_monitored;
 }
 
 /******************************************************************************

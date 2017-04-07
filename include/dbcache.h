@@ -414,26 +414,40 @@ typedef struct
 }
 zbx_queue_item_t;
 
+typedef union
+{
+	zbx_uint64_t	ui64;
+	double		dbl;
+}
+zbx_counter_value_t;
+
+typedef enum
+{
+	ZBX_COUNTER_TYPE_UI64,
+	ZBX_COUNTER_TYPE_DBL
+}
+zbx_counter_type_t;
+
 typedef struct
 {
-	zbx_uint64_t	monitored;
-	zbx_uint64_t	not_monitored;
+	zbx_counter_value_t	monitored;
+	zbx_counter_value_t	not_monitored;
 }
 zbx_host_stats_t;
 
 typedef struct
 {
-	zbx_uint64_t	active_normal;
-	zbx_uint64_t	active_notsupported;
-	zbx_uint64_t	disabled;
+	zbx_counter_value_t	active_normal;
+	zbx_counter_value_t	active_notsupported;
+	zbx_counter_value_t	disabled;
 }
 zbx_item_stats_t;
 
 typedef struct
 {
-	zbx_uint64_t	enabled_ok;
-	zbx_uint64_t	enabled_problem;
-	zbx_uint64_t	disabled;
+	zbx_counter_value_t	enabled_ok;
+	zbx_counter_value_t	enabled_problem;
+	zbx_counter_value_t	disabled;
 }
 zbx_trigger_stats_t;
 
@@ -573,9 +587,9 @@ int	DCget_item_count(zbx_uint64_t hostid);
 int	DCget_item_unsupported_count(zbx_uint64_t hostid);
 double	DCget_required_performance(void);
 
-zbx_host_stats_t	DCget_host_stats(void);
-zbx_item_stats_t	DCget_item_stats(void);
-zbx_trigger_stats_t	DCget_trigger_stats(void);
+void	DCget_host_stats(zbx_host_stats_t *host_stats);
+void	DCget_item_stats(zbx_item_stats_t *item_stats);
+void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
