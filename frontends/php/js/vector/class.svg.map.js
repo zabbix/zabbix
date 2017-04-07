@@ -484,12 +484,12 @@ SVGMap.prototype.update = function (options, incremental) {
 	}, this);
 
 	// Timestamp (date on map) is updated.
-	if (typeof options.timestamp !== undefined) {
+	if (options.timestamp !== undefined) {
 		this.timestamp.element.textContent = options.timestamp;
 	}
 
 	// Homepage is updated.
-	if (typeof options.homepage !== undefined) {
+	if (options.homepage !== undefined) {
 		this.homepage.element.textContent = options.homepage;
 	}
 };
