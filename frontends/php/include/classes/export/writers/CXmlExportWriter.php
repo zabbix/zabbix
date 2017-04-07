@@ -123,7 +123,7 @@ class CXmlExportWriter extends CExportWriter {
 			'headers' => 'header',
 			'variables' => 'variable',
 			'query_fields' => 'query_field',
-			'posts' => 'post_field'
+			'posts' => 'post_field',
 			'shapes' => 'shape'
 		];
 
