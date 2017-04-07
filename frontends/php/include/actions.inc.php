@@ -1328,7 +1328,7 @@ function getActionMessages(array $alerts, array $r_alerts) {
 				: $alert['sendto'];
 
 			$info_icons = [];
-			$in_progress = $alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT;
+			$in_progress = ($alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT);
 			if ($alert['error'] !== '' && !$in_progress) {
 				$info_icons[] = makeErrorIcon($alert['error']);
 			}
@@ -1427,7 +1427,7 @@ function getActionCommands(array $alerts, array $r_alerts) {
 			}
 
 			$error_span = '';
-			$in_progress = $alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT;
+			$in_progress = ($alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT);
 			if ($alert['error'] && !$in_progress) {
 				$error_span = (new CSpan($alert['error']))->addClass(ZBX_STYLE_RED);
 			}
@@ -1493,7 +1493,7 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 			}
 
 			$info_icons = [];
-			$in_progress = $alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT;
+			$in_progress = ($alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT);
 			if ($alert['error'] !== '' && !$in_progress) {
 				$info_icons[] = makeErrorIcon($alert['error']);
 			}
