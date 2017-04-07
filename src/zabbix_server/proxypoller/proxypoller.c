@@ -137,14 +137,17 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  *                                                                            *
  * Purpose: get historical data from proxy                                    *
  *                                                                            *
- * Parameters:                                                                *
+ * Parameters: proxy   - [IN] proxy data                                      *
+ *             request - [IN] requested data type                             *
+ *             data    - [OUT] data received from proxy                       *
+ *             ts      - [OUT] timestamp when the proxy connection was        *
+ *                             established                                    *
+ *             tasks   - [IN] proxy task response flag                        *
  *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts, int tasks)
@@ -197,7 +200,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
  *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy - [IN] proxy data                                        *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
@@ -300,7 +303,8 @@ static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **er
  * Purpose: gets host availability data from proxy                            *
  *          ('host availability' request)                                     *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -361,7 +365,8 @@ out:
  * Purpose: gets historical data from proxy                                   *
  *          ('history data' request)                                          *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -431,7 +436,8 @@ static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
  * Purpose: gets discovery data from proxy                                    *
  *          ('discovery data' request)                                        *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -502,7 +508,8 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
  * Purpose: gets auto registration data from proxy                            *
  *          ('auto registration' request)                                     *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -573,7 +580,11 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
  *                                                                            *
  * Purpose: processes proxy data request                                      *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy  - [IN] proxy data                                       *
+ *             answer - [IN] data received from proxy                         *
+ *             ts     - [IN] timestamp when the proxy connection was          *
+ *                           established                                      *
+ *             more   - [OUT] available data flag                             *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -633,7 +644,9 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             more        - [OUT] available data flag                        *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -702,7 +715,8 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] the proxy data                              *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
