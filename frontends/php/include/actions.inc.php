@@ -1303,7 +1303,7 @@ function getActionMessages(array $alerts, array $r_alerts) {
 			}
 
 			$mediaType = array_pop($alert['mediatypes']);
-			$status = $alert['status'] === ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
+			$status = $alert['status'] == ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:
@@ -1328,7 +1328,8 @@ function getActionMessages(array $alerts, array $r_alerts) {
 				: $alert['sendto'];
 
 			$info_icons = [];
-			if ($alert['error'] !== '') {
+			$in_progress = $alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT;
+			if ($alert['error'] !== '' && !$in_progress) {
 				$info_icons[] = makeErrorIcon($alert['error']);
 			}
 
@@ -1397,7 +1398,7 @@ function getActionCommands(array $alerts, array $r_alerts) {
 				continue;
 			}
 
-			$status = $alert['status'] === ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
+			$status = $alert['status'] == ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:
@@ -1425,12 +1426,18 @@ function getActionCommands(array $alerts, array $r_alerts) {
 				$show_header = false;
 			}
 
+			$error_span = '';
+			$in_progress = $alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT;
+			if ($alert['error'] && !$in_progress) {
+				$error_span = (new CSpan($alert['error']))->addClass(ZBX_STYLE_RED);
+			}
+
 			$table->addRow([
 				$alert['esc_step'],
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 				$status,
 				zbx_nl2br($alert['message']),
-				$alert['error'] ? (new CSpan($alert['error']))->addClass(ZBX_STYLE_RED) : ''
+				$error_span
 			]);
 		}
 
@@ -1450,7 +1457,7 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 		$show_header = $display_recovery_alerts;
 
 		foreach ($alerts_data as $alert) {
-			$status = $alert['status'] === ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
+			$status = $alert['status'] == ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:
@@ -1486,7 +1493,8 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 			}
 
 			$info_icons = [];
-			if ($alert['error'] !== '') {
+			$in_progress = $alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT;
+			if ($alert['error'] !== '' && !$in_progress) {
 				$info_icons[] = makeErrorIcon($alert['error']);
 			}
 
