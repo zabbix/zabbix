@@ -698,7 +698,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_get_tasks                                                   *
+ * Function: proxy_get_tasks                                                  *
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
