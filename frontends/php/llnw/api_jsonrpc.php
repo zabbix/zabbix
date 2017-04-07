@@ -27,7 +27,7 @@ $trans_id = (isset($json['id'])) ? $json['id'] : '';
 // check for the master variable above so only the included scripts will run if $master is defined and equal to 1.
 
 
-if ($json['method'] == 'add.squelch' || $json['method'] == 'get.squelch') {
+if ($json['method'] == 'add.squelch' || $json['method'] == 'get.squelch' || $json['method'] == 'clear.squelch') {
    include($base_dir.'squelch.php');
 }
 elseif ($json['method'] == 'get.ack') {

@@ -172,6 +172,65 @@ elseif ($json['method'] == 'clear.squelch') {
    // but not going to worry about that now.
    // be sure to log these clears as a separate entry in the squlech_log so we can track potential issues.
    // this separate table may help with logic to avoid clearing other squelches?
-}
+   // FOR avoiding of clearing only authorized squelches, we need to send back some ID, and optionally require it for delete
+   // could be optonal or predictible, for something shared we could use THE same ID, but for safety ones generates and send them back for add method.
+
+
+    $hostname = $json['params']['hostname'];
+    $username = $json['params']['username'];
+    $comment = "deleted squelch";
+    $reason = $json['params']['reason'];
+    $start = date('Y-m-d H:i:s');
+
+    if ($username == '' || $hostname == '') {
+      error_log("Error: no username/hostname set to apply squelch!");
+      sendErrorResponse('235','Invalid params','no username or hostname provided');
+    }
+
+    $sql = "SELECT * FROM squelch
+            WHERE hostname='$hostname' AND created_by = '$username'";
+
+    error_log($sql);
+    $rows = $ldb->get_results($sql);
+    $resp['result'] = $ldb->get_results($sql);
+    $ids = array();
+
+    if (isset($rows)) {
+
+      foreach ($rows as $row) {
+        $row = get_object_vars($row);
+        array_push($ids, $row['id']);
+      }
+
+      foreach ($ids as $id) {
+        $sql = "INSERT INTO squelch_log SET ".
+            "squelch_id = '$id', ".
+            "hostname = '$hostname', ".
+            "start = '$start', ".
+            "end = '$start', ".
+            "reason = '$reason', ".
+            "comment = '$comment', ".
+            "created_by = '$username', ".
+            "created_date = now(), ".
+            "updated_date = '0000-00-00 00:00:00'";
+
+        error_log($sql);
+  
+        $ldb->query($sql);
+      }
+      $sql = "DELETE FROM squelch
+              WHERE hostname='$hostname' AND created_by = '$username'";
+      error_log($sql);
+
+      $ldb->query($sql);
+
+      sendResponse($resp);
+    }
+    else {
+      error_log("Error: Incorrect username/hostname provided");
+      sendErrorResponse('235','Invalid params','not valid host or username');
+    }
+
+ }
 
 ?>
