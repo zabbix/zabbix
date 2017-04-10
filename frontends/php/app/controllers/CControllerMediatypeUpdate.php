@@ -44,12 +44,13 @@ class CControllerMediatypeUpdate extends CController {
 			'passwd' =>					'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 			'maxsessions' =>			'not_empty|int32|le 100|db media_type.maxsessions',
-			'maxattempts' =>			'not_empty|db media_type.maxattempts',
+			'maxattempts' =>			'not_empty|int32|le 10|db media_type.maxattempts',
 			'attempt_interval' =>		'not_empty|db media_type.attempt_interval',
 			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
+		$error = $this->GetValidationError();
 
 		if ($ret && $this->hasInput('exec_params')) {
 			foreach ($this->getInput('exec_params') as $exec_param) {
@@ -61,8 +62,21 @@ class CControllerMediatypeUpdate extends CController {
 			}
 		}
 
+		if ($ret && $this->hasInput('attempt_interval')) {
+			$interval = convertFunctionValue($this->getInput('attempt_interval'));
+			$maximum = convertFunctionValue('1m');
+			if (bccomp($maximum, $interval) == -1) {
+				info(_s('Incorrect value "%1$s" for "%2$s" field.', $this->getInput('attempt_interval'),
+					'attempt_interval'
+					)
+				);
+				$ret = false;
+				$error = self::VALIDATION_ERROR;
+			}
+		}
+
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
+			switch ($error) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
 					$response->setFormData($this->getInputAll());
