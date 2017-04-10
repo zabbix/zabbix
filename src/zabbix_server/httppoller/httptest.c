@@ -129,7 +129,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	zbx_uint64_t	itemids[3];
 	int		errcodes[3];
 	size_t		i, num = 0;
-	AGENT_RESULT    value;
+	AGENT_RESULT	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1060,6 +1060,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				zbx_free(var_err_str);
 			}
 
+			zbx_timespec(&ts);
+			process_step_data(db_httpstep.httpstepid, &stat, &ts);
+
 			zbx_free(page.data);
 		}
 		else
@@ -1078,9 +1081,6 @@ httpstep_error:
 
 		zbx_free(httpstep.url);
 		zbx_free(httpstep.headers);
-
-		zbx_timespec(&ts);
-		process_step_data(db_httpstep.httpstepid, &stat, &ts);
 
 		if (NULL != err_str)
 		{
@@ -1110,8 +1110,8 @@ clean:
 
 		if (NULL != db_httpstep.name)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": %s",
-					db_httpstep.name, httptest->httptest.name, host->name, err_str);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": "
+					"%s", db_httpstep.name, httptest->httptest.name, host->name, err_str);
 		}
 	}
 	DBfree_result(result);
