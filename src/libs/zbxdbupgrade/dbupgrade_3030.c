@@ -408,19 +408,10 @@ static int	DBpatch_3030033(void)
 
 static int	DBpatch_3030034(void)
 {
-	/* type=0 (MEDIA_TYPE_EMAIL) */
-	if (ZBX_DB_OK > DBexecute("update media_type set maxsessions=0 where type=0"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_3030035(void)
-{
 	return DBdrop_index("alerts", "alerts_4");
 }
 
-static int	DBpatch_3030036(void)
+static int	DBpatch_3030035(void)
 {
 	return DBcreate_index("alerts", "alerts_4", "status", 0);
 }
@@ -467,6 +458,5 @@ DBPATCH_ADD(3030032, 0, 1)
 DBPATCH_ADD(3030033, 0, 1)
 DBPATCH_ADD(3030034, 0, 1)
 DBPATCH_ADD(3030035, 0, 1)
-DBPATCH_ADD(3030036, 0, 1)
 
 DBPATCH_END()
