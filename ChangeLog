@@ -55,6 +55,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11889] fixed lastaccess update for passive proxy (viktors)
 A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
 ..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
 ..F....... [ZBX-11925] fixed parsing of nested host groups (gcalenko, Sasha)

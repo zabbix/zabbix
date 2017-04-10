@@ -60,7 +60,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	update_proxy_lastaccess(proxy.hostid);
+	update_proxy_lastaccess(proxy.hostid, time(NULL));
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
