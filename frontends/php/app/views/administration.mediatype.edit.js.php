@@ -13,7 +13,6 @@
 		var initialized = false;
 		// type of media
 		$('#type').change(function() {
-			setMaxSessionsTypeOther();
 			switch ($(this).val()) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication').closest('li').show();
@@ -25,6 +24,7 @@
 					// radio button actions
 					toggleSecurityOptions();
 					toggleAuthenticationOptions();
+					setMaxSessionsTypeOther();
 					break;
 
 				case '<?= MEDIA_TYPE_EXEC ?>':
@@ -33,6 +33,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
+					setMaxSessionsTypeOther();
 					break;
 
 				case '<?= MEDIA_TYPE_SMS ?>':
@@ -50,6 +51,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
+					setMaxSessionsTypeOther();
 					break;
 
 				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
@@ -58,6 +60,7 @@
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_params_table')
 						.closest('li')
 						.hide();
+					setMaxSessionsTypeOther();
 					break;
 			}
 		});
@@ -161,6 +164,9 @@
 		 * Set maxsessionsType for other media types
 		 */
 		function setMaxSessionsTypeOther() {
+			if (initialized == false) {
+				return;
+			}
 			$('#maxsessionsType :radio')
 				.attr('disabled', false)
 				.filter('[value=one]')
