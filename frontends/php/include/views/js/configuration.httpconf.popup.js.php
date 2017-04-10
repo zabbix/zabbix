@@ -14,6 +14,7 @@
 				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 			'⇒',
 			(new CTextBox('pairs[#{pair.id}][value]', '#{pair.value}'))
+				->setId('pair_value_#{pair.id}')
 				->setAttribute('data-type', 'value')
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
