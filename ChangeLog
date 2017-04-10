@@ -55,6 +55,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
 ..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
 ..F....... [ZBX-11925] fixed parsing of nested host groups (gcalenko, Sasha)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
@@ -420,6 +421,8 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
+........S. [ZBX-11889] fixed lastaccess update for passive proxy (viktors)
 ..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
