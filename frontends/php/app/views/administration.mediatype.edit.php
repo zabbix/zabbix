@@ -168,18 +168,15 @@ $mediaOptionsForm = (new CFormList('options'))
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addItem([
-				(new CRadioButtonList('maxsessionsType', $data['maxsessionsType']))
-					->addValue(_('One'), 'one')
-					->addValue(_('Unlimited'), 'unlimited')
-					->addValue(_('Custom'), 'custom')
-					// @TODO: find Zabbix build in css class for inline-block
-					->setAttribute('style', 'display: inline-block;')
-					->setModern(true),
-				(new CCol(
-					(new CNumericBox('maxsessions', $maxSessions, 3, false, false, false))
-						->setAttribute('style', 'text-align: left;')
+				(new CDiv(
+					(new CRadioButtonList('maxsessionsType', $data['maxsessionsType']))
+						->addValue(_('One'), 'one')
+						->addValue(_('Unlimited'), 'unlimited')
+						->addValue(_('Custom'), 'custom')
+						->setModern(true)
+				))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CNumericBox('maxsessions', $maxSessions, 3, false, false, false))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				))
 			])
 	)
 	->addRow(_('Attempts'),
