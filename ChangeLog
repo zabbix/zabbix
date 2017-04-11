@@ -55,6 +55,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11477] fixed lost user name in profile title (miks)
 ........S. [ZBX-11889] fixed lastaccess update for passive proxy (viktors)
 A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
 ..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
@@ -422,6 +423,7 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11477] fixed lost user name in profile title (miks)
 A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
 ........S. [ZBX-11889] fixed lastaccess update for passive proxy (viktors)
 ..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
