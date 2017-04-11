@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null],
-	'new_httpstep'		=> [T_ZBX_STR, O_OPT, null,	null,				null],
+	'new_httpstep'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				null],
 	'sel_step'			=> [T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534),	null],
 	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
 	// form
@@ -50,8 +50,8 @@ $fields = [
 	'agent_other'     => [T_ZBX_STR, O_OPT, null, null,
 		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
 	],
-	'pairs'           => [T_ZBX_STR, O_OPT, null,  null,                    null],
-	'steps'           => [T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})', _('Steps')],
+	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    null],
+	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({add}) || isset({update})'],
 	'http_user'       => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               '(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
 		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('User')],
@@ -238,8 +238,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				foreach ($field_names as $field_name) {
 					foreach ($step['pairs'] as $pair) {
 						if (array_key_exists('type', $pair) && $field_name === $pair['type'] &&
-							((array_key_exists('name', $pair) && trim($pair['name']) !== '') ||
-							(array_key_exists('value', $pair) && trim($pair['value']) !== ''))) {
+							((array_key_exists('name', $pair) && $pair['name'] !== '') ||
+							(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
 							$step[$field_name][] = [
 								'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
 								'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
@@ -249,6 +249,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 				unset($step['pairs']);
 			}
+
+			foreach ($step['variables'] as &$variable) {
+				$variable['name'] = trim($variable['name']);
+			}
+			unset($variable);
 
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
 				$step['posts'] = $step['post_fields'];
@@ -281,8 +286,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		foreach (getRequest('pairs', []) as $pair) {
 			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers']) &&
-				((array_key_exists('name', $pair) && trim($pair['name']) !== '') ||
-				(array_key_exists('value', $pair) && trim($pair['value']) !== ''))) {
+				((array_key_exists('name', $pair) && $pair['name'] !== '') ||
+				(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
 
 				$httpTest[$pair['type']][] = [
 					'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
@@ -290,6 +295,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				];
 			}
 		}
+
+		foreach ($httpTest['variables'] as &$variable) {
+			$variable['name'] = trim($variable['name']);
+		}
+		unset($variable);
 
 		if ($new_application) {
 			$exApp = API::Application()->get([

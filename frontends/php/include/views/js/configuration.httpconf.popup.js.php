@@ -350,7 +350,7 @@
 							throw '<?= _('Data is not properly encoded.'); ?>';
 						}
 
-						if (pair.name.trim() === '') {
+						if (pair.name === '') {
 							throw '<?= _('Values without names are not allowed in form fields.'); ?>';
 						}
 
