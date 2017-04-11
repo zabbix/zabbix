@@ -2073,7 +2073,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.18rc1
 
 Bug fixes:
-..F....... [ZBX-7492] fixed undefined index, invalid argument supplied to foreach and invalid value insertion into database (miks)
+A......... [ZBX-7492] fixed undefined index and invalid argument supplied to foreach errors in case if macros tag is empty or is not included in the XML import file (miks)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
