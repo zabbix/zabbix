@@ -627,29 +627,44 @@ static int	DBpatch_3030053(void)
 	DB_RESULT	result;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	selementid, triggerid;
-	int		ret;
+	int		ret = FAIL;
 
 	zbx_db_insert_prepare(&db_insert, "sysmap_element_trigger", "selement_triggerid", "selementid", "triggerid",
 			NULL);
 
 	/* sysmaps_elements.elementid for trigger map elements (2) should be migrated to table sysmap_element_trigger */
-	result = DBselect("select e.selementid,e.elementid"
-			" from sysmaps_elements e,triggers t"
-			" where e.elementtype=2"
-				" and e.elementid=t.triggerid");
+	result = DBselect("select e.selementid,e.label,t.triggerid"
+			" from sysmaps_elements e"
+			" left join triggers t on"
+			" e.elementid=t.triggerid"
+			" where e.elementtype=2");
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(selementid, row[0]);
-		ZBX_STR2UINT64(triggerid, row[1]);
+		if (NULL != row[2])
+		{
+			ZBX_STR2UINT64(triggerid, row[2]);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), selementid, triggerid);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), selementid, triggerid);
+		}
+		else
+		{
+			if (ZBX_DB_OK > DBexecute("delete from sysmaps_elements where selementid=" ZBX_FS_UI64,
+					selementid))
+			{
+				goto out;
+			}
+
+			zabbix_log(LOG_LEVEL_WARNING, "Map trigger element \"%s\" (selementid: " ZBX_FS_UI64 ") will be"
+					" removed during database upgrade: no trigger found", row[1], selementid);
+		}
 	}
-
-	DBfree_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "selement_triggerid");
 	ret = zbx_db_insert_execute(&db_insert);
+out:
+	DBfree_result(result);
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
