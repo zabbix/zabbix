@@ -422,8 +422,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.9rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-11024] fixed popup window size in actions configuration form (miks)
 ..F....... [ZBX-10997] fixed usage of wrong API in screen constructor (miks)
