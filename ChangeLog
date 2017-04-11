@@ -2076,8 +2076,6 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 --------------------------------------------------------------------------------
 Changes for 2.2.18rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-7492] fixed undefined index, invalid argument supplied to foreach and invalid value insertion into database (miks)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
