@@ -727,6 +727,29 @@ static int	get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 	return res;
 }
 
+static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
+{
+	int	res;
+	DC_HOST	host;
+
+	DCconfig_get_hosts_by_itemids(&host, &itemid, &res, 1);
+
+	if (FAIL == res)
+		return FAIL;
+
+	switch (request)
+	{
+		case ZBX_REQUEST_HOST_ID:
+			*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, host.hostid);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			res = FAIL;
+	}
+
+	return res;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBget_item_value                                                 *
@@ -756,6 +779,8 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 		case ZBX_REQUEST_HOST_CONN:
 		case ZBX_REQUEST_HOST_PORT:
 			return get_interface_value(0, itemid, replace_to, request);
+		case ZBX_REQUEST_HOST_ID:
+			return get_host_value(itemid, replace_to, request);
 	}
 
 	result = DBselect(
@@ -769,10 +794,6 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	{
 		switch (request)
 		{
-			case ZBX_REQUEST_HOST_ID:
-				*replace_to = zbx_strdup(*replace_to, row[0]);
-				ret = SUCCEED;
-				break;
 			case ZBX_REQUEST_HOST_HOST:
 				*replace_to = zbx_strdup(*replace_to, row[2]);
 				ret = SUCCEED;
@@ -3749,6 +3770,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_ID);
 				}
 			}
 		}
