@@ -52,8 +52,6 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 --------------------------------------------------------------------------------
 Changes for 3.2.5rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-11024] fixed popup window size in actions configuration form (miks)
 ..F....... [ZBX-10997] fixed usage of wrong API in screen constructor (miks)
