@@ -349,7 +349,7 @@
 #endif
 
 #ifdef HAVE_REGEX_H
-#	include <regex.h>
+#	include <pcreposix.h>
 #endif
 
 #ifdef HAVE_VM_VM_PARAM_H
