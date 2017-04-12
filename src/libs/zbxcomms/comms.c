@@ -1887,7 +1887,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 				return FAIL;
 			}
 		}
-		else if (FAIL == is_ip(start) && FAIL == validate_hostname(start, strlen(start)))
+		else if (FAIL == is_supported_ip(start) && FAIL == validate_hostname(start, strlen(start)))
 		{
 			*error = zbx_dsprintf(NULL, "\"%s\"", start);
 			return FAIL;
