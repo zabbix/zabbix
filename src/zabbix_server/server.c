@@ -86,7 +86,7 @@ const char	*help_message[] = {
 	"The core daemon of Zabbix software.",
 	"",
 	"Options:",
-	"  -c --config config-file        Absolute path to the configuration file",
+	"  -c --config config-file        Path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
 	"  -f --foreground                Run Zabbix server in foreground",
 	"  -R --runtime-control runtime-option   Perform administrative functions",

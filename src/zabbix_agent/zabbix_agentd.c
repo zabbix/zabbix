@@ -105,7 +105,7 @@ const char	*help_message[] = {
 	"A Zabbix daemon for monitoring of various server parameters.",
 	"",
 	"Options:",
-	"  -c --config config-file        Absolute path to the configuration file",
+	"  -c --config config-file        Path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
 	"  -f --foreground                Run Zabbix agent in foreground",
 	"  -p --print                     Print known items and exit",
