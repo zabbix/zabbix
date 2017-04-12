@@ -2374,8 +2374,12 @@ function makeUpdateIntervalFilter($field_name, $values) {
 	$filters = [];
 
 	foreach (getTimeUnitFilters($values) as $filter) {
-		$filters[] = $field_name.' LIKE '.zbx_dbstr($filter);
-		$filters[] = $field_name.' LIKE '.zbx_dbstr($filter.';%');
+		$filter = str_replace("!", "!!", $filter);
+		$filter = str_replace("%", "!%", $filter);
+		$filter = str_replace("_", "!_", $filter);
+
+		$filters[] = $field_name.' LIKE '.zbx_dbstr($filter).' ESCAPE '.zbx_dbstr('!');
+		$filters[] = $field_name.' LIKE '.zbx_dbstr($filter.';%').' ESCAPE '.zbx_dbstr('!');
 	}
 
 	$res = $filters ? implode(' OR ', $filters) : '';
