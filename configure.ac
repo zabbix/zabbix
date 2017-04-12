@@ -162,6 +162,14 @@ if test "x$found_resolv" != "xyes"; then
 fi
 LIBS="${LIBS} ${RESOLV_LIBS}"
 
+dnl check for Perl Compatible Regular Expressions
+found_pcre="no"
+LIBPCRE_CHECK_CONFIG([no])
+if test "x$found_pcre" != "xyes"; then
+	AC_MSG_ERROR([Unable to use regular expressions (libpcre check failed)])
+fi
+LIBS="${LIBS} ${PCRE_LIBS}"
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *          Checks for type definitions and structures           *
