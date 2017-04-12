@@ -244,7 +244,7 @@ function orderItemsByTrends(array &$items, $sortorder){
 
 	foreach ($items as &$item) {
 		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
-			$item['trends_sort'] = 0;
+			$item['trends_sort'] = '';
 		}
 		else {
 			$item['trends_sort'] = ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS)
@@ -278,7 +278,7 @@ function orderItemsByDelay(array &$items, $sortorder, array $options){
 
 	foreach ($items as &$item) {
 		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
-			$item['delay_sort'] = 0;
+			$item['delay_sort'] = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 			$item['delay_sort'] = $update_interval_parser->getDelay();
