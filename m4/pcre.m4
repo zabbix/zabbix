@@ -28,7 +28,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 
 	LIBPCRE_TRY_LINK([-lpcreposix -lpcre])
 
-	AC_MSG_RESULT($found_resolv)
+	AC_MSG_RESULT($found_pcre)
 
 	AC_SUBST(PCRE_LIBS)
 ])dnl
