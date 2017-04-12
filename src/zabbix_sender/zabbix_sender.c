@@ -79,7 +79,7 @@ const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
 	"General options:",
-	"  -c --config config-file    Absolute path to Zabbix agentd configuration file",
+	"  -c --config config-file    Path to Zabbix agentd configuration file",
 	"",
 	"  -z --zabbix-server server  Hostname or IP address of Zabbix server or proxy",
 	"                             to send data to. When used together with --config,",
