@@ -1378,7 +1378,9 @@ ZABBIX.apps.map = (function($) {
 				}, this)
 			});
 
-			this.makeResizable(selementData.elementtype == 3 && selementData.elementsubtype == 1);
+			this.makeResizable(
+					this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1
+			);
 
 			this.updateIcon();
 
@@ -1440,7 +1442,9 @@ ZABBIX.apps.map = (function($) {
 					this.data.use_iconmap = '0';
 				}
 
-				this.makeResizable(this.data.elementtype == 3 && this.data.elementsubtype == 1);
+				this.makeResizable(
+						this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1
+				);
 
 				// if element is image we unset advanced icons
 				if (this.data.elementtype === '4') {

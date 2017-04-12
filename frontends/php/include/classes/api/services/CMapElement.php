@@ -85,39 +85,11 @@ abstract class CMapElement extends CApiService {
 	 *
 	 * @throws APIException if attributes are not valid
 	 *
-	 * @param mixed
+	 * @param array $shapes Array of shapes.
 	 */
-	protected function checkShapeInput(&$shapes, $method) {
-		$update = ($method === 'updateShapes');
-		$delete = ($method === 'deleteShapes');
-
-		// permissions
-		if ($update || $delete) {
-			$db_shapes = API::getApiService()->select('sysmap_shape', [
-				'output' => API_OUTPUT_EXTEND,
-				'filter' => ['selementid' => zbx_objectValues($shapes, 'sysmap_shapeid')],
-				'preservekeys' => true
-			]);
-
-			if ($update) {
-				$shapes = $this->extendFromObjects($shapes, $db_shapes, ['type', 'sysmap_shapeid']);
-			}
-		}
-
+	protected function checkShapeInput(&$shapes) {
 		$color_validator = new CColorValidator();
 		foreach ($shapes as &$shape) {
-			if ($update || $delete) {
-				if (!array_key_exists($shape['sysmap_shapeid'], $db_shapes)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-
-				if ($delete) {
-					continue;
-				}
-			}
-
 			foreach (['border_color', 'background_color', 'font_color'] as $field) {
 				if (array_key_exists($field, $shape) && $shape[$field] !== ''
 						&& !$color_validator->validate($shape[$field])) {
@@ -126,8 +98,6 @@ abstract class CMapElement extends CApiService {
 			}
 		}
 		unset($shape);
-
-		return ($update || $delete) ? $db_shapes : true;
 	}
 
 	/**
@@ -499,7 +469,7 @@ abstract class CMapElement extends CApiService {
 	protected function createShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
 
-		$this->checkShapeInput($shapes, __FUNCTION__);
+		$this->checkShapeInput($shapes);
 		DB::insert('sysmap_shape', $shapes);
 	}
 
@@ -511,7 +481,7 @@ abstract class CMapElement extends CApiService {
 	protected function updateShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
 
-		$this->checkShapeInput($shapes, __FUNCTION__);
+		$this->checkShapeInput($shapes);
 
 		$update = [];
 		foreach ($shapes as $shape) {
@@ -538,7 +508,6 @@ abstract class CMapElement extends CApiService {
 		$shapes = zbx_toArray($shapes);
 		$shape_ids = zbx_objectValues($shapes, 'sysmap_shapeid');
 
-		$this->checkShapeInput($shapes, __FUNCTION__);
 		DB::delete('sysmap_shape', ['sysmap_shapeid' => $shape_ids]);
 	}
 

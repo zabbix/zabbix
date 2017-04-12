@@ -24,6 +24,9 @@
  * Implements vector map rendering functionality.
  */
 function SVGMap(options) {
+	var container,
+		layers;
+
 	this.layers = {};
 	this.options = options;
 	this.elements = {};
@@ -37,13 +40,13 @@ function SVGMap(options) {
 	this.canvas = new SVGCanvas(options.canvas, true);
 
 	// Extra group for font styles.
-	var container = this.canvas.add('g', {
+	container = this.canvas.add('g', {
 		class: 'map-container',
 		'font-family': SVGMap.FONTS[9],
 		'font-size': '10px'
 	});
 
-	var layers = container.add([
+	layers = container.add([
 		//  Background.
 		{
 			type: 'g',
@@ -189,18 +192,18 @@ SVGMap.BORDER_TYPES = {
  * @return {object} Hashmap.
  */
 SVGMap.toHashmap = function (array, key) {
-	var hashMap = {};
+	var hashmap = {};
 
 	array.forEach(function (item) {
-		if (typeof item !== 'object' || item[key] === undefined) {
+		if (typeof item !== 'object' || typeof item[key] === 'undefined') {
 			// Skip elements that are not objects.
 			return;
 		}
 
-		hashMap[item[key]] = item;
+		hashmap[item[key]] = item;
 	});
 
-	return hashMap;
+	return hashmap;
 };
 
 /**
@@ -222,7 +225,7 @@ SVGMap.prototype.getImageUrl = function (id) {
  * @return {object} Image object or null if image object is not present in cache.
  */
 SVGMap.prototype.getImage = function (id) {
-	if (id !== undefined && this.imageCache.images[id] !== undefined) {
+	if (typeof id !== 'undefined' && typeof this.imageCache.images[id] !== 'undefined') {
 		return this.imageCache.images[id];
 	}
 
@@ -419,7 +422,7 @@ SVGMap.prototype.update = function (options, incremental) {
 
 	// elements and links are converted into hashmap as order is not important.
 	rules.forEach(function (rule) {
-		if (options[rule.name] !== undefined) {
+		if (typeof options[rule.name] !== 'undefined') {
 			options[rule.name] = SVGMap.toHashmap(options[rule.name], rule.field);
 		}
 		else {
@@ -428,7 +431,7 @@ SVGMap.prototype.update = function (options, incremental) {
 	});
 
 	// Performs ordering of shapes based on zindex value.
-	if (options.shapes === undefined) {
+	if (typeof options.shapes === 'undefined') {
 		options.shapes = [];
 	}
 	else {
@@ -440,7 +443,7 @@ SVGMap.prototype.update = function (options, incremental) {
 	// Collect the list of images.
 	Object.keys(options.elements).forEach(function (key) {
 		var element = options.elements[key];
-		if (element.icon !== undefined) {
+		if (typeof element.icon !== 'undefined') {
 			images[element.icon] = this.getImageUrl(element.icon);
 		}
 	}, this);
@@ -450,7 +453,8 @@ SVGMap.prototype.update = function (options, incremental) {
 	}
 
 	// Resize the canvas and move marks
-	if (options.canvas !== undefined && options.canvas.width !== undefined && options.canvas.height !== undefined
+	if (typeof options.canvas !== 'undefined' && typeof options.canvas.width !== 'undefined'
+			&& typeof options.canvas.height !== 'undefined'
 			&& this.canvas.resize(options.canvas.width, options.canvas.height)) {
 
 		this.options.canvas = options.canvas;
@@ -484,12 +488,12 @@ SVGMap.prototype.update = function (options, incremental) {
 	}, this);
 
 	// Timestamp (date on map) is updated.
-	if (options.timestamp !== undefined) {
+	if (typeof options.timestamp !== 'undefined') {
 		this.timestamp.element.textContent = options.timestamp;
 	}
 
 	// Homepage is updated.
-	if (options.homepage !== undefined) {
+	if (typeof options.homepage !== 'undefined') {
 		this.homepage.element.textContent = options.homepage;
 	}
 };
@@ -626,6 +630,7 @@ SVGMapElement.prototype.updateHighlight = function() {
 			fill: '#F44336',
 			stroke: '#B71C1C'
 		}, markers);
+
 		this.removeItem('markers');
 		this.markers = element;
 	}
@@ -699,7 +704,7 @@ SVGMapElement.prototype.updateImage = function() {
 		options['style'] = 'cursor: pointer';
 	}
 
-	if (this.options.icon !== undefined) {
+	if (typeof this.options.icon !== 'undefined') {
 		var href = this.map.getImageUrl(this.options.icon);
 
 		if (this.image === null || this.image.attributes['xlink:href'] !== href) {
@@ -788,12 +793,12 @@ SVGMapElement.prototype.update = function(options) {
 
 	// Data type normalization.
 	['x', 'y', 'width', 'height', 'label_location'].forEach(function(name) {
-		if (options[name] !== undefined) {
+		if (typeof options[name] !== 'undefined') {
 			options[name] = parseInt(options[name]);
 		}
 	});
 
-	if (options.width !== undefined && options.height !== undefined) {
+	if (typeof options.width !== 'undefined' && typeof options.height !== 'undefined') {
 		options.x += Math.floor(options.width / 2) - Math.floor(image.naturalWidth / 2);
 		options.y += Math.floor(options.height / 2) - Math.floor(image.naturalHeight / 2);
 	}
@@ -858,7 +863,7 @@ SVGMapLink.prototype.update = function(options) {
 	options.drawtype = parseInt(options.drawtype);
 
 	options.elements = [this.map.elements[options.selementid1], this.map.elements[options.selementid2]];
-	if (options.elements[0] === undefined || options.elements[1] === undefined) {
+	if (typeof options.elements[0] === 'undefined' || typeof options.elements[1] === 'undefined') {
 		var remove = true;
 
 		if (options.elements[0] === options.elements[1]) {
@@ -868,7 +873,7 @@ SVGMapLink.prototype.update = function(options) {
 				this.map.shapes['e-' + options.selementid2]
 			];
 
-			remove = (options.elements[0] === undefined || options.elements[1] === undefined);
+			remove = (typeof options.elements[0] === 'undefined' || typeof options.elements[1] === 'undefined');
 		}
 
 		if (remove) {
@@ -969,6 +974,16 @@ function SVGMapShape(map, options) {
 SVGMapShape.TYPE_RECTANGLE	= 0;
 SVGMapShape.TYPE_ELLIPSE	= 1;
 
+// Predefined label horizontal alignments
+SVGMapShape.LABEL_HALIGN_CENTER	= 0;
+SVGMapShape.LABEL_HALIGN_LEFT	= 1;
+SVGMapShape.LABEL_HALIGN_RIGHT	= 2;
+
+// Predefined label vertical alignments
+SVGMapShape.LABEL_VALIGN_MIDDLE	= 0;
+SVGMapShape.LABEL_VALIGN_TOP	= 1;
+SVGMapShape.LABEL_VALIGN_BOTTOM	= 2;
+
 /*
  * Update shape.
  *
@@ -995,6 +1010,7 @@ SVGMapShape.prototype.update = function(options) {
 	};
 
 	var type,
+		element,
 		clip = {},
 		attributes = {},
 		mapping = [
@@ -1009,7 +1025,7 @@ SVGMapShape.prototype.update = function(options) {
 		];
 
 	mapping.forEach(function(map) {
-		if (options[map.key] !== undefined && options[map.key].trim() !== '') {
+		if (typeof options[map.key] !== 'undefined' && options[map.key].trim() !== '') {
 			attributes[map.value] = '#' + options[map.key];
 		}
 		else
@@ -1018,11 +1034,11 @@ SVGMapShape.prototype.update = function(options) {
 		}
 	}, this);
 
-	if (options['border_width'] !== undefined) {
+	if (typeof options['border_width'] !== 'undefined') {
 		attributes['stroke-width'] = parseInt(options['border_width']);
 	}
 
-	if (options['border_type'] !== undefined) {
+	if (typeof options['border_type'] !== 'undefined') {
 		var border_type = SVGMap.BORDER_TYPES[parseInt(options['border_type'])];
 		if (border_type !== '' && border_type !== 'none' && attributes['stroke-width'] > 1) {
 			var parts = border_type.split(',').map(function (value) {
@@ -1068,7 +1084,7 @@ SVGMapShape.prototype.update = function(options) {
 				height: this.height
 			};
 
-			if (attributes['stroke-linecap'] === undefined) {
+			if (typeof attributes['stroke-linecap'] === 'undefined') {
 				attributes['shape-rendering'] = 'crispEdges';
 			}
 		break;
@@ -1094,8 +1110,7 @@ SVGMapShape.prototype.update = function(options) {
 			throw "Invalid shape configuration!";
 	}
 
-	var element;
-	if (options.text === undefined || options.text.trim() === '') {
+	if (typeof options.text === 'undefined' || options.text.trim() === '') {
 		element = this.map.layers.shapes.add(type, attributes);
 	}
 	else {
@@ -1114,24 +1129,24 @@ SVGMapShape.prototype.update = function(options) {
 			};
 
 		switch (parseInt(options['text_halign'])) {
-			case 1:
+			case SVGMapShape.LABEL_HALIGN_LEFT:
 				x = this.x + this.map.canvas.textPadding;
 				anchor.horizontal = 'left';
 			break;
 
-			case 2:
+			case SVGMapShape.LABEL_HALIGN_RIGHT:
 				x = this.x + this.width - this.map.canvas.textPadding;
 				anchor.horizontal = 'right';
 			break;
 		}
 
 		switch (parseInt(options['text_valign'])) {
-			case 1:
+			case SVGMapShape.LABEL_VALIGN_TOP:
 				y = this.y + this.map.canvas.textPadding;
 				anchor.vertical = 'top';
 			break;
 
-			case 2:
+			case SVGMapShape.LABEL_VALIGN_BOTTOM:
 				y = this.y + this.height - this.map.canvas.textPadding;
 				anchor.vertical = 'bottom';
 			break;

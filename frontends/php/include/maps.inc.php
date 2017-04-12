@@ -1391,12 +1391,12 @@ function populateFromMapAreas(array &$map, $theme) {
 
 				$map['shapes'][] = [
 					'sysmap_shapeid' => 'e-' . $selement['selementid'],
-					'type' => 0,
+					'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
 					'x' => $selement['x'],
 					'y' => $selement['y'],
 					'width' => $selement['width'],
 					'height' => $selement['height'],
-					'border_type' => 0,
+					'border_type' => SYSMAP_SHAPE_BORDER_TYPE_SOLID,
 					'border_width' => 3,
 					'border_color' => $theme['maingridcolor'],
 					'background_color' => '',

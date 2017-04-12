@@ -54,7 +54,7 @@ class CMapHelper {
 		]);
 		$map = reset($maps);
 
-		$theme = self::getGraphTheme();
+		$theme = getUserGraphTheme();
 
 		if (!$map) {
 			$map = [
@@ -67,7 +67,7 @@ class CMapHelper {
 				'links' => [],
 				'shapes' => [
 					[
-						'type' => 0,
+						'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
 						'x' => 0,
 						'y' => 0,
 						'width' => 320,
@@ -103,35 +103,6 @@ class CMapHelper {
 			'shapes' => array_values($map['shapes']),
 			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS),
 			'homepage' => ZABBIX_HOMEPAGE
-		];
-	}
-
-	/**
-	 * Get graphic theme for map elements based on user configuration.
-	 *
-	 * @return array
-	 */
-	public static function getGraphTheme() {
-		$themes = DB::find('graph_theme', [
-			'theme' => getUserTheme(CWebUser::$data)
-		]);
-
-		if ($themes) {
-			return $themes[0];
-		}
-
-		return [
-			'theme' => 'blue-theme',
-			'textcolor' => '1F2C33',
-			'highlightcolor' => 'E33734',
-			'backgroundcolor' => 'FFFFFF',
-			'graphcolor' => 'FFFFFF',
-			'gridcolor' => 'CCD5D9',
-			'maingridcolor' => 'ACBBC2',
-			'gridbordercolor' => 'ACBBC2',
-			'nonworktimecolor' => 'EBEBEB',
-			'leftpercentilecolor' => '429E47',
-			'righttpercentilecolor' => 'E33734'
 		];
 	}
 

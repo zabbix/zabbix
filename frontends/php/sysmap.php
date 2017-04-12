@@ -218,7 +218,7 @@ if ($data['iconList']) {
 	$data['iconList'] = array_values($data['iconList']);
 }
 
-$data['theme'] = CMapHelper::getGraphTheme();
+$data['theme'] = getUserGraphTheme();
 
 // render view
 $sysmapView = new CView('monitoring.sysmap.constructor', $data);

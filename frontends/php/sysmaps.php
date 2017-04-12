@@ -210,7 +210,10 @@ if (hasRequest('add') || hasRequest('update')) {
 					'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
 					'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
 				],
-				'selectShapes' => API_OUTPUT_EXTEND,
+				'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
+					'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
+					'zindex'
+				],
 				'selectLinks' => ['selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
 				'sysmapids' => $sysmap['sysmapid']
 			]);

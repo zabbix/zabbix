@@ -2277,6 +2277,35 @@ function get_color($image, $color, $alpha = 0) {
 }
 
 /**
+ * Get graphic theme based on user configuration.
+ *
+ * @return array
+ */
+function getUserGraphTheme() {
+	$themes = DB::find('graph_theme', [
+		'theme' => getUserTheme(CWebUser::$data)
+	]);
+
+	if ($themes) {
+		return $themes[0];
+	}
+
+	return [
+		'theme' => 'blue-theme',
+		'textcolor' => '1F2C33',
+		'highlightcolor' => 'E33734',
+		'backgroundcolor' => 'FFFFFF',
+		'graphcolor' => 'FFFFFF',
+		'gridcolor' => 'CCD5D9',
+		'maingridcolor' => 'ACBBC2',
+		'gridbordercolor' => 'ACBBC2',
+		'nonworktimecolor' => 'EBEBEB',
+		'leftpercentilecolor' => '429E47',
+		'righttpercentilecolor' => 'E33734'
+	];
+}
+
+/**
  * Custom error handler for PHP errors.
  *
  * @param int     $errno Level of the error raised.
