@@ -370,7 +370,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$new_step = CArrayHelper::unsetEqualValues($step, $db_step, ['httpstepid']);
 					foreach (['headers', 'variables', 'posts', 'query_fields'] as $field_name) {
 						if (!array_key_exists($field_name, $new_step)
-								|| !is_array($new_step[$field_name])
+								|| !is_array($new_step[$field_name]) || !is_array($db_step[$field_name])
 								|| count($new_step[$field_name]) !== count($db_step[$field_name])) {
 							continue;
 						}
