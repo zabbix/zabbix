@@ -1094,8 +1094,7 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('groupid'));
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-			$this->zbxTestClickLinkTextWait($this->itemSimple);
-			$this->zbxTestWaitWindowClose();
+			$this->zbxTestClickLinkAndWaitWindowClose($this->itemSimple);
 
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');

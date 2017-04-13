@@ -1423,7 +1423,7 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user['sessionid'] = md5(time().md5($user['password']).$user['user'].rand(0, 10000000));
+		$db_user['sessionid'] = md5(microtime().md5($user['password']).$user['user'].mt_rand());
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],

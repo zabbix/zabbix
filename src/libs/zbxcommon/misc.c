@@ -1801,7 +1801,6 @@ int	is_ip4(const char *ip)
 	return res;
 }
 
-#ifdef HAVE_IPV6
 /******************************************************************************
  *                                                                            *
  * Function: is_ip6                                                           *
@@ -1868,7 +1867,31 @@ int	is_ip6(const char *ip)
 
 	return res;
 }
-#endif	/* HAVE_IPV6 */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_supported_ip                                                  *
+ *                                                                            *
+ * Purpose: is string IP address of supported version                         *
+ *                                                                            *
+ * Parameters: ip - string                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - is IP address                                      *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+int	is_supported_ip(const char *ip)
+{
+	if (SUCCEED == is_ip4(ip))
+		return SUCCEED;
+#ifdef HAVE_IPV6
+	if (SUCCEED == is_ip6(ip))
+		return SUCCEED;
+#endif
+	return FAIL;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1886,15 +1909,7 @@ int	is_ip6(const char *ip)
  ******************************************************************************/
 int	is_ip(const char *ip)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip() ip:'%s'", ip);
-
-	if (SUCCEED == is_ip4(ip))
-		return SUCCEED;
-#ifdef HAVE_IPV6
-	if (SUCCEED == is_ip6(ip))
-		return SUCCEED;
-#endif
-	return FAIL;
+	return SUCCEED == is_ip4(ip) ? SUCCEED : is_ip6(ip);
 }
 
 /******************************************************************************

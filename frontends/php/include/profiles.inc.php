@@ -138,7 +138,7 @@ function update_config($config) {
 			);
 		}
 		if (array_key_exists('hk_services', $config)) {
-			$msg[] = _s('IT service data storage period (in days) "%1$s".', $config['hk_services']);
+			$msg[] = _s('Service data storage period (in days) "%1$s".', $config['hk_services']);
 		}
 		if (array_key_exists('hk_audit', $config)) {
 			$msg[] = _s('Audit data storage period (in days) "%1$s".', $config['hk_audit']);

@@ -35,7 +35,6 @@
 #	include <sqlite3.h>
 #endif
 
-#include "db.h"
 #include "dbschema.h"
 #include "log.h"
 #if defined(HAVE_SQLITE3)
@@ -115,7 +114,7 @@ static ub4	OCI_DBserver_status();
 
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
-static int			ZBX_PG_BYTEAOID = 0;
+static unsigned int		ZBX_PG_BYTEAOID = 0;
 static int			ZBX_PG_SVERSION = 0;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
@@ -297,6 +296,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*p, *path = NULL;
 #endif
 
+#ifndef HAVE_MYSQL
+	ZBX_UNUSED(dbsocket);
+#endif
 	/* Allow executing statements during a connection initialization. Make sure to mark transaction as failed. */
 	if (0 != txn_level)
 		txn_error = 1;
@@ -374,7 +376,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = DBdyn_escape_string(dbschema);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 		if (0 < (ret = zbx_db_execute("set current schema='%s'", dbschema_esc)))
 			ret = ZBX_DB_OK;
 		zbx_free(dbschema_esc);
@@ -546,7 +548,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = DBdyn_escape_string(dbschema);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 		if (ZBX_DB_DOWN == (rc = zbx_db_execute("set schema '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
 			ret = rc;
 		zbx_free(dbschema_esc);
@@ -597,8 +599,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 out:
 #elif defined(HAVE_SQLITE3)
+	ZBX_UNUSED(host);
+	ZBX_UNUSED(user);
+	ZBX_UNUSED(password);
 	ZBX_UNUSED(dbschema);
-
+	ZBX_UNUSED(port);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
@@ -647,25 +652,9 @@ out:
 	return ret;
 }
 
-#if defined(HAVE_SQLITE3)
-void	zbx_create_sqlite3_mutex(void)
+int	zbx_db_init(const char *dbname, const char *const db_schema, char **error)
 {
-	if (FAIL == zbx_mutex_create_force(&sqlite_access, ZBX_MUTEX_SQLITE3))
-	{
-		zbx_error("cannot create mutex for SQLite3");
-		exit(EXIT_FAILURE);
-	}
-}
-
-void	zbx_remove_sqlite3_mutex(void)
-{
-	zbx_mutex_destroy(&sqlite_access);
-}
-#endif	/* HAVE_SQLITE3 */
-
-void	zbx_db_init(const char *dbname, const char *const db_schema)
-{
-#if defined(HAVE_SQLITE3)
+#ifdef HAVE_SQLITE3
 	zbx_stat_t	buf;
 
 	if (0 != zbx_stat(dbname, &buf))
@@ -676,20 +665,33 @@ void	zbx_db_init(const char *dbname, const char *const db_schema)
 		if (SQLITE_OK != sqlite3_open(dbname, &conn))
 		{
 			zabbix_errlog(ERR_Z3002, dbname, 0, sqlite3_errmsg(conn));
-			exit(EXIT_FAILURE);
+			*error = zbx_strdup(*error, "cannot open database");
+			return FAIL;
 		}
 
-		zbx_create_sqlite3_mutex();
+		if (SUCCEED != zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE3, error))
+			return FAIL;
 
 		zbx_db_execute("%s", db_schema);
 		zbx_db_close();
+		return SUCCEED;
 	}
-	else
-		zbx_create_sqlite3_mutex();
+
+	return zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE3, error);
 #else	/* not HAVE_SQLITE3 */
 	ZBX_UNUSED(dbname);
 	ZBX_UNUSED(db_schema);
+	ZBX_UNUSED(error);
+
+	return SUCCEED;
 #endif	/* HAVE_SQLITE3 */
+}
+
+void	zbx_db_deinit(void)
+{
+#ifdef HAVE_SQLITE3
+	zbx_mutex_destroy(&sqlite_access);
+#endif
 }
 
 void	zbx_db_close(void)
@@ -801,11 +803,19 @@ int	zbx_db_begin(void)
 		rc = ZBX_DB_DOWN;
 	}
 
+	if (ZBX_DB_OK == rc)
+	{
+		/* create savepoint for correct rollback on DB2 */
+		if (0 <= (rc = zbx_db_execute("savepoint zbx_begin_savepoint unique on rollback retain cursors;")))
+			rc = ZBX_DB_OK;
+	}
+
 	if (ZBX_DB_OK != rc)
 	{
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<begin>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
+
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "begin;");
 #elif defined(HAVE_SQLITE3)
@@ -853,7 +863,6 @@ int	zbx_db_commit(void)
 	{
 		rc = ZBX_DB_DOWN;
 	}
-
 	if (ZBX_DB_OK != rc)
 	{
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<commit>");
@@ -912,8 +921,11 @@ int	zbx_db_rollback(void)
 	txn_error = 0;
 
 #if defined(HAVE_IBM_DB2)
-	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
-		rc = ZBX_DB_DOWN;
+
+	/* Rollback to begin that is marked with savepoint. This move undo all transactions. */
+	if (0 <= (rc = zbx_db_execute("rollback to savepoint zbx_begin_savepoint;")))
+		rc = ZBX_DB_OK;
+
 	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
 			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
 	{
@@ -2000,7 +2012,7 @@ int	zbx_db_is_null(const char *field)
 	return FAIL;
 }
 
-#if defined(HAVE_ORACLE)
+#ifdef HAVE_ORACLE
 static void	OCI_DBclean_result(DB_RESULT result)
 {
 	if (NULL == result)
@@ -2109,7 +2121,7 @@ void	DBfree_result(DB_RESULT result)
 #endif	/* HAVE_SQLITE3 */
 }
 
-#if defined(HAVE_IBM_DB2)
+#ifdef HAVE_IBM_DB2
 /* server status: SQL_CD_TRUE or SQL_CD_FALSE */
 static int	IBM_DB2server_status()
 {
@@ -2160,7 +2172,9 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 		}
 	}
 }
-#elif defined(HAVE_ORACLE)
+#endif
+
+#ifdef HAVE_ORACLE
 /* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
 static ub4	OCI_DBserver_status()
 {
@@ -2258,12 +2272,6 @@ static size_t	zbx_db_get_escape_string_len(const char *s, size_t max_bytes, size
 
 	while ('\0' != *s && 0 < max_chars)
 	{
-		if ('\r' == *s)
-		{
-			s++;
-			continue;
-		}
-
 		csize = zbx_utf8_char_len(s);
 
 		/* process non-UTF-8 characters as single byte characters */

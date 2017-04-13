@@ -26,6 +26,7 @@
 #include "proxy.h"
 #include "zbxself.h"
 #include "dbcache.h"
+#include "zbxtasks.h"
 
 #include "datasender.h"
 #include "../servercomms.h"
@@ -33,6 +34,19 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+
+#define ZBX_DATASENDER_AVAILABILITY		0x0001
+#define ZBX_DATASENDER_HISTORY			0x0002
+#define ZBX_DATASENDER_DISCOVERY		0x0004
+#define ZBX_DATASENDER_AUTOREGISTRATION		0x0008
+#define ZBX_DATASENDER_TASKS			0x0010
+#define ZBX_DATASENDER_TASKS_RECV		0x0020
+#define ZBX_DATASENDER_TASKS_REQUEST		0x8000
+
+#define ZBX_DATASENDER_DB_UPDATE	(ZBX_DATASENDER_AVAILABILITY | ZBX_DATASENDER_HISTORY |		\
+					ZBX_DATASENDER_DISCOVERY | ZBX_DATASENDER_AUTOREGISTRATION |	\
+					ZBX_DATASENDER_TASKS | ZBX_DATASENDER_TASKS_RECV)
+
 
 /******************************************************************************
  *                                                                            *
@@ -42,42 +56,71 @@ extern int		server_num, process_num;
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender(int *more)
+static int	proxy_data_sender(int *more, int now)
 {
-	const char	*__function_name = "proxy_data_sender";
-	zbx_socket_t	sock;
-	struct zbx_json	j;
-	int		ret = FAIL, availability_ts, history_records, discovery_records, areg_records, more_history,
-			more_discovery, more_areg;
-	zbx_uint64_t	history_lastid = 0, discovery_lastid = 0, areg_lastid = 0;
-	zbx_timespec_t	ts;
-	char		*error = NULL;
+	const char		*__function_name = "proxy_data_sender";
+
+	static int		data_timestamp = 0, task_timestamp = 0;
+
+	zbx_socket_t		sock;
+	struct zbx_json		j;
+	struct zbx_json_parse	jp, jp_tasks;
+	int			ret = FAIL, availability_ts, history_records = 0, discovery_records = 0,
+				areg_records = 0, more_history, more_discovery, more_areg;
+	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
+	zbx_timespec_t		ts;
+	char			*error = NULL;
+	zbx_vector_ptr_t	tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	*more = ZBX_PROXY_DATA_DONE;
 	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == get_host_availability_data(&j, &availability_ts))
-		ret = SUCCEED;
+	if (CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp)
+	{
+		data_timestamp = now;
 
-	if  (0 != (history_records = proxy_get_hist_data(&j, &history_lastid, &more_history)))
-		ret = SUCCEED;
+		if (SUCCEED == get_host_availability_data(&j, &availability_ts))
+			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-	if  (0 != (discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery)))
-		ret = SUCCEED;
+		if  (0 != (history_records = proxy_get_hist_data(&j, &history_lastid, &more_history)))
+			flags |= ZBX_DATASENDER_HISTORY;
 
-	if  (0 != (areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg)))
-		ret = SUCCEED;
+		if  (0 != (discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery)))
+			flags |= ZBX_DATASENDER_DISCOVERY;
 
-	if (SUCCEED == ret)
+		if  (0 != (areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg)))
+			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
+	}
+
+	zbx_vector_ptr_create(&tasks);
+
+	if (ZBX_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
+	{
+		task_timestamp = now;
+
+		zbx_tm_get_remote_tasks(&tasks, 0);
+
+		if (0 != tasks.values_num)
+		{
+			zbx_tm_json_serialize_tasks(&j, &tasks);
+			flags |= ZBX_DATASENDER_TASKS;
+		}
+
+		flags |= ZBX_DATASENDER_TASKS_REQUEST;
+	}
+
+	if (0 != flags)
 	{
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 				ZBX_PROXY_DATA_MORE == more_areg)
 		{
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
+			*more = ZBX_PROXY_DATA_MORE;
 		}
 
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
@@ -94,36 +137,52 @@ static int	proxy_data_sender(int *more)
 					sock.peer, error);
 			zbx_free(error);
 		}
+		else
+		{
+			zbx_set_availability_diff_ts(availability_ts);
+
+			if (SUCCEED == zbx_json_open(sock.buffer, &jp))
+			{
+				if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
+					flags |= ZBX_DATASENDER_TASKS_RECV;
+			}
+
+			if (0 != (flags & ZBX_DATASENDER_DB_UPDATE))
+			{
+				DBbegin();
+
+				if (0 != (flags & ZBX_DATASENDER_TASKS))
+				{
+					zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
+					zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+				}
+
+				if (0 != (flags & ZBX_DATASENDER_TASKS_RECV))
+				{
+					zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+					zbx_tm_save_tasks(&tasks);
+				}
+
+				if (0 != (flags & ZBX_DATASENDER_HISTORY))
+					proxy_set_hist_lastid(history_lastid);
+
+				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
+					proxy_set_dhis_lastid(discovery_lastid);
+
+				if (0 != (flags & ZBX_DATASENDER_AUTOREGISTRATION))
+					proxy_set_areg_lastid(areg_lastid);
+
+				DBcommit();
+			}
+		}
 
 		disconnect_server(&sock);
 	}
 
+	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+	zbx_vector_ptr_destroy(&tasks);
+
 	zbx_json_free(&j);
-
-	if (SUCCEED == ret)
-	{
-		*more = more_history | more_discovery | more_areg;
-
-		zbx_set_availability_diff_ts(availability_ts);
-
-		if (0 != history_lastid || 0 != discovery_lastid || 0 != areg_lastid)
-		{
-			DBbegin();
-
-			if (0 != history_lastid)
-				proxy_set_hist_lastid(history_lastid);
-
-			if (0 != discovery_lastid)
-				proxy_set_dhis_lastid(discovery_lastid);
-
-			if (0 != areg_lastid)
-				proxy_set_areg_lastid(areg_lastid);
-
-			DBcommit();
-		}
-	}
-	else
-		*more = ZBX_PROXY_DATA_DONE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
 
@@ -140,7 +199,7 @@ static int	proxy_data_sender(int *more)
 ZBX_THREAD_ENTRY(datasender_thread, args)
 {
 	int		records = 0, more;
-	double		time_start, time_diff = 0.0;
+	double		time_start, time_diff = 0.0, time_now;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -164,12 +223,15 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 				get_process_type_string(process_type), records, time_diff);
 
 		records = 0;
-		time_start = zbx_time();
+		time_now = zbx_time();
+		time_start = time_now;
 
 		do
 		{
-			records += proxy_data_sender(&more);
-			time_diff = zbx_time() - time_start;
+			records += proxy_data_sender(&more, (int)time_now);
+
+			time_now = zbx_time();
+			time_diff = time_now - time_start;
 		}
 		while (ZBX_PROXY_DATA_MORE == more && time_diff < SEC_PER_MIN);
 
@@ -177,6 +239,6 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 				get_process_type_string(process_type), records, time_diff, CONFIG_PROXYDATA_FREQUENCY);
 
 		if (ZBX_PROXY_DATA_MORE != more)
-			zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
+			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
 	}
 }

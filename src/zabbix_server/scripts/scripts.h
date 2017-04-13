@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -18,23 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_SCRIPTS_H
+#define ZABBIX_SCRIPTS_H
 
-/**
- * Database backend class for SQLite.
- */
-class SqliteDbBackend extends DbBackend {
+#include "common.h"
+#include "dbcache.h"
 
-	/**
-	 * Check if 'dbversion' table exists.
-	 *
-	 * @return boolean
-	 */
-	protected function checkDbVersionTable() {
-		if (!DBfetch(DBselect("SELECT name FROM sqlite_master WHERE type='table' AND name='dbversion';"))) {
-			$this->setError(_('The frontend does not match Zabbix database.'));
-			return false;
-		}
-
-		return true;
-	}
-}
+void	zbx_script_init(zbx_script_t *script);
+void	zbx_script_clean(zbx_script_t *script);
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, char *error, size_t max_error_len);
+int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, char *error,
+		size_t max_error_len);
+zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now);
+#endif

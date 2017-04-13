@@ -847,7 +847,7 @@ if (!empty($data['new_operation'])) {
 			];
 
 			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-			$new_operation_formlist->addRow(_('Script name'), $userScript);
+			$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP));
 
 			// script
 			$new_operation_formlist->addRow(_('Execute on'),
@@ -855,6 +855,7 @@ if (!empty($data['new_operation'])) {
 					(int) $data['new_operation']['opcommand']['execute_on']
 				))
 					->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+					->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 					->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
 					->setModern(true)
 			);
@@ -1567,6 +1568,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						(int) $data['new_recovery_operation']['opcommand']['execute_on']
 					))
 						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+						->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
 						->setModern(true)
 				);

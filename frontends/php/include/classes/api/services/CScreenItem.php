@@ -142,12 +142,20 @@ class CScreenItem extends CApiService {
 			'resourcetype' => null
 		];
 
+		$defaults = [
+			'x' => 0,
+			'y' => 0,
+			'colspan' => 1,
+			'rowspan' => 1
+		];
+
 		foreach ($screenItems as &$screenItem) {
 			if (!check_db_fields($screenItemDBfields, $screenItem)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
 
 			unset($screenItem['screenitemid']);
+			$screenItem += $defaults;
 		}
 		unset($screenItem);
 
@@ -173,15 +181,14 @@ class CScreenItem extends CApiService {
 			}
 		}
 
-		$dbScreenItems = $this->get([
+		$dbScreenItems = API::getApiService()->select($this->tableName(), [
 			'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan'],
-			'screenids' => $screenIds,
-			'editable' => true,
+			'filter' => ['screenid' => array_keys($dbScreens)],
 			'preservekeys' => true
 		]);
 
 		$this->checkInput($screenItems, $dbScreenItems);
-		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
+		$this->checkDuplicateResourceInCell(array_merge($screenItems, $dbScreenItems), $dbScreens);
 
 		foreach ($screenItems as $screenItem) {
 			$this->checkSpans($screenItem, $dbScreens[$screenItem['screenid']]);
@@ -284,11 +291,11 @@ class CScreenItem extends CApiService {
 			$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
 		}
 
-		$dbScreenItems = $this->get([
+		$dbScreenItems = API::getApiService()->select($this->tableName(), [
 			'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
-				'style'],
-			'screenitemids' => $screenItemIds,
-			'editable' => true,
+				'style'
+			],
+			'filter' => ['screenid' => array_keys($dbScreens)],
 			'preservekeys' => true
 		]);
 
@@ -297,7 +304,7 @@ class CScreenItem extends CApiService {
 		);
 
 		$this->checkInput($screenItems, $dbScreenItems);
-		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
+		$this->checkDuplicateResourceInCell($screenItems + $dbScreenItems, $dbScreens);
 
 		foreach ($screenItems as $screenItem) {
 			$this->checkSpans($screenItem, $dbScreens[$screenItem['screenid']]);
@@ -841,47 +848,46 @@ class CScreenItem extends CApiService {
 	/**
 	 * Check duplicates screen items in one cell.
 	 *
-	 * @param array $screenItems
-	 * @param array $dbScreenItems
-	 * @param array $dbScreens
+	 * @param array  $screen_items
+	 * @param string $screen_items['screenid']
+	 * @param int    $screen_items['x']
+	 * @param int    $screen_items['y']
+	 * @param int    $screen_items['colspan']
+	 * @param int    $screen_items['rowspan']
+	 * @param array  $screens
+	 * @param string $screens['screenid']
+	 * @param string $screens['name']
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	protected function checkDuplicateResourceInCell(array $screenItems, array $dbScreenItems, array $dbScreens) {
-		$pos = [];
+	protected function checkDuplicateResourceInCell(array $screen_items, array $screens) {
+		$calculated = [];
 
-		foreach ($screenItems as $screenItem) {
-			foreach (['x', 'y'] as $field_name) {
-				if (!array_key_exists($field_name, $screenItem)) {
-					$screenItem[$field_name] = array_key_exists('screenitemid', $screenItem)
-						? $dbScreenItems[$screenItem['screenitemid']][$field_name]
-						: 0;
+		foreach ($screen_items as $screen_item) {
+			$screenid = $screen_item['screenid'];
+			$checked = [
+				'left' => $screen_item['x'],
+				'top' => $screen_item['y'],
+				'right' => $screen_item['x'] + $screen_item['colspan'] - 1,
+				'bottom' => $screen_item['y'] + $screen_item['rowspan'] - 1
+			];
+			if (!array_key_exists($screenid, $calculated)) {
+				$calculated[$screenid] = [];
+			}
+
+			foreach ($calculated[$screenid] as $entry) {
+				$overlaps_x = ($checked['left'] <= $entry['right'] && $checked['right'] >= $entry['left']);
+				$overlaps_y = ($checked['top'] <= $entry['bottom'] && $checked['bottom'] >= $entry['top']);
+				if ($overlaps_x && $overlaps_y) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Screen "%1$s" cell X - %2$s Y - %3$s is already taken.', $screens[$screenid]['name'],
+							$checked['left'], $checked['top']
+						)
+					);
 				}
 			}
 
-			if (array_key_exists($screenItem['screenid'], $pos)
-					&& array_key_exists($screenItem['x'], $pos[$screenItem['screenid']])
-					&& array_key_exists($screenItem['y'], $pos[$screenItem['screenid']][$screenItem['x']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" cell X - %2$s Y - %3$s is already taken.',
-					$dbScreens[$screenItem['screenid']]['name'], $screenItem['x'], $screenItem['y']
-				));
-			}
-
-			$pos[$screenItem['screenid']][$screenItem['x']][$screenItem['y']] = true;
-
-			if (array_key_exists('screenitemid', $screenItem)) {
-				unset($dbScreenItems[$screenItem['screenitemid']]);
-			}
-		}
-
-		foreach ($dbScreenItems as $dbScreenItem) {
-			if (array_key_exists($dbScreenItem['screenid'], $pos)
-					&& array_key_exists($dbScreenItem['x'], $pos[$dbScreenItem['screenid']])
-					&& array_key_exists($dbScreenItem['y'], $pos[$dbScreenItem['screenid']][$dbScreenItem['x']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" cell X - %2$s Y - %3$s is already taken.',
-					$dbScreens[$dbScreenItem['screenid']]['name'], $dbScreenItem['x'], $dbScreenItem['y']
-				));
-			}
+			$calculated[$screenid][] = $checked;
 		}
 	}
 

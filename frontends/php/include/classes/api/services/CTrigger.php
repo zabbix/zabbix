@@ -654,9 +654,8 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $triggerIds
 	 */
 	protected function deleteByIds(array $triggerIds) {
-		DB::delete('sysmaps_elements', [
-			'elementid' => $triggerIds,
-			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
+		DB::delete('sysmap_element_trigger', [
+			'triggerid' => $triggerIds
 		]);
 
 		// disable actions
@@ -1540,7 +1539,7 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Returns true if at least one of the given triggers is used in IT services.
+	 * Returns true if at least one of the given triggers is used in services.
 	 *
 	 * @param array $triggerIds
 	 *

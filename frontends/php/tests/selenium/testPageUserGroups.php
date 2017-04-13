@@ -25,19 +25,26 @@ class testPageUserGroups extends CWebTest {
 		return DBdata("select * from usrgrp where name<>'Disabled' order by usrgrpid");
 	}
 
-	/**
-	* @dataProvider allGroups
-	*/
-	public function testPageUserGroups_CheckLayout($group) {
+	public function testPageUserGroups_CheckLayout() {
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestCheckHeader('User groups');
-		$this->zbxTestTextPresent('Displaying');
 
-		$this->zbxTestTextPresent(['Name', '#', 'Members', 'Status', 'Frontend access', 'Debug mode', 'Status']);
+		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'#')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Members')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Frontend access')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Debug mode')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Status')]");
 
-		$this->zbxTestTextPresent([$group['name']]);
-		$this->zbxTestTextPresent('Enable', 'Disable', 'Enable debug mode', 'Disable debug mode', 'Delete');
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
+
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Enable'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Disable'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Enable debug mode'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Disable debug mode'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete'][@disabled]");
 	}
 
 	/**
@@ -56,10 +63,10 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('Group updated');
-		$this->zbxTestTextPresent("$name");
 		$this->zbxTestCheckHeader('User groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
+		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup));
 		$this->assertEquals($oldHashUsersGroups, DBhash($sqlHashUsersGroups));
@@ -179,6 +186,40 @@ class testPageUserGroups extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 
 		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
+	}
+
+	public function testPageUserGroups_FilterByName() {
+		$this->zbxTestLogin('usergrps.php');
+		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Zabbix administrators');
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
+	public function testPageUserGroups_FilterNone() {
+		$this->zbxTestLogin('usergrps.php');
+		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->zbxTestInputTypeOverwrite('filter_name', '%');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+	}
+
+	public function testPageUserGroups_FilterByStatus() {
+		$this->zbxTestLogin('usergrps.php');
+		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
+		$this->zbxTestClickXpath("//label[@for='filter_users_status_1']");
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->zbxTestCheckFatalErrors();
+	}
+
+	public function testPageUserGroups_FilterReset() {
+		$this->zbxTestLogin('usergrps.php');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
 }

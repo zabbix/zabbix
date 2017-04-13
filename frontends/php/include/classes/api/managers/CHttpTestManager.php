@@ -201,10 +201,6 @@ class CHttpTestManager {
 					elseif (!isset($webstep['httpstepid'])) {
 						$steps_create[$key][] = $webstep;
 					}
-
-					if ($db_http_test['templateid'] != 0) {
-						unset($dbSteps[$webstep['httpstepid']]);
-					}
 				}
 
 				$stepidsDelete = array_keys($dbSteps);

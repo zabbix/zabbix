@@ -44,130 +44,61 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mutex_create_ext                                             *
+ * Function: zbx_mutex_create                                                 *
  *                                                                            *
  * Purpose: Create the mutex                                                  *
  *                                                                            *
  * Parameters:  mutex - handle of mutex                                       *
  *              name - name of mutex (index for nix system)                   *
- *              forced - remove mutex if exists (only for nix)                *
  *                                                                            *
  * Return value: If the function succeeds, then return SUCCEED,               *
  *               FAIL on an error                                             *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: use alias 'zbx_mutex_create' and 'zbx_mutex_create_force'        *
- *                                                                            *
  ******************************************************************************/
-int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char forced)
+int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 {
 #ifdef _WINDOWS
-
 	if (NULL == (*mutex = CreateMutex(NULL, FALSE, name)))
 	{
-		zbx_error("error on mutex creating: %s", strerror_from_system(GetLastError()));
+		*error = zbx_dsprintf(*error, "error on mutex creating: %s", strerror_from_system(GetLastError()));
 		return FAIL;
 	}
-
 #else
-
-#define ZBX_MAX_ATTEMPTS	10
-	int		attempts = 0, i;
-	key_t		sem_key;
-	union semun	semopts;
-	struct semid_ds	seminfo;
-
-	if (-1 == (sem_key = ftok(CONFIG_FILE, (int)'z')))
+	if (-1 == ZBX_SEM_LIST_ID)
 	{
-		zbx_error("cannot create IPC key for path '%s', try to create for path '.': %s",
-				CONFIG_FILE, zbx_strerror(errno));
+		union semun	semopts;
+		int		i;
 
-		if (-1 == (sem_key = ftok(".", (int)'z')))
+		if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT, 0600)))
 		{
-			zbx_error("cannot create IPC key for path '.': %s", zbx_strerror(errno));
+			*error = zbx_dsprintf(*error, "cannot create semaphore set: %s", zbx_strerror(errno));
 			return FAIL;
 		}
-	}
-lbl_create:
-	if (-1 != ZBX_SEM_LIST_ID || -1 != (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0600 /* 0022 */)))
-	{
+
 		/* set default semaphore value */
 
 		semopts.val = 1;
 		for (i = 0; ZBX_MUTEX_COUNT > i; i++)
 		{
-			if (-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
-			{
-				zbx_error("semaphore [%i] error in semctl(SETVAL): %s", name, zbx_strerror(errno));
-				return FAIL;
+			if (-1 != semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
+				continue;
 
-			}
+			*error = zbx_dsprintf(*error, "cannot initialize semaphore: %s", zbx_strerror(errno));
 
-			zbx_mutex_lock(&i);	/* call semop to update sem_otime */
-			zbx_mutex_unlock(&i);	/* release semaphore */
-		}
-	}
-	else if (EEXIST == errno)
-	{
-		ZBX_SEM_LIST_ID = semget(sem_key, 0 /* get reference */, 0600 /* 0022 */);
+			if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
+				zbx_error("cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));
 
-		if (1 == forced)
-		{
-			if (0 != semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
-			{
-				zbx_error("cannot recreate Zabbix semaphores for IPC key 0x%lx Semaphore ID %ld: %s",
-						sem_key, ZBX_SEM_LIST_ID, zbx_strerror(errno));
-				exit(EXIT_FAILURE);
-			}
-
-			/* semaphore is successfully removed */
 			ZBX_SEM_LIST_ID = -1;
 
-			if (ZBX_MAX_ATTEMPTS < ++attempts)
-			{
-				zbx_error("cannot recreate Zabbix semaphores for IPC key 0x%lx: too many attempts",
-						sem_key);
-				exit(EXIT_FAILURE);
-			}
-
-			if ((ZBX_MAX_ATTEMPTS / 2) < attempts)
-				zbx_sleep(1);
-
-			goto lbl_create;
+			return FAIL;
 		}
-
-		semopts.buf = &seminfo;
-		/* wait for initialization */
-		for (i = 0; ZBX_MUTEX_MAX_TRIES > i; i++)
-		{
-			if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_STAT, semopts))
-			{
-				zbx_error("semaphore [%i] error in semctl(IPC_STAT): %s",
-						name, zbx_strerror(errno));
-				break;
-			}
-
-			if (0 != semopts.buf->sem_otime)
-				goto lbl_return;
-
-			zbx_sleep(1);
-		}
-
-		zbx_error("semaphore [%i] not initialized", name);
-		return FAIL;
 	}
-	else
-	{
-		zbx_error("cannot create Semaphore: %s", zbx_strerror(errno));
-		return FAIL;
-	}
-lbl_return:
+
 	*mutex = name;
 	mutexes++;
-
-#endif	/* _WINDOWS */
-
+#endif
 	return SUCCEED;
 }
 
@@ -275,30 +206,22 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- * Return value: If the function succeeds, then return 1, 0 on an error       *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
+void	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
 #ifdef _WINDOWS
 	if (ZBX_MUTEX_NULL == *mutex)
-		return SUCCEED;
+		return;
 
 	if (0 == CloseHandle(*mutex))
-	{
 		zbx_error("error on mutex destroying: %s", strerror_from_system(GetLastError()));
-		return FAIL;
-	}
 #else
-	if (0 == --mutexes)
-		semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
+	if (0 == --mutexes && -1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
+		zbx_error("cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));
 #endif
-
 	*mutex = ZBX_MUTEX_NULL;
-
-	return SUCCEED;
 }
 
 #ifdef _WINDOWS

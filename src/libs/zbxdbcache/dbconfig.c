@@ -32,6 +32,7 @@
 #include "dbcache.h"
 #include "zbxregexp.h"
 #include "cfg.h"
+#include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
 static int	sync_in_progress = 0;
@@ -350,6 +351,8 @@ typedef struct
 	zbx_uint64_t	hostid;
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
+	int		proxy_tasks_nextcheck;
+	int		nextcheck;
 	int		timediff;
 	int		lastaccess;
 	int		version;
@@ -1103,6 +1106,12 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 	if (ZBX_LOC_POLLER == proxy->location)
 		return;
 
+	proxy->nextcheck = proxy->proxy_tasks_nextcheck;
+	if (proxy->proxy_data_nextcheck < proxy->nextcheck)
+		proxy->nextcheck = proxy->proxy_data_nextcheck;
+	if (proxy->proxy_config_nextcheck < proxy->nextcheck)
+		proxy->nextcheck = proxy->proxy_config_nextcheck;
+
 	elem.key = proxy->hostid;
 	elem.data = (const void *)proxy;
 
@@ -1276,9 +1285,9 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 			/* set default housekeeper configuration */
 			config->config->hk.events_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.events_trigger = 365;
-			config->config->hk.events_internal = 365;
-			config->config->hk.events_autoreg = 365;
-			config->config->hk.events_discovery = 365;
+			config->config->hk.events_internal = 1;
+			config->config->hk.events_autoreg = 1;
+			config->config->hk.events_discovery = 1;
 
 			config->config->hk.audit_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.audit = 365;
@@ -1757,6 +1766,8 @@ done:
 						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
 				proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+				proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
 
 				DCupdate_proxy_queue(proxy);
 			}
@@ -5293,14 +5304,7 @@ static int	__config_proxy_compare(const void *d1, const void *d2)
 	const ZBX_DC_PROXY		*p1 = (const ZBX_DC_PROXY *)e1->data;
 	const ZBX_DC_PROXY		*p2 = (const ZBX_DC_PROXY *)e2->data;
 
-	int				nextcheck1, nextcheck2;
-
-	nextcheck1 = (p1->proxy_config_nextcheck < p1->proxy_data_nextcheck) ?
-			p1->proxy_config_nextcheck : p1->proxy_data_nextcheck;
-	nextcheck2 = (p2->proxy_config_nextcheck < p2->proxy_data_nextcheck) ?
-			p2->proxy_config_nextcheck : p2->proxy_data_nextcheck;
-
-	ZBX_RETURN_IF_NOT_EQUAL(nextcheck1, nextcheck2);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->nextcheck, p2->nextcheck);
 
 	return 0;
 }
@@ -5350,12 +5354,11 @@ static int	__config_psk_compare(const void *d1, const void *d2)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	init_configuration_cache(void)
+int	init_configuration_cache(char **error)
 {
 	const char	*__function_name = "init_configuration_cache";
 
-	int		i;
-	key_t		shm_key;
+	int		i, ret;
 	size_t		config_size;
 	size_t		strpool_size;
 
@@ -5364,19 +5367,14 @@ void	init_configuration_cache(void)
 	strpool_size = (size_t)(CONFIG_CONF_CACHE_SIZE * 0.15);
 	config_size = CONFIG_CONF_CACHE_SIZE - strpool_size;
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_CONFIG_ID)))
-	{
-		zbx_error("Can't create IPC key for configuration cache");
-		exit(EXIT_FAILURE);
-	}
+	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG, error)))
+		goto out;
 
-	if (FAIL == zbx_mutex_create_force(&config_lock, ZBX_MUTEX_CONFIG))
-	{
-		zbx_error("Unable to create mutex for configuration cache");
-		exit(EXIT_FAILURE);
-	}
+	if (SUCCEED != (ret = zbx_mem_create(&config_mem, config_size, "configuration cache", "CacheSize", 0, error)))
+		goto out;
 
-	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize", 0);
+	if (SUCCEED != (ret = zbx_strpool_create(strpool_size, error)))
+		goto out;
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
@@ -5495,10 +5493,10 @@ void	init_configuration_cache(void)
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
-
-	zbx_strpool_create(strpool_size);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -5519,9 +5517,6 @@ void	free_configuration_cache(void)
 	LOCK_CACHE;
 
 	config = NULL;
-	zbx_mem_destroy(config_mem);
-
-	zbx_strpool_destroy();
 
 	UNLOCK_CACHE;
 
@@ -6186,6 +6181,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
 	dst_trigger->correlation_mode = src_trigger->correlation_mode;
 	dst_trigger->correlation_tag = zbx_strdup(NULL, src_trigger->correlation_tag);
+	dst_trigger->flags = 0;
 
 	dst_trigger->expression = NULL;
 	dst_trigger->recovery_expression = NULL;
@@ -6384,7 +6380,8 @@ void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const 
  * Author: Aleksandrs Saveljevs, Alexander Vladishev                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes, size_t num)
+void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
+		size_t num)
 {
 	size_t			i;
 	const ZBX_DC_FUNCTION	*dc_function;
@@ -6751,8 +6748,15 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 	{
 		dc_trigger = (ZBX_DC_TRIGGER *)config->time_triggers[process_num - 1].values[i];
 
-		if (TRIGGER_STATUS_ENABLED == dc_trigger->status && 0 == dc_trigger->locked &&
-				SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression))
+		if (TRIGGER_STATUS_DISABLED == dc_trigger->status || 1 == dc_trigger->locked)
+			continue;
+
+		/* We trigger the evaluation of the recovery expression only if the trigger have a value of */
+		/* TRIGGER_VALUE_PROBLEM and if the recovery mode use the recovery expression */
+		if (SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression) ||
+				(TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == dc_trigger->recovery_mode &&
+				TRIGGER_VALUE_PROBLEM == dc_trigger->value &&
+				SUCCEED == DCconfig_find_active_time_function(dc_trigger->recovery_expression)))
 		{
 			dc_trigger->locked = 1;
 
@@ -8351,6 +8355,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->hostid = src_proxy->hostid;
 	dst_proxy->proxy_config_nextcheck = src_proxy->proxy_config_nextcheck;
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
+	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->version = src_proxy->version;
 
 	if (NULL != (host = zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
@@ -8447,7 +8452,7 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
 		min = zbx_binary_heap_find_min(queue);
 		dc_proxy = (ZBX_DC_PROXY *)min->data;
 
-		if (dc_proxy->proxy_config_nextcheck > now && dc_proxy->proxy_data_nextcheck > now)
+		if (dc_proxy->nextcheck > now)
 			break;
 
 		zbx_binary_heap_remove_min(queue);
@@ -8496,8 +8501,7 @@ int	DCconfig_get_proxypoller_nextcheck(void)
 		min = zbx_binary_heap_find_min(queue);
 		dc_proxy = (const ZBX_DC_PROXY *)min->data;
 
-		nextcheck = (dc_proxy->proxy_config_nextcheck < dc_proxy->proxy_data_nextcheck) ?
-				dc_proxy->proxy_config_nextcheck : dc_proxy->proxy_data_nextcheck;
+		nextcheck = dc_proxy->nextcheck;
 	}
 	else
 		nextcheck = FAIL;
@@ -8540,6 +8544,11 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 			{
 				dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+			}
+			if (0 != (update_nextcheck & ZBX_PROXY_TASKS_NEXTCHECK))
+			{
+				dc_proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
 			}
 
 			DCupdate_proxy_queue(dc_proxy);
@@ -10391,7 +10400,8 @@ static void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t
 			parent_group->flags |= ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS;
 		}
 
-		zbx_vector_uint64_append_vector(nested_groupids, &parent_group->nested_groupids);
+		zbx_vector_uint64_append_array(nested_groupids, parent_group->nested_groupids.values,
+				parent_group->nested_groupids.values_num);
 	}
 }
 

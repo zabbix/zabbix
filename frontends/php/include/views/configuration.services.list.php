@@ -20,5 +20,5 @@
 
 
 return (new CWidget())
-	->setTitle(_('IT services'))
+	->setTitle(_('Services'))
 	->addItem($this->data['tree']->getHTML());

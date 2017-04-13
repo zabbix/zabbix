@@ -42,7 +42,7 @@ $fields = [
 	],
 	'hk_services_mode' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
 	'hk_services' => 		[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
-		'isset({update}) && isset({hk_services_mode})', _('IT service data storage period')
+		'isset({update}) && isset({hk_services_mode})', _('Service data storage period')
 	],
 	'hk_audit_mode' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
 	'hk_audit' => 			[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),

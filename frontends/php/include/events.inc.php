@@ -438,7 +438,7 @@ function make_popup_eventlist($trigger, $backurl) {
 		$table->setHeader([_('Time'), _('Status'), _('Duration'), _('Age')]);
 	}
 
-	if ($trigger['lastEvent']) {
+	if (array_key_exists('lastEvent', $trigger)) {
 		$events = API::Event()->get([
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
