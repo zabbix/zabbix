@@ -74,7 +74,7 @@ class testFormWebStep extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: query field name cannot be empty.'
+						'Invalid parameter "/1/steps/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -182,7 +182,7 @@ class testFormWebStep extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: post field name cannot be empty.'
+						'Invalid parameter "/1/steps/1/posts/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -436,7 +436,7 @@ class testFormWebStep extends CWebTest {
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: variable name "test" is not enclosed in {} or is malformed.'
+						'Invalid parameter "/1/steps/1/variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -452,7 +452,7 @@ class testFormWebStep extends CWebTest {
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: variable name "{test" is not enclosed in {} or is malformed.'
+						'Invalid parameter "/1/steps/1/variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -468,7 +468,7 @@ class testFormWebStep extends CWebTest {
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: variable name "test}" is not enclosed in {} or is malformed.'
+						'Invalid parameter "/1/steps/1/variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -486,7 +486,7 @@ class testFormWebStep extends CWebTest {
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: /1/steps/1/variables.'
+						'Invalid parameter "/1/steps/1/variables/2": value (name)=({test}) already exists.'
 					]
 				]
 			],
@@ -516,7 +516,7 @@ class testFormWebStep extends CWebTest {
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: variable name cannot be empty. '
+						'Invalid parameter "/1/steps/1/variables/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -592,7 +592,7 @@ class testFormWebStep extends CWebTest {
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: header value cannot be empty.'
+						'Invalid parameter "/1/steps/1/headers/1/value": cannot be empty.'
 					]
 				]
 			],
@@ -609,7 +609,7 @@ class testFormWebStep extends CWebTest {
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #step #1 of web scenario: header name cannot be empty.'
+						'Invalid parameter "/1/steps/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -782,7 +782,7 @@ class testFormWebStep extends CWebTest {
 			$i = 1;
 			foreach($data['query'] as $item) {
 				if (array_key_exists('name', $item)) {
-					$this->zbxTestInputType('pair_name_'.$i, $item['name']);
+					$this->zbxTestInputType('pairs_'.$i.'_name', $item['name']);
 				}
 				if (array_key_exists('value', $item)) {
 					$this->zbxTestInputType('pair_value_'.$i, $item['value']);
@@ -800,7 +800,7 @@ class testFormWebStep extends CWebTest {
 			$i = 2;
 			foreach($data['post'] as $item) {
 				if (array_key_exists('name', $item)) {
-					$this->zbxTestInputType('pair_name_'.$i, $item['name']);
+					$this->zbxTestInputType('pairs_'.$i.'_name', $item['name']);
 				}
 				if (array_key_exists('value', $item)) {
 					$this->zbxTestInputType('pair_value_'.$i, $item['value']);
@@ -814,7 +814,7 @@ class testFormWebStep extends CWebTest {
 			$i = 3;
 			foreach($data['variables'] as $item) {
 				if (array_key_exists('name', $item)) {
-					$this->zbxTestInputType('pair_name_'.$i, $item['name']);
+					$this->zbxTestInputType('pairs_'.$i.'_name', $item['name']);
 				}
 				if (array_key_exists('value', $item)) {
 					$this->zbxTestInputType('pair_value_'.$i, $item['value']);
@@ -828,7 +828,7 @@ class testFormWebStep extends CWebTest {
 			$i = 4;
 			foreach($data['headers'] as $item) {
 				if (array_key_exists('name', $item)) {
-					$this->zbxTestInputType('pair_name_'.$i, $item['name']);
+					$this->zbxTestInputType('pairs_'.$i.'_name', $item['name']);
 				}
 				if (array_key_exists('value', $item)) {
 					$this->zbxTestInputType('pair_value_'.$i, $item['value']);
@@ -851,7 +851,7 @@ class testFormWebStep extends CWebTest {
 			$this->zbxTestCheckboxSelect('retrieve_mode');
 			$this->zbxTestAssertElementPresentXpath("//input[@id='post_type_0'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='post_type_1'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='pair_name_2'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='pairs_2_name'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='pair_value_2'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='required'][@disabled]");
 		}
@@ -889,7 +889,7 @@ class testFormWebStep extends CWebTest {
 			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('posts'));
 			$i = 1;
 			foreach($data['parse_query'] as $item) {
-				$name = $this->zbxTestGetValue("//input[@id='pair_name_".$i."']");
+				$name = $this->zbxTestGetValue("//input[@id='pairs_".$i."_name']");
 				$this->assertEquals($name, $item['name']);
 				if (array_key_exists('value', $item)) {
 					$value = $this->zbxTestGetValue("//input[@id='pair_value_".$i."']");
@@ -912,7 +912,7 @@ class testFormWebStep extends CWebTest {
 			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('posts'));
 			$i = 2;
 			foreach($data['check_post'] as $item) {
-				$name = $this->zbxTestGetValue("//input[@id='pair_name_".$i."']");
+				$name = $this->zbxTestGetValue("//input[@id='pairs_".$i."_name']");
 				$this->assertEquals($name, $item['name']);
 				if (array_key_exists('value', $item)) {
 					$value = $this->zbxTestGetValue("//input[@id='pair_value_".$i."']");
