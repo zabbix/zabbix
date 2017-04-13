@@ -92,8 +92,10 @@ if (!empty($this->data['interfaces'])) {
 	foreach ($this->data['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
-			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
-			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
+			$interface['useip']
+				? $interface['ip'].' : '.$interface['port']
+				: $interface['dns'].' : '.$interface['port'],
+			($interface['interfaceid'] == $this->data['interfaceid'])
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
 		$interfaceGroups[$interface['type']]->addItem($option);

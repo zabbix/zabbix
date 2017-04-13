@@ -119,7 +119,7 @@ if ($data['interfaces']) {
 				$interface['useip']
 					? $interface['ip'].' : '.$interface['port']
 					: $interface['dns'].' : '.$interface['port'],
-				($interface['interfaceid'] == $data['interfaceid']) ? 'yes' : 'no'
+				($interface['interfaceid'] == $data['interfaceid'])
 			);
 			$option->setAttribute('data-interfacetype', $interface['type']);
 			$interfaceGroups[$interface['type']]->addItem($option);

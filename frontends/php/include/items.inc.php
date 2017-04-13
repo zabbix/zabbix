@@ -1326,7 +1326,7 @@ function get_preprocessing_types($type = null, $grouped = true) {
 			]
 		],
 		[
-			'label' => _('Delta'),
+			'label' => _x('Change', 'noun'),
 			'types' => [
 				ZBX_PREPROC_DELTA_VALUE => _('Simple change'),
 				ZBX_PREPROC_DELTA_SPEED => _('Change per second')

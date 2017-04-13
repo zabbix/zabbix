@@ -46,7 +46,7 @@ $itemFormList->addRow(
 // append hosts to form list
 if ($this->data['displayInterfaces']) {
 	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
-	$interfacesComboBox->addItem(new CComboItem(0, '', null, false));
+	$interfacesComboBox->addItem(new CComboItem(0, '', false, false));
 
 	// set up interface groups
 	$interfaceGroups = [];
@@ -58,8 +58,10 @@ if ($this->data['displayInterfaces']) {
 	foreach ($this->data['hosts']['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
-			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
-			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
+			$interface['useip']
+				? $interface['ip'].' : '.$interface['port']
+				: $interface['dns'].' : '.$interface['port'],
+			($interface['interfaceid'] == $this->data['interfaceid'])
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
 		$interfaceGroups[$interface['type']]->addItem($option);

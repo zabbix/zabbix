@@ -21,7 +21,7 @@
 
 class CComboItem extends CTag {
 
-	public function __construct($value, $caption = null, $selected = null, $enabled = null) {
+	public function __construct($value, $caption = null, $selected = false, $enabled = null) {
 		parent::__construct('option', true);
 		$this->setAttribute('value', $value);
 		$this->addItem($caption);
