@@ -105,6 +105,12 @@ class CAudit {
 				$table_name = 'valuemaps';
 				break;
 
+			case AUDIT_RESOURCE_SCENARIO:
+				$field_name_resourceid = 'httptestid';
+				$field_name_resourcename = 'name';
+				$table_name = 'httptest';
+				break;
+
 			default:
 				return;
 		}
