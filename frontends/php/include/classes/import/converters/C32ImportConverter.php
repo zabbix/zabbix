@@ -55,6 +55,9 @@ class C32ImportConverter extends CConverter {
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items']);
 			}
+			if (array_key_exists('httptests', $host)) {
+				$host['httptests'] = $this->convertHttpTests($host['httptests']);
+			}
 		}
 		unset($host);
 
@@ -158,5 +161,66 @@ class C32ImportConverter extends CConverter {
 		unset($selement);
 
 		return $selements;
+	}
+
+	/**
+	 * Convert HTTP fields (headers / variables) into http pair array
+	 *
+	 * @param string $value
+	 * @param string $delimiter
+	 *
+	 * @return array
+	 */
+	protected function convertHttpFields($value, $delimiter) {
+		$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $value))));
+		foreach ($pairs as &$pair) {
+			$pair = explode($delimiter, $pair, 2);
+			$pair = [
+				'name' => $pair[0],
+				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
+			];
+		}
+		unset($pair);
+
+		return $pairs;
+	}
+
+	/**
+	 * Convert httptest step elements.
+	 *
+	 * @param array $http_test_steps
+	 *
+	 * @return array
+	 */
+	protected function convertHttpTestSteps(array $http_test_steps) {
+		foreach ($http_test_steps as &$http_test_step) {
+			$http_test_step['headers'] = $this->convertHttpFields($http_test_step['headers'], ':');
+			$http_test_step['variables'] = $this->convertHttpFields($http_test_step['variables'], '=');
+			$http_test_step['query_fields'] = [];
+		}
+		unset($http_test_step);
+
+		return $http_test_steps;
+	}
+
+	/**
+	 * Convert httptest elements.
+	 *
+	 * @param array $http_tests
+	 *
+	 * @return array
+	 */
+	protected function convertHttpTests(array $http_tests) {
+		foreach ($http_tests as &$http_test) {
+			$http_test['headers'] = $this->convertHttpFields($http_test['headers'], ':');
+			$http_test['variables'] = $this->convertHttpFields($http_test['variables'], '=');
+
+			if (array_key_exists('steps', $http_test)) {
+				$http_test['steps'] = $this->convertHttpTestSteps($http_test['steps']);
+			}
+		}
+		unset($http_test);
+
+		return $http_tests;
 	}
 }

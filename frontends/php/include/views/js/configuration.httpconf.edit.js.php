@@ -1,22 +1,190 @@
+<script type="text/x-jquery-tmpl" id="scenarioPairRow">
+	<?= (new CRow([
+			(new CCol([
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+				new CInput('hidden', 'pairs[#{pair.id}][isNew]', '#{pair.isNew}'),
+				new CInput('hidden', 'pairs[#{pair.id}][id]', '#{pair.id}'),
+				(new CInput('hidden', 'pairs[#{pair.id}][type]', '#{pair.type}'))->setId('pair_type_#{pair.id}'),
+			]))
+				->addClass('pair-drag-control')
+				->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CTextBox('pairs[#{pair.id}][name]', '#{pair.name}'))
+				->setAttribute('data-type', 'name')
+				->setAttribute('placeholder', _('name'))
+				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+			'⇒',
+			(new CTextBox('pairs[#{pair.id}][value]', '#{pair.value}'))
+				->setAttribute('data-type', 'value')
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+			(new CCol(
+				(new CButton('removePair_#{pair.id}', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('remove')
+					->setAttribute('data-pairid', '#{pair.id}')
+			))
+				->addClass(ZBX_STYLE_NOWRAP)
+				->addClass('pair-control')
+		]))
+			->setId('pairRow_#{pair.id}')
+			->addClass('pairRow')
+			->addClass('sortable')
+			->setAttribute('data-pairid', '#{pair.id}')
+			->toString()
+	?>
+</script>
+
 <script type="text/javascript">
+	var pairManager = (function() {
+		'use strict';
+
+		var rowTemplate = new Template(jQuery('#scenarioPairRow').html()),
+			allPairs = {};
+
+		function renderPairRow(pair) {
+			var parent,
+				target = jQuery(getDomTargetIdForRowInsert(pair.type)),
+				pair_row = jQuery(rowTemplate.evaluate({'pair': pair}));
+
+			if (!target.parents('.pair-container').hasClass('pair-container-sortable')) {
+				pair_row.find('.<?= ZBX_STYLE_DRAG_ICON ?>').remove();
+			}
+
+			target.before(pair_row);
+			parent = jQuery('#pairRow_' + pair.id);
+			parent.find("input[data-type]").on('change', function() {
+				var	target = jQuery(this),
+					parent = target.parents('.pairRow'),
+					id = parent.data('pairid'),
+					pair = allPairs[id];
+
+				pair[target.data('type')] = target.val();
+				allPairs[id] = pair;
+			});
+		}
+
+		function getDomTargetIdForRowInsert(type) {
+			return '#' + type.toLowerCase().trim() + '_footer';
+		}
+
+		function addPair(pair) {
+			if (pair.isNew === 'true') {
+				pair.isNew = true;
+			}
+			allPairs[pair.id] = pair;
+			return pair;
+		}
+
+		function createNewPair(typeName) {
+			var newPair = {
+				isNew: true,
+				type: typeName,
+				name: '',
+				value: ''
+			};
+
+			newPair.id = 1;
+			while (allPairs[newPair.id] !== void(0)) {
+				newPair.id++;
+			}
+
+			return addPair(newPair);
+		}
+
+		function refreshContainers() {
+			jQuery('.pair-container-sortable').each(function() {
+				jQuery(this).sortable({
+					disabled: (jQuery(this).find('tr.sortable').length < 2)
+				});
+			});
+		}
+
+		function moveRowToAnotherTypeTable(pairId, type) {
+			jQuery('#pair_type_' + pairId).val(type);
+			jQuery('#pairRow_' + pairId).insertBefore(getDomTargetIdForRowInsert(type));
+
+			refreshContainers();
+		}
+
+		return {
+			add: function(pairs) {
+				for (var i = 0; i < pairs.length; i++) {
+					renderPairRow(addPair(pairs[i]));
+				}
+
+				jQuery('.pair-container').each(function() {
+					var rows = jQuery(this).find('.pairRow').length;
+					if (rows === 0) {
+						renderPairRow(createNewPair(this.id));
+					}
+				});
+
+				refreshContainers();
+			},
+
+			addNew: function(type) {
+				renderPairRow(createNewPair(type));
+				refreshContainers();
+			},
+
+			remove: function(pairId) {
+				delete allPairs[pairId];
+				refreshContainers();
+			},
+
+			setType: function(pairId, type) {
+				if (allPairs[pairId].type !== type) {
+					moveRowToAnotherTypeTable(pairId, type);
+					allPairs[pairId].type = type;
+				}
+			},
+
+			refresh: function() {
+				refreshContainers();
+			}
+		};
+	}());
+
+	jQuery(document).ready(function() {
+		'use strict';
+
+		jQuery('#httpFormList').on('click', 'button.remove', function() {
+			var pairId = jQuery(this).data('pairid');
+			jQuery('#pairRow_' + pairId).remove();
+			pairManager.remove(pairId);
+		});
+
+		jQuery('.pair-container-sortable').sortable({
+			disabled: (jQuery(this).find('tr.sortable').length < 2),
+			items: 'tr.sortable',
+			axis: 'y',
+			cursor: 'move',
+			containment: 'parent',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			tolerance: 'pointer',
+			opacity: 0.6,
+			helper: function(e, ui) {
+				return ui;
+			},
+			start: function(e, ui) {
+				$(ui.placeholder).height($(ui.helper).height());
+			}
+		});
+
+		jQuery('.pairs-control-add').on('click', function() {
+			pairManager.addNew(jQuery(this).data('type'));
+		});
+	});
+
 	function removeStep(obj) {
 		var step = obj.getAttribute('remove_step'),
 			table = jQuery('#httpStepTable');
 
 		jQuery('#steps_' + step).remove();
-		jQuery('#steps_' + step + '_httpstepid').remove();
-		jQuery('#steps_' + step + '_httptestid').remove();
-		jQuery('#steps_' + step + '_name').remove();
-		jQuery('#steps_' + step + '_no').remove();
-		jQuery('#steps_' + step + '_url').remove();
-		jQuery('#steps_' + step + '_timeout').remove();
-		jQuery('#steps_' + step + '_posts').remove();
-		jQuery('#steps_' + step + '_variables').remove();
-		jQuery('#steps_' + step + '_required').remove();
-		jQuery('#steps_' + step + '_status_codes').remove();
-		jQuery('#steps_' + step + '_headers').remove();
-		jQuery('#steps_' + step + '_retrieve_mode').remove();
-		jQuery('#steps_' + step + '_follow_redirects').remove();
+
+		jQuery('input[id^=steps_' + step + '_]').each( function() {
+			this.remove();
+		});
 
 		if (table.find('tr.sortable').length <= 1) {
 			table.sortable('disable');
@@ -35,20 +203,14 @@
 			jQuery('#remove_' + step).attr('id', 'tmp_remove_' + step);
 			jQuery('#name_' + step).attr('id', 'tmp_name_' + step);
 			jQuery('#steps_' + step).attr('id', 'tmp_steps_' + step);
-			jQuery('#steps_' + step + '_httpstepid').attr('id', 'tmp_steps_' + step + '_httpstepid');
-			jQuery('#steps_' + step + '_httptestid').attr('id', 'tmp_steps_' + step + '_httptestid');
-			jQuery('#steps_' + step + '_name').attr('id', 'tmp_steps_' + step + '_name');
-			jQuery('#steps_' + step + '_no').attr('id', 'tmp_steps_' + step + '_no');
-			jQuery('#steps_' + step + '_url').attr('id', 'tmp_steps_' + step + '_url');
-			jQuery('#steps_' + step + '_timeout').attr('id', 'tmp_steps_' + step + '_timeout');
-			jQuery('#steps_' + step + '_posts').attr('id', 'tmp_steps_' + step + '_posts');
-			jQuery('#steps_' + step + '_variables').attr('id', 'tmp_steps_' + step + '_variables');
-			jQuery('#steps_' + step + '_required').attr('id', 'tmp_steps_' + step + '_required');
-			jQuery('#steps_' + step + '_status_codes').attr('id', 'tmp_steps_' + step + '_status_codes');
-			jQuery('#steps_' + step + '_headers').attr('id', 'tmp_steps_' + step + '_headers');
-			jQuery('#steps_' + step + '_follow_redirects').attr('id', 'tmp_steps_' + step + '_follow_redirects');
-			jQuery('#steps_' + step + '_retrieve_mode').attr('id', 'tmp_steps_' + step + '_retrieve_mode');
 			jQuery('#current_step_' + step).attr('id', 'tmp_current_step_' + step);
+
+			jQuery('input[id^=steps_' + step + '_]').each( function() {
+				var input = jQuery(this),
+					id = input.attr('id').replace(/^steps_[0-9]+_/, 'tmp_steps_' + step + '_');
+
+				input.attr('id', id);
+			});
 
 			// set order number
 			jQuery(this)
@@ -65,37 +227,19 @@
 			jQuery('#tmp_remove_' + n).attr('id', 'remove_' + newStep);
 			jQuery('#tmp_name_' + n).attr('id', 'name_' + newStep);
 			jQuery('#tmp_steps_' + n).attr('id', 'steps_' + newStep);
-			jQuery('#tmp_steps_' + n + '_httpstepid').attr('id', 'steps_' + newStep + '_httpstepid');
-			jQuery('#tmp_steps_' + n + '_httptestid').attr('id', 'steps_' + newStep + '_httptestid');
-			jQuery('#tmp_steps_' + n + '_name').attr('id', 'steps_' + newStep + '_name');
-			jQuery('#tmp_steps_' + n + '_no').attr('id', 'steps_' + newStep + '_no');
-			jQuery('#tmp_steps_' + n + '_url').attr('id', 'steps_' + newStep + '_url');
-			jQuery('#tmp_steps_' + n + '_timeout').attr('id', 'steps_' + newStep + '_timeout');
-			jQuery('#tmp_steps_' + n + '_posts').attr('id', 'steps_' + newStep + '_posts');
-			jQuery('#tmp_steps_' + n + '_variables').attr('id', 'steps_' + newStep + '_variables');
-			jQuery('#tmp_steps_' + n + '_required').attr('id', 'steps_' + newStep + '_required');
-			jQuery('#tmp_steps_' + n + '_status_codes').attr('id', 'steps_' + newStep + '_status_codes');
-			jQuery('#tmp_steps_' + n + '_headers').attr('id', 'steps_' + newStep + '_headers');
-			jQuery('#tmp_steps_' + n + '_follow_redirects').attr('id', 'steps_' + newStep + '_follow_redirects');
-			jQuery('#tmp_steps_' + n + '_retrieve_mode').attr('id', 'steps_' + newStep + '_retrieve_mode');
-
 			jQuery('#remove_' + newStep).attr('remove_step', newStep);
 			jQuery('#name_' + newStep).attr('name_step', newStep);
-			jQuery('#steps_' + newStep + '_httpstepid').attr('name', 'steps[' + newStep + '][httpstepid]');
-			jQuery('#steps_' + newStep + '_httptestid').attr('name', 'steps[' + newStep + '][httptestid]');
-			jQuery('#steps_' + newStep + '_name').attr('name', 'steps[' + newStep + '][name]');
-			jQuery('#steps_' + newStep + '_no')
-				.attr('name', 'steps[' + newStep + '][no]')
-				.val(parseInt(newStep) + 1);
-			jQuery('#steps_' + newStep + '_url').attr('name', 'steps[' + newStep + '][url]');
-			jQuery('#steps_' + newStep + '_timeout').attr('name', 'steps[' + newStep + '][timeout]');
-			jQuery('#steps_' + newStep + '_posts').attr('name', 'steps[' + newStep + '][posts]');
-			jQuery('#steps_' + newStep + '_variables').attr('name', 'steps[' + newStep + '][variables]');
-			jQuery('#steps_' + newStep + '_required').attr('name', 'steps[' + newStep + '][required]');
-			jQuery('#steps_' + newStep + '_status_codes').attr('name', 'steps[' + newStep + '][status_codes]');
-			jQuery('#steps_' + newStep + '_headers').attr('name', 'steps[' + newStep + '][headers]');
-			jQuery('#steps_' + newStep + '_retrieve_mode').attr('name', 'steps[' + newStep + '][retrieve_mode]');
-			jQuery('#steps_' + newStep + '_follow_redirects').attr('name', 'steps[' + newStep + '][follow_redirects]');
+
+			jQuery('input[id^=tmp_steps_' + n + '_]').each( function() {
+				var	input = jQuery(this),
+					id = input.attr('id').replace(/^tmp_steps_[0-9]+_/, 'steps_' + newStep + '_'),
+					name = input.attr('name').replace(/^steps\[[0-9]+\]/, 'steps[' + newStep + ']');
+
+				input.attr('id', id);
+				input.attr('name', name);
+			});
+
+			jQuery('#steps_' + newStep + '_no').val(parseInt(newStep) + 1);
 
 			// set new step order position
 			currStep.attr('id', 'current_step_' + newStep);
@@ -157,7 +301,7 @@
 
 				// append existing step names
 				var stepNames = '';
-				form.find('input[name^=steps]').filter('input[name*=name]').each(function(i, stepName) {
+				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, stepName) {
 					stepNames += '&steps_names[]=' + encodeURIComponent($(stepName).val());
 				});
 
@@ -171,7 +315,7 @@
 				// append existing step names
 				var stepNames = '';
 				var form = $(this).parents('form');
-				form.find('input[name^=steps]').filter('input[name*=name]').each(function(i, stepName) {
+				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, stepName) {
 					stepNames += '&steps_names[]=' + encodeURIComponent($(stepName).val());
 				});
 
@@ -180,12 +324,12 @@
 					+ '<?= url_param($step['name'], false, 'name') ?>'
 					+ '<?= url_param($step['url'], false, 'url') ?>'
 					+ '<?= url_param($step['posts'], false, 'posts') ?>'
-					+ '<?= url_param($step['variables'], false, 'variables') ?>'
+					+ '<?= url_param($step['post_type'], false, 'post_type') ?>'
+					+ '<?= url_param(array_key_exists('pairs', $step) ? $step['pairs'] : [], false, 'pairs') ?>'
 					+ '<?= url_param($step['timeout'], false, 'timeout') ?>'
 					+ '<?= url_param($step['required'], false, 'required') ?>'
 					+ '<?= url_param($step['status_codes'], false, 'status_codes') ?>'
 					+ '<?= url_param($step['name'], false, 'old_name') ?>'
-					+ '<?= url_param($step['headers'], false, 'headers') ?>'
 					+ '<?= url_param($step['retrieve_mode'], false, 'retrieve_mode') ?>'
 					+ '<?= url_param($step['follow_redirects'], false, 'follow_redirects') ?>'
 					+ stepNames);
