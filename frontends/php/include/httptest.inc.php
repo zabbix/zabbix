@@ -224,8 +224,8 @@ function copyHttpTests($srcHostId, $dstHostId) {
 			'ssl_key_password', 'verify_peer', 'verify_host', 'headers'
 		],
 		'hostids' => $srcHostId,
-		'selectSteps' => ['name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes', 'variables',
-			'follow_redirects', 'retrieve_mode', 'headers'
+		'selectSteps' => ['name', 'no', 'url', 'query_fields', 'timeout', 'posts', 'required', 'status_codes',
+			'variables', 'follow_redirects', 'retrieve_mode', 'headers'
 		],
 		'inherited' => false
 	]);
