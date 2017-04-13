@@ -336,7 +336,7 @@ $preprocessing->addRow(
 
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
-		->setLabel(_('Preprocessing'))
+		->setLabel(_('Preprocessing steps'))
 		->setChecked(isset($this->data['visible']['preprocessing'])),
 	(new CDiv($preprocessing))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
