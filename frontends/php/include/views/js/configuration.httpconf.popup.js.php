@@ -193,7 +193,9 @@
 					queryFields = [],
 					existingPairs = Object.keys(allPairs);
 
-				this.cleanup('query_fields');
+				if (pairs.length > 0) {
+					this.cleanup('query_fields');
+				}
 
 				for (var p = 0; p < existingPairs.length; p++) {
 					if (allPairs[existingPairs[p]] !== undefined &&
@@ -247,7 +249,7 @@
 
 			fields = query.split('&');
 			for (i = 0; i < fields.length; i++) {
-				if (fields[i].length === 0)
+				if (fields[i].length === 0 || fields[i] === '=')
 					continue;
 
 				pair = {};
@@ -257,6 +259,9 @@
 					pair.value = fields[i].substring(index + 1);
 				}
 				else {
+					if (index === 0) {
+						fields[i] = fields[i].substring(1);
+					}
 					pair.name = fields[i];
 					pair.value = "";
 				}
