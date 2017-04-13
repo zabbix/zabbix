@@ -1,7 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
-...G...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite support for frontend and server (abs)
+A.FG...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite3 support for frontend and server (abs)
 A.F.I..... [ZBXNEXT-2694] implemented multiple triggers support for map elements (Oleg)
 ....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors (abs)
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)
@@ -52,13 +52,17 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 --------------------------------------------------------------------------------
 Changes for 3.2.5rc1
 
-New features:
-
 Bug fixes:
+..F....... [ZBX-11024] fixed popup window size in actions configuration form (miks)
+..F....... [ZBX-10997] fixed usage of wrong API in screen constructor (miks)
+..F....... [ZBX-11477] fixed lost user name in profile title (miks)
+........S. [ZBX-11889] fixed lastaccess update for passive proxy (viktors)
+A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
+..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
 ..F....... [ZBX-11925] fixed parsing of nested host groups (gcalenko, Sasha)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
-........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
+.......PS. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 ..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
@@ -416,12 +420,16 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.9rc1
 
-New features:
-
 Bug fixes:
+..F....... [ZBX-11024] fixed popup window size in actions configuration form (miks)
+..F....... [ZBX-10997] fixed usage of wrong API in screen constructor (miks)
+..F....... [ZBX-11477] fixed lost user name in profile title (miks)
+A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
+........S. [ZBX-11889] fixed lastaccess update for passive proxy (viktors)
+..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
-........S. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
+.......PS. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 ..F....... [ZBX-11984] fixed host hyperlink style on event details page (gcalenko)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
@@ -2064,9 +2072,8 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 --------------------------------------------------------------------------------
 Changes for 2.2.18rc1
 
-New features:
-
 Bug fixes:
+A......... [ZBX-7492] fixed undefined index and invalid argument supplied to foreach errors in case if macros tag is empty or is not included in the XML import file (miks)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ...G...... [ZBX-11959] fixed memory leak in the agent on OpenBSD, FreeBSD and NetBSD (abs)
 .......PS. [ZBX-11807] fixed poller stalling due to incorrect handling of unixODBC library (viktors)
@@ -3606,8 +3613,6 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.21rc1
-
-New features:
 
 Bug fixes:
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)

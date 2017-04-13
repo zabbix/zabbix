@@ -21,7 +21,6 @@ is a daemon that collects monitoring data from devices and sends it to Zabbix se
 .SH OPTIONS
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
-Absolute path should be specified.
 .IP "\fB\-f\fR, \fB\-\-foreground\fR"
 Run Zabbix proxy in foreground.
 .IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR"

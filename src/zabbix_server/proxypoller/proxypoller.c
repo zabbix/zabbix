@@ -137,14 +137,17 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  *                                                                            *
  * Purpose: get historical data from proxy                                    *
  *                                                                            *
- * Parameters:                                                                *
+ * Parameters: proxy   - [IN] proxy data                                      *
+ *             request - [IN] requested data type                             *
+ *             data    - [OUT] data received from proxy                       *
+ *             ts      - [OUT] timestamp when the proxy connection was        *
+ *                             established                                    *
+ *             tasks   - [IN] proxy task response flag                        *
  *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts, int tasks)
@@ -197,7 +200,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
  *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy - [IN] proxy data                                        *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
@@ -300,13 +303,14 @@ static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **er
  * Purpose: gets host availability data from proxy                            *
  *          ('host availability' request)                                     *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_host_availability(DC_PROXY *proxy)
+static int	proxy_get_host_availability(DC_PROXY *proxy, time_t *last_access)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp;
@@ -329,6 +333,7 @@ static int	proxy_get_host_availability(DC_PROXY *proxy)
 		goto out;
 	}
 
+	*last_access = time(NULL);
 	zbx_proxy_update_version(proxy, &jp);
 
 	if (SUCCEED != proxy_check_error_response(&jp, &error))
@@ -360,13 +365,14 @@ out:
  * Purpose: gets historical data from proxy                                   *
  *          ('history data' request)                                          *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(DC_PROXY *proxy)
+static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
@@ -390,11 +396,12 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 			break;
 		}
 
+		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid history data:"
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
@@ -429,13 +436,14 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
  * Purpose: gets discovery data from proxy                                    *
  *          ('discovery data' request)                                        *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_discovery_data(DC_PROXY *proxy)
+static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
@@ -460,11 +468,12 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 			break;
 		}
 
+		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid discovery data:"
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
@@ -499,13 +508,14 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
  * Purpose: gets auto registration data from proxy                            *
  *          ('auto registration' request)                                     *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_auto_registration(DC_PROXY *proxy)
+static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
@@ -531,11 +541,12 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 			break;
 		}
 
+		*last_access = time(NULL);
 		zbx_proxy_update_version(proxy, &jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid auto registration data:"
 					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
@@ -569,7 +580,11 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
  *                                                                            *
  * Purpose: processes proxy data request                                      *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy  - [IN] proxy data                                       *
+ *             answer - [IN] data received from proxy                         *
+ *             ts     - [IN] timestamp when the proxy connection was          *
+ *                           established                                      *
+ *             more   - [OUT] available data flag                             *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -629,13 +644,15 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] proxy data                                  *
+ *             more        - [OUT] available data flag                        *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_data(DC_PROXY *proxy, int *more)
+static int	proxy_get_data(DC_PROXY *proxy, int *more, time_t *last_access)
 {
 	const char	*__function_name = "proxy_get_data";
 
@@ -656,16 +673,16 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 
 	if (ZBX_COMPONENT_VERSION(3, 2) == version)
 	{
-		if (SUCCEED != proxy_get_host_availability(proxy))
+		if (SUCCEED != proxy_get_host_availability(proxy, last_access))
 			goto out;
 
-		if (SUCCEED != proxy_get_history_data(proxy))
+		if (SUCCEED != proxy_get_history_data(proxy, last_access))
 			goto out;
 
-		if (SUCCEED != proxy_get_discovery_data(proxy))
+		if (SUCCEED != proxy_get_discovery_data(proxy, last_access))
 			goto out;
 
-		if (SUCCEED != proxy_get_auto_registration(proxy))
+		if (SUCCEED != proxy_get_auto_registration(proxy, last_access))
 			goto out;
 
 		/* the above functions will retrieve all available data for 3.2 and older proxies */
@@ -694,17 +711,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_get_data                                                   *
+ * Function: proxy_get_tasks                                                  *
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy - [IN]                                                   *
+ * Parameters: proxy       - [IN] the proxy data                              *
+ *             last_access - [OUT] proxy last access timestamp                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_tasks(DC_PROXY *proxy)
+static int	proxy_get_tasks(DC_PROXY *proxy, time_t *last_access)
 {
 	const char	*__function_name = "proxy_get_tasks";
 
@@ -719,6 +737,8 @@ static int	proxy_get_tasks(DC_PROXY *proxy)
 
 	if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_TASKS, &answer, &ts, ZBX_TASKS_SEND))
 		goto out;
+
+	*last_access = time(NULL);
 
 	ret = proxy_process_proxy_data(proxy, answer, &ts, &more);
 
@@ -751,7 +771,7 @@ static int	process_proxy(void)
 	DC_PROXY		proxy;
 	int			num, i, more;
 	char			*port = NULL;
-	time_t			now;
+	time_t			now, last_access;
 	unsigned char		update_nextcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -764,6 +784,7 @@ static int	process_proxy(void)
 	for (i = 0; i < num; i++)
 	{
 		update_nextcheck = 0;
+		last_access = 0;
 
 		if (proxy.proxy_config_nextcheck <= now)
 			update_nextcheck |= ZBX_PROXY_CONFIG_NEXTCHECK;
@@ -787,27 +808,32 @@ static int	process_proxy(void)
 		{
 			if (SUCCEED != proxy_send_configuration(&proxy))
 				goto network_error;
+
+			last_access = time(NULL);
 		}
 
 		if (proxy.proxy_data_nextcheck <= now)
 		{
 			do
 			{
-				if (SUCCEED != proxy_get_data(&proxy, &more))
+				if (SUCCEED != proxy_get_data(&proxy, &more, &last_access))
 					goto network_error;
 			}
 			while (ZBX_PROXY_DATA_MORE == more);
 		}
 		else if (proxy.proxy_tasks_nextcheck <= now)
 		{
-			if (SUCCEED != proxy_get_tasks(&proxy))
+			if (SUCCEED != proxy_get_tasks(&proxy, &last_access))
 				goto network_error;
 		}
-
-		DBbegin();
-		update_proxy_lastaccess(proxy.hostid);
-		DBcommit();
 network_error:
+		if (0 != last_access)
+		{
+			DBbegin();
+			update_proxy_lastaccess(proxy.hostid, last_access);
+			DBcommit();
+		}
+
 		DCrequeue_proxy(proxy.hostid, update_nextcheck);
 	}
 
