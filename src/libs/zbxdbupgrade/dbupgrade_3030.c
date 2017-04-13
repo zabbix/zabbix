@@ -173,7 +173,7 @@ static int	DBpatch_3030015(void)
 
 static int	DBpatch_3030016(void)
 {
-	return DBcreate_index("item_preproc", "item_preproc_1", "itemid, step", 0);
+	return DBcreate_index("item_preproc", "item_preproc_1", "itemid,step", 0);
 }
 
 static int	DBpatch_3030017(void)
@@ -654,6 +654,283 @@ static int	DBpatch_3030053(void)
 	return ret;
 }
 
+static int	DBpatch_3030054(void)
+{
+	const ZBX_TABLE table =
+			{"dashboard", "dashboardid", 0,
+				{
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"private", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030055(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("dashboard", 1, &field);
+}
+
+static int	DBpatch_3030056(void)
+{
+	const ZBX_TABLE table =
+			{"dashboard_user", "dashboard_userid", 0,
+				{
+					{"dashboard_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030057(void)
+{
+	return DBcreate_index("dashboard_user", "dashboard_user_1", "dashboardid,userid", 1);
+}
+
+static int	DBpatch_3030058(void)
+{
+	const ZBX_FIELD	field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dashboard_user", 1, &field);
+}
+
+static int	DBpatch_3030059(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dashboard_user", 2, &field);
+}
+
+static int	DBpatch_3030060(void)
+{
+	const ZBX_TABLE table =
+			{"dashboard_usrgrp", "dashboard_usrgrpid", 0,
+				{
+					{"dashboard_usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030061(void)
+{
+	return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_1", "dashboardid,usrgrpid", 1);
+}
+
+static int	DBpatch_3030062(void)
+{
+	const ZBX_FIELD	field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dashboard_usrgrp", 1, &field);
+}
+
+static int	DBpatch_3030063(void)
+{
+	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dashboard_usrgrp", 2, &field);
+}
+
+static int	DBpatch_3030064(void)
+{
+	const ZBX_TABLE table =
+			{"widget", "widgetid", 0,
+				{
+					{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"row", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"col", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"width", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"height", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030065(void)
+{
+	return DBcreate_index("widget", "widget_1", "dashboardid", 0);
+}
+
+static int	DBpatch_3030066(void)
+{
+	const ZBX_FIELD	field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget", 1, &field);
+}
+
+static int	DBpatch_3030067(void)
+{
+	const ZBX_TABLE table =
+			{"widget_field", "widget_fieldid", 0,
+				{
+					{"widget_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value_int", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value_str", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030068(void)
+{
+	return DBcreate_index("widget_field", "widget_field_1", "widgetid", 0);
+}
+
+static int	DBpatch_3030069(void)
+{
+	return DBcreate_index("widget_field", "widget_field_2", "groupid", 0);
+}
+
+static int	DBpatch_3030070(void)
+{
+	return DBcreate_index("widget_field", "widget_field_3", "hostid", 0);
+}
+
+static int	DBpatch_3030071(void)
+{
+	return DBcreate_index("widget_field", "widget_field_4", "itemid", 0);
+}
+
+static int	DBpatch_3030072(void)
+{
+	return DBcreate_index("widget_field", "widget_field_5", "graphid", 0);
+}
+
+static int	DBpatch_3030073(void)
+{
+	return DBcreate_index("widget_field", "widget_field_6", "sysmapid", 0);
+}
+
+static int	DBpatch_3030074(void)
+{
+	return DBcreate_index("widget_field", "widget_field_7", "dashboardid", 0);
+}
+
+static int	DBpatch_3030075(void)
+{
+	const ZBX_FIELD	field = {"widgetid", NULL, "widget", "widgetid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 1, &field);
+}
+
+static int	DBpatch_3030076(void)
+{
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 2, &field);
+}
+
+static int	DBpatch_3030077(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 3, &field);
+}
+
+static int	DBpatch_3030078(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 4, &field);
+}
+
+static int	DBpatch_3030079(void)
+{
+	const ZBX_FIELD	field = {"graphid", NULL, "graphs", "graphid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 5, &field);
+}
+
+static int	DBpatch_3030080(void)
+{
+	const ZBX_FIELD	field = {"sysmapid", NULL, "sysmaps", "sysmapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 6, &field);
+}
+
+static int	DBpatch_3030081(void)
+{
+	const ZBX_FIELD	field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 7, &field);
+}
+
+static int	DBpatch_3030082(void)
+{
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	zbx_db_insert_prepare(&db_insert, "dashboard", "dashboardid", "name", "userid", "private", NULL);
+
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(1), "Dashboard", __UINT64_C(1), 0);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_3030083(void)
+{
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	zbx_db_insert_prepare(&db_insert, "widget", "widgetid", "dashboardid", "type", "name", "row", "col", "width",
+			"height", NULL);
+
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(1), __UINT64_C(1), "favgrph", "", 0, 0, 3, 2);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(2), __UINT64_C(1), "favscr", "", 0, 2, 3, 2);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(3), __UINT64_C(1), "favmap", "", 0, 4, 3, 2);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(4), __UINT64_C(1), "lastiss", "", 3, 0, 6, 6);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(5), __UINT64_C(1), "webovr", "", 9, 0, 4, 3);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(6), __UINT64_C(1), "dscvry", "", 9, 3, 4, 3);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(7), __UINT64_C(1), "hoststat", "", 0, 6, 4, 6);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(8), __UINT64_C(1), "syssum", "", 4, 6, 4, 6);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(9), __UINT64_C(1), "stszbx", "", 8, 6, 5, 6);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -714,5 +991,35 @@ DBPATCH_ADD(3030050, 0, 1)
 DBPATCH_ADD(3030051, 0, 1)
 DBPATCH_ADD(3030052, 0, 1)
 DBPATCH_ADD(3030053, 0, 1)
+DBPATCH_ADD(3030054, 0, 1)
+DBPATCH_ADD(3030055, 0, 1)
+DBPATCH_ADD(3030056, 0, 1)
+DBPATCH_ADD(3030057, 0, 1)
+DBPATCH_ADD(3030058, 0, 1)
+DBPATCH_ADD(3030059, 0, 1)
+DBPATCH_ADD(3030060, 0, 1)
+DBPATCH_ADD(3030061, 0, 1)
+DBPATCH_ADD(3030062, 0, 1)
+DBPATCH_ADD(3030063, 0, 1)
+DBPATCH_ADD(3030064, 0, 1)
+DBPATCH_ADD(3030065, 0, 1)
+DBPATCH_ADD(3030066, 0, 1)
+DBPATCH_ADD(3030067, 0, 1)
+DBPATCH_ADD(3030068, 0, 1)
+DBPATCH_ADD(3030069, 0, 1)
+DBPATCH_ADD(3030070, 0, 1)
+DBPATCH_ADD(3030071, 0, 1)
+DBPATCH_ADD(3030072, 0, 1)
+DBPATCH_ADD(3030073, 0, 1)
+DBPATCH_ADD(3030074, 0, 1)
+DBPATCH_ADD(3030075, 0, 1)
+DBPATCH_ADD(3030076, 0, 1)
+DBPATCH_ADD(3030077, 0, 1)
+DBPATCH_ADD(3030078, 0, 1)
+DBPATCH_ADD(3030079, 0, 1)
+DBPATCH_ADD(3030080, 0, 1)
+DBPATCH_ADD(3030081, 0, 1)
+DBPATCH_ADD(3030082, 0, 1)
+DBPATCH_ADD(3030083, 0, 1)
 
 DBPATCH_END()
