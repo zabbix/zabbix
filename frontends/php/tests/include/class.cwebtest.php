@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/dbfunc.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
+define('TEST_ERROR', 2);
 
 class CWebTest extends PHPUnit_Framework_TestCase {
 
