@@ -1077,20 +1077,22 @@ class CHttpTest extends CApiService {
 					else {
 						$db_httptest = $db_httptests[$httptest['httptestid']];
 						$db_httpstep = $db_httptest['steps'][$httpstep['httpstepid']];
+						$httpstep += ['retrieve_mode' => $db_httpstep['retrieve_mode']];
 						$httpstep += [
-							'retrieve_mode' => $db_httpstep['retrieve_mode'],
-							'posts' => $db_httpstep['posts'],
-							'required' => $db_httpstep['required']
+							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+								? $db_httpstep['posts']
+								: '',
+							'required' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+								? $db_httpstep['required']
+								: ''
 						];
 					}
 
 					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-						foreach (['posts', 'required'] as $field_name) {
-							if ($httpstep[$field_name] !== '' && $httpstep[$field_name] !== []) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
-								);
-							}
+						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
+							);
 						}
 					}
 				}
