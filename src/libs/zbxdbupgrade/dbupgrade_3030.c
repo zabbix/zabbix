@@ -1021,8 +1021,8 @@ static int	DBpatch_3030079(void)
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"row", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"col", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
