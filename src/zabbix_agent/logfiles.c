@@ -23,7 +23,6 @@
 #include "active.h"
 
 #if defined(_WINDOWS)
-#	include "gnuregex.h"
 #	include "symbols.h"
 #	include "comms.h"	/* ssize_t */
 #endif /* _WINDOWS */

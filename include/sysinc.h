@@ -348,7 +348,7 @@
 #	include <math.h>
 #endif
 
-#ifdef HAVE_REGEX_H
+#ifdef HAVE_PCREPOSIX_H
 #	include <pcreposix.h>
 #endif
 
