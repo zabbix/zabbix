@@ -729,12 +729,12 @@ static int	get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 
 static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 {
-	int	res;
+	int	ret;
 	DC_HOST	host;
 
-	DCconfig_get_hosts_by_itemids(&host, &itemid, &res, 1);
+	DCconfig_get_hosts_by_itemids(&host, &itemid, &ret, 1);
 
-	if (FAIL == res)
+	if (FAIL == ret)
 		return FAIL;
 
 	switch (request)
@@ -750,10 +750,10 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			res = FAIL;
+			ret = FAIL;
 	}
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
