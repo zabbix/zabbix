@@ -34,7 +34,7 @@ var agt = navigator.userAgent.toLowerCase(),
 
 // redirect outdated browser to warning page
 if (document.cookie.indexOf('browserwarning_ignore') < 0) {
-	if (IE6 || IE7 || IE8 || KQ) {
+	if (IE6 || IE7 || IE8 || IE9 || IE10 || KQ) {
 		window.location.replace('browserwarning.php');
 	}
 }
