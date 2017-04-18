@@ -792,8 +792,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	}
 
 	result = DBselect(
-			"select h.proxy_hostid,h.description,"
-				"i.itemid,i.name,i.key_,i.description"
+			"select h.proxy_hostid,h.description,i.itemid,i.name,i.key_,i.description"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
 			" where i.itemid=" ZBX_FS_UI64, itemid);
