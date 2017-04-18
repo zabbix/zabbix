@@ -299,13 +299,13 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestTextPresent('Variables');
 		$this->zbxTestAssertVisibleId('variables');
-		$this->zbxTestAssertAttribute("//input[@id='pair_name_1']", 'maxlength', 255);
-		$this->zbxTestAssertVisibleId('pair_value_1');
+		$this->zbxTestAssertAttribute("//input[@id='pairs_1_name']", 'maxlength', 255);
+		$this->zbxTestAssertVisibleId('pairs_1_value');
 
 		$this->zbxTestTextPresent('Headers');
 		$this->zbxTestAssertVisibleId('headers');
-		$this->zbxTestAssertAttribute("//input[@id='pair_name_2']", 'maxlength', 255);
-		$this->zbxTestAssertVisibleId('pair_value_2');
+		$this->zbxTestAssertAttribute("//input[@id='pairs_2_name']", 'maxlength', 255);
+		$this->zbxTestAssertVisibleId('pairs_2_value');
 
 		$this->zbxTestTextPresent('Enabled');
 		$this->zbxTestAssertElementPresentId('status');
@@ -859,7 +859,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #web scenario: variable name "test" is not enclosed in {} or is malformed.'
+						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -876,7 +876,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #web scenario: variable name "{test" is not enclosed in {} or is malformed.'
+						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -893,7 +893,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #web scenario: variable name "test}" is not enclosed in {} or is malformed.'
+						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -911,7 +911,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #web scenario: /1/variables.'
+						'Invalid parameter "/1/variables/2": value (name)=({test}) already exists.'
 					]
 				]
 			],
@@ -942,7 +942,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #web scenario: variable name cannot be empty.'
+						'Invalid parameter "/1/variables/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -1021,7 +1021,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #web scenario: header value cannot be empty.'
+						'Invalid parameter "/1/headers/1/value": cannot be empty.'
 					]
 				]
 			],
@@ -1038,7 +1038,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect parameter of #web scenario: header name cannot be empty.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -1463,10 +1463,10 @@ class testFormWeb extends CWebTest {
 			$i = 1;
 			foreach($data['variables'] as $variable) {
 				if (isset($variable['name'])) {
-					$this->zbxTestInputType('pair_name_'.$i, $variable['name']);
+					$this->zbxTestInputType('pairs_'.$i.'_name', $variable['name']);
 				}
 				if (isset($variable['value'])) {
-					$this->zbxTestInputType('pair_value_'.$i, $variable['value']);
+					$this->zbxTestInputType('pairs_'.$i.'_value', $variable['value']);
 				}
 				$this->zbxTestClickXpath("//tr[@id='variables_footer']//button");
 				$i = 3;
@@ -1477,10 +1477,10 @@ class testFormWeb extends CWebTest {
 			$i = 2;
 			foreach($data['headers'] as $header) {
 				if (isset($header['name'])) {
-					$this->zbxTestInputType('pair_name_'.$i, $header['name']);
+					$this->zbxTestInputType('pairs_'.$i.'_name', $header['name']);
 				}
 				if (isset($header['value'])) {
-					$this->zbxTestInputType('pair_value_'.$i, $header['value']);
+					$this->zbxTestInputType('pairs_'.$i.'_value', $header['value']);
 				}
 				$this->zbxTestClickXpath("//tr[@id='headers_footer']//button");
 				$i++;
