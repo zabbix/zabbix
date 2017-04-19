@@ -21,9 +21,25 @@
 				<arg line="clean"/>
 			</exec>
 			<exec executable="./configure" failonerror="on">
+				<env key="CC" value="/usr/bin/gcc"/>
 				<arg line="@{args}"/>
 				<arg line="--prefix=$(pwd)/install"/>
 				<arg line="CFLAGS=&quot;-Wall -Wextra -Wno-maybe-uninitialized -Wdeclaration-after-statement -Wpointer-arith -O2 -g&quot;"/>
+			</exec>
+			<exec executable="make" failonerror="on">
+				<arg line="-s"/>
+				<arg line="-j5"/>
+			</exec>
+			<exec executable="make" failonerror="on">
+				<arg line="-s"/>
+				<arg line="-j5"/>
+				<arg line="clean"/>
+			</exec>
+			<exec executable="./configure" failonerror="on">
+				<env key="CC" value="/usr/bin/clang"/>
+				<arg line="@{args}"/>
+				<arg line="--prefix=$(pwd)/install"/>
+				<arg line="CFLAGS=&quot;-Wall -Wextra -Wdeclaration-after-statement -Wpointer-arith -O2 -g&quot;"/>
 			</exec>
 			<exec executable="make" failonerror="on">
 				<arg line="-s"/>
@@ -54,5 +70,5 @@
 		<make-target dbargs="--with-postgresql"/>
 	</target>
 	
-	<target name="build" depends="init,make-mysql"/>
+	<target name="build" depends="init,make-mysql,make-postgresql"/>
 </project>
