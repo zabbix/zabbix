@@ -586,62 +586,6 @@ elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RE
 }
 
 /*
- * Screen item: Clock
- */
-elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
-	$caption = getRequest('caption', '');
-
-	if (zbx_empty($caption) && TIME_TYPE_HOST == $style && $resourceId > 0) {
-		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'key_', 'name'],
-			'selectHosts' => ['name'],
-			'itemids' => $resourceId,
-			'webitems' => true
-		]);
-
-		if ($items) {
-			$items = CMacrosResolverHelper::resolveItemNames($items);
-
-			$item = reset($items);
-			$host = reset($item['hosts']);
-			$caption = $host['name'].NAME_DELIMITER.$item['name_expanded'];
-		}
-	}
-
-	$screenFormList->addRow(_('Time type'), new CComboBox('style', $style, 'submit()', [
-		TIME_TYPE_LOCAL => _('Local time'),
-		TIME_TYPE_SERVER => _('Server time'),
-		TIME_TYPE_HOST => _('Host time')
-	]));
-
-	if (TIME_TYPE_HOST == $style) {
-		$form->addVar('resourceid', $resourceId);
-
-		if ($this->data['screen']['templateid']) {
-			$selectButton = (new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().
-					'&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&templated_hosts=1'.
-					'&only_hostid='.$this->data['screen']['templateid']."');");
-		}
-		else {
-			$selectButton = (new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1=resourceid'.
-					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
-		}
-		$screenFormList->addRow(_('Item'), [
-			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$selectButton
-		]);
-	}
-	else {
-		$form->addVar('caption', $caption);
-	}
-}
-
-/*
  * Append common fields
  */
 if (in_array($resourceType, [SCREEN_RESOURCE_HOST_INFO, SCREEN_RESOURCE_TRIGGER_INFO])) {
@@ -660,7 +604,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 			->setModern(true)
 	);
 }
-elseif ($resourceType != SCREEN_RESOURCE_CLOCK) {
+else {
 	$form->addVar('style', 0);
 }
 
@@ -674,7 +618,6 @@ else {
 $resourcesWithWidthAndHeight = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
-	SCREEN_RESOURCE_CLOCK,
 	SCREEN_RESOURCE_URL,
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
@@ -697,7 +640,6 @@ $resourcesWithHAlign = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_MAP,
-	SCREEN_RESOURCE_CLOCK,
 	SCREEN_RESOURCE_URL,
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH

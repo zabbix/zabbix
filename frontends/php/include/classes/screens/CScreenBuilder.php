@@ -222,9 +222,6 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_SERVER_INFO:
 				return new CScreenServerInfo($options);
 
-			case SCREEN_RESOURCE_CLOCK:
-				return new CScreenClock($options);
-
 			case SCREEN_RESOURCE_SCREEN:
 				return new CScreenScreen($options);
 

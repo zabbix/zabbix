@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/js.inc.php';
 
 function screen_resources($resource = null) {
 	$resources = [
-		SCREEN_RESOURCE_CLOCK => _('Clock'),
 		SCREEN_RESOURCE_DATA_OVERVIEW => _('Data overview'),
 		SCREEN_RESOURCE_GRAPH => _('Graph'),
 		SCREEN_RESOURCE_ACTIONS => _('Action log'),

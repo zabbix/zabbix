@@ -1099,12 +1099,6 @@ class C32XmlValidator {
 					]];
 					break;
 
-				case SCREEN_RESOURCE_CLOCK:
-					if ($parent_data['style'] != TIME_TYPE_HOST) {
-						return $data;
-					}
-					// break; is not missing here
-
 				case SCREEN_RESOURCE_SIMPLE_GRAPH:
 				case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 				case SCREEN_RESOURCE_PLAIN_TEXT:
