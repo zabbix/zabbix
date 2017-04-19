@@ -63,7 +63,12 @@ $widgets = [
 	WIDGET_CLOCK => [
 		'header' => _('Clock'),
 		'pos' => ['row' => 9, 'col' => 3, 'height' => 4, 'width' => 3],
-		'rf_rate' => SEC_PER_MIN
+		'rf_rate' => 15 * SEC_PER_MIN
+	],
+	WIDGET_URL => [
+		'header' => _('URL'),
+		'pos' => ['row' => 13, 'col' => 0, 'height' => 4, 'width' => 3],
+		'rf_rate' => 15 * SEC_PER_MIN
 	]
 ];
 

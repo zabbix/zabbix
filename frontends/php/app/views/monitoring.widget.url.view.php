@@ -18,38 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$item = (new CClock());
-
-if ($data['clock']['width'] !== null) {
-	$item->setWidth($data['clock']['width']);
-}
-
-if ($data['clock']['height'] !== null) {
-	$item->setHeight($data['clock']['height']);
-}
-
-if ($data['clock']['error'] !== null) {
-	$item->setError($data['clock']['error']);
-}
-
-if ($data['clock']['time'] !== null) {
-	$item->setTime($data['clock']['time']);
-}
-
-if ($data['clock']['time_zone_offset'] !== null) {
-	$item->setTimeZoneOffset($data['clock']['time_zone_offset']);
-}
-
-if ($data['clock']['time_zone_string'] !== null) {
-	$item->setTimeZoneString($data['clock']['time_zone_string']);
+if ($data['url']['error'] !== null) {
+	$item = (new CTableInfo())->setNoDataMessage($data['url']['error']);
+} else {
+	$item = (new CIFrame($data['url']['url'], $data['url']['width'], $data['url']['height'], 'auto'));
 }
 
 $output = [
-	'header' => $data['clock']['title'],
+	'header' => _('URL'), // TODO VM: maybe some other text would be better, maybe the one we will setup in widget's config
 	'body' => $item->toString(),
-	'footer' => (new CList([$item->getTimeDiv(),_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
-	'script_file' => $item->getScriptFile(),
-	'script_inline' => $item->getScriptRun()
+	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

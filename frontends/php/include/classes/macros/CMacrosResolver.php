@@ -52,12 +52,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'source' => 'name',
 			'method' => 'resolveGraph'
 		],
-		'screenElementURL' => [
+		'widgetURL' => [
 			'types' => ['host', 'hostId', 'interfaceWithoutPort', 'user'],
 			'source' => 'url',
 			'method' => 'resolveTexts'
 		],
-		'screenElementURLUser' => [
+		'widgetURLUser' => [
 			'types' => ['user'],
 			'source' => 'url',
 			'method' => 'resolveTexts'

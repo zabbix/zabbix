@@ -37,16 +37,21 @@ class CControllerWidgetClockView extends CController {
 
 	protected function doAction() {
 
-		// Default values
-		$resourceid = null;
-		$hostid = null;
-		$width = null;
-		$height = null;
 		$time = null;
 		$title = null;
 		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;
+		$data = [];
+
+		// Default values
+		$default = [
+			'style' => null,
+			'resourceid' => null,
+			'hostid' => null,
+			'width' => null,
+			'height' => null,
+		];
 
 		// Get Clock widget configuration for dashboard
 		// ------------------------ START OF TEST DATA -------------------
@@ -54,33 +59,40 @@ class CControllerWidgetClockView extends CController {
 
 		switch (mt_rand(0,2)) {
 			case 0:
-				$style = TIME_TYPE_LOCAL;
+				$data['style'] = TIME_TYPE_LOCAL;
 				break;
 			case 1:
-				$style = TIME_TYPE_SERVER;
+				$data['style'] = TIME_TYPE_SERVER;
 				break;
 			case 2:
-				$style = TIME_TYPE_HOST;
-				$resourceid = 23308;
-				$hostid = null;
+				$data['style'] = TIME_TYPE_HOST;
+				$data['resourceid'] = 23308;
+				$data['hostid'] = null;
 				break;
 		}
 
 		// TODO (VM): Should be optional values, should have minimal value.
 		// In case of beeing NULL, will take all available widget's space.
 		// Validation: both null, or both bigger/smaller than.
-		$width = null;
-		$height = null;
-//		$width = 150;
-//		$height = 100;
+		$data['width'] = null;
+		$data['height'] = null;
+//		$data['width'] = 150;
+//		$data['height'] = 100;
 		// ------------------------ END OF TEST DATA -------------------
 
-		switch ($style) {
-			case TIME_TYPE_HOST:
-				$itemid = $resourceid;
+		// Apply defualt value for data
+		foreach ($default as $key => $value) {
+			if (!array_key_exists($key, $data)) {
+				$data[$key] = $value;
+			}
+		}
 
-				if (!empty($hostid)) {
-					$new_itemid = get_same_item_for_host($itemid, $hostid);
+		switch ($data['style']) {
+			case TIME_TYPE_HOST:
+				$itemid = $data['resourceid'];
+
+				if (!empty($data['hostid'])) {
+					$new_itemid = get_same_item_for_host($itemid, $data['hostid']);
 					$itemid = !empty($new_itemid) ? $new_itemid : '';
 				}
 
@@ -145,8 +157,8 @@ class CControllerWidgetClockView extends CController {
 				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
 				'error' => $error,
-				'width' => $width,
-				'height' => $height
+				'width' => $data['width'],
+				'height' => $data['height']
 			]
 		]));
 	}
