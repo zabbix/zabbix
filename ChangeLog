@@ -52,9 +52,16 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
-Changes for 3.2.5rc1
+Changes for 3.2.5 
 
-Bug fixes:
+3.2.5rc1 was released as 3.2.5 without any changes 
+
+-------------------------------------------------------------------------------- 
+Changes for 3.2.5rc1 
+
+Bug fixes: 
+........S. [ZBX-12075] fixed security vulnerability with execution of the remote commands on server; thanks to Lilith Wyatt, Cisco Systems (gleb) 
+........S. [ZBX-12076] fixed security vulnerability with execution of the remote commands on proxy; thanks to Lilith Wyatt, Cisco Systems (gleb)
 ..F....... [ZBX-11024] fixed popup window size in actions configuration form (miks)
 ..F....... [ZBX-10997] fixed usage of wrong API in screen constructor (miks)
 ..F....... [ZBX-11477] fixed lost user name in profile title (miks)
