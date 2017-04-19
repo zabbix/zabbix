@@ -25,7 +25,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgets' =>	'required|array'
+			'widgets' =>	'required|array',
+			'save' =>		'required|in '.implode(',', [WIDGET_CONFIG_DONT_SAVE, WIDGET_CONFIG_DO_SAVE])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -64,6 +65,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	}
 
 	protected function doAction() {
+		$save = (int)$this->getInput('save');
+
 		foreach ($this->getInput('widgets') as $widget) {
 			$widgetid = $widget['widgetid'];
 
@@ -71,16 +74,11 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				CProfile::update('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT);
 			}
 
-			if (array_key_exists('pos', $widget)) {
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row'], PROFILE_TYPE_INT);
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col'], PROFILE_TYPE_INT);
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height'], PROFILE_TYPE_INT);
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'], PROFILE_TYPE_INT);
-			}
-
 			if (array_key_exists('fields', $widget)) {
 				// TODO VM: we need to have field validation somewhere, maybe here or in checkInput() method
-				(new CWidgetConfig())->saveConfig($widgetid, $widget['fields']);
+				if ($save === WIDGET_CONFIG_DO_SAVE) {
+					(new CWidgetConfig())->saveConfig($widgetid, $widget['fields']);
+				}
 			}
 		}
 

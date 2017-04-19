@@ -30,11 +30,12 @@ class CControllerWidgetClockView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'widgetid'		=>	'required', // TODO VM: in db.widget
+			'fields'		=>	'array',
 		];
 
 		$ret = $this->validateInput($fields);
 		if ($ret) {
-
+			// TODO VM: if fields are present, check that fields have enough data
 		}
 
 		if (!$ret) {
@@ -63,24 +64,25 @@ class CControllerWidgetClockView extends CController {
 			'time_type' => null,
 			'itemid' => null,
 			'hostid' => null, // TODO VM: probably will not be used at all
-			'width' => null,
-			'height' => null,
+			'inner_width' => null,
+			'inner_height' => null,
 		];
 
-		// Get Clock widget configuration for dashboard
-		$widgetid = $this->getInput('widgetid');
-		$data = (new CWidgetConfig())->getConfig($widgetid);
+		if ($this->hasInput('fields')) {
+			// Use configured data, if possible
+			$data = $this->getInput('fields');
+		}
 
 		// TODO VM: Should be optional values, should have minimal value.
 		// In case of beeing NULL, will take all available widget's space.
 		// Validation: both null, or both bigger/smaller than.
-		if (!array_key_exists('width', $data)
-				|| !array_key_exists('height', $data)
-				|| $data['width'] == 0
-				|| $data['height'] == 0
+		if (!array_key_exists('inner_width', $data)
+				|| !array_key_exists('inner_height', $data)
+				|| $data['inner_width'] == 0
+				|| $data['inner_height'] == 0
 		) {
-			$data['width'] = null;
-			$data['height'] = null;
+			$data['inner_width'] = $default['inner_width'];
+			$data['inner_height'] = $default['inner_height'];
 		}
 
 		// Apply defualt value for data
@@ -160,8 +162,8 @@ class CControllerWidgetClockView extends CController {
 				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
 				'error' => $error,
-				'width' => $data['width'],
-				'height' => $data['height']
+				'inner_width' => $data['inner_width'],
+				'inner_height' => $data['inner_height']
 			]
 		]));
 	}

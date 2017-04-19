@@ -15,7 +15,8 @@
 			var btn_save = $('<button>')
 				.attr('id','dashbrd-save')
 				.attr('type','button')
-				.append('<?= _('Save changes') ?>');
+				.append('<?= _('Save changes') ?>')
+				.click(dashbrd_save_changes);
 
 			var btn_cancel = $('<a>')
 				.attr('id','dashbrd-cancel')
@@ -42,16 +43,25 @@
 			);
 
 			// Update buttons on existing widgets to edit mode
-			$('.dashbrd-grid-widget-container').dashboardGrid('setModeEditWidgets');
+			$('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
 		});
+
+		// Save changes and cancel editing dashboard
+		var dashbrd_save_changes = function() {
+			// Update buttons on existing widgets to view mode
+			$('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
+
+			var form = $(this).closest('form');
+			$('.dashbrd-edit', form).remove();
+			$('#dashbrd-edit', form).closest('li').show();
+		};
 
 		// Cancel editing dashboard
 		var dashbrd_cancel = function(e) {
 			e.preventDefault(); // To prevent going by href link
 
-			// TODO VM: revert all changes that were done in this edit
 			// Update buttons on existing widgets to view mode
-			$('.dashbrd-grid-widget-container').dashboardGrid('setModeViewWidgets');
+			$('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
 
 			var form = $(this).closest('form');
 			$('.dashbrd-edit', form).remove();

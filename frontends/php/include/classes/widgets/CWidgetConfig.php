@@ -21,6 +21,7 @@
 class CWidgetConfig
 {
 	private $knownWidgetTypes;
+	private $rfRates;
 
 	public function __construct() {
 		$this->knownWidgetTypes = [
@@ -36,14 +37,44 @@ class CWidgetConfig
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_URL					=> _('URL'),
 		];
+
+		$this->rfRates = [
+			WIDGET_SYSTEM_STATUS		=> SEC_PER_MIN,
+			WIDGET_ZABBIX_STATUS		=> 15 * SEC_PER_MIN,
+			WIDGET_LAST_ISSUES			=> SEC_PER_MIN,
+			WIDGET_WEB_OVERVIEW			=> SEC_PER_MIN,
+			WIDGET_DISCOVERY_STATUS		=> SEC_PER_MIN,
+			WIDGET_HOST_STATUS			=> SEC_PER_MIN,
+			WIDGET_FAVOURITE_GRAPHS		=> 15 * SEC_PER_MIN,
+			WIDGET_FAVOURITE_MAPS		=> 15 * SEC_PER_MIN,
+			WIDGET_FAVOURITE_SCREENS	=> 15 * SEC_PER_MIN,
+			WIDGET_CLOCK				=> 15 * SEC_PER_MIN,
+			WIDGET_URL					=> 0,
+		];
 	}
 
-	public function getKnownWidgetTypesWNames() {
-		return $this->knownWidgetTypes;
+	public function getKnownWidgetTypesWNames($user_type) {
+		$known_widget_types = $this->knownWidgetTypes;
+
+		$show_discovery_widget = ($user_type >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
+			'output' => [],
+			'filter' => ['status' => DRULE_STATUS_ACTIVE],
+			'limit' => 1
+		]));
+		if (!$show_discovery_widget) {
+			unset($known_widget_types[WIDGET_DISCOVERY_STATUS]);
+		}
+
+		$show_status_widget = ($user_type == USER_TYPE_SUPER_ADMIN);
+		if (!$show_status_widget) {
+			unset($known_widget_types[WIDGET_ZABBIX_STATUS]);
+		}
+
+		return $known_widget_types;
 	}
 
-	public function getKnownWidgetTypes() {
-		return array_keys($this->knownWidgetTypes);
+	public function getKnownWidgetTypes($user_type) {
+		return array_keys($this->getKnownWidgetTypesWNames($user_type));
 	}
 
 	public function saveConfig($widgetid, $fields) {
@@ -60,5 +91,22 @@ class CWidgetConfig
 			$res = [];
 		}
 		return $res;
+	}
+
+	public function getAllWidgetConfig() {
+		// TODO VM: replace by call to API (when it will be ready)
+		// TODO VM: done clunky way, becuase API should be able to do it properly in one call
+		$res = [];
+		for ($i = 1; $i < 20; $i++) {
+			$fields = CProfile::get('web.dashbrd.widget.'.$i.'.fields', '');
+			if ($fields !== '') {
+				$res[] = (new CJson())->decode($fields, true);
+			}
+		}
+		return $res;
+	}
+
+	public function getDefaultRfRate($type) {
+		return $this->rfRates[$type];
 	}
 }

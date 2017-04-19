@@ -407,7 +407,8 @@ function getMenuPopupRefresh(options) {
 									'widgetid': options.widgetName,
 									'rf_rate': currentRate
 								}
-							]
+							],
+							save: 1 // 0 - only check; 1 - check and save
 						},
 						success: function(resp) {
 							jQuery('a').each(function() {

@@ -21,7 +21,7 @@
 if ($data['url']['error'] !== null) {
 	$item = (new CTableInfo())->setNoDataMessage($data['url']['error']);
 } else {
-	$item = (new CIFrame($data['url']['url'], $data['url']['width'], $data['url']['height'], 'auto'));
+	$item = (new CIFrame($data['url']['url'], $data['url']['inner_width'], $data['url']['inner_height'], 'auto'));
 }
 
 $output = [

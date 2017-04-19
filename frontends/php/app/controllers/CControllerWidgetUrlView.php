@@ -30,6 +30,7 @@ class CControllerWidgetUrlView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'widgetid'		=>	'required', // TODO VM: in db.widget
+			'fields'		=>	'array',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,16 +58,26 @@ class CControllerWidgetUrlView extends CController {
 		// Default values
 		$default = [
 			'url' => '',
-			'width' => '100%',
-			'height' => '98%',
+			'inner_width' => '100%',
+			'inner_height' => '98%',
 			'host_id' => 0,
 			'isTemplatedDashboard' => false, // TODO VM: will dashboards be templated?
 			'dynamic' => WIDGET_SIMPLE_ITEM
 		];
 
-		// Get URL widget configuration for dashboard
-		$widgetid = $this->getInput('widgetid');
-		$data = (new CWidgetConfig())->getConfig($widgetid);
+		if ($this->hasInput('fields')) {
+			// Use configured data, if possible
+			$data = $this->getInput('fields');
+		}
+
+		if (!array_key_exists('inner_width', $data)
+				|| !array_key_exists('inner_height', $data)
+				|| $data['inner_width'] == 0
+				|| $data['inner_height'] == 0
+		) {
+			$data['inner_width'] = $default['inner_width'];
+			$data['inner_height'] = $default['inner_height'];
+		}
 
 		// Apply defualt value for data
 		foreach ($default as $key => $value) {
@@ -96,8 +107,8 @@ class CControllerWidgetUrlView extends CController {
 			],
 			'url' => [
 				'url' => $data['url'],
-				'width' => $data['width'],
-				'height' => $data['height'],
+				'inner_width' => $data['inner_width'],
+				'inner_height' => $data['inner_height'],
 				'error' => $error
 			]
 		]));

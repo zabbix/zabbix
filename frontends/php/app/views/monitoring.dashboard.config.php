@@ -22,14 +22,13 @@ $widgetConfig = new CWidgetConfig();
 $formFields = $data['dialogue']['fields'];
 $widgetType = $formFields['type'];
 
-
 $form = (new CForm('post'))
 	->cleanItems()
 	->setId('widget_dialogue_form')
 	->setName('widget_dialogue_form');
 
 $formList = (new CFormList())
-	->addRow(_('Type'), new CComboBox('type', $widgetType, 'updateConfigDialogue()', $widgetConfig->getKnownWidgetTypesWNames()));
+	->addRow(_('Type'), new CComboBox('type', $widgetType, 'updateConfigDialogue()', $data['known_widget_types_w_names']));
 
 /*
  * Screen item: Clock
@@ -86,11 +85,11 @@ if (in_array($widgetType, [WIDGET_URL])) {
 }
 
 // Width and height fields
-if (in_array($widgetType, [WIDGET_CLOCK])) {
-	$width = array_key_exists('width', $formFields) ? $formFields['width'] : 0;
-	$height = array_key_exists('height', $formFields) ? $formFields['height'] : 0;
-	$formList->addRow(_('Width'), (new CNumericBox('width', $width, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH));
-	$formList->addRow(_('Height'), (new CNumericBox('height', $height, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH));
+if (in_array($widgetType, [WIDGET_CLOCK, WIDGET_URL])) {
+	$width = array_key_exists('inner_width', $formFields) ? $formFields['inner_width'] : 0;
+	$height = array_key_exists('inner_height', $formFields) ? $formFields['inner_height'] : 0;
+	$formList->addRow(_('Width'), (new CNumericBox('inner_width', $width, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH));
+	$formList->addRow(_('Height'), (new CNumericBox('inner_height', $height, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH));
 }
 
 $form->addItem($formList);

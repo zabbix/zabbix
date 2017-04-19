@@ -82,38 +82,26 @@ $widgets = [
 	]
 ];
 
-if ($data['show_status_widget']) {
-	$widgets[10] = [
-		'header' => _('Status of Zabbix'),
-		'type' => WIDGET_ZABBIX_STATUS,
-		'pos' => ['row' => 8, 'col' => 6, 'height' => 5, 'width' => 6],
-		'rf_rate' => 15 * SEC_PER_MIN
-	];
-}
-if ($data['show_discovery_widget']) {
-	$widgets[11] = [
-		'header' => _('Discovery status'),
-		'type' => WIDGET_DISCOVERY_STATUS,
-		'pos' => ['row' => 9, 'col' => 3, 'height' => 4, 'width' => 3],
-		'rf_rate' => SEC_PER_MIN
-	];
-}
+if (!empty($data['grid_widgets'])) {
+	$grid_widgets = $data['grid_widgets'];
+} else { // TODO VM: delete. Later it should be managed by API or dashboards.
+	$grid_widgets = [];
 
-$grid_widgets = [];
-
-foreach ($widgets as $widgetid => $widget) {
-	$grid_widgets[] = [
-		'widgetid' => $widgetid,
-		'type' => $widget['type'],
-		'header' => $widget['header'],
-		'pos' => [
-			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col']),
-			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row']),
-			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height']),
-			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'])
-		],
-		'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate'])
-	];
+	foreach ($widgets as $widgetid => $widget) {
+		$grid_widgets[] = [
+			'widgetid' => $widgetid,
+			'type' => $widget['type'],
+			'header' => $widget['header'],
+			'pos' => [
+				'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col']),
+				'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row']),
+				'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height']),
+				'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'])
+			],
+			'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate']),
+			'fields' => ['type' => $widget['type']]
+		];
+	}
 }
 
 (new CWidget())
