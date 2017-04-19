@@ -54,7 +54,6 @@ if (isset($_REQUEST['screenitemid']) && !isset($_REQUEST['form_refresh'])) {
 	$valign			= $screenItem['valign'];
 	$halign			= $screenItem['halign'];
 	$style			= $screenItem['style'];
-	$url			= $screenItem['url'];
 	$dynamic		= $screenItem['dynamic'];
 	$sortTriggers	= $screenItem['sort_triggers'];
 	$application	= $screenItem['application'];
@@ -71,7 +70,6 @@ else {
 	$valign			= getRequest('valign', VALIGN_DEFAULT);
 	$halign			= getRequest('halign', HALIGN_DEFAULT);
 	$style			= getRequest('style', 0);
-	$url			= getRequest('url', '');
 	$dynamic		= getRequest('dynamic', SCREEN_SIMPLE_ITEM);
 	$sortTriggers	= getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC);
 	$application	= getRequest('application', '');
@@ -608,17 +606,9 @@ else {
 	$form->addVar('style', 0);
 }
 
-if (in_array($resourceType, [SCREEN_RESOURCE_URL])) {
-	$screenFormList->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-}
-else {
-	$form->addVar('url', '');
-}
-
 $resourcesWithWidthAndHeight = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
-	SCREEN_RESOURCE_URL,
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 ];
@@ -640,7 +630,6 @@ $resourcesWithHAlign = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_MAP,
-	SCREEN_RESOURCE_URL,
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 ];
@@ -676,7 +665,6 @@ $resourcesWithDynamic = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_PLAIN_TEXT,
-	SCREEN_RESOURCE_URL,
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 ];

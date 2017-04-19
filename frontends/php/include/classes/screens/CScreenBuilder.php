@@ -231,10 +231,6 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_DATA_OVERVIEW:
 				return new CScreenDataOverview($options);
 
-			case SCREEN_RESOURCE_URL:
-				$options = self::appendTemplatedScreenOption($options);
-				return new CScreenUrl($options);
-
 			case SCREEN_RESOURCE_ACTIONS:
 				return new CScreenActions($options);
 

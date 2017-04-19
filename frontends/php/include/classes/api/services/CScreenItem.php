@@ -43,7 +43,6 @@ class CScreenItem extends CApiService {
 		SCREEN_RESOURCE_SCREEN,
 		SCREEN_RESOURCE_TRIGGER_OVERVIEW,
 		SCREEN_RESOURCE_DATA_OVERVIEW,
-		SCREEN_RESOURCE_URL,
 		SCREEN_RESOURCE_ACTIONS,
 		SCREEN_RESOURCE_EVENTS,
 		SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
@@ -226,7 +225,6 @@ class CScreenItem extends CApiService {
 					case SCREEN_RESOURCE_HISTORY:
 					case SCREEN_RESOURCE_SERVER_INFO:
 					case SCREEN_RESOURCE_SYSTEM_STATUS:
-					case SCREEN_RESOURCE_URL:
 						$screenItem['resourceid'] = 0;
 						break;
 				}
@@ -522,18 +520,10 @@ class CScreenItem extends CApiService {
 				case SCREEN_RESOURCE_ACTIONS:
 				case SCREEN_RESOURCE_SERVER_INFO:
 				case SCREEN_RESOURCE_SYSTEM_STATUS:
-				case SCREEN_RESOURCE_URL:
 					if ($screenItem['resourceid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set resource ID for screen element.'));
 					}
 					break;
-			}
-
-			// check url
-			if ($screenItem['resourcetype'] == SCREEN_RESOURCE_URL) {
-				if (!isset($screenItem['url']) || zbx_empty($screenItem['url'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No URL provided for screen element.'));
-				}
 			}
 
 			// check "Show lines"

@@ -40,7 +40,6 @@ function screen_resources($resource = null) {
 		SCREEN_RESOURCE_SYSTEM_STATUS => _('System status'),
 		SCREEN_RESOURCE_TRIGGER_INFO => _('Trigger info'),
 		SCREEN_RESOURCE_TRIGGER_OVERVIEW => _('Trigger overview'),
-		SCREEN_RESOURCE_URL => _('URL'),
 		SCREEN_RESOURCE_LLD_GRAPH => _('Graph prototype'),
 		SCREEN_RESOURCE_LLD_SIMPLE_GRAPH => _('Simple graph prototype')
 	];
