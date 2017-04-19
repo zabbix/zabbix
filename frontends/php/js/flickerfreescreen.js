@@ -166,6 +166,11 @@ jQuery(function($) {
 				}
 			}
 
+			// SCREEN_RESOURCE_CLOCK
+			else if (screen.resourcetype == 7) {
+				// don't refresh anything
+			}
+
 			// SCREEN_RESOURCE_SCREEN
 			else if (screen.resourcetype == 8) {
 				this.refreshProfile(id, ajaxUrl);

@@ -404,6 +404,12 @@ class CConfigurationImport {
 							$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 							break;
 
+						case SCREEN_RESOURCE_CLOCK:
+							if ($screenItem['style'] != TIME_TYPE_HOST) {
+								break;
+							}
+							// break; is not missing here
+
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
@@ -437,6 +443,12 @@ class CConfigurationImport {
 								$hostsRefs[$resource['host']] = $resource['host'];
 								$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 								break;
+
+							case SCREEN_RESOURCE_CLOCK:
+								if ($screenItem['style'] != TIME_TYPE_HOST) {
+									break;
+								}
+								// break; is not missing here
 
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:

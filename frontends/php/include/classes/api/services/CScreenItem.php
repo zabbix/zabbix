@@ -40,6 +40,7 @@ class CScreenItem extends CApiService {
 		SCREEN_RESOURCE_HOST_INFO,
 		SCREEN_RESOURCE_TRIGGER_INFO,
 		SCREEN_RESOURCE_SERVER_INFO,
+		SCREEN_RESOURCE_CLOCK,
 		SCREEN_RESOURCE_SCREEN,
 		SCREEN_RESOURCE_TRIGGER_OVERVIEW,
 		SCREEN_RESOURCE_DATA_OVERVIEW,
@@ -222,6 +223,12 @@ class CScreenItem extends CApiService {
 			// more refined check.
 			if (isset($screenItem['resourcetype'])) {
 				switch ($screenItem['resourcetype']) {
+					case SCREEN_RESOURCE_CLOCK:
+						if (isset($screenItem['style']) && $screenItem['style'] != TIME_TYPE_HOST) {
+							$screenItem['resourceid'] = 0;
+						}
+						break;
+
 					case SCREEN_RESOURCE_ACTIONS:
 					case SCREEN_RESOURCE_HISTORY:
 					case SCREEN_RESOURCE_SERVER_INFO:
@@ -419,6 +426,7 @@ class CScreenItem extends CApiService {
 		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, ['resourcetype']);
 
 		$validStyles = [
+			SCREEN_RESOURCE_CLOCK => [TIME_TYPE_LOCAL, TIME_TYPE_SERVER, TIME_TYPE_HOST],
 			SCREEN_RESOURCE_DATA_OVERVIEW => [STYLE_TOP, STYLE_LEFT],
 			SCREEN_RESOURCE_TRIGGER_OVERVIEW => [STYLE_TOP, STYLE_LEFT],
 			SCREEN_RESOURCE_HOST_INFO => [STYLE_VERTICAL, STYLE_HORIZONTAL],
@@ -501,6 +509,21 @@ class CScreenItem extends CApiService {
 					}
 
 					$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
+					break;
+
+				case SCREEN_RESOURCE_CLOCK:
+					if (isset($screenItem['style'])) {
+						if ($screenItem['style'] == TIME_TYPE_HOST) {
+							if (!$screenItem['resourceid']) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
+							}
+
+							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
+						}
+						elseif ($screenItem['resourceid']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set resource ID for screen element.'));
+						}
+					}
 					break;
 
 				case SCREEN_RESOURCE_MAP:

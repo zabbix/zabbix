@@ -30,6 +30,7 @@ class CClock extends CDiv {
 	private $error;
 	private $script_file;
 	private $script_run;
+	private $screen_clock;
 
 	public function __construct() {
 		parent::__construct();
@@ -45,7 +46,8 @@ class CClock extends CDiv {
 		$this->time_zone_offset = null;
 		$this->error = null;
 		$this->script_file = 'js/class.cclock.js';
-		$this->script_run = null;
+		$this->script_run = '';
+		$this->screen_clock = false;
 	}
 
 	public function setWidth($value) {
@@ -86,6 +88,12 @@ class CClock extends CDiv {
 
 	public function setError($value) {
 		$this->error = $value;
+
+		return $this;
+	}
+
+	public function setScreenClock($value) {
+		$this->screen_clock = ($value) ? true : false;
 
 		return $this;
 	}
@@ -197,9 +205,30 @@ class CClock extends CDiv {
 
 		if ($this->error !== null) {
 			$clock->addClass(ZBX_STYLE_DISABLED);
+		} elseif ($this->screen_clock === true) {
+			if (!defined('ZBX_CLOCK') && $this->error === null) {
+				define('ZBX_CLOCK', 1);
+				insert_js(file_get_contents($this->getScriptFile()));
+			}
+			zbx_add_post_js($this->getScriptRun());
 		}
 
+		if ($this->screen_clock === true) {
+			$this->addItem(
+				(new CDiv($this->error))
+					->addClass(ZBX_STYLE_TIME_ZONE)
+					->addClass(ZBX_STYLE_TIME_ZONE.'-'.$this->getId())
+					->addClass($this->error !== null ? ZBX_STYLE_RED : ZBX_STYLE_GREY)
+			);
+		}
 		$this->addItem($clock);
+		if ($this->screen_clock === true) {
+			$this->addItem(
+				(new CDiv($this->footer))
+					->addClass(ZBX_STYLE_LOCAL_CLOCK)
+					->addClass(ZBX_STYLE_GREY)
+			);
+		}
 	}
 
 	public function toString($destroy = true) {

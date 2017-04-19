@@ -84,6 +84,12 @@ abstract class CAbstractScreenImporter extends CImporter {
 						$screenItem['resourceid'] = $graphId;
 						break;
 
+					case SCREEN_RESOURCE_CLOCK:
+						if ($screenItem['style'] != TIME_TYPE_HOST) {
+							break;
+						}
+						// break; is not missing here
+
 					case SCREEN_RESOURCE_SIMPLE_GRAPH:
 					case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 					case SCREEN_RESOURCE_PLAIN_TEXT:
