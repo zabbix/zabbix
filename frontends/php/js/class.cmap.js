@@ -1802,7 +1802,9 @@ ZABBIX.apps.map = (function($) {
 							triggerids.push(trigger.id);
 							triggers_to_insert[trigger.id] = {
 								id: trigger.id,
-								name: trigger.name
+								name: typeof trigger.prefix == 'undefined'
+									? trigger.name
+									: trigger.prefix + trigger.name
 							};
 						}
 					});
@@ -1811,7 +1813,6 @@ ZABBIX.apps.map = (function($) {
 						// get priority
 						var ajaxUrl = new Curl('jsrpc.php');
 						ajaxUrl.setArgument('type', 11);
-						ajaxUrl.setArgument('method', 'trigget.get');
 						$.ajax({
 							url: ajaxUrl.getUrl(),
 							type: 'post',
