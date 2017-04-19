@@ -62,7 +62,33 @@
 		</sequential>
 	</macrodef>
 
+	<macrodef name="create-db-mysql">
+		<sequential>
+			<exec executable="mysql" failonerror="on">
+				<arg line="-u ${DBUSER}"/>
+				<arg line="-e &quot;DROP DATABASE IF EXISTS ${DBNAME}&quot;"/>
+			</exec>
+			<exec executable="mysql" failonerror="on">
+				<arg line="-u ${DBUSER}"/>
+				<arg line="-e &quot;CREATE DATABASE IF NOT EXISTS ${DBNAME}&quot;"/>
+			</exec>
+			<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
+				<arg line="-u ${DBUSER}"/>
+				<arg line="${DBNAME}"/>
+			</exec>
+			<exec executable="mysql" input="database/mysql/images.sql" failonerror="on">
+				<arg line="-u ${DBUSER}"/>
+				<arg line="${DBNAME}"/>
+			</exec>
+			<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
+				<arg line="-u ${DBUSER}"/>
+				<arg line="${DBNAME}"/>
+			</exec>
+		</sequential>
+	</macrodef>
+
 	<target name="make-mysql">
+		<create-db-mysql/>
 		<make-target dbargs="--with-mysql"/>
 	</target>
 
