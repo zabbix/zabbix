@@ -56,11 +56,11 @@ Changes for 3.2.5
 
 3.2.5rc1 was released as 3.2.5 without any changes 
 
--------------------------------------------------------------------------------- 
-Changes for 3.2.5rc1 
+--------------------------------------------------------------------------------
+Changes for 3.2.5rc1
 
-Bug fixes: 
-........S. [ZBX-12075] fixed security vulnerability with execution of the remote commands on server; thanks to Lilith Wyatt, Cisco Systems (gleb) 
+Bug fixes:
+........S. [ZBX-12075] fixed security vulnerability with execution of the remote commands on server; thanks to Lilith Wyatt, Cisco Systems (gleb)
 ........S. [ZBX-12076] fixed security vulnerability with execution of the remote commands on proxy; thanks to Lilith Wyatt, Cisco Systems (gleb)
 ..F....... [ZBX-11024] fixed popup window size in actions configuration form (miks)
 ..F....... [ZBX-10997] fixed usage of wrong API in screen constructor (miks)
