@@ -3614,9 +3614,16 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.21
+
+2.0.21rc1 was released as 2.0.21 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.21rc1
 
 Bug fixes:
+........S. [ZBX-12075] fixed security vulnerability with execution of the remote commands on server; thanks to Lilith Wyatt, Cisco Systems (gleb)
+........S. [ZBX-12076] fixed security vulnerability with execution of the remote commands on proxy; thanks to Lilith Wyatt, Cisco Systems (gleb)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 
 --------------------------------------------------------------------------------
