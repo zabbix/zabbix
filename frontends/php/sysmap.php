@@ -25,7 +25,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'class.cviewswitcher.js', 'multiselect.js'];
+$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'class.cviewswitcher.js',
+	'multiselect.js'
+];
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -129,14 +131,17 @@ if (isset($_REQUEST['sysmapid'])) {
 		'output' => ['sysmapid', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
 			'iconmapid', 'backgroundid'
 		],
-		'selectShapes' => API_OUTPUT_EXTEND,
+		'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
+			'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
+			'background_color', 'zindex'
+		],
 		'selectSelements' => API_OUTPUT_EXTEND,
 		'selectLinks' => API_OUTPUT_EXTEND,
 		'sysmapids' => getRequest('sysmapid'),
 		'editable' => true,
 		'preservekeys' => true
 	]);
-	if (empty($sysmap)) {
+	if (!$sysmap) {
 		access_deny();
 	}
 	else {

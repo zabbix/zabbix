@@ -81,29 +81,30 @@ abstract class CMapElement extends CApiService {
 	}
 
 	/**
-	 * Checks that shape color attributes are valid and that user have a permission on given shapes
+	 * Checks that shape color attributes are valid.
 	 *
-	 * @throws APIException if attributes are not valid
+	 * @throws APIException if input is invalid.
 	 *
-	 * @param array $shapes Array of shapes.
+	 * @param array $shapes			An array of shapes.
 	 */
-	protected function checkShapeInput(&$shapes) {
+	protected function checkShapeInput($shapes) {
 		$color_validator = new CColorValidator();
-		foreach ($shapes as &$shape) {
-			foreach (['border_color', 'background_color', 'font_color'] as $field) {
+		$fields = ['border_color', 'background_color', 'font_color'];
+
+		foreach ($shapes as $shape) {
+			foreach ($fields as $field) {
 				if (array_key_exists($field, $shape) && $shape[$field] !== ''
 						&& !$color_validator->validate($shape[$field])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $color_validator->getError());
 				}
 			}
 		}
-		unset($shape);
 	}
 
 	/**
 	 * Checks that the user has write permissions to objects used in the map elements.
 	 *
-	 * @throws APIException if the user has no permissions to at least one of the objects
+	 * @throws APIException if the user has no permissions to at least one of the objects.
 	 *
 	 * @param array $selements
 	 */
@@ -470,6 +471,7 @@ abstract class CMapElement extends CApiService {
 		$shapes = zbx_toArray($shapes);
 
 		$this->checkShapeInput($shapes);
+
 		DB::insert('sysmap_shape', $shapes);
 	}
 
@@ -506,9 +508,9 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function deleteShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
-		$shape_ids = zbx_objectValues($shapes, 'sysmap_shapeid');
+		$shapeids = zbx_objectValues($shapes, 'sysmap_shapeid');
 
-		DB::delete('sysmap_shape', ['sysmap_shapeid' => $shape_ids]);
+		DB::delete('sysmap_shape', ['sysmap_shapeid' => $shapeids]);
 	}
 
 	/**

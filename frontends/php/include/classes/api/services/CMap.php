@@ -1283,7 +1283,7 @@ class CMap extends CMapElement {
 			}
 
 			if (array_key_exists('shapes', $maps[$key])) {
-				$path = '/'.($key+1).'/shape';
+				$path = '/'.($key + 1).'/shape';
 				$api_input_rules['fields']['x']['in'] = '0:'.$maps[$key]['width'];
 				$api_input_rules['fields']['y']['in'] = '0:'.$maps[$key]['height'];
 				$api_input_rules['fields']['width']['in'] = '1:'.$maps[$key]['width'];
@@ -1525,7 +1525,7 @@ class CMap extends CMapElement {
 				$map['shapes'] = array_values($map['shapes']);
 				$shape_diff = zbx_array_diff($map['shapes'], $db_map['shapes'], 'sysmap_shapeid');
 
-				$path = '/'.($index+1).'/shape';
+				$path = '/'.($index + 1).'/shape';
 				$width = array_key_exists('width', $map) ? $map['width'] : $db_map['width'];
 				$height = array_key_exists('height', $map) ? $map['height'] : $db_map['height'];
 

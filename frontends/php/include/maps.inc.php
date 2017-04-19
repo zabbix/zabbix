@@ -75,7 +75,6 @@ function getActionsBySysmap($sysmap, array $options = []) {
 	$sysmap['links'] = zbx_toHash($sysmap['links'], 'linkid');
 
 	$actions = [];
-
 	$hostIds = [];
 	$triggerIds = [];
 	$host_groupids = [];
@@ -84,8 +83,10 @@ function getActionsBySysmap($sysmap, array $options = []) {
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$hostIds[$selement['elementid']] = $selement['elementid'];
 
-			// expanding host URL macros again as some hosts were added from hostgroup areas
-			// and automatic expanding only happens for elements that are defined for map in db
+			/*
+			 * Expanding host URL macros again as some hosts were added from hostgroup areas and automatic expanding
+			 * only happens for elements that are defined for map in DB.
+			 */
 			foreach ($selement['urls'] as $urlId => $url) {
 				$selement['urls'][$urlId]['url'] = str_replace('{HOST.ID}', $selement['elementid'], $url['url']);
 			}
@@ -1352,22 +1353,22 @@ function separateMapElements($sysmap) {
 }
 
 /**
- * For each host group which is area for hosts virtual elements as hosts from that host group are created
+ * For each host group which is area for hosts virtual elements as hosts from that host group are created.
  *
- * @param array $map
- * @return array areas with area coordinates and selementids
+ * @param array $map		Map data.
+ * @param array $theme		Theme used to create missing elements (like hostgroup frame).
+ *
+ * @return array			Areas with area coordinates and selementids.
  */
 function populateFromMapAreas(array &$map, $theme) {
 	$areas = [];
-	$new_selement_id = ((count($map['selements']) > 0) ? (int)max(array_keys($map['selements'])) : 0) + 1;
-	$new_link_id = ((count($map['links']) > 0) ? (int)max(array_keys($map['links'])) : 0) + 1;
+	$new_selementid = ((count($map['selements']) > 0) ? (int) max(array_keys($map['selements'])) : 0) + 1;
+	$new_linkid = ((count($map['links']) > 0) ? (int) max(array_keys($map['links'])) : 0) + 1;
 
 	foreach ($map['selements'] as $selement) {
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
 				&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
-
 			$area = ['selementids' => []];
-
 			$origSelement = $selement;
 
 			$hosts = API::host()->get([
@@ -1415,44 +1416,49 @@ function populateFromMapAreas(array &$map, $theme) {
 				$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
 				$selement['elementid'] = $host['hostid'];
 
-				while (array_key_exists($new_selement_id, $map['selements'])) {
-					$new_selement_id += 1;
+				while (array_key_exists($new_selementid, $map['selements'])) {
+					$new_selementid += 1;
 				}
-				$selement['selementid'] = -$new_selement_id;
+				$selement['selementid'] = -$new_selementid;
 
-				$area['selementids'][$new_selement_id] = $new_selement_id;
-				$map['selements'][$new_selement_id] = $selement;
+				$area['selementids'][$new_selementid] = $new_selementid;
+				$map['selements'][$new_selementid] = $selement;
 			}
 
 			$areas[] = $area;
 
 			$selements = zbx_toHash($map['selements'], 'selementid');
+
 			foreach ($map['links'] as $link) {
-				// do not multiply links between two areas
-				if ($selements[$link['selementid1']]['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP &&
-					$selements[$link['selementid1']]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS &&
-					$selements[$link['selementid2']]['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP &&
-					$selements[$link['selementid2']]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+				// Do not multiply links between two areas.
+				$id1 = $link['selementid1'];
+				$id2 = $link['selementid2'];
+
+				if ($selements[$id1]['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+						&& $selements[$id1]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
+						&& $selements[$id2]['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+						&& $selements[$id2]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 					continue;
 				}
 
-				$idNumber = null;
-				if ($link['selementid1'] == $origSelement['selementid']) {
-					$idNumber = 'selementid1';
+				$id_number = null;
+
+				if ($id1 == $origSelement['selementid']) {
+					$id_number = 'selementid1';
 				}
-				elseif ($link['selementid2'] == $origSelement['selementid']) {
-					$idNumber = 'selementid2';
+				elseif ($id2 == $origSelement['selementid']) {
+					$id_number = 'selementid2';
 				}
 
-				if ($idNumber) {
+				if ($id_number) {
 					foreach ($area['selementids'] as $selement_id) {
-						while (array_key_exists($new_link_id, $map['links'])) {
-							$new_link_id += 1;
+						while (array_key_exists($new_linkid, $map['links'])) {
+							$new_linkid += 1;
 						}
 
-						$link['linkid'] = -$new_link_id;
-						$link[$idNumber] = -$selement_id;
-						$map['links'][$new_link_id] = $link;
+						$link['linkid'] = -$new_linkid;
+						$link[$id_number] = -$selement_id;
+						$map['links'][$new_linkid] = $link;
 					}
 				}
 			}
@@ -1460,9 +1466,10 @@ function populateFromMapAreas(array &$map, $theme) {
 	}
 
 	$selements = [];
+
 	foreach ($map['selements'] as $key => $element) {
-		if (($element['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
-				|| $element['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)) {
+		if ($element['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				|| $element['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 			$selements[$key] = $element;
 		}
 	}

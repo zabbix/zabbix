@@ -28,12 +28,13 @@ class CScreenMap extends CScreenBase {
 	 */
 	public function get() {
 		$severity = null;
+
 		if (array_key_exists('severity_min', $this->screenitem)) {
 			$severity = $this->screenitem['severity_min'];
 		}
 
 		$map_data = CMapHelper::get($this->screenitem['resourceid'], $severity);
-		$map_data['container'] = "#map_{$this->screenitem['screenitemid']}";
+		$map_data['container'] = '#map_'.$this->screenitem['screenitemid'];
 		$this->insertFlickerfreeJs($map_data);
 
 		$output = [

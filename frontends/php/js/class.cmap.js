@@ -113,8 +113,7 @@ ZABBIX.apps.map = (function($) {
 		var CMap = function(containerId, mapData) {
 			var selementid,
 				shapeid,
-				linkid,
-				setContainer;
+				linkid;
 
 			this.reupdateImage = false; // if image should be updated again after last update is finished
 			this.imageUpdating = false; // if ajax request for image updating is processing
@@ -177,6 +176,7 @@ ZABBIX.apps.map = (function($) {
 			}
 
 			var shapes = [];
+
 			for (shapeid in this.data.shapes) {
 				if (this.data.shapes.hasOwnProperty(shapeid)) {
 					shapes.push(this.data.shapes[shapeid]);
@@ -273,8 +273,10 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				var elements = [];
+
 				Object.keys(this.selements).forEach(function(key) {
 					var element = {};
+
 					['selementid', 'x', 'y', 'label', 'label_location'].forEach(function (name) {
 						element[name] = this.selements[key].data[name];
 					}, this);
@@ -290,6 +292,7 @@ ZABBIX.apps.map = (function($) {
 				}, this);
 
 				var links = [];
+
 				Object.keys(this.links).forEach(function(key) {
 					var link = {};
 					['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'].forEach(function (name) {
@@ -300,6 +303,7 @@ ZABBIX.apps.map = (function($) {
 				}, this);
 
 				var shapes = [];
+
 				Object.keys(this.shapes).forEach(function(key) {
 					var shape = {};
 					Object.keys(this.shapes[key].data).forEach(function (name) {
@@ -384,11 +388,11 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			bindActions: function() {
-				var that = this;
-
 				/*
 				 * Map panel events
 				 */
+				var that = this;
+
 				// change grid size
 				$('#gridsize').change(function() {
 					var value = $(this).val();
@@ -498,11 +502,11 @@ ZABBIX.apps.map = (function($) {
 				/*
 				 * Selements events
 				 */
-				// delegate selements icons clicks
+				// Delegate selements icons clicks.
 				$(this.container).on('click', '.sysmap_element, .sysmap_shape', function(event) {
 					that.selectElements([{
-							id: $(this).attr('data-id'),
-							type: $(this).attr('data-type')
+						id: $(this).attr('data-id'),
+						type: $(this).attr('data-type')
 					}], event.ctrlKey || event.metaKey);
 				});
 
@@ -514,32 +518,28 @@ ZABBIX.apps.map = (function($) {
 							'items': [
 								{
 									label: locale['S_BRING_TO_FRONT'],
-									clickCallback: function()
-									{
+									clickCallback: function() {
 										that.reorderShapes(item, 'last');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_BRING_FORWARD'],
-									clickCallback: function()
-									{
+									clickCallback: function() {
 										that.reorderShapes(item, 'next');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_SEND_BACKWARD'],
-									clickCallback: function()
-									{
+									clickCallback: function() {
 										that.reorderShapes(item, 'previous');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_SEND_TO_BACK'],
-									clickCallback: function()
-									{
+									clickCallback: function() {
 										that.reorderShapes(item, 'first');
 										that.hideContextMenus();
 									}
@@ -550,8 +550,7 @@ ZABBIX.apps.map = (function($) {
 							'items': [
 								{
 									label: locale['S_REMOVE'],
-									clickCallback: function()
-									{
+									clickCallback: function() {
 										that.shapes[item].remove();
 										that.hideContextMenus();
 										that.toggleForm();
@@ -794,7 +793,7 @@ ZABBIX.apps.map = (function($) {
 						shapes.forEach(function(shape, index) {
 							shape.data.zindex = index;
 						});
-					break;
+						break;
 
 					case 'last':
 						// no need to update
@@ -807,7 +806,7 @@ ZABBIX.apps.map = (function($) {
 						shapes.forEach(function(shape, index) {
 							shape.data.zindex = index;
 						});
-					break;
+						break;
 
 					case 'next':
 						// no need to update
@@ -818,7 +817,7 @@ ZABBIX.apps.map = (function($) {
 						$(shapes[shape].domNode).insertAfter(shapes[shape + 1].domNode);
 						shapes[shape + 1].data.zindex--;
 						shapes[shape].data.zindex++;
-					break;
+						break;
 
 					case 'previous':
 						// no need to update
@@ -829,7 +828,7 @@ ZABBIX.apps.map = (function($) {
 						$(shapes[shape].domNode).insertBefore(shapes[shape - 1].domNode);
 						shapes[shape - 1].data.zindex++;
 						shapes[shape].data.zindex--;
-					break;
+						break;
 				}
 
 				this.map.invalidate('shapes');
@@ -873,8 +872,8 @@ ZABBIX.apps.map = (function($) {
 				this.shapeForm.hide();
 				this.linkForm.hide();
 
-				if (this.selection.count.selements + this.selection.count.shapes === 0 ||
-					(this.selection.count.selements > 0 && this.selection.count.shapes > 0)) {
+				if (this.selection.count.selements + this.selection.count.shapes === 0
+						|| (this.selection.count.selements > 0 && this.selection.count.shapes > 0)) {
 					$('#map-window').hide();
 				}
 				else {
@@ -934,12 +933,12 @@ ZABBIX.apps.map = (function($) {
 		 *
 		 * @class represents connector between two Elements
 		 *
-		 * @property {Object} sysmap reference to Map object
-		 * @property {Object} data link db values
-		 * @property {String} id linkid
+		 * @property {object} sysmap		Reference to Map object.
+		 * @property {object} data			Link db values.
+		 * @property {string} id			Link ID (linkid).
 		 *
-		 * @param {Object} sysmap Map object
-		 * @param {Object} [linkData] link data from db
+		 * @param {object} sysmap			Map object.
+		 * @param {object} linkData			Link data from DB.
 		 */
 		function Link(sysmap, linkData) {
 			var selementid;
@@ -989,7 +988,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Updades values in property data.
 			 *
-			 * @param {Object} data
+			 * @param {object} data
 			 */
 			update: function(data) {
 				var key;
@@ -1032,12 +1031,12 @@ ZABBIX.apps.map = (function($) {
 		 *
 		 * @class represents shape (static) element
 		 *
-		 * @property {Object} sysmap reference to Map object
-		 * @property {Object} data shape db values
-		 * @property {String} id shapeid
+		 * @property {object} sysmap	Reference to Map object
+		 * @property {object} data		Shape values from DB.
+		 * @property {string} id		Shape ID (shapeid).
 		 *
-		 * @param {Object} sysmap Map object
-		 * @param {Object} [shapeData] shape data from db
+		 * @param {object} sysmap Map object
+		 * @param {object} [shapeData] shape data from db
 		 */
 		function Shape(sysmap, shapeData) {
 			this.sysmap = sysmap;
@@ -1074,7 +1073,7 @@ ZABBIX.apps.map = (function($) {
 
 			// create dom
 			this.domNode = $('<div></div>', {
-					style: 'position:absolute; z-index: 1;\
+					style: 'position: absolute; z-index: 1;\
 						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
 				.appendTo(this.sysmap.container)
@@ -1108,7 +1107,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Updades values in property data.
 			 *
-			 * @param {Object} data
+			 * @param {object} data
 			 */
 			update: function(data) {
 				var key;
@@ -1177,7 +1176,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Toggle shape selection.
 			 *
-			 * @param {Boolean} state
+			 * @param {bool} state
 			 */
 			toggleSelect: function(state) {
 				state = state || !this.selected;
@@ -1196,7 +1195,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Align shape to map or map grid.
 			 *
-			 * @param {Boolean} doAutoAlign if we should align element to grid
+			 * @param {bool} doAutoAlign if we should align element to grid
 			 */
 			align: function(doAutoAlign) {
 				var dims = {
@@ -1220,7 +1219,8 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// if autoalign is off
-				else if (doAutoAlign === false || (typeof doAutoAlign === 'undefined' && this.sysmap.data.grid_align == '0')) {
+				else if (doAutoAlign === false
+						|| (typeof doAutoAlign === 'undefined' && this.sysmap.data.grid_align == '0')) {
 					if ((x + dims.width) > this.sysmap.data.width) {
 						newX = this.sysmap.data.width - dims.width;
 					}
@@ -1279,7 +1279,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Updates element position.
 			 *
-			 * @param {Object} coords
+			 * @param {object} coords
 			 */
 			updatePosition: function(coords) {
 				this.data.x = coords.x;
@@ -1318,14 +1318,14 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * @class Creates a new Selement.
 		 *
-		 * @property {Object} sysmap reference to Map object
-		 * @property {Object} data selement db values
-		 * @property {Boolean} selected if element is now selected by user
-		 * @property {String} id elementid
-		 * @property {Object} domNode reference to related DOM element
+		 * @property {object} sysmap reference to Map object
+		 * @property {object} data selement db values
+		 * @property {bool} selected if element is now selected by user
+		 * @property {string} id elementid
+		 * @property {object} domNode reference to related DOM element
 		 *
-		 * @param {Object} sysmap reference to Map object
-		 * @param {Object} selementData element db values
+		 * @param {object} sysmap reference to Map object
+		 * @param {object} selementData element db values
 		 */
 		function Selement(sysmap, selementData) {
 			this.sysmap = sysmap;
@@ -1360,7 +1360,7 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.selements[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {style: 'position:absolute; z-index: 100'})
+			this.domNode = $('<div></div>', {style: 'position: absolute; z-index: 100'})
 				.appendTo(this.sysmap.container)
 				.addClass('pointer sysmap_element')
 				.attr('data-id', this.id)
@@ -1378,9 +1378,7 @@ ZABBIX.apps.map = (function($) {
 				}, this)
 			});
 
-			this.makeResizable(
-					this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1
-			);
+			this.makeResizable(this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1);
 
 			this.updateIcon();
 
@@ -1404,13 +1402,13 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Updates element fields.
 			 *
-			 * @param {Object} data
-			 * @param {Boolean} unsetUndefined if true, all fields that are not in data parameter will be removed from element
+			 * @param {object} data
+			 * @param {bool} unsetUndefined			If true, all fields that are not in data parameter will be removed
+			 *										from element.
 			 */
 			update: function(data, unsetUndefined) {
 				var fieldName,
-					dataFelds = [
-						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
+					dataFelds = ['elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
 						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
 						'application'
@@ -1468,7 +1466,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Updates element position.
 			 *
-			 * @param {Object} coords
+			 * @param {object} coords
 			 */
 			updatePosition: Shape.prototype.updatePosition,
 
@@ -1490,14 +1488,14 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Toggle element selection.
 			 *
-			 * @param {Boolean} state
+			 * @param {bool} state
 			 */
 			toggleSelect: Shape.prototype.toggleSelect,
 
 			/**
 			 * Align element to map or map grid.
 			 *
-			 * @param {Boolean} doAutoAlign if we should align element to grid
+			 * @param {bool} doAutoAlign if we should align element to grid
 			 */
 			align: Shape.prototype.align,
 
@@ -1512,7 +1510,8 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				if ((this.data.use_iconmap === '1' && this.sysmap.data.iconmapid !== '0')
-						&& (this.data.elementtype === '0' || (this.data.elementtype === '3' && this.data.elementsubtype === '1'))) {
+						&& (this.data.elementtype === '0'
+							|| (this.data.elementtype === '3' && this.data.elementsubtype === '1'))) {
 					this.domNode.addClass('sysmap_iconid_' + this.sysmap.defaultAutoIconId);
 				}
 				else {
@@ -1553,8 +1552,8 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for elements.
 		 *
-		 * @param {Object} formContainer jQuery object
-		 * @param {Object} sysmap
+		 * @param {object} formContainer jQuery object
+		 * @param {object} sysmap
 		 */
 		function SelementForm(formContainer, sysmap) {
 			var formTplData = {
@@ -1731,7 +1730,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Adds element urls to form.
 			 *
-			 * @param {Object} urls
+			 * @param {object} urls
 			 */
 			addUrls: function(urls) {
 				var tpl = new Template($('#selementFormUrls').html()),
@@ -1757,7 +1756,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Set form controls with element fields values.
 			 *
-			 * @param {Object} selement
+			 * @param {object} selement
 			 */
 			setValues: function(selement) {
 				for (var elementName in selement) {
@@ -1913,8 +1912,8 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Elements mass update form.
 		 *
-		 * @param {Object} formContainer jQuery object
-		 * @param {Object} sysmap
+		 * @param {object} formContainer jQuery object
+		 * @param {object} sysmap
 		 */
 		function MassForm(formContainer, sysmap) {
 			var i,
@@ -2109,8 +2108,8 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for shape editing.
 		 *
-		 * @param {Object} formContainer jQuery object
-		 * @param {Object} sysmap
+		 * @param {object} formContainer jQuery object
+		 * @param {object} sysmap
 		 */
 		function ShapeForm(formContainer, sysmap) {
 			this.sysmap = sysmap;
@@ -2141,7 +2140,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Set form controls with shape fields values.
 			 *
-			 * @param {Object} shape
+			 * @param {object} shape
 			 */
 			setValues: function(shape) {
 				for (var field in shape) {
@@ -2174,8 +2173,8 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for shape editing.
 		 *
-		 * @param {Object} formContainer jQuery object
-		 * @param {Object} sysmap
+		 * @param {object} formContainer jQuery object
+		 * @param {object} sysmap
 		 */
 		function MassShapeForm(formContainer, sysmap) {
 			var formActions = [];
@@ -2198,13 +2197,11 @@ ZABBIX.apps.map = (function($) {
 				var condition = {};
 				condition[key] = 'checked';
 
-				formActions.push(
-					{
-						action: 'enable',
-						value: mapping[key],
-						cond: [condition]
-					}
-				);
+				formActions.push({
+					action: 'enable',
+					value: mapping[key],
+					cond: [condition]
+				});
 			});
 
 			this.sysmap = sysmap;
@@ -2266,8 +2263,8 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for editin links.
 		 *
-		 * @param {Object} formContainer jQuesry object
-		 * @param {Object} sysmap
+		 * @param {object} formContainer jQuesry object
+		 * @param {object} sysmap
 		 */
 		function LinkForm(formContainer, sysmap) {
 			this.sysmap = sysmap;
@@ -2312,7 +2309,10 @@ ZABBIX.apps.map = (function($) {
 
 					if (linkTrigger !== null) {
 						if (linkTrigger[2] == 'color' && !colorPattern.match(values[i].value.toString())) {
-							throw sprintf(t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'), values[i].value);
+							throw sprintf(
+								t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'),
+								values[i].value
+							);
 						}
 
 						if (typeof data.linktriggers[linkTrigger[1]] === 'undefined') {
@@ -2323,7 +2323,10 @@ ZABBIX.apps.map = (function($) {
 					}
 					else {
 						if (values[i].name == 'color' && !colorPattern.match(values[i].value.toString())) {
-							throw sprintf(t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'), values[i].value);
+							throw sprintf(
+								t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'),
+								values[i].value
+							);
 						}
 
 						data[values[i].name] = values[i].value.toString();
@@ -2336,7 +2339,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Update form controls with values from link.
 			 *
-			 * @param {Object} link
+			 * @param {object} link
 			 */
 			setValues: function(link) {
 				var selement1,
@@ -2351,8 +2354,10 @@ ZABBIX.apps.map = (function($) {
 					i,
 					ln;
 
-				// if only one element is selected, make sure that element1 is equal to the selected element and
-				// element2 - to the connected
+				/*
+				 * If only one element is selected, make sure that element1 is equal to the selected element and
+				 * element2 - to the connected.
+				 */
 				if (this.sysmap.selection.count.selements === 1 && this.sysmap.selection.count.shapes === 0) {
 					// get currently selected element
 					for (selementid in this.sysmap.selection.selements) {
@@ -2386,17 +2391,33 @@ ZABBIX.apps.map = (function($) {
 
 				for (optgroupType in optgroups) {
 					switch (optgroupType) {
-						case '0': optgroupLabel = locale['S_HOST']; break;
-						case '1': optgroupLabel = locale['S_MAP']; break;
-						case '2': optgroupLabel = locale['S_TRIGGER']; break;
-						case '3': optgroupLabel = locale['S_HOST_GROUP']; break;
-						case '4': optgroupLabel = locale['S_IMAGE']; break;
+						case '0':
+							optgroupLabel = locale['S_HOST'];
+							break;
+
+						case '1':
+							optgroupLabel = locale['S_MAP'];
+							break;
+
+						case '2':
+							optgroupLabel = locale['S_TRIGGER'];
+							break;
+
+						case '3':
+							optgroupLabel = locale['S_HOST_GROUP'];
+							break;
+
+						case '4':
+							optgroupLabel = locale['S_IMAGE'];
+							break;
 					}
 
 					optgroupDom = $('<optgroup label="' + optgroupLabel + '"></optgroup>');
 
 					for (i = 0, ln = optgroups[optgroupType].length; i < ln; i++) {
-						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">' + optgroups[optgroupType][i].data.elementName + '</option>')
+						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">'
+							+ optgroups[optgroupType][i].data.elementName + '</option>'
+						);
 					}
 
 					$('#selementid2').append(optgroupDom);
@@ -2416,7 +2437,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Add triggers to link form.
 			 *
-			 * @param {Object} triggers
+			 * @param {object} triggers
 			 */
 			addTriggers: function(triggers) {
 				var tpl = new Template($('#linkTriggerRow').html()),
@@ -2425,7 +2446,8 @@ ZABBIX.apps.map = (function($) {
 				for (linkTrigger in triggers) {
 					this.triggerids[triggers[linkTrigger].triggerid] = linkTrigger;
 					$(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer tbody');
-					$('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype').val(triggers[linkTrigger].drawtype);
+					$('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype')
+						.val(triggers[linkTrigger].drawtype);
 				}
 
 				$('.input-color-picker input', this.domNode).change();
@@ -2434,7 +2456,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Add new triggers which were selected in popup to trigger list.
 			 *
-			 * @param {Object} triggers
+			 * @param {object} triggers
 			 */
 			addNewTriggers: function(triggers) {
 				var tpl = new Template($('#linkTriggerRow').html()),
@@ -2469,7 +2491,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Updates links list for element.
 			 *
-			 * @param {String} selementIds
+			 * @param {string} selementIds
 			 */
 			updateList: function(selementIds) {
 				var links = this.sysmap.getLinksBySelementIds(selementIds),
@@ -2504,11 +2526,12 @@ ZABBIX.apps.map = (function($) {
 					for (i = 0, ln = links.length; i < ln; i++) {
 						link = this.sysmap.links[links[i]].data;
 
-						// if one element selected and it's not link.selementid1
-						// we need to swap link.selementid1 and link.selementid2
-						// in order that sorting works correctly
+						/*
+						 * If one element selected and it's not link.selementid1, we need to swap link.selementid1
+						 * and link.selementid2 in order that sorting works correctly.
+						 */
 						if (objectSize(selementIds) == 1 && !selementIds[link.selementid1]) {
-							// get currently selected element
+							// Get currently selected element.
 							for (var selementId in this.sysmap.selection.selements) {
 								selement = this.sysmap.selements[selementId];
 							}
@@ -2521,6 +2544,7 @@ ZABBIX.apps.map = (function($) {
 						}
 
 						linktriggers = [];
+
 						for (var linktrigger in link.linktriggers) {
 							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
 						}
@@ -2533,7 +2557,7 @@ ZABBIX.apps.map = (function($) {
 						});
 					}
 
-					// sort by "from" element and then by "to" element
+					// Sort by "from" element and then by "to" element.
 					list.sort(function(a, b) {
 						var fromElementA = a.fromElementName.toLowerCase(),
 							fromElementB = b.fromElementName.toLowerCase(),
@@ -2592,8 +2616,7 @@ ZABBIX.apps.map = (function($) {
 
 		Shape.prototype.bind('afterMove', function(event, element) {
 			if (sysmap.selection.count.shapes === 1 && sysmap.selection.count.selements === 0
-				&& sysmap.selection.shapes[element.id] !== void(0)) {
-
+					&& sysmap.selection.shapes[element.id] !== void(0)) {
 				$('#shapeForm input[name=x]').val(element.data.x);
 				$('#shapeForm input[name=y]').val(element.data.y);
 
@@ -2610,8 +2633,7 @@ ZABBIX.apps.map = (function($) {
 
 		Selement.prototype.bind('afterMove', function(event, element) {
 			if (sysmap.selection.count.selements === 1 && sysmap.selection.count.shapes === 0
-				&& sysmap.selection.selements[element.id] !== void(0)) {
-
+					&& sysmap.selection.selements[element.id] !== void(0)) {
 				$('#x').val(element.data.x);
 				$('#y').val(element.data.y);
 

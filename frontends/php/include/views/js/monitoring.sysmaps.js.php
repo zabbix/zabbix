@@ -19,9 +19,9 @@ $vertical_align_types = [
 ];
 
 /**
- * Get font selection combobox
+ * Get font selection for Combobox.
  *
- * @param string	$name	combobox name
+ * @param string $name				Combobox name.
  *
  * @return CComboBox
  */
@@ -287,22 +287,23 @@ function getFontComboBox($name) {
 							_('Horizontal align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CComboBox('text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
-									$horizontal_align_types))->setAttribute('style', 'margin-top: 4px'),
+								$horizontal_align_types
+							))
+								->setAttribute('style', 'margin-top: 4px'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Vertical align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CComboBox('text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
-									$vertical_align_types))
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+								$vertical_align_types
+							))
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addRow(_('Background'),
 						(new CDiv([
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							new CColor('background_color', '#{color}', false)
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addRow(_('Border'),
 						(new CDiv([
@@ -317,8 +318,7 @@ function getFontComboBox($name) {
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							new CColor('border_color', '#{color}', false)
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addRow(new CLabel(_('Coordinates'), 'x'),
 						(new CDiv([
@@ -329,8 +329,7 @@ function getFontComboBox($name) {
 							_('Y'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CTextBox('y'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addRow(new CLabel(_('Size'), 'areaSizeWidth'),
 						(new CDiv([
@@ -345,8 +344,7 @@ function getFontComboBox($name) {
 							(new CTextBox('height'))
 								->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 								->setId('areaSizeHeight')
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
@@ -416,7 +414,8 @@ function getFontComboBox($name) {
 							->setId('chkboxTextHalign')
 							->setLabel(_('Horizontal align')),
 						new CComboBox('mass_text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
-								$horizontal_align_types)
+							$horizontal_align_types
+						)
 					)
 					->addRow((new CCheckBox('chkbox_text_valign'))
 							->setId('chkboxTextValign')
