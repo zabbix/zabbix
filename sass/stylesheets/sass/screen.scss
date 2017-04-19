@@ -1945,16 +1945,49 @@ button {
 	color: $btn-alt-font-color;
 	background-color: $btn-alt-bg-color;
 
+	.plus-icon {
+		background-color: $btn-alt-font-color;
+		margin-right: 8px;
+
+		&::after {
+			background-color: $btn-alt-font-color;
+		}
+	}
+
 	&:hover {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
 	}
 
 	&:focus {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
 	}
 
 	&:active {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
 	}
 }
 
@@ -2090,9 +2123,11 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
+	widget-action: url(../img/icon-sprite.svg) no-repeat -4px -616px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -39px -617px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -39px -580px,
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
@@ -2607,7 +2642,7 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-head {
 	position: relative;
-	padding: 8px 40px 8px 10px;
+	padding: 8px 65px 8px 10px;
 	min-height: 17px;
 
 	h4 {
@@ -2619,7 +2654,7 @@ $form-icon-btn: (
 	ul {
 		position: absolute;
 		top: 0;
-		right: 3px;
+		right: 0;
 
 		li {
 			display: block;
@@ -2921,6 +2956,30 @@ $form-icon-btn: (
 	li {
 		display: inline-block;
 		padding: 8px 0 8px 13px
+	}
+}
+
+.dashbrd-edit {
+	position: relative;
+	display: inline-block;
+	line-height: 24px;
+	background-color: $ui-bg-color;
+	@include box-shadow(0 0 0 4px $ui-bg-color);
+
+	&::after {
+		content: "";
+		position: absolute;
+		min-height: 24px;
+		z-index: -1;
+		top: -5px;
+		right: -5px;
+		bottom: -5px;
+		left: -5px;
+		border: 1px solid $ui-border-color;
+	}
+
+	li:first-child {
+		padding: 0;
 	}
 }
 
@@ -3944,6 +4003,28 @@ td.inactive-bg {
 	margin-right: auto;
 	margin-top: 5%;
 	max-width: 25%;
+}
+
+// Plus/Add icon
+
+.plus-icon {
+	display: inline-block;
+	@extend %plus-icon;
+}
+
+%plus-icon {
+	width: 2px;
+	height: 8px;
+	position: relative;
+
+	&::after {
+		content: "";
+		width: 8px;
+		height: 2px;
+		top: 3px;
+		left: -3px;
+		position: absolute;
+	}
 }
 
 // Close/Remove icon
