@@ -852,10 +852,15 @@ class testScripts extends CZabbixTest {
 					'scriptid' => '1',
 					'hostid' => '10084'
 					],
-				// TODO: different error message on jenkins
+				// TODO: different success result on jenkins
 				// 'success_expected' => true,
 				'success_expected' => false,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Connection to Zabbix server "localhost" refused. Possible reasons:
+1. Incorrect server IP/DNS in the "zabbix.conf.php";
+2. Security environment (for example, SELinux) is blocking the connection;
+3. Zabbix server daemon not running;
+4. Firewall is blocking TCP connection.
+Connection refused'
 			]
 		];
 	}
@@ -912,11 +917,11 @@ class testScripts extends CZabbixTest {
 				// TODO: different error message on jenkins
 				// 'expected_error' => 'Unknown Script ID [14]'
 				'expected_error' => 'Connection to Zabbix server "localhost" refused. Possible reasons:
-					1. Incorrect server IP/DNS in the "zabbix.conf.php";
-					2. Security environment (for example, SELinux) is blocking the connection;
-					3. Zabbix server daemon not running;
-					4. Firewall is blocking TCP connection.
-					Connection refused'
+1. Incorrect server IP/DNS in the "zabbix.conf.php";
+2. Security environment (for example, SELinux) is blocking the connection;
+3. Zabbix server daemon not running;
+4. Firewall is blocking TCP connection.
+Connection refused'
 			],
 			// User have deny permissions to host, but script required read permissions for the host.
 			[
