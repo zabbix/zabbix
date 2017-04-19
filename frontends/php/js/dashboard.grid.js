@@ -24,7 +24,6 @@
 	function makeWidgetDiv(data, widget) {
 		widget['content_header'] = $('<div>')
 			.addClass('dashbrd-grid-widget-head')
-			.addClass('cursor-move')
 			.append($('<h4>').text(widget['header']));
 		widget['content_body'] = $('<div>')
 			.addClass('dashbrd-grid-widget-content');
@@ -285,6 +284,9 @@
 	}
 
 	function makeDraggable($obj, data, widget) {
+		widget['content_header']
+			.addClass('cursor-move');
+
 		widget['div'].draggable({
 			handle: widget['content_header'],
 			start: function(event, ui) {
@@ -297,6 +299,13 @@
 				stopWidgetPositioning($obj, $(event.target), data);
 			}
 		});
+	}
+
+	function stopDraggable($obj, data, widget) {
+		widget['content_header']
+			.removeClass('cursor-move');
+
+		widget['div'].draggable("destroy");
 	}
 
 	function makeResizable($obj, data, widget) {
@@ -328,6 +337,10 @@
 				stopWidgetPositioning($obj, $(event.target), data);
 			}
 		});
+	}
+
+	function stopResizable($obj, data, widget) {
+		widget['div'].resizable("destroy");
 	}
 
 	function showPreloader(widget) {
@@ -394,7 +407,8 @@
 
 		var url = new Curl('zabbix.php');
 
-		url.setArgument('action', 'widget.' + widget['widgetid'] + '.view')
+		url.setArgument('action', 'widget.' + widget['type'] + '.view')
+		url.setArgument('widgetid', widget['widgetid'])
 
 		startPreloader(widget);
 
@@ -460,6 +474,73 @@
 		updateWidgetContent(widget);
 	}
 
+	function updateWidgetConfig($obj, data, widget) {
+		var	url = new Curl('zabbix.php'),
+			ajax_data = [],
+			overlay_dialogue = $('#overlay_dialogue'),
+			body = $('.overlay-dialogue-body', overlay_dialogue),
+			fields = $('form', body).serializeJSON();
+
+		url.setArgument('action', 'dashbrd.widget.update');
+
+		ajax_data.push({
+			'widgetid': widget['widgetid'],
+			'fields': fields
+		});
+
+		$.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				widgets: ajax_data
+//				type: 0 // TODO VM: add use same controller for temporary and final option saving. 0 - local, 1 - final
+			},
+			success: function(resp) {
+				// TODO VM: Don't update widget data, in case of validation error
+				// TODO VM: Show error in case of validation error
+				overlayDialogueDestroy();
+				delete data['dialogue'];
+				$.each(data['widgets'], function(index, data_widget) {
+					if (data_widget['widgetid'] == widget['widgetid']) {
+						data_widget['fields'] = fields;
+						refreshWidget(widget);
+					}
+				});
+			},
+			error: function() {
+				// TODO VM: Do we need to display some kind of error message here?
+			}
+		});
+	}
+
+	function openConfigDialogue($obj, data, widget) {
+		var edit_mode = (widget['widgetid'] === '') ? false : true;
+		data.dialogue = {};
+		data.dialogue.widget = widget;
+
+		overlayDialogue({
+			'title': (edit_mode ? t('Edit widget') : t('Add widget')),
+			'content': '',
+			'buttons': [
+				{
+					'title': (edit_mode ? t('Update') : t('Add')),
+					'class': 'dialogue-widget-save',
+					'action': function() {
+						updateWidgetConfig($obj, data, widget);
+					}
+				},
+				{
+					'title': t('Cancel'),
+					'class': 'btn-alt',
+					'action': function() {}
+				}
+			]
+		});
+
+		updateConfigDialogue();
+	}
+
 	var	methods = {
 		init: function(options) {
 			options = $.extend({}, {columns: 12}, options);
@@ -484,6 +565,7 @@
 		addWidget: function(widget) {
 			widget = $.extend({}, {
 				'widgetid': '',
+				'type': '',
 				'header': '',
 				'pos': {
 					'row': 0,
@@ -513,9 +595,6 @@
 
 				showPreloader(widget);
 				updateWidgetContent(widget);
-
-				makeDraggable($this, data, widget);
-				makeResizable($this, data, widget);
 			});
 		},
 
@@ -552,6 +631,133 @@
 
 				$.each(widgets, function(index, value) {
 					methods.addWidget.apply($this, Array.prototype.slice.call(arguments, 1));
+				});
+			});
+		},
+
+		// Make widgets editable - Header icons, Resizeable, Draggable
+		setModeEditWidgets: function() {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					var btn_edit = $('<button>')
+						.attr('type', 'button')
+						.addClass('btn-widget-edit')
+						.attr('title', t('Edit'))
+						.click(function(){
+							methods.editWidget.call($this, widget);
+						});
+
+					var btn_delete = $('<button>')
+						.attr('type', 'button')
+						.addClass('btn-widget-delete')
+						.attr('title', t('Delete'));
+
+					$('ul',widget['content_header']).hide();
+					widget['content_header'].append($('<ul>')
+						.addClass('dashbrd-widg-edit')
+						.append($('<li>').append(btn_edit))
+						.append($('<li>').append(btn_delete))
+					);
+
+					makeDraggable($this, data, widget);
+					makeResizable($this, data, widget);
+				});
+			});
+		},
+
+		// Remove editable elements from widget - Header icons, Resizeable, Draggable
+		setModeViewWidgets: function() {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					$('.dashbrd-widg-edit',widget['content_header']).remove();
+					$('ul',widget['content_header']).show();
+
+					stopDraggable($this, data, widget);
+					stopResizable($this, data, widget);
+				});
+			});
+		},
+
+		// After pressing "Edit" button on widget
+		editWidget: function(widget) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				openConfigDialogue($this, data, widget);
+			});
+		},
+
+		// Add or update form on widget configuration dialogue
+		// (when opened, as well as when requested by 'onchange' attributes in form itself)
+		updateConfigDialogue: function() {
+			return this.each(function() {
+				var $this = $(this),
+					data = $this.data('dashboardGrid'),
+					overlay_dialogue = $('#overlay_dialogue'),
+					body = $('.overlay-dialogue-body', overlay_dialogue),
+					footer = $('.overlay-dialogue-footer', overlay_dialogue),
+					form = $('form', body),
+					widget = data.dialogue.widget, // widget currently beeing edited
+					url = new Curl('zabbix.php'),
+					ajax_data = {};
+
+				// disable saving, while form is beeing updated
+				$('.dialogue-widget-save', footer).prop('disabled', true);
+
+				url.setArgument('action', 'dashbrd.widget.config');
+
+				if (widget['widgetid'] !== '') {
+					ajax_data.widgetid = widget['widgetid'];
+				}
+
+				if (form.length) {
+					ajax_data.fields = form.serializeJSON();
+				}
+
+//				startPreloader(widget); // TODO VM: add preloader to dialogue? Maybe we don't need it?
+
+				jQuery.ajax({
+					url: url.getUrl(),
+					method: 'POST',
+					data: ajax_data,
+					dataType: 'json',
+					success: function(resp) {
+//						stopPreloader(widget); // TODO VM: update preloader to dialogue
+
+						body.empty();
+						body.append(resp.body);
+						if (typeof(resp.debug) !== 'undefined') {
+							body.append(resp.debug);
+						}
+						if (typeof(resp.messages) !== 'undefined') {
+							body.append(resp.messages);
+						}
+
+						// Change submit function for returned form
+						$('#widget_dialogue_form', body).on('submit', function(e) {
+							e.preventDefault();
+							updateWidgetConfig($this, data, widget);
+						});
+
+						// position dialogue in middle of screen
+						overlay_dialogue.css({
+							'margin-top': '-' + (overlay_dialogue.outerHeight() / 2) + 'px',
+							'margin-left': '-' + (overlay_dialogue.outerWidth() / 2) + 'px'
+						});
+
+						// Enable save button after sucessfull form update
+						$('.dialogue-widget-save', footer).prop('disabled', false);
+					},
+					error: function() {
+						// TODO VM: do we need to have error message on failed dialogue form update?
+					}
 				});
 			});
 		}

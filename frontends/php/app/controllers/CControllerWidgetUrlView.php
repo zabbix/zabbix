@@ -28,7 +28,21 @@ class CControllerWidgetUrlView extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'widgetid'		=>	'required', // TODO VM: in db.widget
+		];
+
+		$ret = $this->validateInput($fields);
+		if ($ret) {
+
+		}
+
+		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -46,15 +60,13 @@ class CControllerWidgetUrlView extends CController {
 			'width' => '100%',
 			'height' => '98%',
 			'host_id' => 0,
-			'isTemplatedDashboard' => false, // TODO VM: will dashboards be templated? Most likely - yes.
+			'isTemplatedDashboard' => false, // TODO VM: will dashboards be templated?
 			'dynamic' => WIDGET_SIMPLE_ITEM
 		];
 
 		// Get URL widget configuration for dashboard
-		// ------------------------ START OF TEST DATA -------------------
-		// TODO (VM): replace test data with data from configuration
-		$data['url'] = 'http://www.zabbix.com';
-		// ------------------------ END OF TEST DATA -------------------
+		$widgetid = $this->getInput('widgetid');
+		$data = (new CWidgetConfig())->getConfig($widgetid);
 
 		// Apply defualt value for data
 		foreach ($default as $key => $value) {

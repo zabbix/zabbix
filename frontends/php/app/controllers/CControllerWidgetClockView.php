@@ -28,7 +28,21 @@ class CControllerWidgetClockView extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'widgetid'		=>	'required', // TODO VM: in db.widget
+		];
+
+		$ret = $this->validateInput($fields);
+		if ($ret) {
+
+		}
+
+		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -46,39 +60,28 @@ class CControllerWidgetClockView extends CController {
 
 		// Default values
 		$default = [
-			'style' => null,
-			'resourceid' => null,
-			'hostid' => null,
+			'time_type' => null,
+			'itemid' => null,
+			'hostid' => null, // TODO VM: probably will not be used at all
 			'width' => null,
 			'height' => null,
 		];
 
 		// Get Clock widget configuration for dashboard
-		// ------------------------ START OF TEST DATA -------------------
-		// TODO (VM): replace test data with data from configuration
+		$widgetid = $this->getInput('widgetid');
+		$data = (new CWidgetConfig())->getConfig($widgetid);
 
-		switch (mt_rand(0,2)) {
-			case 0:
-				$data['style'] = TIME_TYPE_LOCAL;
-				break;
-			case 1:
-				$data['style'] = TIME_TYPE_SERVER;
-				break;
-			case 2:
-				$data['style'] = TIME_TYPE_HOST;
-				$data['resourceid'] = 23308;
-				$data['hostid'] = null;
-				break;
-		}
-
-		// TODO (VM): Should be optional values, should have minimal value.
+		// TODO VM: Should be optional values, should have minimal value.
 		// In case of beeing NULL, will take all available widget's space.
 		// Validation: both null, or both bigger/smaller than.
-		$data['width'] = null;
-		$data['height'] = null;
-//		$data['width'] = 150;
-//		$data['height'] = 100;
-		// ------------------------ END OF TEST DATA -------------------
+		if (!array_key_exists('width', $data)
+				|| !array_key_exists('height', $data)
+				|| $data['width'] == 0
+				|| $data['height'] == 0
+		) {
+			$data['width'] = null;
+			$data['height'] = null;
+		}
 
 		// Apply defualt value for data
 		foreach ($default as $key => $value) {
@@ -87,9 +90,9 @@ class CControllerWidgetClockView extends CController {
 			}
 		}
 
-		switch ($data['style']) {
+		switch ($data['time_type']) {
 			case TIME_TYPE_HOST:
-				$itemid = $data['resourceid'];
+				$itemid = $data['itemid'];
 
 				if (!empty($data['hostid'])) {
 					$new_itemid = get_same_item_for_host($itemid, $data['hostid']);

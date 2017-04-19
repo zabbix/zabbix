@@ -77,6 +77,11 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				CProfile::update('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height'], PROFILE_TYPE_INT);
 				CProfile::update('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'], PROFILE_TYPE_INT);
 			}
+
+			if (array_key_exists('fields', $widget)) {
+				// TODO VM: we need to have field validation somewhere, maybe here or in checkInput() method
+				(new CWidgetConfig())->saveConfig($widgetid, $widget['fields']);
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));

@@ -497,7 +497,8 @@ ul.top-nav-icons {
 	}
 
 	form {
-		display: inline-block;
+		display: flex;
+		justify-content: flex-end;
 	}
 
 	ul {
@@ -3481,19 +3482,19 @@ $form-icon-btn: (
 
 %scroll-vert-shadow {
 	background:
-	// Shadow covers
-	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
-	linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
-	// Shadows
-	radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
-	radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
+		// Shadow covers
+		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
+		linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
+		// Shadows
+		radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
+		radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background:
-	// Shadow covers
-	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
-	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
-	// Shadows
-	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
-	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
+		// Shadow covers
+		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
+		linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
+		// Shadows
+		radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
+		radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background-repeat: no-repeat;
 	background-color: $ui-bg-color;
 	background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
