@@ -30,6 +30,7 @@
 			.addClass('dashbrd-grid-widget-content');
 		widget['content_footer'] = $('<div>')
 			.addClass('dashbrd-grid-widget-foot');
+		widget['content_script'] = $('<div>');
 
 		if (widget['rf_rate'] != 0) {
 			widget['content_header'].append($('<ul>')
@@ -60,6 +61,7 @@
 					.append(widget['content_header'])
 					.append(widget['content_body'])
 					.append(widget['content_footer'])
+					.append(widget['content_script'])
 			);
 	}
 
@@ -406,15 +408,31 @@
 				$('h4', widget['content_header']).text(resp.header);
 
 				widget['content_body'].empty();
-				if (typeof(resp.messages) != 'undefined') {
-					$widget['content_body'].append(resp.messages);
+				if (typeof(resp.messages) !== 'undefined') {
+					widget['content_body'].append(resp.messages);
 				}
 				widget['content_body'].append(resp.body);
-				if (typeof(resp.debug) != 'undefined') {
+				if (typeof(resp.debug) !== 'undefined') {
 					widget['content_body'].append(resp.debug);
 				}
 
 				widget['content_footer'].html(resp.footer);
+
+				// Creates new script elements and removes previous ones to force their reexecution
+				widget['content_script'].empty();
+				if (typeof(resp.script_file) !== 'undefined') {
+					// NOTE: it is done this way to make sure, this script is executed before script_run function below.
+					var new_script = $('<script>')
+						.attr('type', 'text/javascript')
+						.attr('src',resp.script_file);
+					widget['content_script'].append(new_script);
+				}
+				if (typeof(resp.script_inline) !== 'undefined') {
+					// NOTE: to execute scrpt with current widget context, add unique ID for required div, and use it in script
+					var new_script = $('<script>')
+						.text(resp.script_inline);
+					widget['content_script'].append(new_script);
+				}
 
 				if (widget['update_attempts'] == 1) {
 					widget['update_attempts'] = 0;

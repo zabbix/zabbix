@@ -28,19 +28,24 @@ class CClock extends CDiv {
 	private $time;
 	private $time_zone_offset;
 	private $error;
+	private $script_file;
+	private $script_run;
 
 	public function __construct() {
 		parent::__construct();
 
+		$this->setId(uniqid());
 		$this->addClass(ZBX_STYLE_CLOCK);
 
-		$this->width = 150;
-		$this->height = 150;
+		$this->width = null;
+		$this->height = null;
 		$this->time_zone_string = null;
 		$this->footer = null;
 		$this->time = null;
 		$this->time_zone_offset = null;
 		$this->error = null;
+		$this->script_file = 'js/class.cclock.js';
+		$this->script_run = null;
 	}
 
 	public function setWidth($value) {
@@ -83,6 +88,30 @@ class CClock extends CDiv {
 		$this->error = $value;
 
 		return $this;
+	}
+
+	public function getTimeDiv() {
+		return (new CDiv($this->error))
+				->addClass(ZBX_STYLE_TIME_ZONE.'-'.$this->getId())
+				->addClass($this->error !== null ? ZBX_STYLE_RED : ZBX_STYLE_GREY);
+	}
+
+	public function getScriptFile() {
+		return $this->script_file;
+	}
+
+	public function getScriptRun() {
+		if ($this->error === null) {
+			$js_options = [
+				'time' => $this->time,
+				'time_zone_string' => $this->time_zone_string,
+				'time_zone_offset' => $this->time_zone_offset,
+				'clock_id' => $this->getId()
+			];
+			$this->script_run = 'jQuery("#'.$this->getId().'").zbx_clock('.CJs::encodeJson($js_options).');';
+		}
+
+		return $this->script_run;
 	}
 
 	private function makeClockLine($width, $height, $x, $y, $deg) {
@@ -158,110 +187,19 @@ class CClock extends CDiv {
 			->addItem($this->makeClockHands())
 			->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
 			->setAttribute('viewBox', '0 0 100 100')
-			->setAttribute('width', (string) $this->width)
-			->setAttribute('height', (string) $this->height);
+			->addClass(ZBX_STYLE_CLOCK_SVG);
+
+		if ($this->width !== null && $this->height !== null) {
+			$clock
+				->setAttribute('width', (string) $this->width)
+				->setAttribute('height', (string) $this->height);
+		}
 
 		if ($this->error !== null) {
 			$clock->addClass(ZBX_STYLE_DISABLED);
 		}
 
-		$this->addItem([
-			(new CDiv($this->error))
-				->addClass(ZBX_STYLE_TIME_ZONE)
-				->addClass($this->error !== null ? ZBX_STYLE_RED : ZBX_STYLE_GREY),
-			$clock,
-			(new CDiv($this->footer))
-				->addClass(ZBX_STYLE_LOCAL_CLOCK)
-				->addClass(ZBX_STYLE_GREY)
-		]);
-
-		$this->setId(uniqid());
-
-		$options = [
-			'time' => $this->time,
-			'time_zone_string' => $this->time_zone_string,
-			'time_zone_offset' => $this->time_zone_offset
-		];
-
-		if (!defined('ZBX_CLOCK') && $this->error === null) {
-			define('ZBX_CLOCK', 1);
-
-			insert_js("
-jQuery(function($) {
-	/**
-	 * Create clock element.
-	 *
-	 * @param int    options['time']				time in seconds
-	 * @param int    options['time_zone_string']	time zone string like 'GMT+02:00'
-	 * @param int    options['time_zone_offset']	time zone offset in seconds
-	 *
-	 * @return object
-	 */
-	$.fn.zbx_clock = function(options) {
-		var obj = $(this);
-
-		if (obj.length == 0) {
-			return false;
-		}
-
-		clock_hands_start();
-
-		return this;
-
-		function clock_hands_start() {
-			var time_offset = 0,
-				now = new Date();
-
-			if (options.time !== null) {
-				time_offset = now.getTime() - options.time * 1000;
-			}
-
-			if (options.time_zone_offset !== null) {
-				time_offset += (- now.getTimezoneOffset() * 60 - options.time_zone_offset) * 1000;
-			}
-
-			clock_hands_rotate(time_offset);
-
-			setInterval(function() {
-				clock_hands_rotate(time_offset);
-			}, 1000);
-		}
-
-		function clock_hands_rotate(time_offset) {
-			var now = new Date();
-
-			if (time_offset != 0) {
-				now.setTime(now.getTime() - time_offset);
-			}
-
-			var header = now.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, \"$1\");
-
-			if (options.time_zone_string !== null) {
-				header = header + ' ' + options.time_zone_string;
-			}
-
-			$('.time-zone', obj).text(header);
-
-			var h = now.getHours() % 12,
-				m = now.getMinutes(),
-				s = now.getSeconds();
-
-			clock_hand_rotate($('.clock-hand-h', obj), 30 * (h + m / 60 + s / 3600));
-			clock_hand_rotate($('.clock-hand-m', obj), 6 * (m + s / 60));
-			clock_hand_rotate($('.clock-hand-s', obj), 6 * s);
-		}
-
-		function clock_hand_rotate(clock_hand, degree) {
-			$(clock_hand).attr('transform', 'rotate(' + degree + ' 50 50)');
-		}
-	}
-});
-			");
-		}
-
-		if ($this->error === null) {
-			zbx_add_post_js('jQuery("#'.$this->getId().'").zbx_clock('.CJs::encodeJson($options).');');
-		}
+		$this->addItem($clock);
 	}
 
 	public function toString($destroy = true) {

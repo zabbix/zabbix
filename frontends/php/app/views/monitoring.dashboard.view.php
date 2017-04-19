@@ -59,6 +59,11 @@ $widgets = [
 		'header' => _('System status'),
 		'pos' => ['row' => 4, 'col' => 6, 'height' => 4, 'width' => 6],
 		'rf_rate' => SEC_PER_MIN
+	],
+	WIDGET_CLOCK => [
+		'header' => _('Clock'),
+		'pos' => ['row' => 9, 'col' => 3, 'height' => 4, 'width' => 3],
+		'rf_rate' => SEC_PER_MIN
 	]
 ];
 

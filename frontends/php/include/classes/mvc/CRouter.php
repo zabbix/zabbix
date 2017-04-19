@@ -97,7 +97,8 @@ class CRouter {
 		'widget.lastiss.view'	=> ['CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'],
 		'widget.stszbx.view'	=> ['CControllerWidgetStatusView',		'layout.widget',		'monitoring.widget.status.view'],
 		'widget.syssum.view'	=> ['CControllerWidgetSystemView',		'layout.widget',		'monitoring.widget.system.view'],
-		'widget.webovr.view'	=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view']
+		'widget.webovr.view'	=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view'],
+		'widget.clock.view'		=> ['CControllerWidgetClockView',		'layout.widget',		'monitoring.widget.clock.view']
 	];
 
 	public function __construct($action) {
