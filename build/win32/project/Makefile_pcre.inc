@@ -7,6 +7,7 @@
 !	ENDIF
 
 !	IF EXISTS("$(PCREINCDIR)\pcreposix.h")
+CFLAGS =	$(CFLAGS) /DPCRE_STATIC
 INCS =	$(INCS) /I "$(PCREINCDIR)"
 !	ELSE
 !		ERROR PCREINCDIR "$(PCREINCDIR)" cannot find "$(PCREINCDIR)\pcreposix.h"
