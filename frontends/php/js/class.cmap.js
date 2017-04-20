@@ -506,14 +506,29 @@ ZABBIX.apps.map = (function($) {
 					}], event.ctrlKey || event.metaKey);
 				});
 
-				$(this.container).on('contextmenu', '.sysmap_shape', function(event) {
+				$(this.container).on('contextmenu', function(event) {
 					event.preventDefault();
-					var item = $(this).data('id');
-					$(this).menuPopup([
+					event.stopPropagation();
+
+					var itemData = $(event.target).data() || {};
+					var item = itemData.id;
+
+					var canCopy = that.selection.count.shapes > 0 || that.selection.count.selements >0;
+					var canPaste = that.copyPasteBuffer.length > 0;
+					var canRemove = itemData.type === 'shape';
+					var canReorder = itemData.type === 'shape';
+
+					// we have to recreate menu everytime. copy/paste function availability changes
+					if (itemData.menuPopupId) {
+						$('#'+itemData.menuPopupId).filter('.action-menu').remove();
+					}
+
+					var items = [
 						{
 							'items': [
 								{
 									label: locale['S_BRING_TO_FRONT'],
+									disabled: !canReorder,
 									clickCallback: function()
 									{
 										that.reorderShapes(item, 'last');
@@ -522,6 +537,7 @@ ZABBIX.apps.map = (function($) {
 								},
 								{
 									label: locale['S_BRING_FORWARD'],
+									disabled: !canReorder,
 									clickCallback: function()
 									{
 										that.reorderShapes(item, 'next');
@@ -530,6 +546,7 @@ ZABBIX.apps.map = (function($) {
 								},
 								{
 									label: locale['S_SEND_BACKWARD'],
+									disabled: !canReorder,
 									clickCallback: function()
 									{
 										that.reorderShapes(item, 'previous');
@@ -538,6 +555,7 @@ ZABBIX.apps.map = (function($) {
 								},
 								{
 									label: locale['S_SEND_TO_BACK'],
+									disabled: !canReorder,
 									clickCallback: function()
 									{
 										that.reorderShapes(item, 'first');
@@ -550,6 +568,7 @@ ZABBIX.apps.map = (function($) {
 							'items': [
 								{
 									label: locale['S_REMOVE'],
+									disabled: !canRemove,
 									clickCallback: function()
 									{
 										that.shapes[item].remove();
@@ -560,7 +579,9 @@ ZABBIX.apps.map = (function($) {
 								}
 							]
 						}
-					], event);
+					];
+
+					$(event.target).menuPopup(items, event);
 				});
 
 				/*
