@@ -569,6 +569,30 @@ ZABBIX.apps.map = (function($) {
 						{
 							'items': [
 								{
+									label: 'COPY',
+									disabled: !canCopy,
+									clickCallback: function() {
+										var buffer = [];
+										for (var type in that.selection) {
+											if (type in that === false || typeof that[type] !== 'object') {
+												continue;
+											}
+											for (var id in that.selection[type]) {
+												if ('getClone' in that[type][id] === false) {
+													continue;
+												}
+												buffer.push({
+													id: id,
+													type: type,
+													item: that[type][id].getClone()
+												});
+											}
+										}
+										that.copyPasteBuffer = buffer;
+										that.hideContextMenus();
+									}
+								},
+								{
 									label: locale['S_REMOVE'],
 									disabled: !canRemove,
 									clickCallback: function()
