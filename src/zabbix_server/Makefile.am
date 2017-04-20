@@ -86,7 +86,8 @@ zabbix_server_CFLAGS = \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
 	-DDATADIR="\"@datadir@\"" \
 	-DLIBDIR="\"@libdir@\"" \
-	-I@top_srcdir@/src/libs/zbxdbcache
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	$(TESTFLAGS)
 
 SERVER_CONFIG = zabbix_server.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d

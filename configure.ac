@@ -161,6 +161,7 @@ if test "x$found_resolv" != "xyes"; then
 	AC_MSG_ERROR([Unable to do DNS lookups (libresolv check failed)])
 fi
 LIBS="${LIBS} ${RESOLV_LIBS}"
+LIBS="${LIBS} -lcunit"
 
 dnl *****************************************************************
 dnl *                                                               *

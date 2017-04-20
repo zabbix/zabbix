@@ -76,3 +76,56 @@ dist-hook:
 	cp $(srcdir)/modules/dummy/*.c $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/Makefile $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/README $(distdir)/modules/dummy/
+
+## CUnit test support
+TEST_COMMENT = "embedded unit tests - remove before commit"
+TARGETDIR = zabbix_server
+TESTSOURCE = $(TARGETDIR)/zabbix_server_test_impl.c
+TESTENTRY = $(TARGETDIR)/server.c
+REPORTPATH = ${CURDIR}/$(TARGETDIR)/reports
+SRCFILES = `grep $(TEST_COMMENT) * -rl | grep "\.c$$"`
+TESTFILES = `find -name *_test.c`
+
+$(TESTSOURCE):
+	mkdir $(TARGETDIR)/reports
+	echo "#include \"zbxcunit.h\"" >> $(TESTSOURCE)
+	echo 'void run_cu_tests(){' >> $(TESTSOURCE)
+	echo 'CU_set_output_filename("$(REPORTPATH)/$(TARGETDIR)");' >> $(TESTSOURCE)
+	echo 'CU_automated_run_tests();' >> $(TESTSOURCE)
+	echo 'CU_list_tests_to_file();}' >> $(TESTSOURCE)
+	echo 'void test_entry_cu(const char *suites) {' >> $(TESTSOURCE)
+	echo 'int run_all = 0, suite_count = 0;' >> $(TESTSOURCE)
+	echo 'printf("suites: %s\n", suites);' >> $(TESTSOURCE)
+	echo 'if (0 == strcmp(suites, "all")) run_all = 1;' >> $(TESTSOURCE)
+	echo 'if (CUE_SUCCESS != CU_initialize_registry()){' >> $(TESTSOURCE)
+	echo 'fprintf(stderr, "Error while initializing CUnit registry: %s\n", (char *)CU_get_error_msg);' >> $(TESTSOURCE)
+	echo 'goto out;}' >> $(TESTSOURCE)
+	for file in $(TESTFILES); do								\
+		echo "#include \"$${file##*/}\" //$(TEST_COMMENT)" >> "$${file%_test.c}.c"	;\
+		funcname=$${file##*/} 								;\
+		echo "if (1 == run_all || NULL != strstr(suites, \"$${funcname%.c}\")) {zbx_cu_init_$${funcname%.c}(); suite_count++;}" >> $(TESTSOURCE) 	;\
+	done
+	echo 'if (0 == suite_count) {printf("No matching test suite.\n"); goto out;}' >> $(TESTSOURCE)
+	echo 'run_cu_tests();' >> $(TESTSOURCE)
+	echo 'printf("CUnit tests completed.\n");' >> $(TESTSOURCE)
+	echo 'out:' >> $(TESTSOURCE)
+	echo 'CU_cleanup_registry();' >> $(TESTSOURCE)
+	echo 'CU_get_error();' >> $(TESTSOURCE)
+	echo 'exit(0);}' >> $(TESTSOURCE)
+	
+	echo "#include \"$(notdir $(TESTSOURCE))\" //$(TEST_COMMENT)" >> "$(TESTENTRY)"
+
+test: $(TESTSOURCE) 
+	$(MAKE) $(AM_MAKEFLAGS) TESTFLAGS=-DTEST_ENTRY_CU=test_entry_cu
+
+clean-test:
+	rm -rf $(TESTSOURCE)
+	rm -rf $(TARGETDIR)/reports
+	for file in $(SRCFILES); do			\
+		sed -i /$(TEST_COMMENT)/d $$file;	\
+	done
+ 
+clean-local: clean-test
+
+
+.PHONY: test clean-test prepare-test

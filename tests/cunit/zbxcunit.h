@@ -50,7 +50,7 @@ extern struct mallinfo	zbx_cu_minfo;
 		}
 
 #define ZBX_CU_ASSERT_STRING_EQ_FATAL(actual, expected) {							\
-		CU_assertImplementation(!(strcmp((const char*)(actual), (const char*)(expected)0), __LINE__,	\
+		CU_assertImplementation(!(strcmp((const char*)(actual), (const char*)(expected))), __LINE__,	\
 			zbx_cu_asssert_args_str("CU_ASSERT_STRING_EQ_FATAL", #actual, actual, #expected, expected),\
 			__FILE__, "", CU_TRUE);									\
 		}
