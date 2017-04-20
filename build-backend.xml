@@ -65,24 +65,52 @@
 	<macrodef name="create-db-mysql">
 		<sequential>
 			<exec executable="mysql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
+				<arg line="-u ${MYSQLUSER}"/>
 				<arg line="-e &quot;DROP DATABASE IF EXISTS ${DBNAME}&quot;"/>
 			</exec>
 			<exec executable="mysql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
+				<arg line="-u ${MYSQLUSER}"/>
 				<arg line="-e &quot;CREATE DATABASE IF NOT EXISTS ${DBNAME}&quot;"/>
 			</exec>
 			<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
+				<arg line="-u ${MYSQLUSER}"/>
 				<arg line="${DBNAME}"/>
 			</exec>
 			<exec executable="mysql" input="database/mysql/images.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
+				<arg line="-u ${MYSQLUSER}"/>
 				<arg line="${DBNAME}"/>
 			</exec>
 			<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
+				<arg line="-u ${MYSQLUSER}"/>
 				<arg line="${DBNAME}"/>
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="create-db-postgresql">
+		<sequential>
+			<exec executable="psql" failonerror="on">
+				<arg line="-U ${PSQLUSER}"/>
+				<arg line="-c &quot;DROP DATABASE IF EXISTS ${DBNAME};&quot;"/>
+			</exec>
+			<exec executable="psql" failonerror="on">
+				<arg line="-U ${PSQLUSER}"/>
+				<arg line="-c &quot;CREATE DATABASE ${DBNAME};&quot;"/>
+			</exec>
+			<exec executable="psql" failonerror="on">
+				<arg line="-U ${PSQLUSER}"/>
+				<arg line="-d ${DBNAME}"/>
+				<arg line="-f database/postgresql/schema.sql"/>
+			</exec>
+			<exec executable="psql" failonerror="on">
+				<arg line="-U ${PSQLUSER}"/>
+				<arg line="-d ${DBNAME}"/>
+				<arg line="-f database/postgresql/images.sql"/>
+			</exec>
+			<exec executable="psql" failonerror="on">
+				<arg line="-U ${PSQLUSER}"/>
+				<arg line="-d ${DBNAME}"/>
+				<arg line="-f database/postgresql/data.sql"/>
 			</exec>
 		</sequential>
 	</macrodef>
@@ -93,6 +121,7 @@
 	</target>
 
 	<target name="make-postgresql">
+		<create-db-postgresql/>
 		<make-target dbargs="--with-postgresql"/>
 	</target>
 	
