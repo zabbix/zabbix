@@ -246,6 +246,8 @@ ZABBIX.apps.map = (function($) {
 		};
 
 		CMap.prototype = {
+			copyPasteBuffer: [],
+
 			save: function() {
 				var url = new Curl(location.href);
 
@@ -1348,6 +1350,13 @@ ZABBIX.apps.map = (function($) {
 			 */
 			getData: function() {
 				return this.data;
+			},
+
+			/**
+			 * Return element clone
+			 */
+			getClone: function(id) {
+				return this.constructor(this.sysmap, this.getData());
 			}
 		};
 
@@ -1431,6 +1440,11 @@ ZABBIX.apps.map = (function($) {
 			 * Returns element data.
 			 */
 			getData: Shape.prototype.getData,
+
+			/**
+			 * Returns element data.
+			 */
+			getClone: Shape.prototype.getClone,
 
 			/**
 			 * Allows resizing of element
