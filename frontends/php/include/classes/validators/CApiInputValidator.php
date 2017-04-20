@@ -358,6 +358,7 @@ class CApiInputValidator {
 	 * @param array  $rule
 	 * @param array  $rule['fields']
 	 * @param int    $rule['fields'][<field_name>]['flags']   (optional) API_REQUIRED, API_DEPRECATED
+	 * @param mixed  $rule['fields'][<field_name>]['default'] (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -381,6 +382,10 @@ class CApiInputValidator {
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
 			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
+
+			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
+				$data[$field_name] = $field_rule['default'];
+			}
 
 			if (array_key_exists($field_name, $data)) {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
