@@ -28,6 +28,7 @@
 	<target name="scan-backend">
 		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">
 			<arg line="--enable=all"/>
+			<arg line="--suppress=variableScope:*"/>
 			<arg line="--inconclusive"/>
 			<arg line="--xml"/>
 			<arg line="--xml-version=2"/>
