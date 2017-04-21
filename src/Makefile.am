@@ -79,53 +79,35 @@ dist-hook:
 
 ## CUnit test support
 TEST_COMMENT = "embedded unit tests - remove before commit"
-TARGETDIR = zabbix_server
-TESTSOURCE = $(TARGETDIR)/zabbix_server_test_impl.c
-TESTENTRY = $(TARGETDIR)/server.c
-REPORTPATH = ${CURDIR}/$(TARGETDIR)/reports
-SRCFILES = `grep $(TEST_COMMENT) * -rl | grep "\.c$$"`
-TESTFILES = `find -name *_test.c`
+TEST_LIBDIR = libs/zbxcunit
+TEST_SUITESFILE = $(TEST_LIBDIR)/cu_suites.h
+TEST_SRCFILES = `grep $(TEST_COMMENT) * -rl | grep "\.c$$"`
+TEST_TESTFILES = `find -name *_test.c`
+TEST_MODULE = "ZBX_CU_MODULE" 
 
-$(TESTSOURCE):
-	mkdir $(TARGETDIR)/reports
-	echo "#include \"zbxcunit.h\"" >> $(TESTSOURCE)
-	echo 'void run_cu_tests(){' >> $(TESTSOURCE)
-	echo 'CU_set_output_filename("$(REPORTPATH)/$(TARGETDIR)");' >> $(TESTSOURCE)
-	echo 'CU_automated_run_tests();' >> $(TESTSOURCE)
-	echo 'CU_list_tests_to_file();}' >> $(TESTSOURCE)
-	echo 'void test_entry_cu(const char *suites) {' >> $(TESTSOURCE)
-	echo 'int run_all = 0, suite_count = 0;' >> $(TESTSOURCE)
-	echo 'printf("suites: %s\n", suites);' >> $(TESTSOURCE)
-	echo 'if (0 == strcmp(suites, "all")) run_all = 1;' >> $(TESTSOURCE)
-	echo 'if (CUE_SUCCESS != CU_initialize_registry()){' >> $(TESTSOURCE)
-	echo 'fprintf(stderr, "Error while initializing CUnit registry: %s\n", (char *)CU_get_error_msg);' >> $(TESTSOURCE)
-	echo 'goto out;}' >> $(TESTSOURCE)
-	for file in $(TESTFILES); do								\
-		echo "#include \"$${file##*/}\" //$(TEST_COMMENT)" >> "$${file%_test.c}.c"	;\
-		funcname=$${file##*/} 								;\
-		echo "if (1 == run_all || NULL != strstr(suites, \"$${funcname%.c}\")) {zbx_cu_init_$${funcname%.c}(); suite_count++;}" >> $(TESTSOURCE) 	;\
+$(TEST_SUITESFILE):
+	echo 'const char *cu_suites[]={' > $(TEST_SUITESFILE)
+	for file in $(TEST_TESTFILES); do								\
+		if [ -f "$${file%_test.c}.c" ]; then							\
+			echo "#include \"$${file##*/}\" //$(TEST_COMMENT)" >> "$${file%_test.c}.c"	;\
+			grep $(TEST_MODULE) $${file} | while read line; do				\
+				funcname=$${line##*(}							;\
+				echo "\"$${funcname%%)*}\"," >> $(TEST_SUITESFILE)			;\
+			done										;\
+		fi											;\
 	done
-	echo 'if (0 == suite_count) {printf("No matching test suite.\n"); goto out;}' >> $(TESTSOURCE)
-	echo 'run_cu_tests();' >> $(TESTSOURCE)
-	echo 'printf("CUnit tests completed.\n");' >> $(TESTSOURCE)
-	echo 'out:' >> $(TESTSOURCE)
-	echo 'CU_cleanup_registry();' >> $(TESTSOURCE)
-	echo 'CU_get_error();' >> $(TESTSOURCE)
-	echo 'exit(0);}' >> $(TESTSOURCE)
-	
-	echo "#include \"$(notdir $(TESTSOURCE))\" //$(TEST_COMMENT)" >> "$(TESTENTRY)"
+	echo 'NULL};' >> $(TEST_SUITESFILE)
 
-test: $(TESTSOURCE) 
-	$(MAKE) $(AM_MAKEFLAGS) TESTFLAGS=-DTEST_ENTRY_CU=test_entry_cu
+test: $(TEST_SUITESFILE) 
+	$(MAKE) $(AM_MAKEFLAGS) CFLAGS="$(CFLAGS) -O2 -g -rdynamic -DZBX_CUNIT -lcunit" 
 
 clean-test:
-	rm -rf $(TESTSOURCE)
-	rm -rf $(TARGETDIR)/reports
-	for file in $(SRCFILES); do			\
+	rm -rf $(TEST_SUITESFILE)
+	for file in $(TEST_SRCFILES); do		\
 		sed -i /$(TEST_COMMENT)/d $$file;	\
 	done
  
 clean-local: clean-test
 
+.PHONY: test clean-test
 
-.PHONY: test clean-test prepare-test

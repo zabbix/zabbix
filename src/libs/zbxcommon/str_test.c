@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcunit.h"
+#include "../zbxcunit/zbxcunit.h"
 
 static int	cu_str_init_empty()
 {
@@ -36,7 +36,7 @@ static void	zbx_user_macro_parse_test()
 	CU_ASSERT(SUCCEED == (ret = zbx_user_macro_parse("{$MODULE}", &macro_r, &context_l, &context_r)));
 }
 
-int	ZBX_CU_MODULE(str_test)
+int	ZBX_CU_MODULE(str_parse)
 {
 	CU_pSuite	suite = NULL;
 
@@ -48,3 +48,4 @@ int	ZBX_CU_MODULE(str_test)
 
 	return CUE_SUCCESS;
 }
+

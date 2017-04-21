@@ -64,6 +64,10 @@
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"
 
+#ifdef ZBX_CUNIT
+#include "../libs/zbxcunit/zbxcunit.h"
+#endif
+
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
 #include "ipmi/ipmi_poller.h"
@@ -79,9 +83,6 @@ const char	*usage_message[] = {
 	"[-c config-file]", "-R runtime-option", NULL,
 	"-h", NULL,
 	"-V", NULL,
-#ifdef TEST_ENTRY_CU
-	"-t", NULL,
-#endif
 	NULL	/* end of text */
 };
 
@@ -108,14 +109,6 @@ const char	*help_message[] = {
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"",
 	"  -h --help                      Display this help message",
-#ifdef TEST_ENTRY_CU
-	"  -t --test                      Performs CUnit tests",
-	"",
-	"    CUnit test options:",
-	"        all                      Default option to run all tests",
-	"        test-name                Run single test file (e.g., str_test)",
-	"        test-name1,test-name2    Run multiple comma delimited test files (e.g., str_test,test_misc)",
-#endif
 	"  -V --version                   Display version number",
 	NULL	/* end of text */
 };
@@ -130,18 +123,13 @@ static struct zbx_option	longopts[] =
 	{"runtime-control",	1,	NULL,	'R'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
-#ifdef TEST_ENTRY_CU
-	{"test",		1,	NULL,	't'},
-#endif
 	{NULL}
 };
 
+
+
 /* short options */
-#ifdef TEST_ENTRY_CU
-static char	shortopts[] = "c:hVR:ft:";
-#else
 static char	shortopts[] = "c:hVR:f";
-#endif
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -268,10 +256,6 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 char	*CONFIG_SOCKET_PATH		= NULL;
-
-#ifdef TEST_ENTRY_CU
-void	test_entry_cu(const char *suite);
-#endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -730,14 +714,16 @@ int	main(int argc, char **argv)
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch;
 	int		opt_c = 0, opt_r = 0;
-#ifdef TEST_ENTRY_CU
-	char		*test_suites = NULL;
-#endif
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
+
 	progname = get_program_name(argv[0]);
+
+#ifdef ZBX_CUNIT
+	zbx_cu_run(argc, argv);
+#endif
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
@@ -756,12 +742,6 @@ int	main(int argc, char **argv)
 
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
-#ifdef TEST_ENTRY_CU
-			case 't':
-				test_suites = zbx_strdup(test_suites, zbx_optarg);
-				test_entry_cu(test_suites);
-				break;
-#endif
 			case 'h':
 				help();
 				exit(EXIT_SUCCESS);

@@ -20,10 +20,21 @@
 #ifndef ZABBIX_ZBXCUNIT_H
 #define ZABBIX_ZBXCUNIT_H
 
+#ifdef ZBX_CUNIT
+
 #include <CUnit/Basic.h>
 #include <CUnit/Automated.h>
 
-#define ZBX_CU_MODULE(module)	zbx_cu_init_##module()
+#define ZBX_CU_STR2(str)		#str
+#define ZBX_CU_STR(str)			ZBX_CU_STR2(str)
+#define ZBX_CU_MODULE_PREFIX		zbx_cu_init_
+#define ZBX_CU_MODULE_PREFIX_STR	ZBX_CU_STR(ZBX_CU_MODULE_PREFIX)
+
+#define ZBX_CU_MODULE3(prefix, module)	prefix ## module(void)
+#define ZBX_CU_MODULE2(prefix, module)	ZBX_CU_MODULE3(prefix, module)
+#define ZBX_CU_MODULE(module)		ZBX_CU_MODULE2(ZBX_CU_MODULE_PREFIX, module)
+
+typedef int (*zbx_cu_init_module_func_t)(void);
 
 extern struct mallinfo	zbx_cu_minfo;
 
@@ -40,5 +51,13 @@ extern struct mallinfo	zbx_cu_minfo;
 		fprintf(stderr, "Error adding test suite \"%s\"\n", description);	\
 		return CU_get_error();							\
 	}
+
+#endif
+
+void	zbx_cu_run(int args, char *argv[]);
+
+#else
+
+#define ZBX_CUNIT_OPTS	""
 
 #endif

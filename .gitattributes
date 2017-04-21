@@ -305,6 +305,9 @@ sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text
 src/libs/zbxcommon/variant.c -text
+src/libs/zbxcunit/Makefile.am -text
+src/libs/zbxcunit/zbxcunit.c -text
+src/libs/zbxcunit/zbxcunit.h -text
 src/libs/zbxdbcache/item_preproc.c -text
 src/libs/zbxdbcache/item_preproc.h -text
 src/libs/zbxdbhigh/trigger.c -text
