@@ -853,8 +853,8 @@ ZABBIX.apps.map = (function($) {
 							break;
 					}
 					if (element) {
-						data.x = data.x + deltaX;
-						data.y = data.y + deltaY;
+						data.x = parseInt(data.x, 10) + deltaX;
+						data.y = parseInt(data.y, 10) + deltaY;
 						element.update(data);
 						that[type][element.id] = element;
 						selectedIds.push({
