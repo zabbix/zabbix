@@ -123,7 +123,7 @@ SVGCanvas.prototype.createElement = function (type, attributes, parent, content)
  */
 SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 	if (typeof content === 'string' && content.trim() === '') {
-		return;
+		return null;
 	}
 
 	var group = this.createElement('g', null, parent),

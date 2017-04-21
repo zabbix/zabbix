@@ -551,7 +551,7 @@ SVGMapElement.LABEL_POSITION_TOP		= 3;
  * @param {string}    item      Item to be removed.
  */
 SVGMapElement.prototype.removeItem = function (item) {
-	if (typeof this[item] !== 'undefined' && this[item] !== null) {
+	if (this[item] !== null) {
 		this[item].remove();
 		this[item] = null;
 	}
