@@ -638,23 +638,24 @@ ZABBIX.apps.map = (function($) {
 										var sourceCloneIds = {};
 										that.copyPasteBuffer.items.forEach(function(elementData) {
 											var type = elementData.type;
+											var data = $.extend({}, elementData.data, false);
 											var element;
 											switch (type) {
 												case 'selements' :
 													element = new Selement(that);
+													delete data.selementid;
 													break;
 												case 'shapes' :
 													element = new Shape(that);
+													delete data.shapeid;
 													break;
 												default :
 													throw 'Unsupported element type found in copy buffer';
 													break;
 											}
 											if (element) {
-												var data = elementData.data;
 												data.x = data.x + leftDelta;
 												data.y = data.y + topDelta;
-												delete data.id;
 												element.update(data);
 												that[type][element.id] = element;
 												newSelection.push({
@@ -668,21 +669,20 @@ ZABBIX.apps.map = (function($) {
 										var keepExternal = true;
 										var link, fromid, toid, data;
 										that.copyPasteBuffer.links.forEach(function(linkData) {
-											data = linkData.data;
+											data = $.extend({}, linkData.data, false);
 											if (!keepExternal && (data.selementid1 in sourceCloneIds === false ||
 												data.selementid2 in sourceCloneIds === false)
 											) {
 												return;
 											}
 											link = new Link(that);
+											delete data.linkid;
 											fromid = data.selementid1 in sourceCloneIds ?
 												sourceCloneIds[data.selementid1] : data.selementid1;
 											toid = data.selementid2 in sourceCloneIds ?
 												sourceCloneIds[data.selementid2] : data.selementid2;
 											data.selementid1 = fromid;
 											data.selementid2 = toid;
-											delete data.id;
-											delete data.linkid;
 											link.update(data);
 											that.links[link.id] = link;
 										});
