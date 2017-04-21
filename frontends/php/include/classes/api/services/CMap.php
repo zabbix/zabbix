@@ -74,8 +74,8 @@ class CMap extends CMapElement {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
@@ -86,19 +86,19 @@ class CMap extends CMapElement {
 			'selectUrls'				=> null,
 			'selectUsers'				=> null,
 			'selectUserGroups'			=> null,
-			'countOutput'				=> null,
+			'countOutput'				=> false,
 			'expandUrls' 				=> null,
-			'preservekeys'				=> null,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		if ($options['countOutput'] !== null) {
+		if ($options['countOutput']) {
 			$count_output = true;
-			$options['output'] = array('sysmapid');
-			$options['countOutput'] = null;
+			$options['output'] = ['sysmapid'];
+			$options['countOutput'] = false;
 			$options['limit'] = null;
 		}
 		else {
@@ -338,7 +338,7 @@ class CMap extends CMapElement {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 

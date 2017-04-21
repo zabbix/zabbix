@@ -20,72 +20,134 @@
 
 
 /**
- * Class containing methods for operations with screen items.
+ * Class containing methods for operations with dashboards.
  */
 class CDashboard extends CApiService {
 
 	const MAX_ROW = 63;
 	const MAX_COL = 11;
 
-	protected $tableName = 'widget';
-	protected $tableAlias = 'w';
-
-	protected $sortColumns = [
-		'screenitemid',
-		'screenid'
-	];
-
-	public function __construct() {
-		parent::__construct();
-
-		$this->getOptions = zbx_array_merge($this->getOptions, [
-			'screenitemids'	=> null,
-			'screenids'		=> null,
-			'editable'		=> null,
-			'sortfield'		=> '',
-			'sortorder'		=> '',
-			'preservekeys'	=> null,
-			'countOutput'	=> null
-		]);
-	}
+	protected $tableName = 'dashboard';
+	protected $tableAlias = 'd';
+	protected $sortColumns = ['dashboardid'];
 
 	/**
-	 * Get screem item data.
-	 *
 	 * @param array $options
-	 * @param array $options['screenitemids']	Search by screen item IDs
-	 * @param array $options['screenids']		Search by screen IDs
-	 * @param array $options['filter']			Result filter
-	 * @param array $options['limit']			The size of the result set
 	 *
-	 * @return array
+	 * @return array|int
 	 */
 	public function get(array $options = []) {
-		$options = zbx_array_merge($this->getOptions, $options);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'dashboardids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'dashboardid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'private' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
+			]],
+			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private']), 'default' => API_OUTPUT_EXTEND],
+			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
+			'selectUserGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
+			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['type', 'name', 'row', 'col', 'height', 'width']), 'default' => null],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'in' => implode(',', $this->sortColumns), 'default' => []],
+			'sortorder' =>				['type' => API_STRINGS_UTF8, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
-		// build and execute query
-		$sql = $this->createSelectQuery($this->tableName(), $options);
-		$res = DBselect($sql, $options['limit']);
+		$sql_parts = [
+			'select'	=> ['dashboard' => 'd.dashboardid'],
+			'from'		=> ['dashboard' => 'dashboard d'],
+			'where'		=> [],
+			'order'		=> [],
+			'group'		=> []
+		];
 
-		// fetch results
-		$result = [];
-		while ($row = DBfetch($res)) {
-			// count query, return a single result
-			if ($options['countOutput'] !== null) {
-				$result = $row['rowscount'];
+		// permissions
+		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
+			$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+
+			$sql_where = ['d.userid='.self::$userData['userid']];
+			if ($options['editable']) {
+				$sql_where[] = 'd.private='.PUBLIC_SHARING;
 			}
-			// normal select query
+			$sql_where[] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM dashboard_user du'.
+				' WHERE d.dashboardid=du.dashboardid'.
+					' AND du.userid='.self::$userData['userid'].
+					' AND du.permission>='.$permission.
+			')';
+			$sql_where[] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM dashboard_usrgrp dug'.
+				' WHERE d.dashboardid=dug.dashboardid'.
+					' AND '.dbConditionInt('dug.usrgrpid', $user_groups).
+					' AND dug.permission>='.$permission.
+			')';
+
+			$sql_parts['where'][] = implode(',', $sql_where);
+		}
+
+		// dashboardids
+		if ($options['dashboardids'] !== null) {
+			zbx_value2array($options['dashboardids']);
+			$sql_parts['where'][] = dbConditionInt('d.dashboardid', $options['dashboardids']);
+		}
+
+		// filter
+		if ($options['filter'] !== null) {
+			$this->dbFilter('dashboard d', $options, $sql_parts);
+		}
+
+		// search
+		if ($options['search'] !== null) {
+			zbx_db_search('dashboard d', $options, $sql_parts);
+		}
+
+		$db_dashboards = [];
+
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+
+		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
+
+		while ($row = DBfetch($result)) {
+			if ($options['countOutput']) {
+				return $row['rowscount'];
+			}
 			else {
-				if ($options['preservekeys'] !== null) {
-					$result[$row['screenitemid']] = $row;
-				}
-				else {
-					$result[] = $row;
-				}
+				$db_dashboards[$row['dashboardid']] = $row;
 			}
 		}
 
-		return $result;
+		$db_dashboards = $this->addRelatedObjects($options, $db_dashboards);
+		$db_dashboards = $this->unsetExtraFields($db_dashboards, ['dashboardid'], $options['output']);
+
+		if (!$options['preservekeys']) {
+			$db_dashboards = array_values($db_dashboards);
+		}
+
+		return $db_dashboards;
 	}
 
 	/**
@@ -236,8 +298,7 @@ class CDashboard extends CApiService {
 		}
 
 		// Check dashboard names.
-// TODO:$db_dashboards = API::Dashboard()->get([
-		$db_dashboards = DB::select('dashboard', [
+		$db_dashboards = API::Dashboard()->get([
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
 			'dashboardids' => zbx_objectValues($dashboards, 'dashboardid'),
 			'preservekeys' => true
@@ -380,7 +441,7 @@ class CDashboard extends CApiService {
 	}
 
 	/**
-	 * Check duplicates screen items in one cell.
+	 * Check duplicates widgets in one cell.
 	 *
 	 * @param array  $dashboards
 	 * @param string $dashboards[]['name']
@@ -674,8 +735,7 @@ class CDashboard extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-// TODO:$db_dashboards = API::Dashboard()->get([
-		$db_dashboards = DB::select('dashboard', [
+		$db_dashboards = API::Dashboard()->get([
 			'output' => ['dashboardid', 'name'],
 			'dashboardids' => $dashboardids,
 			'preservekeys' => true
@@ -694,5 +754,106 @@ class CDashboard extends CApiService {
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DASHBOARD, $db_dashboards);
 
 		return ['dashboardids' => $dashboardids];
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$dashboardids = array_keys($result);
+
+		// Adding user shares.
+		if ($options['selectUsers'] !== null) {
+			$relation_map = $this->createRelationMap($result, 'dashboardid', 'userid', 'dashboard_user');
+			// Get all allowed users.
+			$db_users = API::User()->get([
+				'output' => [],
+				'userids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			if ($db_users) {
+				$db_dashboard_users = API::getApiService()->select('dashboard_user', [
+					'output' => $this->outputExtend($options['selectUsers'], ['dashboardid', 'userid']),
+					'filter' => ['dashboardid' => $dashboardids, 'userid' => array_keys($db_users)],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($db_dashboard_users, 'dashboardid', 'dashboard_userid');
+
+				$db_dashboard_users = $this->unsetExtraFields($db_dashboard_users, ['userid'], $options['selectUsers']);
+
+				foreach ($db_dashboard_users as &$db_dashboard_user) {
+					unset($db_dashboard_user['dashboard_userid'], $db_dashboard_user['dashboardid']);
+				}
+				unset($db_dashboard_user);
+
+				$result = $relation_map->mapMany($result, $db_dashboard_users, 'users');
+			}
+			else {
+				foreach ($result as &$row) {
+					$row['users'] = [];
+				}
+				unset($row);
+			}
+		}
+
+		// Adding user group shares.
+		if ($options['selectUserGroups'] !== null) {
+			$relation_map = $this->createRelationMap($result, 'dashboardid', 'usrgrpid', 'dashboard_usrgrp');
+			// Get all allowed groups.
+			$db_usrgrps = API::UserGroup()->get([
+				'output' => [],
+				'usrgrpids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			if ($db_usrgrps) {
+				$db_dashboard_usrgrps = API::getApiService()->select('dashboard_usrgrp', [
+					'output' => $this->outputExtend($options['selectUserGroups'], ['dashboardid', 'usrgrpid']),
+					'filter' => ['dashboardid' => $dashboardids, 'usrgrpid' => array_keys($db_usrgrps)],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($db_dashboard_usrgrps, 'dashboardid', 'dashboard_usrgrpid');
+
+				$db_dashboard_usrgrps =
+					$this->unsetExtraFields($db_dashboard_usrgrps, ['usrgrpid'], $options['selectUserGroups']);
+
+				foreach ($db_dashboard_usrgrps as &$db_dashboard_usrgrp) {
+					unset($db_dashboard_usrgrp['dashboard_usrgrpid'], $db_dashboard_usrgrp['dashboardid']);
+				}
+				unset($db_dashboard_usrgrp);
+
+				$result = $relation_map->mapMany($result, $db_dashboard_usrgrps, 'userGroups');
+			}
+			else {
+				foreach ($result as &$row) {
+					$row['userGroups'] = [];
+				}
+				unset($row);
+			}
+		}
+
+		// Adding widgets.
+		if ($options['selectWidgets'] !== null) {
+			$db_widgets = API::getApiService()->select('widget', [
+				'output' => $this->outputExtend($options['selectWidgets'], ['dashboardid']),
+				'filter' => ['dashboardid' => $dashboardids]
+			]);
+
+			foreach ($result as &$row) {
+				$row['widgets'] = [];
+			}
+			unset($row);
+
+			foreach ($db_widgets as $db_widget) {
+				$dashboardid = $db_widget['dashboardid'];
+				unset($db_widget['dashboardid']);
+
+				$result[$dashboardid]['widgets'][] = $db_widget;
+			}
+		}
+
+		return $result;
 	}
 }

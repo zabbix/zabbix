@@ -32,6 +32,7 @@ define('ZBX_LOGIN_BLOCK',		30); // sec
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
+define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 
@@ -1018,14 +1019,17 @@ define('API_FLAG',				5);
 define('API_OBJECT',			6);
 define('API_IDS',				7);
 define('API_OBJECTS',			8);
+define('API_STRINGS_UTF8',		9);
+define('API_INTS32',			10);
 // specific types
-define('API_HG_NAME',			9);
-define('API_SCRIPT_NAME',		10);
-define('API_USER_MACRO',		11);
-define('API_TIME_PERIOD',		12);
-define('API_REGEX',				13);
-define('API_HTTP_POST',			14);
-define('API_VARIABLE_NAME',		15);
+define('API_HG_NAME',			11);
+define('API_SCRIPT_NAME',		12);
+define('API_USER_MACRO',		13);
+define('API_TIME_PERIOD',		14);
+define('API_REGEX',				15);
+define('API_HTTP_POST',			16);
+define('API_VARIABLE_NAME',		17);
+define('API_OUTPUT',			18);
 
 // flags
 define('API_REQUIRED',		0x01);
@@ -1034,6 +1038,7 @@ define('API_ALLOW_NULL',	0x04);
 define('API_NORMALIZE',		0x08);
 define('API_MULTIPLE',		0x10);
 define('API_DEPRECATED',	0x20);
+define('API_ALLOW_COUNT',	0x40);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

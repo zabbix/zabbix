@@ -676,8 +676,8 @@ function zbx_db_search($table, $options, &$sql_parts) {
 		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
-	$start = is_null($options['startSearch']) ? '%' : '';
-	$exclude = is_null($options['excludeSearch']) ? '' : ' NOT ';
+	$start = $options['startSearch'] ? '' : '%';
+	$exclude = $options['excludeSearch'] ? ' NOT ' : '';
 	$glue = (!$options['searchByAny']) ? ' AND ' : ' OR ';
 
 	$search = [];

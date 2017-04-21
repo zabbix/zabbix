@@ -106,9 +106,9 @@ class CHost extends CHostGeneral {
 			'search'					=> null,
 			'searchInventory'			=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
-			'searchWildcardsEnabled'	=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
+			'searchWildcardsEnabled'	=> false,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
@@ -125,9 +125,9 @@ class CHost extends CHostGeneral {
 			'selectHttpTests'           => null,
 			'selectDiscoveryRule'		=> null,
 			'selectHostDiscovery'		=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
@@ -168,7 +168,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['groupid'] = 'hg.groupid';
 			}
 		}
@@ -188,7 +188,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['templateid'] = 'ht.templateid';
 			}
 		}
@@ -261,7 +261,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['where']['dsh'] = 'ds.ip=i.ip';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
 			}
 		}
@@ -274,7 +274,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('mh.maintenanceid', $options['maintenanceids']);
 			$sqlParts['where']['hmh'] = 'h.hostid=mh.hostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['maintenanceid'] = 'mh.maintenanceid';
 			}
 		}
@@ -431,8 +431,8 @@ class CHost extends CHostGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($host = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount'])) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $host;
 				}
 				else {
@@ -444,7 +444,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -453,7 +453,7 @@ class CHost extends CHostGeneral {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
