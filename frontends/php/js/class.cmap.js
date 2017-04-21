@@ -516,7 +516,7 @@ ZABBIX.apps.map = (function($) {
 					var item = itemData.id;
 
 					var canCopy = that.selection.count.shapes > 0 || that.selection.count.selements >0;
-					var canPaste = that.copyPasteBuffer.length > 0;
+					var canPaste = that.copyPasteBuffer.items && that.copyPasteBuffer.items.length > 0;
 					var canRemove = itemData.type === 'shape';
 					var canReorder = itemData.type === 'shape';
 
@@ -572,24 +572,79 @@ ZABBIX.apps.map = (function($) {
 									label: 'COPY',
 									disabled: !canCopy,
 									clickCallback: function() {
-										var buffer = [];
+										that.copyPasteBuffer = {
+											items: [],
+											left: null,
+											top: null,
+											right: null,
+											bottom: null
+										};
+										var items = [];
+										var left = null, top = null, right = null, bottom = null;
 										for (var type in that.selection) {
 											if (type in that === false || typeof that[type] !== 'object') {
 												continue;
 											}
 											for (var id in that.selection[type]) {
-												if ('getClone' in that[type][id] === false) {
+												if ('getData' in that[type][id] === false) {
 													continue;
 												}
-												buffer.push({
+												var data = $.extend({}, that[type][id].getData(), true);
+												left = Math.min(data.x, left === null ? data.x : left);
+												top = Math.min(data.y, top === null ? data.y : top);
+												//right = Math.max(data.x + data.width, right === null ? data.x + data.width : right);
+												//bottom = Math.max(data.y + data.height, bottom === null ? data.y + data.height : bottom);
+												items.push({
 													id: id,
 													type: type,
-													item: that[type][id].getClone()
+													data: data
 												});
 											}
 										}
-										that.copyPasteBuffer = buffer;
+										that.copyPasteBuffer = {
+											items: items,
+											left: left,
+											top: top,
+											right: right,
+											bottom: bottom
+										};
 										that.hideContextMenus();
+									}
+								},
+								{
+									label: 'PASTE',
+									disabled: !canPaste,
+									clickCallback: function() {
+										var topDelta, leftDelta, newSelection;
+										leftDelta = event.clientX - that.copyPasteBuffer.left;
+										topDelta = event.clientY - that.copyPasteBuffer.top;
+										newSelection = [];
+										that.copyPasteBuffer.items.forEach(function(elementData) {
+											var type = elementData.type;
+											var element;
+											switch (type) {
+												case 'selements' :
+													element = new Selement(that);
+													break;
+												case 'shapes' :
+													element = new Shape(that);
+													break;
+											}
+											if (element) {
+												var data = elementData.data;
+												data.x = data.x + leftDelta;
+												data.y = data.y + topDelta;
+												element.update(data);
+												that[type][element.id] = element;
+												newSelection.push({
+													id: element.id,
+													type: type
+												})
+											}
+										});
+										that.selectElements(newSelection, false);
+										that.hideContextMenus();
+										that.updateImage();
 									}
 								},
 								{
@@ -1374,13 +1429,6 @@ ZABBIX.apps.map = (function($) {
 			 */
 			getData: function() {
 				return this.data;
-			},
-
-			/**
-			 * Return element clone
-			 */
-			getClone: function(id) {
-				return this.constructor(this.sysmap, this.getData());
 			}
 		};
 
@@ -1464,11 +1512,6 @@ ZABBIX.apps.map = (function($) {
 			 * Returns element data.
 			 */
 			getData: Shape.prototype.getData,
-
-			/**
-			 * Returns element data.
-			 */
-			getClone: Shape.prototype.getClone,
 
 			/**
 			 * Allows resizing of element
