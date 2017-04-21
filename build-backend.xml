@@ -2,22 +2,39 @@
 <project name="Zabbix backend" default="build" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
-	
-	<!-- Initialize database related options based on the database type -->
-	<switch value="${DBTYPE}" caseinsensitive="true">
-		<case value="MYSQL">
-			<property name="with.db" value="--with-mysql"/>
-			<property name="with.mysql" value="true"/>
-		</case>
-		<case value="POSTGRESQL">
-			<property name="with.db" value="--with-postgresql"/>
-			<property name="with.postgresql" value="true"/>
-		</case>
-		<default>
-			<fail>Unknown database type: ${DBTYPE}</fail>
-		</default>
-	</switch>	
-	
+
+	<!-- We do not need to set the DBTYPE outside the "build" target -->
+	<if>
+		<equals arg1="${current_target}" arg2="build"/>
+		<then>
+			<!-- Initialize database related options based on the database type -->
+			<switch value="${DBTYPE}" caseinsensitive="true">
+				<case value="MYSQL">
+					<property name="with.db" value="--with-mysql"/>
+					<property name="with.mysql" value="true"/>
+				</case>
+				<case value="POSTGRESQL">
+					<property name="with.db" value="--with-postgresql"/>
+					<property name="with.postgresql" value="true"/>
+				</case>
+				<default>
+					<fail>Unknown database type: ${DBTYPE}</fail>
+				</default>
+			</switch>	
+		</then>
+	</if>
+
+	<!-- Static analysis target. Detached from the default -->
+	<target name="scan-backend">
+		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">
+			<arg line="--enable=all"/>
+			<arg line="--inconclusive"/>
+			<arg line="--xml"/>
+			<arg line="--xml-version=2"/>
+			<arg line="."/>
+		</exec>
+	</target>
+
 	<target name="init">
 		<!-- Create database schema -->
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
@@ -26,16 +43,6 @@
 			<arg line="-s"/>
 			<arg line="-j5"/>
 			<arg line="dbschema"/>
-		</exec>
-	</target>
-
-	<target name="scan-backend">
-		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">
-			<arg line="--enable=all"/>
-			<arg line="--inconclusive"/>
-			<arg line="--xml"/>
-			<arg line="--xml-version=2"/>
-			<arg line="."/>
 		</exec>
 	</target>
 
@@ -78,7 +85,7 @@
 			</exec>
 		</sequential>
 	</macrodef>
-	
+
 	<target name="create-db-mysql">
 		<sequential>
 			<exec executable="mysql" failonerror="on">
@@ -138,7 +145,7 @@
 	</target>
 
 	<target name="create-db" depends="create-db-mysql,create-db-postgresql"/>
-	
+
 	<target name="make-gcc">
 		<!-- Build Zabbix with various configuration parameters -->
 		<sequential>
@@ -151,28 +158,28 @@
 			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>	
-	
+
 	<target name="make-clang">
 		<!-- Build Zabbix with clang -->
 		<sequential>
 			<make cc="clang" args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
-	
+
 	<target name="make-db-postgresql" unless="${with.postgresql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
 			<make cc="clang" args="--enable-server --enable-agent --enable-proxy --with-postgresql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
-	
+
 	<target name="make-db-mysql" unless="${with.mysql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
 			<make cc="clang" args="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
-	
+
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql"/>
 
