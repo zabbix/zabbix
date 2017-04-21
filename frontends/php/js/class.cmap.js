@@ -586,62 +586,27 @@ ZABBIX.apps.map = (function($) {
 									label: 'PASTE',
 									disabled: !canPaste,
 									clickCallback: function() {
-										var leftDelta = event.offsetX - that.copyPasteBuffer.left;
-										var topDelta = event.offsetY - that.copyPasteBuffer.top;
-										var newSelection = [];
-										var sourceCloneIds = {};
-										that.copyPasteBuffer.items.forEach(function(elementData) {
-											var type = elementData.type;
-											var data = $.extend({}, elementData.data, false);
-											var element;
-											switch (type) {
-												case 'selements' :
-													element = new Selement(that);
-													delete data.selementid;
-													break;
-												case 'shapes' :
-													element = new Shape(that);
-													delete data.shapeid;
-													break;
-												default :
-													throw 'Unsupported element type found in copy buffer';
-													break;
-											}
-											if (element) {
-												data.x = data.x + leftDelta;
-												data.y = data.y + topDelta;
-												element.update(data);
-												that[type][element.id] = element;
-												newSelection.push({
-													id: element.id,
-													type: type
-												});
-												sourceCloneIds[elementData.id] = element.id;
-											}
-										});
+										var deltaX = event.offsetX - that.copyPasteBuffer.left;
+										var deltaY = event.offsetY - that.copyPasteBuffer.top;
 
-										var keepExternal = true;
-										var link, fromid, toid, data;
-										that.copyPasteBuffer.links.forEach(function(linkData) {
-											data = $.extend({}, linkData.data, false);
-											if (!keepExternal && (data.selementid1 in sourceCloneIds === false ||
-												data.selementid2 in sourceCloneIds === false)
-											) {
-												return;
-											}
-											link = new Link(that);
-											delete data.linkid;
-											fromid = data.selementid1 in sourceCloneIds ?
-												sourceCloneIds[data.selementid1] : data.selementid1;
-											toid = data.selementid2 in sourceCloneIds ?
-												sourceCloneIds[data.selementid2] : data.selementid2;
-											data.selementid1 = fromid;
-											data.selementid2 = toid;
-											link.update(data);
-											that.links[link.id] = link;
-										});
+										var selectedIds = that.pasteSelectionBuffer(deltaX, deltaY, that, true);
 
-										that.selectElements(newSelection, false);
+										that.selectElements(selectedIds, false);
+										that.hideContextMenus();
+										that.updateImage();
+										that.linkForm.updateList(that.selection.selements);
+									}
+								},
+								{
+									label: 'PASTE_SIMPLE',
+									disabled: !canPaste,
+									clickCallback: function() {
+										var deltaX = event.offsetX - that.copyPasteBuffer.left;
+										var deltaY = event.offsetY - that.copyPasteBuffer.top;
+
+										var selectedIds = that.pasteSelectionBuffer(deltaX, deltaY, that, false);
+
+										that.selectElements(selectedIds, false);
 										that.hideContextMenus();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
@@ -856,6 +821,71 @@ ZABBIX.apps.map = (function($) {
 					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));
 					$('#mass_border_color').prop("disabled", disable || !$('#chkboxBorderColor').is(":checked"));
 				});
+			},
+
+			/**
+			 * paste that.copyPasteBuffer content at new location
+			 *
+			 * @param	{number}	deltaX
+			 * @param	{number}	deltaY
+			 * @param	{Object}	that
+			 * @param	{bool}		keepExternalLinks	should be links to non selected elements copied
+			 * @return	{Array.<{id:number, type:string}>}
+			 */
+			pasteSelectionBuffer: function(deltaX, deltaY, that, keepExternalLinks) {
+				var selectedIds = [];
+				var sourceCloneIds = {};
+				that.copyPasteBuffer.items.forEach(function(elementData) {
+					var type = elementData.type;
+					var data = $.extend({}, elementData.data, false);
+					var element;
+					switch (type) {
+						case 'selements' :
+							element = new Selement(that);
+							delete data.selementid;
+							break;
+						case 'shapes' :
+							element = new Shape(that);
+							delete data.shapeid;
+							break;
+						default :
+							throw 'Unsupported element type found in copy buffer';
+							break;
+					}
+					if (element) {
+						data.x = data.x + deltaX;
+						data.y = data.y + deltaY;
+						element.update(data);
+						that[type][element.id] = element;
+						selectedIds.push({
+							id: element.id,
+							type: type
+						});
+						sourceCloneIds[elementData.id] = element.id;
+					}
+				});
+
+				var link, fromid, toid, data;
+				that.copyPasteBuffer.links.forEach(function(linkData) {
+					data = $.extend({}, linkData.data, false);
+					if (!keepExternalLinks && (data.selementid1 in sourceCloneIds === false ||
+						data.selementid2 in sourceCloneIds === false)
+					) {
+						return;
+					}
+					link = new Link(that);
+					delete data.linkid;
+					fromid = data.selementid1 in sourceCloneIds ?
+						sourceCloneIds[data.selementid1] : data.selementid1;
+					toid = data.selementid2 in sourceCloneIds ?
+						sourceCloneIds[data.selementid2] : data.selementid2;
+					data.selementid1 = fromid;
+					data.selementid2 = toid;
+					link.update(data);
+					that.links[link.id] = link;
+				});
+
+				return selectedIds;
 			},
 
 			/**
