@@ -635,6 +635,7 @@ ZABBIX.apps.map = (function($) {
 										var leftDelta = event.offsetX - that.copyPasteBuffer.left;
 										var topDelta = event.offsetY - that.copyPasteBuffer.top;
 										var newSelection = [];
+										var sourceCloneIds = {};
 										that.copyPasteBuffer.items.forEach(function(elementData) {
 											var type = elementData.type;
 											var element;
@@ -658,9 +659,33 @@ ZABBIX.apps.map = (function($) {
 												newSelection.push({
 													id: element.id,
 													type: type
-												})
+												});
+												sourceCloneIds[elementData.id] = element.id;
 											}
 										});
+
+										var keepExternal = true;
+										var link, fromid, toid, data;
+										that.copyPasteBuffer.links.forEach(function(linkData) {
+											data = linkData.data;
+											if (!keepExternal && (data.selementid1 in sourceCloneIds === false ||
+												data.selementid2 in sourceCloneIds === false)
+											) {
+												return;
+											}
+											link = new Link(that);
+											fromid = data.selementid1 in sourceCloneIds ?
+												sourceCloneIds[data.selementid1] : data.selementid1;
+											toid = data.selementid2 in sourceCloneIds ?
+												sourceCloneIds[data.selementid2] : data.selementid2;
+											data.selementid1 = fromid;
+											data.selementid2 = toid;
+											delete data.id;
+											delete data.linkid;
+											link.update(data);
+											that.links[link.id] = link;
+										});
+
 										that.selectElements(newSelection, false);
 										that.hideContextMenus();
 										that.updateImage();
