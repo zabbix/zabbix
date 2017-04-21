@@ -207,6 +207,63 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: httpstep_pairs_join                                              *
+ *                                                                            *
+ * Purpose: performs concatenation of vector of pairs into delimited string   *
+ *                                                                            *
+ * Parameters: str             - [IN/OUT] result string                       *
+ *             alloc_len       - [IN/OUT] allocated memory size               *
+ *             offset          - [IN/OUT] offset within string                *
+ *             value_delimiter - [IN] delimiter to be used between name and   *
+ *                                    value                                   *
+ *             pair_delimiter  - [IN] delimiter to be used between pairs      *
+ *             pairs           - [IN] vector of pairs                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, char *value_delimiter,
+		char *pair_delimiter, zbx_vector_ptr_pair_t *pairs)
+{
+	int	p;
+	char	*key, *value;
+
+	for (p = 0; p < pairs->values_num; p++)
+	{
+		key = (char *)pairs->values[p].first;
+		value = (char *)pairs->values[p].second;
+
+		if (0 != p)
+			zbx_strcpy_alloc(str, alloc_len, offset, pair_delimiter);
+
+		zbx_strcpy_alloc(str, alloc_len, offset, key);
+		zbx_strcpy_alloc(str, alloc_len, offset, value_delimiter);
+		zbx_strcpy_alloc(str, alloc_len, offset, value);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: httppairs_free                                                   *
+ *                                                                            *
+ * Purpose: frees memory allocated for vector of pairs                        *
+ *                                                                            *
+ * Parameters: pairs           - [IN] vector of pairs                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
+{
+	int	p;
+
+	for (p = 0; p < pairs->values_num; p++)
+	{
+		zbx_free(pairs->values[p].first);
+		zbx_free(pairs->values[p].second);
+	}
+
+	zbx_vector_ptr_pair_destroy(pairs);
+}
+
 #ifdef HAVE_LIBCURL
 static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx_timespec_t *ts)
 {
@@ -325,153 +382,6 @@ static void	add_headers(char *headers, struct curl_slist **headers_slist)
 
 		p_begin = p_end;
 	}
-}
-#endif
-
-/******************************************************************************
- *                                                                            *
- * Function: httpstep_pairs_join                                              *
- *                                                                            *
- * Purpose: performs concatenation of vector of pairs into delimited string   *
- *                                                                            *
- * Parameters: str             - [IN/OUT] result string                       *
- *             alloc_len       - [IN/OUT] allocated memory size               *
- *             offset          - [IN/OUT] offset within string                *
- *             value_delimiter - [IN] delimiter to be used between name and   *
- *                                    value                                   *
- *             pair_delimiter  - [IN] delimiter to be used between pairs      *
- *             pairs           - [IN] vector of pairs                         *
- *                                                                            *
- ******************************************************************************/
-static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, char *value_delimiter,
-		char *pair_delimiter, zbx_vector_ptr_pair_t *pairs)
-{
-	int	p;
-	char	*key, *value;
-
-	for (p = 0; p < pairs->values_num; p++)
-	{
-		key = (char *)pairs->values[p].first;
-		value = (char *)pairs->values[p].second;
-
-		if (0 != p)
-			zbx_strcpy_alloc(str, alloc_len, offset, pair_delimiter);
-
-		zbx_strcpy_alloc(str, alloc_len, offset, key);
-		zbx_strcpy_alloc(str, alloc_len, offset, value_delimiter);
-		zbx_strcpy_alloc(str, alloc_len, offset, value);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: httppairs_free                                                   *
- *                                                                            *
- * Purpose: frees memory allocated for vector of pairs                        *
- *                                                                            *
- * Parameters: pairs           - [IN] vector of pairs                         *
- *                                                                            *
- ******************************************************************************/
-static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
-{
-	int	p;
-
-	for (p = 0; p < pairs->values_num; p++)
-	{
-		zbx_free(pairs->values[p].first);
-		zbx_free(pairs->values[p].second);
-	}
-
-	zbx_vector_ptr_pair_destroy(pairs);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: httptest_load_pairs                                              *
- *                                                                            *
- * Purpose: loads http fields of web scenario                                 *
- *                                                                            *
- * Parameters: host            - [IN] host to be used in macro expansion      *
- *             httptest        - [IN/OUT] web scenario                        *
- *                                                                            *
- * Return value: SUCCEED if http fields were loaded and macro expansion was   *
- *               successful. FAIL on error.                                   *
- *                                                                            *
- ******************************************************************************/
-static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
-{
-	int			type, ret = SUCCEED;
-	DB_RESULT		result;
-	DB_ROW			row;
-	size_t			alloc_len = 0, offset;
-	zbx_ptr_pair_t		pair;
-	zbx_vector_ptr_pair_t	*vector, headers;
-	char			*key, *value;
-
-	zbx_vector_ptr_pair_create(&headers);
-	zbx_vector_ptr_pair_create(&httptest->variables);
-
-	httptest->headers = NULL;
-	result = DBselect(
-			"select name,value,type"
-			" from httptest_field"
-			" where httptestid=" ZBX_FS_UI64
-			" order by httptest_fieldid",
-			httptest->httptest.httptestid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		type = atoi(row[2]);
-		value = zbx_strdup(NULL, row[1]);
-
-		/* from now on variable values can contain macros so proper URL encoding can be performed */
-		if (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
-				&value, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
-		{
-			zbx_free(value);
-			goto out;
-		}
-
-		key = zbx_strdup(NULL, row[0]);
-
-		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
-		/* another variables */
-		if (ZBX_HTTPFIELD_VARIABLE != type && SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL,
-				NULL, NULL, host, NULL, NULL, &key, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
-		{
-			httppairs_free(&httptest->variables);
-			zbx_free(key);
-			zbx_free(value);
-			goto out;
-		}
-
-		switch (type)
-		{
-			case ZBX_HTTPFIELD_HEADER:
-				vector = &headers;
-				break;
-			case ZBX_HTTPFIELD_VARIABLE:
-				vector = &httptest->variables;
-				break;
-			default:
-				zbx_free(key);
-				zbx_free(value);
-				ret = FAIL;
-				goto out;
-		}
-
-		pair.first = key;
-		pair.second = value;
-
-		zbx_vector_ptr_pair_append(vector, pair);
-	}
-
-	httpstep_pairs_join(&httptest->headers, &alloc_len, &offset, ":", "\r\n", &headers);
-out:
-	httppairs_free(&headers);
-	DBfree_result(result);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -677,6 +587,96 @@ out:
 
 	return ret;
 }
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: httptest_load_pairs                                              *
+ *                                                                            *
+ * Purpose: loads http fields of web scenario                                 *
+ *                                                                            *
+ * Parameters: host            - [IN] host to be used in macro expansion      *
+ *             httptest        - [IN/OUT] web scenario                        *
+ *                                                                            *
+ * Return value: SUCCEED if http fields were loaded and macro expansion was   *
+ *               successful. FAIL on error.                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
+{
+	int			type, ret = SUCCEED;
+	DB_RESULT		result;
+	DB_ROW			row;
+	size_t			alloc_len = 0, offset;
+	zbx_ptr_pair_t		pair;
+	zbx_vector_ptr_pair_t	*vector, headers;
+	char			*key, *value;
+
+	zbx_vector_ptr_pair_create(&headers);
+	zbx_vector_ptr_pair_create(&httptest->variables);
+
+	httptest->headers = NULL;
+	result = DBselect(
+			"select name,value,type"
+			" from httptest_field"
+			" where httptestid=" ZBX_FS_UI64
+			" order by httptest_fieldid",
+			httptest->httptest.httptestid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		type = atoi(row[2]);
+		value = zbx_strdup(NULL, row[1]);
+
+		/* from now on variable values can contain macros so proper URL encoding can be performed */
+		if (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+				&value, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
+		{
+			zbx_free(value);
+			goto out;
+		}
+
+		key = zbx_strdup(NULL, row[0]);
+
+		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
+		/* another variables */
+		if (ZBX_HTTPFIELD_VARIABLE != type && SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL,
+				NULL, NULL, host, NULL, NULL, &key, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
+		{
+			httppairs_free(&httptest->variables);
+			zbx_free(key);
+			zbx_free(value);
+			goto out;
+		}
+
+		switch (type)
+		{
+			case ZBX_HTTPFIELD_HEADER:
+				vector = &headers;
+				break;
+			case ZBX_HTTPFIELD_VARIABLE:
+				vector = &httptest->variables;
+				break;
+			default:
+				zbx_free(key);
+				zbx_free(value);
+				ret = FAIL;
+				goto out;
+		}
+
+		pair.first = key;
+		pair.second = value;
+
+		zbx_vector_ptr_pair_append(vector, pair);
+	}
+
+	httpstep_pairs_join(&httptest->headers, &alloc_len, &offset, ":", "\r\n", &headers);
+out:
+	httppairs_free(&headers);
+	DBfree_result(result);
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -699,7 +699,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 	DB_RESULT	result;
 	DB_HTTPSTEP	db_httpstep;
-	zbx_httpstep_t	httpstep;
 	char		*err_str = NULL;
 	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
@@ -712,6 +711,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	char		*auth = NULL, errbuf[CURL_ERROR_SIZE];
 	size_t		auth_alloc = 0, auth_offset;
 	CURL		*easyhandle = NULL;
+	zbx_httpstep_t	httpstep;
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",
