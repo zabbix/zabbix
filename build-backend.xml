@@ -19,6 +19,7 @@
 	<target name="scan-backend">
 		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">
 			<arg line="--enable=all"/>
+			<arg line="-j4"/>
 			<arg line="-I/usr/include"/>
 			<arg line="-I/usr/local/include"/>
 			<arg line="-I./include"/>
