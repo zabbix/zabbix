@@ -862,6 +862,9 @@ ZABBIX.apps.map = (function($) {
 							type: type
 						});
 						sourceCloneIds[elementData.id] = element.id;
+						if (that.data.grid_align === '1') {
+							element.align(true);
+						}
 					}
 				});
 
