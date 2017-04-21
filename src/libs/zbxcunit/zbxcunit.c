@@ -35,8 +35,6 @@
 #define ZBX_CU_ASSERT_NAME_LENGTH	128
 #define ZBX_CU_ASSERT_BUFFER_SIZE	(ZBX_CU_ASSERT_ARGS_LENGTH * 2 + ZBX_CU_ASSERT_NAME_LENGTH + 16)
 
-struct mallinfo	zbx_cu_minfo;
-
 static char	zbx_cu_assert_args_buffer[ZBX_CU_ASSERT_BUFFER_SIZE];
 
 const char	*zbx_cu_assert_args_str(const char *assert_name, const char *expression1, const char *actual,

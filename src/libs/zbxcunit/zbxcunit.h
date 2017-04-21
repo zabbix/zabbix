@@ -36,8 +36,6 @@
 
 typedef int (*zbx_cu_init_module_func_t)(void);
 
-extern struct mallinfo	zbx_cu_minfo;
-
 #define ZBX_CU_LEAK_CHECK_START()	zbx_cu_minfo = mallinfo()
 #define ZBX_CU_LEAK_CHECK_END()	{						\
 		struct mallinfo minfo_local;					\
@@ -54,10 +52,10 @@ extern struct mallinfo	zbx_cu_minfo;
 
 #endif
 
+
+#include <malloc.h>
+static struct mallinfo	zbx_cu_minfo;
+
 void	zbx_cu_run(int args, char *argv[]);
-
-#else
-
-#define ZBX_CUNIT_OPTS	""
 
 #endif

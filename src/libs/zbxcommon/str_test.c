@@ -48,4 +48,3 @@ int	ZBX_CU_MODULE(str_parse)
 
 	return CUE_SUCCESS;
 }
-

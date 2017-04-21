@@ -37,6 +37,8 @@ static void	check_time_period_test()
 	period = zbx_strdup(period, "1-5,9:00-18:00");
 
 	CU_ASSERT(SUCCEED == check_time_period(period, time_now));
+
+	zbx_free(period);
 }
 
 int	ZBX_CU_MODULE(misc_test)
