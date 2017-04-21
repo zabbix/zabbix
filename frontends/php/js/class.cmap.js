@@ -572,12 +572,6 @@ ZABBIX.apps.map = (function($) {
 									label: locale['S_COPY'],
 									disabled: !canCopy,
 									clickCallback: function() {
-										that.copyPasteBuffer = {
-											items: [],
-											links: [],
-											left: null,
-											top: null
-										};
 										that.copyPasteBuffer = that.getSelectionBuffer(that);
 										that.hideContextMenus();
 									}
@@ -588,6 +582,9 @@ ZABBIX.apps.map = (function($) {
 									clickCallback: function() {
 										var deltaX = event.offsetX - that.copyPasteBuffer.left;
 										var deltaY = event.offsetY - that.copyPasteBuffer.top;
+
+										deltaX = Math.min(deltaX, parseInt(that.data.width, 10) - that.copyPasteBuffer.right);
+										deltaY = Math.min(deltaY, parseInt(that.data.height, 10) - that.copyPasteBuffer.bottom);
 
 										var selectedIds = that.pasteSelectionBuffer(deltaX, deltaY, that, true);
 
@@ -603,6 +600,9 @@ ZABBIX.apps.map = (function($) {
 									clickCallback: function() {
 										var deltaX = event.offsetX - that.copyPasteBuffer.left;
 										var deltaY = event.offsetY - that.copyPasteBuffer.top;
+
+										deltaX = Math.min(deltaX, parseInt(that.data.width, 10) - that.copyPasteBuffer.right);
+										deltaY = Math.min(deltaY, parseInt(that.data.height, 10) - that.copyPasteBuffer.bottom);
 
 										var selectedIds = that.pasteSelectionBuffer(deltaX, deltaY, that, false);
 
@@ -897,23 +897,31 @@ ZABBIX.apps.map = (function($) {
 			 * @return {Array}	buffer.links	links between selected elements
 			 * @return {number}	buffer.top		boundary box top coordinate
 			 * @return {number}	buffer.left		boundary box left coordinate
+			 * @return {number}	buffer.bottom	boundary box bottom coordinate
+			 * @return {number}	buffer.right	boundary box right coordinate
 			 */
 			getSelectionBuffer: function(that) {
 				var items = [];
-				var left = null, top = null;
+				var left = null, top = null, right = null, bottom = null;
 				// iterate over all type of elements stored in that.selection
 				for (var type in that.selection) {
 					if (type in that === false || typeof that[type] !== 'object') {
 						continue;
 					}
+					var data, domNode, x, y;
 					for (var id in that.selection[type]) {
 						if ('getData' in that[type][id] === false) {
 							continue;
 						}
 						// get rid of observers, only current data
-						var data = $.extend({}, that[type][id].getData(), false);
-						left = Math.min(data.x, left === null ? data.x : left);
-						top = Math.min(data.y, top === null ? data.y : top);
+						data = $.extend({}, that[type][id].getData(), false);
+						domNode = that[type][id].domNode;
+						x = parseInt(data.x, 10);
+						y = parseInt(data.y, 10);
+						left = Math.min(x, left === null ? x : left);
+						top = Math.min(y, top === null ? y : top);
+						right = Math.max(x + domNode.outerWidth(true), right === null ? 0 : right);
+						bottom = Math.max(y + domNode.outerHeight(true), bottom === null ? 0 : bottom);
 						items.push({
 							id: id,
 							type: type,
@@ -938,7 +946,9 @@ ZABBIX.apps.map = (function($) {
 					items: items,
 					links: links,
 					top: top,
-					left: left
+					left: left,
+					right: right,
+					bottom: bottom
 				}
 			},
 
