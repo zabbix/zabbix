@@ -576,55 +576,9 @@ ZABBIX.apps.map = (function($) {
 											items: [],
 											links: [],
 											left: null,
-											top: null,
-											right: null,
-											bottom: null
+											top: null
 										};
-										var items = [];
-										var left = null, top = null, right = null, bottom = null;
-										// iterate over all type of elements stored in that.selection
-										for (var type in that.selection) {
-											if (type in that === false || typeof that[type] !== 'object') {
-												continue;
-											}
-											for (var id in that.selection[type]) {
-												if ('getData' in that[type][id] === false) {
-													continue;
-												}
-												// get rid of observers, only current data
-												var data = $.extend({}, that[type][id].getData(), false);
-												left = Math.min(data.x, left === null ? data.x : left);
-												top = Math.min(data.y, top === null ? data.y : top);
-												//right = Math.max(data.x + data.width, right === null ? data.x + data.width : right);
-												//bottom = Math.max(data.y + data.height, bottom === null ? data.y + data.height : bottom);
-												items.push({
-													id: id,
-													type: type,
-													data: data
-												});
-											}
-										}
-										var links = [];
-										for (var id in that.links) {
-											// get rid of observers, only current data
-											var data = $.extend({}, that.links[id].getData(), false);
-											if (data.selementid1 in that.selection.selements ||
-												data.selementid2 in that.selection.selements
-											) {
-												links.push({
-													id: id,
-													data: data
-												})
-											}
-										}
-										that.copyPasteBuffer = {
-											items: items,
-											links: links,
-											left: left,
-											top: top,
-											right: right,
-											bottom: bottom
-										};
+										that.copyPasteBuffer = that.getSelectionBuffer(that);
 										that.hideContextMenus();
 									}
 								},
@@ -902,6 +856,60 @@ ZABBIX.apps.map = (function($) {
 					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));
 					$('#mass_border_color').prop("disabled", disable || !$('#chkboxBorderColor').is(":checked"));
 				});
+			},
+
+			/**
+			 * return object with selected elements data and links
+			 *
+			 * @param  {Object}	that
+			 * @return {Object} buffer
+			 * @return {Array}	buffer.items	selected elements - Selement, Shape
+			 * @return {Array}	buffer.links	links between selected elements
+			 * @return {number}	buffer.top		boundary box top coordinate
+			 * @return {number}	buffer.left		boundary box left coordinate
+			 */
+			getSelectionBuffer: function(that) {
+				var items = [];
+				var left = null, top = null;
+				// iterate over all type of elements stored in that.selection
+				for (var type in that.selection) {
+					if (type in that === false || typeof that[type] !== 'object') {
+						continue;
+					}
+					for (var id in that.selection[type]) {
+						if ('getData' in that[type][id] === false) {
+							continue;
+						}
+						// get rid of observers, only current data
+						var data = $.extend({}, that[type][id].getData(), false);
+						left = Math.min(data.x, left === null ? data.x : left);
+						top = Math.min(data.y, top === null ? data.y : top);
+						items.push({
+							id: id,
+							type: type,
+							data: data
+						});
+					}
+				}
+				var links = [];
+				for (var id in that.links) {
+					// get rid of observers, only current data
+					var data = $.extend({}, that.links[id].getData(), false);
+					if (data.selementid1 in that.selection.selements ||
+						data.selementid2 in that.selection.selements
+					) {
+						links.push({
+							id: id,
+							data: data
+						})
+					}
+				}
+				return {
+					items: items,
+					links: links,
+					top: top,
+					left: left
+				}
 			},
 
 			clearSelection: function() {
