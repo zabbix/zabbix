@@ -3,26 +3,17 @@
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-	<!-- We do not need to set the DBTYPE outside the "build" target -->
-	<if>
-		<equals arg1="${current_target}" arg2="build"/>
-		<then>
-			<!-- Initialize database related options based on the database type -->
-			<switch value="${DBTYPE}" caseinsensitive="true">
-				<case value="MYSQL">
-					<property name="with.db" value="--with-mysql"/>
-					<property name="with.mysql" value="true"/>
-				</case>
-				<case value="POSTGRESQL">
-					<property name="with.db" value="--with-postgresql"/>
-					<property name="with.postgresql" value="true"/>
-				</case>
-				<default>
-					<fail>Unknown database type: ${DBTYPE}</fail>
-				</default>
-			</switch>	
-		</then>
-	</if>
+	<!-- Initialize database related options based on the database type -->
+	<switch value="${DBTYPE}" caseinsensitive="true">
+		<case value="POSTGRESQL">
+			<property name="with.db" value="--with-postgresql"/>
+			<property name="with.postgresql" value="true"/>
+		</case>
+		<default>
+			<property name="with.db" value="--with-mysql"/>
+			<property name="with.mysql" value="true"/>
+		</default>
+	</switch>
 
 	<!-- Static analysis target. Detached from the default -->
 	<target name="scan-backend">
