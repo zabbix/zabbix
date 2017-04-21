@@ -520,7 +520,7 @@ ZABBIX.apps.map = (function($) {
 					var canRemove = itemData.type === 'shape';
 					var canReorder = itemData.type === 'shape';
 
-					// we have to recreate menu everytime. copy/paste function availability changes
+					// we have to recreate menu everytime due copy/paste function availability changes
 					if (itemData.menuPopupId) {
 						$('#'+itemData.menuPopupId).filter('.action-menu').remove();
 					}
@@ -574,6 +574,7 @@ ZABBIX.apps.map = (function($) {
 									clickCallback: function() {
 										that.copyPasteBuffer = {
 											items: [],
+											links: [],
 											left: null,
 											top: null,
 											right: null,
@@ -581,6 +582,7 @@ ZABBIX.apps.map = (function($) {
 										};
 										var items = [];
 										var left = null, top = null, right = null, bottom = null;
+										// iterate over all type of elements stored in that.selection
 										for (var type in that.selection) {
 											if (type in that === false || typeof that[type] !== 'object') {
 												continue;
@@ -589,7 +591,8 @@ ZABBIX.apps.map = (function($) {
 												if ('getData' in that[type][id] === false) {
 													continue;
 												}
-												var data = $.extend({}, that[type][id].getData(), true);
+												// get rid of observers, only current data
+												var data = $.extend({}, that[type][id].getData(), false);
 												left = Math.min(data.x, left === null ? data.x : left);
 												top = Math.min(data.y, top === null ? data.y : top);
 												//right = Math.max(data.x + data.width, right === null ? data.x + data.width : right);
@@ -601,8 +604,22 @@ ZABBIX.apps.map = (function($) {
 												});
 											}
 										}
+										var links = [];
+										for (var id in that.links) {
+											// get rid of observers, only current data
+											var data = $.extend({}, that.links[id].getData(), false);
+											if (data.selementid1 in that.selection.selements ||
+												data.selementid2 in that.selection.selements
+											) {
+												links.push({
+													id: id,
+													data: data
+												})
+											}
+										}
 										that.copyPasteBuffer = {
 											items: items,
+											links: links,
 											left: left,
 											top: top,
 											right: right,
@@ -615,10 +632,9 @@ ZABBIX.apps.map = (function($) {
 									label: 'PASTE',
 									disabled: !canPaste,
 									clickCallback: function() {
-										var topDelta, leftDelta, newSelection;
-										leftDelta = event.clientX - that.copyPasteBuffer.left;
-										topDelta = event.clientY - that.copyPasteBuffer.top;
-										newSelection = [];
+										var leftDelta = event.offsetX - that.copyPasteBuffer.left;
+										var topDelta = event.offsetY - that.copyPasteBuffer.top;
+										var newSelection = [];
 										that.copyPasteBuffer.items.forEach(function(elementData) {
 											var type = elementData.type;
 											var element;
@@ -628,6 +644,9 @@ ZABBIX.apps.map = (function($) {
 													break;
 												case 'shapes' :
 													element = new Shape(that);
+													break;
+												default :
+													throw 'Unsupported element type found in copy buffer';
 													break;
 											}
 											if (element) {
@@ -645,6 +664,7 @@ ZABBIX.apps.map = (function($) {
 										that.selectElements(newSelection, false);
 										that.hideContextMenus();
 										that.updateImage();
+										that.linkForm.updateList(that.selection.selements);
 									}
 								},
 								{
