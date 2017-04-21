@@ -517,8 +517,8 @@ ZABBIX.apps.map = (function($) {
 
 					var canCopy = that.selection.count.shapes > 0 || that.selection.count.selements >0;
 					var canPaste = that.copyPasteBuffer.items && that.copyPasteBuffer.items.length > 0;
-					var canRemove = itemData.type === 'shape';
-					var canReorder = itemData.type === 'shape';
+					var canRemove = itemData.type === 'shapes';
+					var canReorder = itemData.type === 'shapes';
 
 					// we have to recreate menu everytime due copy/paste function availability changes
 					if (itemData.menuPopupId) {
@@ -654,6 +654,7 @@ ZABBIX.apps.map = (function($) {
 												var data = elementData.data;
 												data.x = data.x + leftDelta;
 												data.y = data.y + topDelta;
+												delete data.id;
 												element.update(data);
 												that[type][element.id] = element;
 												newSelection.push({
