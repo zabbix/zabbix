@@ -569,7 +569,7 @@ ZABBIX.apps.map = (function($) {
 						{
 							'items': [
 								{
-									label: 'COPY',
+									label: locale['S_COPY'],
 									disabled: !canCopy,
 									clickCallback: function() {
 										that.copyPasteBuffer = {
@@ -583,7 +583,7 @@ ZABBIX.apps.map = (function($) {
 									}
 								},
 								{
-									label: 'PASTE',
+									label: locale['S_PASTE'],
 									disabled: !canPaste,
 									clickCallback: function() {
 										var deltaX = event.offsetX - that.copyPasteBuffer.left;
@@ -598,7 +598,7 @@ ZABBIX.apps.map = (function($) {
 									}
 								},
 								{
-									label: 'PASTE_SIMPLE',
+									label: locale['S_PASTE_SIMPLE'],
 									disabled: !canPaste,
 									clickCallback: function() {
 										var deltaX = event.offsetX - that.copyPasteBuffer.left;
