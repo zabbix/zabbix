@@ -1123,6 +1123,18 @@ define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
 // slideshow
 define('WIDGET_SLIDESHOW',				'hat_slides');
 
+// widget field types
+define('ZBX_WIDGET_FIELD_TYPE_INT32',			0);
+define('ZBX_WIDGET_FIELD_TYPE_STR',				1);
+define('ZBX_WIDGET_FIELD_TYPE_GROUP',			2);
+define('ZBX_WIDGET_FIELD_TYPE_HOST',			3);
+define('ZBX_WIDGET_FIELD_TYPE_ITEM',			4);
+define('ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE',	5);
+define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
+define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
+define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
+define('ZBX_WIDGET_FIELD_TYPE_DASHBOARD',		9);
+
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
 define('NOT_EMPTY',	"({}!='')&&");
