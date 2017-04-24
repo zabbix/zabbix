@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.4.0alpha1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030119);
+define('ZABBIX_DB_VERSION',		3030134);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -751,6 +751,14 @@ define('HTTPTEST_AUTH_NTLM',	2);
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
 
+define('ZBX_HTTPFIELD_HEADER',	0);
+define('ZBX_HTTPFIELD_VARIABLE',	1);
+define('ZBX_HTTPFIELD_POST_FIELD',	2);
+define('ZBX_HTTPFIELD_QUERY_FIELD',	3);
+
+define('ZBX_POSTTYPE_RAW',	0);
+define('ZBX_POSTTYPE_FORM',	1);
+
 define('HTTPSTEP_ITEM_TYPE_RSPCODE',	0);
 define('HTTPSTEP_ITEM_TYPE_TIME',		1);
 define('HTTPSTEP_ITEM_TYPE_IN',			2);
@@ -1007,21 +1015,23 @@ define('XML_REQUIRED',		0x08);
 
 // API validation
 // scalar data types
-define('API_STRING_UTF8',	1);
-define('API_INT32',			2);
-define('API_ID',			3);
-define('API_BOOLEAN',		4);
-define('API_FLAG',			5);
+define('API_STRING_UTF8',		1);
+define('API_INT32',				2);
+define('API_ID',				3);
+define('API_BOOLEAN',			4);
+define('API_FLAG',				5);
 // arrays
-define('API_OBJECT',		6);
-define('API_IDS',			7);
-define('API_OBJECTS',		8);
+define('API_OBJECT',			6);
+define('API_IDS',				7);
+define('API_OBJECTS',			8);
 // specific types
-define('API_HG_NAME',		9);
-define('API_SCRIPT_NAME',	10);
-define('API_USER_MACRO',	11);
-define('API_TIME_PERIOD',	12);
-define('API_REGEX',			13);
+define('API_HG_NAME',			9);
+define('API_SCRIPT_NAME',		10);
+define('API_USER_MACRO',		11);
+define('API_TIME_PERIOD',		12);
+define('API_REGEX',				13);
+define('API_HTTP_POST',			14);
+define('API_VARIABLE_NAME',		15);
 define('API_TIME_UNIT',		14);
 
 // flags

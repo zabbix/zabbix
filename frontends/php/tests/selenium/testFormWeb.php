@@ -74,90 +74,6 @@ class testFormWeb extends CWebTest {
 			],
 			[
 				[
-					'agent' => 'Firefox 33.0 (Windows)',
-					'authentication' => 'None',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Firefox 33.0 (Windows)',
-					'authentication' => 'Basic',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Firefox 33.0 (Windows)',
-					'authentication' => 'NTLM',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Opera 25.0 (Windows)',
-					'authentication' => 'None',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Opera 25.0 (Windows)',
-					'authentication' => 'Basic',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Opera 25.0 (Windows)',
-					'authentication' => 'NTLM',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Safari 7.0.6 (Mac)',
-					'authentication' => 'None',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Safari 7.0.6 (Mac)',
-					'authentication' => 'Basic',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Safari 7.0.6 (Mac)',
-					'authentication' => 'NTLM',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Chrome 38.0 (Windows)',
-					'authentication' => 'None',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Chrome 38.0 (Windows)',
-					'authentication' => 'Basic',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'Chrome 38.0 (Windows)',
-					'authentication' => 'NTLM',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
 					'agent' => 'other ...',
 					'authentication' => 'None',
 					'host' => 'Simple form test host'
@@ -197,102 +113,6 @@ class testFormWeb extends CWebTest {
 				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
-					'authentication' => 'NTLM',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Firefox 33.0 (Windows)',
-					'authentication' => 'None',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Firefox 33.0 (Windows)',
-					'authentication' => 'Basic',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Firefox 33.0 (Windows)',
-					'authentication' => 'NTLM',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Opera 25.0 (Windows)',
-					'authentication' => 'None',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Opera 25.0 (Windows)',
-					'authentication' => 'Basic',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Opera 25.0 (Windows)',
-					'authentication' => 'NTLM',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Safari 7.0.6 (Mac)',
-					'authentication' => 'None',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Safari 7.0.6 (Mac)',
-					'authentication' => 'Basic',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Safari 7.0.6 (Mac)',
-					'authentication' => 'NTLM',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Chrome 38.0 (Windows)',
-					'authentication' => 'None',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Chrome 38.0 (Windows)',
-					'authentication' => 'Basic',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Chrome 38.0 (Windows)',
 					'authentication' => 'NTLM',
 					'template' => 'Inheritance test template'
 				]
@@ -479,7 +299,13 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestTextPresent('Variables');
 		$this->zbxTestAssertVisibleId('variables');
-		$this->zbxTestAssertAttribute("//textarea[@id='variables']", 'rows', 7);
+		$this->zbxTestAssertAttribute("//input[@id='pairs_1_name']", 'maxlength', 255);
+		$this->zbxTestAssertVisibleId('pairs_1_value');
+
+		$this->zbxTestTextPresent('Headers');
+		$this->zbxTestAssertVisibleId('headers');
+		$this->zbxTestAssertAttribute("//input[@id='pairs_2_name']", 'maxlength', 255);
+		$this->zbxTestAssertVisibleId('pairs_2_value');
 
 		$this->zbxTestTextPresent('Enabled');
 		$this->zbxTestAssertElementPresentId('status');
@@ -592,7 +418,6 @@ class testFormWeb extends CWebTest {
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
 
-	// Returns create data
 	public static function create() {
 		return [
 			// Empty name/steps
@@ -983,7 +808,9 @@ class testFormWeb extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Variables -just numbers',
-					'variables' => '1234567890',
+					'variables' => [
+						['name' => '{1234567890}']
+					],
 					'add_step' => [
 						['step' => 'Variables -just numbers']
 					]
@@ -994,24 +821,224 @@ class testFormWeb extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Variables -symbols',
-					'variables' => '!@#$%^&*()_+{}:"|<>?,./',
+					'variables' => [
+						['name' => '{!@#$%^&*()_+:"|<>?,./}']
+					],
 					'add_step' => [
 						['step' => 'Variables -symbols']
 					]
 				]
 			],
-			// Variables -255 length-allowed more
+			// Variables -255 max allowed
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Variables -255 length',
-					'http_proxy' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
-						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
-						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
-						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
-						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
+					'variables' => [
+						['name' => '{qwertyuiopqwertyuiopqwertyuiopqwertyui'.
+							'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
+							'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
+							'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
+							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012}']
+					],
 					'add_step' => [
 						['step' => 'Variables -255 length']
+					]
+				]
+			],
+			// Variables -without {}
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Variables -without {}',
+					'variables' => [
+						['name' => 'test']
+					],
+					'add_step' => [
+						['step' => 'Variables -without {}']
+					],
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+					]
+				]
+			],
+			// Variables -without {}
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Variables -without {}',
+					'variables' => [
+						['name' => '{test']
+					],
+					'add_step' => [
+						['step' => 'Variables -without {}']
+					],
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+					]
+				]
+			],
+			// Variables -without {}
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Variables -without {}',
+					'variables' => [
+						['name' => 'test}']
+					],
+					'add_step' => [
+						['step' => 'Variables -without {}']
+					],
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+					]
+				]
+			],
+			// Variables -with the same names
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Variables -with the same names',
+					'variables' => [
+						['name' => '{test}'],
+						['name' => '{test}']
+					],
+					'add_step' => [
+						['step' => 'Variables -with the same names']
+					],
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/variables/2": value (name)=({test}) already exists.'
+					]
+				]
+			],
+			// Variables -two different
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Variables -two different',
+					'variables' => [
+						['name' => '{test1}', 'value' => 'test1'],
+						['name' => '{test2}', 'value' => 'test1']
+					],
+					'add_step' => [
+						['step' => 'Variables -two different']
+					]
+				]
+			],
+			// Variables -empty name
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Variables -two different',
+					'variables' => [
+						['value' => 'test']
+					],
+					'add_step' => [
+						['step' => 'Variables -two different']
+					],
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/variables/1/name": cannot be empty.'
+					]
+				]
+			],
+			// Headers -just numbers
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Headers -just numbers',
+					'headers' => [
+						['name' => '1234567890', 'value' => '123456']
+					],
+					'add_step' => [
+						['step' => 'Headers -just numbers']
+					]
+				]
+			],
+			// Headers -just symbols
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Headers -just symbols',
+					'headers' => [
+						['name' => '!@#$%^&*()_+:"{}|<>?,./', 'value' => '!@#$%^&*()_+:"{}|<>?,./']
+					],
+					'add_step' => [
+						['step' => 'Headers -just symbols']
+					]
+				]
+			],
+			// Headers -255 length
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Headers -255 length',
+					'headers' => [
+						['name' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
+							'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
+							'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
+							'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
+							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop12345678901234',
+							'value' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
+							'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
+							'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
+							'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
+							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop12345678901234']
+					],
+					'add_step' => [
+						['step' => 'Headers -255 length']
+					]
+				]
+			],
+			// Headers -two different
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Headers -two different',
+					'headers' => [
+						['name' => 'test', 'value' => 'test_value'],
+						['name' => 'test', 'value' => 'test_value']
+					],
+					'add_step' => [
+						['step' => 'Headers -two different']
+					]
+				]
+			],
+			// Headers -empty value
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Headers -empty value',
+					'headers' => [
+						['name' => 'test'],
+					],
+					'add_step' => [
+						['step' => 'Headers -empty value']
+					],
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/headers/1/value": cannot be empty.'
+					]
+				]
+			],
+			// Headers -empty name
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Headers -empty name',
+					'headers' => [
+						['value' => 'test'],
+					],
+					'add_step' => [
+						['step' => 'Headers -empty name']
+					],
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -1063,9 +1090,7 @@ class testFormWeb extends CWebTest {
 					'name' => 'Trigger create multiple steps web test',
 					'add_step' => [
 						['step' => 'Trigger create multiple steps web test1'],
-						['step' => 'Trigger create multiple steps web test2'],
-						['step' => 'Trigger create multiple steps web test3'],
-						['step' => 'Trigger create multiple steps web test4'],
+						['step' => 'Trigger create multiple steps web test2']
 					],
 					'createTriggers' => [
 						'web.test.in[Trigger create multiple steps web test,,bps]',
@@ -1076,13 +1101,7 @@ class testFormWeb extends CWebTest {
 						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test1 step]',
 						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test2 step,bps]',
 						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test2 step,resp]',
-						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test2 step]',
-						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test3 step,bps]',
-						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test3 step,resp]',
-						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test3 step]',
-						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test4 step,bps]',
-						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test4 step,resp]',
-						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test4 step]'
+						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test2 step]'
 					]
 				]
 			],
@@ -1106,22 +1125,7 @@ class testFormWeb extends CWebTest {
 						['step' => 'Many websteps added web test12'],
 						['step' => 'Many websteps added web test13'],
 						['step' => 'Many websteps added web test14'],
-						['step' => 'Many websteps added web test15'],
-						['step' => 'Many websteps added web test16'],
-						['step' => 'Many websteps added web test17'],
-						['step' => 'Many websteps added web test18'],
-						['step' => 'Many websteps added web test19'],
-						['step' => 'Many websteps added web test20'],
-						['step' => 'Many websteps added web test21'],
-						['step' => 'Many websteps added web test22'],
-						['step' => 'Many websteps added web test23'],
-						['step' => 'Many websteps added web test24'],
-						['step' => 'Many websteps added web test25'],
-						['step' => 'Many websteps added web test26'],
-						['step' => 'Many websteps added web test27'],
-						['step' => 'Many websteps added web test28'],
-						['step' => 'Many websteps added web test29'],
-						['step' => 'Many websteps added web test30']
+						['step' => 'Many websteps added web test15']
 					]
 				]
 			],
@@ -1456,7 +1460,31 @@ class testFormWeb extends CWebTest {
 		}
 
 		if (isset($data['variables'])) {
-			$this->zbxTestInputType('variables', $data['variables']);
+			$i = 1;
+			foreach($data['variables'] as $variable) {
+				if (isset($variable['name'])) {
+					$this->zbxTestInputType('pairs_'.$i.'_name', $variable['name']);
+				}
+				if (isset($variable['value'])) {
+					$this->zbxTestInputType('pairs_'.$i.'_value', $variable['value']);
+				}
+				$this->zbxTestClickXpath("//tr[@id='variables_footer']//button");
+				$i = 3;
+			}
+		}
+
+		if (isset($data['headers'])) {
+			$i = 2;
+			foreach($data['headers'] as $header) {
+				if (isset($header['name'])) {
+					$this->zbxTestInputType('pairs_'.$i.'_name', $header['name']);
+				}
+				if (isset($header['value'])) {
+					$this->zbxTestInputType('pairs_'.$i.'_value', $header['value']);
+				}
+				$this->zbxTestClickXpath("//tr[@id='headers_footer']//button");
+				$i++;
+			}
 		}
 
 		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
@@ -1525,6 +1553,7 @@ class testFormWeb extends CWebTest {
 				$httptestid = $row['httptestid'];
 			}
 		}
+
 		if (isset($data['formCheck'])) {
 			if (isset ($data['dbName'])) {
 				$dbName = $data['dbName'];

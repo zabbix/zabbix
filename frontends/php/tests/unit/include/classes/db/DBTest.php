@@ -64,6 +64,17 @@ class DBTest extends PHPUnit_Framework_TestCase {
 				],
 				'SELECT COUNT(*) AS rowscount FROM hosts WHERE hostid IN (10001,10002,10003)'
 			],
+			[
+				'users', null,
+				[
+					'output' => ['userid'],
+					'filter' => [
+						'userid' => [2],
+						'type' => [0, 1]
+					]
+				],
+				'SELECT userid FROM users WHERE userid=2 AND type IN (0,1)'
+			]
 		];
 	}
 
