@@ -334,11 +334,13 @@ FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|master_itemid	|t_id		|	|NULL		|0			|5|items	|itemid
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
 INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
+INDEX		|7		|master_itemid
 
 TABLE|httpstepitem|httpstepitemid|ZBX_DATA
 FIELD		|httpstepitemid	|t_id		|	|NOT NULL	|0

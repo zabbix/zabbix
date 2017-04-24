@@ -914,6 +914,25 @@ static int	DBpatch_3030068(void)
 	return DBadd_field("httpstep", &field);
 }
 
+static int	DBpatch_3030069(void)
+{
+	const ZBX_FIELD	field = {"master_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3030070(void)
+{
+	return DBcreate_index("items", "items_7", "master_itemid", 0);
+}
+
+static int	DBpatch_3030071(void)
+{
+	const ZBX_FIELD	field = {"master_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("items", 5, &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
