@@ -936,9 +936,7 @@ ZABBIX.apps.map = (function($) {
 				for (var id in that.links) {
 					// get rid of observers, only current data
 					var data = $.extend({}, that.links[id].getData(), false);
-					if (data.selementid1 in that.selection.selements ||
-						data.selementid2 in that.selection.selements
-					) {
+					if (data.selementid1 in that.selection.selements || data.selementid2 in that.selection.selements) {
 						links.push({
 							id: id,
 							data: data
@@ -2916,8 +2914,8 @@ ZABBIX.apps.map = (function($) {
 						}
 
 						list.push({
-							fromElementName: this.sysmap.selements[link.selementid1].data.elementName,
-							toElementName: this.sysmap.selements[link.selementid2].data.elementName,
+							fromElementName: this.sysmap.selements[link.selementid1].data.elementName||'',
+							toElementName: this.sysmap.selements[link.selementid2].data.elementName||'',
 							linkid: link.linkid,
 							linktriggers: linktriggers
 						});
