@@ -79,7 +79,15 @@
 			if ($.trim(attempts.val()) == '') {
 				attempts.val(0);
 			}
-			setMaxSessionsBeforeSubmit();
+			var mstype = $('#maxsessionsType :radio:checked').val(),
+				inputBox = $('#maxsessions');
+			if (mstype != 'custom') {
+				inputBox.val(mstype == 'one' ? 1 : 0);
+			}
+			else if (mstype == 'custom' && $.trim(inputBox.val()) == '') {
+				inputBox.val(0);
+			}
+
 			$(this).trimValues([
 				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
 				'#jabber_username', '#eztext_username', '#smtp_username', '#maxsessions'
@@ -171,20 +179,6 @@
 				.attr('disabled', false)
 				.filter('[value=one]')
 					.click();
-		}
-
-		/**
-		 * Set #maxsessions value according #maxsessionsType to be submited to server
-		 */
-		function setMaxSessionsBeforeSubmit() {
-			var mstype = $('#maxsessionsType :radio:checked').val();
-			var inputBox = $('#maxsessions');
-			if (mstype != 'custom') {
-				inputBox.val(mstype == 'one' ? 1 : 0);
-			}
-			if (mstype == 'custom' && $.trim(inputBox.val()) == '') {
-				inputBox.val(0);
-			}
 		}
 
 		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
