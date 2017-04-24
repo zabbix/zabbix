@@ -36,7 +36,7 @@ static void	zbx_user_macro_parse_test()
 	CU_ASSERT(SUCCEED == (ret = zbx_user_macro_parse("{$MODULE}", &macro_r, &context_l, &context_r)));
 }
 
-int	ZBX_CU_MODULE(str_parse)
+int	ZBX_CU_SUITE(str_test)
 {
 	CU_pSuite	suite = NULL;
 

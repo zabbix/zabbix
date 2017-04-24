@@ -110,7 +110,7 @@ void	zbx_cu_run(int argc, char *argv[])
 	const char			**suite;
 	char				ch, *scope = NULL, *output = NULL, buffer[MAX_STRING_LEN];
 	int				run_tests = 0, automated = 0;
-	zbx_cu_init_module_func_t	init_func;
+	zbx_cu_init_suite_func_t	init_func;
 
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
@@ -145,7 +145,7 @@ void	zbx_cu_run(int argc, char *argv[])
 		if (NULL != scope && NULL == strstr(scope, *suite))
 			continue;
 
-		zbx_snprintf(buffer, sizeof(buffer), "%s%s", ZBX_CU_MODULE_PREFIX_STR, *suite);
+		zbx_snprintf(buffer, sizeof(buffer), "%s%s", ZBX_CU_SUITE_PREFIX_STR, *suite);
 
 		if (NULL != (init_func = dlsym(RTLD_DEFAULT, buffer)))
 		{

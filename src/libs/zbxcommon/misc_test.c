@@ -41,7 +41,7 @@ static void	check_time_period_test()
 	zbx_free(period);
 }
 
-int	ZBX_CU_MODULE(misc_test)
+int	ZBX_CU_SUITE(misc_test)
 {
 	CU_pSuite	suite = NULL;
 

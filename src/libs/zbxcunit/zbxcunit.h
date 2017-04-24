@@ -27,14 +27,14 @@
 
 #define ZBX_CU_STR2(str)		#str
 #define ZBX_CU_STR(str)			ZBX_CU_STR2(str)
-#define ZBX_CU_MODULE_PREFIX		zbx_cu_init_
-#define ZBX_CU_MODULE_PREFIX_STR	ZBX_CU_STR(ZBX_CU_MODULE_PREFIX)
+#define ZBX_CU_SUITE_PREFIX		zbx_cu_init_
+#define ZBX_CU_SUITE_PREFIX_STR		ZBX_CU_STR(ZBX_CU_SUITE_PREFIX)
 
-#define ZBX_CU_MODULE3(prefix, module)	prefix ## module(void)
-#define ZBX_CU_MODULE2(prefix, module)	ZBX_CU_MODULE3(prefix, module)
-#define ZBX_CU_MODULE(module)		ZBX_CU_MODULE2(ZBX_CU_MODULE_PREFIX, module)
+#define ZBX_CU_SUITE3(prefix, suite)	prefix ## suite(void)
+#define ZBX_CU_SUITE2(prefix, suite)	ZBX_CU_SUITE3(prefix, suite)
+#define ZBX_CU_SUITE(suite)		ZBX_CU_SUITE2(ZBX_CU_SUITE_PREFIX, suite)
 
-typedef int (*zbx_cu_init_module_func_t)(void);
+typedef int (*zbx_cu_init_suite_func_t)(void);
 
 #define ZBX_CU_LEAK_CHECK_START()	zbx_cu_minfo = mallinfo()
 #define ZBX_CU_LEAK_CHECK_END()	{						\

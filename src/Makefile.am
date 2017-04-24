@@ -83,14 +83,14 @@ TEST_LIBDIR = libs/zbxcunit
 TEST_SUITESFILE = $(TEST_LIBDIR)/cu_suites.h
 TEST_SRCFILES = `grep $(TEST_COMMENT) * -rl | grep "\.c$$"`
 TEST_TESTFILES = `find -name *_test.c`
-TEST_MODULE = "ZBX_CU_MODULE" 
+TEST_SUITE = "ZBX_CU_SUITE" 
 
 $(TEST_SUITESFILE):
 	echo 'const char *cu_suites[]={' > $(TEST_SUITESFILE)
 	for file in $(TEST_TESTFILES); do								\
 		if [ -f "$${file%_test.c}.c" ]; then							\
 			echo "#include \"$${file##*/}\" //$(TEST_COMMENT)" >> "$${file%_test.c}.c"	;\
-			grep $(TEST_MODULE) $${file} | while read line; do				\
+			grep $(TEST_SUITE) $${file} | while read line; do				\
 				funcname=$${line##*(}							;\
 				echo "\"$${funcname%%)*}\"," >> $(TEST_SUITESFILE)			;\
 			done										;\
