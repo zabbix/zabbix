@@ -78,7 +78,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxcunit/libzbxcunit.a
 
-zabbix_server_LDADD += @SERVER_LIBS@
+zabbix_server_LDADD += @SERVER_LIBS@ $(CUNIT_LDADD)
 
 zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 
