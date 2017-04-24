@@ -32,6 +32,7 @@
 			<arg line="-I/usr/local/include"/>
 			<arg line="-I./include"/>
 			<arg line="--suppress=variableScope:*"/>
+			<arg line="--suppress=ConfigurationNotChecked:*"/>
 			<arg line="--inconclusive"/>
 			<arg line="--force"/>
 			<arg line="--xml"/>
