@@ -151,6 +151,9 @@ src/libs/zbxdbupgrade/Makefile.in
 src/libs/zbxexec/.deps
 src/libs/zbxexec/Makefile
 src/libs/zbxexec/Makefile.in
+src/libs/zbxhttp/.deps
+src/libs/zbxhttp/Makefile
+src/libs/zbxhttp/Makefile.in
 src/libs/zbxicmpping/.deps
 src/libs/zbxicmpping/Makefile
 src/libs/zbxicmpping/Makefile.in
