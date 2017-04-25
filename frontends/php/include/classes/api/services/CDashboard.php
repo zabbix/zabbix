@@ -105,7 +105,7 @@ class CDashboard extends CApiService {
 					' AND dug.permission>='.$permission.
 			')';
 
-			$sql_parts['where'][] = implode(',', $sql_where);
+			$sql_parts['where'][] = '('.implode(' OR ', $sql_where).')';
 		}
 
 		// dashboardids
@@ -196,35 +196,35 @@ class CDashboard extends CApiService {
 		];
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
-			'userid' =>			['type' => API_ID, 'default' => self::$userData['userid']],
-			'private' =>		['type' => API_INT32, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
-			'users' =>			['type' => API_OBJECTS, 'fields' => [
-				'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
+			'userid' =>				['type' => API_ID, 'default' => self::$userData['userid']],
+			'private' =>			['type' => API_INT32, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
+			'users' =>				['type' => API_OBJECTS, 'fields' => [
+				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'userGroups' =>		['type' => API_OBJECTS, 'fields' => [
-				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
+			'userGroups' =>			['type' => API_OBJECTS, 'fields' => [
+				'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'widgets' =>		['type' => API_OBJECTS, 'fields' => [
-				'type' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
-				'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
-				'row' =>			['type' => API_INT32, 'in' => '0:'.self::MAX_ROW, 'default' => DB::getDefault('widget', 'row')],
-				'col' =>			['type' => API_INT32, 'in' => '0:'.self::MAX_COL, 'default' => DB::getDefault('widget', 'col')],
-				'height' =>			['type' => API_INT32, 'in' => '1:32', 'default' => DB::getDefault('widget', 'height')],
-				'width' =>			['type' => API_INT32, 'in' => '1:12', 'default' => DB::getDefault('widget', 'width')],
-				'fields' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
-					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
-					'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
-					'value_int' =>		['type' => API_INT32],
-					'value_str' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'value_str')],
-					'groupid' =>		['type' => API_ID],
-					'hostid' =>			['type' => API_ID],
-					'itemid' =>			['type' => API_ID],
-					'graphid' =>		['type' => API_ID],
-					'sysmapid' =>		['type' => API_ID],
-					'dashboardid' =>	['type' => API_ID]
+			'widgets' =>			['type' => API_OBJECTS, 'fields' => [
+				'type' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
+				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
+				'row' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_ROW, 'default' => DB::getDefault('widget', 'row')],
+				'col' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_COL, 'default' => DB::getDefault('widget', 'col')],
+				'height' =>				['type' => API_INT32, 'in' => '1:32', 'default' => DB::getDefault('widget', 'height')],
+				'width' =>				['type' => API_INT32, 'in' => '1:12', 'default' => DB::getDefault('widget', 'width')],
+				'fields' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
+					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
+					'value_int' =>			['type' => API_INT32],
+					'value_str' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'value_str')],
+					'value_groupid' =>		['type' => API_ID],
+					'value_hostid' =>		['type' => API_ID],
+					'value_itemid' =>		['type' => API_ID],
+					'value_graphid' =>		['type' => API_ID],
+					'value_sysmapid' =>		['type' => API_ID],
+					'value_dashboardid' =>	['type' => API_ID]
 				]]
 			]]
 		]];
@@ -299,36 +299,36 @@ class CDashboard extends CApiService {
 		];
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid'], ['name']], 'fields' => [
-			'dashboardid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
-			'userid' =>			['type' => API_ID],
-			'private' =>		['type' => API_INT32, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
-			'users' =>			['type' => API_OBJECTS, 'fields' => [
-				'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
+			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
+			'userid' =>				['type' => API_ID],
+			'private' =>			['type' => API_INT32, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
+			'users' =>				['type' => API_OBJECTS, 'fields' => [
+				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'userGroups' =>		['type' => API_OBJECTS, 'fields' => [
-				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
+			'userGroups' =>			['type' => API_OBJECTS, 'fields' => [
+				'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'widgets' =>		['type' => API_OBJECTS, 'fields' => [
-				'type' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
-				'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
-				'row' =>			['type' => API_INT32, 'in' => '0:'.self::MAX_ROW, 'default' => DB::getDefault('widget', 'row')],
-				'col' =>			['type' => API_INT32, 'in' => '0:'.self::MAX_COL, 'default' => DB::getDefault('widget', 'col')],
-				'height' =>			['type' => API_INT32, 'in' => '1:32', 'default' => DB::getDefault('widget', 'height')],
-				'width' =>			['type' => API_INT32, 'in' => '1:12', 'default' => DB::getDefault('widget', 'width')],
-				'fields' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
-					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
-					'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
-					'value_int' =>		['type' => API_INT32],
-					'value_str' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'value_str')],
-					'groupid' =>		['type' => API_ID],
-					'hostid' =>			['type' => API_ID],
-					'itemid' =>			['type' => API_ID],
-					'graphid' =>		['type' => API_ID],
-					'sysmapid' =>		['type' => API_ID],
-					'dashboardid' =>	['type' => API_ID]
+			'widgets' =>			['type' => API_OBJECTS, 'fields' => [
+				'type' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
+				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
+				'row' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_ROW, 'default' => DB::getDefault('widget', 'row')],
+				'col' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_COL, 'default' => DB::getDefault('widget', 'col')],
+				'height' =>				['type' => API_INT32, 'in' => '1:32', 'default' => DB::getDefault('widget', 'height')],
+				'width' =>				['type' => API_INT32, 'in' => '1:12', 'default' => DB::getDefault('widget', 'width')],
+				'fields' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
+					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
+					'value_int' =>			['type' => API_INT32],
+					'value_str' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'value_str')],
+					'value_groupid' =>		['type' => API_ID],
+					'value_hostid' =>		['type' => API_ID],
+					'value_itemid' =>		['type' => API_ID],
+					'value_graphid' =>		['type' => API_ID],
+					'value_sysmapid' =>		['type' => API_ID],
+					'value_dashboardid' =>	['type' => API_ID]
 				]]
 			]]
 		]];
@@ -542,24 +542,24 @@ class CDashboard extends CApiService {
 				return 'value_str';
 
 			case ZBX_WIDGET_FIELD_TYPE_GROUP:
-				return 'groupid';
+				return 'value_groupid';
 
 			case ZBX_WIDGET_FIELD_TYPE_HOST:
-				return 'hostid';
+				return 'value_hostid';
 
 			case ZBX_WIDGET_FIELD_TYPE_ITEM:
 			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-				return 'itemid';
+				return 'value_itemid';
 
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-				return 'graphid';
+				return 'value_graphid';
 
 			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				return 'sysmapid';
+				return 'value_sysmapid';
 
 			case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
-				return 'dashboardid';
+				return 'value_dashboardid';
 		}
 	}
 
@@ -571,14 +571,14 @@ class CDashboard extends CApiService {
 	 * @param array  $dashboards[]['widgets']
 	 * @param array  $dashboards[]['widgets'][]['fields']
 	 * @param int    $dashboards[]['widgets'][]['type']
-	 * @param int    $dashboards[]['widgets'][]['value_int']    (optional)
-	 * @param string $dashboards[]['widgets'][]['value_str']    (optional)
-	 * @param string $dashboards[]['widgets'][]['groupid']      (optional)
-	 * @param string $dashboards[]['widgets'][]['hostid']       (optional)
-	 * @param string $dashboards[]['widgets'][]['itemid']       (optional)
-	 * @param string $dashboards[]['widgets'][]['graphid']      (optional)
-	 * @param string $dashboards[]['widgets'][]['sysmapid']     (optional)
-	 * @param string $dashboards[]['widgets'][]['dashboardid']  (optional)
+	 * @param int    $dashboards[]['widgets'][]['value_int']          (optional)
+	 * @param string $dashboards[]['widgets'][]['value_str']          (optional)
+	 * @param string $dashboards[]['widgets'][]['value_groupid']      (optional)
+	 * @param string $dashboards[]['widgets'][]['value_hostid']       (optional)
+	 * @param string $dashboards[]['widgets'][]['value_itemid']       (optional)
+	 * @param string $dashboards[]['widgets'][]['value_graphid']      (optional)
+	 * @param string $dashboards[]['widgets'][]['value_sysmapid']     (optional)
+	 * @param string $dashboards[]['widgets'][]['value_dashboardid']  (optional)
 	 *
 	 * @throws APIException if input is invalid.
 	 */
@@ -609,35 +609,35 @@ class CDashboard extends CApiService {
 
 						switch ($field['type']) {
 							case ZBX_WIDGET_FIELD_TYPE_GROUP:
-								$groupids[$field['groupid']] = true;
+								$groupids[$field['value_groupid']] = true;
 								break;
 
 							case ZBX_WIDGET_FIELD_TYPE_HOST:
-								$hostids[$field['hostid']] = true;
+								$hostids[$field['value_hostid']] = true;
 								break;
 
 							case ZBX_WIDGET_FIELD_TYPE_ITEM:
-								$itemids[$field['itemid']] = true;
+								$itemids[$field['value_itemid']] = true;
 								break;
 
 							case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-								$item_prototypeids[$field['itemid']] = true;
+								$item_prototypeids[$field['value_itemid']] = true;
 								break;
 
 							case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-								$graphids[$field['graphid']] = true;
+								$graphids[$field['value_graphid']] = true;
 								break;
 
 							case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-								$graph_prototypeids[$field['graphid']] = true;
+								$graph_prototypeids[$field['value_graphid']] = true;
 								break;
 
 							case ZBX_WIDGET_FIELD_TYPE_MAP:
-								$sysmapids[$field['sysmapid']] = true;
+								$sysmapids[$field['value_sysmapid']] = true;
 								break;
 
 							case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
-								$dashboardids[$field['dashboardid']] = true;
+								$dashboardids[$field['value_dashboardid']] = true;
 								break;
 						}
 					}
@@ -1046,8 +1046,8 @@ class CDashboard extends CApiService {
 
 		$db_widget_fields = ($method === 'update')
 			? DB::select('widget_field', [
-				'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str', 'groupid',
-					'hostid', 'itemid', 'graphid', 'sysmapid', 'dashboardid'
+				'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str', 'value_groupid',
+					'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid', 'value_dashboardid'
 				],
 				'filter' => ['widgetid' => array_keys($widgets_fields)],
 				'sortfield' => ['widgetid', 'type', 'name']
@@ -1058,30 +1058,35 @@ class CDashboard extends CApiService {
 		$upd_widget_fields = [];
 		$del_widget_fieldids = [];
 
+		$field_names = [
+			'str' => ['name', 'value_str'],
+			'int' => ['type', 'value_int'],
+			'ids' => ['value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid',
+				'value_dashboardid'
+			]
+		];
+
 		foreach ($db_widget_fields as $db_widget_field) {
 			if ($widgets_fields[$db_widget_field['widgetid']]) {
 				$widget_field = array_shift($widgets_fields[$db_widget_field['widgetid']]);
 
 				$upd_widget_field = [];
 
-				// strings
-				foreach (['name', 'value_str'] as $field_name) {
+				foreach ($field_names['str'] as $field_name) {
 					if (array_key_exists($field_name, $widget_field)) {
 						if ($widget_field[$field_name] !== $db_widget_field[$field_name]) {
 							$upd_widget_field[$field_name] = $widget_field[$field_name];
 						}
 					}
 				}
-				// integers
-				foreach (['type', 'value_int'] as $field_name) {
+				foreach ($field_names['int'] as $field_name) {
 					if (array_key_exists($field_name, $widget_field)) {
 						if ($widget_field[$field_name] != $db_widget_field[$field_name]) {
 							$upd_widget_field[$field_name] = $widget_field[$field_name];
 						}
 					}
 				}
-				// ids
-				foreach (['groupid', 'hostid', 'itemid', 'graphid', 'sysmapid', 'dashboardid'] as $field_name) {
+				foreach ($field_names['ids'] as $field_name) {
 					if (array_key_exists($field_name, $widget_field)) {
 						if (bccomp($widget_field[$field_name], $db_widget_field[$field_name]) != 0) {
 							$upd_widget_field[$field_name] = $widget_field[$field_name];
@@ -1251,8 +1256,8 @@ class CDashboard extends CApiService {
 				unset($db_widget);
 
 				$db_widget_fields = DB::select('widget_field', [
-					'output' => ['widgetid', 'type', 'name', 'value_int', 'value_str', 'groupid', 'hostid', 'itemid',
-						'graphid', 'sysmapid', 'dashboardid'
+					'output' => ['widgetid', 'type', 'name', 'value_int', 'value_str', 'value_groupid', 'value_hostid',
+						'value_itemid', 'value_graphid', 'value_sysmapid', 'value_dashboardid'
 					],
 					'filter' => ['widgetid' => array_keys($db_widgets)]
 				]);
