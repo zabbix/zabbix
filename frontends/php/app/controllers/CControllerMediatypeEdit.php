@@ -102,6 +102,7 @@ class CControllerMediatypeEdit extends CController {
 
 	protected function doAction() {
 		// default values
+		$db_defaults = DB::getDefaults('media_type');
 		$data = [
 			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
@@ -124,9 +125,9 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
-			'maxsessions' => '1',
-			'maxattempts' => '1',
-			'attempt_interval' => '10s',
+			'maxsessions' => $db_defaults['maxsessions'],
+			'maxattempts' => $db_defaults['maxattempts'],
+			'attempt_interval' => $db_defaults['attempt_interval'],
 			'form_refresh' => 0
 		];
 
