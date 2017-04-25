@@ -4575,7 +4575,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 	DB_EVENT		event;
 	DC_TRIGGER		*tr;
-	int			i, ret;
+	int			i;
 	double			expr_result;
 	zbx_vector_ptr_t	unknown_msgs;	    /* pointers to messages about origins of 'unknown' values */
 	char			err[MAX_STRING_LEN];
