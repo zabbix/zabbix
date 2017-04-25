@@ -54,7 +54,7 @@ class CDashboard extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private']), 'default' => API_OUTPUT_EXTEND],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
 			'selectUserGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['usrgrpid', 'permission']), 'default' => null],
 			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['type', 'name', 'row', 'col', 'height', 'width', 'fields']), 'default' => null],
