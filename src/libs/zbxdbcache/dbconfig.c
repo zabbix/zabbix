@@ -4380,7 +4380,6 @@ void	DCsync_configuration(unsigned char mode)
 	update_sec = zbx_time() - sec;
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-
 	{
 		strpool = zbx_strpool_info();
 
