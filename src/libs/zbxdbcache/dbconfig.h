@@ -300,6 +300,8 @@ typedef struct
 	zbx_uint64_t	hostid;
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
+	int		proxy_tasks_nextcheck;
+	int		nextcheck;
 	int		timediff;
 	int		lastaccess;
 	int		version;

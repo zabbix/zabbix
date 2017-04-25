@@ -330,9 +330,11 @@ INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, la
 
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (3,3,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (4,3,1,1,3,NULL,'Map element (Local network)',0,401,101,NULL,NULL);
-INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (5,3,13497,2,15,NULL,'Trigger element (CPU load)',0,101,301,NULL,NULL);
+INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (5,3,0,2,15,NULL,'Trigger element (CPU load)',0,101,301,NULL,NULL);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (6,3,2,3,1,NULL,'Host group element (Linux servers)',0,301,351,NULL,NULL);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (7,3,10084,0,19,NULL,'Host element (Zabbix Server)',0,501,301,NULL,NULL);
+
+INSERT INTO sysmap_element_trigger (selement_triggerid, selementid, triggerid) VALUES (1,5,13497);
 
 INSERT INTO sysmaps_links (linkid, sysmapid, selementid1, selementid2, drawtype, color, label) VALUES (1,3,3,4,2,'00CC00','CPU load: {Zabbix Server:system.cpu.load[].last(0)}');
 INSERT INTO sysmaps_links (linkid, sysmapid, selementid1, selementid2, drawtype, color, label) VALUES (2,3,3,5,0,'00CC00','');
@@ -889,22 +891,22 @@ INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUE
 INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15015, 15026, 15015, 'last', '');
 
 -- testInheritanceWeb.SimpleUpdate
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, variables, headers)             VALUES (15000, 'testInheritanceWeb1', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000, '', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, variables, headers)             VALUES (15001, 'testInheritanceWeb2', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000, '', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, variables, headers)             VALUES (15002, 'testInheritanceWeb3', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000, '', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, variables, headers)             VALUES (15003, 'testInheritanceWeb4', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000, '', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, variables, headers, templateid) VALUES (15004, 'testInheritanceWeb1', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15001, '', '', 15000);
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, variables, headers, templateid) VALUES (15005, 'testInheritanceWeb2', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15001, '', '', 15001);
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, variables, headers, templateid) VALUES (15006, 'testInheritanceWeb3', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15001, '', '', 15002);
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, variables, headers, templateid) VALUES (15007, 'testInheritanceWeb4', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15001, '', '', 15003);
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, variables, headers) VALUES (15000, 15000, 'testInheritanceWeb1', 1, 'testInheritanceWeb1', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, variables, headers) VALUES (15001, 15001, 'testInheritanceWeb2', 1, 'testInheritanceWeb2', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, variables, headers) VALUES (15002, 15002, 'testInheritanceWeb3', 1, 'testInheritanceWeb3', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, variables, headers) VALUES (15003, 15003, 'testInheritanceWeb4', 1, 'testInheritanceWeb4', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, variables, headers) VALUES (15004, 15004, 'testInheritanceWeb1', 1, 'testInheritanceWeb1', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, variables, headers) VALUES (15005, 15005, 'testInheritanceWeb2', 1, 'testInheritanceWeb2', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, variables, headers) VALUES (15006, 15006, 'testInheritanceWeb3', 1, 'testInheritanceWeb3', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, variables, headers) VALUES (15007, 15007, 'testInheritanceWeb4', 1, 'testInheritanceWeb4', 15, '', '', '');
+INSERT INTO httptest (httptestid, name, delay, agent, hostid)             VALUES (15000, 'testInheritanceWeb1', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid)             VALUES (15001, 'testInheritanceWeb2', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid)             VALUES (15002, 'testInheritanceWeb3', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid)             VALUES (15003, 'testInheritanceWeb4', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid, templateid) VALUES (15004, 'testInheritanceWeb1', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15001, 15000);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid, templateid) VALUES (15005, 'testInheritanceWeb2', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15001, 15001);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid, templateid) VALUES (15006, 'testInheritanceWeb3', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15001, 15002);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid, templateid) VALUES (15007, 'testInheritanceWeb4', 60, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15001, 15003);
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15000, 15000, 'testInheritanceWeb1', 1, 'testInheritanceWeb1', 15, '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15001, 15001, 'testInheritanceWeb2', 1, 'testInheritanceWeb2', 15, '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15002, 15002, 'testInheritanceWeb3', 1, 'testInheritanceWeb3', 15, '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15003, 15003, 'testInheritanceWeb4', 1, 'testInheritanceWeb4', 15, '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15004, 15004, 'testInheritanceWeb1', 1, 'testInheritanceWeb1', 15, '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15005, 15005, 'testInheritanceWeb2', 1, 'testInheritanceWeb2', 15, '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15006, 15006, 'testInheritanceWeb3', 1, 'testInheritanceWeb3', 15, '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15007, 15007, 'testInheritanceWeb4', 1, 'testInheritanceWeb4', 15, '');
 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description)             VALUES (15031, 15000, 9, 'Download speed for scenario "$1".'             , 'web.test.in[testInheritanceWeb1,,bps]'                      , 60, 0, 'Bps', '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description)             VALUES (15032, 15000, 9, 'Failed step of scenario "$1".'                 , 'web.test.fail[testInheritanceWeb1]'                         , 60, 3, ''   , '', '');
@@ -1103,14 +1105,14 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600007, 600003, 23804, 1, 1, 'FF5555', 0, 2, 0);
 
 -- testFormWeb.SimpleUpdate
-INSERT INTO httptest (httptestid, hostid, name, delay, status, variables, agent, headers) VALUES (94, 40001, 'testFormWeb1', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, variables, agent, headers) VALUES (95, 40001, 'testFormWeb2', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, variables, agent, headers) VALUES (96, 40001, 'testFormWeb3', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, variables, agent, headers) VALUES (97, 40001, 'testFormWeb4', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (94, 94, 'testFormWeb1', 1, 'testFormWeb1', 15, '', '', '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (95, 95, 'testFormWeb2', 1, 'testFormWeb2', 15, '', '', '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (96, 96, 'testFormWeb3', 1, 'testFormWeb3', 15, '', '', '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (97, 97, 'testFormWeb4', 1, 'testFormWeb4', 15, '', '', '', '', '');
+INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (94, 40001, 'testFormWeb1', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (95, 40001, 'testFormWeb2', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (96, 40001, 'testFormWeb3', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (97, 40001, 'testFormWeb4', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (94, 94, 'testFormWeb1', 1, 'testFormWeb1', 15, '', '', '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (95, 95, 'testFormWeb2', 1, 'testFormWeb2', 15, '', '', '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (96, 96, 'testFormWeb3', 1, 'testFormWeb3', 15, '', '', '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (97, 97, 'testFormWeb4', 1, 'testFormWeb4', 15, '', '', '');
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23420,9,'','',40001,'Download speed for scenario "$1".','web.test.in[testFormWeb1,,bps]',60,30,90,0,0,'','Bps','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23421,9,'','',40001,'Failed step of scenario "$1".','web.test.fail[testFormWeb1]',60,30,90,0,3,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23422,9,'','',40001,'Last error message of scenario "$1".','web.test.error[testFormWeb1]',60,30,90,0,1,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
@@ -1267,16 +1269,16 @@ INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxiss
 INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (700023,700015,40050,0,0,'C80000',0,2,0);
 INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (700024,700016,40054,0,0,'C80000',0,2,0);
 INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (700025,700017,40052,0,0,'C80000',0,2,0);
-INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, variables, agent, headers) VALUES (98, 50000, NULL, 'Web ZBX6663 First', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, variables, agent, headers) VALUES (99, 50002, NULL, 'Web ZBX6663 Second', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, variables, agent, headers) VALUES (100, 50001, 99, 'Web ZBX6663 Second', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, variables, agent, headers) VALUES (101, 50000, 99, 'Web ZBX6663 Second', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, variables, agent, headers) VALUES (102, 50001, NULL, 'Web ZBX6663', 60, 0, '', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (98, 98, 'Web ZBX6663 First Step', 1, 'Web ZBX6663 First Url', 15, '', '', '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (99, 99, 'Web ZBX6663 Second Step', 1, 'Web ZBX6663 Second Url', 15, '', '', '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (100, 100, 'Web ZBX6663 Second Step', 1, 'Web ZBX6663 Second Url', 15, '', '', '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (101, 101, 'Web ZBX6663 Second Step', 1, 'Web ZBX6663 Second Url', 15, '', '', '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes, variables, headers) VALUES (102, 102, 'Web ZBX6663 Step', 1, 'Web ZBX6663 Url', 15, '', '', '', '', '');
+INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, agent) VALUES (98, 50000, NULL, 'Web ZBX6663 First', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, agent) VALUES (99, 50002, NULL, 'Web ZBX6663 Second', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, agent) VALUES (100, 50001, 99, 'Web ZBX6663 Second', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, agent) VALUES (101, 50000, 99, 'Web ZBX6663 Second', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httptest (httptestid, hostid, templateid, name, delay, status, agent) VALUES (102, 50001, NULL, 'Web ZBX6663', 60, 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (98, 98, 'Web ZBX6663 First Step', 1, 'Web ZBX6663 First Url', 15, '', '', '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (99, 99, 'Web ZBX6663 Second Step', 1, 'Web ZBX6663 Second Url', 15, '', '', '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (100, 100, 'Web ZBX6663 Second Step', 1, 'Web ZBX6663 Second Url', 15, '', '', '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (101, 101, 'Web ZBX6663 Second Step', 1, 'Web ZBX6663 Second Url', 15, '', '', '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (102, 102, 'Web ZBX6663 Step', 1, 'Web ZBX6663 Url', 15, '', '', '');
 INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (922,98,40008,2);
 INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (923,98,40009,3);
 INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (924,98,40010,4);
@@ -1353,7 +1355,8 @@ INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (1
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16027,23287,16026,'last','0');
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, grid_size, grid_show, grid_align, label_format, label_type_host, label_type_hostgroup, label_type_trigger, label_type_map, label_type_image, label_string_host, label_string_hostgroup, label_string_trigger, label_string_map, label_string_image, iconmapid, expand_macros, severity_min, userid, private) VALUES (5, 'testZBX6840', 800, 600, NULL, 0, 0, 0, 0, 0, 0, 50, 1, 1, 0, 2, 2, 2, 2, 2, '', '', '', '', '', NULL, 0, 0, 1, 0);
 INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (8,5,10084,0,19,NULL,'Host element (Zabbix Server)',-1,413,268,NULL,NULL,0,0,200,200,0,0);
-INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (9,5,16026,2,15,NULL,'Trigger element (zbx6840)',-1,213,218,NULL,NULL,0,0,200,200,0,0);
+INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (9,5,0,2,15,NULL,'Trigger element (zbx6840)',-1,213,218,NULL,NULL,0,0,200,200,0,0);
+INSERT INTO sysmap_element_trigger (selement_triggerid, selementid, triggerid) VALUES (2,9,16026);
 
 -- testPageHistory_CheckLayout
 

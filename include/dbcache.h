@@ -45,7 +45,6 @@
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
-extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
@@ -195,6 +194,9 @@ typedef struct
 }
 zbx_tag_t;
 
+/* item exist in base expression  */
+#define		ZBX_DC_TRIGGER_BASE_EXPRESSION	1
+
 typedef struct _DC_TRIGGER
 {
 	zbx_uint64_t		triggerid;
@@ -220,6 +222,8 @@ typedef struct _DC_TRIGGER
 	unsigned char		recovery_mode;
 	unsigned char		correlation_mode;
 
+	unsigned char		flags;
+
 	zbx_vector_ptr_t	tags;
 }
 DC_TRIGGER;
@@ -230,6 +234,7 @@ typedef struct
 	char            host[HOST_HOST_LEN_MAX];
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
+	int		proxy_tasks_nextcheck;
 	int		version;
 	char		addr_orig[INTERFACE_ADDR_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
@@ -413,7 +418,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT 
 		unsigned char state, const char *error);
 void	dc_flush_history(void);
 int	DCsync_history(int sync_type, int *sync_num);
-void	init_database_cache(void);
+int	init_database_cache(char **error);
 void	free_database_cache(void);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
@@ -449,13 +454,14 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_UPDATE	1
 
 void	DCsync_configuration(unsigned char mode);
-void	init_configuration_cache(void);
+int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num);
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
+void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
 		zbx_uint64_t flags);
@@ -511,6 +517,7 @@ int	DCconfig_get_proxypoller_nextcheck(void);
 
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
+#define ZBX_PROXY_TASKS_NEXTCHECK	0x04
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff);
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);

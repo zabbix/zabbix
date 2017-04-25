@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.3.0');
-define('ZABBIX_API_VERSION',	'3.3.0');
+define('ZABBIX_VERSION',		'3.4.0alpha1');
+define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030026);
+define('ZABBIX_DB_VERSION',		3030068);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -68,6 +68,7 @@ define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
 
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
+define('ZBX_SCRIPT_EXECUTE_ON_PROXY',	2);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
@@ -100,7 +101,6 @@ define('ZBX_DB_DB2',		'IBM_DB2');
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
-define('ZBX_DB_SQLITE3',	'SQLITE3');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
@@ -313,6 +313,10 @@ define('REPORT_PERIOD_LAST_YEAR',		7);
 
 define('SYSMAP_LABEL_ADVANCED_OFF',	0);
 define('SYSMAP_LABEL_ADVANCED_ON',	1);
+
+define('SYSMAP_PROBLEMS_NUMBER',			0);
+define('SYSMAP_SINGLE_PROBLEM',				1);
+define('SYSMAP_PROBLEMS_NUMBER_CRITICAL',	2);
 
 define('MAP_LABEL_TYPE_LABEL',		0);
 define('MAP_LABEL_TYPE_IP',			1);
@@ -740,6 +744,14 @@ define('HTTPTEST_AUTH_NTLM',	2);
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
 
+define('ZBX_HTTPFIELD_HEADER',	0);
+define('ZBX_HTTPFIELD_VARIABLE',	1);
+define('ZBX_HTTPFIELD_POST_FIELD',	2);
+define('ZBX_HTTPFIELD_QUERY_FIELD',	3);
+
+define('ZBX_POSTTYPE_RAW',	0);
+define('ZBX_POSTTYPE_FORM',	1);
+
 define('HTTPSTEP_ITEM_TYPE_RSPCODE',	0);
 define('HTTPSTEP_ITEM_TYPE_TIME',		1);
 define('HTTPSTEP_ITEM_TYPE_IN',			2);
@@ -771,6 +783,8 @@ define('ZBX_ACKNOWLEDGE_ACTION_NONE',			0x00);
 define('ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM',	0x01);
 
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
+
+define('ZBX_TM_STATUS_NEW', 1);
 
 define('EVENT_SOURCE_TRIGGERS',				0);
 define('EVENT_SOURCE_DISCOVERY',			1);
@@ -994,21 +1008,23 @@ define('XML_REQUIRED',		0x08);
 
 // API validation
 // scalar data types
-define('API_STRING_UTF8',	1);
-define('API_INT32',			2);
-define('API_ID',			3);
-define('API_BOOLEAN',		4);
-define('API_FLAG',			5);
+define('API_STRING_UTF8',		1);
+define('API_INT32',				2);
+define('API_ID',				3);
+define('API_BOOLEAN',			4);
+define('API_FLAG',				5);
 // arrays
-define('API_OBJECT',		6);
-define('API_IDS',			7);
-define('API_OBJECTS',		8);
+define('API_OBJECT',			6);
+define('API_IDS',				7);
+define('API_OBJECTS',			8);
 // specific types
-define('API_HG_NAME',		9);
-define('API_SCRIPT_NAME',	10);
-define('API_USER_MACRO',	11);
-define('API_TIME_PERIOD',	12);
-define('API_REGEX',			13);
+define('API_HG_NAME',			9);
+define('API_SCRIPT_NAME',		10);
+define('API_USER_MACRO',		11);
+define('API_TIME_PERIOD',		12);
+define('API_REGEX',				13);
+define('API_HTTP_POST',			14);
+define('API_VARIABLE_NAME',		15);
 
 // flags
 define('API_REQUIRED',		0x01);

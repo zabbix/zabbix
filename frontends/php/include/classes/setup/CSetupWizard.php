@@ -215,48 +215,36 @@ class CSetupWizard extends CForm {
 			new CComboBox('type', $DB['TYPE'], 'submit()', CFrontendSetup::getSupportedDatabases())
 		);
 
-		switch ($DB['TYPE']) {
-			case ZBX_DB_SQLITE3:
-				$table->addRow(
-					_('Database file'),
-					(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				);
-				break;
+		$table->addRow(_('Database host'),
+			(new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		);
 
-			default:
-				$table->addRow(_('Database host'),
-					(new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost')))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				);
+		$table->addRow(_('Database port'), [
+			(new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, false, false, false))
+				->removeAttribute('style')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
+		]);
 
-				$table->addRow(_('Database port'), [
-					(new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, false, false, false))
-						->removeAttribute('style')
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
-				]);
+		$table->addRow(_('Database name'),
+			(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		);
 
-				$table->addRow(_('Database name'),
-					(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				);
-
-				if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-					$table->addRow(_('Database schema'),
-						(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					);
-				}
-
-				$table->addRow(_('User'),
-					(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				);
-				$table->addRow(_('Password'),
-					(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				);
-				break;
+		if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+			$table->addRow(_('Database schema'),
+				(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			);
 		}
+
+		$table->addRow(_('User'),
+			(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		);
+		$table->addRow(_('Password'),
+			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		);
 
 		if ($this->STEP_FAILED) {
 			global $ZBX_MESSAGES;
@@ -312,23 +300,16 @@ class CSetupWizard extends CForm {
 		$table = new CFormList();
 		$table->addRow((new CSpan(_('Database type')))->addClass(ZBX_STYLE_GREY), $databases[$db_type]);
 
-		switch ($db_type) {
-			case ZBX_DB_SQLITE3:
-				$table->addRow((new CSpan(_('Database file')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
-				break;
-			default:
-				$db_port = ($this->getConfig('DB_PORT') == 0) ? _('default') : $this->getConfig('DB_PORT');
-				$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
+		$db_port = ($this->getConfig('DB_PORT') == 0) ? _('default') : $this->getConfig('DB_PORT');
+		$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
 
-				$table->addRow((new CSpan(_('Database server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SERVER'));
-				$table->addRow((new CSpan(_('Database port')))->addClass(ZBX_STYLE_GREY), $db_port);
-				$table->addRow((new CSpan(_('Database name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
-				$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
-				$table->addRow((new CSpan(_('Database password')))->addClass(ZBX_STYLE_GREY), $db_password);
-				if ($db_type == ZBX_DB_DB2 || $db_type == ZBX_DB_POSTGRESQL) {
-					$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
-				}
-				break;
+		$table->addRow((new CSpan(_('Database server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SERVER'));
+		$table->addRow((new CSpan(_('Database port')))->addClass(ZBX_STYLE_GREY), $db_port);
+		$table->addRow((new CSpan(_('Database name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
+		$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
+		$table->addRow((new CSpan(_('Database password')))->addClass(ZBX_STYLE_GREY), $db_password);
+		if ($db_type == ZBX_DB_DB2 || $db_type == ZBX_DB_POSTGRESQL) {
+			$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 		}
 
 		$table->addRow(null, null);

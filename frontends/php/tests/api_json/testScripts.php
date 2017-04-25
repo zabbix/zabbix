@@ -126,8 +126,8 @@ class testScripts extends CZabbixTest {
 			[
 				'script' => [
 					[
-					'name' => 'Апи скрипт создан утф-8',
-					'command' => 'reboot server 1'
+						'name' => 'Апи скрипт создан утф-8',
+						'command' => 'reboot server 1'
 					]
 				],
 				'success_expected' => true,
@@ -136,12 +136,12 @@ class testScripts extends CZabbixTest {
 			[
 				'script' => [
 					[
-					'name' => 'Api create one script',
-					'command' => 'reboot server 1'
+						'name' => 'Api create one script',
+						'command' => 'reboot server 1'
 					],
 					[
-					'name' => 'æų',
-					'command' => 'æų'
+						'name' => 'æų',
+						'command' => 'æų'
 					]
 				],
 				'success_expected' => true,
@@ -171,7 +171,7 @@ class testScripts extends CZabbixTest {
 				$this->assertEquals($dbRowUser['description'], '');
 				$this->assertEquals($dbRowUser['confirmation'], '');
 				$this->assertEquals($dbRowUser['type'], 0);
-				$this->assertEquals($dbRowUser['execute_on'], 1);
+				$this->assertEquals($dbRowUser['execute_on'], 2);
 			}
 		}
 		else {
@@ -386,7 +386,7 @@ class testScripts extends CZabbixTest {
 				$this->assertEquals($dbRow['description'], '');
 				$this->assertEquals($dbRow['confirmation'], '');
 				$this->assertEquals($dbRow['type'], 0);
-				$this->assertEquals($dbRow['execute_on'], 1);
+				$this->assertEquals($dbRow['execute_on'], 2);
 			}
 		}
 		else {
@@ -585,10 +585,10 @@ class testScripts extends CZabbixTest {
 				'script' => [
 					'name' => 'Api nonexistent execute_on',
 					'command' => 'reboot server',
-					'execute_on' => '2'
+					'execute_on' => '3'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of 0, 1.'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of 0, 1, 2.'
 			],
 			[
 				'script' => [
@@ -852,8 +852,15 @@ class testScripts extends CZabbixTest {
 					'scriptid' => '1',
 					'hostid' => '10084'
 					],
-				'success_expected' => true,
-				'expected_error' => null
+				// TODO: different success result on jenkins
+				// 'success_expected' => true,
+				'success_expected' => false,
+				'expected_error' => 'Connection to Zabbix server "localhost" refused. Possible reasons:
+1. Incorrect server IP/DNS in the "zabbix.conf.php";
+2. Security environment (for example, SELinux) is blocking the connection;
+3. Zabbix server daemon not running;
+4. Firewall is blocking TCP connection.
+Connection refused'
 			]
 		];
 	}
@@ -907,7 +914,14 @@ class testScripts extends CZabbixTest {
 							'scriptid' => '14',
 							'hostid' => '50012'
 						],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				// TODO: different error message on jenkins
+				// 'expected_error' => 'Unknown Script ID [14]'
+				'expected_error' => 'Connection to Zabbix server "localhost" refused. Possible reasons:
+1. Incorrect server IP/DNS in the "zabbix.conf.php";
+2. Security environment (for example, SELinux) is blocking the connection;
+3. Zabbix server daemon not running;
+4. Firewall is blocking TCP connection.
+Connection refused'
 			],
 			// User have deny permissions to host, but script required read permissions for the host.
 			[

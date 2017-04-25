@@ -32,19 +32,6 @@
 #define ZBX_VMWARE_DATASTORE_SIZE_PFREE		2
 #define ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED	3
 
-static const char	*sysinfo_ret_string(int ret)
-{
-	switch (ret)
-	{
-		case SYSINFO_RET_OK:
-			return "SYSINFO_SUCCEED";
-		case SYSINFO_RET_FAIL:
-			return "SYSINFO_FAIL";
-		default:
-			return "SYSINFO_UNKNOWN";
-	}
-}
-
 static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_OK;
@@ -242,7 +229,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		ret = SYSINFO_RET_OK;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -280,7 +267,7 @@ static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const ch
 	ret = vmware_service_get_counter_value_by_path(service, "VirtualMachine", vm->id, path, instance, coeff,
 			result);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -412,7 +399,7 @@ static int	get_vcenter_vmprop(AGENT_REQUEST *request, const char *username, cons
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -481,7 +468,7 @@ static int	get_vcenter_hvprop(AGENT_REQUEST *request, const char *username, cons
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -535,7 +522,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -595,7 +582,7 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -699,7 +686,7 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 
 	ret = SYSINFO_RET_OK;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __function_name, sysinfo_ret_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __function_name, zbx_sysinfo_ret_string(ret),
 			add_results->values_num);
 
 	return ret;
@@ -733,7 +720,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -771,7 +758,7 @@ int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const ch
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -809,7 +796,7 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s fullname:[%s]", __function_name, sysinfo_ret_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s fullname:[%s]", __function_name, zbx_sysinfo_ret_string(ret),
 			ZBX_NULL2STR(fullname));
 
 	return ret;
@@ -863,7 +850,7 @@ int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -882,7 +869,7 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, con
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -948,7 +935,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -964,7 +951,7 @@ int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, cons
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_FULL_NAME, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -980,7 +967,7 @@ int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, const char *username, co
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_NUM_CPU_CORES, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -999,7 +986,7 @@ int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, const char *username, c
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1015,7 +1002,7 @@ int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, const char *username, 
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_CPU_MODEL, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1031,7 +1018,7 @@ int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, const char *username
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_NUM_CPU_THREADS, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1047,7 +1034,7 @@ int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, con
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_MEMORY_SIZE, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1063,7 +1050,7 @@ int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, cons
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_MODEL, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1079,7 +1066,7 @@ int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_UUID, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1095,7 +1082,7 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, con
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_VENDOR, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1161,7 +1148,7 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1180,7 +1167,7 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, c
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1212,7 +1199,7 @@ int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *use
 		UNSET_STR_RESULT(result);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1244,7 +1231,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 		UNSET_STR_RESULT(result);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1259,7 +1246,7 @@ int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const 
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_UPTIME, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1275,7 +1262,7 @@ int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_VERSION, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1323,7 +1310,7 @@ int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1372,7 +1359,7 @@ int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, co
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1421,7 +1408,7 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1464,7 +1451,7 @@ int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *usernam
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1524,7 +1511,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1591,7 +1578,7 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1655,7 +1642,7 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1780,7 +1767,7 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1841,7 +1828,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1858,7 +1845,7 @@ int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_CPU_NUM, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1910,7 +1897,7 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1950,7 +1937,7 @@ int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, con
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1969,7 +1956,7 @@ int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, con
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2017,7 +2004,7 @@ int	check_vcenter_vm_datacenter_name(AGENT_REQUEST *request, const char *usernam
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2093,7 +2080,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2148,7 +2135,7 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2167,7 +2154,7 @@ int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, c
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2186,7 +2173,7 @@ int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2205,7 +2192,7 @@ int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2224,7 +2211,7 @@ int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, const char *use
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2243,7 +2230,7 @@ int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2262,7 +2249,7 @@ int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2281,7 +2268,7 @@ int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *use
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2300,7 +2287,7 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2319,7 +2306,7 @@ int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, co
 	if (SYSINFO_RET_OK == ret)
 		ret = vmware_set_powerstate_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2392,7 +2379,7 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2457,7 +2444,7 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, con
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2522,7 +2509,7 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, co
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2538,7 +2525,7 @@ int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *usern
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_STORAGE_COMMITED, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2554,7 +2541,7 @@ int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *userna
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_STORAGE_UNSHARED, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2570,7 +2557,7 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2586,7 +2573,7 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const 
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_UPTIME, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2658,7 +2645,7 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2723,7 +2710,7 @@ int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2788,7 +2775,7 @@ int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username,
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2854,7 +2841,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2934,7 +2921,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2995,7 +2982,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }

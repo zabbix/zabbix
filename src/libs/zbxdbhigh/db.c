@@ -107,9 +107,14 @@ int	DBconnect(int flag)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBinit(void)
+int	DBinit(char **error)
 {
-	zbx_db_init(CONFIG_DBNAME, db_schema);
+	return zbx_db_init(CONFIG_DBNAME, db_schema, error);
+}
+
+void	DBdeinit(void)
+{
+	zbx_db_deinit();
 }
 
 /******************************************************************************
@@ -682,7 +687,9 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host"))
+			0 == strcmp(tablename, "autoreg_host") ||
+			0 == strcmp(tablename, "task_remote_command") ||
+			0 == strcmp(tablename, "task_remote_command_result"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -2048,6 +2055,8 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 	{
 		if (NULL == (pfield = DBget_field(ptable, field)))
 		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot locate table \"%s\" field \"%s\" in database schema",
+					table, field);
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}

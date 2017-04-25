@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Zabbix backend" default="build" basedir=".">
+	<target name="init">
+		<!-- Create database schema -->
+		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./configure" failonerror="on"></exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
+			<arg line="dbschema"/>
+		</exec>
+	</target>
+	
+	<macrodef name="make">
+		<!-- Build Zabbix with the specified command line arguments -->
+		<attribute name="args"/>
+		<sequential>
+			<exec executable="make" failonerror="on">
+				<arg line="-s"/>
+				<arg line="-j5"/>
+				<arg line="clean"/>
+			</exec>
+			<exec executable="./configure" failonerror="on">
+				<arg line="@{args}"/>
+				<arg line="--prefix=$(pwd)/install"/>
+				<arg line="CFLAGS=&quot;-Wall -Wextra -Wno-maybe-uninitialized -Wdeclaration-after-statement -Wpointer-arith -O2 -g&quot;"/>
+			</exec>
+			<exec executable="make" failonerror="on">
+				<arg line="-s"/>
+				<arg line="-j5"/>
+			</exec>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="make-target">
+		<!-- Build Zabbix with various configuration parameters -->
+		<attribute name="dbargs"/>
+		<sequential>
+			<make args="--enable-server @{dbargs}"/>
+			<make args="--enable-proxy @{dbargs}"/>
+			<make args="--enable-agent"/>
+			<make args="--enable-server --enable-agent --enable-proxy @{dbargs}"/>
+			<make args="--enable-server --enable-agent --enable-proxy @{dbargs} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap  --with-libcurl"/>
+			<make args="--enable-server --enable-agent --enable-proxy @{dbargs} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
+			<make args="--enable-server --enable-agent --enable-proxy @{dbargs} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
+		</sequential>
+	</macrodef>
+
+	<target name="make-mysql">
+		<make-target dbargs="--with-mysql"/>
+	</target>
+
+	<target name="make-postgresql">
+		<make-target dbargs="--with-postgresql"/>
+	</target>
+	
+	<target name="build" depends="init,make-mysql"/>
+</project>

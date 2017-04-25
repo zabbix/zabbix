@@ -88,6 +88,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	CONFIG_ERROR	-7
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
+const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
 
 #define MAX_ID_LEN		21
@@ -672,9 +673,6 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
-/* task manager task types  */
-#define ZBX_TM_TASK_CLOSE_PROBLEM	1
-
 /* acknowledgment actions (flags) */
 #define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
 #define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
@@ -729,6 +727,7 @@ zbx_script_t;
 
 #define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
+#define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
@@ -1042,10 +1041,9 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 		char *severity, size_t severity_len);
 
 /* misc functions */
-#ifdef HAVE_IPV6
 int	is_ip6(const char *ip);
-#endif
 int	is_ip4(const char *ip);
+int	is_supported_ip(const char *ip);
 int	is_ip(const char *ip);
 
 void	zbx_on_exit(void); /* calls exit() at the end! */
@@ -1132,7 +1130,6 @@ int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
-int	zbx_is_utf8(const char *text);
 
 void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
@@ -1360,6 +1357,14 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_HEX2DEC		8
 #define ZBX_PREPROC_DELTA_VALUE		9
 #define ZBX_PREPROC_DELTA_SPEED 	10
+
+#define ZBX_HTTPFIELD_HEADER		0
+#define ZBX_HTTPFIELD_VARIABLE		1
+#define ZBX_HTTPFIELD_POST_FIELD	2
+#define ZBX_HTTPFIELD_QUERY_FIELD	3
+
+#define ZBX_POSTTYPE_RAW		0
+#define ZBX_POSTTYPE_FORM		1
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 

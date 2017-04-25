@@ -615,8 +615,7 @@ static void	DCdump_trigger_tags(const ZBX_DC_TRIGGER *trigger)
 
 	zbx_vector_ptr_create(&index);
 
-	/* must be converted to zbx_vector_ptr_append_array when merged into trunk */
-	zbx_vector_ptr_append_vector(&index, (zbx_vector_ptr_t *)&trigger->tags);
+	zbx_vector_ptr_append_array(&index, trigger->tags.values, trigger->tags.values_num);
 	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  tags:");
@@ -793,8 +792,7 @@ static void	DCdump_corr_conditions(zbx_dc_correlation_t *correlation)
 
 	zbx_vector_ptr_create(&index);
 
-	/* must be converted to zbx_vector_ptr_append_array when merged into trunk */
-	zbx_vector_ptr_append_vector(&index, (zbx_vector_ptr_t *)&correlation->conditions);
+	zbx_vector_ptr_append_array(&index, correlation->conditions.values, correlation->conditions.values_num);
 	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
@@ -837,8 +835,7 @@ static void	DCdump_corr_operations(zbx_dc_correlation_t *correlation)
 
 	zbx_vector_ptr_create(&index);
 
-	/* must be converted to zbx_vector_ptr_append_array when merged into trunk */
-	zbx_vector_ptr_append_vector(&index, (zbx_vector_ptr_t *)&correlation->operations);
+	zbx_vector_ptr_append_array(&index, correlation->operations.values, correlation->operations.values_num);
 	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  operations:");

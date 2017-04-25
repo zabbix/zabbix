@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -10,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -18,23 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_PUNYCODE_H
+#define ZABBIX_PUNYCODE_H
 
-/**
- * Database backend class for SQLite.
- */
-class SqliteDbBackend extends DbBackend {
+#define PUNYCODE_BASE		36
+#define PUNYCODE_BASE_MAX	35
+#define PUNYCODE_TMIN		1
+#define PUNYCODE_TMAX		26
+#define PUNYCODE_SKEW		38
+#define PUNYCODE_DAMP		700
+#define PUNYCODE_INITIAL_N	128
+#define PUNYCODE_INITIAL_BIAS	72
+#define PUNYCODE_BIAS_LIMIT	(((PUNYCODE_BASE_MAX) * PUNYCODE_TMAX) / 2)
+#define PUNYCODE_MAX_UINT32	((uint32_t)-1)
 
-	/**
-	 * Check if 'dbversion' table exists.
-	 *
-	 * @return boolean
-	 */
-	protected function checkDbVersionTable() {
-		if (!DBfetch(DBselect("SELECT name FROM sqlite_master WHERE type='table' AND name='dbversion';"))) {
-			$this->setError(_('The frontend does not match Zabbix database.'));
-			return false;
-		}
+int	zbx_http_punycode_encode(const char *text, char **output);
 
-		return true;
-	}
-}
+#endif

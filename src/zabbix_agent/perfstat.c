@@ -25,11 +25,26 @@
 #include "mutexs.h"
 #include "sysinfo.h"
 
+#define UNSUPPORTED_REFRESH_PERIOD		600
+
+typedef struct
+{
+	PERF_COUNTER_DATA	*pPerfCounterList;
+	PDH_HQUERY		pdh_query;
+	time_t			nextcheck;	/* refresh time of not supported counters */
+}
+ZBX_PERF_STAT_DATA;
+
 static ZBX_PERF_STAT_DATA	ppsd;
 static ZBX_MUTEX		perfstat_access = ZBX_MUTEX_NULL;
 
 #define LOCK_PERFCOUNTERS	zbx_mutex_lock(&perfstat_access)
 #define UNLOCK_PERFCOUNTERS	zbx_mutex_unlock(&perfstat_access)
+
+static int	perf_collector_started(void)
+{
+	return (NULL != ppsd.pdh_query ? SUCCEED : FAIL);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -205,7 +220,7 @@ out:
 
 }
 
-static void	free_perf_counter_list()
+static void	free_perf_counter_list(void)
 {
 	PERF_COUNTER_DATA	*cptr;
 
@@ -231,7 +246,7 @@ static void	free_perf_counter_list()
  *           interval must be less than or equal to counter->interval         *
  *                                                                            *
  ******************************************************************************/
-double	compute_average_value(PERF_COUNTER_DATA *counter, int interval)
+static double	compute_average_value(PERF_COUNTER_DATA *counter, int interval)
 {
 	double	sum = 0;
 	int	i, j, count;
@@ -253,24 +268,32 @@ double	compute_average_value(PERF_COUNTER_DATA *counter, int interval)
 	return sum / (double)count;
 }
 
-int	init_perf_collector(int multithreaded)
+int	init_perf_collector(zbx_threadedness_t threadedness, char **error)
 {
 	const char	*__function_name = "init_perf_collector";
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (0 != multithreaded)
+	switch (threadedness)
 	{
-		if (FAIL == zbx_mutex_create_force(&perfstat_access, ZBX_MUTEX_PERFSTAT))
-		{
-			zbx_error("cannot create mutex for performance counters");
-			exit(EXIT_FAILURE);
-		}
+		case ZBX_SINGLE_THREADED:
+			break;
+		case ZBX_MULTI_THREADED:
+			if (SUCCEED != zbx_mutex_create(&perfstat_access, ZBX_MUTEX_PERFSTAT, error))
+				goto out;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			*error = zbx_strdup(*error, "internal error");
+			goto out;
 	}
 
 	if (ERROR_SUCCESS != zbx_PdhOpenQuery(__function_name, &ppsd.pdh_query))
+	{
+		*error = zbx_strdup(*error, "cannot open performance data query");
 		goto out;
+	}
 
 	ppsd.nextcheck = time(NULL) + UNSUPPORTED_REFRESH_PERIOD;
 
@@ -281,12 +304,7 @@ out:
 	return ret;
 }
 
-int	perf_collector_started()
-{
-	return (NULL != ppsd.pdh_query ? SUCCEED : FAIL);
-}
-
-void	free_perf_collector()
+void	free_perf_collector(void)
 {
 	PERF_COUNTER_DATA	*cptr;
 
@@ -310,7 +328,7 @@ void	free_perf_collector()
 	zbx_mutex_destroy(&perfstat_access);
 }
 
-void	collect_perfstat()
+void	collect_perfstat(void)
 {
 	const char		*__function_name = "collect_perfstat";
 	PERF_COUNTER_DATA	*cptr;
@@ -629,8 +647,3 @@ out:
 
 	return ret;
 }
-
-
-
-
-

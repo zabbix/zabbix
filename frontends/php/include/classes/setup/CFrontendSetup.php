@@ -248,7 +248,7 @@ class CFrontendSetup {
 			'current' => empty($current) ? _('off') : new CSpan($current),
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _('At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported.')
+			'error' => _('At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported.')
 		];
 	}
 
@@ -280,11 +280,6 @@ class CFrontendSetup {
 				'db2_connect', 'db2_escape_string', 'db2_execute', 'db2_fetch_assoc', 'db2_free_result', 'db2_prepare',
 				'db2_rollback', 'db2_set_option', 'db2_stmt_errormsg'])) {
 			$allowed_db[ZBX_DB_DB2] = 'IBM DB2';
-		}
-
-		// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
-		if (class_exists('SQLite3', false) && zbx_is_callable(['ftok', 'sem_acquire', 'sem_get', 'sem_release'])) {
-			$allowed_db[ZBX_DB_SQLITE3] = 'SQLite3';
 		}
 
 		return $allowed_db;

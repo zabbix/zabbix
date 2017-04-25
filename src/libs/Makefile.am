@@ -23,7 +23,9 @@ DIST_SUBDIRS = \
 	zbxexec \
 	zbxself \
 	zbxmodules \
-	zbxregexp
+	zbxregexp \
+	zbxtasks \
+	zbxhttp
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -32,11 +34,13 @@ SERVER_SUBDIRS = \
 	zbxdbupgrade \
 	zbxdbcache \
 	zbxdbhigh \
+	zbxhttp \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
 	zbxmedia \
-	zbxself
+	zbxself \
+	zbxtasks
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -45,10 +49,12 @@ PROXY_SUBDIRS = \
 	zbxdbupgrade \
 	zbxdbcache \
 	zbxdbhigh \
+	zbxhttp \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
-	zbxself
+	zbxself \
+	zbxtasks
 else
 if AGENT
 AGENT_SUBDIRS = \
@@ -64,6 +70,7 @@ SUBDIRS = \
 	zbxalgo \
 	zbxnix \
 	zbxconf \
+	zbxhttp \
 	zbxsysinfo \
 	zbxsys \
 	zbxcomms \

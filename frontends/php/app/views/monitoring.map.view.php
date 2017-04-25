@@ -21,6 +21,8 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
+$this->addJsFile("class.svg.canvas.js");
+$this->addJsFile("class.svg.map.js");
 
 (new CWidget())
 	->setTitle(_('Maps'))
@@ -69,7 +71,8 @@ $this->addJsFile('flickerfreescreen.js');
 						'resourceid' => $data['map']['sysmapid'],
 						'width' => null,
 						'height' => null,
-						'severity_min' => $data['severity_min']
+						'severity_min' => $data['severity_min'],
+						'fullscreen' => $data['fullscreen']
 					]
 				])->get()
 			)
