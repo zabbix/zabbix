@@ -7109,47 +7109,54 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'groupid' => [
+			'value_groupid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'groups',
-				'ref_field' => 'groupid',
+				'ref_field' => 'value_groupid',
 			],
-			'hostid' => [
+			'value_hostid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'hosts',
-				'ref_field' => 'hostid',
+				'ref_field' => 'value_hostid',
 			],
-			'itemid' => [
+			'value_itemid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'items',
-				'ref_field' => 'itemid',
+				'ref_field' => 'value_itemid',
 			],
-			'graphid' => [
+			'value_graphid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'graphs',
-				'ref_field' => 'graphid',
+				'ref_field' => 'value_graphid',
 			],
-			'sysmapid' => [
+			'value_sysmapid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'sysmaps',
-				'ref_field' => 'sysmapid',
+				'ref_field' => 'value_sysmapid',
 			],
-			'dashboardid' => [
+			'value_dashboardid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'dashboard',
-				'ref_field' => 'dashboardid',
+				'ref_field' => 'value_dashboardid',
+			],
+			'value_widgetid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'widget',
+				'ref_field' => 'value_widgetid',
 			],
 		],
 	],
