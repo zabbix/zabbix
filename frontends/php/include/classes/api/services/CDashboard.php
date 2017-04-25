@@ -57,7 +57,7 @@ class CDashboard extends CApiService {
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private']), 'default' => API_OUTPUT_EXTEND],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
 			'selectUserGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['usrgrpid', 'permission']), 'default' => null],
-			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['type', 'name', 'row', 'col', 'height', 'width', 'fields']), 'default' => null],
+			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'in' => implode(',', $this->sortColumns), 'default' => []],
@@ -214,7 +214,7 @@ class CDashboard extends CApiService {
 				'col' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_COL, 'default' => DB::getDefault('widget', 'col')],
 				'height' =>				['type' => API_INT32, 'in' => '1:32', 'default' => DB::getDefault('widget', 'height')],
 				'width' =>				['type' => API_INT32, 'in' => '1:12', 'default' => DB::getDefault('widget', 'width')],
-				'fields' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'fields' =>				['type' => API_OBJECTS, 'fields' => [
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
 					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
 					'value_int' =>			['type' => API_INT32],
@@ -235,7 +235,7 @@ class CDashboard extends CApiService {
 		$this->checkDuplicates(zbx_objectValues($dashboards, 'name'));
 		$this->checkUsers($dashboards);
 		$this->checkUserGroups($dashboards);
-		$this->checkWidgets($dashboards);
+		$this->checkWidgets($dashboards, __FUNCTION__);
 		$this->checkWidgetFields($dashboards);
 	}
 
@@ -280,6 +280,11 @@ class CDashboard extends CApiService {
 		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
 		$this->updateWidget($dashboards, __FUNCTION__);
 
+		foreach ($db_dashboards as &$db_dashboard) {
+			unset($db_dashboard['widgets']);
+		}
+		unset($db_dashboard);
+
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DASHBOARD, $dashboards, $db_dashboards);
 
 		return ['dashboardids' => zbx_objectValues($dashboards, 'dashboardid')];
@@ -312,13 +317,14 @@ class CDashboard extends CApiService {
 				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
 			'widgets' =>			['type' => API_OBJECTS, 'fields' => [
-				'type' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
-				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
-				'row' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_ROW, 'default' => DB::getDefault('widget', 'row')],
-				'col' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_COL, 'default' => DB::getDefault('widget', 'col')],
-				'height' =>				['type' => API_INT32, 'in' => '1:32', 'default' => DB::getDefault('widget', 'height')],
-				'width' =>				['type' => API_INT32, 'in' => '1:12', 'default' => DB::getDefault('widget', 'width')],
-				'fields' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'widgetid' =>			['type' => API_ID],
+				'type' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
+				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name')],
+				'row' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_ROW],
+				'col' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_COL],
+				'height' =>				['type' => API_INT32, 'in' => '1:32'],
+				'width' =>				['type' => API_INT32, 'in' => '1:12'],
+				'fields' =>				['type' => API_OBJECTS, 'fields' => [
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
 					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
 					'value_int' =>			['type' => API_INT32],
@@ -340,12 +346,21 @@ class CDashboard extends CApiService {
 		$db_dashboards = $this->get([
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
 			'dashboardids' => zbx_objectValues($dashboards, 'dashboardid'),
+			'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width'],
 			'preservekeys' => true
 		]);
 
 		$names = [];
 
-		foreach ($dashboards as $dashboard) {
+		$widget_defaults = [
+			'name' => DB::getDefault('widget', 'name'),
+			'row' => DB::getDefault('widget', 'row'),
+			'col' => DB::getDefault('widget', 'col'),
+			'height' => DB::getDefault('widget', 'height'),
+			'width' => DB::getDefault('widget', 'width')
+		];
+
+		foreach ($dashboards as &$dashboard) {
 			// Check if this dashboard exists.
 			if (!array_key_exists($dashboard['dashboardid'], $db_dashboards)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -358,14 +373,42 @@ class CDashboard extends CApiService {
 			if (array_key_exists('name', $dashboard) && $dashboard['name'] !== $db_dashboard['name']) {
 				$names[] = $dashboard['name'];
 			}
+
+			if (array_key_exists('widgets', $dashboard)) {
+				$db_widgets = zbx_toHash($db_dashboard['widgets'], 'widgetid');
+
+				foreach ($dashboard['widgets'] as &$widget) {
+					if (!array_key_exists('widgetid', $widget)) {
+						if (!array_key_exists('type', $widget)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Cannot create widget: %1$s.', _s('the parameter "%1$s" is missing', 'type')
+							));
+						}
+
+						$widget += $widget_defaults;
+					}
+					elseif (!array_key_exists($widget['widgetid'], $db_widgets)) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
+
+				}
+				unset($widget);
+
+				$dashboard['widgets'] = $this->extendObjectsByKey($dashboard['widgets'], $db_widgets, 'widgetid',
+					['row', 'col', 'height', 'width']
+				);
+			}
 		}
+		unset($dashboard);
 
 		if ($names) {
 			$this->checkDuplicates($names);
 		}
 		$this->checkUsers($dashboards);
 		$this->checkUserGroups($dashboards);
-		$this->checkWidgets($dashboards);
+		$this->checkWidgets($dashboards, __FUNCTION__);
 		$this->checkWidgetFields($dashboards);
 	}
 
@@ -595,50 +638,51 @@ class CDashboard extends CApiService {
 		foreach ($dashboards as $dashboard) {
 			if (array_key_exists('widgets', $dashboard)) {
 				foreach ($dashboard['widgets'] as $widget) {
-					foreach ($widget['fields'] as $field) {
-						$field_name = self::getFieldNameByFieldType($field['type']);
+					if (array_key_exists('fields', $widget)) {
+						foreach ($widget['fields'] as $field) {
+							$field_name = self::getFieldNameByFieldType($field['type']);
 
-						if (!array_key_exists($field_name, $field)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s" on dashboard "%3$s": %2$s.', 'fields',
-									$dashboard['name'], _s('the parameter "%1$s" is missing', $field_name)
-								)
-							);
-						}
+							if (!array_key_exists($field_name, $field)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Invalid parameter "%1$s" on dashboard "%3$s": %2$s.', 'fields',
+										$dashboard['name'], _s('the parameter "%1$s" is missing', $field_name)
+									)
+								);
+							}
 
+							switch ($field['type']) {
+								case ZBX_WIDGET_FIELD_TYPE_GROUP:
+									$groupids[$field['value_groupid']] = true;
+									break;
 
-						switch ($field['type']) {
-							case ZBX_WIDGET_FIELD_TYPE_GROUP:
-								$groupids[$field['value_groupid']] = true;
-								break;
+								case ZBX_WIDGET_FIELD_TYPE_HOST:
+									$hostids[$field['value_hostid']] = true;
+									break;
 
-							case ZBX_WIDGET_FIELD_TYPE_HOST:
-								$hostids[$field['value_hostid']] = true;
-								break;
+								case ZBX_WIDGET_FIELD_TYPE_ITEM:
+									$itemids[$field['value_itemid']] = true;
+									break;
 
-							case ZBX_WIDGET_FIELD_TYPE_ITEM:
-								$itemids[$field['value_itemid']] = true;
-								break;
+								case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+									$item_prototypeids[$field['value_itemid']] = true;
+									break;
 
-							case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-								$item_prototypeids[$field['value_itemid']] = true;
-								break;
+								case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+									$graphids[$field['value_graphid']] = true;
+									break;
 
-							case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-								$graphids[$field['value_graphid']] = true;
-								break;
+								case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+									$graph_prototypeids[$field['value_graphid']] = true;
+									break;
 
-							case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-								$graph_prototypeids[$field['value_graphid']] = true;
-								break;
+								case ZBX_WIDGET_FIELD_TYPE_MAP:
+									$sysmapids[$field['value_sysmapid']] = true;
+									break;
 
-							case ZBX_WIDGET_FIELD_TYPE_MAP:
-								$sysmapids[$field['value_sysmapid']] = true;
-								break;
-
-							case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
-								$dashboardids[$field['value_dashboardid']] = true;
-								break;
+								case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
+									$dashboardids[$field['value_dashboardid']] = true;
+									break;
+							}
 						}
 					}
 				}
@@ -970,22 +1014,28 @@ class CDashboard extends CApiService {
 
 		$widgets_fields = [];
 
+		$field_names = [
+			'str' => ['type', 'name'],
+			'int' => ['row', 'col', 'height', 'width']
+		];
 		foreach ($db_widgets as $db_widget) {
 			if ($dashboard_widgets[$db_widget['dashboardid']]) {
 				$widget = array_shift($dashboard_widgets[$db_widget['dashboardid']]);
 
 				$upd_widget = [];
 
-				// strings
-				foreach (['type', 'name'] as $field_name) {
-					if ($widget[$field_name] !== $db_widget[$field_name]) {
-						$upd_widget[$field_name] = $widget[$field_name];
+				foreach ($field_names['str'] as $field_name) {
+					if (array_key_exists($field_name, $widget)) {
+						if ($widget[$field_name] !== $db_widget[$field_name]) {
+							$upd_widget[$field_name] = $widget[$field_name];
+						}
 					}
 				}
-				// integers
-				foreach (['row', 'col', 'height', 'width'] as $field_name) {
-					if ($widget[$field_name] != $db_widget[$field_name]) {
-						$upd_widget[$field_name] = $widget[$field_name];
+				foreach ($field_names['int'] as $field_name) {
+					if (array_key_exists($field_name, $widget)) {
+						if ($widget[$field_name] != $db_widget[$field_name]) {
+							$upd_widget[$field_name] = $widget[$field_name];
+						}
 					}
 				}
 
@@ -996,7 +1046,9 @@ class CDashboard extends CApiService {
 					];
 				}
 
-				$widgets_fields[$db_widget['widgetid']] = $widget['fields'];
+				if (array_key_exists('fields', $widget)) {
+					$widgets_fields[$db_widget['widgetid']] = $widget['fields'];
+				}
 			}
 			else {
 				$del_widgetids[] = $db_widget['widgetid'];
@@ -1015,7 +1067,10 @@ class CDashboard extends CApiService {
 
 			foreach ($dashboard_widgets as $dashboardid => $widgets) {
 				foreach ($widgets as $widget) {
-					$widgets_fields[$widgetids[$index++]] = $widget['fields'];
+					if (array_key_exists('fields', $widget)) {
+						$widgets_fields[$widgetids[$index]] = $widget['fields'];
+					}
+					$index++;
 				}
 			}
 		}
@@ -1244,7 +1299,7 @@ class CDashboard extends CApiService {
 			}
 
 			$db_widgets = API::getApiService()->select('widget', [
-				'output' => $this->outputExtend($options['selectWidgets'], ['dashboardid']),
+				'output' => $this->outputExtend($options['selectWidgets'], ['widgetid', 'dashboardid']),
 				'filter' => ['dashboardid' => $dashboardids],
 				'preservekeys' => true
 			]);
@@ -1275,9 +1330,11 @@ class CDashboard extends CApiService {
 			}
 			unset($row);
 
+			$db_widgets = $this->unsetExtraFields($db_widgets, ['widgetid'], $options['selectWidgets']);
+
 			foreach ($db_widgets as $db_widget) {
 				$dashboardid = $db_widget['dashboardid'];
-				unset($db_widget['widgetid'], $db_widget['dashboardid']);
+				unset($db_widget['dashboardid']);
 
 				$result[$dashboardid]['widgets'][] = $db_widget;
 			}
