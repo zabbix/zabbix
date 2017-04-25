@@ -287,7 +287,7 @@ static char	**dbsync_preproc_row(zbx_dbsync_t *sync, char **row)
 
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_env_init                                                  *
+ * Function: zbx_dbsync_init_env                                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache)
