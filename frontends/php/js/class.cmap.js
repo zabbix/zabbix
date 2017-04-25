@@ -2914,8 +2914,8 @@ ZABBIX.apps.map = (function($) {
 						}
 
 						list.push({
-							fromElementName: this.sysmap.selements[link.selementid1].data.elementName||'',
-							toElementName: this.sysmap.selements[link.selementid2].data.elementName||'',
+							fromElementName: this.sysmap.selements[link.selementid1].data.elements[0].elementName,
+							toElementName: this.sysmap.selements[link.selementid2].data.elements[0].elementName,
 							linkid: link.linkid,
 							linktriggers: linktriggers
 						});
