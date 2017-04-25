@@ -90,7 +90,7 @@ A......... [ZBX-11893] fixed permission issue, when importing hosts that are mon
 ..F....... [ZBX-11907] fixed undefined index in event details page (miks)
 ........S. [ZBX-11931] fixed trigger lastchange update (wiper)
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
-........S. [ZBX-11738] fixed performing actions for problemas that have started and resolved while another problems escalation is executed (vikotrs)
+........S. [ZBX-11738] fixed performing actions for problems that have started and resolved while another problem escalation is executed (viktors)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
 ........S. [ZBX-11829] fixed generation of problems in multiple event mode (Sergejs, abs)
 ..F....... [ZBX-11624] fixed undefined index error for regular expressions form (vmurzins)
