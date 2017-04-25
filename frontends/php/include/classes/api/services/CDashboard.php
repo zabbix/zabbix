@@ -56,7 +56,7 @@ class CDashboard extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private']), 'default' => API_OUTPUT_EXTEND],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
-			'selectUserGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
+			'selectUserGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['usrgrpid', 'permission']), 'default' => null],
 			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['type', 'name', 'row', 'col', 'height', 'width', 'fields']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
