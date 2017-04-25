@@ -1279,7 +1279,7 @@ int	process_httptests(int httppoller_num, int now)
 		httptest.httptest.verify_peer = atoi(row[14]);
 		httptest.httptest.verify_host = atoi(row[15]);
 
-		httptest.httptest.delay = row[18];
+		httptest.httptest.delay = row[16];
 
 		/* add httptest variables to the current test macro cache */
 		http_process_variables(&httptest, &httptest.variables, NULL, NULL);
