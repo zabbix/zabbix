@@ -246,7 +246,7 @@ ZABBIX.apps.map = (function($) {
 		};
 
 		CMap.prototype = {
-			copyPasteBuffer: [],
+			copypaste_buffer: [],
 
 			save: function() {
 				var url = new Curl(location.href);
@@ -509,20 +509,23 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				$(this.container).on('contextmenu', function(event) {
+					var target = $(event.target),
+						item_data = {
+							id: target.data('data-id'),
+							type: target.data('data-type'),
+							popupid: target.data('menu-popup-id')
+						}
+						item = item_data.id,
+						can_copy = that.selection.count.shapes > 0 || that.selection.count.selements > 0,
+						can_paste = that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0,
+						can_remove = item_data.type === 'shapes',
+						can_reorder = item_data.type === 'shapes';
+
 					event.preventDefault();
 					event.stopPropagation();
-
-					var itemData = $(event.target).data() || {};
-					var item = itemData.id;
-
-					var canCopy = that.selection.count.shapes > 0 || that.selection.count.selements >0;
-					var canPaste = that.copyPasteBuffer.items && that.copyPasteBuffer.items.length > 0;
-					var canRemove = itemData.type === 'shapes';
-					var canReorder = itemData.type === 'shapes';
-
 					// we have to recreate menu everytime due copy/paste function availability changes
-					if (itemData.menuPopupId) {
-						$('#'+itemData.menuPopupId).filter('.action-menu').remove();
+					if (item_data.popupid) {
+						$('#'+item_data.popupid).filter('.action-menu').remove();
 					}
 
 					var items = [
@@ -530,7 +533,7 @@ ZABBIX.apps.map = (function($) {
 							'items': [
 								{
 									label: locale['S_BRING_TO_FRONT'],
-									disabled: !canReorder,
+									disabled: !can_reorder,
 									clickCallback: function()
 									{
 										that.reorderShapes(item, 'last');
@@ -539,7 +542,7 @@ ZABBIX.apps.map = (function($) {
 								},
 								{
 									label: locale['S_BRING_FORWARD'],
-									disabled: !canReorder,
+									disabled: !can_reorder,
 									clickCallback: function()
 									{
 										that.reorderShapes(item, 'next');
@@ -548,7 +551,7 @@ ZABBIX.apps.map = (function($) {
 								},
 								{
 									label: locale['S_SEND_BACKWARD'],
-									disabled: !canReorder,
+									disabled: !can_reorder,
 									clickCallback: function()
 									{
 										that.reorderShapes(item, 'previous');
@@ -557,7 +560,7 @@ ZABBIX.apps.map = (function($) {
 								},
 								{
 									label: locale['S_SEND_TO_BACK'],
-									disabled: !canReorder,
+									disabled: !can_reorder,
 									clickCallback: function()
 									{
 										that.reorderShapes(item, 'first');
@@ -570,25 +573,24 @@ ZABBIX.apps.map = (function($) {
 							'items': [
 								{
 									label: locale['S_COPY'],
-									disabled: !canCopy,
+									disabled: !can_copy,
 									clickCallback: function() {
-										that.copyPasteBuffer = that.getSelectionBuffer(that);
+										that.copypaste_buffer = that.getSelectionBuffer(that);
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_PASTE'],
-									disabled: !canPaste,
+									disabled: !can_paste,
 									clickCallback: function() {
-										var deltaX = event.offsetX - that.copyPasteBuffer.left;
-										var deltaY = event.offsetY - that.copyPasteBuffer.top;
+										var delta_x = event.offsetX - that.copypaste_buffer.left,
+											delta_y = event.offsetY - that.copypaste_buffer.top,
+											selectedids;
 
-										deltaX = Math.min(deltaX, parseInt(that.data.width, 10) - that.copyPasteBuffer.right);
-										deltaY = Math.min(deltaY, parseInt(that.data.height, 10) - that.copyPasteBuffer.bottom);
-
-										var selectedIds = that.pasteSelectionBuffer(deltaX, deltaY, that, true);
-
-										that.selectElements(selectedIds, false);
+										delta_x = Math.min(delta_x, parseInt(that.data.width, 10) - that.copypaste_buffer.right);
+										delta_y = Math.min(delta_y, parseInt(that.data.height, 10) - that.copypaste_buffer.bottom);
+										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, true);
+										that.selectElements(selectedids, false);
 										that.hideContextMenus();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
@@ -596,17 +598,16 @@ ZABBIX.apps.map = (function($) {
 								},
 								{
 									label: locale['S_PASTE_SIMPLE'],
-									disabled: !canPaste,
+									disabled: !can_paste,
 									clickCallback: function() {
-										var deltaX = event.offsetX - that.copyPasteBuffer.left;
-										var deltaY = event.offsetY - that.copyPasteBuffer.top;
+										var delta_x = event.offsetX - that.copypaste_buffer.left,
+											delta_y = event.offsetY - that.copypaste_buffer.top,
+											selectedids;
 
-										deltaX = Math.min(deltaX, parseInt(that.data.width, 10) - that.copyPasteBuffer.right);
-										deltaY = Math.min(deltaY, parseInt(that.data.height, 10) - that.copyPasteBuffer.bottom);
-
-										var selectedIds = that.pasteSelectionBuffer(deltaX, deltaY, that, false);
-
-										that.selectElements(selectedIds, false);
+										delta_x = Math.min(delta_x, parseInt(that.data.width, 10) - that.copypaste_buffer.right);
+										delta_y = Math.min(delta_y, parseInt(that.data.height, 10) - that.copypaste_buffer.bottom);
+										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, false);
+										that.selectElements(selectedids, false);
 										that.hideContextMenus();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
@@ -614,7 +615,7 @@ ZABBIX.apps.map = (function($) {
 								},
 								{
 									label: locale['S_REMOVE'],
-									disabled: !canRemove,
+									disabled: !can_remove,
 									clickCallback: function()
 									{
 										that.shapes[item].remove();
@@ -824,21 +825,23 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * paste that.copyPasteBuffer content at new location
+			 * Paste that.copypaste_buffer content at new location.
 			 *
-			 * @param	{number}	deltaX
-			 * @param	{number}	deltaY
-			 * @param	{Object}	that
-			 * @param	{bool}		keepExternalLinks	should be links to non selected elements copied
-			 * @return	{Array.<{id:number, type:string}>}
+			 * @param	{number}	delta_x				shift between desired and actual x position
+			 * @param	{number}	delta_y				shift between desired and actual y position
+			 * @param	{Object}	that				CMap object
+			 * @param	{bool}		keep_external_links	should be links to non selected elements copied
+			 * @return	{Array}
 			 */
-			pasteSelectionBuffer: function(deltaX, deltaY, that, keepExternalLinks) {
-				var selectedIds = [];
-				var sourceCloneIds = {};
-				that.copyPasteBuffer.items.forEach(function(elementData) {
-					var type = elementData.type;
-					var data = $.extend({}, elementData.data, false);
-					var element;
+			pasteSelectionBuffer: function(delta_x, delta_y, that, keep_external_links) {
+				var selectedids = [],
+					sourceCloneIds = {};
+
+				that.copypaste_buffer.items.forEach(function(element_data) {
+					var data = $.extend({}, element_data.data, false),
+						type = element_data.type,
+						element;
+
 					switch (type) {
 						case 'selements' :
 							element = new Selement(that);
@@ -853,25 +856,29 @@ ZABBIX.apps.map = (function($) {
 							break;
 					}
 					if (element) {
-						data.x = parseInt(data.x, 10) + deltaX;
-						data.y = parseInt(data.y, 10) + deltaY;
+						data.x = parseInt(data.x, 10) + delta_x;
+						data.y = parseInt(data.y, 10) + delta_y;
 						element.update(data);
 						that[type][element.id] = element;
-						selectedIds.push({
+						selectedids.push({
 							id: element.id,
 							type: type
 						});
-						sourceCloneIds[elementData.id] = element.id;
+						sourceCloneIds[element_data.id] = element.id;
 						if (that.data.grid_align === '1') {
 							element.align(true);
 						}
 					}
 				});
 
-				var link, fromid, toid, data;
-				that.copyPasteBuffer.links.forEach(function(linkData) {
-					data = $.extend({}, linkData.data, false);
-					if (!keepExternalLinks && (data.selementid1 in sourceCloneIds === false ||
+				var link,
+					fromid,
+					toid,
+					data;
+
+				that.copypaste_buffer.links.forEach(function(link_data) {
+					data = $.extend({}, link_data.data, false);
+					if (!keep_external_links && (data.selementid1 in sourceCloneIds === false ||
 						data.selementid2 in sourceCloneIds === false)
 					) {
 						return;
@@ -888,43 +895,44 @@ ZABBIX.apps.map = (function($) {
 					that.links[link.id] = link;
 				});
 
-				return selectedIds;
+				return selectedids;
 			},
 
 			/**
-			 * return object with selected elements data and links
+			 * Return object with selected elements data and links
 			 *
-			 * @param  {Object}	that
-			 * @return {Object} buffer
-			 * @return {Array}	buffer.items	selected elements - Selement, Shape
-			 * @return {Array}	buffer.links	links between selected elements
-			 * @return {number}	buffer.top		boundary box top coordinate
-			 * @return {number}	buffer.left		boundary box left coordinate
-			 * @return {number}	buffer.bottom	boundary box bottom coordinate
-			 * @return {number}	buffer.right	boundary box right coordinate
+			 * @param  {Object}	that			CMap object
+			 * @return {Object}
 			 */
 			getSelectionBuffer: function(that) {
-				var items = [];
-				var left = null, top = null, right = null, bottom = null;
-				// iterate over all type of elements stored in that.selection
+				var items = [],
+					left = null,
+					top = null,
+					right = null,
+					bottom = null;
+
 				for (var type in that.selection) {
 					if (type in that === false || typeof that[type] !== 'object') {
 						continue;
 					}
-					var data, domNode, x, y;
+					var data,
+						dom_node,
+						x,
+						y;
+
 					for (var id in that.selection[type]) {
 						if ('getData' in that[type][id] === false) {
 							continue;
 						}
 						// get rid of observers, only current data
 						data = $.extend({}, that[type][id].getData(), false);
-						domNode = that[type][id].domNode;
+						dom_node = that[type][id].domNode;
 						x = parseInt(data.x, 10);
 						y = parseInt(data.y, 10);
 						left = Math.min(x, left === null ? x : left);
 						top = Math.min(y, top === null ? y : top);
-						right = Math.max(x + domNode.outerWidth(true), right === null ? 0 : right);
-						bottom = Math.max(y + domNode.outerHeight(true), bottom === null ? 0 : bottom);
+						right = Math.max(x + dom_node.outerWidth(true), right === null ? 0 : right);
+						bottom = Math.max(y + dom_node.outerHeight(true), bottom === null ? 0 : bottom);
 						items.push({
 							id: id,
 							type: type,
@@ -933,9 +941,11 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 				var links = [];
+
 				for (var id in that.links) {
 					// get rid of observers, only current data
 					var data = $.extend({}, that.links[id].getData(), false);
+
 					if (data.selementid1 in that.selection.selements || data.selementid2 in that.selection.selements) {
 						links.push({
 							id: id,
