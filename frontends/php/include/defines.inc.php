@@ -1032,7 +1032,7 @@ define('API_TIME_PERIOD',		12);
 define('API_REGEX',				13);
 define('API_HTTP_POST',			14);
 define('API_VARIABLE_NAME',		15);
-define('API_TIME_UNIT',		14);
+define('API_TIME_UNIT',			16);
 
 // flags
 define('API_REQUIRED',			0x01);
