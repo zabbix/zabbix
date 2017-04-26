@@ -1516,7 +1516,7 @@ static char	**dbsync_item_preproc_row(char **row)
 {
 #define ZBX_DBSYNC_ITEM_COLUMN_DELAY	0x01
 #define ZBX_DBSYNC_ITEM_COLUMN_HISTORY	0x02
-#define ZBX_DBSYNC_ITEM_COLUMN_TRENDS	0x02
+#define ZBX_DBSYNC_ITEM_COLUMN_TRENDS	0x04
 
 	zbx_uint64_t	hostid;
 	unsigned char	flags = 0;
@@ -1577,6 +1577,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
 	ZBX_DC_ITEM		*item;
+	char			**row;
 
 	if (NULL == (result = DBselect(
 			"select i.itemid,i.hostid,i.status,i.type,i.value_type,i.key_,"
@@ -1614,13 +1615,15 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
 
+		row = dbsync_preproc_row(sync, dbrow);
+
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&dbsync_env.cache->items, &rowid)))
 			tag = ZBX_DBSYNC_ROW_ADD;
-		else if (FAIL == dbsync_compare_item(item, dbrow))
+		else if (FAIL == dbsync_compare_item(item, row))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, dbrow);
+			dbsync_add_row(sync, rowid, tag, row);
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->items, &iter);
