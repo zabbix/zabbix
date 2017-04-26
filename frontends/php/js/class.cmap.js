@@ -583,8 +583,9 @@ ZABBIX.apps.map = (function($) {
 									label: locale['S_PASTE'],
 									disabled: !can_paste,
 									clickCallback: function() {
-										var delta_x = event.offsetX - that.copypaste_buffer.left,
-											delta_y = event.offsetY - that.copypaste_buffer.top,
+										var offset = $(that.container).offset(),
+											delta_x = event.pageX - offset.left - that.copypaste_buffer.left,
+											delta_y = event.pageY - offset.top - that.copypaste_buffer.top,
 											selectedids;
 
 										delta_x = Math.min(delta_x, parseInt(that.data.width, 10) - that.copypaste_buffer.right);
@@ -600,8 +601,9 @@ ZABBIX.apps.map = (function($) {
 									label: locale['S_PASTE_SIMPLE'],
 									disabled: !can_paste,
 									clickCallback: function() {
-										var delta_x = event.offsetX - that.copypaste_buffer.left,
-											delta_y = event.offsetY - that.copypaste_buffer.top,
+										var offset = $(that.container).offset(),
+											delta_x = event.pageX - offset.left - that.copypaste_buffer.left,
+											delta_y = event.pageY - offset.top - that.copypaste_buffer.top,
 											selectedids;
 
 										delta_x = Math.min(delta_x, parseInt(that.data.width, 10) - that.copypaste_buffer.right);
