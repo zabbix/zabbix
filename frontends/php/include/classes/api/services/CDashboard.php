@@ -39,7 +39,7 @@ class CDashboard extends CApiService {
 	public function get(array $options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'dashboardids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'dashboardids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'dashboardid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -1064,7 +1064,7 @@ class CDashboard extends CApiService {
 		}
 
 		if ($db_widgets) {
-			DB::delete('widget', ['dashboard_usrgrpid' => array_keys($db_widgets)]);
+			DB::delete('widget', ['widgetid' => array_keys($db_widgets)]);
 		}
 
 		$this->updateWidgetField($dashboards, $method);
@@ -1086,7 +1086,7 @@ class CDashboard extends CApiService {
 				foreach ($dashboard['widgets'] as $widget) {
 					if (array_key_exists('fields', $widget)) {
 						CArrayHelper::sort($widget['fields'], ['type', 'name']);
-						$widget_fields[$widget['widgetid']] = $widget['fields'];
+						$widgets_fields[$widget['widgetid']] = $widget['fields'];
 					}
 				}
 			}
