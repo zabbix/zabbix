@@ -511,8 +511,8 @@ ZABBIX.apps.map = (function($) {
 				$(this.container).on('contextmenu', function(event) {
 					var target = $(event.target),
 						item_data = {
-							id: target.data('data-id'),
-							type: target.data('data-type'),
+							id: target.attr('data-id'),
+							type: target.attr('data-type'),
 							popupid: target.data('menu-popup-id')
 						}
 						item = item_data.id,
