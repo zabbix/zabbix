@@ -278,7 +278,7 @@ class CDashboard extends CApiService {
 
 		$this->updateDashboardUser($dashboards, __FUNCTION__);
 		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
-		$this->updateWidget($dashboards, __FUNCTION__);
+		$this->updateWidget($dashboards, __FUNCTION__, $db_dashboards);
 
 		foreach ($db_dashboards as &$db_dashboard) {
 			unset($db_dashboard['widgets']);
@@ -985,79 +985,60 @@ class CDashboard extends CApiService {
 	 *
 	 * @param array  $dashboards
 	 * @param string $method
+	 * @param array  $db_dashboards
 	 */
-	private function updateWidget(array $dashboards, $method) {
-		$dashboard_widgets = [];
+	private function updateWidget(array $dashboards, $method, array $db_dashboards = null) {
+		$db_widgets = [];
 
-		foreach ($dashboards as $dashboard) {
-			if (array_key_exists('widgets', $dashboard)) {
-				CArrayHelper::sort($dashboard['widgets'], ['row', 'col']);
-				$dashboard_widgets[$dashboard['dashboardid']] = $dashboard['widgets'];
+		if ($db_dashboards !== null) {
+			foreach ($db_dashboards as $db_dashboard) {
+				$db_widgets += zbx_toHash($db_dashboard['widgets'], 'widgetid');
 			}
 		}
 
-		if (!$dashboard_widgets) {
-			return;
-		}
-
-		$db_widgets = ($method === 'update')
-			? DB::select('widget', [
-				'output' => ['widgetid', 'dashboardid', 'type', 'name', 'row', 'col', 'height', 'width'],
-				'filter' => ['dashboardid' => array_keys($dashboard_widgets)],
-				'sortfield' => ['dashboardid', 'row', 'col']
-			])
-			: [];
-
 		$ins_widgets = [];
 		$upd_widgets = [];
-		$del_widgetids = [];
-
-		$widgets_fields = [];
 
 		$field_names = [
 			'str' => ['type', 'name'],
 			'int' => ['row', 'col', 'height', 'width']
 		];
-		foreach ($db_widgets as $db_widget) {
-			if ($dashboard_widgets[$db_widget['dashboardid']]) {
-				$widget = array_shift($dashboard_widgets[$db_widget['dashboardid']]);
 
-				$upd_widget = [];
+		foreach ($dashboards as $dashboard) {
+			if (array_key_exists('widgets', $dashboard)) {
+				foreach ($dashboard['widgets'] as $widget) {
+					if (array_key_exists('widgetid', $widget)) {
+						$db_widget = $db_widgets[$widget['widgetid']];
+						unset($db_widgets[$widget['widgetid']]);
 
-				foreach ($field_names['str'] as $field_name) {
-					if (array_key_exists($field_name, $widget)) {
-						if ($widget[$field_name] !== $db_widget[$field_name]) {
-							$upd_widget[$field_name] = $widget[$field_name];
+						$upd_widget = [];
+
+						foreach ($field_names['str'] as $field_name) {
+							if (array_key_exists($field_name, $widget)) {
+								if ($widget[$field_name] !== $db_widget[$field_name]) {
+									$upd_widget[$field_name] = $widget[$field_name];
+								}
+							}
+						}
+						foreach ($field_names['int'] as $field_name) {
+							if (array_key_exists($field_name, $widget)) {
+								if ($widget[$field_name] != $db_widget[$field_name]) {
+									$upd_widget[$field_name] = $widget[$field_name];
+								}
+							}
+						}
+
+						if ($upd_widget) {
+							$upd_widgets[] = [
+								'values' => $upd_widget,
+								'where' => ['widgetid' => $db_widget['widgetid']]
+							];
 						}
 					}
-				}
-				foreach ($field_names['int'] as $field_name) {
-					if (array_key_exists($field_name, $widget)) {
-						if ($widget[$field_name] != $db_widget[$field_name]) {
-							$upd_widget[$field_name] = $widget[$field_name];
-						}
+					else {
+						$ins_widgets[] = ['dashboardid' => $dashboard['dashboardid']] + $widget;
 					}
 				}
-
-				if ($upd_widget) {
-					$upd_widgets[] = [
-						'values' => $upd_widget,
-						'where' => ['widgetid' => $db_widget['widgetid']]
-					];
-				}
-
-				if (array_key_exists('fields', $widget)) {
-					$widgets_fields[$db_widget['widgetid']] = $widget['fields'];
-				}
-			}
-			else {
-				$del_widgetids[] = $db_widget['widgetid'];
-			}
-		}
-
-		foreach ($dashboard_widgets as $dashboardid => $widgets) {
-			foreach ($widgets as $widget) {
-				$ins_widgets[] = ['dashboardid' => $dashboardid] + $widget;
 			}
 		}
 
@@ -1065,39 +1046,51 @@ class CDashboard extends CApiService {
 			$widgetids = DB::insertBatch('widget', $ins_widgets);
 			$index = 0;
 
-			foreach ($dashboard_widgets as $dashboardid => $widgets) {
-				foreach ($widgets as $widget) {
-					if (array_key_exists('fields', $widget)) {
-						$widgets_fields[$widgetids[$index]] = $widget['fields'];
+			foreach ($dashboards as &$dashboard) {
+				if (array_key_exists('widgets', $dashboard)) {
+					foreach ($dashboard['widgets'] as &$widget) {
+						if (!array_key_exists('widgetid', $widget)) {
+							$widget['widgetid'] = $widgetids[$index++];
+						}
 					}
-					$index++;
+					unset($widget);
 				}
 			}
+			unset($dashboard);
 		}
 
 		if ($upd_widgets) {
 			DB::update('widget', $upd_widgets);
 		}
 
-		if ($del_widgetids) {
-			DB::delete('widget', ['dashboard_usrgrpid' => $del_widgetids]);
+		if ($db_widgets) {
+			DB::delete('widget', ['dashboard_usrgrpid' => array_keys($db_widgets)]);
 		}
 
-		$this->updateWidgetField($widgets_fields, $method);
+		$this->updateWidgetField($dashboards, $method);
 	}
 
 	/**
 	 * Update table "widget_field".
 	 *
-	 * @param array  $widgets_fields
-	 * @param array  $widgets_fields[<widgetid>]
+	 * @param array  $dashboards
+	 * @param array  $dashboards[]['widgets']              (optional)
+	 * @param array  $dashboards[]['widgets'][]['fields']  (optional)
 	 * @param string $method
 	 */
-	private function updateWidgetField(array $widgets_fields, $method) {
-		foreach ($widgets_fields as &$widget_fields) {
-			CArrayHelper::sort($widget_fields, ['type', 'name']);
+	private function updateWidgetField(array $dashboards, $method) {
+		$widgets_fields = [];
+
+		foreach ($dashboards as $dashboard) {
+			if (array_key_exists('widgets', $dashboard)) {
+				foreach ($dashboard['widgets'] as $widget) {
+					if (array_key_exists('fields', $widget)) {
+						CArrayHelper::sort($widget['fields'], ['type', 'name']);
+						$widget_fields[$widget['widgetid']] = $widget['fields'];
+					}
+				}
+			}
 		}
-		unset($widget_fields);
 
 		$db_widget_fields = ($method === 'update')
 			? DB::select('widget_field', [
