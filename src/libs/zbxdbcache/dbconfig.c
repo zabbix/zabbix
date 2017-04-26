@@ -2239,7 +2239,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		{
 			snmpitem = DCfind_id(&config->snmpitems, itemid, sizeof(ZBX_DC_SNMPITEM), &found);
 
-			DCstrpool_replace(found, &snmpitem->snmp_community, row[5]);
+			DCstrpool_replace(found, &snmpitem->snmp_community, row[6]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_securityname, row[9]);
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[10]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_authpassphrase, row[11]);
@@ -2289,11 +2289,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 
 		/* trapper items */
 
-		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[16])
+		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[15])
 		{
 			trapitem = DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
 			zbx_trim_str_list(row[16], ',');
-			DCstrpool_replace(found, &trapitem->trapper_hosts, row[16]);
+			DCstrpool_replace(found, &trapitem->trapper_hosts, row[15]);
 		}
 		else if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
 		{
@@ -2304,11 +2304,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 
 		/* log items */
 
-		if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *row[17])
+		if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *row[16])
 		{
 			logitem = DCfind_id(&config->logitems, itemid, sizeof(ZBX_DC_LOGITEM), &found);
 
-			DCstrpool_replace(found, &logitem->logtimefmt, row[17]);
+			DCstrpool_replace(found, &logitem->logtimefmt, row[16]);
 		}
 		else if (NULL != (logitem = zbx_hashset_search(&config->logitems, &itemid)))
 		{
@@ -2319,13 +2319,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 
 		/* db items */
 
-		if (ITEM_TYPE_DB_MONITOR == item->type && '\0' != *row[18])
+		if (ITEM_TYPE_DB_MONITOR == item->type && '\0' != *row[17])
 		{
 			dbitem = DCfind_id(&config->dbitems, itemid, sizeof(ZBX_DC_DBITEM), &found);
 
-			DCstrpool_replace(found, &dbitem->params, row[18]);
-			DCstrpool_replace(found, &dbitem->username, row[21]);
-			DCstrpool_replace(found, &dbitem->password, row[22]);
+			DCstrpool_replace(found, &dbitem->params, row[17]);
+			DCstrpool_replace(found, &dbitem->username, row[20]);
+			DCstrpool_replace(found, &dbitem->password, row[21]);
 		}
 		else if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &itemid)))
 		{
@@ -2343,12 +2343,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		{
 			sshitem = DCfind_id(&config->sshitems, itemid, sizeof(ZBX_DC_SSHITEM), &found);
 
-			sshitem->authtype = (unsigned short)atoi(row[20]);
-			DCstrpool_replace(found, &sshitem->username, row[21]);
-			DCstrpool_replace(found, &sshitem->password, row[22]);
-			DCstrpool_replace(found, &sshitem->publickey, row[23]);
-			DCstrpool_replace(found, &sshitem->privatekey, row[24]);
-			DCstrpool_replace(found, &sshitem->params, row[18]);
+			sshitem->authtype = (unsigned short)atoi(row[19]);
+			DCstrpool_replace(found, &sshitem->username, row[20]);
+			DCstrpool_replace(found, &sshitem->password, row[21]);
+			DCstrpool_replace(found, &sshitem->publickey, row[22]);
+			DCstrpool_replace(found, &sshitem->privatekey, row[23]);
+			DCstrpool_replace(found, &sshitem->params, row[17]);
 		}
 		else if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &itemid)))
 		{
@@ -2369,9 +2369,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		{
 			telnetitem = DCfind_id(&config->telnetitems, itemid, sizeof(ZBX_DC_TELNETITEM), &found);
 
-			DCstrpool_replace(found, &telnetitem->username, row[21]);
-			DCstrpool_replace(found, &telnetitem->password, row[22]);
-			DCstrpool_replace(found, &telnetitem->params, row[18]);
+			DCstrpool_replace(found, &telnetitem->username, row[20]);
+			DCstrpool_replace(found, &telnetitem->password, row[21]);
+			DCstrpool_replace(found, &telnetitem->params, row[17]);
 		}
 		else if (NULL != (telnetitem = zbx_hashset_search(&config->telnetitems, &itemid)))
 		{
@@ -2390,8 +2390,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		{
 			simpleitem = DCfind_id(&config->simpleitems, itemid, sizeof(ZBX_DC_SIMPLEITEM), &found);
 
-			DCstrpool_replace(found, &simpleitem->username, row[21]);
-			DCstrpool_replace(found, &simpleitem->password, row[22]);
+			DCstrpool_replace(found, &simpleitem->username, row[20]);
+			DCstrpool_replace(found, &simpleitem->password, row[21]);
 		}
 		else if (NULL != (simpleitem = zbx_hashset_search(&config->simpleitems, &itemid)))
 		{
@@ -2409,8 +2409,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		{
 			jmxitem = DCfind_id(&config->jmxitems, itemid, sizeof(ZBX_DC_JMXITEM), &found);
 
-			DCstrpool_replace(found, &jmxitem->username, row[21]);
-			DCstrpool_replace(found, &jmxitem->password, row[22]);
+			DCstrpool_replace(found, &jmxitem->username, row[20]);
+			DCstrpool_replace(found, &jmxitem->password, row[21]);
 		}
 		else if (NULL != (jmxitem = zbx_hashset_search(&config->jmxitems, &itemid)))
 		{
@@ -2446,7 +2446,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		{
 			calcitem = DCfind_id(&config->calcitems, itemid, sizeof(ZBX_DC_CALCITEM), &found);
 
-			DCstrpool_replace(found, &calcitem->params, row[18]);
+			DCstrpool_replace(found, &calcitem->params, row[17]);
 		}
 		else if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &itemid)))
 		{
