@@ -174,7 +174,9 @@ $fields = [
 									IN('"delay","history","key_","name","status","trends","type"'),
 									null
 								],
-	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null],
+	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX]
 ];
 
 check_fields($fields);
@@ -490,7 +492,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'applications' => $applications,
 				'inventory_link' => getRequest('inventory_link', 0),
 				'description' => getRequest('description', ''),
-				'status' => getRequest('status', ITEM_STATUS_DISABLED)
+				'status' => getRequest('status', ITEM_STATUS_DISABLED),
+				'jmx_endpoint' => getRequest('jmx_endpoint', DB::getDefault('items', 'jmx_endpoint'))
 			];
 
 			if ($preprocessing) {
@@ -503,10 +506,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$db_items = API::Item()->get([
 				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'snmp_community', 'snmpv3_contextname',
 					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase',
-					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
+					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'jmx_endpoint', 'username', 'password',
 					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'delay_flex',
 					'history', 'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description',
-					'status', 'templateid', 'flags'
+					'status', 'templateid', 'flags', 'jmx_endpoint'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params'],
@@ -616,6 +619,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
+				}
+				if ($db_item['jmx_endpoint'] !== getRequest('jmx_endpoint', DB::getDefault('items', 'jmx_endpoint'))) {
+					$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
 				}
 				$db_applications = zbx_objectValues($db_item['applications'], 'applicationid');
 				natsort($db_applications);
@@ -873,6 +879,7 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'valuemapid' => getRequest('valuemapid'),
 				'delay_flex' => $delay_flex,
 				'authtype' => getRequest('authtype'),
+				'jmx_endpoint' => getRequest('jmx_endpoint'),
 				'username' => getRequest('username'),
 				'password' => getRequest('password'),
 				'publickey' => getRequest('publickey'),
@@ -1073,7 +1080,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
-				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'jmx_endpoint', 'username', 'password', 'publickey',
 				'privatekey', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
@@ -1135,6 +1142,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
 		'units' => getRequest('units', ''),
 		'authtype' => getRequest('authtype', ''),
+		'jmx_endpoint' => getRequest('jmx_endpoint', ''),
 		'username' => getRequest('username', ''),
 		'password' => getRequest('password', ''),
 		'publickey' => getRequest('publickey', ''),

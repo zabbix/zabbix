@@ -237,6 +237,8 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'username
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'row_username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_username');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'jmx_endpoint');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_jmx_endpoint');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'row_password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'password');
@@ -282,6 +284,9 @@ foreach ($this->data['types'] as $type => $label) {
 		case ITEM_TYPE_JMX:
 			zbx_subarray_push($this->data['typeVisibility'], $type,
 				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX]
+			);
+			zbx_subarray_push($this->data['typeVisibility'], $type,
+				['id' => 'jmx_endpoint', 'defaultValue' => DB::getDefault('items', 'jmx_endpoint')]
 			);
 			break;
 		default:

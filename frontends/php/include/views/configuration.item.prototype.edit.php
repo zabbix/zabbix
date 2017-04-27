@@ -174,6 +174,10 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
+$itemFormList->addRow(_('JMX endpoint'),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $discovered_item, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'row_jmx_endpoint'
+);
 $itemFormList->addRow(_('User name'),
 	(new CTextBox('username', $this->data['username'], false, 64))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
