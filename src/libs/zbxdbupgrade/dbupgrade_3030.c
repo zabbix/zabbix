@@ -914,6 +914,13 @@ static int	DBpatch_3030068(void)
 	return DBadd_field("httpstep", &field);
 }
 
+static int	DBpatch_3030069(void)
+{
+	const ZBX_FIELD	field = {"jmx_endpoint", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -989,5 +996,6 @@ DBPATCH_ADD(3030065, 0, 1)
 DBPATCH_ADD(3030066, 0, 1)
 DBPATCH_ADD(3030067, 0, 1)
 DBPATCH_ADD(3030068, 0, 1)
+DBPATCH_ADD(3030069, 0, 1)
 
 DBPATCH_END()
