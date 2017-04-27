@@ -1137,6 +1137,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 	}
 
 	if (!empty($elems['triggers']) && $tlabel) {
+		$selements = zbx_toHash($selements, 'selementid');
 		foreach ($elems['triggers'] as $selementid => $elem) {
 			foreach ($elem['elements'] as $element) {
 				$trigger = $selements[$selementid]['triggers'][$element['triggerid']];
