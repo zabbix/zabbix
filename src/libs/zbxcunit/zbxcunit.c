@@ -51,6 +51,23 @@ const char	*zbx_cu_assert_args_str(const char *assert_name, const char *expressi
 	return zbx_cu_assert_args_buffer;
 }
 
+const char	*zbx_cu_assert_args_str_n(const char *assert_name, const char *expression1, const char *actual,
+		const char *expression2, const char *expected, size_t n)
+{
+	size_t	offset = 0;
+	char	tmp[ZBX_CU_ASSERT_BUFFER_SIZE];
+
+	zbx_strlcpy(tmp, actual, MIN(ZBX_CU_ASSERT_BUFFER_SIZE, n + 1));
+	offset = zbx_snprintf(zbx_cu_assert_args_buffer, ZBX_CU_ASSERT_NAME_LENGTH + 1, "%s(", assert_name);
+	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 2, "%s=\"%s\", ",
+			expression1, tmp);
+
+	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=\"%s\")",
+			expression2, expected);
+
+	return zbx_cu_assert_args_buffer;
+}
+
 const char	*zbx_cu_assert_args_ui64(const char *assert_name, const char *expression1, zbx_uint64_t actual,
 		const char *expression2, zbx_uint64_t expected)
 {
@@ -89,6 +106,20 @@ const char	*zbx_cu_assert_args_int(const char *assert_name, const char *expressi
 			expression1, actual);
 	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=%d)",
 			expression2, expected);
+
+	return zbx_cu_assert_args_buffer;
+}
+
+const char	*zbx_cu_assert_args_char(const char *assert_name, const char *expression1, char actual,
+		const char *expression2, char expected)
+{
+	size_t	offset = 0;
+
+	offset = zbx_snprintf(zbx_cu_assert_args_buffer, ZBX_CU_ASSERT_NAME_LENGTH + 1, "%s(", assert_name);
+	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 2, "%s=%c (%d), ",
+			expression1, actual, (int)actual);
+	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=%c (%d))",
+			expression2, expected, (int)expected);
 
 	return zbx_cu_assert_args_buffer;
 }
