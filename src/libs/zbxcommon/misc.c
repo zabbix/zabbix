@@ -1732,7 +1732,7 @@ out:
 	{
 		if (NULL != error)
 		{
-			*error = zbx_dsprintf(*error, "invalid %s interval \"%.*s\"", interval_type,
+			*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
 					(NULL == delim ? (int)strlen(interval_str) : delim - interval_str), interval_str);
 		}
 
