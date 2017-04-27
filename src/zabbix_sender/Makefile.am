@@ -14,7 +14,7 @@ zabbix_sender_LDADD = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a
 
-zabbix_sender_LDADD += @SENDER_LIBS@ $(CUNIT_LDADD)
+zabbix_sender_LDADD += @SENDER_LIBS@
 
 zabbix_sender_LDFLAGS = @SENDER_LDFLAGS@
 

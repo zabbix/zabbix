@@ -39,7 +39,7 @@ zabbix_agentd_LDADD = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a
 
-zabbix_agentd_LDADD += @AGENT_LIBS@ $(CUNIT_LDADD)
+zabbix_agentd_LDADD += @AGENT_LIBS@
 
 zabbix_agentd_LDFLAGS = @AGENT_LDFLAGS@
 
