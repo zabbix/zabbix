@@ -395,6 +395,24 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			// jmx
+			if ($fullItem['type'] == ITEM_TYPE_JMX) {
+				$jmx_rules = [
+					'update'	=> [
+						'jmx_endpoint'		=> 'not_empty|string'
+					],
+					'create'	=> [
+						'jmx_endpoint'		=> 'required|not_empty|string'
+					]
+				];
+				$method = $update ? 'update' : 'create';
+				$jmx_validator = new CNewValidator($fullItem, $jmx_rules[$method]);
+				if ($jmx_validator->isError()) {
+					$errors = $jmx_validator->getAllErrors();
+					self::exception(ZBX_API_ERROR_PARAMETERS, $errors[0]);
+				}
+			}
+
 			// ssh, telnet
 			if ($fullItem['type'] == ITEM_TYPE_SSH || $fullItem['type'] == ITEM_TYPE_TELNET) {
 				if (zbx_empty($fullItem['username'])) {
