@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
+.......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)
 A.FG...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite3 support for frontend and server (abs)
@@ -437,6 +438,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.10rc1
 
 New features:
+.......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
 
