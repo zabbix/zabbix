@@ -117,7 +117,9 @@ $fields = [
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
-	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null],
+	'jmx_endpoint' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX]
 ];
 check_fields($fields);
 
@@ -242,6 +244,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
 			'delay_flex' => $delay_flex,
 			'authtype' => getRequest('authtype'),
+			'jmx_endpoint' => getRequest('jmx_endpoint'),
 			'username' => getRequest('username'),
 			'password' => getRequest('password'),
 			'publickey' => getRequest('publickey'),
