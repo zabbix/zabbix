@@ -407,7 +407,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		uncheckTableRows();
 		show_message(_('Hosts updated'));
 
-		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['hosts']);
+		unset($_REQUEST['masssave'], $_REQUEST['form'], $_REQUEST['hosts']);
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -734,7 +734,7 @@ $_REQUEST['hostid'] = getRequest('hostid', 0);
 
 $config = select_config();
 
-if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && hasRequest('hosts')) {
+if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) && hasRequest('hosts')) {
 	$data = [
 		'hosts' => getRequest('hosts'),
 		'visible' => getRequest('visible', []),
