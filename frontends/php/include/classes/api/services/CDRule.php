@@ -705,7 +705,7 @@ class CDRule extends CApiService {
 		$this->validateUpdate($drules);
 
 		$db_drules = API::DRule()->get([
-			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'nextcheck', 'status'],
+			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname'
@@ -720,14 +720,25 @@ class CDRule extends CApiService {
 		$upd_drules = [];
 
 		foreach ($drules as $drule) {
+			$db_drule = $db_drules[$drule['druleid']];
+
 			// Update drule if it's modified.
-			if (DB::recordModified('drules', $db_drules[$drule['druleid']], $drule)) {
+			if (DB::recordModified('drules', $db_drule, $drule)) {
+				if (array_key_exists('delay', $drule) && $db_drule['delay'] != $drule['delay']) {
+					if ($drule['delay'][0] === '{' || $db_drule['delay'][0] === '{') {
+						$drule['nextcheck'] = 0;
+					}
+					elseif (bccomp(timeUnitToSeconds($db_drule['delay']), timeUnitToSeconds($drule['delay'])) != 0) {
+						$drule['nextcheck'] = 0;
+					}
+				}
+
 				DB::updateByPk('drules', $drule['druleid'], $drule);
 			}
 
 			if (array_key_exists('dchecks', $drule)) {
 				// Update dchecks.
-				$db_dchecks = $db_drules[$drule['druleid']]['dchecks'];
+				$db_dchecks = $db_drule['dchecks'];
 
 				$new_dchecks = [];
 				$old_dchecks = [];
