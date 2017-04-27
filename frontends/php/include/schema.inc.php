@@ -1541,6 +1541,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'jmx_endpoint' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+			]
 		],
 	],
 	'httpstepitem' => [
