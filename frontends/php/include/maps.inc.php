@@ -1100,8 +1100,14 @@ function getSelementsInfo($sysmap, array $options = []) {
 	$elems = separateMapElements($sysmap);
 
 	if (!empty($elems['sysmaps']) && $mlabel) {
+		$sysmapids = [];
+
+		foreach ($elems['sysmaps'] as $sysmap_elem) {
+			$sysmapids[$sysmap_elem['elements'][0]['sysmapid']] = true;
+		}
+
 		$subSysmaps = API::Map()->get([
-			'sysmapids' => zbx_objectValues($elems['sysmaps'], 'elementid'),
+			'sysmapids' => array_keys($sysmapids),
 			'nopermissions' => true,
 			'output' => ['name']
 		]);
@@ -1112,8 +1118,14 @@ function getSelementsInfo($sysmap, array $options = []) {
 		}
 	}
 	if (!empty($elems['hostgroups']) && $hglabel) {
+		$groupids = [];
+
+		foreach ($elems['sysmaps'] as $sysmap_elem) {
+			$groupids[$sysmap_elem['elements'][0]['groupid']] = true;
+		}
+
 		$hostgroups = API::HostGroup()->get([
-			'groupids' => zbx_objectValues($elems['hostgroups'], 'elementid'),
+			'groupids' => array_keys($groupids),
 			'nopermissions' => true,
 			'output' => ['name']
 		]);
@@ -1819,7 +1831,7 @@ function getMapLabels($map, $mapInfo, $resolveMacros) {
 		$label = [];
 
 		if ($selement['label_type'] == MAP_LABEL_TYPE_IP && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$interface = reset($mapHosts[$selement['elementid']]['interfaces']);
+			$interface = reset($mapHosts[$selement['elements'][0]['hostid']]['interfaces']);
 
 			$label[] = ['content' => $interface['ip']];
 			$label = array_merge($label, $statusLines[$selementId]);
