@@ -942,6 +942,12 @@ ZABBIX.apps.map = (function($) {
 						});
 					}
 				}
+				// sort items array according item.data.zindex value
+				items = items.sort(function(a, b) {
+					var aindex = parseInt(a.data.zindex, 10) || 0,
+						bindex = parseInt(b.data.zindex, 10) || 0;
+					return aindex - bindex;
+				});
 				var links = [];
 
 				for (var id in that.links) {
