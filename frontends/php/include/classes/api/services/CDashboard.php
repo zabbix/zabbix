@@ -87,7 +87,7 @@ class CDashboard extends CApiService {
 			$user_groups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sql_where = ['d.userid='.self::$userData['userid']];
-			if ($options['editable']) {
+			if (!$options['editable']) {
 				$sql_where[] = 'd.private='.PUBLIC_SHARING;
 			}
 			$sql_where[] = 'EXISTS ('.
