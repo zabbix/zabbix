@@ -59,7 +59,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a
 	
 
-zabbix_proxy_LDADD += @PROXY_LIBS@
+zabbix_proxy_LDADD += @PROXY_LIBS@ $(CUNIT_LDADD)
 
 zabbix_proxy_LDFLAGS = @PROXY_LDFLAGS@
 
