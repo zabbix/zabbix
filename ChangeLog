@@ -58,6 +58,7 @@ Changes for 3.2.6rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9958] fixed wrongly displayed list view after mass update failure (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.5
@@ -441,6 +442,7 @@ New features:
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-9958] fixed wrongly displayed list view after mass update failure (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.9
