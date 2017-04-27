@@ -1442,7 +1442,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[23], sshitem->privatekey))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[19], sshitem->params))
+		if (FAIL == dbsync_compare_str(dbrow[17], sshitem->params))
 			return FAIL;
 	}
 	else if (NULL != sshitem)
@@ -1460,7 +1460,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[21], telnetitem->password))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[19], telnetitem->params))
+		if (FAIL == dbsync_compare_str(dbrow[17], telnetitem->params))
 			return FAIL;
 	}
 	else if (NULL != telnetitem)

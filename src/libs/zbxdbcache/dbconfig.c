@@ -2134,7 +2134,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 			item->update_triggers = 0;
 			item->nextcheck = 0;
 			item->lastclock = 0;
-			item->state = (unsigned char)atoi(row[19]);
+			item->state = (unsigned char)atoi(row[18]);
 			item->db_state = item->state;
 			ZBX_STR2UINT64(item->lastlogsize, row[29]);
 			item->mtime = atoi(row[30]);
@@ -2292,7 +2292,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[15])
 		{
 			trapitem = DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
-			zbx_trim_str_list(row[16], ',');
+			zbx_trim_str_list(row[15], ',');
 			DCstrpool_replace(found, &trapitem->trapper_hosts, row[15]);
 		}
 		else if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
