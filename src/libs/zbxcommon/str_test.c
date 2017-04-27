@@ -204,10 +204,10 @@ int	ZBX_CU_SUITE(str_test)
 	CU_pSuite	suite = NULL;
 
 	/* test suite: str.c */
-	/* check if user macro parse succeeds */
 	if (NULL == (suite = CU_add_suite("user macro parse test", cu_init_empty, cu_clean_empty)))
 		return CU_get_error();
 
+	/* check if user macro parse succeeds */
 	ZBX_CU_ADD_TEST(suite, "{$A}", user_macro_parse_test1);
 	ZBX_CU_ADD_TEST(suite, "{$A}b", user_macro_parse_test2);
 	ZBX_CU_ADD_TEST(suite, "{$A:1}", user_macro_parse_test3);
