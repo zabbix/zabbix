@@ -1239,6 +1239,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
+	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_HOST		*host;
 	unsigned char		value_type, type;
 
@@ -1494,6 +1495,18 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 	else if (NULL != jmxitem)
+		return FAIL;
+
+	calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&dbsync_env.cache->calcitems, &item->itemid);
+	if (ITEM_TYPE_CALCULATED == item->type)
+	{
+		if (NULL == calcitem)
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[18], calcitem->params))
+			return FAIL;
+	}
+	else if (NULL != calcitem)
 		return FAIL;
 
 	return SUCCEED;
