@@ -513,34 +513,42 @@ ZABBIX.apps.map = (function($) {
 				$(this.container).on('contextmenu', '.sysmap_shape', function(event) {
 					event.preventDefault();
 					var item = $(this).data('id');
+
+					if (typeof that.selection.shapes[item] === 'undefined') {
+						that.selectElements([{
+							id: item,
+							type: 'shapes'
+						}]);
+					}
+
 					$(this).menuPopup([
 						{
 							'items': [
 								{
 									label: locale['S_BRING_TO_FRONT'],
 									clickCallback: function() {
-										that.reorderShapes(item, 'last');
+										that.reorderShapes(that.selection.shapes, 'last');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_BRING_FORWARD'],
 									clickCallback: function() {
-										that.reorderShapes(item, 'next');
+										that.reorderShapes(that.selection.shapes, 'next');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_SEND_BACKWARD'],
 									clickCallback: function() {
-										that.reorderShapes(item, 'previous');
+										that.reorderShapes(that.selection.shapes, 'previous');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_SEND_TO_BACK'],
 									clickCallback: function() {
-										that.reorderShapes(item, 'first');
+										that.reorderShapes(that.selection.shapes, 'first');
 										that.hideContextMenus();
 									}
 								}
@@ -551,7 +559,18 @@ ZABBIX.apps.map = (function($) {
 								{
 									label: locale['S_REMOVE'],
 									clickCallback: function() {
-										that.shapes[item].remove();
+										if (that.selection.count.selements || that.selection.count.shapes) {
+											for (selementid in that.selection.selements) {
+												that.selements[selementid].remove();
+												that.removeLinksBySelementId(selementid);
+											}
+
+											for (shapeid in that.selection.shapes) {
+												that.shapes[shapeid].remove();
+											}
+
+										}
+
 										that.hideContextMenus();
 										that.toggleForm();
 										that.updateImage();
@@ -758,9 +777,12 @@ ZABBIX.apps.map = (function($) {
 				}, this);
 			},
 
-			reorderShapes: function(id, position) {
+			reorderShapes: function(ids, position) {
 				var shapes = [],
-					shape = null;
+					target,
+					temp,
+					ignore = [],
+					selection = [];
 
 				Object.keys(this.shapes).forEach(function(key) {
 					shapes.push(this.shapes[key]);
@@ -771,63 +793,90 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				shapes.forEach(function(value, index) {
-					if (value.id == id) {
-						shape = index;
+					if (typeof ids[value.id] !== 'undefined') {
+						selection.push(index);
 					}
 				});
 
-				// shape was not found
-				if (shape === null) {
-					return;
-				}
-
 				switch (position.toLowerCase()) {
 					case 'first':
-						// no need to update
-						if (shape === 0) {
-							return;
+						target = [];
+
+						for (var i = selection.length - 1; i >= 0; i--) {
+							target.unshift(shapes.splice(selection[i], 1)[0]);
 						}
 
-						$(shapes[shape].domNode).insertBefore(shapes[0].domNode);
-						shapes.splice(0, 0, shapes.splice(shape, 1)[0]);
+						for (var i = 0; i < target.length; i++) {
+							$(target[i].domNode).insertBefore(shapes[0].domNode);
+						}
+
+						shapes = target.concat(shapes);
+
 						shapes.forEach(function(shape, index) {
 							shape.data.zindex = index;
 						});
 						break;
 
 					case 'last':
-						// no need to update
-						if (shape === shapes.length - 1) {
-							return;
+						target = [];
+
+						for (var i = selection.length - 1; i >= 0; i--) {
+							target.unshift(shapes.splice(selection[i], 1)[0]);
 						}
 
-						$(shapes[shape].domNode).insertAfter(shapes[shapes.length - 1].domNode);
-						shapes.splice(shapes.length-1, 0, shapes.splice(shape, 1)[0]);
+						for (var i = target.length - 1; i >= 0 ; i--) {
+							$(target[i].domNode).insertAfter(shapes[shapes.length-1].domNode);
+						}
+
+						shapes = shapes.concat(target);
+
 						shapes.forEach(function(shape, index) {
 							shape.data.zindex = index;
 						});
 						break;
 
 					case 'next':
-						// no need to update
-						if (shape === shapes.length - 1) {
-							return;
-						}
+						ignore.push(shapes.length - 1);
 
-						$(shapes[shape].domNode).insertAfter(shapes[shape + 1].domNode);
-						shapes[shape + 1].data.zindex--;
-						shapes[shape].data.zindex++;
+						for (var i = selection.length - 1; i >= 0; i--) {
+							target = selection[i];
+
+							// No need to update.
+							if (ignore.indexOf(target) !== -1) {
+								ignore.push(target - 1);
+								continue;
+							}
+
+							$(shapes[target].domNode).insertAfter(shapes[target + 1].domNode);
+							shapes[target + 1].data.zindex--;
+							shapes[target].data.zindex++;
+
+							temp = shapes[target + 1];
+							shapes[target + 1] = shapes[target];
+							shapes[target] = temp;
+						}
 						break;
 
 					case 'previous':
-						// no need to update
-						if (shape === 0) {
-							return;
-						}
+						ignore.push(0);
 
-						$(shapes[shape].domNode).insertBefore(shapes[shape - 1].domNode);
-						shapes[shape - 1].data.zindex++;
-						shapes[shape].data.zindex--;
+						for (var i = 0; i < selection.length; i++) {
+							target = selection[i];
+
+							// No need to update.
+							if (ignore.indexOf(target) !== -1) {
+								ignore.push(target + 1);
+								continue;
+							}
+
+							$(shapes[target].domNode).insertBefore(shapes[target - 1].domNode);
+							shapes[target - 1].data.zindex++;
+							shapes[target].data.zindex--;
+
+							temp = shapes[target - 1];
+							shapes[target - 1] = shapes[target];
+							shapes[target] = temp;
+						}
 						break;
 				}
 
