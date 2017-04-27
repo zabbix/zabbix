@@ -148,14 +148,14 @@ typedef struct
 	unsigned char		inventory_link;
 	unsigned char		status;
 	unsigned char		unreachable;
+	unsigned char		history;
+	unsigned char		trends;
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char			*units;
 	char			*delay;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
-	int			history;
-	int			trends;
 	int			preproc_ops_num;
 	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];

@@ -84,7 +84,7 @@ typedef struct
 	int			lastclock;
 	int			mtime;
 	int			data_expected_from;
-	int			history;
+	unsigned char		history;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -113,7 +113,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	const char	*units;
-	int		trends;
+	unsigned char	trends;
 }
 ZBX_DC_NUMITEM;
 

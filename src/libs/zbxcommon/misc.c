@@ -2396,7 +2396,7 @@ int	is_time_suffix(const char *str, int *value, int length)
  *                     with time unit suffix at all                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_time2bool(const char *value_raw)
+unsigned char	zbx_time2bool(const char *value_raw)
 {
 	int	value;
 

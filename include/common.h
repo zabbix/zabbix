@@ -871,10 +871,11 @@ int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *c);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 int	is_time_suffix(const char *c, int *value, int length);
-int	zbx_time2bool(const char *value_raw);
 int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+
+unsigned char	zbx_time2bool(const char *value_raw);
 
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
 

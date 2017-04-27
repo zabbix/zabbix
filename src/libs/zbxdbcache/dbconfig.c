@@ -2114,7 +2114,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		ZBX_DBROW2UINT64(item->interfaceid, row[25]);
 
 		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
-			item->history = config->config->hk.history;
+			item->history = (0 != config->config->hk.history);
 		else
 			item->history = zbx_time2bool(row[31]);
 
@@ -2218,7 +2218,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 			numitem = DCfind_id(&config->numitems, itemid, sizeof(ZBX_DC_NUMITEM), &found);
 
 			if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
-				numitem->trends = config->config->hk.trends;
+				numitem->trends = (0 != config->config->hk.trends);
 			else
 				numitem->trends = zbx_time2bool(row[32]);
 

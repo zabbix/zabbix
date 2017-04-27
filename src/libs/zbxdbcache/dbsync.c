@@ -136,7 +136,7 @@ static int	dbsync_compare_int(const char *value_raw, int value)
  * Purpose: compares history/trends storing flag with a raw database value    *
  *                                                                            *
  ******************************************************************************/
-static int	dbsync_compare_bool_time(const char *value_raw, int value)
+static int	dbsync_compare_bool_time(const char *value_raw, unsigned char value)
 {
 	return (zbx_time2bool(value_raw) == value ? SUCCEED : FAIL);
 }
