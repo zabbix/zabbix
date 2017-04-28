@@ -112,7 +112,7 @@ if (!empty($data['grid_widgets'])) {
 			// 'Edit dashboard' should be first one in list,
 			// because it will be visually replaced by last item of new list, when clicked
 			->addItem((new CButton('dashbrd-edit',_('Edit dashboard'))))
-			->addItem(get_icon('dashconf', ['enabled' => $data['filter_enabled']]))
+			->addItem(get_icon('action'))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	)

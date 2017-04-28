@@ -469,15 +469,13 @@
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
 			ajax_data = [],
-			overlay_dialogue = $('#overlay_dialogue'),
-			body = $('.overlay-dialogue-body', overlay_dialogue),
-			fields = $('form', body).serializeJSON();
+			fields = $('form', data.dialogue['body']).serializeJSON();
 
 		url.setArgument('action', 'dashbrd.widget.update');
 
 		ajax_data.push({
 			'widgetid': widget['widgetid'],
-			'fields': $.extend({}, {widgetid: widget['widgetid']}, fields, widget['pos'])
+			'fields': fields
 		});
 
 		$.ajax({
@@ -485,22 +483,28 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
+				dashboard_id: 1, // TODO VM: replace with real
 				widgets: ajax_data,
 				save: 0 // 0 - only check; 1 - check and save
 			},
 			success: function(resp) {
-				// TODO VM: Don't update widget data, in case of validation error
-				// TODO VM: Show error in case of validation error
-				overlayDialogueDestroy();
-				delete data['dialogue'];
+				if (typeof(resp.errors) !== 'undefined') {
+					// Error returned
+					// Remove previous errors
+					$('.msg-bad', data.dialogue['body']).remove();
+					data.dialogue['body'].prepend(resp.errors);
+				} else {
+					// No errors, proceed with update
+					overlayDialogueDestroy();
 
-				// save original values (only on first widget update before save)
-				if (typeof widget['fields_orig'] === 'undefined') {
-					widget['fields_orig'] = widget['fields'];
+					// save original values (only on first widget update before save)
+					if (typeof widget['fields_orig'] === 'undefined') {
+						widget['fields_orig'] = widget['fields'];
+					}
+					widget['fields'] = fields;
+					widget['type'] = widget['fields']['type'];
+					refreshWidget(widget);
 				}
-				widget['fields'] = fields;
-				widget['type'] = widget['fields']['type'];
-				refreshWidget(widget);
 			},
 			error: function() {
 				// TODO VM: Do we need to display some kind of error message here?
@@ -520,6 +524,7 @@
 				{
 					'title': (edit_mode ? t('Update') : t('Add')),
 					'class': 'dialogue-widget-save',
+					'keepOpen': true,
 					'action': function() {
 						updateWidgetConfig($obj, data, widget);
 					}
@@ -532,7 +537,11 @@
 			]
 		});
 
-		updateConfigDialogue();
+		var overlay_dialogue = $('#overlay_dialogue');
+		data.dialogue.div = overlay_dialogue;
+		data.dialogue.body = $('.overlay-dialogue-body', overlay_dialogue);
+
+		updateWidgetConfigDialogue();
 	}
 
 	function setModeEditDashboard($obj, data) {
@@ -593,10 +602,9 @@
 		url.setArgument('action', 'dashbrd.widget.update');
 
 		$.each(data['widgets'], function(index, widget) {
-			widget['fields'] = $.extend({}, {widgetid: widget['widgetid']}, widget['fields'], widget['pos']);
-
 			ajax_data.push({
 				'widgetid': widget['widgetid'],
+				'pos': widget['pos'],
 				'fields': widget['fields']
 			});
 		});
@@ -606,19 +614,32 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
+				dashboard_id: 1, // TODO VM: replace with real
 				widgets: ajax_data,
 				save: 1 // 0 - only check; 1 - check and save
 			},
 			success: function(resp) {
-				// TODO VM: Don't update widget data, in case of validation error
-				// TODO VM: Show error in case of validation error
-				$.each(data['widgets'], function(index, data_widget) {
-					// remove original values (new ones were just saved)
-					delete data_widget['fields_orig'];
-					delete data_widget['pos_orig'];
-				});
+				if (typeof(resp.errors) !== 'undefined') {
+					// Error returned
+					// Remove previous errors
+					$('.article .msg-bad').remove();
+					$('.article').prepend(resp.errors);
+				} else {
+					if (typeof(resp.messages) !== 'undefined') {
+						// Success returned
+						// Remove previous messages
+						$('.article .msg-good').remove();
+						$('.article .msg-bad').remove();
+						$('.article').prepend(resp.messages);
+					}
+					$.each(data['widgets'], function(index, data_widget) {
+						// remove original values (new ones were just saved)
+						delete data_widget['fields_orig'];
+						delete data_widget['pos_orig'];
+					});
 
-				setModeViewDashboard($obj, data);
+					setModeViewDashboard($obj, data);
+				}
 			},
 			error: function() {
 				// TODO VM: Do we need to display some kind of error message here?
@@ -791,15 +812,14 @@
 
 		// Add or update form on widget configuration dialogue
 		// (when opened, as well as when requested by 'onchange' attributes in form itself)
-		updateConfigDialogue: function() {
+		updateWidgetConfigDialogue: function() {
 			return this.each(function() {
 				var $this = $(this),
 					data = $this.data('dashboardGrid'),
-					overlay_dialogue = $('#overlay_dialogue'),
-					body = $('.overlay-dialogue-body', overlay_dialogue),
-					footer = $('.overlay-dialogue-footer', overlay_dialogue),
+					body = data.dialogue['body'],
+					footer = $('.overlay-dialogue-footer', data.dialogue['div']),
 					form = $('form', body),
-					widget = data.dialogue.widget, // widget currently beeing edited
+					widget = data.dialogue['widget'], // widget currently beeing edited
 					url = new Curl('zabbix.php'),
 					ajax_data = {};
 
@@ -842,9 +862,9 @@
 						});
 
 						// position dialogue in middle of screen
-						overlay_dialogue.css({
-							'margin-top': '-' + (overlay_dialogue.outerHeight() / 2) + 'px',
-							'margin-left': '-' + (overlay_dialogue.outerWidth() / 2) + 'px'
+						data.dialogue['div'].css({
+							'margin-top': '-' + (data.dialogue['div'].outerHeight() / 2) + 'px',
+							'margin-left': '-' + (data.dialogue['div'].outerWidth() / 2) + 'px'
 						});
 
 						// Enable save button after sucessfull form update

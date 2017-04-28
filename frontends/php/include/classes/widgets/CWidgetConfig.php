@@ -77,10 +77,18 @@ class CWidgetConfig
 		return array_keys($this->getKnownWidgetTypesWNames($user_type));
 	}
 
-	public function saveConfig($widgetid, $fields) {
+	/**
+	 * Save dashboard
+	 * @param array $dashboard array with dashboard to save
+	 *
+	 * @return bool
+	 */
+	public function saveConfig($dashboard) {
+		$result = (bool) API::Dashboard()->update([$dashboard]);
+		return $result;
 		// TODO VM: replace by call to API (when it will be ready)
-		$fields = (new CJson())->encode($fields);
-		CProfile::update('web.dashbrd.widget.'.$widgetid.'.fields', $fields, PROFILE_TYPE_STR);
+//		$fields = (new CJson())->encode($fields);
+//		CProfile::update('web.dashbrd.widget.'.$widgetid.'.fields', $fields, PROFILE_TYPE_STR);
 	}
 
 	public function getConfig($widgetid) {
@@ -108,5 +116,19 @@ class CWidgetConfig
 
 	public function getDefaultRfRate($type) {
 		return $this->rfRates[$type];
+	}
+
+	public function getForm($data, $user_type) {
+		$known_widget_types = $this->getKnownWidgetTypesWNames($user_type);
+		switch ($data['type']) {
+			case WIDGET_CLOCK:
+				return (new CClockWidgetForm($data, $known_widget_types));
+			case WIDGET_URL:
+				return (new CUrlWidgetForm($data, $known_widget_types));
+
+			default:
+				// TODO VM: delete this case after all widget forms will be created
+				return (new CWidgetForm($data, $known_widget_types));
+		}
 	}
 }

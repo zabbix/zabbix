@@ -47,21 +47,22 @@ class CControllerDashbrdWidgetConfig extends CController {
 			if ($this->hasInput('fields')) {
 				$widget_fields = $this->getInput('fields');
 
-				// Each field array should contain widget type
+				// Field array should contain widget type
 				if (!array_key_exists('type', $widget_fields)) {
+					error(_('No widget type')); // TODO VM: improve message
 					$ret = false;
 				}
 				// We will work only with known widget types
 				elseif (!in_array($widget_fields['type'], $this->widget_config->getKnownWidgetTypes($this->getUserType()))) {
+					error(_('Unknown widget type')); // TODO VM: improve message
 					$ret = false;
 				}
-				// TODO VM: validation
 			}
 		}
 
 		if (!$ret) {
 			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['dialogue' => CJs::encodeJson('')]));
+			$this->setResponse(new CControllerResponseData(['body' => CJs::encodeJson('')]));
 		}
 
 		return $ret;
@@ -80,24 +81,24 @@ class CControllerDashbrdWidgetConfig extends CController {
 			'type' => WIDGET_CLOCK,
 		];
 
-		// get data for current widget - in case we are switching between types, and no fields for widget are given
-		if ($this->hasInput('widgetid')) {
-			$dialogue['widgetid'] = $this->getInput('widgetid');
-			$widget = $this->widget_config->getConfig($dialogue['widgetid']);
-		}
+		// TODO VM: get current widget fields data from JS
+//		// get data for current widget - in case we are switching between types, and no fields for widget are given
+//		if ($this->hasInput('widgetid')) {
+//			$dialogue['widgetid'] = $this->getInput('widgetid');
+//			$widget = $this->widget_config->getConfig($dialogue['widgetid']);
+//		}
 
 		// Get fields from dialogue form
 		$dialogue_fields = $this->hasInput('fields') ? $this->getInput('fields') : [];
 
 		// Take default values, replce with saved ones, replace with selected in dialogue
-		$dialogue['fields'] = array_merge($fields, $widget, $dialogue_fields);
-
+		$fields_data = array_merge($fields, $widget, $dialogue_fields);
+		$dialogue['form'] = $this->widget_config->getForm($fields_data, $this->getUserType());
 		$this->setResponse(new CControllerResponseData([
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
 			'dialogue' => $dialogue,
-			'known_widget_types_w_names' => $this->widget_config->getKnownWidgetTypesWNames($this->getUserType())
 		]));
 	}
 }

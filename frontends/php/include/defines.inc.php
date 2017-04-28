@@ -1131,6 +1131,9 @@ define('WIDGET_DYNAMIC_ITEM',	1);
 // Dashboard widget dynamic state
 define('WIDGET_CONFIG_DONT_SAVE',	0);
 define('WIDGET_CONFIG_DO_SAVE',		1);
+// Widget fields setup types
+define('WIDGET_FIELDS_SETUP_TYPE_CONFIG',	0);
+define('WIDGET_FIELDS_SETUP_TYPE_WIDGET',	1);
 
 // widget field types
 define('ZBX_WIDGET_FIELD_TYPE_INT32',			0);
@@ -1209,6 +1212,7 @@ define('ZBX_STYLE_BLUE', 'blue');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
+define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');

@@ -549,7 +549,9 @@ function overlayDialogue(params) {
 			text: obj.title
 		}).click(function() {
 			obj.action();
-			overlayDialogueDestroy();
+			if (!('keepOpen' in obj) || obj.keepOpen === false) {
+				overlayDialogueDestroy();
+			}
 			return false;
 		});
 

@@ -2,6 +2,15 @@
 	jQuery(document).ready(function($) {
 		// Turn on edit dashboard
 		$('#dashbrd-edit').click(function() {
+			var btn_conf = $('<button>')
+				.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
+				.attr('id','dashbrd-config')
+				.attr('type','button')
+				.append(
+					$('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>') // TODO VM: replace by cog icon
+				)
+				.click(dashbrd_config);
+
 			var btn_add = $('<button>')
 				.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
 				.attr('id','dashbrd-add-widget')
@@ -34,6 +43,7 @@
 				$('<span>')
 					.addClass('<?= ZBX_STYLE_DASHBRD_EDIT ?>')
 					.append($('<ul>')
+						.append($('<li>').append(btn_conf))
 						.append($('<li>').append(btn_add))
 						.append($('<li>').append(btn_save))
 						.append($('<li>').append(btn_cancel))
@@ -45,6 +55,12 @@
 			// Update buttons on existing widgets to edit mode
 			$('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
 		});
+
+		// Change dashboard settings
+		var dashbrd_config = function() {
+			// Update buttons on existing widgets to view mode
+			$('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
+		};
 
 		// Save changes and cancel editing dashboard
 		var dashbrd_save_changes = function() {
@@ -74,7 +90,8 @@
 		};
 	});
 
-	function updateConfigDialogue() {
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('updateConfigDialogue');
+	// Functionis in global scope, because it should be accessable by html onchange() attribute
+	function updateWidgetConfigDialogue() {
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('updateWidgetConfigDialogue');
 	}
 </script>

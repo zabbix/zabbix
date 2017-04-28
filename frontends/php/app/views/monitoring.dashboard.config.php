@@ -18,84 +18,58 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$widgetConfig = new CWidgetConfig();
-$formFields = $data['dialogue']['fields'];
-$widgetType = $formFields['type'];
+$body = '';
+if (array_key_exists('dialogue', $data)) {
+	/* @var $data['dialogue']['form'] CWidgetForm */
+	$formFields = $data['dialogue']['form']->getFields();
 
-$form = (new CForm('post'))
-	->cleanItems()
-	->setId('widget_dialogue_form')
-	->setName('widget_dialogue_form');
+	$form = (new CForm('post'))
+		->cleanItems()
+		->setId('widget_dialogue_form')
+		->setName('widget_dialogue_form');
 
-$formList = (new CFormList())
-	->addRow(_('Type'), new CComboBox('type', $widgetType, 'updateConfigDialogue()', $data['known_widget_types_w_names']));
+	$formList = (new CFormList());
 
-/*
- * Screen item: Clock
- */
-if ($widgetType == WIDGET_CLOCK) {
+	foreach ($formFields as $field) {
+		/* ComboBox */
+		if ($field instanceof CWidgetFieldComboBox) {
+			$formList->addRow(
+				$field->getLabel(),
+				(new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues()))
+			);
+		}
 
-	$time_type = array_key_exists('time_type', $formFields) ? $formFields['time_type'] : TIME_TYPE_LOCAL;
-	$caption = array_key_exists('caption', $formFields) ? $formFields['caption'] : '';
-	$itemId = array_key_exists('itemid', $formFields) ? $formFields['itemid'] : 0;
+		/* TextBox */
+		elseif ($field instanceof CWidgetFieldTextBox) {
+			$formList->addRow(
+				$field->getLabel(),
+				(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			);
+		}
 
-	if ($caption === '' && $time_type === TIME_TYPE_HOST && $itemId > 0) {
-		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'key_', 'name'],
-			'selectHosts' => ['name'],
-			'itemids' => $itemId,
-			'webitems' => true
-		]);
+		/* ItemId */
+		elseif ($field instanceof CWidgetFieldItemId) {
+			$form->addVar($field->getName(), $field->getValue(true)); // needed for popup script
 
-		if ($items) {
-			$items = CMacrosResolverHelper::resolveItemNames($items);
-
-			$item = reset($items);
-			$host = reset($item['hosts']);
-			$caption = $host['name'].NAME_DELIMITER.$item['name_expanded'];
+			$selectButton = (new CButton('select', _('Select')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
+						"&dstfld2=".$field->getCaptionName()."&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
+			$cell = (new CDiv([
+				(new CTextBox($field->getCaptionName(), $field->getCaption(true), true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$selectButton
+			]))->addStyle('display: flex;'); // TODO VM: move style to scss
+			$formList->addRow($field->getLabel(), $cell);
 		}
 	}
 
-	$formList->addRow(_('Time type'), new CComboBox('time_type', $time_type, 'updateConfigDialogue()', [
-		TIME_TYPE_LOCAL => _('Local time'),
-		TIME_TYPE_SERVER => _('Server time'),
-		TIME_TYPE_HOST => _('Host time')
-	]));
-
-	if ($time_type == TIME_TYPE_HOST) {
-		$form->addVar('itemid', $itemId);
-
-		$selectButton = (new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1=itemid'.
-					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
-		$cell = (new CDiv([
-			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$selectButton
-		]))->addStyle('display: flex;'); // TODO VM: move style to scss
-		$formList->addRow(_('Item'), $cell);
-	}
+	$form->addItem($formList);
+	$body = $form->toString();
 }
-
-// URL field
-if (in_array($widgetType, [WIDGET_URL])) {
-	$url = array_key_exists('url', $formFields) ? $formFields['url'] : '';
-	$formList->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-}
-
-// Width and height fields
-if (in_array($widgetType, [WIDGET_CLOCK, WIDGET_URL])) {
-	$width = array_key_exists('inner_width', $formFields) ? $formFields['inner_width'] : 0;
-	$height = array_key_exists('inner_height', $formFields) ? $formFields['inner_height'] : 0;
-	$formList->addRow(_('Width'), (new CNumericBox('inner_width', $width, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH));
-	$formList->addRow(_('Height'), (new CNumericBox('inner_height', $height, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH));
-}
-
-$form->addItem($formList);
 
 $output = [
-	'body' => $form->toString()
+	'body' => $body
 ];
 
 if (($messages = getMessages()) !== null) {
