@@ -1506,7 +1506,7 @@ INDEX		|1			|selementid
 
 TABLE|httptest_field|httptest_fieldid|ZBX_DATA
 FIELD		|httptest_fieldid	|t_id		|	|NOT NULL	|0
-FIELD		|httptestid		|t_id		|	|NOT NULL	|ZBX_PROXY			|1|httptest
+FIELD		|httptestid		|t_id		|	|NOT NULL	|ZBX_PROXY	|1|httptest
 FIELD		|type			|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value			|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
@@ -1514,7 +1514,7 @@ INDEX		|1			|httptestid
 
 TABLE|httpstep_field|httpstep_fieldid|ZBX_DATA
 FIELD		|httpstep_fieldid	|t_id		|	|NOT NULL	|0
-FIELD		|httpstepid		|t_id		|	|NOT NULL	|ZBX_PROXY			|1|httpstep
+FIELD		|httpstepid		|t_id		|	|NOT NULL	|ZBX_PROXY	|1|httpstep
 FIELD		|type			|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value			|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
@@ -1558,19 +1558,21 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|groupid	|t_id		|	|NULL		|0			|2|groups
-FIELD		|hostid		|t_id		|	|NULL		|0			|3|hosts
-FIELD		|itemid		|t_id		|	|NULL		|0			|4|items
-FIELD		|graphid	|t_id		|	|NULL		|0			|5|graphs
-FIELD		|sysmapid	|t_id		|	|NULL		|0			|6|sysmaps
-FIELD		|dashboardid	|t_id		|	|NULL		|0			|7|dashboard
+FIELD		|value_groupid	|t_id		|	|NULL		|0			|2|groups	|groupid
+FIELD		|value_hostid	|t_id		|	|NULL		|0			|3|hosts	|hostid
+FIELD		|value_itemid	|t_id		|	|NULL		|0			|4|items	|itemid
+FIELD		|value_graphid	|t_id		|	|NULL		|0			|5|graphs	|graphid
+FIELD		|value_sysmapid	|t_id		|	|NULL		|0			|6|sysmaps	|sysmapid
+FIELD		|value_dashboardid|t_id		|	|NULL		|0			|7|dashboard	|dashboardid
+FIELD		|value_widgetid	|t_id		|	|NULL		|0			|8|widget	|widgetid
 INDEX		|1		|widgetid
-INDEX		|2		|groupid
-INDEX		|3		|hostid
-INDEX		|4		|itemid
-INDEX		|5		|graphid
-INDEX		|6		|sysmapid
-INDEX		|7		|dashboardid
+INDEX		|2		|value_groupid
+INDEX		|3		|value_hostid
+INDEX		|4		|value_itemid
+INDEX		|5		|value_graphid
+INDEX		|6		|value_sysmapid
+INDEX		|7		|value_dashboardid
+INDEX		|8		|value_widgetid
 
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|

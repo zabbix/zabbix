@@ -33,6 +33,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'application' => 'CApplication',
 			'configuration' => 'CConfiguration',
 			'correlation' => 'CCorrelation',
+			'dashboard' => 'CDashboard',
 			'dcheck' => 'CDCheck',
 			'dhost' => 'CDHost',
 			'discoveryrule' => 'CDiscoveryRule',
