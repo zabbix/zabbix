@@ -149,12 +149,7 @@ class CHttpTestManager {
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
 			if (array_key_exists('delay', $httptest) && $db_httptest['delay'] != $httptest['delay']) {
-				if ($httptest['delay'][0] === '{' || $db_httptest['delay'][0] === '{') {
-					$httptest['nextcheck'] = 0;
-				}
-				elseif (bccomp(timeUnitToSeconds($db_httptest['delay']), timeUnitToSeconds($httptest['delay'])) != 0) {
-					$httptest['nextcheck'] = 0;
-				}
+				$httptest['nextcheck'] = 0;
 			}
 
 			DB::update('httptest', [
