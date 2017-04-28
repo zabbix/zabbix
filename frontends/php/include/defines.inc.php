@@ -654,6 +654,9 @@ define('SCREEN_MAX_SIZE', 100);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
+// dashboards
+define('DASHBOARD_DEFAULT_ID', 1);
+
 // alignments
 define('HALIGN_DEFAULT',	0);
 define('HALIGN_CENTER',		0);
