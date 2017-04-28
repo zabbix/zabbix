@@ -269,7 +269,7 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowUser['autologin'], 0);
 				$this->assertEquals($dbRowUser['autologout'], '15m');
 				$this->assertEquals($dbRowUser['lang'], 'en_GB');
-				$this->assertEquals($dbRowUser['refresh'], '10s');
+				$this->assertEquals($dbRowUser['refresh'], '30s');
 				$this->assertEquals($dbRowUser['rows_per_page'], 50);
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
@@ -284,7 +284,7 @@ class testUsers extends CZabbixTest {
 					$this->assertEquals($dbRowMedia['sendto'], $user[$key]['user_medias'][0]['sendto']);
 					$this->assertEquals($dbRowMedia['active'], 0);
 					$this->assertEquals($dbRowMedia['severity'], 63);
-					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00;{$WORK_PERIOD}');
+					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
 				}
 				else {
 					$dbResultGroup = 'select * from media where userid='.$id;
@@ -617,7 +617,7 @@ class testUsers extends CZabbixTest {
 					$this->assertEquals($dbRowMedia['sendto'], $users[$key]['user_medias'][0]['sendto']);
 					$this->assertEquals($dbRowMedia['active'], 0);
 					$this->assertEquals($dbRowMedia['severity'], 63);
-					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00;{$WORK_PERIOD}');
+					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
 				}
 				else {
 					$dbResultGroup = 'select * from media where userid='.$id;
@@ -757,10 +757,10 @@ class testUsers extends CZabbixTest {
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'autologout' => '10001'
+					'autologout' => '86401'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologout": a number is too large.'
+				'expected_error' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 			],
 			[
 				'user' => [
