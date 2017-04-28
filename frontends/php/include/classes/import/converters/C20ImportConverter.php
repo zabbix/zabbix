@@ -129,6 +129,10 @@ class C20ImportConverter extends CConverter {
 				$item['status'] = ITEM_STATUS_ACTIVE;
 			}
 
+			if ($item['type'] == ITEM_TYPE_JMX) {
+				$item['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
+			}
+
 			$item['key'] = $this->itemKeyConverter->convert($item['key']);
 		}
 		unset($item);
@@ -285,6 +289,10 @@ class C20ImportConverter extends CConverter {
 
 			if (!array_key_exists('host_prototypes', $discovery_rule)) {
 				$discovery_rule['host_prototypes'] = [];
+			}
+
+			if ($discovery_rule['type'] == ITEM_TYPE_JMX) {
+				$discovery_rule['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
 			}
 
 			$discovery_rule['filter'] = $this->convertDiscoveryRuleFilter($discovery_rule['filter']);
