@@ -58,6 +58,8 @@ Changes for 3.2.6rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12100] fixed new line handling in SSH agent with numeric type of information (vso)
+..F....... [ZBX-9958] fixed wrongly displayed list view after mass update failure (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.5
@@ -441,6 +443,8 @@ New features:
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+........S. [ZBX-12100] fixed new line handling in SSH agent with numeric type of information (vso)
+..F....... [ZBX-9958] fixed wrongly displayed list view after mass update failure (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.9
