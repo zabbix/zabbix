@@ -398,11 +398,11 @@ abstract class CItemGeneral extends CApiService {
 			// jmx
 			if ($fullItem['type'] == ITEM_TYPE_JMX) {
 				$jmx_rules = [
-					'update'	=> [
-						'jmx_endpoint'		=> 'not_empty|string'
+					'update' => [
+						'jmx_endpoint' => 'not_empty|string'
 					],
-					'create'	=> [
-						'jmx_endpoint'		=> 'required|not_empty|string'
+					'create' => [
+						'jmx_endpoint' => 'required|not_empty|string'
 					]
 				];
 				$method = $update ? 'update' : 'create';
