@@ -798,6 +798,12 @@ ZABBIX.apps.map = (function($) {
 					}
 				});
 
+				// All shapes are selected, no need to update order.
+				if (shapes.length === selection.length)
+				{
+					return;
+				}
+
 				switch (position.toLowerCase()) {
 					case 'first':
 						target = [];
