@@ -56,8 +56,8 @@ class CGraphItem extends CApiService {
 			// output
 			'selectGraphs'	=> null,
 			'output'		=> API_OUTPUT_EXTEND,
-			'countOutput'	=> null,
-			'preservekeys'	=> null,
+			'countOutput'	=> false,
+			'preservekeys'	=> false,
 			'sortfield'		=> '',
 			'sortorder'		=> '',
 			'limit'			=> null
@@ -114,7 +114,7 @@ class CGraphItem extends CApiService {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($gitem = DBfetch($dbRes)) {
-			if (!is_null($options['countOutput'])) {
+			if ($options['countOutput']) {
 				$result = $gitem['rowscount'];
 			}
 			else {
@@ -122,7 +122,7 @@ class CGraphItem extends CApiService {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -132,7 +132,7 @@ class CGraphItem extends CApiService {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 		return $result;

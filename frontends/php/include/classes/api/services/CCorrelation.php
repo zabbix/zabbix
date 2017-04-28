@@ -55,27 +55,27 @@ class CCorrelation extends CApiService {
 		$options = zbx_array_merge($this->getOptions, $options);
 
 		if ($options['editable'] !== null && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return ($options['countOutput'] !== null && $options['groupCount'] === null) ? 0 : [];
+			return ($options['countOutput'] && !$options['groupCount']) ? 0 : [];
 		}
 
 		$res = DBselect($this->createSelectQuery($this->tableName(), $options), $options['limit']);
 
 		$result = [];
 		while ($row = DBfetch($res)) {
-			if ($options['countOutput'] === null) {
-				$result[$row[$this->pk()]] = $row;
-			}
-			else {
-				if ($options['groupCount'] === null) {
-					$result = $row['rowscount'];
-				}
-				else {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $row;
 				}
+				else {
+					$result = $row['rowscount'];
+				}
+			}
+			else {
+				$result[$row[$this->pk()]] = $row;
 			}
 		}
 
-		if ($options['countOutput'] !== null) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -108,7 +108,7 @@ class CCorrelation extends CApiService {
 		}
 
 		// removing keys (hash -> array)
-		if ($options['preservekeys'] === null) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -1387,7 +1387,7 @@ class CCorrelation extends CApiService {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			// Add filter fields.
 			if ($this->outputIsRequested('formula', $options['selectFilter'])
 					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])

@@ -63,6 +63,12 @@ class CAudit {
 				$table_name = 'applications';
 				break;
 
+			case AUDIT_RESOURCE_DASHBOARD:
+				$field_name_resourceid = 'dashboardid';
+				$field_name_resourcename = 'name';
+				$table_name = 'dashboard';
+				break;
+
 			case AUDIT_RESOURCE_ICON_MAP:
 				$field_name_resourceid = 'iconmapid';
 				$field_name_resourcename = 'name';
