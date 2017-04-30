@@ -58,6 +58,7 @@ Changes for 3.2.6rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-12108] fixed limit option in event.get method (Sasha)
 ........S. [ZBX-12100] fixed new line handling in SSH agent with numeric type of information (vso)
 ..F....... [ZBX-9958] fixed wrongly displayed list view after mass update failure (miks)
 
