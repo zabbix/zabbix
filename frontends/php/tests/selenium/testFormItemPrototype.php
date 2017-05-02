@@ -2547,7 +2547,7 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Simple change'],
 						['type' => 'Simple change']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -2559,7 +2559,7 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Change per second'],
 						['type' => 'Change per second']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -2571,7 +2571,7 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Simple change'],
 						['type' => 'Change per second']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
