@@ -397,16 +397,16 @@ abstract class CItemGeneral extends CApiService {
 
 			// jmx
 			if ($fullItem['type'] == ITEM_TYPE_JMX) {
+				if (!$update && array_key_exists('jmx_endpoint', $item) == false) {
+					$item['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
+				} else {
+					$item['jmx_endpoint'] = trim($item['jmx_endpoint']);
+				}
+				$fullItem['jmx_endpoint'] = $item['jmx_endpoint'];
 				$jmx_rules = [
-					'update' => [
-						'jmx_endpoint' => 'not_empty|string'
-					],
-					'create' => [
-						'jmx_endpoint' => 'required|not_empty|string'
-					]
+					'jmx_endpoint' => 'not_empty|string'
 				];
-				$method = $update ? 'update' : 'create';
-				$jmx_validator = new CNewValidator($fullItem, $jmx_rules[$method]);
+				$jmx_validator = new CNewValidator($fullItem, $jmx_rules);
 				if ($jmx_validator->isError()) {
 					$errors = $jmx_validator->getAllErrors();
 					self::exception(ZBX_API_ERROR_PARAMETERS, $errors[0]);
