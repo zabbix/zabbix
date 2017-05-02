@@ -58,6 +58,7 @@ Changes for 3.2.6rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11981] fixed undefined index 'ns' in options output array (miks)
 ..F....... [ZBX-12116] fixed pagination in Maintenance page (Sasha)
 A......... [ZBX-12108] fixed limit option in event.get method (Sasha)
 ........S. [ZBX-12100] fixed new line handling in SSH agent with numeric type of information (vso)
