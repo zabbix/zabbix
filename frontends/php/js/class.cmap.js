@@ -514,18 +514,18 @@ ZABBIX.apps.map = (function($) {
 							id: target.attr('data-id'),
 							type: target.attr('data-type'),
 							popupid: target.data('menu-popup-id')
-						}
+						},
 						item = item_data.id,
-						can_copy = that.selection.count.shapes > 0 || that.selection.count.selements > 0,
-						can_paste = that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0,
-						can_remove = item_data.type === 'shapes',
-						can_reorder = item_data.type === 'shapes';
+						can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0),
+						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
+						can_remove = (item_data.type === 'shapes'),
+						can_reorder = (item_data.type === 'shapes');
 
 					event.preventDefault();
 					event.stopPropagation();
-					// we have to recreate menu everytime due copy/paste function availability changes
+					// Have to recreate menu everytime due copy/paste function availability changes.
 					if (item_data.popupid) {
-						$('#'+item_data.popupid).filter('.action-menu').remove();
+						$('#' + item_data.popupid).filter('.action-menu').remove();
 					}
 
 					var items = [
@@ -829,15 +829,16 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Paste that.copypaste_buffer content at new location.
 			 *
-			 * @param	{number}	delta_x				shift between desired and actual x position
-			 * @param	{number}	delta_y				shift between desired and actual y position
+			 * @param	{number}	delta_x				Shift between desired and actual x position.
+			 * @param	{number}	delta_y				Shift between desired and actual y position.
 			 * @param	{Object}	that				CMap object
-			 * @param	{bool}		keep_external_links	should be links to non selected elements copied
+			 * @param	{bool}		keep_external_links	Should be links to non selected elements copied or not.
+			 *
 			 * @return	{Array}
 			 */
 			pasteSelectionBuffer: function(delta_x, delta_y, that, keep_external_links) {
 				var selectedids = [],
-					sourceCloneIds = {};
+					source_cloneids = {};
 
 				that.copypaste_buffer.items.forEach(function(element_data) {
 					var data = $.extend({}, element_data.data, false),
@@ -849,12 +850,14 @@ ZABBIX.apps.map = (function($) {
 							element = new Selement(that);
 							delete data.selementid;
 							break;
+
 						case 'shapes' :
 							element = new Shape(that);
 							delete data.shapeid;
 							break;
+
 						default :
-							throw 'Unsupported element type found in copy buffer';
+							throw 'Unsupported element type found in copy buffer!';
 							break;
 					}
 					if (element) {
@@ -866,7 +869,7 @@ ZABBIX.apps.map = (function($) {
 							id: element.id,
 							type: type
 						});
-						sourceCloneIds[element_data.id] = element.id;
+						source_cloneids[element_data.id] = element.id;
 						if (that.data.grid_align === '1') {
 							element.align(true);
 						}
@@ -880,17 +883,15 @@ ZABBIX.apps.map = (function($) {
 
 				that.copypaste_buffer.links.forEach(function(link_data) {
 					data = $.extend({}, link_data.data, false);
-					if (!keep_external_links && (data.selementid1 in sourceCloneIds === false ||
-						data.selementid2 in sourceCloneIds === false)
+					if (!keep_external_links && (data.selementid1 in source_cloneids === false ||
+						data.selementid2 in source_cloneids === false)
 					) {
 						return;
 					}
 					link = new Link(that);
 					delete data.linkid;
-					fromid = data.selementid1 in sourceCloneIds ?
-						sourceCloneIds[data.selementid1] : data.selementid1;
-					toid = data.selementid2 in sourceCloneIds ?
-						sourceCloneIds[data.selementid2] : data.selementid2;
+					fromid = data.selementid1 in source_cloneids ? source_cloneids[data.selementid1] : data.selementid1;
+					toid = data.selementid2 in source_cloneids ? source_cloneids[data.selementid2] : data.selementid2;
 					data.selementid1 = fromid;
 					data.selementid2 = toid;
 					link.update(data);
@@ -904,6 +905,7 @@ ZABBIX.apps.map = (function($) {
 			 * Return object with selected elements data and links
 			 *
 			 * @param  {Object}	that			CMap object
+			 *
 			 * @return {Object}
 			 */
 			getSelectionBuffer: function(that) {
@@ -926,7 +928,7 @@ ZABBIX.apps.map = (function($) {
 						if ('getData' in that[type][id] === false) {
 							continue;
 						}
-						// get rid of observers, only current data
+						// Get current data without observers.
 						data = $.extend({}, that[type][id].getData(), false);
 						dom_node = that[type][id].domNode;
 						x = parseInt(data.x, 10);
@@ -942,16 +944,17 @@ ZABBIX.apps.map = (function($) {
 						});
 					}
 				}
-				// sort items array according item.data.zindex value
+				// Sort items array according item.data.zindex value.
 				items = items.sort(function(a, b) {
 					var aindex = parseInt(a.data.zindex, 10) || 0,
 						bindex = parseInt(b.data.zindex, 10) || 0;
+
 					return aindex - bindex;
 				});
 				var links = [];
 
 				for (var id in that.links) {
-					// get rid of observers, only current data
+					// Get current data without observers.
 					var data = $.extend({}, that.links[id].getData(), false);
 
 					if (data.selementid1 in that.selection.selements || data.selementid2 in that.selection.selements) {
