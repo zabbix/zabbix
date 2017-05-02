@@ -147,7 +147,6 @@ typedef struct
 	unsigned char		snmpv3_privprotocol;
 	unsigned char		inventory_link;
 	unsigned char		status;
-	unsigned char		unreachable;
 	unsigned char		history;
 	unsigned char		trends;
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;

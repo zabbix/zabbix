@@ -5446,7 +5446,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, zbx_uint6
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
-	dst_item->unreachable = src_item->unreachable;
 
 	dst_item->db_state = src_item->db_state;
 	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
