@@ -58,6 +58,7 @@ Changes for 3.2.6rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-10253] fixed translation string and validation of TLS settings in host.create(), host.update() and host.massUpdate() methods; added variables to hosts array required by CHost::validateUpdate() method (miks)
 ........S. [ZBX-12121] fixed problem generation by timer process (gleb)
 ..F....... [ZBX-11530] fixed status of application inheritance from template in API::Application()->get() call (miks)
 ..F....... [ZBX-11536] fixed missing operator in event correlation form (miks)
