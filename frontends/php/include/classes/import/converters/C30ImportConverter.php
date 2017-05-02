@@ -55,31 +55,10 @@ class C30ImportConverter extends CConverter {
 			if (array_key_exists('discovery_rules', $host)) {
 				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules']);
 			}
-			if (array_key_exists('items', $host)) {
-				$host['items'] = $this->convertItems($host['items']);
-			}
 		}
 		unset($host);
 
 		return $hosts;
-	}
-
-	/**
-	 * Convert item elements.
-	 *
-	 * @param array $items
-	 *
-	 * @return array
-	 */
-	protected function convertItems(array $items) {
-		foreach ($items as &$item) {
-			if ($item['type'] == ITEM_TYPE_JMX) {
-				$item['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-			}
-		}
-		unset($item);
-
-		return $items;
 	}
 
 	/**
@@ -93,11 +72,6 @@ class C30ImportConverter extends CConverter {
 		foreach ($discovery_rules as &$discovery_rule) {
 			$discovery_rule['trigger_prototypes'] =
 				$this->convertTriggers($discovery_rule['trigger_prototypes']);
-			$discovery_rule['item_prototypes'] =
-				$this->convertItems($discovery_rule['item_prototypes']);
-			if ($discovery_rule['type'] == ITEM_TYPE_JMX) {
-				$discovery_rule['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-			}
 		}
 		unset($discovery_rule);
 
