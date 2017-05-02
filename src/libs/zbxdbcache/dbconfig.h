@@ -95,6 +95,7 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		status;
 	unsigned char		unreachable;
+	unsigned char		schedulable;
 	unsigned char		update_triggers;
 
 	zbx_vector_ptr_t	preproc_ops;

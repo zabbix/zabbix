@@ -308,7 +308,8 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
 			((ITEM_STATE_NORMAL == item->state && 0 == (flags & ZBX_ITEM_DELAY_CHANGED)) ||
-			(ITEM_STATE_NOTSUPPORTED == item->state && 0 == (flags & ZBX_REFRESH_UNSUPPORTED_CHANGED))))
+			(ITEM_STATE_NOTSUPPORTED == item->state && 0 == (flags & (0 == item->schedulable ?
+					ZBX_ITEM_DELAY_CHANGED : ZBX_REFRESH_UNSUPPORTED_CHANGED)))))
 	{
 		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
@@ -321,12 +322,9 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
-	if (ITEM_STATE_NOTSUPPORTED == item->state)
-	{
-		item->nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL,
-				now);
-	}
-	else
+	/* for new items, supported items and items that are notsupported due to invalid update interval try to parse */
+	/* interval first and then decide whether it should become/remain supported/notsupported */
+	if (0 == item->nextcheck || ITEM_STATE_NORMAL == item->state || 0 == item->schedulable)
 	{
 		int			simple_interval;
 		zbx_custom_interval_t	*custom_intervals;
@@ -350,12 +348,34 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 			/* update intervals or with macros in them are requeued automatically by DCsync_items().   */
 
 			item->nextcheck = ZBX_JAN_2038;
+			item->schedulable = 0;
 			return;
 		}
 
-		item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
+		if (ITEM_STATE_NORMAL == item->state || 0 == item->schedulable)
+		{
+			/* supported items and items that could not have been scheduled previously, but had their */
+			/* update interval fixed, should be scheduled using their update intervals */
+			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
+					now);
+		}
+		else
+		{
+			/* use refresh_unsupported interval for new items that have a valid update interval of their */
+			/* own, but were synced from the database in ITEM_STATE_NOTSUPPORTED state */
+			item->nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported,
+					NULL, now);
+		}
+
 		zbx_custom_interval_free(custom_intervals);
 	}
+	else	/* for items notsupported for other reasons use refresh_unsupported interval */
+	{
+		item->nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL,
+				now);
+	}
+
+	item->schedulable = 1;
 
 	if (NULL != proxy)
 		item->nextcheck += proxy->timediff + 1;
@@ -2144,6 +2164,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = poller_by_item(host->proxy_hostid, type, item->key);
 			item->unreachable = 0;
+			item->schedulable = 1;
 
 			zbx_vector_ptr_create_ext(&item->preproc_ops, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
