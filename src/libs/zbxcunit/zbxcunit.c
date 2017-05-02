@@ -206,7 +206,7 @@ out:
 	zbx_free(scope);
 	zbx_free(output);
 
-	exit(CU_get_error());
+	exit(0 == CU_get_number_of_tests_failed() ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 #endif
