@@ -2187,7 +2187,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (SUCCEED == DCstrpool_replace(found, &item->delay, row[14]))
 			flags |= ZBX_ITEM_DELAY_CHANGED;
 
-		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
+		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status &&
+				SUCCEED == is_counted_in_item_queue(item->type, item->key))
 		{
 			unsigned char	old_poller_type;
 			int		old_nextcheck;
@@ -2196,9 +2197,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCitem_poller_type_update(item, host, flags);
 
 			old_nextcheck = item->nextcheck;
-
-			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
-				DCitem_nextcheck_update(item, host, flags, now);
+			DCitem_nextcheck_update(item, host, flags, now);
 
 			DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 		}
