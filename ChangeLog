@@ -58,6 +58,7 @@ Changes for 3.2.6rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11536] fixed missing operator in event correlation form (miks)
 ..F....... [ZBX-11309] fixed collision of cookies name responsible for storing selected checkboxes (miks)
 ..F....... [ZBX-11981] fixed undefined index 'ns' in options output array (miks)
 ..F....... [ZBX-12116] fixed pagination in Maintenance page (Sasha)
