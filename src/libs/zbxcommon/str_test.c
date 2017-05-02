@@ -35,11 +35,11 @@ static void	cu_test_macro_expresssion(const char *expression, const char *macro,
 	zbx_strloc_t    mloc;
 
 	ret = zbx_user_macro_parse(expression, &macro_r, &context_l, &context_r);
-	ZBX_CU_ASSERT_INT_EQ_FATAL(ret, success);
+	ZBX_CU_ASSERT_INT_EQ_FATAL("return value", ret, success);
 
 	if (FAIL != ret)
 	{
-		ZBX_CU_ASSERT_CHAR_EQ_FATAL(expression[macro_r], '}');
+		ZBX_CU_ASSERT_CHAR_EQ_FATAL("macro end", expression[macro_r], '}');
 
 		mloc.l = 2;
 
@@ -55,18 +55,20 @@ static void	cu_test_macro_expresssion(const char *expression, const char *macro,
 		else
 			mloc.r = macro_r - 1;
 
-		ZBX_CU_ASSERT_STRING_N_EQ_FATAL(expression + 2, macro,  mloc.r - mloc.l + 1);
-		ZBX_CU_ASSERT_INT_EQ_FATAL(strlen(macro), mloc.r - mloc.l + 1);
+		ZBX_CU_ASSERT_STRINGN_EQ_FATAL("macro name", expression + 2, macro,  mloc.r - mloc.l + 1);
+		ZBX_CU_ASSERT_INT_EQ_FATAL("macro name length", strlen(macro), mloc.r - mloc.l + 1);
 
 		if (NULL != context)
 		{
-			ZBX_CU_ASSERT_INT_NE_FATAL(context_l, 0);
-			ZBX_CU_ASSERT_STRING_N_EQ_FATAL(expression + context_l, context, context_r - context_l + 1);
-			ZBX_CU_ASSERT_INT_EQ_FATAL(strlen(context), (size_t)context_r - context_l + 1);
+			ZBX_CU_ASSERT_INT_NE_FATAL("context", context_l, 0);
+			ZBX_CU_ASSERT_STRINGN_EQ_FATAL("context name", expression + context_l, context,
+					context_r - context_l + 1);
+			ZBX_CU_ASSERT_INT_EQ_FATAL("context name length", strlen(context),
+					(size_t)context_r - context_l + 1);
 
 		}
 		else
-			ZBX_CU_ASSERT_INT_EQ_FATAL(context_l, 0);
+			ZBX_CU_ASSERT_INT_EQ_FATAL("context", context_l, 0);
 	}
 }
 

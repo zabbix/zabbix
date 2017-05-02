@@ -26,6 +26,8 @@
 #include <CUnit/Basic.h>
 #include <CUnit/Automated.h>
 
+#include "zbxalgo.h"
+
 #define ZBX_CU_STR2(str)		#str
 #define ZBX_CU_STR(str)			ZBX_CU_STR2(str)
 #define ZBX_CU_SUITE_PREFIX		zbx_cu_init_
@@ -51,121 +53,121 @@ typedef int (*zbx_cu_init_suite_func_t)(void);
 		return CU_get_error();							\
 	}
 
-#define ZBX_CU_ASSERT_STRING_EQ(actual, expected) {								\
+#define ZBX_CU_ASSERT_STRING_EQ(desc, actual, expected) {							\
 		CU_assertImplementation(!(strcmp((const char*)(actual), (const char*)(expected))), __LINE__,	\
-			zbx_cu_assert_args_str("CU_ASSERT_STRING_EQ", #actual, actual, #expected, expected),	\
+			zbx_cu_assert_args_str(desc, "==", #actual, actual, #expected, expected),	\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_STRING_EQ_FATAL(actual, expected) {							\
+#define ZBX_CU_ASSERT_STRING_EQ_FATAL(desc, actual, expected) {							\
 		CU_assertImplementation(!(strcmp((const char*)(actual), (const char*)(expected))), __LINE__,	\
-			zbx_cu_assert_args_str("CU_ASSERT_STRING_EQ_FATAL", #actual, actual, #expected, expected),\
+			zbx_cu_assert_args_str(desc, "==", #actual, actual, #expected, expected),		\
 			__FILE__, "", CU_TRUE);									\
 		}
 
-#define ZBX_CU_ASSERT_STRING_N_EQ(actual, expected, n) {							\
+#define ZBX_CU_ASSERT_STRINGN_EQ(desc, actual, expected, n) {							\
 		CU_assertImplementation(!(strncmp((const char*)(actual), (const char*)(expected), n)), __LINE__,\
-			zbx_cu_assert_args_str_n("CU_ASSERT_STRING_EQ", #actual, actual, #expected, expected, n),\
+			zbx_cu_assert_args_str_n(desc, "==", #actual, actual, #expected, expected, n),		\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_STRING_N_EQ_FATAL(actual, expected, n) {							\
-		CU_assertImplementation(!(strncmp((const char*)(actual), (const char*)(expected), n)), __LINE__,	\
-			zbx_cu_assert_args_str_n("CU_ASSERT_STRING_EQ_FATAL", #actual, actual, #expected, expected, n),\
+#define ZBX_CU_ASSERT_STRINGN_EQ_FATAL(desc, actual, expected, n) {						\
+		CU_assertImplementation(!(strncmp((const char*)(actual), (const char*)(expected), n)), __LINE__,\
+			zbx_cu_assert_args_str_n(desc, "==", #actual, actual, #expected, expected, n),\
 			__FILE__, "", CU_TRUE);									\
 		}
 
-#define ZBX_CU_ASSERT_INT_EQ(actual, expected) {								\
+#define ZBX_CU_ASSERT_INT_EQ(desc, actual, expected) {								\
 		CU_assertImplementation((actual == expected) , __LINE__,					\
-			zbx_cu_assert_args_int("CU_ASSERT_INT_EQ", #actual, actual, #expected, expected),	\
+			zbx_cu_assert_args_int(desc, "==", #actual, actual, #expected, expected),	\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_INT_EQ_FATAL(actual, expected) {								\
+#define ZBX_CU_ASSERT_INT_EQ_FATAL(desc, actual, expected) {							\
 		CU_assertImplementation((actual == expected) , __LINE__,					\
-			zbx_cu_assert_args_int("CU_ASSERT_INT_EQ_FATAL", #actual, actual, #expected, expected),	\
-			__FILE__, "", CU_TRUE);								\
+			zbx_cu_assert_args_int(desc, "==", #actual, actual, #expected, expected),		\
+			__FILE__, "", CU_TRUE);									\
 		}
 
-#define ZBX_CU_ASSERT_INT_NE(actual, expected) {								\
+#define ZBX_CU_ASSERT_INT_NE(desc, actual, expected) {								\
 		CU_assertImplementation((actual != expected) , __LINE__,					\
-			zbx_cu_assert_args_int("CU_ASSERT_INT_NE", #actual, actual, #expected, expected),	\
+			zbx_cu_assert_args_int(desc, "!=", #actual, actual, #expected, expected),		\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_INT_NE_FATAL(actual, expected) {								\
+#define ZBX_CU_ASSERT_INT_NE_FATAL(desc, actual, expected) {							\
 		CU_assertImplementation((actual != expected) , __LINE__,					\
-			zbx_cu_assert_args_int("CU_ASSERT_INT_NE_FATAL", #actual, actual, #expected, expected),	\
-			__FILE__, "", CU_TRUE);								\
+			zbx_cu_assert_args_int(desc, "!=", #actual, actual, #expected, expected),		\
+			__FILE__, "", CU_TRUE);									\
 		}
 
-#define ZBX_CU_ASSERT_UINT64_EQ(actual, expected) {								\
+#define ZBX_CU_ASSERT_UINT64_EQ(desc, actual, expected) {							\
 		CU_assertImplementation((actual == expected) , __LINE__,					\
-			zbx_cu_assert_args_ui64("CU_ASSERT_UINT64_EQ", #actual, actual, #expected, expected),	\
+			zbx_cu_assert_args_ui64(desc, "==", #actual, actual, #expected, expected),		\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_UINT64_EQ_FATAL(actual, expected) {							\
+#define ZBX_CU_ASSERT_UINT64_EQ_FATAL(desc, actual, expected) {							\
 		CU_assertImplementation((actual == expected) , __LINE__,					\
-			zbx_cu_assert_args_ui64("CU_ASSERT_UINT64_EQ_FATAL", #actual, actual, #expected, expected),\
-			__FILE__, "", CU_TRUE);								\
+			zbx_cu_assert_args_ui64(desc, "==", #actual, actual, #expected, expected),		\
+			__FILE__, "", CU_TRUE);									\
 		}
 
 
-#define ZBX_CU_ASSERT_DOUBLE_EQ(actual, expected) {								\
+#define ZBX_CU_ASSERT_DOUBLE_EQ(desc, actual, expected) {							\
 		CU_assertImplementation((actual == expected) , __LINE__,					\
-			zbx_cu_assert_args_dbl("CU_ASSERT_DOUBLE_EQ", #actual, actual, #expected, expected),	\
+			zbx_cu_assert_args_dbl(desc, "==", #actual, actual, #expected, expected),		\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_DOUBLE_EQ_FATAL(actual, expected) {							\
+#define ZBX_CU_ASSERT_DOUBLE_EQ_FATAL(desc, actual, expected) {							\
 		CU_assertImplementation((actual == expected) , __LINE__,					\
-			zbx_cu_assert_args_dbl("CU_ASSERT_DOUBLE_EQ_FATAL", #actual, actual, #expected, expected),\
+			zbx_cu_assert_args_dbl(desc, "==", #actual, actual, #expected, expected),		\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_CHAR_EQ(actual, expected) {								\
+#define ZBX_CU_ASSERT_CHAR_EQ(desc, actual, expected) {								\
 		CU_assertImplementation((actual == expected) , __LINE__,					\
-			zbx_cu_assert_args_char("CU_ASSERT_CHAR_EQ", #actual, actual, #expected, expected),	\
+			zbx_cu_assert_args_char(desc, "==", #actual, actual, #expected, expected),		\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_CHAR_EQ_FATAL(actual, expected) {								\
+#define ZBX_CU_ASSERT_CHAR_EQ_FATAL(desc, actual, expected) {							\
 		CU_assertImplementation((actual == expected) , __LINE__,					\
-			zbx_cu_assert_args_char("CU_ASSERT_CHAR_EQ_FATAL", #actual, actual, #expected, expected),\
-			__FILE__, "", CU_TRUE);								\
+			zbx_cu_assert_args_char(desc, "==", #actual, actual, #expected, expected),		\
+			__FILE__, "", CU_TRUE);									\
 		}
 
-#define ZBX_CU_ASSERT_CHAR_NE(actual, expected) {								\
+#define ZBX_CU_ASSERT_CHAR_NE(desc, actual, expected) {								\
 		CU_assertImplementation((actual != expected) , __LINE__,					\
-			zbx_cu_assert_args_char("CU_ASSERT_CHAR_NE", #actual, actual, #expected, expected),	\
+			zbx_cu_assert_args_char(desc, "!=", #actual, actual, #expected, expected),		\
 			__FILE__, "", CU_FALSE);								\
 		}
 
-#define ZBX_CU_ASSERT_CHAR_NE_FATAL(actual, expected) {								\
+#define ZBX_CU_ASSERT_CHAR_NE_FATAL(desc, actual, expected) {							\
 		CU_assertImplementation((actual != expected) , __LINE__,					\
-			zbx_cu_assert_args_char("CU_ASSERT_CHAR_NE_FATAL", #actual, actual, #expected, expected),\
-			__FILE__, "", CU_TRUE);								\
+			zbx_cu_assert_args_char(desc, "!=", #actual, actual, #expected, expected),		\
+			__FILE__, "", CU_TRUE);									\
 		}
 
 
-const char	*zbx_cu_assert_args_str(const char *assert_name, const char *expression1, const char *actual,
-		const char *expression2, const char *expected);
+const char	*zbx_cu_assert_args_str(const char *description, const char *operation, const char *expression1,
+		const char *actual, const char *expression2, const char *expected);
 
-const char	*zbx_cu_assert_args_str_n(const char *assert_name, const char *expression1, const char *actual,
-		const char *expression2, const char *expected, size_t n);
+const char	*zbx_cu_assert_args_str_n(const char *description, const char *operation, const char *expression1,
+		const char *actual, const char *expression2, const char *expected, size_t n);
 
-const char	*zbx_cu_assert_args_ui64(const char *assert_name, const char *expression1, zbx_uint64_t actual,
-		const char *expression2, zbx_uint64_t expected);
+const char	*zbx_cu_assert_args_ui64(const char *description, const char *operation, const char *expression1,
+		zbx_uint64_t actual, const char *expression2, zbx_uint64_t expected);
 
-const char	*zbx_cu_assert_args_dbl(const char *assert_name, const char *expression1, double actual,
-		const char *expression2, double expected);
+const char	*zbx_cu_assert_args_dbl(const char *description, const char *operation, const char *expression1,
+		double actual, const char *expression2, double expected);
 
-const char	*zbx_cu_assert_args_int(const char *assert_name, const char *expression1, int actual,
-		const char *expression2, int expected);
+const char	*zbx_cu_assert_args_int(const char *description, const char *operation, const char *expression1,
+		int actual, const char *expression2, int expected);
 
-const char	*zbx_cu_assert_args_char(const char *assert_name, const char *expression1, char actual,
-		const char *expression2, char expected);
+const char	*zbx_cu_assert_args_char(const char *description, const char *operation, const char *expression1,
+		char actual, const char *expression2, char expected);
 
 extern struct mallinfo	zbx_cu_minfo;
 

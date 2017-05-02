@@ -32,96 +32,111 @@
 #include "cu_modules.h"
 
 #define ZBX_CU_ASSERT_ARGS_LENGTH	1024
-#define ZBX_CU_ASSERT_NAME_LENGTH	128
-#define ZBX_CU_ASSERT_BUFFER_SIZE	(ZBX_CU_ASSERT_ARGS_LENGTH * 2 + ZBX_CU_ASSERT_NAME_LENGTH + 16)
+#define ZBX_CU_ASSERT_DESC_LENGTH	128
+#define ZBX_CU_ASSERT_OP_LENGTH		16
+#define ZBX_CU_ASSERT_BUFFER_SIZE	(ZBX_CU_ASSERT_ARGS_LENGTH * 2 + ZBX_CU_ASSERT_DESC_LENGTH + 16 + \
+		ZBX_CU_ASSERT_OP_LENGTH)
 
-static char	zbx_cu_assert_args_buffer[ZBX_CU_ASSERT_BUFFER_SIZE];
+static char	cu_buffer[ZBX_CU_ASSERT_BUFFER_SIZE];
 
-const char	*zbx_cu_assert_args_str(const char *assert_name, const char *expression1, const char *actual,
-		const char *expression2, const char *expected)
+const char	*zbx_cu_assert_args_str(const char *description, const char *operation, const char *expression1,
+		const char *actual, const char *expression2, const char *expected)
 {
 	size_t	offset = 0;
 
-	offset = zbx_snprintf(zbx_cu_assert_args_buffer, ZBX_CU_ASSERT_NAME_LENGTH + 1, "%s(", assert_name);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 2, "%s=\"%s\", ",
-			expression1, actual);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=\"%s\")",
-			expression2, expected);
+	offset = zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_DESC_LENGTH, "ASSERT %s: ",
+			(NULL == description ? "string compare" : description));
 
-	return zbx_cu_assert_args_buffer;
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%s)", expression1, actual);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_OP_LENGTH, " %s ", operation);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%s)", expression2, expected);
+
+	return cu_buffer;
 }
 
-const char	*zbx_cu_assert_args_str_n(const char *assert_name, const char *expression1, const char *actual,
-		const char *expression2, const char *expected, size_t n)
+const char	*zbx_cu_assert_args_str_n(const char *description, const char *operation, const char *expression1,
+		const char *actual, const char *expression2, const char *expected, size_t n)
 {
 	size_t	offset = 0;
 	char	tmp[ZBX_CU_ASSERT_BUFFER_SIZE];
 
+	offset = zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_DESC_LENGTH, "ASSERT %s [" ZBX_FS_SIZE_T "]: ",
+			(NULL == description ? "string compare" : description), n);
+
 	zbx_strlcpy(tmp, actual, MIN(ZBX_CU_ASSERT_BUFFER_SIZE, n + 1));
-	offset = zbx_snprintf(zbx_cu_assert_args_buffer, ZBX_CU_ASSERT_NAME_LENGTH + 1, "%s(", assert_name);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 2, "%s=\"%s\", ",
-			expression1, tmp);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%s)", expression1, tmp);
 
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=\"%s\")",
-			expression2, expected);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_OP_LENGTH, " %s ", operation);
 
-	return zbx_cu_assert_args_buffer;
+	zbx_strlcpy(tmp, expected, MIN(ZBX_CU_ASSERT_BUFFER_SIZE, n + 1));
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%s)", expression2, tmp);
+
+	return cu_buffer;
 }
 
-const char	*zbx_cu_assert_args_ui64(const char *assert_name, const char *expression1, zbx_uint64_t actual,
-		const char *expression2, zbx_uint64_t expected)
+const char	*zbx_cu_assert_args_ui64(const char *description, const char *operation, const char *expression1,
+		zbx_uint64_t actual, const char *expression2, zbx_uint64_t expected)
 {
 	size_t	offset = 0;
 
-	offset = zbx_snprintf(zbx_cu_assert_args_buffer, ZBX_CU_ASSERT_NAME_LENGTH + 1, "%s(", assert_name);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 2, "%s=" ZBX_FS_UI64 ", ",
-			expression1, actual);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=" ZBX_FS_UI64  ")",
-			expression2, expected);
+	offset = zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_DESC_LENGTH, "ASSERT %s: ",
+			(NULL == description ? "uint64 compare" : description));
 
-	return zbx_cu_assert_args_buffer;
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (" ZBX_FS_UI64 ")", expression1,
+			actual);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_OP_LENGTH, " %s ", operation);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (" ZBX_FS_UI64 ")", expression2,
+			expected);
+
+	return cu_buffer;
 }
 
-const char	*zbx_cu_assert_args_dbl(const char *assert_name, const char *expression1, double actual,
-		const char *expression2, double expected)
+const char	*zbx_cu_assert_args_dbl(const char *description, const char *operation, const char *expression1,
+		double actual, const char *expression2, double expected)
 {
 	size_t	offset = 0;
 
-	offset = zbx_snprintf(zbx_cu_assert_args_buffer, ZBX_CU_ASSERT_NAME_LENGTH + 1, "%s(", assert_name);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 2, "%s=" ZBX_FS_DBL ", ",
-			expression1, actual);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=" ZBX_FS_DBL  ")",
-			expression2, expected);
+	offset = zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_DESC_LENGTH, "ASSERT %s: ",
+			(NULL == description ? "double compare" : description));
 
-	return zbx_cu_assert_args_buffer;
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%f)", expression1, actual);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_OP_LENGTH, " %s ", operation);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%f)", expression2, expected);
+
+	return cu_buffer;
 }
 
-const char	*zbx_cu_assert_args_int(const char *assert_name, const char *expression1, int actual,
-		const char *expression2, int expected)
+const char	*zbx_cu_assert_args_int(const char *description, const char *operation, const char *expression1,
+		int actual, const char *expression2, int expected)
 {
 	size_t	offset = 0;
 
-	offset = zbx_snprintf(zbx_cu_assert_args_buffer, ZBX_CU_ASSERT_NAME_LENGTH + 1, "%s(", assert_name);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 2, "%s=%d, ",
-			expression1, actual);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=%d)",
-			expression2, expected);
+	offset = zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_DESC_LENGTH, "ASSERT %s: ",
+			(NULL == description ? "int compare" : description));
 
-	return zbx_cu_assert_args_buffer;
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%d)", expression1, actual);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_OP_LENGTH, " %s ", operation);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%d)", expression2, expected);
+
+	return cu_buffer;
 }
 
-const char	*zbx_cu_assert_args_char(const char *assert_name, const char *expression1, char actual,
-		const char *expression2, char expected)
+const char	*zbx_cu_assert_args_char(const char *description, const char *operation, const char *expression1,
+		char actual, const char *expression2, char expected)
 {
 	size_t	offset = 0;
 
-	offset = zbx_snprintf(zbx_cu_assert_args_buffer, ZBX_CU_ASSERT_NAME_LENGTH + 1, "%s(", assert_name);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 2, "%s=%c (%d), ",
-			expression1, actual, (int)actual);
-	offset += zbx_snprintf(zbx_cu_assert_args_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH + 1, "%s=%c (%d))",
-			expression2, expected, (int)expected);
+	offset = zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_DESC_LENGTH, "ASSERT %s: ",
+			(NULL == description ? "int compare" : description));
 
-	return zbx_cu_assert_args_buffer;
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%c %d)", expression1, actual,
+			(int)actual);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_OP_LENGTH, " %s ", operation);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%c %d)", expression2,
+			expected, (int)expected);
+
+	return cu_buffer;
+
 }
 
 /******************************************************************************
