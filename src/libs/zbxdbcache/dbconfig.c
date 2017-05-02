@@ -300,10 +300,25 @@ zbx_reachability_t;
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host);
 
-static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, zbx_reachability_t reach, int now)
+#define ZBX_ITEM_COLLECTED		0x01	/* force item rescheduling after new value collection */
+#define ZBX_ITEM_KEY_CHANGED		0x02
+#define ZBX_ITEM_TYPE_CHANGED		0x04
+#define ZBX_ITEM_DELAY_CHANGED		0x08
+#define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x10
+
+static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, zbx_reachability_t reach, int flags,
+		int now)
 {
 	ZBX_DC_PROXY	*proxy = NULL;
 	zbx_uint64_t	seed;
+
+	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
+			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
+			((ITEM_STATE_NORMAL == item->state && 0 == (flags & ZBX_ITEM_DELAY_CHANGED)) ||
+			(ITEM_STATE_NOTSUPPORTED == item->state && 0 == (flags & ZBX_REFRESH_UNSUPPORTED_CHANGED))))
+	{
+		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
+	}
 
 	switch (reach)
 	{
@@ -719,7 +734,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	return SUCCEED;
 }
 
-static int	DCsync_config(zbx_dbsync_t *sync, int *refresh_unsupported_changed)
+static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 {
 #define SELECTED_FIELD_COUNT	27
 
@@ -742,7 +757,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *refresh_unsupported_changed)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	*refresh_unsupported_changed = 0;
+	*flags = 0;
 
 	if (NULL == config->config)
 	{
@@ -785,7 +800,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *refresh_unsupported_changed)
 	}
 
 	if (0 == found || config->config->refresh_unsupported != refresh_unsupported)
-		*refresh_unsupported_changed = 1;
+		*flags |= ZBX_REFRESH_UNSUPPORTED_CHANGED;
 
 	config->config->refresh_unsupported = refresh_unsupported;
 	ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
@@ -2023,7 +2038,7 @@ static void	dc_host_update_agent_stats(ZBX_DC_HOST *host, unsigned char type, in
 	}
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
+static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 {
 	const char		*__function_name = "DCsync_items";
 
@@ -2051,7 +2066,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 
 	time_t			now;
 	unsigned char		status, type, value_type;
-	int			type_changed, delay_changed, key_changed, found, update_index, ret;
+	int			found, update_index, ret;
 	zbx_uint64_t		itemid, hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2063,6 +2078,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
+
+		flags &= ZBX_REFRESH_UNSUPPORTED_CHANGED;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
@@ -2126,7 +2143,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		else
 			ZBX_STR2UCHAR(value_type, row[4]);
 
-		key_changed = (SUCCEED == DCstrpool_replace(found, &item->key, row[5]));
+		if (SUCCEED == DCstrpool_replace(found, &item->key, row[5]))
+			flags |= ZBX_ITEM_KEY_CHANGED;
 
 		if (0 == found)
 		{
@@ -2149,6 +2167,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		}
 		else
 		{
+			if (item->type != type)
+				flags |= ZBX_ITEM_TYPE_CHANGED;
+
 			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
 
@@ -2166,6 +2187,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 		if (ITEM_STATUS_ACTIVE == status)
 			dc_host_update_agent_stats(host, type, 1);
 
+		item->type = type;
 		item->status = status;
 		item->value_type = value_type;
 
@@ -2181,9 +2203,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 
 		/* process item intervals and update item nextcheck */
 
-		delay_changed = (SUCCEED == DCstrpool_replace(found, &item->delay, row[14]));
-		type_changed = (item->type != type);
-		item->type = type;
+		if (SUCCEED == DCstrpool_replace(found, &item->delay, row[14]))
+			flags |= ZBX_ITEM_DELAY_CHANGED;
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
@@ -2195,13 +2216,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int refresh_unsupported_changed)
 
 			old_nextcheck = item->nextcheck;
 
-			if (SUCCEED == is_counted_in_item_queue(item->type, item->key) &&
-					(0 == item->nextcheck || 0 != key_changed || 0 != type_changed ||
-					(ITEM_STATE_NOTSUPPORTED == item->state && 1 == refresh_unsupported_changed) ||
-					(ITEM_STATE_NORMAL == item->state && 0 != delay_changed)))
-			{
-				DCitem_nextcheck_update(item, host, ZBX_REACHABLE, now);
-			}
+			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
+				DCitem_nextcheck_update(item, host, ZBX_REACHABLE, flags, now);
 
 			DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 		}
@@ -4118,7 +4134,7 @@ void	DCsync_configuration(unsigned char mode)
 {
 	const char		*__function_name = "DCsync_configuration";
 
-	int			i, refresh_unsupported_changed;
+	int			i, flags;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
 				csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2,
 				expr_sec2, action_sec, action_sec2, action_condition_sec, action_condition_sec2,
@@ -4169,7 +4185,7 @@ void	DCsync_configuration(unsigned char mode)
 	/* sync global configuration settings */
 	START_SYNC;
 	sec = zbx_time();
-	DCsync_config(&config_sync, &refresh_unsupported_changed);
+	DCsync_config(&config_sync, &flags);
 	csec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
@@ -4246,7 +4262,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	sec = zbx_time();
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
-	DCsync_items(&items_sync, refresh_unsupported_changed);
+	DCsync_items(&items_sync, flags);
 	isec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
@@ -6574,7 +6590,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, zb
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, dc_host, reach, lastclock);
+	DCitem_nextcheck_update(dc_item, dc_host, reach, ZBX_ITEM_COLLECTED, lastclock);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, reach);
@@ -10141,7 +10157,7 @@ void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values,
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, dc_host, ZBX_REACHABLE, dc_item->lastclock);
+			DCitem_nextcheck_update(dc_item, dc_host, ZBX_REACHABLE, ZBX_ITEM_COLLECTED, dc_item->lastclock);
 	}
 
 	UNLOCK_CACHE;
