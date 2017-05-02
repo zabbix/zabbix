@@ -1546,7 +1546,7 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-			]
+			],
 		],
 	],
 	'httpstepitem' => [
