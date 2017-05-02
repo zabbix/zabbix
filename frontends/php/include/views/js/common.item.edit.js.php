@@ -285,9 +285,6 @@ foreach ($this->data['types'] as $type => $label) {
 			zbx_subarray_push($this->data['typeVisibility'], $type,
 				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX]
 			);
-			zbx_subarray_push($this->data['typeVisibility'], $type,
-				['id' => 'jmx_endpoint', 'defaultValue' => DB::getDefault('items', 'jmx_endpoint')]
-			);
 			break;
 		default:
 			zbx_subarray_push($this->data['typeVisibility'], $type, ['id' => 'key', 'defaultValue' => '']);

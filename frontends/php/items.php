@@ -493,7 +493,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'inventory_link' => getRequest('inventory_link', 0),
 				'description' => getRequest('description', ''),
 				'status' => getRequest('status', ITEM_STATUS_DISABLED),
-				'jmx_endpoint' => getRequest('jmx_endpoint', DB::getDefault('items', 'jmx_endpoint'))
+				'jmx_endpoint' => getRequest('jmx_endpoint', '')
 			];
 
 			if ($preprocessing) {
@@ -506,7 +506,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$db_items = API::Item()->get([
 				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'snmp_community', 'snmpv3_contextname',
 					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase',
-					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'jmx_endpoint', 'username', 'password',
+					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
 					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'delay_flex',
 					'history', 'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description',
 					'status', 'templateid', 'flags', 'jmx_endpoint'
@@ -620,7 +620,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
 				}
-				if ($db_item['jmx_endpoint'] !== getRequest('jmx_endpoint', DB::getDefault('items', 'jmx_endpoint'))) {
+				if ($db_item['jmx_endpoint'] !== getRequest('jmx_endpoint', '')) {
 					$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
 				}
 				$db_applications = zbx_objectValues($db_item['applications'], 'applicationid');
@@ -1115,6 +1115,10 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
+	}
+
+	if (!hasRequest('itemid') && !getRequest('form_refresh')) {
+		$data['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
 	}
 
 	// render view
