@@ -55,8 +55,6 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 --------------------------------------------------------------------------------
 Changes for 3.2.6rc1
 
-New features:
-
 Bug fixes:
 A.F....... [ZBX-10253] fixed translation string and validation of TLS settings in host.create(), host.update() and host.massUpdate() methods; added variables to hosts array required by CHost::validateUpdate() method (miks)
 ........S. [ZBX-12121] fixed problem generation by timer process (gleb)
