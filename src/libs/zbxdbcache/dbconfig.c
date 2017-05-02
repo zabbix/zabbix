@@ -2019,6 +2019,8 @@ static void	dc_host_update_agent_stats(ZBX_DC_HOST *host, unsigned char type, in
 	}
 }
 
+static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags, int lastclock);
+
 static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 {
 	const char		*__function_name = "DCsync_items";
@@ -2190,16 +2192,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status &&
 				SUCCEED == is_counted_in_item_queue(item->type, item->key))
 		{
-			unsigned char	old_poller_type;
-			int		old_nextcheck;
-
-			old_poller_type = item->poller_type;
-			DCitem_poller_type_update(item, host, flags);
-
-			old_nextcheck = item->nextcheck;
-			DCitem_nextcheck_update(item, host, flags, now);
-
-			DCupdate_item_queue(item, old_poller_type, old_nextcheck);
+			dc_requeue_item(item, host, flags, now);
 		}
 		else
 		{
