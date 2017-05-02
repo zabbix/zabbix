@@ -31,9 +31,9 @@
 #define ZBX_CU_SUITE_PREFIX		zbx_cu_init_
 #define ZBX_CU_SUITE_PREFIX_STR		ZBX_CU_STR(ZBX_CU_SUITE_PREFIX)
 
-#define ZBX_CU_SUITE3(prefix, suite)	prefix ## suite(void)
-#define ZBX_CU_SUITE2(prefix, suite)	ZBX_CU_SUITE3(prefix, suite)
-#define ZBX_CU_SUITE(suite)		ZBX_CU_SUITE2(ZBX_CU_SUITE_PREFIX, suite)
+#define ZBX_CU_DECLARE3(prefix, suite)	prefix ## suite(void)
+#define ZBX_CU_DECLARE2(prefix, suite)	ZBX_CU_DECLARE3(prefix, suite)
+#define ZBX_CU_DECLARE(suite)		ZBX_CU_DECLARE2(ZBX_CU_SUITE_PREFIX, suite)
 
 typedef int (*zbx_cu_init_suite_func_t)(void);
 
@@ -44,10 +44,10 @@ typedef int (*zbx_cu_init_suite_func_t)(void);
 		CU_ASSERT_EQUAL(minfo_local.uordblks, zbx_cu_minfo.uordblks);	\
 	}
 
-#define ZBX_CU_ADD_TEST(suite, description, function)					\
-	if (NULL == CU_add_test(suite, #function "(): " description, function))		\
+#define ZBX_CU_ADD_TEST(suite, function)					\
+	if (NULL == CU_add_test(suite, #function, function))		\
 	{										\
-		fprintf(stderr, "Error adding test suite \"%s\"\n", description);	\
+		fprintf(stderr, "Error adding test suite \"" #function "\"\n");		\
 		return CU_get_error();							\
 	}
 
