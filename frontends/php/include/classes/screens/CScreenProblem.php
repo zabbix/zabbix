@@ -837,7 +837,7 @@ class CScreenProblem extends CScreenBase {
 			if ($this->config['event_ack_enable']) {
 				$footer = new CActionButtonList('action', 'eventids', [
 					'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
-				]);
+				], 'problem');
 			}
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
