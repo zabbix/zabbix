@@ -399,7 +399,8 @@ abstract class CItemGeneral extends CApiService {
 			if ($fullItem['type'] == ITEM_TYPE_JMX) {
 				if (!$update && array_key_exists('jmx_endpoint', $item) == false) {
 					$item['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-				} else {
+				}
+				else {
 					$item['jmx_endpoint'] = trim($item['jmx_endpoint']);
 				}
 				$fullItem['jmx_endpoint'] = $item['jmx_endpoint'];
