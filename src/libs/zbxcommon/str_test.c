@@ -33,13 +33,16 @@ static void	cu_test_macro_expresssion(const char *expression, const char *macro,
 {
 	int		macro_r, context_l, context_r, ret;
 	zbx_strloc_t    mloc;
+	char		description[ZBX_KIBIBYTE * 64];
+
+	zbx_snprintf(description, sizeof(description), "expression '%s'", expression);
 
 	ret = zbx_user_macro_parse(expression, &macro_r, &context_l, &context_r);
-	ZBX_CU_ASSERT_INT_EQ_FATAL("return value", ret, success);
+	ZBX_CU_ASSERT_INT_EQ_FATAL(description, ret, success);
 
 	if (FAIL != ret)
 	{
-		ZBX_CU_ASSERT_CHAR_EQ_FATAL("macro end", expression[macro_r], '}');
+		ZBX_CU_ASSERT_CHAR_EQ_FATAL(description, expression[macro_r], '}');
 
 		mloc.l = 2;
 
@@ -55,16 +58,15 @@ static void	cu_test_macro_expresssion(const char *expression, const char *macro,
 		else
 			mloc.r = macro_r - 1;
 
-		ZBX_CU_ASSERT_STRINGN_EQ_FATAL("macro name", expression + 2, macro,  mloc.r - mloc.l + 1);
-		ZBX_CU_ASSERT_INT_EQ_FATAL("macro name length", strlen(macro), mloc.r - mloc.l + 1);
+		ZBX_CU_ASSERT_STRINGN_EQ_FATAL(description, expression + 2, macro,  mloc.r - mloc.l + 1);
+		ZBX_CU_ASSERT_INT_EQ_FATAL(description, strlen(macro), mloc.r - mloc.l + 1);
 
 		if (NULL != context)
 		{
-			ZBX_CU_ASSERT_INT_NE_FATAL("context", context_l, 0);
-			ZBX_CU_ASSERT_STRINGN_EQ_FATAL("context name", expression + context_l, context,
+			ZBX_CU_ASSERT_INT_NE_FATAL(description, context_l, 0);
+			ZBX_CU_ASSERT_STRINGN_EQ_FATAL(description, expression + context_l, context,
 					context_r - context_l + 1);
-			ZBX_CU_ASSERT_INT_EQ_FATAL("context name length", strlen(context),
-					(size_t)context_r - context_l + 1);
+			ZBX_CU_ASSERT_INT_EQ_FATAL(description, strlen(context), (size_t)context_r - context_l + 1);
 
 		}
 		else
@@ -72,206 +74,64 @@ static void	cu_test_macro_expresssion(const char *expression, const char *macro,
 	}
 }
 
-static void	test_zbx_user_macro_parse_fail1()
+static void	test_zbx_user_macro_parse()
 {
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
+	struct zbx_str_test_data_t
+	{
+		const char	*expression;
+		const char	*macro;
+		const char	*context;
+		int		success;	/* expected return value */
+	};
 
-static void	test_zbx_user_macro_parse_fail2()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
+	int				i;
+	size_t				user_macro_parse_test_case_count;
+	struct zbx_str_test_data_t	user_macro_parse_test_cases[] = {
+			{"", NULL, NULL, FAIL},
+			{"{", NULL, NULL, FAIL},
+			{"}", NULL, NULL, FAIL},
+			{"{$A }", NULL, NULL, FAIL},
+			{"{$ A}", NULL, NULL, FAIL},
+			{"{ $A}", NULL, NULL, FAIL},
+			{"{$A", NULL, NULL, FAIL},
+			{"$A}", NULL, NULL, FAIL},
+			{"{$}", NULL, NULL, FAIL},
+			{"{$a}", NULL, NULL, FAIL},
+			{"{$Ab}", NULL, NULL, FAIL},
+			{"B{$A}", NULL, NULL, FAIL},
+			{"B{$A}B", NULL, NULL, FAIL},
+			{"{$A:", NULL, NULL, FAIL},
+			{"{$A: \"", NULL, NULL, FAIL},
+			{"{$A: \"}", NULL, NULL, FAIL},
+			{"{$A:\"1}", NULL, NULL, FAIL},
+			{"{$A:\"1\"2}", NULL, NULL, FAIL},
+			{"{$A:\"1 }", NULL, NULL, FAIL},
+			{"{$A}", "A", NULL, SUCCEED},
+			{"{$ABCD}", "ABCD", NULL, SUCCEED},
+			{"{$A}B", "A", NULL, SUCCEED},
+			{"{$A:1}", "A", "1", SUCCEED},
+			{"{$A:1234}", "A", "1234", SUCCEED},
+			{"{$A:1 }", "A", "1 ", SUCCEED},
+			{"{$A: 1}", "A", "1", SUCCEED},
+			{"{$A: 1 }", "A", "1 ", SUCCEED},
+			{"{$A:  \"1\"}", "A", "\"1\"", SUCCEED},
+			{"{$A:  \"1\"  }", "A", "\"1\"", SUCCEED},
+			{"{$A:  \"\\\"1\\\"\"}", "A", "\"\\\"1\\\"\"", SUCCEED},
+			{"{$A:  \"\\\"1\\\"\"  }", "A", "\"\\\"1\\\"\"", SUCCEED},
+			{"{$A: \"{$B}\" }", "A", "\"{$B}\"", SUCCEED}
+			};
 
-static void	test_zbx_user_macro_parse_fail3()
-{
 	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
 
-static void	test_zbx_user_macro_parse_fail4()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A }", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
+	user_macro_parse_test_case_count = sizeof(user_macro_parse_test_cases)/sizeof(user_macro_parse_test_cases[0]);
 
-static void	test_zbx_user_macro_parse_fail5()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$ A}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
+	for (i = 0; user_macro_parse_test_case_count > i; i++)
+	{
+		cu_test_macro_expresssion(user_macro_parse_test_cases[i].expression,
+				user_macro_parse_test_cases[i].macro,user_macro_parse_test_cases[i].context,
+				user_macro_parse_test_cases[i].success);
+	}
 
-static void	test_zbx_user_macro_parse_fail6()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{ $A}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_fail7()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_fail8()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("$A}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_fail9()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_fail10()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$a}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_fail11()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$Ab}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_fail12()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("B{$A}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_fail13()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("B{$A}B", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_fail1()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A:", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_fail2()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A: \"", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_fail3()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A: \"}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_fail4()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A:\"1}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_fail5()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A:\"1\"2}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_fail6()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A:\"1\"2}", NULL, NULL, FAIL);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_succeed1()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A}", "A", NULL, SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_succeed2()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$ABCD}", "ABCD", NULL, SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_succeed3()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A}B", "A", NULL, SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_succeed1()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A: 1}", "A", "1", SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_succeed2()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A: 1 }", "A", "1 ", SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_succeed3()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A:  \"1\"}", "A", "\"1\"", SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_succeed4()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A:  \"1\"  }", "A", "\"1\"", SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_succeed5()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A:  \"\\\"1\\\"\"}", "A", "\"\\\"1\\\"\"", SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_succeed6()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A:  \"\\\"1\\\"\"  }", "A", "\"\\\"1\\\"\"", SUCCEED);
-	ZBX_CU_LEAK_CHECK_END();
-}
-
-static void	test_zbx_user_macro_parse_context_succeed7()
-{
-	ZBX_CU_LEAK_CHECK_START();
-	cu_test_macro_expresssion("{$A: \"{$B}\" }", "A", "\"{$B}\"", SUCCEED);
 	ZBX_CU_LEAK_CHECK_END();
 }
 
@@ -279,42 +139,11 @@ int	ZBX_CU_DECLARE(str_test)
 {
 	CU_pSuite	suite = NULL;
 
-	/* test suite: str.c */
+	/* test suite: zbx_user_macro_parse() */
 	if (NULL == (suite = CU_add_suite("zbx_user_macro_parse", cu_init_empty, cu_clean_empty)))
 		return CU_get_error();
 
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail1);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail2);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail3);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail4);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail5);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail6);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail7);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail8);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail9);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail10);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail11);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail12);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_fail13);
-
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_fail1);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_fail2);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_fail3);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_fail4);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_fail5);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_fail6);
-
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_succeed1);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_succeed2);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_succeed3);
-
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_succeed1);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_succeed2);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_succeed3);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_succeed4);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_succeed5);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_succeed6);
-	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse_context_succeed7);
+	ZBX_CU_ADD_TEST(suite, test_zbx_user_macro_parse);
 
 	return CUE_SUCCESS;
 }
