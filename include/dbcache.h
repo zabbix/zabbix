@@ -600,6 +600,7 @@ int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 
 /* global configuration support */
+#define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 

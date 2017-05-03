@@ -804,7 +804,12 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 		*flags |= ZBX_REFRESH_UNSUPPORTED_CHANGED;
 
 	config->config->refresh_unsupported = refresh_unsupported;
-	ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
+
+	if (NULL != row[1])
+		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
+	else
+		config->config->discovery_groupid = ZBX_DISCOVERY_GROUPID_UNDEFINED;
+
 	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
 
