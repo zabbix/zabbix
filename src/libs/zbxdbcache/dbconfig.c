@@ -729,7 +729,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	if (0 != non_zero && 0 == *value)
 		return FAIL;
 
-	if (0 != value && value_min > *value)
+	if (0 != *value && value_min > *value)
 		return FAIL;
 
 	return SUCCEED;
