@@ -5,7 +5,7 @@
 # specify whether to default to --with-ldap or --without-ldap.
 # If not supplied, DEFAULT-ACTION is yes.
 #
-# This macro #defines HAVE_PCREPOSIX if a required header files is
+# This macro #defines HAVE_PCREPOSIX_H if a required header files is
 # found, and sets @LIBPCRE_LDFLAGS@ and @LIBPCRE_CFLAGS@ to the necessary
 # values.
 #
@@ -83,7 +83,7 @@ AC_HELP_STRING([--with-libpcre=@<:@DIR@:>@], [use libpcre from given base instal
 	fi
 
 	if test "x$found_libpcre" = "xyes"; then
-		AC_DEFINE([HAVE_LIBPCRE], 1, [Define to 1 if you have the 'libpcre' library (-lpcreposix -lpcre)])
+		AC_DEFINE([HAVE_PCREPOSIX_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcreposix -lpcre)])
 		AC_MSG_RESULT(yes)
 	else
 		LIBPCRE_CFLAGS=""

@@ -1376,9 +1376,6 @@ if test "x$have_ipcservice" = "xyes"; then
 fi
 
 dnl Check for libpcre, used by Zabbix for regular expressions
-
-AC_DEFINE([HAVE_PCREPOSIX], 1, [Define to 1 if Zabbix PCRE is used])
-
 LIBPCRE_CHECK_CONFIG([no])
 if test "x$found_libpcre" != "xyes"; then
 	AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
