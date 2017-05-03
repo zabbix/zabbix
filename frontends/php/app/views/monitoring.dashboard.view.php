@@ -21,18 +21,14 @@
 
 $this->addJsFile('dashboard.grid.js');
 
+$url_list = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.list');
+$url_view = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.view')
+	->setArgument('dashboardid', $data['dashboard']['dashboardid']);
+
 (new CWidget())
 	->setTitle(_('Dashboard'))
-	->addItem((new CList())
-		->addClass(ZBX_STYLE_OBJECT_GROUP)
-		->addItem([
-			(new CSpan())->addItem(new CLink(_('All dashboards'), 'zabbix.php?action=dashboard.list')),
-			'/',
-			(new CSpan())
-				->addClass(ZBX_STYLE_SELECTED)
-				->addItem(new CLink($data['dashboard']['name'], $data['dashboard']['link']))
-		]))
-	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
@@ -40,6 +36,17 @@ $this->addJsFile('dashboard.grid.js');
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	)
+	->addItem((new CList())
+		->addItem([
+			(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl())),
+			'/',
+			(new CSpan())
+				->addItem(new CLink($data['dashboard']['name'], $url_view->getUrl()))
+				->addClass(ZBX_STYLE_SELECTED)
+		])
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+	)
+	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->show();
 
 /*

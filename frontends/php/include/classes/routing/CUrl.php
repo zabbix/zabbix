@@ -114,26 +114,6 @@ class CUrl {
 		return $this;
 	}
 
-	/**
-	 * Clear all arguments
-	 *
-	 * @param array $exlude names of arguments to not delete
-	 * @return $this
-	 */
-	public function clearArguments($exlude = []) {
-		if (count($exlude) > 0) {
-			foreach ($this->arguments as $key => $argument) {
-				if (!in_array($key, $exlude)) {
-					unset($this->arguments[$key]);
-				}
-			}
-		}
-		else {
-			$this->arguments = [];
-		}
-		return $this;
-	}
-
 	public function setArgument($key, $value = '') {
 		$this->arguments[$key] = $value;
 

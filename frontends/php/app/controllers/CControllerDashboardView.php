@@ -23,20 +23,14 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashboardView extends CController {
 
-	/**
-	 * {@inheritdoc}
-	 */
 	protected function init() {
 		$this->disableSIDValidation();
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	protected function checkInput() {
 		$fields = [
-			'fullscreen'  => 'in 0,1',
-			'dashboardid' => 'not_empty|db dashboard.dashboardid'
+			'fullscreen' =>		'in 0,1',
+			'dashboardid' =>	'db dashboard.dashboardid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -48,15 +42,17 @@ class CControllerDashboardView extends CController {
 		return $ret;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	protected function checkPermissions() {
+		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+			return false;
+		}
+
 		if ($this->hasInput('dashboardid')) {
 			$dashboards = API::Dashboard()->get([
 				'output' => [],
-				'dashboardids' => [$this->getInput('dashboardid')]
+				'dashboardids' => $this->getInput('dashboardid')
 			]);
+
 			if (!$dashboards) {
 				return false;
 			}
@@ -65,39 +61,21 @@ class CControllerDashboardView extends CController {
 		return true;
 	}
 
-	/**
-	 * Action to view dashboard by given dashboard ID
-	 *
-	 * @return void
-	 */
 	protected function doAction() {
 		$dashboard = $this->getDashboard();
-		// redirect to list action when no dashboard or user persisted to list page
-		if (empty($dashboard)) {
-			$curl = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
-			$this->setResponse((new CControllerResponseRedirect($curl->getUrl())));
+
+		if ($dashboard === null) {
+			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
+			$this->setResponse((new CControllerResponseRedirect($url->getUrl())));
 			return;
 		}
 
-		$fullscreen = $this->getInput('fullscreen', '0');
-		$dashboard['link'] = $this->getDashboardLink($dashboard, $fullscreen);
-
-		$show_discovery_widget = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
-			'output' => [],
-			'filter' => ['status' => DRULE_STATUS_ACTIVE],
-			'limit' => 1
-		]));
-
 		$data = [
-			'dashboard'             => $dashboard,
-			'fullscreen'            => $fullscreen,
-			'filter_enabled'        => CProfile::get('web.dashconf.filter.enable', 0),
-			'show_status_widget'    => ($this->getUserType() == USER_TYPE_SUPER_ADMIN),
-			'show_discovery_widget' => $show_discovery_widget
+			'dashboard' => $dashboard,
+			'fullscreen' => $this->getInput('fullscreen', '0'),
+			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
+			'grid_widgets' => $this->getWidgets()
 		];
-		$data['grid_widgets'] = $this->getWidgets($data['show_status_widget'], $data['show_discovery_widget']);
-
-		CProfile::update('web.dashbrd.dashboardid', $dashboard['dashboardid'], PROFILE_TYPE_ID);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboard'));
@@ -107,63 +85,40 @@ class CControllerDashboardView extends CController {
 	/**
 	 * Get dashboard data from API
 	 *
-	 * @return array
+	 * @return array|null
 	 */
 	private function getDashboard() {
-		$dashboard_id = null;
-		if (!$this->hasInput('dashboardid')) {
-			$dashboard_id = CProfile::get('web.dashbrd.dashboardid');
-			if ($dashboard_id === null) {
-				if (CProfile::get('web.dashbrd.list_was_opened') !== '1') {
-					$dashboard_id = DASHBOARD_DEFAULT_ID;
-				}
+		$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
+
+		if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
+			$dashboardid = DASHBOARD_DEFAULT_ID;
+		}
+
+		$dashboard = null;
+
+		if ($dashboardid != 0) {
+			$dashboards = API::Dashboard()->get([
+				'output' => ['dashboardid', 'name'],
+				'dashboardids' => $dashboardid
+			]);
+
+			if ($dashboards) {
+				$dashboard = $dashboards[0];
+
+				CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 			}
 		}
-		else {
-			$dashboard_id = $this->getInput('dashboardid', null);
-		}
-
-		$dashboard = [];
-		if ($dashboard_id !== null) {
-			$dashboards = API::Dashboard()->get(
-				['output' => ['dashboardid', 'name'], 'dashboardids' => [$dashboard_id]]
-			);
-			$dashboard = $dashboards[0];
-		}
-
 
 		return $dashboard;
-	}
-
-	/**
-	 * Get clean dashboard link
-	 *
-	 * @param array   $dashboard                dashboard data
-	 * @param string  $dashboard['dashboardid'] dashboard ID
-	 * @param string  $fullscreen               fullscreen mode on/off
-	 * @return string
-	 */
-	private function getDashboardLink($dashboard, $fullscreen) {
-		// remove from current url not needed params and return clean dashboard link
-		$url_builder = (CUrlFactory::getContextUrl())
-			->clearArguments(['action'])
-			->setArgument('dashboardid', $dashboard['dashboardid']);
-		if ($fullscreen) {
-			$url_builder->setArgument('fullscreen', $fullscreen);
-		}
-
-		return $url_builder->getUrl();
 	}
 
 	/**
 	 * Get default widgets
 	 * @TODO should be refactored in ZBXNEXT-3789
 	 *
-	 * @param boolean $show_status_widget
-	 * @param boolean $show_discovery_widget
 	 * @return array
 	 */
-	private function getWidgets($show_status_widget, $show_discovery_widget) {
+	private function getWidgets() {
 		$widgets = [
 			WIDGET_FAVOURITE_GRAPHS => [
 				'header' => _('Favourite graphs'),
@@ -202,13 +157,20 @@ class CControllerDashboardView extends CController {
 			]
 		];
 
-		if ($show_status_widget) {
+		if ($this->getUserType() == USER_TYPE_SUPER_ADMIN) {
 			$widgets[WIDGET_ZABBIX_STATUS] = [
 				'header' => _('Status of Zabbix'),
 				'pos' => ['row' => 8, 'col' => 6, 'height' => 5, 'width' => 6],
 				'rf_rate' => 15 * SEC_PER_MIN
 			];
 		}
+
+		$show_discovery_widget = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
+			'output' => [],
+			'filter' => ['status' => DRULE_STATUS_ACTIVE],
+			'limit' => 1
+		]));
+
 		if ($show_discovery_widget) {
 			$widgets[WIDGET_DISCOVERY_STATUS] = [
 				'header' => _('Discovery status'),
