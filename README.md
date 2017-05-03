@@ -1,3 +1,5 @@
+[![Conference recommends](https://devternity.com/shields/recommends.svg)](https://devternity.com)
+
 ## [Zabbix](http://www.zabbix.com/)
 
 This repo is a git mirror of [svn.zabbix.com](https://zabbix.org/wiki/Get_Zabbix). For the latest development see the trunk branch.
