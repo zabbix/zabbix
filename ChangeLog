@@ -447,6 +447,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.10rc1
 
 New features:
+A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Korean, Romanian, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
