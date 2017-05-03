@@ -24,23 +24,13 @@
  */
 class CControllerDashboardDelete extends CController {
 
-	/**
-	 * {@inheritdoc}
-	 */
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
 	protected function checkInput() {
-
 		$fields = [
-			'dashboardids'   =>	'required|array_db dashboard.dashboardid'
+			'dashboardids' =>	'required|array_db dashboard.dashboardid'
 		];
 
 		$ret = $this->validateInput($fields);
+
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -48,37 +38,30 @@ class CControllerDashboardDelete extends CController {
 		return $ret;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		$dashboards = API::Dashboard()->get([
+			'countOutput' => true,
+			'dashboardids' => $this->getInput('dashboardids'),
+			'editable' => true
+		]);
+
+		return ($dashboards == count($this->getInput('dashboardids')));
 	}
 
-	/**
-	 * Delete dashboards action
-	 *
-	 * @return void
-	 */
 	protected function doAction() {
-		$dashboard_ids = $this->getInput('dashboardids', false);
-		if (!is_array($dashboard_ids)) {
-			$response = new CControllerResponseFatal();
-			$response->addMessage('Please provide dashboardids array param!');
-			$this->setResponse($response);
-			return;
-		}
+		$dashboardids = $this->getInput('dashboardids');
 
-		$result = API::Dashboard()->delete($dashboard_ids);
+		$result = (bool) API::Dashboard()->delete($dashboardids);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=dashboard.list');
+		$deleted = count($dashboardids);
+
+		$response = new CControllerResponseRedirect('zabbix.php?action=dashboard.list&uncheck=1');
+
 		if ($result) {
-			$response->setMessageOk(_n('Dashboard deleted', 'Dashboards deleted', count($result['dashboardids'])));
-			// uncheck selected dashboards only if they successfully deleted
-			$response->setFormData(['uncheck' => '1']);
+			$response->setMessageOk(_n('Dashboard deleted', 'Dashboards deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete dashboard', 'Cannot delete dashboards', count($dashboard_ids)));
+			$response->setMessageError(_n('Cannot delete dashboard', 'Cannot delete dashboards', $deleted));
 		}
 
 		$this->setResponse($response);
