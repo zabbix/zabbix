@@ -1556,10 +1556,10 @@ static char	**dbsync_item_preproc_row(char **row)
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
 		row[14] = zbx_dc_expand_user_macros(row[14], &hostid, 1, NULL);
 
-	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
+	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_HISTORY))
 		row[31] = zbx_dc_expand_user_macros(row[31], &hostid, 1, NULL);
 
-	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
+	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_TRENDS))
 		row[32] = zbx_dc_expand_user_macros(row[32], &hostid, 1, NULL);
 
 	return row;
