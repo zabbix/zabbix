@@ -210,6 +210,13 @@ class CMediatype extends CApiService {
 			);
 		}
 
+		$validation_rules = [
+			'maxsessions' =>			'not_empty|int32|le 100|ge 0|db media_type.maxsessions',
+			'maxattempts' =>			'not_empty|int32|le 10|ge 0|db media_type.maxattempts',
+			'attempt_interval' =>		'not_empty|string|db media_type.attempt_interval',
+		];
+		$simple_interval_parser = new CSimpleIntervalParser();
+
 		foreach ($mediatypes as $mediatype) {
 			// Check if media type already exists.
 			$db_mediatype = API::getApiService()->select('media_type', [
@@ -372,11 +379,21 @@ class CMediatype extends CApiService {
 				}
 			}
 
-			$optional_fields = ['maxsessions', 'maxattempts', 'attempt_interval'];
-			foreach($optional_fields as $field) {
-				if (array_key_exists($field, $mediatype) && $mediatype[$field] === '') {
+			$validator = new CNewValidator($mediatype, $validation_rules);
+			$errors = $validator->getAllErrors();
+			if ($errors) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, reset($errors));
+			}
+
+			if (array_key_exists('attempt_interval', $mediatype)) {
+				$attempt_interval = $mediatype['attempt_interval'];
+				$is_valid = ($simple_interval_parser->parse($attempt_interval) == CParser::PARSE_SUCCESS);
+				$interval = convertFunctionValue($attempt_interval);
+				$maximum = convertFunctionValue('1m');
+				if (!$is_valid || $interval > $maximum || $interval < 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
+						_s('Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+							$attempt_interval, 'attempt_interval', $mediatype['description'])
 					);
 				}
 			}
@@ -417,6 +434,12 @@ class CMediatype extends CApiService {
 		]);
 
 		$check_names = [];
+		$validation_rules = [
+			'maxsessions' =>			'not_empty|int32|le 100|ge 0|db media_type.maxsessions',
+			'maxattempts' =>			'not_empty|int32|le 10|ge 0|db media_type.maxattempts',
+			'attempt_interval' =>		'not_empty|string|db media_type.attempt_interval',
+		];
+		$simple_interval_parser = new CSimpleIntervalParser();
 
 		foreach ($mediatypes as $mediatype) {
 			// Check if this media type exists.
@@ -684,23 +707,23 @@ class CMediatype extends CApiService {
 				}
 			}
 
-			$validation_rules = [
-				'maxsessions' =>			'not_empty|int32|le 100|ge 0|db media_type.maxsessions',
-				'maxattempts' =>			'not_empty|int32|le 10|ge 0|db media_type.maxattempts',
-				'attempt_interval' =>		'not_empty|string|db media_type.attempt_interval',
-			];
 			$validator = new CNewValidator($mediatype, $validation_rules);
 			$errors = $validator->getAllErrors();
 			if ($errors) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, reset($errors));
 			}
 
-			if (array_key_exists('attempt_interval', $mediatype) &&
-				preg_match('/^((0|[1-9][0-9]*)['.ZBX_TIME_SUFFIXES.']?)$/', $mediatype['attempt_interval']) !== 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" in field "%2$s" for media type "%3$s".', $mediatype['attempt_interval'],
-						'attempt_interval', $mediatype['description'])
-				);
+			if (array_key_exists('attempt_interval', $mediatype)) {
+				$attempt_interval = $mediatype['attempt_interval'];
+				$is_valid = ($simple_interval_parser->parse($attempt_interval) == CParser::PARSE_SUCCESS);
+				$interval = convertFunctionValue($attempt_interval);
+				$maximum = convertFunctionValue('1m');
+				if (!$is_valid || $interval > $maximum || $interval < 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+							$attempt_interval, 'attempt_interval', $mediatype['description'])
+					);
+				}
 			}
 		}
 	}
