@@ -121,7 +121,7 @@ class CMapHelper {
 		foreach ($sysmap['selements'] as $id => $element) {
 			$map_info[$id]['name'] = ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
 				? _('Image')
-				: $element['elementName'];
+				: $element['elements'][0]['elementName'];
 		}
 
 		$labels = getMapLabels($sysmap, $map_info, true);

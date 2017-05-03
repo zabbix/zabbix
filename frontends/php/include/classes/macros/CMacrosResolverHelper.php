@@ -548,7 +548,7 @@ class CMacrosResolverHelper {
 	 * @param array  $selement
 	 * @param string $selement['label']						label to expand
 	 * @param int    $selement['elementtype']				element type
-	 * @param int    $selement['elementid']					element id
+	 * @param array    $selement['elements']				elements
 	 * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
 	 *
 	 * @return string

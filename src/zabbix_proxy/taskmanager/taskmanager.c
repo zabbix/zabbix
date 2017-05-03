@@ -98,6 +98,21 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	script.privatekey = row[7];
 	script.command = row[8];
 
+	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type && ZBX_SCRIPT_EXECUTE_ON_PROXY == script.execute_on)
+	{
+		if (0 == CONFIG_ENABLE_REMOTE_COMMANDS)
+		{
+			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
+					"Remote commands are not enabled");
+			goto finish;
+		}
+
+		if (1 == CONFIG_LOG_REMOTE_COMMANDS)
+			zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", script.command);
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", script.command);
+	}
+
 	if (SUCCEED != (ret = zbx_script_execute(&script, &host, &info, error, sizeof(error))))
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	else

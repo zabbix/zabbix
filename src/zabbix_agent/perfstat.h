@@ -26,27 +26,19 @@
 
 #include "perfmon.h"
 
-#define UNSUPPORTED_REFRESH_PERIOD		600
-
-typedef struct
-{
-	PERF_COUNTER_DATA	*pPerfCounterList;
-	PDH_HQUERY		pdh_query;
-	time_t			nextcheck;	/* refresh time of not supported counters */
-}
-ZBX_PERF_STAT_DATA;
-
-extern ZBX_PERF_STAT_DATA	ppsd;
-
 PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, int interval, char **error);
 void			remove_perf_counter(PERF_COUNTER_DATA *counter);
 
-double	compute_average_value(PERF_COUNTER_DATA *counter, int interval);
+typedef enum
+{
+	ZBX_SINGLE_THREADED,
+	ZBX_MULTI_THREADED
+}
+zbx_threadedness_t;
 
-int	init_perf_collector(int multithreaded);
-void	free_perf_collector();
-int	perf_collector_started();
-void	collect_perfstat();
+int	init_perf_collector(zbx_threadedness_t threadedness, char **error);
+void	free_perf_collector(void);
+void	collect_perfstat(void);
 
 int	get_perf_counter_value_by_name(const char *name, double *value, char **error);
 int	get_perf_counter_value_by_path(const char *counterpath, int interval, double *value, char **error);

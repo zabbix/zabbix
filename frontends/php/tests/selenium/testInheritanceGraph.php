@@ -104,6 +104,7 @@ class testInheritanceGraph extends CWebTest {
 		$this->zbxTestLogin('graphs.php?form=Create+graph&hostid='.$this->templateid);
 
 		$this->zbxTestInputType('name', $data['name']);
+		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));
 
 		foreach ($data['addItems'] as $item) {
 			$this->zbxTestLaunchPopup('add_item');

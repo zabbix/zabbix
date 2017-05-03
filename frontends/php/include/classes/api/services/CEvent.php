@@ -547,15 +547,18 @@ class CEvent extends CApiService {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
-			if ($this->outputIsRequested('r_eventid', $options['output'])
-					|| $this->outputIsRequested('c_eventid', $options['output'])
+			if ($this->outputIsRequested('r_eventid', $options['output'])) {
+				// Select fields from event_recovery table using LEFT JOIN.
+
+				$sqlParts['select']['r_eventid'] = 'er1.r_eventid';
+				$sqlParts['left_join'][] = ['from' => 'event_recovery er1', 'on' => 'er1.eventid=e.eventid'];
+			}
+
+			if ($this->outputIsRequested('c_eventid', $options['output'])
 					|| $this->outputIsRequested('correlationid', $options['output'])
 					|| $this->outputIsRequested('userid', $options['output'])) {
 				// Select fields from event_recovery table using LEFT JOIN.
 
-				if ($this->outputIsRequested('r_eventid', $options['output'])) {
-					$sqlParts['select']['r_eventid'] = 'er1.r_eventid';
-				}
 				if ($this->outputIsRequested('c_eventid', $options['output'])) {
 					$sqlParts['select']['c_eventid'] = 'er2.c_eventid';
 				}
@@ -566,7 +569,6 @@ class CEvent extends CApiService {
 					$sqlParts['select']['userid'] = 'er2.userid';
 				}
 
-				$sqlParts['left_join'][] = ['from' => 'event_recovery er1', 'on' => 'er1.eventid=e.eventid'];
 				$sqlParts['left_join'][] = ['from' => 'event_recovery er2', 'on' => 'er2.r_eventid=e.eventid'];
 			}
 

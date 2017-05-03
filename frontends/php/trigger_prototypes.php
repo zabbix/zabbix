@@ -413,7 +413,7 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	}
 
 	if ($result) {
-		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
+		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
@@ -470,7 +470,8 @@ $config = select_config();
 /*
  * Display
  */
-if (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdateform' && hasRequest('g_triggerid')) {
+if ((getRequest('action') === 'triggerprototype.massupdateform' || hasRequest('massupdate'))
+		&& hasRequest('g_triggerid')) {
 	$data = getTriggerMassupdateFormData();
 	$data['action'] = 'triggerprototype.massupdate';
 	$data['hostid'] = $discoveryRule['hostid'];

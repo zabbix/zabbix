@@ -295,8 +295,7 @@ int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, ch
  *               configured in passive mode or access denied)                 *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy,
-		char **error)
+int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
 {
 	char	*ch_error, host[HOST_HOST_LEN_MAX];
 
@@ -377,9 +376,10 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
  * Function: update_proxy_lastaccess                                          *
  *                                                                            *
  ******************************************************************************/
-void	update_proxy_lastaccess(const zbx_uint64_t hostid)
+void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access)
 {
-	DBexecute("update hosts set lastaccess=%d where hostid=" ZBX_FS_UI64, time(NULL), hostid);
+	DBexecute("update hosts set lastaccess=%d where hostid=" ZBX_FS_UI64, last_access, hostid);
+	zbx_dc_update_proxy_lastaccess(hostid, last_access);
 }
 
 /******************************************************************************
@@ -490,7 +490,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",config r where t.groupid=r.discovery_groupid");
 	}
-	else if (SUCCEED == str_in_list("httptest,httptestitem,httpstep", table->table, ','))
+	else if (SUCCEED == str_in_list("httptest,httptest_field,httptestitem,httpstep", table->table, ','))
 	{
 		if (0 == httptests->values_num)
 			goto skip_data;
@@ -499,7 +499,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.httptestid",
 				httptests->values, httptests->values_num);
 	}
-	else if (0 == strcmp(table->table, "httpstepitem"))
+	else if (SUCCEED == str_in_list("httpstepitem,httpstep_field", table->table, ','))
 	{
 		if (0 == httptests->values_num)
 			goto skip_data;
@@ -680,8 +680,10 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"config",
 		"httptest",
 		"httptestitem",
+		"httptest_field",
 		"httpstep",
 		"httpstepitem",
+		"httpstep_field",
 		NULL
 	};
 
@@ -899,7 +901,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 {
 	const char		*__function_name = "process_proxyconfig_table";
 
-	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0, move_out = 0,
+	int			f, fields_count, insert, is_null, i, ret = FAIL, id_field_nr = 0, move_out = 0,
 				move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -975,11 +977,18 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	p = NULL;
 	/* iterate column names (lines 4-6 in T1) */
-	while (NULL != (p = zbx_json_next_value_dyn(&jp_data, p, &buf, &buf_alloc, NULL)))
+	for (fields_count = 0; NULL != (p = zbx_json_next_value_dyn(&jp_data, p, &buf, &buf_alloc, NULL)); fields_count++)
 	{
-		if (NULL == (fields[fields_count++] = DBget_field(table, buf)))
+		if (NULL == (fields[fields_count] = DBget_field(table, buf)))
 		{
 			*error = zbx_dsprintf(*error, "invalid field name \"%s.%s\"", table->table, buf);
+			goto out;
+		}
+
+		if (0 == (fields[fields_count]->flags & ZBX_PROXY) &&
+				(0 != strcmp(table->recid, buf) || ZBX_TYPE_ID != fields[fields_count]->type))
+		{
+			*error = zbx_dsprintf(*error, "unexpected field \"%s.%s\"", table->table, buf);
 			goto out;
 		}
 	}
@@ -1560,7 +1569,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	else
 	{
-		DCsync_configuration();
+		DCsync_configuration(ZBX_DBSYNC_UPDATE);
 		DCupdate_hosts_availability();
 	}
 
@@ -3205,6 +3214,12 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			goto json_parse_error;
+
+		if (SUCCEED != is_ip(ip))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "\"%s\" is not a valid IP address", ip);
+			continue;
+		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 			port = atoi(tmp);

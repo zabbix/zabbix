@@ -90,7 +90,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 				get_process_type_string(process_type), sec);
 
 		sec = zbx_time();
-		DCsync_configuration();
+		DCsync_configuration(ZBX_DBSYNC_UPDATE);
 		DCupdate_hosts_availability();
 		sec = zbx_time() - sec;
 

@@ -45,7 +45,7 @@ class CScreenEvents extends CScreenBase {
 		]);
 
 		$options = [
-			'output' => ['eventid', 'r_eventid', 'objectid', 'clock'],
+			'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,

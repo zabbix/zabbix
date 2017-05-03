@@ -9,6 +9,7 @@ bin/win64/dev/zabbix_sender.lib -text svneol=unset#application/x-archive
 bin/win64/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
 bin/win64/zabbix_get.exe -text svneol=unset#application/x-dosexec
 bin/win64/zabbix_sender.exe -text svneol=unset#application/x-dosexec
+/build-backend.xml -text
 frontends/php/audio/alarm_average.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_disaster.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_high.wav -text svneol=unset#audio/x-wav
@@ -305,6 +306,10 @@ sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text
 src/libs/zbxcommon/variant.c -text
+src/libs/zbxdbcache/dbconfig.h -text
+src/libs/zbxdbcache/dbconfig_dump.c -text
+src/libs/zbxdbcache/dbsync.c -text
+src/libs/zbxdbcache/dbsync.h -text
 src/libs/zbxdbcache/item_preproc.c -text
 src/libs/zbxdbcache/item_preproc.h -text
 src/libs/zbxdbhigh/trigger.c -text

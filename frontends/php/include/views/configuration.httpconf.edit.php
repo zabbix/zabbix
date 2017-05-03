@@ -102,15 +102,39 @@ $httpFormList
 	->addRow(_('HTTP proxy'),
 		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]')
-	)
-	->addRow(_('Variables'),
-		(new CTextArea('variables', $this->data['variables']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Headers'),
-		(new CTextArea('headers', $this->data['headers']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
+			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'));
+
+$pair_tables = [
+	['id' => 'variables', 'label' => _('Variables'), 'class' => 'pair-container'],
+	['id' => 'headers', 'label' => _('Headers'), 'class' => 'pair-container pair-container-sortable']
+];
+
+foreach ($pair_tables as $pair_table){
+	$pair_tab = (new CTable())
+		->setId($pair_table['id'])
+		->addClass($pair_table['class'])
+		->setAttribute('style', 'width: 100%;')
+		->setHeader(['', _('Name'), '', _('Value'), ''])
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('pairs-control-add')
+					->setAttribute('data-type', $pair_table['id'])
+			))->setColSpan(5)
+		]))->setId($pair_table['id'].'_footer'));
+
+	$httpFormList->addRow($pair_table['label'],
+		(new CDiv($pair_tab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', $pair_table['id'])
+			->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+	);
+}
+
+$httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
+
+zbx_add_post_js('pairManager.add('.CJs::encodeJson($this->data['pairs']).');');
 
 /*
  * Authentication tab
@@ -177,12 +201,6 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 	if (!isset($step['url'])) {
 		$step['url'] = '';
-	}
-	if (!isset($step['posts'])) {
-		$step['posts'] = '';
-	}
-	if (!isset($step['required'])) {
-		$step['required'] = '';
 	}
 
 	$numSpan = (new CSpan($i++.':'))

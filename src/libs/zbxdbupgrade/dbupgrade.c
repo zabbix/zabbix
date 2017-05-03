@@ -312,6 +312,8 @@ static void	DBdrop_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop index %s", index_name);
 #ifdef HAVE_MYSQL
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " on %s", table_name);
+#else
+	ZBX_UNUSED(table_name);
 #endif
 }
 
@@ -319,6 +321,9 @@ static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 		const char *old_name, const char *new_name, const char *fields, int unique)
 {
 #if defined(HAVE_IBM_DB2)
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(fields);
+	ZBX_UNUSED(unique);
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename index %s to %s", old_name, new_name);
 #elif defined(HAVE_MYSQL)
 	DBcreate_index_sql(sql, sql_alloc, sql_offset, table_name, new_name, fields, unique);
@@ -326,6 +331,9 @@ static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 	DBdrop_index_sql(sql, sql_alloc, sql_offset, table_name, old_name);
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 #elif defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL)
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(fields);
+	ZBX_UNUSED(unique);
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter index %s rename to %s", old_name, new_name);
 #endif
 }

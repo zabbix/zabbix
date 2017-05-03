@@ -411,6 +411,7 @@ class CConfigurationExportBuilder {
 			$result[] = [
 				'name' => $httpstep['name'],
 				'url' => $httpstep['url'],
+				'query_fields' => $httpstep['query_fields'],
 				'posts' => $httpstep['posts'],
 				'variables' => $httpstep['variables'],
 				'headers' => $httpstep['headers'],
@@ -1036,7 +1037,7 @@ class CConfigurationExportBuilder {
 				'viewtype' => $element['viewtype'],
 				'use_iconmap' => $element['use_iconmap'],
 				'selementid' => $element['selementid'],
-				'element' => $element['elementid'],
+				'elements' => $element['elements'],
 				'icon_off' => $element['iconid_off'],
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],

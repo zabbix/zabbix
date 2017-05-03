@@ -60,12 +60,10 @@ zbx_db_value_t;
 #	define ZBX_ROW_DL	";\n"
 #endif
 
+int	zbx_db_init(const char *dbname, const char *const db_schema, char **error);
+void	zbx_db_deinit(void);
+
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
-#ifdef HAVE_SQLITE3
-void	zbx_create_sqlite3_mutex(void);
-void	zbx_remove_sqlite3_mutex(void);
-#endif
-void	zbx_db_init(const char *dbname, const char *const db_schema);
 void    zbx_db_close(void);
 
 int	zbx_db_begin(void);

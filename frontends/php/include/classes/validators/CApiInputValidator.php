@@ -107,6 +107,12 @@ class CApiInputValidator {
 
 			case API_REGEX:
 				return self::validateRegex($rule, $data, $path, $error);
+
+			case API_HTTP_POST:
+				return self::validateHttpPosts($rule, $data, $path, $error);
+
+			case API_VARIABLE_NAME:
+				return self::validateVariableName($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -138,6 +144,8 @@ class CApiInputValidator {
 			case API_USER_MACRO:
 			case API_TIME_PERIOD:
 			case API_REGEX:
+			case API_HTTP_POST:
+			case API_VARIABLE_NAME:
 				return true;
 
 			case API_IDS:
@@ -815,6 +823,85 @@ class CApiInputValidator {
 					}
 				}
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * HTTP POST validator. Posts can be set to string (raw post) or to http pairs (form fields)
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']        (optional)
+	 * @param int    $rule['name-length']   (optional)
+	 * @param int    $rule['value-length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateHttpPosts($rule, &$data, $path, &$error) {
+		if (is_array($data)) {
+			$rules = ['type' => API_OBJECTS, 'fields' => [
+				'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+			]];
+
+			if (array_key_exists('name-length', $rule)) {
+				$rules['fields']['name']['length'] = $rule['name-length'];
+			}
+
+			if (array_key_exists('value-length', $rule)) {
+				$rules['fields']['value']['length'] = $rule['value-length'];
+			}
+		}
+		else {
+			$rules = ['type' => API_STRING_UTF8];
+
+			if (array_key_exists('length', $rule)) {
+				$rules['length'] = $rule['length'];
+			}
+		}
+
+		return self::validateData($rules, $data, $path, $error);
+	}
+
+	/**
+	 * HTTP variable validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateVariableName($rule, &$data, $path, &$error) {
+		if (!is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
+			return false;
+		}
+
+		if (mb_check_encoding($data, 'UTF-8') !== true) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+			return false;
+		}
+
+		if ($data === '') {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if (preg_match('/^{[^{}]+}$/', $data) !== 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('is not enclosed in {} or is malformed'));
+			return false;
 		}
 
 		return true;

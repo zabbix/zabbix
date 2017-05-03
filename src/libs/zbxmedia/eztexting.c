@@ -297,6 +297,12 @@ clean:
 	return ret;
 
 #else
+	ZBX_UNUSED(username);
+	ZBX_UNUSED(password);
+	ZBX_UNUSED(sendto);
+	ZBX_UNUSED(message);
+	ZBX_UNUSED(limit);
+
 	zbx_snprintf(error, max_error_len, "cURL library is required for Ez Texting support");
 	return FAIL;
 

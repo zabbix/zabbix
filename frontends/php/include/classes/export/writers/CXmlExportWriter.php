@@ -111,6 +111,7 @@ class CXmlExportWriter extends CExportWriter {
 			'maps' => 'map',
 			'urls' => 'url',
 			'selements' => 'selement',
+			'elements' => 'element',
 			'links' => 'link',
 			'linktriggers' => 'linktrigger',
 			'value_maps' => 'value_map',
@@ -119,6 +120,10 @@ class CXmlExportWriter extends CExportWriter {
 			'steps' => 'step',
 			'tags' => 'tag',
 			'preprocessing' => 'step',
+			'headers' => 'header',
+			'variables' => 'variable',
+			'query_fields' => 'query_field',
+			'posts' => 'post_field',
 			'shapes' => 'shape'
 		];
 
