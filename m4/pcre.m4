@@ -1,12 +1,20 @@
 # LIBPCRE_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 #
-# Checks for Perl Compatible Regular Expressions.
+# Checks for pcre.  DEFAULT-ACTION is the string yes or no to
+# specify whether to default to --with-ldap or --without-ldap.
+# If not supplied, DEFAULT-ACTION is yes.
+#
+# This macro #defines HAVE_PCREPOSIX if a required header files is
+# found, and sets @LIBPCRE_LDFLAGS@ and @LIBPCRE_CFLAGS@ to the necessary
+# values.
+#
+# This macro is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_DEFUN([LIBPCRE_TRY_LINK],
 [
-am_save_LIBS="$LIBS"
-LIBS="$LIBS $1"
 AC_TRY_LINK(
 [
 #include <pcreposix.h>
@@ -17,18 +25,73 @@ AC_TRY_LINK(
 	regcomp(&re, "test", 0);
 	regfree(&re);
 ],
-found_pcre="yes"
-PCRE_LIBS="$1")
-LIBS="$am_save_LIBS"
+found_libpcre="yes")
 ])dnl
 
 AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 [
-	AC_MSG_CHECKING(for PCRE functions)
+	AC_ARG_WITH([libpcre],[
+If you want to specify libpcre installation directories:
+AC_HELP_STRING([--with-libpcre=@<:@DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
+		[
+			LIBPCRE_CFLAGS="-I$withval/include"
+			LIBPCRE_LDFLAGS="-L$withval/lib"
+			_libpcre_dir_set="yes"
+		]
+	)
 
-	LIBPCRE_TRY_LINK([-lpcreposix -lpcre])
+	AC_ARG_WITH([libpcre-include],
+		AC_HELP_STRING([--with-libpcre-include=@<:@DIR@:>@],
+			[use libpcre include headers from given path.]
+		),
+		[
+			LIBPCRE_CFLAGS="-I$withval"
+			_libpcre_dir_set="yes"
+		]
+	)
 
-	AC_MSG_RESULT($found_pcre)
+	AC_MSG_CHECKING(for libpcre support)
 
-	AC_SUBST(PCRE_LIBS)
+	LIBPCRE_LIBS="-lpcreposix -lpcre"
+
+	if test -n "$_libpcre_dir_set" -o -f /usr/include/pcreposix.h; then
+		found_libpcre="yes"
+	elif test -f /usr/local/include/pcreposix.h; then
+		LIBPCRE_CFLAGS="-I/usr/local/include"
+		LIBPCRE_LDFLAGS="-L/usr/local/lib"
+		found_libpcre="yes"
+	else
+		found_libpcre="no"
+		AC_MSG_RESULT(no)
+	fi
+
+	if test "x$found_libpcre" = "xyes"; then
+		am_save_CFLAGS="$CFLAGS"
+		am_save_LDFLAGS="$LDFLAGS"
+		am_save_LIBS="$LIBS"
+
+		CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+		LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+		LIBS="$LIBS $LIBPCRE_LIBS"
+
+		found_libpcre="no"
+		LIBPCRE_TRY_LINK([no])
+
+		CFLAGS="$am_save_CFLAGS"
+		LDFLAGS="$am_save_LDFLAGS"
+		LIBS="$am_save_LIBS"
+	fi
+
+	if test "x$found_libpcre" = "xyes"; then
+		AC_DEFINE([HAVE_LIBPCRE], 1, [Define to 1 if you have the 'libpcre' library (-lpcreposix -lpcre)])
+		AC_MSG_RESULT(yes)
+	else
+		LIBPCRE_CFLAGS=""
+		LIBPCRE_LDFLAGS=""
+		LIBPCRE_LIBS=""
+	fi
+
+	AC_SUBST(LIBPCRE_CFLAGS)
+	AC_SUBST(LIBPCRE_LDFLAGS)
+	AC_SUBST(LIBPCRE_LIBS)
 ])dnl

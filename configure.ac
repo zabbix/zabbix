@@ -162,14 +162,6 @@ if test "x$found_resolv" != "xyes"; then
 fi
 LIBS="${LIBS} ${RESOLV_LIBS}"
 
-dnl check for Perl Compatible Regular Expressions
-found_pcre="no"
-LIBPCRE_CHECK_CONFIG([no])
-if test "x$found_pcre" != "xyes"; then
-	AC_MSG_ERROR([Unable to use regular expressions (libpcre check failed)])
-fi
-LIBS="${LIBS} ${PCRE_LIBS}"
-
 dnl *****************************************************************
 dnl *                                                               *
 dnl *          Checks for type definitions and structures           *
@@ -1382,6 +1374,20 @@ if test "x$have_ipcservice" = "xyes"; then
 	AC_SUBST(LIBEVENET_CFLAGS)
 
 fi
+
+dnl Check for libpcre, used by Zabbix for regular expressions
+
+AC_DEFINE([HAVE_PCREPOSIX], 1, [Define to 1 if Zabbix PCRE is used])
+
+LIBPCRE_CHECK_CONFIG([no])
+if test "x$found_libpcre" != "xyes"; then
+	AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
+fi
+CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+LIBS="$LIBS $LIBPCRE_LIBS"
+
+AC_SUBST(LIBPCRE_CFLAGS)
 
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
 LIBMBEDTLS_CHECK_CONFIG([no])
