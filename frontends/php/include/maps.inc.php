@@ -182,7 +182,7 @@ function getActionsBySysmap($sysmap, array $options = []) {
 							}
 						}
 
-						$gotos['events']['triggerid'] = $element['triggerid'];
+						$gotos['events']['triggerids'][] = $element['triggerid'];
 					}
 				}
 				break;
