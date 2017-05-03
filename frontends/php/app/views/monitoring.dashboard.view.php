@@ -28,7 +28,7 @@ $url_view = (new CUrl('zabbix.php'))
 	->setArgument('dashboardid', $data['dashboard']['dashboardid']);
 
 (new CWidget())
-	->setTitle(_('Dashboard'))
+	->setTitle($data['dashboard']['name'])
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
