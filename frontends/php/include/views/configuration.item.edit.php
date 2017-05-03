@@ -309,7 +309,7 @@ $itemFormList->addRow(_('Units'),
 );
 
 $itemFormList->addRow(_('Update interval'),
-	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_delay'
+	(new CTextBox('delay', $data['delay'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_delay'
 );
 
 // Append custom intervals to form list.
@@ -335,7 +335,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 	}
 
 	if ($delay_flex['type'] == ITEM_DELAY_FLEXIBLE) {
-		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay']))
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay'], $discovered_item))
 			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT);
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], $discovered_item))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
