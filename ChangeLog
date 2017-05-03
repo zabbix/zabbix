@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
+..F....... [ZBXNEXT-3567] hide SQL error messages for regular user (gcalenko)
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)
