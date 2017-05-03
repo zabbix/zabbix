@@ -748,7 +748,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
-					"default_inventory_mode"};	/* sync with DCsync_config_select() */
+					"default_inventory_mode"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[SELECTED_FIELD_COUNT];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
