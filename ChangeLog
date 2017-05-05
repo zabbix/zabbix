@@ -60,6 +60,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-12093] fixed removing of applications that are created from application prototypes (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.6
