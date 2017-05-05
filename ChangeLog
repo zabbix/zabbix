@@ -464,6 +464,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+A......... [ZBX-12093] fixed removing of applications that are created from application prototypes (Sasha)
 A.F....... [ZBX-10253] fixed translation string and validation of TLS settings in host.create(), host.update() and host.massUpdate() methods; added variables to hosts array required by CHost::validateUpdate() method (miks)
 ........S. [ZBX-12100] fixed new line handling in SSH agent with numeric type of information (vso)
 ..F....... [ZBX-9958] fixed wrongly displayed list view after mass update failure (miks)
