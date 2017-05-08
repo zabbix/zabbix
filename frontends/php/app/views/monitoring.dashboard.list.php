@@ -68,7 +68,7 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
 		'dashboard.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected dashboards?')]
-	])
+	], 'dashboard')
 ]);
 
 $widget->addItem($form);
