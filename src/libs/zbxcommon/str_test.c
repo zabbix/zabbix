@@ -84,8 +84,7 @@ static void	test_zbx_user_macro_parse()
 		int		success;	/* expected return value */
 	};
 
-	int				i;
-	size_t				user_macro_parse_test_case_count;
+	size_t				i;
 	struct zbx_str_test_data_t	user_macro_parse_test_cases[] = {
 			{"", NULL, NULL, FAIL},
 			{"{", NULL, NULL, FAIL},
@@ -123,9 +122,7 @@ static void	test_zbx_user_macro_parse()
 
 	ZBX_CU_LEAK_CHECK_START();
 
-	user_macro_parse_test_case_count = sizeof(user_macro_parse_test_cases)/sizeof(user_macro_parse_test_cases[0]);
-
-	for (i = 0; user_macro_parse_test_case_count > i; i++)
+	for (i = 0; ARRSIZE(user_macro_parse_test_cases) > i; i++)
 	{
 		cu_test_macro_expresssion(user_macro_parse_test_cases[i].expression,
 				user_macro_parse_test_cases[i].macro,user_macro_parse_test_cases[i].context,

@@ -60,7 +60,7 @@ const char	*zbx_cu_assert_args_str_n(const char *description, const char *operat
 	size_t	offset = 0;
 	char	tmp[ZBX_CU_ASSERT_BUFFER_SIZE];
 
-	offset = zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_DESC_LENGTH, "ASSERT %s [" ZBX_FS_SIZE_T "]: ",
+	offset = zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_DESC_LENGTH, "ASSERT %s: ",
 			(NULL == description ? "string compare" : description), n);
 
 	zbx_strlcpy(tmp, actual, MIN(ZBX_CU_ASSERT_BUFFER_SIZE, n + 1));
@@ -70,6 +70,7 @@ const char	*zbx_cu_assert_args_str_n(const char *description, const char *operat
 
 	zbx_strlcpy(tmp, expected, MIN(ZBX_CU_ASSERT_BUFFER_SIZE, n + 1));
 	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%s)", expression2, tmp);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, " // first " ZBX_FS_SIZE_T " bytes", n);
 
 	return cu_buffer;
 }
