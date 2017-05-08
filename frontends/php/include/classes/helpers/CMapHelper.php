@@ -41,7 +41,7 @@ class CMapHelper {
 				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
 				'background_color', 'zindex'
 			],
-			'selectSelements' => ['selementid', 'elementid', 'elementtype', 'iconid_off', 'iconid_on', 'label',
+			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
 				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
 			],
