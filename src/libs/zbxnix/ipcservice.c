@@ -1,19 +1,10 @@
-#include <errno.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <sys/ioctl.h>
-
 #include "common.h"
-#include "zbxtypes.h"
-#include "zbxalgo.h"
-#include "log.h"
 
 #ifdef HAVE_IPCSERVICE
 
-#include <event.h>
+#include "zbxtypes.h"
+#include "zbxalgo.h"
+#include "log.h"
 
 #include "zbxipcservice.h"
 
