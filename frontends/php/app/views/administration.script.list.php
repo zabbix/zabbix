@@ -103,7 +103,7 @@ $scriptsForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
 		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?')]
-	])
+	], 'script')
 ]);
 
 // append form to widget

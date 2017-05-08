@@ -379,6 +379,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access)
 {
 	DBexecute("update hosts set lastaccess=%d where hostid=" ZBX_FS_UI64, last_access, hostid);
+	zbx_dc_update_proxy_lastaccess(hostid, last_access);
 }
 
 /******************************************************************************
@@ -1568,7 +1569,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	else
 	{
-		DCsync_configuration();
+		DCsync_configuration(ZBX_DBSYNC_UPDATE);
 		DCupdate_hosts_availability();
 	}
 
