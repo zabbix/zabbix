@@ -22,90 +22,14 @@
 $this->addJsFile('dashboard.grid.js');
 $this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
-/*
- * Dashboard grid
- */
-$widgets = [
-	1 => [
-		'header' => _('Favourite graphs'),
-		'type' => WIDGET_FAVOURITE_GRAPHS,
-		'pos' => ['row' => 0, 'col' => 0, 'height' => 3, 'width' => 2],
-		'rf_rate' => 15 * SEC_PER_MIN
-	],
-	2 => [
-		'header' => _('Favourite screens'),
-		'type' => WIDGET_FAVOURITE_SCREENS,
-		'pos' => ['row' => 0, 'col' => 2, 'height' => 3, 'width' => 2],
-		'rf_rate' => 15 * SEC_PER_MIN
-	],
-	3 => [
-		'header' => _('Favourite maps'),
-		'type' => WIDGET_FAVOURITE_MAPS,
-		'pos' => ['row' => 0, 'col' => 4, 'height' => 3, 'width' => 2],
-		'rf_rate' => 15 * SEC_PER_MIN
-	],
-	4 => [
-		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-		'type' => WIDGET_LAST_ISSUES,
-		'pos' => ['row' => 3, 'col' => 0, 'height' => 6, 'width' => 6],
-		'rf_rate' => SEC_PER_MIN
-	],
-	5 => [
-		'header' => _('Web monitoring'),
-		'type' => WIDGET_WEB_OVERVIEW,
-		'pos' => ['row' => 9, 'col' => 0, 'height' => 4, 'width' => 3],
-		'rf_rate' => SEC_PER_MIN
-	],
-	6 => [
-		'header' => _('Host status'),
-		'type' => WIDGET_HOST_STATUS,
-		'pos' => ['row' => 0, 'col' => 6, 'height' => 4, 'width' => 6],
-		'rf_rate' => SEC_PER_MIN
-	],
-	7 => [
-		'header' => _('System status'),
-		'type' => WIDGET_SYSTEM_STATUS,
-		'pos' => ['row' => 4, 'col' => 6, 'height' => 4, 'width' => 6],
-		'rf_rate' => SEC_PER_MIN
-	],
-	8 => [
-		'header' => _('Clock'),
-		'type' => WIDGET_CLOCK,
-		'pos' => ['row' => 9, 'col' => 3, 'height' => 4, 'width' => 3],
-		'rf_rate' => 15 * SEC_PER_MIN
-	],
-	9 => [
-		'header' => _('URL'),
-		'type' => WIDGET_URL,
-		'pos' => ['row' => 13, 'col' => 0, 'height' => 4, 'width' => 3],
-		'rf_rate' => 0
-	]
-];
-
-if (!empty($data['grid_widgets'])) {
-	$grid_widgets = $data['grid_widgets'];
-} else { // TODO VM: delete. Later it should be managed by API or dashboards.
-	$grid_widgets = [];
-
-	foreach ($widgets as $widgetid => $widget) {
-		$grid_widgets[] = [
-			'widgetid' => $widgetid,
-			'type' => $widget['type'],
-			'header' => $widget['header'],
-			'pos' => [
-				'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col']),
-				'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row']),
-				'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height']),
-				'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'])
-			],
-			'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate']),
-			'fields' => ['type' => $widget['type']]
-		];
-	}
-}
+$url_list = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.list');
+$url_view = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.view')
+	->setArgument('dashboardid', $data['dashboard']['dashboardid']);
 
 (new CWidget())
-	->setTitle(_('Dashboard'))
+	->setTitle($data['dashboard']['name'])
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
@@ -115,6 +39,16 @@ if (!empty($data['grid_widgets'])) {
 			->addItem(get_icon('action'))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
+	)
+	->addItem((new CList())
+		->addItem([
+			(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl())),
+			'/',
+			(new CSpan())
+				->addItem(new CLink($data['dashboard']['name'], $url_view->getUrl()))
+				->addClass(ZBX_STYLE_SELECTED)
+		])
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
 	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->show();
@@ -129,5 +63,5 @@ $this->addPostJS('jqBlink.blink();');
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
 		'.dashboardGrid()'.
-		'.dashboardGrid("addWidgets", '.CJs::encodeJson($grid_widgets).');'
+		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );
