@@ -522,7 +522,7 @@ ZABBIX.apps.map = (function($) {
 						item = item_data.id,
 						can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0),
 						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
-						can_remove = (item_data.type === 'shapes'),
+						can_remove = (that.selection.count.shapes > 0 || that.selection.count.selements > 0),
 						can_reorder = (item_data.type === 'shapes');
 
 					event.preventDefault();
@@ -531,15 +531,6 @@ ZABBIX.apps.map = (function($) {
 					// Recreate menu everytime due copy/paste function availability changes.
 					if (item_data.popupid) {
 						$('#' + item_data.popupid).filter('.action-menu').remove();
-					}
-
-					var itemid = $(this).data('id');
-
-					if (typeof that.selection.shapes[itemid] === 'undefined') {
-						that.selectElements([{
-							id: itemid,
-							type: 'shapes'
-						}]);
 					}
 
 					var items = [
@@ -881,7 +872,7 @@ ZABBIX.apps.map = (function($) {
 
 						case 'shapes':
 							element = new Shape(that);
-							delete data.shapeid;
+							delete data.sysmap_shapeid;
 							break;
 
 						default:
