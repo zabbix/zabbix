@@ -24,7 +24,13 @@ if ($data['uncheck']) {
 }
 
 $widget = (new CWidget())
-	->setTitle(_('Dashboards'));
+	->setTitle(_('Dashboards'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+		)
+	);
 
 $form = (new CForm())
 	->setName('dashboardForm');
@@ -38,13 +44,19 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'])
 	]);
 
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.view')
+	->setArgument('dashboardid', '');
+if ($data['fullscreen']) {
+	$url->setArgument('fullscreen', '1');
+}
+
 foreach ($data['dashboards'] as $dashboard) {
 	$table->addRow([
 		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
 			->setEnabled($dashboard['editable']),
 		new CLink($dashboard['name'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.view')
+			$url
 				->setArgument('dashboardid', $dashboard['dashboardid'])
 				->getUrl()
 		)
