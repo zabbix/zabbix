@@ -1472,6 +1472,9 @@ ZABBIX.apps.map = (function($) {
 						}
 					}
 				}
+				else {
+					this.data.elementName = this.data.elements[0].elementName;
+				}
 
 				this.updateIcon();
 				this.align(false);
