@@ -57,6 +57,25 @@ a {
 	}
 }
 
+svg a {
+	fill: $link-color;
+	cursor: pointer;
+
+	&:visited {
+		fill: $link-visited-color;
+	}
+
+	&:hover, &:focus {
+		fill: $link-hover-color;
+		text-decoration: underline;
+	}
+
+	&:active {
+		fill: $link-active-color;
+		text-decoration: underline;
+	}
+}
+
 .link-action {
 	border-bottom: 1px dotted;
 	cursor: pointer;

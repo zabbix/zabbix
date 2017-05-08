@@ -67,6 +67,18 @@ a img {
   border: none;
   vertical-align: top; }
 
+svg a {
+  fill: #0275b8;
+  cursor: pointer; }
+  svg a:visited {
+    fill: #0275b8; }
+  svg a:hover, svg a:focus {
+    fill: #0275b8;
+    text-decoration: underline; }
+  svg a:active {
+    fill: #0275b8;
+    text-decoration: underline; }
+
 .link-action {
   border-bottom: 1px dotted;
   cursor: pointer; }

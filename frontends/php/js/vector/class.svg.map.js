@@ -1156,7 +1156,8 @@ SVGMapShape.prototype.update = function(options) {
 			clip: {
 				'type': type,
 				'attributes': clip
-			}
+			},
+			'parse-links': true
 		}, options.text);
 	}
 

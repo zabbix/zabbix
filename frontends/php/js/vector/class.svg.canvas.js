@@ -102,6 +102,56 @@ SVGCanvas.prototype.createElement = function (type, attributes, parent, content)
 };
 
 /**
+ * Parse text line and extract links as <a> elements.
+ *
+ * @param {string}		text			Text line to be parsed.
+ *
+ * @return {mixed} Parsed text as {array} if links are present or as {string} if there are no links in text.
+ */
+SVGCanvas.prototype.parseLinks = function (text) {
+	var index,
+		offset = 0,
+		link,
+		parts = [];
+
+	while ((index = text.search(/((ftp|file|https?):\/\/[^\s]+)/i)) !== -1) {
+		if (offset !== index) {
+			parts.push(text.substring(offset, index));
+		}
+
+		text = text.substring(index);
+		index = text.search(/\s/);
+
+		if (index === -1) {
+			index = text.length;
+		}
+
+		link = text.substring(0, index);
+		text = text.substring(index);
+		offset = 0;
+		parts.push({
+			type: 'a',
+			attributes: {
+				href: link,
+				onclick: 'return redirect(' + JSON.stringify(link) + ');' // Workaround for Safari.
+			},
+			content: link
+		});
+	}
+
+	if (text !== '') {
+		if (parts.length !== 0) {
+			parts.push(text);
+		}
+		else {
+			parts = text;
+		}
+	}
+
+	return parts;
+};
+
+/**
  * Create new textarea element.
  *
  * Textarea element has poor support in supported browsers so following workaround is used. Textarea element is a text
@@ -132,13 +182,14 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 		anchor = attributes.anchor,
 		background = attributes.background,
 		clip = attributes.clip,
+		parse_links = attributes['parse-links'],
 		lines = [],
 		pos = [x, y],
 		rect = null,
 		offset = 0;
 		skip = 0.9;
 
-	['x', 'y', 'anchor', 'background', 'clip'].forEach(function (key) {
+	['x', 'y', 'anchor', 'background', 'clip', 'parse-links'].forEach(function (key) {
 		delete attributes[key];
 	});
 
@@ -169,14 +220,20 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 
 	content.forEach(function (line) {
 		if (line.content.trim() !== '') {
-			lines.push( {
+			var content = line.content.replace(/[\r\n]/g, '');
+
+			if (parse_links === true) {
+				content = this.parseLinks(content);
+			}
+
+			lines.push({
 				type: 'tspan',
 				attributes: SVGElement.mergeAttributes({
 					x: offset,
 					dy: skip + 'em',
 					'text-anchor': 'middle'
 				}, line.attributes),
-				content: line.content.replace(/[\r\n]/g, '')
+				content: content
 			});
 
 			skip = 1.2;
@@ -184,7 +241,7 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 		else {
 			skip += 1.2;
 		}
-	});
+	}, this);
 
 	var text = group.add('text', attributes, lines),
 		size = text.element.getBBox(),
@@ -656,25 +713,38 @@ SVGElement.prototype.replace = function (target) {
  * @return {object} DOM element.
  */
 SVGElement.prototype.create = function () {
-	var element = document.createElementNS('http://www.w3.org/2000/svg', this.type);
+	var element = this.type !== '' ? document.createElementNS('http://www.w3.org/2000/svg', this.type) :
+			document.createTextNode(this.content);
 
 	this.remove();
 	this.element = element;
-	this.update(this.attributes);
 
-	if (Array.isArray(this.content)) {
-		this.content.forEach(function (element) {
-			if (typeof element !== 'object' || typeof element.type !== 'string') {
-				throw 'Invalid element configuration!';
-			}
+	if (this.type !== '') {
+		this.update(this.attributes);
 
-			this.add(element.type, element.attributes, element.content);
-		}, this);
+		if (Array.isArray(this.content)) {
+			this.content.forEach(function (element) {
+				if (typeof element === 'string') {
+					// Treat element as a text node.
+					element = {
+						type: '',
+						attributes: null,
+						content: element
+					};
+				}
 
-		this.content = null;
-	}
-	else if ((/string|number|boolean/).test(typeof this.content)) {
-		element.textContent = this.content;
+				if (typeof element !== 'object' || typeof element.type !== 'string') {
+					throw 'Invalid element configuration!';
+				}
+
+				this.add(element.type, element.attributes, element.content);
+			}, this);
+
+			this.content = null;
+		}
+		else if ((/string|number|boolean/).test(typeof this.content)) {
+			element.textContent = this.content;
+		}
 	}
 
 	if (this.parent !== null && this.parent.element !== null) {
