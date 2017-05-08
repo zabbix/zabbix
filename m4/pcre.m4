@@ -1,11 +1,9 @@
 # LIBPCRE_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 #
-# Checks for pcre.  DEFAULT-ACTION is the string yes or no to
-# specify whether to default to --with-ldap or --without-ldap.
-# If not supplied, DEFAULT-ACTION is yes.
+# Checks for pcre.
 #
-# This macro #defines HAVE_PCREPOSIX_H if a required header files is
+# This macro #defines HAVE_PCREPOSIX_H if required header files are
 # found, and sets @LIBPCRE_LDFLAGS@ and @LIBPCRE_CFLAGS@ to the necessary
 # values.
 #
