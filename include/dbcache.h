@@ -45,8 +45,6 @@
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
-#define ZBX_STATUS_LIFETIME	60
-
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;

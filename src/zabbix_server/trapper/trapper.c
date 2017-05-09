@@ -601,6 +601,38 @@ zbx_trigger_stats_t	trigger_stats;
 zbx_user_stats_t	user_stats;
 int			template_stats_res, user_stats_res;
 
+void	zbx_status_cache_init(void)
+{
+	zbx_vector_ptr_create(&hosts_monitored_by_proxy);
+	zbx_vector_ptr_create(&hosts_not_monitored_by_proxy);
+	zbx_vector_ptr_create(&items_active_normal_by_proxy);
+	zbx_vector_ptr_create(&items_active_notsupported_by_proxy);
+	zbx_vector_ptr_create(&items_disabled_by_proxy);
+	zbx_vector_ptr_create(&required_performance_by_proxy);
+}
+
+static void	zbx_status_cache_clear(void)
+{
+	zbx_vector_ptr_clear_ext(&hosts_monitored_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&hosts_not_monitored_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_active_normal_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_active_notsupported_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_disabled_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&required_performance_by_proxy, zbx_default_mem_free_func);
+}
+
+void	zbx_status_cache_free(void)
+{
+	zbx_status_cache_clear();
+
+	zbx_vector_ptr_destroy(&hosts_monitored_by_proxy);
+	zbx_vector_ptr_destroy(&hosts_not_monitored_by_proxy);
+	zbx_vector_ptr_destroy(&items_active_normal_by_proxy);
+	zbx_vector_ptr_destroy(&items_active_notsupported_by_proxy);
+	zbx_vector_ptr_destroy(&items_disabled_by_proxy);
+	zbx_vector_ptr_destroy(&required_performance_by_proxy);
+}
+
 const zbx_status_section_t	status_sections[] = {
 /*	{SECTION NAME,			SECTION ACCESS LEVEL	SECTION RESULTS READYNESS,			*/
 /*		{												*/
@@ -776,25 +808,24 @@ static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_e
 
 static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_level)
 {
+#define ZBX_STATUS_LIFETIME	60
+
+	static time_t			last_counted = 0;
 	const zbx_status_section_t	*section;
 	const zbx_section_entry_t	*entry;
 
-	zbx_vector_ptr_create(&hosts_monitored_by_proxy);
-	zbx_vector_ptr_create(&hosts_not_monitored_by_proxy);
-	zbx_vector_ptr_create(&items_active_normal_by_proxy);
-	zbx_vector_ptr_create(&items_active_notsupported_by_proxy);
-	zbx_vector_ptr_create(&items_disabled_by_proxy);
-	zbx_vector_ptr_create(&required_performance_by_proxy);
-
-	/* get status information */
-
-	template_stats_res = DBget_template_stats(&template_stats);
-	DCget_host_stats(&host_stats, &hosts_monitored_by_proxy, &hosts_not_monitored_by_proxy);
-	DCget_item_stats(&item_stats, &items_active_normal_by_proxy, &items_active_notsupported_by_proxy,
-			&items_disabled_by_proxy);
-	DCget_trigger_stats(&trigger_stats);
-	user_stats_res = DBget_user_stats(&user_stats);
-	required_performance.dbl = DCget_required_performance(&required_performance_by_proxy);
+	/* get status information if locally cached data are outdated */
+	if (last_counted + ZBX_STATUS_LIFETIME <= time(NULL))
+	{
+		zbx_status_cache_clear();
+		template_stats_res = DBget_template_stats(&template_stats);
+		DCget_host_stats(&host_stats, &hosts_monitored_by_proxy, &hosts_not_monitored_by_proxy);
+		DCget_item_stats(&item_stats, &items_active_normal_by_proxy, &items_active_notsupported_by_proxy,
+				&items_disabled_by_proxy);
+		DCget_trigger_stats(&trigger_stats);
+		user_stats_res = DBget_user_stats(&user_stats);
+		required_performance.dbl = DCget_required_performance(&required_performance_by_proxy);
+	}
 
 	/* add status information to JSON */
 	for (section = status_sections; NULL != section->name; section++)
@@ -813,19 +844,7 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 		zbx_json_close(json);
 	}
 
-	zbx_vector_ptr_clear_ext(&hosts_monitored_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&hosts_not_monitored_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_normal_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_notsupported_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_disabled_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&required_performance_by_proxy, zbx_default_mem_free_func);
-
-	zbx_vector_ptr_destroy(&hosts_monitored_by_proxy);
-	zbx_vector_ptr_destroy(&hosts_not_monitored_by_proxy);
-	zbx_vector_ptr_destroy(&items_active_normal_by_proxy);
-	zbx_vector_ptr_destroy(&items_active_notsupported_by_proxy);
-	zbx_vector_ptr_destroy(&items_disabled_by_proxy);
-	zbx_vector_ptr_destroy(&required_performance_by_proxy);
+#undef ZBX_STATUS_LIFETIME
 }
 
 /******************************************************************************
