@@ -61,6 +61,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11549] fixed 'numeric value' error in dashboard for php 7 (gcalenko, Sasha)
 ..F....... [ZBX-11559] fixed jquery binded function call on form submit (miks)
 ..F....... [ZBX-11677] fixed wrong order of events in history list (miks)
 ..F....... [ZBX-11405] fixed conditions to display treeview button in triggers section (miks)
