@@ -75,3 +75,6 @@
 
 /* define to 1 if you have the <errno.h> header file */
 #define HAVE_ERRNO_H 1
+
+/* Define to 1 if you have the <pcreposix.h> header file. */
+#define HAVE_PCREPOSIX_H 1
