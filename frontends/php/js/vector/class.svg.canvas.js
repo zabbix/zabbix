@@ -133,7 +133,7 @@ SVGCanvas.prototype.parseLinks = function (text) {
 			type: 'a',
 			attributes: {
 				href: link,
-				onclick: 'return redirect(' + JSON.stringify(link) + ');' // Workaround for Safari.
+				onclick: 'window.location = ' + JSON.stringify(link) + '; return false;' // Workaround for Safari.
 			},
 			content: link
 		});
