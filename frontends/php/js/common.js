@@ -562,5 +562,5 @@ function submitFormWithParam(form_name, input_name, input_value) {
 	input.setAttribute('name', input_name);
 	input.setAttribute('value', input_value);
 	document.forms[form_name].appendChild(input);
-	document.forms[form_name].submit();
+	jQuery(document.forms[form_name]).trigger('submit');
 }
