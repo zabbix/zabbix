@@ -120,7 +120,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		DCget_host_stats(&host_stats);
+		DCget_host_stats(&host_stats, NULL, NULL);
 		SET_UI64_RESULT(result, host_stats.monitored.ui64);
 	}
 	else if (0 == strcmp(tmp, "history") ||			/* zabbix["history"] */
@@ -194,7 +194,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		SET_DBL_RESULT(result, DCget_required_performance());
+		SET_DBL_RESULT(result, DCget_required_performance(NULL));
 	}
 	else if (0 == strcmp(tmp, "uptime"))			/* zabbix["uptime"] */
 	{

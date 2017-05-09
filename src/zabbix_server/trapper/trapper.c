@@ -64,6 +64,7 @@ typedef struct
 {
 	zbx_counter_value_t	*counter_value;
 	zbx_counter_type_t	counter_type;
+	zbx_vector_ptr_t	*counters_by_proxy;
 	zbx_entry_attribute_t	attributes[ZBX_MAX_ENTRY_ATTRIBUTES];
 }
 zbx_section_entry_t;
@@ -595,6 +596,8 @@ out:
 
 /* auxiliary variables for status_stats_export() */
 
+zbx_vector_ptr_t	hosts_monitored_by_proxy, hosts_not_monitored_by_proxy, items_active_normal_by_proxy,
+			items_active_notsupported_by_proxy, items_disabled_by_proxy, required_performance_by_proxy;
 zbx_counter_value_t	template_stats, required_performance;
 zbx_host_stats_t	host_stats;
 zbx_item_stats_t	item_stats;
@@ -605,7 +608,7 @@ int			template_stats_res, user_stats_res;
 const zbx_status_section_t	status_sections[] = {
 /*	{SECTION NAME,			SECTION RESULTS READYNESS,		*/
 /*		{								*/
-/*			{COUNTER VALUE,				COUNTER TYPE,	*/
+/*			{COUNTER VALUE,				COUNTER TYPE,		COUNTER VALUES BY PROXY	*/
 /*				{						*/
 /*					{ATTR. NAME,	ATTRIBUTE VALUE},	*/
 /*					... (up to ZBX_MAX_ENTRY_ATTRIBUTES)	*/
@@ -617,7 +620,7 @@ const zbx_status_section_t	status_sections[] = {
 /*	...									*/
 	{"template stats",		&template_stats_res,
 		{
-			{&template_stats,			ZBX_COUNTER_TYPE_UI64,
+			{&template_stats,			ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
 					{NULL}
 				}
@@ -627,13 +630,13 @@ const zbx_status_section_t	status_sections[] = {
 	},
 	{"host stats",			NULL,
 		{
-			{&host_stats.monitored,			ZBX_COUNTER_TYPE_UI64,
+			{&host_stats.monitored,			ZBX_COUNTER_TYPE_UI64,	&hosts_monitored_by_proxy,
 				{
 					{"status",	HOST_STATUS_MONITORED},
 					{NULL}
 				}
 			},
-			{&host_stats.not_monitored,		ZBX_COUNTER_TYPE_UI64,
+			{&host_stats.not_monitored,		ZBX_COUNTER_TYPE_UI64,	&hosts_not_monitored_by_proxy,
 				{
 					{"status",	HOST_STATUS_NOT_MONITORED},
 					{NULL}
@@ -644,21 +647,21 @@ const zbx_status_section_t	status_sections[] = {
 	},
 	{"item stats",			NULL,
 		{
-			{&item_stats.active_normal,		ZBX_COUNTER_TYPE_UI64,
+			{&item_stats.active_normal,		ZBX_COUNTER_TYPE_UI64,	&items_active_normal_by_proxy,
 				{
 					{"status",	ITEM_STATUS_ACTIVE},
 					{"state",	ITEM_STATE_NORMAL},
 					{NULL}
 				}
 			},
-			{&item_stats.active_notsupported,	ZBX_COUNTER_TYPE_UI64,
+			{&item_stats.active_notsupported,	ZBX_COUNTER_TYPE_UI64,	&items_active_notsupported_by_proxy,
 				{
 					{"status",	ITEM_STATUS_ACTIVE},
 					{"state",	ITEM_STATE_NOTSUPPORTED},
 					{NULL}
 				}
 			},
-			{&item_stats.disabled,			ZBX_COUNTER_TYPE_UI64,
+			{&item_stats.disabled,			ZBX_COUNTER_TYPE_UI64,	&items_disabled_by_proxy,
 				{
 					{"status",	ITEM_STATUS_DISABLED},
 					{NULL}
@@ -669,21 +672,21 @@ const zbx_status_section_t	status_sections[] = {
 	},
 	{"trigger stats",		NULL,
 		{
-			{&trigger_stats.enabled_ok,		ZBX_COUNTER_TYPE_UI64,
+			{&trigger_stats.enabled_ok,		ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
 					{"status",	TRIGGER_STATUS_ENABLED},
 					{"value",	TRIGGER_VALUE_OK},
 					{NULL}
 				}
 			},
-			{&trigger_stats.enabled_problem,	ZBX_COUNTER_TYPE_UI64,
+			{&trigger_stats.enabled_problem,	ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
 					{"status",	TRIGGER_STATUS_ENABLED},
 					{"value",	TRIGGER_VALUE_PROBLEM},
 					{NULL}
 				}
 			},
-			{&trigger_stats.disabled,		ZBX_COUNTER_TYPE_UI64,
+			{&trigger_stats.disabled,		ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
 					{"status",	TRIGGER_STATUS_DISABLED},
 					{NULL}
@@ -694,13 +697,13 @@ const zbx_status_section_t	status_sections[] = {
 	},
 	{"user stats",			&user_stats_res,
 		{
-			{&user_stats.online,			ZBX_COUNTER_TYPE_UI64,
+			{&user_stats.online,			ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
 					{"status",	ZBX_SESSION_ACTIVE},
 					{NULL}
 				}
 			},
-			{&user_stats.offline,			ZBX_COUNTER_TYPE_UI64,
+			{&user_stats.offline,			ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
 					{"status",	ZBX_SESSION_PASSIVE},
 					{NULL}
@@ -711,7 +714,7 @@ const zbx_status_section_t	status_sections[] = {
 	},
 	{"required performance",	NULL,
 		{
-			{&required_performance,	ZBX_COUNTER_TYPE_DBL,
+			{&required_performance,			ZBX_COUNTER_TYPE_DBL,	&required_performance_by_proxy,
 				{
 					{NULL}
 				}
@@ -722,21 +725,82 @@ const zbx_status_section_t	status_sections[] = {
 	{NULL}
 };
 
+static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_entry_t *entry)
+{
+	const zbx_entry_attribute_t	*attribute;
+	const zbx_counter_value_t	*counter_value;
+	char				*tmp = NULL;
+	int				i = 0;
+
+	do
+	{
+		zbx_json_addobject(json, NULL);
+
+		if (NULL != entry->attributes[0].name || NULL != entry->counters_by_proxy)
+		{
+			zbx_json_addobject(json, "attributes");
+
+			if (NULL != entry->counters_by_proxy)
+			{
+				zbx_json_adduint64(json, "proxyid",
+						((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid);
+			}
+
+			for (attribute = entry->attributes; NULL != attribute->name; attribute++)
+				zbx_json_adduint64(json, attribute->name, attribute->value);
+
+			zbx_json_close(json);
+		}
+
+		if (NULL != entry->counters_by_proxy &&
+				0 != ((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid)
+		{
+			counter_value = &((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->counter_value;
+		}
+		else
+			counter_value = entry->counter_value;
+
+		switch (entry->counter_type)
+		{
+			case ZBX_COUNTER_TYPE_UI64:
+				zbx_json_adduint64(json, "count", counter_value->ui64);
+				break;
+			case ZBX_COUNTER_TYPE_DBL:
+				tmp = zbx_dsprintf(tmp, ZBX_FS_DBL, counter_value->dbl);
+				zbx_json_addstring(json, "count", tmp, ZBX_JSON_TYPE_STRING);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+		zbx_json_close(json);
+	}
+	while (NULL != entry->counters_by_proxy && ++i < entry->counters_by_proxy->values_num);
+
+	zbx_free(tmp);
+}
+
 static void	status_stats_export(struct zbx_json *json)
 {
 	const zbx_status_section_t	*section;
 	const zbx_section_entry_t	*entry;
-	const zbx_entry_attribute_t	*attribute;
-	char				*tmp = NULL;
+
+	zbx_vector_ptr_create(&hosts_monitored_by_proxy);
+	zbx_vector_ptr_create(&hosts_not_monitored_by_proxy);
+	zbx_vector_ptr_create(&items_active_normal_by_proxy);
+	zbx_vector_ptr_create(&items_active_notsupported_by_proxy);
+	zbx_vector_ptr_create(&items_disabled_by_proxy);
+	zbx_vector_ptr_create(&required_performance_by_proxy);
 
 	/* get status information */
 
 	template_stats_res = DBget_template_stats(&template_stats);
-	DCget_host_stats(&host_stats);
-	DCget_item_stats(&item_stats);
+	DCget_host_stats(&host_stats, &hosts_monitored_by_proxy, &hosts_not_monitored_by_proxy);
+	DCget_item_stats(&item_stats, &items_active_normal_by_proxy, &items_active_notsupported_by_proxy,
+			&items_disabled_by_proxy);
 	DCget_trigger_stats(&trigger_stats);
 	user_stats_res = DBget_user_stats(&user_stats);
-	required_performance.dbl = DCget_required_performance();
+	required_performance.dbl = DCget_required_performance(&required_performance_by_proxy);
 
 	/* add status information to JSON */
 	for (section = status_sections; NULL != section->name; section++)
@@ -747,39 +811,17 @@ static void	status_stats_export(struct zbx_json *json)
 		zbx_json_addarray(json, section->name);
 
 		for (entry = section->entries; NULL != entry->counter_value; entry++)
-		{
-			zbx_json_addobject(json, NULL);
-
-			if (NULL != entry->attributes[0].name)
-			{
-				zbx_json_addobject(json, "attributes");
-
-				for (attribute = entry->attributes; NULL != attribute->name; attribute++)
-					zbx_json_adduint64(json, attribute->name, attribute->value);
-
-				zbx_json_close(json);
-			}
-
-			switch (entry->counter_type)
-			{
-				case ZBX_COUNTER_TYPE_UI64:
-					zbx_json_adduint64(json, "count", entry->counter_value->ui64);
-					break;
-				case ZBX_COUNTER_TYPE_DBL:
-					tmp = zbx_dsprintf(tmp, ZBX_FS_DBL, entry->counter_value->dbl);
-					zbx_json_addstring(json, "count", tmp, ZBX_JSON_TYPE_STRING);
-					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-			}
-
-			zbx_json_close(json);
-		}
+			status_stats_export_entry(json, entry);
 
 		zbx_json_close(json);
 	}
 
-	zbx_free(tmp);
+	zbx_vector_ptr_destroy(&hosts_monitored_by_proxy);
+	zbx_vector_ptr_destroy(&hosts_not_monitored_by_proxy);
+	zbx_vector_ptr_destroy(&items_active_normal_by_proxy);
+	zbx_vector_ptr_destroy(&items_active_notsupported_by_proxy);
+	zbx_vector_ptr_destroy(&items_disabled_by_proxy);
+	zbx_vector_ptr_destroy(&required_performance_by_proxy);
 }
 
 /******************************************************************************

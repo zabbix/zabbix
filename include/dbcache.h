@@ -418,6 +418,13 @@ typedef union
 }
 zbx_counter_value_t;
 
+typedef struct
+{
+	zbx_uint64_t		proxyid;
+	zbx_counter_value_t	counter_value;
+}
+zbx_proxy_counter_t;
+
 typedef enum
 {
 	ZBX_COUNTER_TYPE_UI64,
@@ -586,10 +593,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
 int	DCget_item_count(zbx_uint64_t hostid);
 int	DCget_item_unsupported_count(zbx_uint64_t hostid);
-double	DCget_required_performance(void);
+double	DCget_required_performance(zbx_vector_ptr_t *nvps_by_proxy);
 
-void	DCget_host_stats(zbx_host_stats_t *host_stats);
-void	DCget_item_stats(zbx_item_stats_t *item_stats);
+void	DCget_host_stats(zbx_host_stats_t *host_stats, zbx_vector_ptr_t *monitored_by_proxy,
+		zbx_vector_ptr_t *not_monitored_by_proxy);
+void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_normal_by_proxy,
+		zbx_vector_ptr_t *active_notsupported_by_proxy, zbx_vector_ptr_t *disabled_by_proxy);
 void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);

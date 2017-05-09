@@ -8731,6 +8731,48 @@ int	DCget_item_unsupported_count(zbx_uint64_t hostid)
 	return count;
 }
 
+static int	zbx_proxy_counter_compare_func(const void *ptr1, const void *ptr2)
+{
+	const zbx_proxy_counter_t	*c1 = *(const zbx_proxy_counter_t **)ptr1;
+	const zbx_proxy_counter_t	*c2 = *(const zbx_proxy_counter_t **)ptr2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(c1->proxyid, c2->proxyid);
+
+	return 0;
+}
+
+static zbx_counter_value_t	*get_counter_by_proxyid(zbx_vector_ptr_t *vector, zbx_uint64_t proxyid,
+		zbx_counter_type_t counter_type)
+{
+	zbx_proxy_counter_t	proxy_counter = {.proxyid = proxyid};
+	int			i;
+
+	if (FAIL == (i = zbx_vector_ptr_search(vector, &proxy_counter, zbx_proxy_counter_compare_func)))
+	{
+		zbx_proxy_counter_t	*counter = NULL;
+
+		counter = zbx_malloc(counter, sizeof(zbx_proxy_counter_t));
+		counter->proxyid = proxyid;
+
+		switch (counter_type)
+		{
+			case ZBX_COUNTER_TYPE_UI64:
+				counter->counter_value.ui64 = 0;
+				break;
+			case ZBX_COUNTER_TYPE_DBL:
+				counter->counter_value.dbl = 0.0;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+		zbx_vector_ptr_append(vector, counter);
+		return &counter->counter_value;
+	}
+
+	return &((zbx_proxy_counter_t *)vector->values[i])->counter_value;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCget_item_stats                                                 *
@@ -8738,7 +8780,8 @@ int	DCget_item_unsupported_count(zbx_uint64_t hostid)
  * Purpose: count enabled, not supported and disabled items                   *
  *                                                                            *
  ******************************************************************************/
-void	DCget_item_stats(zbx_item_stats_t *item_stats)
+void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_normal_by_proxy,
+		zbx_vector_ptr_t *active_notsupported_by_proxy, zbx_vector_ptr_t *disabled_by_proxy)
 {
 	static zbx_uint64_t	items_active_normal = 0, items_active_notsupported = 0, items_disabled = 0;
 	static time_t		last_counted = 0;
@@ -8752,24 +8795,40 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats)
 	items_active_notsupported = 0;
 	items_disabled = 0;
 
+	if (NULL != active_normal_by_proxy)
+		get_counter_by_proxyid(active_normal_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
+
+	if (NULL != active_notsupported_by_proxy)
+		get_counter_by_proxyid(active_notsupported_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
+
+	if (NULL != disabled_by_proxy)
+		get_counter_by_proxyid(disabled_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
+
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
 	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
-		const ZBX_DC_HOST	*dc_host;
+		const ZBX_DC_HOST	*dc_host = NULL;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 		{
 			items_disabled++;
+
+			if (NULL != disabled_by_proxy)
+			{
+				get_counter_by_proxyid(disabled_by_proxy, dc_host->proxy_hostid,
+						ZBX_COUNTER_TYPE_UI64)->ui64++;
+			}
+
 			continue;
 		}
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
-			continue;
-
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
@@ -8777,8 +8836,22 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats)
 
 		items_active_normal++;
 
+		if (NULL != active_normal_by_proxy)
+		{
+			get_counter_by_proxyid(active_normal_by_proxy, dc_host->proxy_hostid,
+					ZBX_COUNTER_TYPE_UI64)->ui64++;
+		}
+
 		if (ITEM_STATE_NOTSUPPORTED == dc_item->state)
+		{
 			items_active_notsupported++;
+
+			if (NULL != active_notsupported_by_proxy)
+			{
+				get_counter_by_proxyid(active_notsupported_by_proxy, dc_host->proxy_hostid,
+						ZBX_COUNTER_TYPE_UI64)->ui64++;
+			}
+		}
 	}
 
 	UNLOCK_CACHE;
@@ -8891,7 +8964,8 @@ out:
  * Purpose: count monitored and not monitored hosts                           *
  *                                                                            *
  ******************************************************************************/
-void	DCget_host_stats(zbx_host_stats_t *host_stats)
+void	DCget_host_stats(zbx_host_stats_t *host_stats, zbx_vector_ptr_t *monitored_by_proxy,
+		zbx_vector_ptr_t *not_monitored_by_proxy)
 {
 	static zbx_uint64_t	hosts_monitored = 0, hosts_not_monitored = 0;
 	static time_t		last_counted = 0;
@@ -8904,6 +8978,12 @@ void	DCget_host_stats(zbx_host_stats_t *host_stats)
 	hosts_monitored = 0;
 	hosts_not_monitored = 0;
 
+	if (NULL != monitored_by_proxy)
+		get_counter_by_proxyid(monitored_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
+
+	if (NULL != not_monitored_by_proxy)
+		get_counter_by_proxyid(not_monitored_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
+
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
@@ -8914,9 +8994,19 @@ void	DCget_host_stats(zbx_host_stats_t *host_stats)
 		{
 			case HOST_STATUS_MONITORED:
 				hosts_monitored++;
+				if (NULL != monitored_by_proxy)
+				{
+					get_counter_by_proxyid(monitored_by_proxy, dc_host->proxy_hostid,
+							ZBX_COUNTER_TYPE_UI64)->ui64++;
+				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
 				hosts_not_monitored++;
+				if (NULL != not_monitored_by_proxy)
+				{
+					get_counter_by_proxyid(not_monitored_by_proxy, dc_host->proxy_hostid,
+							ZBX_COUNTER_TYPE_UI64)->ui64++;
+				}
 				break;
 		}
 	}
@@ -8938,12 +9028,14 @@ out:
  * Return value: the required nvps number                                     *
  *                                                                            *
  ******************************************************************************/
-double	DCget_required_performance(void)
+double	DCget_required_performance(zbx_vector_ptr_t *nvps_by_proxy)
 {
 	double			nvps = 0;
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
-	int			delay;
+
+	if (NULL != nvps_by_proxy)
+		get_counter_by_proxyid(nvps_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
 
 	LOCK_CACHE;
 
@@ -8952,6 +9044,7 @@ double	DCget_required_performance(void)
 	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
 		const ZBX_DC_HOST	*dc_host;
+		int			delay;
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
@@ -8963,7 +9056,15 @@ double	DCget_required_performance(void)
 			continue;
 
 		if (SUCCEED == zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL) && 0 != delay)
+		{
 			nvps += 1.0 / delay;
+
+			if (NULL != nvps_by_proxy)
+			{
+				get_counter_by_proxyid(nvps_by_proxy, dc_host->proxy_hostid,
+						ZBX_COUNTER_TYPE_DBL)->dbl += 1.0 / delay;
+			}
+		}
 	}
 
 	UNLOCK_CACHE;
