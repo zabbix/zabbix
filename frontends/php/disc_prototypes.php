@@ -174,7 +174,9 @@ $fields = [
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
 		IN('"delay","history","key_","name","status","trends","type"'), null
 	],
-	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null],
+	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX]
 ];
 check_fields($fields);
 
@@ -370,7 +372,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'params'		=> getRequest('params'),
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
 			'ruleid'		=> getRequest('parent_discoveryid'),
-			'delay_flex'	=> $delay_flex
+			'delay_flex'	=> $delay_flex,
+			'jmx_endpoint'	=> getRequest('jmx_endpoint')
 		];
 
 		if (hasRequest('update')) {
@@ -382,7 +385,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt',
 					'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
 					'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
-					'snmpv3_privprotocol', 'snmpv3_contextname'
+					'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectApplicationPrototypes' => ['name'],
@@ -505,7 +508,7 @@ if (isset($_REQUEST['form'])) {
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-				'snmpv3_contextname'
+				'snmpv3_contextname', 'jmx_endpoint'
 			],
 			'selectPreprocessing' => ['type', 'params']
 		]);
@@ -518,6 +521,10 @@ if (isset($_REQUEST['form'])) {
 
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
+
+	if (!hasRequest('itemid') && !getRequest('form_refresh')) {
+		$data['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.edit', $data);
