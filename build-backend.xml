@@ -23,6 +23,24 @@
 		</default>
 	</switch>
 
+	<!-- Static analysis target. detached from the default -->
+	<target name="static-analysis">
+		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">
+			<arg line="--enable=all"/>
+			<arg line="-j4"/>
+			<arg line="-I/usr/include"/>
+			<arg line="-I/usr/local/include"/>
+			<arg line="-I./include"/>
+			<arg line="--suppress=variableScope:*"/>
+			<arg line="--suppress=ConfigurationNotChecked:*"/>
+			<arg line="--inconclusive"/>
+			<arg line="--force"/>
+			<arg line="--xml"/>
+			<arg line="--xml-version=2"/>
+			<arg line="."/>
+		</exec>
+	</target>
+
 	<target name="init">
 		<!-- Create database schema -->
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
