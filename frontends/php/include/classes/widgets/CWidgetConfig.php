@@ -126,10 +126,10 @@ class CWidgetConfig
 	/**
 	 * Return Form object for widget with provided data
 	 * @param array $data - array with all widget's fields, including widget type and position
-	 * @param int $user_type - USER_TYPE_ZABBIX_ constant
+	 * @param int $user_type - USER_TYPE_ZABBIX_ constant, if null or not passed, will accept all widget types
 	 * @return CWidgetForm
 	 */
-	public function getForm($data, $user_type) {
+	public function getForm($data, $user_type = null) {
 		$known_widget_types = $this->getKnownWidgetTypesWNames($user_type);
 		switch ($data['type']) {
 			case WIDGET_CLOCK:

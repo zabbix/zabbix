@@ -43,16 +43,9 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$widgetids = [
-				WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES, WIDGET_WEB_OVERVIEW,
-				WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS, WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS,
-				WIDGET_FAVOURITE_SCREENS
-			];
-
 			/*
 			 * @var array  $widgets
 			 * @var string $widget[]['widgetid']
-			 * @var int    $widget[]['rf_rate']        (optional)
 			 * @var array  $widget[]['pos']            (optional)
 			 * @var int    $widget[]['pos']['row']
 			 * @var int    $widget[]['pos']['col']
@@ -70,7 +63,9 @@ class CControllerDashbrdWidgetUpdate extends CController {
 						break; // no need to check fields, if widget type is unknown
 					}
 
-					$widget['form'] = $this->widget_config->getForm($widget_fields, $this->getUserType());
+					// TODO VM: (?) widget types are currently not evaluated by "allowed y user or not"
+					$widget['form'] = $this->widget_config->getForm($widget_fields);
+//					$widget['form'] = $this->widget_config->getForm($widget_fields, $this->getUserType());
 					unset($widget['fields']);
 
 					$errors = $widget['form']->validate();
@@ -114,11 +109,6 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			foreach ($this->widgets as $widget) {
 				$widget_to_save = [];
 				$widget_to_save['widgetid'] = $widget['widgetid'];
-
-
-				if (array_key_exists('rf_rate', $widget)) {
-					CProfile::update('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT);
-				}
 
 				if (array_key_exists('pos', $widget)) {
 					$widget_to_save['row'] = $widget['pos']['row'];

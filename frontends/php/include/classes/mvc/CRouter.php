@@ -62,6 +62,7 @@ class CRouter {
 		'dashboard.delete'		=> ['CControllerDashboardDelete',		null,					null],
 		'dashbrd.widget.config'	=> ['CControllerDashbrdWidgetConfig',	'layout.json',			'monitoring.dashboard.config'],
 		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.json',			null],
+		'dashbrd.widget.rfrate'	=> ['CControllerDashbrdWidgetRfRate',	'layout.json',			null],
 		'discovery.view'		=> ['CControllerDiscoveryView',			'layout.htmlpage',		'monitoring.discovery.view'],
 		'favourite.create'		=> ['CControllerFavouriteCreate',		'layout.javascript',	null],
 		'favourite.delete'		=> ['CControllerFavouriteDelete',		'layout.javascript',	null],
