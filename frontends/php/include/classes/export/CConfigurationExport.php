@@ -97,7 +97,7 @@ class CConfigurationExport {
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt'
+				'logtimefmt', 'jmx_endpoint'
 			]
 		];
 	}
