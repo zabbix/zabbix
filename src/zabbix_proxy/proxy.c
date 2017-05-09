@@ -708,6 +708,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
+			PARM_OPT,	0,			1},
 		{NULL}
 	};
 
@@ -987,7 +991,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	DCsync_configuration();
+	DCsync_configuration(ZBX_DBSYNC_INIT);
 	DBclose();
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)

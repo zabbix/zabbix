@@ -625,11 +625,9 @@ static int	DBpatch_3030053(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	unsigned char	value_type, data_type, delta;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	selementid, triggerid;
-	const char	*formula;
-	int		width, ret;
+	int		ret;
 
 	zbx_db_insert_prepare(&db_insert, "sysmap_element_trigger", "selement_triggerid", "selementid", "triggerid",
 			NULL);

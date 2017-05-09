@@ -887,8 +887,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num, zbx
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, item_num);
 
-	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num,
-			ZBX_EXPAND_MACROS);
+	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, item_num);
 
 	zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
 
@@ -2189,12 +2188,10 @@ int	DCsync_history(int sync_type, int *total_num)
 			/* processing of events, generated in functions: */
 			/*   DCmass_update_items() */
 			/*   DCmass_update_triggers() */
-			if (0 != process_trigger_events(&trigger_diff, &triggerids, ZBX_EVENTS_PROCESS_CORRELATION))
-			{
-				DCconfig_triggers_apply_changes(&trigger_diff);
-				zbx_save_trigger_changes(&trigger_diff);
-			}
+			process_trigger_events(&trigger_diff, &triggerids, ZBX_EVENTS_PROCESS_CORRELATION);
 
+			DCconfig_triggers_apply_changes(&trigger_diff);
+			zbx_save_trigger_changes(&trigger_diff);
 			zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		}
 		else

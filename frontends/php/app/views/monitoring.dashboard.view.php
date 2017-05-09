@@ -26,6 +26,10 @@ $url_list = (new CUrl('zabbix.php'))
 $url_view = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
 	->setArgument('dashboardid', $data['dashboard']['dashboardid']);
+if ($data['fullscreen']) {
+	$url_list->setArgument('fullscreen', '1');
+	$url_view->setArgument('fullscreen', '1');
+}
 
 (new CWidget())
 	->setTitle($data['dashboard']['name'])
