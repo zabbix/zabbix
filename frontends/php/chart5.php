@@ -66,26 +66,7 @@ else {
 	$im = imagecreate($sizeX + $shiftX + 61, $sizeY + $shiftYup + $shiftYdown + 10);
 }
 
-$graphtheme = [
-	'theme' => 'blue-theme',
-	'textcolor' => '1F2C33',
-	'highlightcolor' => 'E33734',
-	'backgroundcolor' => 'FFFFFF',
-	'graphcolor' => 'FFFFFF',
-	'gridcolor' => 'CCD5D9',
-	'maingridcolor' => 'ACBBC2',
-	'gridbordercolor' => 'ACBBC2',
-	'nonworktimecolor' => 'EBEBEB',
-	'leftpercentilecolor' => '429E47',
-	'righttpercentilecolor' => 'E33734'
-];
-
-$themes = DB::find('graph_theme', [
-	'theme' => getUserTheme(CWebUser::$data)
-]);
-if ($themes) {
-	$graphtheme = $themes[0];
-}
+$graphtheme = getUserGraphTheme();
 
 $black = get_color($im, '000000');
 $green = get_color($im, '34AF67');

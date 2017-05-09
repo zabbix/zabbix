@@ -912,6 +912,50 @@ static int	DBpatch_3030068(void)
 	return DBadd_field("httpstep", &field);
 }
 
+static int	DBpatch_3030069(void)
+{
+	const ZBX_FIELD	field = {"sysmap_shapeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBrename_field("sysmap_shape", "shapeid", &field);
+}
+
+static int	DBpatch_3030070(void)
+{
+	const ZBX_FIELD	field = {"text_halign", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmap_shape", &field);
+}
+
+static int	DBpatch_3030071(void)
+{
+	const ZBX_FIELD	field = {"text_valign", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmap_shape", &field);
+}
+
+static int	DBpatch_3030072(void)
+{
+	const ZBX_FIELD	field = {"border_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmap_shape", &field);
+}
+
+static int	DBpatch_3030073(void)
+{
+	const ZBX_FIELD	field = {"zindex", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmap_shape", &field);
+}
+
+static int	DBpatch_3030074(void)
+{
+	if (ZBX_DB_OK > DBexecute("update sysmap_shape set text_halign=text_halign+1,text_valign=text_valign+1,"
+			"border_type=border_type+1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -987,5 +1031,11 @@ DBPATCH_ADD(3030065, 0, 1)
 DBPATCH_ADD(3030066, 0, 1)
 DBPATCH_ADD(3030067, 0, 1)
 DBPATCH_ADD(3030068, 0, 1)
+DBPATCH_ADD(3030069, 0, 1)
+DBPATCH_ADD(3030070, 0, 1)
+DBPATCH_ADD(3030071, 0, 1)
+DBPATCH_ADD(3030072, 0, 1)
+DBPATCH_ADD(3030073, 0, 1)
+DBPATCH_ADD(3030074, 0, 1)
 
 DBPATCH_END()
