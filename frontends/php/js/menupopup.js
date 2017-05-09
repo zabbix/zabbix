@@ -370,6 +370,7 @@ function getMenuPopupRefresh(options) {
 				600: t('10 minutes'),
 				900: t('15 minutes')
 			};
+		// TODO VM: add option with no refresh (for dashboards)
 
 	jQuery.each(intervals, function(value, label) {
 		var item = {
@@ -402,7 +403,7 @@ function getMenuPopupRefresh(options) {
 						method: 'POST',
 						dataType: 'json',
 						data: {
-							dashboard_id: 1, // TODO VM: replace with real
+							dashboard_id: 1, // TODO VM: (?) replace with real (depends on - will we have dashboard id in profile key)
 							widgets: [
 								{
 									'widgetid': options.widgetName,

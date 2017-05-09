@@ -26,12 +26,12 @@ class CControllerDashbrdWidgetConfig extends CController {
 	public function __construct() {
 		parent::__construct();
 
-		$this->widget_config = new CWidgetConfig(); // TODO VM: maybe better to convert to static functions
+		$this->widget_config = new CWidgetConfig();
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'', // TODO VM: in db.widget
+			'widgetid'		=>	'db widget.widgetid',
 			'fields'		=>	'array',
 		];
 
@@ -49,12 +49,12 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 				// Field array should contain widget type
 				if (!array_key_exists('type', $widget_fields)) {
-					error(_('No widget type')); // TODO VM: improve message
+					error(_('No widget type')); // TODO VM: (?) improve message
 					$ret = false;
 				}
 				// We will work only with known widget types
 				elseif (!in_array($widget_fields['type'], $this->widget_config->getKnownWidgetTypes($this->getUserType()))) {
-					error(_('Unknown widget type')); // TODO VM: improve message
+					error(_('Unknown widget type')); // TODO VM: (?) improve message
 					$ret = false;
 				}
 			}
@@ -81,7 +81,9 @@ class CControllerDashbrdWidgetConfig extends CController {
 			'type' => WIDGET_CLOCK,
 		];
 
-		// TODO VM: get current widget fields data from JS
+		// TODO VM: (?) get current widget fields data from JS
+		//			(1) by getting current values from widget config, we can set default values to same fields in different widget type
+		//			(2) it may add unreasonable complaxity
 //		// get data for current widget - in case we are switching between types, and no fields for widget are given
 //		if ($this->hasInput('widgetid')) {
 //			$dialogue['widgetid'] = $this->getInput('widgetid');

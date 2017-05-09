@@ -1228,7 +1228,7 @@ define('ZBX_STYLE_BTN_SEARCH', 'btn-search');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
-define('ZBX_STYLE_BTN_WIDGET_EDIT', 'btn-widget-edit'); // TODO VM: should it be here, if it is not used, but class itself is used
+define('ZBX_STYLE_BTN_WIDGET_EDIT', 'btn-widget-edit'); // TODO VM: (?) should it be here, if it is not used, but class itself is used
 define('ZBX_STYLE_BOTTOM', 'bottom');
 define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
 define('ZBX_STYLE_BROWSER_LOGO_FF', 'browser-logo-ff');

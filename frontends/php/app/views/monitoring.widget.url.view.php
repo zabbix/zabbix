@@ -25,7 +25,7 @@ if ($data['url']['error'] !== null) {
 }
 
 $output = [
-	'header' => _('URL'), // TODO VM: maybe some other text would be better, maybe the one we will setup in widget's config
+	'header' => _('URL'),
 	'body' => $item->toString(),
 	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];

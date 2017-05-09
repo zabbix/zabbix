@@ -82,7 +82,7 @@ class CControllerDashboardView extends CController {
 			'dashboard' => $dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
-			'grid_widgets' => $this->getWidgets()
+			'grid_widgets' => $this->getWidgets($dashboard['widgets'])
 		];
 
 		$response = new CControllerResponseData($data);
@@ -107,6 +107,7 @@ class CControllerDashboardView extends CController {
 		if ($dashboardid != 0) {
 			$dashboards = API::Dashboard()->get([
 				'output' => ['dashboardid', 'name'],
+				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
 				'dashboardids' => $dashboardid
 			]);
 
@@ -125,138 +126,53 @@ class CControllerDashboardView extends CController {
 	 *
 	 * @return array
 	 */
-	private function getWidgets() {
+	private function getWidgets($widgets) {
 		$grid_widgets = [];
+		$widget_names = $this->widget_config->getKnownWidgetTypesWNames();
+		// TODO VM: (?) WIDGET_DISCOVERY_STATUS and WIDGET_ZABBIX_STATUS are displayed only under specidic conditions,
+		// but we currently have these widgets in default dashboard. Should these conditions be be managed by frontend, or API?
+		// Currently these conditions are not managed by any of them.
 
-		// these fields should not appear in fields array of widget in dasjboard.js
-		$fields_to_unset = ['widgetid', 'row', 'col', 'height', 'width'];
-
-		$widgets_config = $this->widget_config->getAllWidgetConfig();
-		$widget_names = $this->widget_config->getKnownWidgetTypesWNames($this->getUserType());
-
-		foreach ($widgets_config as  $widget_config) {
-			$widgetid = (int) $widget_config['widgetid'];
-			$default_rf_rate = $this->widget_config->getDefaultRfRate($widget_config['type']);
+		foreach ($widgets as  $widget) {
+			$widgetid = (int) $widget['widgetid'];
+			$default_rf_rate = $this->widget_config->getDefaultRfRate($widget['type']);
 
 			$grid_widgets[$widgetid]['widgetid'] = $widgetid;
-			$grid_widgets[$widgetid]['type'] = $widget_config['type'];
-			$grid_widgets[$widgetid]['header'] = $widget_names[$widget_config['type']];
+			$grid_widgets[$widgetid]['type'] = $widget['type'];
+			$grid_widgets[$widgetid]['header'] = (strlen($widget['name']) != 0) ? $widget['name'] : $widget_names[$widget['type']];
+			// TODO VM: widget headers are not affeced by name from database, because it is rewritten by specific widget's API call
 			$grid_widgets[$widgetid]['pos'] = [];
-			$grid_widgets[$widgetid]['pos']['row'] = (int) $widget_config['row'];
-			$grid_widgets[$widgetid]['pos']['col'] = (int) $widget_config['col'];
-			$grid_widgets[$widgetid]['pos']['height'] = (int) $widget_config['height'];
-			$grid_widgets[$widgetid]['pos']['width'] = (int) $widget_config['width'];
+			$grid_widgets[$widgetid]['pos']['row'] = (int) $widget['row'];
+			$grid_widgets[$widgetid]['pos']['col'] = (int) $widget['col'];
+			$grid_widgets[$widgetid]['pos']['height'] = (int) $widget['height'];
+			$grid_widgets[$widgetid]['pos']['width'] = (int) $widget['width'];
 			$grid_widgets[$widgetid]['rf_rate'] = (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $default_rf_rate);
+			// TODO VM: (?) update refresh rate to take into account dashboard id
+			//			(1) Adding dashboard ID will limit reusage of dashboard.grid.js for pages without dashboard ID's
+			//			(2) Each widget has unique ID across all dashboards, so it will still work
+			//			(3) Leaving identification only be widget ID, it will be harder to manage, when deleating dashboards.
 
-			foreach($fields_to_unset as $field) {
-				unset($widget_config[$field]);
-			}
-			$grid_widgets[$widgetid]['fields'] = $widget_config;
+			// 'type' always should be in fields array
+			$widget['fields'] = $this->convertWidgetFields($widget['fields']);
+			$widget['fields']['type'] = $widget['type'];
+			$grid_widgets[$widgetid]['fields'] = $widget['fields'];
 		}
 		// TODO VM: delete refresh rate from all user profiles when deleting widget
-
-		// TODO VM: delete, when API will be working fine
-		if (empty($grid_widgets)) {
-			$grid_widgets = $this->getDefaultWidgets();
-		}
+		// TODO VM: delete refresh rate from all user profiles when deleting dashboard
 		return $grid_widgets;
 	}
 
 	/**
-	 * Get default widgets
-	 * @TODO should be refactored in ZBXNEXT-3789
-	 *
+	 * Converts fields, received from API to key/value format
+	 * @param array $fields - fields as received from API
 	 * @return array
 	 */
-	private function getDefaultWidgets() {
-		$widgets = [
-			0 => [
-				'type' => WIDGET_FAVOURITE_GRAPHS,
-				'header' => _('Favourite graphs'),
-				'pos' => ['row' => 0, 'col' => 0, 'height' => 3, 'width' => 2],
-				'rf_rate' => 15 * SEC_PER_MIN
-			],
-			1 => [
-				'type' => WIDGET_FAVOURITE_SCREENS,
-				'header' => _('Favourite screens'),
-				'pos' => ['row' => 0, 'col' => 2, 'height' => 3, 'width' => 2],
-				'rf_rate' => 15 * SEC_PER_MIN
-			],
-			2 => [
-				'type' => WIDGET_FAVOURITE_MAPS,
-				'header' => _('Favourite maps'),
-				'pos' => ['row' => 0, 'col' => 4, 'height' => 3, 'width' => 2],
-				'rf_rate' => 15 * SEC_PER_MIN
-			],
-			3 => [
-				'type' => WIDGET_LAST_ISSUES,
-				'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-				'pos' => ['row' => 3, 'col' => 0, 'height' => 6, 'width' => 6],
-				'rf_rate' => SEC_PER_MIN
-			],
-			4 => [
-				'type' => WIDGET_WEB_OVERVIEW,
-				'header' => _('Web monitoring'),
-				'pos' => ['row' => 9, 'col' => 0, 'height' => 4, 'width' => 3],
-				'rf_rate' => SEC_PER_MIN
-			],
-			5 => [
-				'type' => WIDGET_HOST_STATUS,
-				'header' => _('Host status'),
-				'pos' => ['row' => 0, 'col' => 6, 'height' => 4, 'width' => 6],
-				'rf_rate' => SEC_PER_MIN
-			],
-			6 => [
-				'type' => WIDGET_SYSTEM_STATUS,
-				'header' => _('System status'),
-				'pos' => ['row' => 4, 'col' => 6, 'height' => 4, 'width' => 6],
-				'rf_rate' => SEC_PER_MIN
-			]
-		];
-
-		if ($this->getUserType() == USER_TYPE_SUPER_ADMIN) {
-			$widgets[] = [
-				'type' => WIDGET_ZABBIX_STATUS,
-				'header' => _('Status of Zabbix'),
-				'pos' => ['row' => 8, 'col' => 6, 'height' => 5, 'width' => 6],
-				'rf_rate' => 15 * SEC_PER_MIN
-			];
+	private function convertWidgetFields($fields) {
+		$ret = [];
+		foreach ($fields as $field) {
+			$field_key = $this->widget_config->getApiFieldKey($field['type']);
+			$ret[$field['name']] = $field[$field_key];
 		}
-
-		$show_discovery_widget = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
-			'output' => [],
-			'filter' => ['status' => DRULE_STATUS_ACTIVE],
-			'limit' => 1
-		]));
-
-		if ($show_discovery_widget) {
-			$widgets[] = [
-				'type' => WIDGET_DISCOVERY_STATUS,
-				'header' => _('Discovery status'),
-				'pos' => ['row' => 9, 'col' => 3, 'height' => 4, 'width' => 3],
-				'rf_rate' => SEC_PER_MIN
-			];
-		}
-
-		$grid_widgets = [];
-
-		foreach ($widgets as $widgetid => $widget) {
-			$grid_widgets[] = [
-				'widgetid' => $widgetid,
-				'type' => $widget['type'],
-				'header' => $widget['header'],
-				'pos' => [
-					'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col']),
-					'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row']),
-					'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height']),
-					'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'])
-				],
-				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate']),
-				'fields' => [
-					'type' => $widget['type']
-				]
-			];
-		}
-		return $grid_widgets;
+		return $ret;
 	}
 }

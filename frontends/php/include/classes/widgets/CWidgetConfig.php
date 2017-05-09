@@ -20,8 +20,10 @@
 
 class CWidgetConfig
 {
+	// TODO VM: (?) maybe better to convert all functions to static ones
 	private $knownWidgetTypes;
 	private $rfRates;
+	private $apiFieldKeys;
 
 	public function __construct() {
 		$this->knownWidgetTypes = [
@@ -51,73 +53,82 @@ class CWidgetConfig
 			WIDGET_CLOCK				=> 15 * SEC_PER_MIN,
 			WIDGET_URL					=> 0,
 		];
+
+		$this->apiFieldKeys = [
+			ZBX_WIDGET_FIELD_TYPE_INT32				=> 'value_int',
+			ZBX_WIDGET_FIELD_TYPE_STR				=> 'value_str',
+			ZBX_WIDGET_FIELD_TYPE_GROUP				=> 'value_groupid',
+			ZBX_WIDGET_FIELD_TYPE_HOST				=> 'value_hostid',
+			ZBX_WIDGET_FIELD_TYPE_ITEM				=> 'value_itemid',
+			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE	=> 'value_itemid',
+			ZBX_WIDGET_FIELD_TYPE_GRAPH				=> 'value_graphid',
+			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE	=> 'value_graphid',
+			ZBX_WIDGET_FIELD_TYPE_MAP				=> 'value_sysmapid',
+			ZBX_WIDGET_FIELD_TYPE_DASHBOARD			=> 'value_dashboardid'
+		];
 	}
 
-	public function getKnownWidgetTypesWNames($user_type) {
+	/**
+	 * Return list of all widget types with names
+	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
+	 * @return array
+	 */
+	public function getKnownWidgetTypesWNames($user_type = null) {
 		$known_widget_types = $this->knownWidgetTypes;
 
-		$show_discovery_widget = ($user_type >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
-			'output' => [],
-			'filter' => ['status' => DRULE_STATUS_ACTIVE],
-			'limit' => 1
-		]));
-		if (!$show_discovery_widget) {
-			unset($known_widget_types[WIDGET_DISCOVERY_STATUS]);
-		}
+		// Remove widget types, user can't create
+		if ($user_type !== null) {
+			$show_discovery_widget = ($user_type >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
+				'output' => [],
+				'filter' => ['status' => DRULE_STATUS_ACTIVE],
+				'limit' => 1
+			]));
+			if (!$show_discovery_widget) {
+				unset($known_widget_types[WIDGET_DISCOVERY_STATUS]);
+			}
 
-		$show_status_widget = ($user_type == USER_TYPE_SUPER_ADMIN);
-		if (!$show_status_widget) {
-			unset($known_widget_types[WIDGET_ZABBIX_STATUS]);
+			$show_status_widget = ($user_type == USER_TYPE_SUPER_ADMIN);
+			if (!$show_status_widget) {
+				unset($known_widget_types[WIDGET_ZABBIX_STATUS]);
+			}
 		}
 
 		return $known_widget_types;
 	}
 
-	public function getKnownWidgetTypes($user_type) {
+	/**
+	 * Return list of all widget types
+	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
+	 * @return array
+	 */
+	public function getKnownWidgetTypes($user_type = null) {
 		return array_keys($this->getKnownWidgetTypesWNames($user_type));
 	}
 
 	/**
-	 * Save dashboard
-	 * @param array $dashboard array with dashboard to save
-	 *
-	 * @return bool
+	 * Return default refresh rate for widget type
+	 * @param int $type - WIDGET_ constant
+	 * @return int default refresh rate, "0" for no refresh
 	 */
-	public function saveConfig($dashboard) {
-		$result = (bool) API::Dashboard()->update([$dashboard]);
-		return $result;
-		// TODO VM: replace by call to API (when it will be ready)
-//		$fields = (new CJson())->encode($fields);
-//		CProfile::update('web.dashbrd.widget.'.$widgetid.'.fields', $fields, PROFILE_TYPE_STR);
-	}
-
-	public function getConfig($widgetid) {
-		// TODO VM: replace by call to API (when it will be ready)
-		$fields = CProfile::get('web.dashbrd.widget.'.$widgetid.'.fields', '');
-		$res = (new CJson())->decode($fields, true);
-		if (!is_array($res)) {
-			$res = [];
-		}
-		return $res;
-	}
-
-	public function getAllWidgetConfig() {
-		// TODO VM: replace by call to API (when it will be ready)
-		// TODO VM: done clunky way, becuase API should be able to do it properly in one call
-		$res = [];
-		for ($i = 1; $i < 20; $i++) {
-			$fields = CProfile::get('web.dashbrd.widget.'.$i.'.fields', '');
-			if ($fields !== '') {
-				$res[] = (new CJson())->decode($fields, true);
-			}
-		}
-		return $res;
-	}
-
 	public function getDefaultRfRate($type) {
 		return $this->rfRates[$type];
 	}
 
+	/**
+	 * Returns key, where value is stored for given field type
+	 * @param int $field_type - ZBX_WIDGET_FIELD_TYPE_ constant
+	 * @return string field key, where to save the value
+	 */
+	public function getApiFieldKey($field_type){
+		return $this->apiFieldKeys[$field_type];
+	}
+
+	/**
+	 * Return Form object for widget with provided data
+	 * @param array $data - array with all widget's fields, including widget type and position
+	 * @param int $user_type - USER_TYPE_ZABBIX_ constant
+	 * @return CWidgetForm
+	 */
 	public function getForm($data, $user_type) {
 		$known_widget_types = $this->getKnownWidgetTypesWNames($user_type);
 		switch ($data['type']) {

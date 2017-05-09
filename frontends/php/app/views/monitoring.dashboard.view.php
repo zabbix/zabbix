@@ -36,7 +36,6 @@ $url_view = (new CUrl('zabbix.php'))
 			// 'Edit dashboard' should be first one in list,
 			// because it will be visually replaced by last item of new list, when clicked
 			->addItem((new CButton('dashbrd-edit',_('Edit dashboard'))))
-			->addItem(get_icon('action'))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	)
@@ -62,6 +61,6 @@ $this->addPostJS('jqBlink.blink();');
 // Initialize dashboard grid
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
-		'.dashboardGrid()'.
+		'.dashboardGrid({"dashboardid":'.$data['dashboard']['dashboardid'].'})'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );

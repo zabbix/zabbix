@@ -29,7 +29,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	public function __construct() {
 		parent::__construct();
 
-		$this->widget_config = new CWidgetConfig(); // TODO VM: maybe better to convert to static functions
+		$this->widget_config = new CWidgetConfig();
 		$this->widgets = [];
 	}
 
@@ -65,7 +65,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					$widget_fields = $widget['fields'];
 
 					if (!array_key_exists('type', $widget_fields)) {
-						error(_('No widget type')); // TODO VM: improve message
+						error(_('No widget type')); // TODO VM: (?) improve message
 						$ret = false;
 						break; // no need to check fields, if widget type is unknown
 					}
@@ -77,7 +77,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					if (!empty($errors)) {
 						// Add widget name to each error message.
 						foreach ($errors as $key => $value) {
-							$errors[$key] = _s("Error in widget (id='%s'): %s", $widget['widgetid'], $value); // TODO VM: improve error message
+							$errors[$key] = _s("Error in widget (id='%s'): %s", $widget['widgetid'], $value); // TODO VM: (?) improve error message
 						}
 
 						error($errors);
@@ -143,14 +143,16 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				$dashboard['widgets'][] = $widget_to_save;
 			}
 
-			$result = (new CWidgetConfig())->saveConfig($dashboard);
-			if ($result === true) {
+			$result = API::Dashboard()->update([$dashboard]);
+			if ($result['dashboardids'][0] === $dashboard['dashboardid']) {
 				$return['messages'] = makeMessageBox(true, [], _('Dashboard updated'))->toString();
 			} else {
+				if (!hasErrorMesssages()) {
+					error(_('Failed to update dashboard')); // In case of unknown error
+				}
 				$return['errors'] = getMessages()->toString();
 			}
 		}
-
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($return)]));
 	}
 
@@ -174,34 +176,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				$field_to_save['type'] = $field->getSaveType();
 				$field_to_save['name'] = $field->getName();
 
-				switch ($field_to_save['type']) {
-					case ZBX_WIDGET_FIELD_TYPE_INT32:
-						$field_to_save['value_int'] = $field->getValue();
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_STR:
-						$field_to_save['value_str'] = $field->getValue();
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_GROUP:
-						$field_to_save['value_groupid'] = $field->getValue();
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_HOST:
-						$field_to_save['value_hostid'] = $field->getValue();
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_ITEM:
-					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-						$field_to_save['value_itemid'] = $field->getValue();
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-						$field_to_save['value_graphid'] = $field->getValue();
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_MAP:
-						$field_to_save['value_sysmapid'] = $field->getValue();
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
-						$field_to_save['value_dashboardid'] = $field->getValue();
-						break;
-				}
+				$field_key = $this->widget_config->getApiFieldKey($field_to_save['type']);
+				$field_to_save[$field_key] = $field->getValue();
 
 				if (!array_key_exists('fields', $ret)) {
 					$ret['fields'] = [];

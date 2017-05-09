@@ -483,7 +483,7 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboard_id: 1, // TODO VM: replace with real
+				dashboard_id: data['options']['dashboardid'], // TODO VM: (?) will not work without dashboard id
 				widgets: ajax_data,
 				save: 0 // 0 - only check; 1 - check and save
 			},
@@ -507,7 +507,7 @@
 				}
 			},
 			error: function() {
-				// TODO VM: Do we need to display some kind of error message here?
+				// TODO VM: (?) Do we need to display some kind of error message here?
 			}
 		});
 	}
@@ -593,11 +593,16 @@
 			stopDraggable($obj, data, widget);
 			stopResizable($obj, data, widget);
 		});
+		// update control buttons, controlling dashboard
+		dashboardButtonsSetView();
 	}
 
 	function saveChanges($obj, data) {
 		var	url = new Curl('zabbix.php'),
 			ajax_data = [];
+
+		// Remove previous messages
+		dashboardRemoveMessages();
 
 		url.setArgument('action', 'dashbrd.widget.update');
 
@@ -614,23 +619,18 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboard_id: 1, // TODO VM: replace with real
+				dashboard_id: data['options']['dashboardid'], // TODO VM: (?) will not work without dashboard id
 				widgets: ajax_data,
 				save: 1 // 0 - only check; 1 - check and save
 			},
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned
-					// Remove previous errors
-					$('.article .msg-bad').remove();
-					$('.article').prepend(resp.errors);
+					dashbaordAddMessages(resp.errors);
 				} else {
 					if (typeof(resp.messages) !== 'undefined') {
 						// Success returned
-						// Remove previous messages
-						$('.article .msg-good').remove();
-						$('.article .msg-bad').remove();
-						$('.article').prepend(resp.messages);
+						dashbaordAddMessages(resp.messages);
 					}
 					$.each(data['widgets'], function(index, data_widget) {
 						// remove original values (new ones were just saved)
@@ -642,7 +642,7 @@
 				}
 			},
 			error: function() {
-				// TODO VM: Do we need to display some kind of error message here?
+				// TODO VM: (?) Do we need to display some kind of error message here?
 			}
 		});
 	}
@@ -683,7 +683,7 @@
 
 				$this.append($placeholder.hide());
 
-				// TODO VM: it is good to have warning, but it looks kinda bad and we have no controll over it.
+				// TODO VM: (?) it is good to have warning, but it looks kinda bad and we have no controll over it.
 				$(window).bind('beforeunload', function() {
 					var res = confirmExit($this, data);
 					// return value only if we need confirmation window, return nothing othervise
@@ -776,6 +776,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				dashboardRemoveMessages();
 				setModeEditDashboard($this, data);
 			});
 		},
@@ -796,6 +797,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				dashboardRemoveMessages();
 				setModeViewDashboard($this, data);
 			});
 		},
@@ -871,7 +873,7 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					error: function() {
-						// TODO VM: do we need to have error message on failed dialogue form update?
+						// TODO VM: (?) do we need to have error message on failed dialogue form update?
 					}
 				});
 			});

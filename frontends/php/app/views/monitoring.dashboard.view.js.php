@@ -29,7 +29,7 @@
 
 			var btn_cancel = $('<a>')
 				.attr('id','dashbrd-cancel')
-				.attr('href', '#') // TODO VM: needed for style, but adds # at URL, when clicked. Probably better to create new class with same styles
+				.attr('href', '#') // TODO VM: (?) needed for style, but adds # at URL, when clicked. Probably better to create new class with same styles
 				.append('<?= _('Cancel') ?>')
 				.click(dashbrd_cancel);
 
@@ -66,10 +66,7 @@
 		var dashbrd_save_changes = function() {
 			// Update buttons on existing widgets to view mode
 			$('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
-
-			var form = $(this).closest('form');
-			$('.dashbrd-edit', form).remove();
-			$('#dashbrd-edit', form).closest('li').show();
+			// dashboardButtonsSetView() will be called in case of success of ajax in function 'saveDashboardChanges'
 		};
 
 		// Cancel editing dashboard
@@ -90,7 +87,24 @@
 		};
 	});
 
-	// Functionis in global scope, because it should be accessable by html onchange() attribute
+	// will be called by setModeViewDashboard() method in dashboard.grid.js
+	function dashboardButtonsSetView() {
+		var $form = jQuery('.article .header-title form');
+		jQuery('.dashbrd-edit', $form).remove();
+		jQuery('#dashbrd-edit', $form).closest('li').show();
+	}
+
+	function dashbaordAddMessages(messages) {
+		var $message_div = jQuery('<div>').attr('id','dashbrd-messages');
+		$message_div.append(messages);
+		jQuery('.article').prepend($message_div);
+	}
+
+	function dashboardRemoveMessages() {
+		jQuery('#dashbrd-messages').remove();
+	}
+
+	// Function is in global scope, because it should be accessable by html onchange() attribute
 	function updateWidgetConfigDialogue() {
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('updateWidgetConfigDialogue');
 	}

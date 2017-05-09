@@ -80,8 +80,8 @@ class CWidgetFieldItemId extends CWidgetField
 		return $errors;
 	}
 
-	// TODO VM: in screens it was done only when time typ eis HOST. This way that check is omited.
-	// (but logically it should work just as well)
+	// TODO VM: (?) in screens it was done only when time type is HOST. This way that check is omited.
+	// (but logically it should work same as well)
 	protected function calculateCaption() {
 		$caption = $this->caption;
 		if ($this->caption === '' && $this->value !== null && $this->value > 0) {
