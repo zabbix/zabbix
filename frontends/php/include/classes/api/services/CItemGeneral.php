@@ -397,20 +397,25 @@ abstract class CItemGeneral extends CApiService {
 
 			// jmx
 			if ($fullItem['type'] == ITEM_TYPE_JMX) {
-				if (!$update && array_key_exists('jmx_endpoint', $item) == false) {
-					$item['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-				}
-				else {
+				if (array_key_exists('jmx_endpoint', $item)) {
 					$item['jmx_endpoint'] = trim($item['jmx_endpoint']);
+					$fullItem['jmx_endpoint'] = $item['jmx_endpoint'];
 				}
-				$fullItem['jmx_endpoint'] = $item['jmx_endpoint'];
-				$jmx_rules = [
-					'jmx_endpoint' => 'not_empty|string'
-				];
-				$jmx_validator = new CNewValidator($fullItem, $jmx_rules);
-				if ($jmx_validator->isError()) {
-					$errors = $jmx_validator->getAllErrors();
-					self::exception(ZBX_API_ERROR_PARAMETERS, $errors[0]);
+				elseif (!$update) {
+					$item['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
+					$fullItem['jmx_endpoint'] = $item['jmx_endpoint'];
+				}
+
+				// Allow update item without jmx_endpoint value being set.
+				if (!$update || array_key_exists('jmx_endpoint', $item)) {
+					$jmx_rules = [
+						'jmx_endpoint' => 'not_empty|string'
+					];
+					$jmx_validator = new CNewValidator($fullItem, $jmx_rules);
+					if ($jmx_validator->isError()) {
+						$errors = $jmx_validator->getAllErrors();
+						self::exception(ZBX_API_ERROR_PARAMETERS, $errors[0]);
+					}
 				}
 			}
 
