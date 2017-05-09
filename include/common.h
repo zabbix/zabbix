@@ -689,7 +689,8 @@ zbx_user_t;
 /* user permissions */
 typedef enum
 {
-	USER_TYPE_ZABBIX_USER = 1,
+	USER_TYPE_UNDEFINED = 0,
+	USER_TYPE_ZABBIX_USER,
 	USER_TYPE_ZABBIX_ADMIN,
 	USER_TYPE_SUPER_ADMIN
 }

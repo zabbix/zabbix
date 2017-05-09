@@ -72,6 +72,7 @@ zbx_section_entry_t;
 typedef struct
 {
 	const char		*name;
+	zbx_user_type_t		access_level;
 	int			*res;
 	zbx_section_entry_t	entries[ZBX_MAX_SECTION_ENTRIES];
 }
@@ -334,44 +335,39 @@ static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_session_validate                                             *
+ * Function: zbx_session_access_level                                         *
  *                                                                            *
- * Purpose: validates active session by access level                          *
+ * Purpose: validate if session is active and get its access level            *
  *                                                                            *
- * Parameters:  sessionid    - [IN] the session id to validate                *
- *              access_level - [IN] the required access rights                *
+ * Parameters:  sessionid - [IN] the session id to validate                   *
  *                                                                            *
- * Return value:  SUCCEED - the session is active and user has the required   *
- *                          access rights.                                    *
- *                FAIL    - the session is not active or usr has not enough   *
- *                          access rights.                                    *
+ * Return value:  user access level if session is valid or                    *
+ *                USER_TYPE_UNDEFINED otherwise                               *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_session_validate(const char *sessionid, int access_level)
+static zbx_user_type_t	zbx_session_access_level(const char *sessionid)
 {
+	zbx_user_type_t	access_level;
 	char		*sessionid_esc;
-	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
 	result = DBselect(
-			"select null"
+			"select u.type"
 			" from users u,sessions s"
 			" where u.userid=s.userid"
 				" and s.status=%d"
-				" and s.sessionid='%s'"
-				" and u.type>=%d",
-			ZBX_SESSION_ACTIVE, sessionid_esc, access_level);
+				" and s.sessionid='%s'",
+			ZBX_SESSION_ACTIVE, sessionid_esc);
 
-	if (NULL != (row = DBfetch(result)))
-		ret = SUCCEED;
+	access_level = (NULL == (row = DBfetch(result)) ? USER_TYPE_UNDEFINED : atoi(row[0]));
 	DBfree_result(result);
 
 	zbx_free(sessionid_esc);
 
-	return ret;
+	return access_level;
 }
 
 /******************************************************************************
@@ -400,7 +396,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
-			FAIL == zbx_session_validate(sessionid, USER_TYPE_SUPER_ADMIN))
+			USER_TYPE_SUPER_ADMIN > zbx_session_access_level(sessionid))
 	{
 		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -606,7 +602,7 @@ zbx_user_stats_t	user_stats;
 int			template_stats_res, user_stats_res;
 
 const zbx_status_section_t	status_sections[] = {
-/*	{SECTION NAME,			SECTION RESULTS READYNESS,		*/
+/*	{SECTION NAME,			SECTION ACCESS LEVEL	SECTION RESULTS READYNESS,			*/
 /*		{								*/
 /*			{COUNTER VALUE,				COUNTER TYPE,		COUNTER VALUES BY PROXY	*/
 /*				{						*/
@@ -618,7 +614,7 @@ const zbx_status_section_t	status_sections[] = {
 /*		}								*/
 /*	},									*/
 /*	...									*/
-	{"template stats",		&template_stats_res,
+	{"template stats",		USER_TYPE_ZABBIX_USER,	&template_stats_res,
 		{
 			{&template_stats,			ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
@@ -628,7 +624,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"host stats",			NULL,
+	{"host stats",			USER_TYPE_ZABBIX_USER,	NULL,
 		{
 			{&host_stats.monitored,			ZBX_COUNTER_TYPE_UI64,	&hosts_monitored_by_proxy,
 				{
@@ -645,7 +641,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"item stats",			NULL,
+	{"item stats",			USER_TYPE_ZABBIX_USER,	NULL,
 		{
 			{&item_stats.active_normal,		ZBX_COUNTER_TYPE_UI64,	&items_active_normal_by_proxy,
 				{
@@ -670,7 +666,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"trigger stats",		NULL,
+	{"trigger stats",		USER_TYPE_ZABBIX_USER,	NULL,
 		{
 			{&trigger_stats.enabled_ok,		ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
@@ -695,7 +691,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"user stats",			&user_stats_res,
+	{"user stats",			USER_TYPE_ZABBIX_USER,	&user_stats_res,
 		{
 			{&user_stats.online,			ZBX_COUNTER_TYPE_UI64,	NULL,
 				{
@@ -712,7 +708,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"required performance",	NULL,
+	{"required performance",	USER_TYPE_SUPER_ADMIN,	NULL,
 		{
 			{&required_performance,			ZBX_COUNTER_TYPE_DBL,	&required_performance_by_proxy,
 				{
@@ -778,7 +774,7 @@ static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_e
 	zbx_free(tmp);
 }
 
-static void	status_stats_export(struct zbx_json *json)
+static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_level)
 {
 	const zbx_status_section_t	*section;
 	const zbx_section_entry_t	*entry;
@@ -803,6 +799,9 @@ static void	status_stats_export(struct zbx_json *json)
 	/* add status information to JSON */
 	for (section = status_sections; NULL != section->name; section++)
 	{
+		if (access_level < section->access_level)	/* skip sections user has no rights to access */
+			continue;
+
 		if (NULL != section->res && SUCCEED != *section->res)	/* skip section we have no information for */
 			continue;
 
@@ -849,6 +848,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 #define ZBX_GET_STATUS_FULL	1
 
 	const char		*__function_name = "recv_getstatus";
+	zbx_user_type_t		access_level;
 	int			ret = FAIL, request_type = ZBX_GET_STATUS_UNKNOWN;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
 	struct zbx_json		json;
@@ -856,7 +856,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
-		SUCCEED != zbx_session_validate(sessionid, USER_TYPE_ZABBIX_USER))
+			USER_TYPE_ZABBIX_USER > (access_level = zbx_session_access_level(sessionid)))
 	{
 		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -892,7 +892,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		case ZBX_GET_STATUS_FULL:
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
-			status_stats_export(&json);
+			status_stats_export(&json, access_level);
 			zbx_json_close(&json);
 			break;
 		default:
