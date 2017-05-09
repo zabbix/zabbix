@@ -8783,17 +8783,12 @@ static zbx_counter_value_t	*get_counter_by_proxyid(zbx_vector_ptr_t *vector, zbx
 void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_normal_by_proxy,
 		zbx_vector_ptr_t *active_notsupported_by_proxy, zbx_vector_ptr_t *disabled_by_proxy)
 {
-	static zbx_uint64_t	items_active_normal = 0, items_active_notsupported = 0, items_disabled = 0;
-	static time_t		last_counted = 0;
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
 
-	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
-		goto out;
-
-	items_active_normal = 0;
-	items_active_notsupported = 0;
-	items_disabled = 0;
+	item_stats->active_normal.ui64 = 0;
+	item_stats->active_notsupported.ui64 = 0;
+	item_stats->disabled.ui64 = 0;
 
 	LOCK_CACHE;
 
@@ -8808,7 +8803,7 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_nor
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 		{
-			items_disabled++;
+			item_stats->disabled.ui64++;
 
 			if (NULL != disabled_by_proxy)
 			{
@@ -8825,7 +8820,7 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_nor
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		items_active_normal++;
+		item_stats->active_normal.ui64++;
 
 		if (NULL != active_normal_by_proxy)
 		{
@@ -8835,7 +8830,7 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_nor
 
 		if (ITEM_STATE_NOTSUPPORTED == dc_item->state)
 		{
-			items_active_notsupported++;
+			item_stats->active_notsupported.ui64++;
 
 			if (NULL != active_notsupported_by_proxy)
 			{
@@ -8846,12 +8841,6 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_nor
 	}
 
 	UNLOCK_CACHE;
-
-	last_counted = time(NULL);
-out:
-	item_stats->active_normal.ui64 = items_active_normal;
-	item_stats->active_notsupported.ui64 = items_active_notsupported;
-	item_stats->disabled.ui64 = items_disabled;
 }
 
 /******************************************************************************
@@ -8863,8 +8852,6 @@ out:
  ******************************************************************************/
 void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats)
 {
-	static zbx_uint64_t	triggers_enabled_ok = 0, triggers_enabled_problem = 0, triggers_disabled = 0;
-	static time_t		last_counted = 0;
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		functionid;
 	const ZBX_DC_ITEM	*dc_item;
@@ -8873,12 +8860,9 @@ void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats)
 	const ZBX_DC_HOST	*dc_host;
 	const char		*p, *q;
 
-	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
-		goto out;
-
-	triggers_enabled_ok = 0;
-	triggers_enabled_problem = 0;
-	triggers_disabled = 0;
+	trigger_stats->enabled_ok.ui64 = 0;
+	trigger_stats->enabled_problem.ui64 = 0;
+	trigger_stats->disabled.ui64 = 0;
 
 	LOCK_CACHE;
 
@@ -8888,7 +8872,7 @@ void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats)
 	{
 		if (TRIGGER_STATUS_ENABLED != dc_trigger->status)
 		{
-			triggers_disabled++;
+			trigger_stats->disabled.ui64++;
 			continue;
 		}
 
@@ -8930,22 +8914,16 @@ void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats)
 		switch (dc_trigger->value)
 		{
 			case TRIGGER_VALUE_OK:
-				triggers_enabled_ok++;
+				trigger_stats->enabled_ok.ui64++;
 				break;
 			case TRIGGER_VALUE_PROBLEM:
-				triggers_enabled_problem++;
+				trigger_stats->enabled_problem.ui64++;
 				break;
 		}
 next:;
 	}
 
 	UNLOCK_CACHE;
-
-	last_counted = time(NULL);
-out:
-	trigger_stats->enabled_ok.ui64 = triggers_enabled_ok;
-	trigger_stats->enabled_problem.ui64 = triggers_enabled_problem;
-	trigger_stats->disabled.ui64 = triggers_disabled;
 }
 
 /******************************************************************************
@@ -8958,16 +8936,11 @@ out:
 void	DCget_host_stats(zbx_host_stats_t *host_stats, zbx_vector_ptr_t *monitored_by_proxy,
 		zbx_vector_ptr_t *not_monitored_by_proxy)
 {
-	static zbx_uint64_t	hosts_monitored = 0, hosts_not_monitored = 0;
-	static time_t		last_counted = 0;
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_HOST	*dc_host;
 
-	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
-		goto out;
-
-	hosts_monitored = 0;
-	hosts_not_monitored = 0;
+	host_stats->monitored.ui64 = 0;
+	host_stats->not_monitored.ui64 = 0;
 
 	LOCK_CACHE;
 
@@ -8978,7 +8951,7 @@ void	DCget_host_stats(zbx_host_stats_t *host_stats, zbx_vector_ptr_t *monitored_
 		switch (dc_host->status)
 		{
 			case HOST_STATUS_MONITORED:
-				hosts_monitored++;
+				host_stats->monitored.ui64++;
 				if (NULL != monitored_by_proxy)
 				{
 					get_counter_by_proxyid(monitored_by_proxy, dc_host->proxy_hostid,
@@ -8986,7 +8959,7 @@ void	DCget_host_stats(zbx_host_stats_t *host_stats, zbx_vector_ptr_t *monitored_
 				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
-				hosts_not_monitored++;
+				host_stats->not_monitored.ui64++;
 				if (NULL != not_monitored_by_proxy)
 				{
 					get_counter_by_proxyid(not_monitored_by_proxy, dc_host->proxy_hostid,
@@ -8997,11 +8970,6 @@ void	DCget_host_stats(zbx_host_stats_t *host_stats, zbx_vector_ptr_t *monitored_
 	}
 
 	UNLOCK_CACHE;
-
-	last_counted = time(NULL);
-out:
-	host_stats->monitored.ui64 = hosts_monitored;
-	host_stats->not_monitored.ui64 = hosts_not_monitored;
 }
 
 /******************************************************************************
