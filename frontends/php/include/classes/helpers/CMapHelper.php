@@ -22,29 +22,41 @@
 class CMapHelper {
 
 	/**
-	 * Get map data with resolved element / link states
+	 * Get map data with resolved element / link states.
 	 *
-	 * @param array $ids				map ids
-	 * @param int   $min_severity		minimum severity
+	 * @param array $sysmapids				Map IDs.
+	 * @param int   $min_severity			Minimum severity.
 	 *
 	 * @return array
 	 */
-	public static function get($ids, $min_severity = null) {
+	public static function get($sysmapids, $min_severity = null) {
 		$maps = API::Map()->get([
-			'sysmapids' => $ids,
-			'output' => API_OUTPUT_EXTEND,
-			'selectShapes' => API_OUTPUT_EXTEND,
-			'selectSelements' => API_OUTPUT_EXTEND,
-			'selectLinks' => API_OUTPUT_EXTEND,
+			'output' => ['sysmapid', 'name', 'width', 'height', 'backgroundid', 'label_type', 'label_location',
+				'highlight', 'expandproblem', 'markelements', 'show_unack', 'label_format', 'label_type_host',
+				'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
+				'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image', 'iconmapid',
+				'severity_min'
+			],
+			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
+				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
+				'background_color', 'zindex'
+			],
+			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
+				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
+				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
+			],
+			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'],
+			'selectUrls' => ['sysmapurlid', 'name', 'url'],
+			'sysmapids' => $sysmapids,
 			'expandUrls' => true,
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 		$map = reset($maps);
 
-		$theme = self::getGraphTheme();
+		$theme = getUserGraphTheme();
 
-		if (empty($map)) {
+		if (!$map) {
 			$map = [
 				'sysmapid' => -1,
 				'width' => 320,
@@ -53,19 +65,17 @@ class CMapHelper {
 				'severity_min' => 0,
 				'selements' => [],
 				'links' => [],
-				'shapes' => [
-					[
-						'type' => 0,
-						'x' => 0,
-						'y' => 0,
-						'width' => 320,
-						'height' => 150,
-						'font' => 9,
-						'font_size' => 11,
-						'font_color' => 'D00000',
-						'text' => _('No permissions to referred object or it does not exist!')
-					]
-				]
+				'shapes' => [[
+					'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
+					'x' => 0,
+					'y' => 0,
+					'width' => 320,
+					'height' => 150,
+					'font' => 9,
+					'font_size' => 11,
+					'font_color' => 'FF0000',
+					'text' => _('No permissions to referred object or it does not exist!')
+				]]
 			];
 		}
 		else {
@@ -83,7 +93,7 @@ class CMapHelper {
 				'width' => $map['width'],
 				'height' => $map['height'],
 			],
-			'refresh' => "map.php?sysmapid={$map['sysmapid']}&severity_min={$map['severity_min']}",
+			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'],
 			'background' => $map['backgroundid'],
 			'shapes' => array_values($map['shapes']),
 			'elements' => array_values($map['selements']),
@@ -95,77 +105,45 @@ class CMapHelper {
 	}
 
 	/**
-	 * Get graphic theme for map elements based on user configuration
+	 * Resolve map element (selements and links) state.
 	 *
-	 * @return array
-	 */
-	public static function getGraphTheme() {
-		$themes = DB::find('graph_theme', [
-			'theme' => getUserTheme(CWebUser::$data)
-		]);
-
-		if ($themes) {
-			return $themes[0];
-		}
-
-		return [
-			'theme' => 'blue-theme',
-			'textcolor' => '1F2C33',
-			'highlightcolor' => 'E33734',
-			'backgroundcolor' => 'FFFFFF',
-			'graphcolor' => 'FFFFFF',
-			'gridcolor' => 'CCD5D9',
-			'maingridcolor' => 'ACBBC2',
-			'gridbordercolor' => 'ACBBC2',
-			'nonworktimecolor' => 'EBEBEB',
-			'leftpercentilecolor' => '429E47',
-			'righttpercentilecolor' => 'E33734'
-		];
-	}
-
-	/**
-	 * Resolve map element (selements and links) state
-	 * TODO: corrent solution relies heavily on existing functions from maps.inc.php.
-	 *		 refactoring is required for those functions to improve performance and to simplify the solution
-	 *
-	 * @param array $sysmap				map data
-	 * @param int   $min_severity		minimum severity
-	 * @param int   $theme				theme used to create missing elements (like hostgroup frame)
-	 *
-	 * @return array
+	 * @param array $sysmap				Map data.
+	 * @param int   $min_severity		Minimum severity.
+	 * @param int   $theme				Theme used to create missing elements (like hostgroup frame).
 	 */
 	protected static function resolveMapState(&$sysmap, $min_severity, $theme) {
 		$severity = ['severity_min' => $min_severity];
 		$areas = populateFromMapAreas($sysmap, $theme);
-		$map_Info = getSelementsInfo($sysmap, $severity);
-		processAreasCoordinates($sysmap, $areas, $map_Info);
-
+		$map_info = getSelementsInfo($sysmap, $severity);
+		processAreasCoordinates($sysmap, $areas, $map_info);
 		add_elementNames($sysmap['selements']);
+
 		foreach ($sysmap['selements'] as $id => $element) {
-			$map_Info[$id]['name'] = ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
+			$map_info[$id]['name'] = ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
 				? _('Image')
 				: $element['elements'][0]['elementName'];
 		}
 
-		$labels = getMapLabels($sysmap, $map_Info, true);
-		$highlights = getMapHighligts($sysmap, $map_Info);
+		$labels = getMapLabels($sysmap, $map_info, true);
+		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $severity);
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			$icon = null;
-			if (array_key_exists($id, $map_Info) && array_key_exists('iconid', $map_Info[$id])) {
-				$icon = $map_Info[$id]['iconid'];
+
+			if (array_key_exists($id, $map_info) && array_key_exists('iconid', $map_info[$id])) {
+				$icon = $map_info[$id]['iconid'];
 			}
 
-			unset($element['width']);
-			unset($element['height']);
+			unset($element['width'], $element['height']);
 
 			$element['icon'] = $icon;
 			$element['label'] = $labels[$id];
 			$element['highlight'] = $highlights[$id];
 			$element['actions'] = $actions[$id];
+
 			if ($sysmap['markelements']) {
-				$element['latelyChanged'] = $map_Info[$id]['latelyChanged'];
+				$element['latelyChanged'] = $map_info[$id]['latelyChanged'];
 			}
 		}
 		unset($element);
@@ -189,8 +167,8 @@ class CMapHelper {
 			$linktriggers = $link['linktriggers'];
 			order_result($linktriggers, 'triggerid');
 			$max_severity = 0;
-
 			$triggers = [];
+
 			foreach ($linktriggers as $link_trigger) {
 				if ($link_trigger['triggerid'] == 0) {
 					continue;
@@ -199,13 +177,12 @@ class CMapHelper {
 				$id = $link_trigger['linktriggerid'];
 
 				$triggers[$id] = zbx_array_merge($link_trigger, get_trigger_by_triggerid($link_trigger['triggerid']));
-				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED &&
-						$triggers[$id]['value'] == TRIGGER_VALUE_TRUE) {
-					if ($triggers[$id]['priority'] >= $max_severity) {
-						$drawtype = $triggers[$id]['drawtype'];
-						$color = $triggers[$id]['color'];
-						$max_severity = $triggers[$id]['priority'];
-					}
+
+				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
+						&& $triggers[$id]['priority'] >= $max_severity) {
+					$drawtype = $triggers[$id]['drawtype'];
+					$color = $triggers[$id]['color'];
+					$max_severity = $triggers[$id]['priority'];
 				}
 			}
 
