@@ -728,11 +728,12 @@ const zbx_status_section_t	status_sections[] = {
 static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_entry_t *entry)
 {
 	const zbx_entry_attribute_t	*attribute;
-	const zbx_counter_value_t	*counter_value;
+	const zbx_counter_value_t	*counter_value = entry->counter_value;
+	zbx_uint64_t			proxyid = 0;
 	char				*tmp = NULL;
-	int				i = 0;
+	int				i;
 
-	do
+	for (i = 0; ; i++)
 	{
 		zbx_json_addobject(json, NULL);
 
@@ -741,24 +742,13 @@ static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_e
 			zbx_json_addobject(json, "attributes");
 
 			if (NULL != entry->counters_by_proxy)
-			{
-				zbx_json_adduint64(json, "proxyid", (NULL == entry->counters_by_proxy->values ? 0 :
-						((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid));
-			}
+				zbx_json_adduint64(json, "proxyid", proxyid);
 
 			for (attribute = entry->attributes; NULL != attribute->name; attribute++)
 				zbx_json_adduint64(json, attribute->name, attribute->value);
 
 			zbx_json_close(json);
 		}
-
-		if (NULL != entry->counters_by_proxy && NULL != entry->counters_by_proxy->values &&
-				0 != ((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid)
-		{
-			counter_value = &((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->counter_value;
-		}
-		else
-			counter_value = entry->counter_value;
 
 		switch (entry->counter_type)
 		{
@@ -774,8 +764,16 @@ static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_e
 		}
 
 		zbx_json_close(json);
+
+		if (NULL == entry->counters_by_proxy || NULL == entry->counters_by_proxy->values)
+			break;
+
+		if (i >= entry->counters_by_proxy->values_num)
+			break;
+
+		counter_value = &((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->counter_value;
+		proxyid = ((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid;
 	}
-	while (NULL != entry->counters_by_proxy && ++i < entry->counters_by_proxy->values_num);
 
 	zbx_free(tmp);
 }
