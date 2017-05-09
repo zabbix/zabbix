@@ -2099,6 +2099,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype)
 			return "Failure Audit";
 		case ITEM_LOGTYPE_SUCCESS_AUDIT:
 			return "Success Audit";
+		case ITEM_LOGTYPE_CRITICAL:
+			return "Critical";
+		case ITEM_LOGTYPE_VERBOSE:
+			return "Verbose";
 		default:
 			return "unknown";
 	}

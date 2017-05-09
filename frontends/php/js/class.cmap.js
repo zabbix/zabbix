@@ -246,6 +246,8 @@ ZABBIX.apps.map = (function($) {
 		};
 
 		CMap.prototype = {
+			copypaste_buffer: [],
+
 			save: function() {
 				var url = new Curl(location.href);
 
@@ -506,40 +508,58 @@ ZABBIX.apps.map = (function($) {
 					}], event.ctrlKey || event.metaKey);
 				});
 
-				$(this.container).on('contextmenu', '.sysmap_shape', function(event) {
+				$(this.container).on('contextmenu', function(event) {
+					var target = $(event.target),
+						item_data = {
+							id: target.attr('data-id'),
+							type: target.attr('data-type'),
+							popupid: target.data('menu-popup-id')
+						},
+						item = item_data.id,
+						can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0),
+						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
+						can_remove = (item_data.type === 'shapes'),
+						can_reorder = (item_data.type === 'shapes');
+
 					event.preventDefault();
-					var item = $(this).data('id');
-					$(this).menuPopup([
+					event.stopPropagation();
+
+					// Recreate menu everytime due copy/paste function availability changes.
+					if (item_data.popupid) {
+						$('#' + item_data.popupid).filter('.action-menu').remove();
+					}
+
+					var items = [
 						{
 							'items': [
 								{
 									label: locale['S_BRING_TO_FRONT'],
-									clickCallback: function()
-									{
+									disabled: !can_reorder,
+									clickCallback: function() {
 										that.reorderShapes(item, 'last');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_BRING_FORWARD'],
-									clickCallback: function()
-									{
+									disabled: !can_reorder,
+									clickCallback: function() {
 										that.reorderShapes(item, 'next');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_SEND_BACKWARD'],
-									clickCallback: function()
-									{
+									disabled: !can_reorder,
+									clickCallback: function() {
 										that.reorderShapes(item, 'previous');
 										that.hideContextMenus();
 									}
 								},
 								{
 									label: locale['S_SEND_TO_BACK'],
-									clickCallback: function()
-									{
+									disabled: !can_reorder,
+									clickCallback: function() {
 										that.reorderShapes(item, 'first');
 										that.hideContextMenus();
 									}
@@ -549,9 +569,61 @@ ZABBIX.apps.map = (function($) {
 						{
 							'items': [
 								{
+									label: locale['S_COPY'],
+									disabled: !can_copy,
+									clickCallback: function() {
+										that.copypaste_buffer = that.getSelectionBuffer(that);
+										that.hideContextMenus();
+									}
+								},
+								{
+									label: locale['S_PASTE'],
+									disabled: !can_paste,
+									clickCallback: function() {
+										var offset = $(that.container).offset(),
+											delta_x = event.pageX - offset.left - that.copypaste_buffer.left,
+											delta_y = event.pageY - offset.top - that.copypaste_buffer.top,
+											selectedids;
+
+										delta_x = Math.min(delta_x,
+											parseInt(that.data.width, 10) - that.copypaste_buffer.right
+										);
+										delta_y = Math.min(delta_y,
+											parseInt(that.data.height, 10) - that.copypaste_buffer.bottom
+										);
+										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, true);
+										that.selectElements(selectedids, false);
+										that.hideContextMenus();
+										that.updateImage();
+										that.linkForm.updateList(that.selection.selements);
+									}
+								},
+								{
+									label: locale['S_PASTE_SIMPLE'],
+									disabled: !can_paste,
+									clickCallback: function() {
+										var offset = $(that.container).offset(),
+											delta_x = event.pageX - offset.left - that.copypaste_buffer.left,
+											delta_y = event.pageY - offset.top - that.copypaste_buffer.top,
+											selectedids;
+
+										delta_x = Math.min(delta_x,
+											parseInt(that.data.width, 10) - that.copypaste_buffer.right
+										);
+										delta_y = Math.min(delta_y,
+											parseInt(that.data.height, 10) - that.copypaste_buffer.bottom
+										);
+										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, false);
+										that.selectElements(selectedids, false);
+										that.hideContextMenus();
+										that.updateImage();
+										that.linkForm.updateList(that.selection.selements);
+									}
+								},
+								{
 									label: locale['S_REMOVE'],
-									clickCallback: function()
-									{
+									disabled: !can_remove,
+									clickCallback: function() {
 										that.shapes[item].remove();
 										that.hideContextMenus();
 										that.toggleForm();
@@ -560,7 +632,9 @@ ZABBIX.apps.map = (function($) {
 								}
 							]
 						}
-					], event);
+					];
+
+					$(event.target).menuPopup(items, event);
 				});
 
 				/*
@@ -754,6 +828,164 @@ ZABBIX.apps.map = (function($) {
 					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));
 					$('#mass_border_color').prop("disabled", disable || !$('#chkboxBorderColor').is(":checked"));
 				});
+			},
+
+			/**
+			 * Paste that.copypaste_buffer content at new location.
+			 *
+			 * @param	{number}	delta_x					Shift between desired and actual x position.
+			 * @param	{number}	delta_y					Shift between desired and actual y position.
+			 * @param	{object}	that					CMap object
+			 * @param	{bool}		keep_external_links		Should be links to non selected elements copied or not.
+			 *
+			 * @return	{array}
+			 */
+			pasteSelectionBuffer: function(delta_x, delta_y, that, keep_external_links) {
+				var selectedids = [],
+					source_cloneids = {};
+
+				that.copypaste_buffer.items.forEach(function(element_data) {
+					var data = $.extend({}, element_data.data, false),
+						type = element_data.type,
+						element;
+
+					switch (type) {
+						case 'selements':
+							element = new Selement(that);
+							delete data.selementid;
+							break;
+
+						case 'shapes':
+							element = new Shape(that);
+							delete data.shapeid;
+							break;
+
+						default:
+							throw 'Unsupported element type found in copy buffer!';
+							break;
+					}
+
+					if (element) {
+						data.x = parseInt(data.x, 10) + delta_x;
+						data.y = parseInt(data.y, 10) + delta_y;
+						element.update(data);
+						that[type][element.id] = element;
+						selectedids.push({
+							id: element.id,
+							type: type
+						});
+						source_cloneids[element_data.id] = element.id;
+
+						if (that.data.grid_align === '1') {
+							element.align(true);
+						}
+					}
+				});
+
+				var link,
+					fromid,
+					toid,
+					data;
+
+				that.copypaste_buffer.links.forEach(function(link_data) {
+					data = $.extend({}, link_data.data, false);
+
+					if (!keep_external_links && (data.selementid1 in source_cloneids === false
+							|| data.selementid2 in source_cloneids === false)) {
+						return;
+					}
+
+					link = new Link(that);
+					delete data.linkid;
+					fromid = (data.selementid1 in source_cloneids)
+						? source_cloneids[data.selementid1]
+						: data.selementid1;
+					toid = (data.selementid2 in source_cloneids) ? source_cloneids[data.selementid2] : data.selementid2;
+					data.selementid1 = fromid;
+					data.selementid2 = toid;
+					link.update(data);
+					that.links[link.id] = link;
+				});
+
+				return selectedids;
+			},
+
+			/**
+			 * Return object with selected elements data and links.
+			 *
+			 * @param  {object}	that		CMap object
+			 *
+			 * @return {object}
+			 */
+			getSelectionBuffer: function(that) {
+				var items = [],
+					left = null,
+					top = null,
+					right = null,
+					bottom = null;
+
+				for (var type in that.selection) {
+					if (type in that === false || typeof that[type] !== 'object') {
+						continue;
+					}
+
+					var data,
+						dom_node,
+						x,
+						y;
+
+					for (var id in that.selection[type]) {
+						if ('getData' in that[type][id] === false) {
+							continue;
+						}
+
+						// Get current data without observers.
+						data = $.extend({}, that[type][id].getData(), false);
+						dom_node = that[type][id].domNode;
+						x = parseInt(data.x, 10);
+						y = parseInt(data.y, 10);
+						left = Math.min(x, (left === null) ? x : left);
+						top = Math.min(y, (top === null) ? y : top);
+						right = Math.max(x + dom_node.outerWidth(true), (right === null) ? 0 : right);
+						bottom = Math.max(y + dom_node.outerHeight(true), (bottom === null) ? 0 : bottom);
+						items.push({
+							id: id,
+							type: type,
+							data: data
+						});
+					}
+				}
+
+				// Sort items array according to item.data.zindex value.
+				items = items.sort(function(a, b) {
+					var aindex = parseInt(a.data.zindex, 10) || 0,
+						bindex = parseInt(b.data.zindex, 10) || 0;
+
+					return aindex - bindex;
+				});
+
+				var links = [];
+
+				for (var id in that.links) {
+					// Get current data without observers.
+					var data = $.extend({}, that.links[id].getData(), false);
+
+					if (data.selementid1 in that.selection.selements || data.selementid2 in that.selection.selements) {
+						links.push({
+							id: id,
+							data: data
+						})
+					}
+				}
+
+				return {
+					items: items,
+					links: links,
+					top: top,
+					left: left,
+					right: right,
+					bottom: bottom
+				}
 			},
 
 			clearSelection: function() {
@@ -2717,8 +2949,8 @@ ZABBIX.apps.map = (function($) {
 						}
 
 						list.push({
-							fromElementName: this.sysmap.selements[link.selementid1].data.elementName,
-							toElementName: this.sysmap.selements[link.selementid2].data.elementName,
+							fromElementName: this.sysmap.selements[link.selementid1].data.elements.elementName || '',
+							toElementName: this.sysmap.selements[link.selementid2].data.elements.elementName || '',
 							linkid: link.linkid,
 							linktriggers: linktriggers
 						});

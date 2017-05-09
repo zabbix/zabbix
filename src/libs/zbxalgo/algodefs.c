@@ -239,6 +239,18 @@ zbx_hash_t	zbx_default_string_hash_func(const void *data)
 	return ZBX_DEFAULT_STRING_HASH_ALGO(data, strlen((const char *)data), ZBX_DEFAULT_HASH_SEED);
 }
 
+zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data)
+{
+	const zbx_uint64_pair_t	*pair = (const zbx_uint64_pair_t *)data;
+
+	zbx_hash_t		hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&pair->first);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pair->second, sizeof(pair->second), hash);
+
+	return hash;
+}
+
 /* default comparison functions */
 
 int	zbx_default_int_compare_func(const void *d1, const void *d2)
@@ -280,6 +292,17 @@ int	zbx_default_ptr_compare_func(const void *d1, const void *d2)
 	const void	*p2 = *(const void **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1, p2);
+
+	return 0;
+}
+
+int	zbx_default_uint64_pair_compare_func(const void *d1, const void *d2)
+{
+	const zbx_uint64_pair_t	*p1 = (const zbx_uint64_pair_t *)d1;
+	const zbx_uint64_pair_t	*p2 = (const zbx_uint64_pair_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->first, p2->first);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->second, p2->second);
 
 	return 0;
 }

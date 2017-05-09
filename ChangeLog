@@ -1,6 +1,9 @@
 Changes for 3.4.0alpha1
 
 New features:
+..F....... [ZBXNEXT-51] ability to clone selected elements in map editor via context menu (gcalenko)
+..F....... [ZBXNEXT-3567] hide SQL error messages for regular user (gcalenko)
+.......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)
 A.FG...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite3 support for frontend and server (abs)
@@ -52,6 +55,35 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
+Changes for 3.2.7rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-12012] fixed resolving of Critical and Verbose event log levels by {ITEM.LOG.SEVERITY} macro (Sasha)
+A......... [ZBX-12093] fixed removing of applications that are created from application prototypes (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.6
+
+New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), Korean, Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.6rc1
+
+Bug fixes:
+A.F....... [ZBX-10253] fixed translation string and validation of TLS settings in host.create(), host.update() and host.massUpdate() methods; added variables to hosts array required by CHost::validateUpdate() method (miks)
+........S. [ZBX-12121] fixed problem generation by timer process (gleb)
+..F....... [ZBX-11536] fixed missing operator in event correlation form (miks)
+..F....... [ZBX-11309] fixed collision of cookies name responsible for storing selected checkboxes (miks)
+..F....... [ZBX-11981] fixed undefined index 'ns' in options output array (miks)
+..F....... [ZBX-12116] fixed pagination in Maintenance page (Sasha)
+A......... [ZBX-12108] fixed limit option in event.get method (Sasha)
+........S. [ZBX-12100] fixed new line handling in SSH agent with numeric type of information (vso)
+..F....... [ZBX-9958] fixed wrongly displayed list view after mass update failure (miks)
+
+--------------------------------------------------------------------------------
 Changes for 3.2.5
 
 3.2.5rc1 was released as 3.2.5 without any changes
@@ -83,7 +115,7 @@ A......... [ZBX-11893] fixed permission issue, when importing hosts that are mon
 ..F....... [ZBX-11907] fixed undefined index in event details page (miks)
 ........S. [ZBX-11931] fixed trigger lastchange update (wiper)
 .......PS. [ZBX-11864] fixed formatting of URLs if an IPv6 is used in simple HTTPS checks (abs)
-........S. [ZBX-11738] fixed performing actions for problemas that have started and resolved while another problems escalation is executed (vikotrs)
+........S. [ZBX-11738] fixed performing actions for problems that have started and resolved while another problem escalation is executed (viktors)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
 ........S. [ZBX-11829] fixed generation of problems in multiple event mode (Sergejs, abs)
 ..F....... [ZBX-11624] fixed undefined index error for regular expressions form (vmurzins)
@@ -425,6 +457,20 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.10rc1
+
+New features:
+A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Korean, Romanian, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
+.......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
+
+Bug fixes:
+........S. [ZBX-12012] fixed resolving of Critical and Verbose event log levels by {ITEM.LOG.SEVERITY} macro (Sasha)
+A......... [ZBX-12093] fixed removing of applications that are created from application prototypes (Sasha)
+A.F....... [ZBX-10253] fixed translation string and validation of TLS settings in host.create(), host.update() and host.massUpdate() methods; added variables to hosts array required by CHost::validateUpdate() method (miks)
+........S. [ZBX-12100] fixed new line handling in SSH agent with numeric type of information (vso)
+..F....... [ZBX-9958] fixed wrongly displayed list view after mass update failure (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.9
@@ -2086,6 +2132,15 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.19rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-12012] fixed resolving of Critical and Verbose event log levels by {ITEM.LOG.SEVERITY} macro (Sasha)
+..F....... [ZBX-11888] fixed chart name urlencoding for web scenario reports; thanks to Kotaro Miyashita for patch (miks)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.18
 
 2.2.18rc1 was released as 2.2.18 without any changes
@@ -3633,6 +3688,13 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.22rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 2.0.21
