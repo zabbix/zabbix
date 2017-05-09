@@ -519,7 +519,6 @@ ZABBIX.apps.map = (function($) {
 							type: target.attr('data-type'),
 							popupid: target.data('menu-popup-id')
 						},
-						item = item_data.id,
 						can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0),
 						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
 						can_remove = (that.selection.count.shapes > 0 || that.selection.count.selements > 0),

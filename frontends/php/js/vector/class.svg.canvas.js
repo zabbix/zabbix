@@ -104,9 +104,9 @@ SVGCanvas.prototype.createElement = function (type, attributes, parent, content)
 /**
  * Parse text line and extract links as <a> elements.
  *
- * @param {string}		text			Text line to be parsed.
+ * @param {string} text		Text line to be parsed.
  *
- * @return {mixed} Parsed text as {array} if links are present or as {string} if there are no links in text.
+ * @return {mixed}			Parsed text as {array} if links are present or as {string} if there are no links in text.
  */
 SVGCanvas.prototype.parseLinks = function (text) {
 	var index,
@@ -713,8 +713,9 @@ SVGElement.prototype.replace = function (target) {
  * @return {object} DOM element.
  */
 SVGElement.prototype.create = function () {
-	var element = this.type !== '' ? document.createElementNS('http://www.w3.org/2000/svg', this.type) :
-			document.createTextNode(this.content);
+	var element = (this.type !== '')
+			? document.createElementNS('http://www.w3.org/2000/svg', this.type)
+			: document.createTextNode(this.content);
 
 	this.remove();
 	this.element = element;
