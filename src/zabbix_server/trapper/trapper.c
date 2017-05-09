@@ -603,17 +603,17 @@ int			template_stats_res, user_stats_res;
 
 const zbx_status_section_t	status_sections[] = {
 /*	{SECTION NAME,			SECTION ACCESS LEVEL	SECTION RESULTS READYNESS,			*/
-/*		{								*/
+/*		{												*/
 /*			{COUNTER VALUE,				COUNTER TYPE,		COUNTER VALUES BY PROXY	*/
-/*				{						*/
-/*					{ATTR. NAME,	ATTRIBUTE VALUE},	*/
-/*					... (up to ZBX_MAX_ENTRY_ATTRIBUTES)	*/
-/*				}						*/
-/*			},							*/
-/*			... (up to ZBX_MAX_SECTION_ENTRIES)			*/
-/*		}								*/
-/*	},									*/
-/*	...									*/
+/*				{										*/
+/*					{ATTR. NAME,	ATTRIBUTE VALUE},					*/
+/*					... (up to ZBX_MAX_ENTRY_ATTRIBUTES)					*/
+/*				}										*/
+/*			},											*/
+/*			... (up to ZBX_MAX_SECTION_ENTRIES)							*/
+/*		}												*/
+/*	},													*/
+/*	...													*/
 	{"template stats",		USER_TYPE_ZABBIX_USER,	&template_stats_res,
 		{
 			{&template_stats,			ZBX_COUNTER_TYPE_UI64,	NULL,
