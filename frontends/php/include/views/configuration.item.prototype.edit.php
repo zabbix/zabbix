@@ -175,7 +175,7 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
 $itemFormList->addRow(_('JMX endpoint'),
-	(new CTextBox('jmx_endpoint', $this->data['jmx_endpoint'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_jmx_endpoint'
 );
 $itemFormList->addRow(_('User name'),
