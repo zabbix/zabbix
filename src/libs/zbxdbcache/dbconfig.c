@@ -8795,15 +8795,6 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_nor
 	items_active_notsupported = 0;
 	items_disabled = 0;
 
-	if (NULL != active_normal_by_proxy)
-		get_counter_by_proxyid(active_normal_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
-
-	if (NULL != active_notsupported_by_proxy)
-		get_counter_by_proxyid(active_notsupported_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
-
-	if (NULL != disabled_by_proxy)
-		get_counter_by_proxyid(disabled_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
-
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
@@ -8978,12 +8969,6 @@ void	DCget_host_stats(zbx_host_stats_t *host_stats, zbx_vector_ptr_t *monitored_
 	hosts_monitored = 0;
 	hosts_not_monitored = 0;
 
-	if (NULL != monitored_by_proxy)
-		get_counter_by_proxyid(monitored_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
-
-	if (NULL != not_monitored_by_proxy)
-		get_counter_by_proxyid(not_monitored_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
-
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
@@ -9033,9 +9018,6 @@ double	DCget_required_performance(zbx_vector_ptr_t *nvps_by_proxy)
 	double			nvps = 0;
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
-
-	if (NULL != nvps_by_proxy)
-		get_counter_by_proxyid(nvps_by_proxy, 0, ZBX_COUNTER_TYPE_UI64);
 
 	LOCK_CACHE;
 

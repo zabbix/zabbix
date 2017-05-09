@@ -742,8 +742,8 @@ static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_e
 
 			if (NULL != entry->counters_by_proxy)
 			{
-				zbx_json_adduint64(json, "proxyid",
-						((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid);
+				zbx_json_adduint64(json, "proxyid", (NULL == entry->counters_by_proxy->values ? 0 :
+						((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid));
 			}
 
 			for (attribute = entry->attributes; NULL != attribute->name; attribute++)
@@ -752,7 +752,7 @@ static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_e
 			zbx_json_close(json);
 		}
 
-		if (NULL != entry->counters_by_proxy &&
+		if (NULL != entry->counters_by_proxy && NULL != entry->counters_by_proxy->values &&
 				0 != ((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid)
 		{
 			counter_value = &((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->counter_value;
@@ -815,6 +815,13 @@ static void	status_stats_export(struct zbx_json *json)
 
 		zbx_json_close(json);
 	}
+
+	zbx_vector_ptr_clear_ext(&hosts_monitored_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&hosts_not_monitored_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_active_normal_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_active_notsupported_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_disabled_by_proxy, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&required_performance_by_proxy, zbx_default_mem_free_func);
 
 	zbx_vector_ptr_destroy(&hosts_monitored_by_proxy);
 	zbx_vector_ptr_destroy(&hosts_not_monitored_by_proxy);
