@@ -49,6 +49,7 @@ frontends/php/include/views/.configuration.host.edit.php.swp
 frontends/php/js/jsDump.js
 frontends/php/locale/POTFILES.in
 frontends/php/locale/bg/LC_MESSAGES/frontend.mo
+frontends/php/locale/ca/LC_MESSAGES/frontend.mo
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo
 frontends/php/locale/el/LC_MESSAGES/frontend.mo
@@ -151,6 +152,9 @@ src/libs/zbxdbupgrade/Makefile.in
 src/libs/zbxexec/.deps
 src/libs/zbxexec/Makefile
 src/libs/zbxexec/Makefile.in
+src/libs/zbxhttp/.deps
+src/libs/zbxhttp/Makefile
+src/libs/zbxhttp/Makefile.in
 src/libs/zbxicmpping/.deps
 src/libs/zbxicmpping/Makefile
 src/libs/zbxicmpping/Makefile.in

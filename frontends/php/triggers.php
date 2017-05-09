@@ -542,7 +542,7 @@ $config = select_config();
 /*
  * Display
  */
-if (hasRequest('action') && getRequest('action') === 'trigger.massupdateform' && hasRequest('g_triggerid')) {
+if ((getRequest('action') === 'trigger.massupdateform' || hasRequest('massupdate')) && hasRequest('g_triggerid')) {
 	$data = getTriggerMassupdateFormData();
 	$data['action'] = 'trigger.massupdate';
 	$triggersView = new CView('configuration.triggers.massupdate', $data);

@@ -248,185 +248,371 @@ class CHttpTest extends CApiService {
 	/**
 	 * Create web scenario.
 	 *
-	 * @param $httpTests
+	 * @param $httptests
 	 *
 	 * @return array
 	 */
-	public function create($httpTests) {
-		$httpTests = zbx_toArray($httpTests);
+	public function create($httptests) {
+		$httptests = $this->convertHttpPairs($httptests);
+		$this->validateCreate($httptests);
 
-		if (!$httpTests) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameters.'));
-		}
+		$httptests = Manager::HttpTest()->persist($httptests);
 
-		// Check and set default values, and find "hostid" by "applicationid".
-		foreach ($httpTests as &$httpTest) {
-			$defaultValues = [
-				'verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
-				'verify_host' => HTTPTEST_VERIFY_HOST_OFF
-			];
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCENARIO, $httptests);
 
-			check_db_fields($defaultValues, $httpTest);
-		}
-		unset($httpTest);
-
-		$this->validateCreate($httpTests);
-
-		$httpTests = Manager::HttpTest()->persist($httpTests);
-
-		return ['httptestids' => zbx_objectValues($httpTests, 'httptestid')];
+		return ['httptestids' => zbx_objectValues($httptests, 'httptestid')];
 	}
 
 	/**
-	 * Update web scenario.
+	 * @param array $httpTests
 	 *
-	 * @param $httpTests
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateCreate(array &$httptests) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
+			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
+			'applicationid' =>		['type' => API_ID],
+			'delay' =>				['type' => API_INT32, 'in' => '1:'.SEC_PER_DAY],
+			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
+			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
+			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
+			'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
+				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
+			]],
+			'headers' =>			['type' => API_OBJECTS, 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'name')],
+				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
+			]],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED])],
+			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM])],
+			'http_user' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_user')],
+			'http_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_password')],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_cert_file')],
+			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_file')],
+			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_password')],
+			'steps' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['name'], ['no']], 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'name')],
+				'no' =>					['type' => API_INT32, 'flags' => API_REQUIRED],
+				'url' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'url')],
+				'query_fields' =>		['type' => API_OBJECTS, 'fields' => [
+					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
+				]],
+				'posts' =>				['type' => API_HTTP_POST, 'length' => DB::getFieldLength('httpstep', 'posts'), 'name-length' => DB::getFieldLength('httpstep_field', 'name'), 'value-length' => DB::getFieldLength('httpstep_field', 'value')],
+				'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+					'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
+				]],
+				'headers' =>			['type' => API_OBJECTS, 'fields' => [
+					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
+				]],
+				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
+				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
+				'timeout' =>			['type' => API_INT32, 'in' => '0:65535'],
+				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
+				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
+			]]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $httptests, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$names_by_hostid = [];
+
+		foreach ($httptests as $httptest) {
+			$names_by_hostid[$httptest['hostid']][] = $httptest['name'];
+		}
+
+		$this->checkHostPermissions(array_keys($names_by_hostid));
+		$this->checkDuplicates($names_by_hostid);
+		$this->checkApplications($httptests, __FUNCTION__);
+		$this->validateAuthParameters($httptests, __FUNCTION__);
+		$this->validateSslParameters($httptests, __FUNCTION__);
+		$this->validateSteps($httptests, __FUNCTION__);
+	}
+
+	/**
+	 * @param $httptests
 	 *
 	 * @return array
 	 */
-	public function update($httpTests) {
-		$httpTests = zbx_toArray($httpTests);
+	public function update($httptests) {
+		$httptests = $this->convertHttpPairs($httptests);
+		$this->validateUpdate($httptests, $db_httptests);
 
-		if (!$httpTests) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameters.'));
+		Manager::HttpTest()->persist($httptests);
+
+		foreach ($db_httptests as &$db_httptest) {
+			unset($db_httptest['headers'], $db_httptest['variables'], $db_httptest['steps']);
+		}
+		unset($db_httptest);
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, $httptests, $db_httptests);
+
+		return ['httptestids' => zbx_objectValues($httptests, 'httptestid')];
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateUpdate(array &$httptests, array &$db_httptests = null) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['httptestid']], 'fields' => [
+			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
+			'applicationid' =>		['type' => API_ID],
+			'delay' =>				['type' => API_INT32, 'in' => '1:'.SEC_PER_DAY],
+			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
+			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
+			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
+			'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
+				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
+			]],
+			'headers' =>			['type' => API_OBJECTS, 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'name')],
+				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
+			]],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED])],
+			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM])],
+			'http_user' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_user')],
+			'http_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_password')],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_cert_file')],
+			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_file')],
+			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_password')],
+			'steps' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['httpstepid'], ['name'], ['no']], 'fields' => [
+				'httpstepid' =>			['type' => API_ID],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'name')],
+				'no' =>					['type' => API_INT32],
+				'url' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep', 'url')],
+				'query_fields' =>		['type' => API_OBJECTS, 'fields' => [
+					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
+				]],
+				'posts' =>				['type' => API_HTTP_POST, 'length' => DB::getFieldLength('httpstep', 'posts'), 'name-length' => DB::getFieldLength('httpstep_field', 'name'), 'value-length' => DB::getFieldLength('httpstep_field', 'value')],
+				'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+					'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
+				]],
+				'headers' =>			['type' => API_OBJECTS, 'fields' => [
+					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
+				]],
+				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
+				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
+				'timeout' =>			['type' => API_INT32, 'in' => '0:65535'],
+				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
+				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
+			]]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $httptests, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkObjectIds($httpTests, 'httptestid',
-			_('No "%1$s" given for web scenario.'),
-			_('Empty web scenario ID.'),
-			_('Incorrect web scenario ID.')
-		);
+		// permissions
+		$db_httptests = $this->get([
+			'output' => ['httptestid', 'hostid', 'name', 'applicationid', 'delay', 'retries', 'agent', 'http_proxy',
+				'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'templateid'
+			],
+			'httptestids' => zbx_objectValues($httptests, 'httptestid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		$httpTests = zbx_toHash($httpTests, 'httptestid');
+		foreach ($db_httptests as &$db_httptest) {
+			$db_httptest['headers'] = [];
+			$db_httptest['variables'] = [];
+			$db_httptest['steps'] = [];
+		}
+		unset($db_httptest);
 
-		$dbHttpTests = [];
-		$dbCursor = DBselect(
-			'SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name,'.
-				'ht.ssl_cert_file,ht.ssl_key_file,ht.ssl_key_password,ht.verify_peer,ht.verify_host'.
-			' FROM httptest ht'.
-			' WHERE '.dbConditionInt('ht.httptestid', array_keys($httpTests))
-		);
-		while ($dbHttpTest = DBfetch($dbCursor)) {
-			$dbHttpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+		$db_httpsteps = DB::select('httpstep', [
+			'output' => ['httpstepid', 'httptestid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
+				'status_codes', 'follow_redirects', 'retrieve_mode'
+			],
+			'filter' => ['httptestid' => array_keys($db_httptests)]
+		]);
+
+		foreach ($db_httpsteps as $db_httpstep) {
+			$db_httptests[$db_httpstep['httptestid']]['steps'][$db_httpstep['httpstepid']] = $db_httpstep;
 		}
 
-		$dbCursor = DBselect(
-			'SELECT hs.httpstepid,hs.httptestid,hs.name'.
-			' FROM httpstep hs'.
-			' WHERE '.dbConditionInt('hs.httptestid', array_keys($dbHttpTests))
-		);
-		while ($dbHttpStep = DBfetch($dbCursor)) {
-			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
+		$names_by_hostid = [];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists($httptest['httptestid'], $db_httptests)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			$db_httptest = $db_httptests[$httptest['httptestid']];
+
+			if (array_key_exists('name', $httptest)) {
+				if ($db_httptest['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot update a templated web scenario "%1$s": %2$s.', $httptest['name'],
+						_s('unexpected parameter "%1$s"', 'name')
+					));
+				}
+
+				if ($httptest['name'] !== $db_httptest['name']) {
+					$names_by_hostid[$db_httptest['hostid']][] = $httptest['name'];
+				}
+			}
 		}
 
-		$httpTests = $this->validateUpdate($httpTests, $dbHttpTests);
+		$httptests = $this->extendObjectsByKey($httptests, $db_httptests, 'httptestid', ['hostid', 'name']);
 
-		Manager::HttpTest()->persist($httpTests);
+		// uniqueness
+		foreach ($httptests as &$httptest) {
+			$db_httptest = $db_httptests[$httptest['httptestid']];
 
-		return ['httptestids' => array_keys($httpTests)];
+			if (array_key_exists('steps', $httptest)) {
+				// unexpected patameters for templated web scenario steps
+				if ($db_httptest['templateid'] != 0) {
+					foreach ($httptest['steps'] as $httpstep) {
+						foreach (['name', 'no'] as $field_name) {
+							if (array_key_exists($field_name, $httpstep)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Cannot update step for a templated web scenario "%1$s": %2$s.', $httptest['name'],
+									_s('unexpected parameter "%1$s"', $field_name)
+								));
+							}
+						}
+					}
+				}
+
+				$httptest['steps'] =
+					$this->extendObjectsByKey($httptest['steps'], $db_httptest['steps'], 'httpstepid', ['name']);
+			}
+		}
+		unset($httptest);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']], 'fields' => [
+			'steps' =>	['type' => API_OBJECTS, 'uniq' => [['name']]]
+		]];
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $httptests, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		// validation
+		if ($names_by_hostid) {
+			$this->checkDuplicates($names_by_hostid);
+		}
+		$this->checkApplications($httptests, __FUNCTION__, $db_httptests);
+		$this->validateAuthParameters($httptests, __FUNCTION__, $db_httptests);
+		$this->validateSslParameters($httptests, __FUNCTION__, $db_httptests);
+		$this->validateSteps($httptests, __FUNCTION__, $db_httptests);
+
+		return $httptests;
 	}
 
 	/**
 	 * Delete web scenario.
 	 *
-	 * @param array $httpTestIds
+	 * @param array $httptestids
 	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $httpTestIds, $nopermissions = false) {
-		if (empty($httpTestIds)) {
-			return true;
+	public function delete(array $httptestids, $nopermissions = false) {
+		// TODO: remove $nopermissions hack
+
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $httptestids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$delHttpTests = $this->get([
-			'httptestids' => $httpTestIds,
-			'output' => API_OUTPUT_EXTEND,
+		$db_httptests = $this->get([
+			'output' => ['httptestid', 'name', 'templateid'],
+			'httptestids' => $httptestids,
 			'editable' => true,
-			'selectHosts' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		]);
+
 		if (!$nopermissions) {
-			foreach ($httpTestIds as $httpTestId) {
-				if (!empty($delHttpTests[$httpTestId]['templateid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated web scenario "%1$s".', $delHttpTests[$httpTestId]['name']));
+			foreach ($httptestids as $httptestid) {
+				if (!array_key_exists($httptestid, $db_httptests)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
 				}
-				if (!isset($delHttpTests[$httpTestId])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+
+				$db_httptest = $db_httptests[$httptestid];
+
+				if ($db_httptest['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot delete templated web scenario "%1$s".', $db_httptest['name'])
+					);
 				}
 			}
 		}
 
-		$parentHttpTestIds = $httpTestIds;
-		$childHttpTestIds = [];
+		$parent_httptestids = $httptestids;
+		$child_httptestids = [];
 		do {
-			$dbTests = DBselect('SELECT ht.httptestid FROM httptest ht WHERE '.dbConditionInt('ht.templateid', $parentHttpTestIds));
-			$parentHttpTestIds = [];
-			while ($dbTest = DBfetch($dbTests)) {
-				$parentHttpTestIds[] = $dbTest['httptestid'];
-				$childHttpTestIds[$dbTest['httptestid']] = $dbTest['httptestid'];
-			}
-		} while (!empty($parentHttpTestIds));
+			$parent_httptestids = array_keys(DB::select('httptest', [
+				'output' => [],
+				'filter' => ['templateid' => $parent_httptestids],
+				'preservekeys' => true
+			]));
 
-		$options = [
-			'httptestids' => $childHttpTestIds,
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true,
-			'preservekeys' => true,
-			'selectHosts' => API_OUTPUT_EXTEND
-		];
-		$delHttpTestChildren = $this->get($options);
-		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChildren);
-		$httpTestIds = array_merge($httpTestIds, $childHttpTestIds);
+			$child_httptestids = array_merge($child_httptestids, $parent_httptestids);
+		}
+		while ($parent_httptestids);
 
-		$itemidsDel = [];
-		$dbTestItems = DBselect(
+		$del_httptestids = array_merge($httptestids, $child_httptestids);
+		$del_itemids = [];
+
+		$db_httptestitems = DBselect(
+			'SELECT hti.itemid'.
+			' FROM httptestitem hti'.
+			' WHERE '.dbConditionInt('hti.httptestid', $del_httptestids)
+		);
+		while ($db_httptestitem = DBfetch($db_httptestitems)) {
+			$del_itemids[] = $db_httptestitem['itemid'];
+		}
+
+		$db_httpstepitems = DBselect(
 			'SELECT hsi.itemid'.
-			' FROM httptestitem hsi'.
-			' WHERE '.dbConditionInt('hsi.httptestid', $httpTestIds)
-		);
-		while ($testitem = DBfetch($dbTestItems)) {
-			$itemidsDel[] = $testitem['itemid'];
-		}
-
-		$dbStepItems = DBselect(
-			'SELECT DISTINCT hsi.itemid'.
 			' FROM httpstepitem hsi,httpstep hs'.
-			' WHERE '.dbConditionInt('hs.httptestid', $httpTestIds).
-				' AND hs.httpstepid=hsi.httpstepid'
+			' WHERE hsi.httpstepid=hs.httpstepid'.
+				' AND '.dbConditionInt('hs.httptestid', $del_httptestids)
 		);
-		while ($stepitem = DBfetch($dbStepItems)) {
-			$itemidsDel[] = $stepitem['itemid'];
+		while ($db_httpstepitem = DBfetch($db_httpstepitems)) {
+			$del_itemids[] = $db_httpstepitem['itemid'];
 		}
 
-		if (!empty($itemidsDel)) {
-			API::Item()->delete($itemidsDel, true);
+		if ($del_itemids) {
+			API::Item()->delete($del_itemids, true);
 		}
 
-		DB::delete('httptest', ['httptestid' => $httpTestIds]);
+		DB::delete('httptest', ['httptestid' => $del_httptestids]);
 
-		// TODO: REMOVE
-		foreach ($delHttpTests as $httpTest) {
-			$host = reset($httpTest['hosts']);
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, $db_httptests);
 
-			info(_s('Deleted: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $host['host']));
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-				_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
-				_('Host').' ['.$host['name'].']'
-			);
-		}
-
-		return ['httptestids' => $httpTestIds];
+		return ['httptestids' => $httptestids];
 	}
 
 	/**
-	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
+	 * Checks if the current user has access to the given hosts and templates.
 	 *
-	 * @param array $hostids    an array of host or template IDs
+	 * @param array $hostids  an array of host or template IDs
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
 	 */
-	protected function checkHostPermissions(array $hostids) {
+	private function checkHostPermissions(array $hostids) {
 		if ($hostids) {
 			$count = API::Host()->get([
 				'countOutput' => true,
@@ -453,250 +639,82 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * Validate web scenario parameters for create method.
-	 *  - check if web scenario with same name already exists
-	 *  - check if web scenario has at least one step
+	 * Check for duplicated web scenarios.
 	 *
-	 * @param array $httpTests
+	 * @param array $names_by_hostid
+	 *
+	 * @throws APIException  if web scenario already exists.
 	 */
-	protected function validateCreate(array $httpTests) {
-		$required_fields = ['name', 'hostid', 'steps'];
-		$hostids = [];
-
-		foreach ($httpTests as $httpTest) {
-			$missing_keys = array_diff($required_fields, array_keys($httpTest));
-
-			if ($missing_keys) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Web scenario missing parameters: %1$s', implode(', ', $missing_keys))
-				);
-			}
-
-			$hostids[$httpTest['hostid']] = true;
+	private function checkDuplicates(array $names_by_hostid) {
+		$sql_where = [];
+		foreach ($names_by_hostid as $hostid => $names) {
+			$sql_where[] = '(ht.hostid='.$hostid.' AND '.dbConditionString('ht.name', $names).')';
 		}
 
-		$this->checkHostPermissions(array_keys($hostids));
+		$db_httptests = DBfetchArray(
+			DBselect('SELECT ht.name FROM httptest ht WHERE '.implode(' OR ', $sql_where), 1)
+		);
 
-		foreach ($httpTests as $httpTest) {
-			if (zbx_empty($httpTest['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario name cannot be empty.'));
-			}
-
-			$this->checkSslParameters($httpTest);
-
-			if (empty($httpTest['steps'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
-			}
-
-			$this->checkSteps($httpTest);
-			$this->checkDuplicateSteps($httpTest);
+		if ($db_httptests) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Web scenario "%1$s" already exists.', $db_httptests[0]['name'])
+			);
 		}
-
-		// check input array for duplicate names
-		$collectionValidator = new CCollectionValidator([
-			'uniqueField' => 'name',
-			'uniqueField2' => 'hostid',
-			'messageDuplicate' => _('Web scenario "%1$s" already exists.')
-		]);
-		$this->checkValidator($httpTests, $collectionValidator);
-
-		// check database for duplicate names
-		$this->checkDuplicates($httpTests);
-
-		$this->checkApplicationHost($httpTests);
 	}
 
 	/**
-	 * Validate web scenario parameters for update method.
-	 *  - check permissions
-	 *  - check if web scenario with same name already exists
-	 *  - check that each web scenario object has httptestid defined
-	 *  - return array of web scenarios, if validation was successful
+	 * Check that application belongs to web scenario host.
 	 *
-	 * @param array $httpTests
-	 * @param array $dbHttpTests
+	 * @param array  $httptests
+	 * @param string $method
+	 * @param array  $db_httptests
 	 *
-	 * @return array $httpTests
+	 * @throws APIException  if application does not exists or belongs to another host.
 	 */
-	protected function validateUpdate(array $httpTests, array $dbHttpTests) {
-		$db_httptests = $this->get([
-			'output' => [],
-			'httptestids' => array_keys($httpTests),
-			'editable' => true,
+	private function checkApplications(array $httptests, $method, array $db_httptests = null) {
+		$applicationids = [];
+
+		foreach ($httptests as $index => $httptest) {
+			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
+					&& ($method === 'validateCreate'
+						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
+				$applicationids[$httptest['applicationid']] = true;
+			}
+		}
+
+		if (!$applicationids) {
+			return;
+		}
+
+		$db_applications = DB::select('applications', [
+			'output' => ['applicationid', 'hostid', 'name', 'flags'],
+			'applicationids' => array_keys($applicationids),
 			'preservekeys' => true
 		]);
 
-		foreach ($httpTests as $httpTest) {
-			if (!array_key_exists($httpTest['httptestid'], $db_httptests)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-
-		$httpTests = $this->extendFromObjects($httpTests, $dbHttpTests, [
-			'ssl_key_file', 'ssl_cert_file', 'ssl_key_password', 'verify_host', 'verify_peer'
-		]);
-
-		// Required fields for steps.
-		$required_fields = ['httpstepid'];
-
-		foreach ($httpTests as &$httpTest) {
-			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
-
-			$httpTest['hostid'] = $dbHttpTest['hostid'];
-
-			if (!isset($httpTest['name']) || $dbHttpTest['templateid']) {
-				$httpTest['name'] = $dbHttpTest['name'];
-			}
-
-			$this->checkSslParameters($httpTest);
-
-			if (array_key_exists('steps', $httpTest) && is_array($httpTest['steps'])) {
-				foreach ($httpTest['steps'] as &$httpTestStep) {
-					if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
-						/*
-						 * Handle templated webscenario steps first by checking the keys and then check name before
-						 * populating the name field from parent.
-						 */
-
-						$missing_keys = array_diff($required_fields, array_keys($httpTestStep));
-
-						if ($missing_keys) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Web scenario step is missing parameters: %1$s', implode(', ', $missing_keys))
-							);
-						}
-
-						if (array_key_exists('name', $httpTestStep)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Cannot update step name for a templated web scenario "%1$s".', $httpTest['name'])
-							);
-						}
-					}
-
-					if (isset($httpTestStep['httpstepid'])
-							&& ($dbHttpTest['templateid'] || !isset($httpTestStep['name']))) {
-						$httpTestStep['name'] = $dbHttpTest['steps'][$httpTestStep['httpstepid']]['name'];
-					}
-
-					if ($dbHttpTest['templateid'] != 0) {
-						unset($httpTestStep['no']);
-					}
-
-					// unset required text and POST variables if retrieving only headers
-					if (isset($httpTestStep['retrieve_mode'])
-							&& ($httpTestStep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)) {
-						$httpTestStep['required'] = '';
-						$httpTestStep['posts'] = '';
-					}
-				}
-				unset($httpTestStep);
-
-				$this->checkSteps($httpTest, $dbHttpTest);
-				$this->checkDuplicateSteps($httpTest, $dbHttpTest);
-			}
-
-			unset($httpTest['templateid']);
-		}
-		unset($httpTest);
-
-		// check input array for duplicate names
-		$collectionValidator = new CCollectionValidator([
-			'uniqueField' => 'name',
-			'uniqueField2' => 'hostid',
-			'messageDuplicate' => _('Web scenario "%1$s" already exists.')
-		]);
-		$this->checkValidator($httpTests, $collectionValidator);
-
-		// check database for duplicate names
-		$this->checkDuplicates($httpTests, $dbHttpTests);
-
-		$this->checkApplicationHost($httpTests);
-
-		return $httpTests;
-	}
-
-	/**
-	 * Check DB for duplicate names on hosts
-	 *
-	 * @throws APIException if same name on some host is found.
-	 *
-	 * @param array $httpTests		array of web screnarios
-	 * @param array $dbHttpTests	array of DB web screnarios
-	 */
-	protected function checkDuplicates(array $httpTests, array $dbHttpTests = []) {
-		$httpTestNames = [];
-
-		foreach ($httpTests as $httpTest) {
-			if (isset($httpTest['name'])) {
-				if (zbx_empty($httpTest['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario name cannot be empty.'));
-				}
-				elseif (($dbHttpTests && $dbHttpTests[$httpTest['httptestid']]['name'] !== $httpTest['name'])
-						|| !$dbHttpTests) {
-					$httpTestNames[$httpTest['hostid']][] = $httpTest['name'];
-				}
-			}
-		}
-
-		if ($httpTestNames) {
-			foreach ($httpTestNames as $hostId => $httpTestName) {
-				$nameExists = API::getApiService()->select($this->tableName(), [
-					'output' => ['name'],
-					'filter' => ['name' => $httpTestName, 'hostid' => $hostId],
-					'limit' => 1
-				]);
-
-				if ($nameExists) {
-					$nameExists = reset($nameExists);
+		foreach ($httptests as $index => $httptest) {
+			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
+					&& ($method === 'validateCreate'
+						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
+				if (!array_key_exists($httptest['applicationid'], $db_applications)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Web scenario "%1$s" already exists.', $nameExists['name'])
+						_s('Application with applicationid "%1$s" does not exist.', $httptest['applicationid'])
 					);
 				}
-			}
-		}
-	}
 
-	/**
-	 * Check that application belongs to http test host.
-	 *
-	 * @param array $httpTests
-	 */
-	protected function checkApplicationHost(array $httpTests) {
-		// applications containing 0 in ID, will be removed from web scenario
-		foreach ($httpTests as $httpTestId => $httpTest) {
-			if (array_key_exists('applicationid', $httpTest) && $httpTest['applicationid'] == 0) {
-				unset($httpTests[$httpTestId]);
-			}
-		}
+				$db_application = $db_applications[$httptest['applicationid']];
 
-		$applicationids = zbx_objectValues($httpTests, 'applicationid');
-
-		if ($applicationids) {
-			$applications = API::getApiService()->select('applications', [
-				'output' => ['applicationid', 'hostid', 'name', 'flags'],
-				'applicationids' => $applicationids,
-				'preservekeys' => true
-			]);
-
-			// check if applications exist and are normal applications
-			foreach ($applicationids as $applicationid) {
-				if (!array_key_exists($applicationid, $applications)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-				elseif ($applications[$applicationid]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				if ($db_application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a discovered application "%1$s" to a web scenario.',
-						$applications[$applicationid]['name']
+						'Cannot add a discovered application "%1$s" to a web scenario.', $db_application['name']
 					));
 				}
-			}
 
-			foreach ($httpTests as $httpTest) {
-				if (!idcmp($applications[$httpTest['applicationid']]['hostid'], $httpTest['hostid'])) {
+				$hostid = ($method === 'validateCreate')
+					? $httptest['hostid']
+					: $db_httptests[$httptest['httptestid']]['hostid'];
+
+				if (bccomp($db_application['hostid'], $hostid) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('The web scenario application belongs to a different host than the web scenario host.')
 					);
@@ -706,112 +724,45 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * Check web scenario steps.
-	 *  - check status_codes field
-	 *  - check name characters
+	 * @param array  $httptests
+	 * @param string $method
+	 * @param array  $db_httptests
 	 *
-	 * @throws APIException if incorrect characters are passed, incorrect step numbers step is missing.
-	 *
-	 * @param array $httpTest
-	 * @param array $dbHttpTest
+	 * @throws APIException
 	 */
-	protected function checkSteps(array $httpTest, array $dbHttpTest = []) {
-		if (array_key_exists('steps', $httpTest)
-				&& (!is_array($httpTest['steps']) || (count($httpTest['steps']) == 0))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
-		}
+	protected function validateSteps(array &$httptests, $method, array $db_httptests = null) {
+		if ($method === 'validateUpdate') {
+			foreach ($httptests as $httptest) {
+				if (!array_key_exists('steps', $httptest)) {
+					continue;
+				}
 
-		// Check if step still exists on update.
-		if ($dbHttpTest) {
-			foreach ($httpTest['steps'] as $step) {
-				$dbHttpTest['steps'] = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
+				$db_httptest = $db_httptests[$httptest['httptestid']];
 
-				if (array_key_exists('httpstepid', $step)
-						&& !array_key_exists($step['httpstepid'], $dbHttpTest['steps'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!')
-					);
+				if ($db_httptest['templateid'] != 0) {
+					if (count($httptest['steps']) != count($db_httptest['steps'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
+					}
+
+					foreach ($httptest['steps'] as $httpstep) {
+						if (!array_key_exists('httpstepid', $httpstep)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Cannot update step for a templated web scenario "%1$s": %2$s.', $httptest['name'],
+								_s('the parameter "%1$s" is missing', 'httpstepid')
+							));
+						}
+						elseif (!array_key_exists($httpstep['httpstepid'], $db_httptest['steps'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('No permissions to referred object or it does not exist!')
+							);
+						}
+					}
 				}
 			}
 		}
 
-		$followRedirectsValidator = new CLimitedSetValidator([
-				'values' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]
-			]
-		);
-
-		$retrieveModeValidator = new CLimitedSetValidator([
-				'values' => [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS]
-			]
-		);
-
-		if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
-			$httpTest['steps'] = zbx_toHash($httpTest['steps'], 'httpstepid');
-
-			if (count($httpTest['steps']) != count($dbHttpTest['steps'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
-			}
-		}
-
-		foreach ($httpTest['steps'] as $step) {
-			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && zbx_empty($step['name']))
-					|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || zbx_empty($step['name'])))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name cannot be empty.'));
-			}
-
-			if ((isset($step['httpstepid']) && array_key_exists('url', $step) && zbx_empty($step['url']))
-					|| (!isset($step['httpstepid']) && (!array_key_exists('url', $step) || zbx_empty($step['url'])))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step URL cannot be empty.'));
-			}
-
-			if (isset($step['no']) && $step['no'] <= 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
-			}
-			if (isset($step['status_codes'])) {
-				$this->checkStatusCode($step['status_codes']);
-			}
-
-			if (isset($step['follow_redirects'])) {
-				$followRedirectsValidator->messageInvalid = _s(
-					'Incorrect follow redirects value for step "%1$s" of web scenario "%2$s".',
-					$step['name'],
-					$httpTest['name']
-				);
-
-				$this->checkValidator($step['follow_redirects'], $followRedirectsValidator);
-			}
-
-			if (isset($step['retrieve_mode'])) {
-				$retrieveModeValidator->messageInvalid = _s(
-					'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$s".',
-					$step['name'],
-					$httpTest['name']
-				);
-
-				$this->checkValidator($step['retrieve_mode'], $retrieveModeValidator);
-			}
-		}
-	}
-
-	/**
-	 * Check duplicate step names.
-	 *
-	 * @throws APIException if duplicate step name is found.
-	 *
-	 * @param array $httpTest
-	 * @param array $dbHttpTest
-	 */
-	protected function checkDuplicateSteps(array $httpTest, array $dbHttpTest = []) {
-		if ($dbHttpTest) {
-			$httpTest['steps'] = zbx_toHash($httpTest['steps'], 'httpstepid');
-			$httpTest['steps'] = $this->extendFromObjects($httpTest['steps'], $dbHttpTest['steps'], ['name']);
-		}
-
-		if ($duplicate = CArrayHelper::findDuplicate($httpTest['steps'], 'name')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Web scenario step "%1$s" already exists.', $duplicate['name'])
-			);
-		}
+		$this->checkStatusCodes($httptests);
+		$this->validateRetrieveMode($httptests, $method, $db_httptests);
 	}
 
 	/**
@@ -820,37 +771,45 @@ class CHttpTest extends CApiService {
 	 *
 	 * Examples: '100-199, 301, 404, 500-550' or '{$USER_MACRO123}'
 	 *
+	 * @param array $httptests
+	 *
 	 * @throws APIException if the status code range is invalid.
-	 *
-	 * @param string $statusCodeRange
-	 *
-	 * @return bool
 	 */
-	protected  function checkStatusCode($statusCodeRange) {
+	private function checkStatusCodes(array $httptests) {
 		$user_macro_parser = new CUserMacroParser();
 
-		if ($statusCodeRange === '' || $user_macro_parser->parse($statusCodeRange) == CParser::PARSE_SUCCESS) {
-			return true;
-		}
-		else {
-			$ranges = explode(',', $statusCodeRange);
-			foreach ($ranges as $range) {
-				$range = explode('-', $range);
-				if (count($range) > 2) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $statusCodeRange));
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			foreach ($httptest['steps'] as $httpstep) {
+				if (!array_key_exists('status_codes', $httpstep)) {
+					continue;
 				}
 
-				foreach ($range as $value) {
-					if (!is_numeric($value)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid response code "%1$s".', $statusCodeRange)
-						);
+				$status_codes = $httpstep['status_codes'];
+
+				if ($status_codes === '' || $user_macro_parser->parse($status_codes) == CParser::PARSE_SUCCESS) {
+					continue;
+				}
+
+				foreach (explode(',', $status_codes) as $range) {
+					$range = explode('-', $range);
+					if (count($range) > 2) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $status_codes));
+					}
+
+					foreach ($range as $value) {
+						if (!is_numeric($value)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid response code "%1$s".', $status_codes)
+							);
+						}
 					}
 				}
 			}
 		}
-
-		return true;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -871,6 +830,42 @@ class CHttpTest extends CApiService {
 
 		$httpTestIds = array_keys($result);
 
+		// adding headers and variables
+		$fields = [
+			ZBX_HTTPFIELD_HEADER => 'headers',
+			ZBX_HTTPFIELD_VARIABLE => 'variables'
+		];
+		foreach ($fields as $type => $field) {
+			if (!$this->outputIsRequested($field, $options['output'])) {
+				unset($fields[$type]);
+			}
+		}
+
+		if ($fields) {
+			$db_httpfields = DB::select('httptest_field', [
+				'output' => ['httptestid', 'name', 'value', 'type'],
+				'filter' => [
+					'httptestid' => $httpTestIds,
+					'type' => array_keys($fields)
+				],
+				'sortfield' => ['httptest_fieldid']
+			]);
+
+			foreach ($result as &$httptest) {
+				foreach ($fields as $field) {
+					$httptest[$field] = [];
+				}
+			}
+			unset($httptest);
+
+			foreach ($db_httpfields as $db_httpfield) {
+				$result[$db_httpfield['httptestid']][$fields[$db_httpfield['type']]][] = [
+					'name' => $db_httpfield['name'],
+					'value' => $db_httpfield['value']
+				];
+			}
+		}
+
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'httptestid', 'hostid');
@@ -887,16 +882,62 @@ class CHttpTest extends CApiService {
 		// adding steps
 		if ($options['selectSteps'] !== null) {
 			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
-				$httpSteps = API::getApiService()->select('httpstep', [
-					'output' => $this->outputExtend($options['selectSteps'], ['httptestid', 'httpstepid']),
+				$fields = [
+					ZBX_HTTPFIELD_HEADER => 'headers',
+					ZBX_HTTPFIELD_VARIABLE => 'variables',
+					ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields',
+					ZBX_HTTPFIELD_POST_FIELD => 'posts',
+				];
+				foreach ($fields as $type => $field) {
+					if (!$this->outputIsRequested($field, $options['selectSteps'])) {
+						unset($fields[$type]);
+					}
+				}
+
+				$db_httpsteps = API::getApiService()->select('httpstep', [
+					'output' => $this->outputExtend($options['selectSteps'], ['httptestid', 'httpstepid', 'post_type']),
 					'filters' => ['httptestid' => $httpTestIds],
 					'preservekeys' => true
 				]);
-				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
+				$relationMap = $this->createRelationMap($db_httpsteps, 'httptestid', 'httpstepid');
 
-				$httpSteps = $this->unsetExtraFields($httpSteps, ['httptestid', 'httpstepid'], $options['selectSteps']);
+				if ($fields) {
+					foreach ($db_httpsteps as &$db_httpstep) {
+						foreach ($fields as $type => $field) {
+							if ($type != ZBX_HTTPFIELD_POST_FIELD || $db_httpstep['post_type'] == ZBX_POSTTYPE_FORM) {
+								$db_httpstep[$field] = [];
+							}
+						}
+					}
+					unset($db_httpstep);
 
-				$result = $relationMap->mapMany($result, $httpSteps, 'steps');
+					$db_httpstep_fields = DB::select('httpstep_field', [
+						'output' => ['httpstepid', 'name', 'value', 'type'],
+						'filter' => [
+							'httpstepid' => array_keys($db_httpsteps),
+							'type' => array_keys($fields)
+						],
+						'sortfield' => ['httpstep_fieldid']
+					]);
+
+					foreach ($db_httpstep_fields as $db_httpstep_field) {
+						$db_httpstep = &$db_httpsteps[$db_httpstep_field['httpstepid']];
+
+						if ($db_httpstep_field['type'] != ZBX_HTTPFIELD_POST_FIELD
+								|| $db_httpstep['post_type'] == ZBX_POSTTYPE_FORM) {
+							$db_httpstep[$fields[$db_httpstep_field['type']]][] = [
+								'name' => $db_httpstep_field['name'],
+								'value' => $db_httpstep_field['value']
+							];
+						}
+					}
+					unset($db_httpstep);
+				}
+
+				$db_httpsteps = $this->unsetExtraFields($db_httpsteps, ['httptestid', 'httpstepid', 'post_type'],
+					$options['selectSteps']
+				);
+				$result = $relationMap->mapMany($result, $db_httpsteps, 'steps');
 			}
 			else {
 				$dbHttpSteps = DBselect(
@@ -915,45 +956,217 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * @param $httpTest
+	 * @param array  $httptests
+	 * @param string $method
+	 * @param array  $db_httptests
 	 *
-	 * @throws APIException if bad value for "verify_peer" parameter.
-	 * @throws APIException if bad value for "verify_host" parameter.
+	 * @throws APIException  if auth parameters are invalid.
+	 */
+	private function validateAuthParameters(array &$httptests, $method, array $db_httptests = null) {
+		foreach ($httptests as &$httptest) {
+			if (array_key_exists('authentication', $httptest)
+					|| array_key_exists('http_user', $httptest)
+					|| array_key_exists('http_password', $httptest)) {
+
+				$httptest += [
+					'authentication' => ($method === 'validateUpdate')
+						? $db_httptests[$httptest['httptestid']]['authentication']
+						: HTTPTEST_AUTH_NONE
+				];
+
+				if ($httptest['authentication'] == HTTPTEST_AUTH_NONE) {
+					foreach (['http_user', 'http_password'] as $field_name) {
+						$httptest += [$field_name => ''];
+
+						if ($httptest[$field_name] !== '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
+							);
+						}
+					}
+				}
+				else {
+					foreach (['http_user', 'http_password'] as $field_name) {
+						$httptest += [
+							$field_name => ($method === 'validateUpdate')
+								? $db_httptests[$httptest['httptestid']][$field_name]
+								: ''
+						];
+
+						if ($httptest[$field_name] === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
+							);
+						}
+					}
+				}
+			}
+		}
+		unset($httptest);
+	}
+
+	/**
+	 * @param array  $httptests
+	 * @param string $method
+	 * @param array  $db_httptests
+	 *
 	 * @throws APIException if SSL cert is present but SSL key is not.
 	 */
-	protected function checkSslParameters($httpTest) {
+	private function validateSslParameters(array &$httptests, $method, array $db_httptests = null) {
+		foreach ($httptests as &$httptest) {
+			if (array_key_exists('ssl_key_password', $httptest)
+					|| array_key_exists('ssl_key_file', $httptest)
+					|| array_key_exists('ssl_cert_file', $httptest)) {
+				if ($method === 'validateCreate') {
+					$httptest += [
+						'ssl_key_password' => '',
+						'ssl_key_file' => '',
+						'ssl_cert_file' => ''
+					];
+				}
+				else {
+					$db_httptest = $db_httptests[$httptest['httptestid']];
+					$httptest += [
+						'ssl_key_password' => $db_httptest['ssl_key_password'],
+						'ssl_key_file' => $db_httptest['ssl_key_file'],
+						'ssl_cert_file' => $db_httptest['ssl_cert_file']
+					];
+				}
 
-		$verifyPeerValidator = new CLimitedSetValidator(
-			[
-				'values' => [HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF],
-				'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
-			]
-		);
-		$verifyPeerValidator->setObjectName($httpTest['name']);
-		$this->checkValidator($httpTest['verify_peer'], $verifyPeerValidator);
+				if ($httptest['ssl_key_password'] != '' && $httptest['ssl_key_file'] == '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Empty SSL key file for web scenario "%1$s".', $httptest['name'])
+					);
+				}
 
-		$verifyHostValidator = new CLimitedSetValidator(
-			[
-				'values' => [HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF],
-				'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".')
-			]
-		);
+				if ($httptest['ssl_key_file'] != '' && $httptest['ssl_cert_file'] == '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Empty SSL certificate file for web scenario "%1$s".', $httptest['name'])
+					);
+				}
+			}
+		}
+		unset($httptest);
+	}
 
-		$verifyHostValidator->setObjectName($httpTest['name']);
-		$this->checkValidator($httpTest['verify_host'], $verifyHostValidator);
+	/**
+	 * @param array  $httptests
+	 * @param string $method
+	 * @param array  $db_httptests
+	 *
+	 * @throws APIException if parameters is invalid.
+	 */
+	private function validateRetrieveMode(array &$httptests, $method, array $db_httptests = null) {
+		foreach ($httptests as &$httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
 
-			if (($httpTest['ssl_key_password'] != '') && ($httpTest['ssl_key_file'] == '')) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('Empty SSL key file for web scenario "%1$s".', $httpTest['name'])
-			);
+			foreach ($httptest['steps'] as &$httpstep) {
+				if (array_key_exists('retrieve_mode', $httpstep)
+						|| array_key_exists('posts', $httpstep)
+						|| array_key_exists('required', $httpstep)) {
+
+					if ($method === 'validateCreate' || !array_key_exists('httpstepid', $httpstep)) {
+						$httpstep += [
+							'retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_CONTENT,
+							'posts' => '',
+							'required' => ''
+						];
+					}
+					else {
+						$db_httptest = $db_httptests[$httptest['httptestid']];
+						$db_httpstep = $db_httptest['steps'][$httpstep['httpstepid']];
+						$httpstep += ['retrieve_mode' => $db_httpstep['retrieve_mode']];
+						$httpstep += [
+							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+								? $db_httpstep['posts']
+								: '',
+							'required' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+								? $db_httpstep['required']
+								: ''
+						];
+					}
+
+					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
+						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
+							);
+						}
+					}
+				}
+			}
+			unset($httpstep);
+		}
+		unset($httptest);
+	}
+
+	/**
+	 * Convert string to HTTP pair array.
+	 *
+	 * @param string $data
+	 * @param string $delimiter
+	 *
+	 * @return mixed
+	 */
+	private function convertHTTPPairString($data, $delimiter) {
+		/* converts to pair array */
+		$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $data))));
+		foreach ($pairs as &$pair) {
+			$pair = explode($delimiter, $pair, 2);
+			$pair = [
+				'name' => $pair[0],
+				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
+			];
+		}
+		unset($pair);
+
+		return $pairs;
+	}
+
+	/**
+	 * Convert headers and variables from string to HTTP pair array.
+	 * @deprecated conversion will be removed in future
+	 *
+	 * @param array  $httptests
+	 *
+	 * @return array
+	 */
+	private function convertHttpPairs($httptests) {
+		reset($httptests);
+
+		if (!is_int(key($httptests))) {
+			$httptests = [$httptests];
 		}
 
-		if (($httpTest['ssl_key_file'] != '') && ($httpTest['ssl_cert_file'] == '')) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('Empty SSL certificate file for web scenario "%1$s".', $httpTest['name'])
-			);
+		$fields = [
+			'headers' => ':',
+			'variables' => '='
+		];
+
+		foreach ($httptests as &$httptest) {
+			foreach ($fields as $field => $delimiter) {
+				if (is_array($httptest) && array_key_exists($field, $httptest) && is_string($httptest[$field])) {
+					$this->deprecated('using string format for field "'.$field.'" is deprecated.');
+					$httptest[$field] = $this->convertHTTPPairString($httptest[$field], $delimiter);
+				}
+			}
+
+			if (array_key_exists('steps', $httptest) && is_array($httptest['steps'])) {
+				foreach ($httptest['steps'] as &$step) {
+					foreach ($fields as $field => $delimiter) {
+						if (is_array($step) && array_key_exists($field, $step) && is_string($step[$field])) {
+							$this->deprecated('using string format for field "'.$field.'" is deprecated.');
+							$step[$field] = $this->convertHTTPPairString($step[$field], $delimiter);
+						}
+					}
+				}
+				unset($step);
+			}
 		}
+		unset($httptest);
+
+		return $httptests;
 	}
 }
