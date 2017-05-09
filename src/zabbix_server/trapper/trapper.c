@@ -755,9 +755,9 @@ const zbx_status_section_t	status_sections[] = {
 
 static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_entry_t *entry)
 {
+	zbx_uint64_t			proxyid = 0;				/* Start with printing server stats. */
+	const zbx_counter_value_t	*counter_value = entry->counter_value;	/* It should contain total count. */
 	const zbx_entry_attribute_t	*attribute;
-	const zbx_counter_value_t	*counter_value = entry->counter_value;
-	zbx_uint64_t			proxyid = 0;
 	char				*tmp = NULL;
 	int				i;
 
@@ -795,12 +795,18 @@ static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_e
 
 		if (NULL == entry->counters_by_proxy || NULL == entry->counters_by_proxy->values)
 			break;
-
+next:
 		if (i >= entry->counters_by_proxy->values_num)
 			break;
 
+		/* server has its own separate counter, skip it in vector of proxy counters */
+		if (0 == (proxyid = ((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid))
+		{
+			i++;
+			goto next;
+		}
+
 		counter_value = &((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->counter_value;
-		proxyid = ((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid;
 	}
 
 	zbx_free(tmp);
