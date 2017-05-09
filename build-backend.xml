@@ -172,48 +172,12 @@
 		</sequential>
 	</target>
 
-<<<<<<< .working
-	<target name="make-db-postgresql" if="${with.postgresql}">
-		<!-- Build Zabbix with postgresql database -->
-		<sequential>
-			<make cc="clang" args="--enable-server --enable-agent --enable-proxy --with-postgresql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		</sequential>
-=======
 	<target name="make-db-postgresql" unless="${with.postgresql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
 			<make args="--enable-server --enable-agent --enable-proxy --with-postgresql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
->>>>>>> .merge-right.r67902
 	</target>
-<<<<<<< .working
-
-	<target name="make-db-mysql" if="${with.mysql}">
-		<!-- Build Zabbix with postgresql database -->
-		<sequential>
-			<make cc="clang" args="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		</sequential>
-	</target>
-
-	<target name="make-db-oracle" if="${with.oracle}">
-		<!-- Build Zabbix with oracle database -->
-		<sequential>
-			<make cc="clang" args="--enable-server --enable-agent --enable-proxy --with-oracle --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		</sequential>
-	</target>
-
-	<target name="make-db-db2" if="${with.db2}">
-		<!-- Build Zabbix with ibm db2 database -->
-		<sequential>
-			<make cc="clang" args="--enable-server --enable-agent --enable-proxy --with-ibm-db2 --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		</sequential>
-	</target>
-
-	<!-- Build Zabbix with all supported databases  -->
-	<target name="make-db" depends="make-db-mysql,make-db-postgresql"/>
-
-	<target name="build" depends="init,create-db,make-gcc,make-clang,make-db"/>
-=======
 
 	<target name="make-db-mysql" unless="${with.mysql}">
 		<!-- Build Zabbix with postgresql database -->
@@ -240,5 +204,4 @@
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
 
 	<target name="build" depends="init,create-db,make-gcc,make-clang,make-db"/>
->>>>>>> .merge-right.r67902
 </project>
