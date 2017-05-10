@@ -80,12 +80,12 @@
 				attempts.val(0);
 			}
 			var mstype = $('#maxsessionsType :radio:checked').val(),
-				inputBox = $('#maxsessions');
+				inputbox = $('#maxsessions');
 			if (mstype !== 'custom') {
-				inputBox.val(mstype === 'one' ? 1 : 0);
+				inputbox.val(mstype === 'one' ? 1 : 0);
 			}
-			else if (mstype === 'custom' && $.trim(inputBox.val()) === '') {
-				inputBox.val(0);
+			else if (mstype === 'custom' && $.trim(inputbox.val()) === '') {
+				inputbox.val(0);
 			}
 
 			$(this).trimValues([
@@ -140,18 +140,18 @@
 		 */
 		function toggleMaxSessionsType(radio) {
 			var mstype = $(radio).val();
-			var inputBox = $('#maxsessions');
+			var inputbox = $('#maxsessions');
 			switch(mstype) {
 				case 'one' :
-					inputBox.hide();
+					inputbox.hide();
 					break;
 				case 'unlimited' :
-					inputBox.hide();
+					inputbox.hide();
 					break;
 				default :
-					inputBox.show();
+					inputbox.show();
 					if (initialized == true) {
-						inputBox.select().focus();
+						inputbox.select().focus();
 					}
 					break;
 			}
