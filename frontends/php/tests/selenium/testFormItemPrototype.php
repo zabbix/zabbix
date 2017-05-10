@@ -2487,7 +2487,7 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item prototype left trim',
 					'key' => 'item-prototype-empty-left-trim',
 					'preprocessing' => [
-						['type' => 'Left trim ', 'params' => ''],
+						['type' => 'Left trim', 'params' => ''],
 					],
 					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -2544,10 +2544,10 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item prototype two delta',
 					'key' => 'item-prototype-two-delta',
 					'preprocessing' => [
-						['type' => 'Delta'],
-						['type' => 'Delta']
+						['type' => 'Simple change'],
+						['type' => 'Simple change']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -2556,10 +2556,10 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item prototype two delta per second',
 					'key' => 'item-prototype-two-delta-per-second',
 					'preprocessing' => [
-						['type' => 'Delta per second'],
-						['type' => 'Delta per second']
+						['type' => 'Change per second'],
+						['type' => 'Change per second']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -2568,10 +2568,10 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item prototype two different delta',
 					'key' => 'item-prototype-two-different-delta',
 					'preprocessing' => [
-						['type' => 'Delta'],
-						['type' => 'Delta per second']
+						['type' => 'Simple change'],
+						['type' => 'Change per second']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -2581,14 +2581,14 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'item.prototype.preprocessing',
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'params' => '123'],
 						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
 						['type' => 'Boolean to decimal'],
 						['type' => 'Octal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Delta']
+						['type' => 'Simple change']
 					]
 				]
 			],
@@ -2599,7 +2599,7 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'item.prototype.symbols.preprocessing',
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => '1a!@#$%^&*()-='],
-						['type' => 'Left trim ', 'params' => '2b!@#$%^&*()-='],
+						['type' => 'Left trim', 'params' => '2b!@#$%^&*()-='],
 						['type' => 'Trim', 'params' => '3c!@#$%^&*()-='],
 						['type' => 'Custom multiplier', 'params' => '4e+10'],
 						['type' => 'Regular expression', 'params' => '5d!@#$%^&*()-=', 'output' => '6e!@#$%^&*()-=']
@@ -2614,8 +2614,8 @@ class testFormItemPrototype extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => 'abc'],
 						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Left trim ', 'params' => 'def'],
-						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'params' => '123'],
@@ -2628,7 +2628,7 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Octal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Delta per second']
+						['type' => 'Change per second']
 					]
 				]
 			]

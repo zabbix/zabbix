@@ -92,8 +92,10 @@ if (!empty($this->data['interfaces'])) {
 	foreach ($this->data['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
-			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
-			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
+			$interface['useip']
+				? $interface['ip'].' : '.$interface['port']
+				: $interface['dns'].' : '.$interface['port'],
+			($interface['interfaceid'] == $this->data['interfaceid'])
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
 		$interfaceGroups[$interface['type']]->addItem($option);
@@ -425,6 +427,18 @@ foreach ($data['preprocessing'] as $i => $step) {
 		$itemForm->addVar('preprocessing['.$i.'][type]', $step['type']);
 	}
 
+	$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
+
+	foreach (get_preprocessing_types() as $group) {
+		$cb_group = new COptGroup($group['label']);
+
+		foreach ($group['types'] as $type => $label) {
+			$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
+		}
+
+		$preproc_types_cbbox->addItem($cb_group);
+	}
+
 	$preprocessing->addRow(
 		(new CRow([
 			$readonly
@@ -435,7 +449,7 @@ foreach ($data['preprocessing'] as $i => $step) {
 			$readonly
 				? (new CTextBox('preprocessing['.$i.'][type_name]', get_preprocessing_types($step['type'])))
 					->setReadonly(true)
-				: (new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+				: $preproc_types_cbbox,
 			$params[0],
 			$params[1],
 			$readonly
@@ -458,7 +472,7 @@ $preprocessing->addRow(
 );
 
 $item_preproc_list = (new CFormList('item_preproc_list'))
-	->addRow(_('Preprocessing'), $preprocessing);
+	->addRow(_('Preprocessing steps'), $preprocessing);
 
 // append tabs to form
 $itemTab = (new CTabView())
