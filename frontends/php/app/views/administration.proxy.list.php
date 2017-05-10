@@ -136,8 +136,8 @@ foreach ($data['proxies'] as $proxy) {
 		$proxy['lastaccess'] == 0
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
-		count($proxy['hosts']),
-		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : 0,
+		array_key_exists('host_count', $proxy) ? $proxy['host_count'] : '',
+		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : '',
 		array_key_exists('perf', $proxy) ? $proxy['perf'] : '',
 		$hosts ? $hosts : ''
 	]);

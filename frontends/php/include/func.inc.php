@@ -2027,8 +2027,8 @@ function parse_period($str) {
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$server_status = (new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT))
-		->getStatus(get_cookie('zbx_sessionid'));
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
 
 	if ($server_status === false) {
 		return false;
@@ -2045,8 +2045,7 @@ function get_status() {
 		'hosts_count_not_monitored' => 0,
 		'hosts_count_template' => 0,
 		'users_count' => 0,
-		'users_online' => 0,
-		'qps_total' => 0
+		'users_online' => 0
 	];
 
 	// hosts
@@ -2055,14 +2054,16 @@ function get_status() {
 	}
 
 	foreach ($server_status['host stats'] as $stats) {
-		switch ($stats['attributes']['status']) {
-			case HOST_STATUS_MONITORED:
-				$status['hosts_count_monitored'] += $stats['count'];
-				break;
+		if ($stats['attributes']['proxyid'] == 0) {
+			switch ($stats['attributes']['status']) {
+				case HOST_STATUS_MONITORED:
+					$status['hosts_count_monitored'] += $stats['count'];
+					break;
 
-			case HOST_STATUS_NOT_MONITORED:
-				$status['hosts_count_not_monitored'] += $stats['count'];
-				break;
+				case HOST_STATUS_NOT_MONITORED:
+					$status['hosts_count_not_monitored'] += $stats['count'];
+					break;
+			}
 		}
 	}
 	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored']
@@ -2070,24 +2071,26 @@ function get_status() {
 
 	// items
 	foreach ($server_status['item stats'] as $stats) {
-		switch ($stats['attributes']['status']) {
-			case ITEM_STATUS_ACTIVE:
-				if (array_key_exists('state', $stats['attributes'])) {
-					switch ($stats['attributes']['state']) {
-						case ITEM_STATE_NORMAL:
-							$status['items_count_monitored'] += $stats['count'];
-							break;
+		if ($stats['attributes']['proxyid'] == 0) {
+			switch ($stats['attributes']['status']) {
+				case ITEM_STATUS_ACTIVE:
+					if (array_key_exists('state', $stats['attributes'])) {
+						switch ($stats['attributes']['state']) {
+							case ITEM_STATE_NORMAL:
+								$status['items_count_monitored'] += $stats['count'];
+								break;
 
-						case ITEM_STATE_NOTSUPPORTED:
-							$status['items_count_not_supported'] += $stats['count'];
-							break;
+							case ITEM_STATE_NOTSUPPORTED:
+								$status['items_count_not_supported'] += $stats['count'];
+								break;
+						}
 					}
-				}
-				break;
+					break;
 
-			case ITEM_STATUS_DISABLED:
-				$status['items_count_disabled'] += $stats['count'];
-				break;
+				case ITEM_STATUS_DISABLED:
+					$status['items_count_disabled'] += $stats['count'];
+					break;
+			}
 		}
 	}
 	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
@@ -2133,7 +2136,15 @@ function get_status() {
 	$status['users_count'] += $status['users_online'];
 
 	// performance
-	$status['qps_total'] += $server_status['required performance'][0]['count'];
+	if (array_key_exists('required performance', $server_status)) {
+		$status['qps_total'] = 0;
+
+		foreach ($server_status['required performance'] as $stats) {
+			if ($stats['attributes']['proxyid'] == 0) {
+				$status['qps_total'] += $stats['count'];
+			}
+		}
+	}
 
 	return $status;
 }

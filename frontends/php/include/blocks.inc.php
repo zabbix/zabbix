@@ -273,7 +273,7 @@ function make_status_of_zbx() {
 	]);
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$table->addRow([_('Required server performance, new values per second'),
-			$status !== false ? $status['qps_total'] : '', ''
+			($status !== false && array_key_exists('qps_total', $status)) ? $status['qps_total'] : '', ''
 		]);
 	}
 

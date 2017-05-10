@@ -192,12 +192,14 @@ class CZabbixServer {
 			]],
 			'host stats' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])]
 				]],
 				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
 			]],
 			'item stats' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 					'state' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED])]
 				]],
@@ -216,7 +218,11 @@ class CZabbixServer {
 				]],
 				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
 			]],
-			'required performance' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+			// only for super-admins 'required performance' is available
+			'required performance' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				]],
 				'count' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]	// API_FLOAT 0-n
 			]]
 		]];
