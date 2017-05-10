@@ -46,7 +46,7 @@ class CScreenMap extends CScreenBase {
 		];
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$output += [BR(), new CLink(_('Change'), $this->action)];
+			$output += [BR(), new CLink(_x('Change', 'verb'), $this->action)];
 		}
 
 		$div = (new CDiv($output))
