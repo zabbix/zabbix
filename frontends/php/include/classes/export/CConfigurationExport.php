@@ -679,8 +679,8 @@ class CConfigurationExport {
 				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
 				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password'
 			],
-			'selectSteps' => ['no', 'name', 'url', 'posts', 'variables', 'headers', 'follow_redirects', 'retrieve_mode',
-				'timeout', 'required', 'status_codes'
+			'selectSteps' => ['no', 'name', 'url', 'query_fields', 'posts', 'variables', 'headers', 'follow_redirects',
+				'retrieve_mode', 'timeout', 'required', 'status_codes'
 			],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
@@ -955,7 +955,10 @@ class CConfigurationExport {
 	protected function gatherMaps(array $mapIds) {
 		$sysmaps = API::Map()->get([
 			'sysmapids' => $mapIds,
-			'selectShapes' => API_OUTPUT_EXTEND,
+			'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
+				'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
+				'zindex'
+			],
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectIconMap' => API_OUTPUT_EXTEND,

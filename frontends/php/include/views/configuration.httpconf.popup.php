@@ -53,11 +53,11 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 		'name' => getRequest('name'),
 		'timeout' => getRequest('timeout'),
 		'url' => getRequest('url'),
+		'post_type' => getRequest('post_type', ZBX_POSTTYPE_FORM),
 		'posts' => getRequest('posts'),
-		'variables' => getRequest('variables'),
+		'pairs' => array_values(getRequest('pairs', [])),
 		'required' => getRequest('required'),
 		'status_codes' => getRequest('status_codes'),
-		'headers' => getRequest('headers'),
 		'follow_redirects' => getRequest('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF),
 		'retrieve_mode' => getRequest('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 	];
@@ -88,15 +88,87 @@ else {
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 		->addRow(_('URL'),
-			(new CTextBox('url', getRequest('url', ''), false, null))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-		->addRow(_('Post'), (new CTextArea('posts', getRequest('posts', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-		->addRow(_('Variables'),
-			(new CTextArea('variables', getRequest('variables', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-		->addRow(_('Headers'),
-			(new CTextArea('headers', getRequest('headers', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
+			new CDiv([
+				(new CTextBox('url', getRequest('url', ''), false, null))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('parse', _('Parse')))
+					->onClick('javascript: parseUrl();')
+					->addClass(ZBX_STYLE_BTN_GREY)
+			])
+		);
+
+	$pair_tables = [
+		[
+			'id' => 'query_fields',
+			'label' => _('Query fields'),
+			'class' => 'pair-container pair-container-sortable'
+		],
+		[
+			'id' => 'post_fields',
+			'label' => _('Post fields'),
+			'header' => [
+				'label' => _('Post type'),
+				'items' => (new CRadioButtonList('post_type', getRequest('post_type', ZBX_POSTTYPE_FORM)))
+					->addValue(_('Form data'), ZBX_POSTTYPE_FORM, null, 'return switchToPostType(this.value);')
+					->addValue(_('Raw data'), ZBX_POSTTYPE_RAW, null, 'return switchToPostType(this.value);')
+					->setModern(true)
+			],
+			'footer' => [
+				'id' => 'post_raw_row',
+				'label' => _('Raw post'),
+				'items' => (new CTextArea('posts', getRequest('posts', '')))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			],
+			'class' => 'pair-container pair-container-sortable'
+		],
+		[
+			'id' => 'variables',
+			'label' => _('Variables'),
+			'class' => 'pair-container'
+		],
+		[
+			'id' => 'headers',
+			'label' => _('Headers'),
+			'class' => 'pair-container pair-container-sortable'
+		]
+	];
+
+	foreach ($pair_tables as $pair_table) {
+		if (array_key_exists('header', $pair_table)) {
+			$httpPopupFormList->addRow($pair_table['header']['label'], $pair_table['header']['items']);
+		}
+
+		$pair_tab = (new CTable())
+			->setId($pair_table['id'])
+			->addClass($pair_table['class'])
+			->setAttribute('style', 'width: 100%;')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow([
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('pairs-control-add')
+						->setAttribute('data-type', $pair_table['id'])
+				))->setColSpan(5)
+			]))->setId($pair_table['id'].'_footer'));
+
+		$httpPopupFormList->addRow($pair_table['label'],
+			(new CDiv($pair_tab))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('data-type', $pair_table['id'])
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
+			$pair_table['id'].'_row'
+		);
+
+		if (array_key_exists('footer', $pair_table)) {
+			$httpPopupFormList->addRow($pair_table['footer']['label'], $pair_table['footer']['items'],
+				$pair_table['footer']['id']
+			);
+		}
+	}
+
+	$httpPopupFormList
 		->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1))
 		->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1))
 		->addRow(_('Timeout'),
@@ -130,5 +202,8 @@ else {
 	$httpPopupForm->addItem($httpPopupTab);
 	$httpPopupWidget->addItem($httpPopupForm);
 }
+
+zbx_add_post_js('pairManager.add(' . CJs::encodeJson(array_values(getRequest('pairs', []))) . ');');
+zbx_add_post_js('setPostType(' . CJs::encodeJson(getRequest('post_type', ZBX_POSTTYPE_FORM)) . ');');
 
 return $httpPopupWidget;

@@ -401,6 +401,7 @@ function zbx_num2bitstr($num, $rev = false) {
 function str2mem($val) {
 	$val = trim($val);
 	$last = strtolower(substr($val, -1));
+	$val = (int) $val;
 
 	switch ($last) {
 		case 'g':
@@ -1815,9 +1816,17 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	$imageMessages = [];
 
 	$title = $good ? $okmsg : $errmsg;
-	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
-
+	$messages = is_array($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 	$ZBX_MESSAGES = [];
+
+	if (ZBX_SHOW_SQL_ERRORS == false && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+		foreach ($messages as &$message) {
+			if (array_key_exists('sql_error', $message) && ($message['sql_error'] === true)) {
+				$message['message'] = _('SQL error, please contact Zabbix administrator.');
+			}
+		}
+		unset($message);
+	}
 
 	switch ($page['type']) {
 		case PAGE_TYPE_IMAGE:
@@ -1926,6 +1935,20 @@ function error($msgs) {
 
 	foreach ($msgs as $msg) {
 		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg];
+	}
+}
+
+function sqlError($msgs) {
+	global $ZBX_MESSAGES;
+
+	if (!isset($ZBX_MESSAGES)) {
+		$ZBX_MESSAGES = [];
+	}
+
+	$msgs = zbx_toArray($msgs);
+
+	foreach ($msgs as $msg) {
+		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg, 'sql_error' => true];
 	}
 }
 
@@ -2274,6 +2297,35 @@ function get_color($image, $color, $alpha = 0) {
 	}
 
 	return imagecolorallocate($image, $red, $green, $blue);
+}
+
+/**
+ * Get graphic theme based on user configuration.
+ *
+ * @return array
+ */
+function getUserGraphTheme() {
+	$themes = DB::find('graph_theme', [
+		'theme' => getUserTheme(CWebUser::$data)
+	]);
+
+	if ($themes) {
+		return $themes[0];
+	}
+
+	return [
+		'theme' => 'blue-theme',
+		'textcolor' => '1F2C33',
+		'highlightcolor' => 'E33734',
+		'backgroundcolor' => 'FFFFFF',
+		'graphcolor' => 'FFFFFF',
+		'gridcolor' => 'CCD5D9',
+		'maingridcolor' => 'ACBBC2',
+		'gridbordercolor' => 'ACBBC2',
+		'nonworktimecolor' => 'EBEBEB',
+		'leftpercentilecolor' => '429E47',
+		'righttpercentilecolor' => 'E33734'
+	];
 }
 
 /**

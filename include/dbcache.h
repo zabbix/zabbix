@@ -45,8 +45,6 @@
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
-#define ZBX_EXPAND_MACROS		1
-
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
@@ -196,8 +194,9 @@ typedef struct
 }
 zbx_tag_t;
 
-/* item exist in base expression  */
-#define		ZBX_DC_TRIGGER_BASE_EXPRESSION	1
+#define ZBX_DC_TRIGGER_PROBLEM_EXPRESSION	0x1	/* this flag shows that trigger value recalculation is  */
+							/* initiated by a time-based function or a new value of */
+							/* an item in problem expression */
 
 typedef struct _DC_TRIGGER
 {
@@ -450,15 +449,20 @@ void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
-void	DCsync_configuration(void);
+/* initial sync, get all data */
+#define ZBX_DBSYNC_INIT		0
+/* update sync, get changed data */
+#define ZBX_DBSYNC_UPDATE	1
+
+void	DCsync_configuration(unsigned char mode);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
-void	DCload_config(void);
 
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num);
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
+void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
 		zbx_uint64_t flags);
@@ -472,8 +476,7 @@ void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zb
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers(void);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num,
-		unsigned char expand);
+		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
 int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
 		zbx_uint64_t start_triggerid, int process_num);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
@@ -558,14 +561,6 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 
-/* flags to specify which host interfaces have enabled items */
-#define ZBX_FLAG_INTERFACE_NONE		0x00
-#define ZBX_FLAG_INTERFACE_ZABBIX	(0x01 << (INTERFACE_TYPE_AGENT - 1))
-#define ZBX_FLAG_INTERFACE_SNMP		(0x01 << (INTERFACE_TYPE_SNMP - 1))
-#define ZBX_FLAG_INTERFACE_IPMI		(0x01 << (INTERFACE_TYPE_IPMI - 1))
-#define ZBX_FLAG_INTERFACE_JMX		(0x01 << (INTERFACE_TYPE_JMX - 1))
-#define ZBX_FLAG_INTERFACE_UNKNOWN	0x80
-
 int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
@@ -629,4 +624,6 @@ typedef struct
 zbx_agent_value_t;
 
 void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
+void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess);
+
 #endif

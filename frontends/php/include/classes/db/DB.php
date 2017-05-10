@@ -1090,7 +1090,7 @@ class DB {
 		}
 
 		if ($filter) {
-			$sql_parts['where'][] = (count($filter) == 1) ? $filter[0] : '('.implode(' OR ', $filter).')';
+			$sql_parts['where'][] = implode(' AND ', $filter);
 		}
 
 		return $sql_parts;
