@@ -519,10 +519,18 @@ ZABBIX.apps.map = (function($) {
 							type: target.attr('data-type'),
 							popupid: target.data('menu-popup-id')
 						},
-						can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0),
+						can_copy = false,
 						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
-						can_remove = (that.selection.count.shapes > 0 || that.selection.count.selements > 0),
-						can_reorder = (item_data.type === 'shapes');
+						can_remove = false,
+						can_reorder = false;
+
+					if (item_data.type && typeof that.selection[item_data.type][item_data.id] === 'undefined') {
+						that.selectElements([item_data]);
+					}
+
+					can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0);
+					can_remove = can_copy;
+					can_reorder = (that.selection.count.shapes > 0);
 
 					event.preventDefault();
 					event.stopPropagation();
