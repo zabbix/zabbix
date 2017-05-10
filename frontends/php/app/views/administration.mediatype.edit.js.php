@@ -76,15 +76,15 @@
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
 		$('#media_type_form').submit(function() {
 			var attempts = $('#maxattempts');
-			if ($.trim(attempts.val()) == '') {
+			if ($.trim(attempts.val()) === '') {
 				attempts.val(0);
 			}
 			var mstype = $('#maxsessionsType :radio:checked').val(),
 				inputBox = $('#maxsessions');
-			if (mstype != 'custom') {
-				inputBox.val(mstype == 'one' ? 1 : 0);
+			if (mstype !== 'custom') {
+				inputBox.val(mstype === 'one' ? 1 : 0);
 			}
-			else if (mstype == 'custom' && $.trim(inputBox.val()) == '') {
+			else if (mstype === 'custom' && $.trim(inputBox.val()) === '') {
 				inputBox.val(0);
 			}
 
