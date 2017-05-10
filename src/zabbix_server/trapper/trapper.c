@@ -831,6 +831,7 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 		DCget_trigger_stats(&trigger_stats);
 		user_stats_res = DBget_user_stats(&user_stats);
 		required_performance.dbl = DCget_required_performance(&required_performance_by_proxy);
+		last_counted = time(NULL);
 	}
 
 	/* add status information to JSON */
