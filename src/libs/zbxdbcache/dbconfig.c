@@ -8897,15 +8897,28 @@ void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats)
 			if (SUCCEED != is_uint64_n(p + 1, q - p - 1, &functionid))
 					continue;
 
-			if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionid)) ||
-					NULL == (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) ||
-					ITEM_STATUS_ACTIVE != dc_item->status ||
-					NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) ||
-					HOST_STATUS_MONITORED != dc_host->status)
+			if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
+					NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)))
 			{
-				trigger_stats->disabled.ui64++;
-				goto next;
+				if (ITEM_STATUS_ACTIVE != dc_item->status)
+				{
+					trigger_stats->disabled.ui64++;
+					goto next;
+				}
 			}
+			else
+				goto next;
+
+			if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			{
+				if (HOST_STATUS_MONITORED != dc_host->status)
+				{
+					trigger_stats->disabled.ui64++;
+					goto next;
+				}
+			}
+			else
+				goto next;
 
 			p = q;
 		}
