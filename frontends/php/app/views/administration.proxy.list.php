@@ -138,7 +138,7 @@ foreach ($data['proxies'] as $proxy) {
 			: zbx_date2age($proxy['lastaccess']),
 		array_key_exists('host_count', $proxy) ? $proxy['host_count'] : '',
 		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : '',
-		array_key_exists('perf', $proxy) ? $proxy['perf'] : '',
+		array_key_exists('vps_total', $proxy) ? $proxy['vps_total'] : '',
 		$hosts ? $hosts : ''
 	]);
 }

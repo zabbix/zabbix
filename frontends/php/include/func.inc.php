@@ -2137,11 +2137,11 @@ function get_status() {
 
 	// performance
 	if (array_key_exists('required performance', $server_status)) {
-		$status['qps_total'] = 0;
+		$status['vps_total'] = 0;
 
 		foreach ($server_status['required performance'] as $stats) {
 			if ($stats['attributes']['proxyid'] == 0) {
-				$status['qps_total'] += $stats['count'];
+				$status['vps_total'] += $stats['count'];
 			}
 		}
 	}

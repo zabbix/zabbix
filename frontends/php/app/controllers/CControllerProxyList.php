@@ -131,7 +131,7 @@ class CControllerProxyList extends CController {
 					'item_count' => 0
 				];
 				if (array_key_exists('required performance', $server_status)) {
-					$defaults['perf'] = 0;
+					$defaults['vps_total'] = 0;
 				}
 				foreach ($data['proxies'] as &$proxy) {
 					$proxy += $defaults;
@@ -160,7 +160,7 @@ class CControllerProxyList extends CController {
 				if (array_key_exists('required performance', $server_status)) {
 					foreach ($server_status['required performance'] as $stats) {
 						if (array_key_exists($stats['attributes']['proxyid'], $data['proxies'])) {
-							$data['proxies'][$stats['attributes']['proxyid']]['perf'] += $stats['count'];
+							$data['proxies'][$stats['attributes']['proxyid']]['vps_total'] += round($stats['count'], 2);
 						}
 					}
 				}
