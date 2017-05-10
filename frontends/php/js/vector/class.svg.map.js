@@ -17,7 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * SVGMap class.
+ *
+ * Implements vector map rendering functionality.
+ */
 function SVGMap(options) {
+	var container,
+		layers;
+
 	this.layers = {};
 	this.options = options;
 	this.elements = {};
@@ -25,20 +34,19 @@ function SVGMap(options) {
 	this.links = {};
 	this.background = null;
 	this.container = null;
-
 	this.imageUrl = 'imgstore.php?iconid=';
 	this.imageCache = new ImageCache();
 	this.canvas = new SVGCanvas(options.canvas, true);
 
-	/* extra group for font styles */
-	var container = this.canvas.add('g', {
+	// Extra group for font styles.
+	container = this.canvas.add('g', {
 		class: 'map-container',
 		'font-family': SVGMap.FONTS[9],
 		'font-size': '10px'
 	});
 
-	var layers = container.add([
-		/* Background */
+	layers = container.add([
+		//  Background.
 		{
 			type: 'g',
 			attributes: {
@@ -46,7 +54,7 @@ function SVGMap(options) {
 				fill: '#' + options.theme.backgroundcolor
 			}
 		},
-		/* Grid */
+		// Grid.
 		{
 			type: 'g',
 			attributes: {
@@ -58,35 +66,35 @@ function SVGMap(options) {
 				'shape-rendering': 'crispEdges'
 			}
 		},
-		/* Custom shapes */
+		// Custom shapes.
 		{
 			type: 'g',
 			attributes: {
 				class: 'map-shapes'
 			}
 		},
-		/* Highlights of elements */
+		// Highlights of elements.
 		{
 			type: 'g',
 			attributes: {
 				class: 'map-highlights'
 			}
 		},
-		/* Links */
+		// Links.
 		{
 			type: 'g',
 			attributes: {
 				class: 'map-links'
 			}
 		},
-		/* Elements */
+		// Elements.
 		{
 			type: 'g',
 			attributes: {
 				class: 'map-elements'
 			}
 		},
-		/* Marks */
+		// Marks (timestamp and homepage).
 		{
 			type: 'g',
 			attributes: {
@@ -105,7 +113,6 @@ function SVGMap(options) {
 						y: options.canvas.height - 6
 					}
 				},
-
 				{
 					type: 'text',
 					attributes: {
@@ -131,13 +138,14 @@ function SVGMap(options) {
 		height: this.options.canvas.height
 	});
 
-	/* Render goes first as it is needed for getBBox to work */
+	// Render goes first as it is needed for getBBox to work.
 	if (this.options.container) {
 		this.render(this.options.container);
 	}
 
 	['timestamp', 'homepage'].forEach(function (attribute) {
 		var elements = this.canvas.getElementsByAttributes({class: 'map-' + attribute});
+
 		if (elements.length === 1) {
 			this[attribute] = elements[0];
 		}
@@ -149,6 +157,7 @@ function SVGMap(options) {
 	this.update(this.options);
 }
 
+// Predefined list of fonts for maps.
 SVGMap.FONTS = [
 	'Georgia, serif',
 	'"Palatino Linotype", "Book Antiqua", Palatino, serif',
@@ -165,50 +174,79 @@ SVGMap.FONTS = [
 	'"Lucida Console", Monaco, monospace'
 ];
 
+// Predefined border types (@see dash-array of SVG) for maps.
 SVGMap.BORDER_TYPES = {
-	'-1': '',
-	'0': 'none',
-	'1': '1,2',
-	'2': '4,4'
+	'0': '',
+	'1': 'none',
+	'2': '1,2',
+	'3': '4,4'
 };
 
+/**
+ * Convert array of objects to hashmap (object).
+ *
+ * @param {array}     array   Array of objects.
+ * @param {string}    key     Object field used to identify object.
+ *
+ * @return {object} Hashmap.
+ */
 SVGMap.toHashmap = function (array, key) {
-	var hashMap = {};
+	var hashmap = {};
 
 	array.forEach(function (item) {
-		if (typeof item !== 'object' || item[key] === undefined) {
-			/* skip */
+		if (typeof item !== 'object' || typeof item[key] === 'undefined') {
+			// Skip elements that are not objects.
 			return;
 		}
 
-		hashMap[item[key]] = item;
+		hashmap[item[key]] = item;
 	});
 
-	return hashMap;
+	return hashmap;
 };
 
+/**
+ * Get image url.
+ *
+ * @param {number|string}    id     Image id.
+ *
+ * @return {string} Image url.
+ */
 SVGMap.prototype.getImageUrl = function (id) {
 	return this.imageUrl + id;
 };
 
+/**
+ * Get image from image cache.
+ *
+ * @param {number|string}    id     Image id.
+ *
+ * @return {object} Image object or null if image object is not present in cache.
+ */
 SVGMap.prototype.getImage = function (id) {
-	if (id !== undefined && this.imageCache.images[id] !== undefined) {
+	if (typeof id !== 'undefined' && typeof this.imageCache.images[id] !== 'undefined') {
 		return this.imageCache.images[id];
 	}
 
 	return null;
 };
 
+/**
+ * Update background image.
+ *
+ * @param {string}    background     Background image id.
+ */
 SVGMap.prototype.updateBackground = function (background) {
 	var element = null;
 
 	if (background && background !== '0') {
 		if (this.background !== null && background === this.options.background) {
-			/* not changed */
+			// Background was not changed.
 			return;
 		}
 
 		var image = this.getImage(background);
+
 		element = this.layers.background.add('image', {
 			x: 0,
 			y: 0,
@@ -225,6 +263,11 @@ SVGMap.prototype.updateBackground = function (background) {
 	this.background = element;
 };
 
+/**
+ * Set grid size.
+ *
+ * @param {number}    size     Grid size. Setting grid size to 0 turns of the grid.
+ */
 SVGMap.prototype.setGrid = function (size) {
 	this.layers.grid.clear();
 
@@ -269,12 +312,21 @@ SVGMap.prototype.setGrid = function (size) {
 	}, 'Y X:');
 };
 
+/**
+ * Compare objects.  * Used to compare map object attributes to determine if attributes were changed.
+ *
+ * @param {object} source	Object to be compared.
+ * @param {object} target	Object to be compared with.
+ *
+ * @return {boolean}		True if objects attributes are different, false if object attributes are the same.
+ */
 SVGMap.isChanged = function (source, target) {
-	if (typeof source !== 'object') {
+	if (typeof source !== 'object' || source === null) {
 		return true;
 	}
 
 	var keys = Object.keys(target);
+
 	for (var i = 0; i < keys.length; i++) {
 		if (typeof target[keys[i]] === 'object') {
 			if (SVGMap.isChanged(source[keys[i]], target[keys[i]])) {
@@ -291,6 +343,14 @@ SVGMap.isChanged = function (source, target) {
 	return false;
 };
 
+/**
+ * Update map objects. Iterate through map objects of specified type and update object attributes.
+ *
+ * @param {string}    type         Object type (name of SVGMap class attribute).
+ * @param {string}    className    Class name used to create instance of a new object.
+ * @param {object}    items        Hashmap of map objects.
+ * @param {boolean}   incremental  Update method. If set to true, items are added to the existing set of map objects.
+ */
 SVGMap.prototype.updateItems = function (type, className, items, incremental) {
 	var keys = Object.keys(items);
 
@@ -311,6 +371,15 @@ SVGMap.prototype.updateItems = function (type, className, items, incremental) {
 	}, this);
 };
 
+/**
+ * Update ordered map objects.
+ *
+ * @param {string}    type         Object type (name of SVGMap class attribute).
+ * @param {string}    idField      Field used to identify objects.
+ * @param {string}    className    Class name used to create instance of a new object.
+ * @param {object}    items        Array of map objects.
+ * @param {boolean}   incremental  Update method. If set to true, items are added to the existing set of map objects.
+ */
 SVGMap.prototype.updateOrderedItems = function (type, idField, className, items, incremental) {
 	if (incremental !== true) {
 		Object.keys(this[type]).forEach(function (key) {
@@ -331,21 +400,28 @@ SVGMap.prototype.updateOrderedItems = function (type, idField, className, items,
 	}, this);
 };
 
+/**
+ * Update map objects based on specified options.
+ *
+ * @param {object}    options      Map options.
+ * @param {boolean}   incremental  Update method. If set to true, items are added to the existing set of map objects.
+ */
 SVGMap.prototype.update = function (options, incremental) {
-	var images = {};
-	var rules = [
-		{
-			name: 'elements',
-			field: 'selementid'
-		},
-		{
-			name: 'links',
-			field: 'linkid'
-		}
-	];
+	var images = {},
+		rules = [
+			{
+				name: 'elements',
+				field: 'selementid'
+			},
+			{
+				name: 'links',
+				field: 'linkid'
+			}
+		];
 
+	// elements and links are converted into hashmap as order is not important.
 	rules.forEach(function (rule) {
-		if (options[rule.name] !== undefined) {
+		if (typeof options[rule.name] !== 'undefined') {
 			options[rule.name] = SVGMap.toHashmap(options[rule.name], rule.field);
 		}
 		else {
@@ -353,7 +429,8 @@ SVGMap.prototype.update = function (options, incremental) {
 		}
 	});
 
-	if (options.shapes === undefined) {
+	// Performs ordering of shapes based on zindex value.
+	if (typeof options.shapes === 'undefined') {
 		options.shapes = [];
 	}
 	else {
@@ -362,9 +439,10 @@ SVGMap.prototype.update = function (options, incremental) {
 		});
 	}
 
+	// Collect the list of images.
 	Object.keys(options.elements).forEach(function (key) {
 		var element = options.elements[key];
-		if (element.icon !== undefined) {
+		if (typeof element.icon !== 'undefined') {
 			images[element.icon] = this.getImageUrl(element.icon);
 		}
 	}, this);
@@ -373,8 +451,10 @@ SVGMap.prototype.update = function (options, incremental) {
 		images[options.background] = this.getImageUrl(options.background);
 	}
 
-	if (options.canvas !== undefined && options.canvas.width !== undefined && options.canvas.height !== undefined &&
-		this.canvas.resize(options.canvas.width, options.canvas.height)) {
+	// Resize the canvas and move marks
+	if (typeof options.canvas !== 'undefined' && typeof options.canvas.width !== 'undefined'
+			&& typeof options.canvas.height !== 'undefined'
+			&& this.canvas.resize(options.canvas.width, options.canvas.height)) {
 
 		this.options.canvas = options.canvas;
 
@@ -395,20 +475,33 @@ SVGMap.prototype.update = function (options, incremental) {
 		});
 	}
 
+	// Images are preloaded before update.
 	this.imageCache.preload(images, function () {
+		// Update is performed after preloading all of the images.
 		this.updateItems('elements', 'SVGMapElement', options.elements, incremental);
-		this.updateOrderedItems('shapes', 'shapeid', 'SVGMapShape', options.shapes, incremental);
+		this.updateOrderedItems('shapes', 'sysmap_shapeid', 'SVGMapShape', options.shapes, incremental);
 		this.updateItems('links', 'SVGMapLink', options.links, incremental);
 		this.updateBackground(options.background, incremental);
 
 		this.options = SVGElement.mergeAttributes(this.options, options);
 	}, this);
 
-	if (options.timestamp) {
+	// Timestamp (date on map) is updated.
+	if (typeof options.timestamp !== 'undefined') {
 		this.timestamp.element.textContent = options.timestamp;
+	}
+
+	// Homepage is updated.
+	if (typeof options.homepage !== 'undefined') {
+		this.homepage.element.textContent = options.homepage;
 	}
 };
 
+/**
+ * Invalidate items based on type.
+ *
+ * @param {string}    type      Object type (name of SVGMap class attribute).
+ */
 SVGMap.prototype.invalidate = function (type) {
 	Object.keys(this[type]).forEach(function (key) {
 		this[type][key].options = {};
@@ -416,6 +509,11 @@ SVGMap.prototype.invalidate = function (type) {
 	}, this);
 };
 
+/**
+ * Render map within container.
+ *
+ * @param {mixed}    container      DOM element or jQuery selector.
+ */
 SVGMap.prototype.render = function (container) {
 	if (typeof container === 'string') {
 		container = jQuery(container)[0];
@@ -424,45 +522,34 @@ SVGMap.prototype.render = function (container) {
 	this.container = container;
 };
 
-SVGMap.isChanged = function (source, target) {
-	if (typeof source !== 'object' || source === null) {
-		return true;
-	}
-
-	var keys = Object.keys(target);
-	for (var i = 0; i < keys.length; i++) {
-		if (typeof target[keys[i]] === 'object') {
-			if (SVGMap.isChanged(source[keys[i]], target[keys[i]])) {
-				return true;
-			}
-		}
-		else {
-			if (target[keys[i]] !== source[keys[i]]) {
-				return true;
-			}
-		}
-	}
-
-	return false;
-};
-
+/*
+ * SVGMapElement class. Implements rendering of map elements (selements).
+ *
+ * @param {object}    map       Parent map.
+ * @param {object}    options   Element attributes (match field names in data source).
+ */
 function SVGMapElement(map, options) {
 	this.map = map;
 	this.options = options;
-
 	this.highlight = null;
 	this.image = null;
 	this.label = null;
 	this.markers = null;
 }
 
-SVGMapElement.LABEL_POSITION_NONE	= null;
+// Predefined label positions.
+SVGMapElement.LABEL_POSITION_NONE		= null;
 SVGMapElement.LABEL_POSITION_DEFAULT	= -1;
-SVGMapElement.LABEL_POSITION_BOTTOM	= 0;
-SVGMapElement.LABEL_POSITION_LEFT	= 1;
-SVGMapElement.LABEL_POSITION_RIGHT	= 2;
-SVGMapElement.LABEL_POSITION_TOP	= 3;
+SVGMapElement.LABEL_POSITION_BOTTOM		= 0;
+SVGMapElement.LABEL_POSITION_LEFT		= 1;
+SVGMapElement.LABEL_POSITION_RIGHT		= 2;
+SVGMapElement.LABEL_POSITION_TOP		= 3;
 
+/**
+ * Remove part (item) of an element.
+ *
+ * @param {string}    item      Item to be removed.
+ */
 SVGMapElement.prototype.removeItem = function (item) {
 	if (this[item] !== null) {
 		this[item].remove();
@@ -470,6 +557,9 @@ SVGMapElement.prototype.removeItem = function (item) {
 	}
 };
 
+/**
+ * Remove element.
+ */
 SVGMapElement.prototype.remove = function () {
 	['highlight', 'image', 'label', 'markers'].forEach(function (name) {
 		this.removeItem(name);
@@ -478,21 +568,25 @@ SVGMapElement.prototype.remove = function () {
 	delete this.map.elements[this.options.selementid];
 };
 
+/**
+ * Update element highlight (shape and markers placed on the background of element).
+ */
 SVGMapElement.prototype.updateHighlight = function() {
 	var type = null,
 		options = null;
 
 	if (this.options.latelyChanged) {
-		var radius = Math.floor(this.width / 2) + 12;
+		var radius = Math.floor(this.width / 2) + 12,
+			markers = [];
 
-		var markers = [];
-		if (this.options.label_location !== SVGMapElement.LABEL_POSITION_DEFAULT &&
-			this.options.label_location !== SVGMapElement.LABEL_POSITION_BOTTOM) {
+		if (this.options.label_location !== SVGMapElement.LABEL_POSITION_DEFAULT
+				&& this.options.label_location !== SVGMapElement.LABEL_POSITION_BOTTOM) {
 			markers.push({
 				type: 'path',
 				attributes: {
 					d: 'M11, 2.91 L5.87, 8 L11, 13.09 L8.07, 16 L0, 8 L8.07, 0, L11, 2.91',
-					transform: 'rotate(90 ' + (this.center.x+8) + ',' + (this.center.y+radius) + ') translate(' + (this.center.x+8) + ',' + (this.center.y+radius) + ')'
+					transform: 'rotate(90 ' + (this.center.x+8) + ',' + (this.center.y+radius) + ') translate(' +
+						(this.center.x+8) + ',' + (this.center.y+radius) + ')'
 				}
 			});
 		}
@@ -502,7 +596,8 @@ SVGMapElement.prototype.updateHighlight = function() {
 				type: 'path',
 				attributes: {
 					d: 'M11, 2.91 L5.87, 8 L11, 13.09 L8.07, 16 L0, 8 L8.07, 0, L11, 2.91',
-					transform: 'rotate(180 ' + (this.center.x-radius) + ',' + (this.center.y+8) + ') translate(' + (this.center.x-radius) + ',' + (this.center.y+8) + ')'
+					transform: 'rotate(180 ' + (this.center.x-radius) + ',' + (this.center.y+8) + ') translate(' +
+						(this.center.x-radius) + ',' + (this.center.y+8) + ')'
 				}
 			});
 		}
@@ -522,7 +617,8 @@ SVGMapElement.prototype.updateHighlight = function() {
 				type: 'path',
 				attributes: {
 					d: 'M11, 2.91 L5.87, 8 L11, 13.09 L8.07, 16 L0, 8 L8.07, 0, L11, 2.91',
-					transform: 'rotate(270 ' + (this.center.x-8) + ',' + (this.center.y-radius) + ') translate(' + (this.center.x-8) + ',' + (this.center.y-radius) + ')'
+					transform: 'rotate(270 ' + (this.center.x-8) + ',' + (this.center.y-radius) + ') translate(' +
+						(this.center.x-8) + ',' + (this.center.y-radius) + ')'
 				}
 			});
 		}
@@ -531,6 +627,7 @@ SVGMapElement.prototype.updateHighlight = function() {
 			fill: '#F44336',
 			stroke: '#B71C1C'
 		}, markers);
+
 		this.removeItem('markers');
 		this.markers = element;
 	}
@@ -586,6 +683,9 @@ SVGMapElement.prototype.updateHighlight = function() {
 	}
 };
 
+/**
+ * Update element image. Image should be pre-loaded and placed in cache before calling this method.
+ */
 SVGMapElement.prototype.updateImage = function() {
 	var image,
 		options =  {
@@ -600,7 +700,7 @@ SVGMapElement.prototype.updateImage = function() {
 		options['style'] = 'cursor: pointer';
 	}
 
-	if (this.options.icon !== undefined) {
+	if (typeof this.options.icon !== 'undefined') {
 		var href = this.map.getImageUrl(this.options.icon);
 
 		if (this.image === null || this.image.attributes['xlink:href'] !== href) {
@@ -619,6 +719,9 @@ SVGMapElement.prototype.updateImage = function() {
 	}
 };
 
+/**
+ * Update element label.
+ */
 SVGMapElement.prototype.updateLabel = function() {
 	var x = this.center.x,
 		y = this.center.y,
@@ -673,20 +776,26 @@ SVGMapElement.prototype.updateLabel = function() {
 	}
 };
 
+/**
+ * Update element (highlight, image and label).
+ *
+ * @param {object}    options      Element attributes.
+ */
 SVGMapElement.prototype.update = function(options) {
 	var image = this.map.getImage(options.icon);
+
 	if (image === null) {
 		throw "Invalid element configuration!";
 	}
 
-	/* data type normalization */
+	// Data type normalization.
 	['x', 'y', 'width', 'height', 'label_location'].forEach(function(name) {
-		if (options[name] !== undefined) {
+		if (typeof options[name] !== 'undefined') {
 			options[name] = parseInt(options[name]);
 		}
 	});
 
-	if (options.width !== undefined && options.height !== undefined) {
+	if (typeof options.width !== 'undefined' && typeof options.height !== 'undefined') {
 		options.x += Math.floor(options.width / 2) - Math.floor(image.naturalWidth / 2);
 		options.y += Math.floor(options.height / 2) - Math.floor(image.naturalHeight / 2);
 	}
@@ -699,13 +808,14 @@ SVGMapElement.prototype.update = function(options) {
 	}
 
 	if (SVGMap.isChanged(this.options, options) === false) {
-		/* no need to update */
+		// No need to update.
 		return;
 	}
 
 	this.options = options;
 
-	if (this.x !== options.x || this.y !== options.y || this.width !== options.width || this.height !== options.height) {
+	if (this.x !== options.x || this.y !== options.y || this.width !== options.width
+			|| this.height !== options.height) {
 		['x', 'y', 'width', 'height'].forEach(function(name) {
 			this[name] = options[name];
 		}, this);
@@ -721,35 +831,51 @@ SVGMapElement.prototype.update = function(options) {
 	this.updateLabel();
 };
 
+/**
+ * SVGMapLink class. Implements rendering of map links.
+ *
+ * @param {object}    map       Parent map.
+ * @param {object}    options   Link attributes.
+ */
 function SVGMapLink(map, options) {
 	this.map = map;
 	this.options = options;
 	this.element = null;
 }
 
+// Predefined set of line styles
 SVGMapLink.LINE_STYLE_DEFAULT	= 0;
-SVGMapLink.LINE_STYLE_BOLD	= 2;
+SVGMapLink.LINE_STYLE_BOLD		= 2;
 SVGMapLink.LINE_STYLE_DOTTED	= 3;
 SVGMapLink.LINE_STYLE_DASHED	= 4;
 
+/**
+ * Update link.
+ *
+ * @param {object}    options   Link attributes (match field names in data source).
+ */
 SVGMapLink.prototype.update = function(options) {
-	/* data type normalization */
+	// Data type normalization.
 	options.drawtype = parseInt(options.drawtype);
-
 	options.elements = [this.map.elements[options.selementid1], this.map.elements[options.selementid2]];
-	if (options.elements[0] === undefined || options.elements[1] === undefined) {
+
+	if (typeof options.elements[0] === 'undefined' || typeof options.elements[1] === 'undefined') {
 		var remove = true;
 
 		if (options.elements[0] === options.elements[1]) {
-			/* check if hostgroup to hostgroup */
-			options.elements = [this.map.shapes['e-' + options.selementid1], this.map.shapes['e-' + options.selementid2]];
+			// Check if link is from hostgroup to hostgroup.
+			options.elements = [
+				this.map.shapes['e-' + options.selementid1],
+				this.map.shapes['e-' + options.selementid2]
+			];
 
-			remove = (options.elements[0] === undefined || options.elements[1] === undefined);
+			remove = (typeof options.elements[0] === 'undefined' || typeof options.elements[1] === 'undefined');
 		}
 
 		if (remove) {
-			/* invalid link configuration */
+			// Invalid link configuration.
 			this.remove();
+
 			return;
 		}
 	}
@@ -762,7 +888,7 @@ SVGMapLink.prototype.update = function(options) {
 	};
 
 	if (SVGMap.isChanged(this.options, options) === false) {
-		/* no need to update */
+		// No need to update.
 		return;
 	}
 
@@ -778,15 +904,15 @@ SVGMapLink.prototype.update = function(options) {
 	switch (options.drawtype) {
 		case SVGMapLink.LINE_STYLE_BOLD:
 			attributes['stroke-width'] = 2;
-		break;
+			break;
 
 		case SVGMapLink.LINE_STYLE_DOTTED:
 			attributes['stroke-dasharray'] = '1,2';
-		break;
+			break;
 
 		case SVGMapLink.LINE_STYLE_DASHED:
 			attributes['stroke-dasharray'] = '4,4';
-		break;
+			break;
 	}
 
 	this.element = this.map.layers.links.add('g', attributes, [
@@ -818,6 +944,9 @@ SVGMapLink.prototype.update = function(options) {
 	);
 };
 
+/**
+ * Remove link.
+ */
 SVGMapLink.prototype.remove = function () {
 	if (this.element !== null) {
 		this.element.remove();
@@ -825,18 +954,40 @@ SVGMapLink.prototype.remove = function () {
 	}
 };
 
+/**
+ * SVGMapShape class. Implements rendering of map shapes.
+ *
+ * @param {object}    map       Parent map.
+ * @param {object}    options   Shape attributes.
+ */
 function SVGMapShape(map, options) {
 	this.map = map;
 	this.options = options;
 	this.element = null;
 }
 
+// Predefined set of map shape types.
 SVGMapShape.TYPE_RECTANGLE	= 0;
 SVGMapShape.TYPE_ELLIPSE	= 1;
 
+// Predefined label horizontal alignments.
+SVGMapShape.LABEL_HALIGN_CENTER	= 0;
+SVGMapShape.LABEL_HALIGN_LEFT	= 1;
+SVGMapShape.LABEL_HALIGN_RIGHT	= 2;
+
+// Predefined label vertical alignments.
+SVGMapShape.LABEL_VALIGN_MIDDLE	= 0;
+SVGMapShape.LABEL_VALIGN_TOP	= 1;
+SVGMapShape.LABEL_VALIGN_BOTTOM	= 2;
+
+/**
+ * Update shape.
+ *
+ * @param {object}    options        Shape attributes (match field names in data source).
+ */
 SVGMapShape.prototype.update = function(options) {
 	if (SVGMap.isChanged(this.options, options) === false) {
-		/* no need to update */
+		// No need to update.
 		return;
 	}
 
@@ -855,6 +1006,7 @@ SVGMapShape.prototype.update = function(options) {
 	};
 
 	var type,
+		element,
 		clip = {},
 		attributes = {},
 		mapping = [
@@ -869,27 +1021,27 @@ SVGMapShape.prototype.update = function(options) {
 		];
 
 	mapping.forEach(function(map) {
-		if (options[map.key] !== undefined && options[map.key].trim() !== '') {
+		if (typeof options[map.key] !== 'undefined' && options[map.key].trim() !== '') {
 			attributes[map.value] = '#' + options[map.key];
 		}
-		else
-		{
+		else {
 			attributes[map.value] = 'none';
 		}
 	}, this);
 
-	if (options['border_width'] !== undefined) {
+	if (typeof options['border_width'] !== 'undefined') {
 		attributes['stroke-width'] = parseInt(options['border_width']);
 	}
 
-	if (options['border_type'] !== undefined) {
+	if (typeof options['border_type'] !== 'undefined') {
 		var border_type = SVGMap.BORDER_TYPES[parseInt(options['border_type'])];
+
 		if (border_type !== '' && border_type !== 'none' && attributes['stroke-width'] > 1) {
 			var parts = border_type.split(',').map(function (value) {
 				return parseInt(value);
 			});
 
-			/* make dots round */
+			// Make dots round.
 			if (parts[0] === 1 && attributes['stroke-width'] > 2) {
 				attributes['stroke-linecap'] = 'round';
 			}
@@ -928,10 +1080,10 @@ SVGMapShape.prototype.update = function(options) {
 				height: this.height
 			};
 
-			if (attributes['stroke-linecap'] === undefined) {
+			if (typeof attributes['stroke-linecap'] === 'undefined') {
 				attributes['shape-rendering'] = 'crispEdges';
 			}
-		break;
+			break;
 
 		case SVGMapShape.TYPE_ELLIPSE:
 			type = 'ellipse';
@@ -948,23 +1100,20 @@ SVGMapShape.prototype.update = function(options) {
 				rx: this.rx,
 				ry: this.ry
 			};
-		break;
+			break;
 
 		default:
 			throw "Invalid shape configuration!";
 	}
 
-	var element;
-	if (options.text === undefined || options.text.trim() === '') {
+	if (typeof options.text === 'undefined' || options.text.trim() === '') {
 		element = this.map.layers.shapes.add(type, attributes);
 	}
 	else {
-		element = this.map.layers.shapes.add('g', null, [
-			{
-				'type': type,
-				'attributes': attributes
-			}
-		]);
+		element = this.map.layers.shapes.add('g', null, [{
+			'type': type,
+			'attributes': attributes
+		}]);
 
 		var x = this.center.x,
 			y = this.center.y,
@@ -974,27 +1123,27 @@ SVGMapShape.prototype.update = function(options) {
 			};
 
 		switch (parseInt(options['text_halign'])) {
-			case 0:
+			case SVGMapShape.LABEL_HALIGN_LEFT:
 				x = this.x + this.map.canvas.textPadding;
 				anchor.horizontal = 'left';
-			break;
+				break;
 
-			case 1:
+			case SVGMapShape.LABEL_HALIGN_RIGHT:
 				x = this.x + this.width - this.map.canvas.textPadding;
 				anchor.horizontal = 'right';
-			break;
+				break;
 		}
 
 		switch (parseInt(options['text_valign'])) {
-			case 0:
+			case SVGMapShape.LABEL_VALIGN_TOP:
 				y = this.y + this.map.canvas.textPadding;
 				anchor.vertical = 'top';
-			break;
+				break;
 
-			case 1:
+			case SVGMapShape.LABEL_VALIGN_BOTTOM:
 				y = this.y + this.height - this.map.canvas.textPadding;
 				anchor.vertical = 'bottom';
-			break;
+				break;
 		}
 
 		element.add('textarea', {
@@ -1007,13 +1156,21 @@ SVGMapShape.prototype.update = function(options) {
 			clip: {
 				'type': type,
 				'attributes': clip
-			}
+			},
+			'parse-links': true
 		}, options.text);
 	}
 
 	this.replace(element);
 };
 
+/**
+ * Replace shape.
+ *
+ * @see SVGElement.prototype.replace
+ *
+ * @param {object}    element   New shape element.
+ */
 SVGMapShape.prototype.replace = function (element) {
 	if (this.element !== null) {
 		this.element.replace(element);
@@ -1023,9 +1180,12 @@ SVGMapShape.prototype.replace = function (element) {
 	}
 };
 
+/**
+ * Remove shape.
+ */
 SVGMapShape.prototype.remove = function () {
 	if (this.element !== null) {
-		delete this.map.shapes[this.options.shapeid];
+		delete this.map.shapes[this.options.sysmap_shapeid];
 
 		this.element.remove();
 		this.element = null;

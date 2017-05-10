@@ -215,93 +215,31 @@ abstract class CMapElement extends CApiService {
 		return $update ? $db_selements : true;
 	}
 
-	protected function checkShapeInput(&$shapes, $method) {
-		$update = ($method == 'updateShapes');
-		$delete = ($method == 'deleteShapes');
+	/**
+	 * Checks that shape color attributes are valid.
+	 *
+	 * @throws APIException if input is invalid.
+	 *
+	 * @param array $shapes			An array of shapes.
+	 */
+	protected function checkShapeInput($shapes) {
+		$color_validator = new CColorValidator();
+		$fields = ['border_color', 'background_color', 'font_color'];
 
-		// permissions
-		if ($update || $delete) {
-			$dbShapes = API::getApiService()->select('sysmap_shape', [
-				'output' => API_OUTPUT_EXTEND,
-				'filter' => ['selementid' => zbx_objectValues($shapes, 'shapeid')],
-				'preservekeys' => true
-			]);
-
-			if ($update) {
-				$shapes = $this->extendFromObjects($shapes, $dbShapes, ['type', 'shapeid']);
+		foreach ($shapes as $shape) {
+			foreach ($fields as $field) {
+				if (array_key_exists($field, $shape) && $shape[$field] !== ''
+						&& !$color_validator->validate($shape[$field])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $color_validator->getError());
+				}
 			}
 		}
-
-		foreach ($shapes as &$shape) {
-			if ($update || $delete) {
-				if (!isset($dbShapes[$shape['shapeid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!'));
-				}
-
-				if ($delete) {
-					continue;
-				}
-			}
-
-			if (!array_key_exists('type', $shape) || !in_array($shape['type'], range(0,1))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape type is not correct.'));
-			}
-
-			foreach (['x', 'y'] as $field) {
-				if (array_key_exists($field, $shape) && $shape[$field] < 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape position is not correct.'));
-				}
-			}
-
-			foreach (['width', 'height'] as $field) {
-				if (array_key_exists($field, $shape) && $shape[$field] < 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape dimensions are not correct.'));
-				}
-			}
-
-			if (array_key_exists('font', $shape) && !in_array($shape['font'], range(0,12))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape font is not correct.'));
-			}
-
-			if (array_key_exists('font_size', $shape) && ($shape['font_size'] < 1 || $shape['font_size'] > 250)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape font size is not correct.'));
-			}
-
-			foreach (['border_color', 'background_color', 'font_color'] as $field) {
-				if (array_key_exists($field, $shape) && !empty($shape[$field])) {
-					$colorValidator = new CColorValidator();
-
-					if (!$colorValidator->validate($shape[$field])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $field));
-					}
-				}
-			}
-
-			foreach (['text_halign', 'text_valign'] as $field) {
-				if (array_key_exists($field, $shape) && !in_array($shape[$field], range(-1,1))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape text alignment is not correct.'));
-				}
-			}
-
-			if (array_key_exists('border_type', $shape) && !in_array($shape['border_type'], range(-1,2))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape border type is not correct.'));
-			}
-
-			if (array_key_exists('border_width', $shape) && $shape['border_width'] < 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Shape border width is not correct.'));
-			}
-		}
-		unset($shape);
-
-		return ($update || $delete) ? $dbShapes : true;
 	}
 
 	/**
 	 * Checks that the user has write permissions to objects used in the map elements.
 	 *
-	 * @throws APIException if the user has no permissions to at least one of the objects
+	 * @throws APIException if the user has no permissions to at least one of the objects.
 	 *
 	 * @param array $selements
 	 */
@@ -836,53 +774,52 @@ abstract class CMapElement extends CApiService {
 	/**
 	 * Add shape to sysmap.
 	 *
-	 * @return array
+	 * @param array $shapes							Multidimensional array with shape properties.
 	 */
 	protected function createShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
 
-		$this->checkShapeInput($shapes, __FUNCTION__);
+		$this->checkShapeInput($shapes);
 
-		$shapeIds = DB::insert('sysmap_shape', $shapes);
-
-		return ['shapeids' => $shapeIds];
+		DB::insert('sysmap_shape', $shapes);
 	}
 
 	/**
 	 * Update shapes to sysmap.
+	 *
+	 * @param array $shapes							Multidimensional array with shape properties.
 	 */
 	protected function updateShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
-		$shapeIds = [];
 
-		$this->checkShapeInput($shapes, __FUNCTION__);
+		$this->checkShapeInput($shapes);
 
 		$update = [];
 		foreach ($shapes as $shape) {
-			$update[] = [
-				'values' => $shape,
-				'where' => ['shapeid' => $shape['shapeid']],
-			];
-			$shapeIds[] = $shape['shapeid'];
+			$shapeid = $shape['sysmap_shapeid'];
+			unset($shape['sysmap_shapeid']);
+
+			if ($shape) {
+				$update[] = [
+					'values' => $shape,
+					'where' => ['sysmap_shapeid' => $shapeid],
+				];
+			}
 		}
 
 		DB::update('sysmap_shape', $update);
-
-		return ['shapeids' => $shapeIds];
 	}
 
 	/**
 	 * Delete shapes from map.
+	 *
+	 * @param array $shapes							Multidimensional array with shape properties.
 	 */
 	protected function deleteShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
-		$shapeIds = zbx_objectValues($shapes, 'shapeid');
+		$shapeids = zbx_objectValues($shapes, 'sysmap_shapeid');
 
-		$this->checkShapeInput($shapes, __FUNCTION__);
-
-		DB::delete('sysmap_shape', ['shapeid' => $shapeIds]);
-
-		return $shapeIds;
+		DB::delete('sysmap_shape', ['sysmap_shapeid' => $shapeids]);
 	}
 
 	/**

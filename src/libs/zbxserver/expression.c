@@ -130,14 +130,29 @@ int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *fun
  ******************************************************************************/
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 {
-	const char	*start = expression;
+	zbx_token_t	token;
+	int		pos = 0;
 	zbx_uint64_t	functionid;
 
 	if ('\0' == *expression)
 		return;
 
-	while (SUCCEED == get_N_functionid(start, 1, &functionid, &start))
-		zbx_vector_uint64_append(functionids, functionid);
+	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_OBJECTID:
+				is_uint64_n(expression + token.token.l + 1, token.token.r - token.token.l - 1,
+						&functionid);
+				zbx_vector_uint64_append(functionids, functionid);
+				/* break; is not missing here */
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_SIMPLE_MACRO:
+			case ZBX_TOKEN_MACRO:
+				pos = token.token.r;
+				break;
+		}
+	}
 
 	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -727,6 +742,35 @@ static int	get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 	return res;
 }
 
+static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
+{
+	int	ret;
+	DC_HOST	host;
+
+	DCconfig_get_hosts_by_itemids(&host, &itemid, &ret, 1);
+
+	if (FAIL == ret)
+		return FAIL;
+
+	switch (request)
+	{
+		case ZBX_REQUEST_HOST_ID:
+			*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, host.hostid);
+			break;
+		case ZBX_REQUEST_HOST_HOST:
+			*replace_to = zbx_strdup(*replace_to, host.host);
+			break;
+		case ZBX_REQUEST_HOST_NAME:
+			*replace_to = zbx_strdup(*replace_to, host.name);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			ret = FAIL;
+	}
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBget_item_value                                                 *
@@ -756,11 +800,14 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 		case ZBX_REQUEST_HOST_CONN:
 		case ZBX_REQUEST_HOST_PORT:
 			return get_interface_value(0, itemid, replace_to, request);
+		case ZBX_REQUEST_HOST_ID:
+		case ZBX_REQUEST_HOST_HOST:
+		case ZBX_REQUEST_HOST_NAME:
+			return get_host_value(itemid, replace_to, request);
 	}
 
 	result = DBselect(
-			"select h.hostid,h.proxy_hostid,h.host,h.name,h.description,"
-				"i.itemid,i.name,i.key_,i.description"
+			"select h.proxy_hostid,h.description,i.itemid,i.name,i.key_,i.description"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
 			" where i.itemid=" ZBX_FS_UI64, itemid);
@@ -769,24 +816,12 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	{
 		switch (request)
 		{
-			case ZBX_REQUEST_HOST_ID:
-				*replace_to = zbx_strdup(*replace_to, row[0]);
-				ret = SUCCEED;
-				break;
-			case ZBX_REQUEST_HOST_HOST:
-				*replace_to = zbx_strdup(*replace_to, row[2]);
-				ret = SUCCEED;
-				break;
-			case ZBX_REQUEST_HOST_NAME:
-				*replace_to = zbx_strdup(*replace_to, row[3]);
-				ret = SUCCEED;
-				break;
 			case ZBX_REQUEST_HOST_DESCRIPTION:
-				*replace_to = zbx_strdup(*replace_to, row[4]);
+				*replace_to = zbx_strdup(*replace_to, row[1]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_ID:
-				*replace_to = zbx_strdup(*replace_to, row[5]);
+				*replace_to = zbx_strdup(*replace_to, row[2]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
@@ -809,7 +844,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 						if (ZBX_REQUEST_ITEM_NAME == request)
 						{
-							*replace_to = zbx_strdup(*replace_to, row[6]);
+							*replace_to = zbx_strdup(*replace_to, row[3]);
 							item_description(replace_to, key, dc_item.host.hostid);
 							zbx_free(key);
 						}
@@ -824,19 +859,19 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				}
 				break;
 			case ZBX_REQUEST_ITEM_NAME_ORIG:
-				*replace_to = zbx_strdup(*replace_to, row[6]);
+				*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_KEY_ORIG:
-				*replace_to = zbx_strdup(*replace_to, row[7]);
+				*replace_to = zbx_strdup(*replace_to, row[4]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_DESCRIPTION:
-				*replace_to = zbx_strdup(*replace_to, row[8]);
+				*replace_to = zbx_strdup(*replace_to, row[5]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_PROXY_NAME:
-				ZBX_DBROW2UINT64(proxy_hostid, row[1]);
+				ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 
 				if (0 == proxy_hostid)
 				{
@@ -847,7 +882,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					ret = DBget_host_value(proxy_hostid, replace_to, "host");
 				break;
 			case ZBX_REQUEST_PROXY_DESCRIPTION:
-				ZBX_DBROW2UINT64(proxy_hostid, row[1]);
+				ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 
 				if (0 == proxy_hostid)
 				{
@@ -3502,10 +3537,23 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
-					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
+				if (ZBX_TOKEN_USER_MACRO == token.type)
+				{
+					/* When processing trigger expressions the user macros are already expanded. */
+					/* An unexpanded user macro means either unknown macro or macro value        */
+					/* validation failure.                                                       */
 
-				/* when processing trigger expressions the user macros are already expanded */
+					if (NULL != error)
+					{
+						zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
+								token.token.r - token.token.l + 1,
+								*data + token.token.l);
+					}
+
+					res = FAIL;
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
+					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 			}
 		}
 		else if (0 != (macro_type & MACRO_TYPE_TRIGGER_URL))
@@ -3740,6 +3788,41 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.token.r;
 				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_ID);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_HOST);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_NAME))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_IP))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_IP);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_DNS))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_DNS);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_CONN))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_CONN);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_PORT);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
 					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
@@ -3896,16 +3979,24 @@ zbx_trigger_func_position_t;
  * Author: Andrea Biscuola                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	expand_trigger_macros(DB_EVENT *event, DC_TRIGGER *trigger)
+static int	expand_trigger_macros(DB_EVENT *event, DC_TRIGGER *trigger, char *error, size_t maxerrlen)
 {
-	substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, &trigger->expression,
-			MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+	if (FAIL == substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, &trigger->expression,
+			MACRO_TYPE_TRIGGER_EXPRESSION, error, maxerrlen))
+	{
+		return FAIL;
+	}
 
 	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
 	{
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
-				&trigger->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+		if (FAIL == substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+				&trigger->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, error, maxerrlen))
+		{
+			return FAIL;
+		}
 	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -3949,7 +4040,7 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 
 		ev.value = tr->value;
 
-		expand_trigger_macros(&ev, tr);
+		expand_trigger_macros(&ev, tr, NULL, 0);
 
 		if (SUCCEED == extract_expression_functionids(&funcids, tr->expression))
 		{
@@ -3975,8 +4066,8 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
  *                                                                            *
  * Function: zbx_determine_items_in_expressions                               *
  *                                                                            *
- * Purpose: determine which items is used in the base trigger expressions and *
- *          flag it with ZBX_DC_TRIGGER_BASE_EXPRESSION                       *
+ * Purpose: mark triggers that use one of the items in problem expression     *
+ *          with ZBX_DC_TRIGGER_PROBLEM_EXPRESSION flag                       *
  *                                                                            *
  * Parameters: trigger_order - [IN/OUT] pointer to the list of triggers       *
  *             itemids       - [IN] array of item IDs                         *
@@ -4016,7 +4107,7 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 			if (FAIL != zbx_vector_uint64_bsearch(&itemids_sorted, functions[f].itemid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				func_pos->trigger->flags = ZBX_DC_TRIGGER_BASE_EXPRESSION;
+				func_pos->trigger->flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
 				break;
 			}
 		}
@@ -4499,14 +4590,9 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		event.value = tr->value;
 
-		if (NULL == tr->new_error)
+		if (SUCCEED != expand_trigger_macros(&event, tr, err, sizeof(err)))
 		{
-			expand_trigger_macros(&event, tr);
-		}
-		else
-		{
-			zbx_snprintf(err, sizeof(err), "Cannot evaluate expression: %s.", tr->new_error);
-			tr->new_error = zbx_strdup(tr->new_error, err);
+			tr->new_error = zbx_dsprintf(tr->new_error, "Cannot evaluate expression: %s", err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
 		}
 	}
@@ -4535,10 +4621,15 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		/* trigger expression evaluates to true, set PROBLEM value */
 		if (SUCCEED != zbx_double_compare(expr_result, 0.0))
 		{
-			if (ZBX_DC_TRIGGER_BASE_EXPRESSION == tr->flags)
-				tr->new_value = TRIGGER_VALUE_PROBLEM;
-			else
+			if (0 == (tr->flags & ZBX_DC_TRIGGER_PROBLEM_EXPRESSION))
+			{
+				/* trigger value should remain unchanged and no PROBLEM events should be generated if */
+				/* problem expression evaluates to true, but trigger recalculation was initiated by a */
+				/* time-based function or a new value of an item in recovery expression */
 				tr->new_value = TRIGGER_VALUE_NONE;
+			}
+			else
+				tr->new_value = TRIGGER_VALUE_PROBLEM;
 
 			continue;
 		}
