@@ -8796,12 +8796,15 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_nor
 
 	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
-		const ZBX_DC_HOST	*dc_host = NULL;
+		const ZBX_DC_HOST	*dc_host;
+
+		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
+			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		if (ITEM_STATUS_ACTIVE != dc_item->status)
+		if (HOST_STATUS_MONITORED != dc_host->status || ITEM_STATUS_ACTIVE != dc_item->status)
 		{
 			item_stats->disabled.ui64++;
 
@@ -8814,29 +8817,24 @@ void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_nor
 			continue;
 		}
 
-		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
-			continue;
-
-		if (HOST_STATUS_MONITORED != dc_host->status)
-			continue;
-
-		item_stats->active_normal.ui64++;
-
-		if (NULL != active_normal_by_proxy)
+		switch (dc_item->state)
 		{
-			get_counter_by_proxyid(active_normal_by_proxy, dc_host->proxy_hostid,
-					ZBX_COUNTER_TYPE_UI64)->ui64++;
-		}
-
-		if (ITEM_STATE_NOTSUPPORTED == dc_item->state)
-		{
-			item_stats->active_notsupported.ui64++;
-
-			if (NULL != active_notsupported_by_proxy)
-			{
-				get_counter_by_proxyid(active_notsupported_by_proxy, dc_host->proxy_hostid,
-						ZBX_COUNTER_TYPE_UI64)->ui64++;
-			}
+			case ITEM_STATE_NORMAL:
+				item_stats->active_normal.ui64++;
+				if (NULL != active_normal_by_proxy)
+				{
+					get_counter_by_proxyid(active_normal_by_proxy, dc_host->proxy_hostid,
+							ZBX_COUNTER_TYPE_UI64)->ui64++;
+				}
+				break;
+			case ITEM_STATE_NOTSUPPORTED:
+				item_stats->active_notsupported.ui64++;
+				if (NULL != active_notsupported_by_proxy)
+				{
+					get_counter_by_proxyid(active_notsupported_by_proxy, dc_host->proxy_hostid,
+							ZBX_COUNTER_TYPE_UI64)->ui64++;
+				}
+				break;
 		}
 	}
 
@@ -8905,6 +8903,7 @@ void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats)
 					NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) ||
 					HOST_STATUS_MONITORED != dc_host->status)
 			{
+				trigger_stats->disabled.ui64++;
 				goto next;
 			}
 
