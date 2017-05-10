@@ -187,8 +187,8 @@ abstract class CMapElement extends CApiService {
 			}
 
 			if (isset($selement['iconid_off']) && $selement['iconid_off'] == 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No icon for map element "%s".',
-						array_key_exists('label', $selement) ? $selement['label'] : '')
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('No icon for map element "%s".', array_key_exists('label', $selement) ? $selement['label'] : '')
 				);
 			}
 
