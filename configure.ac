@@ -58,11 +58,11 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
   zone.h nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
-  sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
+  sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h pcreposix.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h)
+  dlfcn.h sys/utsname.h sys/un.h event.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -1375,6 +1375,17 @@ if test "x$have_ipcservice" = "xyes"; then
 
 fi
 
+dnl Check for libpcre, used by Zabbix for regular expressions
+LIBPCRE_CHECK_CONFIG([no])
+if test "x$found_libpcre" != "xyes"; then
+	AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
+fi
+CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+LIBS="$LIBS $LIBPCRE_LIBS"
+
+AC_SUBST(LIBPCRE_CFLAGS)
+
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
 LIBMBEDTLS_CHECK_CONFIG([no])
 if test "x$want_mbedtls" = "xyes"; then
@@ -1596,6 +1607,7 @@ AC_OUTPUT([
 	src/libs/zbxdb/Makefile
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxjson/Makefile
+	src/libs/zbxhttp/Makefile
 	src/libs/zbxserver/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxexec/Makefile

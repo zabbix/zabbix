@@ -94,6 +94,18 @@ class C32ImportConverterTest extends CImportConverterTest {
 										]
 									]
 								]
+							],
+							'httptests' => [
+								[
+									'headers' => "Host:www.zabbix.com\nConnection:keep-alive\nPragma:no-cache",
+									'variables' => "{var1}=value1\r\n\r\n\r\n{var2}=value2",
+									'steps' => [
+										[
+											'headers' => "Host:internal.zabbix.com\n\n",
+											'variables' => "{var3}=value3"
+										]
+									]
+								]
 							]
 						]
 					],
@@ -163,6 +175,18 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'formula' => '100',
 											'multiplier' => 1,
 											'delta' => 2
+										]
+									]
+								]
+							],
+							'httptests' => [
+								[
+									'headers' => '',
+									'variables' => "{variable}=s00p3r$3c3t",
+									'steps' => [
+										[
+											'headers' => "\r\n\n\r\r\r\nPragma:no-cache",
+											'variables' => ''
 										]
 									]
 								]
@@ -272,6 +296,51 @@ class C32ImportConverterTest extends CImportConverterTest {
 										]
 									]
 								]
+							],
+							'httptests' => [
+								[
+									'headers' => [
+										[
+											'name' => 'Host',
+											'value' => 'www.zabbix.com'
+										],
+										[
+											'name' => 'Connection',
+											'value' => 'keep-alive'
+										],
+										[
+											'name' => 'Pragma',
+											'value' => 'no-cache'
+										]
+									],
+									'variables' => [
+										[
+											'name' => '{var1}',
+											'value' => 'value1'
+										],
+										[
+											'name' => '{var2}',
+											'value' => 'value2'
+										]
+									],
+									'steps' => [
+										[
+											'headers' => [
+												[
+													'name' => 'Host',
+													'value' => 'internal.zabbix.com'
+												]
+											],
+											'variables' => [
+												[
+													'name' => '{var3}',
+													'value' => 'value3'
+												]
+											],
+											'query_fields' => []
+										]
+									]
+								]
 							]
 						]
 					],
@@ -373,6 +442,29 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => '100'
 												]
 											]
+										]
+									]
+								]
+							],
+							'httptests' => [
+								[
+									'headers' => [],
+									'variables' => [
+										[
+											'name' => '{variable}',
+											'value' => 's00p3r$3c3t'
+										]
+									],
+									'steps' => [
+										[
+											'headers' => [
+												[
+													'name' => 'Pragma',
+													'value' => 'no-cache'
+												]
+											],
+											'variables' => [],
+											'query_fields' => []
 										]
 									]
 								]

@@ -183,7 +183,8 @@ class CArrayHelper {
 
 		foreach ($a1 as $key => $value) {
 			// check if the values under $key are equal, skip arrays
-			if (isset($a2[$key]) && !is_array($value) && (string) $a1[$key] === (string) $a2[$key]) {
+			if (isset($a2[$key]) && !is_array($value) && !is_array($a2[$key])
+					&& (string) $a1[$key] === (string) $a2[$key]) {
 				unset($a1[$key]);
 			}
 		}

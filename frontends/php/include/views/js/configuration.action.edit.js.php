@@ -392,9 +392,7 @@
 				},
 				popup: {
 					parameters: 'srctbl=' + srctbl + '&dstfrm=action.edit&dstfld1=opCmdTargetObject&srcfld1=' +
-						srcfld1 + '&writeonly=1&multiselect=1',
-					width: 450,
-					height: 450
+						srcfld1 + '&writeonly=1&multiselect=1'
 				}
 			});
 		}

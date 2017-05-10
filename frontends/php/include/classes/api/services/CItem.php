@@ -642,26 +642,23 @@ class CItem extends CItemGeneral {
 			'value_id' => $itemIds
 		]);
 
-		$itemDataTables = [
-			'trends',
-			'trends_uint',
-			'history_text',
-			'history_log',
-			'history_uint',
-			'history_str',
+		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
 			'history'
 		];
+
 		$insert = [];
+
 		foreach ($itemIds as $itemId) {
-			foreach ($itemDataTables as $table) {
+			foreach ($table_names as $table_name) {
 				$insert[] = [
-					'tablename' => $table,
+					'tablename' => $table_name,
 					'field' => 'itemid',
 					'value' => $itemId
 				];
 			}
 		}
-		DB::insert('housekeeper', $insert);
+
+		DB::insertBatch('housekeeper', $insert);
 
 		// TODO: remove info from API
 		foreach ($delItems as $item) {

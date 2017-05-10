@@ -1,3 +1,56 @@
+<?php
+$shape_border_types = [
+	SYSMAP_SHAPE_BORDER_TYPE_NONE		=> _('None'),
+	SYSMAP_SHAPE_BORDER_TYPE_SOLID		=> '———',
+	SYSMAP_SHAPE_BORDER_TYPE_DOTTED		=> '· · · ·',
+	SYSMAP_SHAPE_BORDER_TYPE_DASHED		=> '- - - -'
+];
+
+$horizontal_align_types = [
+	SYSMAP_SHAPE_LABEL_HALIGN_LEFT		=> _('Left'),
+	SYSMAP_SHAPE_LABEL_HALIGN_CENTER	=> _('Center'),
+	SYSMAP_SHAPE_LABEL_HALIGN_RIGHT		=> _('Right')
+];
+
+$vertical_align_types = [
+	SYSMAP_SHAPE_LABEL_VALIGN_TOP		=> _('Top'),
+	SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE	=> _('Middle'),
+	SYSMAP_SHAPE_LABEL_VALIGN_BOTTOM	=> _('Bottom')
+];
+
+/**
+ * Get font selection for Combobox.
+ *
+ * @param string $name				Combobox name.
+ *
+ * @return CComboBox
+ */
+function getFontComboBox($name) {
+	return (new CComboBox($name))
+		->addItem(
+			(new COptGroup(_('Serif')))
+				->addItem(new CComboItem(0, 'Georgia'))
+				->addItem(new CComboItem(1, 'Palatino'))
+				->addItem(new CComboItem(2, 'Times New Roman'))
+		)
+		->addItem(
+			(new COptGroup(_('Sans-Serif')))
+				->addItem(new CComboItem(3, 'Arial'))
+				->addItem(new CComboItem(4, 'Arial Black'))
+				->addItem(new CComboItem(5, 'Comic Sans'))
+				->addItem(new CComboItem(6, 'Impact'))
+				->addItem(new CComboItem(7, 'Lucida Sans'))
+				->addItem(new CComboItem(8, 'Tahoma'))
+				->addItem(new CComboItem(9, 'Helvetica'))
+				->addItem(new CComboItem(10, 'Verdana'))
+		)
+		->addItem(
+			(new COptGroup(_('Monospace')))
+				->addItem(new CComboItem(11, 'Courier New'))
+				->addItem(new CComboItem(12, 'Lucida Console'))
+		);
+}
+?>
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Map element'))))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
@@ -212,19 +265,18 @@
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
 			->addClass(ZBX_STYLE_CURSOR_MOVE)
 			->setId('shapeDragHandler')
-			->toString()
-	?>
-	<?= (new CForm())
+			->toString().
+		(new CForm())
 			->cleanItems()
 			->setName('shapeForm')
 			->setId('shapeForm')
-			->addVar('shapeid', '')
+			->addVar('sysmap_shapeid', '')
 			->addItem(
 				(new CFormList())
 					->addRow(_('Shape'),
-						(new CRadioButtonList('type', 0))
-							->addValue(_('Rectangle'), 0)
-							->addValue(_('Ellipse'), 1)
+						(new CRadioButtonList('type', SYSMAP_SHAPE_TYPE_RECTANGLE))
+							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE)
+							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE)
 							->setModern(true)
 					)
 					->addRow(_('Text'),
@@ -235,29 +287,7 @@
 							BR(),
 							_('Font'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('font'))
-								->addItem(
-									(new COptGroup(_('Serif')))
-										->addItem(new CComboItem(0, 'Georgia'))
-										->addItem(new CComboItem(1, 'Palatino'))
-										->addItem(new CComboItem(2, 'Times New Roman'))
-								)
-								->addItem(
-									(new COptGroup(_('Sans-Serif')))
-										->addItem(new CComboItem(3, 'Arial'))
-										->addItem(new CComboItem(4, 'Arial Black'))
-										->addItem(new CComboItem(5, 'Comic Sans'))
-										->addItem(new CComboItem(6, 'Impact'))
-										->addItem(new CComboItem(7, 'Lucida Sans'))
-										->addItem(new CComboItem(8, 'Tahoma'))
-										->addItem(new CComboItem(9, 'Helvetica'))
-										->addItem(new CComboItem(10, 'Verdana'))
-								)
-								->addItem(
-									(new COptGroup(_('Monospace')))
-										->addItem(new CComboItem(11, 'Courier New'))
-										->addItem(new CComboItem(12, 'Lucida Console'))
-								),
+							getFontComboBox('font'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Font size'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -269,40 +299,30 @@
 							BR(),
 							_('Horizontal align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('text_halign', -1, null, [
-								'0'	=> _('Left'),
-								'-1'	=> _('Center'),
-								'1'	=> _('Right')
-							]))->setAttribute('style', 'margin-top:4px'),
+							(new CComboBox('text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
+								$horizontal_align_types
+							))
+								->setAttribute('style', 'margin-top: 4px'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Vertical align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('text_valign', -1, null, [
-								'0'	=> _('Top'),
-								'-1'	=> _('Middle'),
-								'1'	=> _('Bottom')
-							])),
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							(new CComboBox('text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
+								$vertical_align_types
+							))
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addRow(_('Background'),
 						(new CDiv([
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							new CColor('background_color', '#{color}', false)
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addRow(_('Border'),
 						(new CDiv([
 							_('Type'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('border_type', null, null, [
-								'-1'	=> _('None'),
-								'0'	=> '———',
-								'1'	=> '· · · ·',
-								'2'	=> '- - - -',
-							])),
+							(new CComboBox('border_type', null, null, $shape_border_types)),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Width'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -311,8 +331,7 @@
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							new CColor('border_color', '#{color}', false)
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addRow(new CLabel(_('Coordinates'), 'x'),
 						(new CDiv([
@@ -323,8 +342,7 @@
 							_('Y'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CTextBox('y'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addRow(new CLabel(_('Size'), 'areaSizeWidth'),
 						(new CDiv([
@@ -339,8 +357,7 @@
 							(new CTextBox('height'))
 								->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 								->setId('areaSizeHeight')
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
@@ -369,9 +386,8 @@
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
 			->addClass(ZBX_STYLE_CURSOR_MOVE)
 			->setId('massShapeDragHandler')
-			->toString()
-	?>
-	<?= (new CForm())
+			->toString().
+		(new CForm())
 			->cleanItems()
 			->setName('shapeForm')
 			->setId('massShapeForm')
@@ -380,9 +396,9 @@
 					->addRow((new CCheckBox('chkbox_type'))
 							->setId('chkboxType')
 							->setLabel(_('Shape')),
-						(new CRadioButtonList('mass_type', 0))
-							->addValue(_('Rectangle'), 0)
-							->addValue(_('Ellipse'), 1)
+						(new CRadioButtonList('mass_type', SYSMAP_SHAPE_TYPE_RECTANGLE))
+							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE)
+							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE)
 							->setModern(true)
 					)
 					->addRow((new CCheckBox('chkbox_text'))
@@ -395,29 +411,7 @@
 					->addRow((new CCheckBox('chkbox_font'))
 							->setId('chkboxFont')
 							->setLabel(_('Font')),
-						(new CComboBox('mass_font'))
-								->addItem(
-									(new COptGroup(_('Serif')))
-										->addItem(new CComboItem(0, 'Georgia'))
-										->addItem(new CComboItem(1, 'Palatino'))
-										->addItem(new CComboItem(2, 'Times New Roman'))
-								)
-								->addItem(
-									(new COptGroup(_('Sans-Serif')))
-										->addItem(new CComboItem(3, 'Arial'))
-										->addItem(new CComboItem(4, 'Arial Black'))
-										->addItem(new CComboItem(5, 'Comic Sans'))
-										->addItem(new CComboItem(6, 'Impact'))
-										->addItem(new CComboItem(7, 'Lucida Sans'))
-										->addItem(new CComboItem(8, 'Tahoma'))
-										->addItem(new CComboItem(9, 'Helvetica'))
-										->addItem(new CComboItem(10, 'Verdana'))
-								)
-								->addItem(
-									(new COptGroup(_('Monospace')))
-										->addItem(new CComboItem(11, 'Courier New'))
-										->addItem(new CComboItem(12, 'Lucida Console'))
-								)
+						getFontComboBox('mass_font')
 					)
 					->addRow((new CCheckBox('chkbox_font_size'))
 							->setId('chkboxFontSize')
@@ -432,20 +426,14 @@
 					->addRow((new CCheckBox('chkbox_text_halign'))
 							->setId('chkboxTextHalign')
 							->setLabel(_('Horizontal align')),
-						new CComboBox('mass_text_halign', -1, null, [
-								'0'	=> _('Left'),
-								'-1'	=> _('Center'),
-								'1'	=> _('Right')
-							])
+						new CComboBox('mass_text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
+							$horizontal_align_types
+						)
 					)
 					->addRow((new CCheckBox('chkbox_text_valign'))
 							->setId('chkboxTextValign')
 							->setLabel(_('Vertical align')),
-						new CComboBox('mass_text_valign', -1, null, [
-								'0'	=> _('Top'),
-								'-1'	=> _('Middle'),
-								'1'	=> _('Bottom')
-							])
+						new CComboBox('mass_text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null, $vertical_align_types)
 					)
 					->addRow((new CCheckBox('chkbox_background'))
 							->setId('chkboxBackground')
@@ -455,12 +443,7 @@
 					->addRow((new CCheckBox('chkbox_border_type'))
 							->setId('chkboxBorderType')
 							->setLabel(_('Border type')),
-						new CComboBox('mass_border_type', null, null, [
-								'-1'	=> _('None'),
-								'0'	=> '———',
-								'1'	=> '· · · ·',
-								'2'	=> '- - - -',
-							])
+						new CComboBox('mass_border_type', null, null, $shape_border_types)
 					)
 					->addRow((new CCheckBox('chkbox_border_width'))
 							->setId('chkboxBorderWidth')

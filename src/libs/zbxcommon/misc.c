@@ -1870,6 +1870,31 @@ int	is_ip6(const char *ip)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_supported_ip                                                  *
+ *                                                                            *
+ * Purpose: is string IP address of supported version                         *
+ *                                                                            *
+ * Parameters: ip - string                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - is IP address                                      *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+int	is_supported_ip(const char *ip)
+{
+	if (SUCCEED == is_ip4(ip))
+		return SUCCEED;
+#ifdef HAVE_IPV6
+	if (SUCCEED == is_ip6(ip))
+		return SUCCEED;
+#endif
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_ip                                                            *
  *                                                                            *
  * Purpose: is string IP address                                              *

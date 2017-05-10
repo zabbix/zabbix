@@ -76,7 +76,7 @@ static void	cu_test_macro_expresssion(const char *expression, const char *macro,
 
 static void	test_zbx_user_macro_parse()
 {
-	struct zbx_str_test_data_t
+	struct zbx_user_macrotest_data_t
 	{
 		const char	*expression;
 		const char	*macro;
@@ -85,7 +85,7 @@ static void	test_zbx_user_macro_parse()
 	};
 
 	size_t				i;
-	struct zbx_str_test_data_t	user_macro_parse_test_cases[] = {
+	struct zbx_user_macrotest_data_t	user_macro_parse_test_cases[] = {
 			{"", NULL, NULL, FAIL},
 			{"{", NULL, NULL, FAIL},
 			{"}", NULL, NULL, FAIL},

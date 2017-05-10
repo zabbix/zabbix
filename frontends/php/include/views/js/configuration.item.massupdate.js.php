@@ -24,17 +24,26 @@
 	</tr>
 </script>
 <script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
-	<?=
-		(new CRow([
+	<?php
+		$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
+
+		foreach (get_preprocessing_types() as $group) {
+			$cb_group = new COptGroup($group['label']);
+
+			foreach ($group['types'] as $type => $label) {
+				$cb_group->addItem(new CComboItem($type, $label));
+			}
+
+			$preproc_types_cbbox->addItem($cb_group);
+		}
+
+		echo (new CRow([
 			(new CCol(
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CComboBox('preprocessing[#{rowNum}][type]', '', null, get_preprocessing_types())),
-			(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-				->setAttribute('placeholder', _('number')),
-			(new CTextBox('preprocessing[#{rowNum}][params][1]'))
-				->setAttribute('placeholder', _('output'))
-				->addStyle('display: none;'),
+			$preproc_types_cbbox,
+			(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', _('number')),
+			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', _('output')),
 			(new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')

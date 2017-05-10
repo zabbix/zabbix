@@ -1096,6 +1096,248 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/1/expression',
 				'@^[a-z$'
 			],
+			[
+				['type' => API_VARIABLE_NAME, 'length' => 6],
+				'{var1}',
+				'/1/variables',
+				'{var1}'
+			],
+			[
+				['type' => API_VARIABLE_NAME, 'length' => 5],
+				'{var1}',
+				'/1/variables',
+				'Invalid parameter "/1/variables": value is too long.'
+			],
+			[
+				['type' => API_VARIABLE_NAME],
+				'',
+				'/1/variables',
+				'Invalid parameter "/1/variables": cannot be empty.'
+			],
+			[
+				['type' => API_VARIABLE_NAME],
+				null,
+				'/1/variables',
+				'Invalid parameter "/1/variables": a character string is expected.'
+			],
+			[
+				['type' => API_VARIABLE_NAME],
+				'{var',
+				'/1/variables',
+				'Invalid parameter "/1/variables": is not enclosed in {} or is malformed.'
+			],
+			[
+				['type' => API_HTTP_POST, 'name-length' => 255],
+				[
+					[
+						'name' => str_repeat('Long ', 95).'name',
+						'value' => 'value'
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/1/name": value is too long.'
+			],
+			[
+				['type' => API_HTTP_POST, 'value-length' => 255],
+				[
+					[
+						'name' => 'name',
+						'value' => str_repeat('Long ', 95).'value'
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/1/value": value is too long.'
+			],
+			[
+				['type' => API_HTTP_POST, 'name-length' => 6, 'value-length' => 19],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => 'v:a:l:u:e'
+					]
+				],
+				'/1/posts',
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => 'v:a:l:u:e'
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/2": the parameter "name" is missing.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom'
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/2": the parameter "value" is missing.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => 'v:a:l:u:e',
+						'type' => 1
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/2": unexpected parameter "type".'
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => null,
+						'value' => 'v:a:l:u:e'
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/2/name": a character string is expected.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => true
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/2/value": a character string is expected.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => '',
+						'value' => 'v:a:l:u:e'
+					]
+				],
+				'/1/posts',
+				'Invalid parameter "/1/posts/2/name": cannot be empty.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => ''
+					]
+				],
+				'/1/posts',
+				[
+					[
+						'name' => 'Host',
+						'value' => 'www.zabbix.com:8080'
+					],
+					[
+						'name' => 'Custom',
+						'value' => ''
+					]
+				]
+			],
+			[
+				['type' => API_HTTP_POST],
+				true,
+				'/1/posts',
+				'Invalid parameter "/1/posts": a character string is expected.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				null,
+				'/1/posts',
+				'Invalid parameter "/1/posts": a character string is expected.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				['a', 'b'],
+				'/1/posts',
+				'Invalid parameter "/1/posts/1": an array is expected.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				'a=raw\r post that\n should : not be altered',
+				'/1/posts',
+				'a=raw\r post that\n should : not be altered'
+			],
+			[
+				['type' => API_HTTP_POST, 'length' => 10],
+				'12345678901',
+				'/1/posts',
+				'Invalid parameter "/1/posts": value is too long.'
+			],
+			[
+				['type' => API_HTTP_POST],
+				[
+					[
+						'name' => 'p1',
+						'value' => 'value1'
+					],
+					[
+						'name' => 'p2',
+						'value' => 'value2'
+					]
+				],
+				'/1/posts',
+				[
+					[
+						'name' => 'p1',
+						'value' => 'value1'
+					],
+					[
+						'name' => 'p2',
+						'value' => 'value2'
+					]
+				]
+			]
 		];
 	}
 
