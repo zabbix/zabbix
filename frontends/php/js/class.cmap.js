@@ -1750,8 +1750,12 @@ ZABBIX.apps.map = (function($) {
 						this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1
 				);
 
-				// if element is image we unset advanced icons
-				if (this.data.elementtype === '4') {
+				if (this.data.elementtype === '2') {
+					// For element type trigger not exist signle element name.
+					delete this.data['elementName'];
+				}
+				else if (this.data.elementtype === '4') {
+					// if element is image we unset advanced icons
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
@@ -1762,6 +1766,9 @@ ZABBIX.apps.map = (function($) {
 							this.data.elementName = this.sysmap.iconList[i].name;
 						}
 					}
+				}
+				else {
+					this.data.elementName = this.data.elements[0].elementName;
 				}
 
 				this.updateIcon();
@@ -2094,7 +2101,9 @@ ZABBIX.apps.map = (function($) {
 							triggerids.push(trigger.id);
 							triggers_to_insert[trigger.id] = {
 								id: trigger.id,
-								name: trigger.name
+								name: typeof trigger.prefix == 'undefined'
+									? trigger.name
+									: trigger.prefix + trigger.name
 							};
 						}
 					});
@@ -2103,7 +2112,6 @@ ZABBIX.apps.map = (function($) {
 						// get priority
 						var ajaxUrl = new Curl('jsrpc.php');
 						ajaxUrl.setArgument('type', 11);
-						ajaxUrl.setArgument('method', 'trigget.get');
 						$.ajax({
 							url: ajaxUrl.getUrl(),
 							type: 'post',
@@ -2533,21 +2541,14 @@ ZABBIX.apps.map = (function($) {
 						case '4': elementTypeText = locale['S_IMAGE']; break;
 					}
 
-					name = element.data.elementName;
-					if (name === undefined) {
-						if (typeof element.data.elements === 'object') {
-							var names = [],
-								keys = Object.keys(element.data.elements);
-
-							for (i = 0; i < keys.length; i++) {
-								names.push(element.data.elements[keys[i]].elementName.escapeHTML());
-							}
-
-							name = names.join("<br>");
+					if (typeof element.data.elementName === 'undefined') {
+						name = element.data.elements[0].elementName.escapeHTML();
+						if (Object.keys(element.data.elements).length > 1) {
+							name += '...';
 						}
 					}
 					else {
-						name = name.escapeHTML();
+						name = element.data.elementName.escapeHTML();
 					}
 
 					list.push({
@@ -2987,7 +2988,9 @@ ZABBIX.apps.map = (function($) {
 					tmp,
 					ln,
 					link,
-					linktriggers;
+					linktriggers,
+					fromElementName,
+					toElementName;
 
 				$('.element-links').hide();
 				$('.element-links tbody').empty();
@@ -3033,9 +3036,29 @@ ZABBIX.apps.map = (function($) {
 							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
 						}
 
+						if (typeof this.sysmap.selements[link.selementid1].data.elementName === 'undefined') {
+							fromElementName = this.sysmap.selements[link.selementid1].data.elements[0].elementName;
+							if (Object.keys(this.sysmap.selements[link.selementid1].data.elements).length > 1) {
+								fromElementName += '...';
+							}
+						}
+						else {
+							fromElementName = this.sysmap.selements[link.selementid1].data.elementName;
+						}
+
+						if (typeof this.sysmap.selements[link.selementid2].data.elementName === 'undefined') {
+							toElementName = this.sysmap.selements[link.selementid2].data.elements[0].elementName;
+							if (Object.keys(this.sysmap.selements[link.selementid2].data.elements).length > 1) {
+								toElementName += '...';
+							}
+						}
+						else {
+							toElementName = this.sysmap.selements[link.selementid2].data.elementName;
+						}
+
 						list.push({
-							fromElementName: this.sysmap.selements[link.selementid1].data.elements.elementName || '',
-							toElementName: this.sysmap.selements[link.selementid2].data.elements.elementName || '',
+							fromElementName: fromElementName,
+							toElementName: toElementName,
 							linkid: link.linkid,
 							linktriggers: linktriggers
 						});
