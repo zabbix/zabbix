@@ -339,9 +339,14 @@ switch ($data['method']) {
 				break;
 
 			case 'triggers':
+				$host_fields = ['name'];
+				if (array_key_exists('real_hosts', $data) && $data['real_hosts']) {
+					array_push($host_fields, 'status');
+				}
+
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid', 'description'],
-					'selectHosts' => ['name'],
+					'selectHosts' => $host_fields,
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'monitored' => isset($data['monitored']) ? $data['monitored'] : null,
 					'search' => isset($data['search']) ? ['description' => $data['search']] : null,
@@ -349,6 +354,18 @@ switch ($data['method']) {
 				]);
 
 				if ($triggers) {
+					if (array_key_exists('real_hosts', $data) && $data['real_hosts']) {
+						foreach ($triggers as $key => $trigger) {
+							foreach ($triggers[$key]['hosts'] as $host) {
+								if ($host['status'] != HOST_STATUS_MONITORED
+										&& $host['status'] != HOST_STATUS_NOT_MONITORED) {
+									unset($triggers[$key]);
+									break;
+								}
+							}
+						}
+					}
+
 					CArrayHelper::sort($triggers, [
 						['field' => 'description', 'order' => ZBX_SORT_UP]
 					]);

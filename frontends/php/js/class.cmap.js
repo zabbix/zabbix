@@ -2008,11 +2008,12 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
-					editable: true
+					editable: true,
+					real_hosts: true
 				},
 				popup: {
-					parameters: 'srctbl=triggers&dstfrm=selementForm&dstfld1=elementNameTriggers' +
-						'&srcfld1=triggerid&multiselect=1'
+					parameters: 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers' +
+						'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
 				}
 			});
 

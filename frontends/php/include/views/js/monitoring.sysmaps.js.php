@@ -153,7 +153,15 @@ function getFontComboBox($name) {
 							new CVar('elementExpressionTrigger', ''),
 							(new CMultiSelect([
 								'name' => 'elementNameTriggers',
-								'objectName' => 'triggers'
+								'objectName' => 'triggers',
+								'objectOptions' => [
+									'editable' => true,
+									'real_hosts' => true
+								],
+								'popup' => [
+									'parameters' => 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers'.
+										'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
+								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 							new CDiv(
 								(new CButton(null, _('Add')))
