@@ -1131,7 +1131,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 	if (!empty($elems['hostgroups']) && $hglabel) {
 		$groupids = [];
 
-		foreach ($elems['sysmaps'] as $sysmap_elem) {
+		foreach ($elems['hostgroups'] as $sysmap_elem) {
 			$groupids[$sysmap_elem['elements'][0]['groupid']] = true;
 		}
 
