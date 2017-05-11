@@ -220,7 +220,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	sec1 = zbx_time();
-	sec2 = sec1;
 
 	sleeptime = ZBX_TM_PROCESS_PERIOD - (int)sec1 % ZBX_TM_PROCESS_PERIOD;
 
