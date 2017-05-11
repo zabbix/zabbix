@@ -605,7 +605,7 @@ static int	DBpatch_3030049(void)
 
 static int	DBpatch_3030050(void)
 {
-	return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_1", "selementid", 0);
+	return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_1", "selementid,triggerid", 1);
 }
 
 static int	DBpatch_3030051(void)
