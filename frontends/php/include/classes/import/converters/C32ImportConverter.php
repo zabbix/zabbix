@@ -157,6 +157,7 @@ class C32ImportConverter extends CConverter {
 	protected function convertMapElements(array $selements) {
 		foreach ($selements as &$selement) {
 			$selement['elements'] = [$selement['element']];
+			unset($selement['element']);
 		}
 		unset($selement);
 
