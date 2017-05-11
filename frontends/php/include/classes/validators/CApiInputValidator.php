@@ -319,8 +319,14 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (is_string($data) && $data[0] === '0' && strlen($data) > 1) {
+		$data = (string) $data;
+
+		if ($data[0] === '0') {
 			$data = ltrim($data, '0');
+
+			if ($data === '') {
+				$data = '0';
+			}
 		}
 
 		return true;
