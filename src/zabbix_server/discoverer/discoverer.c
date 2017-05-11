@@ -431,7 +431,7 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 				unique ? "=" : "<>", drule->unique_dcheckid);
 	}
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by dcheckid");
+	zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by dcheckid");
 
 	result = DBselect("%s", sql);
 
