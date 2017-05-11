@@ -210,11 +210,6 @@ class CMediatype extends CApiService {
 			);
 		}
 
-		$validation_rules = [
-			'maxsessions' =>			'not_empty|int32|le 100|ge 0|db media_type.maxsessions',
-			'maxattempts' =>			'not_empty|int32|le 10|ge 0|db media_type.maxattempts',
-			'attempt_interval' =>		'not_empty|string|db media_type.attempt_interval',
-		];
 		$simple_interval_parser = new CSimpleIntervalParser();
 
 		foreach ($mediatypes as $mediatype) {
@@ -350,17 +345,6 @@ class CMediatype extends CApiService {
 						}
 					}
 					break;
-
-				case MEDIA_TYPE_SMS:
-					if (array_key_exists('maxsessions', $mediatype) && $mediatype['maxsessions'] > 1) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-							$mediatype['maxsessions'],
-							'maxsessions',
-							$mediatype['description']
-						));
-					}
-					break;
 			}
 
 			// Validate optional 'status' field.
@@ -379,12 +363,39 @@ class CMediatype extends CApiService {
 				}
 			}
 
-			$validator = new CNewValidator($mediatype, $validation_rules);
-			$errors = $validator->getAllErrors();
-			if ($errors) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, reset($errors));
+			// Validate optional 'maxsessions' field.
+			if (array_key_exists('maxsessions', $mediatype)) {
+				$ge_value = 0;
+				$le_value = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
+				$value = $mediatype['maxsessions'];
+				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
+				if (!$valid_value || $value < $ge_value || $value > $le_value) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+						$mediatype['maxsessions'],
+						'maxsessions',
+						$mediatype['description']
+					));
+				}
 			}
 
+			// Validate optional 'maxattempts' field.
+			if (array_key_exists('maxattempts', $mediatype)) {
+				$ge_value = 0;
+				$le_value = 10;
+				$value = $mediatype['maxattempts'];
+				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
+				if (!$valid_value || $value < $ge_value || $value > $le_value) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+						$mediatype['maxattempts'],
+						'maxattempts',
+						$mediatype['description']
+					));
+				}
+			}
+
+			// Validate optional 'attempt_interval' field.
 			if (array_key_exists('attempt_interval', $mediatype)) {
 				$attempt_interval = $mediatype['attempt_interval'];
 				$is_valid = ($simple_interval_parser->parse($attempt_interval) == CParser::PARSE_SUCCESS);
@@ -434,11 +445,6 @@ class CMediatype extends CApiService {
 		]);
 
 		$check_names = [];
-		$validation_rules = [
-			'maxsessions' =>			'not_empty|int32|le 100|ge 0|db media_type.maxsessions',
-			'maxattempts' =>			'not_empty|int32|le 10|ge 0|db media_type.maxattempts',
-			'attempt_interval' =>		'not_empty|string|db media_type.attempt_interval',
-		];
 		$simple_interval_parser = new CSimpleIntervalParser();
 
 		foreach ($mediatypes as $mediatype) {
@@ -678,17 +684,6 @@ class CMediatype extends CApiService {
 						}
 					}
 					break;
-
-				case MEDIA_TYPE_SMS:
-					if (array_key_exists('maxsessions', $mediatype) && $mediatype['maxsessions'] > 1) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-							$mediatype['maxsessions'],
-							'maxsessions',
-							$mediatype['description']
-						));
-					}
-					break;
 			}
 
 			// Validate optional 'status' field and only when status is changed.
@@ -707,10 +702,34 @@ class CMediatype extends CApiService {
 				}
 			}
 
-			$validator = new CNewValidator($mediatype, $validation_rules);
-			$errors = $validator->getAllErrors();
-			if ($errors) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, reset($errors));
+			if (array_key_exists('maxsessions', $mediatype)) {
+				$ge_value = 0;
+				$le_value = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
+				$value = $mediatype['maxsessions'];
+				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
+				if (!$valid_value || $value < $ge_value || $value > $le_value) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+						$mediatype['maxsessions'],
+						'maxsessions',
+						$mediatype['description']
+					));
+				}
+			}
+
+			if (array_key_exists('maxattempts', $mediatype)) {
+				$ge_value = 0;
+				$le_value = 10;
+				$value = $mediatype['maxattempts'];
+				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
+				if (!$valid_value || $value < $ge_value || $value > $le_value) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+						$mediatype['maxattempts'],
+						'maxattempts',
+						$mediatype['description']
+					));
+				}
 			}
 
 			if (array_key_exists('attempt_interval', $mediatype)) {
