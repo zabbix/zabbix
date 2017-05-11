@@ -1110,7 +1110,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 	// get names if needed
 	$elems = separateMapElements($sysmap);
 
-	if (!empty($elems['sysmaps']) && $mlabel) {
+	if ($elems['sysmaps'] && $mlabel) {
 		$sysmapids = [];
 
 		foreach ($elems['sysmaps'] as $sysmap_elem) {
@@ -1128,7 +1128,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 			$info[$elem['selementid']]['name'] = $subSysmaps[$elem['elements'][0]['sysmapid']]['name'];
 		}
 	}
-	if (!empty($elems['hostgroups']) && $hglabel) {
+	if ($elems['hostgroups'] && $hglabel) {
 		$groupids = [];
 
 		foreach ($elems['hostgroups'] as $sysmap_elem) {
@@ -1146,8 +1146,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 			$info[$elem['selementid']]['name'] = $hostgroups[$elem['elements'][0]['groupid']]['name'];
 		}
 	}
-
-	if (!empty($elems['triggers']) && $tlabel) {
+	if ($elems['triggers'] && $tlabel) {
 		$selements = zbx_toHash($selements, 'selementid');
 		foreach ($elems['triggers'] as $selementid => $elem) {
 			foreach ($elem['elements'] as $element) {
@@ -1156,7 +1155,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 			}
 		}
 	}
-	if (!empty($elems['hosts']) && $hlabel) {
+	if ($elems['hosts'] && $hlabel) {
 		foreach ($elems['hosts'] as $elem) {
 			$info[$elem['selementid']]['name'] = $allHosts[$elem['elements'][0]['hostid']]['name'];
 		}
