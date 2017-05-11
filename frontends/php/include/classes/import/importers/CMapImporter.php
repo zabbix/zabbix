@@ -254,8 +254,6 @@ class CMapImporter extends CImporter {
 						break;
 				}
 
-				unset($selement['element']);
-
 				$icons = [
 					'icon_off' => 'iconid_off',
 					'icon_on' => 'iconid_on',
