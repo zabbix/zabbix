@@ -54,7 +54,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'script' => [
@@ -261,7 +261,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server'
 				]],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'script' => [[
