@@ -61,6 +61,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10754] fixed comparison of previously and newly linked web scenarios (miks)
 ..F....... [ZBX-11549] fixed 'numeric value' error in dashboard for php 7 (gcalenko, Sasha)
 ..F....... [ZBX-11559] fixed jquery binded function call on form submit (miks)
 ..F....... [ZBX-11677] fixed wrong order of events in history list (miks)
@@ -471,6 +472,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-10754] fixed comparison of previously and newly linked web scenarios (miks)
 ..F....... [ZBX-11549] fixed 'numeric value' error in dashboard for php 7 (gcalenko, Sasha)
 ..F....... [ZBX-11559] fixed jquery binded function call on form submit (miks)
 ..F....... [ZBX-11405] fixed conditions to display treeview button in triggers section (miks)
