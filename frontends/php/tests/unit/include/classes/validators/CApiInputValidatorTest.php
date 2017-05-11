@@ -874,7 +874,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_SCRIPT_NAME],
 				'',
 				'/1/name',
-				'Invalid parameter "/1/name": directory or script name cannot be empty.'
+				'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				['type' => API_SCRIPT_NAME],

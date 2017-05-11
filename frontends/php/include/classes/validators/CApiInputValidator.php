@@ -162,6 +162,35 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Generic string validator.
+	 *
+	 * @param int    $flags  API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkStringUtf8($flags, &$data, $path, &$error) {
+		if (!is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
+			return false;
+		}
+
+		if (mb_check_encoding($data, 'UTF-8') !== true) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && $data === '') {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * String validator.
 	 *
 	 * @param array  $rule
@@ -181,18 +210,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (!is_string($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
-			return false;
-		}
-
-		if (mb_check_encoding($data, 'UTF-8') !== true) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
-			return false;
-		}
-
-		if (($flags & API_NOT_EMPTY) && $data === '') {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -510,18 +528,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateHostGroupName($rule, &$data, $path, &$error) {
-		if (!is_string($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
-			return false;
-		}
-
-		if (mb_check_encoding($data, 'UTF-8') !== true) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
-			return false;
-		}
-
-		if ($data === '') {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -552,13 +559,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateScriptName($rule, &$data, $path, &$error) {
-		if (!is_string($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
-			return false;
-		}
-
-		if (mb_check_encoding($data, 'UTF-8') !== true) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -593,18 +594,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateUserMacro($rule, &$data, $path, &$error) {
-		if (!is_string($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
-			return false;
-		}
-
-		if (mb_check_encoding($data, 'UTF-8') !== true) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
-			return false;
-		}
-
-		if ($data === '') {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -638,18 +628,7 @@ class CApiInputValidator {
 	private static function validateTimePeriod($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (!is_string($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
-			return false;
-		}
-
-		if (mb_check_encoding($data, 'UTF-8') !== true) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
-			return false;
-		}
-
-		if ($data === '') {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -683,18 +662,7 @@ class CApiInputValidator {
 	private static function validateRegex($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (!is_string($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
-			return false;
-		}
-
-		if (mb_check_encoding($data, 'UTF-8') !== true) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
-			return false;
-		}
-
-		if (($flags & API_NOT_EMPTY) && $data === '') {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -879,18 +847,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateVariableName($rule, &$data, $path, &$error) {
-		if (!is_string($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
-			return false;
-		}
-
-		if (mb_check_encoding($data, 'UTF-8') !== true) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
-			return false;
-		}
-
-		if ($data === '') {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
