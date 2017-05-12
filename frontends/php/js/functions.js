@@ -576,9 +576,6 @@ function overlayDialogue(params) {
 		id: 'overlay_dialogue',
 		class: 'overlay-dialogue',
 		css: {
-			'position': 'fixed',
-			'top': '40%',
-			'left': '50%',
 			'display': 'none'
 		}
 	})
@@ -619,11 +616,22 @@ function overlayDialogue(params) {
 		.appendTo('body')
 		.show();
 	overlay_dialogue
-		.appendTo('body')
-		.css({
-			'margin-top': '-' + (overlay_dialogue.outerHeight() / 2) + 'px',
-			'margin-left': '-' + (overlay_dialogue.outerWidth() / 2) + 'px'
-		})
+		.appendTo('body');
+
+	// position of window should be centred on 40% of top offset line and 30px max
+	var top = Math.max(jQuery(window).innerHeight() * 0.4 - (overlay_dialogue.outerHeight() / 2), 30);
+	var left = Math.max(((jQuery(window).innerWidth() - overlay_dialogue.outerWidth())  / 2), 0);
+
+	var css = {
+		'position': 'fixed',
+		'top': top + 'px',
+		'left': left + 'px',
+		'max-height': (jQuery(window).innerHeight() - top) * 0.95 + 'px',
+		'overflow': 'auto'
+	};
+
+	overlay_dialogue
+		.css(css)
 		.show();
 
 	var focusable = jQuery(':focusable', overlay_dialogue);

@@ -98,7 +98,7 @@ class CControllerDashboardView extends CController {
 
 		if ($dashboardid != 0) {
 			$dashboards = API::Dashboard()->get([
-				'output' => ['dashboardid', 'name'],
+				'output' => ['dashboardid', 'name', 'private'],
 				'dashboardids' => $dashboardid
 			]);
 

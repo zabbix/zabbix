@@ -1205,6 +1205,7 @@ define('ZBX_STYLE_BLUE', 'blue');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
+define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');

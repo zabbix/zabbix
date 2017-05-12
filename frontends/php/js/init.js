@@ -84,6 +84,9 @@ jQuery(function($) {
 			case 'triggerMacro':
 				data = getMenuPopupTriggerMacro(data);
 				break;
+			case 'dashboard':
+				data = getMenuPopupDashboard(data);
+				break;
 		}
 
 		obj.menuPopup(data, event);
