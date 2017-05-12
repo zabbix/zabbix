@@ -46,7 +46,7 @@ $itemFormList->addRow(
 // append hosts to form list
 if ($this->data['displayInterfaces']) {
 	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
-	$interfacesComboBox->addItem(new CComboItem(0, '', null, false));
+	$interfacesComboBox->addItem(new CComboItem(0, '', false, false));
 
 	// set up interface groups
 	$interfaceGroups = [];
@@ -58,8 +58,10 @@ if ($this->data['displayInterfaces']) {
 	foreach ($this->data['hosts']['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
-			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
-			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
+			$interface['useip']
+				? $interface['ip'].' : '.$interface['port']
+				: $interface['dns'].' : '.$interface['port'],
+			($interface['interfaceid'] == $this->data['interfaceid'])
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
 		$interfaceGroups[$interface['type']]->addItem($option);
@@ -299,10 +301,22 @@ foreach ($data['preprocessing'] as $i => $step) {
 			break;
 	}
 
+	$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
+
+	foreach (get_preprocessing_types() as $group) {
+		$cb_group = new COptGroup($group['label']);
+
+		foreach ($group['types'] as $type => $label) {
+			$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
+		}
+
+		$preproc_types_cbbox->addItem($cb_group);
+	}
+
 	$preprocessing->addRow(
 		(new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+			$preproc_types_cbbox,
 			$params[0],
 			$params[1],
 			(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
@@ -322,7 +336,7 @@ $preprocessing->addRow(
 
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
-		->setLabel(_('Preprocessing'))
+		->setLabel(_('Preprocessing steps'))
 		->setChecked(isset($this->data['visible']['preprocessing'])),
 	(new CDiv($preprocessing))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

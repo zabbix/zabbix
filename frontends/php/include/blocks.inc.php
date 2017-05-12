@@ -558,10 +558,10 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 	CArrayHelper::sort($triggers, [['field' => 'lastchange', 'order' => ZBX_SORT_DOWN]]);
 
 	foreach ($triggers as $trigger) {
-		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, [
 			'clock' => $trigger['event']['clock'],
 			'ns' => $trigger['event']['ns']
-		)));
+		]));
 
 		// unknown triggers
 		$info_icons = [];

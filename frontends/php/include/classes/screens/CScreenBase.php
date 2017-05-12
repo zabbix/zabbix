@@ -402,7 +402,7 @@ class CScreenBase {
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$div->addItem(
 				(new CDiv([
-					new CLink(_('Change'), $this->action)
+					new CLink(_x('Change', 'verb'), $this->action)
 				]))->addClass(ZBX_STYLE_CENTER)
 			);
 		}

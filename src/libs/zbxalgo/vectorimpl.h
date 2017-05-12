@@ -88,7 +88,7 @@ void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __typ
 	vector->values[vector->values_num++] = *value;								\
 }														\
 														\
-void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, const __type *values,		\
+void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, __type const *values,		\
 									int values_num)				\
 {														\
 	zbx_vector_ ## __id ## _reserve(vector, vector->values_num + values_num);				\
