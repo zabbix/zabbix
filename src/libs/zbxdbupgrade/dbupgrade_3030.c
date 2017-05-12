@@ -547,28 +547,22 @@ static int	DBpatch_3030046(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	zbx_db_insert_t	db_insert;
-	zbx_uint64_t	mapid;
-	int		width, ret;
-
-	zbx_db_insert_prepare(&db_insert, "sysmap_shape", "shapeid", "sysmapid", "width", "height", "text",
-			"border_width", NULL);
+	int		id = 1, ret = FAIL;
 
 	result = DBselect("select sysmapid,width from sysmaps");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(mapid, row[0]);
-		width = atoi(row[1]);
-
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mapid, width, 15, "{MAP.NAME}", 0);
+		if (ZBX_DB_OK > DBexecute("insert into sysmap_shape (shapeid,sysmapid,width,height,text,border_width)"
+				" values (%d,%s,%s,15,'{MAP.NAME}',0)", id++, row[0], row[1]))
+		{
+			goto out;
+		}
 	}
 
+	ret = SUCCEED;
+out:
 	DBfree_result(result);
-
-	zbx_db_insert_autoincrement(&db_insert, "shapeid");
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
 
 	return ret;
 }
