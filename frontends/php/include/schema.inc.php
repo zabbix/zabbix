@@ -1904,6 +1904,17 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
+			'ack_shortdata' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'ack_longdata' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
 		],
 	],
 	'operations' => [
@@ -5222,6 +5233,13 @@ return [
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
 			],
+			'acknowledgeid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid',
+			]
 		],
 	],
 	'globalvars' => [
@@ -6946,4 +6964,23 @@ return [
 			],
 		],
 	],
+	'task_acknowledge' => [
+		'key' => 'acknowledgeid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'acknowledgeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid',
+			]
+		]
+	]
 ];
