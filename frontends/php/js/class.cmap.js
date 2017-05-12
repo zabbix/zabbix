@@ -2130,12 +2130,13 @@ ZABBIX.apps.map = (function($) {
 									}
 								});
 
-								$('#elementNameTriggers').multiSelect('clean');
 								SelementForm.prototype.recalculateSortOrder();
 								SelementForm.prototype.initSortable();
 							}
 						});
 					}
+
+					$('#elementNameTriggers').multiSelect('clean');
 				}
 			},
 
