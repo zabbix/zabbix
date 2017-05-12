@@ -62,6 +62,8 @@
 #define ZBX_AGGR_FUNC_MAX		2
 #define ZBX_AGGR_FUNC_MIN		3
 
+#define ZBX_SELFMON_DELAY		1
+
 int		get_process_type_by_name(const char *proc_type_str);
 int		get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
