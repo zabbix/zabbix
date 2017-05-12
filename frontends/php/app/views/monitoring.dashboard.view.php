@@ -116,12 +116,11 @@ $form
 								'label' => _('Sharing'),
 								'form_data' => [
 									'dashboardid' => $data['dashboard']['dashboardid'],
-								]
+								],
+								'disabled' => !$data['dashboard']['editable']
 							]
 						]
-					],
-						true
-					)
+					])
 				)
 			)
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))

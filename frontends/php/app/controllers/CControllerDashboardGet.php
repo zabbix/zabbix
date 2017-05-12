@@ -26,7 +26,8 @@ class CControllerDashboardGet extends CController
 {
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' => 'db dashboard.dashboardid'
+			'dashboardid' => 'db dashboard.dashboardid',
+			'editable'    => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,7 +50,8 @@ class CControllerDashboardGet extends CController
 
 		$dashboards = API::Dashboard()->get([
 			'output' => [],
-			'dashboardids' => $this->getInput('dashboardid')
+			'dashboardids' => $this->getInput('dashboardid'),
+			'editable' => (boolean) $this->getInput('editable', false)
 		]);
 
 		if (!$dashboards) {

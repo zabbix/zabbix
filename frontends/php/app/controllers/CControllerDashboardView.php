@@ -104,6 +104,16 @@ class CControllerDashboardView extends CController {
 
 			if ($dashboards) {
 				$dashboard = $dashboards[0];
+				$dashboards_rw = API::Dashboard()->get([
+					'output' => [],
+					'dashboardids' => [$dashboardid],
+					'editable' => true,
+					'preservekeys' => true
+				]);
+				$dashboard['editable'] = false;
+				if (array_key_exists($dashboardid, $dashboards_rw)) {
+					$dashboard['editable'] = true;
+				}
 
 				CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 			}

@@ -458,7 +458,7 @@ function getMenuPopupDashboard(options) {
 				url.setArgument('action', 'dashboard.get');
 
 				jQuery.ajax({
-					data: {"dashboardid": item.form_data.dashboardid},
+					data: {"dashboardid": item.form_data.dashboardid, 'editable': '1'},
 					type: 'GET',
 					url: url.getUrl(),
 					success: function(response) {
