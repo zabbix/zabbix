@@ -1816,16 +1816,26 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	$imageMessages = [];
 
 	$title = $good ? $okmsg : $errmsg;
-	$messages = is_array($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
+	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 	$ZBX_MESSAGES = [];
 
 	if (ZBX_SHOW_SQL_ERRORS == false && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
-		foreach ($messages as &$message) {
-			if (array_key_exists('sql_error', $message) && ($message['sql_error'] === true)) {
-				$message['message'] = _('SQL error, please contact Zabbix administrator.');
+		$filtered_messages = [];
+		$generic_exists = false;
+		foreach ($messages as $message) {
+			if (array_key_exists('sql_error', $message) && $message['sql_error'] === true) {
+				if (!$generic_exists) {
+					$message['message'] = _('SQL error, please contact Zabbix administrator.');
+					$filtered_messages[] = $message;
+					$generic_exists = true;
+				}
+			}
+			else {
+				$filtered_messages[] = $message;
 			}
 		}
-		unset($message);
+		$messages = $filtered_messages;
+		unset($filtered_messages);
 	}
 
 	switch ($page['type']) {
@@ -1938,18 +1948,21 @@ function error($msgs) {
 	}
 }
 
-function sqlError($msgs) {
+/**
+ * Add SQL error message to global messages array
+ *
+ * @param string $msg
+ *
+ * @return void
+ */
+function sqlError($msg) {
 	global $ZBX_MESSAGES;
 
 	if (!isset($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = [];
 	}
 
-	$msgs = zbx_toArray($msgs);
-
-	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg, 'sql_error' => true];
-	}
+	$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg, 'sql_error' => true];
 }
 
 function clear_messages($count = null) {
