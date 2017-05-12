@@ -408,13 +408,12 @@ abstract class CItemGeneral extends CApiService {
 
 				// Allow update item without jmx_endpoint value being set.
 				if (!$update || array_key_exists('jmx_endpoint', $item)) {
-					$jmx_rules = [
-						'jmx_endpoint' => 'not_empty|string'
-					];
-					$jmx_validator = new CNewValidator($fullItem, $jmx_rules);
-					if ($jmx_validator->isError()) {
-						$errors = $jmx_validator->getAllErrors();
-						self::exception(ZBX_API_ERROR_PARAMETERS, $errors[0]);
+					$is_empty = (trim($item['jmx_endpoint']) == '');
+					$is_long = (strlen($item['jmx_endpoint']) > 255);
+					if ($is_empty || $is_long) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', $item['jmx_endpoint'])
+						);
 					}
 				}
 			}
