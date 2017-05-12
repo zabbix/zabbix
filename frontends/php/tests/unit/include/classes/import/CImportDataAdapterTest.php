@@ -1235,11 +1235,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '32',
-						'element' => [
-							'description' => 'trigger',
-							'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
-							'recovery_expression' => ''
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1251,6 +1246,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							[
 								'name' => 'url',
 								'url' => 'http://google.com'
+							]
+						],
+						'elements' => [
+							[
+								'description' => 'trigger',
+								'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
+								'recovery_expression' => ''
 							]
 						]
 					],
@@ -1267,9 +1269,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '33',
-						'element' => [
-							'host' => 'export-host'
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1277,7 +1276,12 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'icon_disabled' => [],
 						'icon_maintenance' => [],
 						'application' => '',
-						'urls' => []
+						'urls' => [],
+						'elements' => [
+							[
+								'host' => 'export-host'
+							]
+						]
 					],
 					[
 						'elementtype' => '3',
@@ -1292,9 +1296,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '34',
-						'element' => [
-							'name' => 'Zabbix servers'
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1302,7 +1303,12 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'icon_disabled' => [],
 						'icon_maintenance' => [],
 						'application' => '',
-						'urls' => []
+						'urls' => [],
+						'elements' => [
+							[
+								'name' => 'Zabbix servers'
+							]
+						]
 					]
 				],
 				'links' => [

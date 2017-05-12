@@ -887,7 +887,7 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types())]);
+			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types(null, false))]);
 
 			$required_fields = ['type', 'params'];
 			$delta = false;
@@ -1010,7 +1010,7 @@ abstract class CItemGeneral extends CApiService {
 
 						// Check if one of the deltas (Delta per second or Delta value) already exists.
 						if ($delta) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one "Delta" step is allowed.'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
 						}
 						else {
 							$delta = true;

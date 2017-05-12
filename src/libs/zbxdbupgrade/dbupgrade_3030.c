@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 /*
  * 3.4 development database patches
@@ -625,30 +626,46 @@ static int	DBpatch_3030053(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	unsigned char	value_type, data_type, delta;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	selementid, triggerid;
-	const char	*formula;
-	int		width, ret;
+	int		ret = FAIL;
 
 	zbx_db_insert_prepare(&db_insert, "sysmap_element_trigger", "selement_triggerid", "selementid", "triggerid",
 			NULL);
 
 	/* sysmaps_elements.elementid for trigger map elements (2) should be migrated to table sysmap_element_trigger */
-	result = DBselect("select selementid, elementid from sysmaps_elements where elementtype=2");
+	result = DBselect("select e.selementid,e.label,t.triggerid"
+			" from sysmaps_elements e"
+			" left join triggers t on"
+			" e.elementid=t.triggerid"
+			" where e.elementtype=2");
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(selementid, row[0]);
-		ZBX_STR2UINT64(triggerid, row[1]);
+		if (NULL != row[2])
+		{
+			ZBX_STR2UINT64(triggerid, row[2]);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), selementid, triggerid);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), selementid, triggerid);
+		}
+		else
+		{
+			if (ZBX_DB_OK > DBexecute("delete from sysmaps_elements where selementid=" ZBX_FS_UI64,
+					selementid))
+			{
+				goto out;
+			}
+
+			zabbix_log(LOG_LEVEL_WARNING, "Map trigger element \"%s\" (selementid: " ZBX_FS_UI64 ") will be"
+					" removed during database upgrade: no trigger found", row[1], selementid);
+		}
 	}
-
-	DBfree_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "selement_triggerid");
 	ret = zbx_db_insert_execute(&db_insert);
+out:
+	DBfree_result(result);
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
@@ -914,6 +931,50 @@ static int	DBpatch_3030068(void)
 	return DBadd_field("httpstep", &field);
 }
 
+static int	DBpatch_3030069(void)
+{
+	const ZBX_FIELD	field = {"sysmap_shapeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBrename_field("sysmap_shape", "shapeid", &field);
+}
+
+static int	DBpatch_3030070(void)
+{
+	const ZBX_FIELD	field = {"text_halign", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmap_shape", &field);
+}
+
+static int	DBpatch_3030071(void)
+{
+	const ZBX_FIELD	field = {"text_valign", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmap_shape", &field);
+}
+
+static int	DBpatch_3030072(void)
+{
+	const ZBX_FIELD	field = {"border_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmap_shape", &field);
+}
+
+static int	DBpatch_3030073(void)
+{
+	const ZBX_FIELD	field = {"zindex", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmap_shape", &field);
+}
+
+static int	DBpatch_3030074(void)
+{
+	if (ZBX_DB_OK > DBexecute("update sysmap_shape set text_halign=text_halign+1,text_valign=text_valign+1,"
+			"border_type=border_type+1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -989,5 +1050,11 @@ DBPATCH_ADD(3030065, 0, 1)
 DBPATCH_ADD(3030066, 0, 1)
 DBPATCH_ADD(3030067, 0, 1)
 DBPATCH_ADD(3030068, 0, 1)
+DBPATCH_ADD(3030069, 0, 1)
+DBPATCH_ADD(3030070, 0, 1)
+DBPATCH_ADD(3030071, 0, 1)
+DBPATCH_ADD(3030072, 0, 1)
+DBPATCH_ADD(3030073, 0, 1)
+DBPATCH_ADD(3030074, 0, 1)
 
 DBPATCH_END()

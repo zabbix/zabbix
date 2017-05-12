@@ -411,7 +411,7 @@ if ($filter['showDetails']) {
 		(new CColHeader(_('Type')))->addStyle('width: 8%'),
 		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
-		(new CColHeader(_x('Change', 'noun in latest data')))->addStyle('width: 10%'),
+		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -427,7 +427,7 @@ else {
 			->addStyle('width: '.($singleHostSelected ? 57 : 40).'%'),
 		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
-		(new CColHeader(_x('Change', 'noun in latest data')))->addStyle('width: 10%'),
+		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%')
 	]);
 }
