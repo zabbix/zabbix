@@ -136,6 +136,10 @@ src/libs/zbxconf/Makefile.in
 src/libs/zbxcrypto/.deps
 src/libs/zbxcrypto/Makefile
 src/libs/zbxcrypto/Makefile.in
+src/libs/zbxcunit/.deps
+src/libs/zbxcunit/Makefile
+src/libs/zbxcunit/Makefile.in
+src/libs/zbxcunit/cu_modules.h
 src/libs/zbxdb/.deps
 src/libs/zbxdb/Makefile
 src/libs/zbxdb/Makefile.in

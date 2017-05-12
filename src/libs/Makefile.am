@@ -78,6 +78,7 @@ SUBDIRS = \
 	zbxexec \
 	zbxmodules \
 	zbxregexp \
+	zbxcunit \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)
