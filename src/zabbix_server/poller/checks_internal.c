@@ -76,8 +76,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
 	{
-		zbx_trigger_stats_t	trigger_stats;
-
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
 
@@ -87,8 +85,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		DCget_trigger_stats(&trigger_stats);
-		SET_UI64_RESULT(result, trigger_stats.enabled_ok.ui64 + trigger_stats.enabled_problem.ui64);
+		SET_UI64_RESULT(result, DCget_trigger_count());
 	}
 	else if (0 == strcmp(tmp, "items"))			/* zabbix["items"] */
 	{
@@ -112,16 +109,13 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "hosts"))			/* zabbix["hosts"] */
 	{
-		zbx_host_stats_t	host_stats;
-
 		if (1 != nparams)
 		{
 			error = zbx_strdup(error, "Invalid number of parameters.");
 			goto out;
 		}
 
-		DCget_host_stats(&host_stats, NULL, NULL);
-		SET_UI64_RESULT(result, host_stats.monitored.ui64);
+		SET_UI64_RESULT(result, DCget_host_count());
 	}
 	else if (0 == strcmp(tmp, "history") ||			/* zabbix["history"] */
 			0 == strcmp(tmp, "history_log") ||	/* zabbix["history_log"] */
@@ -194,7 +188,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		SET_DBL_RESULT(result, DCget_required_performance(NULL));
+		SET_DBL_RESULT(result, DCget_required_performance());
 	}
 	else if (0 == strcmp(tmp, "uptime"))			/* zabbix["uptime"] */
 	{

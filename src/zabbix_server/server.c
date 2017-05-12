@@ -785,8 +785,6 @@ int	main(int argc, char **argv)
 
 	zbx_initialize_events();
 
-	zbx_status_cache_init();
-
 #ifdef HAVE_IPCSERVICE
 	{
 		char	*error = NULL;
@@ -1161,8 +1159,6 @@ void	zbx_on_exit(void)
 		zbx_vmware_destroy();
 
 	free_selfmon_collector();
-
-	zbx_status_cache_free();
 
 	zbx_uninitialize_events();
 

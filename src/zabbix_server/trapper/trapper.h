@@ -26,9 +26,6 @@
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
-void	zbx_status_cache_init(void);
-void	zbx_status_cache_free(void);
-
 ZBX_THREAD_ENTRY(trapper_thread, args);
 
 #endif

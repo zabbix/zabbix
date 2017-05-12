@@ -430,29 +430,6 @@ typedef enum
 }
 zbx_counter_type_t;
 
-typedef struct
-{
-	zbx_counter_value_t	monitored;
-	zbx_counter_value_t	not_monitored;
-}
-zbx_host_stats_t;
-
-typedef struct
-{
-	zbx_counter_value_t	active_normal;
-	zbx_counter_value_t	active_notsupported;
-	zbx_counter_value_t	disabled;
-}
-zbx_item_stats_t;
-
-typedef struct
-{
-	zbx_counter_value_t	enabled_ok;
-	zbx_counter_value_t	enabled_problem;
-	zbx_counter_value_t	disabled;
-}
-zbx_trigger_stats_t;
-
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
@@ -589,15 +566,17 @@ void	DCset_delta_items(zbx_hashset_t *items);
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
-int	DCget_item_count(zbx_uint64_t hostid);
-int	DCget_item_unsupported_count(zbx_uint64_t hostid);
-double	DCget_required_performance(zbx_vector_ptr_t *nvps_by_proxy);
+zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid);
+zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid);
+zbx_uint64_t	DCget_trigger_count(void);
+double		DCget_required_performance(void);
+zbx_uint64_t	DCget_host_count(void);
 
-void	DCget_host_stats(zbx_host_stats_t *host_stats, zbx_vector_ptr_t *monitored_by_proxy,
-		zbx_vector_ptr_t *not_monitored_by_proxy);
-void	DCget_item_stats(zbx_item_stats_t *item_stats, zbx_vector_ptr_t *active_normal_by_proxy,
-		zbx_vector_ptr_t *active_notsupported_by_proxy, zbx_vector_ptr_t *disabled_by_proxy);
-void	DCget_trigger_stats(zbx_trigger_stats_t *trigger_stats);
+void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not_monitored,
+		zbx_vector_ptr_t *items_active_normal, zbx_vector_ptr_t *items_active_notsupported,
+		zbx_vector_ptr_t *items_disabled, zbx_uint64_t *triggers_enabled_ok,
+		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
+		zbx_vector_ptr_t *required_performance);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);

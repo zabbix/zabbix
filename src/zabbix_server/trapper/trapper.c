@@ -53,6 +53,13 @@ typedef struct
 }
 zbx_user_stats_t;
 
+typedef union
+{
+	zbx_counter_value_t	counter;	/* single global counter */
+	zbx_vector_ptr_t	counters;	/* array of per proxy counters */
+}
+zbx_entry_info_t;
+
 typedef struct
 {
 	const char	*name;
@@ -62,16 +69,23 @@ zbx_entry_attribute_t;
 
 typedef struct
 {
-	zbx_counter_value_t	*counter_value;
+	zbx_entry_info_t	*info;
 	zbx_counter_type_t	counter_type;
-	zbx_vector_ptr_t	*counters_by_proxy;
 	zbx_entry_attribute_t	attributes[ZBX_MAX_ENTRY_ATTRIBUTES];
 }
 zbx_section_entry_t;
 
+typedef enum
+{
+	ZBX_SECTION_ENTRY_THE_ONLY,
+	ZBX_SECTION_ENTRY_PER_PROXY
+}
+zbx_entry_type_t;
+
 typedef struct
 {
 	const char		*name;
+	zbx_entry_type_t	entry_type;
 	zbx_user_type_t		access_level;
 	int			*res;
 	zbx_section_entry_t	entries[ZBX_MAX_SECTION_ENTRIES];
@@ -527,7 +541,7 @@ out:
 	return ret;
 }
 
-static int	DBget_template_stats(zbx_counter_value_t *template_stats)
+static int	DBget_template_count(zbx_uint64_t *count)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -536,7 +550,7 @@ static int	DBget_template_stats(zbx_counter_value_t *template_stats)
 	if (NULL == (result = DBselect("select count(*) from hosts where status=%d", HOST_STATUS_TEMPLATE)))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED != is_uint64(row[0], &template_stats->ui64))
+	if (NULL == (row = DBfetch(result)) || SUCCEED != is_uint64(row[0], count))
 		goto out;
 
 	ret = SUCCEED;
@@ -546,7 +560,7 @@ out:
 	return ret;
 }
 
-static int	DBget_user_stats(zbx_user_stats_t *user_stats)
+static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offline)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -581,8 +595,8 @@ static int	DBget_user_stats(zbx_user_stats_t *user_stats)
 		users_offline--;
 	}
 
-	user_stats->online.ui64 = users_online;
-	user_stats->offline.ui64 = users_offline;
+	*count_online = users_online;
+	*count_offline = users_offline;
 	ret = SUCCEED;
 out:
 	DBfree_result(result);
@@ -592,63 +606,54 @@ out:
 
 /* auxiliary variables for status_stats_export() */
 
-zbx_vector_ptr_t	hosts_monitored_by_proxy, hosts_not_monitored_by_proxy, items_active_normal_by_proxy,
-			items_active_notsupported_by_proxy, items_disabled_by_proxy, required_performance_by_proxy;
-zbx_counter_value_t	template_stats, required_performance;
-zbx_host_stats_t	host_stats;
-zbx_item_stats_t	item_stats;
-zbx_trigger_stats_t	trigger_stats;
-zbx_user_stats_t	user_stats;
-int			template_stats_res, user_stats_res;
+zbx_entry_info_t	templates, hosts_monitored, hosts_not_monitored, items_active_normal, items_active_notsupported,
+			items_disabled, triggers_enabled_ok, triggers_enabled_problem, triggers_disabled, users_online,
+			users_offline, required_performance;
+int			templates_res, users_res;
 
-void	zbx_status_cache_init(void)
+static void	zbx_status_counters_init(void)
 {
-	zbx_vector_ptr_create(&hosts_monitored_by_proxy);
-	zbx_vector_ptr_create(&hosts_not_monitored_by_proxy);
-	zbx_vector_ptr_create(&items_active_normal_by_proxy);
-	zbx_vector_ptr_create(&items_active_notsupported_by_proxy);
-	zbx_vector_ptr_create(&items_disabled_by_proxy);
-	zbx_vector_ptr_create(&required_performance_by_proxy);
+	zbx_vector_ptr_create(&hosts_monitored.counters);
+	zbx_vector_ptr_create(&hosts_not_monitored.counters);
+	zbx_vector_ptr_create(&items_active_normal.counters);
+	zbx_vector_ptr_create(&items_active_notsupported.counters);
+	zbx_vector_ptr_create(&items_disabled.counters);
+	zbx_vector_ptr_create(&required_performance.counters);
 }
 
-static void	zbx_status_cache_clear(void)
+static void	zbx_status_counters_free(void)
 {
-	zbx_vector_ptr_clear_ext(&hosts_monitored_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&hosts_not_monitored_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_normal_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_notsupported_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_disabled_by_proxy, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&required_performance_by_proxy, zbx_default_mem_free_func);
-}
+	zbx_vector_ptr_clear_ext(&hosts_monitored.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&hosts_not_monitored.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_active_normal.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_active_notsupported.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_disabled.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&required_performance.counters, zbx_default_mem_free_func);
 
-void	zbx_status_cache_free(void)
-{
-	zbx_status_cache_clear();
-
-	zbx_vector_ptr_destroy(&hosts_monitored_by_proxy);
-	zbx_vector_ptr_destroy(&hosts_not_monitored_by_proxy);
-	zbx_vector_ptr_destroy(&items_active_normal_by_proxy);
-	zbx_vector_ptr_destroy(&items_active_notsupported_by_proxy);
-	zbx_vector_ptr_destroy(&items_disabled_by_proxy);
-	zbx_vector_ptr_destroy(&required_performance_by_proxy);
+	zbx_vector_ptr_destroy(&hosts_monitored.counters);
+	zbx_vector_ptr_destroy(&hosts_not_monitored.counters);
+	zbx_vector_ptr_destroy(&items_active_normal.counters);
+	zbx_vector_ptr_destroy(&items_active_notsupported.counters);
+	zbx_vector_ptr_destroy(&items_disabled.counters);
+	zbx_vector_ptr_destroy(&required_performance.counters);
 }
 
 const zbx_status_section_t	status_sections[] = {
-/*	{SECTION NAME,			SECTION ACCESS LEVEL	SECTION RESULTS READYNESS,			*/
-/*		{												*/
-/*			{COUNTER VALUE,				COUNTER TYPE,		COUNTER VALUES BY PROXY	*/
-/*				{										*/
-/*					{ATTR. NAME,	ATTRIBUTE VALUE},					*/
-/*					... (up to ZBX_MAX_ENTRY_ATTRIBUTES)					*/
-/*				}										*/
-/*			},											*/
-/*			... (up to ZBX_MAX_SECTION_ENTRIES)							*/
-/*		}												*/
-/*	},													*/
-/*	...													*/
-	{"template stats",		USER_TYPE_ZABBIX_USER,	&template_stats_res,
+/*	{SECTION NAME,			NUMBER OF SECTION ENTRIES	SECTION ACCESS LEVEL	SECTION READYNESS,	*/
+/*		{													*/
+/*			{ENTRY INFORMATION,		COUNTER TYPE,							*/
+/*				{											*/
+/*					{ATTR. NAME,	ATTRIBUTE VALUE},						*/
+/*					... (up to ZBX_MAX_ENTRY_ATTRIBUTES)						*/
+/*				}											*/
+/*			},												*/
+/*			... (up to ZBX_MAX_SECTION_ENTRIES)								*/
+/*		}													*/
+/*	},														*/
+/*	...														*/
+	{"template stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&templates_res,
 		{
-			{&template_stats,			ZBX_COUNTER_TYPE_UI64,	NULL,
+			{&templates,			ZBX_COUNTER_TYPE_UI64,
 				{
 					{NULL}
 				}
@@ -656,15 +661,15 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"host stats",			USER_TYPE_ZABBIX_USER,	NULL,
+	{"host stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
 		{
-			{&host_stats.monitored,			ZBX_COUNTER_TYPE_UI64,	&hosts_monitored_by_proxy,
+			{&hosts_monitored,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	HOST_STATUS_MONITORED},
 					{NULL}
 				}
 			},
-			{&host_stats.not_monitored,		ZBX_COUNTER_TYPE_UI64,	&hosts_not_monitored_by_proxy,
+			{&hosts_not_monitored,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	HOST_STATUS_NOT_MONITORED},
 					{NULL}
@@ -673,23 +678,23 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"item stats",			USER_TYPE_ZABBIX_USER,	NULL,
+	{"item stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
 		{
-			{&item_stats.active_normal,		ZBX_COUNTER_TYPE_UI64,	&items_active_normal_by_proxy,
+			{&items_active_normal,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ITEM_STATUS_ACTIVE},
 					{"state",	ITEM_STATE_NORMAL},
 					{NULL}
 				}
 			},
-			{&item_stats.active_notsupported,	ZBX_COUNTER_TYPE_UI64,	&items_active_notsupported_by_proxy,
+			{&items_active_notsupported,	ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ITEM_STATUS_ACTIVE},
 					{"state",	ITEM_STATE_NOTSUPPORTED},
 					{NULL}
 				}
 			},
-			{&item_stats.disabled,			ZBX_COUNTER_TYPE_UI64,	&items_disabled_by_proxy,
+			{&items_disabled,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ITEM_STATUS_DISABLED},
 					{NULL}
@@ -698,23 +703,23 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"trigger stats",		USER_TYPE_ZABBIX_USER,	NULL,
+	{"trigger stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	NULL,
 		{
-			{&trigger_stats.enabled_ok,		ZBX_COUNTER_TYPE_UI64,	NULL,
+			{&triggers_enabled_ok,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	TRIGGER_STATUS_ENABLED},
 					{"value",	TRIGGER_VALUE_OK},
 					{NULL}
 				}
 			},
-			{&trigger_stats.enabled_problem,	ZBX_COUNTER_TYPE_UI64,	NULL,
+			{&triggers_enabled_problem,	ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	TRIGGER_STATUS_ENABLED},
 					{"value",	TRIGGER_VALUE_PROBLEM},
 					{NULL}
 				}
 			},
-			{&trigger_stats.disabled,		ZBX_COUNTER_TYPE_UI64,	NULL,
+			{&triggers_disabled,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	TRIGGER_STATUS_DISABLED},
 					{NULL}
@@ -723,15 +728,15 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"user stats",			USER_TYPE_ZABBIX_USER,	&user_stats_res,
+	{"user stats",			ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&users_res,
 		{
-			{&user_stats.online,			ZBX_COUNTER_TYPE_UI64,	NULL,
+			{&users_online,			ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ZBX_SESSION_ACTIVE},
 					{NULL}
 				}
 			},
-			{&user_stats.offline,			ZBX_COUNTER_TYPE_UI64,	NULL,
+			{&users_offline,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ZBX_SESSION_PASSIVE},
 					{NULL}
@@ -740,9 +745,9 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"required performance",	USER_TYPE_SUPER_ADMIN,	NULL,
+	{"required performance",	ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_SUPER_ADMIN,	NULL,
 		{
-			{&required_performance,			ZBX_COUNTER_TYPE_DBL,	&required_performance_by_proxy,
+			{&required_performance,		ZBX_COUNTER_TYPE_DBL,
 				{
 					{NULL}
 				}
@@ -753,86 +758,61 @@ const zbx_status_section_t	status_sections[] = {
 	{NULL}
 };
 
-static void	status_stats_export_entry(struct zbx_json *json, const zbx_section_entry_t *entry)
+static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t *entry,
+		zbx_counter_value_t counter_value, const zbx_uint64_t *proxyid)
 {
-	zbx_uint64_t			proxyid = 0;				/* Start with printing server stats. */
-	const zbx_counter_value_t	*counter_value = entry->counter_value;	/* It should contain total count. */
 	const zbx_entry_attribute_t	*attribute;
 	char				*tmp = NULL;
-	int				i;
 
-	for (i = 0; ; i++)
+	zbx_json_addobject(json, NULL);
+
+	if (NULL != entry->attributes[0].name || NULL != proxyid)
 	{
-		zbx_json_addobject(json, NULL);
+		zbx_json_addobject(json, "attributes");
 
-		if (NULL != entry->attributes[0].name || NULL != entry->counters_by_proxy)
-		{
-			zbx_json_addobject(json, "attributes");
+		if (NULL != proxyid)
+			zbx_json_adduint64(json, "proxyid", *proxyid);
 
-			if (NULL != entry->counters_by_proxy)
-				zbx_json_adduint64(json, "proxyid", proxyid);
-
-			for (attribute = entry->attributes; NULL != attribute->name; attribute++)
-				zbx_json_adduint64(json, attribute->name, attribute->value);
-
-			zbx_json_close(json);
-		}
-
-		switch (entry->counter_type)
-		{
-			case ZBX_COUNTER_TYPE_UI64:
-				zbx_json_adduint64(json, "count", counter_value->ui64);
-				break;
-			case ZBX_COUNTER_TYPE_DBL:
-				tmp = zbx_dsprintf(tmp, ZBX_FS_DBL, counter_value->dbl);
-				zbx_json_addstring(json, "count", tmp, ZBX_JSON_TYPE_STRING);
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
+		for (attribute = entry->attributes; NULL != attribute->name; attribute++)
+			zbx_json_adduint64(json, attribute->name, attribute->value);
 
 		zbx_json_close(json);
-
-		if (NULL == entry->counters_by_proxy || NULL == entry->counters_by_proxy->values)
-			break;
-next:
-		if (i >= entry->counters_by_proxy->values_num)
-			break;
-
-		/* server has its own separate counter, skip it in vector of proxy counters */
-		if (0 == (proxyid = ((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->proxyid))
-		{
-			i++;
-			goto next;
-		}
-
-		counter_value = &((zbx_proxy_counter_t *)entry->counters_by_proxy->values[i])->counter_value;
 	}
+
+	switch (entry->counter_type)
+	{
+		case ZBX_COUNTER_TYPE_UI64:
+			zbx_json_adduint64(json, "count", counter_value.ui64);
+			break;
+		case ZBX_COUNTER_TYPE_DBL:
+			tmp = zbx_dsprintf(tmp, ZBX_FS_DBL, counter_value.dbl);
+			zbx_json_addstring(json, "count", tmp, ZBX_JSON_TYPE_STRING);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	zbx_json_close(json);
 
 	zbx_free(tmp);
 }
 
 static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_level)
 {
-#define ZBX_STATUS_LIFETIME	60
-
-	static time_t			last_counted = 0;
 	const zbx_status_section_t	*section;
 	const zbx_section_entry_t	*entry;
+	int				i;
 
-	/* get status information if locally cached data are outdated */
-	if (last_counted + ZBX_STATUS_LIFETIME <= time(NULL))
-	{
-		zbx_status_cache_clear();
-		template_stats_res = DBget_template_stats(&template_stats);
-		DCget_host_stats(&host_stats, &hosts_monitored_by_proxy, &hosts_not_monitored_by_proxy);
-		DCget_item_stats(&item_stats, &items_active_normal_by_proxy, &items_active_notsupported_by_proxy,
-				&items_disabled_by_proxy);
-		DCget_trigger_stats(&trigger_stats);
-		user_stats_res = DBget_user_stats(&user_stats);
-		required_performance.dbl = DCget_required_performance(&required_performance_by_proxy);
-		last_counted = time(NULL);
-	}
+	zbx_status_counters_init();
+
+	/* get status information */
+
+	templates_res = DBget_template_count(&templates.counter.ui64);
+	users_res = DBget_user_count(&users_online.counter.ui64, &users_offline.counter.ui64);
+	DCget_status(&hosts_monitored.counters, &hosts_not_monitored.counters, &items_active_normal.counters,
+			&items_active_notsupported.counters, &items_disabled.counters, &triggers_enabled_ok.counter.ui64,
+			&triggers_enabled_problem.counter.ui64, &triggers_disabled.counter.ui64,
+			&required_performance.counters);
 
 	/* add status information to JSON */
 	for (section = status_sections; NULL != section->name; section++)
@@ -845,13 +825,31 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 		zbx_json_addarray(json, section->name);
 
-		for (entry = section->entries; NULL != entry->counter_value; entry++)
-			status_stats_export_entry(json, entry);
+		for (entry = section->entries; NULL != entry->info; entry++)
+		{
+			switch (section->entry_type)
+			{
+				case ZBX_SECTION_ENTRY_THE_ONLY:
+					status_entry_export(json, entry, entry->info->counter, NULL);
+					break;
+				case ZBX_SECTION_ENTRY_PER_PROXY:
+					for (i = 0; i < entry->info->counters.values_num; i++)
+					{
+						const zbx_proxy_counter_t	*proxy_counter = entry->info->counters.values[i];
+
+						status_entry_export(json, entry, proxy_counter->counter_value,
+								&proxy_counter->proxyid);
+					}
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
+		}
 
 		zbx_json_close(json);
 	}
 
-#undef ZBX_STATUS_LIFETIME
+	zbx_status_counters_free();
 }
 
 /******************************************************************************
