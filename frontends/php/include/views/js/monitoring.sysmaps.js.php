@@ -140,7 +140,7 @@ function getFontComboBox($name) {
 					->addRow(_('Triggers'), [
 						(new CDiv([
 							(new CTable())
-								->setHeader(['', _('Name'), _('Action')])
+								->setHeader(['', _('Name'), (new CColHeader(_('Action')))->addStyle('padding: 0 5px;')])
 								->setId('triggerContainer')
 								->setAttribute('style', 'width: 100%;')
 								->addClass('ui-sortable')
@@ -744,17 +744,20 @@ function getFontComboBox($name) {
 <script type="text/x-jquery-tmpl" id="selementFormTriggers">
 	<?= (new CRow([
 			(new CCol([
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+				(new CDiv())
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addStyle('top: 0px;'),
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol([(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)]))
-				->addStyle('background: ##{color}'),
+				->addStyle('background: ##{color}; padding: 0 5px;'),
 			(new CCol([
 				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),
 				(new CVar('element_name[#{triggerid}]', '#{name}')),
 				(new CVar('element_priority[#{triggerid}]', '#{priority}')),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->addStyle('margin: 0 5px;')
 					->onClick('jQuery("#triggerrow_#{triggerid}").remove();')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
