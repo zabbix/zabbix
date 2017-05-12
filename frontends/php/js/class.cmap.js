@@ -932,6 +932,10 @@ ZABBIX.apps.map = (function($) {
 				return selectedids;
 			},
 
+			dragSelectedItems: function(delta_x, delta_y) {
+
+			},
+
 			/**
 			 * Return object with selected elements data and links.
 			 *
@@ -1387,17 +1391,7 @@ ZABBIX.apps.map = (function($) {
 				.attr('data-id', this.id)
 				.attr('data-type', 'shapes');
 
-			this.domNode.draggable({
-				containment: 'parent',
-				opacity: 0.5,
-				helper: 'clone',
-				stop: $.proxy(function(event, data) {
-					this.updatePosition({
-						x: parseInt(data.position.left, 10),
-						y: parseInt(data.position.top, 10)
-					});
-				}, this)
-			});
+			this.makeDraggable();
 
 			this.makeResizable(true);
 
@@ -1595,6 +1589,49 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Make element draggable. Initialize jQueryUI on domNode
+			 */
+			makeDraggable: function() {
+				this.domNode.draggable({
+					containment: 'parent',
+					opacity: 0.5,
+					helper: 'clone',
+					start: $.proxy(this.dragStart, this),
+					drag: $.proxy(this.dragDrag, this),
+					stop: $.proxy(this.dragStop, this)
+				});
+			},
+
+			/**
+			 * Drag event start action handler.
+			 */
+			dragStart: function(event, data) {
+
+			},
+
+			/**
+			 * Drag event drag action handler.
+			 */
+			dragDrag: function(event, data) {
+				if (this.selected) {
+					var delta_x = data.position.left - data.originalPosition.left,
+						delta_y = data.position.top - data.originalPosition.top;
+
+					//this.sysmap.dragSelectedItems(delta_x, delta_y);
+				}
+			},
+
+			/**
+			 * Drag event stop action handler.
+			 */
+			dragStop: function(event, data) {
+				this.updatePosition({
+					x: parseInt(data.position.left, 10),
+					y: parseInt(data.position.top, 10)
+				});
+			},
+
+			/**
 			 * Removes Shape object, delete all reference to it.
 			 */
 			remove: function() {
@@ -1672,17 +1709,7 @@ ZABBIX.apps.map = (function($) {
 				.attr('data-id', this.id)
 				.attr('data-type', 'selements');
 
-			this.domNode.draggable({
-				containment: 'parent',
-				opacity: 0.5,
-				helper: 'clone',
-				stop: $.proxy(function(event, data) {
-					this.updatePosition({
-						x: parseInt(data.position.left, 10),
-						y: parseInt(data.position.top, 10)
-					});
-				}, this)
-			});
+			this.makeDraggable();
 
 			this.makeResizable(this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1);
 
@@ -1782,6 +1809,26 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} coords
 			 */
 			updatePosition: Shape.prototype.updatePosition,
+
+			/**
+			 * Make element draggable. Initialize jQueryUI on domNode
+			 */
+			makeDraggable: Shape.prototype.makeDraggable,
+
+			/**
+			 * Drag event start action handler.
+			 */
+			dragStart: Shape.prototype.dragStart,
+
+			/**
+			 * Drag event drag action handler.
+			 */
+			dragDrag: Shape.prototype.dragDrag,
+
+			/**
+			 * Drag event stop action handler.
+			 */
+			dragStop: Shape.prototype.dragStop,
 
 			/**
 			 * Remove element.
