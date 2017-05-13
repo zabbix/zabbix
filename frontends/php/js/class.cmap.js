@@ -931,11 +931,11 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				buffer.xaxis = {
-					min: parseInt(draggable.data.x, 10) - buffer.left,
+					min: event.clientX - buffer.left,
 					max: (draggable.sysmap.container).width() - (buffer.right - event.clientX)
 				};
 				buffer.yaxis = {
-					min: event.clientY - parseInt(draggable.data.y, 10),
+					min: event.clientY - buffer.top,
 					max: (draggable.sysmap.container).width() - (buffer.bottom - event.clientY)
 				}
 
