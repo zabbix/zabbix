@@ -631,27 +631,6 @@
 		makeResizable($obj, data, widget);
 	}
 
-	function deleteConfirmation($obj, data, widget) {
-		overlayDialogue({
-			'title': t('Deleating widget'),
-			'content': t('Are you sure, you want to delete this widget?'),
-			'buttons': [
-				{
-					'title': t('Delete'),
-					'class': 'dialogue-widget-save',
-					'action': function() {
-						deleteWidget($obj, data, widget);
-					}
-				},
-				{
-					'title': t('Cancel'),
-					'class': 'btn-alt',
-					'action': function() {}
-				}
-			]
-		});
-	}
-
 	function deleteWidget($obj, data, widget) {
 		var index = widget['div'].data('widget-index');
 
@@ -879,9 +858,9 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				// TODO VM: (?) should user be warned about unsaved changes?
-				// TODO VM: (?) should the warning be general one, or custom made one. (Overlay with "Discard changes?")
-				// TODO VM: (?) If no warning is needed, then this function can be implemented in monitoring.dashboard.view.js
+				// Don't show warning about existing updates
+				data['options']['updated'] = false;
+
 				// Redirect to last active dashboard.
 				// (1) In case of New Dashboard from list, it will open list
 				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
@@ -906,7 +885,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				deleteConfirmation($this, data, widget);
+				deleteWidget($this, data, widget);
 			});
 		},
 
