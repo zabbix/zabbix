@@ -344,8 +344,8 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 
 			/* Polling items with invalid update intervals repeatedly does not make sense because they */
 			/* can only be healed by editing configuration (either update interval or macros involved) */
-			/* and such changes will be detected during configuration synchronization. Items with new  */
-			/* update intervals or with macros in them are requeued automatically by DCsync_items().   */
+			/* and such changes will be detected during configuration synchronization. DCsync_items()  */
+			/* detects item configuration changes affecting check scheduling and passes them in flags. */
 
 			item->nextcheck = ZBX_JAN_2038;
 			item->schedulable = 0;
