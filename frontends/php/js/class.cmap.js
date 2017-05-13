@@ -2123,11 +2123,17 @@ ZABBIX.apps.map = (function($) {
 							},
 							success: function(data) {
 								data = JSON.parse(data);
-								data.result.each(function(trigger) {
-									if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
-										trigger.name = triggers_to_insert[trigger.triggerid].name;
-										$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
-									}
+								triggers.each(function(sorted_trigger) {
+									data.result.each(function(trigger) {
+										if (sorted_trigger.id == trigger.triggerid) {
+											if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
+												trigger.name = triggers_to_insert[trigger.triggerid].name;
+												$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+
+												return false;
+											}
+										}
+									});
 								});
 
 								SelementForm.prototype.recalculateSortOrder();
