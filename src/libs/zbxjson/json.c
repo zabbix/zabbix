@@ -971,3 +971,101 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 
 	return num;
 }
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_jsonpath_error                                               *
+ *                                                                            *
+ * Purpose: sets json error message and returns FAIL                          *
+ *                                                                            *
+ * Comments: This function is used to return from json path parsing functions *
+ *           in the case of failure.                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_jsonpath_error(const char *path)
+{
+	zbx_set_json_strerror("Unsupported character in json path starting with: \"%s\"", path);
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_jsonpath_next                                                *
+ *                                                                            *
+ * Purpose: returns next component of json path                               *
+ *                                                                            *
+ * Parameters: path  - [IN] the json path                                     *
+ *             pnext - [IN/OUT] the reference to the next path component      *
+ *             loc   - [OUT]  the location of the path component              *
+ *                                                                            *
+ * Return value: SUCCEED - the json path component was parsed successfully    *
+ *               FAIL    - json path parsing error                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc)
+{
+	const char	*next = *pnext;
+	size_t		pos;
+
+	if (NULL == next)
+	{
+		if ('$' != *path)
+			return zbx_jsonpath_error(path);
+
+		next = path + 1;
+	}
+
+	if (*next == '.')
+	{
+		if ('\0' == *(++next))
+			return zbx_jsonpath_error(*pnext);
+
+		loc->l = next - path;
+
+		while (0 != isalnum(*next) || '_' == *next)
+			next++;
+
+		if ((pos = next - path) == loc->l)
+			return zbx_jsonpath_error(*pnext);
+
+		loc->r = pos - 1;
+	}
+	else if (*next == '[')
+	{
+		char	quotes;
+
+		while (*(++next) == ' ')
+			;
+
+		quotes = *next++;
+		loc->l = next - path;
+
+		while (quotes != *next)
+		{
+			if ('\0' == *next)
+				return zbx_jsonpath_error(*pnext);
+			next++;
+		}
+
+		if ((pos = next - path) == loc->l)
+			return zbx_jsonpath_error(*pnext);
+
+		loc->r = pos - 1;
+
+		while (*(++next) == ' ')
+			;
+
+		if (']' != *next++)
+			return zbx_jsonpath_error(*pnext);
+	}
+	else
+		return zbx_jsonpath_error(*pnext);
+
+	*pnext = next;
+
+	return SUCCEED;
+}
+
+
+
