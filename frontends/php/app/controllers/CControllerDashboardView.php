@@ -82,7 +82,8 @@ class CControllerDashboardView extends CController {
 			'dashboard' => $dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
-			'grid_widgets' => $this->getWidgets($dashboard['widgets'])
+			'grid_widgets' => $this->getWidgets($dashboard['widgets']),
+			'widgetDefaults' => $this->widget_config->getDefaults($this->getUserType())
 		];
 
 		$response = new CControllerResponseData($data);

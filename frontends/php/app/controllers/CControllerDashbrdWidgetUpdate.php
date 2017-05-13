@@ -108,7 +108,9 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 			foreach ($this->widgets as $widget) {
 				$widget_to_save = [];
-				$widget_to_save['widgetid'] = $widget['widgetid'];
+				if ($widget['widgetid'] !== '') {
+					$widget_to_save['widgetid'] = $widget['widgetid'];
+				}
 
 				if (array_key_exists('pos', $widget)) {
 					$widget_to_save['row'] = $widget['pos']['row'];

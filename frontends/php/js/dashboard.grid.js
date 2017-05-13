@@ -254,10 +254,8 @@
 			});
 
 			if (changed === true) {
-				// save original values (only on first widget update before save)
-				if (typeof this['pos_orig'] === 'undefined') {
-					this['pos_orig'] = this['pos'];
-				}
+				// mark dashboard as updated
+				data['options']['updated'] = true;
 				this['pos'] = this['current_pos'];
 			}
 
@@ -468,23 +466,25 @@
 
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
-			ajax_data = [],
+			ajax_widgets = [],
 			fields = $('form', data.dialogue['body']).serializeJSON();
 
 		url.setArgument('action', 'dashbrd.widget.update');
 
-		ajax_data.push({
-			'widgetid': widget['widgetid'],
-			'fields': fields
-		});
+		var ajax_widget = {};
+		if (widget !== null) {
+			ajax_widget.widgetid = widget['widgetid'];
+		}
+		ajax_widget.fields = fields;
+		ajax_widgets.push(ajax_widget);
 
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboard_id: data['options']['dashboardid'], // TODO VM: (?) will not work without dashboard id
-				widgets: ajax_data,
+				dashboard_id: data['dashboard']['id'], // TODO VM: (?) will not work without dashboard id
+				widgets: ajax_widgets,
 				save: 0 // 0 - only check; 1 - check and save
 			},
 			success: function(resp) {
@@ -497,13 +497,31 @@
 					// No errors, proceed with update
 					overlayDialogueDestroy();
 
-					// save original values (only on first widget update before save)
-					if (typeof widget['fields_orig'] === 'undefined') {
-						widget['fields_orig'] = widget['fields'];
+					if (widget === null) {
+						// In case of ADD widget
+						// create widget with required selected fields and add it to dashboard
+						var pos = findEmptyPosition($obj, data, fields['type']);
+						var widget_data = {
+							'type': fields['type'],
+							'header': data['widget_defaults'][fields['type']]['header'],
+							'pos': pos, // TODO VM: get default size
+							'rf_rate': data['widget_defaults'][fields['type']]['rf_rate'],
+							'fields': fields
+						}
+						methods.addWidget.call($obj, widget_data);
+						// new widget is last element in data['widgets'] array
+						widget = data['widgets'].slice(-1)[0];
+						setWidgetModeEdit($obj, data, widget);
+					} else {
+						// In case of EDIT widget
 					}
+
 					widget['fields'] = fields;
 					widget['type'] = widget['fields']['type'];
 					refreshWidget(widget);
+
+					// mark dashboard as updated
+					data['options']['updated'] = true;
 				}
 			},
 			error: function() {
@@ -512,8 +530,43 @@
 		});
 	}
 
-	function openConfigDialogue($obj, data, widget) {
-		var edit_mode = (widget['widgetid'] === '') ? false : true;
+	function findEmptyPosition($obj, data, type) {
+		var pos = {
+			'row': 0,
+			'col': 0,
+			'height': data['widget_defaults'][type]['size']['height'],
+			'width': data['widget_defaults'][type]['size']['width']
+		}
+
+		// go row by row and try to position widget in each space
+		// TODO VM: (?) probably not the most efficient algorithm,
+		//			but simple one, and for our dashboard size should work fast enough
+		var max_col = data['options']['columns'] - pos['width'],
+			found = false,
+			col, row;
+		for (row = 0; !found; row++) {
+			for (col = 0; col <= max_col && !found; col++) {
+				pos['row'] = row;
+				pos['col'] = col;
+				found = isPosFree($obj, data, pos);
+			}
+		}
+
+		return pos;
+	}
+
+	function isPosFree($obj, data, pos) {
+		var free = true;
+		$.each(data['widgets'], function() {
+			if (rectOverlap(pos, this['pos'])) {
+				free = false;
+			}
+		});
+		return free;
+	}
+
+	function openConfigDialogue($obj, data, widget = null) {
+		var edit_mode = (widget !== null) ? true : false;
 		data.dialogue = {};
 		data.dialogue.widget = widget;
 
@@ -546,55 +599,74 @@
 
 	function setModeEditDashboard($obj, data) {
 		$.each(data['widgets'], function(index, widget) {
-			var btn_edit = $('<button>')
-				.attr('type', 'button')
-				.addClass('btn-widget-edit')
-				.attr('title', t('Edit'))
-				.click(function(){
-					methods.editWidget.call($obj, widget);
-				});
-
-			var btn_delete = $('<button>')
-				.attr('type', 'button')
-				.addClass('btn-widget-delete')
-				.attr('title', t('Delete'));
-
-			$('ul',widget['content_header']).hide();
-			widget['content_header'].append($('<ul>')
-				.addClass('dashbrd-widg-edit')
-				.append($('<li>').append(btn_edit))
-				.append($('<li>').append(btn_delete))
-			);
-
-			makeDraggable($obj, data, widget);
-			makeResizable($obj, data, widget);
+			setWidgetModeEdit($obj, data, widget);
 		});
 	}
 
-	function setModeViewDashboard($obj, data) {
-		$.each(data['widgets'], function(index, widget) {
-			// revert all unsaved changes that were done in this edit
-			if (typeof widget['pos_orig'] !== 'undefined') {
-				widget['pos'] = widget['pos_orig'];
-				delete widget['pos_orig'];
-				setDivPosition(widget['div'], data, widget['pos']);
-				resizeDashboardGrid($obj, data);
-			}
-			if (typeof widget['fields_orig'] !== 'undefined') {
-				widget['fields'] = widget['fields_orig'];
-				widget['type'] = widget['fields']['type'];
-				delete widget['fields_orig'];
-				refreshWidget(widget);
-			}
+	function setWidgetModeEdit($obj, data, widget) {
+		var btn_edit = $('<button>')
+			.attr('type', 'button')
+			.addClass('btn-widget-edit')
+			.attr('title', t('Edit'))
+			.click(function(){
+				methods.editWidget.call($obj, widget);
+			});
 
-			$('.dashbrd-widg-edit',widget['content_header']).remove();
-			$('ul',widget['content_header']).show();
+		var btn_delete = $('<button>')
+			.attr('type', 'button')
+			.addClass('btn-widget-delete')
+			.attr('title', t('Delete'))
+			.click(function(){
+				methods.deleteWidget.call($obj, widget);
+			});
 
-			stopDraggable($obj, data, widget);
-			stopResizable($obj, data, widget);
+		$('ul',widget['content_header']).hide();
+		widget['content_header'].append($('<ul>')
+			.addClass('dashbrd-widg-edit')
+			.append($('<li>').append(btn_edit))
+			.append($('<li>').append(btn_delete))
+		);
+
+		makeDraggable($obj, data, widget);
+		makeResizable($obj, data, widget);
+	}
+
+	function deleteConfirmation($obj, data, widget) {
+		overlayDialogue({
+			'title': t('Deleating widget'),
+			'content': t('Are you sure, you want to delete this widget?'),
+			'buttons': [
+				{
+					'title': t('Delete'),
+					'class': 'dialogue-widget-save',
+					'action': function() {
+						deleteWidget($obj, data, widget);
+					}
+				},
+				{
+					'title': t('Cancel'),
+					'class': 'btn-alt',
+					'action': function() {}
+				}
+			]
 		});
-		// update control buttons, controlling dashboard
-		dashboardButtonsSetView();
+	}
+
+	function deleteWidget($obj, data, widget) {
+		var index = widget['div'].data('widget-index');
+
+		// remove div from the grid
+		widget['div'].remove();
+		data['widgets'].splice(index,1);
+
+		// update widget-index for all following widgets
+		for (var i = index; i < data['widgets'].length; i++) {
+			data['widgets'][i]['div'].data('widget-index', i);
+		}
+
+		// mark dashboard as updated
+		data['options']['updated'] = true;
+		resizeDashboardGrid($obj, data);
 	}
 
 	function saveChanges($obj, data) {
@@ -619,7 +691,7 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboard_id: data['options']['dashboardid'], // TODO VM: (?) will not work without dashboard id
+				dashboard_id: data['dashboard']['id'], // TODO VM: (?) will not work without dashboard id
 				widgets: ajax_data,
 				save: 1 // 0 - only check; 1 - check and save
 			},
@@ -630,15 +702,12 @@
 				} else {
 					if (typeof(resp.messages) !== 'undefined') {
 						// Success returned
-						dashbaordAddMessages(resp.messages);
+//						dashbaordAddMessages(resp.messages); // TODO VM: looks bad
 					}
-					$.each(data['widgets'], function(index, data_widget) {
-						// remove original values (new ones were just saved)
-						delete data_widget['fields_orig'];
-						delete data_widget['pos_orig'];
-					});
-
-					setModeViewDashboard($obj, data);
+					// There are no more unsaved changes
+					data['options']['updated'] = false;
+					// Reload page to get latest wiget data from server.
+					location.reload(true); // TODO VM: (?) in case of page reloading I can't display success message with current functionality.
 				}
 			},
 			error: function() {
@@ -648,17 +717,7 @@
 	}
 
 	function confirmExit($obj, data) {
-		var has_changes = false;
-		$.each(data['widgets'], function(index, widget) {
-			if (typeof widget['pos_orig'] !== 'undefined') {
-				has_changes = true;
-			}
-			if (typeof widget['fields_orig'] !== 'undefined') {
-				has_changes = true;
-			}
-		});
-
-		if (has_changes === true) {
+		if (data['options']['updated'] === true) {
 			return t('You have unsaved changes.')+"\n"+t('Are you sure, you want to leave this page?');
 		}
 	}
@@ -669,14 +728,17 @@
 			options['widget-height'] = 70;
 			options['widget-width'] = 100 / options['columns'];
 			options['rows'] = 0;
+			options['updated'] = false; // TODO VM: (?) not sure, where this flag in data structure should be
 
 			return this.each(function() {
 				var	$this = $(this),
 					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'});
 
 				$this.data('dashboardGrid', {
+					dashboard: {},
 					options: options,
 					widgets: [],
+					widget_defaults: {},
 					placeholder: $placeholder
 				});
 				var data = $this.data('dashboardGrid');
@@ -691,6 +753,26 @@
 						return res;
 					}
 				});
+			});
+		},
+
+		setDashboardData: function(dashboard) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				dashboard = $.extend({}, data['dashboard'], dashboard);
+				data['dashboard'] = dashboard;
+			});
+		},
+
+		setWidgetDefaults: function(defaults) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				defaults = $.extend({}, data['widget_defaults'], defaults);
+				data['widget_defaults'] = defaults;
 			});
 		},
 
@@ -797,8 +879,14 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				dashboardRemoveMessages();
-				setModeViewDashboard($this, data);
+				// TODO VM: (?) should user be warned about unsaved changes?
+				// TODO VM: (?) should the warning be general one, or custom made one. (Overlay with "Discard changes?")
+				// TODO VM: (?) If no warning is needed, then this function can be implemented in monitoring.dashboard.view.js
+				// Redirect to last active dashboard.
+				// (1) In case of New Dashboard from list, it will open list
+				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
+				// (3) In case of simple editing of current dashboard, it will reload same dashboard
+				location.replace('zabbix.php?action=dashboard.view'); // TODO VM: (?) by such I am limiting usage of dashboard grid to this page.
 			});
 		},
 
@@ -809,6 +897,16 @@
 					data = $this.data('dashboardGrid');
 
 				openConfigDialogue($this, data, widget);
+			});
+		},
+
+		// After pressing "delete" button on widget
+		deleteWidget: function(widget) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				deleteConfirmation($this, data, widget);
 			});
 		},
 
@@ -830,16 +928,15 @@
 
 				url.setArgument('action', 'dashbrd.widget.config');
 
-				if (widget['widgetid'] !== '') {
-					ajax_data.widgetid = widget['widgetid'];
-				}
-
 				if (form.length) {
 					// Take values from form
 					ajax_data.fields = form.serializeJSON();
-				} else {
+				} else if (widget !== null) {
 					// Open form with current config
 					ajax_data.fields = widget['fields'];
+				} else {
+					// Get default config for new widget
+					ajax_data.fields = [];
 				}
 
 				jQuery.ajax({
@@ -876,6 +973,15 @@
 						// TODO VM: (?) do we need to have error message on failed dialogue form update?
 					}
 				});
+			});
+		},
+
+		addNewWidget: function() {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				openConfigDialogue($this, data);
 			});
 		}
 	}

@@ -63,8 +63,15 @@ if ($data['fullscreen']) {
 $this->addPostJS('jqBlink.blink();');
 
 // Initialize dashboard grid
+$dashboard_data = [
+	'id' => $data['dashboard']['dashboardid'],
+	'name' => $data['dashboard']['name'],
+//	'owner' => $data['dashboard']['owner'] // TODO VM: add owner
+];
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
-		'.dashboardGrid({"dashboardid":'.$data['dashboard']['dashboardid'].'})'.
+		'.dashboardGrid()'.
+		'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
+		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widgetDefaults']).')'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );

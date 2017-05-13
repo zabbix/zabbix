@@ -31,7 +31,6 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'db widget.widgetid',
 			'fields'		=>	'array',
 		];
 
@@ -53,6 +52,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 					$ret = false;
 				}
 				// We will work only with known widget types
+				// TODO VM: (?) what should happen if I will open dashboard with widget, here I don't have right for this widget type.
 				elseif (!in_array($widget_fields['type'], $this->widget_config->getKnownWidgetTypes($this->getUserType()))) {
 					error(_('Unknown widget type')); // TODO VM: (?) improve message
 					$ret = false;

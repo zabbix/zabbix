@@ -23,6 +23,7 @@ class CWidgetConfig
 	// TODO VM: (?) maybe better to convert all functions to static ones
 	private $knownWidgetTypes;
 	private $rfRates;
+	private $dimensions;
 	private $apiFieldKeys;
 
 	public function __construct() {
@@ -54,6 +55,20 @@ class CWidgetConfig
 			WIDGET_URL					=> 0,
 		];
 
+		$this->dimensions = [
+			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
+			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
+			WIDGET_LAST_ISSUES			=> ['width' => 6, 'height' => 6],
+			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
+			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
+			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 4],
+			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
+			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
+			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
+			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
+			WIDGET_URL					=> ['width' => 7, 'height' => 9],
+		];
+
 		$this->apiFieldKeys = [
 			ZBX_WIDGET_FIELD_TYPE_INT32				=> 'value_int',
 			ZBX_WIDGET_FIELD_TYPE_STR				=> 'value_str',
@@ -66,6 +81,23 @@ class CWidgetConfig
 			ZBX_WIDGET_FIELD_TYPE_MAP				=> 'value_sysmapid',
 			ZBX_WIDGET_FIELD_TYPE_DASHBOARD			=> 'value_dashboardid'
 		];
+	}
+
+	/**
+	 * Return default values for new widgets
+	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
+	 * @return array
+	 */
+	public function getDefaults($user_type = null) {
+		$ret = [];
+		$known_widget_types = $this->getKnownWidgetTypes($user_type);
+		foreach ($known_widget_types as $value) {
+			$ret[$value] = [];
+			$ret[$value]['header'] = $this->knownWidgetTypes[$value];
+			$ret[$value]['rf_rate'] = $this->rfRates[$value];
+			$ret[$value]['size'] = $this->dimensions[$value];
+		}
+		return $ret;
 	}
 
 	/**

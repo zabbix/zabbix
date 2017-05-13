@@ -83,7 +83,7 @@
 
 		// Add new widget
 		var dashbrd_add_widget = function() {
-			// TODO VM: implement adding widget functionality
+			$('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
 		};
 	});
 
