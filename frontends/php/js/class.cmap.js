@@ -882,9 +882,9 @@ ZABBIX.apps.map = (function($) {
 			 * @return {object}								Object of elements with recalculated positions.
 			 */
 			dragGroupRecalculate: function(cmap, delta_x, delta_y) {
-				var selected = cmap.draggable_buffer;
+				var dragged = cmap.draggable_buffer;
 
-				selected.items.forEach(function(item) {
+				dragged.items.forEach(function(item) {
 					node = cmap[item.type][item.id];
 					node.data.x = parseInt(node.data.x, 10) + delta_x;
 					node.data.y = parseInt(node.data.y, 10) + delta_y;
@@ -906,7 +906,7 @@ ZABBIX.apps.map = (function($) {
 			 *
 			 * @return void
 			 */
-			dragInit: function(event, data, draggable) {
+			dragGroupInit: function(event, data, draggable) {
 				var buffer,
 					draggable_node;
 
@@ -951,7 +951,7 @@ ZABBIX.apps.map = (function($) {
 			 *
 			 * @return void
 			 */
-			dragGroup: function(event, data, draggable) {
+			dragGroupDrag: function(event, data, draggable) {
 				var cmap = draggable.sysmap,
 					delta_x = data.position.left - parseInt(draggable.data.x, 10),
 					delta_y = data.position.top - parseInt(draggable.data.y, 10);
@@ -970,8 +970,29 @@ ZABBIX.apps.map = (function($) {
 					cmap.dragGroupRecalculate(cmap, delta_x, delta_y);
 					cmap.updateImage();
 				}
+			},
 
-				// TODO: add dragGroupStop with align for dragged elements
+			/**
+			 * Final tasks for dragged element on drag stop event
+			 *
+			 * @param {object}		event					jQuery ui draggable event.
+			 * @param {objact}		data					jQuery ui draggable data.
+			 * @param {object}		draggable				Element where drag stop event occured.
+			 *
+			 * @return void
+			 */
+			dragGroupStop: function(event, data, draggable) {
+				var cmap = draggable.sysmap,
+					should_align = (cmap.data.grid_align === '1');
+
+				if (should_align) {
+					cmap.draggable_buffer.items.forEach(function(item) {
+						if ('align' in cmap[item.type][item.id]) {
+							cmap[item.type][item.id].align(true);
+							cmap[item.type][item.id].trigger('afterMove');
+						}
+					});
+				}
 			},
 
 			/**
@@ -1716,10 +1737,13 @@ ZABBIX.apps.map = (function($) {
 						return this.sysmap.dragGroupPlaceholder(this.domNode);
 					}, this),
 					start: $.proxy(function(event, data) {
-						this.sysmap.dragInit(event, data, this);
+						this.sysmap.dragGroupInit(event, data, this);
 					}, this),
 					drag: $.proxy(function(event, data) {
-						this.sysmap.dragGroup(event, data, this);
+						this.sysmap.dragGroupDrag(event, data, this);
+					}, this),
+					stop: $.proxy(function(event, data) {
+						this.sysmap.dragGroupStop(event, data, this);
 					}, this)
 				});
 			},
