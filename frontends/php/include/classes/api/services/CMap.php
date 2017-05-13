@@ -173,8 +173,6 @@ class CMap extends CMapElement {
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 		while ($sysmap = DBfetch($res)) {
-			$sysmapids[$sysmap['sysmapid']] = true;
-
 			// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
 			// leaving this block commented
 			// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
@@ -184,8 +182,8 @@ class CMap extends CMapElement {
 			$result[$sysmap['sysmapid']] = $sysmap;
 		}
 
-		if ($sysmapids && $user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$sysmapids = array_keys($sysmapids);
+		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$sysmapids = array_keys($result);
 
 			$linkTriggers = [];
 
