@@ -853,6 +853,131 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Buffer for draggable elements and elements group bounds.
+			 */
+			draggable_buffer: null,
+
+			/**
+			 * Returns virtual dom element used by draggable.
+			 *
+			 * @param {object}	source_node		jQuery element where dragging was started on.
+			 *
+			 * @return {object}
+			 */
+			dragGroupPlaceholder: function(source_node) {
+				var drag_placeholder = $('<div/>').css({
+					width: $(this.domNode).width(),
+					height: $(this.domNode).height()
+				});
+
+				return drag_placeholder;
+			},
+
+			/**
+			 * Recalculate x and y position of moved elements.
+			 *
+			 * @param {int}		delta_x		Shift between old and new x position.
+			 * @param {int}		delta_y		Shift between old and new y position.
+			 *
+			 * @return {object}				Object of elements with recalculated positions.
+			 */
+			dragGroupRecalculate: function(cmap, delta_x, delta_y) {
+				var selected = cmap.draggable_buffer;
+
+				selected.items.forEach(function(item) {
+					node = cmap[item.type][item.id];
+					node.data.x = parseInt(node.data.x, 10) + delta_x;
+					node.data.y = parseInt(node.data.y, 10) + delta_y;
+					if ('domNode' in cmap[item.type][item.id]) {
+						$(cmap[item.type][item.id].domNode).css({
+							top: node.data.y + 'px',
+							left: node.data.x + 'px'
+						})
+					}
+				});
+			},
+
+			/**
+			 * Initializes multiple elements dragging.
+			 *
+			 * @param {object}		draggable	Draggable dom element where drag event wa started.
+			 *
+			 * @return void
+			 */
+			dragInit: function(draggable) {
+				var buffer,
+					draggable_node;
+
+				if (draggable.selected) {
+					buffer = draggable.sysmap.getSelectionBuffer(draggable.sysmap);
+				}
+				else {
+					draggable_node = $(draggable.domNode);
+					// Have to create getSelectionBuffer structure if drag event was started on not selected element.
+					buffer = {
+					items: [
+						{
+							type: draggable_node.attr('data-type'),
+							id: draggable.id
+						}
+					],
+						left: parseInt(draggable.data.x, 10),
+						right: parseInt(draggable.data.x, 10) + draggable_node.width(),
+						top: parseInt(draggable.data.y, 10),
+						bottom: parseInt(draggable.data.y, 10) + draggable_node.height()
+					}
+				}
+
+				draggable.sysmap.draggable_buffer = buffer;
+			},
+
+			/**
+			 * Handler for drag event.
+			 *
+			 * @param {object}		event					jQuery ui draggable event.
+			 * @param {objact}		data					jQuery ui draggable data.
+			 * @param {object}		draggable				Element where drag event occured.
+			 *
+			 * @return void
+			 */
+			dragGroup: function(event, data, draggable) {
+				var cmap = draggable.sysmap;//,
+				// 	selected = cmap.getSelectionBuffer(cmap),
+				// 	offset = $(cmap.container).offset(),
+				// 	delta_x = event.pageX - offset.left - selected.left,
+				// 	delta_y = event.pageY - offset.top - selected.top;
+
+				// delta_x = Math.min(delta_x,
+				// 	parseInt(cmap.data.width, 10) - selected.right
+				// );
+				// delta_y = Math.min(delta_y,
+				// 	parseInt(cmap.data.height, 10) - selected.bottom
+				// );
+
+				var delta_x = data.position.left - parseInt(draggable.data.x, 10),
+					delta_y = data.position.top - parseInt(draggable.data.y, 10);
+
+				cmap.dragGroupRecalculate(cmap, delta_x, delta_y);
+
+
+				// if (this.selected) {
+				// 	// var delta_x = data.position.left - parseInt(this.data.x, 10),
+				// 	// 	delta_y = data.position.top - parseInt(this.data.y, 10);
+
+				// 	this.sysmap.dragGroupRecalculate(this.sysmap, delta_x, delta_y);
+				// } else {
+				// 	this.data.x = data.position.left;
+				// 	this.data.y = data.position.top;
+				// 	$(this.domNode).css({
+				// 		top: this.data.y + 'px',
+				// 		left: this.data.x + 'px'
+				// 	});
+				// }
+
+				cmap.updateImage();
+			},
+
+			/**
 			 * Paste that.copypaste_buffer content at new location.
 			 *
 			 * @param	{number}	delta_x					Shift between desired and actual x position.
@@ -930,10 +1055,6 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				return selectedids;
-			},
-
-			dragSelectedItems: function(delta_x, delta_y) {
-
 			},
 
 			/**
@@ -1589,45 +1710,20 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Make element draggable. Initialize jQueryUI on domNode
+			 * Make element draggable.
 			 */
 			makeDraggable: function() {
 				this.domNode.draggable({
 					containment: 'parent',
-					opacity: 0.5,
-					helper: 'clone',
-					start: $.proxy(this.dragStart, this),
-					drag: $.proxy(this.dragDrag, this),
-					stop: $.proxy(this.dragStop, this)
-				});
-			},
-
-			/**
-			 * Drag event start action handler.
-			 */
-			dragStart: function(event, data) {
-
-			},
-
-			/**
-			 * Drag event drag action handler.
-			 */
-			dragDrag: function(event, data) {
-				if (this.selected) {
-					var delta_x = data.position.left - data.originalPosition.left,
-						delta_y = data.position.top - data.originalPosition.top;
-
-					//this.sysmap.dragSelectedItems(delta_x, delta_y);
-				}
-			},
-
-			/**
-			 * Drag event stop action handler.
-			 */
-			dragStop: function(event, data) {
-				this.updatePosition({
-					x: parseInt(data.position.left, 10),
-					y: parseInt(data.position.top, 10)
+					helper: $.proxy(function() {
+						return this.sysmap.dragGroupPlaceholder(this.domNode);
+					}, this),
+					start: $.proxy(function() {
+						this.sysmap.dragInit(this);
+					}, this),
+					drag: $.proxy(function(event, data) {
+						this.sysmap.dragGroup(event, data, this);
+					}, this)
 				});
 			},
 
@@ -1811,24 +1907,9 @@ ZABBIX.apps.map = (function($) {
 			updatePosition: Shape.prototype.updatePosition,
 
 			/**
-			 * Make element draggable. Initialize jQueryUI on domNode
+			 * Make element draggable.
 			 */
 			makeDraggable: Shape.prototype.makeDraggable,
-
-			/**
-			 * Drag event start action handler.
-			 */
-			dragStart: Shape.prototype.dragStart,
-
-			/**
-			 * Drag event drag action handler.
-			 */
-			dragDrag: Shape.prototype.dragDrag,
-
-			/**
-			 * Drag event stop action handler.
-			 */
-			dragStop: Shape.prototype.dragStop,
 
 			/**
 			 * Remove element.
