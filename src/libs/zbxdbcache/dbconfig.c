@@ -6304,6 +6304,7 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 		zbx_uint64_t start_triggerid, int process_num)
 {
 	int			i, start;
+	unsigned char		flags;
 	ZBX_DC_TRIGGER		*dc_trigger;
 	DC_TRIGGER		*trigger;
 
@@ -6314,30 +6315,43 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 
 	for (i = start; i < config->time_triggers[process_num - 1].values_num; i++)
 	{
+		flags = 0;
+
 		dc_trigger = (ZBX_DC_TRIGGER *)config->time_triggers[process_num - 1].values[i];
 
 		if (TRIGGER_STATUS_DISABLED == dc_trigger->status || 1 == dc_trigger->locked)
 			continue;
 
-		/* We trigger the evaluation of the recovery expression only if the trigger have a value of */
-		/* TRIGGER_VALUE_PROBLEM and if the recovery mode use the recovery expression */
-		if (SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression) ||
-				(TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == dc_trigger->recovery_mode &&
-				TRIGGER_VALUE_PROBLEM == dc_trigger->value &&
-				SUCCEED == DCconfig_find_active_time_function(dc_trigger->recovery_expression)))
+		if (SUCCEED != DCconfig_find_active_time_function(dc_trigger->expression))
 		{
-			dc_trigger->locked = 1;
-
-			trigger = &trigger_info[trigger_order->values_num];
-
-			DCget_trigger(trigger, dc_trigger);
-			zbx_timespec(&trigger->timespec);
-
-			zbx_vector_ptr_append(trigger_order, trigger);
-
-			if (trigger_order->values_num == max_triggers)
-				break;
+			/* We trigger the evaluation of the recovery expression only if the trigger have a value of */
+			/* TRIGGER_VALUE_PROBLEM and if the recovery mode use the recovery expression */
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION != dc_trigger->recovery_mode ||
+					TRIGGER_VALUE_PROBLEM != dc_trigger->value ||
+					SUCCEED != DCconfig_find_active_time_function(dc_trigger->recovery_expression))
+			{
+				continue;
+			}
 		}
+		else
+		{
+			/* Remember that trigger is chosen for evaluation because of time-based function in problem */
+			/* expression. This information is later used in evaluate_expressions() to avoid generation */
+			/* of duplicate PROBLEM events if recovery expression remains to be false. */
+			flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
+		}
+
+		dc_trigger->locked = 1;
+		trigger = &trigger_info[trigger_order->values_num];
+
+		DCget_trigger(trigger, dc_trigger);
+		zbx_timespec(&trigger->timespec);
+		trigger->flags = flags;
+
+		zbx_vector_ptr_append(trigger_order, trigger);
+
+		if (trigger_order->values_num == max_triggers)
+			break;
 	}
 
 	UNLOCK_CACHE;

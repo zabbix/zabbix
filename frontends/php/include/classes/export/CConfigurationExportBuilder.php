@@ -176,12 +176,6 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($maps, ['name']);
 
 		foreach ($maps as $map) {
-			foreach ($map['shapes'] as &$shape) {
-				unset($shape['shapeid']);
-				unset($shape['sysmapid']);
-			}
-			unset($shape);
-
 			$tmpSelements = $this->formatMapElements($map['selements']);
 			$this->data['maps'][] = [
 				'name' => $map['name'],

@@ -192,8 +192,9 @@ typedef struct
 }
 zbx_tag_t;
 
-/* item exist in base expression  */
-#define		ZBX_DC_TRIGGER_BASE_EXPRESSION	1
+#define ZBX_DC_TRIGGER_PROBLEM_EXPRESSION	0x1	/* this flag shows that trigger value recalculation is  */
+							/* initiated by a time-based function or a new value of */
+							/* an item in problem expression */
 
 typedef struct _DC_TRIGGER
 {

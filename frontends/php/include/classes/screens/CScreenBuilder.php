@@ -512,7 +512,7 @@ class CScreenBuilder {
 				elseif ($this->mode == SCREEN_MODE_EDIT) {
 					$item =[
 						(new CDiv(
-							(new CLink(_('Change'), $action))->addClass('empty_change_link')
+							(new CLink(_x('Change', 'verb'), $action))->addClass('empty_change_link')
 						))->addClass(ZBX_STYLE_CENTER)
 					];
 				}
