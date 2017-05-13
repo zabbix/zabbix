@@ -241,35 +241,6 @@ class CMap extends CMapElement {
 				}
 			}
 
-			// check sysmaps
-			$sysmapids_to_check = [];
-
-			$db_sysmap_elements = DBselect(
-				'SELECT se.elementid,se.sysmapid'.
-				' FROM sysmaps_elements se'.
-				' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_MAP]).
-					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
-			);
-			while ($db_sysmap_element = DBfetch($db_sysmap_elements)) {
-				$sysmapids_to_check[$db_sysmap_element['elementid']][$db_sysmap_element['sysmapid']] = true;
-			}
-
-			if ($sysmapids_to_check) {
-				$db_sysmaps = $this->get([
-					'output' => [],
-					'sysmapids' => array_keys($sysmapids_to_check),
-					'preservekeys' => true
-				]);
-
-				foreach ($sysmapids_to_check as $sysmapid => $sysmapids) {
-					if (!array_key_exists($sysmapid, $db_sysmaps)) {
-						foreach (array_keys($sysmapids) as $sysmapid) {
-							unset($result[$sysmapid]);
-						}
-					}
-				}
-			}
-
 			// check triggers
 			$triggerids_to_check = [];
 
@@ -302,6 +273,35 @@ class CMap extends CMapElement {
 
 				foreach ($triggerids_to_check as $triggerid => $sysmapids) {
 					if (!array_key_exists($triggerid, $db_triggers)) {
+						foreach (array_keys($sysmapids) as $sysmapid) {
+							unset($result[$sysmapid]);
+						}
+					}
+				}
+			}
+
+			// check sysmaps
+			$sysmapids_to_check = [];
+
+			$db_sysmap_elements = DBselect(
+				'SELECT se.elementid,se.sysmapid'.
+				' FROM sysmaps_elements se'.
+				' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_MAP]).
+					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
+			);
+			while ($db_sysmap_element = DBfetch($db_sysmap_elements)) {
+				$sysmapids_to_check[$db_sysmap_element['elementid']][$db_sysmap_element['sysmapid']] = true;
+			}
+
+			if ($sysmapids_to_check) {
+				$db_sysmaps = $this->get([
+					'output' => [],
+					'sysmapids' => array_keys($sysmapids_to_check),
+					'preservekeys' => true
+				]);
+
+				foreach ($sysmapids_to_check as $sysmapid => $sysmapids) {
+					if (!array_key_exists($sysmapid, $db_sysmaps)) {
 						foreach (array_keys($sysmapids) as $sysmapid) {
 							unset($result[$sysmapid]);
 						}
