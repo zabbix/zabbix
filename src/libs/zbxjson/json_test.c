@@ -23,6 +23,7 @@ typedef struct
 {
 	int	retcode;
 	char	*component;
+	int	index;
 }
 zbx_jsonpath_parse_t;
 
@@ -48,25 +49,27 @@ static void	cu_test_json_path(const char *path, zbx_jsonpath_parse_t *parse)
 	char		description[MAX_STRING_LEN];
 	const char	*next = NULL;
 	zbx_strloc_t	loc;
-	int		index = 0, ret;
+	int		num = 0, ret, index;
 	size_t		len;
 
 	zbx_snprintf(description, sizeof(description), "jsonpath '%s'", path);
 
 	do
 	{
-		ret = zbx_jsonpath_next(path, &next, &loc);
-		ZBX_CU_ASSERT_INT_EQ_FATAL(description, ret, parse[index].retcode);
+		ret = zbx_jsonpath_next(path, &next, &loc, &index);
+		ZBX_CU_ASSERT_INT_EQ_FATAL(description, ret, parse[num].retcode);
 
 		if (FAIL == ret)
 			return;
 
+		ZBX_CU_ASSERT_INT_EQ_FATAL(description, index, parse[num].index);
+
 		len = loc.r - loc.l + 1;
 
-		ZBX_CU_ASSERT_INT_EQ_FATAL(description, len, strlen(parse[index].component));
-		ZBX_CU_ASSERT_STRINGN_EQ_FATAL(description, path + loc.l, parse[index].component, len);
+		ZBX_CU_ASSERT_INT_EQ_FATAL(description, len, strlen(parse[num].component));
+		ZBX_CU_ASSERT_STRINGN_EQ_FATAL(description, path + loc.l, parse[num].component, len);
 
-		index++;
+		num++;
 	}
 	while ('\0' != *next);
 }
@@ -78,20 +81,30 @@ static void	test_zbx_jsonpath_next()
 			{"", {{FAIL}}},
 			{"$", {{FAIL}}},
 			{"$.", {{FAIL}}},
-			{"$.a", {{SUCCEED, "a"}}},
-			{"$['a']", {{SUCCEED, "a"}}},
-			{"$[ 'a' ]", {{SUCCEED, "a"}}},
-			{"$[\"a\"]", {{SUCCEED, "a"}}},
-			{"$.a.", {{SUCCEED, "a"}, {FAIL}}},
-			{"$.a.b", {{SUCCEED, "a"}, {SUCCEED, "b"}}},
-			{"$['a'].b", {{SUCCEED, "a"}, {SUCCEED, "b"}}},
-			{"$['a']['b']", {{SUCCEED, "a"}, {SUCCEED, "b"}}},
-			{"$.a['b']", {{SUCCEED, "a"}, {SUCCEED, "b"}}},
+			{"$.a", {{SUCCEED, "a", -1}}},
+			{"$['a']", {{SUCCEED, "a", -1}}},
+			{"$[ 'a' ]", {{SUCCEED, "a", -1}}},
+			{"$[\"a\"]", {{SUCCEED, "a", -1}}},
+			{"$.a.", {{SUCCEED, "a", -1}, {FAIL}}},
+			{"$.a.b", {{SUCCEED, "a", -1}, {SUCCEED, "b", -1}}},
+			{"$['a'].b", {{SUCCEED, "a", -1}, {SUCCEED, "b", -1}}},
+			{"$['a']['b']", {{SUCCEED, "a", -1}, {SUCCEED, "b", -1}}},
+			{"$.a['b']", {{SUCCEED, "a", -1}, {SUCCEED, "b", -1}}},
 			{"$['a'", {{FAIL}}},
 			{"$[a']", {{FAIL}}},
 			{"$['a'", {{FAIL}}},
 			{"$['']", {{FAIL}}},
 			{"$.['a']", {{FAIL}}},
+			{"$.a[0]", {{SUCCEED, "a", 0}}},
+			{"$.a[0].b[1]", {{SUCCEED, "a", 0}, {SUCCEED, "b", 1}}},
+			{"$.a[1000]", {{SUCCEED, "a", 1000}}},
+			{"$.a[ 1 ]", {{SUCCEED, "a", 1}}},
+			{"$['a'][2]", {{SUCCEED, "a", 2}}},
+			{"$['a'][2]['b'][3]", {{SUCCEED, "a", 2}, {SUCCEED, "b", 3}}},
+			{"$.a[]", {{SUCCEED, "a", -1}, {FAIL}}},
+			{"$.a[1", {{FAIL}}},
+			{"$['a'][]", {{SUCCEED, "a", -1}, {FAIL}}},
+			{"$['a'][1", {{FAIL}}},
 			};
 
 	ZBX_CU_LEAK_CHECK_START();

@@ -997,13 +997,14 @@ static int	zbx_jsonpath_error(const char *path)
  *                                                                            *
  * Parameters: path  - [IN] the json path                                     *
  *             pnext - [IN/OUT] the reference to the next path component      *
- *             loc   - [OUT]  the location of the path component              *
+ *             loc   - [OUT] the location of the path component               *
+ *             index - [OUT] the array index if used in component             *
  *                                                                            *
  * Return value: SUCCEED - the json path component was parsed successfully    *
  *               FAIL    - json path parsing error                            *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc)
+static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *index)
 {
 	const char	*next = *pnext;
 	size_t		pos;
@@ -1031,7 +1032,7 @@ static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t 
 
 		loc->r = pos - 1;
 	}
-	else if (*next == '[')
+	else if ('[' == *next)
 	{
 		char	quotes;
 
@@ -1063,6 +1064,29 @@ static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t 
 		return zbx_jsonpath_error(*pnext);
 
 	*pnext = next;
+	*index = -1;
+
+	if ('[' == *next)
+	{
+		while (*(++next) == ' ')
+			;
+
+		for (pos = 0; 0 != isdigit(next[pos]); pos++)
+			;
+
+		if (0 != pos && SUCCEED == is_uint_n_range(next, pos, index, 4, 0, 0xFFFFFFFF))
+		{
+			next += pos;
+
+			while (*next == ' ')
+				next++;
+
+			if (']' != *next++)
+				return zbx_jsonpath_error(*pnext);
+
+			*pnext = next;
+		}
+	}
 
 	return SUCCEED;
 }
