@@ -987,9 +987,13 @@ ZABBIX.apps.map = (function($) {
 
 				if (should_align) {
 					cmap.draggable_buffer.items.forEach(function(item) {
-						if ('align' in cmap[item.type][item.id]) {
-							cmap[item.type][item.id].align(true);
-							cmap[item.type][item.id].trigger('afterMove');
+						var element = cmap[item.type][item.id];
+
+						if ('updatePosition' in element) {
+							element.updatePosition({
+								x: element.data.x,
+								y: element.data.y
+							});
 						}
 					});
 				}
