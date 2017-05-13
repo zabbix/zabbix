@@ -21,9 +21,8 @@
 
 typedef struct
 {
-	int	retcode;
+	int	type;
 	char	*component;
-	int	index;
 }
 zbx_jsonpath_parse_t;
 
@@ -49,20 +48,23 @@ static void	cu_test_json_path(const char *path, zbx_jsonpath_parse_t *parse)
 	char		description[MAX_STRING_LEN];
 	const char	*next = NULL;
 	zbx_strloc_t	loc;
-	int		num = 0, ret, index;
+	int		num = 0, ret, type;
 	size_t		len;
 
 	zbx_snprintf(description, sizeof(description), "jsonpath '%s'", path);
 
 	do
 	{
-		ret = zbx_jsonpath_next(path, &next, &loc, &index);
-		ZBX_CU_ASSERT_INT_EQ_FATAL(description, ret, parse[num].retcode);
+		ret = zbx_jsonpath_next(path, &next, &loc, &type);
 
-		if (FAIL == ret)
+		if (FAIL == parse[num].type)
+		{
+			ZBX_CU_ASSERT_INT_EQ_FATAL(description, ret, FAIL);
 			return;
+		}
 
-		ZBX_CU_ASSERT_INT_EQ_FATAL(description, index, parse[num].index);
+		ZBX_CU_ASSERT_INT_EQ_FATAL(description, ret, SUCCEED);
+		ZBX_CU_ASSERT_INT_EQ_FATAL(description, type, parse[num].type);
 
 		len = loc.r - loc.l + 1;
 
@@ -78,44 +80,99 @@ static void	test_zbx_jsonpath_next()
 {
 	size_t			i;
 	zbx_jsonpath_data_t	data[] = {
-			{"", {{FAIL}}},
-			{"$", {{FAIL}}},
-			{"$.", {{FAIL}}},
-			{"$.a", {{SUCCEED, "a", -1}}},
-			{"$['a']", {{SUCCEED, "a", -1}}},
-			{"$[ 'a' ]", {{SUCCEED, "a", -1}}},
-			{"$[\"a\"]", {{SUCCEED, "a", -1}}},
-			{"$.a.", {{SUCCEED, "a", -1}, {FAIL}}},
-			{"$.a.b", {{SUCCEED, "a", -1}, {SUCCEED, "b", -1}}},
-			{"$['a'].b", {{SUCCEED, "a", -1}, {SUCCEED, "b", -1}}},
-			{"$['a']['b']", {{SUCCEED, "a", -1}, {SUCCEED, "b", -1}}},
-			{"$.a['b']", {{SUCCEED, "a", -1}, {SUCCEED, "b", -1}}},
-			{"$['a'", {{FAIL}}},
-			{"$[a']", {{FAIL}}},
-			{"$['a'", {{FAIL}}},
-			{"$['']", {{FAIL}}},
-			{"$.['a']", {{FAIL}}},
-			{"$.a[0]", {{SUCCEED, "a", 0}}},
-			{"$.a[0].b[1]", {{SUCCEED, "a", 0}, {SUCCEED, "b", 1}}},
-			{"$.a[1000]", {{SUCCEED, "a", 1000}}},
-			{"$.a[ 1 ]", {{SUCCEED, "a", 1}}},
-			{"$['a'][2]", {{SUCCEED, "a", 2}}},
-			{"$['a'][2]['b'][3]", {{SUCCEED, "a", 2}, {SUCCEED, "b", 3}}},
-			{"$.a[]", {{SUCCEED, "a", -1}, {FAIL}}},
-			{"$.a[1", {{FAIL}}},
-			{"$['a'][]", {{SUCCEED, "a", -1}, {FAIL}}},
-			{"$['a'][1", {{FAIL}}},
+			{"", {{-1}}},
+			{"$", {{-1}}},
+			{"$.", {{-1}}},
+			{"$.a", {{0, "a"}}},
+			{"$['a']", {{1, "a"}}},
+			{"$[ 'a' ]", {{1, "a"}}},
+			{"$[\"a\"]", {{1, "a"}}},
+			{"$.a.", {{0, "a"}, {-1}}},
+			{"$.a.b", {{0, "a"}, {0, "b"}}},
+			{"$['a'].b", {{1, "a"}, {0, "b"}}},
+			{"$['a']['b']", {{1, "a"}, {1, "b"}}},
+			{"$.a['b']", {{0, "a"}, {1, "b"}}},
+			{"$['a'", {{-1}}},
+			{"$[a']", {{-1}}},
+			{"$['a'", {{-1}}},
+			{"$['']", {{-1}}},
+			{"$.['a']", {{-1}}},
+			{"$.a[0]", {{0, "a"}, {2, "0"}}},
+			{"$.a[0].b[1]", {{0, "a"}, {2, "0"}, {0, "b"}, {2, "1"}}},
+			{"$.a[1000]", {{0, "a"}, {2, "1000"}}},
+			{"$.a[ 1 ]", {{0, "a"}, {2, "1"}}},
+			{"$['a'][2]", {{1, "a"}, {2, "2"}}},
+			{"$['a'][2]['b'][3]", {{1, "a"}, {2, "2"}, {1, "b"}, {2, "3"}}},
+			{"$.a[]", {{0, "a"}, {-1}}},
+			{"$.a[1", {{0, "a"}, {-1}}},
+			{"$['a'][]", {{1, "a"}, {-1}}},
+			{"$['a'][1", {{1, "a"}, {-1}}},
 			};
 
 	ZBX_CU_LEAK_CHECK_START();
 
 	for (i = 0; ARRSIZE(data) > i; i++)
-	{
 		cu_test_json_path(data[i].path, data[i].parse);
-	}
 
 	ZBX_CU_LEAK_CHECK_END();
 }
+
+static void	cu_test_zbx_json_path_open(const char *json, const char *jpath, const char *result, int retcode)
+{
+	struct zbx_json_parse	jp, jp_out;
+
+	char		description[MAX_STRING_LEN];
+	const char	*next = NULL;
+	zbx_strloc_t	loc;
+	int		num = 0, ret, type;
+	size_t		len;
+
+	zbx_snprintf(description, sizeof(description), "json '%s', path '%s'", json, jpath);
+
+	ZBX_CU_ASSERT_INT_EQ_FATAL(description, zbx_json_open(json, &jp), SUCCEED);
+
+	ret = zbx_json_path_open(&jp, jpath, &jp_out);
+
+	ZBX_CU_ASSERT_INT_EQ_FATAL(description, ret, retcode);
+	if (FAIL == ret)
+		return;
+
+	len = jp_out.end - jp_out.start + 1;
+	ZBX_CU_ASSERT_INT_EQ_FATAL(description, len, strlen(result));
+	ZBX_CU_ASSERT_STRINGN_EQ_FATAL(description, jp_out.start, result, len);
+}
+
+static void	test_zbx_json_path_open()
+{
+	typedef struct
+	{
+		const char	*json;
+		const char	*jpath;
+		const char	*result;
+		int		retcode;
+	}
+	zbx_json_data_t;
+
+	size_t			i;
+	zbx_json_data_t		data[] = {
+			{"{\"a\":{\"b\": [{\"x\":10}, 2, 3] }}", "$.a", "{\"b\": [{\"x\":10}, 2, 3] }", SUCCEED},
+			{"{\"a\" : {\"b\": [{\"x\":10}, 2, 3] }}", "$.a", "{\"b\": [{\"x\":10}, 2, 3] }", SUCCEED},
+			{"{\"a\":{\"b\": [{\"x\":10}, 2, 3] }}", "$.a.b", "[{\"x\":10}, 2, 3]", SUCCEED},
+			{"{\"a\":{\"b\": [{\"x\":10}, 2, 3] }}", "$.a.b[0]", "{\"x\":10}", SUCCEED},
+			{"{\"a\":{\"b\": [{\"x\":10}, 2, 3] }}", "$.a.b[1]", "2", SUCCEED},
+			{"{\"a\":{\"b\": [{\"x\":10}, 2, 3] }}", "$.a.b[2]", "3", SUCCEED},
+			{"{\"a\":{\"b\": [{\"x\":10}, 2, 3] }}", "$.a.b[3]", NULL, FAIL},
+			};
+
+	ZBX_CU_LEAK_CHECK_START();
+
+	for (i = 0; ARRSIZE(data) > i; i++)
+		cu_test_zbx_json_path_open(data[i].json, data[i].jpath, data[i].result, data[i].retcode);
+
+	ZBX_CU_LEAK_CHECK_END();
+
+}
+
 
 int	ZBX_CU_DECLARE(json)
 {
@@ -126,6 +183,12 @@ int	ZBX_CU_DECLARE(json)
 		return CU_get_error();
 
 	ZBX_CU_ADD_TEST(suite, test_zbx_jsonpath_next);
+
+	/* test suite: zbx_user_macro_parse() */
+	if (NULL == (suite = CU_add_suite("zbx_json_path_open", cu_init_empty, cu_clean_empty)))
+		return CU_get_error();
+
+	ZBX_CU_ADD_TEST(suite, test_zbx_json_path_open);
 
 	return CUE_SUCCESS;
 }
