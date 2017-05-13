@@ -295,36 +295,32 @@ function add_elementNames(&$selements) {
 	$hosts = API::Host()->get([
 		'hostids' => $hostids,
 		'output' => ['name'],
-		'nopermissions' => true,
 		'preservekeys' => true
 	]);
 
 	$maps = API::Map()->get([
 		'mapids' => $mapids,
 		'output' => ['name'],
-		'nopermissions' => true,
 		'preservekeys' => true
 	]);
 
 	$triggers = API::Trigger()->get([
+		'output' => ['description', 'expression', 'priority'],
 		'triggerids' => $triggerids,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['hostid', 'name'],
-		'nopermissions' => true,
+		'selectHosts' => ['name'],
 		'preservekeys' => true
 	]);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	$hostgroups = API::HostGroup()->get([
 		'hostgroupids' => $hostgroupids,
 		'output' => ['name'],
-		'nopermissions' => true,
 		'preservekeys' => true
 	]);
 
 	$images = API::image()->get([
 		'imageids' => $imageids,
 		'output' => API_OUTPUT_EXTEND,
-		'nopermissions' => true,
 		'preservekeys' => true
 	]);
 
@@ -337,13 +333,10 @@ function add_elementNames(&$selements) {
 				$selements[$snum]['elements'][0]['elementName'] = $maps[$selement['elements'][0]['sysmapid']]['name'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				CArrayHelper::sort($triggers, ['field' => 'priority', 'order' => ZBX_SORT_DOWN]);
-
 				foreach ($selement['elements'] as &$element) {
 					$trigger = $triggers[$element['triggerid']];
-					$hostname = reset($trigger['hosts']);
-					$element['elementName'] = $hostname['name'].NAME_DELIMITER.
-						CMacrosResolverHelper::resolveTriggerName($triggers[$element['triggerid']]);
+					$element['elementName'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
+					$element['elementExpressionTrigger'] = $trigger['expression'];
 					$element['priority'] = $trigger['priority'];
 				}
 				unset($element);
@@ -356,42 +349,6 @@ function add_elementNames(&$selements) {
 					$selements[$snum]['elements'][0]['elementName'] = $images[$selement['iconid_off']]['name'];
 				}
 				break;
-		}
-	}
-	unset($selement);
-
-	if (!empty($triggers)) {
-		add_triggerExpressions($selements, $triggers);
-	}
-}
-
-function add_triggerExpressions(&$selements, $triggers = []) {
-	if (empty($triggers)) {
-		$triggerIds = [];
-
-		foreach ($selements as $selement) {
-			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-				foreach ($selement['elements'] as $element) {
-					$triggerIds[] = $element['triggerid'];
-				}
-			}
-		}
-
-		$triggers = API::Trigger()->get([
-			'triggerids' => $triggerIds,
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['name'],
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-	}
-
-	foreach ($selements as $snum => &$selement) {
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-			foreach ($selement['elements'] as &$element) {
-				$element['elementExpressionTrigger'] = $triggers[$element['triggerid']]['expression'];
-			}
-			unset($element);
 		}
 	}
 	unset($selement);
