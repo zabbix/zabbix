@@ -860,7 +860,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Returns virtual dom element used by draggable.
 			 *
-			 * @param {object}	source_node		jQuery element where dragging was started on.
+			 * @param {object}	source_node					jQuery element where dragging was started on.
 			 *
 			 * @return {object}
 			 */
@@ -876,10 +876,10 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Recalculate x and y position of moved elements.
 			 *
-			 * @param {int}		delta_x		Shift between old and new x position.
-			 * @param {int}		delta_y		Shift between old and new y position.
+			 * @param {int}		delta_x						Shift between old and new x position.
+			 * @param {int}		delta_y						Shift between old and new y position.
 			 *
-			 * @return {object}				Object of elements with recalculated positions.
+			 * @return {object}								Object of elements with recalculated positions.
 			 */
 			dragGroupRecalculate: function(cmap, delta_x, delta_y) {
 				var selected = cmap.draggable_buffer;
@@ -900,11 +900,13 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Initializes multiple elements dragging.
 			 *
-			 * @param {object}		draggable	Draggable dom element where drag event wa started.
+			 * @param {object}		event					jQuery ui draggable event.
+			 * @param {objact}		data					jQuery ui draggable data.
+			 * @param {object}		draggable				Draggable dom element where drag event wa started.
 			 *
 			 * @return void
 			 */
-			dragInit: function(draggable) {
+			dragInit: function(event, data, draggable) {
 				var buffer,
 					draggable_node;
 
@@ -928,6 +930,15 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 
+				buffer.xaxis = {
+					min: parseInt(draggable.data.x, 10) - buffer.left,
+					max: (draggable.sysmap.container).width() - (buffer.right - event.clientX)
+				};
+				buffer.yaxis = {
+					min: event.clientY - parseInt(draggable.data.y, 10),
+					max: (draggable.sysmap.container).width() - (buffer.bottom - event.clientY)
+				}
+
 				draggable.sysmap.draggable_buffer = buffer;
 			},
 
@@ -941,40 +952,26 @@ ZABBIX.apps.map = (function($) {
 			 * @return void
 			 */
 			dragGroup: function(event, data, draggable) {
-				var cmap = draggable.sysmap;//,
-				// 	selected = cmap.getSelectionBuffer(cmap),
-				// 	offset = $(cmap.container).offset(),
-				// 	delta_x = event.pageX - offset.left - selected.left,
-				// 	delta_y = event.pageY - offset.top - selected.top;
-
-				// delta_x = Math.min(delta_x,
-				// 	parseInt(cmap.data.width, 10) - selected.right
-				// );
-				// delta_y = Math.min(delta_y,
-				// 	parseInt(cmap.data.height, 10) - selected.bottom
-				// );
-
-				var delta_x = data.position.left - parseInt(draggable.data.x, 10),
+				var cmap = draggable.sysmap,
+					delta_x = data.position.left - parseInt(draggable.data.x, 10),
 					delta_y = data.position.top - parseInt(draggable.data.y, 10);
 
-				cmap.dragGroupRecalculate(cmap, delta_x, delta_y);
+				if (event.clientX > cmap.draggable_buffer.xaxis.max
+						|| event.clientX < cmap.draggable_buffer.xaxis.min) {
+					delta_x = 0;
+				}
 
+				if (event.clientY > cmap.draggable_buffer.yaxis.max
+						|| event.clientY < cmap.draggable_buffer.yaxis.min) {
+					delta_y = 0;
+				}
 
-				// if (this.selected) {
-				// 	// var delta_x = data.position.left - parseInt(this.data.x, 10),
-				// 	// 	delta_y = data.position.top - parseInt(this.data.y, 10);
+				if (delta_x != 0 || delta_y != 0) {
+					cmap.dragGroupRecalculate(cmap, delta_x, delta_y);
+					cmap.updateImage();
+				}
 
-				// 	this.sysmap.dragGroupRecalculate(this.sysmap, delta_x, delta_y);
-				// } else {
-				// 	this.data.x = data.position.left;
-				// 	this.data.y = data.position.top;
-				// 	$(this.domNode).css({
-				// 		top: this.data.y + 'px',
-				// 		left: this.data.x + 'px'
-				// 	});
-				// }
-
-				cmap.updateImage();
+				// TODO: add dragGroupStop with align for dragged elements
 			},
 
 			/**
@@ -1718,8 +1715,8 @@ ZABBIX.apps.map = (function($) {
 					helper: $.proxy(function() {
 						return this.sysmap.dragGroupPlaceholder(this.domNode);
 					}, this),
-					start: $.proxy(function() {
-						this.sysmap.dragInit(this);
+					start: $.proxy(function(event, data) {
+						this.sysmap.dragInit(event, data, this);
 					}, this),
 					drag: $.proxy(function(event, data) {
 						this.sysmap.dragGroup(event, data, this);
