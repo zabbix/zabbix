@@ -8643,7 +8643,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  *                                                                            *
  * Function: dc_trigger_items_hosts_enabled                                   *
  *                                                                            *
- * Purpose: checks that functionids in trigger (recovery) expression          *
+ * Purpose: check that functionids in trigger (recovery) expression           *
  *          correspond to enabled items and hosts                             *
  *                                                                            *
  * Parameters: expression - [IN] trigger (recovery) expression                *
@@ -8699,6 +8699,34 @@ static int	dc_trigger_items_hosts_enabled(const char *expression)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_status_update                                                 *
+ *                                                                            *
+ * Purpose: check when status information stored in configuration cache was   *
+ *          updated last time and update it if necessary                      *
+ *                                                                            *
+ * Comments: This function gathers the following information:                 *
+ *             - number of enabled hosts (total and per proxy)                *
+ *             - number of disabled hosts (total and per proxy)               *
+ *             - number of enabled and supported items (total, per host and   *
+ *                                                                 per proxy) *
+ *             - number of enabled and not supported items (total, per host   *
+ *                                                             and per proxy) *
+ *             - number of disabled items (total and per proxy)               *
+ *             - number of enabled triggers with value OK                     *
+ *             - number of enabled triggers with value PROBLEM                *
+ *             - number of disabled triggers                                  *
+ *             - required performance (total and per proxy)                   *
+ *           Gathered information can then be displayed in the frontend (see  *
+ *           "status.get" request) and used in calculation of zabbix[] items. *
+ *                                                                            *
+ * NOTE: Always call this function before accessing information stored in     *
+ *       config->status as well as host and required performance counters     *
+ *       stored in elements of config->proxies and item counters in elements  *
+ *       of config->hosts.                                                    *
+ *                                                                            *
+ ******************************************************************************/
 static void	dc_status_update(void)
 {
 #define ZBX_STATUS_LIFETIME	SEC_PER_MIN
@@ -8706,8 +8734,8 @@ static void	dc_status_update(void)
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_PROXY		*dc_proxy;
 	ZBX_DC_HOST		*dc_host, *dc_proxy_host;
-	ZBX_DC_ITEM		*dc_item;
-	ZBX_DC_TRIGGER		*dc_trigger;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_TRIGGER	*dc_trigger;
 
 	if (0 != config->status->last_update && config->status->last_update + ZBX_STATUS_LIFETIME > time(NULL))
 		return;
