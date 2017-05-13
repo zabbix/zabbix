@@ -8803,6 +8803,9 @@ static void	dc_status_update(void)
 
 	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
+		dc_proxy = NULL;
+		dc_proxy_host = NULL;
+
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
 			continue;
 
@@ -8826,7 +8829,7 @@ static void	dc_status_update(void)
 					{
 						config->status->required_performance += 1.0 / delay;
 
-						if (0 != dc_host->proxy_hostid && NULL != dc_proxy)
+						if (NULL != dc_proxy)
 							dc_proxy->required_performance += 1.0 / delay;
 					}
 
@@ -8835,13 +8838,13 @@ static void	dc_status_update(void)
 						case ITEM_STATE_NORMAL:
 							config->status->items_active_normal++;
 							dc_host->items_active_normal++;
-							if (0 != dc_host->proxy_hostid && NULL != dc_proxy_host)
+							if (NULL != dc_proxy_host)
 								dc_proxy_host->items_active_normal++;
 							break;
 						case ITEM_STATE_NOTSUPPORTED:
 							config->status->items_active_notsupported++;
 							dc_host->items_active_notsupported++;
-							if (0 != dc_host->proxy_hostid && NULL != dc_proxy_host)
+							if (NULL != dc_proxy_host)
 								dc_proxy_host->items_active_notsupported++;
 							break;
 						default:
@@ -8853,7 +8856,7 @@ static void	dc_status_update(void)
 				/* break; is not missing here, item on disabled host counts as disabled */
 			case ITEM_STATUS_DISABLED:
 				config->status->items_disabled++;
-				if (0 != dc_host->proxy_hostid && NULL != dc_proxy_host)
+				if (NULL != dc_proxy_host)
 					dc_proxy_host->items_disabled++;
 				break;
 			default:
