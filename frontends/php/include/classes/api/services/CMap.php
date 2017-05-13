@@ -183,144 +183,127 @@ class CMap extends CMapElement {
 		}
 
 		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$sysmapids = array_keys($result);
+			// check host groups
+			$hostgroupids_to_check = [];
 
-			$linkTriggers = [];
-
-			$dbLinkTriggers = DBselect(
-				'SELECT slt.triggerid,sl.sysmapid'.
-				' FROM sysmaps_link_triggers slt,sysmaps_links sl'.
-				' WHERE '.dbConditionInt('sl.sysmapid', $sysmapids).
-					' AND sl.linkid=slt.linkid'
+			$db_sysmap_elements = DBselect(
+				'SELECT se.elementid,se.sysmapid'.
+				' FROM sysmaps_elements se'.
+				' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_HOST_GROUP]).
+					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
 			);
-			while ($linkTrigger = DBfetch($dbLinkTriggers)) {
-				$linkTriggers[$linkTrigger['sysmapid']] = $linkTrigger['triggerid'];
+			while ($db_sysmap_element = DBfetch($db_sysmap_elements)) {
+				$hostgroupids_to_check[$db_sysmap_element['elementid']][$db_sysmap_element['sysmapid']] = true;
 			}
 
-			if ($linkTriggers) {
-				$all_triggers = API::Trigger()->get([
-					'output' => ['triggerid'],
-					'triggerids' => $linkTriggers,
+			if ($hostgroupids_to_check) {
+				$db_hostgroups = API::HostGroup()->get([
+					'output' => [],
+					'groupids' => array_keys($hostgroupids_to_check),
 					'preservekeys' => true
 				]);
 
-				foreach ($linkTriggers as $id => $triggerid) {
-					if (!array_key_exists($triggerid, $all_triggers)) {
-						unset($result[$id], $sysmapids[$id]);
+				foreach ($hostgroupids_to_check as $hostgroupid => $sysmapids) {
+					if (!array_key_exists($hostgroupid, $db_hostgroups)) {
+						foreach (array_keys($sysmapids) as $sysmapid) {
+							unset($result[$sysmapid]);
+						}
 					}
 				}
 			}
 
-			$hostsToCheck = [];
-			$mapsToCheck = [];
-			$triggersToCheck = [];
-			$hostGroupsToCheck = [];
+			// check hosts
+			$hostids_to_check = [];
 
-			$selements = [];
-			$dbSelements = DBselect(
-				'SELECT se.*'.
+			$db_sysmap_elements = DBselect(
+				'SELECT se.elementid,se.sysmapid'.
 				' FROM sysmaps_elements se'.
-				' WHERE '.dbConditionInt('se.sysmapid', $sysmapids)
+				' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_HOST]).
+					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
 			);
+			while ($db_sysmap_element = DBfetch($db_sysmap_elements)) {
+				$hostids_to_check[$db_sysmap_element['elementid']][$db_sysmap_element['sysmapid']] = true;
+			}
 
-			$trigger_selementids = [];
-			$selements_maps = [];
-			while ($selement = DBfetch($dbSelements)) {
-				$selements[$selement['selementid']] = $selement;
+			if ($hostids_to_check) {
+				$db_hosts = API::Host()->get([
+					'output' => [],
+					'hostids' => array_keys($hostids_to_check),
+					'preservekeys' => true
+				]);
 
-				switch ($selement['elementtype']) {
-					case SYSMAP_ELEMENT_TYPE_HOST:
-						$hostsToCheck[$selement['elementid']] = $selement['elementid'];
-						break;
-					case SYSMAP_ELEMENT_TYPE_MAP:
-						$mapsToCheck[$selement['elementid']] = $selement['elementid'];
-						break;
-					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$trigger_selementids[$selement['selementid']] = true;
-						$selements_maps[$selement['selementid']] = $selement['sysmapid'];
-						break;
-					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$hostGroupsToCheck[$selement['elementid']] = $selement['elementid'];
-						break;
+				foreach ($hostids_to_check as $hostid => $sysmapids) {
+					if (!array_key_exists($hostid, $db_hosts)) {
+						foreach (array_keys($sysmapids) as $sysmapid) {
+							unset($result[$sysmapid]);
+						}
+					}
 				}
+			}
+
+			// check sysmaps
+			$sysmapids_to_check = [];
+
+			$db_sysmap_elements = DBselect(
+				'SELECT se.elementid,se.sysmapid'.
+				' FROM sysmaps_elements se'.
+				' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_MAP]).
+					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
+			);
+			while ($db_sysmap_element = DBfetch($db_sysmap_elements)) {
+				$sysmapids_to_check[$db_sysmap_element['elementid']][$db_sysmap_element['sysmapid']] = true;
+			}
+
+			if ($sysmapids_to_check) {
+				$db_sysmaps = $this->get([
+					'output' => [],
+					'sysmapids' => array_keys($sysmapids_to_check),
+					'preservekeys' => true
+				]);
+
+				foreach ($sysmapids_to_check as $sysmapid => $sysmapids) {
+					if (!array_key_exists($sysmapid, $db_sysmaps)) {
+						foreach (array_keys($sysmapids) as $sysmapid) {
+							unset($result[$sysmapid]);
+						}
+					}
+				}
+			}
+
+			// check triggers
+			$triggerids_to_check = [];
+
+			$db_link_triggers = DBselect(
+				'SELECT slt.triggerid,sl.sysmapid'.
+				' FROM sysmaps_link_triggers slt,sysmaps_links sl'.
+				' WHERE slt.linkid=sl.linkid'.
+					' AND '.dbConditionInt('sl.sysmapid', array_keys($result))
+			);
+			while ($db_link_trigger = DBfetch($db_link_triggers)) {
+				$triggerids_to_check[$db_link_trigger['triggerid']][$db_link_trigger['sysmapid']] = true;
 			}
 
 			$db_element_triggers = DBselect(
-				'SELECT et.selementid,et.triggerid'.
-				' FROM sysmap_element_trigger et'.
-				' WHERE '.dbConditionInt('et.selementid', array_keys($trigger_selementids))
+				'SELECT set.triggerid,se.sysmapid'.
+				' FROM sysmap_element_trigger set,sysmaps_elements se'.
+				' WHERE set.selementid=se.selementid'.
+					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
 			);
-
 			while ($db_element_trigger = DBfetch($db_element_triggers)) {
-				$triggersToCheck[$db_element_trigger['selementid']] = $db_element_trigger['triggerid'];
+				$triggerids_to_check[$db_element_trigger['triggerid']][$db_element_trigger['sysmapid']] = true;
 			}
 
-			if ($hostsToCheck) {
-				$allowedHosts = API::Host()->get([
-					'output' => ['hostid'],
-					'hostids' => $hostsToCheck,
+			if ($triggerids_to_check) {
+				$db_triggers = API::Trigger()->get([
+					'output' => [],
+					'triggerids' => array_keys($triggerids_to_check),
 					'preservekeys' => true
 				]);
 
-				foreach ($hostsToCheck as $elementid) {
-					if (!array_key_exists($elementid, $allowedHosts)) {
-						foreach ($selements as $selementid => $selement) {
-							if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
-									&& bccomp($selement['elementid'], $elementid) == 0) {
-								unset($result[$selement['sysmapid']], $selements[$selementid]);
-							}
-						}
-					}
-				}
-			}
-
-			if ($mapsToCheck) {
-				$allowedMaps = $this->get([
-					'output' => ['sysmapid'],
-					'sysmapids' => $mapsToCheck,
-					'preservekeys' => true
-				]);
-
-				foreach ($mapsToCheck as $elementid) {
-					if (!array_key_exists($elementid, $allowedMaps)) {
-						foreach ($selements as $selementid => $selement) {
-							if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
-									&& bccomp($selement['elementid'], $elementid) == 0) {
-								unset($result[$selement['sysmapid']], $selements[$selementid]);
-							}
-						}
-					}
-				}
-			}
-
-			if ($triggersToCheck) {
-				$allowedTriggers = API::Trigger()->get([
-					'triggerids' => $triggersToCheck,
-					'preservekeys' => true,
-					'output' => ['triggerid']
-				]);
-
-				foreach ($triggersToCheck as $selementid => $triggerid) {
-					if (!array_key_exists($triggerid, $allowedTriggers)) {
-						unset($result[$selements_maps[$selementid]], $selements[$selementid]);
-					}
-				}
-			}
-
-			if ($hostGroupsToCheck) {
-				$allowedHostGroups = API::HostGroup()->get([
-					'output' => ['groupid'],
-					'groupids' => $hostGroupsToCheck,
-					'preservekeys' => true
-				]);
-
-				foreach ($hostGroupsToCheck as $elementid) {
-					if (!array_key_exists($elementid, $allowedHostGroups)) {
-						foreach ($selements as $selementid => $selement) {
-							if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
-									&& bccomp($selement['elementid'], $elementid) == 0) {
-								unset($result[$selement['sysmapid']], $selements[$selementid]);
-							}
+				foreach ($triggerids_to_check as $triggerid => $sysmapids) {
+					if (!array_key_exists($triggerid, $db_triggers)) {
+						foreach (array_keys($sysmapids) as $sysmapid) {
+							unset($result[$sysmapid]);
 						}
 					}
 				}
