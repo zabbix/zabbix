@@ -547,14 +547,15 @@ static int	DBpatch_3030046(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	int		id = 1, ret = FAIL;
+	int		ret = FAIL;
+	zbx_uint64_t	shapeid = 0;
 
 	result = DBselect("select sysmapid,width from sysmaps");
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		if (ZBX_DB_OK > DBexecute("insert into sysmap_shape (shapeid,sysmapid,width,height,text,border_width)"
-				" values (%d,%s,%s,15,'{MAP.NAME}',0)", id++, row[0], row[1]))
+				" values (" ZBX_FS_UI64 ",%s,%s,15,'{MAP.NAME}',0)", shapeid++, row[0], row[1]))
 		{
 			goto out;
 		}
