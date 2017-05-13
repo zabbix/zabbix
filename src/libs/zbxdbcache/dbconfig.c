@@ -8809,10 +8809,10 @@ static void	dc_status_update(void)
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		if (0 != dc_host->proxy_hostid &&
-				NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &dc_host->proxy_hostid)))
+		if (0 != dc_host->proxy_hostid)
 		{
-			dc_proxy_host = zbx_hashset_search(&config->hosts, &dc_proxy->hostid);
+			dc_proxy = zbx_hashset_search(&config->proxies, &dc_host->proxy_hostid);
+			dc_proxy_host = zbx_hashset_search(&config->hosts, &dc_host->proxy_hostid);
 		}
 
 		switch (dc_item->status)
@@ -8826,7 +8826,7 @@ static void	dc_status_update(void)
 					{
 						config->status->required_performance += 1.0 / delay;
 
-						if (NULL != dc_proxy)
+						if (0 != dc_host->proxy_hostid && NULL != dc_proxy)
 							dc_proxy->required_performance += 1.0 / delay;
 					}
 
@@ -8835,23 +8835,25 @@ static void	dc_status_update(void)
 						case ITEM_STATE_NORMAL:
 							config->status->items_active_normal++;
 							dc_host->items_active_normal++;
-							if (0 != dc_host->proxy_hostid && NULL != dc_proxy && NULL != dc_proxy_host)
+							if (0 != dc_host->proxy_hostid && NULL != dc_proxy_host)
 								dc_proxy_host->items_active_normal++;
 							break;
 						case ITEM_STATE_NOTSUPPORTED:
 							config->status->items_active_notsupported++;
 							dc_host->items_active_notsupported++;
-							if (0 != dc_host->proxy_hostid && NULL != dc_proxy && NULL != dc_proxy_host)
+							if (0 != dc_host->proxy_hostid && NULL != dc_proxy_host)
 								dc_proxy_host->items_active_notsupported++;
 							break;
 						default:
 							THIS_SHOULD_NEVER_HAPPEN;
 					}
+
+					break;
 				}
 				/* break; is not missing here, item on disabled host counts as disabled */
 			case ITEM_STATUS_DISABLED:
 				config->status->items_disabled++;
-				if (0 != dc_host->proxy_hostid && NULL != dc_proxy && NULL != dc_proxy_host)
+				if (0 != dc_host->proxy_hostid && NULL != dc_proxy_host)
 					dc_proxy_host->items_disabled++;
 				break;
 			default:
