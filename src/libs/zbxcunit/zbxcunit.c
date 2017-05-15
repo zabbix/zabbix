@@ -197,7 +197,7 @@ void	zbx_cu_run(int argc, char *argv[])
 {
 	const char			**module;
 	char				ch, *suite = NULL, *output = NULL, buffer[MAX_STRING_LEN];
-	int				run_tests = 0, automated = 0;
+	int				run_tests = 0, automated = 0, ret = EXIT_FAILURE;
 	zbx_cu_init_suite_func_t	init_func;
 
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
@@ -252,6 +252,9 @@ void	zbx_cu_run(int argc, char *argv[])
 		}
 		else
 			CU_basic_run_tests();
+
+		if (0 == CU_get_number_of_tests_failed())
+			ret = EXIT_SUCCESS;
 	}
 	else
 	{
@@ -260,13 +263,14 @@ void	zbx_cu_run(int argc, char *argv[])
 
 		CU_automated_run_tests();
 		CU_list_tests_to_file();
+		ret = EXIT_SUCCESS;
 	}
 
 out:
 	zbx_free(suite);
 	zbx_free(output);
 
-	exit(0 == CU_get_number_of_tests_failed() ? EXIT_SUCCESS : EXIT_FAILURE);
+	exit(ret);
 }
 
 #endif
