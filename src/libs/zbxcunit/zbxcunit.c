@@ -70,7 +70,8 @@ const char	*zbx_cu_assert_args_str_n(const char *description, const char *operat
 
 	zbx_strlcpy(tmp, expected, MIN(ZBX_CU_ASSERT_BUFFER_SIZE, n + 1));
 	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, "%s (%s)", expression2, tmp);
-	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, " // first " ZBX_FS_SIZE_T " bytes", n);
+	offset += zbx_snprintf(cu_buffer + offset, ZBX_CU_ASSERT_ARGS_LENGTH, " // first " ZBX_FS_SIZE_T " bytes",
+			(zbx_fs_size_t)n);
 
 	return cu_buffer;
 }
