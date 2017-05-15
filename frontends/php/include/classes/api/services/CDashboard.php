@@ -347,6 +347,7 @@ class CDashboard extends CApiService {
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
 			'dashboardids' => zbx_objectValues($dashboards, 'dashboardid'),
 			'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width'],
+			'editable' => true,
 			'preservekeys' => true
 		]);
 
