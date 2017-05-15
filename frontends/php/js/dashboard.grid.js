@@ -467,11 +467,11 @@
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
 			ajax_widgets = [],
+			ajax_widget = {},
 			fields = $('form', data.dialogue['body']).serializeJSON();
 
 		url.setArgument('action', 'dashbrd.widget.update');
 
-		var ajax_widget = {};
 		if (widget !== null) {
 			ajax_widget.widgetid = widget['widgetid'];
 		}
@@ -650,7 +650,7 @@
 
 	function saveChanges($obj, data) {
 		var	url = new Curl('zabbix.php'),
-			ajax_data = [];
+			ajax_widgets = [];
 
 		// Remove previous messages
 		dashboardRemoveMessages();
@@ -658,11 +658,14 @@
 		url.setArgument('action', 'dashbrd.widget.update');
 
 		$.each(data['widgets'], function(index, widget) {
-			ajax_data.push({
-				'widgetid': widget['widgetid'],
-				'pos': widget['pos'],
-				'fields': widget['fields']
-			});
+			var ajax_widget = {};
+			if (widget['widgetid'] !== '') {
+				ajax_widget.widgetid = widget['widgetid'];
+			}
+			ajax_widget['pos'] = widget['pos'];
+			ajax_widget['fields'] = widget['fields'];
+
+			ajax_widgets.push(ajax_widget);
 		});
 
 		$.ajax({
@@ -671,7 +674,7 @@
 			dataType: 'json',
 			data: {
 				dashboard_id: data['dashboard']['id'], // TODO VM: (?) will not work without dashboard id
-				widgets: ajax_data,
+				widgets: ajax_widgets,
 				save: 1 // 0 - only check; 1 - check and save
 			},
 			success: function(resp) {
