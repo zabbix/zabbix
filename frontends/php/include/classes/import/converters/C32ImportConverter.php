@@ -141,6 +141,7 @@ class C32ImportConverter extends CConverter {
 		foreach ($maps as &$map) {
 			$map['selements'] = $this->convertMapElements($map['selements']);
 			$map['shapes'] = [];
+			$map['lines'] = [];
 		}
 		unset($map);
 

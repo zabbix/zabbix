@@ -208,6 +208,7 @@ class CConfigurationExportBuilder {
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $tmpSelements,
 				'shapes' => $map['shapes'],
+				'lines' => $map['lines'],
 				'links' => $this->formatMapLinks($map['links'], $tmpSelements)
 			];
 		}

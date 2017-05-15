@@ -81,6 +81,7 @@ class CMap extends CMapElement {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectSelements'			=> null,
 			'selectShapes'				=> null,
+			'selectLines'				=> null,
 			'selectLinks'				=> null,
 			'selectIconMap'				=> null,
 			'selectUrls'				=> null,
@@ -1251,7 +1252,7 @@ class CMap extends CMapElement {
 		$shapes = [];
 		$selements = [];
 		$links = [];
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+		$api_shape_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SYSMAP_SHAPE_TYPE_RECTANGLE, SYSMAP_SHAPE_TYPE_ELLIPSE])],
 			'x' =>					['type' => API_INT32],
 			'y' =>					['type' => API_INT32],
@@ -1267,6 +1268,16 @@ class CMap extends CMapElement {
 			'background_color' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'background_color')],
 			'font_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'font_color')],
 			'text' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'text')],
+			'zindex' =>				['type' => API_INT32],
+		]];
+		$api_line_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+			'x1' =>					['type' => API_INT32],
+			'y1' =>					['type' => API_INT32],
+			'x2' =>					['type' => API_INT32],
+			'y2' =>					['type' => API_INT32],
+			'line_type' =>			['type' => API_INT32, 'in' => implode(',', [SYSMAP_SHAPE_BORDER_TYPE_NONE, SYSMAP_SHAPE_BORDER_TYPE_SOLID, SYSMAP_SHAPE_BORDER_TYPE_DOTTED, SYSMAP_SHAPE_BORDER_TYPE_DASHED])],
+			'line_width' =>			['type' => API_INT32, 'in' => '0:50'],
+			'line_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'border_color')],
 			'zindex' =>				['type' => API_INT32],
 		]];
 
@@ -1310,12 +1321,12 @@ class CMap extends CMapElement {
 
 			if (array_key_exists('shapes', $maps[$key])) {
 				$path = '/'.($key + 1).'/shape';
-				$api_input_rules['fields']['x']['in'] = '0:'.$maps[$key]['width'];
-				$api_input_rules['fields']['y']['in'] = '0:'.$maps[$key]['height'];
-				$api_input_rules['fields']['width']['in'] = '1:'.$maps[$key]['width'];
-				$api_input_rules['fields']['height']['in'] = '1:'.$maps[$key]['height'];
+				$api_shape_rules['fields']['x']['in'] = '0:'.$maps[$key]['width'];
+				$api_shape_rules['fields']['y']['in'] = '0:'.$maps[$key]['height'];
+				$api_shape_rules['fields']['width']['in'] = '1:'.$maps[$key]['width'];
+				$api_shape_rules['fields']['height']['in'] = '1:'.$maps[$key]['height'];
 
-				if (!CApiInputValidator::validate($api_input_rules, $maps[$key]['shapes'], $path, $error)) {
+				if (!CApiInputValidator::validate($api_shape_rules, $maps[$key]['shapes'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
@@ -1324,6 +1335,24 @@ class CMap extends CMapElement {
 				}
 
 				$shapes += $maps[$key]['shapes'];
+			}
+
+			if (array_key_exists('lines', $maps[$key])) {
+				$path = '/'.($key + 1).'/line';
+				$api_shape_rules['fields']['x1']['in'] = '0:'.$maps[$key]['width'];
+				$api_shape_rules['fields']['y1']['in'] = '0:'.$maps[$key]['height'];
+				$api_shape_rules['fields']['x2']['in'] = '0:'.$maps[$key]['width'];
+				$api_shape_rules['fields']['y2']['in'] = '0:'.$maps[$key]['height'];
+
+				if (!CApiInputValidator::validate($api_line_rules, $maps[$key]['lines'], $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				foreach ($maps[$key]['lines'] as $line) {
+					$shape = CMapHelper::convertLineToShape($line);
+					$shape['sysmapid'] = $sysmapid;
+					$shapes[] = $shape;
+				}
 			}
 
 			if (array_key_exists('links', $maps[$key])) {
@@ -1411,6 +1440,9 @@ class CMap extends CMapElement {
 				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
 				'background_color', 'zindex'
 			],
+			'selectLines' => ['sysmap_shapeid', 'x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color',
+				'zindex'
+			],
 			'selectUrls' => ['sysmapid', 'sysmapurlid', 'name', 'url'],
 			'selectUsers' => ['sysmapuserid', 'sysmapid', 'userid', 'permission'],
 			'selectUserGroups' => ['sysmapusrgrpid', 'sysmapid', 'usrgrpid', 'permission'],
@@ -1439,7 +1471,7 @@ class CMap extends CMapElement {
 		$shared_user_groupids_to_delete = [];
 		$shared_user_groups_to_update = [];
 		$shared_user_groups_to_add = [];
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+		$api_shape_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 			'sysmap_shapeid' =>		['type' => API_ID],
 			'type' =>				['type' => API_INT32, 'in' => implode(',', [SYSMAP_SHAPE_TYPE_RECTANGLE, SYSMAP_SHAPE_TYPE_ELLIPSE])],
 			'x' =>					['type' => API_INT32],
@@ -1456,6 +1488,17 @@ class CMap extends CMapElement {
 			'background_color' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'background_color')],
 			'font_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'font_color')],
 			'text' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'text')],
+			'zindex' =>				['type' => API_INT32],
+		]];
+		$api_line_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+			'sysmap_shapeid' =>		['type' => API_ID],
+			'x1' =>					['type' => API_INT32],
+			'y1' =>					['type' => API_INT32],
+			'x2' =>					['type' => API_INT32],
+			'y2' =>					['type' => API_INT32],
+			'line_type' =>			['type' => API_INT32, 'in' => implode(',', [SYSMAP_SHAPE_BORDER_TYPE_NONE, SYSMAP_SHAPE_BORDER_TYPE_SOLID, SYSMAP_SHAPE_BORDER_TYPE_DOTTED, SYSMAP_SHAPE_BORDER_TYPE_DASHED])],
+			'line_width' =>			['type' => API_INT32, 'in' => '0:50'],
+			'line_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'border_color')],
 			'zindex' =>				['type' => API_INT32],
 		]];
 
@@ -1546,15 +1589,15 @@ class CMap extends CMapElement {
 				$selements_to_delete = array_merge($selements_to_delete, $selement_diff['second']);
 			}
 
+			$map_width = array_key_exists('width', $map) ? $map['width'] : $db_map['width'];
+			$map_height = array_key_exists('height', $map) ? $map['height'] : $db_map['height'];
+
 			// Map shapes.
 			if (array_key_exists('shapes', $map)) {
 				$map['shapes'] = array_values($map['shapes']);
 				$shape_diff = zbx_array_diff($map['shapes'], $db_map['shapes'], 'sysmap_shapeid');
 
 				$path = '/'.($index + 1).'/shape';
-				$width = array_key_exists('width', $map) ? $map['width'] : $db_map['width'];
-				$height = array_key_exists('height', $map) ? $map['height'] : $db_map['height'];
-
 				foreach ($shape_diff['first'] as $new_shape) {
 					if (array_key_exists('sysmap_shapeid', $new_shape)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1563,20 +1606,20 @@ class CMap extends CMapElement {
 					}
 				}
 
-				unset($api_input_rules['fields']['sysmap_shapeid']);
-				$api_input_rules['fields']['type']['flags'] = API_REQUIRED;
-				$api_input_rules['fields']['x']['in'] = '0:'.$width;
-				$api_input_rules['fields']['y']['in'] = '0:'.$height;
-				$api_input_rules['fields']['width']['in'] = '1:'.$width;
-				$api_input_rules['fields']['height']['in'] = '1:'.$height;
+				unset($api_shape_rules['fields']['sysmap_shapeid']);
+				$api_shape_rules['fields']['type']['flags'] = API_REQUIRED;
+				$api_shape_rules['fields']['x']['in'] = '0:'.$map_width;
+				$api_shape_rules['fields']['y']['in'] = '0:'.$map_height;
+				$api_shape_rules['fields']['width']['in'] = '1:'.$map_width;
+				$api_shape_rules['fields']['height']['in'] = '1:'.$map_height;
 
-				if (!CApiInputValidator::validate($api_input_rules, $shape_diff['first'], $path, $error)) {
+				if (!CApiInputValidator::validate($api_shape_rules, $shape_diff['first'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				$api_input_rules['fields']['sysmap_shapeid'] = ['type' => API_ID, 'flags' => API_REQUIRED];
-				$api_input_rules['fields']['type']['flags'] = 0;
-				if (!CApiInputValidator::validate($api_input_rules, $shape_diff['both'], $path, $error)) {
+				$api_shape_rules['fields']['sysmap_shapeid'] = ['type' => API_ID, 'flags' => API_REQUIRED];
+				$api_shape_rules['fields']['type']['flags'] = 0;
+				if (!CApiInputValidator::validate($api_shape_rules, $shape_diff['both'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
@@ -1585,6 +1628,43 @@ class CMap extends CMapElement {
 
 				// We need sysmapid for add operations.
 				foreach ($shape_diff['first'] as $new_shape) {
+					$new_shape['sysmapid'] = $map['sysmapid'];
+					$shapes_to_add[] = $new_shape;
+				}
+			}
+
+			if (array_key_exists('lines', $map)) {
+				$shapes = [];
+
+				$api_shape_rules['fields']['x1']['in'] = '0:'.$map_width;
+				$api_shape_rules['fields']['y1']['in'] = '0:'.$map_height;
+				$api_shape_rules['fields']['x2']['in'] = '0:'.$map_width;
+				$api_shape_rules['fields']['y2']['in'] = '0:'.$map_height;
+
+				$path = '/'.($index + 1).'/line';
+				if (!CApiInputValidator::validate($api_line_rules, $map['lines'], $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				foreach ($map['lines'] as $line) {
+					$shapes[] = CMapHelper::convertLineToShape($line);
+				}
+
+				$line_diff = zbx_array_diff($shapes, $db_map['lines'], 'sysmap_shapeid');
+
+				foreach ($line_diff['first'] as $new_line) {
+					if (array_key_exists('sysmap_shapeid', $new_line)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
+				}
+
+				$shapes_to_update = array_merge($shapes_to_update, $line_diff['both']);
+				$shapes_to_delete = array_merge($shapes_to_delete, $line_diff['second']);
+
+				// We need sysmapid for add operations.
+				foreach ($line_diff['first'] as $new_shape) {
 					$new_shape['sysmapid'] = $map['sysmapid'];
 					$shapes_to_add[] = $new_shape;
 				}
@@ -1934,18 +2014,74 @@ class CMap extends CMapElement {
 			$result = $relation_map->mapMany($result, $selements, 'selements');
 		}
 
-		// Adding shapes.
+		$shape_types = [];
 		if ($options['selectShapes'] !== null && $options['selectShapes'] != API_OUTPUT_COUNT) {
-			$shapes = API::getApiService()->select('sysmap_shape', [
-				'output' => $this->outputExtend($options['selectShapes'], ['sysmap_shapeid', 'sysmapid']),
-				'filter' => ['sysmapid' => $sysmapIds],
+			$shape_types = [SYSMAP_SHAPE_TYPE_RECTANGLE, SYSMAP_SHAPE_TYPE_ELLIPSE];
+		}
+
+		if ($options['selectLines'] !== null && $options['selectLines'] != API_OUTPUT_COUNT) {
+			$shape_types[] = SYSMAP_SHAPE_TYPE_LINE;
+		}
+
+		// Adding shapes.
+		if ($shape_types) {
+			$fields = API_OUTPUT_EXTEND;
+
+			if ($options['selectShapes'] != API_OUTPUT_EXTEND && $options['selectLines'] != API_OUTPUT_EXTEND) {
+				$fields = ['sysmap_shapeid', 'sysmapid', 'type'];
+				$mapping = [
+					'x1' => 'x',
+					'y1' => 'y',
+					'x2' => 'width',
+					'y2' =>	'height',
+					'line_type' => 'border_type',
+					'line_width' => 'border_width',
+					'line_color' => 'border_color'
+				];
+
+				foreach ($mapping as $source_field => $target_field) {
+					if (in_array($source_field, $options['selectLines'])) {
+						$fields[] = $target_field;
+					}
+				}
+
+				$fields = array_merge($fields, $options['selectShapes']);
+			}
+
+			$db_shapes = API::getApiService()->select('sysmap_shape', [
+				'output' => $fields,
+				'filter' => ['sysmapid' => $sysmapIds, 'type' => $shape_types],
 				'preservekeys' => true
 			]);
-			$relation_map = $this->createRelationMap($shapes, 'sysmapid', 'sysmap_shapeid');
 
-			$shapes = $this->unsetExtraFields($shapes, ['sysmap_shapeid'], $options['selectShapes']);
-			$shapes = $this->unsetExtraFields($shapes, ['sysmapid'], null);
-			$result = $relation_map->mapMany($result, $shapes, 'shapes');
+			$shapes = [];
+			$lines = [];
+			foreach ($db_shapes as $key => $db_shape) {
+				if ($db_shape['type'] == SYSMAP_SHAPE_TYPE_LINE) {
+					$lines[$key] = CMapHelper::convertShapeToLine($db_shape);
+				}
+				else {
+					$shapes[$key] = $db_shape;
+				}
+			}
+
+			$relation_map = $this->createRelationMap($db_shapes, 'sysmapid', 'sysmap_shapeid');
+
+			if ($options['selectShapes'] !== null && $options['selectShapes'] != API_OUTPUT_COUNT) {
+				$shapes = $this->unsetExtraFields($shapes, $fields, $options['selectShapes']);
+				$shapes = $this->unsetExtraFields($shapes, ['sysmapid'], null);
+
+				$result = $relation_map->mapMany($result, $shapes, 'shapes');
+			}
+
+			if ($options['selectLines'] !== null && $options['selectLines'] != API_OUTPUT_COUNT) {
+				$lines = $this->unsetExtraFields($lines, ['sysmap_shapeid', 'x1', 'x2', 'y1', 'y2', 'line_type',
+						'line_width', 'line_color', 'zindex'], $options['selectLines']
+				);
+				$lines = $this->unsetExtraFields($lines, ['sysmapid', 'type'], null);
+
+				$result = $relation_map->mapMany($result, $lines, 'lines');
+			}
 		}
 
 		// adding icon maps

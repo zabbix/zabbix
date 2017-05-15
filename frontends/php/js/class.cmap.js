@@ -268,7 +268,7 @@ ZABBIX.apps.map = (function($) {
 
 			updateImage: function() {
 				if (this.data.grid_show === '1') {
-					this.map.setGrid(parseInt(this.data.grid_size));
+					this.map.setGrid(parseInt(this.data.grid_size, 10));
 				}
 				else {
 					this.map.setGrid(0);
@@ -850,6 +850,45 @@ ZABBIX.apps.map = (function($) {
 					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));
 					$('#mass_border_color').prop("disabled", disable || !$('#chkboxBorderColor').is(":checked"));
 				});
+
+				$('#shapeForm input[type=radio][name=type]').on('change', function() {
+					var value = parseInt(this.value, 10),
+						last_value = parseInt($('#shapeForm #last_shape_type').val(), 10);
+
+					$('#shape-text-row, #shape-background-row').toggle(value !== SVGMapShape.TYPE_LINE);
+					$('.switchable-content').each(function (i, element) {
+						element.textContent = element.hasAttribute('data-value-' + value) ?
+								element.getAttribute('data-value-' + value) :
+								element.getAttribute('data-value');
+					});
+
+					if ((last_value === SVGMapShape.TYPE_LINE) !== (value === SVGMapShape.TYPE_LINE)) {
+						var x = parseInt($('#shapeForm #x').val(), 10),
+							y = parseInt($('#shapeForm #y').val(), 10),
+							width = parseInt($('#shapeForm #areaSizeWidth').val(), 10),
+							height = parseInt($('#shapeForm #areaSizeHeight').val(), 10);
+
+						if (value === SVGMapShape.TYPE_LINE) {
+							// Switching from figures to line.
+							$('#shapeForm #areaSizeWidth').val(x + width);
+							$('#shapeForm #areaSizeHeight').val(y + height);
+						}
+						else {
+							// Switching from line to figures.
+							var mx = Math.min(x, width),
+								my = Math.min(y, height);
+
+							$('#shapeForm #x').val(mx);
+							$('#shapeForm #y').val(my);
+							$('#shapeForm #areaSizeWidth').val(Math.max(x, width) - mx);
+							$('#shapeForm #areaSizeHeight').val(Math.max(x, height) - my);
+						}
+					}
+
+					$('#last_shape_type').val(value);
+				});
+
+				$('input[type=radio][name=type]:checked').change();
 			},
 
 			/**
@@ -890,6 +929,13 @@ ZABBIX.apps.map = (function($) {
 					if (element) {
 						data.x = parseInt(data.x, 10) + delta_x;
 						data.y = parseInt(data.y, 10) + delta_y;
+
+						if (type === 'shapes' && data.type == SVGMapShape.TYPE_LINE) {
+							// Additional shift for line shape.
+							data.width = parseInt(data.width, 10) + delta_x;
+							data.height = parseInt(data.height, 10) + delta_y;
+						}
+
 						element.update(data);
 						that[type][element.id] = element;
 						selectedids.push({
@@ -1156,10 +1202,13 @@ ZABBIX.apps.map = (function($) {
 
 				for (i = 0, ln = ids.length; i < ln; i++) {
 					var id = ids[i].id,
-						type = ids[i].type,
-						selected = this[type][id].toggleSelect();
+						type = ids[i].type;
 
-					if (selected) {
+					if (typeof id === 'undefined' || typeof type === 'undefined') {
+						continue;
+					}
+
+					if (this[type][id].toggleSelect()) {
 						this.selection.count[type]++;
 						this.selection[type][id] = id;
 					}
@@ -1224,11 +1273,24 @@ ZABBIX.apps.map = (function($) {
 
 					// multiple shapes selected
 					else {
+						var figures = null;
+						for (id in this.selection.shapes) {
+							if (figures === null) {
+								figures = (this.shapes[id].data.type != SVGMapShape.TYPE_LINE);
+							}
+							else if (figures !== (this.shapes[id].data.type != SVGMapShape.TYPE_LINE)) {
+								// Different shape types are selected (lines and figures).
+								$('#map-window').hide();
+								this.massShapeForm.hide();
+								return;
+							}
+						}
+
 						this.form.hide();
 						this.massForm.hide();
 						$('#link-connect-to').hide();
 
-						this.massShapeForm.show();
+						this.massShapeForm.show(figures);
 					}
 				}
 			}
@@ -1349,7 +1411,7 @@ ZABBIX.apps.map = (function($) {
 
 			if (!shapeData) {
 				shapeData = {
-					type: 0,
+					type: SVGMapShape.TYPE_RECTANGLE,
 					x: 10,
 					y: 10,
 					width: 50,
@@ -1387,25 +1449,15 @@ ZABBIX.apps.map = (function($) {
 				.attr('data-id', this.id)
 				.attr('data-type', 'shapes');
 
-			this.domNode.draggable({
-				containment: 'parent',
-				opacity: 0.5,
-				helper: 'clone',
-				stop: $.proxy(function(event, data) {
-					this.updatePosition({
-						x: parseInt(data.position.left, 10),
-						y: parseInt(data.position.top, 10)
-					});
-				}, this)
-			});
+			this.makeDraggable(true);
+			this.makeResizable(this.data.type != SVGMapShape.TYPE_LINE);
 
-			this.makeResizable(true);
-
+			var dimensions = this.getDimensions();
 			this.domNode.css({
-				top: this.data.y + 'px',
-				left: this.data.x + 'px',
-				width: this.data.width + 'px',
-				height: this.data.height + 'px'
+				top: dimensions.y + 'px',
+				left: dimensions.x + 'px',
+				width: dimensions.width + 'px',
+				height: dimensions.height + 'px'
 			});
 		}
 
@@ -1416,17 +1468,27 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} data
 			 */
 			update: function(data) {
-				var key;
+				var key,
+					dimensions;
 
 				for (key in data) {
 					this.data[key] = data[key];
 				}
 
+				['x', 'y', 'width', 'height'].forEach(function(name) {
+					this[name] = parseInt(this[name], 10);
+				}, this.data);
+
+				dimensions = this.getDimensions();
+
 				this.domNode
 					.css({
-						width: this.data.width + 'px',
-						height: this.data.height + 'px'
+						width: dimensions.width + 'px',
+						height: dimensions.height + 'px'
 					});
+
+				this.makeDraggable(true);
+				this.makeResizable(this.data.type != SVGMapShape.TYPE_LINE);
 
 				this.align(false);
 				this.trigger('afterMove', this);
@@ -1435,13 +1497,137 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Gets shape dimensions.
+			 */
+			getDimensions: function () {
+				var dimensions = {
+					x: parseInt(this.data.x, 10),
+					y: parseInt(this.data.y, 10),
+					width: parseInt(this.data.width, 10),
+					height: parseInt(this.data.height, 10)
+				};
+
+				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
+					var x = Math.min(dimensions.x, dimensions.width),
+						y = Math.min(dimensions.y, dimensions.height),
+						dx = Math.max(dimensions.x, dimensions.width) - x,
+						dy = Math.max(dimensions.y, dimensions.height) - y;
+
+					dimensions = {
+						x: x,
+						y: y,
+						width: dx,
+						height: dy
+					};
+				}
+
+				return dimensions;
+			},
+
+			updateHandles: function() {
+				if (typeof this.handles === 'undefined') {
+					this.handles = [
+						$('<div>', {'class': 'ui-resize-dot cursor-move'}),
+						$('<div>', {'class': 'ui-resize-dot cursor-move'})
+					];
+
+					this.domNode.parent().append(this.handles);
+
+					for (var i = 0; i < 2; i++) {
+						this.handles[i].data('id', i);
+						this.handles[i].draggable({
+							containment: 'parent',
+							drag: $.proxy(function(event, data) {
+								var dimensions;
+								if (data.helper.data('id') === 0) {
+									this.data.x = parseInt(data.position.left, 10) + 4;
+									this.data.y = parseInt(data.position.top, 10) + 4;
+								}
+								else {
+									this.data.width = parseInt(data.position.left, 10) + 4;
+									this.data.height = parseInt(data.position.top, 10) + 4;
+								}
+
+								dimensions = this.getDimensions();
+								this.domNode.css({
+									top: dimensions.y + 'px',
+									left: dimensions.x + 'px',
+									width: dimensions.width + 'px',
+									height: dimensions.height + 'px'
+								});
+
+								this.trigger('afterMove', this);
+							}, this)
+						});
+					}
+				}
+
+				this.handles[0].css({
+					left: (this.data.x - 3) + 'px',
+					top: (this.data.y - 3) + 'px'
+				});
+
+				this.handles[1].css({
+					left: (this.data.width - 3) + 'px',
+					top: (this.data.height - 3) + 'px'
+				});
+			},
+
+			/**
+			 * Allow dragging of shape.
+			 */
+			makeDraggable: function(enable) {
+				var node = this.domNode;
+
+				if (enable) {
+					if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
+						this.updateHandles();
+					}
+					else {
+						if (typeof this.handles !== 'undefined') {
+							this.handles.forEach(function (handle) {
+								handle.remove();
+							});
+							delete this.handles;
+						}
+					}
+
+					if (!node.hasClass('ui-draggable')) {
+						node.draggable({
+							containment: 'parent',
+							opacity: 0.5,
+							helper: 'clone',
+							drag: $.proxy(function(event, data) {
+								this.updatePosition({
+									x: parseInt(data.position.left, 10),
+									y: parseInt(data.position.top, 10)
+								});
+							}, this)
+						});
+					}
+				}
+				else {
+					if (typeof this.handles !== 'undefined') {
+						this.handles.forEach(function (handle) {
+							handle.remove();
+						});
+						delete this.handles;
+					}
+
+					if (node.hasClass('ui-draggable')) {
+						node.draggable("destroy");
+					}
+				}
+			},
+
+			/**
 			 * Allow resizing of shape.
 			 */
 			makeResizable: function(enable) {
 				var node = this.domNode,
-					isEnabled = node.hasClass('ui-resizable');
+					enabled = node.hasClass('ui-resizable');
 
-				if (enable === isEnabled) {
+				if (enable === enabled) {
 					return;
 				}
 
@@ -1508,8 +1694,9 @@ ZABBIX.apps.map = (function($) {
 						height: this.domNode.height(),
 						width: this.domNode.width()
 					},
-					x = parseInt(this.data.x, 10),
-					y = parseInt(this.data.y, 10),
+					dimensions = this.getDimensions(),
+					x = dimensions.x,
+					y = dimensions.y,
 					shiftX = Math.round(dims.width / 2),
 					shiftY = Math.round(dims.height / 2),
 					newX = x,
@@ -1517,6 +1704,18 @@ ZABBIX.apps.map = (function($) {
 					newWidth = dims.width,
 					newHeight = dims.height,
 					gridSize = parseInt(this.sysmap.data.grid_size, 10);
+
+				// Lines should not be aligned
+				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
+					this.domNode.css({
+						top: dimensions.y + 'px',
+						left: dimensions.x + 'px',
+						width: dimensions.width + 'px',
+						height: dimensions.height + 'px'
+					});
+
+					return;
+				}
 
 				// if 'fit to map' area coords are 0 always
 				if (this.data.elementsubtype === '1' && this.data.areatype === '0') {
@@ -1588,8 +1787,22 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} coords
 			 */
 			updatePosition: function(coords) {
-				this.data.x = coords.x;
-				this.data.y = coords.y;
+				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
+					var dx = coords.x - Math.min(parseInt(this.data.x, 10), parseInt(this.data.width, 10)),
+						dy = coords.y - Math.min(parseInt(this.data.y, 10), parseInt(this.data.height, 10));
+
+					this.data.x = parseInt(this.data.x, 10) + dx;
+					this.data.y = parseInt(this.data.y, 10) + dy;
+					this.data.width = parseInt(this.data.width, 10) + dx;
+					this.data.height = parseInt(this.data.height, 10) + dy;
+
+					this.updateHandles();
+				}
+				else {
+					this.data.x = coords.x;
+					this.data.y = coords.y;
+				}
+
 				this.align();
 				this.trigger('afterMove', this);
 			},
@@ -1598,6 +1811,7 @@ ZABBIX.apps.map = (function($) {
 			 * Removes Shape object, delete all reference to it.
 			 */
 			remove: function() {
+				this.makeDraggable(false);
 				this.domNode.remove();
 				delete this.sysmap.data.shapes[this.id];
 				delete this.sysmap.shapes[this.id];
@@ -1672,18 +1886,7 @@ ZABBIX.apps.map = (function($) {
 				.attr('data-id', this.id)
 				.attr('data-type', 'selements');
 
-			this.domNode.draggable({
-				containment: 'parent',
-				opacity: 0.5,
-				helper: 'clone',
-				stop: $.proxy(function(event, data) {
-					this.updatePosition({
-						x: parseInt(data.position.left, 10),
-						y: parseInt(data.position.top, 10)
-					});
-				}, this)
-			});
-
+			this.makeDraggable(true);
 			this.makeResizable(this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1);
 
 			this.updateIcon();
@@ -1699,6 +1902,11 @@ ZABBIX.apps.map = (function($) {
 			 * Returns element data.
 			 */
 			getData: Shape.prototype.getData,
+
+			/**
+			 * Allows dragging of element
+			 */
+			makeDraggable: Shape.prototype.makeDraggable,
 
 			/**
 			 * Allows resizing of element
@@ -1811,6 +2019,11 @@ ZABBIX.apps.map = (function($) {
 			 * @param {bool} doAutoAlign if we should align element to grid
 			 */
 			align: Shape.prototype.align,
+
+			/**
+			 * Get element dimensions.
+			 */
+			getDimensions: Shape.prototype.getDimensions,
 
 			/**
 			 * Updates element icon and height/witdh in case element is area type.
@@ -2634,6 +2847,9 @@ ZABBIX.apps.map = (function($) {
 
 				$('.input-color-picker input', this.domNode).change();
 				$('#border_type').change();
+
+				$('#last_shape_type').val(shape.type);
+				$('input[type=radio][name=type]:checked').change();
 			},
 
 			/**
@@ -2702,7 +2918,16 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Show form.
 			 */
-			show: function() {
+			show: function(figures) {
+				var value = figures ? 0 : 2;
+
+				$('.shape_figure_row', this.domNode).toggle(figures);
+				$('.switchable-content', this.domNode).each(function (i, element) {
+					element.textContent = element.hasAttribute('data-value-' + value) ?
+							element.getAttribute('data-value-' + value) :
+							element.getAttribute('data-value');
+				});
+
 				this.formContainer.draggable('option', 'handle', '#massShapeDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
@@ -2720,7 +2945,8 @@ ZABBIX.apps.map = (function($) {
 					var select = $(this);
 					select.val($('option:first', select).val());
 				});
-				$('textarea', this.domNode).val('');
+				$('textarea, input[type=text]', this.domNode).val('');
+				$('.input-color-picker input', this.domNode).change();
 				this.actionProcessor.process();
 			},
 
