@@ -892,7 +892,7 @@ ZABBIX.apps.map = (function($) {
 						$(cmap[item.type][item.id].domNode).css({
 							top: node.data.y + 'px',
 							left: node.data.x + 'px'
-						})
+						});
 					}
 				});
 			},
@@ -902,7 +902,7 @@ ZABBIX.apps.map = (function($) {
 			 *
 			 * @param {object}		event					jQuery ui draggable event.
 			 * @param {objact}		data					jQuery ui draggable data.
-			 * @param {object}		draggable				Draggable dom element where drag event wa started.
+			 * @param {object}		draggable				Draggable dom element where drag event was started.
 			 *
 			 * @return void
 			 */
@@ -928,7 +928,7 @@ ZABBIX.apps.map = (function($) {
 						right: parseInt(draggable.data.x, 10) + draggable_node.width(),
 						top: parseInt(draggable.data.y, 10),
 						bottom: parseInt(draggable.data.y, 10) + draggable_node.height()
-					}
+					};
 				}
 
 				buffer.xaxis = {
@@ -981,7 +981,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Final tasks for dragged element on drag stop event
+			 * Final tasks for dragged element on drag stop event.
 			 *
 			 * @param {object}		event					jQuery ui draggable event.
 			 * @param {objact}		data					jQuery ui draggable data.
