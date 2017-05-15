@@ -908,7 +908,8 @@ ZABBIX.apps.map = (function($) {
 			 */
 			dragGroupInit: function(event, data, draggable) {
 				var buffer,
-					draggable_node;
+					draggable_node,
+					body = $('body');
 
 				if (draggable.selected) {
 					buffer = draggable.sysmap.getSelectionBuffer(draggable.sysmap);
@@ -937,7 +938,11 @@ ZABBIX.apps.map = (function($) {
 				buffer.yaxis = {
 					min: event.clientY - buffer.top,
 					max: (draggable.sysmap.container).width() - (buffer.bottom - event.clientY)
-				}
+				};
+				buffer.margin = {
+					top: body.scrollTop(),
+					left: body.scrollLeft()
+				};
 
 				draggable.sysmap.draggable_buffer = buffer;
 			},
@@ -954,15 +959,18 @@ ZABBIX.apps.map = (function($) {
 			dragGroupDrag: function(event, data, draggable) {
 				var cmap = draggable.sysmap,
 					delta_x = data.position.left - parseInt(draggable.data.x, 10),
-					delta_y = data.position.top - parseInt(draggable.data.y, 10);
+					delta_y = data.position.top - parseInt(draggable.data.y, 10),
+					body = $('body'),
+					xshift = body.scrollLeft() - cmap.draggable_buffer.margin.left,
+					yshift = body.scrollTop() - cmap.draggable_buffer.margin.top;
 
-				if (event.clientX > cmap.draggable_buffer.xaxis.max
-						|| event.clientX < cmap.draggable_buffer.xaxis.min) {
+				if (event.clientX > (cmap.draggable_buffer.xaxis.max - xshift)
+						|| event.clientX < (cmap.draggable_buffer.xaxis.min - xshift)) {
 					delta_x = 0;
 				}
 
-				if (event.clientY > cmap.draggable_buffer.yaxis.max
-						|| event.clientY < cmap.draggable_buffer.yaxis.min) {
+				if (event.clientY > (cmap.draggable_buffer.yaxis.max - yshift)
+						|| event.clientY < (cmap.draggable_buffer.yaxis.min - yshift)) {
 					delta_y = 0;
 				}
 
