@@ -347,6 +347,7 @@ class CDashboard extends CApiService {
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
 			'dashboardids' => zbx_objectValues($dashboards, 'dashboardid'),
 			'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width'],
+			'editable' => true,
 			'preservekeys' => true
 		]);
 
@@ -1179,6 +1180,8 @@ class CDashboard extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $dashboardids) {
+		// TODO VM: delete refresh rate from all user profiles when deleting widget
+		// TODO VM: delete refresh rate from all user profiles when deleting dashboard
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $dashboardids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
