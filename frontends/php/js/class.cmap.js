@@ -930,7 +930,7 @@ ZABBIX.apps.map = (function($) {
 
 				buffer.yaxis = {
 					min: event.clientY - buffer.top,
-					max: (draggable.sysmap.container).width() - (buffer.bottom - event.clientY)
+					max: (draggable.sysmap.container).height() - (buffer.bottom - event.clientY)
 				};
 
 				buffer.margin = {
