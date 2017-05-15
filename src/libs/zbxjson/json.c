@@ -1025,6 +1025,7 @@ static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t 
 			return zbx_jsonpath_error(path);
 
 		next = path + 1;
+		*pnext = next;
 	}
 
 	/* process dot notation component */
@@ -1180,22 +1181,18 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
  *                                                                            *
  * Purpose: return json fragment or value located at json parse location      *
  *                                                                            *
- * Return value: SUCCEED - if value successfully parsed, FAIL - otherwise     *
- *                                                                            *
  ******************************************************************************/
-int	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc)
+void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc)
 {
 	if (NULL == zbx_json_decodevalue_dyn(jp->start, string, string_alloc, NULL))
 	{
-		size_t	len = jp->end - jp->start;
+		size_t	len = jp->end - jp->start + 2;
 
 		if (*string_alloc < len)
 			*string = zbx_realloc(*string, len);
 
 		zbx_strlcpy(*string, jp->start, len);
 	}
-
-	return SUCCEED;
 }
 
 

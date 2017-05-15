@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "zbxregexp.h"
+#include "zbxjson.h"
 
 #include "item_preproc.h"
 
@@ -761,6 +762,42 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_jsonpath                                            *
+ *                                                                            *
+ * Purpose: execute jsonpath query                                            *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	struct	zbx_json_parse	jp, jp_out;
+	char	*data = NULL;
+	size_t	data_alloc = 0;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_json_path_open(&jp, params, &jp_out))
+	{
+		*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
+		return FAIL;
+	}
+
+	zbx_json_value_dyn(&jp_out, &data, &data_alloc);
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, data);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -803,6 +840,8 @@ int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timesp
 			return item_preproc_delta_value(item, value, ts, delta_history, errmsg);
 		case ZBX_PREPROC_DELTA_SPEED:
 			return item_preproc_delta_speed(item, value, ts, delta_history, errmsg);
+		case ZBX_PREPROC_JSONPATH:
+			return item_preproc_jsonpath(value, op->params, errmsg);
 	}
 
 	*errmsg = zbx_dsprintf(*errmsg, "Unknown preprocessing operation.");
