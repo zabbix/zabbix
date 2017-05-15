@@ -817,7 +817,7 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 	if (SUCCEED == item_preproc_jsonpath_op(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot extract value from json by path \"%s\": ", params, err);
+	*errmsg = zbx_dsprintf(*errmsg, "Cannot extract value from json by path \"%s\": %s", params, err);
 	zbx_free(err);
 
 	return FAIL;
