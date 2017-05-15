@@ -564,6 +564,13 @@ class CAction extends CApiService {
 					$operations_to_create[] = $recovery_operation;
 				}
 			}
+
+			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
+				foreach ($action['acknowledge_operations'] as $ack_operation) {
+					$ack_operation['actionid'] = $actionid;
+					$operations_to_create[] = $ack_operation;
+				}
+			}
 		}
 
 		$createdConditions = $this->addConditions($conditions_to_create);
@@ -923,6 +930,7 @@ class CAction extends CApiService {
 					break;
 
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
+				case OPERATION_TYPE_ACK_MESSAGE:
 					if (array_key_exists('opmessage', $operation) && $operation['opmessage']) {
 						$operation['opmessage']['operationid'] = $operationId;
 						$opMessagesToInsert[] = $operation['opmessage'];

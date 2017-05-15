@@ -1069,7 +1069,8 @@ function operation_type2str($type = null) {
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
-		OPERATION_TYPE_RECOVERY_MESSAGE => _('Send recovery message')
+		OPERATION_TYPE_RECOVERY_MESSAGE => _('Send recovery message'),
+		OPERATION_TYPE_ACK_MESSAGE => _('Send acknowledgement message')
 	];
 
 	if (is_null($type)) {
