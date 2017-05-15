@@ -301,7 +301,7 @@ void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache)
  * Function: dbsync_env_release                                               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dbsync_free_env()
+void	zbx_dbsync_free_env(void)
 {
 	zbx_hashset_destroy(&dbsync_env.strpool);
 }
