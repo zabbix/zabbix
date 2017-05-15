@@ -504,7 +504,7 @@
 						var widget_data = {
 							'type': fields['type'],
 							'header': data['widget_defaults'][fields['type']]['header'],
-							'pos': pos, // TODO VM: get default size
+							'pos': pos,
 							'rf_rate': data['widget_defaults'][fields['type']]['rf_rate'],
 							'fields': fields
 						}
