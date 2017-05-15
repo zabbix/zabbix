@@ -376,9 +376,6 @@ static zbx_user_type_t	zbx_session_access_level(const char *sessionid)
 				" and s.sessionid='%s'",
 			ZBX_SESSION_ACTIVE, sessionid_esc);
 
-#if USER_TYPE_UNDEFINED != 0
-#      error "expression below assumes that atoi() of non-numeric value will yield USER_TYPE_UNDEFINED too"
-#endif
 	access_level = (NULL == (row = DBfetch(result)) ? USER_TYPE_UNDEFINED : atoi(row[0]));
 	DBfree_result(result);
 
