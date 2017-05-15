@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class testWeb extends CZabbixTest {
+class testWebScenario extends CZabbixTest {
 
 	public static function httptest_create() {
 		return [
