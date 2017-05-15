@@ -267,14 +267,15 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			updateImage: function() {
-				if (this.data.grid_show === '1') {
-					this.map.setGrid(parseInt(this.data.grid_size, 10));
-				}
-				else {
-					this.map.setGrid(0);
-				}
+				var shapes = [],
+					links = [],
+					elements = [],
+					grid_size = (this.data.grid_show === '1') ? parseInt(this.data.grid_size, 10) : 0;
 
-				var elements = [];
+				if (grid_size !== this.data.last_grid_size) {
+					this.map.setGrid(grid_size);
+					this.data.last_grid_size = grid_size;
+				}
 
 				Object.keys(this.selements).forEach(function(key) {
 					var element = {};
@@ -293,8 +294,6 @@ ZABBIX.apps.map = (function($) {
 					elements.push(element);
 				}, this);
 
-				var links = [];
-
 				Object.keys(this.links).forEach(function(key) {
 					var link = {};
 					['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'].forEach(function (name) {
@@ -303,8 +302,6 @@ ZABBIX.apps.map = (function($) {
 
 					links.push(link);
 				}, this);
-
-				var shapes = [];
 
 				Object.keys(this.shapes).forEach(function(key) {
 					var shape = {};
