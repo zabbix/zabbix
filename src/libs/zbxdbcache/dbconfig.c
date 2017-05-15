@@ -4625,7 +4625,7 @@ out:
 	zbx_dbsync_clear(&hgroups_sync);
 	zbx_dbsync_clear(&itempp_sync);
 
-	zbx_dbsync_free_env(config);
+	zbx_dbsync_free_env();
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 		DCdump_configuration(config);
