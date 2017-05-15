@@ -187,10 +187,10 @@ class CMap extends CMapElement {
 			$hostgroupids_to_check = [];
 
 			$db_sysmap_elements = DBselect(
-				'SELECT se.elementid,se.sysmapid'.
-				' FROM sysmaps_elements se'.
-				' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_HOST_GROUP]).
-					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
+				'SELECT e.elementid,e.sysmapid'.
+				' FROM sysmaps_elements e'.
+				' WHERE '.dbConditionInt('e.elementtype', [SYSMAP_ELEMENT_TYPE_HOST_GROUP]).
+					' AND '.dbConditionInt('e.sysmapid', array_keys($result))
 			);
 			while ($db_sysmap_element = DBfetch($db_sysmap_elements)) {
 				$hostgroupids_to_check[$db_sysmap_element['elementid']][$db_sysmap_element['sysmapid']] = true;
@@ -216,10 +216,10 @@ class CMap extends CMapElement {
 			$hostids_to_check = [];
 
 			$db_sysmap_elements = DBselect(
-				'SELECT se.elementid,se.sysmapid'.
-				' FROM sysmaps_elements se'.
-				' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_HOST]).
-					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
+				'SELECT e.elementid,e.sysmapid'.
+				' FROM sysmaps_elements e'.
+				' WHERE '.dbConditionInt('e.elementtype', [SYSMAP_ELEMENT_TYPE_HOST]).
+					' AND '.dbConditionInt('e.sysmapid', array_keys($result))
 			);
 			while ($db_sysmap_element = DBfetch($db_sysmap_elements)) {
 				$hostids_to_check[$db_sysmap_element['elementid']][$db_sysmap_element['sysmapid']] = true;
@@ -255,10 +255,10 @@ class CMap extends CMapElement {
 			}
 
 			$db_element_triggers = DBselect(
-				'SELECT set.triggerid,se.sysmapid'.
-				' FROM sysmap_element_trigger set,sysmaps_elements se'.
-				' WHERE set.selementid=se.selementid'.
-					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
+				'SELECT et.triggerid,e.sysmapid'.
+				' FROM sysmap_element_trigger et,sysmaps_elements e'.
+				' WHERE et.selementid=e.selementid'.
+					' AND '.dbConditionInt('e.sysmapid', array_keys($result))
 			);
 			while ($db_element_trigger = DBfetch($db_element_triggers)) {
 				$triggerids_to_check[$db_element_trigger['triggerid']][$db_element_trigger['sysmapid']] = true;
@@ -284,10 +284,10 @@ class CMap extends CMapElement {
 			$sysmapids_to_check = [];
 
 			$db_sysmap_elements = DBselect(
-				'SELECT se.elementid,se.sysmapid'.
-				' FROM sysmaps_elements se'.
-				' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_MAP]).
-					' AND '.dbConditionInt('se.sysmapid', array_keys($result))
+				'SELECT e.elementid,e.sysmapid'.
+				' FROM sysmaps_elements e'.
+				' WHERE '.dbConditionInt('e.elementtype', [SYSMAP_ELEMENT_TYPE_MAP]).
+					' AND '.dbConditionInt('e.sysmapid', array_keys($result))
 			);
 			while ($db_sysmap_element = DBfetch($db_sysmap_elements)) {
 				$sysmapids_to_check[$db_sysmap_element['elementid']][$db_sysmap_element['sysmapid']] = true;
