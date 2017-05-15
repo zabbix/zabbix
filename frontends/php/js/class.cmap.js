@@ -858,28 +858,24 @@ ZABBIX.apps.map = (function($) {
 			draggable_buffer: null,
 
 			/**
-			 * Returns virtual dom element used by draggable.
-			 *
-			 * @param {object}	source_node					jQuery element where dragging was started on.
+			 * Returns virtual DOM element used by draggable.
 			 *
 			 * @return {object}
 			 */
-			dragGroupPlaceholder: function(source_node) {
-				var drag_placeholder = $('<div/>').css({
+			dragGroupPlaceholder: function() {
+				return $('<div/>').css({
 					width: $(this.domNode).width(),
 					height: $(this.domNode).height()
 				});
-
-				return drag_placeholder;
 			},
 
 			/**
 			 * Recalculate x and y position of moved elements.
 			 *
-			 * @param {int}		delta_x						Shift between old and new x position.
-			 * @param {int}		delta_y						Shift between old and new y position.
+			 * @param {int} delta_x						Shift between old and new x position.
+			 * @param {int} delta_y						Shift between old and new y position.
 			 *
-			 * @return {object}								Object of elements with recalculated positions.
+			 * @return {object}							Object of elements with recalculated positions.
 			 */
 			dragGroupRecalculate: function(cmap, delta_x, delta_y) {
 				var dragged = cmap.draggable_buffer;
@@ -888,6 +884,7 @@ ZABBIX.apps.map = (function($) {
 					node = cmap[item.type][item.id];
 					node.data.x = parseInt(node.data.x, 10) + delta_x;
 					node.data.y = parseInt(node.data.y, 10) + delta_y;
+
 					if ('domNode' in cmap[item.type][item.id]) {
 						$(cmap[item.type][item.id].domNode).css({
 							top: node.data.y + 'px',
@@ -900,13 +897,10 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Initializes multiple elements dragging.
 			 *
-			 * @param {object}		event					jQuery ui draggable event.
-			 * @param {objact}		data					jQuery ui draggable data.
-			 * @param {object}		draggable				Draggable dom element where drag event was started.
-			 *
-			 * @return void
+			 * @param {object} event					jQuery UI draggable event.
+			 * @param {object} draggable				Draggable DOM element where drag event was started.
 			 */
-			dragGroupInit: function(event, data, draggable) {
+			dragGroupInit: function(event, draggable) {
 				var buffer,
 					draggable_node,
 					body = $('body');
@@ -916,14 +910,12 @@ ZABBIX.apps.map = (function($) {
 				}
 				else {
 					draggable_node = $(draggable.domNode);
-					// Have to create getSelectionBuffer structure if drag event was started on not selected element.
+					// Create getSelectionBuffer structure if drag event was started on unselected element.
 					buffer = {
-					items: [
-						{
+						items: [{
 							type: draggable_node.attr('data-type'),
 							id: draggable.id
-						}
-					],
+						}],
 						left: parseInt(draggable.data.x, 10),
 						right: parseInt(draggable.data.x, 10) + draggable_node.width(),
 						top: parseInt(draggable.data.y, 10),
@@ -935,10 +927,12 @@ ZABBIX.apps.map = (function($) {
 					min: event.clientX - buffer.left,
 					max: (draggable.sysmap.container).width() - (buffer.right - event.clientX)
 				};
+
 				buffer.yaxis = {
 					min: event.clientY - buffer.top,
 					max: (draggable.sysmap.container).width() - (buffer.bottom - event.clientY)
 				};
+
 				buffer.margin = {
 					top: body.scrollTop(),
 					left: body.scrollLeft()
@@ -950,11 +944,9 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Handler for drag event.
 			 *
-			 * @param {object}		event					jQuery ui draggable event.
-			 * @param {objact}		data					jQuery ui draggable data.
-			 * @param {object}		draggable				Element where drag event occured.
-			 *
-			 * @return void
+			 * @param {object} event					jQuery UI draggable event.
+			 * @param {object} data						jQuery UI draggable data.
+			 * @param {object} draggable				Element where drag event occured.
 			 */
 			dragGroupDrag: function(event, data, draggable) {
 				var cmap = draggable.sysmap,
@@ -983,13 +975,9 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Final tasks for dragged element on drag stop event.
 			 *
-			 * @param {object}		event					jQuery ui draggable event.
-			 * @param {objact}		data					jQuery ui draggable data.
-			 * @param {object}		draggable				Element where drag stop event occured.
-			 *
-			 * @return void
+			 * @param {object} draggable				Element where drag stop event occured.
 			 */
-			dragGroupStop: function(event, data, draggable) {
+			dragGroupStop: function(draggable) {
 				var cmap = draggable.sysmap,
 					should_align = (cmap.data.grid_align === '1');
 
@@ -1746,16 +1734,16 @@ ZABBIX.apps.map = (function($) {
 				this.domNode.draggable({
 					containment: 'parent',
 					helper: $.proxy(function() {
-						return this.sysmap.dragGroupPlaceholder(this.domNode);
+						return this.sysmap.dragGroupPlaceholder();
 					}, this),
-					start: $.proxy(function(event, data) {
-						this.sysmap.dragGroupInit(event, data, this);
+					start: $.proxy(function(event) {
+						this.sysmap.dragGroupInit(event, this);
 					}, this),
 					drag: $.proxy(function(event, data) {
 						this.sysmap.dragGroupDrag(event, data, this);
 					}, this),
-					stop: $.proxy(function(event, data) {
-						this.sysmap.dragGroupStop(event, data, this);
+					stop: $.proxy(function() {
+						this.sysmap.dragGroupStop(this);
 					}, this)
 				});
 			},
