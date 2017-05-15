@@ -1132,7 +1132,7 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 
 		if (ZBX_JSONPATH_ARRAY_INDEX == type)
 		{
-			if ('[' != *p)
+			if ('[' != *object.start)
 				return FAIL;
 
 			if (FAIL == is_uint_n_range(path + loc.l, loc.r - loc.l + 1, &index, sizeof(index), 0,
@@ -1145,14 +1145,21 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 				;
 
 			if (0 != index || NULL == p)
+			{
+				zbx_set_json_strerror("Array index out of bounds starting with json path: \"%s\"",
+						path + loc.l);
 				return FAIL;
+			}
 		}
 		else
 		{
 			zbx_strlcpy(buffer, path + loc.l, loc.r - loc.l + 2);
 
 			if (NULL == (p = zbx_json_pair_by_name(&object, buffer)))
+			{
+				zbx_set_json_strerror("Object not found starting with json path: \"%s\"", path + loc.l);
 				return FAIL;
+			}
 		}
 
 		object.start = p;
@@ -1171,7 +1178,7 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
  *                                                                            *
  * Function: zbx_json_value_dyn                                               *
  *                                                                            *
- * Purpose: return value located at json parse location                       *
+ * Purpose: return json fragment or value located at json parse location      *
  *                                                                            *
  * Return value: SUCCEED - if value successfully parsed, FAIL - otherwise     *
  *                                                                            *
@@ -1179,7 +1186,14 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 int	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc)
 {
 	if (NULL == zbx_json_decodevalue_dyn(jp->start, string, string_alloc, NULL))
-		return FAIL;
+	{
+		size_t	len = jp->end - jp->start;
+
+		if (*string_alloc < len)
+			*string = zbx_realloc(*string, len);
+
+		zbx_strlcpy(*string, jp->start, len);
+	}
 
 	return SUCCEED;
 }
