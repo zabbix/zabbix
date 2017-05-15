@@ -265,7 +265,7 @@ out:
 	zbx_free(suite);
 	zbx_free(output);
 
-	exit(0 == CU_get_number_of_tests_failed() ? EXIT_SUCCESS : EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }
 
 #endif
