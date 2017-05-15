@@ -55,7 +55,7 @@ class CWidgetField
 	}
 
 	public function setValue($value) {
-		if ($this->save_type === ZBX_WIDGET_FIELD_TYPE_INT32) {
+		if ($this->save_type === ZBX_WIDGET_FIELD_TYPE_INT32 || $this->save_type === ZBX_WIDGET_FIELD_TYPE_MAP) {
 			$value = (int)$value;
 		}
 		$this->value = $value;
@@ -105,7 +105,8 @@ class CWidgetField
 		$known_save_types = [
 			ZBX_WIDGET_FIELD_TYPE_INT32,
 			ZBX_WIDGET_FIELD_TYPE_STR,
-			ZBX_WIDGET_FIELD_TYPE_ITEM
+			ZBX_WIDGET_FIELD_TYPE_ITEM,
+			ZBX_WIDGET_FIELD_TYPE_MAP
 		];
 
 		if (in_array($save_type, $known_save_types)) {

@@ -47,6 +47,44 @@ if (array_key_exists('dialogue', $data)) {
 			);
 		}
 
+		/* RadioButtonList */
+		elseif ($field instanceof CWidgetRadioButtonList) {
+			$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()));
+			$radioButtonsList->setModern($field->getModern());
+
+			foreach ($field->getValues() as $value) {
+				$radioButtonsList->addValue($value['name'], $value['value'], null, $field->getAction());
+			}
+
+			$formList->addRow(_('Source type'), $radioButtonsList);
+		}
+
+		/* CWidgetFieldSelectResource */
+		elseif ($field instanceof CWidgetFieldSelectResource) {
+			$form->addVar($field->getName(), $field->getValue());
+			$formList->addRow($field->getLabel(), [
+				(new CTextBox($field->getCaptionName(), $field->caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('select', _('Select')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getAttribute('id').'");')
+			]);
+		}
+
+		/* CWidgetFieldFilterWidgetComboBox */
+		elseif ($field instanceof CWidgetFieldFilterWidgetComboBox) {
+			// TODI miks: make sure it supports tree widget once it will be ready
+			$formList->addRow(
+				$field->getLabel(),
+				(new CComboBox($field->getName(), [], $field->getAction(), []))
+			);
+
+			$javascript = $field->getJavascript();
+			if ($javascript !== '') {
+				$form->addItem(new CJsScript(get_js($javascript, true)));
+			}
+		}
+
 		/* ItemId */
 		elseif ($field instanceof CWidgetFieldItemId) {
 			$form->addVar($field->getName(), $field->getValue(true)); // needed for popup script

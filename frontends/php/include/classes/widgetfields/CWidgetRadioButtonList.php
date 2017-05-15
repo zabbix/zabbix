@@ -18,19 +18,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldTextBox extends CWidgetField
+class CWidgetRadioButtonList extends CWidgetField
 {
-	public function __construct($name, $label, $default = '') {
-		parent::__construct($name, $label, $default, null);
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+	private $values = [];
+	private $modern = false;
+	
+	public function __construct($name, $label, $default = '', $action = null, $dataFieldType = ZBX_WIDGET_FIELD_TYPE_INT32) {
+		parent::__construct($name, $label, $default, $action);
+		$this->setSaveType($dataFieldType);
 	}
 
-	public function validate() {
-		$errors = [];
-		if ($this->required === true && $this->value == '') {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
-		}
+	public function addValue($name, $value, $id = null, $on_change = null) {
+		$this->javascript = '';
+		$this->values[] = [
+			'name' => $name,
+			'value' => $value,
+			'id' => ($id === null ? null : zbx_formatDomId($id)),
+			'on_change' => $on_change
+		];
 
-		return $errors;
+		return $this;
+	}
+
+	public function setModern($modern) {
+		$this->modern = $modern;
+
+		return $this;
+	}
+
+	public function getModern() {
+		return $this->modern;
+	}
+
+	public function getValues() {
+		return $this->values;
 	}
 }

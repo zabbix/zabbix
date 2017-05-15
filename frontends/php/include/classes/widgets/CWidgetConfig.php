@@ -37,6 +37,7 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_MAPS		=> _('Favourite maps'),
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
+			WIDGET_SYSMAP				=> _('Map'),
 			WIDGET_URL					=> _('URL'),
 		];
 
@@ -51,6 +52,7 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_MAPS		=> 15 * SEC_PER_MIN,
 			WIDGET_FAVOURITE_SCREENS	=> 15 * SEC_PER_MIN,
 			WIDGET_CLOCK				=> 15 * SEC_PER_MIN,
+			WIDGET_SYSMAP				=> 15 * SEC_PER_MIN,
 			WIDGET_URL					=> 0,
 		];
 
@@ -134,6 +136,8 @@ class CWidgetConfig
 		switch ($data['type']) {
 			case WIDGET_CLOCK:
 				return (new CClockWidgetForm($data, $known_widget_types));
+			case WIDGET_SYSMAP:
+				return (new CSysmapWidgetForm($data, $known_widget_types));
 			case WIDGET_URL:
 				return (new CUrlWidgetForm($data, $known_widget_types));
 

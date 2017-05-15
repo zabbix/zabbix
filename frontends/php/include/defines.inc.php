@@ -1115,7 +1115,16 @@ define('WIDGET_SYSTEM_STATUS',			'syssum');
 define('WIDGET_WEB_OVERVIEW',			'webovr');
 define('WIDGET_ZABBIX_STATUS',			'stszbx');
 define('WIDGET_CLOCK',					'clock');
+define('WIDGET_SYSMAP',					'sysmap');
 define('WIDGET_URL',					'url');
+
+// sysmap widget source types
+define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
+define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
+
+// widget select resource field types
+define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
+
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
 define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
@@ -1244,6 +1253,7 @@ define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
+define('ZBX_STYLE_SYSMAP', 'sysmap');
 define('ZBX_STYLE_CLOCK_SVG', 'clock-svg');
 define('ZBX_STYLE_CLOCK_FACE', 'clock-face');
 define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');

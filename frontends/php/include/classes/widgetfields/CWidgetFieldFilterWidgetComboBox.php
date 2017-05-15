@@ -18,19 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldTextBox extends CWidgetField
+class CWidgetFieldFilterWidgetComboBox extends CWidgetField
 {
+	private $javascript;
+
 	public function __construct($name, $label, $default = '') {
 		parent::__construct($name, $label, $default, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	public function validate() {
-		$errors = [];
-		if ($this->required === true && $this->value == '') {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
-		}
+	public function setJavascript($js = '') {
+		$this->javascript = $js;
+		return $this;
+	}
 
-		return $errors;
+	public function getJavascript() {
+		return $this->javascript;
 	}
 }
