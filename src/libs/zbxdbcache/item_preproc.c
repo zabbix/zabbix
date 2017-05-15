@@ -762,7 +762,7 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
 
 /******************************************************************************
  *                                                                            *
- * Function: item_preproc_jsonpath                                            *
+ * Function: item_preproc_jsonpath_op                                         *
  *                                                                            *
  * Purpose: execute jsonpath query                                            *
  *                                                                            *
@@ -774,7 +774,7 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
 	struct	zbx_json_parse	jp, jp_out;
 	char	*data = NULL;
@@ -794,6 +794,33 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 	zbx_variant_set_str(value, data);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_jsonpath                                            *
+ *                                                                            *
+ * Purpose: execute jsonpath query                                            *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	*err = NULL;
+
+	if (SUCCEED == item_preproc_jsonpath_op(value, params, &err))
+		return SUCCEED;
+
+	*errmsg = zbx_dsprintf(*errmsg, "Cannot extract value from json by path \"%s\": ", params, err);
+	zbx_free(err);
+
+	return FAIL;
 }
 
 /******************************************************************************
