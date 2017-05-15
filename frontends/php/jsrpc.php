@@ -341,7 +341,7 @@ switch ($data['method']) {
 			case 'triggers':
 				$host_fields = ['name'];
 				if (array_key_exists('real_hosts', $data) && $data['real_hosts']) {
-					array_push($host_fields, 'status');
+					$host_fields[] = 'status';
 				}
 
 				$triggers = API::Trigger()->get([
