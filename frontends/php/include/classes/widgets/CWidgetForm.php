@@ -23,17 +23,14 @@ class CWidgetForm
 	protected $fields;
 
 	public function __construct($data) {
-		$known_widget_types = (new CWidgetConfig())->getKnownWidgetTypes();
-
 		$this->fields = [];
 
-		// Widget Type field
-		$field_type = (new CWidgetFieldComboBox('type', _('Type'), $known_widget_types, WIDGET_CLOCK, 'updateWidgetConfigDialogue()'));
-		$field_type->setRequired(true);
-		if (array_key_exists('type', $data)) {
-			$field_type->setValue($data['type']);
-		}
-		$this->fields[] = $field_type;
+		// Type field
+		$this->fields[] = (new CWidgetFieldComboBox('type', _('Type'), (new CWidgetConfig())->getKnownWidgetTypes(),
+			WIDGET_CLOCK, 'updateWidgetConfigDialogue()'
+		))
+			->setRequired(true)
+			->setValue($data['type']);
 	}
 
 	/**
@@ -48,9 +45,9 @@ class CWidgetForm
 	public function validate() {
 		$errors = [];
 		foreach ($this->fields as $field) {
-			// Validate each field seperately
 			$errors = array_merge($errors, $field->validate());
 		}
+
 		return $errors;
 	}
 }
