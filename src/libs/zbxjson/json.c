@@ -385,7 +385,7 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
 	if ('n' == p[0] && 'u' == p[1] && 'l' == p[2] && 'l' == p[3])
 		return ZBX_JSON_TYPE_NULL;
 
-	zbx_set_json_strerror("Invalid type of JSON value \"%.64s\"", p);
+	zbx_set_json_strerror("invalid type of JSON value \"%.64s\"", p);
 
 	return ZBX_JSON_TYPE_UNKNOWN;
 }
@@ -807,7 +807,7 @@ const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *n
 		if (0 == strcmp(name, buffer))
 			return p;
 
-	zbx_set_json_strerror("Can't find pair with name \"%s\"", name);
+	zbx_set_json_strerror("cannot find pair with name \"%s\"", name);
 
 	return NULL;
 }
@@ -903,7 +903,7 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
 {
 	if (NULL == (jp->end = __zbx_json_rbracket(p)))
 	{
-		zbx_set_json_strerror("Can't open JSON object or array \"%.64s\"", p);
+		zbx_set_json_strerror("cannot open JSON object or array \"%.64s\"", p);
 		return FAIL;
 	}
 
@@ -993,7 +993,7 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
  ******************************************************************************/
 static int	zbx_jsonpath_error(const char *path)
 {
-	zbx_set_json_strerror("Unsupported character in json path starting with: \"%s\"", path);
+	zbx_set_json_strerror("unsupported character in json path starting with: \"%s\"", path);
 	return FAIL;
 }
 
@@ -1147,7 +1147,7 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 
 			if (0 != index || NULL == p)
 			{
-				zbx_set_json_strerror("Array index out of bounds starting with json path: \"%s\"",
+				zbx_set_json_strerror("array index out of bounds starting with json path: \"%s\"",
 						path + loc.l);
 				return FAIL;
 			}
@@ -1158,7 +1158,7 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 
 			if (NULL == (p = zbx_json_pair_by_name(&object, buffer)))
 			{
-				zbx_set_json_strerror("Object not found starting with json path: \"%s\"", path + loc.l);
+				zbx_set_json_strerror("object not found starting with json path: \"%s\"", path + loc.l);
 				return FAIL;
 			}
 		}
