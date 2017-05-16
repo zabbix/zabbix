@@ -625,6 +625,7 @@ class CAction extends CApiService {
 			'selectFilter' => ['formula', 'conditions'],
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'selectRecoveryOperations' => API_OUTPUT_EXTEND,
+			'selectAcknowledgeOperations' => API_OUTPUT_EXTEND,
 			'actionids' => $actionIds,
 			'editable' => true,
 			'preservekeys' => true
@@ -722,6 +723,28 @@ class CAction extends CApiService {
 					}
 				}
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_recovery_operations));
+			}
+
+			if (array_key_exists('acknowledge_operations', $action)) {
+				$db_ack_operations = zbx_toHash($db_action['acknowledgeOperations'], 'operationid');
+
+				foreach ($action['acknowledge_operations'] as $ack_operation) {
+					if (!array_key_exists('operationid', $ack_operation)) {
+						$ack_operation['actionid'] = $action['actionid'];
+						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+						$operations_to_create[] = $ack_operation;
+					}
+					else {
+						$operationid = $ack_operation['operationid'];
+
+						if (array_key_exists($operationid, $db_ack_operations)) {
+							$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+							$operations_to_update[] = $ack_operation;
+							unset($db_ack_operations[$operationid]);
+						}
+					}
+				}
+				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_ack_operations));
 			}
 
 			if ($actionUpdateValues) {
@@ -2633,6 +2656,23 @@ class CAction extends CApiService {
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
+					}
+				}
+			}
+
+			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
+				$db_ack_operations = zbx_toHash($db_actions[$action['actionid']]['acknowledgeOperations'],
+					'operationid'
+				);
+				foreach ($action['acknowledge_operations'] as $ack_operation) {
+					if (!array_key_exists('operationid', $ack_operation)
+							|| array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
+						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+						$ack_operation['eventsource'] = $db_action['eventsource'];
+						$operations_to_validate[] = $ack_operation;
+					}
+					else {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect acknowledge action operationid.'));
 					}
 				}
 			}
