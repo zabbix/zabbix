@@ -2069,7 +2069,11 @@ class CMap extends CMapElement {
 			$relation_map = $this->createRelationMap($db_shapes, 'sysmapid', 'sysmap_shapeid');
 
 			if ($options['selectShapes'] !== null && $options['selectShapes'] != API_OUTPUT_COUNT) {
-				$shapes = $this->unsetExtraFields($shapes, $fields, $options['selectShapes']);
+				$shapes = $this->unsetExtraFields($shapes, ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height',
+						'text', 'font', 'font_size', 'font_color', 'text_halign', 'text_valign', 'border_type',
+						'border_width', 'border_color', 'background_color', 'zindex'
+						], $options['selectShapes']
+				);
 				$shapes = $this->unsetExtraFields($shapes, ['sysmapid'], null);
 
 				$result = $relation_map->mapMany($result, $shapes, 'shapes');
