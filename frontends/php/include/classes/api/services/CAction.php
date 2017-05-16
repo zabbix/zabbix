@@ -568,6 +568,7 @@ class CAction extends CApiService {
 			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
 				foreach ($action['acknowledge_operations'] as $ack_operation) {
 					$ack_operation['actionid'] = $actionid;
+					$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
 					$operations_to_create[] = $ack_operation;
 				}
 			}
