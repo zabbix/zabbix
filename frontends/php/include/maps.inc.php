@@ -374,8 +374,30 @@ function getTriggersInfo($selement, $i, $showUnack) {
 
 	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
 			|| in_array($showUnack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))) {
+		// Number of problems.
+		if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+			if ($i['problem'] == 1) {
+				$msg = _('PROBLEM');
+			}
+			else {
+				$msg = $i['problem'].' '._('Problems');
+			}
+		}
+		// Expand single problem.
+		elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
+			$msg = $i['problem_title'];
+		}
+		// Number of problems and expand most critical one.
+		elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+			$msg = $i['problem_title'];
+
+			if ($i['problem'] > 1) {
+				$msg .= "\n".$i['problem'].' '._('Problems');;
+			}
+		}
+
 		$info['info']['unack'] = [
-			'msg' => _('PROBLEM'),
+			'msg' => $msg,
 			'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
 		];
 
@@ -992,12 +1014,19 @@ function getSelementsInfo($sysmap, array $options = []) {
 		// If there are no events, problems cannot be unacknowledged. Hide the green line in this case.
 		$i['ack'] = ($last_event) ? (bool) !($i['problem_unack']) : false;
 
-		if ($sysmap['expandproblem'] == SYSMAP_SINGLE_PROBLEM && $i['problem'] == 1) {
-			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
+		// Number of problems.
+		if ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+			$i['expandproblem'] = SYSMAP_PROBLEMS_NUMBER;
 		}
-
-		if ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL && $i['problem']) {
+		// Expand single problem.
+		elseif ($sysmap['expandproblem'] == SYSMAP_SINGLE_PROBLEM && $i['problem']) {
+			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
+			$i['expandproblem'] = SYSMAP_SINGLE_PROBLEM;
+		}
+		// Number of problems and expand most critical one.
+		elseif ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL && $i['problem']) {
 			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$critical_triggerid]);
+			$i['expandproblem'] = SYSMAP_PROBLEMS_NUMBER_CRITICAL;
 		}
 
 		// replace default icons
@@ -1750,12 +1779,16 @@ function getMapLabels($map, $map_info, $resolveMacros) {
 				continue;
 			}
 
-			$statusLines[$selementId][] = [
-				'content' => $elementInfo['info'][$caption]['msg'],
-				'attributes' => [
-					'fill' => '#' . $elementInfo['info'][$caption]['color']
-				]
-			];
+			$msgs = explode("\n", $elementInfo['info'][$caption]['msg']);
+
+			foreach ($msgs as $msg) {
+				$statusLines[$selementId][] = [
+					'content' => $msg,
+					'attributes' => [
+						'fill' => '#' . $elementInfo['info'][$caption]['color']
+					]
+				];
+			}
 		}
 	}
 
