@@ -23,14 +23,6 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashboardView extends CController {
 
-	private $widget_config;
-
-	public function __construct() {
-		parent::__construct();
-
-		$this->widget_config = new CWidgetConfig();
-	}
-
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -128,14 +120,14 @@ class CControllerDashboardView extends CController {
 	 */
 	private function getWidgets($widgets) {
 		$grid_widgets = [];
-		$widget_names = $this->widget_config->getKnownWidgetTypes();
+		$widget_names = CWidgetConfig::getKnownWidgetTypes();
 		// TODO VM: (?) WIDGET_DISCOVERY_STATUS and WIDGET_ZABBIX_STATUS are displayed only under specidic conditions,
 		// but we currently have these widgets in default dashboard. Should these conditions be be managed by frontend, or API?
 		// Currently these conditions are not managed by any of them.
 
 		foreach ($widgets as $widget) {
 			$widgetid = (int) $widget['widgetid'];
-			$default_rf_rate = $this->widget_config->getDefaultRfRate($widget['type']);
+			$default_rf_rate = CWidgetConfig::getDefaultRfRate($widget['type']);
 
 			$grid_widgets[$widgetid] = [
 				'widgetid' => $widgetid,
@@ -171,7 +163,7 @@ class CControllerDashboardView extends CController {
 	private function convertWidgetFields($fields) {
 		$ret = [];
 		foreach ($fields as $field) {
-			$field_key = $this->widget_config->getApiFieldKey($field['type']);
+			$field_key = CWidgetConfig::getApiFieldKey($field['type']);
 			$ret[$field['name']] = $field[$field_key];
 		}
 		return $ret;

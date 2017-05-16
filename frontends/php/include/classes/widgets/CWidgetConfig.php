@@ -20,13 +20,15 @@
 
 class CWidgetConfig
 {
-	// TODO VM: (?) maybe better to convert all functions to static ones
-	private $knownWidgetTypes;
-	private $rfRates;
-	private $apiFieldKeys;
-
-	public function __construct() {
-		$this->knownWidgetTypes = [
+	/**
+	 * Return list of all widget types with names.
+	 *
+	 * @static
+	 *
+	 * @return array
+	 */
+	public static function getKnownWidgetTypes() {
+		return [
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix'),
 			WIDGET_LAST_ISSUES			=> _('Last issues'),
@@ -37,66 +39,87 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_MAPS		=> _('Favourite maps'),
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
-			WIDGET_URL					=> _('URL'),
-		];
-
-		$this->rfRates = [
-			WIDGET_SYSTEM_STATUS		=> SEC_PER_MIN,
-			WIDGET_ZABBIX_STATUS		=> 15 * SEC_PER_MIN,
-			WIDGET_LAST_ISSUES			=> SEC_PER_MIN,
-			WIDGET_WEB_OVERVIEW			=> SEC_PER_MIN,
-			WIDGET_DISCOVERY_STATUS		=> SEC_PER_MIN,
-			WIDGET_HOST_STATUS			=> SEC_PER_MIN,
-			WIDGET_FAVOURITE_GRAPHS		=> 15 * SEC_PER_MIN,
-			WIDGET_FAVOURITE_MAPS		=> 15 * SEC_PER_MIN,
-			WIDGET_FAVOURITE_SCREENS	=> 15 * SEC_PER_MIN,
-			WIDGET_CLOCK				=> 15 * SEC_PER_MIN,
-			WIDGET_URL					=> 0,
-		];
-
-		$this->apiFieldKeys = [
-			ZBX_WIDGET_FIELD_TYPE_INT32				=> 'value_int',
-			ZBX_WIDGET_FIELD_TYPE_STR				=> 'value_str',
-			ZBX_WIDGET_FIELD_TYPE_GROUP				=> 'value_groupid',
-			ZBX_WIDGET_FIELD_TYPE_HOST				=> 'value_hostid',
-			ZBX_WIDGET_FIELD_TYPE_ITEM				=> 'value_itemid',
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE	=> 'value_itemid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH				=> 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE	=> 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_MAP				=> 'value_sysmapid',
-			ZBX_WIDGET_FIELD_TYPE_DASHBOARD			=> 'value_dashboardid'
+			WIDGET_URL					=> _('URL')
 		];
 	}
 
 	/**
-	 * Return list of all widget types with names.
+	 * Return default refresh rate for widget type.
 	 *
-	 * @return array
+	 * @static
+	 *
+	 * @param int $type  WIDGET_ constant
+	 *
+	 * @return int  default refresh rate, "0" for no refresh
 	 */
-	public function getKnownWidgetTypes() {
-		return $this->knownWidgetTypes;
+	public static function getDefaultRfRate($type) {
+		switch ($type) {
+			case WIDGET_SYSTEM_STATUS:
+			case WIDGET_LAST_ISSUES:
+			case WIDGET_WEB_OVERVIEW:
+			case WIDGET_DISCOVERY_STATUS:
+			case WIDGET_HOST_STATUS:
+				return SEC_PER_MIN;
+
+			case WIDGET_ZABBIX_STATUS:
+			case WIDGET_FAVOURITE_GRAPHS:
+			case WIDGET_FAVOURITE_MAPS:
+			case WIDGET_FAVOURITE_SCREENS:
+			case WIDGET_CLOCK:
+				return 15 * SEC_PER_MIN;
+
+			case WIDGET_URL:
+				return 0;
+		}
 	}
 
 	/**
-	 * Return default refresh rate for widget type
-	 * @param int $type - WIDGET_ constant
-	 * @return int default refresh rate, "0" for no refresh
+	 * Returns key, where value is stored for given field type.
+	 *
+	 * @static
+	 *
+	 * @param int $field_type  ZBX_WIDGET_FIELD_TYPE_ constant
+	 *
+	 * @return string  field key, where to save the value
 	 */
-	public function getDefaultRfRate($type) {
-		return $this->rfRates[$type];
-	}
+	public static function getApiFieldKey($field_type){
+		switch ($field_type) {
+			case ZBX_WIDGET_FIELD_TYPE_INT32:
+				return 'value_int';
 
-	/**
-	 * Returns key, where value is stored for given field type
-	 * @param int $field_type - ZBX_WIDGET_FIELD_TYPE_ constant
-	 * @return string field key, where to save the value
-	 */
-	public function getApiFieldKey($field_type){
-		return $this->apiFieldKeys[$field_type];
+			case ZBX_WIDGET_FIELD_TYPE_STR:
+				return 'value_str';
+
+			case ZBX_WIDGET_FIELD_TYPE_GROUP:
+				return 'value_groupid';
+
+			case ZBX_WIDGET_FIELD_TYPE_HOST:
+				return 'value_hostid';
+
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
+				return 'value_itemid';
+
+			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+				return 'value_itemid';
+
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+				return 'value_graphid';
+
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+				return 'value_graphid';
+
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
+				return 'value_sysmapid';
+
+			case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
+				return 'value_dashboardid';
+		}
 	}
 
 	/**
 	 * Return Form object for widget with provided data.
+	 *
+	 * @static
 	 *
 	 * @param array  $data          array with all widget's fields, including widget type
 	 * @param string $data['type']
@@ -104,7 +127,7 @@ class CWidgetConfig
 	 *
 	 * @return CWidgetForm
 	 */
-	public function getForm($data) {
+	public static function getForm($data) {
 		switch ($data['type']) {
 			case WIDGET_CLOCK:
 				return new CClockWidgetForm($data);

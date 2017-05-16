@@ -21,14 +21,6 @@
 
 class CControllerDashbrdWidgetConfig extends CController {
 
-	private $widget_config;
-
-	public function __construct() {
-		parent::__construct();
-
-		$this->widget_config = new CWidgetConfig();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'widgetid' =>	'db widget.widgetid',
@@ -44,7 +36,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 			 */
 			if ($this->hasInput('fields')) {
 				$widget_fields = $this->getInput('fields');
-				$known_widget_types = array_keys($this->widget_config->getKnownWidgetTypes());
+				$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes());
 
 				if (!array_key_exists('type', $widget_fields)) {
 					error(_s('Invalid parameter "%1$s": %2$s.', 'fields',
@@ -88,7 +80,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 //		// get data for current widget - in case we are switching between types, and no fields for widget are given
 //		if ($this->hasInput('widgetid')) {
 //			$dialogue['widgetid'] = $this->getInput('widgetid');
-//			$widget = $this->widget_config->getConfig($dialogue['widgetid']);
+//			$widget = CWidgetConfig::getConfig($dialogue['widgetid']);
 //		}
 
 		// Get fields from dialogue form
@@ -96,7 +88,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 		// Take default values, replce with saved ones, replace with selected in dialogue
 		$fields_data = array_merge($fields, $widget, $dialogue_fields);
-		$dialogue['form'] = $this->widget_config->getForm($fields_data);
+		$dialogue['form'] = CWidgetConfig::getForm($fields_data);
 		$this->setResponse(new CControllerResponseData([
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

@@ -26,7 +26,7 @@ class CWidgetForm
 		$this->fields = [];
 
 		// Type field
-		$this->fields[] = (new CWidgetFieldComboBox('type', _('Type'), (new CWidgetConfig())->getKnownWidgetTypes(),
+		$this->fields[] = (new CWidgetFieldComboBox('type', _('Type'), CWidgetConfig::getKnownWidgetTypes(),
 			WIDGET_CLOCK, 'updateWidgetConfigDialogue()'
 		))
 			->setRequired(true)

@@ -24,12 +24,10 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 class CControllerDashbrdWidgetUpdate extends CController {
 
 	private $widgets;
-	private $widget_config;
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->widget_config = new CWidgetConfig();
 		$this->widgets = [];
 	}
 
@@ -63,7 +61,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 						break; // no need to check fields, if widget type is unknown
 					}
 
-					$widget['form'] = $this->widget_config->getForm($widget_fields);
+					$widget['form'] = CWidgetConfig::getForm($widget_fields);
 					unset($widget['fields']);
 
 					$errors = $widget['form']->validate();
@@ -164,7 +162,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				$field_to_save['type'] = $field->getSaveType();
 				$field_to_save['name'] = $field->getName();
 
-				$field_key = $this->widget_config->getApiFieldKey($field_to_save['type']);
+				$field_key = CWidgetConfig::getApiFieldKey($field_to_save['type']);
 				$field_to_save[$field_key] = $field->getValue();
 
 				if (!array_key_exists('fields', $ret)) {
