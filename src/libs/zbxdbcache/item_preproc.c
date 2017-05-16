@@ -163,7 +163,7 @@ static int	item_preproc_multiplier(zbx_variant_t *value, const char *params, cha
 	if (SUCCEED == item_preproc_multiplier_variant(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
 			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 	zbx_free(err);
 
@@ -342,7 +342,7 @@ static int	item_preproc_delta_value(const DC_ITEM *item, zbx_variant_t *value, c
 	if (SUCCEED == item_preproc_delta(item, value, ts, ZBX_PREPROC_DELTA_VALUE, delta_history, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot calculate delta (simple change) for value \"%s\" of type"
+	*errmsg = zbx_dsprintf(*errmsg, "cannot calculate delta (simple change) for value \"%s\" of type"
 				" \"%s\": %s", zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -375,7 +375,7 @@ static int	item_preproc_delta_speed(const DC_ITEM *item, zbx_variant_t *value, c
 	if (SUCCEED == item_preproc_delta(item, value, ts, ZBX_PREPROC_DELTA_SPEED, delta_history, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot calculate delta (speed per second) for value \"%s\" of type"
+	*errmsg = zbx_dsprintf(*errmsg, "cannot calculate delta (speed per second) for value \"%s\" of type"
 				" \"%s\": %s", zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -476,7 +476,7 @@ static int item_preproc_rtrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_RTRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot perform right trim of \"%s\" for value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform right trim of \"%s\" for value \"%s\" of type \"%s\": %s",
 			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -505,7 +505,7 @@ static int item_preproc_ltrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_LTRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot perform left trim of \"%s\" for value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform left trim of \"%s\" for value \"%s\" of type \"%s\": %s",
 			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -534,7 +534,7 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_TRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot perform trim of \"%s\" for value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform trim of \"%s\" for value \"%s\" of type \"%s\": %s",
 			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -622,7 +622,7 @@ static int	item_preproc_bool2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_BOOL2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot convert value \"%s\" of type \"%s\" from boolean format: %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from boolean format: %s",
 			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -650,7 +650,7 @@ static int	item_preproc_oct2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_OCT2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot convert value \"%s\" of type \"%s\" from octal format: %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from octal format: %s",
 			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -678,7 +678,7 @@ static int	item_preproc_hex2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_HEX2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot convert value \"%s\" of type \"%s\" from hexadecimal format: %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from hexadecimal format: %s",
 			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -752,7 +752,7 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_regsub_op(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot perform regular expression match on value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match on value \"%s\" of type \"%s\": %s",
 			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -817,7 +817,7 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 	if (SUCCEED == item_preproc_jsonpath_op(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot extract value from json by path \"%s\": %s", params, err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot extract value from json by path \"%s\": %s", params, err);
 	zbx_free(err);
 
 	return FAIL;
@@ -871,7 +871,7 @@ int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timesp
 			return item_preproc_jsonpath(value, op->params, errmsg);
 	}
 
-	*errmsg = zbx_dsprintf(*errmsg, "Unknown preprocessing operation.");
+	*errmsg = zbx_dsprintf(*errmsg, "unknown preprocessing operation");
 
 	return FAIL;
 }
