@@ -1846,6 +1846,7 @@ class CAction extends CApiService {
 		if (array_key_exists('selectAcknowledgeOperations', $options)
 				&& $options['selectAcknowledgeOperations'] != API_OUTPUT_COUNT) {
 			$ack_operations = $this->getAcknowledgeOperations($actionIds, $options['selectAcknowledgeOperations']);
+			$relationMap = new CRelationMap();
 			$result = $relationMap->mapMany($result, $ack_operations, 'acknowledge_operations');
 		}
 
