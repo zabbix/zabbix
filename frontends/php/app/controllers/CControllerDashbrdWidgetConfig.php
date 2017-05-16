@@ -31,30 +31,31 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'db widget.widgetid',
-			'fields'		=>	'array',
+			'widgetid' =>	'db widget.widgetid',
+			'fields' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
+
 		if ($ret) {
 			/*
-			 * @var string	fields['type']
-			 * @var int		fields['time_type']			(optional)
-			 * @var string	fields['itemid']			(optional)
-			 * @var string	fields['caption']			(optional)
-			 * @var string	fields['url']				(optional)
+			 * @var string fields['type']
+			 * @var string fields[<name>]  (optional)
 			 */
 			if ($this->hasInput('fields')) {
 				$widget_fields = $this->getInput('fields');
+				$known_widget_types = $this->widget_config->getKnownWidgetTypes($this->getUserType());
 
-				// Field array should contain widget type
 				if (!array_key_exists('type', $widget_fields)) {
-					error(_('No widget type')); // TODO VM: (?) improve message
+					error(_s('Invalid parameter "%1$s": %2$s.', 'fields',
+						_s('the parameter "%1$s" is missing', 'type')
+					));
 					$ret = false;
 				}
-				// We will work only with known widget types
-				elseif (!in_array($widget_fields['type'], $this->widget_config->getKnownWidgetTypes($this->getUserType()))) {
-					error(_('Unknown widget type')); // TODO VM: (?) improve message
+				elseif (!in_array($widget_fields['type'], $known_widget_types)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'fields[type]',
+						_s('value must be one of %1$s', implode(',', $known_widget_types))
+					));
 					$ret = false;
 				}
 			}
@@ -78,7 +79,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 		// default fields data
 		$fields = [
-			'type' => WIDGET_CLOCK,
+			'type' => WIDGET_CLOCK
 		];
 
 		// TODO VM: (?) get current widget fields data from JS
@@ -100,7 +101,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'dialogue' => $dialogue,
+			'dialogue' => $dialogue
 		]));
 	}
 }
