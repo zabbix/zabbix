@@ -2253,13 +2253,14 @@ class CAction extends CApiService {
 		]);
 		$relationMap = $this->createRelationMap($ack_operations, 'actionid', 'operationid');
 		$ack_operationids = $relationMap->getRelatedIds();
-		$child_objects = [];
+		$single_child = [];
+		$multiple_childs = [];
 		$opmessages = [];
 		$opcommands = [];
 		$op_ack_messages = [];
 
 		if ($this->outputIsRequested('opconditions', $ack_options)) {
-			$child_objects['opconditions'] = 'SELECT op.* FROM opconditions op WHERE '.
+			$multiple_childs['opconditions'] = 'SELECT op.* FROM opconditions op WHERE '.
 												dbConditionInt('op.operationid', $ack_operationids);
 		}
 
@@ -2278,42 +2279,52 @@ class CAction extends CApiService {
 		}
 
 		if ($opmessages) {
-			$child_objects['opmessage'] = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+			$single_child['opmessage'] = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
 											' FROM opmessage o'.
 											' WHERE '.dbConditionInt('operationid', $opmessages);
-			$child_objects['opmessage_grp'] = 'SELECT og.operationid,og.usrgrpid'.
+			$multiple_childs['opmessage_grp'] = 'SELECT og.operationid,og.usrgrpid'.
 												' FROM opmessage_grp og'.
 												' WHERE '.dbConditionInt('operationid', $opmessages);
-			$child_objects['opmessage_usr'] = 'SELECT ou.operationid,ou.userid'.
+			$multiple_childs['opmessage_usr'] = 'SELECT ou.operationid,ou.userid'.
 												' FROM opmessage_usr ou'.
 												' WHERE '.dbConditionInt('operationid', $opmessages);
 		}
 
 		if ($opcommands) {
-			$child_objects['opcommand'] = 'SELECT o.*'.
+			$single_child['opcommand'] = 'SELECT o.*'.
 											' FROM opcommand o'.
 											' WHERE '.dbConditionInt('operationid', $opcommands);
-			$child_objects['opcommand_hst'] = 'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
+			$multiple_childs['opcommand_hst'] = 'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
 												' FROM opcommand_hst oh'.
 												' WHERE '.dbConditionInt('operationid', $opcommands);
-			$child_objects['opcommand_hst'] = 'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
+			$multiple_childs['opcommand_hst'] = 'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
 												' FROM opcommand_grp og'.
 												' WHERE '.dbConditionInt('operationid', $opcommands);
 		}
 
 		if ($op_ack_messages) {
-			$child_objects['opmessage'] = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+			$single_child['opmessage'] = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
 											' FROM opmessage o'.
 											' WHERE '.dbConditionInt('operationid', $op_ack_messages);
 		}
 
-		if ($child_objects) {
-			foreach ($child_objects as $opkey => $opquery) {
+		if ($multiple_childs) {
+			foreach ($multiple_childs as $opkey => $opquery) {
 				if ($this->outputIsRequested($opkey, $ack_options)) {
-					foreach ($opmessage as $ack_operationid) {
-						$ack_operations[$ack_operationid][$opkey] = [];
+					$db_cursor = DBselect($opquery);
+					while ($db_row = DBfetch($db_cursor)) {
+						if (!array_key_exists($opkey, $ack_operations[$db_row['operationid']])) {
+							$ack_operations[$db_row['operationid']][$opkey] = [];
+						}
+						$ack_operations[$db_row['operationid']][$opkey][] = $db_row;
 					}
+				}
+			}
+		}
 
+		if ($single_child) {
+			foreach ($single_child as $opkey => $opquery) {
+				if ($this->outputIsRequested($opkey, $ack_options)) {
 					$db_cursor = DBselect($opquery);
 					while ($db_row = DBfetch($db_cursor)) {
 						$ack_operations[$db_row['operationid']][$opkey] = $db_row;
