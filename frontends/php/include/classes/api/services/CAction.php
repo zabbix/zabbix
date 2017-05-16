@@ -83,6 +83,7 @@ class CAction extends CApiService {
 			'selectFilter'				=> null,
 			'selectOperations'			=> null,
 			'selectRecoveryOperations'	=> null,
+			'selectAcknowledgeOperations'	=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
@@ -1841,6 +1842,13 @@ class CAction extends CApiService {
 			unset($action);
 		}
 
+		// Acknowledge operations data.
+		if (array_key_exists('selectAcknowledgeOperations', $options)
+				&& $options['selectAcknowledgeOperations'] != API_OUTPUT_COUNT) {
+			$ack_operations = $this->getAcknowledgeOperations($actionIds, $options['selectAcknowledgeOperations']);
+			$result = $relationMap->mapMany($result, $ack_operations, 'acknowledge_operations');
+		}
+
 		// adding operations
 		if ($options['selectOperations'] !== null && $options['selectOperations'] != API_OUTPUT_COUNT) {
 			$operations = API::getApiService()->select('operations', [
@@ -2224,6 +2232,96 @@ class CAction extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Returns array of acknowledge operations for requested actions.
+	 *
+	 * @param array $actionIds
+	 * @param array $ack_options
+	 *
+	 * @return array
+	 */
+	protected function getAcknowledgeOperations($actionIds, $ack_options) {
+		$ack_operations = API::getApiService()->select('operations', [
+			'output' => $this->outputExtend($ack_options,
+				['operationid', 'actionid', 'operationtype']
+			),
+			'filter' => ['actionid' => $actionIds, 'recovery' => ACTION_ACKNOWLEDGE_OPERATION],
+			'preservekeys' => true
+		]);
+		$relationMap = $this->createRelationMap($ack_operations, 'actionid', 'operationid');
+		$ack_operationids = $relationMap->getRelatedIds();
+		$child_objects = [];
+		$opmessages = [];
+		$opcommands = [];
+		$op_ack_messages = [];
+
+		if ($this->outputIsRequested('opconditions', $ack_options)) {
+			$child_objects['opconditions'] = 'SELECT op.* FROM opconditions op WHERE '.
+												dbConditionInt('op.operationid', $ack_operationids);
+		}
+
+		foreach ($ack_operations as $ack_operationid => $ack_operation) {
+			switch ($ack_operation['operationtype']) {
+				case OPERATION_TYPE_MESSAGE:
+					$opmessage[] = $ack_operationid;
+					break;
+				case OPERATION_TYPE_COMMAND:
+					$opcommand[] = $ack_operationid;
+					break;
+				case OPERATION_TYPE_ACK_MESSAGE:
+					$op_ack_messages[] = $ack_operationid;
+					break;
+			}
+		}
+
+		if ($opmessages) {
+			$child_objects['opmessage'] = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+											' FROM opmessage o'.
+											' WHERE '.dbConditionInt('operationid', $opmessages);
+			$child_objects['opmessage_grp'] = 'SELECT og.operationid,og.usrgrpid'.
+												' FROM opmessage_grp og'.
+												' WHERE '.dbConditionInt('operationid', $opmessages);
+			$child_objects['opmessage_usr'] = 'SELECT ou.operationid,ou.userid'.
+												' FROM opmessage_usr ou'.
+												' WHERE '.dbConditionInt('operationid', $opmessages);
+		}
+
+		if ($opcommands) {
+			$child_objects['opcommand'] = 'SELECT o.*'.
+											' FROM opcommand o'.
+											' WHERE '.dbConditionInt('operationid', $opcommands);
+			$child_objects['opcommand_hst'] = 'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
+												' FROM opcommand_hst oh'.
+												' WHERE '.dbConditionInt('operationid', $opcommands);
+			$child_objects['opcommand_hst'] = 'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
+												' FROM opcommand_grp og'.
+												' WHERE '.dbConditionInt('operationid', $opcommands);
+		}
+
+		if ($op_ack_messages) {
+			$child_objects['opmessage'] = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+											' FROM opmessage o'.
+											' WHERE '.dbConditionInt('operationid', $op_ack_messages);
+		}
+
+		if ($child_objects) {
+			foreach ($child_objects as $opkey => $opquery) {
+				if ($this->outputIsRequested($opkey, $ack_options)) {
+					foreach ($opmessage as $ack_operationid) {
+						$ack_operations[$ack_operationid][$opkey] = [];
+					}
+
+					$db_cursor = DBselect($opquery);
+					while ($db_row = DBfetch($db_cursor)) {
+						$ack_operations[$db_row['operationid']][$opkey] = $db_row;
+					}
+				}
+			}
+		}
+
+		return $this->unsetExtraFields($ack_operations, ['operationid', 'actionid' ,'operationtype'], $ack_options);
 	}
 
 	/**
