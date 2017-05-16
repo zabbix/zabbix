@@ -44,7 +44,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 			 */
 			if ($this->hasInput('fields')) {
 				$widget_fields = $this->getInput('fields');
-				$known_widget_types = array_keys($this->widget_config->getKnownWidgetTypes($this->getUserType()));
+				$known_widget_types = array_keys($this->widget_config->getKnownWidgetTypes());
 
 				if (!array_key_exists('type', $widget_fields)) {
 					error(_s('Invalid parameter "%1$s": %2$s.', 'fields',
@@ -96,7 +96,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 		// Take default values, replce with saved ones, replace with selected in dialogue
 		$fields_data = array_merge($fields, $widget, $dialogue_fields);
-		$dialogue['form'] = $this->widget_config->getForm($fields_data, $this->getUserType());
+		$dialogue['form'] = $this->widget_config->getForm($fields_data);
 		$this->setResponse(new CControllerResponseData([
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

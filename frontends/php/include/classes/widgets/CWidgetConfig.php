@@ -69,31 +69,12 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Return list of all widget types with names
-	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
+	 * Return list of all widget types with names.
+	 *
 	 * @return array
 	 */
-	public function getKnownWidgetTypes($user_type = null) {
-		$known_widget_types = $this->knownWidgetTypes;
-
-		// Remove widget types, user can't create
-		if ($user_type !== null) {
-			$show_discovery_widget = ($user_type >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
-				'output' => [],
-				'filter' => ['status' => DRULE_STATUS_ACTIVE],
-				'limit' => 1
-			]));
-			if (!$show_discovery_widget) {
-				unset($known_widget_types[WIDGET_DISCOVERY_STATUS]);
-			}
-
-			$show_status_widget = ($user_type == USER_TYPE_SUPER_ADMIN);
-			if (!$show_status_widget) {
-				unset($known_widget_types[WIDGET_ZABBIX_STATUS]);
-			}
-		}
-
-		return $known_widget_types;
+	public function getKnownWidgetTypes() {
+		return $this->knownWidgetTypes;
 	}
 
 	/**
@@ -115,13 +96,14 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Return Form object for widget with provided data
-	 * @param array $data - array with all widget's fields, including widget type and position
-	 * @param int $user_type - USER_TYPE_ZABBIX_ constant, if null or not passed, will accept all widget types
+	 * Return Form object for widget with provided data.
+	 *
+	 * @param array $data  array with all widget's fields, including widget type and position
+	 *
 	 * @return CWidgetForm
 	 */
-	public function getForm($data, $user_type = null) {
-		$known_widget_types = $this->getKnownWidgetTypes($user_type);
+	public function getForm($data) {
+		$known_widget_types = $this->getKnownWidgetTypes();
 		switch ($data['type']) {
 			case WIDGET_CLOCK:
 				return (new CClockWidgetForm($data, $known_widget_types));

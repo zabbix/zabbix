@@ -63,9 +63,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 						break; // no need to check fields, if widget type is unknown
 					}
 
-					// TODO VM: (?) widget types are currently not evaluated by "allowed y user or not"
 					$widget['form'] = $this->widget_config->getForm($widget_fields);
-//					$widget['form'] = $this->widget_config->getForm($widget_fields, $this->getUserType());
 					unset($widget['fields']);
 
 					$errors = $widget['form']->validate();
