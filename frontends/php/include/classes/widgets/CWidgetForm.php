@@ -36,7 +36,7 @@ class CWidgetForm
 	/**
 	 * Return fields for this form
 	 *
-	 * @return CWidgetField[]
+	 * @return array  an array of CWidgetField
 	 */
 	public function getFields() {
 		return $this->fields;
