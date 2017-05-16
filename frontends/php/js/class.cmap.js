@@ -2858,11 +2858,31 @@ ZABBIX.apps.map = (function($) {
 				var values = $('#shapeForm').serializeArray(),
 					data = {},
 					i,
-					ln;
+					ln,
+					min_size,
+					width = parseInt(this.sysmap.data.width),
+					height = parseInt(this.sysmap.data.height);
 
 				for (i = 0, ln = values.length; i < ln; i++) {
 					data[values[i].name] = values[i].value.toString();
 				}
+
+				data.x = parseInt(data.x, 10);
+				data.y = parseInt(data.y, 10);
+				data.width = parseInt(data.width, 10);
+				data.height = parseInt(data.height, 10);
+
+				data.x = isNaN(data.x) || (data.x < 0) ? 0 : data.x;
+				data.y = isNaN(data.y) || (data.y < 0) ? 0 : data.y;
+
+				min_size = (data.type != SVGMapShape.TYPE_LINE) ? 1 : 0;
+				data.width = isNaN(data.width) || (data.width < min_size) ? min_size : data.width;
+				data.height = isNaN(data.height) || (data.height < min_size) ? min_size : data.height;
+
+				data.x = (data.x >= width) ? width : data.x;
+				data.y = (data.y >= height) ? height : data.y;
+				data.width = (data.width >= width) ? width : data.width;
+				data.height = (data.height >= height) ? height : data.height;
 
 				return data;
 			}
