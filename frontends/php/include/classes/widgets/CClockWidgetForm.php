@@ -20,8 +20,8 @@
 
 class CClockWidgetForm extends CWidgetForm
 {
-	public function __construct($data, $known_widget_types) {
-		parent::__construct($data, $known_widget_types);
+	public function __construct($data) {
+		parent::__construct($data);
 
 		// Time Type field
 		$time_types = [

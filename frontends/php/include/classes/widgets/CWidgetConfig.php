@@ -98,21 +98,23 @@ class CWidgetConfig
 	/**
 	 * Return Form object for widget with provided data.
 	 *
-	 * @param array $data  array with all widget's fields, including widget type and position
+	 * @param array  $data          array with all widget's fields, including widget type
+	 * @param string $data['type']
+	 * @param string $data[<name>]  (optional)
 	 *
 	 * @return CWidgetForm
 	 */
 	public function getForm($data) {
-		$known_widget_types = $this->getKnownWidgetTypes();
 		switch ($data['type']) {
 			case WIDGET_CLOCK:
-				return (new CClockWidgetForm($data, $known_widget_types));
+				return new CClockWidgetForm($data);
+
 			case WIDGET_URL:
-				return (new CUrlWidgetForm($data, $known_widget_types));
+				return new CUrlWidgetForm($data);
 
 			default:
 				// TODO VM: delete this case after all widget forms will be created
-				return (new CWidgetForm($data, $known_widget_types));
+				return new CWidgetForm($data);
 		}
 	}
 }

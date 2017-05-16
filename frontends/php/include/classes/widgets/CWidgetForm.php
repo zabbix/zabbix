@@ -22,7 +22,9 @@ class CWidgetForm
 {
 	protected $fields;
 
-	public function __construct($data, $known_widget_types) {
+	public function __construct($data) {
+		$known_widget_types = (new CWidgetConfig())->getKnownWidgetTypes();
+
 		$this->fields = [];
 
 		// Widget Type field
