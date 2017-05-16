@@ -1634,6 +1634,7 @@ class CMap extends CMapElement {
 			}
 
 			if (array_key_exists('lines', $map)) {
+				$map['lines'] = array_values($map['lines']);
 				$shapes = [];
 
 				$api_shape_rules['fields']['x1']['in'] = '0:'.$map_width;
