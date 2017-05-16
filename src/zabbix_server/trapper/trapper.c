@@ -639,18 +639,18 @@ static void	zbx_status_counters_free(void)
 }
 
 const zbx_status_section_t	status_sections[] = {
-/*	{SECTION NAME,			NUMBER OF SECTION ENTRIES	SECTION ACCESS LEVEL	SECTION READYNESS,	*/
-/*		{													*/
-/*			{ENTRY INFORMATION,		COUNTER TYPE,							*/
-/*				{											*/
-/*					{ATTR. NAME,	ATTRIBUTE VALUE},						*/
-/*					... (up to ZBX_MAX_ENTRY_ATTRIBUTES)						*/
-/*				}											*/
-/*			},												*/
-/*			... (up to ZBX_MAX_SECTION_ENTRIES)								*/
-/*		}													*/
-/*	},														*/
-/*	...														*/
+/*	{SECTION NAME,			NUMBER OF SECTION ENTRIES	SECTION ACCESS LEVEL	SECTION READYNESS, */
+/*		{                                                                                                  */
+/*			{ENTRY INFORMATION,		COUNTER TYPE,                                              */
+/*				{                                                                                  */
+/*					{ATTR. NAME,	ATTRIBUTE VALUE},                                          */
+/*					... (up to ZBX_MAX_ENTRY_ATTRIBUTES)                                       */
+/*				}                                                                                  */
+/*			},                                                                                         */
+/*			... (up to ZBX_MAX_SECTION_ENTRIES)                                                        */
+/*		}                                                                                                  */
+/*	},                                                                                                         */
+/*	...                                                                                                        */
 	{"template stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&templates_res,
 		{
 			{&templates,			ZBX_COUNTER_TYPE_UI64,
@@ -810,9 +810,9 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 	templates_res = DBget_template_count(&templates.counter.ui64);
 	users_res = DBget_user_count(&users_online.counter.ui64, &users_offline.counter.ui64);
 	DCget_status(&hosts_monitored.counters, &hosts_not_monitored.counters, &items_active_normal.counters,
-			&items_active_notsupported.counters, &items_disabled.counters, &triggers_enabled_ok.counter.ui64,
-			&triggers_enabled_problem.counter.ui64, &triggers_disabled.counter.ui64,
-			&required_performance.counters);
+			&items_active_notsupported.counters, &items_disabled.counters,
+			&triggers_enabled_ok.counter.ui64, &triggers_enabled_problem.counter.ui64,
+			&triggers_disabled.counter.ui64, &required_performance.counters);
 
 	/* add status information to JSON */
 	for (section = status_sections; NULL != section->name; section++)
@@ -835,8 +835,9 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 				case ZBX_SECTION_ENTRY_PER_PROXY:
 					for (i = 0; i < entry->info->counters.values_num; i++)
 					{
-						const zbx_proxy_counter_t	*proxy_counter = entry->info->counters.values[i];
+						const zbx_proxy_counter_t	*proxy_counter;
 
+						proxy_counter = entry->info->counters.values[i];
 						status_entry_export(json, entry, proxy_counter->counter_value,
 								&proxy_counter->proxyid);
 					}

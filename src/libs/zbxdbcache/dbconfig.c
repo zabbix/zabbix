@@ -8839,7 +8839,8 @@ static void	dc_status_update(void)
 				{
 					int	delay;
 
-					if (SUCCEED == zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL) && 0 != delay)
+					if (SUCCEED == zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL) &&
+							0 != delay)
 					{
 						config->status->required_performance += 1.0 / delay;
 
