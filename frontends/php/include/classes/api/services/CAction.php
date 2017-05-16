@@ -857,6 +857,8 @@ class CAction extends CApiService {
 		foreach ($operations as $operationId => $operation) {
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
+					// falls through
+				case OPERATION_TYPE_ACK_MESSAGE:
 					if (isset($operation['opmessage']) && !empty($operation['opmessage'])) {
 						$operation['opmessage']['operationid'] = $operationId;
 						$opMessagesToInsert[] = $operation['opmessage'];
@@ -930,7 +932,6 @@ class CAction extends CApiService {
 					break;
 
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
-				case OPERATION_TYPE_ACK_MESSAGE:
 					if (array_key_exists('opmessage', $operation) && $operation['opmessage']) {
 						$operation['opmessage']['operationid'] = $operationId;
 						$opMessagesToInsert[] = $operation['opmessage'];
@@ -1425,6 +1426,9 @@ class CAction extends CApiService {
 					OPERATION_TYPE_RECOVERY_MESSAGE
 				],
 				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_RECOVERY_MESSAGE]
+			],
+			ACTION_ACKNOWLEDGE_OPERATION => [
+				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]
 			]
 		];
 
@@ -1468,6 +1472,8 @@ class CAction extends CApiService {
 			}
 
 			switch ($operationtype) {
+				case OPERATION_TYPE_ACK_MESSAGE:
+					// falls through
 				case OPERATION_TYPE_MESSAGE:
 					$userids = array_key_exists('opmessage_usr', $operation)
 						? zbx_objectValues($operation['opmessage_usr'], 'userid')
@@ -1478,7 +1484,11 @@ class CAction extends CApiService {
 						: [];
 
 					if (!$userids && !$usrgrpids) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
+						$error_mesage = ($operationtype == OPERATION_TYPE_MESSAGE)
+							? _('No recipients for action operation message.')
+							: _('No recipients for acknowledge operation message.');
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error_mesage);
 					}
 
 					$all_userids = array_merge($all_userids, $userids);
@@ -2413,7 +2423,8 @@ class CAction extends CApiService {
 			}
 
 			if ((!array_key_exists('operations', $action) || !$action['operations'])
-					&& (!array_key_exists('recovery_operations', $action) || !$action['recovery_operations'])) {
+					&& (!array_key_exists('recovery_operations', $action) || !$action['recovery_operations'])
+					&& (!array_key_exists('acknowledge_operations', $action) || !$action['acknowledge_operations'])) {
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
 					_s('Action "%1$s" no operations defined.', $action['name'])
@@ -2432,6 +2443,14 @@ class CAction extends CApiService {
 					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 					$recovery_operation['eventsource'] = $action['eventsource'];
 					$operations_to_validate[] = $recovery_operation;
+				}
+			}
+
+			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
+				foreach ($action['acknowledge_operations'] as $operation) {
+					$operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+					$operation['eventsource'] = $action['eventsource'];
+					$operations_to_validate[] = $operation;
 				}
 			}
 		}
