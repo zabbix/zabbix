@@ -44,7 +44,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 			 */
 			if ($this->hasInput('fields')) {
 				$widget_fields = $this->getInput('fields');
-				$known_widget_types = $this->widget_config->getKnownWidgetTypes($this->getUserType());
+				$known_widget_types = array_keys($this->widget_config->getKnownWidgetTypes($this->getUserType()));
 
 				if (!array_key_exists('type', $widget_fields)) {
 					error(_s('Invalid parameter "%1$s": %2$s.', 'fields',

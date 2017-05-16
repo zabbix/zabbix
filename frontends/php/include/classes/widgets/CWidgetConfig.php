@@ -73,7 +73,7 @@ class CWidgetConfig
 	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
 	 * @return array
 	 */
-	public function getKnownWidgetTypesWNames($user_type = null) {
+	public function getKnownWidgetTypes($user_type = null) {
 		$known_widget_types = $this->knownWidgetTypes;
 
 		// Remove widget types, user can't create
@@ -94,15 +94,6 @@ class CWidgetConfig
 		}
 
 		return $known_widget_types;
-	}
-
-	/**
-	 * Return list of all widget types
-	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
-	 * @return array
-	 */
-	public function getKnownWidgetTypes($user_type = null) {
-		return array_keys($this->getKnownWidgetTypesWNames($user_type));
 	}
 
 	/**
@@ -130,7 +121,7 @@ class CWidgetConfig
 	 * @return CWidgetForm
 	 */
 	public function getForm($data, $user_type = null) {
-		$known_widget_types = $this->getKnownWidgetTypesWNames($user_type);
+		$known_widget_types = $this->getKnownWidgetTypes($user_type);
 		switch ($data['type']) {
 			case WIDGET_CLOCK:
 				return (new CClockWidgetForm($data, $known_widget_types));

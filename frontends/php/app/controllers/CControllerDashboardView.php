@@ -128,7 +128,7 @@ class CControllerDashboardView extends CController {
 	 */
 	private function getWidgets($widgets) {
 		$grid_widgets = [];
-		$widget_names = $this->widget_config->getKnownWidgetTypesWNames();
+		$widget_names = $this->widget_config->getKnownWidgetTypes();
 		// TODO VM: (?) WIDGET_DISCOVERY_STATUS and WIDGET_ZABBIX_STATUS are displayed only under specidic conditions,
 		// but we currently have these widgets in default dashboard. Should these conditions be be managed by frontend, or API?
 		// Currently these conditions are not managed by any of them.
