@@ -173,7 +173,6 @@ typedef struct
 	char			*db_error;
 
 	zbx_item_preproc_t	*preproc_ops;
-
 }
 DC_ITEM;
 
