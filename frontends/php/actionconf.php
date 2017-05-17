@@ -67,6 +67,9 @@ $fields = [
 	'recovery_operations' =>			[null,		O_OPT,	null,	null,		null],
 	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	'new_recovery_operation' =>			[null,		O_OPT,	null,	null,		null],
+	'ack_operations' =>					[null,		O_OPT,	null,	null,		null],
+	'edit_ack_operationid' =>			[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
+	'new_ack_operation' =>				[null,		O_OPT,	null,	null,		null],
 	'opconditions' =>					[null,		O_OPT,	null,	null,		null],
 	'new_opcondition' =>				[null,		O_OPT,	null,	null,		'isset({add_opcondition})'],
 	// actions
@@ -80,6 +83,8 @@ $fields = [
 	'cancel_new_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_recovery_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel_new_recovery_operation' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_ack_operation' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel_new_ack_operation' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_opcondition' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel_new_opcondition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'maintenance_mode' =>				[T_ZBX_STR, O_OPT, null,
@@ -132,6 +137,9 @@ elseif (hasRequest('cancel_new_opcondition')) {
 elseif (hasRequest('cancel_new_recovery_operation')) {
 	unset($_REQUEST['new_recovery_operation']);
 }
+elseif (hasRequest('cancel_new_ack_operation')) {
+	unset($_REQUEST['new_ack_operation']);
+}
 elseif (hasRequest('add') || hasRequest('update')) {
 	$action = [
 		'name' => getRequest('name'),
@@ -142,7 +150,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'r_shortdata' => getRequest('r_shortdata', ''),
 		'r_longdata' => getRequest('r_longdata', ''),
 		'operations' => getRequest('operations', []),
-		'recovery_operations' => getRequest('recovery_operations', [])
+		'recovery_operations' => getRequest('recovery_operations', []),
+		'ack_operations' => getRequest('ack_operations', [])
 	];
 
 	foreach ($action['operations'] as &$operation) {
@@ -183,6 +192,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 	unset($recovery_operation);
+
+	foreach ($action['ack_operations'] as &$ack_operation) {
+		if (array_key_exists('opmessage', $ack_operation)
+				&& !array_key_exists('default_msg', $ack_operation['opmessage'])) {
+			$ack_operation['opmessage']['default_msg'] = 0;
+		}
+	}
+	unset($ack_operation);
 
 	$filter = [
 		'conditions' => getRequest('conditions', []),
@@ -523,6 +540,7 @@ if (hasRequest('form')) {
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
 		'new_recovery_operation' => getRequest('new_recovery_operation'),
+		'new_ack_operation' => getRequest('new_ack_operation'),
 		'config' => $config
 	];
 
@@ -533,6 +551,9 @@ if (hasRequest('form')) {
 			'selectRecoveryOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
 				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
 			],
+			'selectAcknowledgeOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
+				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
+			],
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
@@ -540,6 +561,7 @@ if (hasRequest('form')) {
 		$data['action'] = reset($data['action']);
 
 		$data['action']['recovery_operations'] = $data['action']['recoveryOperations'];
+		$data['action']['ack_operations'] = $data['action']['acknowledgeOperations'];
 		unset($data['action']['recoveryOperations']);
 
 		foreach ($data['action']['operations'] as &$operation) {
@@ -595,6 +617,8 @@ if (hasRequest('form')) {
 			$data['action']['def_longdata'] = getRequest('def_longdata', '');
 			$data['action']['r_shortdata'] = getRequest('r_shortdata', '');
 			$data['action']['r_longdata'] = getRequest('r_longdata', '');
+			$data['action']['ack_shortdata'] = getRequest('ack_shortdata', '');
+			$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
 
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				$data['action']['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
@@ -606,6 +630,8 @@ if (hasRequest('form')) {
 				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
 				$data['action']['r_shortdata'] = getRequest('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
 				$data['action']['r_longdata'] = getRequest('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+				$data['action']['ack_shortdata'] = getRequest('ack_shortdata', ACTION_DEFAULT_SUBJ_ACKNOWLEDGE);
+				$data['action']['ack_longdata'] = getRequest('ack_longdata', ACTION_DEFAULT_MSG_ACKNOWLEDGE);
 				$data['action']['maintenance_mode'] = getRequest('maintenance_mode',
 					hasRequest('form_refresh') ? ACTION_MAINTENANCE_MODE_NORMAL : ACTION_MAINTENANCE_MODE_PAUSE
 				);
@@ -623,6 +649,8 @@ if (hasRequest('form')) {
 				$data['action']['def_longdata'] = getRequest('def_longdata', '');
 				$data['action']['r_shortdata'] = getRequest('r_shortdata', '');
 				$data['action']['r_longdata'] = getRequest('r_longdata', '');
+				$data['action']['ack_shortdata'] = getRequest('ack_shortdata', '');
+				$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
 			}
 		}
 	}
@@ -728,6 +756,26 @@ if (hasRequest('form')) {
 	// New recovery operation.
 	if ($data['new_recovery_operation'] && !is_array($data['new_recovery_operation'])) {
 		$data['new_recovery_operation'] = ['operationtype' => 0];
+	}
+
+	$data['available_mediatypes'] = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
+	order_result($data['available_mediatypes'], 'description');
+
+	if ($data['new_ack_operation'] && !is_array($data['new_ack_operation'])) {
+		$data['new_ack_operation'] = [
+			'operationtype' => 0,
+			'ack_short' => ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+			'ack_long' => ACTION_DEFAULT_MSG_ACKNOWLEDGE,
+		];
+	}
+	if ($data['new_ack_operation'] && !array_key_exists('opmessage', $data['new_ack_operation'])
+			&& $data['new_ack_operation']['operationtype'] != OPERATION_TYPE_COMMAND) {
+		$data['new_ack_operation']['opmessage'] = [
+			'default_msg'	=> 1,
+			'mediatypeid'	=> 0,
+			'subject'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+			'message'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+		];
 	}
 
 	// Render view.

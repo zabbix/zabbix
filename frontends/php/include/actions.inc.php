@@ -808,6 +808,12 @@ function getActionOperationDescriptions(array $actions, $type) {
 							_('Notify all who received any messages regarding the problem before')
 						);
 						break;
+
+					case OPERATION_TYPE_ACK_MESSAGE:
+						$result[$i][$j][] = bolf(
+							_('Notify all who added acknowledgement and involved in discussion')
+						);
+						break;
 				}
 			}
 		}
@@ -1011,6 +1017,11 @@ function getAllowedOperations($eventsource) {
 				OPERATION_TYPE_MESSAGE,
 				OPERATION_TYPE_COMMAND,
 				OPERATION_TYPE_RECOVERY_MESSAGE
+			],
+			ACTION_ACKNOWLEDGE_OPERATION => [
+				OPERATION_TYPE_MESSAGE,
+				OPERATION_TYPE_COMMAND,
+				OPERATION_TYPE_ACK_MESSAGE
 			]
 		];
 	}
