@@ -37,7 +37,6 @@ class CControllerDashboardUpdate extends CController {
 		$ret = $this->validateInput($fields) && $this->checkUsers() && $this->checkUserGroups();
 
 		if (!$ret) {
-			error(_('Input data are invalid or don\'t exist!'));
 			$this->setResponse(new CControllerResponseData([
 				'main_block' => CJs::encodeJson(['errors' => [getMessages()->toString()]])
 			]));
