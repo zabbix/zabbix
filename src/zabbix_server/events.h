@@ -42,4 +42,7 @@ int	process_events(void);
 int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock, int mode);
 int	flush_correlated_events(void);
 
+int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event, char **error);
+void	free_event_info(DB_EVENT *event);
+
 #endif

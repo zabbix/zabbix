@@ -304,7 +304,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	{
 		tmp_str = zbx_strdup(tmp_str, event->trigger.description);
 
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		switch (condition->operator)
@@ -1752,8 +1752,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
 	zbx_vector_ptr_create(&new_escalations);
-	zbx_hashset_create(&rec_escalations, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&rec_escalations, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
@@ -1894,7 +1893,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 		int		i;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-					"itemid", "eventid", "r_eventid", NULL);
+					"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
 
 		for (i = 0; i < new_escalations.values_num; i++)
 		{
@@ -1916,7 +1915,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), new_escalation->actionid,
 					(int)ESCALATION_STATUS_ACTIVE, triggerid, itemid,
-					new_escalation->event->eventid, __UINT64_C(0));
+					new_escalation->event->eventid, __UINT64_C(0), __UINT64_C(0));
 
 			zbx_free(new_escalation);
 		}
@@ -1964,4 +1963,74 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	zbx_vector_ptr_destroy(&new_escalations);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_actions_by_acknowledgments                               *
+ *                                                                            *
+ * Purpose: process actions for each acknowledgment in the array              *
+ *                                                                            *
+ * Parameters: ackids        - [IN] array of acknowledgment IDs               *
+ *             eventids      - [IN] array of event IDs                        *
+ *                                                                            *
+ ******************************************************************************/
+int	process_actions_by_acknowledgments(zbx_vector_uint64_t *ackids, zbx_vector_uint64_t *eventids)
+{
+	const char		*__function_name = "process_actions_by_acknowledgments";
+
+	zbx_db_insert_t		db_insert;
+	zbx_vector_ptr_t	actions;
+	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
+	DB_EVENT		event;
+	char			*error = NULL;
+	int			i, j, processed_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
+
+	zbx_vector_ptr_create(&actions);
+	zbx_dc_get_actions_eval(&actions, uniq_conditions);
+
+	zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
+				"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
+
+	for (i = 0; i < ackids->values_num; i++)
+	{
+		if (SUCCEED != get_event_info(eventids->values[i], &event, &error) ||
+				EVENT_SOURCE_TRIGGERS != event.source ||
+				0 != (event.flags & ZBX_FLAGS_DB_EVENT_NO_ACTION))
+		{
+			continue;
+		}
+
+		if (SUCCEED == check_event_conditions(&event, uniq_conditions))
+		{
+			for (j = 0; j < actions.values_num; j++)
+			{
+				zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
+
+				if (action->eventsource != event.source)
+					continue;
+
+				if (SUCCEED == check_action_conditions(action))
+				{
+					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid,
+						(int)ESCALATION_STATUS_ACTIVE, event.trigger.triggerid, __UINT64_C(0),
+						event.eventid, __UINT64_C(0), ackids[i].values[i]);
+					processed_num++;
+				}
+			}
+		}
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "escalationid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed_num:%d", __function_name, processed_num);
+
+	return processed_num;
 }

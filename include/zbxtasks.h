@@ -32,6 +32,7 @@
 #define ZBX_TM_TASK_CLOSE_PROBLEM			1
 #define ZBX_TM_TASK_REMOTE_COMMAND			2
 #define ZBX_TM_TASK_REMOTE_COMMAND_RESULT		3
+#define ZBX_TM_TASK_ACKNOWLEDGE				4
 
 /* task manager task states */
 #define ZBX_TM_STATUS_NEW			1

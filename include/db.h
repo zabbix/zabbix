@@ -392,11 +392,20 @@ typedef struct
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		eventid;
 	zbx_uint64_t		r_eventid;
+	zbx_uint64_t		acknowledgeid;
 	int			nextcheck;
 	int			esc_step;
 	zbx_escalation_status_t	status;
 }
 DB_ESCALATION;
+
+typedef struct
+{
+	zbx_uint64_t	acknowledgeid;
+	zbx_uint64_t	userid;
+	char		*message;
+}
+DB_ACKNOWLEDGE;
 
 int	DBinit(char **error);
 void	DBdeinit(void);

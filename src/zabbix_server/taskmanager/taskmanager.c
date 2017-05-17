@@ -255,6 +255,70 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_process_acknowledgments                                       *
+ *                                                                            *
+ * Purpose: process acknowledgments for alerts sending                        *
+ *                                                                            *
+ * Return value: The number of successfully processed tasks                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_process_acknowledgments()
+{
+	const char		*__function_name = "tm_process_acknowledgments";
+
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			processed_num = 0;
+	zbx_uint64_t		ackid, eventid;
+	zbx_vector_uint64_t	ackids, eventids;
+
+	zbx_vector_uint64_create(&ackids);
+	zbx_vector_uint64_create(&eventids);
+
+	result = DBselect(
+			"select a.eventid,ta.acknowledgeid"
+					" from task_acknowledge ta"
+					" left join acknowledges a"
+						" on ta.acknowledgeid=a.acknowledgeid"
+					" left join events e"
+						" on a.eventid=e.eventid"
+					" left join task t"
+						" on ta.taskid=t.taskid"
+					" where t.type=%d"
+						" and t.status=%d"
+					" order by acknowledgeid",
+			ZBX_TM_TASK_ACKNOWLEDGE,
+			ZBX_TM_STATUS_NEW);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(eventid, row[0]);
+		ZBX_STR2UINT64(ackid, row[1]);
+
+		zbx_vector_uint64_append(&eventids, eventid);
+		zbx_vector_uint64_append(&ackids, ackid);
+	}
+	DBfree_result(result);
+
+	processed_num = process_actions_by_acknowledgments(&ackids, &eventids);
+
+	DBexecute(
+		"update task t"
+		" left join task_acknowledge ta"
+			" on ta.taskid=t.taskid"
+		" set t.status=%d"
+		" where t.type=%d"
+			" and ta.acknowledgeid<=" ZBX_FS_UI64,
+		ZBX_TM_STATUS_DONE, ZBX_TM_TASK_ACKNOWLEDGE, ackid);
+
+	zbx_vector_uint64_destroy(&ackids);
+	zbx_vector_uint64_destroy(&eventids);
+
+	return processed_num;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_process_tasks                                                 *
  *                                                                            *
  * Purpose: process task manager tasks depending on task type                 *
@@ -271,9 +335,9 @@ static int	tm_process_tasks(int now)
 
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
-				" where status in (%d,%d)"
+				" where status in (%d,%d) and type<>%d"
 				" order by taskid",
-			ZBX_TM_STATUS_NEW, ZBX_TM_STATUS_INPROGRESS);
+			ZBX_TM_STATUS_NEW, ZBX_TM_STATUS_INPROGRESS, ZBX_TM_TASK_ACKNOWLEDGE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -309,7 +373,7 @@ static int	tm_process_tasks(int now)
 	}
 	DBfree_result(result);
 
-	return processed_num;
+	return tm_process_acknowledgments() + processed_num;
 }
 
 /******************************************************************************

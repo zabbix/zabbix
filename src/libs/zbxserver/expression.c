@@ -1579,6 +1579,40 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_username                                                   *
+ *                                                                            *
+ * Purpose: retrieve the username                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_username(char **replace_to, zbx_uint64_t userid)
+{
+	const char	*__function_name = "DBget_ack_username";
+
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select name from users"
+			" where userid=" ZBX_FS_UI64,
+			userid);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		*replace_to = zbx_strdup(*replace_to, row[0]);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
 #define MVAR_ACTION			"{ACTION."			/* a prefix for all action macros */
 #define MVAR_ACTION_ID			MVAR_ACTION "ID}"
 #define MVAR_ACTION_NAME		MVAR_ACTION "NAME}"
@@ -1763,6 +1797,9 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ALERT_SENDTO		"{ALERT.SENDTO}"
 #define MVAR_ALERT_SUBJECT		"{ALERT.SUBJECT}"
 #define MVAR_ALERT_MESSAGE		"{ALERT.MESSAGE}"
+
+#define MVAR_ACK_MESSAGE                "{ACK.MESSAGE}"
+#define MVAR_ACK_USERNAME               "{ACK.USERNAME}"
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
@@ -2478,7 +2515,7 @@ static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_al
  ******************************************************************************/
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, DC_ITEM *dc_item,
-		DB_ALERT *alert, char **data, int macro_type, char *error, int maxerrlen)
+		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
 	const char		*__function_name = "substitute_simple_macros";
 
@@ -2565,7 +2602,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				(*data)[token.token.r + 1] = '\0';
 				break;
 			case ZBX_TOKEN_SIMPLE_MACRO:
-				if (0 == (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY)) ||
+				if (0 == (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY | MACRO_TYPE_MESSAGE_ACK)) ||
 						EVENT_SOURCE_TRIGGERS != ((NULL != r_event) ? r_event : event)->source)
 				{
 					pos++;
@@ -2588,7 +2625,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 		ret = SUCCEED;
 
-		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY)))
+		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY | MACRO_TYPE_MESSAGE_ACK)))
 		{
 			const DB_EVENT	*c_event;
 
@@ -2771,7 +2808,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
-							&replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
+							NULL, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
 							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
@@ -2818,7 +2855,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
-							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
+							NULL, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
 							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
@@ -2845,11 +2882,22 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
-							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
+							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->value);
+				}
+				else if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+				{
+					if (0 == strcmp(m, MVAR_ACK_MESSAGE))
+					{
+						replace_to = zbx_strdup(replace_to, ack->message);
+					}
+					else if (0 == strcmp(m, MVAR_ACK_USERNAME))
+					{
+						ret = DBget_username(&replace_to, ack->userid);
+					}
 				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
@@ -2972,7 +3020,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
-							&replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
+							NULL, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
 							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
@@ -3003,7 +3051,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
-							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
+							NULL, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
 							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
@@ -3030,7 +3078,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
-							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
+							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
@@ -3953,12 +4001,12 @@ zbx_trigger_func_position_t;
  ******************************************************************************/
 static void	expand_trigger_macros(DB_EVENT *event, DC_TRIGGER *trigger)
 {
-	substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, &trigger->expression,
+	substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &trigger->expression,
 			MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
 
 	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
 	{
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&trigger->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
 	}
 }
@@ -4964,7 +5012,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 		unquote_key_param(*param);
 
 	if (NULL == jp_row)
-		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL,
 				param, macro_type, NULL, 0);
 	else
 		substitute_lld_macros(param, jp_row, ZBX_MACRO_ANY, NULL, 0);

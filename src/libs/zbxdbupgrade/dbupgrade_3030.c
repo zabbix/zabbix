@@ -914,6 +914,56 @@ static int	DBpatch_3030068(void)
 	return DBadd_field("httpstep", &field);
 }
 
+static int	DBpatch_3030069(void)
+{
+	const ZBX_TABLE table =
+			{"task_acknowledge", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030070(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_acknowledge", 1, &field);
+}
+
+static int	DBpatch_3030071(void)
+{
+	const ZBX_FIELD	field = {"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+
+static int	DBpatch_3030072(void)
+{
+	const ZBX_FIELD	field = {"acknowledgeid", NULL, "acknowledges", "acknowledgeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("escalations", 1, &field);
+}
+
+static int	DBpatch_3030073(void)
+{
+	const ZBX_FIELD	field = {"ack_shortdata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_3030074(void)
+{
+	const ZBX_FIELD	field = {"ack_longdata", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -989,5 +1039,11 @@ DBPATCH_ADD(3030065, 0, 1)
 DBPATCH_ADD(3030066, 0, 1)
 DBPATCH_ADD(3030067, 0, 1)
 DBPATCH_ADD(3030068, 0, 1)
+DBPATCH_ADD(3030069, 0, 1)
+DBPATCH_ADD(3030070, 0, 1)
+DBPATCH_ADD(3030071, 0, 1)
+DBPATCH_ADD(3030072, 0, 1)
+DBPATCH_ADD(3030073, 0, 1)
+DBPATCH_ADD(3030074, 0, 1)
 
 DBPATCH_END()

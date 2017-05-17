@@ -127,7 +127,7 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		events[events_num].trigger.correlation_mode = trigger_correlation_mode;
 		events[events_num].trigger.correlation_tag = zbx_strdup(NULL, trigger_correlation_tag);
 
-		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&events[events_num].trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
 		zbx_vector_ptr_create(&events[events_num].tags);
@@ -144,10 +144,10 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 				tag->value = zbx_strdup(NULL, trigger_tag->value);
 
 				substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-						&tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+						NULL, &tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
 				substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-						&tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+						NULL, &tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
 				if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
 					tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
@@ -2035,4 +2035,131 @@ int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object
 	events[index].flags |= ZBX_FLAGS_DB_EVENT_LINKED;
 
 	return index;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_event_info                                                   *
+ *                                                                            *
+ * Purpose: get event and trigger info to event structure                     *
+ *                                                                            *
+ * Parameters: eventid - [IN] requested event id                              *
+ *             event   - [OUT] event data                                     *
+ *             error   - [OUT] message in case event info cannot be retrieved *
+ *                                                                            *
+ * Return value: SUCCEED if processed successfully, FAIL - otherwise          *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: use 'free_event_info' function to release allocated memory       *
+ *                                                                            *
+ ******************************************************************************/
+int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event, char **error)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	memset(event, 0, sizeof(DB_EVENT));
+
+	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns"
+			" from events"
+			" where eventid=" ZBX_FS_UI64,
+			eventid);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		*error = zbx_dsprintf(*error, "event id:" ZBX_FS_UI64 " deleted.", eventid);
+		goto out;
+	}
+
+	ZBX_STR2UINT64(event->eventid, row[0]);
+	event->source = atoi(row[1]);
+	event->object = atoi(row[2]);
+	ZBX_STR2UINT64(event->objectid, row[3]);
+	event->clock = atoi(row[4]);
+	event->value = atoi(row[5]);
+	event->acknowledged = atoi(row[6]);
+	event->ns = atoi(row[7]);
+
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_vector_ptr_create(&event->tags);
+
+		DBfree_result(result);
+
+		result = DBselect("select tag,value from event_tag where eventid=" ZBX_FS_UI64, eventid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_tag_t	*tag;
+
+			tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag->tag = zbx_strdup(NULL, row[0]);
+			tag->value = zbx_strdup(NULL, row[1]);
+
+			zbx_vector_ptr_append(&event->tags, tag);
+		}
+	}
+
+	if (EVENT_OBJECT_TRIGGER == event->object)
+	{
+		DBfree_result(result);
+
+		result = DBselect(
+				"select description,expression,priority,comments,url,recovery_expression,recovery_mode"
+				" from triggers"
+				" where triggerid=" ZBX_FS_UI64,
+				event->objectid);
+
+		if (NULL == (row = DBfetch(result)))
+		{
+			*error = zbx_dsprintf(*error, "trigger id:" ZBX_FS_UI64 " deleted.", event->objectid);
+			goto out;
+		}
+
+		event->trigger.triggerid = event->objectid;
+		event->trigger.description = zbx_strdup(event->trigger.description, row[0]);
+		event->trigger.expression = zbx_strdup(event->trigger.expression, row[1]);
+		ZBX_STR2UCHAR(event->trigger.priority, row[2]);
+		event->trigger.comments = zbx_strdup(event->trigger.comments, row[3]);
+		event->trigger.url = zbx_strdup(event->trigger.url, row[4]);
+		event->trigger.recovery_expression = zbx_strdup(event->trigger.recovery_expression, row[5]);
+		ZBX_STR2UCHAR(event->trigger.recovery_mode, row[6]);
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: free_event_info                                                  *
+ *                                                                            *
+ * Purpose: deallocate memory allocated in function 'get_event_info'          *
+ *                                                                            *
+ * Parameters: event - [IN] event data                                        *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+void	free_event_info(DB_EVENT *event)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
+		zbx_vector_ptr_destroy(&event->tags);
+	}
+
+	if (EVENT_OBJECT_TRIGGER == event->object)
+	{
+		zbx_free(event->trigger.description);
+		zbx_free(event->trigger.expression);
+		zbx_free(event->trigger.recovery_expression);
+		zbx_free(event->trigger.comments);
+		zbx_free(event->trigger.url);
+	}
 }
