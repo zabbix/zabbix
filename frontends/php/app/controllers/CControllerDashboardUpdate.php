@@ -23,6 +23,8 @@
  * Controller to update dashboard
  */
 class CControllerDashboardUpdate extends CController {
+	const EMPTY_USER = 'empty_user';
+	const EMPTY_GROUP = 'empty_group';
 
 	protected function checkInput() {
 		$fields = [
@@ -32,15 +34,51 @@ class CControllerDashboardUpdate extends CController {
 			'userGroups' =>		'array'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->checkUsers() && $this->checkUserGroups();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['error' => 'Input data are invalid or don\'t exist!'])
+				'main_block' => CJs::encodeJson(['error' => _('Input data are invalid or don\'t exist!')])
 			]));
 		}
 
 		return $ret;
+	}
+
+	/**
+	 * Check users.
+	 *
+	 * @return bool
+	 */
+	private function checkUsers() {
+		$users = $this->getInput('users', []);
+		if (!is_array($users)) {
+			return false;
+		}
+		foreach ($users as $key => $user) {
+			if ($key !== self::EMPTY_USER && (!isset($user['userid']) || !isset($user['permission']))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Check user groups.
+	 *
+	 * @return bool
+	 */
+	private function checkUserGroups() {
+		$usrgrps = $this->getInput('userGroups', []);
+		if (!is_array($usrgrps)) {
+			return false;
+		}
+		foreach ($usrgrps as $key => $group) {
+			if ($key !== self::EMPTY_GROUP && (!isset($group['usrgrpid']) || !isset($group['permission']))) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	protected function checkPermissions() {
@@ -59,14 +97,16 @@ class CControllerDashboardUpdate extends CController {
 		}
 		if ($this->hasInput('users')) {
 			$users = $this->getInput('users');
-			// indicator to help delete all users
-			unset($users['no-users']);
+			// empty user needed to always POST the users param
+			// if users is empty array (excluding empty user) then API delete all users
+			unset($users[self::EMPTY_USER]);
 			$dashboard['users'] = $users;
 		}
 		if ($this->hasInput('userGroups')) {
 			$groups = $this->getInput('userGroups');
-			// indicator to help delete all user groups
-			unset($groups['no-groups']);
+			// empty user group needed to always POST the userGroups param
+			// if userGroups is empty array (excluding empty group) then API delete all userGroups
+			unset($groups[self::EMPTY_GROUP]);
 			$dashboard['userGroups'] = $groups;
 		}
 
