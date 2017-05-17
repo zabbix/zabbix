@@ -29,6 +29,10 @@ zabbix_server_SOURCES = \
 	operations.c operations.h \
 	events.c events.h \
 	server.c
+	
+if ZBXCUNIT
+nodist_zabbix_server_SOURCES = ../libs/zbxcunit/zbxcunit.c ../libs/zbxcunit/zbxcunit.h
+endif
 
 zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
@@ -76,8 +80,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
-	$(top_srcdir)/src/libs/zbxcunit/libzbxcunit.a
+	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a
 
 zabbix_server_LDADD += @SERVER_LIBS@ $(CUNIT_LDADD)
 
