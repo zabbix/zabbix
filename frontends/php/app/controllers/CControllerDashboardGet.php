@@ -18,102 +18,80 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Controller to get dashboard data
- *
  */
-class CControllerDashboardGet extends CController
-{
+class CControllerDashboardGet extends CController {
+
+	private $dashboard;
+
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' => 'db dashboard.dashboardid',
-			'editable'    => 'in 0,1'
+			'dashboardid' =>	'db dashboard.dashboardid',
+			'editable' =>		'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData([
-					'main_block' => CJs::encodeJson(['error' => _('Input data are invalid or don\'t exist!')])
-				])
-			);
+			$this->setResponse(new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['error' => _('Input data are invalid or don\'t exist!')])
+			]));
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
-			return false;
-		}
-
 		$dashboards = API::Dashboard()->get([
-			'output' => [],
+			'output' => ['dashboardid', 'name', 'private'],
+			'selectUsers' => ['userid', 'permission'],
+			'selectUserGroups' => ['usrgrpid', 'permission'],
 			'dashboardids' => $this->getInput('dashboardid'),
-			'editable' => (boolean) $this->getInput('editable', false)
+			'editable' => (bool) $this->getInput('editable', false)
 		]);
 
 		if (!$dashboards) {
 			return false;
 		}
 
+		$this->dashboard = $dashboards[0];
+
 		return true;
 	}
 
-	protected function doAction()
-	{
+	protected function doAction() {
+		$this->dashboard['users'] = $this->prepareUsers($this->dashboard['users']);
+		$this->dashboard['user_groups'] = $this->prepareUserGroups($this->dashboard['userGroups']);
+		unset($this->dashboard['userGroups']);
+
 		$this->setResponse(new CControllerResponseData([
-			'main_block' => CJs::encodeJson(['data' => $this->getDashboard()])
+			'main_block' => CJs::encodeJson(['data' => $this->dashboard])
 		]));
-	}
-
-	/**
-	 * Get dashboard data from API
-	 *
-	 * @return array|null
-	 */
-	private function getDashboard() {
-		$dashboards = API::Dashboard()->get([
-			'output' => ['dashboardid', 'name', 'private'],
-			'selectUsers' => ['userid', 'permission'],
-			'selectUserGroups' => ['usrgrpid', 'permission'],
-			'dashboardids' => $this->getInput('dashboardid')
-		]);
-
-		if ($dashboards) {
-			$dashboard = $dashboards[0];
-			$dashboard['users'] = $this->prepareUsers($dashboard['users']);
-			$dashboard['user_groups'] = $this->prepareUserGroups($dashboard['userGroups']);
-			unset($dashboard['userGroups']);
-			return $dashboard;
-		}
-		return null;
 	}
 
 	/**
 	 * Extend dashboard users data
 	 *
-	 * @param array $dashboard_users
+	 * @param array $users
+	 *
 	 * @return array
 	 */
-	private function prepareUsers(array $dashboard_users) {
-		$userids = [];
-		foreach ($dashboard_users as $data) {
-			$userids[$data['userid']] = $data['permission'];
-		}
+	private function prepareUsers(array $users) {
+		$users = zbx_toHash($users, 'userid');
 
-		$users = API::User()->get([
+		$db_users = API::User()->get([
 			'output' => ['userid', 'alias', 'name', 'surname'],
-			'userids' => array_keys($userids)
+			'userids' => array_keys($users)
 		]);
 
 		$result = [];
-		foreach ($users as $user) {
+		foreach ($db_users as $db_user) {
 			$result[] = [
-				'id'   => $user['userid'],
-				'name' => getUserFullname($user),
-				'permission' => $userids[$user['userid']]
+				'id'   => $db_user['userid'],
+				'name' => getUserFullname($db_user),
+				'permission' => $users[$db_user['userid']]['permission']
 			];
 		}
 
@@ -121,30 +99,29 @@ class CControllerDashboardGet extends CController
 	}
 
 	/**
-	 * Extend dashboard user groups data
+	 * Extend dashboard user groups data.
 	 *
-	 * @param array $dashboard_user_groups
+	 * @param array $usrgrps
+	 *
 	 * @return array
 	 */
-	private function prepareUserGroups(array $dashboard_user_groups)
-	{
-		$groupids = [];
-		foreach ($dashboard_user_groups as $data) {
-			$groupids[$data['usrgrpid']] = $data['permission'];
-		}
+	private function prepareUserGroups(array $usrgrps) {
+		$usrgrps = zbx_toHash($usrgrps, 'usrgrpid');
 
-		$groups = API::UserGroup()->get([
+		$db_usrgrps = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name'],
 			'usrgrpids' => array_keys($groupids)
 		]);
+
 		$result = [];
-		foreach ($groups as $user_group) {
+		foreach ($db_usrgrps as $db_usrgrp) {
 			$result[] = [
-				'usrgrpid' => $user_group['usrgrpid'],
-				'name' => $user_group['name'],
-				'permission' => $groupids[$user_group['usrgrpid']]['permission']
+				'usrgrpid' => $db_usrgrp['usrgrpid'],
+				'name' => $db_usrgrp['name'],
+				'permission' => $usrgrps[$db_usrgrp['usrgrpid']]['permission']
 			];
 		}
+
 		return $result;
 	}
 }
