@@ -110,7 +110,7 @@ class CControllerDashboardGet extends CController {
 
 		$db_usrgrps = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name'],
-			'usrgrpids' => array_keys($groupids)
+			'usrgrpids' => array_keys($usrgrps)
 		]);
 
 		$result = [];
