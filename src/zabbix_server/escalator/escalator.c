@@ -966,8 +966,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (period)");
 			continue;
 		}
-
-		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
+		else if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
 			status = ALERT_STATUS_NOT_SENT;
 			perror = "";
