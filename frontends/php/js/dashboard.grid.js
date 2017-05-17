@@ -407,7 +407,7 @@
 
 				widget['content_body'].empty();
 				if (typeof(resp.messages) != 'undefined') {
-					$widget['content_body'].append(resp.messages);
+					widget['content_body'].append(resp.messages);
 				}
 				widget['content_body'].append(resp.body);
 				if (typeof(resp.debug) != 'undefined') {

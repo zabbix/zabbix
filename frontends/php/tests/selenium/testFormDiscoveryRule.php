@@ -570,24 +570,24 @@ class testFormDiscoveryRule extends CWebTest {
 			case 'SSH agent':
 			case 'TELNET agent':
 			case 'JMX agent':
-				$this->zbxTestTextPresent('Update interval (in sec)');
+				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 5);
+				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($data['form'])) {
-					$this->zbxTestAssertElementValue('delay', 30);
+					$this->zbxTestAssertElementValue('delay', '30s');
 				}
 				break;
 			default:
-				$this->zbxTestTextNotVisibleOnPage('Update interval (in sec)');
+				$this->zbxTestTextNotVisibleOnPage('Update interval');
 				$this->zbxTestAssertNotVisibleId('delay');
 		}
 
-		$this->zbxTestTextPresent('Keep lost resources period (in days)');
+		$this->zbxTestTextPresent('Keep lost resources period');
 		$this->zbxTestAssertVisibleId('lifetime');
-		$this->zbxTestAssertAttribute("//input[@id='lifetime']", 'maxlength', 64);
+		$this->zbxTestAssertAttribute("//input[@id='lifetime']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='lifetime']", 'size', 20);
-		$this->zbxTestAssertElementValue('lifetime', 30);
+		$this->zbxTestAssertElementValue('lifetime', '30d');
 
 		switch ($type) {
 			case 'Zabbix agent':
@@ -606,9 +606,9 @@ class testFormDiscoveryRule extends CWebTest {
 
 				$this->zbxTestTextPresent(['Flexible', 'Scheduling']);
 				$this->zbxTestAssertVisibleId('delay_flex_0_delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 5);
+				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 255);
 				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', 50);
+				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', '50s');
 
 				$this->zbxTestAssertVisibleId('delay_flex_0_period');
 				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'maxlength', 255);
@@ -687,7 +687,6 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestTextPresent("$name");
 
 		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
-
 	}
 
 	// Returns create data
@@ -760,6 +759,136 @@ class testFormDiscoveryRule extends CWebTest {
 						'Item with key "discovery-key-no1" already exists on "Simple form test host".']
 				]
 			],
+			// Empty keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => ' ',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": a time unit is expected.'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '-30',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": a time unit is expected.'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => 1,
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => 3599,
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '59m',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '1304w',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '9126d',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '219001h',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '13140001m',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => 788400001,
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
 			// Empty timedelay
 			[
 				[
@@ -773,16 +902,16 @@ class testFormDiscoveryRule extends CWebTest {
 					]
 				]
 			],
-//			// Incorrect timedelay
+			// Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Discovery delay',
 					'key' => 'discovery-delay-test',
 					'delay' => '-30',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -793,9 +922,61 @@ class testFormDiscoveryRule extends CWebTest {
 					'name' => 'Discovery delay',
 					'key' => 'discovery-delay-test',
 					'delay' => 86401,
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
+						'Item will not be refreshed. Please enter a correct update interval.'
+					]
+				]
+			],
+			// Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '1w',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Item will not be refreshed. Please enter a correct update interval.'
+					]
+				]
+			],
+			// Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '2d',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Item will not be refreshed. Please enter a correct update interval.'
+					]
+				]
+			],
+			// Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '25h',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Item will not be refreshed. Please enter a correct update interval.'
+					]
+				]
+			],
+			// Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '1441m',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -810,7 +991,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Invalid interval "50/": unexpected end of interval.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -825,7 +1006,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Invalid interval "50/1-11,00:00-24:00": incorrect syntax near "1,00:00-24:00"'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -840,7 +1021,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect time period "1-7,00:00-25:00".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -855,7 +1036,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1323,7 +1504,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'key' => 'discovery-ipmi-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "IPMI sensor": cannot be empty.'
+						'Incorrect value for field "IPMI sensor": cannot be empty.'
 					]
 				]
 			],
@@ -1335,8 +1516,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'key' => 'discovery-ssh-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "User name": cannot be empty.',
-							'Incorrect value for field "Executed script": cannot be empty.'
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],
@@ -1348,8 +1529,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'key' => 'discovery-telnet-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "User name": cannot be empty.',
-							'Incorrect value for field "Executed script": cannot be empty.'
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],
@@ -1374,7 +1555,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'params_es' => 'script to be executed',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -1388,7 +1569,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'params_es' => 'script to be executed',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -1401,7 +1582,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'username' => 'zabbix',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			]
@@ -1470,6 +1651,10 @@ class testFormDiscoveryRule extends CWebTest {
 
 		if (isset($data['params_es'])) {
 			$this->zbxTestInputType('params_es', $data['params_es']);
+		}
+
+		if (isset($data['lifetime']))	{
+			$this->zbxTestInputTypeOverwrite('lifetime', $data['lifetime']);
 		}
 
 		if (isset($data['delay']))	{

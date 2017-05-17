@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
@@ -216,7 +217,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [
 					[
-						'name' => 'Api value map created',
+						'name' => 'API value map created',
 						'mappings' =>[
 							[
 								'value' => '123',
@@ -246,7 +247,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [
 					[
-						'name' => 'Api create value map with two values',
+						'name' => 'API create value map with two values',
 						'mappings' =>[
 							[
 								'value' => '0',
@@ -265,7 +266,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [
 					[
-					'name' => 'Api create valuemap one',
+					'name' => 'API create valuemap one',
 						'mappings' =>[
 							[
 								'value' => '0',
@@ -324,7 +325,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'Api update non existent parametr',
+					'name' => 'API update non existent parametr',
 					'value' => 4
 				]],
 				'success_expected' => false,
@@ -333,7 +334,7 @@ class testValuemap extends CZabbixTest {
 			// Check valuemap id.
 			[
 				'valuemap' => [[
-					'name' => 'Api valuemap updated'
+					'name' => 'API valuemap updated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "valuemapid" is missing.'
@@ -341,7 +342,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '',
-					'name' => 'Api valuemap updated'
+					'name' => 'API valuemap updated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/valuemapid": a number is expected.'
@@ -349,7 +350,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '123456',
-					'name' => 'Api valuemap updated'
+					'name' => 'API valuemap updated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -357,7 +358,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => 'abc',
-					'name' => 'Api valuemap updated'
+					'name' => 'API valuemap updated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/valuemapid": a number is expected.'
@@ -365,7 +366,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '0.0',
-					'name' => 'Api valuemap udated'
+					'name' => 'API valuemap udated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/valuemapid": a number is expected.'
@@ -374,11 +375,11 @@ class testValuemap extends CZabbixTest {
 				'valuemap' => [
 					[
 						'valuemapid' => '19',
-						'name' => 'Api valuemap with the same ids1',
+						'name' => 'API valuemap with the same ids1',
 					],
 					[
 						'valuemapid' => '19',
-						'name' => 'Api valuemap with the same ids2',
+						'name' => 'API valuemap with the same ids2',
 					]
 				],
 				'success_expected' => false,
@@ -433,7 +434,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'Api update without mappings',
+					'name' => 'API update without mappings',
 					'mappings' =>[
 					]
 				]],
@@ -443,7 +444,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'Api update without mapping newvalue',
+					'name' => 'API update without mapping newvalue',
 					'mappings' =>[
 						[
 							'value' => '0'
@@ -456,7 +457,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'Api update long newvalue',
+					'name' => 'API update long newvalue',
 					'mappings' =>[
 						[
 							'value' => '0',
@@ -470,7 +471,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'Api update without mapping value',
+					'name' => 'API update without mapping value',
 					'mappings' =>[
 						[
 							'newvalue' => 'Down'
@@ -483,7 +484,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'Api update long value',
+					'name' => 'API update long value',
 					'mappings' =>[
 						[
 							'value' => 'Pellentesque rutrum, odio at imperdiet venenatis, mauris mauris65',
@@ -497,7 +498,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'Api update non existent parametr',
+					'name' => 'API update non existent parametr',
 					'mappings' =>[
 						[
 							'value' => '0',
@@ -512,7 +513,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'Api update with the same mapping values',
+					'name' => 'API update with the same mapping values',
 					'mappings' =>[
 						[
 							'value' => '0',
@@ -532,7 +533,7 @@ class testValuemap extends CZabbixTest {
 				'valuemap' => [
 					[
 						'valuemapid' => '19',
-						'name' => 'Api valuemap name updated',
+						'name' => 'API valuemap name updated',
 					]
 				],
 				'success_expected' => true,
@@ -542,7 +543,7 @@ class testValuemap extends CZabbixTest {
 				'valuemap' => [
 					[
 						'valuemapid' => '18',
-						'name' => 'Api mappings updated',
+						'name' => 'API mappings updated',
 						'mappings' =>[
 							[
 								'value' => '123',
@@ -574,7 +575,7 @@ class testValuemap extends CZabbixTest {
 				'valuemap' => [
 					[
 						'valuemapid' => '18',
-						'name' => 'Api update valuemap with two values',
+						'name' => 'API update valuemap with two values',
 						'mappings' =>[
 							[
 								'value' => 'æų',
@@ -594,7 +595,7 @@ class testValuemap extends CZabbixTest {
 				'valuemap' => [
 					[
 					'valuemapid' => '18',
-					'name' => 'Api update valuemap one',
+					'name' => 'API update valuemap one',
 						'mappings' =>[
 							[
 								'value' => 'abc',
@@ -604,7 +605,7 @@ class testValuemap extends CZabbixTest {
 					],
 					[
 					'valuemapid' => '19',
-					'name' => 'Api update valuemap two',
+					'name' => 'API update valuemap two',
 						'mappings' =>[
 							[
 								'value' => 'def',
@@ -768,7 +769,7 @@ class testValuemap extends CZabbixTest {
 				'method' => 'valuemap.create',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
-					'name' => 'Api value create as zabbix admin',
+					'name' => 'API value create as zabbix admin',
 					'mappings' =>[
 						[
 							'value' => '123',
@@ -783,7 +784,7 @@ class testValuemap extends CZabbixTest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
-					'name' => 'Api value update as zabbix admin',
+					'name' => 'API value update as zabbix admin',
 				],
 				'expected_error' => 'Only super admins can update value maps.'
 			],
@@ -799,7 +800,7 @@ class testValuemap extends CZabbixTest {
 				'method' => 'valuemap.create',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
-					'name' => 'Api value create as zabbix user',
+					'name' => 'API value create as zabbix user',
 					'mappings' =>[
 						[
 							'value' => '123',
@@ -814,7 +815,7 @@ class testValuemap extends CZabbixTest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
-					'name' => 'Api value update as zabbix user',
+					'name' => 'API value update as zabbix user',
 				],
 				'expected_error' => 'Only super admins can update value maps.'
 			],

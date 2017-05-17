@@ -33,8 +33,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'shows' =>			[T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null],
 	'slideshowid' =>	[T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
-	'name' => [T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
-	'delay' => [T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')],
+	'name' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
+	'delay' =>			[T_ZBX_TU,  O_OPT, null, null, 'isset({add}) || isset({update})', _('Default delay')],
 	'slides' =>			[null,		 O_OPT, null,		null,	null],
 	'userid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'private' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
@@ -100,12 +100,19 @@ if (hasRequest('action')) {
 if (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
+	$slides = getRequest('slides', []);
+
+	foreach ($slides as &$slide) {
+		$slide['delay'] = ($slide['delay'] === '') ? '0' : $slide['delay'];
+	}
+	unset($slide);
+
 	if (hasRequest('update')) {
 		$data = [
 			'slideshowid' => getRequest('slideshowid'),
 			'name' => getRequest('name'),
 			'delay' => getRequest('delay'),
-			'slides' => getRequest('slides', []),
+			'slides' => $slides,
 			'userid' => getRequest('userid', ''),
 			'private' => getRequest('private'),
 			'users' => getRequest('users', []),
@@ -138,7 +145,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		$result = add_slideshow([
 			'name' => getRequest('name'),
 			'delay' => getRequest('delay'),
-			'slides' => getRequest('slides', []),
+			'slides' => $slides,
 			'userid' => getRequest('userid'),
 			'private' => getRequest('private'),
 			'users' => getRequest('users', []),
@@ -287,7 +294,7 @@ if (hasRequest('form')) {
 		$data['slideshow'] = [
 			'slideshowid' => getRequest('slideshowid'),
 			'name' => getRequest('name', ''),
-			'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
+			'delay' => getRequest('delay', DB::getDefault('slideshows', 'delay')),
 			'slides' => getRequest('slides', []),
 			'private' => getRequest('private', PRIVATE_SHARING),
 			'users' => getRequest('users', []),
@@ -310,6 +317,11 @@ if (hasRequest('form')) {
 			}
 		}
 	}
+
+	foreach ($data['slideshow']['slides'] as &$slide) {
+		$slide['delay'] = $slide['delay'] === '0' ? '' : $slide['delay'];
+	}
+	unset($slide);
 
 	$screenids = [];
 	foreach ($data['slideshow']['slides'] as $slides) {

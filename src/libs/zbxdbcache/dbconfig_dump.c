@@ -385,11 +385,6 @@ static void	DCdump_ipmiitem(const ZBX_DC_IPMIITEM *ipmiitem)
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_sensor:'%s'", ipmiitem->ipmi_sensor);
 }
 
-static void	DCdump_flexitem(const ZBX_DC_FLEXITEM *flexitem)
-{
-	zabbix_log(LOG_LEVEL_TRACE, "  delay_flex:'%s'", flexitem->delay_flex);
-}
-
 static void	DCdump_trapitem(const ZBX_DC_TRAPITEM *trapitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  trapper_hosts:'%s'", trapitem->trapper_hosts);
@@ -475,7 +470,6 @@ static void	DCdump_items(ZBX_DC_CONFIG *config)
 		{&config->numitems, (zbx_dc_dump_func_t)DCdump_numitem},
 		{&config->snmpitems, (zbx_dc_dump_func_t)DCdump_snmpitem},
 		{&config->ipmiitems, (zbx_dc_dump_func_t)DCdump_ipmiitem},
-		{&config->flexitems, (zbx_dc_dump_func_t)DCdump_flexitem},
 		{&config->trapitems, (zbx_dc_dump_func_t)DCdump_trapitem},
 		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
 		{&config->dbitems, (zbx_dc_dump_func_t)DCdump_dbitem},
@@ -508,13 +502,13 @@ static void	DCdump_items(ZBX_DC_CONFIG *config)
 		zabbix_log(LOG_LEVEL_TRACE, "  flags:%u status:%u", item->flags, item->status);
 		zabbix_log(LOG_LEVEL_TRACE, "  valuemapid:" ZBX_FS_UI64, item->valuemapid);
 		zabbix_log(LOG_LEVEL_TRACE, "  lastlogsize:" ZBX_FS_UI64 " mtime:%d", item->lastlogsize, item->mtime);
-		zabbix_log(LOG_LEVEL_TRACE, "  delay:%d nextcheck:%d lastclock:%d", item->delay, item->nextcheck,
+		zabbix_log(LOG_LEVEL_TRACE, "  delay:'%s' nextcheck:%d lastclock:%d", item->delay, item->nextcheck,
 				item->lastclock);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", item->data_expected_from);
 		zabbix_log(LOG_LEVEL_TRACE, "  history:%d", item->history);
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
-		zabbix_log(LOG_LEVEL_TRACE, "  unreachable %u", item->unreachable);
+		zabbix_log(LOG_LEVEL_TRACE, "  unreachable:%u schedulable:%u", item->unreachable, item->schedulable);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{
