@@ -220,6 +220,7 @@ if ($items) {
 	// macros
 	$items = CMacrosResolverHelper::resolveItemKeys($items);
 	$items = CMacrosResolverHelper::resolveItemNames($items);
+	$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
 	// filter items by name
 	foreach ($items as $key => $item) {
@@ -437,7 +438,60 @@ $tab_rows = [];
 
 $config = select_config();
 
-foreach ($items as $key => $item){
+// Resolve delay, history and trend macros.
+$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$simple_interval_parser = new CSimpleIntervalParser();
+
+foreach ($items as &$item) {
+	if ($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER) {
+		$item['delay'] = '';
+	}
+	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+		$item['delay'] = $update_interval_parser->getDelay();
+
+		if ($item['delay'][0] === '{') {
+			$item['delay'] = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
+		}
+	}
+	else {
+		$item['delay'] = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
+	}
+
+	if ($config['hk_history_global']) {
+		$keep_history = timeUnitToSeconds($config['hk_history']);
+		$item['history'] = $config['hk_history'];
+	}
+	elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
+		$keep_history = timeUnitToSeconds($item['history']);
+	}
+	else {
+		$keep_history = 0;
+		$item['history'] = (new CSpan($item['history']))->addClass(ZBX_STYLE_RED);
+	}
+
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		if ($config['hk_trends_global']) {
+			$keep_trends = timeUnitToSeconds($config['hk_trends']);
+			$item['trends'] = $config['hk_trends'];
+		}
+		elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
+			$keep_trends = timeUnitToSeconds($item['trends']);
+		}
+		else {
+			$keep_trends = 0;
+			$item['trends'] = (new CSpan($item['trends']))->addClass(ZBX_STYLE_RED);
+		}
+	}
+	else {
+		$keep_trends = 0;
+		$item['trends'] = '';
+	}
+
+	$item['show_link'] = ($keep_history != 0 || $keep_trends != 0);
+}
+unset($item);
+
+foreach ($items as $key => $item) {
 	if (!$item['applications']) {
 		continue;
 	}
@@ -484,21 +538,18 @@ foreach ($items as $key => $item){
 		$change = UNKNOWN_VALUE;
 	}
 
-	$showLink = ((($config['hk_history_global'] && $config['hk_history'] == 0) || $item['history'] == 0)
-			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
-	);
 
 	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$actions = $showLink
-			? UNKNOWN_VALUE
-			: new CLink(_('Graph'), 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['itemid']);
+		$actions = $item['show_link']
+			? new CLink(_('Graph'), 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['itemid'])
+			: UNKNOWN_VALUE;
 	}
 	else {
-		$actions = $showLink
-			? UNKNOWN_VALUE
-			: new CLink(_('History'), 'history.php?action='.HISTORY_VALUES.'&itemids[]='.$item['itemid']);
+		$actions = $item['show_link']
+			? new CLink(_('History'), 'history.php?action='.HISTORY_VALUES.'&itemids[]='.$item['itemid'])
+			: UNKNOWN_VALUE;
 		$checkbox->setEnabled(false);
 	}
 
@@ -517,26 +568,14 @@ foreach ($items as $key => $item){
 			$info_icons[] = makeErrorIcon($item['error']);
 		}
 
-		// trend value
-		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $item['trends'];
-		}
-		else {
-			$trendValue = UNKNOWN_VALUE;
-		}
-
 		$row = new CRow([
 			'',
 			$checkbox,
 			$hostColumn,
 			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
-			(new CCol(
-				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
-					? UNKNOWN_VALUE
-					: $item['delay']
-			))->addClass($state_css),
-			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
-			(new CCol($trendValue))->addClass($state_css),
+			(new CCol($item['delay']))->addClass($state_css),
+			(new CCol($item['history']))->addClass($state_css),
+			(new CCol($item['trends']))->addClass($state_css),
 			(new CCol(item_type2str($item['type'])))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),
@@ -659,22 +698,17 @@ foreach ($items as $item) {
 		$change = UNKNOWN_VALUE;
 	}
 
-	// column "action"
-	$showLink = ((($config['hk_history_global'] && $config['hk_history'] == 0) || $item['history'] == 0)
-			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
-	);
-
 	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$actions = $showLink
-			? UNKNOWN_VALUE
-			: new CLink(_('Graph'), 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['itemid']);
+		$actions = $item['show_link']
+			? new CLink(_('Graph'), 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['itemid'])
+			: UNKNOWN_VALUE;
 	}
 	else {
-		$actions = $showLink
-			? UNKNOWN_VALUE
-			: new CLink(_('History'), 'history.php?action='.HISTORY_VALUES.'&itemids[]='.$item['itemid']);
+		$actions = $item['show_link']
+			? new CLink(_('History'), 'history.php?action='.HISTORY_VALUES.'&itemids[]='.$item['itemid'])
+			: UNKNOWN_VALUE;
 		$checkbox->setEnabled(false);
 	}
 
@@ -694,26 +728,14 @@ foreach ($items as $item) {
 			$info_icons[] = makeErrorIcon($item['error']);
 		}
 
-		// trend value
-		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $item['trends'];
-		}
-		else {
-			$trendValue = UNKNOWN_VALUE;
-		}
-
 		$row = new CRow([
 			'',
 			$checkbox,
 			$hostColumn,
 			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
-			(new CCol(
-				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
-					? UNKNOWN_VALUE
-					: $item['delay']
-			))->addClass($state_css),
-			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
-			(new CCol($trendValue))->addClass($state_css),
+			(new CCol($item['delay']))->addClass($state_css),
+			(new CCol($item['history']))->addClass($state_css),
+			(new CCol($item['trends']))->addClass($state_css),
 			(new CCol(item_type2str($item['type'])))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),

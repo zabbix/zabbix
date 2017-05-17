@@ -207,6 +207,101 @@ function itemIndicatorStyle($status, $state = null) {
 }
 
 /**
+ * Order items by keep history.
+ *
+ * @param array  $items
+ * @param string $items['history']
+ * @param string $sortorder
+ */
+function orderItemsByHistory(array &$items, $sortorder){
+	$simple_interval_parser = new CSimpleIntervalParser();
+
+	foreach ($items as &$item) {
+		$item['history_sort'] = ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS)
+			? timeUnitToSeconds($item['history'])
+			: $item['history'];
+	}
+	unset($item);
+
+	order_result($items, 'history_sort', $sortorder);
+
+	foreach ($items as &$item) {
+		unset($item['history_sort']);
+	}
+	unset($item);
+}
+
+/**
+ * Order items by keep trends.
+ *
+ * @param array  $items
+ * @param int    $items['value_type']
+ * @param string $items['trends']
+ * @param string $sortorder
+ */
+function orderItemsByTrends(array &$items, $sortorder){
+	$simple_interval_parser = new CSimpleIntervalParser();
+
+	foreach ($items as &$item) {
+		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+			$item['trends_sort'] = '';
+		}
+		else {
+			$item['trends_sort'] = ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS)
+				? timeUnitToSeconds($item['trends'])
+				: $item['trends'];
+		}
+	}
+	unset($item);
+
+	order_result($items, 'trends_sort', $sortorder);
+
+	foreach ($items as &$item) {
+		unset($item['trends_sort']);
+	}
+	unset($item);
+}
+
+/**
+ * Order items by update interval.
+ *
+ * @param array  $items
+ * @param int    $items['type']
+ * @param string $items['delay']
+ * @param string $sortorder
+ * @param array  $options
+ * @param bool   $options['usermacros']
+ * @param bool   $options['lldmacros']
+ */
+function orderItemsByDelay(array &$items, $sortorder, array $options){
+	$update_interval_parser = new CUpdateIntervalParser($options);
+
+	foreach ($items as &$item) {
+		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+			$item['delay_sort'] = '';
+		}
+		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+			$item['delay_sort'] = $update_interval_parser->getDelay();
+
+			if ($item['delay_sort'][0] !== '{') {
+				$item['delay_sort'] = timeUnitToSeconds($item['delay_sort']);
+			}
+		}
+		else {
+			$item['delay_sort'] = $item['delay'];
+		}
+	}
+	unset($item);
+
+	order_result($items, 'delay_sort', $sortorder);
+
+	foreach ($items as &$item) {
+		unset($item['delay_sort']);
+	}
+	unset($item);
+}
+
+/**
  * Orders items by both status and state. Items are sorted in the following order: enabled, disabled, not supported.
  *
  * Keep in sync with orderTriggersByStatus().
@@ -296,8 +391,8 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
-			'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
-			'publickey', 'privatekey', 'flags', 'port', 'description', 'inventory_link'
+			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+			'privatekey', 'flags', 'port', 'description', 'inventory_link'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
@@ -364,8 +459,8 @@ function copyItems($srcHostId, $dstHostId) {
 		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
-			'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
-			'publickey', 'privatekey', 'flags', 'port',	'description', 'inventory_link'
+			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+			'privatekey', 'flags', 'port',	'description', 'inventory_link'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
@@ -452,9 +547,9 @@ function get_item_by_itemid_limited($itemid) {
 		'SELECT i.itemid,i.interfaceid,i.name,i.key_,i.hostid,i.delay,i.history,i.status,i.type,i.lifetime,'.
 			'i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.port,i.units,i.snmpv3_contextname,'.
 			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,i.snmpv3_authpassphrase,'.
-			'i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,'.
-			'i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,'.
-			'i.description,i.inventory_link'.
+			'i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.trends,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,'.
+			'i.templateid,i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,i.description,'.
+			'i.inventory_link'.
 		' FROM items i'.
 		' WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($row) {
@@ -1039,6 +1134,8 @@ function checkTimePeriod($period, $now) {
  * @return string
  */
 function getItemDelay($delay, array $flexible_intervals) {
+	$delay = timeUnitToSeconds($delay);
+
 	if ($delay != 0 || !$flexible_intervals) {
 		return $delay;
 	}
@@ -1047,7 +1144,7 @@ function getItemDelay($delay, array $flexible_intervals) {
 
 	foreach ($flexible_intervals as $flexible_interval) {
 		$flexible_interval_parts = explode('/', $flexible_interval);
-		$flexible_delay = (int) $flexible_interval_parts[0];
+		$flexible_delay = timeUnitToSeconds($flexible_interval_parts[0]);
 
 		$min_delay = min($min_delay, $flexible_delay);
 	}
