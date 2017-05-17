@@ -68,7 +68,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
-				'value' => '5-7,00:00-09:00;1,10:00-20:00;',
+				'value' => '5-7,00:00-09:00;1,10:00-20:00',
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
@@ -241,14 +241,14 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 					'value' => '',
 				],
-				'Empty time period.'
+				'Invalid time period.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 					'value' => 'QQQQQQ',
 				],
-				'Incorrect time period "QQQQQQ".'
+				'Invalid time period.'
 			],
 			[[],
 				[

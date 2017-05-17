@@ -208,7 +208,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID | ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE);
 
-	if (0 == cfg.discovery_groupid)
+	if (ZBX_DISCOVERY_GROUPID_UNDEFINED == cfg.discovery_groupid)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host: group for discovered hosts is not defined");
 		goto clean;

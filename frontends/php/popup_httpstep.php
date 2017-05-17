@@ -40,7 +40,9 @@ $fields = [
 	'pairs' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				'isset({add}) || isset({update})'],
 	'retrieve_mode' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'follow_redirects' => [T_ZBX_STR, O_OPT, null,	null,				null],
-	'timeout' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0,65535),	'isset({add}) || isset({update})', _('Timeout')],
+	'timeout' =>		[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,		'isset({add}) || isset({update})',
+		_('Timeout')
+	],
 	'required' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	'status_codes' =>	[T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
 	'templated' =>		[T_ZBX_STR, O_OPT, null, 	null, null],

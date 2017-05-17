@@ -699,9 +699,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 	DB_RESULT	result;
 	DB_HTTPSTEP	db_httpstep;
-	char		*err_str = NULL;
+	char		*err_str = NULL, *buffer = NULL;
 	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
+	int		delay;
 	double		speed_download = 0;
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
@@ -724,6 +725,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			" where httptestid=" ZBX_FS_UI64
 			" order by no",
 			httptest->httptest.httptestid);
+
+	buffer = zbx_strdup(buffer, httptest->httptest.delay);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &buffer, MACRO_TYPE_COMMON,
+			NULL, 0);
+
+	if (SUCCEED != is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
+	{
+		err_str = zbx_dsprintf(err_str, "update interval \"%s\" is invalid", buffer);
+		lastfailedstep = -1;
+		goto httptest_error;
+	}
 
 	/* Explicitly initialize the name. If we compile without libCURL support, */
 	/* we avoid the potential usage of unititialized values. */
@@ -851,7 +863,20 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			goto httpstep_error;
 		}
 
-		db_httpstep.timeout = atoi(row[4]);
+		buffer = zbx_strdup(buffer, row[4]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &buffer,
+				MACRO_TYPE_COMMON, NULL, 0);
+
+		if (SUCCEED != is_time_suffix(buffer, &db_httpstep.timeout, ZBX_LENGTH_UNLIMITED))
+		{
+			err_str = zbx_dsprintf(err_str, "timeout \"%s\" is invalid", buffer);
+			goto httpstep_error;
+		}
+		else if (SEC_PER_HOUR < db_httpstep.timeout)
+		{
+			err_str = zbx_dsprintf(err_str, "timeout \"%s\" exceeds 1 hour limit", buffer);
+			goto httpstep_error;
+		}
 
 		db_httpstep.required = zbx_strdup(NULL, row[6]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
@@ -1096,14 +1121,38 @@ clean:
 	err_str = zbx_strdup(err_str, "cURL library is required for Web monitoring support");
 #endif	/* HAVE_LIBCURL */
 
+httptest_error:
 	zbx_timespec(&ts);
+
+	if (0 > lastfailedstep)	/* update interval is invalid, delay is uninitialized */
+	{
+		zbx_config_t	cfg;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				(0 == cfg.refresh_unsupported || 0 > ts.sec + cfg.refresh_unsupported ?
+				ZBX_JAN_2038 : ts.sec + cfg.refresh_unsupported), httptest->httptest.httptestid);
+		zbx_config_clean(&cfg);
+	}
+	else if (0 > ts.sec + delay)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "nextcheck update causes overflow for web scenario \"%s\" on host \"%s\"",
+				httptest->httptest.name, host->name);
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				ZBX_JAN_2038, httptest->httptest.httptestid);
+	}
+	else
+	{
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				ts.sec + delay, httptest->httptest.httptestid);
+	}
 
 	if (NULL != err_str)
 	{
-		if (0 == lastfailedstep)
+		if (0 >= lastfailedstep)
 		{
-			/* we are here either because cURL initialization failed */
-			/* or we have been compiled without cURL library */
+			/* we are here because web scenario update interval is invalid, */
+			/* cURL initialization failed or we have been compiled without cURL library */
 
 			lastfailedstep = 1;
 		}
@@ -1116,14 +1165,12 @@ clean:
 	}
 	DBfree_result(result);
 
-	DBexecute("update httptest set nextcheck=%d+delay where httptestid=" ZBX_FS_UI64,
-			ts.sec, httptest->httptest.httptestid);
-
 	if (0 != speed_download_num)
 		speed_download /= speed_download_num;
 
 	process_test_data(httptest->httptest.httptestid, lastfailedstep, speed_download, err_str, &ts);
 
+	zbx_free(buffer);
 	zbx_free(err_str);
 
 	dc_flush_history();
@@ -1164,7 +1211,7 @@ int	process_httptests(int httppoller_num, int now)
 	result = DBselect(
 			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.agent,"
 				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.ssl_cert_file,"
-				"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host"
+				"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host,t.delay"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -1236,6 +1283,8 @@ int	process_httptests(int httppoller_num, int now)
 
 		httptest.httptest.verify_peer = atoi(row[14]);
 		httptest.httptest.verify_host = atoi(row[15]);
+
+		httptest.httptest.delay = row[16];
 
 		/* add httptest variables to the current test macro cache */
 		http_process_variables(&httptest, &httptest.variables, NULL, NULL);

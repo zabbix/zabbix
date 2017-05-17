@@ -48,9 +48,10 @@ $fields = [
 	'name' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'key' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Key')],
-	'delay' =>				[T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY),
+	'delay' =>				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP,
-		_('Update interval (in sec)')],
+		_('Update interval')
+	],
 	'delay_flex' =>			[T_ZBX_STR, O_OPT, null,	null,			null],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
 	'type' =>				[T_ZBX_INT, O_OPT, null,
@@ -171,16 +172,18 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	$result = true;
 
-	/*
-	 * Intially validate "delay_flex" field one by one to make sure it does not have interval separator ";".
-	 * Skip empty fields and convert "delay_flex" array to string glued with ";" which is later validated through API.
-	 */
-	$delay_flex = '';
-	$intervals = [];
+	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
+	$type = getRequest('type', ITEM_TYPE_ZABBIX);
 
-	if (getRequest('delay_flex')) {
+	/*
+	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
+	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
+	 */
+	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP]) && hasRequest('delay_flex')) {
+		$intervals = [];
+
 		foreach (getRequest('delay_flex') as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 				if ($interval['delay'] === '' && $interval['period'] === '') {
 					continue;
 				}
@@ -214,7 +217,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($intervals) {
-			$delay_flex = join(';', $intervals);
+			$delay .= ';'.implode(';', $intervals);
 		}
 	}
 
@@ -226,7 +229,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'description' => getRequest('description'),
 			'key_' => getRequest('key'),
 			'hostid' => getRequest('hostid'),
-			'delay' => getRequest('delay'),
+			'delay' => $delay,
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
 			'type' => getRequest('type'),
 			'snmp_community' => getRequest('snmp_community'),
@@ -240,7 +243,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'delay_flex' => $delay_flex,
 			'authtype' => getRequest('authtype'),
 			'username' => getRequest('username'),
 			'password' => getRequest('password'),
@@ -375,7 +377,7 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($formItem, [
 		'is_discovery_rule' => true
 	]);
-	$data['lifetime'] = getRequest('lifetime', 30);
+	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
@@ -428,21 +430,19 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
-	// hide zeroes for trapper and SNMP trap items
-	foreach ($data['discoveries'] as &$discovery) {
-		if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
-			$discovery['delay'] = '';
-		}
-	}
-	unset($discovery);
-
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
-	if ($sortField === 'status') {
-		orderItemsByStatus($data['discoveries'], $sortOrder);
-	}
-	else {
-		order_result($data['discoveries'], $sortField, $sortOrder);
+	switch ($sortField) {
+		case 'delay':
+			orderItemsByDelay($data['discoveries'], $sortOrder, ['usermacros' => true]);
+			break;
+
+		case 'status':
+			orderItemsByStatus($data['discoveries'], $sortOrder);
+			break;
+
+		default:
+			order_result($data['discoveries'], $sortField, $sortOrder);
 	}
 
 	// paging
