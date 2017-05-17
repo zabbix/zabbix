@@ -1339,10 +1339,10 @@ class CMap extends CMapElement {
 
 			if (array_key_exists('lines', $maps[$key])) {
 				$path = '/'.($key + 1).'/line';
-				$api_shape_rules['fields']['x1']['in'] = '0:'.$maps[$key]['width'];
-				$api_shape_rules['fields']['y1']['in'] = '0:'.$maps[$key]['height'];
-				$api_shape_rules['fields']['x2']['in'] = '0:'.$maps[$key]['width'];
-				$api_shape_rules['fields']['y2']['in'] = '0:'.$maps[$key]['height'];
+				$api_line_rules['fields']['x1']['in'] = '0:'.$maps[$key]['width'];
+				$api_line_rules['fields']['y1']['in'] = '0:'.$maps[$key]['height'];
+				$api_line_rules['fields']['x2']['in'] = '0:'.$maps[$key]['width'];
+				$api_line_rules['fields']['y2']['in'] = '0:'.$maps[$key]['height'];
 
 				if (!CApiInputValidator::validate($api_line_rules, $maps[$key]['lines'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1637,10 +1637,10 @@ class CMap extends CMapElement {
 				$map['lines'] = array_values($map['lines']);
 				$shapes = [];
 
-				$api_shape_rules['fields']['x1']['in'] = '0:'.$map_width;
-				$api_shape_rules['fields']['y1']['in'] = '0:'.$map_height;
-				$api_shape_rules['fields']['x2']['in'] = '0:'.$map_width;
-				$api_shape_rules['fields']['y2']['in'] = '0:'.$map_height;
+				$api_line_rules['fields']['x1']['in'] = '0:'.$map_width;
+				$api_line_rules['fields']['y1']['in'] = '0:'.$map_height;
+				$api_line_rules['fields']['x2']['in'] = '0:'.$map_width;
+				$api_line_rules['fields']['y2']['in'] = '0:'.$map_height;
 
 				$path = '/'.($index + 1).'/line';
 				if (!CApiInputValidator::validate($api_line_rules, $map['lines'], $path, $error)) {
