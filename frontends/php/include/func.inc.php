@@ -1826,7 +1826,7 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 		foreach ($messages as $message) {
 			if (array_key_exists('sql_error', $message) && $message['sql_error'] === true) {
 				if (!$generic_exists) {
-					$message['message'] = _('SQL error, please contact Zabbix administrator.');
+					$message['message'] = _('SQL error. Please contact Zabbix administrator.');
 					$filtered_messages[] = $message;
 					$generic_exists = true;
 				}
