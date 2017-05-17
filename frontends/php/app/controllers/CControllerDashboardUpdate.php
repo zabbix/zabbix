@@ -18,14 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Controller to update dashboard
- *
  */
-class CControllerDashboardUpdate extends CController
-{
-	protected function checkInput()
-	{
+class CControllerDashboardUpdate extends CController {
+
+	protected function checkInput() {
 		$fields = [
 			'dashboardid' =>	'required|db dashboard.dashboardid',
 			'private' =>		'db dashboard.private|in 0,1',
@@ -52,8 +51,7 @@ class CControllerDashboardUpdate extends CController
 		]);
 	}
 
-	protected function doAction()
-	{
+	protected function doAction() {
 		$dashboard = ['dashboardid' => $this->getInput('dashboardid')];
 
 		if ($this->hasInput('private')) {
