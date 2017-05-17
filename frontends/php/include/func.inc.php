@@ -1819,9 +1819,10 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 	$ZBX_MESSAGES = [];
 
-	if (ZBX_SHOW_SQL_ERRORS == false && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+	if (!ZBX_SHOW_SQL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$filtered_messages = [];
 		$generic_exists = false;
+
 		foreach ($messages as $message) {
 			if (array_key_exists('sql_error', $message) && $message['sql_error'] === true) {
 				if (!$generic_exists) {
@@ -1835,7 +1836,6 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 			}
 		}
 		$messages = $filtered_messages;
-		unset($filtered_messages);
 	}
 
 	switch ($page['type']) {
@@ -1949,11 +1949,9 @@ function error($msgs) {
 }
 
 /**
- * Add SQL error message to global messages array
+ * Add SQL error message to global messages array.
  *
- * @param string $msg
- *
- * @return void
+ * @param string $msg		Error message text.
  */
 function sqlError($msg) {
 	global $ZBX_MESSAGES;
