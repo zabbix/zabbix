@@ -1318,7 +1318,7 @@ static int	preprocess_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata, zbx
 			goto out;
 		}
 	}
-	dc_history_set_value(hdata, item->value_type, &value_var);
+	ret = dc_history_set_value(hdata, item->value_type, &value_var);
 out:
 	zbx_variant_clear(&value_var);
 
