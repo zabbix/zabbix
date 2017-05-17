@@ -93,9 +93,9 @@ jQuery.fn.fillForm = function(data) {
 		addPopupValues({'object': 'userid', 'values': data.users });
 	}
 
-	if (typeof data.user_groups !== 'undefined') {
+	if (typeof data.userGroups !== 'undefined') {
 		removeUserGroupShares();
-		addPopupValues({'object': 'usrgrpid', 'values': data.user_groups });
+		addPopupValues({'object': 'usrgrpid', 'values': data.userGroups });
 	}
 };
 

@@ -28,7 +28,7 @@ class CControllerDashboardGet extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>	'db dashboard.dashboardid',
+			'dashboardid' =>	'required|db dashboard.dashboardid',
 			'editable' =>		'in 0,1'
 		];
 
@@ -45,7 +45,7 @@ class CControllerDashboardGet extends CController {
 
 	protected function checkPermissions() {
 		$dashboards = API::Dashboard()->get([
-			'output' => ['dashboardid', 'name', 'private'],
+			'output' => ['dashboardid', 'private'],
 			'selectUsers' => ['userid', 'permission'],
 			'selectUserGroups' => ['usrgrpid', 'permission'],
 			'dashboardids' => $this->getInput('dashboardid'),
@@ -63,8 +63,7 @@ class CControllerDashboardGet extends CController {
 
 	protected function doAction() {
 		$this->dashboard['users'] = $this->prepareUsers($this->dashboard['users']);
-		$this->dashboard['user_groups'] = $this->prepareUserGroups($this->dashboard['userGroups']);
-		unset($this->dashboard['userGroups']);
+		$this->dashboard['userGroups'] = $this->prepareUserGroups($this->dashboard['userGroups']);
 
 		$this->setResponse(new CControllerResponseData([
 			'main_block' => CJs::encodeJson(['data' => $this->dashboard])
