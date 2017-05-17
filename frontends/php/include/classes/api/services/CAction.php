@@ -1843,11 +1843,18 @@ class CAction extends CApiService {
 		}
 
 		// Acknowledge operations data.
-		if (array_key_exists('selectAcknowledgeOperations', $options)
+		if ($options['selectAcknowledgeOperations'] !== null
 				&& $options['selectAcknowledgeOperations'] != API_OUTPUT_COUNT) {
-			$ack_operations = $this->getAcknowledgeOperations($actionIds, $options['selectAcknowledgeOperations']);
-			$relationMap = new CRelationMap();
-			$result = $relationMap->mapMany($result, $ack_operations, 'acknowledge_operations');
+			$ack_operations = API::getApiService()->select('operations', [
+				'output' => $this->outputExtend($options['selectAcknowledgeOperations'],
+					['operationid', 'actionid', 'operationtype']
+				),
+				'filter' => ['actionid' => $actionIds, 'recovery' => ACTION_ACKNOWLEDGE_OPERATION],
+				'preservekeys' => true
+			]);
+			$relationMap = $this->createRelationMap($ack_operations, 'actionid', 'operationid');
+			$ack_operations = $this->getAcknowledgeOperations($ack_operations, $options['selectAcknowledgeOperations']);
+			$result = $relationMap->mapMany($result, $ack_operations, 'acknowledgeOperations');
 		}
 
 		// adding operations
@@ -2236,23 +2243,15 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Returns array of acknowledge operations for requested actions.
+	 * Returns array of acknowledge operations according to requested options.
 	 *
-	 * @param array $actionIds
-	 * @param array $ack_options
+	 * @param array $ack_operations		Array of acknowledge operation with key set to operationid.
+	 * @param array $ack_options		Array of acknowledge operation options from request.
 	 *
 	 * @return array
 	 */
-	protected function getAcknowledgeOperations($actionIds, $ack_options) {
-		$ack_operations = API::getApiService()->select('operations', [
-			'output' => $this->outputExtend($ack_options,
-				['operationid', 'actionid', 'operationtype']
-			),
-			'filter' => ['actionid' => $actionIds, 'recovery' => ACTION_ACKNOWLEDGE_OPERATION],
-			'preservekeys' => true
-		]);
-		$relationMap = $this->createRelationMap($ack_operations, 'actionid', 'operationid');
-		$ack_operationids = $relationMap->getRelatedIds();
+	protected function getAcknowledgeOperations($ack_operations, $ack_options) {
+		$ack_operationids = array_keys($ack_operations);
 		$single_child = [];
 		$multiple_childs = [];
 		$opmessages = [];
@@ -2333,7 +2332,10 @@ class CAction extends CApiService {
 			}
 		}
 
-		return $this->unsetExtraFields($ack_operations, ['operationid', 'actionid' ,'operationtype'], $ack_options);
+		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'actionid' ,'operationtype'],
+			$ack_options
+		);
+		return $ack_operations;
 	}
 
 	/**
