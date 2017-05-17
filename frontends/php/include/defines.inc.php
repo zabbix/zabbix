@@ -545,6 +545,7 @@ define('EZ_TEXTING_LIMIT_CANADA',	1);
 define('ACTION_DEFAULT_SUBJ_TRIGGER', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
 define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
 define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
+define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Acknowledgement message: {TRIGGER.NAME} ');
 
 define('ACTION_DEFAULT_MSG_TRIGGER', "Trigger: {TRIGGER.NAME}\nTrigger status: {TRIGGER.STATUS}\n".
 		"Trigger severity: {TRIGGER.SEVERITY}\nTrigger URL: {TRIGGER.URL}\n\nItem values:\n\n".
@@ -559,6 +560,16 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 		"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\nDevice service name: {DISCOVERY.SERVICE.NAME}\n".
 		"Device service port: {DISCOVERY.SERVICE.PORT}\nDevice service status: {DISCOVERY.SERVICE.STATUS}\n".
 		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
+);
+define('ACTION_DEFAULT_MSG_ACKNOWLEDGE', "Acknowledgement message: {ACK.MESSAGE}\n".
+		"Acknowledgement by user: {ACK.USERNAME}\n\nAcknowledgement status: {EVENT.ACK.STATUS}\n".
+		"Acknowledgement history: {EVENT.ACK.HISTORY}\n\n".
+		"Trigger: {TRIGGER.NAME}\nTrigger status: {TRIGGER.STATUS}\nTrigger severity: {TRIGGER.SEVERITY}\n".
+		"Trigger URL: {TRIGGER.URL}\n\nItem values:\n\n".
+		"1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}\n".
+		"2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\n".
+		"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}\n\n".
+		"Original event ID: {EVENT.ID}"
 );
 
 define('ACTION_STATUS_ENABLED',		0);
