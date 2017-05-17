@@ -83,13 +83,20 @@
 
 // fill the form with actual data
 jQuery.fn.fillForm = function(data) {
-	addPopupValues({'object': 'private', 'values': [data.private] });
 
-	removeUserShares();
-	addPopupValues({'object': 'userid', 'values': data.users });
+	if (typeof data.private !== 'undefined') {
+		addPopupValues({'object': 'private', 'values': [data.private] });
+	}
 
-	removeUserGroupShares();
-	addPopupValues({'object': 'usrgrpid', 'values': data.user_groups });
+	if (typeof data.users !== 'undefined') {
+		removeUserShares();
+		addPopupValues({'object': 'userid', 'values': data.users });
+	}
+
+	if (typeof data.user_groups !== 'undefined') {
+		removeUserGroupShares();
+		addPopupValues({'object': 'usrgrpid', 'values': data.user_groups });
+	}
 };
 
 /**

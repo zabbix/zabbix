@@ -450,54 +450,63 @@ function getMenuPopupRefresh(options) {
 
 function getMenuPopupDashboard(options) {
 	jQuery.map(options.items, function(item) {
-		if (item.name === 'sharing') {
-			item.clickCallback = function () {
-				var obj = jQuery(this),
-					url = new Curl('zabbix.php'),
-					error_message = t('Something went wrong. Please try again later!');
-				url.setArgument('action', 'dashboard.get');
+		switch (item.name) {
+			case 'sharing':
+				item.clickCallback = function () {
+					var obj = jQuery(this),
+						url = new Curl('zabbix.php'),
+						error_message = t('Something went wrong. Please try again later!');
+					url.setArgument('action', 'dashboard.get');
 
-				jQuery.ajax({
-					data: {"dashboardid": item.form_data.dashboardid, 'editable': '1'},
-					type: 'GET',
-					url: url.getUrl(),
-					success: function(response) {
-						if (typeof response.data !== 'undefined') {
-							var form = jQuery('form[name="dashboard_sharing_form"]'),
-								oldFormParent = form.parent();
-							form.fillForm(response.data);
-							showDialogForm(oldFormParent, form);
-						} else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
-							alert(t('You need permission to perform this action!'))
-						} else {
+					jQuery.ajax({
+						data: {"dashboardid": item.form_data.dashboardid, 'editable': '1'},
+						type: 'GET',
+						url: url.getUrl(),
+						success: function(response) {
+							if (typeof response.data !== 'undefined') {
+								var form = jQuery('form[name="dashboard_sharing_form"]');
+
+								showDialogForm(
+									form,
+									{"title": t('Dashboard sharing'), "action_title": t('Update')},
+									response.data
+								);
+							} else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+								alert(t('You need permission to perform this action!'))
+							} else {
+								alert(error_message);
+							}
+						},
+						error: function() {
 							alert(error_message);
 						}
-					},
-					error: function() {
-						alert(error_message);
-					}
-				});
-				// hide menu
-				obj.closest('.action-menu').fadeOut(100);
-			}
+					});
+					// hide menu
+					obj.closest('.action-menu').fadeOut(100);
+				}
+				break;
 		}
 		return item;
 	});
 	return [{ label: options.label, items: options.items}];
 }
 
-function showDialogForm(oldFormParent, form) {
+function showDialogForm(form, options, formData) {
 
+	var oldFormParent = form.parent();
 	// trick to get outerWidth, outerHeight of "display:none" form
 	form.css('visibility', 'hidden');
 	form.css('display', 'block');
 
+	if (typeof formData !== 'undefined' && typeof form.fillForm === 'function') {
+		form.fillForm(formData);
+	}
 	overlayDialogue({
-		'title': t('Dashboard sharing'),
+		'title': options.title,
 		'content': form,
 		'buttons': [
 			{
-				'title': t('Update'),
+				'title': options.action_title,
 				'focused': true,
 				'class': 'dialogue-widget-save',
 				'keepOpen': false,
