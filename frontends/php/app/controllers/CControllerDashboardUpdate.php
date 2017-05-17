@@ -37,8 +37,9 @@ class CControllerDashboardUpdate extends CController {
 		$ret = $this->validateInput($fields) && $this->checkUsers() && $this->checkUserGroups();
 
 		if (!$ret) {
+			error(_('Input data are invalid or don\'t exist!'));
 			$this->setResponse(new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['error' => _('Input data are invalid or don\'t exist!')])
+				'main_block' => CJs::encodeJson(['errors' => [getMessages()->toString()]])
 			]));
 		}
 
@@ -112,6 +113,8 @@ class CControllerDashboardUpdate extends CController {
 
 		$result = API::Dashboard()->update($dashboard);
 
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson(['result' => $result])]));
+		$this->setResponse(new CControllerResponseData(
+			['main_block' => CJs::encodeJson(['result' => $result, 'errors' => [getMessages()->toString()]])]
+		));
 	}
 }

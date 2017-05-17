@@ -66,6 +66,16 @@
 
 <script type="text/javascript">
 
+	function dashboardAddMessages(messages) {
+		var $message_div = jQuery('<div>').attr('id','dashbrd-messages');
+		$message_div.append(messages);
+		jQuery('.article').prepend($message_div);
+	}
+
+	function dashboardRemoveMessages() {
+		jQuery('#dashbrd-messages').remove();
+	}
+
 	jQuery(document).ready(function() {
 		var form = jQuery('form[name="dashboard_sharing_form"]');
 
@@ -75,7 +85,20 @@
 			jQuery.ajax({
 				data: jQuery(me).serialize(), // get the form data
 				type: jQuery(me).attr('method'),
-				url: jQuery(me).attr('action')
+				url: jQuery(me).attr('action'),
+				success: function (response) {
+					dashboardRemoveMessages();
+					if (typeof response === 'object') {
+						if ('errors' in response && response.errors.length > 0) {
+							dashboardAddMessages(response.errors.join());
+						}
+					} else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+						alert(t('You need permission to perform this action!'));
+					}
+				},
+				error: function (response) {
+					alert(t('Something went wrong. Please try again later!'))
+				}
 			});
 			event.preventDefault(); // cancel original event to prevent form submitting
 		});
