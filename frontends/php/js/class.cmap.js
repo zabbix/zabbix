@@ -878,7 +878,7 @@ ZABBIX.apps.map = (function($) {
 							$('#shapeForm #x').val(mx);
 							$('#shapeForm #y').val(my);
 							$('#shapeForm #areaSizeWidth').val(Math.max(x, width) - mx);
-							$('#shapeForm #areaSizeHeight').val(Math.max(x, height) - my);
+							$('#shapeForm #areaSizeHeight').val(Math.max(y, height) - my);
 						}
 					}
 
