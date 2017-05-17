@@ -27,41 +27,29 @@ class CControllerDashboardUpdate extends CController
 	protected function checkInput()
 	{
 		$fields = [
-			'dashboardid' => 'required|db dashboard.dashboardid',
-			'private' =>     'db dashboard.private| in 0,1',
-			'users' =>       'array',
-			'userGroups' =>  'array'
-
+			'dashboardid' =>	'required|db dashboard.dashboardid',
+			'private' =>		'db dashboard.private|in 0,1',
+			'users' =>			'array',
+			'userGroups' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData([
-					'main_block' => CJs::encodeJson(['error' => 'Input data are invalid or don\'t exist!'])
-				])
-			);
+			$this->setResponse(new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['error' => 'Input data are invalid or don\'t exist!'])
+			]));
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
-			return false;
-		}
-
-		$dashboards = API::Dashboard()->get([
+		return (bool) API::Dashboard()->get([
 			'output' => [],
 			'dashboardids' => $this->getInput('dashboardid'),
 			'editable' => true
 		]);
-		if (!$dashboards) {
-			return false;
-		}
-
-		return true;
 	}
 
 	protected function doAction()
@@ -75,21 +63,17 @@ class CControllerDashboardUpdate extends CController
 			$users = $this->getInput('users');
 			// indicator to help delete all users
 			unset($users['no-users']);
-			$dashboard['users'] = array_values($users);
+			$dashboard['users'] = $users;
 		}
 		if ($this->hasInput('userGroups')) {
 			$groups = $this->getInput('userGroups');
 			// indicator to help delete all user groups
 			unset($groups['no-groups']);
-			$dashboard['userGroups'] = array_values($groups);
+			$dashboard['userGroups'] = $groups;
 		}
 
-		$result = API::Dashboard()->update([$dashboard]);
+		$result = API::Dashboard()->update($dashboard);
 
-		$this->setResponse(
-			new CControllerResponseData(
-				['main_block' => CJs::encodeJson(['result' => $result])]
-			)
-		);
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson(['result' => $result])]));
 	}
 }
