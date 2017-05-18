@@ -1089,6 +1089,8 @@ AC_ARG_ENABLE(ipv6,[  --enable-ipv6           Turn on support of IPv6],
 esac],
 [ipv6=no])
 
+AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
+
 have_db="no"
 have_unixodbc="no"
 have_web_monitoring="no"
@@ -1349,8 +1351,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
-	
-	AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
 fi
 
 dnl Check if Zabbix internal IPC services are used
