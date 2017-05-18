@@ -1505,16 +1505,18 @@ ZABBIX.apps.map = (function($) {
 				};
 
 				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
-					var x = Math.min(dimensions.x, dimensions.width),
-						y = Math.min(dimensions.y, dimensions.height),
+					var width = parseInt(this.sysmap.data.width),
+						height = parseInt(this.sysmap.data.height),
+						x = Math.min(Math.max(0, Math.min(dimensions.x, dimensions.width)), width),
+						y = Math.min(Math.max(0, Math.min(dimensions.y, dimensions.height)), height),
 						dx = Math.max(dimensions.x, dimensions.width) - x,
 						dy = Math.max(dimensions.y, dimensions.height) - y;
 
 					dimensions = {
 						x: x,
 						y: y,
-						width: dx,
-						height: dy
+						width: Math.min(Math.max(0, dx), width - x),
+						height: Math.min(Math.max(0, dy), height - y)
 					};
 				}
 
