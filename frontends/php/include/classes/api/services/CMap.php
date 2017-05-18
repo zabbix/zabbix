@@ -1879,7 +1879,10 @@ class CMap extends CMapElement {
 					];
 				}
 
-				$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP, SYSMAP_ELEMENT_TYPE_HOST_GROUP];
+				$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP,
+					SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				];
+
 				foreach ($selements as &$selement) {
 					if (in_array($selement['elementtype'], $single_element_types)) {
 						switch ($selement['elementtype']) {
@@ -1903,15 +1906,9 @@ class CMap extends CMapElement {
 				unset($selement);
 			}
 
-			if ($options['selectSelements'] != API_OUTPUT_EXTEND
-					&& !in_array('elementtype', $options['selectSelements'])) {
-				foreach ($selements as &$selement) {
-					unset($selement['elementtype']);
-				}
-				unset($selement);
-			}
-
-			$selements = $this->unsetExtraFields($selements, ['sysmapid', 'selementid'], $options['selectSelements']);
+			$selements = $this->unsetExtraFields($selements, ['sysmapid', 'selementid', 'elementid', 'elementtype'],
+				$options['selectSelements']
+			);
 			$result = $relation_map->mapMany($result, $selements, 'selements');
 		}
 
