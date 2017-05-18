@@ -1711,6 +1711,66 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	$operations_table = (new CTable())->setAttribute('style', 'width: 100%;');
 	$operations_table->setHeader([_('Details'), _('Action')]);
 
+	if ($data['action']['ack_operations']) {
+		$operation_descriptions = getActionOperationDescriptions([$data['action']], ACTION_ACKNOWLEDGE_OPERATION);
+
+		$default_message = [
+			'subject' => $data['action']['ack_shortdata'],
+			'message' => $data['action']['ack_longdata']
+		];
+
+		$operation_hints = getActionOperationHints($data['action']['ack_operations'], $default_message);
+		$operation_defaults = [
+			'opconditions'	=> [],
+			'mediatypeid'	=> 0
+		];
+
+		foreach ($data['action']['ack_operations'] as $operationid => $operation) {
+			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION])) {
+				continue;
+			}
+			$operation = array_merge($operation_defaults, $operation);
+
+			$operations_table
+				->addRow([
+					(new CSpan($operation_descriptions[0][$operationid]))->setHint($operation_hints[$operationid]),
+					(new CCol(
+						new CHorList([
+							(new CSimpleButton(_('Edit')))
+								->onClick('javascript: submitFormWithParam('.
+									'"'.$action_formname.'", "edit_ack_operationid['.$operationid.']", "1"'.
+								');')
+								->addClass(ZBX_STYLE_BTN_LINK),
+							[
+								(new CButton('remove', _('Remove')))
+									->onClick(
+										'javascript: removeOperation('.$operationid.', '.ACTION_ACKNOWLEDGE_OPERATION.');'
+									)
+									->addClass(ZBX_STYLE_BTN_LINK),
+								new CVar('ack_operations['.$operationid.']', $operation)
+							]
+						])
+					))->addClass(ZBX_STYLE_NOWRAP)
+				],
+				null,
+				'ack_operations_'.$operationid
+				);
+
+			$operation['opmessage_grp'] = isset($operation['opmessage_grp'])
+				? zbx_toHash($operation['opmessage_grp'], 'usrgrpid')
+				: null;
+			$operation['opmessage_usr'] = isset($operation['opmessage_usr'])
+				? zbx_toHash($operation['opmessage_usr'], 'userid')
+				: null;
+			$operation['opcommand_grp'] = isset($operation['opcommand_grp'])
+				? zbx_toHash($operation['opcommand_grp'], 'groupid')
+				: null;
+			$operation['opcommand_hst'] = isset($operation['opcommand_hst'])
+				? zbx_toHash($operation['opcommand_hst'], 'hostid')
+				: null;
+		}
+	}
+
 	if ($data['new_ack_operation']) {
 		$new_ack_operation_vars = null;
 		$new_operation_formlist = (new CFormList())->setAttribute('style', 'width: 100%;');
@@ -1755,12 +1815,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							(new CButton(null, _('Add')))
 							->onClick('return PopUp('.
 									'"popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name'.
-									'&multiselect=1&dstfld1=recOpmsgUsrgrpListFooter"'.
+									'&multiselect=1&dstfld1=ackOpmsgUsrgrpListFooter"'.
 								')'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(2)
-					))->setId('recOpmsgUsrgrpListFooter')
+					))->setId('ackOpmsgUsrgrpListFooter')
 				);
 
 			$user_list = (new CTable())
@@ -1772,12 +1832,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							(new CButton(null, _('Add')))
 							->onClick('return PopUp('.
 									'"popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname'.
-									'&multiselect=1&dstfld1=recOpmsgUserListFooter"'.
+									'&multiselect=1&dstfld1=ackOpmsgUserListFooter"'.
 								')'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(2)
-					))->setId('recOpmsgUserListFooter')
+					))->setId('ackOpmsgUserListFooter')
 				);
 
 			$usrgrpids = isset($data['new_ack_operation']['opmessage_grp'])
@@ -1807,18 +1867,221 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			unset($user);
 
 			$js_insert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps,
-				'parentId' => 'recOpmsgUsrgrpListFooter']).
+				'parentId' => 'ackOpmsgUsrgrpListFooter']).
 			');';
 			$js_insert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users,
-				'parentId' => 'recOpmsgUserListFooter']).
+				'parentId' => 'ackOpmsgUserListFooter']).
 			');';
 			zbx_add_post_js($js_insert);
 		}
 		elseif ($data['new_ack_operation']['operationtype'] == OPERATION_TYPE_COMMAND) {
+			if (!isset($data['new_ack_operation']['opcommand'])) {
+					$data['new_ack_operation']['opcommand'] = [];
+				}
+			$opcommand_defaults = [
+				'type'			=> ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scriptid'		=> '',
+				'execute_on'	=> ZBX_SCRIPT_EXECUTE_ON_AGENT,
+				'publickey'		=> '',
+				'privatekey'	=> '',
+				'authtype'		=> ITEM_AUTHTYPE_PASSWORD,
+				'username'		=> '',
+				'password'		=> '',
+				'port'			=> '',
+				'command'		=> ''
+			];
+			$data['new_ack_operation']['opcommand'] = array_merge($opcommand_defaults,
+				$data['new_ack_operation']['opcommand']);
 
-		}
-		elseif ($data['new_ack_operation']['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+			$data['new_ack_operation']['opcommand']['script'] = '';
+			if (!zbx_empty($data['new_ack_operation']['opcommand']['scriptid'])) {
+				$userScripts = API::Script()->get([
+					'scriptids' => $data['new_ack_operation']['opcommand']['scriptid'],
+					'output' => API_OUTPUT_EXTEND
+				]);
+				if ($userScript = reset($userScripts)) {
+					$data['new_ack_operation']['opcommand']['script'] = $userScript['name'];
+				}
+			}
 
+			// add participations
+			if (!isset($data['new_ack_operation']['opcommand_grp'])) {
+				$data['new_ack_operation']['opcommand_grp'] = [];
+			}
+			if (!isset($data['new_ack_operation']['opcommand_hst'])) {
+				$data['new_ack_operation']['opcommand_hst'] = [];
+			}
+
+			$hosts = API::Host()->get([
+				'hostids' => zbx_objectValues($data['new_ack_operation']['opcommand_hst'], 'hostid'),
+				'output' => ['hostid', 'name'],
+				'preservekeys' => true,
+				'editable' => true
+			]);
+
+			$data['new_ack_operation']['opcommand_hst'] = array_values(
+				$data['new_ack_operation']['opcommand_hst']
+			);
+
+			foreach ($data['new_ack_operation']['opcommand_hst'] as $ohnum => $cmd) {
+				$data['new_ack_operation']['opcommand_hst'][$ohnum]['name'] = ($cmd['hostid'] > 0)
+					? $hosts[$cmd['hostid']]['name']
+					: '';
+			}
+			order_result($data['new_ack_operation']['opcommand_hst'], 'name');
+
+			$groups = API::HostGroup()->get([
+				'groupids' => zbx_objectValues($data['new_ack_operation']['opcommand_grp'], 'groupid'),
+				'output' => ['groupid', 'name'],
+				'preservekeys' => true,
+				'editable' => true
+			]);
+
+			$data['new_ack_operation']['opcommand_grp'] = array_values(
+				$data['new_ack_operation']['opcommand_grp']
+			);
+
+			foreach ($data['new_ack_operation']['opcommand_grp'] as $ognum => $cmd) {
+				$data['new_ack_operation']['opcommand_grp'][$ognum]['name'] = $groups[$cmd['groupid']]['name'];
+			}
+			order_result($data['new_ack_operation']['opcommand_grp'], 'name');
+
+			// js add commands
+			$host_values = zbx_jsvalue([
+				'object' => 'hostid',
+				'values' => $data['new_ack_operation']['opcommand_hst'],
+				'parentId' => 'ackOpCmdListFooter'
+			]);
+
+			$js_insert = 'addPopupValues('.$host_values.');';
+
+			$group_values = zbx_jsvalue([
+				'object' => 'groupid',
+				'values' => $data['new_ack_operation']['opcommand_grp'],
+				'parentId' => 'ackOpCmdListFooter'
+			]);
+
+			$js_insert .= 'addPopupValues('.$group_values.');';
+			zbx_add_post_js($js_insert);
+
+			// target list
+			$new_operation_formlist->addRow(_('Target list'),
+				(new CDiv(
+					(new CTable())
+						->setAttribute('style', 'width: 100%;')
+						->setHeader([_('Target'), _('Action')])
+						->addRow(
+							(new CRow(
+								(new CCol(
+									(new CButton('add', _('New')))
+										->onClick('javascript: showOpCmdForm(0, '.ACTION_ACKNOWLEDGE_OPERATION.');')
+										->addClass(ZBX_STYLE_BTN_LINK)
+								))->setColSpan(3)
+							))->setId('ackOpCmdListFooter')
+						)
+				))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+					->setId('ackOpCmdList')
+			);
+
+			// type
+			$typeComboBox = new CComboBox('new_ack_operation[opcommand][type]',
+				$data['new_ack_operation']['opcommand']['type'],
+				'showOpTypeForm('.ACTION_ACKNOWLEDGE_OPERATION.')', [
+					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
+					ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
+					ZBX_SCRIPT_TYPE_SSH => _('SSH'),
+					ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
+					ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
+				]
+			);
+
+			$userScript = [
+				new CVar('new_ack_operation[opcommand][scriptid]',
+					$data['new_ack_operation']['opcommand']['scriptid']
+				),
+				(new CTextBox('new_ack_operation[opcommand][script]',
+					$data['new_ack_operation']['opcommand']['script'], true
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('select_ack_operation_opcommand_script', _('Select')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+			];
+
+			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
+			$new_operation_formlist->addRow(_('Script name'), $userScript);
+
+			// script
+			$new_operation_formlist->addRow(_('Execute on'),
+				(new CRadioButtonList('new_ack_operation[opcommand][execute_on]',
+					(int) $data['new_ack_operation']['opcommand']['execute_on']
+				))
+					->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+					->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
+					->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+					->setModern(true)
+			);
+
+			// ssh
+			$authTypeComboBox = new CComboBox('new_ack_operation[opcommand][authtype]',
+				$data['new_ack_operation']['opcommand']['authtype'],
+				'showOpTypeAuth('.ACTION_ACKNOWLEDGE_OPERATION.')', [
+					ITEM_AUTHTYPE_PASSWORD => _('Password'),
+					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+				]
+			);
+
+			$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
+			$new_operation_formlist->addRow(_('User name'),
+				(new CTextBox('new_ack_operation[opcommand][username]',
+					$data['new_ack_operation']['opcommand']['username']
+				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			);
+			$new_operation_formlist->addRow(_('Public key file'),
+				(new CTextBox('new_ack_operation[opcommand][publickey]',
+					$data['new_ack_operation']['opcommand']['publickey']
+				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			);
+			$new_operation_formlist->addRow(_('Private key file'),
+				(new CTextBox('new_ack_operation[opcommand][privatekey]',
+					$data['new_ack_operation']['opcommand']['privatekey']
+				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			);
+			$new_operation_formlist->addRow(_('Password'),
+				(new CTextBox('new_ack_operation[opcommand][password]',
+					$data['new_ack_operation']['opcommand']['password']
+				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			);
+
+			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
+			$passphraseCB = (new CTextBox('new_ack_operation[opcommand][password]',
+				$data['new_ack_operation']['opcommand']['password']
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setId('new_ack_operation_opcommand_passphrase');
+			$new_operation_formlist->addRow(_('Key passphrase'), $passphraseCB);
+
+			// ssh && telnet
+			$new_operation_formlist->addRow(_('Port'),
+				(new CTextBox('new_ack_operation[opcommand][port]',
+					$data['new_ack_operation']['opcommand']['port']
+				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			);
+
+			// command
+			$new_operation_formlist->addRow(_('Commands'),
+				(new CTextArea('new_ack_operation[opcommand][command]',
+					$data['new_ack_operation']['opcommand']['command']
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			);
+			$new_operation_formlist->addRow(_('Commands'),
+				(new CTextBox('new_ack_operation[opcommand][command]',
+					$data['new_ack_operation']['opcommand']['command']
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setId('new_ack_operation_opcommand_command_ipmi')
+			);
 		}
 
 		if (!is_null($usrgrp_list)) {

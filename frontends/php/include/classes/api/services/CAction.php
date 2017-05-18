@@ -1498,7 +1498,9 @@ class CAction extends CApiService {
 
 			switch ($operationtype) {
 				case OPERATION_TYPE_ACK_MESSAGE:
-					// falls through
+					// Do we need specific validation for messages of such type?
+					break;
+
 				case OPERATION_TYPE_MESSAGE:
 					$userids = array_key_exists('opmessage_usr', $operation)
 						? zbx_objectValues($operation['opmessage_usr'], 'userid')

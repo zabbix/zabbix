@@ -929,6 +929,20 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 							italic(zbx_nl2br($operation['opcommand']['command']))
 						];
 				}
+
+			case OPERATION_TYPE_ACK_MESSAGE:
+				$opmessage = $operation['opmessage'];
+				if (array_key_exists('default_msg', $opmessage) && $opmessage['default_msg']) {
+					$subject = $defaultMessage['subject'];
+					$message = $defaultMessage['message'];
+				}
+				else {
+					$subject = $opmessage['subject'];
+					$message = $opmessage['message'];
+				}
+
+				$result[$key][] = [bold($subject), BR(), BR(), zbx_nl2br($message)];
+				break;
 		}
 	}
 
