@@ -17,8 +17,26 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
-require_once dirname(__FILE__).'/include/config.inc.php';
+class CWidgetFieldHidden extends CWidgetField
+{
+	public function __construct($name, $value = '', $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
+		parent::__construct($name);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setValue($value);
+
+		switch ($save_type) {
+			case ZBX_WIDGET_FIELD_TYPE_STR:
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+				break;
+			case ZBX_WIDGET_FIELD_TYPE_INT32:
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
+				break;
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
+				break;
+			default:
+				break;
+		}
+	}
+}

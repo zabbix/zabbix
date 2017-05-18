@@ -140,6 +140,7 @@ class CControllerDashboardView extends CController {
 			$grid_widgets[$widgetid]['widgetid'] = $widgetid;
 			$grid_widgets[$widgetid]['type'] = $widget['type'];
 			$grid_widgets[$widgetid]['header'] = (strlen($widget['name']) != 0) ? $widget['name'] : $widget_names[$widget['type']];
+			$grid_widgets[$widgetid]['triggerrs'] = $this->widget_config->getTriggers($widget['type']);
 			// TODO VM: widget headers are not affeced by name from database, because it is rewritten by specific widget's API call
 			$grid_widgets[$widgetid]['pos'] = [];
 			$grid_widgets[$widgetid]['pos']['row'] = (int) $widget['row'];

@@ -38,6 +38,7 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_SYSMAP				=> _('Map'),
+			WIDGET_NAVIGATION_TREE	=> _('Map Navigation Tree'),
 			WIDGET_URL					=> _('URL'),
 		];
 
@@ -53,7 +54,19 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_SCREENS	=> 15 * SEC_PER_MIN,
 			WIDGET_CLOCK				=> 15 * SEC_PER_MIN,
 			WIDGET_SYSMAP				=> 15 * SEC_PER_MIN,
+			WIDGET_NAVIGATION_TREE => 15 * SEC_PER_MIN,
 			WIDGET_URL					=> 0,
+		];
+
+		$this->triggers = [
+			WIDGET_NAVIGATION_TREE => [
+				'onEditStart' => 'zbx_navtree("onEditStart")',
+				'beforeDashboardSave' => 'zbx_navtree("beforeDashboardSave")',
+				'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
+				'onEditStop' => 'zbx_navtree("onEditStop")',
+				'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
+				'beforeConfigLoad' => 'zbx_navtree("beforeConfigLoad")'
+			]
 		];
 
 		$this->apiFieldKeys = [
@@ -117,6 +130,15 @@ class CWidgetConfig
 	}
 
 	/**
+	 * Return widget triggers
+	 * @param int $type - WIDGET_ constant
+	 * @return array - list of [onEvent => jsMethodToCall] pairs
+	 */
+	public function getTriggers($type) {
+		return array_key_exists($type, $this->triggers) ? $this->triggers[$type] : [];
+	}
+
+	/**
 	 * Returns key, where value is stored for given field type
 	 * @param int $field_type - ZBX_WIDGET_FIELD_TYPE_ constant
 	 * @return string field key, where to save the value
@@ -136,6 +158,8 @@ class CWidgetConfig
 		switch ($data['type']) {
 			case WIDGET_CLOCK:
 				return (new CClockWidgetForm($data, $known_widget_types));
+			case WIDGET_NAVIGATION_TREE:
+				return (new CNavigationWidgetForm($data, $known_widget_types));
 			case WIDGET_SYSMAP:
 				return (new CSysmapWidgetForm($data, $known_widget_types));
 			case WIDGET_URL:

@@ -84,6 +84,17 @@
 		return widgets[$div.data('widget-index')];
 	}
 
+	function generateRandomString(length) {
+		var space = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+				length = length||5,
+				ret = '';
+
+		for (var i = 0; length > i; i++) {
+			ret += space.charAt(Math.floor(Math.random() * space.length));
+		}
+		return ret;
+	}
+
 	function getDivPosition($obj, data, $div) {
 		var	target_pos = $div.position(),
 			widget_width_px = Math.floor($obj.width() / data['options']['columns']),
@@ -557,6 +568,7 @@
 				.addClass('btn-widget-edit')
 				.attr('title', t('Edit'))
 				.click(function(){
+					runTrigger($(this), data, 'beforeConfigLoad');
 					methods.editWidget.call($obj, widget);
 				});
 
@@ -667,6 +679,17 @@
 		if (has_changes === true) {
 			return t('You have unsaved changes.')+"\n"+t('Are you sure, you want to leave this page?');
 		}
+	}
+
+	function runTrigger($obj, data, triggerName) {
+		$.each(data['widgets'], function(index, widget) {
+			if (typeof widget['triggerrs'][triggerName] !== 'undefined') {
+				try {
+					eval('$("#"+$("[id]", widget.content_body).attr("id")).'+widget['triggerrs'][triggerName]);
+				}
+				catch(e) {}
+			}
+		});
 	}
 
 	var	methods = {
@@ -795,6 +818,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				runTrigger($this, data, 'onEditStart');
 				dashboardRemoveMessages();
 				setModeEditDashboard($this, data);
 			});
@@ -806,7 +830,9 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				runTrigger($this, data, 'beforeDashboardSave');
 				saveChanges($this, data);
+				runTrigger($this, data, 'afterDashboardSave');
 			});
 		},
 
@@ -816,6 +842,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				runTrigger($this, data, 'onEditStop');
 				dashboardRemoveMessages();
 				setModeViewDashboard($this, data);
 			});
@@ -923,42 +950,65 @@
 						data = $this.data('dashboardGrid');
 
 				for (var i = 0, l = data['widgets'].length; l > i; i++) {
-					if (data['widgets'][i]['widgetid'] === obj.widgetid) {
-						if (typeof data['widgets'][i]['triggers'] == 'undefined') {
-							data['widgets'][i]['triggers'] = [];
+					if (data['widgets'][i]['widgetid'] == obj.widgetid) {
+						if (typeof data['widgets'][i]['listenFor'] === 'undefined') {
+							data['widgets'][i]['listenFor'] = [];
 						}
-						data['widgets'][i]['triggers'].push(obj);
+						data['widgets'][i]['listenFor'].push(obj);
 					}
 				}
 			});
 		},
 
 		widgetDataShare: function(widget) {
-			var args = Array.prototype.slice.call(arguments, 1);
+			var args = Array.prototype.slice.call(arguments, 1),
+					reference = '';
 
-			return this.each(function() {
-				var $this = $(this),
-						data = $this.data('dashboardGrid');
-				for (var i = 0, l = data['widgets'].length; l > i; i++) {
-					if (typeof(data['widgets'][i].triggers) != 'undefined') {
-						for (var t = 0, j = data['widgets'][i].triggers.length; j > t; t++) {
-							if (data['widgets'][i].triggers[t].sourceWidget == widget.widgetid) {
-								var trigger = data['widgets'][i].triggers[t];
+			if (!args.length) {
+				return false;
+			}
 
-								if (typeof(trigger.filterFunction) == 'function') {
-									var argsToApply = args.filter(trigger.filterFunction);
-								} else {
-									var argsToApply = args;
+			if (typeof widget['fields']['reference'] !== 'undefined') {
+				var reference = widget['fields']['reference'];
+
+				return this.each(function() {
+					var $this = $(this),
+							data = $this.data('dashboardGrid');
+
+					for (var i = 0, l = data['widgets'].length; l > i; i++) {
+						if (typeof(data['widgets'][i]['listenFor']) != 'undefined') {
+							for (var t = 0, j = data['widgets'][i]['listenFor'].length; j > t; t++) {
+								if (data['widgets'][i]['listenFor'][t]['sourceWidgetReference'] === reference) {
+									data['widgets'][i]['listenFor'][t].callback.apply(this, [data['widgets'][i], args]);
 								}
+							}
+						}
+					}
+				});
+			}
+		},
 
-								if (argsToApply.length) {
-									trigger.callback.apply(this, [data['widgets'][i], argsToApply]);
-								}
+		makeReference: function() {
+			var ref = false;
+
+			this.each(function() {
+				var data = $(this).data('dashboardGrid');
+
+				while (!ref) {
+					ref = generateRandomString();
+
+					for (var i = 0, l = data['widgets'].length; l > i; i++) {
+						if (typeof data['widgets'][i]['fields']['reference'] !== 'undefined') {
+							if (data['widgets'][i]['fields']['reference'] === ref) {
+								ref = false;
+								break;
 							}
 						}
 					}
 				}
 			});
+
+			return ref;
 		}
 	}
 

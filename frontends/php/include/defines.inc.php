@@ -1116,6 +1116,7 @@ define('WIDGET_WEB_OVERVIEW',			'webovr');
 define('WIDGET_ZABBIX_STATUS',			'stszbx');
 define('WIDGET_CLOCK',					'clock');
 define('WIDGET_SYSMAP',					'sysmap');
+define('WIDGET_NAVIGATION_TREE', 'navigationtree');
 define('WIDGET_URL',					'url');
 
 // sysmap widget source types
@@ -1124,6 +1125,9 @@ define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
 
 // widget select resource field types
 define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
+
+// max depth of navigation tree
+define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 3);
 
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
@@ -1254,6 +1258,7 @@ define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
 define('ZBX_STYLE_SYSMAP', 'sysmap');
+define('ZBX_STYLE_NAVIGATIONTREE', 'navtree');
 define('ZBX_STYLE_CLOCK_SVG', 'clock-svg');
 define('ZBX_STYLE_CLOCK_FACE', 'clock-face');
 define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');
