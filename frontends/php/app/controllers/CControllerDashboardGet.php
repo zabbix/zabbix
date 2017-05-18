@@ -36,7 +36,7 @@ class CControllerDashboardGet extends CController {
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['error' => _('Input data are invalid or don\'t exist!')])
+				'main_block' => CJs::encodeJson(['errors' => [getMessages()->toString()]])
 			]));
 		}
 
