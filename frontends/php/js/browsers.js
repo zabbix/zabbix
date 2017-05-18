@@ -26,7 +26,7 @@ var agt = navigator.userAgent.toLowerCase(),
 	IE10 = (agt.indexOf('msie 10.0') != -1),
 	IE11 = !!agt.match(/trident\/.*rv:11/),
 	IE = (IE6 || IE7 || IE8 || IE9 || IE10 || IE11),
-	ED = (agt.indexOf('edge/') != -1),
+	ED = (agt.indexOf('edge') != -1),
 	CR = (agt.indexOf('chrome') != -1 && !ED),
 	SF = (agt.indexOf('safari') != -1 && !CR),
 	KQ = (agt.indexOf('konqueror') && agt.indexOf('khtml') != -1 && agt.indexOf('applewebkit') == -1),
@@ -34,7 +34,7 @@ var agt = navigator.userAgent.toLowerCase(),
 
 // redirect outdated browser to warning page
 if (document.cookie.indexOf('browserwarning_ignore') < 0) {
-	if (IE6 || IE7 || IE8 || KQ) {
+	if (IE6 || IE7 || IE8 || IE9 || IE10 || KQ) {
 		window.location.replace('browserwarning.php');
 	}
 }

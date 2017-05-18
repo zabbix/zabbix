@@ -34,14 +34,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null],
 	'new_httpstep'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				null],
-	'sel_step'			=> [T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534),	null],
 	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
 	// form
 	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'],
 	'applicationid'   => [T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')],
 	'httptestid'      => [T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   'isset({form}) && {form} == "update"'],
 	'name'            => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({add}) || isset({update})', _('Name')],
-	'delay'           => [T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})', _('Update interval (in sec)')],
+	'delay'           => [T_ZBX_STR, O_OPT, null,  null,					'isset({add}) || isset({update})'],
 	'retries'         => [T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})',
 		_('Attempts')
 	],
@@ -267,7 +266,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
 			'applicationid' => getRequest('applicationid', 0),
-			'delay' => $_REQUEST['delay'],
+			'delay' => getRequest('delay', DB::getDefault('httptest', 'delay')),
 			'retries' => $_REQUEST['retries'],
 			'status' => hasRequest('status') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED,
 			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),
@@ -678,7 +677,7 @@ if (isset($_REQUEST['form'])) {
 		$data['name'] = getRequest('name', '');
 		$data['applicationid'] = getRequest('applicationid');
 		$data['new_application'] = getRequest('new_application', '');
-		$data['delay'] = getRequest('delay', 60);
+		$data['delay'] = getRequest('delay', DB::getDefault('httptest', 'delay'));
 		$data['retries'] = getRequest('retries', 1);
 
 		$data['agent'] = getRequest('agent', ZBX_DEFAULT_AGENT);

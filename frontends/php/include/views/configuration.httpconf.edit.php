@@ -74,8 +74,8 @@ $httpFormList
 			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 	)
-	->addRow(_('Update interval (in sec)'),
-		(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow(_('Update interval'),
+		(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Attempts'),
 		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
@@ -197,7 +197,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['name'] = '';
 	}
 	if (!isset($step['timeout'])) {
-		$step['timeout'] = 15;
+		$step['timeout'] = DB::getDefault('httpstep', 'timeout');
 	}
 	if (!isset($step['url'])) {
 		$step['url'] = '';
@@ -240,7 +240,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 			$dragHandler,
 			$numSpan,
 			$name,
-			$step['timeout'].SPACE._('sec'),
+			$step['timeout'],
 			$url,
 			htmlspecialchars($step['required']),
 			$step['status_codes'],

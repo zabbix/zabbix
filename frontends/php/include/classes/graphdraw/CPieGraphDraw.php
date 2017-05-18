@@ -169,14 +169,51 @@ class CPieGraphDraw extends CGraphDraw {
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
-			// override item history setting with housekeeping settings
+			$to_resolve = [];
+
+			// Override item history setting with housekeeping settings, if they are enabled in config.
 			if ($config['hk_history_global']) {
-				$item['history'] = $config['hk_history'];
+				$item['history'] = timeUnitToSeconds($config['hk_history']);
+			}
+			else {
+				$to_resolve[] = 'history';
 			}
 
-			$trendsEnabled = $config['hk_trends_global'] ? ($config['hk_trends'] > 0) : ($item['trends'] > 0);
+			if ($config['hk_trends_global']) {
+				$item['trends'] = timeUnitToSeconds($config['hk_trends']);
+			}
+			else {
+				$to_resolve[] = 'trends';
+			}
 
-			if (!$trendsEnabled || (($item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)))) {
+			// Otherwise, resolve user macro and parse the string. If successfull, convert to seconds.
+			if ($to_resolve) {
+				$item = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve)[0];
+
+				$simple_interval_parser = new CSimpleIntervalParser();
+
+				if (!$config['hk_history_global']) {
+					if ($simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
+						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'history',
+							_('invalid history storage period')
+						));
+						exit;
+					}
+					$item['history'] = timeUnitToSeconds($item['history']);
+				}
+
+				if (!$config['hk_trends_global']) {
+					if ($simple_interval_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
+						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
+							_('invalid trend storage period')
+						));
+						exit;
+					}
+					$item['trends'] = timeUnitToSeconds($item['trends']);
+				}
+			}
+
+			if ($item['trends'] == 0 || ($item['history'] * SEC_PER_DAY > time() - ($from_time + $this->period / 2))) {
 				$this->dataFrom = 'history';
 
 				$sql_select = 'AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';

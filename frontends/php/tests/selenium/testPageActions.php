@@ -48,7 +48,8 @@ class testPageActions extends CWebTest {
 	private $oldHashOpConditions = '';
 
 	private function calculateHash($actionid) {
-		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid='.$actionid;
+		$this->sqlHashAction = 'SELECT actionid,name,eventsource,evaltype,status,def_shortdata,def_longdata,r_shortdata,'
+				. 'r_longdata,formula,maintenance_mode 	 FROM actions WHERE actionid='.$actionid;
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 		$this->sqlHashConditions = 'SELECT * FROM conditions WHERE actionid='.$actionid.' AND actionid>2  ORDER BY conditionid';
 		$this->oldHashConditions = DBhash($this->sqlHashConditions);
@@ -111,30 +112,18 @@ class testPageActions extends CWebTest {
 	}
 
 	private function verifyHash() {
-		$this->assertEquals($this->oldHashAction, DBhash($this->sqlHashAction),
-				'Chuck Norris: Action update changed data in table "actions".');
-		$this->assertEquals($this->oldHashConditions, DBhash($this->sqlHashConditions),
-				'Chuck Norris: Action update changed data in table "conditions".');
-		$this->assertEquals($this->oldHashOperations, DBhash($this->sqlHashOperations),
-				'Chuck Norris: Action update changed data in table "operations".');
-		$this->assertEquals($this->oldHashOpMessage, DBhash($this->sqlHashOpMessage),
-				'Chuck Norris: Action update changed data in table "opmessage".');
-		$this->assertEquals($this->oldHashOpMessageGrp, DBhash($this->sqlHashOpMessageGrp),
-				'Chuck Norris: Action update changed data in table "opmessage_grp".');
-		$this->assertEquals($this->oldHashOpMessageUsr, DBhash($this->sqlHashOpMessageUsr),
-				'Chuck Norris: Action update changed data in table "opmessage_usr".');
-		$this->assertEquals($this->oldHashOpCommand, DBhash($this->sqlHashOpCommand),
-				'Chuck Norris: Action update changed data in table "opcommand".');
-		$this->assertEquals($this->oldHashOpCommandHst, DBhash($this->sqlHashOpCommandHst),
-				'Chuck Norris: Action update changed data in table "opcommand_hst".');
-		$this->assertEquals($this->oldHashOpCommandGrp, DBhash($this->sqlHashOpCommandGrp),
-				'Chuck Norris: Action update changed data in table "opcommand_grp".');
-		$this->assertEquals($this->oldHashOpGroup, DBhash($this->sqlHashOpGroup),
-				'Chuck Norris: Action update changed data in table "opgroup".');
-		$this->assertEquals($this->oldHashOpTemplate, DBhash($this->sqlHashOpTemplate),
-				'Chuck Norris: Action update changed data in table "optemplate".');
-		$this->assertEquals($this->oldHashOpConditions, DBhash($this->sqlHashOpConditions),
-				'Chuck Norris: Action update changed data in table "opconditions".');
+		$this->assertEquals($this->oldHashAction, DBhash($this->sqlHashAction));
+		$this->assertEquals($this->oldHashConditions, DBhash($this->sqlHashConditions));
+		$this->assertEquals($this->oldHashOperations, DBhash($this->sqlHashOperations));
+		$this->assertEquals($this->oldHashOpMessage, DBhash($this->sqlHashOpMessage));
+		$this->assertEquals($this->oldHashOpMessageGrp, DBhash($this->sqlHashOpMessageGrp));
+		$this->assertEquals($this->oldHashOpMessageUsr, DBhash($this->sqlHashOpMessageUsr));
+		$this->assertEquals($this->oldHashOpCommand, DBhash($this->sqlHashOpCommand));
+		$this->assertEquals($this->oldHashOpCommandHst, DBhash($this->sqlHashOpCommandHst));
+		$this->assertEquals($this->oldHashOpCommandGrp, DBhash($this->sqlHashOpCommandGrp));
+		$this->assertEquals($this->oldHashOpGroup, DBhash($this->sqlHashOpGroup));
+		$this->assertEquals($this->oldHashOpTemplate, DBhash($this->sqlHashOpTemplate));
+		$this->assertEquals($this->oldHashOpConditions, DBhash($this->sqlHashOpConditions));
 	}
 
 	public static function allEventSources() {

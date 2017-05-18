@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/CHost.php';
 require_once dirname(__FILE__).'/CItem.php';
 require_once dirname(__FILE__).'/testAPIInfo.php';
@@ -30,6 +31,7 @@ require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
+require_once dirname(__FILE__).'/testWebScenario.php';
 
 class ApiJsonTests {
 	public static function suite() {
@@ -47,6 +49,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testUserMacro');
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
+		$suite->addTestSuite('testWebScenario');
 
 		return $suite;
 	}
