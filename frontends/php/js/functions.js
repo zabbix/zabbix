@@ -619,16 +619,15 @@ function overlayDialogue(params) {
 		.appendTo('body');
 
 	// position of window should be centred on 40% of top offset line and 30px max
-	var top = Math.max(jQuery(window).innerHeight() * 0.4 - (overlay_dialogue.outerHeight() / 2), 30);
-	var left = Math.max(((jQuery(window).innerWidth() - overlay_dialogue.outerWidth())  / 2), 0);
-
-	var css = {
-		'position': 'fixed',
-		'top': top + 'px',
-		'left': left + 'px',
-		'max-height': (jQuery(window).innerHeight() - top) * 0.95 + 'px',
-		'overflow': 'auto'
-	};
+	var	top = Math.max(jQuery(window).innerHeight() * 0.4 - overlay_dialogue.outerHeight() / 2, 30),
+		left = Math.max((jQuery(window).innerWidth() - overlay_dialogue.outerWidth()) / 2, 0),
+		css = {
+			'position': 'fixed',
+			'top': top + 'px',
+			'left': left + 'px',
+			'max-height': (jQuery(window).innerHeight() - top) * 0.95 + 'px',
+			'overflow': 'auto'
+		};
 
 	overlay_dialogue
 		.css(css)

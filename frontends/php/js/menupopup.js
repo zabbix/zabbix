@@ -453,7 +453,7 @@ function getMenuPopupDashboard(options) {
 		switch (item.name) {
 			case 'sharing':
 				item.clickCallback = function () {
-					var obj = jQuery(this),
+					var	obj = jQuery(this),
 						url = new Curl('zabbix.php'),
 						error_message = t('Something went wrong. Please try again later!');
 					url.setArgument('action', 'dashboard.get');
@@ -466,14 +466,14 @@ function getMenuPopupDashboard(options) {
 							if (typeof response.data !== 'undefined') {
 								var form = jQuery('form[name="dashboard_sharing_form"]');
 
-								showDialogForm(
-									form,
-									{"title": t('Dashboard sharing'), "action_title": t('Update')},
+								showDialogForm(form, {"title": t('Dashboard sharing'), "action_title": t('Update')},
 									response.data
 								);
-							} else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+							}
+							else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
 								alert(t('You need permission to perform this action!'))
-							} else {
+							}
+							else {
 								alert(error_message);
 							}
 						},
@@ -488,7 +488,7 @@ function getMenuPopupDashboard(options) {
 		}
 		return item;
 	});
-	return [{ label: options.label, items: options.items}];
+	return [{label: options.label, items: options.items}];
 }
 
 function showDialogForm(form, options, formData) {
