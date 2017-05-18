@@ -34,7 +34,7 @@ class CControllerDashboardUpdate extends CController {
 			'userGroups' =>		'array'
 		];
 
-		$ret = $this->validateInput($fields) && $this->checkUsers() && $this->checkUserGroups();
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData([
@@ -43,42 +43,6 @@ class CControllerDashboardUpdate extends CController {
 		}
 
 		return $ret;
-	}
-
-	/**
-	 * Check users.
-	 *
-	 * @return bool
-	 */
-	private function checkUsers() {
-		$users = $this->getInput('users', []);
-		if (!is_array($users)) {
-			return false;
-		}
-		foreach ($users as $key => $user) {
-			if ($key !== self::EMPTY_USER && (!isset($user['userid']) || !isset($user['permission']))) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Check user groups.
-	 *
-	 * @return bool
-	 */
-	private function checkUserGroups() {
-		$usrgrps = $this->getInput('userGroups', []);
-		if (!is_array($usrgrps)) {
-			return false;
-		}
-		foreach ($usrgrps as $key => $group) {
-			if ($key !== self::EMPTY_GROUP && (!isset($group['usrgrpid']) || !isset($group['permission']))) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	protected function checkPermissions() {
