@@ -74,10 +74,10 @@ class CControllerDashboardUpdate extends CController {
 			$dashboard['userGroups'] = $groups;
 		}
 
-		$result = API::Dashboard()->update($dashboard);
+		$result = (bool) API::Dashboard()->update($dashboard);
 
 		$response = ['result' => $result];
-		if ($errors = getMessages()) {
+		if (($errors = getMessages()) !== null) {
 			$response['errors'] = [$errors->toString()];
 		}
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($response)]));
