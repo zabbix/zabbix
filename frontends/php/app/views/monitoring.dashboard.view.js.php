@@ -69,8 +69,8 @@
 				success: function (response) {
 					dashboardRemoveMessages();
 					if (typeof response === 'object') {
-						if ('errors' in response && response.errors.length > 0) {
-							dashboardAddMessages(response.errors.join());
+						if ('messages' in response && response.messages.length > 0) {
+							dashboardAddMessages(response.messages.join());
 						}
 					}
 					else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
