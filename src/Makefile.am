@@ -99,7 +99,7 @@ $(TEST_SUITESFILE):
 	echo 'NULL};' >> $(TEST_SUITESFILE)
 
 test: $(TEST_SUITESFILE) 
-	$(MAKE) $(AM_MAKEFLAGS) CFLAGS="$(CFLAGS) -rdynamic -DZBX_CUNIT" CUNIT_LDADD="-lcunit" 
+	$(MAKE) $(AM_MAKEFLAGS) CFLAGS="$(CFLAGS) -rdynamic -DZBX_CUNIT" CUNIT_LDADD="-lcunit"
 
 clean-test:
 	rm -rf $(TEST_SUITESFILE)
