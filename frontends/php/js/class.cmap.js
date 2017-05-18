@@ -903,7 +903,7 @@ ZABBIX.apps.map = (function($) {
 			dragGroupInit: function(event, draggable) {
 				var buffer,
 					draggable_node,
-					body = $('body');
+					body = $(window.document);
 
 				if (draggable.selected) {
 					buffer = draggable.sysmap.getSelectionBuffer(draggable.sysmap);
@@ -952,7 +952,7 @@ ZABBIX.apps.map = (function($) {
 				var cmap = draggable.sysmap,
 					delta_x = data.position.left - parseInt(draggable.data.x, 10),
 					delta_y = data.position.top - parseInt(draggable.data.y, 10),
-					body = $('body'),
+					body = $(window.document),
 					xshift = body.scrollLeft() - cmap.draggable_buffer.margin.left,
 					yshift = body.scrollTop() - cmap.draggable_buffer.margin.top;
 
