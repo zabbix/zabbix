@@ -2070,13 +2070,17 @@ class CMap extends CMapElement {
 					'line_color' => 'border_color'
 				];
 
-				foreach ($mapping as $source_field => $target_field) {
-					if (in_array($source_field, $options['selectLines'])) {
-						$fields[] = $target_field;
+				if (is_array($options['selectLines'])) {
+					foreach ($mapping as $source_field => $target_field) {
+						if (in_array($source_field, $options['selectLines'])) {
+							$fields[] = $target_field;
+						}
 					}
 				}
 
-				$fields = array_merge($fields, $options['selectShapes']);
+				if (is_array($options['selectShapes'])) {
+					$fields = array_merge($fields, $options['selectShapes']);
+				}
 			}
 
 			$db_shapes = API::getApiService()->select('sysmap_shape', [
