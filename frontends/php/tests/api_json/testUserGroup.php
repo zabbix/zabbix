@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class testUserGroup extends CZabbixTest {
@@ -30,7 +31,7 @@ class testUserGroup extends CZabbixTest {
 		return [
 			[
 				'group' => [
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'usrgrpid' => '7'
 				],
 				'success_expected' => false,
@@ -105,7 +106,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [
 					[
-						'name' => 'Api user group create one',
+						'name' => 'API user group create one',
 					],
 					[
 						'name' => 'æų',
@@ -157,7 +158,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [[
 					'usrgrpid' => '13',
-					'name' => 'Api update with non existent parametr',
+					'name' => 'API update with non existent parametr',
 					'value' => '4'
 				]],
 				'success_expected' => false,
@@ -166,7 +167,7 @@ class testUserGroup extends CZabbixTest {
 			// Check user group id.
 			[
 				'group' => [[
-					'name' => 'Api user group updated'
+					'name' => 'API user group updated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "usrgrpid" is missing.'
@@ -174,7 +175,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [[
 					'usrgrpid' => '',
-					'name' => 'Api user group udated'
+					'name' => 'API user group udated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
@@ -182,7 +183,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [[
 					'usrgrpid' => '123456',
-					'name' => 'Api user group udated'
+					'name' => 'API user group udated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -190,7 +191,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [[
 					'usrgrpid' => 'abc',
-					'name' => 'Api user group updated'
+					'name' => 'API user group updated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
@@ -198,7 +199,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [[
 					'usrgrpid' => '1.1',
-					'name' => 'Api user group udated'
+					'name' => 'API user group udated'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
@@ -287,11 +288,11 @@ class testUserGroup extends CZabbixTest {
 				'group' => [
 					[
 						'usrgrpid' => '13',
-						'name' => 'Api user group with the same ids1',
+						'name' => 'API user group with the same ids1',
 					],
 					[
 						'usrgrpid' => '13',
-						'name' => 'Api user group with the same ids2',
+						'name' => 'API user group with the same ids2',
 					]
 				],
 				'success_expected' => false,
@@ -312,7 +313,7 @@ class testUserGroup extends CZabbixTest {
 				'group' => [
 					[
 						'usrgrpid' => '14',
-						'name' => 'Api user group updated with rights',
+						'name' => 'API user group updated with rights',
 						'rights' =>[
 							[
 								'id' => '50013',
@@ -328,7 +329,7 @@ class testUserGroup extends CZabbixTest {
 				'group' => [
 					[
 					'usrgrpid' => '13',
-					'name' => 'Api update user group one',
+					'name' => 'API update user group one',
 						'rights' =>[
 							[
 								'id' => '50013',
@@ -338,7 +339,7 @@ class testUserGroup extends CZabbixTest {
 					],
 					[
 					'usrgrpid' => '14',
-					'name' => 'Api update user group two',
+					'name' => 'API update user group two',
 						'rights' =>[
 							[
 								'id' => '50012',
@@ -604,7 +605,7 @@ class testUserGroup extends CZabbixTest {
 			// Check successfully update and create of user group with all properties.
 			[
 				'group' => [
-					'name' => 'Api user group with users and rights',
+					'name' => 'API user group with users and rights',
 					'gui_access' => 1,
 					'users_status' => 1,
 					'debug_mode' => 1,
@@ -724,19 +725,19 @@ class testUserGroup extends CZabbixTest {
 			[
 				'usergroup' => ['20'],
 				'success_expected' => false,
-				'expected_error' => 'User group "Api user group in actions" is used in "Api action" action.'
+				'expected_error' => 'User group "API user group in actions" is used in "API action" action.'
 			],
 			// Check user group used in scripts
 			[
 				'usergroup' => ['21'],
 				'success_expected' => false,
-				'expected_error' => 'User group "Api user group in scripts" is used in script "Api script".'
+				'expected_error' => 'User group "API user group in scripts" is used in script "API script".'
 			],
 			// Check user group used in configuration
 			[
 				'usergroup' => ['22'],
 				'success_expected' => false,
-				'expected_error' => 'User group "Api user group in configuration" is used in configuration for database down messages.'
+				'expected_error' => 'User group "API user group in configuration" is used in configuration for database down messages.'
 			],
 			// Check successfully delete of user group.
 			[
@@ -780,7 +781,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'method' => 'usergroup.create',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
-				'usergroup' => ['name' => 'Api user group create as admin user'],
+				'usergroup' => ['name' => 'API user group create as admin user'],
 				'expected_error' => 'Only Super Admins can create user groups.'
 			],
 			[
@@ -788,7 +789,7 @@ class testUserGroup extends CZabbixTest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'usergroup' => [
 					'usrgrpid' => '13',
-					'name' => 'Api user group update as admin user without peremissions'
+					'name' => 'API user group update as admin user without peremissions'
 				],
 				'expected_error' => 'Only Super Admins can update user groups.'
 			],
@@ -801,7 +802,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'method' => 'usergroup.create',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
-				'usergroup' => ['name' => 'Api host group create as zabbix user'],
+				'usergroup' => ['name' => 'API host group create as zabbix user'],
 				'expected_error' => 'Only Super Admins can create user groups.'
 			],
 			[
@@ -809,7 +810,7 @@ class testUserGroup extends CZabbixTest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => [
 					'usrgrpid' => '13',
-					'name' => 'Api user group update as zabbix user without peremissions'
+					'name' => 'API user group update as zabbix user without peremissions'
 				],
 				'expected_error' => 'Only Super Admins can update user groups.'
 			],

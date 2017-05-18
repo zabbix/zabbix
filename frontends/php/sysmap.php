@@ -25,7 +25,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'class.cviewswitcher.js', 'multiselect.js'];
+$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'class.cviewswitcher.js',
+	'multiselect.js'
+];
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -77,6 +79,15 @@ if (isset($_REQUEST['favobj'])) {
 			$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
 			$sysmapUpdate['sysmapid'] = $sysmapid;
 
+			if (array_key_exists('shapes', $sysmapUpdate)) {
+				foreach ($sysmapUpdate['shapes'] as &$shape) {
+					if (array_key_exists('sysmap_shapeid', $shape) && !is_numeric($shape['sysmap_shapeid'])) {
+						unset($shape['sysmap_shapeid']);
+					}
+				}
+				unset($shape);
+			}
+
 			$result = API::Map()->update($sysmapUpdate);
 
 			if ($result !== false) {
@@ -120,14 +131,17 @@ if (isset($_REQUEST['sysmapid'])) {
 		'output' => ['sysmapid', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
 			'iconmapid', 'backgroundid'
 		],
-		'selectShapes' => API_OUTPUT_EXTEND,
+		'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
+			'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
+			'background_color', 'zindex'
+		],
 		'selectSelements' => API_OUTPUT_EXTEND,
 		'selectLinks' => API_OUTPUT_EXTEND,
 		'sysmapids' => getRequest('sysmapid'),
 		'editable' => true,
 		'preservekeys' => true
 	]);
-	if (empty($sysmap)) {
+	if (!$sysmap) {
 		access_deny();
 	}
 	else {
@@ -150,7 +164,7 @@ $data = [
 add_elementNames($data['sysmap']['selements']);
 
 $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
-$data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'shapeid');
+$data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'sysmap_shapeid');
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 
 // get links
@@ -209,7 +223,7 @@ if ($data['iconList']) {
 	$data['iconList'] = array_values($data['iconList']);
 }
 
-$data['theme'] = CMapHelper::getGraphTheme();
+$data['theme'] = getUserGraphTheme();
 
 // render view
 $sysmapView = new CView('monitoring.sysmap.constructor', $data);

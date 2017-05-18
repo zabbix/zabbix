@@ -75,7 +75,7 @@ foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow([
 		$checkbox,
 		(new CLink($slide['name'], 'slides.php?elementid='.$slide['slideshowid']))->addClass('action'),
-		convertUnitsS($slide['delay']),
+		$slide['delay'],
 		$slide['cnt'],
 		$properties
 	]);

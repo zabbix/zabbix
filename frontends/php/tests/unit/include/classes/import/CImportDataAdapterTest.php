@@ -320,8 +320,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmp_community' => '',
 					'snmp_oid' => '',
 					'delay' => '30',
-					'history' => '90',
-					'trends' => '365',
+					'history' => '90d',
+					'trends' => '365d',
 					'status' => '0',
 					'value_type' => '3',
 					'units' => '',
@@ -332,7 +332,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -356,8 +355,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmp_community' => '',
 					'snmp_oid' => '',
 					'delay' => '30',
-					'history' => '90',
-					'trends' => '365',
+					'history' => '90d',
+					'trends' => '365d',
 					'status' => '0',
 					'value_type' => '3',
 					'units' => '',
@@ -368,7 +367,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -398,8 +396,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmp_community' => '',
 					'snmp_oid' => '',
 					'delay' => '30',
-					'history' => '90',
-					'trends' => '365',
+					'history' => '90d',
+					'trends' => '365d',
 					'status' => '0',
 					'value_type' => '3',
 					'units' => '',
@@ -410,7 +408,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -433,8 +430,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmp_community' => '',
 					'snmp_oid' => '',
 					'delay' => '30',
-					'history' => '90',
-					'trends' => '365',
+					'history' => '90d',
+					'trends' => '365d',
 					'status' => '0',
 					'value_type' => '3',
 					'units' => '',
@@ -445,7 +442,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -643,7 +639,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -657,7 +652,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'formula' => '',
 						'conditions' => []
 					],
-					'lifetime' => '30',
+					'lifetime' => '30d',
 					'description' => '',
 					'item_prototypes' => [],
 					'trigger_prototypes' => [],
@@ -681,7 +676,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -708,7 +702,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							]
 						]
 					],
-					'lifetime' => '30',
+					'lifetime' => '30d',
 					'description' => '',
 					'item_prototypes' => [
 						[
@@ -717,8 +711,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmp_community' => '',
 							'snmp_oid' => '',
 							'delay' => '30',
-							'history' => '90',
-							'trends' => '365',
+							'history' => '90d',
+							'trends' => '365d',
 							'status' => '0',
 							'value_type' => '3',
 							'units' => '',
@@ -729,7 +723,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmpv3_authpassphrase' => '',
 							'snmpv3_privprotocol' => '0',
 							'snmpv3_privpassphrase' => '',
-							'delay_flex' => '',
 							'params' => '',
 							'ipmi_sensor' => '',
 							'authtype' => '0',
@@ -753,8 +746,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmp_community' => '',
 							'snmp_oid' => '',
 							'delay' => '30',
-							'history' => '90',
-							'trends' => '365',
+							'history' => '90d',
+							'trends' => '365d',
 							'status' => '0',
 							'value_type' => '3',
 							'units' => '',
@@ -765,7 +758,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmpv3_authpassphrase' => '',
 							'snmpv3_privprotocol' => '0',
 							'snmpv3_privpassphrase' => '',
-							'delay_flex' => '',
 							'params' => '',
 							'ipmi_sensor' => '',
 							'authtype' => '0',
@@ -879,7 +871,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -893,7 +884,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'formula' => '',
 						'conditions' => []
 					],
-					'lifetime' => '30',
+					'lifetime' => '30d',
 					'description' => '',
 					'item_prototypes' => [],
 					'trigger_prototypes' => [],
@@ -916,7 +907,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -943,7 +933,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							]
 						]
 					],
-					'lifetime' => '30',
+					'lifetime' => '30d',
 					'description' => '',
 					'item_prototypes' => [
 						[
@@ -952,8 +942,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmp_community' => '',
 							'snmp_oid' => '',
 							'delay' => '30',
-							'history' => '90',
-							'trends' => '365',
+							'history' => '90d',
+							'trends' => '365d',
 							'status' => '0',
 							'value_type' => '3',
 							'units' => '',
@@ -964,7 +954,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmpv3_authpassphrase' => '',
 							'snmpv3_privprotocol' => '0',
 							'snmpv3_privpassphrase' => '',
-							'delay_flex' => '',
 							'params' => '',
 							'ipmi_sensor' => '',
 							'authtype' => '0',
@@ -987,8 +976,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmp_community' => '',
 							'snmp_oid' => '',
 							'delay' => '30',
-							'history' => '90',
-							'trends' => '365',
+							'history' => '90d',
+							'trends' => '365d',
 							'status' => '0',
 							'value_type' => '3',
 							'units' => '',
@@ -999,7 +988,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmpv3_authpassphrase' => '',
 							'snmpv3_privprotocol' => '0',
 							'snmpv3_privpassphrase' => '',
-							'delay_flex' => '',
 							'params' => '',
 							'ipmi_sensor' => '',
 							'authtype' => '0',
@@ -1235,11 +1223,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '32',
-						'element' => [
-							'description' => 'trigger',
-							'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
-							'recovery_expression' => ''
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1251,6 +1234,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							[
 								'name' => 'url',
 								'url' => 'http://google.com'
+							]
+						],
+						'elements' => [
+							[
+								'description' => 'trigger',
+								'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
+								'recovery_expression' => ''
 							]
 						]
 					],
@@ -1267,9 +1257,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '33',
-						'element' => [
-							'host' => 'export-host'
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1277,7 +1264,12 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'icon_disabled' => [],
 						'icon_maintenance' => [],
 						'application' => '',
-						'urls' => []
+						'urls' => [],
+						'elements' => [
+							[
+								'host' => 'export-host'
+							]
+						]
 					],
 					[
 						'elementtype' => '3',
@@ -1292,9 +1284,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '34',
-						'element' => [
-							'name' => 'Zabbix servers'
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1302,7 +1291,12 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'icon_disabled' => [],
 						'icon_maintenance' => [],
 						'application' => '',
-						'urls' => []
+						'urls' => [],
+						'elements' => [
+							[
+								'name' => 'Zabbix servers'
+							]
+						]
 					]
 				],
 				'links' => [
@@ -1472,12 +1466,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'value_type' => '0',
 						'ipmi_sensor' => '',
 						'delay' => '30',
-						'history' => '7',
-						'trends' => '365',
+						'history' => '7d',
+						'trends' => '365d',
 						'status' => '0',
 						'units' => '%',
 						'logtimefmt' => '',
-						'delay_flex' => '',
 						'authtype' => '0',
 						'username' => '',
 						'password' => '',
@@ -1511,12 +1504,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'value_type' => '3',
 						'ipmi_sensor' => '',
 						'delay' => '30',
-						'history' => '90',
-						'trends' => '365',
+						'history' => '90d',
+						'trends' => '365d',
 						'status' => '0',
 						'units' => '',
 						'logtimefmt' => '',
-						'delay_flex' => '',
 						'authtype' => '0',
 						'username' => '',
 						'password' => '',
@@ -1545,12 +1537,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'value_type' => '3',
 						'ipmi_sensor' => '',
 						'delay' => '30',
-						'history' => '90',
-						'trends' => '365',
+						'history' => '90d',
+						'trends' => '365d',
 						'status' => '0',
 						'units' => '',
 						'logtimefmt' => '',
-						'delay_flex' => '',
 						'authtype' => '0',
 						'username' => '',
 						'password' => '',

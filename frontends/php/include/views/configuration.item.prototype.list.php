@@ -49,6 +49,8 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Create enabled'), 'status', $this->data['sort'], $this->data['sortorder'])
 	]);
 
+$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
+
 foreach ($this->data['items'] as $item) {
 	$description = [];
 	if (!empty($item['templateid'])) {
@@ -91,13 +93,25 @@ foreach ($this->data['items'] as $item) {
 		$applications = '';
 	}
 
+	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+		$item['trends'] = '';
+	}
+
+	// hide zeroes for trapper and SNMP trap items
+	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+		$item['delay'] = '';
+	}
+	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+		$item['delay'] = $update_interval_parser->getDelay();
+	}
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$description,
 		$item['key_'],
-		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
-		$item['history']._x('d', 'day short'),
-		($item['trends'] !== '') ? $item['trends']._x('d', 'day short') : '',
+		$item['delay'],
+		$item['history'],
+		$item['trends'],
 		item_type2str($item['type']),
 		$applications,
 		$status

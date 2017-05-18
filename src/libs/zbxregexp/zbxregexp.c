@@ -20,10 +20,6 @@
 #include "common.h"
 #include "zbxregexp.h"
 
-#if defined(_WINDOWS)
-#	include "gnuregex.h"
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_regexp_compile                                               *

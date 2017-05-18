@@ -1,19 +1,10 @@
-#include <errno.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <sys/ioctl.h>
-
 #include "common.h"
-#include "zbxtypes.h"
-#include "zbxalgo.h"
-#include "log.h"
 
 #ifdef HAVE_IPCSERVICE
 
-#include <event.h>
+#include "zbxtypes.h"
+#include "zbxalgo.h"
+#include "log.h"
 
 #include "zbxipcservice.h"
 
@@ -92,7 +83,7 @@ static void	event_free(struct event *event)
 static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg);
 static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg);
 
-static const char	*ipc_get_path()
+static const char	*ipc_get_path(void)
 {
 	ipc_path[ipc_path_root_len] = '\0';
 
@@ -121,10 +112,8 @@ static const char	*ipc_get_path()
  ******************************************************************************/
 static const char	*ipc_make_path(const char *service_name)
 {
-	int	path_len, offset;
-	char	*prefix;
-	size_t	prefix_len;
-
+	const char	*prefix;
+	size_t		path_len, offset, prefix_len;
 
 	path_len = strlen(service_name);
 
@@ -992,7 +981,7 @@ static void ipc_service_event_log_cb(int severity, const char *msg)
  * Purpose: initialize libevent library                                       *
  *                                                                            *
  ******************************************************************************/
-static void	ipc_service_init_libevent()
+static void	ipc_service_init_libevent(void)
 {
 	event_set_log_callback(ipc_service_event_log_cb);
 }
@@ -1004,7 +993,7 @@ static void	ipc_service_init_libevent()
  * Purpose: uninitialize libevent library                                     *
  *                                                                            *
  ******************************************************************************/
-static void	ipc_service_free_libevent()
+static void	ipc_service_free_libevent(void)
 {
 }
 
@@ -1227,13 +1216,13 @@ int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 	{
-		char	*data = NULL;
+		char	*msg = NULL;
 
-		zbx_ipc_message_format(message, &data);
+		zbx_ipc_message_format(message, &msg);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, data);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, msg);
 
-		zbx_free(data);
+		zbx_free(msg);
 	}
 
 	ret = SUCCEED;
@@ -1424,7 +1413,7 @@ out:
  * Purpose: frees IPC service environment                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_ipc_service_free_env()
+void	zbx_ipc_service_free_env(void)
 {
 	ipc_service_free_libevent();
 }

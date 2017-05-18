@@ -449,7 +449,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	}
 	else
 	{
-		if (FAIL == is_time_suffix(param, &seconds))
+		if (FAIL == is_time_suffix(param, &seconds, ZBX_LENGTH_UNLIMITED))
 		{
 			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter."));
 			goto clean2;
