@@ -992,8 +992,10 @@ class CDashboard extends CApiService {
 		$db_widgets = [];
 
 		if ($db_dashboards !== null) {
-			foreach ($db_dashboards as $db_dashboard) {
-				$db_widgets += zbx_toHash($db_dashboard['widgets'], 'widgetid');
+			foreach ($dashboards as $dashboard) {
+				if (array_key_exists('widgets', $dashboard)) {
+					$db_widgets += zbx_toHash($db_dashboards[$dashboard['dashboardid']]['widgets'], 'widgetid');
+				}
 			}
 		}
 
