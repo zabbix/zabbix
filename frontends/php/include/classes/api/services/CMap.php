@@ -1280,6 +1280,8 @@ class CMap extends CMapElement {
 			'line_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'border_color')],
 			'zindex' =>				['type' => API_INT32]
 		]];
+		$default_shape_width = DB::getDefault('sysmap_shape', 'width');
+		$default_shape_height = DB::getDefault('sysmap_shape', 'height');
 
 		foreach ($sysmapids as $key => $sysmapid) {
 			// Map user shares.
@@ -1326,6 +1328,12 @@ class CMap extends CMapElement {
 				$api_shape_rules['fields']['width']['in'] = '1:'.$maps[$key]['width'];
 				$api_shape_rules['fields']['height']['in'] = '1:'.$maps[$key]['height'];
 
+				foreach ($maps[$key]['shapes'] as &$shape) {
+					$shape['width'] = array_key_exists('width', $shape) ? $shape['width'] : $default_shape_width;
+					$shape['height'] = array_key_exists('height', $shape) ? $shape['height'] : $default_shape_height;
+				}
+				unset($shape);
+
 				if (!CApiInputValidator::validate($api_shape_rules, $maps[$key]['shapes'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
@@ -1343,6 +1351,12 @@ class CMap extends CMapElement {
 				$api_line_rules['fields']['y1']['in'] = '0:'.$maps[$key]['height'];
 				$api_line_rules['fields']['x2']['in'] = '0:'.$maps[$key]['width'];
 				$api_line_rules['fields']['y2']['in'] = '0:'.$maps[$key]['height'];
+
+				foreach ($maps[$key]['lines'] as &$line) {
+					$line['x2'] = array_key_exists('x2', $line) ? $line['x2'] : $default_shape_width;
+					$line['y2'] = array_key_exists('y2', $line) ? $line['y2'] : $default_shape_height;
+				}
+				unset($line);
 
 				if (!CApiInputValidator::validate($api_line_rules, $maps[$key]['lines'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1488,7 +1502,7 @@ class CMap extends CMapElement {
 			'background_color' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'background_color')],
 			'font_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'font_color')],
 			'text' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'text')],
-			'zindex' =>				['type' => API_INT32],
+			'zindex' =>				['type' => API_INT32]
 		]];
 		$api_line_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 			'sysmap_shapeid' =>		['type' => API_ID],
@@ -1499,8 +1513,10 @@ class CMap extends CMapElement {
 			'line_type' =>			['type' => API_INT32, 'in' => implode(',', [SYSMAP_SHAPE_BORDER_TYPE_NONE, SYSMAP_SHAPE_BORDER_TYPE_SOLID, SYSMAP_SHAPE_BORDER_TYPE_DOTTED, SYSMAP_SHAPE_BORDER_TYPE_DASHED])],
 			'line_width' =>			['type' => API_INT32, 'in' => '0:50'],
 			'line_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'border_color')],
-			'zindex' =>				['type' => API_INT32],
+			'zindex' =>				['type' => API_INT32]
 		]];
+		$default_shape_width = DB::getDefault('sysmap_shape', 'width');
+		$default_shape_height = DB::getDefault('sysmap_shape', 'height');
 
 		foreach ($maps as $index => $map) {
 			$update_maps[] = [
@@ -1595,6 +1611,13 @@ class CMap extends CMapElement {
 			// Map shapes.
 			if (array_key_exists('shapes', $map)) {
 				$map['shapes'] = array_values($map['shapes']);
+
+				foreach ($map['shapes'] as &$shape) {
+					$shape['width'] = array_key_exists('width', $shape) ? $shape['width'] : $default_shape_width;
+					$shape['height'] = array_key_exists('height', $shape) ? $shape['height'] : $default_shape_height;
+				}
+				unset($shape);
+
 				$shape_diff = zbx_array_diff($map['shapes'], $db_map['shapes'], 'sysmap_shapeid');
 
 				$path = '/'.($index + 1).'/shape';
@@ -1643,6 +1666,13 @@ class CMap extends CMapElement {
 				$api_line_rules['fields']['y2']['in'] = '0:'.$map_height;
 
 				$path = '/'.($index + 1).'/line';
+
+				foreach ($map['lines'] as &$line) {
+					$line['x2'] = array_key_exists('x2', $line) ? $line['x2'] : $default_shape_width;
+					$line['y2'] = array_key_exists('y2', $line) ? $line['y2'] : $default_shape_height;
+				}
+				unset($line);
+
 				if (!CApiInputValidator::validate($api_line_rules, $map['lines'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
