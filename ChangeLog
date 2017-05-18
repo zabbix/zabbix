@@ -70,7 +70,7 @@ Bug fixes:
 ..F....... [ZBX-10754] fixed comparison of previously and newly linked web scenarios (miks)
 ..F....... [ZBX-11549] fixed 'numeric value' error in dashboard for php 7 (gcalenko, Sasha)
 ..F....... [ZBX-11559] fixed jquery binded function call on form submit (miks)
-..F....... [ZBX-11677] fixed order in list of latest 500 item values (miks)
+..F....... [ZBX-11677] fixed history page to display values in chronological order (miks)
 ..F....... [ZBX-11405] fixed conditions to display treeview button in triggers section (miks)
 ........S. [ZBX-12012] fixed resolving of Critical and Verbose event log levels by {ITEM.LOG.SEVERITY} macro (Sasha)
 A......... [ZBX-12093] fixed removing of applications that are created from application prototypes (Sasha)
