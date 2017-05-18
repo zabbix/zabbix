@@ -83,7 +83,7 @@ $form
 	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardUpdate::EMPTY_GROUP.']', '1'))
 	->addItem((new CFormList('sharing_form'))
 	->addRow(_('Type'),
-		(new CRadioButtonList('private', (int) $data['dashboard']['private']))
+		(new CRadioButtonList('private', PRIVATE_SHARING))
 			->addValue(_('Private'), PRIVATE_SHARING)
 			->addValue(_('Public'), PUBLIC_SHARING)
 			->setModern(true)

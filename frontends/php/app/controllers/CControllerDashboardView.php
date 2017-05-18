@@ -98,7 +98,7 @@ class CControllerDashboardView extends CController {
 
 		if ($dashboardid != 0) {
 			$dashboards = API::Dashboard()->get([
-				'output' => ['dashboardid', 'name', 'private'],
+				'output' => ['dashboardid', 'name'],
 				'dashboardids' => $dashboardid
 			]);
 
@@ -106,14 +106,11 @@ class CControllerDashboardView extends CController {
 				$dashboard = $dashboards[0];
 				$dashboards_rw = API::Dashboard()->get([
 					'output' => [],
-					'dashboardids' => [$dashboardid],
+					'dashboardids' => $dashboardid,
 					'editable' => true,
 					'preservekeys' => true
 				]);
-				$dashboard['editable'] = false;
-				if (array_key_exists($dashboardid, $dashboards_rw)) {
-					$dashboard['editable'] = true;
-				}
+				$dashboard['editable'] = array_key_exists($dashboardid, $dashboards_rw);
 
 				CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 			}
