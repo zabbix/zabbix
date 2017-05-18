@@ -74,11 +74,11 @@
 						}
 					}
 					else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
-						alert(t('You need permission to perform this action!'));
+						alert('<?= _('You need permission to perform this action!') ?>');
 					}
 				},
 				error: function (response) {
-					alert(t('Something went wrong. Please try again later!'))
+					alert('<?= _('Something went wrong. Please try again later!') ?>)
 				}
 			});
 			event.preventDefault(); // cancel original event to prevent form submitting
