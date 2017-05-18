@@ -672,7 +672,7 @@ class testWebScenario extends CZabbixTest {
 					'delay' => '-1'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
 			],
 			[
 				'httptest' => [
@@ -696,7 +696,7 @@ class testWebScenario extends CZabbixTest {
 					'delay' => '☺'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/delay": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
 			],
 			[
 				'httptest' => [
@@ -704,7 +704,7 @@ class testWebScenario extends CZabbixTest {
 					'delay' => '1.5'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/delay": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
 			],
 			// Check web headers.
 			[
