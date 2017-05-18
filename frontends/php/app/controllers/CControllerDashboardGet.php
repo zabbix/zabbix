@@ -93,8 +93,8 @@ class CControllerDashboardGet extends CController {
 				'permission' => $users[$db_user['userid']]['permission']
 			];
 		}
-
-		return $result;
+		order_result($result, 'name');
+		return array_values($result);
 	}
 
 	/**
@@ -120,7 +120,7 @@ class CControllerDashboardGet extends CController {
 				'permission' => $usrgrps[$db_usrgrp['usrgrpid']]['permission']
 			];
 		}
-
-		return $result;
+		order_result($result, 'name');
+		return array_values($result);
 	}
 }
