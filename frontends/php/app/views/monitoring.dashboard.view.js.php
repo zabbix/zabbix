@@ -1,4 +1,80 @@
+<script type="text/x-jquery-tmpl" id="user_group_row_tpl">
+<?= (new CRow([
+	new CCol([
+		(new CTextBox('userGroups[#{usrgrpid}][usrgrpid]', '#{usrgrpid}'))->setAttribute('type', 'hidden'),
+		'#{name}'
+	]),
+	new CCol(
+		(new CRadioButtonList('userGroups[#{usrgrpid}][permission]', PERM_READ))
+			->addValue(_('Read-only'), PERM_READ, 'user_group_#{usrgrpid}_permission_'.PERM_READ)
+			->addValue(_('Read-write'), PERM_READ_WRITE, 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
+			->setModern(true)
+	),
+	(new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('removeUserGroupShares("#{usrgrpid}");')
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->setId('user_group_shares_#{usrgrpid}')
+	->toString()
+?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="user_row_tpl">
+<?= (new CRow([
+	new CCol([
+		(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
+		'#{name}',
+	]),
+	new CCol(
+		(new CRadioButtonList('users[#{id}][permission]', PERM_READ))
+			->addValue(_('Read-only'), PERM_READ, 'user_#{id}_permission_'.PERM_READ)
+			->addValue(_('Read-write'), PERM_READ_WRITE, 'user_#{id}_permission_'.PERM_READ_WRITE)
+			->setModern(true)
+	),
+	(new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('removeUserShares("#{id}");')
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->setId('user_shares_#{id}')
+	->toString()
+?>
+</script>
+
 <script type="text/javascript">
+	// Change dashboard settings
+	var dashbrd_config = function() {
+		// Update buttons on existing widgets to view mode
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
+	};
+
+	// Save changes and cancel editing dashboard
+	var dashbrd_save_changes = function() {
+		// Update buttons on existing widgets to view mode
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
+		// dashboardButtonsSetView() will be called in case of success of ajax in function 'saveDashboardChanges'
+	};
+
+	// Cancel editing dashboard
+	var dashbrd_cancel = function(e) {
+		e.preventDefault(); // To prevent going by href link
+
+		// Update buttons on existing widgets to view mode
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
+
+		var form = jQuery(this).closest('form');
+		jQuery('.dashbrd-edit', form).remove();
+		jQuery('#dashbrd-edit', form).closest('li').show();
+	};
+
+	// Add new widget
+	var dashbrd_add_widget = function() {
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
+	};
+
 	jQuery(document).ready(function($) {
 		// Turn on edit dashboard
 		$('#dashbrd-edit').click(function() {
@@ -56,36 +132,51 @@
 			$('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
 		});
 
-		// Change dashboard settings
-		var dashbrd_config = function() {
-			// Update buttons on existing widgets to view mode
-			$('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
-		};
+		var	form = jQuery('form[name="dashboard_sharing_form"]');
 
-		// Save changes and cancel editing dashboard
-		var dashbrd_save_changes = function() {
-			// Update buttons on existing widgets to view mode
-			$('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
-			// dashboardButtonsSetView() will be called in case of success of ajax in function 'saveDashboardChanges'
-		};
+		// overwrite submit action to AJAX call
+		form.submit(function(event) {
+			var	me = this;
+			event.preventDefault();
 
-		// Cancel editing dashboard
-		var dashbrd_cancel = function(e) {
-			e.preventDefault(); // To prevent going by href link
-
-			// Update buttons on existing widgets to view mode
-			$('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
-
-			var form = $(this).closest('form');
-			$('.dashbrd-edit', form).remove();
-			$('#dashbrd-edit', form).closest('li').show();
-		};
-
-		// Add new widget
-		var dashbrd_add_widget = function() {
-			$('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
-		};
+			jQuery.ajax({
+				data: jQuery(me).serialize(), // get the form data
+				type: jQuery(me).attr('method'),
+				url: jQuery(me).attr('action'),
+				success: function (response) {
+					dashboardRemoveMessages();
+					if (typeof response === 'object') {
+						if ('messages' in response && response.messages.length > 0) {
+							dashbaordAddMessages(response.messages.join());
+						}
+					}
+					else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+						alert('<?= _('You need permission to perform this action!') ?>');
+					}
+				},
+				error: function (response) {
+					alert('<?= _('Something went wrong. Please try again later!') ?>')
+				}
+			});
+		});
 	});
+
+	// fill the form with actual data
+	jQuery.fn.fillForm = function(data) {
+		if (typeof data.private !== 'undefined') {
+			addPopupValues({'object': 'private', 'values': [data.private] });
+		}
+
+		if (typeof data.users !== 'undefined') {
+			removeUserShares();
+			addPopupValues({'object': 'userid', 'values': data.users });
+		}
+
+		if (typeof data.userGroups !== 'undefined') {
+			removeUserGroupShares();
+			addPopupValues({'object': 'usrgrpid', 'values': data.userGroups });
+		}
+	};
 
 	// will be called by setModeViewDashboard() method in dashboard.grid.js
 	function dashboardButtonsSetView() {
@@ -107,5 +198,83 @@
 	// Function is in global scope, because it should be accessable by html onchange() attribute
 	function updateWidgetConfigDialogue() {
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('updateWidgetConfigDialogue');
+	}
+
+	/**
+	 * @see init.js add.popup event
+	 */
+	function addPopupValues(list) {
+		var	i,
+			tpl,
+			container;
+
+		for (i = 0; i < list.values.length; i++) {
+			var	value = list.values[i];
+
+			if (empty(value)) {
+				continue;
+			}
+
+			if (typeof value.permission === 'undefined') {
+				if (jQuery('input[name=private]:checked').val() == <?= PRIVATE_SHARING ?>) {
+					value.permission = <?= PERM_READ ?>;
+				}
+				else {
+					value.permission = <?= PERM_READ_WRITE ?>;
+				}
+			}
+
+			switch (list.object) {
+				case 'private':
+					jQuery('input[name=private][value=' + value + ']').prop('checked', 'checked');
+					break;
+
+				case 'usrgrpid':
+					if (jQuery('#user_group_shares_' + value.usrgrpid).length) {
+						continue;
+					}
+
+					tpl = new Template(jQuery('#user_group_row_tpl').html());
+
+					container = jQuery('#user_group_list_footer');
+					container.before(tpl.evaluate(value));
+
+					jQuery('#user_group_' + value.usrgrpid + '_permission_' + value.permission + '')
+						.prop('checked', true);
+					break;
+
+				case 'userid':
+					if (jQuery('#user_shares_' + value.id).length) {
+						continue;
+					}
+
+					tpl = new Template(jQuery('#user_row_tpl').html());
+
+					container = jQuery('#user_list_footer');
+					container.before(tpl.evaluate(value));
+
+					jQuery('#user_' + value.id + '_permission_' + value.permission + '')
+						.prop('checked', true);
+					break;
+			}
+		}
+	}
+
+	function removeUserGroupShares(usrgrpid) {
+		if (typeof usrgrpid === 'undefined') {
+			jQuery("[id^='user_group_shares']").remove();
+		}
+		else {
+			jQuery('#user_group_shares_' + usrgrpid).remove();
+		}
+	}
+
+	function removeUserShares(userid) {
+		if (typeof userid === 'undefined') {
+			jQuery("[id^='user_shares']").remove();
+		}
+		else {
+			jQuery('#user_shares_' + userid).remove();
+		}
 	}
 </script>

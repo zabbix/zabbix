@@ -169,12 +169,91 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Retrieve Status of Zabbix information.
+	 *
+	 * @param $sid
+	 *
+	 * @return bool|array
+	 */
+	public function getStatus($sid) {
+		$response = $this->request([
+			'request' => 'status.get',
+			'type' => 'full',
+			'sid' => $sid
+		]);
+
+		if ($response === false) {
+			return false;
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'template stats' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
+			]],
+			'host stats' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])]
+				]],
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
+			]],
+			'item stats' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+					'state' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED])]
+				]],
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
+			]],
+			'trigger stats' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])],
+					'value' =>					['type' => API_INT32, 'in' => implode(',', [TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE])]
+				]],
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
+			]],
+			'user stats' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'status' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SESSION_ACTIVE, ZBX_SESSION_PASSIVE])]
+				]],
+				'count' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32]
+			]],
+			// only for super-admins 'required performance' is available
+			'required performance' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'attributes' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				]],
+				'count' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]	// API_FLOAT 0-n
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $response, '/', $this->error)) {
+			return false;
+		}
+
+		return $response;
+	}
+
+	/**
 	 * Returns true if the Zabbix server is running and false otherwise.
+	 *
+	 * @param $sid
 	 *
 	 * @return bool
 	 */
-	public function isRunning() {
-		return (bool) $this->connect();
+	public function isRunning($sid) {
+		$response = $this->request([
+			'request' => 'status.get',
+			'type' => 'ping',
+			'sid' => $sid
+		]);
+
+		if ($response === false) {
+			return false;
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
 	}
 
 	/**
@@ -263,6 +342,7 @@ class CZabbixServer {
 		}
 
 		$response = CJs::decodeJson($response);
+
 		if (!$response || !$this->validateResponse($response)) {
 			$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 

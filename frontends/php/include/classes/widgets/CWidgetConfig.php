@@ -20,14 +20,15 @@
 
 class CWidgetConfig
 {
-	// TODO VM: (?) maybe better to convert all functions to static ones
-	private $knownWidgetTypes;
-	private $rfRates;
-	private $dimensions;
-	private $apiFieldKeys;
-
-	public function __construct() {
-		$this->knownWidgetTypes = [
+	/**
+	 * Return list of all widget types with names.
+	 *
+	 * @static
+	 *
+	 * @return array
+	 */
+	public static function getKnownWidgetTypes() {
+		return [
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix'),
 			WIDGET_LAST_ISSUES			=> _('Last issues'),
@@ -38,24 +39,18 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_MAPS		=> _('Favourite maps'),
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
-			WIDGET_URL					=> _('URL'),
+			WIDGET_URL					=> _('URL')
 		];
+	}
 
-		$this->rfRates = [
-			WIDGET_SYSTEM_STATUS		=> SEC_PER_MIN,
-			WIDGET_ZABBIX_STATUS		=> 15 * SEC_PER_MIN,
-			WIDGET_LAST_ISSUES			=> SEC_PER_MIN,
-			WIDGET_WEB_OVERVIEW			=> SEC_PER_MIN,
-			WIDGET_DISCOVERY_STATUS		=> SEC_PER_MIN,
-			WIDGET_HOST_STATUS			=> SEC_PER_MIN,
-			WIDGET_FAVOURITE_GRAPHS		=> 15 * SEC_PER_MIN,
-			WIDGET_FAVOURITE_MAPS		=> 15 * SEC_PER_MIN,
-			WIDGET_FAVOURITE_SCREENS	=> 15 * SEC_PER_MIN,
-			WIDGET_CLOCK				=> 15 * SEC_PER_MIN,
-			WIDGET_URL					=> 0,
-		];
-
-		$this->dimensions = [
+	/**
+	 * Get default widget dimensions.
+	 *
+	 * @return array
+	 */
+	public static function getDefaultDimensions()
+	{
+		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_LAST_ISSUES			=> ['width' => 6, 'height' => 6],
@@ -68,110 +63,122 @@ class CWidgetConfig
 			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
 			WIDGET_URL					=> ['width' => 7, 'height' => 9],
 		];
-
-		$this->apiFieldKeys = [
-			ZBX_WIDGET_FIELD_TYPE_INT32				=> 'value_int',
-			ZBX_WIDGET_FIELD_TYPE_STR				=> 'value_str',
-			ZBX_WIDGET_FIELD_TYPE_GROUP				=> 'value_groupid',
-			ZBX_WIDGET_FIELD_TYPE_HOST				=> 'value_hostid',
-			ZBX_WIDGET_FIELD_TYPE_ITEM				=> 'value_itemid',
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE	=> 'value_itemid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH				=> 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE	=> 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_MAP				=> 'value_sysmapid',
-			ZBX_WIDGET_FIELD_TYPE_DASHBOARD			=> 'value_dashboardid'
-		];
 	}
 
 	/**
 	 * Return default values for new widgets
-	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
+	 *
 	 * @return array
 	 */
-	public function getDefaults($user_type = null) {
+	public static function getDefaults() {
 		$ret = [];
-		$known_widget_types = $this->getKnownWidgetTypes($user_type);
-		foreach ($known_widget_types as $value) {
-			$ret[$value] = [];
-			$ret[$value]['header'] = $this->knownWidgetTypes[$value];
-			$ret[$value]['rf_rate'] = $this->rfRates[$value];
-			$ret[$value]['size'] = $this->dimensions[$value];
+		$known_widget_types = self::getKnownWidgetTypes();
+		$dimensions = self::getDefaultDimensions();
+		foreach ($known_widget_types as $key => $value) {
+			$ret[$key] = [
+				'header' => $value,
+				'rf_rate' => self::getDefaultRfRate($key),
+				'size' => $dimensions[$key]
+			];
 		}
 		return $ret;
 	}
 
 	/**
-	 * Return list of all widget types with names
-	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
-	 * @return array
+	 * Return default refresh rate for widget type.
+	 *
+	 * @static
+	 *
+	 * @param int $type  WIDGET_ constant
+	 *
+	 * @return int  default refresh rate, "0" for no refresh
 	 */
-	public function getKnownWidgetTypesWNames($user_type = null) {
-		$known_widget_types = $this->knownWidgetTypes;
+	public static function getDefaultRfRate($type) {
+		switch ($type) {
+			case WIDGET_SYSTEM_STATUS:
+			case WIDGET_LAST_ISSUES:
+			case WIDGET_WEB_OVERVIEW:
+			case WIDGET_DISCOVERY_STATUS:
+			case WIDGET_HOST_STATUS:
+				return SEC_PER_MIN;
 
-		// Remove widget types, user can't create
-		if ($user_type !== null) {
-			$show_discovery_widget = ($user_type >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
-				'output' => [],
-				'filter' => ['status' => DRULE_STATUS_ACTIVE],
-				'limit' => 1
-			]));
-			if (!$show_discovery_widget) {
-				unset($known_widget_types[WIDGET_DISCOVERY_STATUS]);
-			}
+			case WIDGET_ZABBIX_STATUS:
+			case WIDGET_FAVOURITE_GRAPHS:
+			case WIDGET_FAVOURITE_MAPS:
+			case WIDGET_FAVOURITE_SCREENS:
+			case WIDGET_CLOCK:
+				return 15 * SEC_PER_MIN;
 
-			$show_status_widget = ($user_type == USER_TYPE_SUPER_ADMIN);
-			if (!$show_status_widget) {
-				unset($known_widget_types[WIDGET_ZABBIX_STATUS]);
-			}
+			case WIDGET_URL:
+				return 0;
 		}
-
-		return $known_widget_types;
 	}
 
 	/**
-	 * Return list of all widget types
-	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
-	 * @return array
+	 * Returns key, where value is stored for given field type.
+	 *
+	 * @static
+	 *
+	 * @param int $field_type  ZBX_WIDGET_FIELD_TYPE_ constant
+	 *
+	 * @return string  field key, where to save the value
 	 */
-	public function getKnownWidgetTypes($user_type = null) {
-		return array_keys($this->getKnownWidgetTypesWNames($user_type));
+	public static function getApiFieldKey($field_type){
+		switch ($field_type) {
+			case ZBX_WIDGET_FIELD_TYPE_INT32:
+				return 'value_int';
+
+			case ZBX_WIDGET_FIELD_TYPE_STR:
+				return 'value_str';
+
+			case ZBX_WIDGET_FIELD_TYPE_GROUP:
+				return 'value_groupid';
+
+			case ZBX_WIDGET_FIELD_TYPE_HOST:
+				return 'value_hostid';
+
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
+				return 'value_itemid';
+
+			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+				return 'value_itemid';
+
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+				return 'value_graphid';
+
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+				return 'value_graphid';
+
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
+				return 'value_sysmapid';
+
+			case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
+				return 'value_dashboardid';
+		}
 	}
 
 	/**
-	 * Return default refresh rate for widget type
-	 * @param int $type - WIDGET_ constant
-	 * @return int default refresh rate, "0" for no refresh
-	 */
-	public function getDefaultRfRate($type) {
-		return $this->rfRates[$type];
-	}
-
-	/**
-	 * Returns key, where value is stored for given field type
-	 * @param int $field_type - ZBX_WIDGET_FIELD_TYPE_ constant
-	 * @return string field key, where to save the value
-	 */
-	public function getApiFieldKey($field_type){
-		return $this->apiFieldKeys[$field_type];
-	}
-
-	/**
-	 * Return Form object for widget with provided data
-	 * @param array $data - array with all widget's fields, including widget type and position
-	 * @param int $user_type - USER_TYPE_ZABBIX_ constant, if null or not passed, will accept all widget types
+	 * Return Form object for widget with provided data.
+	 *
+	 * @static
+	 *
+	 * @param array  $data          array with all widget's fields, including widget type
+	 * @param string $data['type']
+	 * @param string $data[<name>]  (optional)
+	 *
 	 * @return CWidgetForm
 	 */
-	public function getForm($data, $user_type = null) {
-		$known_widget_types = $this->getKnownWidgetTypesWNames($user_type);
+	public static function getForm($data) {
 		switch ($data['type']) {
 			case WIDGET_CLOCK:
-				return (new CClockWidgetForm($data, $known_widget_types));
+				return new CClockWidgetForm($data);
+
 			case WIDGET_URL:
-				return (new CUrlWidgetForm($data, $known_widget_types));
+				return new CUrlWidgetForm($data);
 
 			default:
 				// TODO VM: delete this case after all widget forms will be created
-				return (new CWidgetForm($data, $known_widget_types));
+				return new CWidgetForm($data);
 		}
 	}
 }

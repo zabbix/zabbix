@@ -34,7 +34,7 @@
 					.attr('readonly', 'readonly')
 					.val($('#macros_' + macroNum + '_inherited_value').val());
 				$('#macros_' + macroNum + '_change')
-					.text(<?= CJs::encodeJson(_('Change')) ?>);
+					.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
 			}
 			else {
 				$('#macros_' + macroNum + '_type')

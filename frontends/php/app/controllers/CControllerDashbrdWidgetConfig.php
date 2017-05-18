@@ -21,40 +21,33 @@
 
 class CControllerDashbrdWidgetConfig extends CController {
 
-	private $widget_config;
-
-	public function __construct() {
-		parent::__construct();
-
-		$this->widget_config = new CWidgetConfig();
-	}
-
 	protected function checkInput() {
 		$fields = [
+			'widgetid'		=>	'db widget.widgetid',
 			'fields'		=>	'array',
 		];
 
 		$ret = $this->validateInput($fields);
+
 		if ($ret) {
 			/*
-			 * @var string	fields['type']
-			 * @var int		fields['time_type']			(optional)
-			 * @var string	fields['itemid']			(optional)
-			 * @var string	fields['caption']			(optional)
-			 * @var string	fields['url']				(optional)
+			 * @var string fields['type']
+			 * @var string fields[<name>]  (optional)
 			 */
 			if ($this->hasInput('fields')) {
 				$widget_fields = $this->getInput('fields');
+				$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes());
 
-				// Field array should contain widget type
 				if (!array_key_exists('type', $widget_fields)) {
-					error(_('No widget type')); // TODO VM: (?) improve message
+					error(_s('Invalid parameter "%1$s": %2$s.', 'fields',
+						_s('the parameter "%1$s" is missing', 'type')
+					));
 					$ret = false;
 				}
-				// We will work only with known widget types
-				// TODO VM: (?) what should happen if I will open dashboard with widget, here I don't have right for this widget type.
-				elseif (!in_array($widget_fields['type'], $this->widget_config->getKnownWidgetTypes($this->getUserType()))) {
-					error(_('Unknown widget type')); // TODO VM: (?) improve message
+				elseif (!in_array($widget_fields['type'], $known_widget_types)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'fields[type]',
+						_s('value must be one of %1$s', implode(',', $known_widget_types))
+					));
 					$ret = false;
 				}
 			}
@@ -78,7 +71,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 		// default fields data
 		$fields = [
-			'type' => WIDGET_CLOCK,
+			'type' => WIDGET_CLOCK
 		];
 
 		// TODO VM: (?) get current widget fields data from JS
@@ -87,7 +80,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 //		// get data for current widget - in case we are switching between types, and no fields for widget are given
 //		if ($this->hasInput('widgetid')) {
 //			$dialogue['widgetid'] = $this->getInput('widgetid');
-//			$widget = $this->widget_config->getConfig($dialogue['widgetid']);
+//			$widget = CWidgetConfig::getConfig($dialogue['widgetid']);
 //		}
 
 		// Get fields from dialogue form
@@ -95,12 +88,12 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 		// Take default values, replce with saved ones, replace with selected in dialogue
 		$fields_data = array_merge($fields, $widget, $dialogue_fields);
-		$dialogue['form'] = $this->widget_config->getForm($fields_data, $this->getUserType());
+		$dialogue['form'] = CWidgetConfig::getForm($fields_data);
 		$this->setResponse(new CControllerResponseData([
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'dialogue' => $dialogue,
+			'dialogue' => $dialogue
 		]));
 	}
 }

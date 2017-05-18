@@ -50,6 +50,8 @@ $discoveryTable = (new CTableInfo())
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
 
+$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+
 foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
@@ -96,6 +98,14 @@ foreach ($data['discoveries'] as $discovery) {
 		];
 	}
 
+	// hide zeroes for trapper and SNMP trap items
+	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
+		$discovery['delay'] = '';
+	}
+	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
+		$discovery['delay'] = $update_interval_parser->getDelay();
+	}
+
 	$discoveryTable->addRow([
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
 		$description,
@@ -122,7 +132,7 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		$hostPrototypeLink,
 		$discovery['key_'],
-		($discovery['delay'] === '') ? '' : convertUnitsS($discovery['delay']),
+		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
 		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
