@@ -945,19 +945,12 @@ static int	DBpatch_3030071(void)
 
 static int	DBpatch_3030072(void)
 {
-	const ZBX_FIELD	field = {"acknowledgeid", NULL, "acknowledges", "acknowledgeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("escalations", 1, &field);
-}
-
-static int	DBpatch_3030073(void)
-{
 	const ZBX_FIELD	field = {"ack_shortdata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("actions", &field);
 }
 
-static int	DBpatch_3030074(void)
+static int	DBpatch_3030073(void)
 {
 	const ZBX_FIELD	field = {"ack_longdata", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
@@ -1044,6 +1037,5 @@ DBPATCH_ADD(3030070, 0, 1)
 DBPATCH_ADD(3030071, 0, 1)
 DBPATCH_ADD(3030072, 0, 1)
 DBPATCH_ADD(3030073, 0, 1)
-DBPATCH_ADD(3030074, 0, 1)
 
 DBPATCH_END()
