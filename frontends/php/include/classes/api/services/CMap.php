@@ -1268,7 +1268,7 @@ class CMap extends CMapElement {
 			'background_color' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'background_color')],
 			'font_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'font_color')],
 			'text' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'text')],
-			'zindex' =>				['type' => API_INT32],
+			'zindex' =>				['type' => API_INT32]
 		]];
 		$api_line_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 			'x1' =>					['type' => API_INT32],
@@ -1278,7 +1278,7 @@ class CMap extends CMapElement {
 			'line_type' =>			['type' => API_INT32, 'in' => implode(',', [SYSMAP_SHAPE_BORDER_TYPE_NONE, SYSMAP_SHAPE_BORDER_TYPE_SOLID, SYSMAP_SHAPE_BORDER_TYPE_DOTTED, SYSMAP_SHAPE_BORDER_TYPE_DASHED])],
 			'line_width' =>			['type' => API_INT32, 'in' => '0:50'],
 			'line_color' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmap_shape', 'border_color')],
-			'zindex' =>				['type' => API_INT32],
+			'zindex' =>				['type' => API_INT32]
 		]];
 
 		foreach ($sysmapids as $key => $sysmapid) {
