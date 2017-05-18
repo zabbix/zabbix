@@ -78,7 +78,7 @@
 					}
 				},
 				error: function (response) {
-					alert('<?= _('Something went wrong. Please try again later!') ?>)
+					alert('<?= _('Something went wrong. Please try again later!') ?>')
 				}
 			});
 			event.preventDefault(); // cancel original event to prevent form submitting
