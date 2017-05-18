@@ -73,24 +73,7 @@ class CControllerDashboardUpdate extends CController {
 			unset($groups[self::EMPTY_GROUP]);
 			$dashboard['userGroups'] = $groups;
 		}
-ob_start();
-echo 'PID: ' . posix_getpid() . PHP_EOL;
-echo '----------------------------------------------------------------------' . PHP_EOL;
-var_dump($dashboard);
-echo '------------------------------BACKTRACE-------------------------------' . PHP_EOL;
-$backtrace = debug_backtrace();
-array_shift($backtrace);
-$output = '';
-foreach ($backtrace as $n => $bt) {
-	$output .= '  --[' . $n . ']-- ' . $bt['file'] . ' : ' . $bt['line'] . PHP_EOL;
-	$output .= "    " . (isset($bt['class']) ? $bt['class'] . $bt['type'] . $bt['function'] : $bt['function']) . PHP_EOL;
-}
-echo $output;
 
-echo '----------------------------------------------------------------------' . PHP_EOL;
-$dump = ob_get_contents();
-ob_end_clean();
-file_put_contents('/home/maximt/test.txt', $dump, FILE_APPEND);
 		$result = (bool) API::Dashboard()->update($dashboard);
 
 		$response = ['result' => $result];

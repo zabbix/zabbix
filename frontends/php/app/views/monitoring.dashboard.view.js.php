@@ -50,12 +50,14 @@
 		// Update buttons on existing widgets to view mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
 	};
+
 	// Save changes and cancel editing dashboard
 	var dashbrd_save_changes = function() {
 		// Update buttons on existing widgets to view mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
 		// dashboardButtonsSetView() will be called in case of success of ajax in function 'saveDashboardChanges'
 	};
+
 	// Cancel editing dashboard
 	var dashbrd_cancel = function(e) {
 		e.preventDefault(); // To prevent going by href link
@@ -67,6 +69,7 @@
 		jQuery('.dashbrd-edit', form).remove();
 		jQuery('#dashbrd-edit', form).closest('li').show();
 	};
+
 	// Add new widget
 	var dashbrd_add_widget = function() {
 		// TODO VM: implement adding widget functionality
@@ -130,6 +133,7 @@
 		});
 
 		var	form = jQuery('form[name="dashboard_sharing_form"]');
+
 		// overwrite submit action to AJAX call
 		form.submit(function(event) {
 			var	me = this;
@@ -195,6 +199,7 @@
 	function updateWidgetConfigDialogue() {
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('updateWidgetConfigDialogue');
 	}
+
 	/**
 	 * @see init.js add.popup event
 	 */
@@ -214,7 +219,7 @@
 				if (jQuery('input[name=private]:checked').val() == <?= PRIVATE_SHARING ?>) {
 					value.permission = <?= PERM_READ ?>;
 				}
-			else {
+				else {
 					value.permission = <?= PERM_READ_WRITE ?>;
 				}
 			}
