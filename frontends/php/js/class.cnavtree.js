@@ -513,8 +513,15 @@ jQuery(function($) {
 
 			// Records data from DOM to dashboard widget[fields] array.
 			var updateWidgetFields = function() {
-				var dashboard_widget = getWidgetData();
-				if (!dashboard_widget) {
+				/*
+				 * TODO miks: if (!widget_data.editMode) return false; is here just to prevent dashboard_widget['fields'] to be
+				 * removed if widget is not in editmode like it is once widget config is updated. Should be fixed in other way.
+				 * Discuss it with VM how to prevent widget refresh after config update.
+				 */
+				var dashboard_widget = getWidgetData(),
+						widget_data = $this.data('widgetData');
+
+				if (!dashboard_widget || !widget_data.editMode) {
 					return false;
 				}
 
