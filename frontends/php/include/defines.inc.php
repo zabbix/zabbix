@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.4.0alpha1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030074);
+define('ZABBIX_DB_VERSION',		3030140);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -32,6 +32,8 @@ define('ZBX_LOGIN_BLOCK',		30); // sec
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
+define('ZBX_MIN_INT32',			-2147483648);
+define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 
@@ -135,16 +137,19 @@ define('T_ZBX_CLR',			5);
 define('T_ZBX_DBL_BIG',		9);
 define('T_ZBX_DBL_STR',		10);
 define('T_ZBX_TP',			11);
+define('T_ZBX_TU',			12);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
 define('O_NO',		2);
 
-define('P_SYS',				1);
-define('P_UNSET_EMPTY',		2);
-define('P_ACT',				16);
-define('P_NZERO',			32);
-define('P_NO_TRIM',			64);
+define('P_SYS',					0x0001);
+define('P_UNSET_EMPTY',			0x0002);
+define('P_ACT',					0x0010);
+define('P_NZERO',				0x0020);
+define('P_NO_TRIM',				0x0040);
+define('P_ALLOW_USER_MACRO',	0x0080);
+define('P_ALLOW_LLD_MACRO',		0x0100);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');
@@ -384,7 +389,9 @@ define('SYSMAP_GRID_ALIGN_OFF',	0);
 define('PUBLIC_SHARING',	0);
 define('PRIVATE_SHARING',	1);
 
-define('ZBX_ITEM_DELAY_DEFAULT', 30);
+define('ZBX_ITEM_DELAY_DEFAULT',			'30s');
+define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
+define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
 
 define('ITEM_TYPE_ZABBIX',			0);
 define('ITEM_TYPE_SNMPV1',			1);
@@ -461,8 +468,8 @@ define('ITEM_LOGTYPE_SUCCESS_AUDIT',	8);
 define('ITEM_LOGTYPE_CRITICAL',			9);
 define('ITEM_LOGTYPE_VERBOSE',			10);
 
-define('ITEM_DELAY_FLEX_TYPE_FLEXIBLE',		0);
-define('ITEM_DELAY_FLEX_TYPE_SCHEDULING',	1);
+define('ITEM_DELAY_FLEXIBLE',	0);
+define('ITEM_DELAY_SCHEDULING',	1);
 
 // item pre-processing
 define('ZBX_PREPROC_MULTIPLIER',	1);
@@ -1044,14 +1051,15 @@ define('API_TIME_PERIOD',		12);
 define('API_REGEX',				13);
 define('API_HTTP_POST',			14);
 define('API_VARIABLE_NAME',		15);
+define('API_TIME_UNIT',			16);
 
 // flags
-define('API_REQUIRED',		0x01);
-define('API_NOT_EMPTY',		0x02);
-define('API_ALLOW_NULL',	0x04);
-define('API_NORMALIZE',		0x08);
-define('API_MULTIPLE',		0x10);
-define('API_DEPRECATED',	0x20);
+define('API_REQUIRED',			0x01);
+define('API_NOT_EMPTY',			0x02);
+define('API_ALLOW_NULL',		0x04);
+define('API_NORMALIZE',			0x08);
+define('API_DEPRECATED',		0x10);
+define('API_ALLOW_USER_MACRO',	0x20);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

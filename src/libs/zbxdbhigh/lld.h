@@ -43,7 +43,7 @@ void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zb
 		zbx_uint64_t flag);
 
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error,
-		unsigned short lifetime, int lastcheck);
+		int lifetime, int lastcheck);
 
 void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows);
 
@@ -51,7 +51,9 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error);
 
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error,
-		unsigned short lifetime, int lastcheck);
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error, int lifetime,
+		int lastcheck);
+
+int	lld_end_of_life(int lastcheck, int lifetime);
 
 #endif

@@ -32,65 +32,108 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'data_type' => ITEM_DATA_TYPE_DECIMAL,
 									'formula' => '1',
 									'multiplier' => 0,
-									'delta' => 0
+									'delta' => 0,
+									'delay' => 60,
+									'delay_flex' => '30/1-5,08:00-12:00',
+									'history' => 0,
+									'trends' => 0
 								],
 								[
 									'data_type' => ITEM_DATA_TYPE_DECIMAL,
 									'formula' => '10',
 									'multiplier' => 1,
-									'delta' => 0
+									'delta' => 0,
+									'delay' => 60,
+									'delay_flex' => '',
+									'history' => 90,
+									'trends' => 365
 								],
 								[
 									'data_type' => ITEM_DATA_TYPE_OCTAL,
 									'formula' => '1',
 									'multiplier' => 0,
-									'delta' => 0
+									'delta' => 0,
+									'delay' => 60,
+									'delay_flex' => '',
+									'history' => 90,
+									'trends' => 365
 								],
 								[
 									'data_type' => ITEM_DATA_TYPE_HEXADECIMAL,
 									'formula' => '1',
 									'multiplier' => 0,
-									'delta' => 1
+									'delta' => 1,
+									'delay' => 60,
+									'delay_flex' => '',
+									'history' => 90,
+									'trends' => 365
 								],
 								[
 									'data_type' => ITEM_DATA_TYPE_BOOLEAN,
 									'formula' => '100',
 									'multiplier' => 1,
-									'delta' => 2
+									'delta' => 2,
+									'delay' => 60,
+									'delay_flex' => '',
+									'history' => 90,
+									'trends' => 365
 								]
 							],
 							'discovery_rules' => [
 								[
+									'delay' => 60,
+									'delay_flex' => '30/1-5,08:00-12:00',
+									'lifetime' => '{$LIFETIME}',
 									'item_prototypes' => [
 										[
 											'data_type' => ITEM_DATA_TYPE_DECIMAL,
 											'formula' => '1',
 											'multiplier' => 0,
-											'delta' => 0
+											'delta' => 0,
+											'delay' => 60,
+											'delay_flex' => '30/1-5,08:00-12:00',
+											'history' => 0,
+											'trends' => 0
 										],
 										[
 											'data_type' => ITEM_DATA_TYPE_DECIMAL,
 											'formula' => '10',
 											'multiplier' => 1,
-											'delta' => 0
+											'delta' => 0,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 90,
+											'trends' => 365
 										],
 										[
 											'data_type' => ITEM_DATA_TYPE_OCTAL,
 											'formula' => '1',
 											'multiplier' => 0,
-											'delta' => 0
+											'delta' => 0,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 90,
+											'trends' => 365
 										],
 										[
 											'data_type' => ITEM_DATA_TYPE_HEXADECIMAL,
 											'formula' => '1',
 											'multiplier' => 0,
-											'delta' => 1
+											'delta' => 1,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 90,
+											'trends' => 365
 										],
 										[
 											'data_type' => ITEM_DATA_TYPE_BOOLEAN,
 											'formula' => '100',
 											'multiplier' => 1,
-											'delta' => 2
+											'delta' => 2,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 90,
+											'trends' => 365
 										]
 									]
 								]
@@ -116,65 +159,108 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'data_type' => ITEM_DATA_TYPE_DECIMAL,
 									'formula' => '1',
 									'multiplier' => 0,
-									'delta' => 0
+									'delta' => 0,
+									'delay' => 60,
+									'delay_flex' => '30/1-5,08:00-12:00',
+									'history' => 0,
+									'trends' => 0
 								],
 								[
 									'data_type' => ITEM_DATA_TYPE_DECIMAL,
 									'formula' => '10',
 									'multiplier' => 1,
-									'delta' => 0
+									'delta' => 0,
+									'delay' => 60,
+									'delay_flex' => '',
+									'history' => 90,
+									'trends' => 365
 								],
 								[
 									'data_type' => ITEM_DATA_TYPE_OCTAL,
 									'formula' => '1',
 									'multiplier' => 0,
-									'delta' => 0
+									'delta' => 0,
+									'delay' => 60,
+									'delay_flex' => '',
+									'history' => 90,
+									'trends' => 365
 								],
 								[
 									'data_type' => ITEM_DATA_TYPE_HEXADECIMAL,
 									'formula' => '1',
 									'multiplier' => 0,
-									'delta' => 1
+									'delta' => 1,
+									'delay' => 60,
+									'delay_flex' => '',
+									'history' => 90,
+									'trends' => 365
 								],
 								[
 									'data_type' => ITEM_DATA_TYPE_BOOLEAN,
 									'formula' => '100',
 									'multiplier' => 1,
-									'delta' => 2
+									'delta' => 2,
+									'delay' => 60,
+									'delay_flex' => '',
+									'history' => 90,
+									'trends' => 365
 								]
 							],
 							'discovery_rules' => [
 								[
+									'delay' => 60,
+									'delay_flex' => '30/1-5,08:00-12:00',
+									'lifetime' => '30',
 									'item_prototypes' => [
 										[
 											'data_type' => ITEM_DATA_TYPE_DECIMAL,
 											'formula' => '1',
 											'multiplier' => 0,
-											'delta' => 0
+											'delta' => 0,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 0,
+											'trends' => 0
 										],
 										[
 											'data_type' => ITEM_DATA_TYPE_DECIMAL,
 											'formula' => '10',
 											'multiplier' => 1,
-											'delta' => 0
+											'delta' => 0,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 90,
+											'trends' => 365
 										],
 										[
 											'data_type' => ITEM_DATA_TYPE_OCTAL,
 											'formula' => '1',
 											'multiplier' => 0,
-											'delta' => 0
+											'delta' => 0,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 90,
+											'trends' => 365
 										],
 										[
 											'data_type' => ITEM_DATA_TYPE_HEXADECIMAL,
 											'formula' => '1',
 											'multiplier' => 0,
-											'delta' => 1
+											'delta' => 1,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 90,
+											'trends' => 365
 										],
 										[
 											'data_type' => ITEM_DATA_TYPE_BOOLEAN,
 											'formula' => '100',
 											'multiplier' => 1,
-											'delta' => 2
+											'delta' => 2,
+											'delay' => 60,
+											'delay_flex' => '',
+											'history' => 90,
+											'trends' => 365
 										]
 									]
 								]
@@ -199,8 +285,14 @@ class C32ImportConverterTest extends CImportConverterTest {
 						[
 							'items' => [
 								[
+									'delay' => '60;30/1-5,08:00-12:00',
+									'history' => '0',
+									'trends' => '0'
 								],
 								[
+									'delay' => '60',
+									'history' => '90d',
+									'trends' => '365d',
 									'preprocessing' => [
 										[
 											'type' => ZBX_PREPROC_MULTIPLIER,
@@ -209,6 +301,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								[
+									'delay' => '60',
+									'history' => '90d',
+									'trends' => '365d',
 									'preprocessing' => [
 										[
 											'type' => ZBX_PREPROC_OCT2DEC,
@@ -217,6 +312,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								[
+									'delay' => '60',
+									'history' => '90d',
+									'trends' => '365d',
 									'preprocessing' => [
 										[
 											'type' => ZBX_PREPROC_HEX2DEC,
@@ -229,6 +327,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								[
+									'delay' => '60',
+									'history' => '90d',
+									'trends' => '365d',
 									'preprocessing' => [
 										[
 											'type' => ZBX_PREPROC_BOOL2DEC,
@@ -247,10 +348,18 @@ class C32ImportConverterTest extends CImportConverterTest {
 							],
 							'discovery_rules' => [
 								[
+									'delay' => '60;30/1-5,08:00-12:00',
+									'lifetime' => '{$LIFETIME}',
 									'item_prototypes' => [
 										[
+											'delay' => '60;30/1-5,08:00-12:00',
+											'history' => '0',
+											'trends' => '0',
 										],
 										[
+											'delay' => '60',
+											'history' => '90d',
+											'trends' => '365d',
 											'preprocessing' => [
 												[
 													'type' => ZBX_PREPROC_MULTIPLIER,
@@ -259,6 +368,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 											]
 										],
 										[
+											'delay' => '60',
+											'history' => '90d',
+											'trends' => '365d',
 											'preprocessing' => [
 												[
 													'type' => ZBX_PREPROC_OCT2DEC,
@@ -267,6 +379,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 											]
 										],
 										[
+											'delay' => '60',
+											'history' => '90d',
+											'trends' => '365d',
 											'preprocessing' => [
 												[
 													'type' => ZBX_PREPROC_HEX2DEC,
@@ -279,6 +394,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 											]
 										],
 										[
+											'delay' => '60',
+											'history' => '90d',
+											'trends' => '365d',
 											'preprocessing' => [
 												[
 													'type' => ZBX_PREPROC_BOOL2DEC,
@@ -348,8 +466,14 @@ class C32ImportConverterTest extends CImportConverterTest {
 						[
 							'items' => [
 								[
+									'delay' => '60;30/1-5,08:00-12:00',
+									'history' => '0',
+									'trends' => '0',
 								],
 								[
+									'delay' => '60',
+									'history' => '90d',
+									'trends' => '365d',
 									'preprocessing' => [
 										[
 											'type' => ZBX_PREPROC_MULTIPLIER,
@@ -358,6 +482,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								[
+									'delay' => '60',
+									'history' => '90d',
+									'trends' => '365d',
 									'preprocessing' => [
 										[
 											'type' => ZBX_PREPROC_OCT2DEC,
@@ -366,6 +493,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								[
+									'delay' => '60',
+									'history' => '90d',
+									'trends' => '365d',
 									'preprocessing' => [
 										[
 											'type' => ZBX_PREPROC_HEX2DEC,
@@ -378,6 +508,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								[
+									'delay' => '60',
+									'history' => '90d',
+									'trends' => '365d',
 									'preprocessing' => [
 										[
 											'type' => ZBX_PREPROC_BOOL2DEC,
@@ -396,10 +529,18 @@ class C32ImportConverterTest extends CImportConverterTest {
 							],
 							'discovery_rules' => [
 								[
+									'delay' => '60;30/1-5,08:00-12:00',
+									'lifetime' => '30d',
 									'item_prototypes' => [
 										[
+											'delay' => '60',
+											'history' => '0',
+											'trends' => '0',
 										],
 										[
+											'delay' => '60',
+											'history' => '90d',
+											'trends' => '365d',
 											'preprocessing' => [
 												[
 													'type' => ZBX_PREPROC_MULTIPLIER,
@@ -408,6 +549,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 											]
 										],
 										[
+											'delay' => '60',
+											'history' => '90d',
+											'trends' => '365d',
 											'preprocessing' => [
 												[
 													'type' => ZBX_PREPROC_OCT2DEC,
@@ -416,6 +560,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 											]
 										],
 										[
+											'delay' => '60',
+											'history' => '90d',
+											'trends' => '365d',
 											'preprocessing' => [
 												[
 													'type' => ZBX_PREPROC_HEX2DEC,
@@ -428,6 +575,9 @@ class C32ImportConverterTest extends CImportConverterTest {
 											]
 										],
 										[
+											'delay' => '60',
+											'history' => '90d',
+											'trends' => '365d',
 											'preprocessing' => [
 												[
 													'type' => ZBX_PREPROC_BOOL2DEC,

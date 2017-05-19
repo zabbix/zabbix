@@ -889,6 +889,153 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Buffer for draggable elements and elements group bounds.
+			 */
+			draggable_buffer: null,
+
+			/**
+			 * Returns virtual DOM element used by draggable.
+			 *
+			 * @return {object}
+			 */
+			dragGroupPlaceholder: function() {
+				return $('<div/>').css({
+					width: $(this.domNode).width(),
+					height: $(this.domNode).height()
+				});
+			},
+
+			/**
+			 * Recalculate x and y position of moved elements.
+			 *
+			 * @param {int} delta_x						Shift between old and new x position.
+			 * @param {int} delta_y						Shift between old and new y position.
+			 *
+			 * @return {object}							Object of elements with recalculated positions.
+			 */
+			dragGroupRecalculate: function(cmap, delta_x, delta_y) {
+				var dragged = cmap.draggable_buffer;
+
+				dragged.items.forEach(function(item) {
+					var node = cmap[item.type][item.id];
+
+					if ('updatePosition' in node) {
+						var dimensions = node.getDimensions();
+
+						node.updatePosition({
+							x: dimensions.x + delta_x,
+							y: dimensions.y + delta_y
+						}, false);
+					}
+				});
+			},
+
+			/**
+			 * Initializes multiple elements dragging.
+			 *
+			 * @param {object} event					jQuery UI draggable event.
+			 * @param {object} draggable				Draggable DOM element where drag event was started.
+			 */
+			dragGroupInit: function(event, draggable) {
+				var buffer,
+					draggable_node,
+					body = $('body');
+
+				if (draggable.selected) {
+					buffer = draggable.sysmap.getSelectionBuffer(draggable.sysmap);
+				}
+				else {
+					var dimensions = draggable.getDimensions();
+
+					draggable_node = $(draggable.domNode);
+					// Create getSelectionBuffer structure if drag event was started on unselected element.
+					buffer = {
+						items: [{
+							type: draggable_node.attr('data-type'),
+							id: draggable.id
+						}],
+						left: dimensions.x,
+						right: dimensions.x + draggable_node.width(),
+						top: dimensions.y,
+						bottom: dimensions.y + draggable_node.height()
+					};
+				}
+
+				buffer.xaxis = {
+					min: event.clientX - buffer.left,
+					max: (draggable.sysmap.container).width() - (buffer.right - event.clientX)
+				};
+
+				buffer.yaxis = {
+					min: event.clientY - buffer.top,
+					max: (draggable.sysmap.container).height() - (buffer.bottom - event.clientY)
+				};
+
+				buffer.margin = {
+					top: body.scrollTop(),
+					left: body.scrollLeft()
+				};
+
+				draggable.sysmap.draggable_buffer = buffer;
+			},
+
+			/**
+			 * Handler for drag event.
+			 *
+			 * @param {object} event					jQuery UI draggable event.
+			 * @param {object} data						jQuery UI draggable data.
+			 * @param {object} draggable				Element where drag event occured.
+			 */
+			dragGroupDrag: function(event, data, draggable) {
+				var cmap = draggable.sysmap,
+					body = $('body'),
+					xshift = body.scrollLeft() - cmap.draggable_buffer.margin.left,
+					yshift = body.scrollTop() - cmap.draggable_buffer.margin.top,
+					dimensions = draggable.getDimensions(),
+					delta_x = data.position.left - dimensions.x,
+					delta_y = data.position.top - dimensions.y;
+
+				if (event.clientX > (cmap.draggable_buffer.xaxis.max - xshift)
+						|| event.clientX < (cmap.draggable_buffer.xaxis.min - xshift)) {
+					delta_x = 0;
+				}
+
+				if (event.clientY > (cmap.draggable_buffer.yaxis.max - yshift)
+						|| event.clientY < (cmap.draggable_buffer.yaxis.min - yshift)) {
+					delta_y = 0;
+				}
+
+				if (delta_x != 0 || delta_y != 0) {
+					cmap.dragGroupRecalculate(cmap, delta_x, delta_y);
+					cmap.updateImage();
+				}
+			},
+
+			/**
+			 * Final tasks for dragged element on drag stop event.
+			 *
+			 * @param {object} draggable				Element where drag stop event occured.
+			 */
+			dragGroupStop: function(draggable) {
+				var cmap = draggable.sysmap,
+					should_align = (cmap.data.grid_align === '1');
+
+				if (should_align) {
+					cmap.draggable_buffer.items.forEach(function(item) {
+						var node = cmap[item.type][item.id];
+
+						if ('updatePosition' in node) {
+							var dimensions = node.getDimensions();
+							node.updatePosition({
+								x: dimensions.x,
+								y: dimensions.y
+							});
+						}
+					});
+				}
+			},
+
+			/**
 			 * Paste that.copypaste_buffer content at new location.
 			 *
 			 * @param	{number}	delta_x					Shift between desired and actual x position.
@@ -995,6 +1142,7 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					var data,
+						dimensions,
 						dom_node,
 						x,
 						y;
@@ -1006,9 +1154,10 @@ ZABBIX.apps.map = (function($) {
 
 						// Get current data without observers.
 						data = $.extend({}, that[type][id].getData(), false);
+						dimensions = that[type][id].getDimensions();
 						dom_node = that[type][id].domNode;
-						x = parseInt(data.x, 10);
-						y = parseInt(data.y, 10);
+						x = dimensions.x;
+						y = dimensions.y;
 						left = Math.min(x, (left === null) ? x : left);
 						top = Math.min(y, (top === null) ? y : top);
 						right = Math.max(x + dom_node.outerWidth(true), (right === null) ? 0 : right);
@@ -1050,7 +1199,7 @@ ZABBIX.apps.map = (function($) {
 					left: left,
 					right: right,
 					bottom: bottom
-				}
+				};
 			},
 
 			clearSelection: function() {
@@ -1594,13 +1743,17 @@ ZABBIX.apps.map = (function($) {
 					if (!node.hasClass('ui-draggable')) {
 						node.draggable({
 							containment: 'parent',
-							opacity: 0.5,
-							helper: 'clone',
+							helper: $.proxy(function() {
+								return this.sysmap.dragGroupPlaceholder();
+							}, this),
+							start: $.proxy(function(event) {
+								this.sysmap.dragGroupInit(event, this);
+							}, this),
 							drag: $.proxy(function(event, data) {
-								this.updatePosition({
-									x: parseInt(data.position.left, 10),
-									y: parseInt(data.position.top, 10)
-								});
+								this.sysmap.dragGroupDrag(event, data, this);
+							}, this),
+							stop: $.proxy(function() {
+								this.sysmap.dragGroupStop(this);
 							}, this)
 						});
 					}
@@ -1785,7 +1938,7 @@ ZABBIX.apps.map = (function($) {
 			 *
 			 * @param {object} coords
 			 */
-			updatePosition: function(coords) {
+			updatePosition: function(coords, invalidate) {
 				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
 					var dx = coords.x - Math.min(parseInt(this.data.x, 10), parseInt(this.data.width, 10)),
 						dy = coords.y - Math.min(parseInt(this.data.y, 10), parseInt(this.data.height, 10));
@@ -1802,8 +1955,18 @@ ZABBIX.apps.map = (function($) {
 					this.data.y = coords.y;
 				}
 
-				this.align();
-				this.trigger('afterMove', this);
+				if (invalidate !== false) {
+					this.align();
+					this.trigger('afterMove', this);
+				}
+				else {
+					var dimensions = this.getDimensions();
+
+					this.domNode.css({
+						top: dimensions.y + 'px',
+						left: dimensions.x + 'px'
+					});
+				}
 			},
 
 			/**
