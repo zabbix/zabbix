@@ -2110,12 +2110,13 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			foreach ($data['available_mediatypes'] as $mediatype) {
 				$mediatype_cbox->addItem($mediatype['mediatypeid'], $mediatype['description']);
 			}
+			$is_default_msg = array_key_exists('default_msg', $data['new_ack_operation']['opmessage']);
 
 			$new_operation_formlist
 				->addRow(_('Send only to'), $mediatype_cbox)
 				->addRow(_('Default message'),
 					(new CCheckBox('new_ack_operation[opmessage][default_msg]'))
-						->setChecked($data['new_ack_operation']['opmessage']['default_msg'] == 1)
+						->setChecked($is_default_msg)
 				)
 				->addRow(_('Subject'),
 					(new CTextBox('new_ack_operation[opmessage][subject]',
