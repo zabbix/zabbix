@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
@@ -201,7 +202,7 @@ class testConfiguration extends CZabbixTest {
 								<date>2016-12-09T07:12:45Z</date>
 								<groups>
 									<group>
-										<name>Api import host group</name>
+										<name>API import host group</name>
 									</group>
 								</groups>
 								</zabbix_export>'
@@ -542,17 +543,17 @@ class testConfiguration extends CZabbixTest {
 								<date>2016-12-09T07:12:45Z</date>
 								<groups>
 									<group>
-										<name>Api host group xml import</name>
+										<name>API host group xml import</name>
 									</group>
 								</groups>
 								</zabbix_export>',
-				'sql' => 'select * from groups where name=\'Api host group xml import\''
+				'sql' => 'select * from groups where name=\'API host group xml import\''
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'groups',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"Api host group json import"}]}}',
-				'sql' => 'select * from groups where name=\'Api host group json import\''
+				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import"}]}}',
+				'sql' => 'select * from groups where name=\'API host group json import\''
 			],
 			[
 				'format' => 'xml',
@@ -563,20 +564,20 @@ class testConfiguration extends CZabbixTest {
 								<date>2016-12-12T07:18:00Z</date>
 								<screens>
 									<screen>
-										<name>Api screen xml import</name>
+										<name>API screen xml import</name>
 										<hsize>1</hsize>
 										<vsize>1</vsize>
 									</screen>
 								</screens>
 								</zabbix_export>',
-				'sql' => 'select * from screens where name=\'Api screen xml import\''
+				'sql' => 'select * from screens where name=\'API screen xml import\''
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'screens',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","screens":[{"name":"Api screen json import",'
+				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","screens":[{"name":"API screen json import",'
 							. '"hsize":"1","vsize":"1"}]}}',
-				'sql' => 'select * from screens where name=\'Api screen json import\''
+				'sql' => 'select * from screens where name=\'API screen json import\''
 			],
 			[
 				'format' => 'xml',
@@ -587,7 +588,7 @@ class testConfiguration extends CZabbixTest {
 								<date>2016-12-12T07:18:00Z</date>
 								<value_maps>
 									<value_map>
-										<name>Api valueMap xml import</name>
+										<name>API valueMap xml import</name>
 										<mappings>
 											<mapping>
 												<value>1</value>
@@ -597,14 +598,14 @@ class testConfiguration extends CZabbixTest {
 									</value_map>
 								</value_maps>
 								</zabbix_export>',
-				'sql' => 'select * from valuemaps where name=\'Api valueMap xml import\''
+				'sql' => 'select * from valuemaps where name=\'API valueMap xml import\''
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'valueMaps',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"Api valueMap json import",'
+				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"API valueMap json import",'
 							. '"mappings":[{"value":"1","newvalue":"Up"}]}]}}',
-				'sql' => 'select * from valuemaps where name=\'Api valueMap json import\''
+				'sql' => 'select * from valuemaps where name=\'API valueMap json import\''
 			]
 		];
 	}
@@ -643,18 +644,18 @@ class testConfiguration extends CZabbixTest {
 								<date>2016-12-09T07:12:45Z</date>
 								<groups>
 									<group>
-										<name>Api host group xml import as non Super Admin</name>
+										<name>API host group xml import as non Super Admin</name>
 									</group>
 								</groups>
 								</zabbix_export>',
-				'sql' => 'select * from groups where name=\'Api host group xml import as non Super Admin\'',
+				'sql' => 'select * from groups where name=\'API host group xml import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'groups',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"Api host group json import as non Super Admin"}]}}',
-				'sql' => 'select * from groups where name=\'Api host group json import as non Super Admin\'',
+				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
+				'sql' => 'select * from groups where name=\'API host group json import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[
@@ -666,7 +667,7 @@ class testConfiguration extends CZabbixTest {
 								<date>2016-12-12T07:18:00Z</date>
 								<value_maps>
 									<value_map>
-										<name>Api valueMap xml import as non Super Admin</name>
+										<name>API valueMap xml import as non Super Admin</name>
 										<mappings>
 											<mapping>
 												<value>1</value>
@@ -676,15 +677,15 @@ class testConfiguration extends CZabbixTest {
 									</value_map>
 								</value_maps>
 								</zabbix_export>',
-				'sql' => 'select * from valuemaps where name=\'Api valueMap xml import as non Super Admin\'',
+				'sql' => 'select * from valuemaps where name=\'API valueMap xml import as non Super Admin\'',
 				'expected_error' => 'Only super admins can create value maps.'
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'valueMaps',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"Api valueMap json import as non Super Admin",'
+				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"API valueMap json import as non Super Admin",'
 							. '"mappings":[{"value":"1","newvalue":"Up"}]}]}}',
-				'sql' => 'select * from valuemaps where name=\'Api valueMap json import as non Super Admin\'',
+				'sql' => 'select * from valuemaps where name=\'API valueMap json import as non Super Admin\'',
 				'expected_error' => 'Only super admins can create value maps.'
 			]
 		];

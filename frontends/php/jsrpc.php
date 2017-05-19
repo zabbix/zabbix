@@ -67,7 +67,9 @@ switch ($data['method']) {
 		break;
 
 	case 'message.settings':
-		$result = getMessageSettings();
+		$msgsettings = getMessageSettings();
+		$msgsettings['timeout'] = timeUnitToSeconds($msgsettings['timeout']);
+		$result = $msgsettings;
 		break;
 
 	case 'message.get':
@@ -79,7 +81,7 @@ switch ($data['method']) {
 		}
 
 		// timeout
-		$timeout = time() - $msgsettings['timeout'];
+		$timeout = time() - timeUnitToSeconds($msgsettings['timeout']);
 		$lastMsgTime = 0;
 		if (isset($data['params']['messageLast']['events'])) {
 			$lastMsgTime = $data['params']['messageLast']['events']['time'];
@@ -169,7 +171,7 @@ switch ($data['method']) {
 		if (!CSession::keyExists('serverCheckResult')
 				|| (CSession::getValue('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
 			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
-			CSession::setValue('serverCheckResult', $zabbixServer->isRunning());
+			CSession::setValue('serverCheckResult', $zabbixServer->isRunning(CWebUser::getSessionCookie()));
 			CSession::setValue('serverCheckTime', time());
 		}
 

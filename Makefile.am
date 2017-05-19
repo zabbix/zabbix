@@ -83,3 +83,11 @@ css_icons:
 	cp sass/favicon.ico frontends/php/
 
 css: css_theme_blue css_theme_dark css_icons
+
+## CUnit test support
+TESTDIR = src
+
+test:
+	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
+
+.PHONY: test

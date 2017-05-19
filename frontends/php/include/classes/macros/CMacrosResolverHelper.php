@@ -583,4 +583,20 @@ class CMacrosResolverHelper {
 
 		return $macros['url'];
 	}
+
+	/**
+	 * Resolve time unit macros.
+	 *
+	 * @static
+	 *
+	 * @param array $data
+	 * @param array $field_names
+	 *
+	 * @return string
+	 */
+	public static function resolveTimeUnitMacros(array $data, array $field_names) {
+		self::init();
+
+		return self::$macrosResolver->resolveTimeUnitMacros($data, ['sources' => $field_names]);
+	}
 }
