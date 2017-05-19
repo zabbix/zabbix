@@ -1029,6 +1029,18 @@ class C34XmlValidator {
 							'zindex' =>				['type' => XML_STRING | XML_REQUIRED],
 						]]
 					]],
+					'lines' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'line', 'rules' => [
+						'line' =>				['type' => XML_ARRAY, 'rules' => [
+							'x1' =>					['type' => XML_STRING | XML_REQUIRED],
+							'y1' =>					['type' => XML_STRING | XML_REQUIRED],
+							'x2' =>					['type' => XML_STRING | XML_REQUIRED],
+							'y2' =>					['type' => XML_STRING | XML_REQUIRED],
+							'line_type' =>			['type' => XML_STRING | XML_REQUIRED],
+							'line_width' =>			['type' => XML_STRING | XML_REQUIRED],
+							'line_color' =>			['type' => XML_STRING | XML_REQUIRED],
+							'zindex' =>				['type' => XML_STRING | XML_REQUIRED],
+						]]
+					]],
 					'links' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'link', 'rules' => [
 						'link' =>					['type' => XML_ARRAY, 'rules' => [
 							'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
