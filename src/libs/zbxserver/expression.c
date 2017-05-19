@@ -1588,7 +1588,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
  ******************************************************************************/
 static int	DBget_username(char **replace_to, zbx_uint64_t userid)
 {
-	const char	*__function_name = "DBget_ack_username";
+	const char	*__function_name = "DBget_username";
 
 	int		ret = FAIL;
 	DB_RESULT	result;
@@ -2602,7 +2602,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				(*data)[token.token.r + 1] = '\0';
 				break;
 			case ZBX_TOKEN_SIMPLE_MACRO:
-				if (0 == (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY | MACRO_TYPE_MESSAGE_ACK)) ||
+				if (0 == (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY |
+							MACRO_TYPE_MESSAGE_ACK)) ||
 						EVENT_SOURCE_TRIGGERS != ((NULL != r_event) ? r_event : event)->source)
 				{
 					pos++;
@@ -2625,7 +2626,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 		ret = SUCCEED;
 
-		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY | MACRO_TYPE_MESSAGE_ACK)))
+		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY |
+				MACRO_TYPE_MESSAGE_ACK)))
 		{
 			const DB_EVENT	*c_event;
 

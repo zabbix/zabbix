@@ -489,7 +489,7 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select distinct userid from acknowledgewhere eventid=" ZBX_FS_UI64, event->eventid);
+	result = DBselect("select distinct userid from acknowledges where eventid=" ZBX_FS_UI64, event->eventid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1934,7 +1934,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 	memset(&ack, 0, sizeof(ack));
 
 	result = DBselect(
-			"select message, userid from acknowledges"
+			"select message,userid from acknowledges"
 			" where acknowledgeid=" ZBX_FS_UI64,
 			escalation->acknowledgeid);
 

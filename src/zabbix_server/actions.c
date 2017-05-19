@@ -2000,8 +2000,7 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_t *ackids, zbx_vector_u
 	for (i = 0; i < ackids->values_num; i++)
 	{
 		if (SUCCEED != get_event_info(eventids->values[i], &event, &error) ||
-				EVENT_SOURCE_TRIGGERS != event.source ||
-				0 != (event.flags & ZBX_FLAGS_DB_EVENT_NO_ACTION))
+				EVENT_SOURCE_TRIGGERS != event.source)
 		{
 			continue;
 		}
@@ -2019,7 +2018,7 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_t *ackids, zbx_vector_u
 				{
 					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid,
 						(int)ESCALATION_STATUS_ACTIVE, event.trigger.triggerid, __UINT64_C(0),
-						event.eventid, __UINT64_C(0), ackids[i].values[i]);
+						event.eventid, __UINT64_C(0), ackids->values[i]);
 					processed_num++;
 				}
 			}
