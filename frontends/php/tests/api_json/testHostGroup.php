@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
@@ -87,7 +88,7 @@ class testHostGroup extends CZabbixTest {
 			[
 				'hostgroup' => [
 					[
-						'name' => 'Api host group create',
+						'name' => 'API host group create',
 					]
 				],
 				'success_expected' => true,
@@ -117,10 +118,10 @@ class testHostGroup extends CZabbixTest {
 			[
 				'hostgroup' => [
 					[
-						'name' => 'Api'
+						'name' => 'API'
 					],
 					[
-						'name' => 'Api/Nested'
+						'name' => 'API/Nested'
 					],
 				],
 				'success_expected' => true,
@@ -253,15 +254,15 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					[
 					'groupid' => '50005',
-					'name' => 'Api update two host group with the same names'
+					'name' => 'API update two host group with the same names'
 					],
 					[
 					'groupid' => '50006',
-					'name' => 'Api update two host group with the same names'
+					'name' => 'API update two host group with the same names'
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Api update two host group with the same names) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name)=(API update two host group with the same names) already exists.'
 			],
 			[
 				'hostgroup' => [
@@ -281,7 +282,7 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					[
 					'groupid' => '50015',
-					'name' => 'Api updated discovered group'
+					'name' => 'API updated discovered group'
 					]
 				],
 				'success_expected' => false,
@@ -292,7 +293,7 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					[
 					'groupid' => '50005',
-					'name' => 'Api host group updated'
+					'name' => 'API host group updated'
 					]
 				],
 				'success_expected' => true,
@@ -302,7 +303,7 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					[
 					'groupid' => '50006',
-					'name' => 'Api internal host group updated'
+					'name' => 'API internal host group updated'
 					],
 					[
 					'groupid' => '50005',
@@ -413,14 +414,14 @@ class testHostGroup extends CZabbixTest {
 					'50007'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Host group "Api host group delete internal" is internal and can not be deleted.'
+				'expected_error' => 'Host group "API host group delete internal" is internal and can not be deleted.'
 			],
 			[
 				'hostgroup' => [
 					'50014'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Group "Api group for host prototype" cannot be deleted, because it is used by a host prototype.'
+				'expected_error' => 'Group "API group for host prototype" cannot be deleted, because it is used by a host prototype.'
 			],
 			[
 				'hostgroup' => [
@@ -484,7 +485,7 @@ class testHostGroup extends CZabbixTest {
 				'method' => 'hostgroup.create',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'hostgroup' => [
-					'name' => 'Api host group create as zabbix admin'
+					'name' => 'API host group create as zabbix admin'
 				],
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
@@ -493,7 +494,7 @@ class testHostGroup extends CZabbixTest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'hostgroup' => [
 					'groupid' => '50005',
-					'name' => 'Api host group update as zabbix admin without peremissions'
+					'name' => 'API host group update as zabbix admin without peremissions'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -509,7 +510,7 @@ class testHostGroup extends CZabbixTest {
 				'method' => 'hostgroup.create',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
-					'name' => 'Api host group create as zabbix user'
+					'name' => 'API host group create as zabbix user'
 				],
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
@@ -518,7 +519,7 @@ class testHostGroup extends CZabbixTest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'hostgroup' => [
 					'groupid' => '50005',
-					'name' => 'Api host group update as zabbix user without peremissions'
+					'name' => 'API host group update as zabbix user without peremissions'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],

@@ -1027,7 +1027,8 @@ function getSelementsInfo($sysmap, array $options = []) {
 						}
 					}
 
-					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
+					$i['latelyChanged'] |=
+						((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
 				}
 			}
 		}

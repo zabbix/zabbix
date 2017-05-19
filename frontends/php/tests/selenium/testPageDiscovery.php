@@ -27,7 +27,7 @@ class testPageDiscovery extends CWebTest {
 
 		$this->zbxTestCheckHeader('Discovery rules');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(['Name', 'IP range', 'Delay', 'Checks', 'Status']);
+		$this->zbxTestTextPresent(['Name', 'IP range', 'Interval', 'Checks', 'Status']);
 		$this->zbxTestTextPresent(['Enable', 'Disable', 'Delete']);
 	}
 

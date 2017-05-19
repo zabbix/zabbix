@@ -46,10 +46,10 @@ $fields = [
 	'lang' =>				[T_ZBX_STR, O_OPT, null, null, null],
 	'theme' =>				[T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({update})'],
 	'autologin' =>			[T_ZBX_INT, O_OPT, null, IN('1'), null],
-	'autologout' =>	[T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')],
+	'autologout' =>			[T_ZBX_STR, O_OPT, null, null, null, _('Auto-logout')],
 	'autologout_visible' =>	[T_ZBX_STR, O_OPT, null, IN('1'), null],
 	'url' =>				[T_ZBX_STR, O_OPT, null, null, 'isset({update})'],
-	'refresh' => [T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({update})', _('Refresh (in seconds)')],
+	'refresh' =>			[T_ZBX_STR, O_OPT, null, null, 'isset({update})', _('Refresh')],
 	'rows_per_page' => [T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})', _('Rows per page')],
 	'change_password' =>	[T_ZBX_STR, O_OPT, null, null, null],
 	'user_medias' =>		[T_ZBX_STR, O_OPT, null, NOT_EMPTY, null],
@@ -123,7 +123,7 @@ elseif (hasRequest('update')) {
 			'userid' => CWebUser::$data['userid'],
 			'url' => getRequest('url'),
 			'autologin' => getRequest('autologin', 0),
-			'autologout' => hasRequest('autologout_visible') ? getRequest('autologout') : 0,
+			'autologout' => hasRequest('autologout_visible') ? getRequest('autologout') : '0',
 			'theme' => getRequest('theme'),
 			'refresh' => getRequest('refresh'),
 			'rows_per_page' => getRequest('rows_per_page')
@@ -163,14 +163,11 @@ elseif (hasRequest('update')) {
 		}
 
 		DBstart();
-		updateMessageSettings($messages);
+		$result = updateMessageSettings($messages);
 
-		$result = (bool) API::User()->update($user);
+		$result = $result && (bool) API::User()->update($user);
 
 		$result = DBend($result);
-		if (!$result) {
-			error(API::User()->resetErrors());
-		}
 
 		if ($result) {
 			ob_end_clean();
@@ -197,7 +194,6 @@ $data['surname'] = CWebUser::$data['surname'];
 $data['alias'] = CWebUser::$data['alias'];
 $data['form'] = getRequest('form');
 $data['form_refresh'] = getRequest('form_refresh', 0);
-$data['autologout'] = getRequest('autologout');
 
 // render view
 $usersView = new CView('administration.users.edit', $data);

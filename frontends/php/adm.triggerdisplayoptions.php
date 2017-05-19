@@ -39,10 +39,8 @@ $fields = [
 	'problem_ack_style' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')],
 	'ok_unack_style' =>			[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')],
 	'ok_ack_style' =>			[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')],
-	'ok_period' =>				[T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY), 'isset({update})',
-		_('Display OK triggers for')
-	],
-	'blink_period' =>			[T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY), 'isset({update})',
+	'ok_period' =>				[T_ZBX_STR, O_OPT, null, null, 'isset({update})', _('Display OK triggers for')],
+	'blink_period' =>			[T_ZBX_STR, O_OPT, null, null, 'isset({update})',
 		_('On status change triggers blink for')
 	],
 	// actions

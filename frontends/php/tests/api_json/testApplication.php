@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ class testApplication extends CZabbixTest {
 			[
 				'application' => [
 					[
-						'name' => 'Api host application create',
+						'name' => 'API host application create',
 						'hostid' => '50009'
 					]
 				],
@@ -178,7 +178,7 @@ class testApplication extends CZabbixTest {
 			[
 				'application' => [
 					[
-						'name' => 'Api template application create',
+						'name' => 'API template application create',
 						'hostid' => '10093'
 					]
 				],
@@ -378,7 +378,7 @@ class testApplication extends CZabbixTest {
 				'application' => [
 					[
 						'applicationid' => '375',
-						'name' => 'Api discovery application update'
+						'name' => 'API discovery application update'
 					]
 				],
 				'success_expected' => false,
@@ -442,7 +442,7 @@ class testApplication extends CZabbixTest {
 			[
 				'application' => [
 					'applicationid' => '368',
-					'name' => 'Api template application updated'
+					'name' => 'API template application updated'
 				],
 				'success_expected' => true,
 				'expected_error' => null
@@ -675,7 +675,7 @@ class testApplication extends CZabbixTest {
 				'method' => 'application.create',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'application' => [
-						'name' => 'Api host application create as zabbix admin',
+						'name' => 'API host application create as zabbix admin',
 						'hostid' => '10084'
 					],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -685,7 +685,7 @@ class testApplication extends CZabbixTest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'application' => [
 					'applicationid' => '376',
-					'name' => 'Api application update as zabbix admin',
+					'name' => 'API application update as zabbix admin',
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -701,7 +701,7 @@ class testApplication extends CZabbixTest {
 				'method' => 'application.create',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'application' => [
-						'name' => 'Api host application create as zabbix user',
+						'name' => 'API host application create as zabbix user',
 						'hostid' => '10084'
 					],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -711,7 +711,7 @@ class testApplication extends CZabbixTest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'application' => [
 					'applicationid' => '376',
-					'name' => 'Api application update as zabbix user',
+					'name' => 'API application update as zabbix user',
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
