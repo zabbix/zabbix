@@ -950,8 +950,8 @@ ZABBIX.apps.map = (function($) {
 			 */
 			dragGroupDrag: function(event, data, draggable) {
 				var cmap = draggable.sysmap,
-					delta_x = data.position.left - parseInt(draggable.data.x, 10),
-					delta_y = data.position.top - parseInt(draggable.data.y, 10),
+					delta_x = Math.round(data.position.left - parseInt(draggable.data.x, 10)),
+					delta_y = Math.round(data.position.top - parseInt(draggable.data.y, 10)),
 					body = $('body'),
 					xshift = body.scrollLeft() - cmap.draggable_buffer.margin.left,
 					yshift = body.scrollTop() - cmap.draggable_buffer.margin.top;
