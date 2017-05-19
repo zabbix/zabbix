@@ -32,6 +32,73 @@ if ($data['fullscreen']) {
 	$url_view->setArgument('fullscreen', '1');
 }
 
+$form = (new CForm('post', (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.update')
+	->getUrl()
+))
+	->setName('dashboard_sharing_form')
+	->addStyle('display: none;');
+
+$user_group_shares_table = (new CTable())
+	->setHeader([_('User groups'), _('Permissions'), _('Action')])
+	->addStyle('width: 100%;');
+
+$add_user_group_btn = ([(new CButton(null, _('Add')))
+	->onClick("return PopUp('popup.php?dstfrm=".$form->getName().
+		"&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1')"
+	)
+	->addClass(ZBX_STYLE_BTN_LINK)
+]);
+
+$user_group_shares_table->addRow(
+	(new CRow(
+		(new CCol($add_user_group_btn))->setColSpan(3)
+	))->setId('user_group_list_footer')
+);
+
+// User sharing table.
+$user_shares_table = (new CTable())
+	->setHeader([_('Users'), _('Permissions'), _('Action')])
+	->addStyle('width: 100%;');
+
+$add_user_btn = ([(new CButton(null, _('Add')))
+	->onClick("return PopUp('popup.php?dstfrm=".$form->getName().
+		"&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1')"
+	)
+	->addClass(ZBX_STYLE_BTN_LINK)]);
+
+$user_shares_table->addRow(
+	(new CRow(
+		(new CCol($add_user_btn))->setColSpan(3)
+	))->setId('user_list_footer')
+);
+
+// create form
+$form
+	->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']))
+	// indicator to help delete all users
+	->addItem(new CInput('hidden', 'users['.CControllerDashboardUpdate::EMPTY_USER.']', '1'))
+	// indicator to help delete all user groups
+	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardUpdate::EMPTY_GROUP.']', '1'))
+	->addItem((new CFormList('sharing_form'))
+	->addRow(_('Type'),
+		(new CRadioButtonList('private', PRIVATE_SHARING))
+			->addValue(_('Private'), PRIVATE_SHARING)
+			->addValue(_('Public'), PUBLIC_SHARING)
+			->setModern(true)
+	)
+	->addRow(_('List of user group shares'),
+		(new CDiv($user_group_shares_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	)
+	->addRow(_('List of user shares'),
+		(new CDiv($user_shares_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	)
+);
+
 (new CWidget())
 	->setTitle($data['dashboard']['name'])
 	->setControls((new CForm())
@@ -40,6 +107,27 @@ if ($data['fullscreen']) {
 			// 'Edit dashboard' should be first one in list,
 			// because it will be visually replaced by last item of new list, when clicked
 			->addItem((new CButton('dashbrd-edit',_('Edit dashboard'))))
+			->addItem((new CButton(SPACE))
+				->addClass(ZBX_STYLE_BTN_ACTION)
+				->setTitle(_('Actions'))
+				->setAttribute(
+					'data-menu-popup',
+					CJs::encodeJson([
+						'type' => 'dashboard',
+						'label' => _('Actions'),
+						'items' => [
+							[
+								'name' => 'sharing',
+								'label' => _('Sharing'),
+								'form_data' => [
+									'dashboardid' => $data['dashboard']['dashboardid'],
+								],
+								'disabled' => !$data['dashboard']['editable']
+							]
+						]
+					])
+				)
+			)
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	)
@@ -54,6 +142,7 @@ if ($data['fullscreen']) {
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
+	->addItem($form)
 	->show();
 
 /*

@@ -28,37 +28,37 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = [
 	'hk_events_mode' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
-	'hk_events_trigger' => 	[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	'hk_events_trigger' => 	[T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_events_mode})', _('Trigger event and alert data storage period')
 	],
-	'hk_events_internal' => [T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	'hk_events_internal' => [T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_events_mode})', _('Internal event and alert data storage period')
 	],
-	'hk_events_discovery' =>[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	'hk_events_discovery' =>[T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_events_mode})', _('Network discovery event and alert data storage period')
 	],
-	'hk_events_autoreg' => 	[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	'hk_events_autoreg' => 	[T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_events_mode})', _('Auto-registration event and alert data storage period')
 	],
 	'hk_services_mode' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
-	'hk_services' => 		[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	'hk_services' => 		[T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_services_mode})', _('Service data storage period')
 	],
 	'hk_audit_mode' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
-	'hk_audit' => 			[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	'hk_audit' => 			[T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_audit_mode})', _('Audit data storage period')
 	],
 	'hk_sessions_mode' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
-	'hk_sessions' => 		[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	'hk_sessions' => 		[T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_sessions_mode})', _('User session data storage period')],
 	'hk_history_mode' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
 	'hk_history_global' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Override item history period')],
-	'hk_history' => 		[T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999),
+	'hk_history' => 		[T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_history_global})', _('History data storage period')
 	],
 	'hk_trends_mode' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
 	'hk_trends_global' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Override item history period')],
-	'hk_trends' => 			[T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999),
+	'hk_trends' => 			[T_ZBX_STR, O_OPT, null, null,
 		'isset({update}) && isset({hk_trends_global})', _('Trend data storage period')
 	],
 	// actions
