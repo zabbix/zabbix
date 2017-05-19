@@ -47,6 +47,21 @@ if (array_key_exists('dialogue', $data)) {
 			);
 		}
 
+		/* CWidgetFieldReference */
+		elseif ($field instanceof CWidgetFieldReference) {
+			$form->addVar($field->getName(), $field->getValue());
+
+			if (!$field->getValue()) {
+				$javascript = $field->getJavascript('#'.$form->getAttribute('id'));
+				$form->addItem(new CJsScript(get_js($javascript, true)));
+			}
+		}
+
+		/* CWidgetFieldHidden */
+		elseif ($field instanceof CWidgetFieldHidden) {
+			$form->addVar($field->getName(), $field->getValue());
+		}
+
 		/* RadioButtonList */
 		elseif ($field instanceof CWidgetRadioButtonList) {
 			$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()));
@@ -73,16 +88,12 @@ if (array_key_exists('dialogue', $data)) {
 
 		/* CWidgetFieldFilterWidgetComboBox */
 		elseif ($field instanceof CWidgetFieldFilterWidgetComboBox) {
-			// TODI miks: make sure it supports tree widget once it will be ready
 			$formList->addRow(
 				$field->getLabel(),
 				(new CComboBox($field->getName(), [], $field->getAction(), []))
 			);
 
-			$javascript = $field->getJavascript();
-			if ($javascript !== '') {
-				$form->addItem(new CJsScript(get_js($javascript, true)));
-			}
+			$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
 		}
 
 		/* ItemId */

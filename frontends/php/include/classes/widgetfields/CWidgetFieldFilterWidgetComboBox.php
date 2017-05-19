@@ -20,19 +20,35 @@
 
 class CWidgetFieldFilterWidgetComboBox extends CWidgetField
 {
-	private $javascript;
-
 	public function __construct($name, $label, $default = '') {
 		parent::__construct($name, $label, $default, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	public function setJavascript($js = '') {
-		$this->javascript = $js;
-		return $this;
+	public function getJavascript() {
+		return
+			'var widgets, filters_box;'.
+			'widgets = jQuery(".dashbrd-grid-widget-container").dashboardGrid("getWidgetsBy", "type", "navigationtree"),'.
+			'filters_box = jQuery("#'.$this->getName().'");'.
+			'if (widgets.length) {'.
+				'jQuery("<option>'._('Select filter widget').'</option>").val("").appendTo(filters_box);'.
+				'jQuery.each(widgets, function(i, widget) {'.
+					'if (typeof widget["fields"]["type"] !== "undefined") {'.
+						'jQuery("<option></option>")'.
+								'.text(widget["fields"]["widget_name"])'.
+								'.val(widget["fields"]["reference"])'.
+								'.appendTo(filters_box);'.
+					'}'.
+				'});'.
+			'}';
 	}
 
-	public function getJavascript() {
-		return $this->javascript;
+	public function validate() {
+		$errors = [];
+		if ($this->required === true && $this->value === '') {
+			$errors[] = _s('Field \'%s\' is required', $this->label);
+		}
+
+		return $errors;
 	}
 }

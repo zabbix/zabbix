@@ -88,16 +88,16 @@ class CSysmap extends CDiv {
 
 				if ($reference) {
 					$this->script_run =
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
-							'widgetid: '.$this->sysmap_conf['widgetid'].','.
-							'sourceWidget: "'.$reference.'",'.
-							'callback: function(widget, data){'.
-							' if(data[0].mapid !== +data[0].mapid) return;'.
-							'	jQuery(".dashbrd-grid-widget-container")'.
-								'.dashboardGrid(\'setWidgetFieldValue\', widget.widgetid, \'sysmap_id\', data[0].mapid);'.
-							'	jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'refreshWidget\', widget.widgetid);'.
-							'}'.
-						'});';
+						'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'
+						. 'widgetid: '.$this->sysmap_conf['widgetid'].','
+						. 'sourceWidgetReference: "'.$reference.'",'
+						. 'callback: function(widget, data) {'
+						. ' if(data[0].mapid !== +data[0].mapid) return;'
+						. '	jQuery(".dashbrd-grid-widget-container")'
+						.			'.dashboardGrid(\'setWidgetFieldValue\', widget.widgetid, \'sysmap_id\', data[0].mapid);'
+						.	' jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'refreshWidget\', widget.widgetid);'
+						. '}'
+						.'});';
 				}
 				else {
 					info(_('Filter widget does not exist.'));

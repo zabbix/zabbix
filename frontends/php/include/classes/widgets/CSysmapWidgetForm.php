@@ -48,24 +48,12 @@ class CSysmapWidgetForm extends CWidgetForm
 
 		// select filter widget field
 		if ($source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
-			$filter_widget_field = (new CWidgetFieldFilterWidgetComboBox('filter_widget_reference', _('Filter')));
-			$filter_widget_field->setRequired(true);
+			$filter_widget_field = (new CWidgetFieldFilterWidgetComboBox('filter_widget_reference', _('Filter')))
+					->setRequired(true);
 
-			// TODO miks: validate reference and pass it to objects
-			//$widget_reference = [0];
-			//$filter_widget_field->setValue($widget_reference);
-
-			// TODO miks: replace type by referene and favmap to mapnavtree ot whatever else
-			$filter_widget_field->setJavascript(''
-			 . 'var widgets = jQuery(".dashbrd-grid-widget-container").dashboardGrid("getWidgetsBy", "type", "favmap"),'
-			 .		'filters_box = jQuery("#filter_widget_reference");'
-			 . 'if (widgets.length) {'
-			 .		'widgets.each(function(widget){'
-			 .			'if (typeof widget["fields"]["type"] !== "undefined") {'
-			 .				'jQuery("<option></option>").text(widget.header).val(widget["fields"]["type"]).appendTo(filters_box);'
-			 .			'}'
-			 .		'});'
-			 . '}');
+			if (array_key_exists('filter_widget_reference', $data)) {
+				$filter_widget_field->setValue($data['filter_widget_reference']);
+			}
 
 			$this->fields[] = $filter_widget_field;
 		}

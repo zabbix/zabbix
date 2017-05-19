@@ -40,7 +40,37 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_SYSMAP				=> _('Map'),
+			WIDGET_NAVIGATION_TREE	=> _('Map Navigation Tree'),
 			WIDGET_URL					=> _('URL')
+		];
+
+		$this->rfRates = [
+			WIDGET_SYSTEM_STATUS		=> SEC_PER_MIN,
+			WIDGET_ZABBIX_STATUS		=> 15 * SEC_PER_MIN,
+			WIDGET_LAST_ISSUES			=> SEC_PER_MIN,
+			WIDGET_WEB_OVERVIEW			=> SEC_PER_MIN,
+			WIDGET_DISCOVERY_STATUS		=> SEC_PER_MIN,
+			WIDGET_HOST_STATUS			=> SEC_PER_MIN,
+			WIDGET_FAVOURITE_GRAPHS		=> 15 * SEC_PER_MIN,
+			WIDGET_FAVOURITE_MAPS		=> 15 * SEC_PER_MIN,
+			WIDGET_FAVOURITE_SCREENS	=> 15 * SEC_PER_MIN,
+			WIDGET_CLOCK				=> 15 * SEC_PER_MIN,
+			WIDGET_SYSMAP				=> 15 * SEC_PER_MIN,
+			WIDGET_NAVIGATION_TREE => 15 * SEC_PER_MIN,
+			WIDGET_URL					=> 0,
+		];
+
+		$this->apiFieldKeys = [
+			ZBX_WIDGET_FIELD_TYPE_INT32				=> 'value_int',
+			ZBX_WIDGET_FIELD_TYPE_STR				=> 'value_str',
+			ZBX_WIDGET_FIELD_TYPE_GROUP				=> 'value_groupid',
+			ZBX_WIDGET_FIELD_TYPE_HOST				=> 'value_hostid',
+			ZBX_WIDGET_FIELD_TYPE_ITEM				=> 'value_itemid',
+			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE	=> 'value_itemid',
+			ZBX_WIDGET_FIELD_TYPE_GRAPH				=> 'value_graphid',
+			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE	=> 'value_graphid',
+			ZBX_WIDGET_FIELD_TYPE_MAP				=> 'value_sysmapid',
+			ZBX_WIDGET_FIELD_TYPE_DASHBOARD			=> 'value_dashboardid'
 		];
 	}
 
@@ -76,13 +106,31 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Returns key, where value is stored for given field type.
-	 *
-	 * @static
-	 *
-	 * @param int $field_type  ZBX_WIDGET_FIELD_TYPE_ constant
-	 *
-	 * @return string  field key, where to save the value
+	 * Return widget triggers
+	 * @param int $type - WIDGET_ constant
+	 * @return array - list of [onEvent => jsMethodToCall] pairs
+	 */
+	public static function getTriggers($type) {
+		switch ($type) {
+			case WIDGET_NAVIGATION_TREE:
+				return [
+					'onEditStart' => 'zbx_navtree("onEditStart")',
+					'beforeDashboardSave' => 'zbx_navtree("beforeDashboardSave")',
+					'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
+					'onEditStop' => 'zbx_navtree("onEditStop")',
+					'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
+					'beforeConfigLoad' => 'zbx_navtree("beforeConfigLoad")'
+				];
+				break;
+			default:
+				return [];
+		}
+	}
+
+	/**
+	 * Returns key, where value is stored for given field type
+	 * @param int $field_type - ZBX_WIDGET_FIELD_TYPE_ constant
+	 * @return string field key, where to save the value
 	 */
 	public static function getApiFieldKey($field_type){
 		switch ($field_type) {
@@ -134,6 +182,8 @@ class CWidgetConfig
 			case WIDGET_CLOCK:
 				return new CClockWidgetForm($data);
 
+			case WIDGET_NAVIGATION_TREE:
+				return (new CNavigationWidgetForm($data));
 			case WIDGET_SYSMAP:
 				return (new CSysmapWidgetForm($data));
 			case WIDGET_URL:

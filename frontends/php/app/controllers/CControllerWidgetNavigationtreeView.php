@@ -18,9 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetSysmapView extends CController {
+class CControllerWidgetNavigationtreeView extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -33,36 +34,6 @@ class CControllerWidgetSysmapView extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			$input_fields = getRequest('fields');
-
-			$validationRules = [
-				'widget_name' => 'string',
-				'source_type' =>	'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER
-			];
-
-			if (array_key_exists('source_type', $input_fields)) {
-				if ($input_fields['source_type'] == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
-					$validationRules['filter_widget_reference'] = 'string';
-					$validationRules['sysmap_id'] = 'db sysmaps.sysmapid';
-				}
-				else {
-					$validationRules['sysmap_id'] = 'required|db sysmaps.sysmapid';
-				}
-
-				$validator = new CNewValidator($input_fields, $validationRules);
-
-				$errors = $validator->getAllErrors();
-				if ($errors) {
-					$ret = false;
-
-					foreach ($validator->getAllErrors() as $error) {
-						info($error);
-					}
-				}
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
@@ -81,9 +52,7 @@ class CControllerWidgetSysmapView extends CController {
 
 		// Default values
 		$default = [
-			'source_type' => WIDGET_SYSMAP_SOURCETYPE_MAP,
-			'widget_name' => _('Map widget'),
-			'filter_widget_reference' => ''
+			'widget_name' => ''
 		];
 
 		if ($this->hasInput('fields')) {
@@ -98,11 +67,34 @@ class CControllerWidgetSysmapView extends CController {
 			}
 		}
 
+		// Parse tree items and prepare an array from them.
+		$items = [];
+		foreach ($data as $field_key => $field_value) {
+			preg_match('/^map\.?(?<item_key>id|parent|name)\.(?<itemid>\d+)$/', $field_key, $field_details);
+			if (array_key_exists('item_key', $field_details) && array_key_exists('itemid', $field_details)) {
+				$item_key = $field_details['item_key'];
+				$itemid = $field_details['itemid'];
+
+				if (!array_key_exists($itemid, $items)) {
+					$items[$itemid] = [
+						'parent' => 0,
+						'name' => '',
+						'mapid' => 0,
+						'id' => $itemid
+					];
+				}
+
+				$items[$itemid][($item_key == 'id') ? 'mapid' : $item_key] = $field_value;
+				unset($data[$field_key]);
+			}
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
 			'widgetid' => getRequest('widgetid'),
+			'field_items' => $items,
 			'fields' => $data,
 			'error' => $error
 		]));

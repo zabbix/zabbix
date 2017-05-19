@@ -101,7 +101,7 @@ class CWidgetField
 		return $errors;
 	}
 
-	protected function setSaveType($save_type) {
+	public function setSaveType($save_type) {
 		$known_save_types = [
 			ZBX_WIDGET_FIELD_TYPE_INT32,
 			ZBX_WIDGET_FIELD_TYPE_STR,

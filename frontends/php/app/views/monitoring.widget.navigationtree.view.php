@@ -18,23 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-if (array_key_exists('sysmap_id', $this->data['fields'])) {
-	$options['sysmapid'] = $this->data['fields']['sysmap_id'];
-}
-if (array_key_exists('filter_widget_reference', $this->data['fields'])) {
-	$options['filter_widget_reference'] = $this->data['fields']['filter_widget_reference'];
-}
-$options['source_type'] = $this->data['fields']['source_type'];
-$options['widgetid'] = $this->data['widgetid'];
-
-$item = (new CSysmap($options));
+$item = (new CNavigationTree($this->data));
 
 if ($this->data['error'] !== null) {
 	$item->setError($this->data['error']);
 }
 
 $output = [
-	'header' => $this->data['fields']['widget_name']?:_('Map widget'),
+	'header' => $this->data['fields']['widget_name'],
 	'body' => $item->toString(),
 	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
 	'script_file' => $item->getScriptFile(),
@@ -45,7 +36,7 @@ if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
 
-if ($this->data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
