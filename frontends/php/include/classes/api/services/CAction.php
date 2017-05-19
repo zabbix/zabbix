@@ -2261,17 +2261,19 @@ class CAction extends CApiService {
 		$op_ack_messages = [];
 
 		if ($this->outputIsRequested('opconditions', $ack_options)) {
-			$multiple_childs['opconditions'] = 'SELECT op.* FROM opconditions op WHERE '.
-												dbConditionInt('op.operationid', $ack_operationids);
+			$multiple_childs[] = [
+				'opconditions',
+				'SELECT op.* FROM opconditions op WHERE '.dbConditionInt('op.operationid', $ack_operationids)
+			];
 		}
 
 		foreach ($ack_operations as $ack_operationid => $ack_operation) {
 			switch ($ack_operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
-					$opmessage[] = $ack_operationid;
+					$opmessages[] = $ack_operationid;
 					break;
 				case OPERATION_TYPE_COMMAND:
-					$opcommand[] = $ack_operationid;
+					$opcommands[] = $ack_operationid;
 					break;
 				case OPERATION_TYPE_ACK_MESSAGE:
 					$op_ack_messages[] = $ack_operationid;
@@ -2280,37 +2282,57 @@ class CAction extends CApiService {
 		}
 
 		if ($opmessages) {
-			$single_child['opmessage'] = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
-											' FROM opmessage o'.
-											' WHERE '.dbConditionInt('operationid', $opmessages);
-			$multiple_childs['opmessage_grp'] = 'SELECT og.operationid,og.usrgrpid'.
-												' FROM opmessage_grp og'.
-												' WHERE '.dbConditionInt('operationid', $opmessages);
-			$multiple_childs['opmessage_usr'] = 'SELECT ou.operationid,ou.userid'.
-												' FROM opmessage_usr ou'.
-												' WHERE '.dbConditionInt('operationid', $opmessages);
+			$single_child[] = [
+				'opmessage',
+				'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+				' FROM opmessage o'.
+				' WHERE '.dbConditionInt('operationid', $opmessages)
+			];
+			$multiple_childs[] = [
+				'opmessage_grp',
+				'SELECT og.operationid,og.usrgrpid'.
+				' FROM opmessage_grp og'.
+				' WHERE '.dbConditionInt('operationid', $opmessages)
+			];
+			$multiple_childs[] = [
+				'opmessage_usr',
+				'SELECT ou.operationid,ou.userid'.
+				' FROM opmessage_usr ou'.
+				' WHERE '.dbConditionInt('operationid', $opmessages)
+			];
 		}
 
 		if ($opcommands) {
-			$single_child['opcommand'] = 'SELECT o.*'.
-											' FROM opcommand o'.
-											' WHERE '.dbConditionInt('operationid', $opcommands);
-			$multiple_childs['opcommand_hst'] = 'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
-												' FROM opcommand_hst oh'.
-												' WHERE '.dbConditionInt('operationid', $opcommands);
-			$multiple_childs['opcommand_hst'] = 'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
-												' FROM opcommand_grp og'.
-												' WHERE '.dbConditionInt('operationid', $opcommands);
+			$single_child[] = [
+				'opcommand',
+				'SELECT o.* FROM opcommand o WHERE '.dbConditionInt('operationid', $opcommands)
+			];
+			$multiple_childs[] = [
+				'opcommand_hst',
+				'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
+				' FROM opcommand_hst oh'.
+				' WHERE '.dbConditionInt('operationid', $opcommands)
+			];
+			$multiple_childs[] = [
+				'opcommand_grp',
+				'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
+				' FROM opcommand_grp og'.
+				' WHERE '.dbConditionInt('operationid', $opcommands)
+			];
 		}
 
 		if ($op_ack_messages) {
-			$single_child['opmessage'] = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
-											' FROM opmessage o'.
-											' WHERE '.dbConditionInt('operationid', $op_ack_messages);
+			$single_child[] = [
+				'opmessage',
+				'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+				' FROM opmessage o'.
+				' WHERE '.dbConditionInt('operationid', $op_ack_messages)
+			];
 		}
 
 		if ($multiple_childs) {
-			foreach ($multiple_childs as $opkey => $opquery) {
+			foreach ($multiple_childs as $child_getter) {
+				list($opkey, $opquery) = $child_getter;
 				if ($this->outputIsRequested($opkey, $ack_options)) {
 					$db_cursor = DBselect($opquery);
 					while ($db_row = DBfetch($db_cursor)) {
@@ -2324,7 +2346,8 @@ class CAction extends CApiService {
 		}
 
 		if ($single_child) {
-			foreach ($single_child as $opkey => $opquery) {
+			foreach ($single_child as $child_getter) {
+				list($opkey, $opquery) = $child_getter;
 				if ($this->outputIsRequested($opkey, $ack_options)) {
 					$db_cursor = DBselect($opquery);
 					while ($db_row = DBfetch($db_cursor)) {
