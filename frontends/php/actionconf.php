@@ -58,6 +58,8 @@ $fields = [
 	'def_longdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'r_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'r_longdata' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ack_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ack_longdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'g_actionid' =>						[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'conditions' =>						[null,		O_OPT,	null,	null,		null],
 	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
@@ -149,57 +151,45 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'def_longdata' => getRequest('def_longdata', ''),
 		'r_shortdata' => getRequest('r_shortdata', ''),
 		'r_longdata' => getRequest('r_longdata', ''),
+		'ack_shortdata' => getRequest('ack_shortdata', ''),
+		'ack_longdata' => getRequest('ack_longdata', ''),
 		'operations' => getRequest('operations', []),
 		'recovery_operations' => getRequest('recovery_operations', []),
-		'ack_operations' => getRequest('ack_operations', [])
+		'acknowledge_operations' => getRequest('ack_operations', [])
 	];
+	$operation_keys = ['operations', 'recovery_operations', 'acknowledge_operations'];
+
+	foreach ($operation_keys as $operation_key) {
+		foreach ($action[$operation_key] as &$operation) {
+			if (array_key_exists('opmessage', $operation)
+					&& !array_key_exists('default_msg', $operation['opmessage'])) {
+				$operation['opmessage']['default_msg'] = 0;
+			}
+		}
+		unset($operation);
+	}
 
 	foreach ($action['operations'] as &$operation) {
-		if (isset($operation['opmessage']) && !isset($operation['opmessage']['default_msg'])) {
-			$operation['opmessage']['default_msg'] = 0;
+		if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD
+				|| $operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
+			$operation['opgroup'] = [];
+
+			foreach ($operation['groupids'] as $groupid) {
+				$operation['opgroup'][] = ['groupid' => $groupid];
+			}
+			unset($operation['groupids']);
 		}
+		elseif ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD
+					|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
+			$operation['optemplate'] = [];
 
-		switch ($operation['operationtype']) {
-			case OPERATION_TYPE_GROUP_ADD:
-			case OPERATION_TYPE_GROUP_REMOVE:
-				$operation['opgroup'] = [];
-
-				foreach ($operation['groupids'] as $groupid) {
-					$operation['opgroup'][] = ['groupid' => $groupid];
-				}
-				unset($operation['groupids']);
-
-				break;
-
-			case OPERATION_TYPE_TEMPLATE_ADD:
-			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				$operation['optemplate'] = [];
-
-				foreach ($operation['templateids'] as $templateid) {
-					$operation['optemplate'][] = ['templateid' => $templateid];
-				}
-				unset($operation['templateids']);
-
-				break;
+			foreach ($operation['templateids'] as $templateid) {
+				$operation['optemplate'][] = ['templateid' => $templateid];
+			}
+			unset($operation['templateids']);
 		}
 	}
 	unset($operation);
-
-	foreach ($action['recovery_operations'] as &$recovery_operation) {
-		if (array_key_exists('opmessage', $recovery_operation)
-				&& !array_key_exists('default_msg', $recovery_operation['opmessage'])) {
-			$recovery_operation['opmessage']['default_msg'] = 0;
-		}
-	}
-	unset($recovery_operation);
-
-	foreach ($action['ack_operations'] as &$ack_operation) {
-		if (array_key_exists('opmessage', $ack_operation)
-				&& !array_key_exists('default_msg', $ack_operation['opmessage'])) {
-			$ack_operation['opmessage']['default_msg'] = 0;
-		}
-	}
-	unset($ack_operation);
 
 	$filter = [
 		'conditions' => getRequest('conditions', []),
@@ -796,7 +786,7 @@ if (hasRequest('form')) {
 
 	if ($data['new_ack_operation'] && !is_array($data['new_ack_operation'])) {
 		$data['new_ack_operation'] = [
-			'operationtype' => 0,
+			'operationtype' => OPERATION_TYPE_MESSAGE,
 			'ack_short' => ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
 			'ack_long' => ACTION_DEFAULT_MSG_ACKNOWLEDGE,
 		];
