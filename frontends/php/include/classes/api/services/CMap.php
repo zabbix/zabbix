@@ -2104,9 +2104,9 @@ class CMap extends CMapElement {
 
 			if ($options['selectShapes'] !== null && $options['selectShapes'] != API_OUTPUT_COUNT) {
 				$shapes = $this->unsetExtraFields($shapes, ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height',
-						'text', 'font', 'font_size', 'font_color', 'text_halign', 'text_valign', 'border_type',
-						'border_width', 'border_color', 'background_color', 'zindex'
-						], $options['selectShapes']
+					'text', 'font', 'font_size', 'font_color', 'text_halign', 'text_valign', 'border_type',
+					'border_width', 'border_color', 'background_color', 'zindex'
+					], $options['selectShapes']
 				);
 				$shapes = $this->unsetExtraFields($shapes, ['sysmapid'], null);
 
@@ -2115,7 +2115,7 @@ class CMap extends CMapElement {
 
 			if ($options['selectLines'] !== null && $options['selectLines'] != API_OUTPUT_COUNT) {
 				$lines = $this->unsetExtraFields($lines, ['sysmap_shapeid', 'x1', 'x2', 'y1', 'y2', 'line_type',
-						'line_width', 'line_color', 'zindex'], $options['selectLines']
+					'line_width', 'line_color', 'zindex'], $options['selectLines']
 				);
 				$lines = $this->unsetExtraFields($lines, ['sysmapid', 'type'], null);
 
