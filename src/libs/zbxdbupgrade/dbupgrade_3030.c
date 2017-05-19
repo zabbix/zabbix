@@ -1978,26 +1978,27 @@ static int	DBpatch_3030171(void)
 
 static int	DBpatch_3030172(void)
 {
-	zbx_db_insert_t	db_insert;
-	int		ret;
+	int		i;
+	const char	*columns = "widgetid,dashboardid,type,name,row,col,height,width";
+	const char	*values[] = {
+		"1,1,'favgrph','',0,0,3,2",
+		"2,1,'favscr','',0,2,3,2",
+		"3,1,'favmap','',0,4,3,2",
+		"4,1,'lastiss','',3,0,6,6",
+		"5,1,'webovr','',9,0,4,3",
+		"6,1,'dscvry','',9,3,4,3",
+		"7,1,'hoststat','',0,6,4,6",
+		"8,1,'syssum','',4,6,4,6",
+		"9,1,'stszbx','',8,6,5,6",
+		NULL
+	};
 
-	zbx_db_insert_prepare(&db_insert, "widget", "widgetid", "dashboardid", "type", "name", "row", "col", "width",
-			"height", NULL);
+	for (i = 0; NULL != values[i]; i++) {
+		if (ZBX_DB_OK > DBexecute("insert into widget (%s) values (%s)", columns, values[i]))
+			return FAIL;
+	}
 
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(1), __UINT64_C(1), "favgrph", "", 0, 0, 3, 2);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(2), __UINT64_C(1), "favscr", "", 0, 2, 3, 2);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(3), __UINT64_C(1), "favmap", "", 0, 4, 3, 2);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(4), __UINT64_C(1), "lastiss", "", 3, 0, 6, 6);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(5), __UINT64_C(1), "webovr", "", 9, 0, 4, 3);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(6), __UINT64_C(1), "dscvry", "", 9, 3, 4, 3);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(7), __UINT64_C(1), "hoststat", "", 0, 6, 4, 6);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(8), __UINT64_C(1), "syssum", "", 4, 6, 4, 6);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(9), __UINT64_C(1), "stszbx", "", 8, 6, 5, 6);
-
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	return ret;
+	return SUCCEED;
 }
 
 #endif
