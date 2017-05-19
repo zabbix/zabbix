@@ -216,6 +216,7 @@ if (hasRequest('add') || hasRequest('update')) {
 					'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
 					'zindex'
 				],
+				'selectLines' => ['x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color', 'zindex'],
 				'selectLinks' => ['selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
 				'sysmapids' => $sysmap['sysmapid']
 			]);
@@ -223,6 +224,7 @@ if (hasRequest('add') || hasRequest('update')) {
 			if ($maps) {
 				$map['selements'] = $maps[0]['selements'];
 				$map['shapes'] = $maps[0]['shapes'];
+				$map['lines'] = $maps[0]['lines'];
 				$map['links'] = $maps[0]['links'];
 			}
 		}
