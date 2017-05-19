@@ -450,7 +450,11 @@ function getActionOperationDescriptions(array $actions, $type) {
 			}
 		}
 		else {
-			foreach ($action['recovery_operations'] as $j => $operation) {
+			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
+				? 'recovery_operations'
+				: 'ack_operations';
+
+			foreach ($action[$operations_key] as $j => $operation) {
 				$result[$i][$j] = [];
 
 				switch ($operation['operationtype']) {
@@ -716,7 +720,11 @@ function getActionOperationDescriptions(array $actions, $type) {
 			}
 		}
 		else {
-			foreach ($action['recovery_operations'] as $j => $operation) {
+			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
+				? 'recovery_operations'
+				: 'ack_operations';
+
+			foreach ($action[$operations_key] as $j => $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$media_type = _('all media');
@@ -810,7 +818,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 						break;
 
 					case OPERATION_TYPE_ACK_MESSAGE:
-						$result[$i][$j][] = bolf(
+						$result[$i][$j][] = bold(
 							_('Notify all who added acknowledgement and involved in discussion')
 						);
 						break;
@@ -929,6 +937,7 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 							italic(zbx_nl2br($operation['opcommand']['command']))
 						];
 				}
+				break;
 
 			case OPERATION_TYPE_ACK_MESSAGE:
 				$opmessage = $operation['opmessage'];

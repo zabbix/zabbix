@@ -584,29 +584,26 @@ if (hasRequest('form')) {
 
 		$data['action']['recovery_operations'] = $data['action']['recoveryOperations'];
 		$data['action']['ack_operations'] = $data['action']['acknowledgeOperations'];
-		unset($data['action']['recoveryOperations']);
+		unset($data['action']['recoveryOperations'], $data['action']['acknowledgeOperations']);
 
 		foreach ($data['action']['operations'] as &$operation) {
-			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_GROUP_ADD:
-				case OPERATION_TYPE_GROUP_REMOVE:
-					$operation = [
-						'actionid' => $operation['actionid'],
-						'operationid' => $operation['operationid'],
-						'operationtype' => $operation['operationtype'],
-						'groupids' => zbx_objectValues($operation['opgroup'], 'groupid')
-					];
-					break;
-
-				case OPERATION_TYPE_TEMPLATE_ADD:
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$operation = [
-						'actionid' => $operation['actionid'],
-						'operationid' => $operation['operationid'],
-						'operationtype' => $operation['operationtype'],
-						'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
-					];
-					break;
+			if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD
+					|| $operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
+				$operation = [
+					'actionid' => $operation['actionid'],
+					'operationid' => $operation['operationid'],
+					'operationtype' => $operation['operationtype'],
+					'groupids' => zbx_objectValues($operation['opgroup'], 'groupid')
+				];
+			}
+			elseif ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD
+						|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
+				$operation = [
+					'actionid' => $operation['actionid'],
+					'operationid' => $operation['operationid'],
+					'operationtype' => $operation['operationtype'],
+					'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
+				];
 			}
 		}
 		unset($operation);
@@ -620,7 +617,7 @@ if (hasRequest('form')) {
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
-	if (isset($data['action']['actionid']) && !hasRequest('form_refresh')) {
+	if (array_key_exists('actionid', $data['action']) && !hasRequest('form_refresh')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
 	}
 	else {
@@ -697,11 +694,12 @@ if (hasRequest('form')) {
 	}
 
 	// New condition.
-	$data['new_condition'] = [
-		'conditiontype' => isset($data['new_condition']['conditiontype']) ? $data['new_condition']['conditiontype'] : CONDITION_TYPE_TRIGGER_NAME,
-		'operator' => isset($data['new_condition']['operator']) ? $data['new_condition']['operator'] : CONDITION_OPERATOR_LIKE,
-		'value' => isset($data['new_condition']['value']) ? $data['new_condition']['value'] : ''
+	$new_condition_defaults =[
+		'conditiontype'	=> CONDITION_TYPE_TRIGGER_NAME,
+		'operator'		=> CONDITION_OPERATOR_LIKE,
+		'value'			=> ''
 	];
+	$data['new_condition'] = array_merge($new_condition_defaults, $data['new_condition']);
 
 	if (!str_in_array($data['new_condition']['conditiontype'], $data['allowedConditions'])) {
 		$data['new_condition']['conditiontype'] = $data['allowedConditions'][0];
@@ -710,7 +708,7 @@ if (hasRequest('form')) {
 	// New operation.
 	if ($data['new_operation'] && !is_array($data['new_operation'])) {
 		$data['new_operation'] = [
-			'operationtype' => 0,
+			'operationtype' => OPERATION_TYPE_MESSAGE,
 			'esc_period' => 0,
 			'esc_step_from' => 1,
 			'esc_step_to' => 1,
@@ -778,7 +776,7 @@ if (hasRequest('form')) {
 
 	// New recovery operation.
 	if ($data['new_recovery_operation'] && !is_array($data['new_recovery_operation'])) {
-		$data['new_recovery_operation'] = ['operationtype' => 0];
+		$data['new_recovery_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
 	}
 
 	$data['available_mediatypes'] = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
