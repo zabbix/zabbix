@@ -1501,7 +1501,7 @@ TABLE|sysmap_element_trigger|selement_triggerid|ZBX_DATA
 FIELD		|selement_triggerid	|t_id	|	|NOT NULL	|0
 FIELD		|selementid		|t_id	|	|NOT NULL	|0			|1|sysmaps_elements
 FIELD		|triggerid		|t_id	|	|NOT NULL	|0			|2|triggers
-INDEX		|1			|selementid
+UNIQUE		|1			|selementid,triggerid
 
 TABLE|httptest_field|httptest_fieldid|ZBX_DATA
 FIELD		|httptest_fieldid	|t_id		|	|NOT NULL	|0
