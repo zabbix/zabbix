@@ -69,14 +69,14 @@ class CNavigationTree extends CDiv {
 
 	public function getScriptRun() {
 		if ($this->error === null) {
-			$this->script_run = ''
-				. 'jQuery("#'.$this->getId().'").zbx_navtree({'
-				.		'problems: '.json_encode($this->problems).','
-				.		'severityLevels: '.json_encode($this->getSeverityConfig()).','
-				.		'widgetId: '.$this->widgetid.','
-				//.		'editMode: '.(getRequest('save', 1) ? 'false' : 'true').','
-				.		'maxDepth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH
-				. '});';
+			$this->script_run = ''.
+				'jQuery("#'.$this->getId().'").zbx_navtree({'.
+					'problems: '.json_encode($this->problems).','.
+					'severityLevels: '.json_encode($this->getSeverityConfig()).','.
+					'widgetId: '.$this->widgetid.','.
+					'editMode: '.(getRequest('save', 1) ? 'false' : 'true').','.
+					'maxDepth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
+				'});';
 		}
 
 		return $this->script_run;
@@ -101,7 +101,8 @@ class CNavigationTree extends CDiv {
 						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 							$element = reset($selement['elements']);
 							if ($element) {
-								$problems_by_elements[SYSMAP_ELEMENT_TYPE_HOST_GROUP][$element['groupid']] = $this->problems_per_severity_tpl;
+								$problems_by_elements[SYSMAP_ELEMENT_TYPE_HOST_GROUP][$element['groupid']]
+										= $this->problems_per_severity_tpl;
 							}
 							break;
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:

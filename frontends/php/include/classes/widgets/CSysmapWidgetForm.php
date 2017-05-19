@@ -55,21 +55,6 @@ class CSysmapWidgetForm extends CWidgetForm
 				$filter_widget_field->setValue($data['filter_widget_reference']);
 			}
 
-			$filter_widget_field->setJavascript(''
-				. 'var widgets = jQuery(".dashbrd-grid-widget-container").dashboardGrid("getWidgetsBy", "type", "navigationtree"),'
-				.		'filters_box = jQuery("#'.$filter_widget_field->getName().'");'
-				. 'if (widgets.length) {'
-				.		'jQuery("<option>Select filter widget</option>").val(0).appendTo(filters_box);'
-				.		'jQuery.each(widgets, function(i, widget) {'
-				.			'if (typeof widget["fields"]["type"] !== "undefined") {'
-				.				'jQuery("<option></option>")'
-				.						'.text(widget["fields"]["widget_name"])'
-				.						'.val(widget["fields"]["reference"])'
-				.						'.appendTo(filters_box);'
-				.			'}'
-				.		'});'
-				. '}');
-
 			$this->fields[] = $filter_widget_field;
 		}
 

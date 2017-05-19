@@ -475,6 +475,7 @@ jQuery(function($) {
 						}
 
 						if (item['id'] <= 0) {
+							// TODO miks: remove if do not see this message in console anymore. Should be resolved.
 							console.log('Item id cant\'t be', item['id'], 'on item', item);
 						}
 						else if (item['parent'] === parent_id) {
@@ -566,9 +567,7 @@ jQuery(function($) {
 				},
 				// beforeConfigLoad trigger method
 				beforeConfigLoad: function() {
-					console.log('111');
 					updateWidgetFields();
-					console.log('222');
 				},
 				// beforeDashboardSave trigger method
 				beforeDashboardSave: function() {

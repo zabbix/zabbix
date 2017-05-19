@@ -93,10 +93,7 @@ if (array_key_exists('dialogue', $data)) {
 				(new CComboBox($field->getName(), [], $field->getAction(), []))
 			);
 
-			$javascript = $field->getJavascript();
-			if ($javascript !== '') {
-				$form->addItem(new CJsScript(get_js($javascript, true)));
-			}
+			$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
 		}
 
 		/* ItemId */
