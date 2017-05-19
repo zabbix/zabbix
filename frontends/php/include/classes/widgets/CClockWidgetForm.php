@@ -20,41 +20,34 @@
 
 class CClockWidgetForm extends CWidgetForm
 {
-	public function __construct($data, $known_widget_types) {
-		parent::__construct($data, $known_widget_types);
+	public function __construct($data) {
+		parent::__construct($data);
 
-		// Time Type field
+		// Time type field
 		$time_types = [
 			TIME_TYPE_LOCAL => _('Local time'),
 			TIME_TYPE_SERVER => _('Server time'),
 			TIME_TYPE_HOST => _('Host time')
 		];
-		$field_time_type =
-			(new CWidgetFieldComboBox(
-				'time_type',
-				_('Time type'),
-				$time_types,
-				TIME_TYPE_LOCAL,
-				'updateWidgetConfigDialogue()',
-				ZBX_WIDGET_FIELD_TYPE_INT32
-			));
-		$field_time_type->setRequired(true);
+
+		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), $time_types, TIME_TYPE_LOCAL,
+			'updateWidgetConfigDialogue()', ZBX_WIDGET_FIELD_TYPE_INT32
+		))->setRequired(true);
 		if (array_key_exists('time_type', $data)) {
 			$field_time_type->setValue($data['time_type']);
 		}
 		$this->fields[] = $field_time_type;
 
 		// Item field
-		if ($field_time_type->getValue() === TIME_TYPE_HOST) {
-			$field_itemid = (new CWidgetFieldItemId('itemid', _('Item')));
-			$field_itemid->setRequired(true);
+		if ($field_time_type->getValue(true) === TIME_TYPE_HOST) {
+			$field_item = (new CWidgetFieldItemId('itemid', _('Item')))->setRequired(true);
 			if (array_key_exists('itemid', $data)) {
-				$field_itemid->setValue($data['itemid']);
+				$field_item->setValue($data['itemid']);
 			}
 			if (array_key_exists('caption', $data)) {
-				$field_itemid->setCaption($data['caption']);
+				$field_item->setCaption($data['caption']);
 			}
-			$this->fields[] = $field_itemid;
+			$this->fields[] = $field_item;
 		}
 	}
 }

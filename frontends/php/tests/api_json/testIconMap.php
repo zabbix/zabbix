@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
@@ -87,7 +88,7 @@ class testIconMap extends CZabbixTest {
 			],
 			[
 				'iconmap' => [
-					'name' => 'Api icon map',
+					'name' => 'API icon map',
 					'default_iconid' => '2',
 					'mappings' =>[
 						[
@@ -98,12 +99,12 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => 'Icon map "Api icon map" already exists.'
+				'expected_error' => 'Icon map "API icon map" already exists.'
 			],
 			[
 				'iconmap' => [
 					[
-					'name' => 'Api icon map the same name',
+					'name' => 'API icon map the same name',
 					'default_iconid' => '2',
 					'mappings' =>[
 							[
@@ -114,7 +115,7 @@ class testIconMap extends CZabbixTest {
 						]
 					],
 					[
-					'name' => 'Api icon map the same name',
+					'name' => 'API icon map the same name',
 					'default_iconid' => '2',
 					'mappings' =>[
 							[
@@ -126,12 +127,12 @@ class testIconMap extends CZabbixTest {
 					],
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Api icon map the same name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name)=(API icon map the same name) already exists.'
 			],
 			// Check iconmap default_iconid.
 			[
 				'iconmap' => [
-					'name' => 'Api icon map without default_iconid',
+					'name' => 'API icon map without default_iconid',
 					'mappings' =>[
 						[
 							'inventory_link' => '1',
@@ -145,7 +146,7 @@ class testIconMap extends CZabbixTest {
 			],
 			[
 				'iconmap' => [
-					'name' => 'Api icon map with empty default_iconid',
+					'name' => 'API icon map with empty default_iconid',
 					'default_iconid' => '',
 					'mappings' =>[
 						[
@@ -160,7 +161,7 @@ class testIconMap extends CZabbixTest {
 			],
 			[
 				'iconmap' => [
-					'name' => 'Api icon map with string default_iconid',
+					'name' => 'API icon map with string default_iconid',
 					'default_iconid' => 'abc',
 					'mappings' =>[
 						[
@@ -190,7 +191,7 @@ class testIconMap extends CZabbixTest {
 			],
 			[
 				'iconmap' => [
-					'name' => 'Api icon map nonexistent default_iconid',
+					'name' => 'API icon map nonexistent default_iconid',
 					'default_iconid' => '123456',
 					'mappings' =>[
 						[
@@ -206,7 +207,7 @@ class testIconMap extends CZabbixTest {
 			// Check mappings.
 			[
 				'iconmap' => [
-					'name' => 'Api icon map without mappings',
+					'name' => 'API icon map without mappings',
 					'default_iconid' => '2',
 				],
 				'success_expected' => false,
@@ -233,7 +234,7 @@ class testIconMap extends CZabbixTest {
 			[
 				'iconmap' => [
 					[
-						'name' => 'Api create value map with two mappings',
+						'name' => 'API create value map with two mappings',
 						'default_iconid' => '2',
 						'mappings' =>[
 							[
@@ -266,7 +267,7 @@ class testIconMap extends CZabbixTest {
 						]
 					],
 					[
-					'name' => 'Api create iconmap two',
+					'name' => 'API create iconmap two',
 					'default_iconid' => '2',
 						'mappings' =>[
 							[
@@ -319,7 +320,7 @@ class testIconMap extends CZabbixTest {
 			// Check mappings.
 			[
 				'iconmap' => [
-					'name' => 'Api icon map without mapping parametrs',
+					'name' => 'API icon map without mapping parametrs',
 					'default_iconid' => '2',
 					'mappings' =>[
 					]
@@ -723,30 +724,30 @@ class testIconMap extends CZabbixTest {
 			[
 				'iconmap' => [[
 					'iconmapid' => 2,
-					'name' => 'Api icon map'
+					'name' => 'API icon map'
 				]],
 				'success_expected' => false,
-				'expected_error' => 'Icon map "Api icon map" already exists.'
+				'expected_error' => 'Icon map "API icon map" already exists.'
 			],
 			[
 				'iconmap' => [
 					[
 						'iconmapid' => 2,
-						'name' => 'Api icon map the same name'
+						'name' => 'API icon map the same name'
 					],
 					[
 						'iconmapid' => 3,
-						'name' => 'Api icon map the same name'
+						'name' => 'API icon map the same name'
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Api icon map the same name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name)=(API icon map the same name) already exists.'
 			],
 			// Check iconmap default_iconid.
 			[
 				'iconmap' => [[
 					'iconmapid' => 2,
-					'name' => 'Api icon map with empty default_iconid',
+					'name' => 'API icon map with empty default_iconid',
 					'default_iconid' => '',
 				]],
 				'success_expected' => false,
@@ -755,7 +756,7 @@ class testIconMap extends CZabbixTest {
 			[
 				'iconmap' => [[
 					'iconmapid' => 2,
-					'name' => 'Api icon map with string default_iconid',
+					'name' => 'API icon map with string default_iconid',
 					'default_iconid' => 'abc',
 				]],
 				'success_expected' => false,
@@ -773,7 +774,7 @@ class testIconMap extends CZabbixTest {
 			[
 				'iconmap' => [[
 					'iconmapid' => 2,
-					'name' => 'Api icon map nonexistent default_iconid',
+					'name' => 'API icon map nonexistent default_iconid',
 					'default_iconid' => '123456',
 				]],
 				'success_expected' => false,
@@ -802,7 +803,7 @@ class testIconMap extends CZabbixTest {
 				'iconmap' => [
 					[
 						'iconmapid' => 2,
-						'name' => 'Api value map with two mappings updated æų',
+						'name' => 'API value map with two mappings updated æų',
 						'default_iconid' => '3',
 						'mappings' =>[
 							[
@@ -825,7 +826,7 @@ class testIconMap extends CZabbixTest {
 				'iconmap' => [
 					[
 					'iconmapid' => 2,
-					'name' => 'Api iconmap one updated',
+					'name' => 'API iconmap one updated',
 					'default_iconid' => '1',
 						'mappings' =>[
 							[
@@ -837,7 +838,7 @@ class testIconMap extends CZabbixTest {
 					],
 					[
 					'iconmapid' => 3,
-					'name' => 'Api iconmap two updated',
+					'name' => 'API iconmap two updated',
 					'default_iconid' => '2',
 						'mappings' =>[
 							[
@@ -883,7 +884,7 @@ class testIconMap extends CZabbixTest {
 			$this->assertSame($expected_error, $result['error']['data']);
 
 			foreach ($iconmaps as $iconmap) {
-				if (array_key_exists('name', $iconmap) && $iconmap['name'] != 'Api icon map'){
+				if (array_key_exists('name', $iconmap) && $iconmap['name'] != 'API icon map'){
 					$dbResult = "select * from icon_map where name='".$iconmap['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
@@ -958,7 +959,7 @@ class testIconMap extends CZabbixTest {
 					'7'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Icon map "Api iconmap in map" cannot be deleted. Used in map "Map with iconmap".'
+				'expected_error' => 'Icon map "API iconmap in map" cannot be deleted. Used in map "Map with iconmap".'
 			],
 			[
 				'iconmap' => [
@@ -1010,7 +1011,7 @@ class testIconMap extends CZabbixTest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'iconmap' => [
 					[
-						'name' => 'Api iconmap create as zabbix admin',
+						'name' => 'API iconmap create as zabbix admin',
 						'default_iconid' => '1',
 						'mappings' =>[
 							[
@@ -1028,7 +1029,7 @@ class testIconMap extends CZabbixTest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'iconmap' => [
 					'iconmapid' => '2',
-					'name' => 'Api iconmap update as zabbix admin'
+					'name' => 'API iconmap update as zabbix admin'
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
@@ -1042,7 +1043,7 @@ class testIconMap extends CZabbixTest {
 				'method' => 'iconmap.create',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'iconmap' => [
-					'name' => 'Api iconmap create as zabbix user',
+					'name' => 'API iconmap create as zabbix user',
 					'default_iconid' => '1',
 					'mappings' =>[
 							[
@@ -1059,7 +1060,7 @@ class testIconMap extends CZabbixTest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'iconmap' => [
 					'iconmapid' => '19',
-					'name' => 'Api iconmap update as zabbix user',
+					'name' => 'API iconmap update as zabbix user',
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],

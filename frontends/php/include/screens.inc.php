@@ -317,11 +317,25 @@ function get_slideshow_by_slideshowid($slideshowid, $permission) {
 function add_slideshow($data) {
 	$user_data = CWebUser::$data;
 
+	if (!validateTimeUnit($data['delay'], 1, SEC_PER_DAY, false, $error)) {
+		error(_s('Incorrect value for field "%1$s": %2$s.', 'delay', $error));
+
+		return false;
+	}
+
 	// Validate slides.
 	if (empty($data['slides'])) {
 		error(_('Slide show must contain slides.'));
 
 		return false;
+	}
+
+	foreach ($data['slides'] as $slide) {
+		if (!validateTimeUnit($slide['delay'], 0, SEC_PER_DAY, false, $error)) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'delay', $error));
+
+			return false;
+		}
 	}
 
 	// Validate screens.
@@ -416,11 +430,6 @@ function add_slideshow($data) {
 	foreach ($data['slides'] as $slide) {
 		$slideid = get_dbid('slides', 'slideid');
 
-		// set default delay
-		if (empty($slide['delay'])) {
-			$slide['delay'] = 0;
-		}
-
 		$result = DBexecute(
 			'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
 			' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.($i++).','.zbx_dbstr($slide['delay']).')'
@@ -437,11 +446,25 @@ function add_slideshow($data) {
 function update_slideshow($data) {
 	$user_data = CWebUser::$data;
 
+	if (!validateTimeUnit($data['delay'], 1, SEC_PER_DAY, false, $error)) {
+		error(_s('Incorrect value for field "%1$s": %2$s.', 'delay', $error));
+
+		return false;
+	}
+
 	// Validate slides.
 	if (empty($data['slides'])) {
 		error(_('Slide show must contain slides.'));
 
 		return false;
+	}
+
+	foreach ($data['slides'] as $slide) {
+		if (!validateTimeUnit($slide['delay'], 0, SEC_PER_DAY, false, $error)) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'delay', $error));
+
+			return false;
+		}
 	}
 
 	// validate screens.
@@ -625,7 +648,6 @@ function update_slideshow($data) {
 	$slidesToDel = zbx_toHash($slidesToDel);
 	$step = 0;
 	foreach ($data['slides'] as $slide) {
-		$slide['delay'] = $slide['delay'] ? $slide['delay'] : 0;
 		if (isset($db_slides[$slide['slideid']])) {
 			// update slide
 			if ($db_slides[$slide['slideid']]['delay'] != $slide['delay'] || $db_slides[$slide['slideid']]['step'] != $step) {

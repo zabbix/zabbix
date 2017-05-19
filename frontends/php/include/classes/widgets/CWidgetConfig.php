@@ -20,13 +20,15 @@
 
 class CWidgetConfig
 {
-	// TODO VM: (?) maybe better to convert all functions to static ones
-	private $knownWidgetTypes;
-	private $rfRates;
-	private $apiFieldKeys;
-
-	public function __construct() {
-		$this->knownWidgetTypes = [
+	/**
+	 * Return list of all widget types with names.
+	 *
+	 * @static
+	 *
+	 * @return array
+	 */
+	public static function getKnownWidgetTypes() {
+		return [
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix'),
 			WIDGET_LAST_ISSUES			=> _('Last issues'),
@@ -39,7 +41,7 @@ class CWidgetConfig
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_SYSMAP				=> _('Map'),
 			WIDGET_NAVIGATION_TREE	=> _('Map Navigation Tree'),
-			WIDGET_URL					=> _('URL'),
+			WIDGET_URL					=> _('URL')
 		];
 
 		$this->rfRates = [
@@ -58,17 +60,6 @@ class CWidgetConfig
 			WIDGET_URL					=> 0,
 		];
 
-		$this->triggers = [
-			WIDGET_NAVIGATION_TREE => [
-				'onEditStart' => 'zbx_navtree("onEditStart")',
-				'beforeDashboardSave' => 'zbx_navtree("beforeDashboardSave")',
-				'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
-				'onEditStop' => 'zbx_navtree("onEditStop")',
-				'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
-				'beforeConfigLoad' => 'zbx_navtree("beforeConfigLoad")'
-			]
-		];
-
 		$this->apiFieldKeys = [
 			ZBX_WIDGET_FIELD_TYPE_INT32				=> 'value_int',
 			ZBX_WIDGET_FIELD_TYPE_STR				=> 'value_str',
@@ -84,49 +75,34 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Return list of all widget types with names
-	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
-	 * @return array
+	 * Return default refresh rate for widget type.
+	 *
+	 * @static
+	 *
+	 * @param int $type  WIDGET_ constant
+	 *
+	 * @return int  default refresh rate, "0" for no refresh
 	 */
-	public function getKnownWidgetTypesWNames($user_type = null) {
-		$known_widget_types = $this->knownWidgetTypes;
+	public static function getDefaultRfRate($type) {
+		switch ($type) {
+			case WIDGET_SYSTEM_STATUS:
+			case WIDGET_LAST_ISSUES:
+			case WIDGET_WEB_OVERVIEW:
+			case WIDGET_DISCOVERY_STATUS:
+			case WIDGET_HOST_STATUS:
+				return SEC_PER_MIN;
 
-		// Remove widget types, user can't create
-		if ($user_type !== null) {
-			$show_discovery_widget = ($user_type >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
-				'output' => [],
-				'filter' => ['status' => DRULE_STATUS_ACTIVE],
-				'limit' => 1
-			]));
-			if (!$show_discovery_widget) {
-				unset($known_widget_types[WIDGET_DISCOVERY_STATUS]);
-			}
+			case WIDGET_ZABBIX_STATUS:
+			case WIDGET_FAVOURITE_GRAPHS:
+			case WIDGET_FAVOURITE_MAPS:
+			case WIDGET_FAVOURITE_SCREENS:
+			case WIDGET_CLOCK:
+			case WIDGET_SYSMAP:
+				return 15 * SEC_PER_MIN;
 
-			$show_status_widget = ($user_type == USER_TYPE_SUPER_ADMIN);
-			if (!$show_status_widget) {
-				unset($known_widget_types[WIDGET_ZABBIX_STATUS]);
-			}
+			case WIDGET_URL:
+				return 0;
 		}
-
-		return $known_widget_types;
-	}
-
-	/**
-	 * Return list of all widget types
-	 * @param int $user_type - USER_TYPE_ZABBIX_, if not passed, all widget types will be returned
-	 * @return array
-	 */
-	public function getKnownWidgetTypes($user_type = null) {
-		return array_keys($this->getKnownWidgetTypesWNames($user_type));
-	}
-
-	/**
-	 * Return default refresh rate for widget type
-	 * @param int $type - WIDGET_ constant
-	 * @return int default refresh rate, "0" for no refresh
-	 */
-	public function getDefaultRfRate($type) {
-		return $this->rfRates[$type];
 	}
 
 	/**
@@ -134,8 +110,21 @@ class CWidgetConfig
 	 * @param int $type - WIDGET_ constant
 	 * @return array - list of [onEvent => jsMethodToCall] pairs
 	 */
-	public function getTriggers($type) {
-		return array_key_exists($type, $this->triggers) ? $this->triggers[$type] : [];
+	public static function getTriggers($type) {
+		switch ($type) {
+			case WIDGET_NAVIGATION_TREE:
+				return [
+					'onEditStart' => 'zbx_navtree("onEditStart")',
+					'beforeDashboardSave' => 'zbx_navtree("beforeDashboardSave")',
+					'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
+					'onEditStop' => 'zbx_navtree("onEditStop")',
+					'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
+					'beforeConfigLoad' => 'zbx_navtree("beforeConfigLoad")'
+				];
+				break;
+			default:
+				return [];
+		}
 	}
 
 	/**
@@ -143,31 +132,66 @@ class CWidgetConfig
 	 * @param int $field_type - ZBX_WIDGET_FIELD_TYPE_ constant
 	 * @return string field key, where to save the value
 	 */
-	public function getApiFieldKey($field_type){
-		return $this->apiFieldKeys[$field_type];
+	public static function getApiFieldKey($field_type){
+		switch ($field_type) {
+			case ZBX_WIDGET_FIELD_TYPE_INT32:
+				return 'value_int';
+
+			case ZBX_WIDGET_FIELD_TYPE_STR:
+				return 'value_str';
+
+			case ZBX_WIDGET_FIELD_TYPE_GROUP:
+				return 'value_groupid';
+
+			case ZBX_WIDGET_FIELD_TYPE_HOST:
+				return 'value_hostid';
+
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
+				return 'value_itemid';
+
+			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+				return 'value_itemid';
+
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+				return 'value_graphid';
+
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+				return 'value_graphid';
+
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
+				return 'value_sysmapid';
+
+			case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
+				return 'value_dashboardid';
+		}
 	}
 
 	/**
-	 * Return Form object for widget with provided data
-	 * @param array $data - array with all widget's fields, including widget type and position
-	 * @param int $user_type - USER_TYPE_ZABBIX_ constant, if null or not passed, will accept all widget types
+	 * Return Form object for widget with provided data.
+	 *
+	 * @static
+	 *
+	 * @param array  $data          array with all widget's fields, including widget type
+	 * @param string $data['type']
+	 * @param string $data[<name>]  (optional)
+	 *
 	 * @return CWidgetForm
 	 */
-	public function getForm($data, $user_type = null) {
-		$known_widget_types = $this->getKnownWidgetTypesWNames($user_type);
+	public static function getForm($data) {
 		switch ($data['type']) {
 			case WIDGET_CLOCK:
-				return (new CClockWidgetForm($data, $known_widget_types));
+				return new CClockWidgetForm($data);
+
 			case WIDGET_NAVIGATION_TREE:
-				return (new CNavigationWidgetForm($data, $known_widget_types));
+				return (new CNavigationWidgetForm($data));
 			case WIDGET_SYSMAP:
-				return (new CSysmapWidgetForm($data, $known_widget_types));
+				return (new CSysmapWidgetForm($data));
 			case WIDGET_URL:
-				return (new CUrlWidgetForm($data, $known_widget_types));
+				return new CUrlWidgetForm($data);
 
 			default:
 				// TODO VM: delete this case after all widget forms will be created
-				return (new CWidgetForm($data, $known_widget_types));
+				return new CWidgetForm($data);
 		}
 	}
 }

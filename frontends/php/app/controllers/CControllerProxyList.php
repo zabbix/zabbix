@@ -84,14 +84,13 @@ class CControllerProxyList extends CController {
 		];
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept'],
+			'output' => ['proxyid', $sortField],
 			'search' => [
 				'host' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
-			'selectHosts' => ['hostid', 'name', 'status'],
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1,
 			'editable' => true,
@@ -105,41 +104,66 @@ class CControllerProxyList extends CController {
 
 		$data['paging'] = getPagingLine($data['proxies'], $sortOrder, $url);
 
+		$data['proxies'] = API::Proxy()->get([
+			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept'],
+			'selectHosts' => ['hostid', 'name', 'status'],
+			'proxyids' => array_keys($data['proxies']),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+		order_result($data['proxies'], $sortField, $sortOrder);
+
 		foreach ($data['proxies'] as &$proxy) {
 			order_result($proxy['hosts'], 'name');
+			$proxy['hosts'] = array_slice($proxy['hosts'], 0, $data['config']['max_in_table'] + 1);
 		}
 		unset($proxy);
 
-		// get proxy IDs for a *selected* page
-		$proxyIds = array_keys($data['proxies']);
+		if ($data['proxies']) {
+			global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		if ($proxyIds) {
-			// calculate performance
-			$dbPerformance = DBselect(
-				'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
-				' FROM hosts h,items i'.
-				' WHERE h.hostid=i.hostid'.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND i.delay<>0'.
-					' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE.
-					' AND '.dbConditionInt('h.proxy_hostid', $proxyIds).
-				' GROUP BY h.proxy_hostid'
-			);
-			while ($performance = DBfetch($dbPerformance)) {
-				$data['proxies'][$performance['proxy_hostid']]['perf'] = round($performance['qps'], 2);
-			}
+			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+			$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
 
-			// get items
-			$items = API::Item()->get([
-				'proxyids' => $proxyIds,
-				'groupCount' => true,
-				'countOutput' => true,
-				'webitems' => true,
-				'monitored' => true
-			]);
-			foreach ($items as $item) {
-				$data['proxies'][$item['proxy_hostid']]['item_count'] = $item['rowscount'];
+			if ($server_status !== false) {
+				$defaults = [
+					'host_count' => 0,
+					'item_count' => 0
+				];
+				if (array_key_exists('required performance', $server_status)) {
+					$defaults['vps_total'] = 0;
+				}
+				foreach ($data['proxies'] as &$proxy) {
+					$proxy += $defaults;
+				}
+				unset($proxy);
+
+				// hosts
+				foreach ($server_status['host stats'] as $stats) {
+					if ($stats['attributes']['status'] == HOST_STATUS_MONITORED) {
+						if (array_key_exists($stats['attributes']['proxyid'], $data['proxies'])) {
+							$data['proxies'][$stats['attributes']['proxyid']]['host_count'] += $stats['count'];
+						}
+					}
+				}
+
+				// items
+				foreach ($server_status['item stats'] as $stats) {
+					if ($stats['attributes']['status'] == ITEM_STATUS_ACTIVE) {
+						if (array_key_exists($stats['attributes']['proxyid'], $data['proxies'])) {
+							$data['proxies'][$stats['attributes']['proxyid']]['item_count'] += $stats['count'];
+						}
+					}
+				}
+
+				// performance
+				if (array_key_exists('required performance', $server_status)) {
+					foreach ($server_status['required performance'] as $stats) {
+						if (array_key_exists($stats['attributes']['proxyid'], $data['proxies'])) {
+							$data['proxies'][$stats['attributes']['proxyid']]['vps_total'] += round($stats['count'], 2);
+						}
+					}
+				}
 			}
 		}
 

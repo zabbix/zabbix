@@ -24,12 +24,10 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 class CControllerDashbrdWidgetUpdate extends CController {
 
 	private $widgets;
-	private $widget_config;
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->widget_config = new CWidgetConfig();
 		$this->widgets = [];
 	}
 
@@ -63,9 +61,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 						break; // no need to check fields, if widget type is unknown
 					}
 
-					// TODO VM: (?) widget types are currently not evaluated by "allowed y user or not"
-					$widget['form'] = $this->widget_config->getForm($widget_fields);
-//					$widget['form'] = $this->widget_config->getForm($widget_fields, $this->getUserType());
+					$widget['form'] = CWidgetConfig::getForm($widget_fields);
 					unset($widget['fields']);
 
 					$errors = $widget['form']->validate();
@@ -103,7 +99,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		$save = (int)$this->getInput('save');
 		if ($save === WIDGET_CONFIG_DO_SAVE) {
 			$dashboard = [];
-			$dashboard['dashboardid'] = (int)$this->getInput('dashboard_id');
+			$dashboard['dashboardid'] = $this->getInput('dashboard_id');
 			$dashboard['widgets'] = [];
 
 			foreach ($this->widgets as $widget) {
@@ -134,7 +130,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			}
 
 			$result = API::Dashboard()->update([$dashboard]);
-			if ($result['dashboardids'][0] === $dashboard['dashboardid']) {
+
+			if ($result['dashboardids'][0] == $dashboard['dashboardid']) {
 				$return['messages'] = makeMessageBox(true, [], _('Dashboard updated'))->toString();
 			} else {
 				if (!hasErrorMesssages()) {
@@ -166,7 +163,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				$field_to_save['type'] = $field->getSaveType();
 				$field_to_save['name'] = $field->getName();
 
-				$field_key = $this->widget_config->getApiFieldKey($field_to_save['type']);
+				$field_key = CWidgetConfig::getApiFieldKey($field_to_save['type']);
 				$field_to_save[$field_key] = $field->getValue();
 
 				if (!array_key_exists('fields', $ret)) {

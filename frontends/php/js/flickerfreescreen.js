@@ -249,16 +249,28 @@ jQuery(function($) {
 					data: {},
 					dataType: 'html',
 					success: function(html) {
-						// get timestamp from html
-						var htmlTimestamp = null;
+						// Get timestamp and error message from HTML.
+						var htmlTimestamp = null,
+							msg_bad = null;
 
 						$(html).each(function() {
 							var obj = $(this);
 
-							if (obj.prop('nodeName') == 'DIV') {
+							if (obj.hasClass('msg-bad')) {
+								msg_bad = obj;
+							}
+							else if (obj.prop('nodeName') === 'DIV') {
 								htmlTimestamp = obj.data('timestamp');
 							}
 						});
+
+						$('.msg-bad').remove();
+
+						// set message
+						if (msg_bad) {
+							$(msg_bad).insertBefore('.article > :first-child');
+							html = $(html).not('.msg-bad');
+						}
 
 						// set html
 						if ($('#flickerfreescreen_' + id).data('timestamp') < htmlTimestamp) {

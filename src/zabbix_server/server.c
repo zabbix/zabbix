@@ -64,6 +64,10 @@
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"
 
+#ifdef ZBX_CUNIT
+#include "../libs/zbxcunit/zbxcunit.h"
+#endif
+
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
 #include "ipmi/ipmi_poller.h"
@@ -121,6 +125,8 @@ static struct zbx_option	longopts[] =
 	{"version",		0,	NULL,	'V'},
 	{NULL}
 };
+
+
 
 /* short options */
 static char	shortopts[] = "c:hVR:f";
@@ -712,7 +718,12 @@ int	main(int argc, char **argv)
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
+
 	progname = get_program_name(argv[0]);
+
+#ifdef ZBX_CUNIT
+	zbx_cu_run(argc, argv);
+#endif
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
