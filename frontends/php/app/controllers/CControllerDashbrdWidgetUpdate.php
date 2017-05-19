@@ -99,7 +99,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		$save = (int)$this->getInput('save');
 		if ($save === WIDGET_CONFIG_DO_SAVE) {
 			$dashboard = [];
-			$dashboard['dashboardid'] = (int)$this->getInput('dashboard_id');
+			$dashboard['dashboardid'] = $this->getInput('dashboard_id');
 			$dashboard['widgets'] = [];
 
 			foreach ($this->widgets as $widget) {
@@ -130,7 +130,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			}
 
 			$result = API::Dashboard()->update([$dashboard]);
-			if ($result['dashboardids'][0] === $dashboard['dashboardid']) {
+
+			if ($result['dashboardids'][0] == $dashboard['dashboardid']) {
 				$return['messages'] = makeMessageBox(true, [], _('Dashboard updated'))->toString();
 			} else {
 				if (!hasErrorMesssages()) {
