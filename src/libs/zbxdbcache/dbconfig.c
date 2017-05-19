@@ -2215,17 +2215,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (SUCCEED == DCstrpool_replace(found, &item->delay, row[14]))
 			flags |= ZBX_ITEM_DELAY_CHANGED;
 
-		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status &&
-				SUCCEED == is_counted_in_item_queue(item->type, item->key))
-		{
-			dc_requeue_item(item, host, flags, now);
-		}
-		else
-		{
-			item->nextcheck = 0;
-			item->unreachable = 0;
-		}
-
 		/* numeric items */
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
@@ -2469,6 +2458,17 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
+		}
+
+		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status &&
+				SUCCEED == is_counted_in_item_queue(item->type, item->key))
+		{
+			dc_requeue_item(item, host, flags, now);
+		}
+		else
+		{
+			item->nextcheck = 0;
+			item->unreachable = 0;
 		}
 	}
 
