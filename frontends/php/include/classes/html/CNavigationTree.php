@@ -83,8 +83,6 @@ class CNavigationTree extends CDiv {
 	}
 
 	protected function getNumberOfProblemsBySysmap(array $mapsId = []) {
-		// TODO miks: create submap counter
-
 		$response = [];
 		$sysmaps = API::Map()->get([
 				'output' => ['sysmapid', 'severity_min'],
@@ -117,12 +115,23 @@ class CNavigationTree extends CDiv {
 								$problems_by_elements[SYSMAP_ELEMENT_TYPE_HOST][$element['hostid']] = $this->problems_per_severity_tpl;
 							}
 							break;
-						/*case SYSMAP_ELEMENT_TYPE_MAP:
+						case SYSMAP_ELEMENT_TYPE_MAP:
 							$element = reset($selement['elements']);
 							if ($element) {
-								$selements['sysmaps'][] = $selement['sysmapid'];
+								$db_mapselements = DBselect(
+									'SELECT DISTINCT se.elementtype,se.elementid'.
+									' FROM sysmaps_elements se'.
+									' WHERE se.sysmapid='.zbx_dbstr($element['sysmapid'])
+								);
+								while ($db_mapelement = DBfetch($db_mapselements)) {
+									$el_type = $db_mapelement['elementtype'];
+									$el_id = $db_mapelement['elementid'];
+
+									$problems_by_elements[SYSMAP_ELEMENT_TYPE_MAP][$element['sysmapid']][$el_type][] = $el_id;
+									$problems_by_elements[$el_type][$el_id] = $this->problems_per_severity_tpl;
+								}
 							}
-							break;*/
+							break;
 					}
 				}
 			}
@@ -237,12 +246,18 @@ class CNavigationTree extends CDiv {
 							case SYSMAP_ELEMENT_TYPE_HOST:
 								$problems = $problems_by_elements[SYSMAP_ELEMENT_TYPE_HOST][$element['hostid']];
 								break;
-							/*case SYSMAP_ELEMENT_TYPE_MAP:
-								$element = reset($selement['elements']);
-								if ($element) {
-									$selements['sysmaps'][] = $selement['sysmapid'];
+							case SYSMAP_ELEMENT_TYPE_MAP:
+								$problems = $this->problems_per_severity_tpl;
+								foreach ($problems_by_elements[SYSMAP_ELEMENT_TYPE_MAP][$element['sysmapid']] as $el_type => $el_list) {
+									foreach ($el_list as $el_id) {
+										if (array_key_exists($el_id, $problems_by_elements[$el_type])) {
+											$problems = array_map(function() {
+												return array_sum(func_get_args());
+											}, $problems_by_elements[$el_type][$el_id], $problems);
+										}
+									}
 								}
-								break; */
+								break;
 							default:
 								$problems = null;
 								break;

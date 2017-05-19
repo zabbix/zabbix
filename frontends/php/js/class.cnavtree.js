@@ -11,6 +11,7 @@ jQuery(function($) {
 	// to get state of edit mode.
 	// 
 	// TODO miks: change button icons.
+	// TODO miks: improve sortability.
 
 	if (typeof($.fn.zbx_navtree) === 'undefined') {
 		$.fn.zbx_navtree = function(input) {

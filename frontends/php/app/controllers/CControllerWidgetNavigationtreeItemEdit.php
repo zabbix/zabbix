@@ -18,8 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// TODO miks: make separate view.
-
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerWidgetNavigationtreeItemEdit extends CController {
@@ -64,7 +62,7 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 
 		$formList = new CFormList();
 		$formList->addRow(
-			_('Name'), 
+			_('Name'),
 			(new CTextBox('map.name.'.$map_id, $map_item_name))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		);
 
