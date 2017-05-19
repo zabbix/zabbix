@@ -215,13 +215,6 @@
 			</exec>
 		</sequential>
 	</target>
-	
-	<target name="make-dist" depends="init">
-		<!-- Create Zabbix distribution file -->
-		<sequential>
-			<make args="" target="dist"/>
-		</sequential>
-	</target>
 
 	<target name="build" depends="init,create-db,make-gcc,make-clang,make-db"/>
 </project>
