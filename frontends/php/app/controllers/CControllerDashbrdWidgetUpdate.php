@@ -131,11 +131,12 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				$dashboard['widgets'][] = $widget_to_save;
 			}
 
-			$result = API::Dashboard()->update([$dashboard]);
+			$result = (bool) API::Dashboard()->update([$dashboard]);
 
-			if ($result['dashboardids'][0] == $dashboard['dashboardid']) {
+			if ($result) {
 				$return['messages'] = makeMessageBox(true, [], _('Dashboard updated'))->toString();
-			} else {
+			}
+			else {
 				if (!hasErrorMesssages()) {
 					error(_('Failed to update dashboard')); // In case of unknown error
 				}
