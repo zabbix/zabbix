@@ -485,7 +485,7 @@
 			data: {
 				dashboard_id: data['options']['dashboardid'], // TODO VM: (?) will not work without dashboard id
 				widgets: ajax_data,
-				save: 0 // 0 - only check; 1 - check and save
+				save: 0 // WIDGET_CONFIG_DONT_SAVE - only check
 			},
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
@@ -621,7 +621,7 @@
 			data: {
 				dashboard_id: data['options']['dashboardid'], // TODO VM: (?) will not work without dashboard id
 				widgets: ajax_data,
-				save: 1 // 0 - only check; 1 - check and save
+				save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
 			},
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
