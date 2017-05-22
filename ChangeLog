@@ -66,6 +66,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
 ..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
 ..F....... [ZBX-10807] fixed wrongly displayed field in item prototype form (miks)
@@ -480,6 +481,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
 ..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
 ..F....... [ZBX-10807] fixed wrongly displayed field in item prototype form (miks)
