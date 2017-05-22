@@ -356,7 +356,8 @@ ul.top-nav-icons {
   .header-title h1 {
     text-align: left; }
   .header-title form {
-    display: inline-block; }
+    display: flex;
+    justify-content: flex-end; }
   .header-title ul li {
     display: inline-block;
     vertical-align: top;
@@ -1327,18 +1328,35 @@ button {
 .btn-alt {
   color: #0275b8;
   background-color: transparent; }
+  .btn-alt .plus-icon {
+    background-color: #0275b8;
+    margin-right: 8px; }
+    .btn-alt .plus-icon::after {
+      background-color: #0275b8; }
   .btn-alt:hover {
     color: #fff;
     background-color: #02659f;
     border-color: #02659f; }
+    .btn-alt:hover .plus-icon {
+      background-color: #fff; }
+      .btn-alt:hover .plus-icon::after {
+        background-color: #fff; }
   .btn-alt:focus {
     color: #fff;
     background-color: #02659f;
     border-color: #02659f; }
+    .btn-alt:focus .plus-icon {
+      background-color: #fff; }
+      .btn-alt:focus .plus-icon::after {
+        background-color: #fff; }
   .btn-alt:active {
     color: #fff;
     background-color: #02659f;
     border-color: #02659f; }
+    .btn-alt:active .plus-icon {
+      background-color: #fff; }
+      .btn-alt:active .plus-icon::after {
+        background-color: #fff; }
 
 .btn-grey {
   color: #1f2c33;
@@ -1440,13 +1458,19 @@ button {
   background: #0275b8 url(../img/icon-sprite.svg) no-repeat -7px -439px; }
 
 .btn-widget-action {
-  background: url(../img/icon-sprite.svg) no-repeat -2px -616px; }
+  background: url(../img/icon-sprite.svg) no-repeat -4px -616px; }
 
 .btn-widget-collapse {
   background: url(../img/icon-sprite.svg) no-repeat -5px -652px; }
 
 .btn-widget-expand {
   background: url(../img/icon-sprite.svg) no-repeat -5px -688px; }
+
+.btn-widget-edit {
+  background: url(../img/icon-sprite.svg) no-repeat -39px -617px; }
+
+.btn-widget-delete {
+  background: url(../img/icon-sprite.svg) no-repeat -39px -580px; }
 
 .btn-alarm-on {
   background: url(../img/icon-sprite.svg) no-repeat -3px -545px; }
@@ -1460,7 +1484,7 @@ button {
 .btn-sound-off {
   background: url(../img/icon-sprite.svg) no-repeat -3px -509px; }
 
-.btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off {
+.btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off {
   border: none;
   width: 30px;
   height: 28px;
@@ -1472,7 +1496,7 @@ button {
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
-  .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus {
+  .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-widget-delete:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none; }
@@ -1516,7 +1540,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   opacity: 1;
   filter: alpha(opacity=100); }
 
-.btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active {
+.btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-widget-delete:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-widget-delete:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-widget-delete:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active {
   background-color: transparent;
   opacity: 1;
   filter: alpha(opacity=100); }
@@ -1804,7 +1828,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-head {
   position: relative;
-  padding: 8px 40px 8px 10px;
+  padding: 8px 65px 8px 10px;
   min-height: 17px; }
   .dashbrd-grid-widget-head h4 {
     color: #3c5563;
@@ -1812,7 +1836,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-widget-head ul {
     position: absolute;
     top: 0;
-    right: 3px; }
+    right: 0; }
     .dashbrd-grid-widget-head ul li {
       display: block;
       float: left;
@@ -2027,6 +2051,27 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-widget-foot li {
     display: inline-block;
     padding: 8px 0 8px 13px; }
+
+.dashbrd-edit {
+  position: relative;
+  display: inline-block;
+  line-height: 24px;
+  background-color: #fff;
+  -webkit-box-shadow: 0 0 0 4px #fff;
+  -moz-box-shadow: 0 0 0 4px #fff;
+  box-shadow: 0 0 0 4px #fff; }
+  .dashbrd-edit::after {
+    content: "";
+    position: absolute;
+    min-height: 24px;
+    z-index: -1;
+    top: -5px;
+    right: -5px;
+    bottom: -5px;
+    left: -5px;
+    border: 1px solid #dfe4e7; }
+  .dashbrd-edit li:first-child {
+    padding: 0; }
 
 .action-menu {
   position: absolute;
@@ -2667,6 +2712,21 @@ td.active-bg {
   margin-top: 5%;
   max-width: 25%; }
 
+.plus-icon {
+  display: inline-block; }
+
+.plus-icon {
+  width: 2px;
+  height: 8px;
+  position: relative; }
+  .plus-icon::after {
+    content: "";
+    width: 8px;
+    height: 2px;
+    top: 3px;
+    left: -3px;
+    position: absolute; }
+
 .remove-btn, .overlay-close-btn, a.overlay-close-btn, .subfilter-disable-btn {
   display: block;
   padding: 0;
@@ -2907,8 +2967,13 @@ tr.cursor-move td * {
   text-transform: uppercase; }
 
 .clock {
-  text-align: center;
-  display: inline-block; }
+  padding: 0 5px;
+  height: 100%; }
+
+.clock-svg {
+  max-height: 100%;
+  display: block;
+  margin: 0 auto; }
 
 .time-zone {
   margin: 0 0 .5em 0;
