@@ -399,10 +399,6 @@ if (isset($_REQUEST['form'])) {
 		$data['form'] = 'clone';
 	}
 
-	if (!hasRequest('itemid') && !getRequest('form_refresh')) {
-		$data['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-	}
-
 	// render view
 	$itemView = new CView('configuration.host.discovery.edit', $data);
 	$itemView->render();

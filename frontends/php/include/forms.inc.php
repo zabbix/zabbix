@@ -856,7 +856,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
 		'templates' => [],
-		'jmx_endpoint' => getRequest('jmx_endpoint', '')
+		'jmx_endpoint' => getRequest('jmx_endpoint', DB::getDefault('items', 'jmx_endpoint'))
 	];
 
 	// hostid

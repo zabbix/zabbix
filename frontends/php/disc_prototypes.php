@@ -525,10 +525,6 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
 
-	if (!hasRequest('itemid') && !getRequest('form_refresh')) {
-		$data['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-	}
-
 	// render view
 	$itemView = new CView('configuration.item.prototype.edit', $data);
 	$itemView->render();

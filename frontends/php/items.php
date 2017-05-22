@@ -1120,10 +1120,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		$data['inventory_link'] = $item['inventory_link'];
 	}
 
-	if (!hasRequest('itemid') && !getRequest('form_refresh')) {
-		$data['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-	}
-
 	// render view
 	$itemView = new CView('configuration.item.edit', $data);
 	$itemView->render();
