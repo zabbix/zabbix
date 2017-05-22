@@ -108,9 +108,7 @@ class C32ImportConverter extends CConverter {
 				unset($item['preprocessing']);
 			}
 
-			if ($item['type'] == ITEM_TYPE_JMX) {
-				$item['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-			}
+			$item['jmx_endpoint'] = ($item['type'] == ITEM_TYPE_JMX) ? DB::getDefault('items', 'jmx_endpoint') : '';
 		}
 		unset($item);
 
@@ -126,11 +124,10 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertDiscoveryRules(array $discovery_rules) {
 		foreach ($discovery_rules as &$discovery_rule) {
-			$discovery_rule['item_prototypes'] =
-				$this->convertItems($discovery_rule['item_prototypes']);
-			if ($discovery_rule['type'] == ITEM_TYPE_JMX) {
-				$discovery_rule['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-			}
+			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['jmx_endpoint'] = ($discovery_rule['type'] == ITEM_TYPE_JMX)
+				? DB::getDefault('items', 'jmx_endpoint')
+				: '';
 		}
 		unset($discovery_rule);
 
