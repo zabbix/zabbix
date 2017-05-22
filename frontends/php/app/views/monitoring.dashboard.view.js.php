@@ -81,7 +81,7 @@
 	var showEditMode = function showEditMode() {
 		var edit_button = jQuery('#dashbrd-edit');
 		var btn_conf = jQuery('<button>')
-			.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
+			.addClass('<?= ZBX_STYLE_BTN_WIDGET_EDIT ?>')
 			.attr('id','dashbrd-config')
 			.attr('type','button')
 			.append(

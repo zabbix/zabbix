@@ -20,6 +20,7 @@
 
 $url_list = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.list');
+
 if ($data['fullscreen']) {
 	$url_list->setArgument('fullscreen', '1');
 }
@@ -27,7 +28,6 @@ if ($data['fullscreen']) {
 $breadcrumbs = [
 	(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
 ];
-
 
 if (!$is_new) {
 	$url_view = (new CUrl('zabbix.php'))
