@@ -170,7 +170,12 @@ class C32ImportConverter extends CConverter {
 	protected function convertMaps(array $maps) {
 		foreach ($maps as &$map) {
 			$map['selements'] = $this->convertMapElements($map['selements']);
-			$map['shapes'] = [];
+			$map['shapes'] = [[
+				'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
+				'width' => $map['width'],
+				'height' => 15,
+				'text' => '{MAP.NAME}'
+			]];
 			$map['lines'] = [];
 		}
 		unset($map);
