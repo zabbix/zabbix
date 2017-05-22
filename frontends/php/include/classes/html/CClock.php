@@ -84,8 +84,8 @@ class CClock extends CDiv {
 
 	public function getTimeDiv() {
 		return (new CDiv($this->error))
-				->addClass(ZBX_STYLE_TIME_ZONE.'-'.$this->getId())
-				->addClass($this->error !== null ? ZBX_STYLE_RED : ZBX_STYLE_GREY);
+			->addClass(ZBX_STYLE_TIME_ZONE.'-'.$this->getId())
+			->addClass($this->error !== null ? ZBX_STYLE_RED : ZBX_STYLE_GREY);
 	}
 
 	public function getScriptFile() {
@@ -183,8 +183,8 @@ class CClock extends CDiv {
 
 		if ($this->width !== null && $this->height !== null) {
 			$clock
-				->setAttribute('width', (string) $this->width)
-				->setAttribute('height', (string) $this->height);
+				->setAttribute('width', (string) $this->width.'px')
+				->setAttribute('height', (string) $this->height.'px');
 		}
 
 		if ($this->error !== null) {
