@@ -18,26 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CUrlWidgetForm extends CWidgetForm
+class CWidgetFieldCheckbox extends CWidgetField
 {
-	public function __construct($data) {
-		parent::__construct($data);
+	public function __construct($name, $label, $default = 0) {
+		parent::__construct($name, $label, $default, null);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
+	}
 
-		// URL field
-		$field_url = (new CWidgetFieldTextBox('url', _('URL')));
-		if (array_key_exists('url', $data)) {
-			$field_url->setValue($data['url']);
-		}
-		$this->fields[] = $field_url;
-
-		// Dynamic item
-		$field_dynamic = (new CWidgetFieldCheckbox('dynamic', _('Dynamic item')));
-		if (array_key_exists('dynamic', $data)) {
-			$field_dynamic->setValue($data['dynamic']);
-		}
-		else {
-			$field_dynamic->setValue(false);
-		}
-		$this->fields[] = $field_dynamic;
+	public function setValue($value) {
+		// Only values in this array will be considered as true, any other value will be considered as false.
+		$true_values = [true,1,'1'];
+		$value = (in_array($value, $true_values)) ? 1 : 0;
+		return parent::setValue($value);
 	}
 }

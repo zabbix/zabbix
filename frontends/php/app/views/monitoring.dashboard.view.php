@@ -99,11 +99,46 @@ $form
 	)
 );
 
+$item_groupid = null;
+$item_hostid = null;
+if ($data['dynamic']['has_dynamic_widgets'] === true) {
+	$pageFilter = new CPageFilter([
+		'groups' => [
+			'monitored_hosts' => true,
+			'with_items' => true
+		],
+		'hosts' => [
+			'monitored_hosts' => true,
+			'with_items' => true,
+			'DDFirstLabel' => _('not selected')
+		],
+		'hostid' => $data['dynamic']['hostid'],
+		'groupid' => $data['dynamic']['groupid']
+	]);
+	// Changes values to default ones, if nonexisting ones were received
+	$data['dynamic']['groupid'] = $pageFilter->groupid;
+	$data['dynamic']['hostid'] = $pageFilter->hostid;
+
+	$item_groupid = ([
+			new CLabel(_('Group'), 'groupid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$pageFilter->getGroupsCB()
+		]);
+	$item_hostid = ([
+			new CLabel(_('Host'), 'hostid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$pageFilter->getHostsCB()
+		]);
+}
+
 (new CWidget())
 	->setTitle($data['dashboard']['name'])
-	->setControls((new CForm())
+	->setControls((new CForm('post', 'zabbix.php?action=dashboard.view'))
 		->cleanItems()
 		->addItem((new CList())
+			// $item_groupid and $item_hostid will be hidden, when 'Edit Dashboard' will be clicked.
+			->addItem($item_groupid)
+			->addItem($item_hostid)
 			// 'Edit dashboard' should be first one in list,
 			// because it will be visually replaced by last item of new list, when clicked
 			->addItem((new CButton('dashbrd-edit',_('Edit dashboard'))))
@@ -155,6 +190,7 @@ $this->addPostJS('jqBlink.blink();');
 $dashboard_data = [
 	'id' => $data['dashboard']['dashboardid'],
 	'name' => $data['dashboard']['name'],
+	'dynamic' => $data['dynamic']
 //	'owner' => $data['dashboard']['owner'] // TODO VM: add owner
 ];
 $this->addPostJS(
