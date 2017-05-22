@@ -47,6 +47,7 @@
 <script type="text/javascript">
 	// Change dashboard settings
 	var dashbrd_config = function() {
+		// TODO VM: dashboard configuration dialogue should be opened here
 		// Update buttons on existing widgets to view mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
 	};
