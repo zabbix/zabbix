@@ -2252,6 +2252,26 @@ function hasErrorMesssages() {
 }
 
 /**
+ * Get messages by given type as array.
+ *
+ *
+ * @return array
+ */
+function getMessagesByType($type) {
+	global $ZBX_MESSAGES;
+
+	$result = [];
+	if (isset($ZBX_MESSAGES)) {
+		foreach ($ZBX_MESSAGES as $message) {
+			if ($message['type'] === $type) {
+				$result[] = $message['message'];
+			}
+		}
+	}
+	return $result;
+}
+
+/**
  * Clears table rows selection's cookies.
  *
  * @param string $cookieId		parent ID, is used as cookie suffix

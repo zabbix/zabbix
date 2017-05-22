@@ -43,8 +43,7 @@ $edit_form->addItem((new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-)
-	->addItem((new CDiv())->addClass(ZBX_STYLE_DIALOG_FORM_ERRORS));
+);
 
 return $edit_form;
 

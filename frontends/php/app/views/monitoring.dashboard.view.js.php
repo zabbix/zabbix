@@ -141,24 +141,30 @@
 		sharing_form.submit(function(event) {
 			var	me = this;
 			event.preventDefault();
+			function saveErrors(errors) {
+				jQuery(me).data('errors', errors);
+			}
 
 			jQuery.ajax({
+				async: false, // waiting errors
 				data: jQuery(me).serialize(), // get the form data
 				type: jQuery(me).attr('method'),
 				url: jQuery(me).attr('action'),
 				success: function (response) {
-					dashboardRemoveMessages();
+					var errors = [];
 					if (typeof response === 'object') {
-						if ('messages' in response && response.messages.length > 0) {
-							dashbaordAddMessages(response.messages.join());
+						if ('errors' in response) {
+							errors = response.errors;
 						}
 					}
 					else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
-						alert('<?= _('You need permission to perform this action!') ?>');
+						errors.push('<?= _('You need permission to perform this action!') ?>');
 					}
+					saveErrors(errors);
+
 				},
 				error: function (response) {
-					alert('<?= _('Something went wrong. Please try again later!') ?>')
+					saveErrors(['<?= _('Something went wrong. Please try again later!') ?>']);
 				}
 			});
 		});
@@ -217,7 +223,7 @@
 				errors.push(t('Owner cannot be empty!'));
 			}
 			if (!formData['name']) {
-				errors.push(t('Name cannot be empty!'))
+				errors.push(t('Name cannot be empty!'));
 			}
 			form.data('errors', errors);
 
