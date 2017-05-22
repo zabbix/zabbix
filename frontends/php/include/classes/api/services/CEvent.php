@@ -476,11 +476,12 @@ class CEvent extends CApiService {
 
 		$acknowledgeids = DB::insert('acknowledges', $acknowledges);
 
+		$ack_count = count($acknowledgeids);
+
 		if ($action == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
 			// Close the problem manually.
 
 			$tasks = [];
-			$ack_count = count($acknowledgeids);
 
 			for ($i = 0; $i < $ack_count; $i++) {
 				$tasks[] = [
@@ -503,6 +504,31 @@ class CEvent extends CApiService {
 
 			DB::insert('task_close_problem', $task_close, false);
 		}
+
+		// TODO: find action triggered event and _only_ if action have ack_operation
+		// perform insert to 'task' and 'task_acknowledge' tables
+		$tasks = [];
+
+		for ($i = 0; $i < $ack_count; $i++) {
+			$tasks[] = [
+				'type' => ZBX_TM_TASK_ACKNOWLEDGE,
+				'status' => ZBX_TM_STATUS_NEW,
+				'clock' => $time
+			];
+		}
+
+		$taskids = DB::insert('task', $tasks);
+
+		$tasks_ack = [];
+
+		for ($i = 0; $i < $ack_count; $i++) {
+			$tasks_ack[] = [
+				'taskid' => $taskids[$i],
+				'acknowledgeid' => $acknowledgeids[$i]
+			];
+		}
+
+		$task_ackids = DB::insert('task_acknowledge', $tasks_ack);
 
 		return ['eventids' => array_values($eventids)];
 	}
