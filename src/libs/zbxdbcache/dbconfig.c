@@ -2460,6 +2460,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
+		/* it is crucial to update type specific (config->snmpitems, config->ipmiitems, etc.) hashsets before */
+		/* attempting to requeue an item because type specific properties are used to arrange items in queues */
+
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status &&
 				SUCCEED == is_counted_in_item_queue(item->type, item->key))
 		{
@@ -9031,8 +9034,6 @@ zbx_uint64_t	DCget_host_count(void)
 /******************************************************************************
  *                                                                            *
  * Function: DCget_required_performance                                       *
- *                                                                            *
- * Purpose: calculate the required server performance (values per second)     *
  *                                                                            *
  * Return value: the required nvps number                                     *
  *                                                                            *
