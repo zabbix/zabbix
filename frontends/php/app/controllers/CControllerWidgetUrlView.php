@@ -29,9 +29,9 @@ class CControllerWidgetUrlView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'required', // TODO VM: in db.widget
-			'fields'		=>	'array',
-			'dynamic'		=>	'array',
+			'widgetid' =>	'required', // TODO VM: in db.widget
+			'fields' =>		'array',
+			'dynamic' =>	'array',
 		];
 
 		$ret = $this->validateInput($fields);

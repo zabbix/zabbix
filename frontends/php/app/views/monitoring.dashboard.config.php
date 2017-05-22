@@ -18,66 +18,63 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$body = '';
-if (array_key_exists('dialogue', $data)) {
-	/* @var $data['dialogue']['form'] CWidgetForm */
-	$formFields = $data['dialogue']['form']->getFields();
 
-	$form = (new CForm('post'))
-		->cleanItems()
-		->setId('widget_dialogue_form')
-		->setName('widget_dialogue_form');
+/* @var $data['dialogue']['form'] CWidgetForm */
+$formFields = $data['dialogue']['form']->getFields();
 
-	$formList = (new CFormList());
+$form = (new CForm('post'))
+	->cleanItems()
+	->setId('widget_dialogue_form')
+	->setName('widget_dialogue_form');
 
-	foreach ($formFields as $field) {
-		/* ComboBox */
-		if ($field instanceof CWidgetFieldComboBox) {
-			$formList->addRow(
-				$field->getLabel(),
-				(new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues()))
-			);
-		}
+$formList = (new CFormList());
 
-		/* TextBox */
-		elseif ($field instanceof CWidgetFieldTextBox) {
-			$formList->addRow(
-				$field->getLabel(),
-				(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			);
-		}
-
-		/* Checkbox */
-		elseif ($field instanceof CWidgetFieldCheckbox) {
-			$formList->addRow(
-				$field->getLabel(),
-				(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
-			);
-		}
-
-		/* ItemId */
-		elseif ($field instanceof CWidgetFieldItemId) {
-			$form->addVar($field->getName(), $field->getValue(true)); // needed for popup script
-
-			$selectButton = (new CButton('select', _('Select')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
-						"&dstfld2=".$field->getCaptionName()."&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
-			$cell = (new CDiv([
-				(new CTextBox($field->getCaptionName(), $field->getCaption(true), true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$selectButton
-			]))->addStyle('display: flex;'); // TODO VM: move style to scss
-			$formList->addRow($field->getLabel(), $cell);
-		}
+foreach ($formFields as $field) {
+	/* ComboBox */
+	if ($field instanceof CWidgetFieldComboBox) {
+		$formList->addRow(
+			$field->getLabel(),
+			(new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues()))
+		);
 	}
 
-	$form->addItem($formList);
-	$body = $form->toString();
+	/* TextBox */
+	elseif ($field instanceof CWidgetFieldTextBox) {
+		$formList->addRow(
+			$field->getLabel(),
+			(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
+	}
+
+	/* Checkbox */
+	elseif ($field instanceof CWidgetFieldCheckbox) {
+		$formList->addRow(
+			$field->getLabel(),
+			(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
+		);
+	}
+
+	/* ItemId */
+	elseif ($field instanceof CWidgetFieldItemId) {
+		$form->addVar($field->getName(), $field->getValue(true)); // needed for popup script
+
+		$selectButton = (new CButton('select', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
+					"&dstfld2=".$field->getCaptionName()."&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
+		$cell = (new CDiv([
+			(new CTextBox($field->getCaptionName(), $field->getCaption(true), true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$selectButton
+		]))->addStyle('display: flex;'); // TODO VM: move style to scss
+		$formList->addRow($field->getLabel(), $cell);
+	}
 }
 
+$form->addItem($formList);
+
 $output = [
-	'body' => $body
+	'body' => $form->toString()
 ];
 
 if (($messages = getMessages()) !== null) {
