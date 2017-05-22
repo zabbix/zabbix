@@ -400,6 +400,12 @@
 		if (typeof widget['fields'] !== 'undefined') {
 			ajax_data['fields'] = widget['fields'];
 		}
+		if (typeof(widget['dynamic']) !== 'undefined') {
+			ajax_data['dynamic'] = {
+				'hostid': widget['dynamic']['hostid'],
+				'groupid': widget['dynamic']['groupid']
+			}
+		}
 
 		startPreloader(widget);
 
@@ -503,6 +509,7 @@
 					}
 					widget['fields'] = fields;
 					widget['type'] = widget['fields']['type'];
+					updateWidgetDynamic($obj, data, widget);
 					refreshWidget(widget);
 				}
 			},
@@ -663,6 +670,23 @@
 		}
 	}
 
+	function updateWidgetDynamic($obj, data, widget) {
+		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] === '1') {
+			if (data['options']['dynamic']['has_dynamic_widgets'] === true) {
+				widget['dynamic'] = {
+					'hostid': data['options']['dynamic']['hostid'],
+					'groupid': data['options']['dynamic']['groupid']
+				};
+			}
+			else {
+				delete widget['dynamic'];
+			}
+		}
+		else if (typeof(widget['dynamic']) !== 'undefined') {
+			delete widget['dynamic'];
+		}
+	}
+
 	var	methods = {
 		init: function(options) {
 			options = $.extend({}, {columns: 12}, options);
@@ -719,6 +743,7 @@
 					data = $this.data('dashboardGrid');
 
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
+				updateWidgetDynamic($this, data, widget);
 
 				data['widgets'].push(widget);
 				$this.append(widget['div']);

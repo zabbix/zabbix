@@ -31,11 +31,18 @@ class CControllerWidgetUrlView extends CController {
 		$fields = [
 			'widgetid'		=>	'required', // TODO VM: in db.widget
 			'fields'		=>	'array',
+			'dynamic'		=>	'array',
 		];
 
 		$ret = $this->validateInput($fields);
 		if ($ret) {
+			if ($this->hasInput('dynamic')) {
+				$dynamic = $this->getInput('dynamic');
 
+				if (!array_key_exists('hostid', $dynamic)) {
+					$ret = false;
+				}
+			}
 		}
 
 		if (!$ret) {
@@ -68,6 +75,10 @@ class CControllerWidgetUrlView extends CController {
 		if ($this->hasInput('fields')) {
 			// Use configured data, if possible
 			$data = $this->getInput('fields');
+		}
+
+		if ($this->hasInput('dynamic')) {
+			$data['host_id'] = $this->getInput('dynamic')['hostid'];
 		}
 
 		if (!array_key_exists('inner_width', $data)
