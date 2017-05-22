@@ -141,7 +141,7 @@ if ($data['dynamic']['has_dynamic_widgets'] === true) {
 			->addItem($item_hostid)
 			// 'Edit dashboard' should be first one in list,
 			// because it will be visually replaced by last item of new list, when clicked
-			->addItem((new CButton('dashbrd-edit',_('Edit dashboard'))))
+			->addItem((new CButton('dashbrd-edit', _('Edit dashboard'))))
 			->addItem((new CButton(SPACE))
 				->addClass(ZBX_STYLE_BTN_ACTION)
 				->setTitle(_('Actions'))
