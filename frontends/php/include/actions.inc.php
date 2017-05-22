@@ -1596,6 +1596,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 		' FROM alerts a'.
 		' WHERE '.dbConditionInt('a.eventid', array_keys($eventids)).
 			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+			' AND a.acknowledgeid IS NULL'.
 		' ORDER BY a.alertid DESC'
 	);
 
