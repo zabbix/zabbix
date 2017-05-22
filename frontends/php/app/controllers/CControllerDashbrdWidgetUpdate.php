@@ -33,7 +33,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboard_id' =>	'required|db dashboard.dashboardid',
+			'dashboardid' =>	'required|db dashboard.dashboardid',
 			'widgets' =>		'required|array',
 			'save' =>			'required|in '.implode(',', [WIDGET_CONFIG_DONT_SAVE, WIDGET_CONFIG_DO_SAVE])
 		];
@@ -99,7 +99,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		$save = (int)$this->getInput('save');
 		if ($save === WIDGET_CONFIG_DO_SAVE) {
 			$dashboard = [];
-			$dashboard['dashboardid'] = $this->getInput('dashboard_id');
+			$dashboard['dashboardid'] = $this->getInput('dashboardid');
 			$dashboard['widgets'] = [];
 
 			foreach ($this->widgets as $widget) {
