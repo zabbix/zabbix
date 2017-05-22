@@ -617,7 +617,8 @@ if (hasRequest('form')) {
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
-	if (array_key_exists('actionid', $data['action']) && !hasRequest('form_refresh')) {
+	if (array_key_exists('action', $data) && array_key_exists('actionid', $data['action'])
+			&& !hasRequest('form_refresh')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
 	}
 	else {

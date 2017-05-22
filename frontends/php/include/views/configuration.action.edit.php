@@ -1772,7 +1772,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	}
 
 	if ($data['new_ack_operation']) {
-		$new_ack_operation_vars = null;
 		$new_operation_formlist = (new CFormList())->setAttribute('style', 'width: 100%;');
 
 		if (is_array($data['new_ack_operation'])) {
@@ -2024,7 +2023,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			);
 
 			// ssh
-			$authTypeComboBox = new CComboBox('new_ack_operation[opcommand][authtype]',
+			$auth_type_combobox = new CComboBox('new_ack_operation[opcommand][authtype]',
 				$data['new_ack_operation']['opcommand']['authtype'],
 				'showOpTypeAuth('.ACTION_ACKNOWLEDGE_OPERATION.')', [
 					ITEM_AUTHTYPE_PASSWORD => _('Password'),
@@ -2032,7 +2031,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				]
 			);
 
-			$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
+			$new_operation_formlist->addRow(_('Authentication method'), $auth_type_combobox);
 			$new_operation_formlist->addRow(_('User name'),
 				(new CTextBox('new_ack_operation[opcommand][username]',
 					$data['new_ack_operation']['opcommand']['username']
@@ -2054,13 +2053,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			);
 
-			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
-			$passphraseCB = (new CTextBox('new_ack_operation[opcommand][password]',
+			$passphrase = (new CTextBox('new_ack_operation[opcommand][password]',
 				$data['new_ack_operation']['opcommand']['password']
 			))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setId('new_ack_operation_opcommand_passphrase');
-			$new_operation_formlist->addRow(_('Key passphrase'), $passphraseCB);
+			$new_operation_formlist->addRow(_('Key passphrase'), $passphrase);
 
 			// ssh && telnet
 			$new_operation_formlist->addRow(_('Port'),
@@ -2110,7 +2108,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			foreach ($data['available_mediatypes'] as $mediatype) {
 				$mediatype_cbox->addItem($mediatype['mediatypeid'], $mediatype['description']);
 			}
-			$is_default_msg = array_key_exists('default_msg', $data['new_ack_operation']['opmessage']);
+			$is_default_msg = (array_key_exists('default_msg', $data['new_ack_operation']['opmessage'])
+				&& $data['new_ack_operation']['opmessage']['default_msg'] == 1);
 
 			$new_operation_formlist
 				->addRow(_('Send only to'), $mediatype_cbox)
@@ -2130,29 +2129,39 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				);
 		}
 
-		$operation_buttons = new CHorList([
-			(new CSimpleButton((isset($data['new_ack_operation']['id'])) ? _('Update') : _('Add')))
-				->onClick('javascript: submitFormWithParam("'.$action_formname.'", "add_ack_operation", "1");')
-				->addClass(ZBX_STYLE_BTN_LINK),
-			(new CSimpleButton(_('Cancel')))
-				->onClick('javascript: submitFormWithParam("'.$action_formname.'", "cancel_new_ack_operation", "1");')
-				->addClass(ZBX_STYLE_BTN_LINK)
-		]);
+		$acknowledge_tab->addRow(_('Operations'),
+			(new CDiv([$new_ack_operation_vars, $operations_table]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		);
+
+		$acknowledge_tab->addRow(_('Operation details'),
+			(new CDiv([$new_operation_formlist,
+				new CHorList([
+					(new CSimpleButton((isset($data['new_ack_operation']['id'])) ? _('Update') : _('Add')))
+						->onClick('javascript: submitFormWithParam("'.$action_formname.'", "add_ack_operation", "1");')
+						->addClass(ZBX_STYLE_BTN_LINK),
+					(new CSimpleButton(_('Cancel')))
+						->onClick('javascript: submitFormWithParam("'.$action_formname.'", "cancel_new_ack_operation", "1");')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				])
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		);
 	}
 	else {
-		$new_ack_operation_vars = null;
-		$new_operation_formlist = null;
 
-		$operation_buttons = (new CSimpleButton(_('New')))
-			->onClick('javascript: submitFormWithParam("'.$action_formname.'", "new_ack_operation", "1");')
-			->addClass(ZBX_STYLE_BTN_LINK);
+		$acknowledge_tab->addRow(_('Operations'),
+			(new CDiv([$operations_table,
+				(new CSimpleButton(_('New')))
+					->onClick('javascript: submitFormWithParam("'.$action_formname.'", "new_ack_operation", "1");')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		);
 	}
-
-	$acknowledge_tab->addRow(_('Operations'),
-		(new CDiv([$new_ack_operation_vars, $operations_table, $new_operation_formlist, $operation_buttons]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
 
 	$action_tabs->addTab('acknowledgeTab', _('Acknowledge operations'), $acknowledge_tab);
 }

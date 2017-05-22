@@ -881,9 +881,9 @@ class CAction extends CApiService {
 
 		foreach ($operations as $operationId => $operation) {
 			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_MESSAGE:
-					// falls through
 				case OPERATION_TYPE_ACK_MESSAGE:
+					// falls through
+				case OPERATION_TYPE_MESSAGE:
 					if (isset($operation['opmessage']) && !empty($operation['opmessage'])) {
 						$operation['opmessage']['operationid'] = $operationId;
 						$opMessagesToInsert[] = $operation['opmessage'];
