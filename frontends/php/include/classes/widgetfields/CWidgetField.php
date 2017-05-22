@@ -95,7 +95,7 @@ class CWidgetField
 	public function validate() {
 		$errors = [];
 		if ($this->required === true && $this->value === null) {
-			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
+			$errors[] = _s('Field \'%s\' is required', $this->label);
 		}
 
 		return $errors;

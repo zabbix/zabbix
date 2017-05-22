@@ -74,7 +74,7 @@ class CWidgetFieldItemId extends CWidgetField
 	public function validate() {
 		$errors = parent::validate();
 		if ($this->required === true && $this->value === 0) {
-			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
+			$errors[] = _s('Field \'%s\' is required', $this->label);
 		}
 
 		return $errors;
