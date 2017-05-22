@@ -25,13 +25,17 @@ class CControllerDashbrdWidgetRfRate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboard_id' =>	'db dashboard.dashboardid',
-			'widgets' =>		'required|array'
+			'widgets' =>	'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			// TODO AV: validation of 'widgets'
+		}
+
 		if (!$ret) {
+			// TODO AV: improve error reporting
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 		}
 
