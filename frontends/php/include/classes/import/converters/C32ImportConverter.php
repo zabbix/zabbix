@@ -33,6 +33,9 @@ class C32ImportConverter extends CConverter {
 		if (array_key_exists('templates', $data['zabbix_export'])) {
 			$data['zabbix_export']['templates'] = $this->convertHosts($data['zabbix_export']['templates']);
 		}
+		if (array_key_exists('maps', $data['zabbix_export'])) {
+			$data['zabbix_export']['maps'] = $this->convertMaps($data['zabbix_export']['maps']);
+		}
 
 		return $data;
 	}
@@ -52,6 +55,9 @@ class C32ImportConverter extends CConverter {
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items']);
 			}
+			if (array_key_exists('httptests', $host)) {
+				$host['httptests'] = $this->convertHttpTests($host['httptests']);
+			}
 		}
 		unset($host);
 
@@ -67,6 +73,7 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertItems(array $items) {
 		foreach ($items as &$item) {
+			// Item preprocessing.
 			$item['preprocessing'] = [];
 
 			if ($item['data_type'] != ITEM_DATA_TYPE_DECIMAL) {
@@ -101,6 +108,23 @@ class C32ImportConverter extends CConverter {
 			if (!$item['preprocessing']) {
 				unset($item['preprocessing']);
 			}
+
+			// Merge delay_flex into delay separated by a semicolon.
+			$item['delay'] = (string) $item['delay'];
+			if ($item['delay_flex'] !== '') {
+				$item['delay'] .= ';'.$item['delay_flex'];
+			}
+			unset($item['delay_flex']);
+
+			// Convert to days.
+			$item['history'] = (string) $item['history'];
+			if ($item['history'] != 0) {
+				$item['history'] .= 'd';
+			}
+			$item['trends'] = (string) $item['trends'];
+			if ($item['trends'] != 0) {
+				$item['trends'] .= 'd';
+			}
 		}
 		unset($item);
 
@@ -118,9 +142,127 @@ class C32ImportConverter extends CConverter {
 		foreach ($discovery_rules as &$discovery_rule) {
 			$discovery_rule['item_prototypes'] =
 				$this->convertItems($discovery_rule['item_prototypes']);
+
+			// Merge delay_flex into delay separated by a semicolon.
+			$discovery_rule['delay'] = (string) $discovery_rule['delay'];
+			if ($discovery_rule['delay_flex'] !== '') {
+				$discovery_rule['delay'] .= ';'.$discovery_rule['delay_flex'];
+			}
+			unset($discovery_rule['delay_flex']);
+
+			// Convert to days.
+			if (ctype_digit($discovery_rule['lifetime']) && $discovery_rule['lifetime'] != 0) {
+				$discovery_rule['lifetime'] .= 'd';
+			}
 		}
 		unset($discovery_rule);
 
 		return $discovery_rules;
+	}
+
+	/**
+	 * Convert maps.
+	 *
+	 * @param array $maps
+	 *
+	 * @return array
+	 */
+	protected function convertMaps(array $maps) {
+		foreach ($maps as &$map) {
+			$map['selements'] = $this->convertMapElements($map['selements']);
+			$map['shapes'] = [];
+			$map['lines'] = [];
+		}
+		unset($map);
+
+		return $maps;
+	}
+
+	/**
+	 * Convert map elements.
+	 *
+	 * @param array $selements
+	 *
+	 * @return array
+	 */
+	protected function convertMapElements(array $selements) {
+		foreach ($selements as &$selement) {
+			if (zbx_is_int($selement['elementtype'])) {
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_HOST:
+					case SYSMAP_ELEMENT_TYPE_MAP:
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$selement['elements'] = [$selement['element']];
+						break;
+				}
+			}
+
+			unset($selement['element']);
+		}
+		unset($selement);
+
+		return $selements;
+	}
+
+	/**
+	 * Convert HTTP fields (headers / variables) into http pair array
+	 *
+	 * @param string $value
+	 * @param string $delimiter
+	 *
+	 * @return array
+	 */
+	protected function convertHttpFields($value, $delimiter) {
+		$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $value))));
+		foreach ($pairs as &$pair) {
+			$pair = explode($delimiter, $pair, 2);
+			$pair = [
+				'name' => $pair[0],
+				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
+			];
+		}
+		unset($pair);
+
+		return $pairs;
+	}
+
+	/**
+	 * Convert httptest step elements.
+	 *
+	 * @param array $http_test_steps
+	 *
+	 * @return array
+	 */
+	protected function convertHttpTestSteps(array $http_test_steps) {
+		foreach ($http_test_steps as &$http_test_step) {
+			$http_test_step['headers'] = $this->convertHttpFields($http_test_step['headers'], ':');
+			$http_test_step['variables'] = $this->convertHttpFields($http_test_step['variables'], '=');
+			$http_test_step['query_fields'] = [];
+		}
+		unset($http_test_step);
+
+		return $http_test_steps;
+	}
+
+	/**
+	 * Convert httptest elements.
+	 *
+	 * @param array $http_tests
+	 *
+	 * @return array
+	 */
+	protected function convertHttpTests(array $http_tests) {
+		foreach ($http_tests as &$http_test) {
+			$http_test['headers'] = $this->convertHttpFields($http_test['headers'], ':');
+			$http_test['variables'] = $this->convertHttpFields($http_test['variables'], '=');
+
+			if (array_key_exists('steps', $http_test)) {
+				$http_test['steps'] = $this->convertHttpTestSteps($http_test['steps']);
+			}
+		}
+		unset($http_test);
+
+		return $http_tests;
 	}
 }

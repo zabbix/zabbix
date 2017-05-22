@@ -110,14 +110,14 @@ static int	get_function_parameter_int(zbx_uint64_t hostid, const char *parameter
 		}
 		else if ('-' == *parameter)
 		{
-			if (SUCCEED == is_time_suffix(parameter + 1, value))
+			if (SUCCEED == is_time_suffix(parameter + 1, value, ZBX_LENGTH_UNLIMITED))
 			{
 				*value = -(*value);
 				*type = ZBX_VALUE_SECONDS;
 				ret = SUCCEED;
 			}
 		}
-		else if (SUCCEED == is_time_suffix(parameter, value))
+		else if (SUCCEED == is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED))
 		{
 			*type = ZBX_VALUE_SECONDS;
 			ret = SUCCEED;

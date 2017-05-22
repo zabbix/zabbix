@@ -21,7 +21,6 @@ is the core daemon of Zabbix software.
 .SH OPTIONS
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
-Absolute path should be specified.
 .IP "\fB\-f\fR, \fB\-\-foreground\fR"
 Run Zabbix server in foreground.
 .IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR"

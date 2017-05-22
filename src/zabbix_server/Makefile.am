@@ -18,7 +18,8 @@ SUBDIRS = \
 	selfmon \
 	vmware \
 	taskmanager \
-	ipmi
+	ipmi \
+	scripts
 
 sbin_PROGRAMS = zabbix_server
 
@@ -26,8 +27,11 @@ zabbix_server_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
-	scripts.c scripts.h \
 	server.c
+	
+if ZBXCUNIT
+nodist_zabbix_server_SOURCES = ../libs/zbxcunit/zbxcunit.c ../libs/zbxcunit/zbxcunit.h
+endif
 
 zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
@@ -47,6 +51,7 @@ zabbix_server_LDADD = \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
 	ipmi/libipmi.a \
+	scripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
@@ -55,6 +60,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
@@ -65,15 +71,16 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
-	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
-	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
+	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a
 
-zabbix_server_LDADD += @SERVER_LIBS@
+zabbix_server_LDADD += @SERVER_LIBS@ $(CUNIT_LDADD)
 
 zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 
@@ -82,7 +89,7 @@ zabbix_server_CFLAGS = \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
 	-DDATADIR="\"@datadir@\"" \
 	-DLIBDIR="\"@libdir@\"" \
-	-I@top_srcdir@/src/libs/zbxdbcache
+	-I@top_srcdir@/src/libs/zbxdbcache 
 
 SERVER_CONFIG = zabbix_server.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d

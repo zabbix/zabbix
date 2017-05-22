@@ -74,6 +74,9 @@ foreach ($data['scripts'] as $script) {
 			case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				$scriptExecuteOn = _('Server');
 				break;
+			case ZBX_SCRIPT_EXECUTE_ON_PROXY:
+				$scriptExecuteOn = _('Server (proxy)');
+				break;
 		}
 	}
 	else {
@@ -100,7 +103,7 @@ $scriptsForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
 		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?')]
-	])
+	], 'script')
 ]);
 
 // append form to widget

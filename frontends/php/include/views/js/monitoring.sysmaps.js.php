@@ -1,3 +1,56 @@
+<?php
+$shape_border_types = [
+	SYSMAP_SHAPE_BORDER_TYPE_NONE		=> _('None'),
+	SYSMAP_SHAPE_BORDER_TYPE_SOLID		=> '———',
+	SYSMAP_SHAPE_BORDER_TYPE_DOTTED		=> '· · · ·',
+	SYSMAP_SHAPE_BORDER_TYPE_DASHED		=> '- - - -'
+];
+
+$horizontal_align_types = [
+	SYSMAP_SHAPE_LABEL_HALIGN_LEFT		=> _('Left'),
+	SYSMAP_SHAPE_LABEL_HALIGN_CENTER	=> _('Center'),
+	SYSMAP_SHAPE_LABEL_HALIGN_RIGHT		=> _('Right')
+];
+
+$vertical_align_types = [
+	SYSMAP_SHAPE_LABEL_VALIGN_TOP		=> _('Top'),
+	SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE	=> _('Middle'),
+	SYSMAP_SHAPE_LABEL_VALIGN_BOTTOM	=> _('Bottom')
+];
+
+/**
+ * Get font selection for Combobox.
+ *
+ * @param string $name				Combobox name.
+ *
+ * @return CComboBox
+ */
+function getFontComboBox($name) {
+	return (new CComboBox($name))
+		->addItem(
+			(new COptGroup(_('Serif')))
+				->addItem(new CComboItem(0, 'Georgia'))
+				->addItem(new CComboItem(1, 'Palatino'))
+				->addItem(new CComboItem(2, 'Times New Roman'))
+		)
+		->addItem(
+			(new COptGroup(_('Sans-Serif')))
+				->addItem(new CComboItem(3, 'Arial'))
+				->addItem(new CComboItem(4, 'Arial Black'))
+				->addItem(new CComboItem(5, 'Comic Sans'))
+				->addItem(new CComboItem(6, 'Impact'))
+				->addItem(new CComboItem(7, 'Lucida Sans'))
+				->addItem(new CComboItem(8, 'Tahoma'))
+				->addItem(new CComboItem(9, 'Helvetica'))
+				->addItem(new CComboItem(10, 'Verdana'))
+		)
+		->addItem(
+			(new COptGroup(_('Monospace')))
+				->addItem(new CComboItem(11, 'Courier New'))
+				->addItem(new CComboItem(12, 'Lucida Console'))
+		);
+}
+?>
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Map element'))))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
@@ -9,7 +62,6 @@
 			->cleanItems()
 			->setName('selementForm')
 			->setId('selementForm')
-			->addVar('elementid', '')
 			->addItem(
 				(new CFormList())
 					->addRow(_('Type'),
@@ -85,30 +137,52 @@
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 						'hostSelectRow'
 					)
-					->addRow(_('Trigger'), [
-						new CVar('elementExpressionTrigger', ''),
-						(new CTextBox('elementName'))
-							->setReadonly(true)
-							->setId('elementNameTrigger')
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CButton(null, _('Select')))
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('PopUp("popup.php?dstfrm=selementForm&dstfld1=elementid'.
-								'&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers'.
-								'&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1'.
-								'&real_hosts=1&noempty=1")')
-					], 'triggerSelectRow')
+					->addRow(_('Triggers'), [
+						(new CDiv([
+							(new CTable())
+								->setHeader(['', _('Name'), (new CColHeader(_('Action')))->addStyle('padding: 0 5px;')])
+								->setId('triggerContainer')
+								->setAttribute('style', 'width: 100%;')
+								->addClass('ui-sortable')
+						]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+					], 'triggerListRow')
+					->addRow(_('New triggers'),
+						(new CDiv([
+							new CVar('elementExpressionTrigger', ''),
+							(new CMultiSelect([
+								'name' => 'elementNameTriggers',
+								'objectName' => 'triggers',
+								'objectOptions' => [
+									'editable' => true,
+									'real_hosts' => true
+								],
+								'popup' => [
+									'parameters' => 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers'.
+										'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
+								]
+							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+							new CDiv(
+								(new CButton(null, _('Add')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->setId('newSelementTriggers')
+						)]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+						'triggerSelectRow'
+					)
 					->addRow(_('Map'), [
 						(new CTextBox('elementName'))
 							->setReadonly(true)
 							->setId('elementNameMap')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
 							->onClick('PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
-								'&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap'.
+								'&dstfrm=selementForm&dstfld1=sysmapid&dstfld2=elementNameMap'.
 								'&excludeids[]=#{sysmapid}")'
 							)
 					], 'mapSelectRow')
@@ -185,6 +259,275 @@
 							(new CButton(null, _('Close')))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->setId('elementClose')
+						]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
+					])
+			)
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="mapShapeFormTpl">
+	<?= (new CDiv(new CTag('h4', true, _('Map shape'))))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_CURSOR_MOVE)
+			->setId('shapeDragHandler')
+			->toString().
+		(new CForm())
+			->cleanItems()
+			->setName('shapeForm')
+			->setId('shapeForm')
+			->addVar('sysmap_shapeid', '')
+			->addItem(
+				(new CFormList())
+					->addRow(_('Shape'), [
+						(new CRadioButtonList('type', SYSMAP_SHAPE_TYPE_RECTANGLE))
+							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE)
+							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE)
+							->addValue(_('Line'), SYSMAP_SHAPE_TYPE_LINE)
+							->setModern(true),
+						new CVar('', '', 'last_shape_type')
+					])
+					->addRow(_('Text'),
+						(new CDiv([
+							(new CTextArea('text'))
+								->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+								->setRows(3),
+							BR(),
+							_('Font'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							getFontComboBox('font'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							_('Font size'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CTextBox('font_size'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							_('Colour'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							new CColor('font_color', '#{color}', false),
+							BR(),
+							_('Horizontal align'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CComboBox('text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
+								$horizontal_align_types
+							))
+								->setAttribute('style', 'margin-top: 4px'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							_('Vertical align'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CComboBox('text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
+								$vertical_align_types
+							))
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
+						'shape-text-row'
+					)
+					->addRow(_('Background'),
+						(new CDiv([
+							_('Colour'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							new CColor('background_color', '#{color}', false)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
+						'shape-background-row'
+					)
+					->addRow((new CSpan())
+							->addClass('switchable-content')
+							->setAttribute('data-value', _('Border'))
+							->setAttribute('data-value-2', _('Line')),
+						(new CDiv([
+							_('Type'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CComboBox('border_type', null, null, $shape_border_types)),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							_('Width'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CTextBox('border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							_('Colour'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							new CColor('border_color', '#{color}', false)
+						]))
+							->addClass(ZBX_STYLE_NOWRAP)
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					)
+					->addRow((new CSpan())
+							->addClass('switchable-content')
+							->setAttribute('data-value', _('Coordinates'))
+							->setAttribute('data-value-2', _('Points')),
+						(new CDiv([
+							(new CSpan())
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('X'))
+								->setAttribute('data-value-2', _('X1')),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CTextBox('x'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CSpan())
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Y'))
+								->setAttribute('data-value-2', _('Y1')),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CTextBox('y'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					)
+					->addRow((new CSpan())
+							->addClass('switchable-content')
+							->setAttribute('data-value', _('Size'))
+							->setAttribute('data-value-2', ''),
+						(new CDiv([
+							(new CSpan())
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Width'))
+								->setAttribute('data-value-2', _('X2')),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CTextBox('width'))
+								->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+								->setId('areaSizeWidth'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CSpan())
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Height'))
+								->setAttribute('data-value-2', _('Y2')),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CTextBox('height'))
+								->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+								->setId('areaSizeHeight')
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					)
+					->addItem([
+						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+						(new CDiv([
+							(new CButton(null, _('Apply')))
+								->addClass('shape-edit-control')
+								->setId('shapeApply'),
+							(new CButton(null, _('Remove')))
+								->addClass('shape-edit-control')
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->setId('shapeRemove'),
+							(new CButton(null, _('Close')))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->setId('shapeClose')
+						]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
+					])
+			)
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="mapMassShapeFormTpl">
+	<?= (new CDiv(new CTag('h4', true, _('Mass update shapes'))))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_CURSOR_MOVE)
+			->setId('massShapeDragHandler')
+			->toString().
+		(new CForm())
+			->cleanItems()
+			->setName('shapeForm')
+			->setId('massShapeForm')
+			->addItem(
+				(new CFormList())
+					->addRow((new CCheckBox('chkbox_type'))
+							->setId('chkboxType')
+							->setLabel(_('Shape')),
+						(new CRadioButtonList('mass_type', SYSMAP_SHAPE_TYPE_RECTANGLE))
+							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE)
+							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE)
+							->setModern(true),
+						null, 'shape_figure_row'
+					)
+					->addRow((new CCheckBox('chkbox_text'))
+							->setId('chkboxText')
+							->setLabel(_('Text')),
+						(new CTextArea('mass_text'))
+								->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+								->setRows(2),
+						null, 'shape_figure_row'
+					)
+					->addRow((new CCheckBox('chkbox_font'))
+							->setId('chkboxFont')
+							->setLabel(_('Font')),
+						getFontComboBox('mass_font'),
+						null, 'shape_figure_row'
+					)
+					->addRow((new CCheckBox('chkbox_font_size'))
+							->setId('chkboxFontSize')
+							->setLabel(_('Font size')),
+						(new CTextBox('mass_font_size'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+						null, 'shape_figure_row'
+					)
+					->addRow((new CCheckBox('chkbox_font_color'))
+							->setId('chkboxFontColor')
+							->setLabel(_('Font colour')),
+						new CColor('mass_font_color', '#{color}', false),
+						null, 'shape_figure_row'
+					)
+					->addRow((new CCheckBox('chkbox_text_halign'))
+							->setId('chkboxTextHalign')
+							->setLabel(_('Horizontal align')),
+						new CComboBox('mass_text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
+							$horizontal_align_types
+						),
+						null, 'shape_figure_row'
+					)
+					->addRow((new CCheckBox('chkbox_text_valign'))
+							->setId('chkboxTextValign')
+							->setLabel(_('Vertical align')),
+						new CComboBox('mass_text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
+							$vertical_align_types
+						),
+						null, 'shape_figure_row'
+					)
+					->addRow((new CCheckBox('chkbox_background'))
+							->setId('chkboxBackground')
+							->setLabel(_('Background colour')),
+						new CColor('mass_background_color', '#{color}', false),
+						null, 'shape_figure_row'
+					)
+					->addRow((new CCheckBox('chkbox_border_type'))
+							->setId('chkboxBorderType')
+							->setLabel((new CDiv())
+								->addClass('form-input-margin')
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Border type'))
+								->setAttribute('data-value-2', _('Line type'))
+							),
+						new CComboBox('mass_border_type', null, null, $shape_border_types)
+					)
+					->addRow((new CCheckBox('chkbox_border_width'))
+							->setId('chkboxBorderWidth')
+							->setLabel((new CDiv())
+								->addClass('form-input-margin')
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Border width'))
+								->setAttribute('data-value-2', _('Line width'))
+							),
+						(new CTextBox('mass_border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+					)
+					->addRow((new CCheckBox('chkbox_border_color'))
+							->setId('chkboxBorderColor')
+							->setLabel((new CDiv())
+								->addClass('form-input-margin')
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Border colour'))
+								->setAttribute('data-value-2', _('Line colour'))
+							),
+						new CColor('mass_border_color', '#{color}', false)
+					)
+					->addItem([
+						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+						(new CDiv([
+							(new CButton(null, _('Apply')))
+								->addClass('shape-edit-control')
+								->setId('shapeMassApply'),
+							(new CButton(null, _('Remove')))
+								->addClass('shape-edit-control')
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->setId('shapeMassRemove'),
+							(new CButton(null, _('Close')))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->setId('shapeMassClose')
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
@@ -291,7 +634,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="mapMassFormListRow">
-	<?= (new CRow(['#{elementType}', '#{elementName}']))->toString() ?>
+	<?= (new CRow(['#{elementType}', '#{*elementName}']))->toString() ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="linkFormTpl">
@@ -446,6 +789,32 @@
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setId('urlrow_#{selementurlid}')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="selementFormTriggers">
+	<?= (new CRow([
+			(new CCol([
+				(new CDiv())
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addStyle('top: 0px;'),
+				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
+			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol([(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)]))
+				->addStyle('background: ##{color}; padding: 0 5px;'),
+			(new CCol([
+				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),
+				(new CVar('element_name[#{triggerid}]', '#{name}')),
+				(new CVar('element_priority[#{triggerid}]', '#{priority}')),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addStyle('margin: 0 5px;')
+					->onClick('jQuery("#triggerrow_#{triggerid}").remove();')
+			]))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('sortable')
+			->setId('triggerrow_#{triggerid}')
 			->toString()
 	?>
 </script>

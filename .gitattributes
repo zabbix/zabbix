@@ -9,6 +9,7 @@ bin/win64/dev/zabbix_sender.lib -text svneol=unset#application/x-archive
 bin/win64/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
 bin/win64/zabbix_get.exe -text svneol=unset#application/x-dosexec
 bin/win64/zabbix_sender.exe -text svneol=unset#application/x-dosexec
+/build-backend.xml -text
 frontends/php/audio/alarm_average.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_disaster.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_high.wav -text svneol=unset#audio/x-wav
@@ -34,6 +35,7 @@ frontends/php/img/browser-sprite.png -text svneol=unset#image/png
 frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
 frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
 frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
+frontends/php/locale/ca/LC_MESSAGES/frontend.po -text
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
 include/zbxipcservice.h -text
 include/zbxserialize.h -text
@@ -305,6 +307,12 @@ sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text
 src/libs/zbxcommon/variant.c -text
+src/libs/zbxcunit/zbxcunit.c -text
+src/libs/zbxcunit/zbxcunit.h -text
+src/libs/zbxdbcache/dbconfig.h -text
+src/libs/zbxdbcache/dbconfig_dump.c -text
+src/libs/zbxdbcache/dbsync.c -text
+src/libs/zbxdbcache/dbsync.h -text
 src/libs/zbxdbcache/item_preproc.c -text
 src/libs/zbxdbcache/item_preproc.h -text
 src/libs/zbxdbhigh/trigger.c -text
@@ -316,6 +324,7 @@ src/zabbix_java/lib/logback-classic-0.9.27.jar -text svneol=unset#application/ja
 src/zabbix_java/lib/logback-core-0.9.27.jar -text svneol=unset#application/java-archive
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text svneol=unset#application/java-archive
 src/zabbix_java/tests/junit-4.8.2.jar -text svneol=unset#application/java-archive
+src/zabbix_proxy/taskmanager/server_tasks.c -text
 src/zabbix_server/alerter/alert_manager.c -text
 src/zabbix_server/alerter/alert_manager.h -text
 src/zabbix_server/alerter/alerter_protocol.c -text
@@ -331,7 +340,9 @@ src/zabbix_server/ipmi/ipmi_poller.c -text
 src/zabbix_server/ipmi/ipmi_poller.h -text
 src/zabbix_server/ipmi/ipmi_protocol.c -text
 src/zabbix_server/ipmi/ipmi_protocol.h -text
+src/zabbix_server/scripts/Makefile.am -text
 src/zabbix_server/taskmanager/Makefile.am -text
+src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
 tests/images/image.png -text svneol=unset#image/png

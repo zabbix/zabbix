@@ -2099,6 +2099,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype)
 			return "Failure Audit";
 		case ITEM_LOGTYPE_SUCCESS_AUDIT:
 			return "Success Audit";
+		case ITEM_LOGTYPE_CRITICAL:
+			return "Critical";
+		case ITEM_LOGTYPE_VERBOSE:
+			return "Verbose";
 		default:
 			return "unknown";
 	}
@@ -4440,6 +4444,10 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 					token->token.r = token->token.l + 1;
 					return SUCCEED;
 				}
+
+				if (NULL == dollar)
+					token_search = ZBX_TOKEN_SEARCH_BASIC;
+
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

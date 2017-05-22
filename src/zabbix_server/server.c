@@ -19,6 +19,10 @@
 
 #include "common.h"
 
+#ifdef HAVE_SQLITE3
+#	error SQLite is not supported as a main Zabbix database backend.
+#endif
+
 #include "cfg.h"
 #include "pid.h"
 #include "db.h"
@@ -60,6 +64,10 @@
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"
 
+#ifdef ZBX_CUNIT
+#include "../libs/zbxcunit/zbxcunit.h"
+#endif
+
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
 #include "ipmi/ipmi_poller.h"
@@ -82,7 +90,7 @@ const char	*help_message[] = {
 	"The core daemon of Zabbix software.",
 	"",
 	"Options:",
-	"  -c --config config-file        Absolute path to the configuration file",
+	"  -c --config config-file        Path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
 	"  -f --foreground                Run Zabbix server in foreground",
 	"  -R --runtime-control runtime-option   Perform administrative functions",
@@ -117,6 +125,8 @@ static struct zbx_option	longopts[] =
 	{"version",		0,	NULL,	'V'},
 	{NULL}
 };
+
+
 
 /* short options */
 static char	shortopts[] = "c:hVR:f";
@@ -459,7 +469,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
+	if (NULL != CONFIG_SOURCE_IP && SUCCEED != is_supported_ip(CONFIG_SOURCE_IP))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		err = 1;
@@ -707,7 +717,12 @@ int	main(int argc, char **argv)
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
+
 	progname = get_program_name(argv[0]);
+
+#ifdef ZBX_CUNIT
+	zbx_cu_run(argc, argv);
+#endif
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
@@ -799,6 +814,7 @@ int	main(int argc, char **argv)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
+	char		*error = NULL;
 	int		i, db_type;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
@@ -807,7 +823,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
-	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
+	{
+		zbx_error("cannot open log: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS	"YES"
@@ -894,32 +915,57 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_free_config();
 
-	init_database_cache();
-	init_configuration_cache();
-	init_selfmon_collector();
+	if (SUCCEED != init_database_cache(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
-	/* initialize vmware support */
-	if (0 != CONFIG_VMWARE_FORKS)
-		zbx_vmware_init();
+	if (SUCCEED != init_configuration_cache(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
-	/* initialize history value cache */
-	zbx_vc_init();
+	if (SUCCEED != init_selfmon_collector(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
-	zbx_create_itservices_lock();
+	if (0 != CONFIG_VMWARE_FORKS && SUCCEED != zbx_vmware_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
-#ifdef	HAVE_SQLITE3
-	zbx_create_sqlite3_mutex();
-#endif
+	if (SUCCEED != zbx_vc_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history value cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_create_itservices_lock(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IT services lock: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": database is not a Zabbix database",
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
 	else if (ZBX_DB_SERVER != db_type)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": Zabbix server cannot work with a"
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix server cannot work with a"
 				" Zabbix proxy database", CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
@@ -929,10 +975,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	DCload_config();
-
 	/* make initial configuration sync before worker processes are forked */
-	DCsync_configuration();
+	DCsync_configuration(ZBX_DBSYNC_INIT);
 
 	DBclose();
 
@@ -1120,10 +1164,6 @@ void	zbx_on_exit(void)
 	zbx_vc_destroy();
 
 	zbx_destroy_itservices_lock();
-
-#ifdef HAVE_SQLITE3
-	zbx_remove_sqlite3_mutex();
-#endif
 
 	/* free vmware support */
 	if (0 != CONFIG_VMWARE_FORKS)

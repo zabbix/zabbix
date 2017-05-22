@@ -21,6 +21,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxregexp.h"
+#include "zbxhttp.h"
 
 #include "httpmacro.h"
 
@@ -89,29 +90,15 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'",
 			__function_name, (int)nkey, pkey, (int)nvalue, pvalue);
 
-	if (0 == nkey || 0 == nvalue)
+	if (0 == nkey && 0 != nvalue)
 	{
-		if (0 == nkey && 0 != nvalue)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%.*s\"",
-					__function_name, (int)nvalue, pvalue);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%.*s\"",
+				__function_name, (int)nvalue, pvalue);
 
-			if (NULL != err_str && NULL == *err_str)
-			{
-				*err_str = zbx_dsprintf(*err_str, "missing variable name (only value provided):"
-						" \"%.*s\"", (int)nvalue, pvalue);
-			}
-		}
-		else if (0 == nvalue && 0 != nkey)
+		if (NULL != err_str && NULL == *err_str)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable value (only name provided): \"%.*s\"",
-					__function_name, (int)nkey, pkey);
-
-			if (NULL != err_str && NULL == *err_str)
-			{
-				*err_str = zbx_dsprintf(*err_str, "missing variable value (only name provided):"
-						" \"%.*s\"", (int)nkey, pkey);
-			}
+			*err_str = zbx_dsprintf(*err_str, "missing variable name (only value provided):"
+					" \"%.*s\"", (int)nvalue, pvalue);
 		}
 
 		goto out;
@@ -157,7 +144,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		pair.second = value_str;
 
 	/* get macro name */
-	zbx_strncpy_alloc((char**)&pair.first, &key_size, &key_offset, pkey, nkey);
+	zbx_strncpy_alloc((char **)&pair.first, &key_size, &key_offset, pkey, nkey);
 
 	/* remove existing macro if necessary */
 	index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_cmp_func);
@@ -193,12 +180,12 @@ out:
  * Author: Alexei Vladishev, Andris Zeila                                     *
  *                                                                            *
  ******************************************************************************/
-void	http_substitute_variables(zbx_httptest_t *httptest, char **data)
+int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 {
 	const char	*__function_name = "http_substitute_variables";
-	char		replace_char;
-	size_t		left, right;
-	int		index;
+	char		replace_char, *substitute;
+	size_t		left, right, len, offset;
+	int		index, ret = SUCCEED;
 	zbx_ptr_pair_t	pair;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
@@ -207,6 +194,8 @@ void	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 	{
 		if ('{' != (*data)[left])
 			continue;
+
+		offset = ('{' == (*data)[left + 1] ? 1 : 0);
 
 		for (right = left + 1; '\0' != (*data)[right] && '}' != (*data)[right]; right++)
 			;
@@ -217,7 +206,7 @@ void	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 		replace_char = (*data)[right + 1];
 		(*data)[right + 1] = '\0';
 
-		pair.first = *data + left;
+		pair.first = *data + left + offset;
 		index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_cmp_func);
 
 		(*data)[right + 1] = replace_char;
@@ -225,16 +214,57 @@ void	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 		if (FAIL == index)
 			continue;
 
-		zbx_replace_string(data, left, &right, (char*)httptest->macros.values[index].second);
+		substitute = httptest->macros.values[index].second;
+
+		if ('.' == replace_char && 1 == offset)
+		{
+			right += 2;
+			offset = right;
+
+			for (; '\0' != (*data)[right] && '}' != (*data)[right]; right++)
+				;
+
+			if ('}' != (*data)[right])
+				break;
+
+			len = right - offset;
+
+			if (ZBX_CONST_STRLEN("urlencode()") == len && 0 == strncmp(*data + offset, "urlencode()", len))
+			{
+				/* http_variable_urlencode cannot fail (except for "out of memory") */
+				/* so no check is needed */
+				substitute = NULL;
+				zbx_http_url_encode(httptest->macros.values[index].second, &substitute);
+			}
+			else if (ZBX_CONST_STRLEN("urldecode()") == len &&
+					0 == strncmp(*data + offset, "urldecode()", len))
+			{
+				/* on error substitute will remain unchanged */
+				substitute = NULL;
+				if (FAIL == (ret = zbx_http_url_decode(httptest->macros.values[index].second,
+						&substitute)))
+				{
+					break;
+				}
+			}
+			else
+				continue;
+
+		}
+		else
+			left += offset;
+
+		zbx_replace_string(data, left, &right, substitute);
+		if (substitute != (char *)httptest->macros.values[index].second)
+			zbx_free(substitute);
 
 		left = right;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
-}
 
-#define TRIM_LEADING_WHITESPACE(ptr)	while (' ' == *ptr || '\t' == *ptr) ptr++;
-#define TRIM_TRAILING_WHITESPACE(ptr)	do { ptr--; } while (' ' == *ptr || '\t' == *ptr);
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -242,80 +272,44 @@ void	http_substitute_variables(zbx_httptest_t *httptest, char **data)
  *                                                                            *
  * Purpose: parses http test/step variable string and stores results into     *
  *          httptest macro cache.                                             *
- *          The variables are specified in {<key>}=<value> format, one        *
- *          variable per line.                                                *
+ *          The variables are specified as {<key>}=><value> pairs             *
  *          If the value format is 'regex:<pattern>', then regular expression *
  *          match is performed against the supplied data value and specified  *
  *          pattern. The first captured group is assigned to the macro value. *
  *                                                                            *
  * Parameters: httptest  - [IN/OUT] the http test data                        *
- *             variables - [IN] the variable string to parse                  *
+ *             variables - [IN] the variable vector                           *
  *             data      - [IN] the data for variable regexp matching         *
  *                         (optional).                                        *
+ *             err_str   - [OUT] the error message (optional)                 *
  *                                                                            *
- * Return value: SUCCEED - the variable string was processed successfully     *
- *               FAIL    - the variable string processing failed (either      *
- *                         because of bad formatting or failed regexp match). *
+ * Return value: SUCCEED - the variables were processed successfully          *
+ *               FAIL    - the variable processing failed (regexp match       *
+ *                         failed).                                           *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-int	http_process_variables(zbx_httptest_t *httptest, const char *variables, const char *data, char **err_str)
+int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data,
+		char **err_str)
 {
 	const char	*__function_name = "http_process_variables";
-	const char	*pkey = variables, *pvalue;
-	size_t		nkey, nvalue;
-	int		rc = FAIL;
+	char		*key, *value;
+	int		i, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() variables:'%s'", __function_name, variables);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %d variables", __function_name, variables->values_num);
 
-	while ('\0' != *pkey)
+	for (i = 0; i < variables->values_num; i++)
 	{
-		const char	*ptr = pkey;
-
-		/* find end of the line */
-		while (NULL == strchr("\n\r", *ptr))
-			ptr++;
-
-		/* parse line */
-		pvalue = strchr(pkey, '=');
-		if (NULL != pvalue && pvalue < ptr)
-		{
-			const char	*ptail = pvalue++;
-
-			TRIM_LEADING_WHITESPACE(pkey);
-			if (pkey != ptail)
-			{
-				TRIM_TRAILING_WHITESPACE(ptail);
-				nkey = ptail - pkey + 1;
-			}
-			else
-				nkey = 0;
-
-			ptail = ptr;
-			TRIM_LEADING_WHITESPACE(pvalue);
-			if (pvalue != ptail)
-			{
-				TRIM_TRAILING_WHITESPACE(ptail);
-				nvalue = ptail - pvalue + 1;
-			}
-			else
-				nvalue = 0;
-
-			if (FAIL == httpmacro_append_pair(httptest, pkey, nkey, pvalue, nvalue, data, err_str))
-				goto out;
-		}
-
-		/* skip LF/CR symbols until the next nonempty line */
-		while ('\n' == *ptr || '\r' == *ptr)
-			ptr++;
-
-		pkey = ptr;
+		key = (char *)variables->values[i].first;
+		value = (char *)variables->values[i].second;
+		if (FAIL == httpmacro_append_pair(httptest, key, strlen(key), value, strlen(value), data, err_str))
+			goto out;
 	}
 
-	rc = SUCCEED;
+	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(rc));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return rc;
+	return ret;
 }

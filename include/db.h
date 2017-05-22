@@ -73,7 +73,6 @@ struct	_DC_TRIGGER;
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
-#define TRIGGER_ERROR_LEN		128
 #if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
 #	define TRIGGER_COMMENTS_LEN	2048
 #else
@@ -105,6 +104,9 @@ struct	_DC_TRIGGER;
 
 #define ITEM_NAME_LEN			255
 #define ITEM_KEY_LEN			255
+#define ITEM_DELAY_LEN			1024
+#define ITEM_HISTORY_LEN		255
+#define ITEM_TRENDS_LEN			255
 #define ITEM_UNITS_LEN			255
 #define ITEM_SNMP_COMMUNITY_LEN		64
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
@@ -124,8 +126,6 @@ struct	_DC_TRIGGER;
 #define ITEM_SNMPV3_CONTEXTNAME_LEN_MAX		(ITEM_SNMPV3_CONTEXTNAME_LEN + 1)
 #define ITEM_LOGTIMEFMT_LEN		64
 #define ITEM_LOGTIMEFMT_LEN_MAX		(ITEM_LOGTIMEFMT_LEN + 1)
-#define ITEM_DELAY_FLEX_LEN		1024
-#define ITEM_DELAY_FLEX_LEN_MAX		(ITEM_DELAY_FLEX_LEN + 1)
 #define ITEM_IPMI_SENSOR_LEN		128
 #define ITEM_IPMI_SENSOR_LEN_MAX	(ITEM_IPMI_SENSOR_LEN + 1)
 #define ITEM_USERNAME_LEN		64
@@ -156,7 +156,7 @@ struct	_DC_TRIGGER;
 #define HISTORY_LOG_SOURCE_LEN		64
 #define HISTORY_LOG_SOURCE_LEN_MAX	(HISTORY_LOG_SOURCE_LEN + 1)
 
-#define ALERT_ERROR_LEN			128
+#define ALERT_ERROR_LEN			2048
 #define ALERT_ERROR_LEN_MAX		(ALERT_ERROR_LEN + 1)
 
 #define GRAPH_NAME_LEN			128
@@ -354,8 +354,6 @@ typedef struct
 {
 	zbx_uint64_t	httptestid;
 	char		*name;
-	char		*variables;
-	char		*headers;
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
@@ -363,6 +361,7 @@ typedef struct
 	char		*ssl_cert_file;
 	char		*ssl_key_file;
 	char		*ssl_key_password;
+	char		*delay;
 	int		authentication;
 	int		retries;
 	int		verify_peer;
@@ -381,10 +380,9 @@ typedef struct
 	char		*status_codes;
 	int		no;
 	int		timeout;
-	char		*variables;
 	int		follow_redirects;
 	int		retrieve_mode;
-	char		*headers;
+	int		post_type;
 }
 DB_HTTPSTEP;
 
@@ -402,8 +400,10 @@ typedef struct
 }
 DB_ESCALATION;
 
+int	DBinit(char **error);
+void	DBdeinit(void);
+
 int	DBconnect(int flag);
-void	DBinit(void);
 void	DBclose(void);
 
 #ifdef HAVE_ORACLE
@@ -527,8 +527,8 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
 
-void	zbx_create_itservices_lock();
-void	zbx_destroy_itservices_lock();
+int	zbx_create_itservices_lock(char **error);
+void	zbx_destroy_itservices_lock(void);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);

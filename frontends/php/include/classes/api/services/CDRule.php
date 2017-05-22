@@ -119,6 +119,10 @@ class CDRule extends CApiService {
 
 // filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('delay', $options['filter']) && $options['filter']['delay'] !== null) {
+				$options['filter']['delay'] = getTimeUnitFilters($options['filter']['delay']);
+			}
+
 			$this->dbFilter('drules dr', $options, $sqlParts);
 		}
 
@@ -218,15 +222,11 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (array_key_exists('delay', $drule)) {
-				if (!zbx_is_int($drule['delay'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'delay'));
-				}
-				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['delay'], 'delay')
-					);
-				}
+			if (array_key_exists('delay', $drule)
+					&& !validateTimeUnit($drule['delay'], 1, SEC_PER_WEEK, false, $error, ['usermacros' => true])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'delay', $error)
+				);
 			}
 
 			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
@@ -371,15 +371,11 @@ class CDRule extends CApiService {
 				}
 			}
 
-			if (array_key_exists('delay', $drule)) {
-				if (!zbx_is_int($drule['delay'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'delay'));
-				}
-				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['delay'], 'delay')
-					);
-				}
+			if (array_key_exists('delay', $drule)
+					&& !validateTimeUnit($drule['delay'], 1, SEC_PER_WEEK, false, $error, ['usermacros' => true])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'delay', $error)
+				);
 			}
 
 			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
@@ -709,7 +705,7 @@ class CDRule extends CApiService {
 		$this->validateUpdate($drules);
 
 		$db_drules = API::DRule()->get([
-			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'nextcheck', 'status'],
+			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname'
@@ -724,14 +720,20 @@ class CDRule extends CApiService {
 		$upd_drules = [];
 
 		foreach ($drules as $drule) {
+			$db_drule = $db_drules[$drule['druleid']];
+
 			// Update drule if it's modified.
-			if (DB::recordModified('drules', $db_drules[$drule['druleid']], $drule)) {
+			if (DB::recordModified('drules', $db_drule, $drule)) {
+				if (array_key_exists('delay', $drule) && $db_drule['delay'] != $drule['delay']) {
+					$drule['nextcheck'] = 0;
+				}
+
 				DB::updateByPk('drules', $drule['druleid'], $drule);
 			}
 
 			if (array_key_exists('dchecks', $drule)) {
 				// Update dchecks.
-				$db_dchecks = $db_drules[$drule['druleid']]['dchecks'];
+				$db_dchecks = $db_drule['dchecks'];
 
 				$new_dchecks = [];
 				$old_dchecks = [];

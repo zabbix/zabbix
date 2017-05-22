@@ -548,7 +548,7 @@ class CMacrosResolverHelper {
 	 * @param array  $selement
 	 * @param string $selement['label']						label to expand
 	 * @param int    $selement['elementtype']				element type
-	 * @param int    $selement['elementid']					element id
+	 * @param array    $selement['elements']				elements
 	 * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
 	 *
 	 * @return string
@@ -582,5 +582,21 @@ class CMacrosResolverHelper {
 		$macros = reset($macros);
 
 		return $macros['url'];
+	}
+
+	/**
+	 * Resolve time unit macros.
+	 *
+	 * @static
+	 *
+	 * @param array $data
+	 * @param array $field_names
+	 *
+	 * @return string
+	 */
+	public static function resolveTimeUnitMacros(array $data, array $field_names) {
+		self::init();
+
+		return self::$macrosResolver->resolveTimeUnitMacros($data, ['sources' => $field_names]);
 	}
 }

@@ -121,7 +121,6 @@ class C34XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 							'params' =>					['type' => XML_STRING | XML_REQUIRED],
 							'ipmi_sensor' =>			['type' => XML_STRING | XML_REQUIRED],
 							'authtype' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -167,7 +166,6 @@ class C34XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 							'params' =>					['type' => XML_STRING | XML_REQUIRED],
 							'ipmi_sensor' =>			['type' => XML_STRING | XML_REQUIRED],
 							'authtype' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -212,7 +210,6 @@ class C34XmlValidator {
 									'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-									'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'ipmi_sensor' =>			['type' => XML_STRING | XML_REQUIRED],
 									'authtype' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -347,8 +344,18 @@ class C34XmlValidator {
 							'attempts' =>				['type' => XML_STRING | XML_REQUIRED],
 							'agent' =>					['type' => XML_STRING | XML_REQUIRED],
 							'http_proxy' =>				['type' => XML_STRING | XML_REQUIRED],
-							'variables' =>				['type' => XML_STRING | XML_REQUIRED],
-							'headers' =>				['type' => XML_STRING | XML_REQUIRED],
+							'variables' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'variable', 'rules' => [
+								'variable' =>				['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'headers' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
 							'status' =>					['type' => XML_STRING | XML_REQUIRED],
 							'authentication' =>			['type' => XML_STRING | XML_REQUIRED],
 							'http_user' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -362,9 +369,25 @@ class C34XmlValidator {
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED],
-									'posts' =>					['type' => XML_STRING | XML_REQUIRED],
-									'variables' =>				['type' => XML_STRING | XML_REQUIRED],
-									'headers' =>				['type' => XML_STRING | XML_REQUIRED],
+									'query_fields' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'query_field', 'rules' => [
+										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'posts' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateHttpPosts']],
+									'variables' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'variable', 'rules' => [
+										'variable' =>				['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'headers' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'header', 'rules' => [
+										'header' =>					['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'follow_redirects' =>		['type' => XML_STRING | XML_REQUIRED],
 									'retrieve_mode' =>			['type' => XML_STRING | XML_REQUIRED],
 									'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -496,7 +519,6 @@ class C34XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 							'params' =>					['type' => XML_STRING | XML_REQUIRED],
 							'ipmi_sensor' =>			['type' => XML_STRING | XML_REQUIRED],
 							'authtype' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -541,7 +563,6 @@ class C34XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 							'params' =>					['type' => XML_STRING | XML_REQUIRED],
 							'ipmi_sensor' =>			['type' => XML_STRING | XML_REQUIRED],
 							'authtype' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -585,7 +606,6 @@ class C34XmlValidator {
 									'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-									'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'ipmi_sensor' =>			['type' => XML_STRING | XML_REQUIRED],
 									'authtype' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -719,8 +739,18 @@ class C34XmlValidator {
 							'attempts' =>				['type' => XML_STRING | XML_REQUIRED],
 							'agent' =>					['type' => XML_STRING | XML_REQUIRED],
 							'http_proxy' =>				['type' => XML_STRING | XML_REQUIRED],
-							'variables' =>				['type' => XML_STRING | XML_REQUIRED],
-							'headers' =>				['type' => XML_STRING | XML_REQUIRED],
+							'variables' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'variable', 'rules' => [
+								'variable' =>				['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'headers' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
 							'status' =>					['type' => XML_STRING | XML_REQUIRED],
 							'authentication' =>			['type' => XML_STRING | XML_REQUIRED],
 							'http_user' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -734,9 +764,25 @@ class C34XmlValidator {
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED],
-									'posts' =>					['type' => XML_STRING | XML_REQUIRED],
-									'variables' =>				['type' => XML_STRING | XML_REQUIRED],
-									'headers' =>				['type' => XML_STRING | XML_REQUIRED],
+									'query_fields' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'query_field', 'rules' => [
+										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'posts' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateHttpPosts']],
+									'variables' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'variable', 'rules' => [
+										'variable' =>				['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'headers' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'header', 'rules' => [
+										'header' =>					['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'follow_redirects' =>		['type' => XML_STRING | XML_REQUIRED],
 									'retrieve_mode' =>			['type' => XML_STRING | XML_REQUIRED],
 									'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -759,9 +805,9 @@ class C34XmlValidator {
 							'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
 							'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
 								'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
-									// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
+									// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_validate' method.
 									'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-									// The tag 'style' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
+									// The tag 'style' should be validated before the 'resource' because it is used in 'ex_validate' method.
 									'style' =>					['type' => XML_STRING | XML_REQUIRED],
 									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
 									'width' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -856,9 +902,9 @@ class C34XmlValidator {
 					'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
 					'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
 						'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
-							// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
+							// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_validate' method.
 							'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-							// The tag 'style' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
+							// The tag 'style' should be validated before the 'resource' because it is used in 'ex_validate' method.
 							'style' =>					['type' => XML_STRING | XML_REQUIRED],
 							'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
 							'width' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -928,9 +974,9 @@ class C34XmlValidator {
 					]],
 					'selements' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'selement', 'rules' => [
 						'selement' =>				['type' => XML_ARRAY, 'rules' => [
-							// The tag 'elementtype' should be validated before the 'element' because it is used in 'ex_required' and 'ex_validate' methods.
+							// The tag 'elementtype' should be validated before the 'elements' because it is used in 'ex_required' and 'ex_validate' methods.
 							'elementtype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'element' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElement']],
+							'elements' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements']],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],
@@ -961,6 +1007,38 @@ class C34XmlValidator {
 									'url' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
+						]]
+					]],
+					'shapes' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'shape', 'rules' => [
+						'shape' =>				['type' => XML_ARRAY, 'rules' => [
+							'type' =>				['type' => XML_STRING | XML_REQUIRED],
+							'x' =>					['type' => XML_STRING | XML_REQUIRED],
+							'y' =>					['type' => XML_STRING | XML_REQUIRED],
+							'width' =>				['type' => XML_STRING | XML_REQUIRED],
+							'height' =>				['type' => XML_STRING | XML_REQUIRED],
+							'text' =>				['type' => XML_STRING | XML_REQUIRED],
+							'font' =>				['type' => XML_STRING | XML_REQUIRED],
+							'font_size' =>			['type' => XML_STRING | XML_REQUIRED],
+							'font_color' =>			['type' => XML_STRING | XML_REQUIRED],
+							'text_halign' =>		['type' => XML_STRING | XML_REQUIRED],
+							'text_valign' =>		['type' => XML_STRING | XML_REQUIRED],
+							'border_type' =>		['type' => XML_STRING | XML_REQUIRED],
+							'border_width' =>		['type' => XML_STRING | XML_REQUIRED],
+							'border_color' =>		['type' => XML_STRING | XML_REQUIRED],
+							'background_color' =>	['type' => XML_STRING | XML_REQUIRED],
+							'zindex' =>				['type' => XML_STRING | XML_REQUIRED],
+						]]
+					]],
+					'lines' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'line', 'rules' => [
+						'line' =>				['type' => XML_ARRAY, 'rules' => [
+							'x1' =>					['type' => XML_STRING | XML_REQUIRED],
+							'y1' =>					['type' => XML_STRING | XML_REQUIRED],
+							'x2' =>					['type' => XML_STRING | XML_REQUIRED],
+							'y2' =>					['type' => XML_STRING | XML_REQUIRED],
+							'line_type' =>			['type' => XML_STRING | XML_REQUIRED],
+							'line_width' =>			['type' => XML_STRING | XML_REQUIRED],
+							'line_color' =>			['type' => XML_STRING | XML_REQUIRED],
+							'zindex' =>				['type' => XML_STRING | XML_REQUIRED],
 						]]
 					]],
 					'links' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'link', 'rules' => [
@@ -1040,45 +1118,46 @@ class C34XmlValidator {
 	}
 
 	/**
-	 * Validate map element.
+	 * Validate map elements.
 	 *
 	 * @param string $data			import data
 	 * @param array  $parent_data	data's parent array
 	 * @param string $path			XML path
 	 *
-	 * @throws Exception			if the map element is invalid
+	 * @throws Exception			if the map elements are invalid
 	 */
-	public function validateMapElement($data, array $parent_data = null, $path) {
+	public function validateMapElements($data, array $parent_data = null, $path) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'host' =>					['type' => XML_STRING | XML_REQUIRED]
+					$rules = ['type' => XML_INDEXED_ARRAY, 'prefix' => 'element', 'rules' => [
+						'element' => ['type' => XML_ARRAY, 'rules' => [
+							'host' =>					['type' => XML_STRING | XML_REQUIRED]
+						]]
 					]];
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_MAP:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>					['type' => XML_STRING | XML_REQUIRED]
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$rules = ['type' => XML_INDEXED_ARRAY, 'prefix' => 'element', 'rules' => [
+						'element' => ['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
+						]]
 					]];
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'description' =>			['type' => XML_STRING | XML_REQUIRED],
-						'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-						'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
-					]];
-					break;
-
-				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>					['type' => XML_STRING | XML_REQUIRED]
+					$rules = ['type' => XML_INDEXED_ARRAY, 'prefix' => 'element', 'rules' => [
+						'element' => ['type' => XML_ARRAY, 'rules' => [
+							'description' =>			['type' => XML_STRING | XML_REQUIRED],
+							'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+							'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+						]]
 					]];
 					break;
 
 				default:
-					return $data;
+					$rules = ['type' => XML_ARRAY, 'rules' => []];
 			}
 
 			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
@@ -1208,5 +1287,32 @@ class C34XmlValidator {
 	 */
 	public function transformZero2Array($value) {
 		return ($value === '0') ? [] : $value;
+	}
+
+	/**
+	 * Validate "posts" tag of http test step.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if the element is invalid
+	 */
+	public function validateHttpPosts($data, array $parent_data = null, $path) {
+		if (is_array($data)) {
+			/* posts can be an HTTP pair array */
+			$rules = ['type' => XML_INDEXED_ARRAY, 'prefix' => 'post_field', 'rules' => [
+				'post_field' =>	['type' => XML_ARRAY, 'rules' => [
+					'name' =>		['type' => XML_STRING | XML_REQUIRED],
+					'value' =>		['type' => XML_STRING | XML_REQUIRED]
+				]]
+			]];
+		}
+		else {
+			/* posts can be string */
+			$rules = ['type' => XML_STRING];
+		}
+
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 	}
 }

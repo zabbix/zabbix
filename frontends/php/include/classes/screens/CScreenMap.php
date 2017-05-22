@@ -27,41 +27,27 @@ class CScreenMap extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$image = (new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].
-			'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'].'&curtime='.time()))
-			->setId('map_'.$this->screenitem['screenitemid']);
+		$severity = null;
 
-		if ($this->mode == SCREEN_MODE_PREVIEW) {
-			$sysmap = API::Map()->get([
-				'sysmapids' => $this->screenitem['resourceid'],
-				'output' => API_OUTPUT_EXTEND,
-				'selectSelements' => API_OUTPUT_EXTEND,
-				'selectLinks' => API_OUTPUT_EXTEND,
-				'expandUrls' => true,
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$sysmap = reset($sysmap);
-
-			if (array_key_exists('severity_min', $this->screenitem)) {
-				$sysmap['severity_min'] = $this->screenitem['severity_min'];
-			}
-
-			$image->setSrc($image->getAttribute('src').'&severity_min='.$sysmap['severity_min']);
-
-			$action_map = getActionMapBySysmap($sysmap, ['severity_min' => $sysmap['severity_min']]);
-			$image->setMap($action_map->getName());
-
-			$output = [$action_map, $image];
-		}
-		elseif ($this->mode == SCREEN_MODE_EDIT) {
-			$output = [$image, BR(), new CLink(_('Change'), $this->action)];
-		}
-		else {
-			$output = [$image];
+		if (array_key_exists('severity_min', $this->screenitem)) {
+			$severity = $this->screenitem['severity_min'];
 		}
 
-		$this->insertFlickerfreeJs();
+		$map_data = CMapHelper::get($this->screenitem['resourceid'], $severity);
+		$map_data['container'] = '#map_'.$this->screenitem['screenitemid'];
+		$this->insertFlickerfreeJs($map_data);
+
+		$output = [
+			(new CDiv())
+				->setId('map_'.$this->screenitem['screenitemid'])
+				->addStyle('width: '.$map_data['canvas']['width'].'px;')
+				->addStyle('height: '.$map_data['canvas']['height'].'px;')
+				->addStyle('overflow: hidden;')
+		];
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$output += [BR(), new CLink(_x('Change', 'verb'), $this->action)];
+		}
 
 		$div = (new CDiv($output))
 			->addClass('map-container')

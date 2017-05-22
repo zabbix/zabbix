@@ -27,7 +27,9 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Custom slides');
 $page['file'] = 'slides.php';
-$page['scripts'] = ['class.pmaster.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
+$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.pmaster.js', 'class.calendar.js', 'gtlc.js',
+	'flickerfreescreen.js'
+];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
@@ -137,7 +139,7 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['s
 			);
 		}
 
-		$delay = ($screen['delay'] > 0) ? $screen['delay'] : $data['screen']['delay'];
+		$delay = timeUnitToSeconds(($screen['delay'] === '0') ? $data['screen']['delay'] : $screen['delay']);
 
 		insert_js(
 			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.

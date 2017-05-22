@@ -23,7 +23,61 @@
 #include "zbxserver.h"
 #include "db.h"
 #include "log.h"
-#include "../scripts.h"
+#include "../scripts/scripts.h"
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: execute_remote_script                                            *
+ *                                                                            *
+ * Purpose: execute remote command and wait for the result                    *
+ *                                                                            *
+ * Return value:  SUCCEED - the remote command was executed successfully      *
+ *                FAIL    - an error occurred                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	execute_remote_script(zbx_script_t *script, DC_HOST *host, char **info, char *error,
+		size_t max_error_len)
+{
+	int		ret = FAIL, time_start;
+	zbx_uint64_t	taskid;
+	DB_RESULT	result = NULL;
+	DB_ROW		row;
+
+	if (0 == (taskid = zbx_script_create_task(script, host, 0, time(NULL))))
+	{
+		zbx_snprintf(error, max_error_len, "Cannot create remote command task.");
+		return FAIL;
+	}
+
+	for (time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
+	{
+		result = DBselect(
+				"select tr.status,tr.info"
+				" from task t"
+				" left join task_remote_command_result tr"
+					" on tr.taskid=t.taskid"
+				" where tr.parent_taskid=" ZBX_FS_UI64,
+				taskid);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			if (SUCCEED == (ret = atoi(row[0])))
+				*info = zbx_strdup(*info, row[1]);
+			else
+				zbx_strlcpy(error, row[1], max_error_len);
+
+			DBfree_result(result);
+			return ret;
+		}
+
+		DBfree_result(result);
+	}
+
+	zbx_snprintf(error, max_error_len, "Timeout while waiting for remote command result.");
+
+	return FAIL;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -65,7 +119,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
 	script.scriptid = scriptid;
 
-	ret = zbx_execute_script(&host, &script, &user, result, error, sizeof(error));
+	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, &user, error, sizeof(error))))
+	{
+		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
+			ret = zbx_script_execute(&script, &host, result, error, sizeof(error));
+		else
+			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
+	}
 
 	zbx_script_clean(&script);
 fail:

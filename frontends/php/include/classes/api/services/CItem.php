@@ -281,6 +281,19 @@ class CItem extends CItemGeneral {
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('delay', $options['filter']) && $options['filter']['delay'] !== null) {
+				$sqlParts['where'][] = makeUpdateIntervalFilter('i.delay', $options['filter']['delay']);
+				unset($options['filter']['delay']);
+			}
+
+			if (array_key_exists('history', $options['filter']) && $options['filter']['history'] !== null) {
+				$options['filter']['history'] = getTimeUnitFilters($options['filter']['history']);
+			}
+
+			if (array_key_exists('trends', $options['filter']) && $options['filter']['trends'] !== null) {
+				$options['filter']['trends'] = getTimeUnitFilters($options['filter']['trends']);
+			}
+
 			$this->dbFilter('items i', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
@@ -642,26 +655,23 @@ class CItem extends CItemGeneral {
 			'value_id' => $itemIds
 		]);
 
-		$itemDataTables = [
-			'trends',
-			'trends_uint',
-			'history_text',
-			'history_log',
-			'history_uint',
-			'history_str',
+		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
 			'history'
 		];
+
 		$insert = [];
+
 		foreach ($itemIds as $itemId) {
-			foreach ($itemDataTables as $table) {
+			foreach ($table_names as $table_name) {
 				$insert[] = [
-					'tablename' => $table,
+					'tablename' => $table_name,
 					'field' => 'itemid',
 					'value' => $itemId
 				];
 			}
 		}
-		DB::insert('housekeeper', $insert);
+
+		DB::insertBatch('housekeeper', $insert);
 
 		// TODO: remove info from API
 		foreach ($delItems as $item) {
@@ -702,14 +712,32 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Check item specific fields.
+	 * Check item specific fields:
+	 *		- validate history and trends using simple interval parser and user macro parser;
+	 *		- validate item preprocessing.
 	 *
-	 * @param array  $item			An array of single item data.
-	 * @param string $method		A string of "create" or "update" method.
+	 * @param array  $item    An array of single item data.
+	 * @param string $method  A string of "create" or "update" method.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function checkSpecificFields(array $item, $method) {
+		if (array_key_exists('history', $item)
+				&& !validateTimeUnit($item['history'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
+					['usermacros' => true])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
+			);
+		}
+
+		if (array_key_exists('trends', $item)
+				&& !validateTimeUnit($item['trends'], SEC_PER_DAY, 25 * SEC_PER_YEAR, true, $error,
+					['usermacros' => true])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
+			);
+		}
+
 		$this->validateItemPreprocessing($item, $method);
 	}
 

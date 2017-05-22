@@ -207,6 +207,8 @@ class CConfigurationExportBuilder {
 				'iconmap' => $map['iconmap'],
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $tmpSelements,
+				'shapes' => $map['shapes'],
+				'lines' => $map['lines'],
 				'links' => $this->formatMapLinks($map['links'], $tmpSelements)
 			];
 		}
@@ -328,7 +330,6 @@ class CConfigurationExportBuilder {
 				'snmpv3_authpassphrase' => $discoveryRule['snmpv3_authpassphrase'],
 				'snmpv3_privprotocol' => $discoveryRule['snmpv3_privprotocol'],
 				'snmpv3_privpassphrase' => $discoveryRule['snmpv3_privpassphrase'],
-				'delay_flex' => $discoveryRule['delay_flex'],
 				'params' => $discoveryRule['params'],
 				'ipmi_sensor' => $discoveryRule['ipmi_sensor'],
 				'authtype' => $discoveryRule['authtype'],
@@ -410,6 +411,7 @@ class CConfigurationExportBuilder {
 			$result[] = [
 				'name' => $httpstep['name'],
 				'url' => $httpstep['url'],
+				'query_fields' => $httpstep['query_fields'],
 				'posts' => $httpstep['posts'],
 				'variables' => $httpstep['variables'],
 				'headers' => $httpstep['headers'],
@@ -679,7 +681,6 @@ class CConfigurationExportBuilder {
 				'snmpv3_authpassphrase' => $item['snmpv3_authpassphrase'],
 				'snmpv3_privprotocol' => $item['snmpv3_privprotocol'],
 				'snmpv3_privpassphrase' => $item['snmpv3_privpassphrase'],
-				'delay_flex' => $item['delay_flex'],
 				'params' => $item['params'],
 				'ipmi_sensor' => $item['ipmi_sensor'],
 				'authtype' => $item['authtype'],
@@ -1035,7 +1036,7 @@ class CConfigurationExportBuilder {
 				'viewtype' => $element['viewtype'],
 				'use_iconmap' => $element['use_iconmap'],
 				'selementid' => $element['selementid'],
-				'element' => $element['elementid'],
+				'elements' => $element['elements'],
 				'icon_off' => $element['iconid_off'],
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],

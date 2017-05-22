@@ -519,6 +519,9 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		zbx_free(error);
 		goto out;
 	}
+#else
+	ZBX_UNUSED(tls_arg1);
+	ZBX_UNUSED(tls_arg2);
 #endif
 	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
 
@@ -631,6 +634,9 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		zbx_free(error);
 		return FAIL;
 	}
+#else
+	ZBX_UNUSED(tls_arg1);
+	ZBX_UNUSED(tls_arg2);
 #endif
 	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
 
@@ -1881,7 +1887,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 				return FAIL;
 			}
 		}
-		else if (FAIL == is_ip(start) && FAIL == validate_hostname(start, strlen(start)))
+		else if (FAIL == is_supported_ip(start) && FAIL == validate_hostname(start, strlen(start)))
 		{
 			*error = zbx_dsprintf(NULL, "\"%s\"", start);
 			return FAIL;

@@ -1554,7 +1554,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 
 	if (NULL == c)
 	{
-		*error = zbx_dsprintf(*error, "Control %s@ on address %s:%d does not exist.", sensor, h->ip, h->port);
+		*error = zbx_dsprintf(*error, "Control \"%s\" at address \"%s:%d\" does not exist.", sensor, h->ip, h->port);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", *error);
 		return NOTSUPPORTED;
 	}

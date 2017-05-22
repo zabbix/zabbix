@@ -106,10 +106,6 @@ function DBsave_tables($topTable) {
 			DBexecute("create table ${table}_tmp like $table");
 			DBexecute("insert into ${table}_tmp select * from $table");
 			break;
-		case ZBX_DB_SQLITE3:
-			DBexecute("drop table if exists ${table}_tmp");
-			DBexecute("create table if not exists ${table}_tmp as select * from ${table}");
-			break;
 		default:
 			DBexecute("drop table if exists ${table}_tmp");
 			DBexecute("select * into table ${table}_tmp from $table");

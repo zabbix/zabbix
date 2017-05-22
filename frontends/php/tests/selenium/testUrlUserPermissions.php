@@ -729,7 +729,7 @@ class testUrlUserPermissions extends CWebTest {
 			[[
 				'url' => 'profile.php',
 				'title' =>	'User profile',
-				'header' => 'User profile:',
+				'header' => 'User profile: ',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => true,
@@ -764,7 +764,12 @@ class testUrlUserPermissions extends CWebTest {
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
 				$this->zbxTestOpen($data['url']);
 				$this->zbxTestCheckTitle($data['title']);
-				$this->zbxTestCheckHeader($data['header']);
+				if ($data['url'] == 'profile.php') {
+					$this->zbxTestCheckHeader($data['header'].$alias);
+				}
+				else {
+					$this->zbxTestCheckHeader($data['header']);
+				}
 				$this->zbxTestCheckFatalErrors();
 				$this->webDriver->manage()->deleteAllcookies();
 			}
