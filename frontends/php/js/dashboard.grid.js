@@ -697,6 +697,8 @@
 			options = $.extend({}, {columns: 12}, options);
 			options['widget-height'] = 70;
 			options['widget-width'] = 100 / options['columns'];
+			// TODO miks: make it consistant with changes Valdis made in latest versions.
+			options['edit_mode'] = false;
 			options['rows'] = 0;
 
 			return this.each(function() {
@@ -818,6 +820,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				data['options']['edit_mode'] = true;
 				runTrigger($this, data, 'onEditStart');
 				dashboardRemoveMessages();
 				setModeEditDashboard($this, data);
@@ -832,6 +835,7 @@
 
 				runTrigger($this, data, 'beforeDashboardSave');
 				saveChanges($this, data);
+				data['options']['edit_mode'] = false;
 				runTrigger($this, data, 'afterDashboardSave');
 			});
 		},
@@ -844,6 +848,7 @@
 
 				runTrigger($this, data, 'onEditStop');
 				dashboardRemoveMessages();
+				data['options']['edit_mode'] = false;
 				setModeViewDashboard($this, data);
 			});
 		},

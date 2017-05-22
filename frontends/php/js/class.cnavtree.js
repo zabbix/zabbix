@@ -5,11 +5,6 @@ jQuery(function($) {
 	 * @return object
 	 */
 
-	// TODO miks: this is important! After closing widget edit modal window, widget is reloaded (by dashboard grid) and 
-	// looses state editmode=true. This MUST be fixed before any demo, because once 'save dashboard' will be clicked, 
-	// there are no more data to collect with updateWidgetFields() and all tree items are lost! Discuss with VM about how 
-	// to get state of edit mode.
-	// 
 	// TODO miks: change button icons.
 	// TODO miks: improve sortability.
 
@@ -65,14 +60,16 @@ jQuery(function($) {
 
 				$.each(tree, function(i, item) {
 					if (typeof item === 'object') {
-						root.append(createTreeLeap(item, 1));
+						root.append(createTreeItem(item, 1));
 					}
 				});
+
+				setTreeHandlers();
 			};
 
 			var parseProblems = function() {
 				var widget_data = $this.data('widgetData');
-				if (widget_data.editMode || typeof widget_data.severityLevels === 'undefined') {
+				if (isEditMode() || typeof widget_data.severityLevels === 'undefined') {
 					return false;
 				}
 
@@ -151,17 +148,9 @@ jQuery(function($) {
 				}
 			};
 
-			var createTreeLeap = function(item, depth) {
+			var createTreeItem = function(item, depth) {
 				var widget_data = $this.data('widgetData'),
-						opened_nodes, node_opened = false, link, span, li, ul, arrow;
-
-				opened_nodes = cookie.read(getCookieName('opened_nodes'));
-				if (opened_nodes) {
-					opened_nodes = opened_nodes.split(',');					
-					if (opened_nodes.indexOf(item.id.toString()) !== -1) {
-						node_opened = true;
-					}
-				}
+						link, span, li, ul, arrow;
 
 				if (typeof item.mapid !== 'undefined' && item.mapid) {
 					link = $('<a></a>').attr('href', '#');
@@ -172,7 +161,7 @@ jQuery(function($) {
 
 				link.addClass('item-name').text(item.name);
 
-				if (widget_data.editMode) {
+				if (isEditMode()) {
 					link.click(function(e) {
 						e.preventDefault();
 					});
@@ -191,9 +180,7 @@ jQuery(function($) {
 								.addClass('row')
 								.append(link);
 
-				li = $('<li></li>')
-								.addClass('tree-item ' + (node_opened ? 'opened' : 'closed'))
-								.append(span);
+				li = $('<li></li>').addClass('tree-item').append(span);
 
 				if (typeof item.mapid !== 'undefined' && item.mapid) {
 					li.attr('data-mapid', item.mapid);
@@ -228,7 +215,7 @@ jQuery(function($) {
 
 					$.each(item.children, function(i, item){
 						if (typeof item === 'object') {
-							ul.append(createTreeLeap(item, depth+1));
+							ul.append(createTreeItem(item, depth+1));
 							if (item.id > widget_data.lastId) {
 								widget_data.lastId = item.id;
 							}
@@ -236,10 +223,10 @@ jQuery(function($) {
 					});
 				}
 
-				if (widget_data.editMode) {
+				if (isEditMode()) {
 					var tools = $('<div></div>').addClass('tools').insertAfter(link);
 
-					if (widget_data.maxDepth > depth) {
+					if (widget_data.maxDepth > +$(this).closest('.tree-list').data('depth')) {
 						$('<input>')
 							.click(function() {
 								var parentId = $(this).data('id'),
@@ -258,7 +245,7 @@ jQuery(function($) {
 								}
 
 								$('.tree-item[data-id='+parentId+']', $this).addClass('is-parent opened').removeClass('closed');
-								branch.append(createTreeLeap(new_item, depth+1));
+								branch.append(createTreeItem(new_item, depth+1));
 								storeUIState();
 							})
 							.addClass('add-child-btn')
@@ -271,7 +258,7 @@ jQuery(function($) {
 						.click(function() {
 							var id = $(this).data('id');
 							var url = new Curl('zabbix.php');
-							
+
 							var ajax_data = {
 								map_name: $('[name="map.name.'+id+'"]', $this).val(),
 								mapid: $('[name="mapid.'+id+'"]', $this).val(),
@@ -321,7 +308,7 @@ jQuery(function($) {
 
 					$('<input>')
 						.click(function(){
-							methods.removeItem.apply($this, [$(this).data('id')]);
+							removeItem([$(this).data('id')]);
 						})
 						.attr({'type':'button', 'data-id':item.id})
 						.addClass('remove-item-btn')
@@ -349,12 +336,40 @@ jQuery(function($) {
 				return li;
 			};
 
+			var setTreeHandlers = function() {
+				var opened_nodes = cookie.read(getCookieName('opened_nodes'));
+
+				opened_nodes = opened_nodes ? opened_nodes.split(',') : [];
+
+				$('.tree-list', $this).each(function() {
+					if ($('.tree-item', $(this)).size()) {
+						$(this).closest('.tree-item').addClass('is-parent');
+					}
+					else {
+						$(this).closest('.tree-item').removeClass('is-parent');
+					}
+				});
+
+				$('.tree-item[data-id]').each(function() {
+					var id = $(this).data('id');
+					if (opened_nodes.indexOf(id.toString()) !== -1) {
+						$(this).addClass('opened').removeClass('closed');
+					}
+					else {
+						$(this).addClass('closed').removeClass('opened');
+					}
+				});
+
+				$('.is-parent.opened .arrow-right', $this).removeClass('arrow-right').addClass('arrow-down');
+				$('.is-parent.closed .arrow-down', $this).removeClass('arrow-down').addClass('arrow-right');
+			};
+
 			var addEditTools = function() {
 				var root = $('ul.root', $this),
 						widget_data = $this.data('widgetData'),
 						toolBar;
 
-				if (!widget_data.editMode) {
+				if (!isEditMode()) {
 					return false;
 				}
 
@@ -369,38 +384,54 @@ jQuery(function($) {
 						var widget_data = $this.data('widgetData'),
 								new_item = {
 									name: t('New item'),
-									parent: 0,
-									id: getNextId()
+									id: getNextId(),
+									parent: 0
 								};
 
 						root = (typeof root !== 'undefined') ? root : $('ul.root', $this);
-						root.append(createTreeLeap(new_item, 1));
+						root.append(createTreeItem(new_item, 1));
 					})
 					.appendTo(toolBar)
 					.html(t('Add'));
 
-				$(root)
-					.sortable({
-						containment: root,
-						connectWith: '.tree-list',
-						placeholder: 'sortable-item-placeholder',
-						disabled: ($('.tree-item', root).length < 2),
-						items: '.tree-item',
-						dropOnEmpty: true,
-						axis: 'y',
-						receive: function(e, ui) {
-							var new_parent = $(e.target).closest('[data-id]').data('id'),
-									id = $(ui.item).data('id');
+					$('li', root)
+						.draggable({
+							handle: '.row',
+							stop: function(event, ui){
+								ui.helper.attr('style', 'position: relative');
+							},
+							revert: 'invalid',
+							cursor: 'move'
+						})
+						.disableSelection();
 
-							console.log(e);
-							console.log(ui);
+					$('.tree-item', root)
+						.droppable({
+							over: function() {
+								$(this).addClass('tree-item-placeholder');
+							},
+							tolerance: 'pointer',
+							out: function() {
+								$(this).removeClass('tree-item-placeholder');
+							},
+							drop: function(event, ui) {
+								var li = $(this).closest('li'),
+										ul = li.children('ul'),
+										new_parent_id = 0;
 
-							console.log('element changed parent', 'map.parent.'+id);
-							console.log('new parent', new_parent||0);
-							$('[name="map.parent.'+id+'"]').val(new_parent||0);
-						}
-					})
-					.disableSelection();
+								$(this).removeClass('tree-item-placeholder');
+								ui.draggable.appendTo(ul);
+								ui.draggable.attr('style', 'position: relative');
+
+								if (li.length) {
+									new_parent_id = li.data('id');
+									ul = li.children('ul');
+								}
+
+								$('[name^="map.parent."]', ui.draggable).val(new_parent_id);
+								setTreeHandlers();
+							}
+						});
 			};
 
 			var removeEditTools = function() {
@@ -420,6 +451,19 @@ jQuery(function($) {
 						}
 					});
 				}
+
+				return response;
+			};
+
+			var isEditMode = function() {
+				var dashboard_data = $(".dashbrd-grid-widget-container").data('dashboardGrid'),
+						response = null;
+
+				$.each(dashboard_data, function(i, db) {
+					if (typeof db['edit_mode'] !== 'undefined') {
+						response = db['edit_mode'];
+					}
+				});
 
 				return response;
 			};
@@ -474,11 +518,7 @@ jQuery(function($) {
 							widget_data.lastId = item['id'];
 						}
 
-						if (item['id'] <= 0) {
-							// TODO miks: remove if do not see this message in console anymore. Should be resolved.
-							console.log('Item id cant\'t be', item['id'], 'on item', item);
-						}
-						else if (item['parent'] === parent_id) {
+						if (item['parent'] == parent_id) {
 							var children = buildTree(rows, item['id']);
 
 							if (children.length) {
@@ -513,17 +553,23 @@ jQuery(function($) {
 				return tree;
 			};
 
+			var removeItem = function(id) {
+					var parent_id;
+					if (confirm('Remove item and all its children?')) {
+						parent_id = $('input[name="map.parent.'+id+'"]', $this).val();
+						if ($('.tree-item', $('[data-id='+parent_id+']', $this)).length == 1) {
+							$('[data-id='+parent_id+']').removeClass('is-parent');
+						}
+						$('[data-id='+id+']').remove();
+					}
+			};
+
 			// Records data from DOM to dashboard widget[fields] array.
 			var updateWidgetFields = function() {
-				/*
-				 * TODO miks: if (!widget_data.editMode) return false; is here just to prevent dashboard_widget['fields'] to be
-				 * removed if widget is not in editmode like it is once widget config is updated. Should be fixed in other way.
-				 * Discuss it with VM how to prevent widget refresh after config update.
-				 */
 				var dashboard_widget = getWidgetData(),
 						widget_data = $this.data('widgetData');
 
-				if (!dashboard_widget || !widget_data.editMode) {
+				if (!dashboard_widget || !isEditMode()) {
 					return false;
 				}
 
@@ -547,6 +593,7 @@ jQuery(function($) {
 						dashboard_widget['fields'][$(this).attr('name')] = $(this).val();
 						dashboard_widget['fields']['map.parent.'+id] = parent||0;
 						dashboard_widget['fields']['map.order.'+id] = order;
+
 						if (mapid) {
 							dashboard_widget['fields']['mapid.'+id] = mapid;
 						}
@@ -554,71 +601,72 @@ jQuery(function($) {
 				});
 			};
 
+			var switchToNavigationMode = function() {
+				var widget_data = $this.data('widgetData'),
+						dashboard_widget = getWidgetData();
+
+				if (!dashboard_widget) {
+					return false;
+				}
+
+				removeEditTools();
+				drawTree();
+				parseProblems();
+
+				$(".dashbrd-grid-widget-container").dashboardGrid('setWidgetRefreshRate', dashboard_widget['widgetid'],
+						dashboard_widget['rf_rate']);
+			};
+
+			var switchToEditMode = function() {
+				var widget_data = $this.data('widgetData'),
+						dashboard_widget = getWidgetData();
+
+				if (!dashboard_widget) {
+					return false;
+				}
+
+				if (typeof dashboard_widget['rf_timeoutid'] !== 'undefined') {
+					clearTimeout(dashboard_widget['rf_timeoutid']);
+					delete dashboard_widget['rf_timeoutid'];
+				}
+
+				removeEditTools();
+				drawTree();
+				addEditTools();
+			};
+
 			var methods = {
-				removeItem: function(id) {
-					var parent_id;
-					if (confirm('Remove item and all its children?')) {
-						parent_id = $('input[name="map.parent.'+id+'"]', $this).val();
-						if ($('.tree-item', $('[data-id='+parent_id+']', $this)).length == 1) {
-							$('[data-id='+parent_id+']').removeClass('is-parent');
-						}
-						$('[data-id='+id+']').remove();
-					}
-				},
 				// beforeConfigLoad trigger method
 				beforeConfigLoad: function() {
-					updateWidgetFields();
+					return this.each(function() {
+						updateWidgetFields();
+					});
 				},
 				// beforeDashboardSave trigger method
 				beforeDashboardSave: function() {
-					updateWidgetFields();
+					return this.each(function() {
+						updateWidgetFields();
+					});
 				},
 				// afterDashboardSave trigger method
 				afterDashboardSave: function() {
-					methods.switchToNavigationMode();
+					return this.each(function() {
+						switchToNavigationMode();
+					});
 				},
 				// onEditStart trigger method
 				onEditStart: function() {
-					methods.switchToEditMode();
+					return this.each(function() {
+						switchToEditMode();
+					});
 				},
 				// onEditStop trigger method
 				onEditStop: function() {
-					methods.switchToNavigationMode();
+					return this.each(function() {
+						switchToNavigationMode();
+					});
 				},
-				switchToEditMode: function() {
-					var widget_data = $this.data('widgetData'),
-							dashboard_widget = getWidgetData();
-
-					if (!dashboard_widget) {
-						return false;
-					}
-
-					if (typeof dashboard_widget['rf_timeoutid'] !== 'undefined') {
-						clearTimeout(dashboard_widget['rf_timeoutid']);
-						delete dashboard_widget['rf_timeoutid'];
-					}
-
-					widget_data.editMode = true;
-					removeEditTools();
-					drawTree();
-					addEditTools();
-				},
-				switchToNavigationMode: function() {
-					var widget_data = $this.data('widgetData'),
-							dashboard_widget = getWidgetData();
-
-					if (!dashboard_widget) {
-						return false;
-					}
-
-					widget_data.editMode = false;
-					removeEditTools();
-					drawTree();
-					parseProblems();
-
-					$(".dashbrd-grid-widget-container").dashboardGrid('setWidgetRefreshRate', dashboard_widget['widgetid'], 
-							dashboard_widget['rf_rate']);
-				},
+				// initialization of widget
 				init: function(options) {
 					options = $.extend({}, options);
 
@@ -627,13 +675,16 @@ jQuery(function($) {
 							widgetid: options.widgetId,
 							severityLevels: options.severityLevels||[],
 							problems: options.problems||[],
-							editMode: options.editMode||false,
 							maxDepth: options.maxDepth||3,
 							lastId: 0
 						});
 
-						drawTree();
-						parseProblems();
+						if (isEditMode()) {
+							switchToEditMode();
+						}
+						else {
+							switchToNavigationMode();
+						}
 					});
 				}
 			};
@@ -648,5 +699,3 @@ jQuery(function($) {
 		}
 	}
 });
-
-

@@ -23,7 +23,8 @@ class CNavigationWidgetForm extends CWidgetForm {
 		parent::__construct($data);
 
 		// widget name field
-		$widget_name = (new CWidgetFieldTextBox('widget_name', _('Name')))->setRequired(true);
+		$widget_name = (new CWidgetFieldTextBox('widget_name', _('Name'),
+				CWidgetConfig::getKnownWidgetTypes(WIDGET_NAVIGATION_TREE)));
 		if (array_key_exists('widget_name', $data)) {
 			$widget_name->setValue($data['widget_name']);
 		}

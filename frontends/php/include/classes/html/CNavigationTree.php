@@ -74,7 +74,6 @@ class CNavigationTree extends CDiv {
 					'problems: '.json_encode($this->problems).','.
 					'severityLevels: '.json_encode($this->getSeverityConfig()).','.
 					'widgetId: '.$this->widgetid.','.
-					'editMode: '.(getRequest('save', 1) ? 'false' : 'true').','.
 					'maxDepth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
 				'});';
 		}

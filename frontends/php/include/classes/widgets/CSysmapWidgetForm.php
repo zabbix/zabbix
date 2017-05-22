@@ -24,7 +24,7 @@ class CSysmapWidgetForm extends CWidgetForm
 		parent::__construct($data);
 
 		// widget name field
-		$widget_name = (new CWidgetFieldTextBox('widget_name', _('Name')))->setRequired(true);
+		$widget_name = (new CWidgetFieldTextBox('widget_name', _('Name')));
 		if (array_key_exists('widget_name', $data)) {
 			$widget_name->setValue($data['widget_name']);
 		}

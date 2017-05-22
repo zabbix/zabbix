@@ -79,8 +79,8 @@ class CWidgetFieldSelectResource extends CWidgetField
 					]);
 
 					if (!array_key_exists($this->value, $maps)) {
-						$errors[] = _(
-								'No permissions to referred object specified in field \'%s\' or it does not exist!', $this->label);
+						$errors[] = _(sprintf('No permissions to referred object specified in field \'%s\' or it does not exist!',
+								$this->label));
 					}
 					break;
 			}
