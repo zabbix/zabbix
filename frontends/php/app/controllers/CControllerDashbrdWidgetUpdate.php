@@ -61,7 +61,6 @@ class CControllerDashbrdWidgetUpdate extends CController {
 								_s('the parameter "%1$s" is missing', $field)
 							));
 							$ret = false;
-							break;
 						}
 					}
 				}
