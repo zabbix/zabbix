@@ -102,6 +102,8 @@ $fields = [
 	'evaltype' =>	 		[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' => 			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'conditions' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'jmx_endpoint' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),
@@ -117,9 +119,7 @@ $fields = [
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
-	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null],
-	'jmx_endpoint' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX]
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
