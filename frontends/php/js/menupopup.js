@@ -403,7 +403,6 @@ function getMenuPopupRefresh(options) {
 						method: 'POST',
 						dataType: 'json',
 						data: {
-							dashboardid: 1, // TODO VM: (?) replace with real (depends on - will we have dashboard id in profile key)
 							widgets: [
 								{
 									'widgetid': options.widgetName,

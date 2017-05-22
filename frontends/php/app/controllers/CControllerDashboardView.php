@@ -153,11 +153,7 @@ class CControllerDashboardView extends CController {
 					'height' => (int) $widget['height'],
 					'width' => (int) $widget['width']
 				],
-				// TODO VM: (?) update refresh rate to take into account dashboard id
-				//			(1) Adding dashboard ID will limit reusage of dashboard.grid.js for pages without dashboard ID's
-				//			(2) Each widget has unique ID across all dashboards, so it will still work
-				//			(3) Leaving identification only be widget ID, it will be harder to manage, when deleating dashboards.
-				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $default_rf_rate),
+				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
 				// 'type' always should be in fields array
 				'fields' => ['type' => $widget['type']] + $this->convertWidgetFields($widget['fields'])
 			];

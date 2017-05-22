@@ -49,7 +49,7 @@ class CControllerDashbrdWidgetRfRate extends CController {
 	protected function doAction() {
 		foreach ($this->getInput('widgets') as $widget) {
 			if (array_key_exists('rf_rate', $widget)) {
-				CProfile::update('web.dashbrd.widget.'.$widget['widgetid'].'.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT);
+				CProfile::update('web.dashbrd.widget.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT, $widget['widgetid']);
 			}
 		}
 
