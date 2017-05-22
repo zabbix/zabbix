@@ -29,11 +29,12 @@ class CControllerWidgetClockView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'required', // TODO VM: in db.widget
-			'fields'		=>	'array',
+			'widgetid' =>	'required', // TODO VM: in db.widget
+			'fields' =>		'array',
 		];
 
 		$ret = $this->validateInput($fields);
+
 		if ($ret) {
 			// TODO VM: if fields are present, check that fields have enough data
 		}
@@ -51,7 +52,6 @@ class CControllerWidgetClockView extends CController {
 	}
 
 	protected function doAction() {
-
 		$time = null;
 		$title = null;
 		$time_zone_string = null;
