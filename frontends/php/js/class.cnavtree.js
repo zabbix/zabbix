@@ -393,15 +393,69 @@ jQuery(function($) {
 					})
 					.appendTo(toolBar)
 					.html(t('Add'));
+/*
+					var droppedTo;
+
+					$(".tree-list.root").sortable({
+						items: '.tree-item',
+						connectWith: '.tree-list',
+						placeholder: 'sortable-item-placeholder',
+						update: function(event, ui) {
+							co ns ole.log(this);
+							co ns ole.log(ui.item);
+						},
+						stop: function(event, ui) {
+							if (typeof droppedTo === 'undefined') {
+								return;
+							}
+
+							var new_parent_id = 0;
+							if (droppedTo.data('id') !== 'undefined') {
+								new_parent_id = $(droppedTo).data('id');
+							}
+
+							if (new_parent_id && droppedTo.data('id') != ui.item.data('id')) {
+								$('ul:first', $(droppedTo))
+									.append(ui.item);
+
+								$(droppedTo)
+									.addClass('is-parent opened')
+									.removeClass('closed');
+							}
+							else {
+								$(droppedTo).append(ui.item);
+							}
+
+							$('[name^="map.parent."]', ui.item).val(new_parent_id);
+							droppedTo = null;
+							setTreeHandlers();
+						}
+					})
+					.disableSelection();
+
+					$(".tree-list.root").droppable({
+						accept: ".tree-item",
+						drop: function(event, ui) {
+							droppedTo = $(this);
+						}
+					});
+*/
 
 					$('li', root)
 						.draggable({
 							handle: '.row',
 							stop: function(event, ui){
 								ui.helper.attr('style', 'position: relative');
+								setTreeHandlers();
+							},
+							drag: function( event, ui ) {
+								ui.position.left = Math.min(100, ui.position.left);
 							},
 							revert: 'invalid',
-							cursor: 'move'
+							cursor: 'move',
+							helper: 'clone',
+							zIndex: 100,
+							axis: 'y'
 						})
 						.disableSelection();
 

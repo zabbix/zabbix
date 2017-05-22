@@ -70,6 +70,8 @@ class CNavigationTree extends CDiv {
 	public function getScriptRun() {
 		if ($this->error === null) {
 			$this->script_run = ''.
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("setWidgetTriggers", '.$this->widgetid.', '.
+						json_encode(CWidgetConfig::getTriggers(WIDGET_NAVIGATION_TREE)).');'.
 				'jQuery("#'.$this->getId().'").zbx_navtree({'.
 					'problems: '.json_encode($this->problems).','.
 					'severityLevels: '.json_encode($this->getSeverityConfig()).','.

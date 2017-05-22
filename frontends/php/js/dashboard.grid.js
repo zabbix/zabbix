@@ -682,6 +682,7 @@
 	}
 
 	function runTrigger($obj, data, triggerName) {
+		// TODO miks: correct typo in 'triggerrs'.
 		$.each(data['widgets'], function(index, widget) {
 			if (typeof widget['triggerrs'][triggerName] !== 'undefined') {
 				try {
@@ -720,6 +721,19 @@
 					// return value only if we need confirmation window, return nothing othervise
 					if (typeof res !== 'undefined') {
 						return res;
+					}
+				});
+			});
+		},
+
+		setWidgetTriggers: function(widgetid, triggerrs) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					if (widget['widgetid'] == widgetid) {
+						widget['triggerrs'] = triggerrs;
 					}
 				});
 			});
