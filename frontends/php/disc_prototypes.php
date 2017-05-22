@@ -372,9 +372,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'params'		=> getRequest('params'),
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
 			'ruleid'		=> getRequest('parent_discoveryid'),
-			'delay_flex'	=> $delay_flex,
-			'jmx_endpoint'	=> getRequest('jmx_endpoint')
+			'delay_flex'	=> $delay_flex
 		];
+
+		if ($item['type'] == ITEM_TYPE_JMX) {
+			$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+		}
 
 		if (hasRequest('update')) {
 			$itemId = getRequest('itemid');

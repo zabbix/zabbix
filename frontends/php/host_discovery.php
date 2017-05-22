@@ -244,7 +244,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
 			'delay_flex' => $delay_flex,
 			'authtype' => getRequest('authtype'),
-			'jmx_endpoint' => getRequest('jmx_endpoint'),
 			'username' => getRequest('username'),
 			'password' => getRequest('password'),
 			'publickey' => getRequest('publickey'),
@@ -253,6 +252,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ipmi_sensor' => getRequest('ipmi_sensor'),
 			'lifetime' => getRequest('lifetime')
 		];
+
+		if ($newItem['type'] == ITEM_TYPE_JMX) {
+			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+		}
 
 		// add macros; ignore empty new macros
 		$filter = [
