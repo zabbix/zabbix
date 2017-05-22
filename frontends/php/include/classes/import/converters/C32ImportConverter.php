@@ -168,14 +168,28 @@ class C32ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertMaps(array $maps) {
+		$default_shape = [
+			'type' =>				SYSMAP_SHAPE_TYPE_RECTANGLE,
+			'x' =>					DB::getDefault('sysmap_shape', 'x'),
+			'y' =>					DB::getDefault('sysmap_shape', 'y'),
+			'height' =>				15,
+			'text' =>				'{MAP.NAME}',
+			'font' =>				DB::getDefault('sysmap_shape', 'font'),
+			'font_size' =>			DB::getDefault('sysmap_shape', 'font_size'),
+			'font_color' =>			DB::getDefault('sysmap_shape', 'font_color'),
+			'text_halign' =>		DB::getDefault('sysmap_shape', 'text_halign'),
+			'text_valign' =>		DB::getDefault('sysmap_shape', 'text_valign'),
+			'border_type' =>		DB::getDefault('sysmap_shape', 'border_type'),
+			'border_width' =>		DB::getDefault('sysmap_shape', 'border_width'),
+			'border_color' =>		DB::getDefault('sysmap_shape', 'border_color'),
+			'background_color' =>	DB::getDefault('sysmap_shape', 'background_color'),
+			'zindex' =>				DB::getDefault('sysmap_shape', 'zindex')
+		];
+
 		foreach ($maps as &$map) {
 			$map['selements'] = $this->convertMapElements($map['selements']);
-			$map['shapes'] = [[
-				'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
-				'width' => $map['width'],
-				'height' => 15,
-				'text' => '{MAP.NAME}'
-			]];
+			$default_shape['width'] = $map['width'];
+			$map['shapes'] = [$default_shape];
 			$map['lines'] = [];
 		}
 		unset($map);
