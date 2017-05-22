@@ -29,7 +29,10 @@ $sharing_form = include 'monitoring.dashboard.sharing_form.php';
 $edit_form = include 'monitoring.dashboard.edit_form.php';
 $breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
-$dashboard_data = [];
+$dashboard_data = [
+	// name is required for new dashboard creation
+	'name' => $data['dashboard']['name']
+];
 if (!$is_new) {
 	$dashboard_data = [
 		'id' => $data['dashboard']['dashboardid']
