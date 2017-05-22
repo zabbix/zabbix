@@ -19,59 +19,48 @@
 **/
 
 
-/* @var $data['dialogue']['form'] CWidgetForm */
-$formFields = $data['dialogue']['form']->getFields();
-
 $form = (new CForm('post'))
 	->cleanItems()
 	->setId('widget_dialogue_form')
 	->setName('widget_dialogue_form');
 
-$formList = (new CFormList());
+$form_list = (new CFormList());
 
-foreach ($formFields as $field) {
-	/* ComboBox */
+foreach ($data['dialogue']['form']->getFields() as $field) {
 	if ($field instanceof CWidgetFieldComboBox) {
-		$formList->addRow(
-			$field->getLabel(),
+		$form_list->addRow($field->getLabel(),
 			(new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues()))
 		);
 	}
-
-	/* TextBox */
 	elseif ($field instanceof CWidgetFieldTextBox) {
-		$formList->addRow(
-			$field->getLabel(),
+		$form_list->addRow($field->getLabel(),
 			(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
 	}
-
-	/* Checkbox */
 	elseif ($field instanceof CWidgetFieldCheckbox) {
-		$formList->addRow(
-			$field->getLabel(),
+		$form_list->addRow($field->getLabel(),
 			(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
 		);
 	}
-
-	/* ItemId */
 	elseif ($field instanceof CWidgetFieldItemId) {
 		$form->addVar($field->getName(), $field->getValue(true)); // needed for popup script
 
-		$selectButton = (new CButton('select', _('Select')))
+		$select_button = (new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
 					"&dstfld2=".$field->getCaptionName()."&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
 		$cell = (new CDiv([
-			(new CTextBox($field->getCaptionName(), $field->getCaption(true), true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox($field->getCaptionName(), $field->getCaption(true), true))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$selectButton
+			$select_button
 		]))->addStyle('display: flex;'); // TODO VM: move style to scss
-		$formList->addRow($field->getLabel(), $cell);
+
+		$form_list->addRow($field->getLabel(), $cell);
 	}
 }
 
-$form->addItem($formList);
+$form->addItem($form_list);
 
 $output = [
 	'body' => $form->toString()
