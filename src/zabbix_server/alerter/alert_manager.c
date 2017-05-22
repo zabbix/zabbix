@@ -1195,7 +1195,7 @@ static int	am_db_update_mediatypes(zbx_am_t *manager, const zbx_uint64_t *mediat
 		maxsessions = atoi(row[16]);
 		maxattempts = atoi(row[17]);
 
-		if (FAIL == is_time_suffix(row[18], &attempt_interval))
+		if (FAIL == is_time_suffix(row[18], &attempt_interval, ZBX_LENGTH_UNLIMITED))
 		{
 			const ZBX_TABLE	*table;
 			const ZBX_FIELD	*field;
