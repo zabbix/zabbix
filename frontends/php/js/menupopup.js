@@ -506,6 +506,9 @@ function showDialogForm(form, options, formData) {
 	overlayDialogue({
 		'title': options.title,
 		'content': form,
+		'css_body': {
+			"margin-bottom": '10px'
+		},
 		'buttons': [
 			{
 				'title': options.action_title,
@@ -513,11 +516,29 @@ function showDialogForm(form, options, formData) {
 				'class': 'dialogue-widget-save',
 				'keepOpen': false,
 				'action': function() {
+					form.find('.dialog-form-errors ul').remove();
+					form.submit();
+					var errors = form.data('errors');
+
+					// output errors
+					if (typeof errors === 'object' && errors.length > 0) {
+						var errorBlock = form.find('.dialog-form-errors');
+						// output errors only if error block exists
+						if (errorBlock.length) {
+							var ul = jQuery('<ul>');
+							errors.each(function(value) {
+								ul.append(jQuery('<li>').append(value));
+							});
+							errorBlock.append(ul);
+						}
+						// if form has errors dialog overlay not be destroyed
+						return false;
+					}
+
 					form.css('display', 'none');
 					form.css('visibility', 'hidden');
 					oldFormParent.append(form);
-					form.submit();
-
+					return true;
 				}
 			},
 			{
@@ -526,6 +547,8 @@ function showDialogForm(form, options, formData) {
 				'cancel': true,
 				'action': function() {
 					// to not destroy form need to move it to old place
+					// remove previous errors
+					form.find('.dialog-form-errors ul').remove();
 					form.css('display', 'none');
 					form.css('visibility', 'hidden');
 					oldFormParent.append(form);

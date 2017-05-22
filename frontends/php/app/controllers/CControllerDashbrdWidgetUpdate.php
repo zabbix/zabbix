@@ -33,8 +33,10 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboard_id' =>	'required|db dashboard.dashboardid',
-			'widgets' =>		'required|array',
+			'dashboard_id' =>	'db dashboard.dashboardid',
+			'userid' =>         'db dashboard.userid',
+			'name' =>           'not_empty',
+			'widgets' =>		'array',
 			'save' =>			'required|in '.implode(',', [WIDGET_CONFIG_DONT_SAVE, WIDGET_CONFIG_DO_SAVE])
 		];
 
@@ -51,7 +53,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			 * @var int    $widget[]['pos']['width']
 			 * @var array  $widget[]['fields']
 			 */
-			foreach ($this->getInput('widgets') as $widget) {
+			foreach ($this->getInput('widgets', []) as $widget) {
 				if (array_key_exists('fields', $widget)) {
 					$widget_fields = $widget['fields'];
 
@@ -99,7 +101,16 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		$save = (int)$this->getInput('save');
 		if ($save === WIDGET_CONFIG_DO_SAVE) {
 			$dashboard = [];
-			$dashboard['dashboardid'] = $this->getInput('dashboard_id');
+			if ($this->hasInput('dashboard_id')) {
+				$dashboard['dashboardid'] = $this->getInput('dashboard_id');
+			}
+			if ($this->hasInput('name')) {
+				$dashboard['name'] = $this->getInput('name');
+			}
+			if ($this->hasInput('userid')
+				&& in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])) {
+				$dashboard['userid'] = $this->getInput('userid');
+			}
 			$dashboard['widgets'] = [];
 
 			foreach ($this->widgets as $widget) {
@@ -131,19 +142,31 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				$dashboard['widgets'][] = $widget_to_save;
 			}
 
-			$result = (bool) API::Dashboard()->update([$dashboard]);
-
-			if ($result) {
-				$return['messages'] = makeMessageBox(true, [], _('Dashboard updated'))->toString();
+			if (array_key_exists('dashboardid', $dashboard)) {
+				$result = API::Dashboard()->update([$dashboard]);
+				$message = _('Dashboard updated');
+				$error_msg =  _('Failed to update dashboard');
+			} else {
+				$result = API::Dashboard()->create([$dashboard]);
+				$message = _('Dashboard created');
+				$error_msg = _('Failed to create dashboard');
 			}
-			else {
+
+			if (is_array($result) && array_key_exists('dashboardids', $result)) {
+				$return['redirect'] = (new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('dashboardid', $result['dashboardids'][0])
+					->getUrl();
+
+				CSession::setValue('messageOk', $message);
+			} else {
 				if (!hasErrorMesssages()) {
-					error(_('Failed to update dashboard')); // In case of unknown error
+					error(_($error_msg)); // In case of unknown error
 				}
 				$return['errors'] = getMessages()->toString();
 			}
 		}
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($return)]));
+		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($return)])));
 	}
 
 	/**

@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerDashboardView extends CController {
+class CControllerDashboardView extends CControllerDashboardAbstract {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -30,7 +30,8 @@ class CControllerDashboardView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'fullscreen' =>		'in 0,1',
-			'dashboardid' =>	'db dashboard.dashboardid'
+			'dashboardid' =>	'db dashboard.dashboardid',
+			'new' =>           'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,7 +59,7 @@ class CControllerDashboardView extends CController {
 			}
 		}
 
-		return true;
+	return true;
 	}
 
 	protected function doAction() {
@@ -69,7 +70,6 @@ class CControllerDashboardView extends CController {
 			$this->setResponse((new CControllerResponseRedirect($url->getUrl())));
 			return;
 		}
-
 		$data = [
 			'dashboard' => $dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
@@ -89,6 +89,16 @@ class CControllerDashboardView extends CController {
 	 * @return array|null
 	 */
 	private function getDashboard() {
+
+		if ($this->hasInput('new')) {
+			return [
+				'name' => 'New Dashboard',
+				'editable' => true,
+				'widgets' => [],
+				'owner' => $this->getOwnerData(CWebUser::$data['userid'])
+			];
+		}
+
 		$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
 
 		if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
@@ -99,26 +109,41 @@ class CControllerDashboardView extends CController {
 
 		if ($dashboardid != 0) {
 			$dashboards = API::Dashboard()->get([
-				'output' => ['dashboardid', 'name'],
+				'output' => ['dashboardid', 'name', 'userid'],
 				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
-				'dashboardids' => $dashboardid
+				'dashboardids' => $dashboardid,
+				'preservekeys' => true
 			]);
 
 			if ($dashboards) {
-				$dashboard = $dashboards[0];
-				$dashboards_rw = API::Dashboard()->get([
-					'output' => [],
-					'dashboardids' => $dashboardid,
-					'editable' => true,
-					'preservekeys' => true
-				]);
-				$dashboard['editable'] = array_key_exists($dashboardid, $dashboards_rw);
+				$this->prepareEditableFlag($dashboards);
+				$dashboard = array_shift($dashboards);
+				$dashboard['owner'] = $this->getOwnerData($dashboard['userid']);
 
 				CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 			}
 		}
 
 		return $dashboard;
+	}
+
+	/**
+	 * Get owner data
+	 *
+	 * @param int $userid
+	 * @return array
+	 */
+	private function getOwnerData($userid)
+	{
+		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
+		$users = API::User()->get([
+			'output' => ['userid', 'name', 'surname', 'alias'],
+			'userids' => [$userid]
+		]);
+		if ($users) {
+			$owner['name'] = getUserFullname($users[0]);
+		}
+		return $owner;
 	}
 
 	/**

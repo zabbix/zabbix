@@ -46,96 +46,99 @@
 
 <script type="text/javascript">
 	// Change dashboard settings
-	var dashbrd_config = function() {
-		// Update buttons on existing widgets to view mode
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
+	function dashbrd_config() {
+		var form = jQuery('form[name="dashboard_form"]');
+		showDialogForm(
+			form,
+			{"title": t('Dashboard Properties'), "action_title": t('Apply')},
+			{"name": form.data('data').name, "owner": form.data('data').owner}
+		);
 	};
 
 	// Save changes and cancel editing dashboard
-	var dashbrd_save_changes = function() {
+	function dashbrd_save_changes() {
 		// Update buttons on existing widgets to view mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
 		// dashboardButtonsSetView() will be called in case of success of ajax in function 'saveDashboardChanges'
 	};
 
 	// Cancel editing dashboard
-	var dashbrd_cancel = function(e) {
+	function dashbrd_cancel(e) {
 		e.preventDefault(); // To prevent going by href link
 
 		// Update buttons on existing widgets to view mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
-
 		var form = jQuery(this).closest('form');
 		jQuery('.dashbrd-edit', form).remove();
 		jQuery('#dashbrd-edit', form).closest('li').show();
 	};
 
 	// Add new widget
-	var dashbrd_add_widget = function() {
+	var dashbrd_add_widget = function dashbrd_add_widget() {
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
 	};
 
-	jQuery(document).ready(function($) {
-		// Turn on edit dashboard
-		$('#dashbrd-edit').click(function() {
-			var btn_conf = $('<button>')
-				.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
-				.attr('id','dashbrd-config')
-				.attr('type','button')
-				.append(
-					$('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>') // TODO VM: replace by cog icon
+	var showEditMode = function showEditMode() {
+		var edit_button = jQuery('#dashbrd-edit');
+		var btn_conf = jQuery('<button>')
+			.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
+			.attr('id','dashbrd-config')
+			.attr('type','button')
+			.append(
+				jQuery('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>') // TODO VM: replace by cog icon
+			)
+			.click(dashbrd_config);
+
+		var btn_add = jQuery('<button>')
+			.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
+			.attr('id','dashbrd-add-widget')
+			.attr('type','button')
+			.append(
+				jQuery('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>'),
+				'<?= _('Add widget') ?>'
+		)
+		.click(dashbrd_add_widget);
+
+		var btn_save = jQuery('<button>')
+			.attr('id','dashbrd-save')
+			.attr('type','button')
+			.append('<?= _('Save changes') ?>')
+		.click(dashbrd_save_changes);
+
+		var btn_cancel = jQuery('<a>')
+			.attr('id','dashbrd-cancel')
+			.attr('href', '#') // TODO VM: (?) needed for style, but adds # at URL, when clicked. Probably better to create new class with same styles
+			.append('<?= _('Cancel') ?>')
+		.click(dashbrd_cancel);
+
+		var btn_edit_disabled = jQuery('<button>')
+			.attr('disabled','disabled')
+			.attr('type','button')
+			.append('<?= _('Edit dashboard') ?>');
+
+		var li = jQuery('<li>').css('vertical-align', 'middle');
+		edit_button.closest('li').hide();
+		edit_button.closest('ul').before(
+			jQuery('<span>')
+				.addClass('<?= ZBX_STYLE_DASHBRD_EDIT ?>')
+				.append(jQuery('<ul>')
+					.append(li.clone().append(btn_conf))
+					.append(li.clone().append(btn_add))
+					.append(li.clone().append(btn_save))
+					.append(li.clone().append(btn_cancel))
+					.append(jQuery('<li>'))
+					.append(li.clone().append(btn_edit_disabled))
 				)
-				.click(dashbrd_config);
+		);
 
-			var btn_add = $('<button>')
-				.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
-				.attr('id','dashbrd-add-widget')
-				.attr('type','button')
-				.append(
-					$('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>'),
-					'<?= _('Add widget') ?>'
-				)
-				.click(dashbrd_add_widget);
+		// Update buttons on existing widgets to edit mode
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
+};
 
-			var btn_save = $('<button>')
-				.attr('id','dashbrd-save')
-				.attr('type','button')
-				.append('<?= _('Save changes') ?>')
-				.click(dashbrd_save_changes);
-
-			var btn_cancel = $('<a>')
-				.attr('id','dashbrd-cancel')
-				.attr('href', '#') // TODO VM: (?) needed for style, but adds # at URL, when clicked. Probably better to create new class with same styles
-				.append('<?= _('Cancel') ?>')
-				.click(dashbrd_cancel);
-
-			var btn_edit_disabled = $('<button>')
-				.attr('disabled','disabled')
-				.attr('type','button')
-				.append('<?= _('Edit dashboard') ?>');
-
-			$(this).closest('li').hide();
-			$(this).closest('ul').before(
-				$('<span>')
-					.addClass('<?= ZBX_STYLE_DASHBRD_EDIT ?>')
-					.append($('<ul>')
-						.append($('<li>').append(btn_conf))
-						.append($('<li>').append(btn_add))
-						.append($('<li>').append(btn_save))
-						.append($('<li>').append(btn_cancel))
-						.append($('<li>'))
-						.append($('<li>').append(btn_edit_disabled))
-					)
-			);
-
-			// Update buttons on existing widgets to edit mode
-			$('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
-		});
-
-		var	form = jQuery('form[name="dashboard_sharing_form"]');
-
+	function initSharingForm() {
+		var	sharing_form = jQuery('form[name="dashboard_sharing_form"]');
 		// overwrite submit action to AJAX call
-		form.submit(function(event) {
+		sharing_form.submit(function(event) {
 			var	me = this;
 			event.preventDefault();
 
@@ -159,10 +162,17 @@
 				}
 			});
 		});
-	});
+	};
 
 	// fill the form with actual data
 	jQuery.fn.fillForm = function(data) {
+		if (typeof data.name) {
+			this.find('#name').val(data.name);
+		}
+		if (typeof data.owner) {
+			// this method should remove previous selected data because option selectedLimit = 1
+			this.find('#userid').multiSelect('addData', data.owner);
+		}
 		if (typeof data.private !== 'undefined') {
 			addPopupValues({'object': 'private', 'values': [data.private] });
 		}
@@ -177,6 +187,58 @@
 			addPopupValues({'object': 'usrgrpid', 'values': data.userGroups });
 		}
 	};
+
+	function initEditForm(dashboard) {
+		var edit_form = jQuery('form[name="dashboard_form"]');
+
+		function save_previous_form_state(form) {
+			var userElement = form.find('#userid'),
+				owner;
+			if (typeof userElement.data('multiSelect') !== 'undefined') {
+				owner = userElement.multiSelect('getData');
+				owner = owner[0];
+			}
+			owner = owner || userElement.data().defaultOwner;
+			form.data('data', {"name": form.find('#name').val(), "owner": owner});
+		};
+
+		save_previous_form_state(edit_form);
+
+		edit_form.submit(function(event) {
+			var me = this,
+				errors = [],
+				form = jQuery(me),
+				formData = JSON.parse(form.formToJSON());
+
+			// cancel original event to prevent form submitting
+			event.preventDefault();
+
+			if (!formData['userid']) {
+				errors.push(t('Owner cannot be empty!'));
+			}
+			if (!formData['name']) {
+				errors.push(t('Name cannot be empty!'))
+			}
+			form.data('errors', errors);
+
+			if (errors.length > 0) {
+				return false;
+			}
+			save_previous_form_state(form);
+
+			dashboard.dashboardGrid(
+				"setDashboardData", {"name": formData['name'], "userid": formData['userid']}
+			);
+			jQuery('div.article h1').text(form.data('data').name);
+		});
+	};
+
+	jQuery(document).ready(function($) {
+		// Turn on edit dashboard
+		$('#dashbrd-edit').click(showEditMode);
+		initSharingForm();
+		initEditForm(jQuery('.dashbrd-grid-widget-container'));
+	});
 
 	// will be called by setModeViewDashboard() method in dashboard.grid.js
 	function dashboardButtonsSetView() {

@@ -668,15 +668,25 @@
 			ajax_widgets.push(ajax_widget);
 		});
 
+		var ajax_data = {
+			dashboard_id: data['dashboard']['id'], // can be undefined if dashboard is new
+			widgets: ajax_widgets,
+			save: 1 // 0 - only check; 1 - check and save
+		};
+
+		if (typeof data['dashboard']['name'] !== 'undefined') {
+			ajax_data['name'] = data['dashboard']['name'];
+		}
+
+		if (typeof data['dashboard']['userid'] !== 'undefined') {
+			ajax_data['userid'] = data['dashboard']['userid'];
+		}
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
-			data: {
-				dashboard_id: data['dashboard']['id'], // TODO VM: (?) will not work without dashboard id
-				widgets: ajax_widgets,
-				save: 1 // 0 - only check; 1 - check and save
-			},
+			data: ajax_data,
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned
@@ -689,7 +699,7 @@
 					// There are no more unsaved changes
 					data['options']['updated'] = false;
 					// Reload page to get latest wiget data from server.
-					location.reload(true); // TODO VM: (?) in case of page reloading I can't display success message with current functionality.
+					window.location.replace(resp.redirect);
 				}
 			},
 			error: function() {
@@ -746,6 +756,10 @@
 				dashboard = $.extend({}, data['dashboard'], dashboard);
 				data['dashboard'] = dashboard;
 			});
+		},
+
+		getDashboardData: function() {
+			return $(this).data('dashboardGrid');
 		},
 
 		setWidgetDefaults: function(defaults) {
