@@ -397,24 +397,10 @@ abstract class CItemGeneral extends CApiService {
 
 			// jmx
 			if ($fullItem['type'] == ITEM_TYPE_JMX) {
-				if (array_key_exists('jmx_endpoint', $item)) {
-					$item['jmx_endpoint'] = trim($item['jmx_endpoint']);
-					$fullItem['jmx_endpoint'] = $item['jmx_endpoint'];
-				}
-				elseif (!$update) {
-					$item['jmx_endpoint'] = DB::getDefault('items', 'jmx_endpoint');
-					$fullItem['jmx_endpoint'] = $item['jmx_endpoint'];
-				}
-
-				// Allow update item without jmx_endpoint value being set.
-				if (!$update || array_key_exists('jmx_endpoint', $item)) {
-					$is_empty = (trim($item['jmx_endpoint']) == '');
-					$is_long = (strlen($item['jmx_endpoint']) > 255);
-					if ($is_empty || $is_long) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', $item['jmx_endpoint'])
-						);
-					}
+				if (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('cannot be empty'))
+					);
 				}
 			}
 
