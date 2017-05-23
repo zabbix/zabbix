@@ -111,7 +111,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 
 	if (SUCCEED != (rc = DBget_user_by_active_session(sessionid, &user)))
 	{
-		zbx_strlcpy(error, "Active session identifier is missing.", sizeof(error));
+		zbx_strlcpy(error, "Permission denied.", sizeof(error));
 		goto fail;
 	}
 
