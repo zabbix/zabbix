@@ -57,7 +57,6 @@
 		<attribute name="args"/>
 		<attribute name="cc" default="gcc"/>
 		<attribute name="target" default=""/>
-		<attribute name="distdir" default="."/>
 		<sequential>
 			<!-- initialize cflags depending on used compiler -->
 			<local name="common.cflags"/>
@@ -76,19 +75,19 @@
 			</switch>
 
 			<!-- clean, configure and build -->
-			<exec executable="./configure" dir="@{distdir}" failonerror="on">
+			<exec executable="./configure" failonerror="on">
 				<env key="CC" value="@{cc}"/>
 				<arg line="@{args}"/>
 				<arg line="--prefix=$(pwd)/install"/>
 				<arg line="CFLAGS=&quot;${common.cflags} ${cc.cflags}&quot;"/>
 			</exec>
-			<exec executable="make" dir="@{distdir}" failonerror="on">
-				<arg line="-s"/>
+			<exec executable="make" failonerror="on">
+				<!-- <arg line="-s"/> -->
 				<arg line="-j5"/>
 				<arg line="clean"/>
 			</exec>
-			<exec executable="make" dir="@{distdir}" failonerror="on">
-				<arg line="-s"/>
+			<exec executable="make" failonerror="on">
+				<!-- <arg line="-s"/> -->
 				<arg line="-j5"/>
 				<arg line="@{target}"/>
 			</exec>
@@ -158,13 +157,13 @@
 	<target name="make-gcc">
 		<!-- Build Zabbix with various configuration parameters -->
 		<sequential>
-			<make args="--enable-server ${with.db}" distdir="${dist.dir}"/>
-			<make args="--enable-proxy ${with.db}" distdir="${dist.dir}"/>
-			<make args="--enable-agent" distdir="${dist.dir}"/>
-			<make args="--enable-server --enable-agent --enable-proxy ${with.db}" distdir="${dist.dir}"/>
-			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap  --with-libcurl" distdir="${dist.dir}"/>
-			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl" distdir="${dist.dir}"/>
-			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl" distdir="${dist.dir}"/>
+			<make args="--enable-server ${with.db}"/>
+			<make args="--enable-proxy ${with.db}"/>
+			<make args="--enable-agent"/>
+			<make args="--enable-server --enable-agent --enable-proxy ${with.db}"/>
+			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap  --with-libcurl"/>
+			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
+			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
 
@@ -230,14 +229,13 @@
 				<arg line="-zxvf"/>
 				<fileset dir="." includes="*.tar.gz"/>
 			</apply>
-			<antcall target="create-db"/>
 			<dirset dir="." includes="zabbix-*" id="dist.dir"/>
 			<property name="prop.dist.dir" refid="dist.dir"/>
-			<antcall target="make-gcc">
-				<param name="dist.dir" value="${prop.dist.dir}"/>
-			</antcall>
+			<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dir-target" inheritAll="true" inheritRefs="true" />
 		</sequential>
 	</target>
 
-	<target name="build" depends="init,create-db,make-gcc,make-clang,make-db"/>
+	<target name="build-dir-target" depends="create-db,make-gcc,make-db"/>
+
+	<target name="build" depends="init,make-clang"/>
 </project>
