@@ -921,7 +921,7 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 
 		if ($items_to_update) {
 			foreach ($items_to_update as $index => $update_item) {
-				if (array_key_exists($update_item['itemid'], $items) && $items[$update_item['itemid']]['type'] != ITEM_TYPE_JMX) {
+				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_JMX) {
 					unset($items_to_update[$index]['jmx_endpoint']);
 				}
 			}
