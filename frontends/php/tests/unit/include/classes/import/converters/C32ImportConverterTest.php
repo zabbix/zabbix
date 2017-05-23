@@ -62,6 +62,13 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'formula' => '100',
 									'multiplier' => 1,
 									'delta' => 2
+								],
+								[
+									'type' => '16',
+									'data_type' => ITEM_DATA_TYPE_DECIMAL,
+									'formula' => '1',
+									'multiplier' => 0,
+									'delta' => 0
 								]
 							],
 							'discovery_rules' => [
@@ -102,6 +109,13 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'formula' => '100',
 											'multiplier' => 1,
 											'delta' => 2
+										],
+										[
+											'type' => '16',
+											'data_type' => ITEM_DATA_TYPE_DECIMAL,
+											'formula' => '1',
+											'multiplier' => 0,
+											'delta' => 0
 										]
 									]
 								]
@@ -157,6 +171,13 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'formula' => '100',
 									'multiplier' => 1,
 									'delta' => 2
+								],
+								[
+									'type' => '16',
+									'data_type' => ITEM_DATA_TYPE_DECIMAL,
+									'formula' => '1',
+									'multiplier' => 0,
+									'delta' => 0
 								]
 							],
 							'discovery_rules' => [
@@ -197,6 +218,13 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'formula' => '100',
 											'multiplier' => 1,
 											'delta' => 2
+										],
+										[
+											'type' => '16',
+											'data_type' => ITEM_DATA_TYPE_DECIMAL,
+											'formula' => '1',
+											'multiplier' => 0,
+											'delta' => 0
 										]
 									]
 								]
@@ -275,6 +303,10 @@ class C32ImportConverterTest extends CImportConverterTest {
 										]
 									],
 									'jmx_endpoint' => ''
+								],
+								[
+									'type' => '16',
+									'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 								]
 							],
 							'discovery_rules' => [
@@ -336,6 +368,10 @@ class C32ImportConverterTest extends CImportConverterTest {
 												]
 											],
 											'jmx_endpoint' => ''
+										],
+										[
+											'type' => '16',
+											'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 										]
 									],
 									'jmx_endpoint' => ''
@@ -446,6 +482,10 @@ class C32ImportConverterTest extends CImportConverterTest {
 										]
 									],
 									'jmx_endpoint' => ''
+								],
+								[
+									'type' => '16',
+									'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 								]
 							],
 							'discovery_rules' => [
@@ -507,6 +547,10 @@ class C32ImportConverterTest extends CImportConverterTest {
 												]
 											],
 											'jmx_endpoint' => ''
+										],
+										[
+											'type' => '16',
+											'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 										]
 									],
 									'jmx_endpoint' => ''
