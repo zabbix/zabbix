@@ -24,6 +24,7 @@ $this->addJsFile('multiselect.js');
 $this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
 $is_new = !array_key_exists('dashboardid', $data['dashboard']);
+$dashboardid = $is_new ? null : $data['dashboard']['dashboardid'];
 
 $sharing_form = include 'monitoring.dashboard.sharing_form.php';
 $edit_form = include 'monitoring.dashboard.edit_form.php';
@@ -36,7 +37,7 @@ $dashboard_data = [
 ];
 $dashboard_options = [];
 if (!$is_new) {
-	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
+	$dashboard_data['id'] = $dashboardid;
 } else {
 	$dashboard_options['updated'] = true;
 }
@@ -102,7 +103,7 @@ if ($data['dynamic']['has_dynamic_widgets'] === true) {
 								'name' => 'sharing',
 								'label' => _('Sharing'),
 								'form_data' => [
-									'dashboardid' => $is_new ? null : $data['dashboard']['dashboardid'],
+									'dashboardid' => $dashboardid,
 								],
 								'disabled' => !$data['dashboard']['editable'] || $is_new
 							],
@@ -113,6 +114,15 @@ if ($data['dynamic']['has_dynamic_widgets'] === true) {
 									->setArgument('action', 'dashboard.view')
 									->setArgument('new', '1')
 									->getUrl()
+							],
+							[
+								'name' => 'clone',
+								'label' => _('Clone'),
+								'url'  => (new CUrl('zabbix.php'))
+									->setArgument('action', 'dashboard.view')
+									->setArgument('source_dashboardid', $dashboardid)
+									->getUrl(),
+								'disabled' => $is_new
 							]
 						]
 					])

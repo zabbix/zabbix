@@ -59,7 +59,7 @@ $user_shares_table->addRow(
 );
 
 $sharing_form
-	->addItem(new CInput('hidden', 'dashboardid', $is_new ? '' : $data['dashboard']['dashboardid']))
+	->addItem(new CInput('hidden', 'dashboardid', $dashboardid))
 	// indicator to help delete all users
 	->addItem(new CInput('hidden', 'users['.CControllerDashboardUpdate::EMPTY_USER.']', '1'))
 	// indicator to help delete all user groups

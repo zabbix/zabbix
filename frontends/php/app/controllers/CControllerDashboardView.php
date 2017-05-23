@@ -23,17 +23,20 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashboardView extends CControllerDashboardAbstract {
 
+	private $dashboard;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>		'in 0,1',
-			'dashboardid' =>	'db dashboard.dashboardid',
-			'groupid' =>		'db groups.groupid',
-			'hostid' =>			'db hosts.hostid',
-			'new' =>            'in 1'
+			'fullscreen' =>		    'in 0,1',
+			'dashboardid' =>        'db dashboard.dashboardid',
+			'source_dashboardid' => 'db dashboard.dashboardid',
+			'groupid' =>            'db groups.groupid',
+			'hostid' =>             'db hosts.hostid',
+			'new' =>                'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -50,36 +53,25 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return false;
 		}
 
-		if ($this->hasInput('dashboardid')) {
-			$dashboards = API::Dashboard()->get([
-				'output' => [],
-				'dashboardids' => $this->getInput('dashboardid')
-			]);
-
-			if (!$dashboards) {
-				return false;
-			}
-		}
-
-	return true;
+		$this->dashboard = $this->getDashboard();
+		return !$this->hasInput('dashboardid') || is_array($this->dashboard);
 	}
 
 	protected function doAction() {
-		$dashboard = $this->getDashboard();
 
-		if ($dashboard === null) {
+		if ($this->dashboard === null) {
 			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 			$this->setResponse((new CControllerResponseRedirect($url->getUrl())));
 			return;
 		}
 		$data = [
-			'dashboard' => $dashboard,
+			'dashboard' => $this->dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
-			'grid_widgets' => $this->getWidgets($dashboard['widgets']),
+			'grid_widgets' => $this->getWidgets($this->dashboard['widgets']),
 			'widgetDefaults' => CWidgetConfig::getDefaults(),
 			'dynamic' => [
-				'has_dynamic_widgets' => $this->hasDynamicWidgets($dashboard['widgets']),
+				'has_dynamic_widgets' => $this->hasDynamicWidgets($this->dashboard['widgets']),
 				'groupid' => $this->getInput('groupid', 0),
 				'hostid' => $this->getInput('hostid', 0)
 			]
@@ -97,41 +89,64 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 */
 	private function getDashboard() {
 
-		if ($this->hasInput('new')) {
-			return [
-				'name' => 'New Dashboard',
-				'editable' => true,
-				'widgets' => [],
-				'owner' => $this->getOwnerData(CWebUser::$data['userid'])
-			];
-		}
-
-		$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
-
-		if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
-			$dashboardid = DASHBOARD_DEFAULT_ID;
-		}
-
 		$dashboard = null;
-
-		if ($dashboardid != 0) {
+		if ($this->hasInput('new')) {
+			$dashboard = $this->getNewDashboard();
+		} else if ($this->hasInput('source_dashboardid')) {
+			// clone dashboard and show as new
 			$dashboards = API::Dashboard()->get([
-				'output' => ['dashboardid', 'name', 'userid'],
+				'output' => ['name'],
 				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
-				'dashboardids' => $dashboardid,
-				'preservekeys' => true
+				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
+			if (isset($dashboards[0])) {
+				$dashboard = $this->getNewDashboard();
+				$dashboard['name'] = $dashboards[0]['name'];
+				// cloning widgets
+				$dashboard['widgets'] = $dashboards[0]['widgets'];
+			}
+		} else {
+			// getting existing dashboard
+			$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
 
-			if ($dashboards) {
-				$this->prepareEditableFlag($dashboards);
-				$dashboard = array_shift($dashboards);
-				$dashboard['owner'] = $this->getOwnerData($dashboard['userid']);
+			if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
+				$dashboardid = DASHBOARD_DEFAULT_ID;
+			}
 
-				CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
+			if ($dashboardid != 0) {
+				$dashboards = API::Dashboard()->get([
+					'output' => ['dashboardid', 'name', 'userid'],
+					'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
+					'dashboardids' => $dashboardid,
+					'preservekeys' => true
+				]);
+
+				if ($dashboards) {
+					$this->prepareEditableFlag($dashboards);
+					$dashboard = array_shift($dashboards);
+					$dashboard['owner'] = $this->getOwnerData($dashboard['userid']);
+
+					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
+				}
 			}
 		}
 
 		return $dashboard;
+	}
+
+	/**
+	 * Get new dashboard.
+	 *
+	 * @return array
+	 */
+	private function getNewDashboard()
+	{
+		return [
+			'name' => _('New Dashboard'),
+			'editable' => true,
+			'widgets' => [],
+			'owner' => $this->getOwnerData(CWebUser::$data['userid'])
+		];
 	}
 
 	/**
