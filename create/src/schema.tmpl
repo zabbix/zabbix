@@ -334,7 +334,7 @@ FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|jmx_endpoint	|t_varchar(255)	|'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'	|NOT NULL	|ZBX_PROXY
+FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
