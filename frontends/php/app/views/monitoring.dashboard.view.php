@@ -33,10 +33,13 @@ $dashboard_data = [
 	// name is required for new dashboard creation
 	'name' => $data['dashboard']['name']
 ];
+$dashboard_options = [];
 if (!$is_new) {
 	$dashboard_data = [
 		'id' => $data['dashboard']['dashboardid']
 	];
+} else {
+	$dashboard_options['updated'] = true;
 }
 
 $edit_button = new CButton('dashbrd-edit',_('Edit dashboard'));
@@ -102,7 +105,7 @@ $this->addPostJS('jqBlink.blink();');
 // Initialize dashboard grid
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
-		'.dashboardGrid()'.
+		'.dashboardGrid('. CJs::encodeJson($dashboard_options) . ')'.
 		'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
 		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widgetDefaults']).')'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'

@@ -716,11 +716,15 @@
 
 	var	methods = {
 		init: function(options) {
-			options = $.extend({}, {columns: 12}, options);
-			options['widget-height'] = 70;
+			var default_options = {
+				'widget-height': 70,
+				'columns': 12,
+				'widget-width': 100 / 12,
+				'rows': 0,
+				'updated': false
+			};
+			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['columns'];
-			options['rows'] = 0;
-			options['updated'] = false; // TODO VM: (?) not sure, where this flag in data structure should be
 
 			return this.each(function() {
 				var	$this = $(this),
