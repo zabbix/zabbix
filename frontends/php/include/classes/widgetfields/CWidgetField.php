@@ -35,8 +35,6 @@ class CWidgetField
 	 * @param string $label label for the field in form
 	 * @param mixed $default default value
 	 * @param string $action JS function to call on field change
-	 *
-	 * @return CWidgetField
 	 */
 	public function __construct($name, $label = null, $default = null, $action = null) {
 		$this->name = $name;
