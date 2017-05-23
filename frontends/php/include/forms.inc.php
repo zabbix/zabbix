@@ -32,7 +32,14 @@
 function getUserFormData($userId, array $config, $isProfile = false) {
 	$data = [
 		'is_profile' => $isProfile,
-		'config' => $config
+		'config' => [
+			'severity_name_0' => $config['severity_name_0'],
+			'severity_name_1' => $config['severity_name_1'],
+			'severity_name_2' => $config['severity_name_2'],
+			'severity_name_3' => $config['severity_name_3'],
+			'severity_name_4' => $config['severity_name_4'],
+			'severity_name_5' => $config['severity_name_5']
+		]
 	];
 
 	if ($userId != 0 && (!hasRequest('form_refresh') || hasRequest('register'))) {
@@ -45,20 +52,21 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		]);
 		$user = reset($users);
 
-		$data['alias']			= $user['alias'];
-		$data['name']			= $user['name'];
-		$data['surname']		= $user['surname'];
-		$data['password1']		= null;
-		$data['password2']		= null;
-		$data['url']			= $user['url'];
-		$data['autologin']		= $user['autologin'];
-		$data['autologout']		= $user['autologout'];
-		$data['lang']			= $user['lang'];
-		$data['theme']			= $user['theme'];
-		$data['refresh']		= $user['refresh'];
-		$data['rows_per_page']	= $user['rows_per_page'];
-		$data['user_type']		= $user['type'];
-		$data['messages'] 		= getMessageSettings();
+		$data['alias']				= $user['alias'];
+		$data['name']				= $user['name'];
+		$data['surname']			= $user['surname'];
+		$data['password1']			= null;
+		$data['password2']			= null;
+		$data['url']				= $user['url'];
+		$data['autologin']			= $user['autologin'];
+		$data['autologout']			= $user['autologout'];
+		$data['autologout_visible']	= (bool) timeUnitToSeconds($data['autologout']);
+		$data['lang']				= $user['lang'];
+		$data['theme']				= $user['theme'];
+		$data['refresh']			= $user['refresh'];
+		$data['rows_per_page']		= $user['rows_per_page'];
+		$data['user_type']			= $user['type'];
+		$data['messages'] 			= getMessageSettings();
 
 		$userGroups = API::UserGroup()->get([
 			'output' => ['usrgrpid'],
@@ -68,28 +76,25 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['user_groups']	= zbx_toHash($userGroup);
 
 		$data['user_medias'] = $user['medias'];
-
-		if ($data['autologout'] > 0) {
-			$_REQUEST['autologout'] = $data['autologout'];
-		}
 	}
 	else {
-		$data['alias']			= getRequest('alias', '');
-		$data['name']			= getRequest('name', '');
-		$data['surname']		= getRequest('surname', '');
-		$data['password1']		= getRequest('password1', '');
-		$data['password2']		= getRequest('password2', '');
-		$data['url']			= getRequest('url', '');
-		$data['autologin']		= getRequest('autologin', 0);
-		$data['autologout']		= getRequest('autologout', 900);
-		$data['lang']			= getRequest('lang', 'en_gb');
-		$data['theme']			= getRequest('theme', THEME_DEFAULT);
-		$data['refresh']		= getRequest('refresh', 30);
-		$data['rows_per_page']	= getRequest('rows_per_page', 50);
-		$data['user_type']		= getRequest('user_type', USER_TYPE_ZABBIX_USER);
-		$data['user_groups']	= getRequest('user_groups', []);
-		$data['change_password']= getRequest('change_password');
-		$data['user_medias']	= getRequest('user_medias', []);
+		$data['alias']				= getRequest('alias', '');
+		$data['name']				= getRequest('name', '');
+		$data['surname']			= getRequest('surname', '');
+		$data['password1']			= getRequest('password1', '');
+		$data['password2']			= getRequest('password2', '');
+		$data['url']				= getRequest('url', '');
+		$data['autologin']			= getRequest('autologin', 0);
+		$data['autologout']			= getRequest('autologout', DB::getDefault('users', 'autologout'));
+		$data['autologout_visible']	= hasRequest('autologout_visible');
+		$data['lang']				= getRequest('lang', 'en_gb');
+		$data['theme']				= getRequest('theme', THEME_DEFAULT);
+		$data['refresh']			= getRequest('refresh', DB::getDefault('users', 'refresh'));
+		$data['rows_per_page']		= getRequest('rows_per_page', 50);
+		$data['user_type']			= getRequest('user_type', USER_TYPE_ZABBIX_USER);
+		$data['user_groups']		= getRequest('user_groups', []);
+		$data['change_password']	= getRequest('change_password');
+		$data['user_medias']		= getRequest('user_medias', []);
 
 		// set messages
 		$data['messages'] = getRequest('messages', []);
@@ -119,8 +124,8 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 	}
 
 	// set autologout
-	if ($data['autologin'] || !isset($data['autologout'])) {
-		$data['autologout'] = 0;
+	if ($data['autologin']) {
+		$data['autologout'] = '0';
 	}
 
 	// set media types
@@ -168,7 +173,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 }
 
 function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
-	order_result($data, 'name');
+	CArrayHelper::sort($data, ['value', 'name']);
 
 	$output = [new CTag('h3', true, $label)];
 
@@ -394,8 +399,8 @@ function getItemFilterForm(&$items) {
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
-	$filterColumn2->addRow(_('Update interval (in sec)'),
-		(new CNumericBox('filter_delay', $filter_delay, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+	$filterColumn2->addRow(_('Update interval'),
+		(new CTextBox('filter_delay', $filter_delay))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_delay_row'
 	);
 	$filterColumn4->addRow(_('Status'),
@@ -431,9 +436,8 @@ function getItemFilterForm(&$items) {
 		'filter_snmpv3_securityname_row'
 	);
 
-	$filterColumn3->addRow(_('History (in days)'),
-		(new CNumericBox('filter_history', $filter_history, 8, false, true))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	$filterColumn3->addRow(_('History'),
+		(new CTextBox('filter_history', $filter_history))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 	$filterColumn4->addRow(_('Triggers'),
 		new CComboBox('filter_with_triggers', $filter_with_triggers, null, [
@@ -451,9 +455,8 @@ function getItemFilterForm(&$items) {
 		(new CTextBox('filter_snmp_oid', $filter_snmp_oid, '', 255))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_oid_row'
 	);
-	$filterColumn3->addRow(_('Trends (in days)'),
-		(new CNumericBox('filter_trends', $filter_trends, 8, false, true))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	$filterColumn3->addRow(_('Trends'),
+		(new CTextBox('filter_trends', $filter_trends))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 	$filterColumn4->addRow(_('Template'),
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
@@ -499,6 +502,9 @@ function getItemFilterForm(&$items) {
 		'trends' => [],
 		'interval' => []
 	];
+
+	$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+	$simple_interval_parser = new CSimpleIntervalParser();
 
 	// generate array with values for subfilters of selected items
 	foreach ($items as $item) {
@@ -682,9 +688,22 @@ function getItemFilterForm(&$items) {
 		}
 
 		// trends
-		if (zbx_empty($filter_trends)) {
-			if (!isset($item_params['trends'][$item['trends']]) && $item['trends'] !== '') {
-				$item_params['trends'][$item['trends']] = ['name' => $item['trends'], 'count' => 0];
+		if ($filter_trends === ''
+				&& !in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+			$trends = $item['trends'];
+			$value = $trends;
+
+			if ($simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS) {
+				$value = timeUnitToSeconds($trends);
+				$trends = convertUnitsS($value);
+			}
+
+			if (!array_key_exists($trends, $item_params['trends'])) {
+				$item_params['trends'][$trends] = [
+					'name' => $trends,
+					'count' => 0,
+					'value' => $value
+				];
 			}
 
 			$show_item = true;
@@ -696,32 +715,69 @@ function getItemFilterForm(&$items) {
 				$show_item &= $value;
 			}
 
-			if ($show_item && $item['trends'] !== '') {
-				$item_params['trends'][$item['trends']]['count']++;
+			if ($show_item) {
+				$item_params['trends'][$trends]['count']++;
 			}
 		}
 
 		// history
-		if (zbx_empty($filter_history)) {
-			if (!isset($item_params['history'][$item['history']])) {
-				$item_params['history'][$item['history']] = ['name' => $item['history'], 'count' => 0];
+		if ($filter_history === '') {
+			$history = $item['history'];
+			$value = $history;
+
+			if ($simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS) {
+				$value = timeUnitToSeconds($history);
+				$history = convertUnitsS($value);
 			}
+
+			if (!array_key_exists($history, $item_params['history'])) {
+				$item_params['history'][$history] = [
+					'name' => $history,
+					'count' => 0,
+					'value' => $value
+				];
+			}
+
 			$show_item = true;
+
 			foreach ($item['subfilters'] as $name => $value) {
-				if ($name == 'subfilter_history') {
+				if ($name === 'subfilter_history') {
 					continue;
 				}
 				$show_item &= $value;
 			}
+
 			if ($show_item) {
-				$item_params['history'][$item['history']]['count']++;
+				$item_params['history'][$history]['count']++;
 			}
 		}
 
 		// interval
-		if (zbx_empty($filter_delay) && $filter_type != ITEM_TYPE_TRAPPER) {
-			if (!isset($item_params['interval'][$item['delay']]) && $item['delay'] !== '') {
-				$item_params['interval'][$item['delay']] = ['name' => $item['delay'], 'count' => 0];
+		if ($filter_delay === '' && $filter_type != ITEM_TYPE_TRAPPER
+				&& $item['type'] != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_SNMPTRAP) {
+			// Use temporary variable for delay, because the original will be used for sorting later.
+			$delay = $item['delay'];
+			$value = $delay;
+
+			if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
+				$delay = $update_interval_parser->getDelay();
+
+				// "value" is delay represented in seconds and it is used for sorting the subfilter.
+				if ($delay[0] !== '{') {
+					$value = timeUnitToSeconds($delay);
+					$delay = convertUnitsS($value);
+				}
+				else {
+					$value = $delay;
+				}
+			}
+
+			if (!array_key_exists($delay, $item_params['interval'])) {
+				$item_params['interval'][$delay] = [
+					'name' => $delay,
+					'count' => 0,
+					'value' => $value
+				];
 			}
 
 			$show_item = true;
@@ -733,8 +789,8 @@ function getItemFilterForm(&$items) {
 				$show_item &= $value;
 			}
 
-			if ($show_item && $item['delay'] !== '') {
-				$item_params['interval'][$item['delay']]['count']++;
+			if ($show_item) {
+				$item_params['interval'][$delay]['count']++;
 			}
 		}
 	}
@@ -822,7 +878,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'key' => getRequest('key', ''),
 		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'history' => getRequest('history', 90),
+		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 		'type' => getRequest('type', 0),
 		'snmp_community' => getRequest('snmp_community', 'public'),
@@ -833,7 +889,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'units' => getRequest('units', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
-		'trends' => getRequest('trends', DAY_IN_YEAR),
+		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'new_application' => getRequest('new_application', ''),
 		'applications' => getRequest('applications', []),
 		'delay_flex' => getRequest('delay_flex', []),
@@ -1020,32 +1076,47 @@ function getItemFormData(array $item = [], array $options = []) {
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['delay'] = $data['item']['delay'];
-			if (($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP) && $data['delay'] == 0) {
-				$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
-			}
-			$data['history'] = $data['item']['history'];
-			$data['status'] = $data['item']['status'];
-			$data['trends'] = $data['item']['trends'];
 
-			$parser = new CItemDelayFlexParser($data['item']['delay_flex']);
-			if ($parser->isValid()) {
-				foreach ($parser->getIntervals() as $interval) {
-					if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+			$update_interval_parser = new CUpdateIntervalParser([
+				'usermacros' => true,
+				'lldmacros' => (bool) $data['parent_discoveryid']
+			]);
+
+			if ($update_interval_parser->parse($data['delay']) == CParser::PARSE_SUCCESS) {
+				$data['delay'] = $update_interval_parser->getDelay();
+
+				if ($data['delay'][0] !== '{') {
+					$delay = timeUnitToSeconds($data['delay']);
+
+					if (($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP) && $delay == 0) {
+						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+					}
+				}
+
+				foreach ($update_interval_parser->getIntervals() as $interval) {
+					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 						$interval_parts = explode('/', $interval['interval']);
 						$data['delay_flex'][] = [
 							'delay' => $interval_parts[0],
 							'period' => $interval_parts[1],
-							'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE
+							'type' => ITEM_DELAY_FLEXIBLE
 						];
 					}
 					else {
 						$data['delay_flex'][] = [
 							'schedule' => $interval['interval'],
-							'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING
+							'type' => ITEM_DELAY_SCHEDULING
 						];
 					}
 				}
 			}
+			else {
+				$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+			}
+
+			$data['history'] = $data['item']['history'];
+			$data['status'] = $data['item']['status'];
+			$data['trends'] = $data['item']['trends'];
 
 			$data['applications'] = array_unique(zbx_array_merge($data['applications'], get_applications_by_itemid($data['itemid'])));
 
@@ -1071,7 +1142,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	if (!$data['delay_flex']) {
-		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE];
+		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
 	}
 
 	// applications

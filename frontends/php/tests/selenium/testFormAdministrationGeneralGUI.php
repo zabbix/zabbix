@@ -47,7 +47,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'Limit for search and filter results',
 					'Max count of elements to show inside table cell',
 					'Enable event acknowledgement',
-					'Show events not older than (in days)',
+					'Show events not older than',
 					'Max count of events per trigger to show',
 					'Show warning if Zabbix server is down'
 					]
@@ -317,50 +317,52 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralGUI_EventExpire() {
-		// 1-99999
+		// 86400-788400000
 
 		$this->zbxTestLogin('adm.gui.php');
 
 		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sqlHash);
 
-		$this->zbxTestInputType('event_expire', '99999');
+		$this->zbxTestInputType('event_expire', '788400000');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
-		$this->zbxTestTextPresent(['GUI', 'Show events not older than (in days)']);
+		$this->zbxTestTextPresent(['GUI', 'Show events not older than']);
 
-		$sql = 'SELECT event_expire FROM config WHERE event_expire=99999';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_expire"');
+		$sql = "SELECT event_expire FROM config WHERE event_expire='788400000'";
+		$this->assertEquals(1, DBcount($sql));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_expire', '1');
+		$this->zbxTestInputType('event_expire', '86400');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestTextPresent('Show events not older than (in days)');
+		$this->zbxTestTextPresent('Show events not older than');
 
-		$sql = 'select event_expire from config where event_expire=1';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_expire"');
-
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_expire', '100000');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "100000" for "Show events not older than (in days)" field: must be between 1 and 99999.']);
-		$this->zbxTestTextNotPresent('Configuration updated');
-		$this->zbxTestTextPresent(['GUI', 'Show events not older than (in days)']);
+		$sql = "select event_expire from config where event_expire='86400'";
+		$this->assertEquals(1, DBcount($sql));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_expire', '0');
+		$this->zbxTestInputType('event_expire', '788400001');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "0" for "Show events not older than (in days)" field: must be between 1 and 99999.']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
+		$this->zbxTestTextPresent('Invalid event expiry time: must be between "86400" and "788400000"');
 		$this->zbxTestTextNotPresent('Configuration updated');
-		$this->zbxTestTextPresent(['GUI', 'Show events not older than (in days)']);
+		$this->zbxTestTextPresent(['GUI', 'Show events not older than']);
+
+		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->zbxTestCheckTitle('Configuration of GUI');
+		$this->zbxTestCheckHeader('GUI');
+		$this->zbxTestInputType('event_expire', '86399');
+		$this->zbxTestClickWait('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
+		$this->zbxTestTextPresent('Invalid event expiry time: must be between "86400" and "788400000"');
+		$this->zbxTestTextNotPresent('Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Show events not older than']);
 
 		$this->assertEquals($oldHash, DBhash($sqlHash));
 	}

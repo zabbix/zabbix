@@ -43,11 +43,12 @@ $fields = [
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'key' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Key')],
-	'delay' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
+	'delay' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 		'(isset({add}) || isset({update})) && isset({type}) && {type}!='.ITEM_TYPE_TRAPPER.' && {type}!='.ITEM_TYPE_SNMPTRAP,
-		_('Update interval (in sec)')],
+		_('Update interval')
+	],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
-	'history' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})',
+	'history' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})',
 		_('History storage period')
 	],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
@@ -55,8 +56,10 @@ $fields = [
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP]), 'isset({add}) || isset({update})'],
-	'trends' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), '(isset({add}) || isset({update})) && isset({value_type}) && '.
-		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'), _('Trend storage period')
+	'trends' =>					[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({value_type}) && '.
+			IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
+		_('Trend storage period')
 	],
 	'value_type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
 	'valuemapid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		'(isset({add}) || isset({update})) && isset({value_type}) && '.
@@ -150,9 +153,9 @@ $fields = [
 	'filter_snmp_oid' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_port' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Port')],
 	'filter_value_type' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1,2,3,4'), null],
-	'filter_delay' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, SEC_PER_DAY), null, _('Update interval')],
-	'filter_history' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null,	_('History')],
-	'filter_trends' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Trends')],
+	'filter_delay' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
+	'filter_history' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('History')],
+	'filter_trends' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Trends')],
 	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]), null],
 	'filter_state' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]), null],
 	'filter_templated_items' => [T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
@@ -168,9 +171,9 @@ $fields = [
 	'subfilter_templated_items' => [T_ZBX_INT, O_OPT, null, null,		null],
 	'subfilter_with_triggers' => [T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_hosts' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_interval' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_history' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_trends' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_interval' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_history' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_trends' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS,
 									IN('"delay","history","key_","name","status","trends","type"'),
@@ -387,16 +390,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 
-	/*
-	 * Intially validate "delay_flex" field one by one to make sure it does not have interval separator ";".
-	 * Skip empty fields and convert "delay_flex" array to string glued with ";" which is later validated through API.
-	 */
-	$delay_flex = '';
-	$intervals = [];
+	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
+	$type = getRequest('type', ITEM_TYPE_ZABBIX);
 
-	if (getRequest('delay_flex')) {
+	/*
+	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
+	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
+	 */
+	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP])
+			&& hasRequest('delay_flex')) {
+		$intervals = [];
+
 		foreach (getRequest('delay_flex') as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 				if ($interval['delay'] === '' && $interval['period'] === '') {
 					continue;
 				}
@@ -430,7 +436,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($intervals) {
-			$delay_flex = join(';', $intervals);
+			$delay .= ';'.implode(';', $intervals);
 		}
 	}
 
@@ -482,10 +488,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'ipmi_sensor' => getRequest('ipmi_sensor', ''),
 				'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_FLOAT),
 				'units' => getRequest('units', ''),
-				'delay' => getRequest('delay', 0),
-				'delay_flex' => $delay_flex,
-				'history' => getRequest('history', 0),
-				'trends' => getRequest('trends', 0),
+				'delay' => $delay,
+				'history' => getRequest('history', DB::getDefault('items', 'history')),
+				'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 				'valuemapid' => getRequest('valuemapid', 0),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -510,9 +515,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'snmp_community', 'snmpv3_contextname',
 					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase',
 					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
-					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'delay_flex',
-					'history', 'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description',
-					'status', 'templateid', 'flags', 'jmx_endpoint'
+					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'history',
+					'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description', 'status',
+					'templateid', 'flags', 'jmx_endpoint'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params'],
@@ -608,17 +613,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['params'] !== getRequest('params', '')) {
 					$item['params'] = getRequest('params', '');
 				}
-				if ($db_item['delay'] != getRequest('delay', 0)) {
-					$item['delay'] = getRequest('delay', 0);
+				if ($db_item['delay'] != $delay) {
+					$item['delay'] = $delay;
 				}
-				if ($db_item['delay_flex'] !== $delay_flex) {
-					$item['delay_flex'] = $delay_flex;
+				if ($db_item['history'] != getRequest('history', DB::getDefault('items', 'history'))) {
+					$item['history'] = getRequest('history', DB::getDefault('items', 'history'));
 				}
-				if ($db_item['history'] != getRequest('history', 0)) {
-					$item['history'] = getRequest('history', 0);
-				}
-				if ($db_item['trends'] != getRequest('trends', 0)) {
-					$item['trends'] = getRequest('trends', 0);
+				if ($db_item['trends'] != getRequest('trends', DB::getDefault('items', 'trends'))) {
+					$item['trends'] = getRequest('trends', DB::getDefault('items', 'trends'));
 				}
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
@@ -712,13 +714,14 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 
 	$result = true;
 
-	if (isset($visible['delay_flex'])) {
-		$delay_flex = '';
-		$intervals = [];
+	if (isset($visible['update_interval'])) {
+		$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 
-		if (getRequest('delay_flex')) {
+		if (hasRequest('delay_flex')) {
+			$intervals = [];
+
 			foreach (getRequest('delay_flex') as $interval) {
-				if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+				if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 					if ($interval['delay'] === '' && $interval['period'] === '') {
 						continue;
 					}
@@ -752,12 +755,12 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			}
 
 			if ($intervals) {
-				$delay_flex = join(';', $intervals);
+				$delay .= ';'.implode(';', $intervals);
 			}
 		}
 	}
 	else {
-		$delay_flex = null;
+		$delay = null;
 	}
 
 	$applications = getRequest('applications');
@@ -829,27 +832,6 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			API::Application()->massAdd($linkApp);
 		}
 
-		$preprocessing = getRequest('preprocessing', []);
-
-		foreach ($preprocessing as &$step) {
-			switch ($step['type']) {
-				case ZBX_PREPROC_MULTIPLIER:
-				case ZBX_PREPROC_RTRIM:
-				case ZBX_PREPROC_LTRIM:
-				case ZBX_PREPROC_TRIM:
-					$step['params'] = $step['params'][0];
-					break;
-
-				case ZBX_PREPROC_REGSUB:
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				default:
-					$step['params'] = '';
-			}
-		}
-		unset($step);
-
 		$items = API::Item()->get([
 			'output' => ['itemid', 'flags', 'type'],
 			'itemids' => $itemids,
@@ -861,7 +843,7 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			$item = [
 				'interfaceid' => getRequest('interfaceid'),
 				'description' => getRequest('description'),
-				'delay' => getRequest('delay'),
+				'delay' => $delay,
 				'history' => getRequest('history'),
 				'type' => getRequest('type'),
 				'snmp_community' => getRequest('snmp_community'),
@@ -880,7 +862,6 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'trends' => getRequest('trends'),
 				'logtimefmt' => getRequest('logtimefmt'),
 				'valuemapid' => getRequest('valuemapid'),
-				'delay_flex' => $delay_flex,
 				'authtype' => getRequest('authtype'),
 				'jmx_endpoint' => getRequest('jmx_endpoint'),
 				'username' => getRequest('username'),
@@ -889,9 +870,32 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'privatekey' => getRequest('privatekey'),
 				'ipmi_sensor' => getRequest('ipmi_sensor'),
 				'applications' => $applications,
-				'status' => getRequest('status'),
-				'preprocessing' => $preprocessing
+				'status' => getRequest('status')
 			];
+			if (hasRequest('preprocessing')) {
+				$preprocessing = getRequest('preprocessing');
+
+				foreach ($preprocessing as &$step) {
+					switch ($step['type']) {
+						case ZBX_PREPROC_MULTIPLIER:
+						case ZBX_PREPROC_RTRIM:
+						case ZBX_PREPROC_LTRIM:
+						case ZBX_PREPROC_TRIM:
+							$step['params'] = $step['params'][0];
+							break;
+
+						case ZBX_PREPROC_REGSUB:
+							$step['params'] = implode("\n", $step['params']);
+							break;
+
+						default:
+							$step['params'] = '';
+					}
+				}
+				unset($step);
+
+				$item['preprocessing'] = $preprocessing;
+			}
 			foreach ($item as $key => $field) {
 				if ($field === null) {
 					unset($item[$key]);
@@ -1089,9 +1093,9 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
-				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'jmx_endpoint', 'username', 'password', 'publickey',
-				'privatekey', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
@@ -1141,7 +1145,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'description' => getRequest('description', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'delay_flex' => getRequest('delay_flex', []),
-		'history' => getRequest('history', 90),
+		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', 0),
 		'type' => getRequest('type', 0),
 		'interfaceid' => getRequest('interfaceid', 0),
@@ -1157,7 +1161,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'publickey' => getRequest('publickey', ''),
 		'privatekey' => getRequest('privatekey', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
-		'trends' => getRequest('trends', DAY_IN_YEAR),
+		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'applications' => getRequest('applications', []),
 		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
 		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
@@ -1247,7 +1251,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	CArrayHelper::sort($data['valuemaps'], ['name']);
 
 	if (!$data['delay_flex']) {
-		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE];
+		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
 	}
 
 	// render view
@@ -1433,6 +1437,8 @@ else {
 		// resolve name macros
 		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
+		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 
@@ -1441,15 +1447,30 @@ else {
 				$item['host'] = $host['name'];
 			}
 
-			// Hide trend (zero values) for non-numeric item types.
-			if ($item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_LOG
-					|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-				$item['trends'] = '';
-			}
+			// Use temporary variable for delay, because the original will be used for sorting later.
+			$delay = $item['delay'];
 
 			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
-				$item['delay'] = '';
+				$delay = '';
 			}
+			else {
+				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
+					$delay = $update_interval_parser->getDelay();
+
+					$delay = ($delay[0] !== '{') ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
+				}
+			}
+
+			$history = $item['history'];
+			$history = ($history[0] !== '{') ? convertUnitsS(timeUnitToSeconds($history)) : $history;
+
+			// Hide trend (zero values) for non-numeric item types.
+			$trends = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+				? $item['trends']
+				: '';
+			$trends = ($trends !== '' && $trends[0] !== '{')
+				? convertUnitsS(timeUnitToSeconds($trends))
+				: $trends;
 
 			$item['subfilters'] = [
 				'subfilter_hosts' => empty($_REQUEST['subfilter_hosts'])
@@ -1468,12 +1489,12 @@ else {
 				'subfilter_with_triggers' => empty($_REQUEST['subfilter_with_triggers'])
 					|| (count($item['triggers']) == 0 && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
 					|| (count($item['triggers']) > 0 && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])),
-				'subfilter_history' => empty($_REQUEST['subfilter_history'])
-					|| uint_in_array($item['history'], $_REQUEST['subfilter_history']),
-				'subfilter_trends' => !getRequest('subfilter_trends')
-					|| ($item['trends'] !== '' && uint_in_array($item['trends'], getRequest('subfilter_trends'))),
-				'subfilter_interval' => !getRequest('subfilter_interval')
-					|| ($item['delay'] !== '' && uint_in_array($item['delay'], getRequest('subfilter_interval'))),
+				'subfilter_history' => (!getRequest('subfilter_history')
+					|| (in_array($history, getRequest('subfilter_history')))),
+				'subfilter_trends' => (!getRequest('subfilter_trends')
+					|| ($trends !== '' && in_array($trends, getRequest('subfilter_trends')))),
+				'subfilter_interval' => (!getRequest('subfilter_interval')
+					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval')))),
 				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
 			];
 
@@ -1526,25 +1547,38 @@ else {
 		}
 	}
 
+	// Draw the filter and subfilter.
 	$data['flicker'] = getItemFilterForm($data['items']);
 
-	// remove subfiltered items
-	if (!empty($data['items'])) {
-		foreach ($data['items'] as $number => $item) {
-			foreach ($item['subfilters'] as $value) {
-				if (!$value) {
-					unset($data['items'][$number]);
-					break;
-				}
+	// Remove subfiltered items.
+	foreach ($data['items'] as $number => $item) {
+		foreach ($item['subfilters'] as $value) {
+			if (!$value) {
+				unset($data['items'][$number]);
+				break;
 			}
 		}
 	}
 
-	if ($sortField === 'status') {
-		orderItemsByStatus($data['items'], $sortOrder);
-	}
-	else {
-		order_result($data['items'], $sortField, $sortOrder);
+	switch ($sortField) {
+		case 'delay':
+			orderItemsByDelay($data['items'], $sortOrder, ['usermacros' => true]);
+			break;
+
+		case 'history':
+			orderItemsByHistory($data['items'], $sortOrder);
+			break;
+
+		case 'trends':
+			orderItemsByTrends($data['items'], $sortOrder);
+			break;
+
+		case 'status':
+			orderItemsByStatus($data['items'], $sortOrder);
+			break;
+
+		default:
+			order_result($data['items'], $sortField, $sortOrder);
 	}
 
 	$data['paging'] = getPagingLine($data['items'], $sortOrder, new CUrl('items.php'));

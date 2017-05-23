@@ -72,6 +72,7 @@ function corrOperationTypes($type = null) {
 
 	return ($type === null) ? $types : $types[$type];
 }
+
 /**
  * Return an array of operators supported by the given correlation condition.
  *
@@ -83,7 +84,6 @@ function getOperatorsByCorrConditionType($type) {
 	switch ($type) {
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 			return [CONDITION_OPERATOR_EQUAL];
 
@@ -92,6 +92,9 @@ function getOperatorsByCorrConditionType($type) {
 			return [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
 				CONDITION_OPERATOR_NOT_LIKE
 			];
+
+		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+			return [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL];
 	}
 }
 

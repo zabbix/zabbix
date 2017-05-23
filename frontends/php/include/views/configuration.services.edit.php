@@ -48,7 +48,7 @@ $servicesFormList = (new CFormList('servicesFormList'))
 $servicesFormList->addRow(_('Parent service'), [
 	(new CTextBox('parent_name', $this->data['parentname'], true, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('select_parent', _('Change')))
+	(new CButton('select_parent', _x('Change', 'verb')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick(
 			"javascript: openWinCentered('services.php?pservices=1".url_param('serviceid')."', ".

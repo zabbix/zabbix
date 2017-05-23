@@ -46,9 +46,9 @@ return [
 			],
 			'autologout' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '900',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '15m',
 			],
 			'lang' => [
 				'null' => false,
@@ -58,9 +58,9 @@ return [
 			],
 			'refresh' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '30',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '30s',
 			],
 			'type' => [
 				'null' => false,
@@ -721,9 +721,9 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '30s',
 			],
 			'userid' => [
 				'null' => false,
@@ -830,8 +830,8 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
 				'default' => '0',
 			],
 		],
@@ -865,9 +865,9 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '3600',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '1h',
 			],
 			'nextcheck' => [
 				'null' => false,
@@ -1030,9 +1030,9 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '60',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '1m',
 			],
 			'status' => [
 				'null' => false,
@@ -1157,9 +1157,9 @@ return [
 			],
 			'timeout' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '15',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '15s',
 			],
 			'posts' => [
 				'null' => false,
@@ -1320,21 +1320,21 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
 				'default' => '0',
 			],
 			'history' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '90',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '90d',
 			],
 			'trends' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '365d',
 			],
 			'status' => [
 				'null' => false,
@@ -1422,12 +1422,6 @@ return [
 				'ref_table' => 'valuemaps',
 				'ref_field' => 'valuemapid',
 			],
-			'delay_flex' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
-				'default' => '',
-			],
 			'params' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
@@ -1508,8 +1502,8 @@ return [
 			'lifetime' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '30',
+				'length' => 255,
+				'default' => '30d',
 			],
 			'snmpv3_authprotocol' => [
 				'null' => false,
@@ -1872,9 +1866,9 @@ return [
 			],
 			'esc_period' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '1h',
 			],
 			'def_shortdata' => [
 				'null' => false,
@@ -1935,8 +1929,8 @@ return [
 			],
 			'esc_period' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => '0',
 			],
 			'esc_step_from' => [
@@ -2303,15 +2297,15 @@ return [
 			],
 			'refresh_unsupported' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '10m',
 			],
 			'work_period' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
-				'default' => '1-5,00:00-24:00',
+				'length' => 255,
+				'default' => '1-5,09:00-18:00',
 			],
 			'alert_usrgrpid' => [
 				'null' => true,
@@ -2328,9 +2322,9 @@ return [
 			],
 			'event_expire' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '7',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1w',
 			],
 			'event_show_max' => [
 				'null' => false,
@@ -2491,15 +2485,15 @@ return [
 			],
 			'ok_period' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1800',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '30m',
 			],
 			'blink_period' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1800',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '30m',
 			],
 			'problem_unack_color' => [
 				'null' => false,
@@ -2569,27 +2563,27 @@ return [
 			],
 			'hk_events_trigger' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'hk_events_internal' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1d',
 			],
 			'hk_events_discovery' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1d',
 			],
 			'hk_events_autoreg' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1d',
 			],
 			'hk_services_mode' => [
 				'null' => false,
@@ -2599,9 +2593,9 @@ return [
 			],
 			'hk_services' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'hk_audit_mode' => [
 				'null' => false,
@@ -2611,9 +2605,9 @@ return [
 			],
 			'hk_audit' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'hk_sessions_mode' => [
 				'null' => false,
@@ -2623,9 +2617,9 @@ return [
 			],
 			'hk_sessions' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'hk_history_mode' => [
 				'null' => false,
@@ -2641,9 +2635,9 @@ return [
 			],
 			'hk_history' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '90',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '90d',
 			],
 			'hk_trends_mode' => [
 				'null' => false,
@@ -2659,9 +2653,9 @@ return [
 			],
 			'hk_trends' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'default_inventory_mode' => [
 				'null' => false,
@@ -6732,9 +6726,9 @@ return [
 		],
 	],
 	'sysmap_shape' => [
-		'key' => 'shapeid',
+		'key' => 'sysmap_shapeid',
 		'fields' => [
-			'shapeid' => [
+			'sysmap_shapeid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -6803,19 +6797,19 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'text_valign' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'border_type' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'border_width' => [
 				'null' => false,
@@ -6839,7 +6833,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 		],
 	],
