@@ -412,10 +412,6 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-
-			if ($item['type'] == ITEM_TYPE_JMX && !array_key_exists('jmx_endpoint', $item)) {
-				$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
-			}
 		}
 		unset($item);
 
