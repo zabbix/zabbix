@@ -1192,6 +1192,7 @@ class CDashboard extends CApiService {
 		$db_dashboards = $this->get([
 			'output' => ['dashboardid', 'name'],
 			'dashboardids' => $dashboardids,
+			'editable' => true,
 			'preservekeys' => true
 		]);
 
