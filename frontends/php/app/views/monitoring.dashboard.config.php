@@ -47,6 +47,14 @@ if (array_key_exists('dialogue', $data)) {
 			);
 		}
 
+		/* Checkbox */
+		elseif ($field instanceof CWidgetFieldCheckbox) {
+			$formList->addRow(
+				$field->getLabel(),
+				(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
+			);
+		}
+
 		/* ItemId */
 		elseif ($field instanceof CWidgetFieldItemId) {
 			$form->addVar($field->getName(), $field->getValue(true)); // needed for popup script

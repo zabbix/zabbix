@@ -31,7 +31,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$fields = [
 			'fullscreen' =>		'in 0,1',
 			'dashboardid' =>	'db dashboard.dashboardid',
-			'new' =>           'in 1'
+			'groupid' =>		'db groups.groupid',
+			'hostid' =>			'db hosts.hostid',
+			'new' =>            'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -75,7 +77,12 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
 			'grid_widgets' => $this->getWidgets($dashboard['widgets']),
-			'widgetDefaults' => CWidgetConfig::getDefaults()
+			'widgetDefaults' => CWidgetConfig::getDefaults(),
+			'dynamic' => [
+				'has_dynamic_widgets' => $this->hasDynamicWidgets($dashboard['widgets']),
+				'groupid' => $this->getInput('groupid', 0),
+				'hostid' => $this->getInput('hostid', 0)
+			]
 		];
 
 		$response = new CControllerResponseData($data);
@@ -200,5 +207,25 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$ret[$field['name']] = $field[$field_key];
 		}
 		return $ret;
+	}
+
+	/**
+	 * Checks, if any of widgets has checked dynamic field
+	 *
+	 * @param array $widgets
+	 *
+	 * @return boolean
+	 */
+	private function hasDynamicWidgets($widgets) {
+		$dynamic = false;
+		foreach ($widgets as $widget) {
+			foreach ($widget['fields'] as $field) {
+				// TODO VM: document 'dynamic' as field with special interraction
+				if ($field['name'] === 'dynamic' && $field['value_int'] === '1') {
+					$dynamic = true;
+				}
+			}
+		}
+		return $dynamic;
 	}
 }

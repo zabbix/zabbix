@@ -68,9 +68,8 @@
 
 		// Update buttons on existing widgets to view mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
-		var form = jQuery(this).closest('form');
-		jQuery('.dashbrd-edit', form).remove();
-		jQuery('#dashbrd-edit', form).closest('li').show();
+
+		dashboardButtonsSetView();
 	};
 
 	// Add new widget
@@ -116,8 +115,11 @@
 			.attr('type','button')
 			.append('<?= _('Edit dashboard') ?>');
 
-		var li = jQuery('<li>').css('vertical-align', 'middle');
 		edit_button.closest('li').hide();
+		jQuery('#groupid', edit_button.closest('ul')).closest('li').hide();
+		jQuery('#hostid', edit_button.closest('ul')).closest('li').hide();
+
+		var li = jQuery('<li>').css('vertical-align', 'middle');
 		edit_button.closest('ul').before(
 			jQuery('<span>')
 				.addClass('<?= ZBX_STYLE_DASHBRD_EDIT ?>')
@@ -251,6 +253,8 @@
 		var $form = jQuery('.article .header-title form');
 		jQuery('.dashbrd-edit', $form).remove();
 		jQuery('#dashbrd-edit', $form).closest('li').show();
+		jQuery('#groupid', $form).closest('li').show();
+		jQuery('#hostid', $form).closest('li').show();
 	}
 
 	function dashbaordAddMessages(messages) {

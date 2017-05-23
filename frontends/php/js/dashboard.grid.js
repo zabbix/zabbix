@@ -398,6 +398,12 @@
 		if (typeof widget['fields'] !== 'undefined') {
 			ajax_data['fields'] = widget['fields'];
 		}
+		if (typeof(widget['dynamic']) !== 'undefined') {
+			ajax_data['dynamic'] = {
+				'hostid': widget['dynamic']['hostid'],
+				'groupid': widget['dynamic']['groupid']
+			}
+		}
 
 		startPreloader(widget);
 
@@ -485,7 +491,7 @@
 			data: {
 				dashboard_id: data['dashboard']['id'], // TODO VM: (?) will not work without dashboard id
 				widgets: ajax_widgets,
-				save: 0 // 0 - only check; 1 - check and save
+				save: 0 // WIDGET_CONFIG_DONT_SAVE - only check
 			},
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
@@ -518,6 +524,7 @@
 
 					widget['fields'] = fields;
 					widget['type'] = widget['fields']['type'];
+					updateWidgetDynamic($obj, data, widget);
 					refreshWidget(widget);
 
 					// mark dashboard as updated
@@ -671,7 +678,7 @@
 		var ajax_data = {
 			dashboard_id: data['dashboard']['id'], // can be undefined if dashboard is new
 			widgets: ajax_widgets,
-			save: 1 // 0 - only check; 1 - check and save
+			save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
 		};
 
 		if (typeof data['dashboard']['name'] !== 'undefined') {
@@ -711,6 +718,23 @@
 	function confirmExit($obj, data) {
 		if (data['options']['updated'] === true) {
 			return t('You have unsaved changes.')+"\n"+t('Are you sure, you want to leave this page?');
+		}
+	}
+
+	function updateWidgetDynamic($obj, data, widget) {
+		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] === '1') {
+			if (data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
+				widget['dynamic'] = {
+					'hostid': data['dashboard']['dynamic']['hostid'],
+					'groupid': data['dashboard']['dynamic']['groupid']
+				};
+			}
+			else {
+				delete widget['dynamic'];
+			}
+		}
+		else if (typeof(widget['dynamic']) !== 'undefined') {
+			delete widget['dynamic'];
 		}
 	}
 
@@ -801,6 +825,7 @@
 					data = $this.data('dashboardGrid');
 
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
+				updateWidgetDynamic($this, data, widget);
 
 				data['widgets'].push(widget);
 				$this.append(widget['div']);
