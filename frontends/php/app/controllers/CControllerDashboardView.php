@@ -72,14 +72,29 @@ class CControllerDashboardView extends CController {
 			return;
 		}
 
+		$pageFilter = new CPageFilter([
+			'groups' => [
+				'monitored_hosts' => true,
+				'with_items' => true
+			],
+			'hosts' => [
+				'monitored_hosts' => true,
+				'with_items' => true,
+				'DDFirstLabel' => _('not selected')
+			],
+			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
+			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
+		]);
+
 		$data = [
 			'dashboard' => $dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'grid_widgets' => $this->getWidgets($dashboard['widgets']),
+			'pageFilter' => $pageFilter,
 			'dynamic' => [
 				'has_dynamic_widgets' => $this->hasDynamicWidgets($dashboard['widgets']),
-				'groupid' => $this->getInput('groupid', 0),
-				'hostid' => $this->getInput('hostid', 0)
+				'hostid' => $pageFilter->hostid,
+				'groupid' => $pageFilter->groupid
 			]
 		];
 

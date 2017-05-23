@@ -102,32 +102,15 @@ $form
 $item_groupid = null;
 $item_hostid = null;
 if ($data['dynamic']['has_dynamic_widgets'] === true) {
-	$pageFilter = new CPageFilter([
-		'groups' => [
-			'monitored_hosts' => true,
-			'with_items' => true
-		],
-		'hosts' => [
-			'monitored_hosts' => true,
-			'with_items' => true,
-			'DDFirstLabel' => _('not selected')
-		],
-		'hostid' => $data['dynamic']['hostid'],
-		'groupid' => $data['dynamic']['groupid']
-	]);
-	// Changes values to default ones, if nonexisting ones were received
-	$data['dynamic']['groupid'] = $pageFilter->groupid;
-	$data['dynamic']['hostid'] = $pageFilter->hostid;
-
 	$item_groupid = ([
 			new CLabel(_('Group'), 'groupid'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$pageFilter->getGroupsCB()
+			$data['pageFilter']->getGroupsCB()
 		]);
 	$item_hostid = ([
 			new CLabel(_('Host'), 'hostid'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$pageFilter->getHostsCB()
+			$data['pageFilter']->getHostsCB()
 		]);
 }
 
