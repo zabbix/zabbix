@@ -401,10 +401,8 @@
 			ajax_data['fields'] = widget['fields'];
 		}
 		if (typeof(widget['dynamic']) !== 'undefined') {
-			ajax_data['dynamic'] = {
-				'hostid': widget['dynamic']['hostid'],
-				'groupid': widget['dynamic']['groupid']
-			}
+			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
+			ajax_data['dynamic_groupid'] = widget['dynamic']['groupid'];
 		}
 
 		startPreloader(widget);
