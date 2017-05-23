@@ -1269,9 +1269,9 @@ class testFormItem extends CWebTest {
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => '-30',
-					'error_msg' => 'Cannot add item',
+					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Field "Update interval" is not correct: a time unit is expected'
 					]
 				]
 			],
@@ -2307,8 +2307,8 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//li[28]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (3m 9d)');
-		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (1y 3m)');
+		$this->zbxTestAssertElementText("//li[28]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('adm.gui.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');

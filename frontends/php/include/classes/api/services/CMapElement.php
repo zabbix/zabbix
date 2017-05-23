@@ -91,7 +91,7 @@ abstract class CMapElement extends CApiService {
 
 			if (!$elementtype_validator->validate($selement['elementtype'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'expandproblem', _s('value must be one of %1$s', implode(', ', $element_types))
+					'elementtype', _s('value must be one of %1$s', implode(', ', $element_types))
 				));
 			}
 

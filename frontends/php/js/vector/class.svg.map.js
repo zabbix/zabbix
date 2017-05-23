@@ -969,6 +969,7 @@ function SVGMapShape(map, options) {
 // Predefined set of map shape types.
 SVGMapShape.TYPE_RECTANGLE	= 0;
 SVGMapShape.TYPE_ELLIPSE	= 1;
+SVGMapShape.TYPE_LINE		= 2;
 
 // Predefined label horizontal alignments.
 SVGMapShape.LABEL_HALIGN_CENTER	= 0;
@@ -1101,6 +1102,19 @@ SVGMapShape.prototype.update = function(options) {
 				ry: this.ry
 			};
 			break;
+
+		case SVGMapShape.TYPE_LINE:
+			type = 'line';
+
+			delete attributes['fill'];
+			delete options['text'];
+			attributes = SVGElement.mergeAttributes(attributes, {
+				x1: this.x,
+				y1: this.y,
+				x2: this.width,
+				y2: this.height
+			});
+		break;
 
 		default:
 			throw "Invalid shape configuration!";

@@ -1172,7 +1172,25 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'urls' => [],
 				'selements' => [],
 				'links' => [],
-				'shapes' => []
+				'shapes' => [[
+					'type' => 0,
+					'x' => '0',
+					'y' => '0',
+					'width' => '800',
+					'height' => 15,
+					'text' => '{MAP.NAME}',
+					'font' => '9',
+					'font_size' => '11',
+					'font_color' => '000000',
+					'text_halign' => '0',
+					'text_valign' => '0',
+					'border_type' => '0',
+					'border_width' => '1',
+					'border_color' => '000000',
+					'background_color' => '',
+					'zindex' => '0'
+				]],
+				'lines' => []
 			],
 			[
 				'name' => 'map',
@@ -1327,7 +1345,25 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'linktriggers' => []
 					]
 				],
-				'shapes' => []
+				'shapes' => [[
+					'type' => 0,
+					'x' => '0',
+					'y' => '0',
+					'width' => '800',
+					'height' => 15,
+					'text' => '{MAP.NAME}',
+					'font' => '9',
+					'font_size' => '11',
+					'font_color' => '000000',
+					'text_halign' => '0',
+					'text_valign' => '0',
+					'border_type' => '0',
+					'border_width' => '1',
+					'border_color' => '000000',
+					'background_color' => '',
+					'zindex' => '0'
+				]],
+				'lines' => []
 			]
 		]);
 	}

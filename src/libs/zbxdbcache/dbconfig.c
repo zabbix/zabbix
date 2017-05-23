@@ -2232,17 +2232,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (SUCCEED == DCstrpool_replace(found, &item->delay, row[14]))
 			flags |= ZBX_ITEM_DELAY_CHANGED;
 
-		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status &&
-				SUCCEED == is_counted_in_item_queue(item->type, item->key))
-		{
-			dc_requeue_item(item, host, flags, now);
-		}
-		else
-		{
-			item->nextcheck = 0;
-			item->unreachable = 0;
-		}
-
 		/* numeric items */
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
@@ -2486,6 +2475,20 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
+		}
+
+		/* it is crucial to update type specific (config->snmpitems, config->ipmiitems, etc.) hashsets before */
+		/* attempting to requeue an item because type specific properties are used to arrange items in queues */
+
+		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status &&
+				SUCCEED == is_counted_in_item_queue(item->type, item->key))
+		{
+			dc_requeue_item(item, host, flags, now);
+		}
+		else
+		{
+			item->nextcheck = 0;
+			item->unreachable = 0;
 		}
 	}
 
@@ -9048,8 +9051,6 @@ zbx_uint64_t	DCget_host_count(void)
 /******************************************************************************
  *                                                                            *
  * Function: DCget_required_performance                                       *
- *                                                                            *
- * Purpose: calculate the required server performance (values per second)     *
  *                                                                            *
  * Return value: the required nvps number                                     *
  *                                                                            *

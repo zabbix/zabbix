@@ -1,12 +1,13 @@
 Changes for 3.4.0alpha1
 
 New features:
+A.F....... [ZBXNEXT-3869] implemented map lines (vjaceslavs)
 A.F.I..PS. [ZBXNEXT-1675] added support for user macros and time unit suffixes in various time-related settings: update intervals, timeouts, housekeeping settings, time periods, etc. (gleb, Ivo, Sasha, vjaceslavs)
 ..F....... [ZBXNEXT-3762] added browser warning for IE 9 and IE10 (gcalenko)
 ..F....... [ZBXNEXT-3870] implemented ability to drag multiple selected items in map editor (gcalenko)
 .......PS. [ZBXNEXT-3655] reduced self monitoring cache locking in trappers and manager processes (wiper)
-..F....... [ZBXNEXT-51] ability to clone selected elements in map editor via context menu (gcalenko)
-..F....... [ZBXNEXT-3567] hide SQL error messages for regular user (gcalenko)
+..F....... [ZBXNEXT-51] implemented ability to copy and paste map elements (gcalenko)
+..F....... [ZBXNEXT-3567] implemented ability to hide SQL error messages for non-superadmin users (gcalenko)
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)
@@ -65,12 +66,14 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
+..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
 ..F....... [ZBX-10807] fixed wrongly displayed field in item prototype form (miks)
 ..F....... [ZBX-10754] fixed comparison of previously and newly linked web scenarios (miks)
 ..F....... [ZBX-11549] fixed 'numeric value' error in dashboard for php 7 (gcalenko, Sasha)
 ..F....... [ZBX-11559] fixed jquery binded function call on form submit (miks)
-..F....... [ZBX-11677] fixed order in list of latest 500 item values (miks)
+..F....... [ZBX-11677] fixed history page to display values in chronological order (miks)
 ..F....... [ZBX-11405] fixed conditions to display treeview button in triggers section (miks)
 ........S. [ZBX-12012] fixed resolving of Critical and Verbose event log levels by {ITEM.LOG.SEVERITY} macro (Sasha)
 A......... [ZBX-12093] fixed removing of applications that are created from application prototypes (Sasha)
@@ -478,6 +481,8 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
+..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
 ..F....... [ZBX-10807] fixed wrongly displayed field in item prototype form (miks)
 ..F....... [ZBX-10754] fixed comparison of previously and newly linked web scenarios (miks)
