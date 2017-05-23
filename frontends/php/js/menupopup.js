@@ -546,8 +546,6 @@ function showDialogForm(form, options, formData) {
 				'action': function() {
 					removeErrorBlock();
 					// to not destroy form need to move it to old place
-					// remove previous errors
-					form.find('.dialog-form-errors ul').remove();
 					form.css('display', 'none');
 					form.css('visibility', 'hidden');
 					oldFormParent.append(form);

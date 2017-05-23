@@ -73,7 +73,7 @@
 	};
 
 	// Add new widget
-	var dashbrd_add_widget = function dashbrd_add_widget() {
+	function dashbrd_add_widget() {
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
 	};
 
