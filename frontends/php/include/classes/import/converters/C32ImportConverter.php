@@ -171,6 +171,7 @@ class C32ImportConverter extends CConverter {
 		foreach ($maps as &$map) {
 			$map['selements'] = $this->convertMapElements($map['selements']);
 			$map['shapes'] = [];
+			$map['lines'] = [];
 		}
 		unset($map);
 
@@ -186,7 +187,17 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertMapElements(array $selements) {
 		foreach ($selements as &$selement) {
-			$selement['elements'] = [$selement['element']];
+			if (zbx_is_int($selement['elementtype'])) {
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_HOST:
+					case SYSMAP_ELEMENT_TYPE_MAP:
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$selement['elements'] = [$selement['element']];
+						break;
+				}
+			}
+
 			unset($selement['element']);
 		}
 		unset($selement);

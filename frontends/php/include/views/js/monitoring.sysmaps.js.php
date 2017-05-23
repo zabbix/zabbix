@@ -140,7 +140,7 @@ function getFontComboBox($name) {
 					->addRow(_('Triggers'), [
 						(new CDiv([
 							(new CTable())
-								->setHeader(['', _('Name'), _('Action')])
+								->setHeader(['', _('Name'), (new CColHeader(_('Action')))->addStyle('padding: 0 5px;')])
 								->setId('triggerContainer')
 								->setAttribute('style', 'width: 100%;')
 								->addClass('ui-sortable')
@@ -153,7 +153,15 @@ function getFontComboBox($name) {
 							new CVar('elementExpressionTrigger', ''),
 							(new CMultiSelect([
 								'name' => 'elementNameTriggers',
-								'objectName' => 'triggers'
+								'objectName' => 'triggers',
+								'objectOptions' => [
+									'editable' => true,
+									'real_hosts' => true
+								],
+								'popup' => [
+									'parameters' => 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers'.
+										'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
+								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 							new CDiv(
 								(new CButton(null, _('Add')))
@@ -273,12 +281,14 @@ function getFontComboBox($name) {
 			->addVar('sysmap_shapeid', '')
 			->addItem(
 				(new CFormList())
-					->addRow(_('Shape'),
+					->addRow(_('Shape'), [
 						(new CRadioButtonList('type', SYSMAP_SHAPE_TYPE_RECTANGLE))
 							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE)
 							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE)
-							->setModern(true)
-					)
+							->addValue(_('Line'), SYSMAP_SHAPE_TYPE_LINE)
+							->setModern(true),
+						new CVar('', '', 'last_shape_type')
+					])
 					->addRow(_('Text'),
 						(new CDiv([
 							(new CTextArea('text'))
@@ -309,16 +319,21 @@ function getFontComboBox($name) {
 							(new CComboBox('text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
 								$vertical_align_types
 							))
-						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
+						'shape-text-row'
 					)
 					->addRow(_('Background'),
 						(new CDiv([
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							new CColor('background_color', '#{color}', false)
-						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
+						'shape-background-row'
 					)
-					->addRow(_('Border'),
+					->addRow((new CSpan())
+							->addClass('switchable-content')
+							->setAttribute('data-value', _('Border'))
+							->setAttribute('data-value-2', _('Line')),
 						(new CDiv([
 							_('Type'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -331,28 +346,48 @@ function getFontComboBox($name) {
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							new CColor('border_color', '#{color}', false)
-						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))
+							->addClass(ZBX_STYLE_NOWRAP)
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
-					->addRow(new CLabel(_('Coordinates'), 'x'),
+					->addRow((new CSpan())
+							->addClass('switchable-content')
+							->setAttribute('data-value', _('Coordinates'))
+							->setAttribute('data-value-2', _('Points')),
 						(new CDiv([
-							_('X'),
+							(new CSpan())
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('X'))
+								->setAttribute('data-value-2', _('X1')),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CTextBox('x'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							_('Y'),
+							(new CSpan())
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Y'))
+								->setAttribute('data-value-2', _('Y1')),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CTextBox('y'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					)
-					->addRow(new CLabel(_('Size'), 'areaSizeWidth'),
+					->addRow((new CSpan())
+							->addClass('switchable-content')
+							->setAttribute('data-value', _('Size'))
+							->setAttribute('data-value-2', ''),
 						(new CDiv([
-							_('Width'),
+							(new CSpan())
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Width'))
+								->setAttribute('data-value-2', _('X2')),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CTextBox('width'))
 								->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 								->setId('areaSizeWidth'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							_('Height'),
+							(new CSpan())
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Height'))
+								->setAttribute('data-value-2', _('Y2')),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CTextBox('height'))
 								->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -399,60 +434,85 @@ function getFontComboBox($name) {
 						(new CRadioButtonList('mass_type', SYSMAP_SHAPE_TYPE_RECTANGLE))
 							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE)
 							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE)
-							->setModern(true)
+							->setModern(true),
+						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_text'))
 							->setId('chkboxText')
 							->setLabel(_('Text')),
 						(new CTextArea('mass_text'))
 								->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-								->setRows(2)
+								->setRows(2),
+						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_font'))
 							->setId('chkboxFont')
 							->setLabel(_('Font')),
-						getFontComboBox('mass_font')
+						getFontComboBox('mass_font'),
+						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_font_size'))
 							->setId('chkboxFontSize')
 							->setLabel(_('Font size')),
-						(new CTextBox('mass_font_size'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+						(new CTextBox('mass_font_size'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_font_color'))
 							->setId('chkboxFontColor')
 							->setLabel(_('Font colour')),
-						new CColor('mass_font_color', '#{color}', false)
+						new CColor('mass_font_color', '#{color}', false),
+						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_text_halign'))
 							->setId('chkboxTextHalign')
 							->setLabel(_('Horizontal align')),
 						new CComboBox('mass_text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
 							$horizontal_align_types
-						)
+						),
+						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_text_valign'))
 							->setId('chkboxTextValign')
 							->setLabel(_('Vertical align')),
-						new CComboBox('mass_text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null, $vertical_align_types)
+						new CComboBox('mass_text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
+							$vertical_align_types
+						),
+						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_background'))
 							->setId('chkboxBackground')
 							->setLabel(_('Background colour')),
-						new CColor('mass_background_color', '#{color}', false)
+						new CColor('mass_background_color', '#{color}', false),
+						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_border_type'))
 							->setId('chkboxBorderType')
-							->setLabel(_('Border type')),
+							->setLabel((new CDiv())
+								->addClass('form-input-margin')
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Border type'))
+								->setAttribute('data-value-2', _('Line type'))
+							),
 						new CComboBox('mass_border_type', null, null, $shape_border_types)
 					)
 					->addRow((new CCheckBox('chkbox_border_width'))
 							->setId('chkboxBorderWidth')
-							->setLabel(_('Border width')),
+							->setLabel((new CDiv())
+								->addClass('form-input-margin')
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Border width'))
+								->setAttribute('data-value-2', _('Line width'))
+							),
 						(new CTextBox('mass_border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 					)
 					->addRow((new CCheckBox('chkbox_border_color'))
 							->setId('chkboxBorderColor')
-							->setLabel(_('Border colour')),
+							->setLabel((new CDiv())
+								->addClass('form-input-margin')
+								->addClass('switchable-content')
+								->setAttribute('data-value', _('Border colour'))
+								->setAttribute('data-value-2', _('Line colour'))
+							),
 						new CColor('mass_border_color', '#{color}', false)
 					)
 					->addItem([
@@ -736,17 +796,20 @@ function getFontComboBox($name) {
 <script type="text/x-jquery-tmpl" id="selementFormTriggers">
 	<?= (new CRow([
 			(new CCol([
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+				(new CDiv())
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addStyle('top: 0px;'),
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol([(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)]))
-				->addStyle('background: ##{color}'),
+				->addStyle('background: ##{color}; padding: 0 5px;'),
 			(new CCol([
 				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),
 				(new CVar('element_name[#{triggerid}]', '#{name}')),
 				(new CVar('element_priority[#{triggerid}]', '#{priority}')),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->addStyle('margin: 0 5px;')
 					->onClick('jQuery("#triggerrow_#{triggerid}").remove();')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))

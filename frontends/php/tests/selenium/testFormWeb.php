@@ -710,7 +710,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value for field "delay": a time unit is expected.'
+						'Invalid parameter "/1/delay": a time unit is expected.'
 					]
 				]
 			],
@@ -725,7 +725,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value for field "delay": must be between "1" and "86400"'
+						'Invalid parameter "/1/delay": value must be one of 1-86400.'
 					]
 				]
 			],
@@ -762,7 +762,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value for field "delay": must be between "1" and "86400"'
+						'Invalid parameter "/1/delay": value must be one of 1-86400.'
 					]
 				]
 			],

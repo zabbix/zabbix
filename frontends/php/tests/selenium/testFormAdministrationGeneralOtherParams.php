@@ -111,10 +111,10 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
-		$sql = 'SELECT refresh_unsupported FROM config WHERE refresh_unsupported=700';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "refresh_unsupported"');
+		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='700'";
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=1';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "snmptrap_logging"');
+		$this->assertEquals(1, DBcount($sql));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
@@ -127,10 +127,10 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
-		$sql = 'SELECT refresh_unsupported FROM config WHERE refresh_unsupported=86400';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "refresh_unsupported"');
+		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='86400'";
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=0';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "snmptrap_logging"');
+		$this->assertEquals(1, DBcount($sql));
 
 		// trying to enter value > max_value
 		$this->zbxTestCheckTitle('Other configuration parameters');

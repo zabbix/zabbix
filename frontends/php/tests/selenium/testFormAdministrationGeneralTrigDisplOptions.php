@@ -136,9 +136,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_ack_style FROM config WHERE ok_ack_style=0 AND ok_ack_color='.zbx_dbstr('66FF66');
 		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT ok_period FROM config WHERE ok_period=120';
+		$sql = "SELECT ok_period FROM config WHERE ok_period='120'";
 		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT blink_period FROM config WHERE blink_period=120';
+		$sql = "SELECT blink_period FROM config WHERE blink_period='120'";
 		$this->assertEquals(1, DBcount($sql));
 
 		$newHash = DBhash($sqlHash);

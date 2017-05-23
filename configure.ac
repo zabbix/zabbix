@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([Zabbix],[3.4.0alpha1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1089,6 +1089,8 @@ AC_ARG_ENABLE(ipv6,[  --enable-ipv6           Turn on support of IPv6],
 esac],
 [ipv6=no])
 
+AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
+
 have_db="no"
 have_unixodbc="no"
 have_web_monitoring="no"
@@ -1615,7 +1617,6 @@ AC_OUTPUT([
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxtasks/Makefile
-	src/libs/zbxcunit/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
