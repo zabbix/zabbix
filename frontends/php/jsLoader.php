@@ -225,6 +225,7 @@ $tranStrings = [
 		'You need permission to perform this action!' => _('You need permission to perform this action!'),
 		'Owner cannot be empty!' => _('Owner cannot be empty!'),
 		'Name cannot be empty!' => _('Name cannot be empty!'),
+		'Dashboard Properties' => _('Dashboard Properties'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
 		'1 minute' => _n('%1$s minute', '%1$s minutes', 1),
