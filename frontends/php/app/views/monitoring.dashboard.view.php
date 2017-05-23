@@ -108,7 +108,7 @@ if ($data['dynamic']['has_dynamic_widgets'] === true) {
 							],
 							[
 								'name' => 'create',
-								'label' => _('Create New'),
+								'label' => _('Create new'),
 								'url'  => (new CUrl('zabbix.php'))
 									->setArgument('action', 'dashboard.view')
 									->setArgument('new', '1')
