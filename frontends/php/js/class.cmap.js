@@ -2121,16 +2121,16 @@ ZABBIX.apps.map = (function($) {
 				);
 
 				if (this.data.elementtype === '2') {
-					// For element type trigger not exist signle element name.
+					// For element type trigger not exist single element name.
 					delete this.data['elementName'];
 				}
 				else if (this.data.elementtype === '4') {
-					// if element is image we unset advanced icons
+					// If element is image, unset advanced icons.
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
 
-					// if image element, set elementName to image name
+					// If image element, set elementName to image name.
 					for (i in this.sysmap.iconList) {
 						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
 							this.data.elementName = this.sysmap.iconList[i].name;
@@ -2383,11 +2383,12 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
-					editable: true
+					editable: true,
+					real_hosts: true
 				},
 				popup: {
-					parameters: 'srctbl=triggers&dstfrm=selementForm&dstfld1=elementNameTriggers' +
-						'&srcfld1=triggerid&multiselect=1'
+					parameters: 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers' +
+						'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
 				}
 			});
 
@@ -2497,19 +2498,26 @@ ZABBIX.apps.map = (function($) {
 							},
 							success: function(data) {
 								data = JSON.parse(data);
-								data.result.each(function(trigger) {
-									if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
-										trigger.name = triggers_to_insert[trigger.triggerid].name;
-										$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
-									}
+								triggers.each(function(sorted_trigger) {
+									data.result.each(function(trigger) {
+										if (sorted_trigger.id == trigger.triggerid) {
+											if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
+												trigger.name = triggers_to_insert[trigger.triggerid].name;
+												$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+
+												return false;
+											}
+										}
+									});
 								});
 
-								$('#elementNameTriggers').multiSelect('clean');
 								SelementForm.prototype.recalculateSortOrder();
 								SelementForm.prototype.initSortable();
 							}
 						});
 					}
+
+					$('#elementNameTriggers').multiSelect('clean');
 				}
 			},
 
@@ -3446,6 +3454,7 @@ ZABBIX.apps.map = (function($) {
 
 						if (typeof this.sysmap.selements[link.selementid1].data.elementName === 'undefined') {
 							fromElementName = this.sysmap.selements[link.selementid1].data.elements[0].elementName;
+
 							if (Object.keys(this.sysmap.selements[link.selementid1].data.elements).length > 1) {
 								fromElementName += '...';
 							}
@@ -3456,6 +3465,7 @@ ZABBIX.apps.map = (function($) {
 
 						if (typeof this.sysmap.selements[link.selementid2].data.elementName === 'undefined') {
 							toElementName = this.sysmap.selements[link.selementid2].data.elements[0].elementName;
+
 							if (Object.keys(this.sysmap.selements[link.selementid2].data.elements).length > 1) {
 								toElementName += '...';
 							}
