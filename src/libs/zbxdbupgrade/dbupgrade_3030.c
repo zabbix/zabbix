@@ -916,23 +916,20 @@ static int	DBpatch_3030068(void)
 
 static int	DBpatch_3030069(void)
 {
-	const ZBX_FIELD	field = {"jmx_endpoint", "", NULL,
-			NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"jmx_endpoint", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_3030070(void)
 {
-	int			ret;
+#define ZBX_DEFAULT_JMX_ENDPOINT	"service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi"
+	/* 16 - ITEM_TYPE_JMX */
+	if (ZBX_DB_OK > DBexecute("update items set jmx_endpoint='" ZBX_DEFAULT_JMX_ENDPOINT "' where type=16"))
+		return FAIL;
 
-	ret = DBexecute(
-			"update items"
-			" set jmx_endpoint='service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'",
-			" where type=%d"
-		ITEM_TYPE_JMX);
-
-	return (ZBX_DB_OK > ret ? FAIL : SUCCEED);
+	return SUCCEED;
+#undef ZBX_DEFAULT_JMX_ENDPOINT
 }
 
 #endif
