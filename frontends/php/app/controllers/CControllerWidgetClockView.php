@@ -29,12 +29,18 @@ class CControllerWidgetClockView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'required', // TODO VM: in db.widget
-			'fields'		=>	'array',
+			'fields' =>		'array',
 		];
 
 		$ret = $this->validateInput($fields);
+
 		if ($ret) {
+			/*
+			 * @var array  $fields
+			 * @var int    $fields['time_type']
+			 * @var string $fields['itemid']             (optional)
+			 * @var string $fields['hostid']             (optional)
+			 */
 			// TODO VM: if fields are present, check that fields have enough data
 		}
 
@@ -51,7 +57,6 @@ class CControllerWidgetClockView extends CController {
 	}
 
 	protected function doAction() {
-
 		$time = null;
 		$title = null;
 		$time_zone_string = null;
@@ -63,26 +68,12 @@ class CControllerWidgetClockView extends CController {
 		$default = [
 			'time_type' => null,
 			'itemid' => null,
-			'hostid' => null, // TODO VM: probably will not be used at all
-			'inner_width' => null,
-			'inner_height' => null,
+			'hostid' => null // TODO VM: probably will not be used at all
 		];
 
 		if ($this->hasInput('fields')) {
 			// Use configured data, if possible
 			$data = $this->getInput('fields');
-		}
-
-		// TODO VM: Should be optional values, should have minimal value.
-		// In case of beeing NULL, will take all available widget's space.
-		// Validation: both null, or both bigger/smaller than.
-		if (!array_key_exists('inner_width', $data)
-				|| !array_key_exists('inner_height', $data)
-				|| $data['inner_width'] == 0
-				|| $data['inner_height'] == 0
-		) {
-			$data['inner_width'] = $default['inner_width'];
-			$data['inner_height'] = $default['inner_height'];
 		}
 
 		// Apply defualt value for data
@@ -161,9 +152,7 @@ class CControllerWidgetClockView extends CController {
 				'time' => $time,
 				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
-				'error' => $error,
-				'inner_width' => $data['inner_width'],
-				'inner_height' => $data['inner_height']
+				'error' => $error
 			]
 		]));
 	}

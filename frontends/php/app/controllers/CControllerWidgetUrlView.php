@@ -29,20 +29,18 @@ class CControllerWidgetUrlView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'required', // TODO VM: in db.widget
-			'fields'		=>	'array',
-			'dynamic'		=>	'array',
+			'fields' =>		'array',
+			'dynamic_hostid' =>	'db hosts.hostid',
 		];
 
 		$ret = $this->validateInput($fields);
 		if ($ret) {
-			if ($this->hasInput('dynamic')) {
-				$dynamic = $this->getInput('dynamic');
-
-				if (!array_key_exists('hostid', $dynamic)) {
-					$ret = false;
-				}
-			}
+			/*
+			 * @var array  $fields
+			 * @var string $fields['url']              (optional)
+			 * @var int    $fields['dynamic']          (optional)
+			 */
+			// TODO VM: validate fields
 		}
 
 		if (!$ret) {
@@ -67,7 +65,7 @@ class CControllerWidgetUrlView extends CController {
 			'url' => '',
 			'inner_width' => '100%',
 			'inner_height' => '98%',
-			'host_id' => 0,
+			'hostid' => '0',
 			'isTemplatedDashboard' => false, // TODO VM: will dashboards be templated?
 			'dynamic' => WIDGET_SIMPLE_ITEM
 		];
@@ -77,8 +75,8 @@ class CControllerWidgetUrlView extends CController {
 			$data = $this->getInput('fields');
 		}
 
-		if ($this->hasInput('dynamic')) {
-			$data['host_id'] = $this->getInput('dynamic')['hostid'];
+		if ($this->hasInput('dynamic_hostid')) {
+			$data['hostid'] = $this->getInput('dynamic_hostid');
 		}
 
 		if (!array_key_exists('inner_width', $data)
@@ -97,7 +95,7 @@ class CControllerWidgetUrlView extends CController {
 			}
 		}
 
-		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $data['host_id'] == 0) {
+		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && bccomp($data['hostid'], '0') === 0) {
 			$error = _('No host selected.');
 		}
 		else {
@@ -106,7 +104,7 @@ class CControllerWidgetUrlView extends CController {
 			$resolved_url = CMacrosResolverHelper::resolveWidgetURL([
 				'config' => $resolveHostMacros ? 'widgetURL' : 'widgetURLUser',
 				'url' => $data['url'],
-				'hostid' => $resolveHostMacros ? $data['host_id'] : 0
+				'hostid' => $resolveHostMacros ? $data['hostid'] : '0'
 			]);
 
 			$data['url'] = $resolved_url ? $resolved_url : $data['url'];

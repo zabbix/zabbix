@@ -20,14 +20,6 @@
 
 $item = (new CClock());
 
-if ($data['clock']['inner_width'] !== null) {
-	$item->setWidth($data['clock']['inner_width']);
-}
-
-if ($data['clock']['inner_height'] !== null) {
-	$item->setHeight($data['clock']['inner_height']);
-}
-
 if ($data['clock']['error'] !== null) {
 	$item->setError($data['clock']['error']);
 }
