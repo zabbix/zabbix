@@ -451,6 +451,23 @@ static void	DCincrease_disable_until(const ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCfind_id                                                        *
+ *                                                                            *
+ * Purpose: Find an element in a hashset by its 'id' or create the element if *
+ *          it does not exist                                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     hashset - [IN] hashset to search                                       *
+ *     id      - [IN] id of element to search for                             *
+ *     size    - [IN] size of element to search for                           *
+ *     found   - [OUT flag. 0 - element did not exist, it was created.        *
+ *                          1 - existing element was found.                   *
+ *                                                                            *
+ * Return value: pointer to the found or created element                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
 {
 	void		*ptr;
