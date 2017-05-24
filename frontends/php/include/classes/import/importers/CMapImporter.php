@@ -78,6 +78,7 @@ class CMapImporter extends CImporter {
 						'sysmapid' => $maps[$mapItem['name']]['sysmapid'],
 						'name' => $mapItem['name'],
 						'shapes' => $maps[$mapItem['name']]['shapes'],
+						'lines' => $maps[$mapItem['name']]['lines'],
 						'selements' => $maps[$mapItem['name']]['selements'],
 						'links' => $maps[$mapItem['name']]['links']
 					];
@@ -253,8 +254,6 @@ class CMapImporter extends CImporter {
 						unset($selement['elements']);
 						break;
 				}
-
-				unset($selement['element']);
 
 				$icons = [
 					'icon_off' => 'iconid_off',

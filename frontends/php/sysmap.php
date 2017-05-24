@@ -78,11 +78,17 @@ if (isset($_REQUEST['favobj'])) {
 
 			$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
 			$sysmapUpdate['sysmapid'] = $sysmapid;
+			$sysmapUpdate['lines'] = [];
 
 			if (array_key_exists('shapes', $sysmapUpdate)) {
-				foreach ($sysmapUpdate['shapes'] as &$shape) {
+				foreach ($sysmapUpdate['shapes'] as $key => &$shape) {
 					if (array_key_exists('sysmap_shapeid', $shape) && !is_numeric($shape['sysmap_shapeid'])) {
 						unset($shape['sysmap_shapeid']);
+					}
+
+					if ($shape['type'] == SYSMAP_SHAPE_TYPE_LINE) {
+						$sysmapUpdate['lines'][$key] = CMapHelper::convertShapeToLine($shape);
+						unset($sysmapUpdate['shapes'][$key]);
 					}
 				}
 				unset($shape);
@@ -135,6 +141,7 @@ if (isset($_REQUEST['sysmapid'])) {
 			'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
 			'background_color', 'zindex'
 		],
+		'selectLines' => ['sysmap_shapeid', 'x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color', 'zindex'],
 		'selectSelements' => API_OUTPUT_EXTEND,
 		'selectLinks' => API_OUTPUT_EXTEND,
 		'sysmapids' => getRequest('sysmapid'),
@@ -162,6 +169,11 @@ $data = [
 
 // get selements
 add_elementNames($data['sysmap']['selements']);
+
+foreach ($data['sysmap']['lines'] as $line) {
+	$data['sysmap']['shapes'][] = CMapHelper::convertLineToShape($line);
+}
+unset($data['sysmap']['lines']);
 
 $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
 $data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'sysmap_shapeid');

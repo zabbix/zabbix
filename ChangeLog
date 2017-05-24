@@ -1,12 +1,13 @@
 Changes for 3.4.0alpha1
 
 New features:
+A.F....... [ZBXNEXT-3869] implemented map lines (vjaceslavs)
 A.F.I..PS. [ZBXNEXT-1675] added support for user macros and time unit suffixes in various time-related settings: update intervals, timeouts, housekeeping settings, time periods, etc. (gleb, Ivo, Sasha, vjaceslavs)
 ..F....... [ZBXNEXT-3762] added browser warning for IE 9 and IE10 (gcalenko)
 ..F....... [ZBXNEXT-3870] implemented ability to drag multiple selected items in map editor (gcalenko)
 .......PS. [ZBXNEXT-3655] reduced self monitoring cache locking in trappers and manager processes (wiper)
 ..F....... [ZBXNEXT-51] implemented ability to copy and paste map elements (gcalenko)
-..F....... [ZBXNEXT-3567] hide SQL error messages for regular user (gcalenko)
+..F....... [ZBXNEXT-3567] implemented ability to hide SQL error messages for non-superadmin users (gcalenko)
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)
@@ -48,6 +49,7 @@ A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 b
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+........S. [ZBX-12199] removed condition check for recovery operations (wiper)
 ...GI..PS. [ZBX-3924] switched from POSIX extended to the PCRE regular expression library for enhanced regular expressions and consistency with frontend (vso)
 .......PS. [ZBX-11867] fixed memory leak in history cache and history cache statistics (wiper)
 ...G...... [ZBX-11671] added register information and backtrace to log when metric thread crashes (viktors)
@@ -65,6 +67,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
 ..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
 ..F....... [ZBX-10807] fixed wrongly displayed field in item prototype form (miks)
@@ -479,6 +482,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
 ..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
 ..F....... [ZBX-10807] fixed wrongly displayed field in item prototype form (miks)

@@ -41,6 +41,9 @@ class CMapHelper {
 				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
 				'background_color', 'zindex'
 			],
+			'selectLines' => ['sysmap_shapeid', 'x1', 'x2', 'y1', 'y2', 'line_type', 'line_width', 'line_color',
+				'zindex'
+			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
 				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
@@ -155,6 +158,10 @@ class CMapHelper {
 		}
 		unset($shape);
 
+		foreach ($sysmap['lines'] as $line) {
+			$sysmap['shapes'][] = self::convertLineToShape($line);
+		}
+
 		foreach ($sysmap['links'] as &$link) {
 			$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
 
@@ -190,5 +197,73 @@ class CMapHelper {
 			$link['drawtype'] = $drawtype;
 		}
 		unset($link);
+	}
+
+	/**
+	 * Convert map shape to line (apply mapping to attribute set).
+	 *
+	 * @param array $shape				Map shape.
+	 *
+	 * @return array
+	 */
+	public static function convertShapeToLine($shape) {
+		$mapping = [
+			'sysmap_shapeid',
+			'zindex',
+			'x' => 'x1',
+			'y' => 'y1',
+			'width' => 'x2',
+			'height' =>	'y2',
+			'border_type' => 'line_type',
+			'border_width' => 'line_width',
+			'border_color' => 'line_color'
+		];
+
+		$line = [];
+
+		foreach ($mapping as $source_key => $target_key) {
+			$source_key = (is_numeric($source_key)) ? $target_key : $source_key;
+
+			if (array_key_exists($source_key, $shape)) {
+				$line[$target_key] = $shape[$source_key];
+			}
+		}
+
+		return $line;
+	}
+
+	/**
+	 * Convert map line to shape (apply mapping to attribute set).
+	 *
+	 * @param array $line				Map line.
+	 *
+	 * @return array
+	 */
+	public static function convertLineToShape($line) {
+		$mapping = [
+			'sysmap_shapeid',
+			'zindex',
+			'x1' => 'x',
+			'y1' => 'y',
+			'x2' => 'width',
+			'y2' =>	'height',
+			'line_type' => 'border_type',
+			'line_width' => 'border_width',
+			'line_color' => 'border_color'
+		];
+
+		$shape = [];
+
+		foreach ($mapping as $source_key => $target_key) {
+			$source_key = (is_numeric($source_key)) ? $target_key : $source_key;
+
+			if (array_key_exists($source_key, $line)) {
+				$shape[$target_key] = $line[$source_key];
+			}
+		}
+
+		$shape['type'] = SYSMAP_SHAPE_TYPE_LINE;
+
+		return $shape;
 	}
 }

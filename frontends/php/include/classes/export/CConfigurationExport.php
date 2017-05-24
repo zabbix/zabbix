@@ -957,6 +957,7 @@ class CConfigurationExport {
 				'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
 				'zindex'
 			],
+			'selectLines' => ['x1', 'x2', 'y1', 'y2', 'line_type', 'line_width', 'line_color', 'zindex'],
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectIconMap' => API_OUTPUT_EXTEND,
