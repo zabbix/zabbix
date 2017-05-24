@@ -68,6 +68,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11618] fixed displaying hints with no content inside (miks)
 ..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
 ..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
