@@ -7,7 +7,7 @@ A.F.I..PS. [ZBXNEXT-1675] added support for user macros and time unit suffixes i
 ..F....... [ZBXNEXT-3870] implemented ability to drag multiple selected items in map editor (gcalenko)
 .......PS. [ZBXNEXT-3655] reduced self monitoring cache locking in trappers and manager processes (wiper)
 ..F....... [ZBXNEXT-51] implemented ability to copy and paste map elements (gcalenko)
-..F....... [ZBXNEXT-3567] hide SQL error messages for regular user (gcalenko)
+..F....... [ZBXNEXT-3567] implemented ability to hide SQL error messages for non-superadmin users (gcalenko)
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)

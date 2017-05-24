@@ -349,43 +349,6 @@ static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_session_access_level                                         *
- *                                                                            *
- * Purpose: validate if session is active and get its access level            *
- *                                                                            *
- * Parameters:  sessionid - [IN] the session id to validate                   *
- *                                                                            *
- * Return value:  user access level if session is valid or                    *
- *                USER_TYPE_UNDEFINED otherwise                               *
- *                                                                            *
- ******************************************************************************/
-static zbx_user_type_t	zbx_session_access_level(const char *sessionid)
-{
-	zbx_user_type_t	access_level;
-	char		*sessionid_esc;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	sessionid_esc = DBdyn_escape_string(sessionid);
-
-	result = DBselect(
-			"select u.type"
-			" from users u,sessions s"
-			" where u.userid=s.userid"
-				" and s.status=%d"
-				" and s.sessionid='%s'",
-			ZBX_SESSION_ACTIVE, sessionid_esc);
-
-	access_level = (NULL == (row = DBfetch(result)) ? USER_TYPE_UNDEFINED : atoi(row[0]));
-	DBfree_result(result);
-
-	zbx_free(sessionid_esc);
-
-	return access_level;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: recv_getqueue                                                    *
  *                                                                            *
  * Purpose: process queue request                                             *
@@ -402,6 +365,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	const char		*__function_name = "recv_getqueue";
 	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
+	zbx_user_t		user;
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
@@ -410,7 +374,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
-			USER_TYPE_SUPER_ADMIN > zbx_session_access_level(sessionid))
+			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -873,7 +837,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 #define ZBX_GET_STATUS_FULL	1
 
 	const char		*__function_name = "recv_getstatus";
-	zbx_user_type_t		access_level;
+	zbx_user_t		user;
 	int			ret = FAIL, request_type = ZBX_GET_STATUS_UNKNOWN;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
 	struct zbx_json		json;
@@ -881,7 +845,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
-			USER_TYPE_ZABBIX_USER > (access_level = zbx_session_access_level(sessionid)))
+			SUCCEED != DBget_user_by_active_session(sessionid, &user))
 	{
 		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -917,7 +881,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		case ZBX_GET_STATUS_FULL:
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
-			status_stats_export(&json, access_level);
+			status_stats_export(&json, user.type);
 			zbx_json_close(&json);
 			break;
 		default:
