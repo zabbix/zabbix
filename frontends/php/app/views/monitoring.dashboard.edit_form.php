@@ -21,7 +21,7 @@ $edit_form = (new CForm())
 	->setName('dashboard_form')
 	->setAttribute('style', 'display: none;');
 
-$user_multiselect = (new CMultiSelect([
+$multiselect = (new CMultiSelect([
 	'name' => 'userid',
 	'selectedLimit' => 1,
 	'objectName' => 'users',
@@ -37,7 +37,7 @@ $user_multiselect = (new CMultiSelect([
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $edit_form->addItem((new CFormList())
-	->addRow(_('Owner'), $user_multiselect)
+	->addRow(_('Owner'), $multiselect)
 	->addRow(_('Name'),
 		(new CTextBox('name', $data['dashboard']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -45,5 +45,5 @@ $edit_form->addItem((new CFormList())
 	)
 );
 
-return $edit_form;
+return [$edit_form, $multiselect];
 

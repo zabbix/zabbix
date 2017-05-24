@@ -27,7 +27,7 @@ $is_new = !array_key_exists('dashboardid', $data['dashboard']);
 $dashboardid = $is_new ? null : $data['dashboard']['dashboardid'];
 
 $sharing_form = include 'monitoring.dashboard.sharing_form.php';
-$edit_form = include 'monitoring.dashboard.edit_form.php';
+list($edit_form, $user_multiselect) = include 'monitoring.dashboard.edit_form.php';
 $breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
 $dashboard_data = [
