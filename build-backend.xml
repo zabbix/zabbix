@@ -82,12 +82,12 @@
 				<arg line="CFLAGS=&quot;${common.cflags} ${cc.cflags}&quot;"/>
 			</exec>
 			<exec executable="make" failonerror="on">
-				<!-- <arg line="-s"/> -->
+				<arg line="-s"/>
 				<arg line="-j5"/>
 				<arg line="clean"/>
 			</exec>
 			<exec executable="make" failonerror="on">
-				<!-- <arg line="-s"/> -->
+				<arg line="-s"/>
 				<arg line="-j5"/>
 				<arg line="@{target}"/>
 			</exec>
