@@ -74,15 +74,6 @@ class CControllerDashbrdWidgetConfig extends CController {
 			'type' => WIDGET_CLOCK
 		];
 
-		// TODO VM: (?) get current widget fields data from JS
-		//			(1) by getting current values from widget config, we can set default values to same fields in different widget type
-		//			(2) it may add unreasonable complaxity
-//		// get data for current widget - in case we are switching between types, and no fields for widget are given
-//		if ($this->hasInput('widgetid')) {
-//			$dialogue['widgetid'] = $this->getInput('widgetid');
-//			$widget = CWidgetConfig::getConfig($dialogue['widgetid']);
-//		}
-
 		// Get fields from dialogue form
 		$dialogue_fields = $this->hasInput('fields') ? $this->getInput('fields') : [];
 

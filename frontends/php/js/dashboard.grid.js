@@ -31,22 +31,20 @@
 			.addClass('dashbrd-grid-widget-foot');
 		widget['content_script'] = $('<div>');
 
-		if (widget['rf_rate'] != 0) {
-			widget['content_header'].append($('<ul>')
-				.append($('<li>')
-					.append($('<button>', {
-						'type': 'button',
-						'class': 'btn-widget-action',
-						'data-menu-popup': JSON.stringify({
-							'type': 'refresh',
-							'widgetName': widget['widgetid'],
-							'currentRate': widget['rf_rate'],
-							'multiplier': false
-						})
-					}))
-				)
-			);
-		}
+		widget['content_header'].append($('<ul>')
+			.append($('<li>')
+				.append($('<button>', {
+					'type': 'button',
+					'class': 'btn-widget-action',
+					'data-menu-popup': JSON.stringify({
+						'type': 'refresh',
+						'widgetName': widget['widgetid'],
+						'currentRate': widget['rf_rate'],
+						'multiplier': false
+					})
+				}))
+			)
+		);
 
 		return $('<div>', {
 			'class': 'dashbrd-grid-widget',
