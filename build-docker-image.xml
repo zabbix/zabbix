@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix docker" default="build" basedir=".">
-
 	<target name="build">
+	<!-- Get, run and delete script for generating new Zabbix image on Docker Hub -->
 		<exec executable="svn" failonerror="on">
 			<arg line="co"/>
 			<arg line="svn://192.168.3.4/docker/"/>
@@ -18,5 +18,4 @@
 		</exec>
 		<delete dir="docker"/>
 	</target>
-
 </project>
