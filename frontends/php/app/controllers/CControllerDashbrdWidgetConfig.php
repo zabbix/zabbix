@@ -93,7 +93,55 @@ class CControllerDashbrdWidgetConfig extends CController {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'dialogue' => $dialogue
+			'dialogue' => $dialogue,
+			'captions' => $this->getCaptions($dialogue['form'])
 		]));
+	}
+
+	/**
+	 * Prepares mapped list of names for all required resources
+	 *
+	 * @param CWidgetForm $form
+	 *
+	 * @return array
+	 */
+	private function getCaptions($form) {
+		$captions = [];
+		foreach ($form->getFields() as $field) {
+			if ($field instanceof CWidgetFieldItem) {
+				if (!array_key_exists('items', $captions)) {
+					$captions['items'] = [];
+				}
+				if (bccomp($field->getValue(true), '0') === 1
+					&& !array_key_exists($field->getValue(true), $captions['items'])
+				){
+					$captions['items'][$field->getValue(true)] = '';
+				}
+			}
+		}
+
+		foreach ($captions as $resource => $list) {
+			if (empty($list)) {
+				continue;
+			}
+			if ($resource === 'items') {
+				$items = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'key_', 'name'],
+					'selectHosts' => ['name'],
+					'itemids' => array_keys($list),
+					'webitems' => true
+				]);
+
+				if ($items) {
+					$items = CMacrosResolverHelper::resolveItemNames($items);
+
+					foreach ($items as $key => $item) {
+						$captions['items'][$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+					}
+				}
+			}
+		}
+
+		return $captions;
 	}
 }

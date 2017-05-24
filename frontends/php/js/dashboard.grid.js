@@ -399,10 +399,8 @@
 			ajax_data['fields'] = widget['fields'];
 		}
 		if (typeof(widget['dynamic']) !== 'undefined') {
-			ajax_data['dynamic'] = {
-				'hostid': widget['dynamic']['hostid'],
-				'groupid': widget['dynamic']['groupid']
-			}
+			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
+			ajax_data['dynamic_groupid'] = widget['dynamic']['groupid'];
 		}
 
 		startPreloader(widget);
@@ -489,7 +487,7 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboard_id: data['dashboard']['id'], // TODO VM: (?) will not work without dashboard id
+				dashboard_id: data['dashboard']['id'],
 				widgets: ajax_widgets,
 				save: 0 // WIDGET_CONFIG_DONT_SAVE - only check
 			},

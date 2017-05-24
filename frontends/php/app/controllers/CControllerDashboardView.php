@@ -64,16 +64,31 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$this->setResponse((new CControllerResponseRedirect($url->getUrl())));
 			return;
 		}
+		$pageFilter = new CPageFilter([
+			'groups' => [
+				'monitored_hosts' => true,
+				'with_items' => true
+			],
+			'hosts' => [
+				'monitored_hosts' => true,
+				'with_items' => true,
+				'DDFirstLabel' => _('not selected')
+			],
+			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
+			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
+		]);
+
 		$data = [
 			'dashboard' => $this->dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
 			'grid_widgets' => $this->getWidgets($this->dashboard['widgets']),
 			'widgetDefaults' => CWidgetConfig::getDefaults(),
+			'pageFilter' => $pageFilter,
 			'dynamic' => [
 				'has_dynamic_widgets' => $this->hasDynamicWidgets($this->dashboard['widgets']),
-				'groupid' => $this->getInput('groupid', 0),
-				'hostid' => $this->getInput('hostid', 0)
+				'hostid' => $pageFilter->hostid,
+				'groupid' => $pageFilter->groupid
 			]
 		];
 
@@ -195,11 +210,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'height' => (int) $widget['height'],
 					'width' => (int) $widget['width']
 				],
-				// TODO VM: (?) update refresh rate to take into account dashboard id
-				//			(1) Adding dashboard ID will limit reusage of dashboard.grid.js for pages without dashboard ID's
-				//			(2) Each widget has unique ID across all dashboards, so it will still work
-				//			(3) Leaving identification only be widget ID, it will be harder to manage, when deleating dashboards.
-				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $default_rf_rate),
+				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
 				// 'type' always should be in fields array
 				'fields' => ['type' => $widget['type']] + $this->convertWidgetFields($widget['fields'])
 			];

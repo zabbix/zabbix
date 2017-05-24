@@ -35,8 +35,6 @@ class CWidgetField
 	 * @param string $label label for the field in form
 	 * @param mixed $default default value
 	 * @param string $action JS function to call on field change
-	 *
-	 * @return CWidgetField
 	 */
 	public function __construct($name, $label = null, $default = null, $action = null) {
 		$this->name = $name;
@@ -95,7 +93,7 @@ class CWidgetField
 	public function validate() {
 		$errors = [];
 		if ($this->required === true && $this->value === null) {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
+			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
 		}
 
 		return $errors;

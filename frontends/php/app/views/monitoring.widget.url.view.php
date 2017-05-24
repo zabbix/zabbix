@@ -18,11 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-if ($data['url']['error'] !== null) {
-	$item = (new CTableInfo())->setNoDataMessage($data['url']['error']);
-} else {
-	$item = (new CIFrame($data['url']['url'], $data['url']['inner_width'], $data['url']['inner_height'], 'auto'));
-}
+$item = ($data['url']['error'] !== null)
+	? (new CTableInfo())->setNoDataMessage($data['url']['error'])
+	: (new CIFrame($data['url']['url'], $data['url']['inner_width'], $data['url']['inner_height'], 'auto'));
 
 $output = [
 	'header' => _('URL'),
