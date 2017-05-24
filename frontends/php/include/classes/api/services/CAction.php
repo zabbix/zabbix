@@ -1027,13 +1027,16 @@ class CAction extends CApiService {
 		$opInventoryToUpdate = [];
 		$opInventoryToDeleteByOpId = [];
 
+		$operation_actions_hashkey = [
+			ACTION_OPERATION				=> 'operations',
+			ACTION_RECOVERY_OPERATION		=> 'recoveryOperations',
+			ACTION_ACKNOWLEDGE_OPERATION	=> 'acknowledgeOperations'
+		];
+
 		foreach ($operations as $operation) {
-			if ($operation['recovery'] == ACTION_OPERATION) {
-				$operationsDb = zbx_toHash($db_actions[$operation['actionid']]['operations'], 'operationid');
-			}
-			else {
-				$operationsDb = zbx_toHash($db_actions[$operation['actionid']]['recoveryOperations'], 'operationid');
-			}
+			$actions_key = $operation_actions_hashkey[$operation['recovery']];
+
+			$operationsDb = zbx_toHash($db_actions[$operation['actionid']][$actions_key], 'operationid');
 
 			$operationDb = $operationsDb[$operation['operationid']];
 
