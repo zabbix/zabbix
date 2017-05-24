@@ -682,11 +682,10 @@
 	}
 
 	function runTrigger($obj, data, triggerName) {
-		// TODO miks: correct typo in 'triggerrs'.
 		$.each(data['widgets'], function(index, widget) {
-			if (typeof widget['triggerrs'][triggerName] !== 'undefined') {
+			if (typeof widget['triggers'][triggerName] !== 'undefined') {
 				try {
-					eval('$("#"+$("[id]", widget.content_body).attr("id")).'+widget['triggerrs'][triggerName]);
+					eval('$("#"+$("[id]", widget.content_body).attr("id")).'+widget['triggers'][triggerName]);
 				}
 				catch(e) {}
 			}
@@ -726,14 +725,14 @@
 			});
 		},
 
-		setWidgetTriggers: function(widgetid, triggerrs) {
+		setWidgetTriggers: function(widgetid, triggers) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid) {
-						widget['triggerrs'] = triggerrs;
+						widget['triggers'] = triggers;
 					}
 				});
 			});

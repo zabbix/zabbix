@@ -139,7 +139,7 @@ class CControllerDashboardView extends CController {
 			$grid_widgets[$widgetid] = [
 				'widgetid' => $widgetid,
 				'type' => $widget['type'],
-				'triggerrs' => CWidgetConfig::getTriggers($widget['type']),
+				'triggers' => CWidgetConfig::getTriggers($widget['type']),
 				'header' => ($widget['name'] !== '') ? $widget['name'] : $widget_names[$widget['type']],
 				// TODO VM: widget headers are not affeced by name from database, because it is rewritten by specific widget's API call
 				'pos' => [

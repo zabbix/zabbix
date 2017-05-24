@@ -3059,6 +3059,9 @@ tr.cursor-move td * {
       border-width: 1px 0px;
       border-style: solid; }
 
+.drop-hover > .row {
+  background: #faebd7; }
+
 /*doc
 ---
 //title: About

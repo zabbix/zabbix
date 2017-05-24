@@ -44,7 +44,7 @@ class CWidgetFieldSelectResource extends CWidgetField
 				$this->popup_url_dstfld1 = $name;
 				$this->popup_url_dstfld2 = $this->caption_name;
 
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 				break;
 			default:
 				break;

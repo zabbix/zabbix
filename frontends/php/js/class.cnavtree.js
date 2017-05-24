@@ -5,14 +5,15 @@ jQuery(function($) {
 	 * @return object
 	 */
 
-	// TODO miks: change button icons.
-	// TODO miks: improve sortability.
-
 	if (typeof($.fn.zbx_navtree) === 'undefined') {
 		$.fn.zbx_navtree = function(input) {
 			$this = $(this);
+			var dropped_to = null;
 
-			// TODO miks: move style to css.
+			/* TODO miks:
+			 * Button styles should be moved to stylesheet.
+			 * Icons should be changed.
+			 */
 			var buttonCssAdd = {
 				'background': "url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjguMyAoMjk4MDIpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjIweDIwL1BsdXM8L3RpdGxlPgogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+CiAgICA8ZGVmcz48L2RlZnM+CiAgICA8ZyBpZD0iMjB4MjAiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICAgICAgPGcgaWQ9IjIweDIwL1BsdXMiIHN0cm9rZT0iIzM2NDM0RCI+CiAgICAgICAgICAgIDxnIGlkPSJQbHVzIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyLjAwMDAwMCwgMi4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMCw4IEwxNiw4IiBpZD0iTGluZS00Ij48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTgsMCBMOCwxNiIgaWQ9IkxpbmUtMyI+PC9wYXRoPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=') no-repeat left center",
 				'background-size': 'cover',
@@ -49,6 +50,24 @@ jQuery(function($) {
 				return widget_data.lastId;
 			}
 
+			var getDroppableOptions = function() {
+				var widget_data = $this.data('widgetData');
+
+				return {
+					hoverClass: 'drop-hover',
+					addClasses: false,
+					accept: function() {
+						return (widget_data.maxDepth >= +$('.tree-list', this).data('depth'));
+					},
+					addClasses: false,
+					tolerance: 'pointer',
+					drop: function(event, ui) {
+						dropped_to = $(this);
+					},
+					greedy: true
+				};
+			};
+
 			var drawTree = function() {
 				var widget_data = $this.data('widgetData'),
 						root = createTreeBranch('root'),
@@ -60,7 +79,7 @@ jQuery(function($) {
 
 				$.each(tree, function(i, item) {
 					if (typeof item === 'object') {
-						root.append(createTreeItem(item, 1));
+						root.append(createTreeItem(item));
 					}
 				});
 
@@ -116,12 +135,9 @@ jQuery(function($) {
 				});
 			};
 
-			var createTreeBranch = function(className, depth) {
+			var createTreeBranch = function(className) {
 				var className = className||null,
-						depth = depth||1,
-						ul = $('<ul></ul>')
-								.attr('data-depth', depth)
-								.addClass('tree-list');
+						ul = $('<ul></ul>').addClass('tree-list');
 
 				if (className) {
 					$(ul).addClass(className);
@@ -150,6 +166,7 @@ jQuery(function($) {
 
 			var createTreeItem = function(item, depth) {
 				var widget_data = $this.data('widgetData'),
+						depth = depth||1,
 						link, span, li, ul, arrow;
 
 				if (typeof item.mapid !== 'undefined' && item.mapid) {
@@ -187,9 +204,7 @@ jQuery(function($) {
 					link.attr('data-mapid', item.mapid);
 				}
 
-				if (widget_data.maxDepth > depth) {
-					ul = createTreeBranch(null, depth+1);
-				}
+				ul = createTreeBranch(null);
 
 				arrow = $('<span></span>')
 					.click(function() {
@@ -213,46 +228,49 @@ jQuery(function($) {
 						li.addClass('is-parent');
 					}
 
-					$.each(item.children, function(i, item){
-						if (typeof item === 'object') {
-							ul.append(createTreeItem(item, depth+1));
-							if (item.id > widget_data.lastId) {
-								widget_data.lastId = item.id;
+					if (widget_data.maxDepth > depth) {
+						$.each(item.children, function(i, item) {
+							if (typeof item === 'object') {
+								ul.append(createTreeItem(item, depth+1));
+								if (item.id > widget_data.lastId) {
+									widget_data.lastId = item.id;
+								}
 							}
-						}
-					});
+						});
+					}
 				}
 
 				if (isEditMode()) {
 					var tools = $('<div></div>').addClass('tools').insertAfter(link);
 
-					if (widget_data.maxDepth > +$(this).closest('.tree-list').data('depth')) {
-						$('<input>')
-							.click(function() {
-								var parentId = $(this).data('id'),
-										widget_data = $this.data('widgetData'),
-										depth = +$(this).closest('.tree-list').data('depth'),
-										branch = $('.tree-item[data-id='+parentId+']>ul', $this),
-										new_item = {
-											name: t('New item'),
-											parent: parentId,
-											id: getNextId()
-										};
+					$('<input>')
+						.click(function() {
+							var parentId = $(this).data('id'),
+									widget_data = $this.data('widgetData'),
+									depth = +$(this).closest('.tree-list').data('depth'),
+									branch = $('.tree-item[data-id='+parentId+']>ul', $this),
+									new_item = {
+										name: t('New item'),
+										parent: parentId,
+										id: getNextId()
+									};
 
+							if (widget_data.maxDepth > depth) {
 								if (!branch.size()) {
-									branch = createTreeBranch(null, depth+1);
+									branch = createTreeBranch(null);
 									branch.appentTo($('.tree-item[data-id='+parentId+']', $this));
 								}
 
 								$('.tree-item[data-id='+parentId+']', $this).addClass('is-parent opened').removeClass('closed');
-								branch.append(createTreeItem(new_item, depth+1));
+								branch.append(createTreeItem(new_item));
+								$(".tree-item").droppable(getDroppableOptions());
 								storeUIState();
-							})
-							.addClass('add-child-btn')
-							.attr({'type':'button', 'data-id':item.id})
-							.css(buttonCssAdd)
-							.appendTo(tools);
-					}
+							}
+						})
+						.addClass('add-child-btn')
+						.attr({'type':'button', 'data-id':item.id})
+						.css(buttonCssAdd)
+						.appendTo(tools);
 
 					$('<input>')
 						.click(function() {
@@ -336,11 +354,30 @@ jQuery(function($) {
 				return li;
 			};
 
+			// Returns a number of levels till the deepest branch (ul.tree-list).
+			var levelsUnder = function(item) {
+				var depths = [], levels;
+
+				$('.tree-list', item).not(':empty').each(function(i, item) {
+					levels = 0;
+					while ($('.tree-list', item).size()) {
+						item = $('.tree-list', item).not(':empty');
+						levels++;
+					}
+
+					depths.push(levels);
+				});
+
+				return depths.length ? Math.max.apply(null, depths) : 0;
+			};
+
 			var setTreeHandlers = function() {
-				var opened_nodes = cookie.read(getCookieName('opened_nodes'));
+				var opened_nodes = cookie.read(getCookieName('opened_nodes')),
+						widget_data = $this.data('widgetData');
 
 				opened_nodes = opened_nodes ? opened_nodes.split(',') : [];
 
+				// Add .is-parent class for branches with sub-items.
 				$('.tree-list', $this).each(function() {
 					if ($('.tree-item', $(this)).size()) {
 						$(this).closest('.tree-item').addClass('is-parent');
@@ -350,6 +387,7 @@ jQuery(function($) {
 					}
 				});
 
+				// Set which brances are opened and which ones are closed.
 				$('.tree-item[data-id]').each(function() {
 					var id = $(this).data('id');
 					if (opened_nodes.indexOf(id.toString()) !== -1) {
@@ -360,6 +398,20 @@ jQuery(function($) {
 					}
 				});
 
+				// Set [data-depth] for list and each sublist.
+				$('.tree-list').each(function() {
+					$(this).attr('data-depth', $(this).parents('.tree-list').size()+1);
+				});
+
+				// Show/hide 'add new items' buttons.
+				$('.tree-list').filter(function(){return +$(this).data('depth') >= widget_data.maxDepth;}).each(function() {
+					$('.add-child-btn', $(this)).hide();
+				});
+				$('.tree-list').filter(function(){return widget_data.maxDepth > +$(this).data('depth');}).each(function() {
+					$('>.tree-item>.row>.tools>.add-child-btn', $(this)).show();
+				});
+
+				// Change arrow style.
 				$('.is-parent.opened .arrow-right', $this).removeClass('arrow-right').addClass('arrow-down');
 				$('.is-parent.closed .arrow-down', $this).removeClass('arrow-down').addClass('arrow-right');
 			};
@@ -389,103 +441,82 @@ jQuery(function($) {
 								};
 
 						root = (typeof root !== 'undefined') ? root : $('ul.root', $this);
-						root.append(createTreeItem(new_item, 1));
+						root.append(createTreeItem(new_item));
+						$(".tree-item").droppable(getDroppableOptions());
 					})
 					.appendTo(toolBar)
 					.html(t('Add'));
-/*
-					var droppedTo;
 
-					$(".tree-list.root").sortable({
+					$('.tree-list.root').sortable({
 						items: '.tree-item',
 						connectWith: '.tree-list',
 						placeholder: 'sortable-item-placeholder',
+						cursor: 'move',
+						axis: 'y',
+						opacity: .75,
+						distance: 5,
+						cursorAt: {bottom: 5},
+						forcePlaceholderSize: true,
+						forceHelperSize: true,
+						tolerance: 'intersect',
+						zIndex: 9999,
 						update: function(event, ui) {
-							co ns ole.log(this);
-							co ns ole.log(ui.item);
+							$('.drop-hover').removeClass('drop-hover');
+							setTreeHandlers();
 						},
 						stop: function(event, ui) {
-							if (typeof droppedTo === 'undefined') {
-								return;
-							}
+							var dropped_to_root = false,
+									new_parent_id = 0,
+									overlaped_by = 0,
+									item_height = 33,
+									tolerance = 10;
 
-							var new_parent_id = 0;
-							if (droppedTo.data('id') !== 'undefined') {
-								new_parent_id = $(droppedTo).data('id');
-							}
-
-							if (new_parent_id && droppedTo.data('id') != ui.item.data('id')) {
-								$('ul:first', $(droppedTo))
-									.append(ui.item);
-
-								$(droppedTo)
-									.addClass('is-parent opened')
-									.removeClass('closed');
-							}
-							else {
-								$(droppedTo).append(ui.item);
-							}
-
-							$('[name^="map.parent."]', ui.item).val(new_parent_id);
-							droppedTo = null;
-							setTreeHandlers();
-						}
-					})
-					.disableSelection();
-
-					$(".tree-list.root").droppable({
-						accept: ".tree-item",
-						drop: function(event, ui) {
-							droppedTo = $(this);
-						}
-					});
-*/
-
-					$('li', root)
-						.draggable({
-							handle: '.row',
-							stop: function(event, ui){
-								ui.helper.attr('style', 'position: relative');
-								setTreeHandlers();
-							},
-							drag: function( event, ui ) {
-								ui.position.left = Math.min(100, ui.position.left);
-							},
-							revert: 'invalid',
-							cursor: 'move',
-							helper: 'clone',
-							zIndex: 100,
-							axis: 'y'
-						})
-						.disableSelection();
-
-					$('.tree-item', root)
-						.droppable({
-							over: function() {
-								$(this).addClass('tree-item-placeholder');
-							},
-							tolerance: 'pointer',
-							out: function() {
-								$(this).removeClass('tree-item-placeholder');
-							},
-							drop: function(event, ui) {
-								var li = $(this).closest('li'),
-										ul = li.children('ul'),
-										new_parent_id = 0;
-
-								$(this).removeClass('tree-item-placeholder');
-								ui.draggable.appendTo(ul);
-								ui.draggable.attr('style', 'position: relative');
-
-								if (li.length) {
-									new_parent_id = li.data('id');
-									ul = li.children('ul');
+							if (dropped_to) {
+								// If  $(dropped_to) have [data-depth] > maxDepth, select it's parent.
+								while ($('>ul:first', $(dropped_to)).size() &&
+											+$('>ul:first', $(dropped_to)).data('depth') > widget_data.maxDepth) {
+									dropped_to = $(dropped_to).closest('.tree-list').closest('.tree-item');
 								}
 
-								$('[name^="map.parent."]', ui.draggable).val(new_parent_id);
-								setTreeHandlers();
+								if (dropped_to.length) {
+									// Cancel sorting if by dropping an item the maxDepth will be exceeded.
+									var num_of_new_levels = $('ul:first', $(dropped_to)).data('depth') + levelsUnder(ui.item);
+									if (num_of_new_levels > widget_data.maxDepth) {
+										alert('Only '+widget_data.maxDepth+' levels are allowed.');
+
+										$('.tree-list.root').sortable('cancel');
+										dropped_to = null;
+										setTreeHandlers();
+										return;
+									}
+
+									dropped_to_root = ($(dropped_to).data('id') === 'undefined');
+									overlaped_by = ui.offset.top - dropped_to.offset().top;
+
+									// Add as child element. Otherwise rely on default sortablility.
+									if (Math.abs(overlaped_by) <= item_height/2) {
+										if (!dropped_to_root) {
+											$('>ul:first', $(dropped_to)).append(ui.item);
+
+											$(dropped_to)
+												.addClass('is-parent opened')
+												.removeClass('closed');
+										}
+									}
+								}
 							}
-						});
+
+							new_parent_id = $('.tree-item[data-id='+ui.item.data('id')+']').closest('.tree-list')
+										.closest('.tree-item').data('id');
+
+							$('[name^="map.parent.'+ui.item.data('id')+'"]').val(new_parent_id||0);
+							dropped_to = null;
+							storeUIState();
+							setTreeHandlers();
+						}
+					}).disableSelection();
+
+					$(".tree-item").droppable(getDroppableOptions());
 			};
 
 			var removeEditTools = function() {
