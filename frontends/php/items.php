@@ -1109,6 +1109,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['config'] = select_config();
 	$data['host'] = $host;
+	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
