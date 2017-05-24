@@ -231,11 +231,11 @@
 			</apply>
 			<dirset dir="." includes="zabbix-*" id="dist.dir"/>
 			<property name="prop.dist.dir" refid="dist.dir"/>
-			<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dir-target" inheritAll="true" inheritRefs="true" />
+			<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true" />
 		</sequential>
 	</target>
 
-	<target name="build-dir-target" depends="create-db,make-gcc,make-db"/>
+	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
-	<target name="build" depends="init,make-clang"/>
+	<target name="build" depends="init,make-clang,make-dist"/>
 </project>
