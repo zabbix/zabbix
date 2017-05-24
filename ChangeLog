@@ -49,6 +49,7 @@ A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 b
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+........S. [ZBX-12201] fixed crash when processing SNMP trap log item, fixed log item processing without pre-processing options (wiper)
 ........S. [ZBX-12199] removed condition check for recovery operations (wiper)
 ...GI..PS. [ZBX-3924] switched from POSIX extended to the PCRE regular expression library for enhanced regular expressions and consistency with frontend (vso)
 .......PS. [ZBX-11867] fixed memory leak in history cache and history cache statistics (wiper)
