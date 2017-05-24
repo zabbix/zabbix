@@ -75,11 +75,6 @@
 			</switch>
 
 			<!-- clean, configure and build -->
-			<exec executable="make" failonerror="on">
-				<arg line="-s"/>
-				<arg line="-j5"/>
-				<arg line="clean"/>
-			</exec>
 			<exec executable="./configure" failonerror="on">
 				<env key="CC" value="@{cc}"/>
 				<arg line="@{args}"/>
@@ -87,7 +82,12 @@
 				<arg line="CFLAGS=&quot;${common.cflags} ${cc.cflags}&quot;"/>
 			</exec>
 			<exec executable="make" failonerror="on">
-				<arg line="-s"/>
+				<!-- <arg line="-s"/> -->
+				<arg line="-j5"/>
+				<arg line="clean"/>
+			</exec>
+			<exec executable="make" failonerror="on">
+				<!-- <arg line="-s"/> -->
 				<arg line="-j5"/>
 				<arg line="@{target}"/>
 			</exec>
@@ -215,6 +215,27 @@
 			</exec>
 		</sequential>
 	</target>
+	
+	<target name="make-dist" depends="init">
+		<!-- Create & build Zabbix distribution -->
+		<sequential>
+			<delete includeemptydirs="true">
+				<fileset dir="." includes="zabbix-*/**"/>
+				<dirset dir="." includes="zabbix-*"/>
+				<fileset dir="." includes="zabbix-*"/>
+			</delete>
+			<make args="" target="dist"/>
+			<apply executable="tar">
+				<arg line="-zxvf"/>
+				<fileset dir="." includes="*.tar.gz"/>
+			</apply>
+			<dirset dir="." includes="zabbix-*" id="dist.dir"/>
+			<property name="prop.dist.dir" refid="dist.dir"/>
+			<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true" />
+		</sequential>
+	</target>
 
-	<target name="build" depends="init,create-db,make-gcc,make-clang,make-db"/>
+	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
+
+	<target name="build" depends="init,make-clang,make-dist"/>
 </project>
