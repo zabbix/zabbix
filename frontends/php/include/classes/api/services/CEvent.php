@@ -505,8 +505,6 @@ class CEvent extends CApiService {
 			DB::insert('task_close_problem', $task_close, false);
 		}
 
-		// TODO: find action triggered event and _only_ if action have ack_operation
-		// perform insert to 'task' and 'task_acknowledge' tables
 		$tasks = [];
 
 		for ($i = 0; $i < $ack_count; $i++) {
