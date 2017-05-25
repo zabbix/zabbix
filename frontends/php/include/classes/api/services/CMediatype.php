@@ -384,7 +384,7 @@ class CMediatype extends CApiService {
 				$ge_value = 0;
 				$le_value = 10;
 				$value = $mediatype['maxattempts'];
-				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
+				$valid_value = (is_integer($mediatype['maxattempts']) || is_string($mediatype['maxattempts']));
 				if (!$valid_value || $value < $ge_value || $value > $le_value) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
