@@ -1652,7 +1652,8 @@ ZABBIX.apps.map = (function($) {
 					gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
 				// if 'fit to map' area coords are 0 always
-				if (this.data.elementsubtype === '1' && this.data.areatype === '0') {
+				if (this.data.elementsubtype === '1' && this.data.areatype === '0'
+						&& this.data.elementtype === '3') {
 					newX = 0;
 					newY = 0;
 				}
