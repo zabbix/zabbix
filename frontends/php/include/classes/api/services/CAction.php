@@ -666,7 +666,7 @@ class CAction extends CApiService {
 				$actionUpdateValues['evaltype'] = $actionFilter['evaltype'];
 			}
 
-			if (array_key_exists('operations', $action) && $action['operations']) {
+			if (array_key_exists('operations', $action)) {
 				$db_operations = zbx_toHash($db_action['operations'], 'operationid');
 
 				foreach ($action['operations'] as $operation) {
@@ -688,7 +688,7 @@ class CAction extends CApiService {
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_operations));
 			}
 
-			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']) {
+			if (array_key_exists('recovery_operations', $action)) {
 				$db_recovery_operations = zbx_toHash($db_action['recoveryOperations'], 'operationid');
 
 				foreach ($action['recovery_operations'] as $recovery_operation) {
@@ -726,7 +726,7 @@ class CAction extends CApiService {
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_recovery_operations));
 			}
 
-			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
+			if (array_key_exists('acknowledge_operations', $action)) {
 				$db_ack_operations = zbx_toHash($db_action['acknowledgeOperations'], 'operationid');
 
 				foreach ($action['acknowledge_operations'] as $ack_operation) {
