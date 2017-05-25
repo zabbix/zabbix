@@ -111,6 +111,9 @@ $fields = [
 ];
 
 $dataValid = check_fields($fields);
+$edit_ack_operationid = null;
+$new_ack_operation = getRequest('new_ack_operation', []);
+$ack_operations = getRequest('ack_operations', []);
 
 if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
 	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
@@ -441,25 +444,18 @@ elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operati
 		unset($_REQUEST['new_recovery_operation']);
 	}
 }
-elseif (hasRequest('add_ack_operation') && hasRequest('new_ack_operation')) {
-	$new_ack_operation = getRequest('new_ack_operation');
-
-	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
-
+elseif (hasRequest('add_ack_operation') && $new_ack_operation) {
 	$new_ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
-	$new_ack_operation['eventsource'] = $eventsource;
+	$new_ack_operation['eventsource'] = EVENT_SOURCE_TRIGGERS;
 
 	if (API::Action()->validateOperationsIntegrity($new_ack_operation)) {
-		$_REQUEST['ack_operations'] = getRequest('ack_operations', []);
-
-		if (isset($_REQUEST['new_ack_operation']['id'])) {
-			$_REQUEST['ack_operations'][$_REQUEST['new_ack_operation']['id']] = $_REQUEST['new_ack_operation'];
+		if (array_key_exists('id', $new_ack_operation)) {
+			$ack_operations[$new_ack_operation['id']] = $new_ack_operation;
 		}
 		else {
-			$_REQUEST['ack_operations'][] = $_REQUEST['new_ack_operation'];
+			$ack_operations[] = $new_ack_operation;
 		}
-
-		unset($_REQUEST['new_ack_operation']);
+		$new_ack_operation = [];
 	}
 }
 elseif (hasRequest('edit_operationid')) {
@@ -484,14 +480,11 @@ elseif (hasRequest('edit_recovery_operationid')) {
 	}
 }
 elseif (hasRequest('edit_ack_operationid')) {
-	$_REQUEST['edit_ack_operationid'] = array_keys($_REQUEST['edit_ack_operationid']);
-	$edit_ack_operationid = array_pop($_REQUEST['edit_ack_operationid']);
-	$_REQUEST['edit_ack_operationid'] = $edit_ack_operationid;
-	$_REQUEST['ack_operations'] = getRequest('ack_operations', []);
+	$edit_ack_operationid = array_keys(getRequest('edit_ack_operationid'))[0];
 
-	if (array_key_exists($edit_ack_operationid, $_REQUEST['ack_operations'])) {
-		$_REQUEST['new_ack_operation'] = $_REQUEST['ack_operations'][$edit_ack_operationid];
-		$_REQUEST['new_ack_operation']['id'] = $edit_ack_operationid;
+	if (array_key_exists($edit_ack_operationid, $ack_operations)) {
+		$new_ack_operation = $ack_operations[$edit_ack_operationid];
+		$new_ack_operation['id'] = $edit_ack_operationid;
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.massenable', 'action.massdisable']) && hasRequest('g_actionid')) {
@@ -562,7 +555,7 @@ if (hasRequest('form')) {
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
 		'new_recovery_operation' => getRequest('new_recovery_operation'),
-		'new_ack_operation' => getRequest('new_ack_operation'),
+		'new_ack_operation' => $new_ack_operation,
 		'config' => $config
 	];
 
@@ -627,7 +620,7 @@ if (hasRequest('form')) {
 		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['operations'] = getRequest('operations', []);
 		$data['action']['recovery_operations'] = getRequest('recovery_operations', []);
-		$data['action']['ack_operations'] = getRequest('ack_operations', []);
+		$data['action']['ack_operations'] = $ack_operations;
 
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');
