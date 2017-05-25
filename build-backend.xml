@@ -23,8 +23,8 @@
 		</default>
 	</switch>
 
-	<!-- Static analysis target. detached from the default -->
-	<target name="static-analysis">
+	<!-- Cppcheck static analysis target -->
+	<target name="cppcheck-static-analysis">
 		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">
 			<arg line="--enable=all"/>
 			<arg line="-j4"/>
@@ -40,6 +40,25 @@
 			<arg line="."/>
 		</exec>
 	</target>
+	
+	<!-- Clang Static Analyzer target -->
+	<target name="clang-static-analyzer">
+		<exec executable="scan-build" failonerror="on">
+			<arg line="./configure"/>
+			<arg line="--enable-server"/>
+			<arg line="--with-mysql"/>
+		</exec>
+		<exec executable="scan-build" failonerror="on">
+			<arg line="-o"/>
+			<arg line="${WORKSPACE}/clang-scan-build-reports"/>
+			<arg line="make"/>
+			<arg line="-s"/>
+			<arg line="-j5"/>
+		</exec>
+	</target>
+	
+	<!-- Static analysis container target -->
+	<target name="static-analysi" depends="cppcheck-static-analysis,clang-static-analyzer"/>
 
 	<target name="init">
 		<!-- Create database schema -->
