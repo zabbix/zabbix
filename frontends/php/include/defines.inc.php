@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.4.0alpha1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030073);
+define('ZABBIX_DB_VERSION',		3030076);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -545,7 +545,7 @@ define('EZ_TEXTING_LIMIT_CANADA',	1);
 define('ACTION_DEFAULT_SUBJ_TRIGGER', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
 define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
 define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
-define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Acknowledgement message: {TRIGGER.NAME} ');
+define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Acknowledgement message: {TRIGGER.NAME}');
 
 define('ACTION_DEFAULT_MSG_TRIGGER', "Trigger: {TRIGGER.NAME}\nTrigger status: {TRIGGER.STATUS}\n".
 		"Trigger severity: {TRIGGER.SEVERITY}\nTrigger URL: {TRIGGER.URL}\n\nItem values:\n\n".
@@ -562,7 +562,7 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
 );
 define('ACTION_DEFAULT_MSG_ACKNOWLEDGE', "Acknowledgement message: {ACK.MESSAGE}\n".
-		"Acknowledgement by user: {ACK.USERNAME}\n\nAcknowledgement status: {EVENT.ACK.STATUS}\n".
+		"Acknowledgement by user: {USER.FULLNAME}\n\nAcknowledgement status: {EVENT.ACK.STATUS}\n".
 		"Acknowledgement history: {EVENT.ACK.HISTORY}\n\n".
 		"Trigger: {TRIGGER.NAME}\nTrigger status: {TRIGGER.STATUS}\nTrigger severity: {TRIGGER.SEVERITY}\n".
 		"Trigger URL: {TRIGGER.URL}\n\nItem values:\n\n".

@@ -1579,40 +1579,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DBget_username                                                   *
- *                                                                            *
- * Purpose: retrieve the username                                             *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_username(char **replace_to, zbx_uint64_t userid)
-{
-	const char	*__function_name = "DBget_username";
-
-	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result = DBselect(
-			"select name from users"
-			" where userid=" ZBX_FS_UI64,
-			userid);
-
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		ret = SUCCEED;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
 #define MVAR_ACTION			"{ACTION."			/* a prefix for all action macros */
 #define MVAR_ACTION_ID			MVAR_ACTION "ID}"
 #define MVAR_ACTION_NAME		MVAR_ACTION "NAME}"
@@ -1799,7 +1765,7 @@ static int	DBget_username(char **replace_to, zbx_uint64_t userid)
 #define MVAR_ALERT_MESSAGE		"{ALERT.MESSAGE}"
 
 #define MVAR_ACK_MESSAGE                "{ACK.MESSAGE}"
-#define MVAR_ACK_USERNAME               "{ACK.USERNAME}"
+#define MVAR_USER_FULLNAME          	"{USER.FULLNAME}"
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
@@ -2890,15 +2856,17 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->value);
 				}
-				else if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+				else if (0 == strcmp(m, MVAR_ACK_MESSAGE))
 				{
-					if (0 == strcmp(m, MVAR_ACK_MESSAGE))
-					{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
 						replace_to = zbx_strdup(replace_to, ack->message);
-					}
-					else if (0 == strcmp(m, MVAR_ACK_USERNAME))
+				}
+				else if (0 == strcmp(m, MVAR_USER_FULLNAME))
+				{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
 					{
-						ret = DBget_username(&replace_to, ack->userid);
+						replace_to = zbx_dsprintf(replace_to, "%s",
+								zbx_user_string(ack->userid));
 					}
 				}
 			}

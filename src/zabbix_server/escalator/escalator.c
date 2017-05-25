@@ -29,6 +29,7 @@
 #include "../operations.h"
 #include "../actions.h"
 #include "../scripts/scripts.h"
+#include "../events.h"
 #include "../../libs/zbxcrypto/tls.h"
 #include "comms.h"
 
@@ -52,6 +53,7 @@ typedef struct
 {
 	zbx_uint64_t	userid;
 	zbx_uint64_t	mediatypeid;
+	zbx_uint64_t	ackid;
 	char		*subject;
 	char		*message;
 	void		*next;
@@ -80,7 +82,8 @@ extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
-		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message);
+		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
+		zbx_uint64_t ackid);
 
 /******************************************************************************
  *                                                                            *
@@ -257,7 +260,7 @@ static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
 }
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message)
+		const char *subject, const char *message, zbx_uint64_t ackid)
 {
 	const char	*__function_name = "add_user_msg";
 	ZBX_USER_MSG	*p, **pnext;
@@ -268,7 +271,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	{
 		for (pnext = user_msg, p = *user_msg; NULL != p; p = *pnext)
 		{
-			if (p->userid == userid && 0 == strcmp(p->subject, subject) &&
+			if (p->userid == userid && p->ackid == ackid && 0 == strcmp(p->subject, subject) &&
 					0 == strcmp(p->message, message) && 0 != p->mediatypeid)
 			{
 				*pnext = p->next;
@@ -284,9 +287,12 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 	for (p = *user_msg; NULL != p; p = p->next)
 	{
-		if (p->userid == userid && 0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message) &&
+		if (p->userid == userid && p->ackid == ackid && 0 == strcmp(p->subject, subject) &&
+				0 == strcmp(p->message, message) &&
 				(0 == p->mediatypeid || mediatypeid == p->mediatypeid))
+		{
 			break;
+		}
 	}
 
 	if (NULL == p)
@@ -295,6 +301,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 		p->userid = userid;
 		p->mediatypeid = mediatypeid;
+		p->ackid = ackid;
 		p->subject = zbx_strdup(NULL, subject);
 		p->message = zbx_strdup(NULL, message);
 		p->next = *user_msg;
@@ -307,14 +314,13 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, const char *subject, const char *message, const DB_EVENT *event,
-		const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack)
+		const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, int macro_type)
 {
 	const char	*__function_name = "add_object_msg";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid;
 	char		*subject_dyn, *message_dyn;
-	int		message_type = (ack != NULL ? MACRO_TYPE_MESSAGE_ACK : MACRO_TYPE_MESSAGE_NORMAL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -353,11 +359,12 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		message_dyn = zbx_strdup(NULL, message);
 
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
-				&subject_dyn, message_type, NULL, 0);
+				&subject_dyn, macro_type, NULL, 0);
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
-				&message_dyn, message_type, NULL, 0);
+				&message_dyn, macro_type, NULL, 0);
 
-		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
+		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn,
+				(NULL != ack ? ack->acknowledgeid : 0));
 
 		zbx_free(subject_dyn);
 		zbx_free(message_dyn);
@@ -450,7 +457,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
 				NULL, &message_dyn, message_type, NULL, 0);
 
-		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
+		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn, 0);
 
 		zbx_free(subject_dyn);
 		zbx_free(message_dyn);
@@ -473,23 +480,24 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
  *             actionid    - [IN] the action identifie                        *
  *             event       - [IN] the event                                   *
  *             ack         - [IN] the acknowlegment                           *
- *             mediatypeid - [IN] the ID of mediatype                         *
  *             subject     - [IN] the message subject                         *
  *             message     - [IN] the message body                            *
  *                                                                            *
  ******************************************************************************/
 static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event,
-		const DB_ACKNOWLEDGE *ack, zbx_uint64_t mediatypeid, const char *subject, const char *message)
+		const DB_ACKNOWLEDGE *ack, const char *subject, const char *message)
 {
 	const char	*__function_name = "add_sentusers_ack_msg";
 	char		*subject_dyn, *message_dyn;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	userid;
+	zbx_uint64_t	userid, mediatypeid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select distinct userid from acknowledges where eventid=" ZBX_FS_UI64, event->eventid);
+	result = DBselect(
+			"select distinct userid,mediatypeid"
+			" from acknowledges where eventid=" ZBX_FS_UI64, event->eventid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -507,7 +515,8 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL,
 				NULL, ack, &message_dyn, MACRO_TYPE_MESSAGE_ACK, NULL, 0);
 
-		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
+		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn,
+				(NULL != ack ? ack->acknowledgeid : 0));
 
 		zbx_free(subject_dyn);
 		zbx_free(message_dyn);
@@ -528,7 +537,7 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const DB_EVENT
 		*user_msg = (*user_msg)->next;
 
 		add_message_alert(event, r_event, actionid, esc_step, p->userid, p->mediatypeid, p->subject,
-				p->message);
+				p->message, p->ackid);
 
 		zbx_free(p->subject);
 		zbx_free(p->message);
@@ -737,7 +746,7 @@ static void	get_operation_groupids(zbx_uint64_t operationid, zbx_vector_uint64_t
 }
 
 static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
-		zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step)
+		zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step, int macro_type)
 {
 	const char		*__function_name = "execute_commands";
 	DB_RESULT		result;
@@ -747,13 +756,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 	char			*buffer = NULL;
 	size_t			buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
 	zbx_vector_uint64_t	executed_on_hosts, groupids;
-	int			message_type = (r_event != NULL ?
-					MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (ack != NULL)
-		message_type |= MACRO_TYPE_MESSAGE_ACK;
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
@@ -854,7 +858,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		{
 			script.command = zbx_strdup(script.command, row[12]);
 			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, NULL, &script.command, message_type, NULL, 0);
+					NULL, NULL, NULL, ack, &script.command, macro_type, NULL, 0);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
@@ -962,7 +966,8 @@ skip:
 #undef ZBX_IPMI_FIELDS_NUM
 
 static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
-		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message)
+		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
+		zbx_uint64_t ackid)
 {
 	const char	*__function_name = "add_message_alert";
 
@@ -1035,20 +1040,21 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		{
 			zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid",
 					"clock", "mediatypeid", "sendto", "subject", "message", "status", "error",
-					"esc_step", "alerttype", (NULL != r_event ? "p_eventid" : NULL), NULL);
+					"esc_step", "alerttype", "acknowledgeid",
+					(NULL != r_event ? "p_eventid" : NULL), NULL);
 		}
 
 		if (NULL != r_event)
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
 					now, mediatypeid, row[1], subject, message, status, perror, esc_step,
-					(int)ALERT_TYPE_MESSAGE, event->eventid);
+					(int)ALERT_TYPE_MESSAGE, ackid, event->eventid);
 		}
 		else
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, event->eventid, userid,
 					now, mediatypeid, row[1], subject, message, status, perror, esc_step,
-					(int)ALERT_TYPE_MESSAGE);
+					(int)ALERT_TYPE_MESSAGE, ackid);
 		}
 
 	}
@@ -1063,19 +1069,19 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype",
-				(NULL != r_event ? "p_eventid" : NULL), NULL);
+				"acknowledgeid", (NULL != r_event ? "p_eventid" : NULL), NULL);
 
 		if (NULL != r_event)
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
 					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					esc_step, (int)ALERT_TYPE_MESSAGE, event->eventid);
+					esc_step, (int)ALERT_TYPE_MESSAGE, ackid, event->eventid);
 		}
 		else
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, event->eventid, userid,
 					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					esc_step, (int)ALERT_TYPE_MESSAGE);
+					esc_step, (int)ALERT_TYPE_MESSAGE, ackid);
 		}
 	}
 
@@ -1275,11 +1281,12 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 					}
 
 					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg,
-							subject, message, event, NULL, NULL);
+							subject, message, event, NULL, NULL,
+							MACRO_TYPE_MESSAGE_NORMAL);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, NULL, NULL, action->actionid, operationid,
-							escalation->esc_step);
+							escalation->esc_step, MACRO_TYPE_MESSAGE_NORMAL);
 					break;
 			}
 		}
@@ -1408,7 +1415,7 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 					}
 
 					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
-							message, event, r_event, NULL);
+							message, event, r_event, NULL, MACRO_TYPE_MESSAGE_RECOVERY);
 					break;
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 					if (SUCCEED == DBis_null(row[3]))
@@ -1431,7 +1438,8 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 							message);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, r_event, NULL, action->actionid, operationid, 1);
+					execute_commands(event, r_event, NULL, action->actionid, operationid, 1,
+							MACRO_TYPE_MESSAGE_RECOVERY);
 					break;
 			}
 		}
@@ -1466,14 +1474,15 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 	DB_RESULT	result;
 	DB_ROW		row;
 	ZBX_USER_MSG	*user_msg = NULL;
-	zbx_uint64_t	operationid;
-	unsigned char	operationtype, evaltype;
+	zbx_uint64_t	operationid, mediatypeid;
+	unsigned char	operationtype, default_msg;
+	char		*subject, *message;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select o.operationid,o.operationtype,o.evaltype,"
-				"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
+			"select o.operationid,o.operationtype,m.operationid,m.default_msg,"
+				"m.subject,m.message,m.mediatypeid"
 			" from operations o"
 				" left join opmessage m"
 					" on m.operationid=o.operationid"
@@ -1488,66 +1497,55 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 	{
 		ZBX_STR2UINT64(operationid, row[0]);
 		operationtype = (unsigned char)atoi(row[1]);
-		evaltype = (unsigned char)atoi(row[2]);
 
-		if (SUCCEED == check_operation_conditions(event, operationid, evaltype))
+		switch (operationtype)
 		{
-			unsigned char	default_msg;
-			char		*subject, *message;
-			zbx_uint64_t	mediatypeid;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
-
-			switch (operationtype)
-			{
-				case OPERATION_TYPE_MESSAGE:
-					if (SUCCEED == DBis_null(row[3]))
-						break;
-
-					ZBX_STR2UCHAR(default_msg, row[4]);
-					ZBX_DBROW2UINT64(mediatypeid, row[7]);
-
-					if (0 == default_msg)
-					{
-						subject = row[5];
-						message = row[6];
-					}
-					else
-					{
-						subject = action->ack_shortdata;
-						message = action->ack_longdata;
-					}
-
-					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
-							message, event, NULL, ack);
+			case OPERATION_TYPE_MESSAGE:
+				if (SUCCEED == DBis_null(row[2]))
 					break;
-				case OPERATION_TYPE_ACK_MESSAGE:
-					if (SUCCEED == DBis_null(row[3]))
-						break;
 
-					ZBX_STR2UCHAR(default_msg, row[4]);
+				ZBX_STR2UCHAR(default_msg, row[3]);
+				ZBX_DBROW2UINT64(mediatypeid, row[6]);
 
-					if (0 == default_msg)
-					{
-						subject = row[5];
-						message = row[6];
-					}
-					else
-					{
-						subject = action->ack_shortdata;
-						message = action->ack_longdata;
-					}
+				if (0 == default_msg)
+				{
+					subject = row[4];
+					message = row[5];
+				}
+				else
+				{
+					subject = action->ack_shortdata;
+					message = action->ack_longdata;
+				}
 
-					add_sentusers_ack_msg(&user_msg, action->actionid, event, NULL, mediatypeid,
-							subject, message);
+				add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
+						message, event, NULL, ack, MACRO_TYPE_MESSAGE_ACK);
+				break;
+			case OPERATION_TYPE_ACK_MESSAGE:
+				if (SUCCEED == DBis_null(row[2]))
 					break;
-				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, NULL, ack, action->actionid, operationid, 1);
-					break;
-			}
+
+				ZBX_STR2UCHAR(default_msg, row[3]);
+
+				if (0 == default_msg)
+				{
+					subject = row[4];
+					message = row[5];
+				}
+				else
+				{
+					subject = action->ack_shortdata;
+					message = action->ack_longdata;
+				}
+
+				add_sentusers_ack_msg(&user_msg, action->actionid, event, NULL,
+						subject, message);
+				break;
+			case OPERATION_TYPE_COMMAND:
+				execute_commands(event, NULL, ack, action->actionid, operationid, 1,
+						MACRO_TYPE_MESSAGE_ACK);
+				break;
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
 	}
 	DBfree_result(result);
 
@@ -2194,6 +2192,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		DB_ACTION	action;
 		DB_EVENT	event, r_event;
 		char		*error = NULL;
+		int		event_info_flag, r_event_info_flag;
 
 		escalation.nextcheck = atoi(row[5]);
 		ZBX_DBROW2UINT64(escalation.r_eventid, row[4]);
@@ -2229,22 +2228,24 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		}
 
 		/* Cancel escalation if event is absent. */
-		if (SUCCEED != get_event_info(escalation.eventid, &event, &error))
+		if (SUCCEED != get_event_info(escalation.eventid, &event, &event_info_flag, &error))
 		{
 			escalation_log_cancel_warning(&escalation, error);
 			zbx_free(error);
 			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+			free_event_info(&event, event_info_flag);
 			free_db_action(&action);
 			continue;
 		}
 
 		/* Cancel escalation if recovery event is absent. */
-		if ((0 != escalation.r_eventid) && (SUCCEED != get_event_info(escalation.r_eventid, &r_event, &error)))
+		if ((0 != escalation.r_eventid) && (SUCCEED != get_event_info(escalation.r_eventid, &r_event,
+				&r_event_info_flag, &error)))
 		{
 			escalation_cancel(&escalation, &action, &event, error);
 			zbx_free(error);
 			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-			free_event_info(&event);
+			free_event_info(&r_event, event_info_flag);
 			free_db_action(&action);
 			continue;
 		}
@@ -2262,8 +2263,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				/* break; is not missing here */
 			case ZBX_ESCALATION_SKIP:
 				if (0 != escalation.r_eventid)
-					free_event_info(&r_event);
-				free_event_info(&event);
+					free_event_info(&r_event, r_event_info_flag);
+				free_event_info(&event, event_info_flag);
 				free_db_action(&action);
 				continue;
 			case ZBX_ESCALATION_PROCESS:
@@ -2276,7 +2277,11 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		/* Execute operations and recovery operations, mark changes in 'diffs' for batch saving in DB below. */
 		diff = escalation_create_diff(&escalation);
 
-		if (0 != escalation.r_eventid)
+		if (0 != escalation.acknowledgeid)
+		{
+			escalation_acknowledge(&escalation, &action, &event);
+		}
+		else if (0 != escalation.r_eventid)
 		{
 			if (0 == escalation.esc_step)
 				escalation_execute(&escalation, &action, &event);
@@ -2287,10 +2292,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		{
 			if (ESCALATION_STATUS_ACTIVE == escalation.status)
 			{
-				if (0 != escalation.acknowledgeid)
-					escalation_acknowledge(&escalation, &action, &event);
-				else
-					escalation_execute(&escalation, &action, &event);
+				escalation_execute(&escalation, &action, &event);
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation.status)
 			{
@@ -2310,10 +2312,9 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		zbx_vector_ptr_append(&diffs, diff);
 
 		if (0 != escalation.r_eventid)
-			free_event_info(&r_event);
-		free_event_info(&event);
+			free_event_info(&r_event, r_event_info_flag);
+		free_event_info(&event, event_info_flag);
 		free_db_action(&action);
-
 	}
 
 	DBfree_result(result);

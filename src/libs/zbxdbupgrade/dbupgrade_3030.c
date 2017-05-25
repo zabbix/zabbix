@@ -957,6 +957,44 @@ static int	DBpatch_3030073(void)
 	return DBadd_field("actions", &field);
 }
 
+static int	DBpatch_3030074(void)
+{
+	const ZBX_FIELD	field = {"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("alerts", &field);
+}
+
+static int	DBpatch_3030075(void)
+{
+	const ZBX_FIELD	field = {"acknowledgeid", NULL, "acknowledges", "acknowledgeid", 0, ZBX_TYPE_ID, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("alerts", 6, &field);
+}
+
+static int	DBpatch_3030076(void)
+{
+	if (ZBX_DB_OK > DBexecute("update actions set "
+			"ack_shortdata='Acknowledgement message: {TRIGGER.NAME}', "
+			"ack_longdata="
+				"'Acknowledgement message: {ACK.MESSAGE}\n"
+				"Acknowledgement by user: {USER.FULLNAME}\n\n"
+				"Acknowledgement status: {EVENT.ACK.STATUS}\n"
+				"Acknowledgement history: {EVENT.ACK.HISTORY}\n\n"
+				"Trigger: {TRIGGER.NAME}\n"
+				"Trigger status: {TRIGGER.STATUS}\n"
+				"Trigger severity: {TRIGGER.SEVERITY}\n"
+				"Trigger URL: {TRIGGER.URL}\n\nItem values:\n\n"
+				"1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}\n"
+				"2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\n"
+				"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}\n\n"
+				"Original event ID: {EVENT.ID}' "
+			"where eventsource=3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -1037,5 +1075,8 @@ DBPATCH_ADD(3030070, 0, 1)
 DBPATCH_ADD(3030071, 0, 1)
 DBPATCH_ADD(3030072, 0, 1)
 DBPATCH_ADD(3030073, 0, 1)
+DBPATCH_ADD(3030074, 0, 1)
+DBPATCH_ADD(3030075, 0, 1)
+DBPATCH_ADD(3030076, 0, 1)
 
 DBPATCH_END()

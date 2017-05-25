@@ -25,6 +25,7 @@
 #include "dbcache.h"
 #include "zbxtasks.h"
 #include "../events.h"
+#include "../actions.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -262,54 +263,66 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_acknowledgments()
+static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 {
-	const char		*__function_name = "tm_process_acknowledgments";
-
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			processed_num = 0;
 	zbx_uint64_t		ackid, eventid;
 	zbx_vector_uint64_t	ackids, eventids;
+	char			*filter_s = NULL, *filter_u = NULL;
+	size_t			sql_s_alloc = 0, sql_s_offset = 0, sql_u_alloc = 0, sql_u_offset = 0;
+
+	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_create(&ackids);
 	zbx_vector_uint64_create(&eventids);
 
+	DBadd_condition_alloc(&filter_s, &sql_s_alloc, &sql_s_offset, "ta.taskid", ack_taskids->values,
+			ack_taskids->values_num);
+
 	result = DBselect(
 			"select a.eventid,ta.acknowledgeid"
-					" from task_acknowledge ta"
-					" left join acknowledges a"
-						" on ta.acknowledgeid=a.acknowledgeid"
-					" left join events e"
-						" on a.eventid=e.eventid"
-					" left join task t"
-						" on ta.taskid=t.taskid"
-					" where t.type=%d"
-						" and t.status=%d"
-					" order by acknowledgeid",
-			ZBX_TM_TASK_ACKNOWLEDGE,
-			ZBX_TM_STATUS_NEW);
+			" from task_acknowledge ta"
+			" left join acknowledges a"
+				" on ta.acknowledgeid=a.acknowledgeid"
+			" left join events e"
+				" on a.eventid=e.eventid"
+			" left join task t"
+				" on ta.taskid=t.taskid"
+			" where t.status=%d and%s",
+			ZBX_TM_STATUS_NEW, filter_s);
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (SUCCEED == DBis_null(row[0]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process acknowledge tasks because related event"
+					" was removed");
+			continue;
+		}
+
 		ZBX_STR2UINT64(eventid, row[0]);
 		ZBX_STR2UINT64(ackid, row[1]);
-
 		zbx_vector_uint64_append(&eventids, eventid);
 		zbx_vector_uint64_append(&ackids, ackid);
 	}
 	DBfree_result(result);
+	zbx_free(filter_s);
 
-	processed_num = process_actions_by_acknowledgments(&ackids, &eventids);
+	if (0 < ackids.values_num)
+		processed_num = process_actions_by_acknowledgments(&ackids, &eventids);
 
-	DBexecute(
-		"update task t"
+	DBadd_condition_alloc(&filter_u, &sql_u_alloc, &sql_u_offset, "ta.acknowledgeid", ack_taskids->values,
+			ack_taskids->values_num);
+
+	DBexecute("update task t"
 		" left join task_acknowledge ta"
 			" on ta.taskid=t.taskid"
 		" set t.status=%d"
-		" where t.type=%d"
-			" and ta.acknowledgeid<=" ZBX_FS_UI64,
-		ZBX_TM_STATUS_DONE, ZBX_TM_TASK_ACKNOWLEDGE, ackid);
+		" where %s", ZBX_TM_STATUS_DONE, filter_u);
+
+	zbx_free(filter_u);
 
 	zbx_vector_uint64_destroy(&ackids);
 	zbx_vector_uint64_destroy(&eventids);
@@ -328,16 +341,19 @@ static int	tm_process_acknowledgments()
  ******************************************************************************/
 static int	tm_process_tasks(int now)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
-	int		type, ret, processed_num = 0, clock, ttl;
-	zbx_uint64_t	taskid;
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			type, ret, processed_num = 0, clock, ttl;
+	zbx_uint64_t		taskid;
+	zbx_vector_uint64_t	ack_taskids;
+
+	zbx_vector_uint64_create(&ack_taskids);
 
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
-				" where status in (%d,%d) and type<>%d"
+				" where status in (%d,%d)"
 				" order by taskid",
-			ZBX_TM_STATUS_NEW, ZBX_TM_STATUS_INPROGRESS, ZBX_TM_TASK_ACKNOWLEDGE);
+			ZBX_TM_STATUS_NEW, ZBX_TM_STATUS_INPROGRESS);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -362,6 +378,10 @@ static int	tm_process_tasks(int now)
 				/* close problem tasks will never have 'in progress' status */
 				ret = tm_process_remote_command_result(taskid);
 				break;
+			case ZBX_TM_TASK_ACKNOWLEDGE:
+				zbx_vector_uint64_append(&ack_taskids, taskid);
+				ret = SUCCEED;
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				ret = FAIL;
@@ -373,7 +393,12 @@ static int	tm_process_tasks(int now)
 	}
 	DBfree_result(result);
 
-	return tm_process_acknowledgments() + processed_num;
+	if (0 < ack_taskids.values_num)
+		processed_num += tm_process_acknowledgments(&ack_taskids);
+
+	zbx_vector_uint64_destroy(&ack_taskids);
+
+	return processed_num;
 }
 
 /******************************************************************************
