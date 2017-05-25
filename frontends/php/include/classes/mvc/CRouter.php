@@ -105,6 +105,7 @@ class CRouter {
 		'widget.syssum.view'	=> ['CControllerWidgetSystemView',		'layout.widget',		'monitoring.widget.system.view'],
 		'widget.webovr.view'	=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view'],
 		'widget.clock.view'		=> ['CControllerWidgetClockView',		'layout.widget',		'monitoring.widget.clock.view'],
+		'widget.actlog.view'	=> ['CControllerWidgetActionLogView',	'layout.widget',		'monitoring.widget.actionlog.view'],
 		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view']
 	];
 
