@@ -22,7 +22,7 @@
 list($table, $info) = make_latest_issues($data['filter'], 'zabbix.php?action=dashboard.view');
 
 $output = [
-	'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
+	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' =>(new CList([$info, _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];

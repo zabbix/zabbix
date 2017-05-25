@@ -29,7 +29,8 @@ class CControllerWidgetClockView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'fields' =>		'array',
+			'fields' =>		'required|array',
+			'name' =>		'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -39,7 +40,6 @@ class CControllerWidgetClockView extends CController {
 			 * @var array  $fields
 			 * @var int    $fields['time_type']
 			 * @var string $fields['itemid']             (optional)
-			 * @var string $fields['hostid']             (optional)
 			 */
 			// TODO VM: if fields are present, check that fields have enough data
 		}
@@ -62,18 +62,20 @@ class CControllerWidgetClockView extends CController {
 		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;
-		$data = [];
 
 		// Default values
 		$default = [
+			'name' => '', // If not defined by user, use calculated one
 			'time_type' => null,
 			'itemid' => null,
 			'hostid' => null // TODO VM: probably will not be used at all
 		];
 
-		if ($this->hasInput('fields')) {
-			// Use configured data, if possible
-			$data = $this->getInput('fields');
+		$data = $this->getInput('fields');
+
+		$data['name'] = $this->getInput('name');
+		if ($data['name'] === '') {
+			$data['name'] = $default['name'];
 		}
 
 		// Apply defualt value for data
@@ -148,12 +150,12 @@ class CControllerWidgetClockView extends CController {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'clock' => [
-				'title' => $title,
 				'time' => $time,
 				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
 				'error' => $error
-			]
+			],
+			'name' => ($data['name'] === '') ? $title : $data['name']
 		]));
 	}
 }

@@ -25,6 +25,7 @@
 		widget['content_header'] = $('<div>')
 			.addClass('dashbrd-grid-widget-head')
 			.append($('<h4>').text(widget['header']));
+		// TODO VM: if header is empty, use defualt value
 		widget['content_body'] = $('<div>')
 			.addClass('dashbrd-grid-widget-content');
 		widget['content_footer'] = $('<div>')
@@ -394,6 +395,7 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data['widgetid'] = widget['widgetid'];
+		ajax_data['name'] = widget['header'];
 		// display widget with yet unsaved changes
 		if (typeof widget['fields'] !== 'undefined') {
 			ajax_data['fields'] = widget['fields'];
@@ -471,12 +473,19 @@
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
 			ajax_data = [],
-			fields = $('form', data.dialogue['body']).serializeJSON();
+			fields = $('form', data.dialogue['body']).serializeJSON(),
+			type = fields['type'],
+			name = fields['name'];
+
+		delete fields['type'];
+		delete fields['name'];
 
 		url.setArgument('action', 'dashbrd.widget.update');
 
 		ajax_data.push({
 			'widgetid': widget['widgetid'],
+			'type': type,
+			'name': name,
 			'fields': fields
 		});
 
@@ -502,9 +511,12 @@
 					// save original values (only on first widget update before save)
 					if (typeof widget['fields_orig'] === 'undefined') {
 						widget['fields_orig'] = widget['fields'];
+						widget['type_orig'] = widget['type'];
+						widget['header_orig'] = widget['header'];
 					}
+					widget['type'] = type;
+					widget['header'] = name;
 					widget['fields'] = fields;
-					widget['type'] = widget['fields']['type'];
 					updateWidgetDynamic($obj, data, widget);
 					refreshWidget(widget);
 				}
@@ -585,8 +597,11 @@
 			}
 			if (typeof widget['fields_orig'] !== 'undefined') {
 				widget['fields'] = widget['fields_orig'];
-				widget['type'] = widget['fields']['type'];
+				widget['type'] = widget['type_orig'];
+				widget['header'] = widget['header_orig'];
 				delete widget['fields_orig'];
+				delete widget['type_orig'];
+				delete widget['header_orig'];
 				refreshWidget(widget);
 			}
 
@@ -613,6 +628,8 @@
 			ajax_data.push({
 				'widgetid': widget['widgetid'],
 				'pos': widget['pos'],
+				'type': widget['type'],
+				'name': widget['header'],
 				'fields': widget['fields']
 			});
 		});
@@ -638,6 +655,8 @@
 					$.each(data['widgets'], function(index, data_widget) {
 						// remove original values (new ones were just saved)
 						delete data_widget['fields_orig'];
+						delete data_widget['type_orig'];
+						delete data_widget['header_orig'];
 						delete data_widget['pos_orig'];
 					});
 
@@ -715,6 +734,10 @@
 		},
 
 		addWidget: function(widget) {
+			// If no fields are given, 'fields' will contain empty array instead of simple object.
+			if (widget['fields'].length === 0) {
+				widget['fields'] = {};
+			}
 			widget = $.extend({}, {
 				'widgetid': '',
 				'type': '',
@@ -729,9 +752,7 @@
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
-				'fields': {
-					'type': '',
-				}
+				'fields': {}
 			}, widget);
 
 			return this.each(function() {
@@ -858,9 +879,15 @@
 				if (form.length) {
 					// Take values from form
 					ajax_data.fields = form.serializeJSON();
+					ajax_data.type = ajax_data['fields']['type'];
+					ajax_data.name = ajax_data['fields']['name'];
+					delete ajax_data['fields']['type'];
+					delete ajax_data['fields']['name'];
 				} else {
 					// Open form with current config
 					ajax_data.fields = widget['fields'];
+					ajax_data.type = widget['type'];
+					ajax_data.name = widget['header'];
 				}
 
 				jQuery.ajax({

@@ -148,7 +148,6 @@ class CControllerDashboardView extends CController {
 	 */
 	private function getWidgets($widgets) {
 		$grid_widgets = [];
-		$widget_names = CWidgetConfig::getKnownWidgetTypes();
 
 		foreach ($widgets as $widget) {
 			$widgetid = (int) $widget['widgetid'];
@@ -157,8 +156,7 @@ class CControllerDashboardView extends CController {
 			$grid_widgets[$widgetid] = [
 				'widgetid' => $widgetid,
 				'type' => $widget['type'],
-				'header' => ($widget['name'] !== '') ? $widget['name'] : $widget_names[$widget['type']],
-				// TODO VM: widget headers are not affeced by name from database, because it is rewritten by specific widget's API call
+				'header' => $widget['name'],
 				'pos' => [
 					'row' => (int) $widget['row'],
 					'col' => (int) $widget['col'],
@@ -166,8 +164,7 @@ class CControllerDashboardView extends CController {
 					'width' => (int) $widget['width']
 				],
 				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
-				// 'type' always should be in fields array
-				'fields' => ['type' => $widget['type']] + $this->convertWidgetFields($widget['fields'])
+				'fields' => $this->convertWidgetFields($widget['fields'])
 			];
 		}
 

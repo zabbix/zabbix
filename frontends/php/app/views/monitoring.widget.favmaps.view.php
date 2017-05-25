@@ -33,7 +33,7 @@ foreach ($data['maps'] as $map) {
 }
 
 $output = [
-	'header' => _('Favourite maps'),
+	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' => (new CList([
 		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
