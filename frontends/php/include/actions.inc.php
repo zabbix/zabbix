@@ -1330,7 +1330,7 @@ function getActionMessages(array $alerts, array $r_alerts) {
 			}
 
 			$mediaType = array_pop($alert['mediatypes']);
-			$status = $alert['status'] == ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
+			$status = ($alert['status'] == ALERT_STATUS_NEW) ? ALERT_STATUS_NOT_SENT : $alert['status'];
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:
@@ -1425,7 +1425,7 @@ function getActionCommands(array $alerts, array $r_alerts) {
 				continue;
 			}
 
-			$status = $alert['status'] == ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
+			$status = ($alert['status'] == ALERT_STATUS_NEW) ? ALERT_STATUS_NOT_SENT : $alert['status'];
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:
@@ -1484,7 +1484,7 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 		$show_header = $display_recovery_alerts;
 
 		foreach ($alerts_data as $alert) {
-			$status = $alert['status'] == ALERT_STATUS_NEW ? ALERT_STATUS_NOT_SENT : $alert['status'];
+			$status = ($alert['status'] == ALERT_STATUS_NEW) ? ALERT_STATUS_NOT_SENT : $alert['status'];
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:

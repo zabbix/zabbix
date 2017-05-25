@@ -371,10 +371,8 @@ class CMediatype extends CApiService {
 				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
 				if (!$valid_value || $value < $ge_value || $value > $le_value) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-						$mediatype['maxsessions'],
-						'maxsessions',
-						$mediatype['description']
+						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".', $mediatype['maxsessions'],
+						'maxsessions', $mediatype['description']
 					));
 				}
 			}
@@ -387,10 +385,8 @@ class CMediatype extends CApiService {
 				$valid_value = (is_integer($mediatype['maxattempts']) || is_string($mediatype['maxattempts']));
 				if (!$valid_value || $value < $ge_value || $value > $le_value) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-						$mediatype['maxattempts'],
-						'maxattempts',
-						$mediatype['description']
+						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".', $mediatype['maxattempts'],
+						'maxattempts', $mediatype['description']
 					));
 				}
 			}
@@ -403,8 +399,8 @@ class CMediatype extends CApiService {
 				$maximum = convertFunctionValue('1m');
 				if (!$is_valid || $interval > $maximum || $interval < 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-							$attempt_interval, 'attempt_interval', $mediatype['description'])
+						_s('Incorrect value "%1$s" in field "%2$s" for media type "%3$s".', $attempt_interval,
+							'attempt_interval', $mediatype['description'])
 					);
 				}
 			}
