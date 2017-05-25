@@ -23,34 +23,18 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'db widget.widgetid',
-			'fields'		=>	'array',
+			'widgetid' =>	'db widget.widgetid',
+			'type' =>		'in '.implode(',' ,array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'name' =>		'string',
+			'fields' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
 			/*
-			 * @var string fields['type']
 			 * @var string fields[<name>]  (optional)
 			 */
-			if ($this->hasInput('fields')) {
-				$widget_fields = $this->getInput('fields');
-				$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes());
-
-				if (!array_key_exists('type', $widget_fields)) {
-					error(_s('Invalid parameter "%1$s": %2$s.', 'fields',
-						_s('the parameter "%1$s" is missing', 'type')
-					));
-					$ret = false;
-				}
-				elseif (!in_array($widget_fields['type'], $known_widget_types)) {
-					error(_s('Invalid parameter "%1$s": %2$s.', 'fields[type]',
-						_s('value must be one of %1$s', implode(',', $known_widget_types))
-					));
-					$ret = false;
-				}
-			}
 		}
 
 		if (!$ret) {
@@ -66,35 +50,19 @@ class CControllerDashbrdWidgetConfig extends CController {
 	}
 
 	protected function doAction() {
-		$widget = [];
-		$dialogue = [];
+		$type = $this->getInput('type', WIDGET_CLOCK);
+		$form = CWidgetConfig::getForm($type, $this->getInput('fields', []));
 
-		// default fields data
-		$fields = [
-			'type' => WIDGET_CLOCK
-		];
-
-		// TODO VM: (?) get current widget fields data from JS
-		//			(1) by getting current values from widget config, we can set default values to same fields in different widget type
-		//			(2) it may add unreasonable complaxity
-//		// get data for current widget - in case we are switching between types, and no fields for widget are given
-//		if ($this->hasInput('widgetid')) {
-//			$dialogue['widgetid'] = $this->getInput('widgetid');
-//			$widget = CWidgetConfig::getConfig($dialogue['widgetid']);
-//		}
-
-		// Get fields from dialogue form
-		$dialogue_fields = $this->hasInput('fields') ? $this->getInput('fields') : [];
-
-		// Take default values, replce with saved ones, replace with selected in dialogue
-		$fields_data = array_merge($fields, $widget, $dialogue_fields);
-		$dialogue['form'] = CWidgetConfig::getForm($fields_data);
 		$this->setResponse(new CControllerResponseData([
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'dialogue' => $dialogue,
-			'captions' => $this->getCaptions($dialogue['form'])
+			'dialogue' => [
+				'type' => $this->getInput('type', WIDGET_CLOCK),
+				'name' => $this->getInput('name', ''),
+				'form' => $form,
+			],
+			'captions' => $this->getCaptions($form)
 		]));
 	}
 
