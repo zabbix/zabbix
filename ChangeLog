@@ -2165,6 +2165,7 @@ Changes for 2.2.19rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ........S. [ZBX-12012] fixed resolving of Critical and Verbose event log levels by {ITEM.LOG.SEVERITY} macro (Sasha)
 ..F....... [ZBX-11888] fixed chart name urlencoding for web scenario reports; thanks to Kotaro Miyashita for patch (miks)
 
