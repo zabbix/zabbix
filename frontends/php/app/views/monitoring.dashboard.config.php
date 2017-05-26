@@ -26,6 +26,18 @@ $form = (new CForm('post'))
 
 $form_list = (new CFormList());
 
+// Common fields
+$form_list->addRow(_('Type'),
+	(new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()',
+		CWidgetConfig::getKnownWidgetTypes()))
+);
+
+$form_list->addRow(_('Name'),
+	(new CTextBox('name', $data['dialogue']['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('placeholder', _('default'))
+);
+
+// Widget specific fields
 foreach ($data['dialogue']['form']->getFields() as $field) {
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow($field->getLabel(),

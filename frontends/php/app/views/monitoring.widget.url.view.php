@@ -20,10 +20,10 @@
 
 $item = ($data['url']['error'] !== null)
 	? (new CTableInfo())->setNoDataMessage($data['url']['error'])
-	: (new CIFrame($data['url']['url'], $data['url']['inner_width'], $data['url']['inner_height'], 'auto'));
+	: (new CIFrame($data['url']['url'], '100%', '98%', 'auto')); // height is 98% to remove vertical scroll on widget
 
 $output = [
-	'header' => _('URL'),
+	'header' => $data['name'],
 	'body' => $item->toString(),
 	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];

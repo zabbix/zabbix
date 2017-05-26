@@ -37,7 +37,7 @@ if ($data['clock']['time_zone_string'] !== null) {
 }
 
 $output = [
-	'header' => $data['clock']['title'],
+	'header' => $data['name'],
 	'body' => $item->toString(),
 	'footer' => (new CList([$item->getTimeDiv(),_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
 	'script_file' => $item->getScriptFile(),

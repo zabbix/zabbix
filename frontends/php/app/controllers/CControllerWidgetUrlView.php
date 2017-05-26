@@ -29,8 +29,9 @@ class CControllerWidgetUrlView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'fields' =>		'array',
-			'dynamic_hostid' =>	'db hosts.hostid',
+			'fields' =>			'required|array',
+			'name' =>			'required|string',
+			'dynamic_hostid' =>	'db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,35 +58,26 @@ class CControllerWidgetUrlView extends CController {
 
 	protected function doAction() {
 
-		$data = [];
 		$error = null;
 
 		// Default values
 		$default = [
+			'name' => CWidgetConfig::getKnownWidgetTypes()[WIDGET_URL],
 			'url' => '',
-			'inner_width' => '100%',
-			'inner_height' => '98%',
 			'hostid' => '0',
 			'isTemplatedDashboard' => false, // TODO VM: will dashboards be templated?
 			'dynamic' => WIDGET_SIMPLE_ITEM
 		];
 
-		if ($this->hasInput('fields')) {
-			// Use configured data, if possible
-			$data = $this->getInput('fields');
+		$data = $this->getInput('fields');
+
+		$data['name'] = $this->getInput('name');
+		if ($data['name'] === '') {
+			$data['name'] = $default['name'];
 		}
 
 		if ($this->hasInput('dynamic_hostid')) {
 			$data['hostid'] = $this->getInput('dynamic_hostid');
-		}
-
-		if (!array_key_exists('inner_width', $data)
-				|| !array_key_exists('inner_height', $data)
-				|| $data['inner_width'] == 0
-				|| $data['inner_height'] == 0
-		) {
-			$data['inner_width'] = $default['inner_width'];
-			$data['inner_height'] = $default['inner_height'];
 		}
 
 		// Apply defualt value for data
@@ -116,10 +108,9 @@ class CControllerWidgetUrlView extends CController {
 			],
 			'url' => [
 				'url' => $data['url'],
-				'inner_width' => $data['inner_width'],
-				'inner_height' => $data['inner_height'],
 				'error' => $error
-			]
+			],
+			'name' => $data['name']
 		]));
 	}
 }

@@ -31,7 +31,7 @@ class CWidgetConfig
 		return [
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix'),
-			WIDGET_LAST_ISSUES			=> _('Last issues'),
+			WIDGET_LAST_ISSUES			=> _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
 			WIDGET_WEB_OVERVIEW			=> _('Web monitoring'),
 			WIDGET_DISCOVERY_STATUS		=> _('Discovery status'),
 			WIDGET_HOST_STATUS			=> _('Host status'),
@@ -162,14 +162,14 @@ class CWidgetConfig
 	 *
 	 * @static
 	 *
-	 * @param array  $data          array with all widget's fields, including widget type
-	 * @param string $data['type']
+	 * @param string $type          widget type - 'WIDGET_' constant
+	 * @param array  $data          array with all widget's fields
 	 * @param string $data[<name>]  (optional)
 	 *
 	 * @return CWidgetForm
 	 */
-	public static function getForm($data) {
-		switch ($data['type']) {
+	public static function getForm($type, $data) {
+		switch ($type) {
 			case WIDGET_CLOCK:
 				return new CClockWidgetForm($data);
 

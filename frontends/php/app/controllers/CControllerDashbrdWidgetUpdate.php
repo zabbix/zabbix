@@ -45,48 +45,68 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $widgets
-			 * @var string $widget[]['widgetid']
+			 * @var string $widget[]['widgetid']        (optional)
 			 * @var array  $widget[]['pos']             (optional)
 			 * @var int    $widget[]['pos']['row']
 			 * @var int    $widget[]['pos']['col']
 			 * @var int    $widget[]['pos']['height']
 			 * @var int    $widget[]['pos']['width']
-			 * @var array  $widget[]['fields']          (optional)
-			 * @var string $widget[]['fields']['type']
+			 * @var string $widget[]['type']
+			 * @var string $widget[]['name']
+			 * @var array  $widget[]['fields']
 			 * @var string $widget[]['fields'][<name>]  (optional)
 			 */
 			foreach ($this->getInput('widgets', []) as $index => $widget) {
-				if (array_key_exists('pos', $widget)) {
-					foreach (['row', 'col', 'height', 'width'] as $field) {
-						if (!array_key_exists($field, $widget['pos'])) {
-							error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][pos]',
-								_s('the parameter "%1$s" is missing', $field)
-							));
-							$ret = false;
-						}
-					}
-				}
-				if (array_key_exists('fields', $widget)) {
-					if (!array_key_exists('type', $widget['fields'])) {
-						error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][fields]',
-							_s('the parameter "%1$s" is missing', 'type')
+				// TODO VM: check widgetid - if present in $widget, must be existing widget id
+				// TODO VM: (?) instead of adding optional fields, it may be more consistent to add additinal controller
+				//			for checking single widget. That will make this controller more straigt forward.
+				if ($this->getInput('save') == WIDGET_CONFIG_DO_SAVE) {
+					if (!array_key_exists('pos', $widget)) {
+						error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+							_s('the parameter "%1$s" is missing', 'pos')
 						));
 						$ret = false;
-						break;
 					}
-
-					$widget['form'] = CWidgetConfig::getForm($widget['fields']);
-					unset($widget['fields']);
-
-					if (($errors = $widget['form']->validate()) !== []) {
-						// Add widget name to each error message.
-						foreach ($errors as $key => $error) {
-							error(_s("Error in widget (id='%s'): %s.", $widget['widgetid'], $error)); // TODO VM: (?) improve error message
+					else {
+						foreach (['row', 'col', 'height', 'width'] as $field) {
+							if (!array_key_exists($field, $widget['pos'])) {
+								error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][pos]',
+									_s('the parameter "%1$s" is missing', $field)
+								));
+								$ret = false;
+							}
 						}
-
-						$ret = false;
 					}
 				}
+
+				if (!array_key_exists('type', $widget)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+						_s('the parameter "%1$s" is missing', 'type')
+					));
+					$ret = false;
+					break;
+				}
+
+				if (!array_key_exists('name', $widget)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+						_s('the parameter "%1$s" is missing', 'name')
+					));
+					$ret = false;
+				}
+
+				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget['fields']);
+				unset($widget['fields']);
+
+				if (($errors = $widget['form']->validate()) !== []) {
+					// TODO VM: Add widget name to each error message.
+					foreach ($errors as $key => $error) {
+						// TODO VM: widgetid will not be present in case of new widget - need to find solution
+						error(_s("Error in widget (id='%s'): %s.", $widget['widgetid'], $error)); // TODO VM: (?) improve error message
+					}
+
+					$ret = false;
+				}
+
 				$this->widgets[] = $widget;
 			}
 		}
@@ -132,16 +152,15 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					$upd_widget['widgetid'] = $widget['widgetid'];
 				}
 
-				if (array_key_exists('pos', $widget)) {
-					$upd_widget['row'] = $widget['pos']['row'];
-					$upd_widget['col'] = $widget['pos']['col'];
-					$upd_widget['height'] = $widget['pos']['height'];
-					$upd_widget['width'] = $widget['pos']['width'];
-				}
-
-				if (array_key_exists('form', $widget)) {
-					$upd_widget += $this->prepareFields($widget['form']);
-				}
+				$upd_widget += [
+					'row' => $widget['pos']['row'],
+					'col' => $widget['pos']['col'],
+					'height' => $widget['pos']['height'],
+					'width' => $widget['pos']['width'],
+					'type' => $widget['type'],
+					'name' => $widget['name'],
+					'fields' => $this->prepareFields($widget['form']),
+				];
 
 				$dashboard['widgets'][] = $upd_widget;
 			}
@@ -179,33 +198,24 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	 *
 	 * @param CWidgetForm $form  form object with widget fields
 	 *
-	 * @return array  With keys 'type', 'name', 'fields'
+	 * @return array  Array of widget fields ready for saving in API
 	 */
 	protected function prepareFields($form) {
-		$widget = ['fields' => []];
+		// TODO VM: (?) may be good idea to move it to CWidgetForm
+		$fields = [];
 
 		foreach ($form->getFields() as $field) {
-			$name = $field->getName();
+			$save_type = $field->getSaveType();
 
-			switch ($name) {
-				case 'type':
-				case 'name':
-					$widget[$name] = $field->getValue();
-					break;
+			$widget_field = [
+				'type' => $save_type,
+				'name' => $field->getName()
+			];
+			$widget_field[CWidgetConfig::getApiFieldKey($save_type)] = $field->getValue();
 
-				default:
-					$save_type = $field->getSaveType();
-
-					$widget_field = [
-						'type' => $save_type,
-						'name' => $field->getName()
-					];
-					$widget_field[CWidgetConfig::getApiFieldKey($save_type)] = $field->getValue();
-
-					$widget['fields'][] = $widget_field;
-			}
+			$fields[] = $widget_field;
 		}
 
-		return $widget;
+		return $fields;
 	}
 }

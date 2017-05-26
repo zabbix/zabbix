@@ -28,7 +28,18 @@ class CControllerWidgetFavScreensView extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'name' =>		'required|string'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -36,6 +47,11 @@ class CControllerWidgetFavScreensView extends CController {
 	}
 
 	protected function doAction() {
+		$name = $this->getInput('name');
+		if ($name === '') {
+			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_SCREENS];
+		}
+
 		$screens = [];
 		$ids = ['screenid' => [], 'slideshowid' => []];
 
@@ -80,7 +96,8 @@ class CControllerWidgetFavScreensView extends CController {
 			'screens' => $screens,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'name' => $name
 		]));
 	}
 }

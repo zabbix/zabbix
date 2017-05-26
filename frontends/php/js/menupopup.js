@@ -363,6 +363,7 @@ function getMenuPopupRefresh(options) {
 				'x5': 'x5'
 			}
 			: {
+				0: t('No refresh'),
 				10: t('10 seconds'),
 				30: t('30 seconds'),
 				60: t('1 minute'),
@@ -370,7 +371,6 @@ function getMenuPopupRefresh(options) {
 				600: t('10 minutes'),
 				900: t('15 minutes')
 			};
-		// TODO VM: add option with no refresh (for dashboards)
 
 	jQuery.each(intervals, function(value, label) {
 		var item = {
