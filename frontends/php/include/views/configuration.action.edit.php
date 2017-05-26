@@ -426,8 +426,15 @@ if ($data['action']['operations']) {
 			$operation['mediatypeid'] = 0;
 		}
 
-		$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
-			->setHint($action_operation_hints[$operationid]);
+		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
+
+		if (array_key_exists($operationid, $action_operation_hints)) {
+			$action_operation_hints[$operationid] = array_filter($action_operation_hints[$operationid]);
+
+			if ($action_operation_hints[$operationid]) {
+				$details->setHint($action_operation_hints[$operationid]);
+			}
+		}
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 			$esc_steps_txt = null;
@@ -1189,8 +1196,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$operation['mediatypeid'] = 0;
 			}
 
-			$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
-				->setHint($action_operation_hints[$operationid]);
+			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
+
+			if (array_key_exists($operationid, $action_operation_hints)) {
+				$action_operation_hints[$operationid] = array_filter($action_operation_hints[$operationid]);
+
+				if ($action_operation_hints[$operationid]) {
+					$details->setHint($action_operation_hints[$operationid]);
+				}
+			}
 
 			$operationRow = [
 				$details,
