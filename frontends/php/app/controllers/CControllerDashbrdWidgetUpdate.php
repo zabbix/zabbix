@@ -93,6 +93,11 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					$ret = false;
 				}
 
+				// AJAX is not sending empty elements,
+				// absence of 'fields' element means, there are no fields for this widget
+				if (!array_key_exists('fields', $widget)) {
+					$widget['fields'] = [];
+				}
 				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget['fields']);
 				unset($widget['fields']);
 
