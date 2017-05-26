@@ -454,7 +454,7 @@ static int	DBpatch_3030038(void)
 
 static int	DBpatch_3030039(void)
 {
-	const ZBX_TABLE table =
+	const ZBX_TABLE	table =
 			{"task_remote_command_result", "taskid", 0,
 				{
 					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -495,7 +495,7 @@ static int	DBpatch_3030042(void)
 
 static int	DBpatch_3030043(void)
 {
-	const ZBX_TABLE table =
+	const ZBX_TABLE	table =
 			{"sysmap_shape", "shapeid", 0,
 				{
 					{"shapeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -577,7 +577,7 @@ static int	DBpatch_3030048(void)
 
 static int	DBpatch_3030049(void)
 {
-	const ZBX_TABLE table =
+	const ZBX_TABLE	table =
 			{"sysmap_element_trigger", "selement_triggerid", 0,
 				{
 					{"selement_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -661,7 +661,7 @@ out:
 
 static int	DBpatch_3030054(void)
 {
-	const ZBX_TABLE table =
+	const ZBX_TABLE	table =
 			{"httptest_field", "httptest_fieldid", 0,
 				{
 					{"httptest_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -691,7 +691,7 @@ static int	DBpatch_3030056(void)
 
 static int	DBpatch_3030057(void)
 {
-	const ZBX_TABLE table =
+	const ZBX_TABLE	table =
 			{"httpstep_field", "httpstep_fieldid", 0,
 				{
 					{"httpstep_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
