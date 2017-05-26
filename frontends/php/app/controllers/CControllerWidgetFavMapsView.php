@@ -28,7 +28,18 @@ class CControllerWidgetFavMapsView extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'name' =>		'required|string'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -38,6 +49,11 @@ class CControllerWidgetFavMapsView extends CController {
 	protected function doAction() {
 		$maps = [];
 		$mapids = [];
+
+		$name = $this->getInput('name');
+		if ($name === '') {
+			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_MAPS];
+		}
 
 		foreach (CFavorite::get('web.favorite.sysmapids') as $favourite) {
 			$mapids[$favourite['value']] = true;
@@ -63,7 +79,8 @@ class CControllerWidgetFavMapsView extends CController {
 			'maps' => $maps,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'name' => $name
 		]));
 	}
 }

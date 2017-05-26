@@ -37,7 +37,8 @@ class CControllerWidgetActionLogView extends CController
 
 	protected function checkInput() {
 		$fields = [
-			'fields' =>		'array',
+			'fields' =>		'required|array',
+			'name' =>	'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,7 +47,6 @@ class CControllerWidgetActionLogView extends CController
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 		}
 
-		$this->fields = $this->getInput('fields');
 		return $ret;
 	}
 
@@ -56,6 +56,12 @@ class CControllerWidgetActionLogView extends CController
 
 	protected function doAction()
 	{
+		$this->fields = $this->getInput('fields');
+		$name = $this->getInput('name');
+		if ($name === '') {
+			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG];
+		}
+
 		list($sortfield, $sortorder) = $this->getSorting();
 		$alerts = $this->getAlerts($sortfield, $sortorder);
 		$dbUsers = $this->getDbUsers($alerts);
@@ -67,7 +73,7 @@ class CControllerWidgetActionLogView extends CController
 		]);
 
 		$this->setResponse(new CControllerResponseData([
-			'header' => CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG],
+			'header' => $name,
 			'actions' => $actions,
 			'alerts'  => $alerts,
 			'db_users' => $dbUsers,
