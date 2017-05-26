@@ -365,43 +365,52 @@ class CMediatype extends CApiService {
 
 			// Validate optional 'maxsessions' field.
 			if (array_key_exists('maxsessions', $mediatype)) {
-				$ge_value = 0;
-				$le_value = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
-				$value = $mediatype['maxsessions'];
-				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
-				if (!$valid_value || $value < $ge_value || $value > $le_value) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".', $mediatype['maxsessions'],
-						'maxsessions', $mediatype['description']
+				if ($mediatype['maxsessions'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'maxsessions', _('cannot be empty')
+					));
+				}
+				$max = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
+
+				if (!ctype_digit((string) $mediatype['maxsessions']) || $mediatype['maxsessions'] > $max) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'maxsessions',
+							_s('must be between "%1$s" and "%2$s"', 0, $max)
 					));
 				}
 			}
 
 			// Validate optional 'maxattempts' field.
 			if (array_key_exists('maxattempts', $mediatype)) {
-				$ge_value = 0;
-				$le_value = 10;
-				$value = $mediatype['maxattempts'];
-				$valid_value = (is_integer($mediatype['maxattempts']) || is_string($mediatype['maxattempts']));
-				if (!$valid_value || $value < $ge_value || $value > $le_value) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".', $mediatype['maxattempts'],
-						'maxattempts', $mediatype['description']
+				if ($mediatype['maxattempts'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'maxattempts', _('cannot be empty')
+					));
+				}
+
+				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 10) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'maxattempts',
+							_s('must be between "%1$s" and "%2$s"', 0, 10)
 					));
 				}
 			}
 
 			// Validate optional 'attempt_interval' field.
 			if (array_key_exists('attempt_interval', $mediatype)) {
-				$attempt_interval = $mediatype['attempt_interval'];
-				$is_valid = ($simple_interval_parser->parse($attempt_interval) == CParser::PARSE_SUCCESS);
-				$interval = convertFunctionValue($attempt_interval);
-				$maximum = convertFunctionValue('1m');
-				if (!$is_valid || $interval > $maximum || $interval < 0) {
+				if ($mediatype['attempt_interval'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'attempt_interval', _('cannot be empty')
+					));
+				}
+				$valid_value = ($simple_interval_parser->parse($mediatype['attempt_interval']) == CParser::PARSE_SUCCESS);
+				$interval = timeUnitToSeconds($mediatype['attempt_interval']);
+
+				if (!$valid_value || $mediatype['attempt_interval'] > 60 || $mediatype['attempt_interval'] < 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" in field "%2$s" for media type "%3$s".', $attempt_interval,
-							'attempt_interval', $mediatype['description'])
-					);
+						_s('Incorrect value for field "%1$s": %2$s.', 'attempt_interval',
+							_s('must be between "%1$s" and "%2$s"', 0, 60)
+					));
 				}
 			}
 		}
@@ -435,7 +444,7 @@ class CMediatype extends CApiService {
 		// Check value map names.
 		$db_mediatypes = API::getApiService()->select('media_type', [
 			'output' => ['mediatypeid', 'type', 'description', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
-				'smtp_verify_host', 'smtp_authentication'],
+				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
@@ -698,46 +707,57 @@ class CMediatype extends CApiService {
 				}
 			}
 
-			if (array_key_exists('maxsessions', $mediatype)) {
-				$ge_value = 0;
-				$le_value = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
-				$value = $mediatype['maxsessions'];
-				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
-				if (!$valid_value || $value < $ge_value || $value > $le_value) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-						$mediatype['maxsessions'],
-						'maxsessions',
-						$mediatype['description']
+			// Validate optional 'maxsessions' field.
+			if (array_key_exists('maxsessions', $mediatype)
+					&& $db_mediatype['maxsessions'] != $mediatype['maxsessions']) {
+				if ($mediatype['maxsessions'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'maxsessions', _('cannot be empty')
 					));
 				}
-			}
+				$max = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
 
-			if (array_key_exists('maxattempts', $mediatype)) {
-				$ge_value = 0;
-				$le_value = 10;
-				$value = $mediatype['maxattempts'];
-				$valid_value = (is_integer($mediatype['maxsessions']) || is_string($mediatype['maxsessions']));
-				if (!$valid_value || $value < $ge_value || $value > $le_value) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-						$mediatype['maxattempts'],
-						'maxattempts',
-						$mediatype['description']
-					));
-				}
-			}
-
-			if (array_key_exists('attempt_interval', $mediatype)) {
-				$attempt_interval = $mediatype['attempt_interval'];
-				$is_valid = ($simple_interval_parser->parse($attempt_interval) == CParser::PARSE_SUCCESS);
-				$interval = convertFunctionValue($attempt_interval);
-				$maximum = convertFunctionValue('1m');
-				if (!$is_valid || $interval > $maximum || $interval < 0) {
+				if (!ctype_digit((string) $mediatype['maxsessions']) || $mediatype['maxsessions'] > $max) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-							$attempt_interval, 'attempt_interval', $mediatype['description'])
-					);
+						_s('Incorrect value for field "%1$s": %2$s.', 'maxsessions',
+							_s('must be between "%1$s" and "%2$s"', 0, $max)
+					));
+				}
+			}
+
+			// Validate optional 'maxattempts' field.
+			if (array_key_exists('maxattempts', $mediatype)
+					&& $db_mediatype['maxattempts'] != $mediatype['maxattempts']) {
+				if ($mediatype['maxattempts'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'maxattempts', _('cannot be empty')
+					));
+				}
+
+				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 10) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'maxattempts',
+							_s('must be between "%1$s" and "%2$s"', 0, 10)
+					));
+				}
+			}
+
+			// Validate optional 'attempt_interval' field.
+			if (array_key_exists('attempt_interval', $mediatype)
+					&& $db_mediatype['attempt_interval'] != $mediatype['attempt_interval']) {
+				if ($mediatype['attempt_interval'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'attempt_interval', _('cannot be empty')
+					));
+				}
+				$valid_value = ($simple_interval_parser->parse($mediatype['attempt_interval']) == CParser::PARSE_SUCCESS);
+				$interval = timeUnitToSeconds($mediatype['attempt_interval']);
+
+				if (!$valid_value || $mediatype['attempt_interval'] > 60 || $mediatype['attempt_interval'] < 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'attempt_interval',
+							_s('must be between "%1$s" and "%2$s"', 0, 60)
+					));
 				}
 			}
 		}
@@ -763,9 +783,9 @@ class CMediatype extends CApiService {
 	 * @param string	$mediatypes['username']				username
 	 * @param string	$mediatypes['passwd']				password
 	 * @param int		$mediatypes['status']				media type status
-	 * @param int		$mediatypes['maxsessions']			limit of simultaneously processed alerts
-	 * @param int		$mediatypes['maxattempts']			max attempts to delivery alert successfully
-	 * @param string	$mediatypes['attempt_interval']		interval between alert delivery attempts
+	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
+	 * @param int		$mediatypes['maxattempts']			Maximum attempts to delivery alert successfully.
+	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
 	 *
 	 * @return array
 	 */
@@ -800,9 +820,9 @@ class CMediatype extends CApiService {
 	 * @param string	$mediatypes['username']				username
 	 * @param string	$mediatypes['passwd']				password
 	 * @param int		$mediatypes['status']				media type status
-	 * @param int		$mediatypes['maxsessions']			limit of simultaneously processed alerts
-	 * @param int		$mediatypes['maxattempts']			max attempts to delivery alert successfully
-	 * @param string	$mediatypes['attempt_interval']		interval between alert delivery attempts
+	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
+	 * @param int		$mediatypes['maxattempts']			Maximum attempts to delivery alert successfully.
+	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
 	 *
 	 * @return array
 	 */
