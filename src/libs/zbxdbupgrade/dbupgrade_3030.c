@@ -39,14 +39,14 @@ static int	DBpatch_3030001(void)
 {
 	const ZBX_FIELD field = {"snmp_oid", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("items", &field);
+	return DBmodify_field_type("items", &field, NULL);
 }
 
 static int	DBpatch_3030002(void)
 {
 	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("dchecks", &field);
+	return DBmodify_field_type("dchecks", &field, NULL);
 }
 
 static int	DBpatch_3030003(void)
@@ -137,14 +137,14 @@ static int	DBpatch_3030012(void)
 {
 	const ZBX_FIELD field = {"snmp_lastsize", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("globalvars", &field);
+	return DBmodify_field_type("globalvars", &field, NULL);
 }
 
 static int	DBpatch_3030013(void)
 {
 	const ZBX_FIELD field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("media", &field);
+	return DBmodify_field_type("media", &field, NULL);
 }
 
 static int	DBpatch_3030015(void)
@@ -565,14 +565,14 @@ static int	DBpatch_3030047(void)
 {
 	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("triggers", &field);
+	return DBmodify_field_type("triggers", &field, NULL);
 }
 
 static int	DBpatch_3030048(void)
 {
 	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("alerts", &field);
+	return DBmodify_field_type("alerts", &field, NULL);
 }
 
 static int	DBpatch_3030049(void)
@@ -1084,9 +1084,10 @@ out:
 
 static int	DBpatch_3030075(void)
 {
-	const ZBX_FIELD field = {"autologout", "15m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"autologout", "900", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"autologout", "15m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("users", &field);
+	return DBmodify_field_type("users", &new_field, &old_field);
 }
 
 static int	DBpatch_3030076(void)
@@ -1098,9 +1099,10 @@ static int	DBpatch_3030076(void)
 
 static int	DBpatch_3030077(void)
 {
-	const ZBX_FIELD field = {"refresh", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"refresh", "30", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"refresh", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("users", &field);
+	return DBmodify_field_type("users", &new_field, &old_field);
 }
 
 static int	DBpatch_3030078(void)
@@ -1123,9 +1125,10 @@ static int	DBpatch_3030079(void)
 
 static int	DBpatch_3030080(void)
 {
-	const ZBX_FIELD field = {"delay", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"delay", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"delay", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("slideshows", &field);
+	return DBmodify_field_type("slideshows", &new_field, &old_field);
 }
 
 static int	DBpatch_3030081(void)
@@ -1137,16 +1140,18 @@ static int	DBpatch_3030081(void)
 
 static int	DBpatch_3030082(void)
 {
-	const ZBX_FIELD field = {"delay", "0", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"delay", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"delay", "0", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("slides", &field);
+	return DBmodify_field_type("slides", &new_field, &old_field);
 }
 
 static int	DBpatch_3030083(void)
 {
-	const ZBX_FIELD field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"delay", "3600", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("drules", &field);
+	return DBmodify_field_type("drules", &new_field, &old_field);
 }
 
 static int	DBpatch_3030084(void)
@@ -1165,9 +1170,10 @@ static int	DBpatch_3030085(void)
 
 static int	DBpatch_3030086(void)
 {
-	const ZBX_FIELD field = {"delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"delay", "60", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("httptest", &field);
+	return DBmodify_field_type("httptest", &new_field, &old_field);
 }
 
 static int	DBpatch_3030087(void)
@@ -1186,9 +1192,10 @@ static int	DBpatch_3030088(void)
 
 static int	DBpatch_3030089(void)
 {
-	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"timeout", "15", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("httpstep", &field);
+	return DBmodify_field_type("httpstep", &new_field, &old_field);
 }
 
 static int	DBpatch_3030090(void)
@@ -1207,9 +1214,10 @@ static int	DBpatch_3030091(void)
 
 static int	DBpatch_3030092(void)
 {
-	const ZBX_FIELD field = {"delay", "0", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"delay", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"delay", "0", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("items", &field);
+	return DBmodify_field_type("items", &new_field, &old_field);
 }
 
 static int	DBpatch_3030093(void)
@@ -1281,9 +1289,10 @@ static int	DBpatch_3030094(void)
 
 static int	DBpatch_3030095(void)
 {
-	const ZBX_FIELD field = {"history", "90d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"history", "90", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"history", "90d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("items", &field);
+	return DBmodify_field_type("items", &new_field, &old_field);
 }
 
 static int	DBpatch_3030096(void)
@@ -1295,9 +1304,10 @@ static int	DBpatch_3030096(void)
 
 static int	DBpatch_3030097(void)
 {
-	const ZBX_FIELD field = {"trends", "365d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"trends", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"trends", "365d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("items", &field);
+	return DBmodify_field_type("items", &new_field, &old_field);
 }
 
 static int	DBpatch_3030098(void)
@@ -1322,7 +1332,7 @@ static int	DBpatch_3030100(void)
 {
 	const ZBX_FIELD field = {"lifetime", "30d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("items", &field);
+	return DBmodify_field_type("items", &field, NULL);
 }
 
 static int	DBpatch_3030101(void)
@@ -1382,9 +1392,10 @@ out:
 
 static int	DBpatch_3030103(void)
 {
-	const ZBX_FIELD field = {"esc_period", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"esc_period", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"esc_period", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("actions", &field);
+	return DBmodify_field_type("actions", &new_field, &old_field);
 }
 
 static int	DBpatch_3030104(void)
@@ -1403,9 +1414,10 @@ static int	DBpatch_3030105(void)
 
 static int	DBpatch_3030106(void)
 {
-	const ZBX_FIELD field = {"esc_period", "0", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"esc_period", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"esc_period", "0", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("operations", &field);
+	return DBmodify_field_type("operations", &new_field, &old_field);
 }
 
 static int	DBpatch_3030107(void)
@@ -1417,9 +1429,10 @@ static int	DBpatch_3030107(void)
 
 static int	DBpatch_3030108(void)
 {
-	const ZBX_FIELD field = {"refresh_unsupported", "10m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"refresh_unsupported", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"refresh_unsupported", "10m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030109(void)
@@ -1433,7 +1446,7 @@ static int	DBpatch_3030110(void)
 {
 	const ZBX_FIELD field = {"work_period", "1-5,09:00-18:00", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &field, NULL);
 }
 
 static int	DBpatch_3030111(void)
@@ -1445,9 +1458,10 @@ static int	DBpatch_3030111(void)
 
 static int	DBpatch_3030112(void)
 {
-	const ZBX_FIELD field = {"event_expire", "1w", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"event_expire", "7", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"event_expire", "1w", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030113(void)
@@ -1459,9 +1473,10 @@ static int	DBpatch_3030113(void)
 
 static int	DBpatch_3030114(void)
 {
-	const ZBX_FIELD field = {"ok_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"ok_period", "1800", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"ok_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030115(void)
@@ -1473,9 +1488,10 @@ static int	DBpatch_3030115(void)
 
 static int	DBpatch_3030116(void)
 {
-	const ZBX_FIELD field = {"blink_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"blink_period", "1800", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"blink_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030117(void)
@@ -1487,9 +1503,10 @@ static int	DBpatch_3030117(void)
 
 static int	DBpatch_3030118(void)
 {
-	const ZBX_FIELD field = {"hk_events_trigger", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_events_trigger", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_events_trigger", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030119(void)
@@ -1501,9 +1518,10 @@ static int	DBpatch_3030119(void)
 
 static int	DBpatch_3030120(void)
 {
-	const ZBX_FIELD field = {"hk_events_internal", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_events_internal", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_events_internal", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030121(void)
@@ -1515,9 +1533,10 @@ static int	DBpatch_3030121(void)
 
 static int	DBpatch_3030122(void)
 {
-	const ZBX_FIELD field = {"hk_events_discovery", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_events_discovery", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_events_discovery", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030123(void)
@@ -1529,9 +1548,10 @@ static int	DBpatch_3030123(void)
 
 static int	DBpatch_3030124(void)
 {
-	const ZBX_FIELD field = {"hk_events_autoreg", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_events_autoreg", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_events_autoreg", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030125(void)
@@ -1543,9 +1563,10 @@ static int	DBpatch_3030125(void)
 
 static int	DBpatch_3030126(void)
 {
-	const ZBX_FIELD field = {"hk_services", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_services", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_services", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030127(void)
@@ -1557,9 +1578,10 @@ static int	DBpatch_3030127(void)
 
 static int	DBpatch_3030128(void)
 {
-	const ZBX_FIELD field = {"hk_audit", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_audit", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_audit", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030129(void)
@@ -1571,9 +1593,10 @@ static int	DBpatch_3030129(void)
 
 static int	DBpatch_3030130(void)
 {
-	const ZBX_FIELD field = {"hk_sessions", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_sessions", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_sessions", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030131(void)
@@ -1585,9 +1608,10 @@ static int	DBpatch_3030131(void)
 
 static int	DBpatch_3030132(void)
 {
-	const ZBX_FIELD field = {"hk_history", "90d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_history", "90", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_history", "90d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030133(void)
@@ -1599,9 +1623,10 @@ static int	DBpatch_3030133(void)
 
 static int	DBpatch_3030134(void)
 {
-	const ZBX_FIELD field = {"hk_trends", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"hk_trends", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	new_field = {"hk_trends", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBmodify_field_type("config", &new_field, &old_field);
 }
 
 static int	DBpatch_3030135(void)
@@ -1644,7 +1669,7 @@ static int	DBpatch_3030137(void)
 				"'web.items.subfilter_history',"
 				"'web.items.subfilter_interval',"
 				"'web.items.subfilter_trends'"
-			");";
+			")";
 
 	if (ZBX_DB_OK > DBexecute("%s", sql))
 		return FAIL;
