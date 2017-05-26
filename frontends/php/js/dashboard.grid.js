@@ -24,8 +24,9 @@
 	function makeWidgetDiv(data, widget) {
 		widget['content_header'] = $('<div>')
 			.addClass('dashbrd-grid-widget-head')
-			.append($('<h4>').text(widget['header']));
-		// TODO VM: if header is empty, use defualt value
+			.append($('<h4>').text(
+				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
+			));
 		widget['content_body'] = $('<div>')
 			.addClass('dashbrd-grid-widget-content');
 		widget['content_footer'] = $('<div>')
@@ -511,12 +512,12 @@
 					if (widget === null) {
 						// In case of ADD widget
 						// create widget with required selected fields and add it to dashboard
-						var pos = findEmptyPosition($obj, data, fields['type']);
+						var pos = findEmptyPosition($obj, data, type);
 						var widget_data = {
-							'type': fields['type'],
-							'header': data['widget_defaults'][fields['type']]['header'],
+							'type': type,
+							'header': name,
 							'pos': pos,
-							'rf_rate': data['widget_defaults'][fields['type']]['rf_rate'],
+							'rf_rate': data['widget_defaults'][type]['rf_rate'],
 							'fields': fields
 						}
 						methods.addWidget.call($obj, widget_data);
@@ -525,11 +526,10 @@
 						setWidgetModeEdit($obj, data, widget);
 					} else {
 						// In case of EDIT widget
+						widget['type'] = type;
+						widget['header'] = name;
+						widget['fields'] = fields;
 					}
-
-					widget['type'] = type;
-					widget['header'] = name;
-					widget['fields'] = fields;
 
 					updateWidgetDynamic($obj, data, widget);
 					refreshWidget(widget);
