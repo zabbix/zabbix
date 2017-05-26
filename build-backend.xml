@@ -42,7 +42,7 @@
 	</target>
 	
 	<!-- Clang Static Analyzer target -->
-	<target name="clang-static-analyzer">
+	<target name="clang-static-analyzer" depends="init">
 		<exec executable="scan-build" failonerror="on">
 			<arg line="./configure"/>
 			<arg line="--enable-server"/>
