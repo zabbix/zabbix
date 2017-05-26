@@ -704,18 +704,16 @@
 			dataType: 'json',
 			data: ajax_data,
 			success: function(resp) {
-				if (typeof(resp.errors) !== 'undefined') {
-					// Error returned
-					dashbaordAddMessages(resp.errors);
-				} else {
-					if (typeof(resp.messages) !== 'undefined') {
-						// Success returned
-//						dashbaordAddMessages(resp.messages); // TODO VM: looks bad
-					}
+				// we can have redirect with errors
+				if ('redirect' in resp) {
 					// There are no more unsaved changes
 					data['options']['updated'] = false;
-					// Reload page to get latest wiget data from server.
+					// Replace add possibility to remove previous url (as ..&new=1) from the document history
+					// it allows to use back browser button more user-friendly
 					window.location.replace(resp.redirect);
+				} else if ('errors' in resp) {
+					// Error returned
+					dashbaordAddMessages(resp.errors);
 				}
 			},
 			error: function() {
