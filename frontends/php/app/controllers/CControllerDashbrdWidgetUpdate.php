@@ -185,7 +185,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $result['dashboardids'][0])
 					->getUrl();
-
+				// @TODO should be moved from here to base logic by ZBXNEXT-3892
 				CSession::setValue('messageOk', $message);
 			}
 			else {
