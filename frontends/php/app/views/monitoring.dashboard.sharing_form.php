@@ -17,48 +17,46 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-$sharing_form = (new CForm('post', (new CUrl('zabbix.php'))
+
+
+$form = (new CForm('post', (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.update')
 	->getUrl()
 ))
 	->setName('dashboard_sharing_form')
 	->addStyle('display: none;');
 
-$user_group_shares_table = (new CTable())
+$table_user_groups = (new CTable())
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
+	->addRow(
+		(new CRow(
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->onClick("return PopUp('popup.php?dstfrm=".$form->getName().
+						"&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1')"
+					)
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(3)
+		))->setId('user_group_list_footer')
+	)
 	->addStyle('width: 100%;');
 
-$add_user_group_btn = ([(new CButton(null, _('Add')))
-	->onClick("return PopUp('popup.php?dstfrm=".$sharing_form->getName().
-		"&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1')"
-	)
-	->addClass(ZBX_STYLE_BTN_LINK)
-]);
-
-$user_group_shares_table->addRow(
-	(new CRow(
-		(new CCol($add_user_group_btn))->setColSpan(3)
-	))->setId('user_group_list_footer')
-);
-
-// User sharing table.
-$user_shares_table = (new CTable())
+$table_users = (new CTable())
 	->setHeader([_('Users'), _('Permissions'), _('Action')])
+	->addRow(
+		(new CRow(
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->onClick("return PopUp('popup.php?dstfrm=".$form->getName().
+						"&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1')"
+					)
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(3)
+		))->setId('user_list_footer')
+	)
 	->addStyle('width: 100%;');
 
-$add_user_btn = ([(new CButton(null, _('Add')))
-	->onClick("return PopUp('popup.php?dstfrm=".$sharing_form->getName().
-		"&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1')"
-	)
-	->addClass(ZBX_STYLE_BTN_LINK)]);
-
-$user_shares_table->addRow(
-	(new CRow(
-		(new CCol($add_user_btn))->setColSpan(3)
-	))->setId('user_list_footer')
-);
-
-$sharing_form
+$form
 	->addItem(new CInput('hidden', 'dashboardid', $dashboardid))
 	// indicator to help delete all users
 	->addItem(new CInput('hidden', 'users['.CControllerDashboardUpdate::EMPTY_USER.']', '1'))
@@ -72,16 +70,15 @@ $sharing_form
 				->setModern(true)
 		)
 		->addRow(_('List of user group shares'),
-			(new CDiv($user_group_shares_table))
+			(new CDiv($table_user_groups))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		)
 		->addRow(_('List of user shares'),
-			(new CDiv($user_shares_table))
+			(new CDiv($table_users))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		)
 	);
 
-return $sharing_form;
-
+return $form;
