@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Media types'));
@@ -148,35 +149,38 @@ $mediaTypeFormList
 $tabs->addTab('mediaTab', _('Media type'), $mediaTypeFormList);
 
 // media options tab
-$maxSessions = (int) $data['maxsessions'] > 1 ? (int) $data['maxsessions'] : 0;
+$max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;
 if ($data['type'] == MEDIA_TYPE_SMS) {
-	$maxSessions = 1;
+	$max_sessions = 1;
 }
+
 switch($data['maxsessions']) {
-	case 1 :
-		$data['maxsessionsType'] = 'one';
+	case 1:
+		$data['maxsessions_type'] = 'one';
 		break;
-	case 0 :
-		$data['maxsessionsType'] = 'unlimited';
+
+	case 0:
+		$data['maxsessions_type'] = 'unlimited';
 		break;
-	default :
-		$data['maxsessionsType'] = 'custom';
-		break;
+
+	default:
+		$data['maxsessions_type'] = 'custom';
 }
+
 $mediaOptionsForm = (new CFormList('options'))
 	->addRow(_('Concurrent sessions'),
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addItem([
 				(new CDiv(
-					(new CRadioButtonList('maxsessionsType', $data['maxsessionsType']))
+					(new CRadioButtonList('maxsessions_type', $data['maxsessions_type']))
 						->addValue(_('One'), 'one')
 						->addValue(_('Unlimited'), 'unlimited')
 						->addValue(_('Custom'), 'custom')
 						->setModern(true)
 				))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CNumericBox('maxsessions', $maxSessions, 3, false, false, false))
-						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				(new CNumericBox('maxsessions', $max_sessions, 3, false, false, false))
+					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			])
 	)
 	->addRow(_('Attempts'),

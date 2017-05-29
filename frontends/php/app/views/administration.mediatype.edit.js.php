@@ -79,7 +79,7 @@
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
 		$('#media_type_form').submit(function() {
 			var attempts = $('#maxattempts'),
-				sessions_type = $('#maxsessionsType :radio:checked').val(),
+				sessions_type = $('#maxsessions_type :radio:checked').val(),
 				inputbox = $('#maxsessions');
 
 			if ($.trim(attempts.val()) === '') {
@@ -98,13 +98,13 @@
 			]);
 		});
 
-		$('#maxsessionsType :radio').change(function() {
+		$('#maxsessions_type :radio').change(function() {
 			toggleMaxSessionsVisibility($(this).val());
 		});
 
 		// Refresh field visibility on document load.
 		$('#type').trigger('change');
-		$('#maxsessionsType :radio:checked').trigger('change');
+		$('#maxsessions_type :radio:checked').trigger('change');
 
 		$('input[name=smtp_security]').change(function() {
 			toggleSecurityOptions();
@@ -155,12 +155,12 @@
 		}
 
 		/**
-		 * Set maxsessionsType radio buttons accessibility.
+		 * Set maxsessions_type radio buttons accessibility.
 		 *
 		 * @param {int} media_type		Selected media type.
 		 */
 		function setMaxSessionsType(media_type) {
-			var radio_items = $('#maxsessionsType :radio');
+			var radio_items = $('#maxsessions_type :radio');
 
 			if (media_type == <?= MEDIA_TYPE_SMS ?>) {
 				radio_items.attr('disabled', true).filter('[value=one]').attr('disabled', false);
