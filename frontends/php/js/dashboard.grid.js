@@ -495,7 +495,7 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboardid: data['dashboard']['id'], // TODO VM: (?) will not work without dashboard id
+				dashboardid: data['dashboard']['id'],
 				widgets: ajax_widgets,
 				save: 0 // WIDGET_CONFIG_DONT_SAVE - only check
 			},
@@ -539,7 +539,7 @@
 				}
 			},
 			error: function() {
-				// TODO VM: (?) Do we need to display some kind of error message here?
+				// TODO VM: Add error message box in this case
 			}
 		});
 	}
@@ -553,8 +553,6 @@
 		}
 
 		// go row by row and try to position widget in each space
-		// TODO VM: (?) probably not the most efficient algorithm,
-		//			but simple one, and for our dashboard size should work fast enough
 		var max_col = data['options']['columns'] - pos['width'],
 			found = false,
 			col, row;
@@ -689,7 +687,7 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboardid: data['dashboard']['id'], // TODO VM: (?) will not work without dashboard id
+				dashboardid: data['dashboard']['id'],
 				widgets: ajax_widgets,
 				save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
 			},
@@ -698,18 +696,14 @@
 					// Error returned
 					dashbaordAddMessages(resp.errors);
 				} else {
-					if (typeof(resp.messages) !== 'undefined') {
-						// Success returned
-//						dashbaordAddMessages(resp.messages); // TODO VM: looks bad
-					}
 					// There are no more unsaved changes
 					data['options']['updated'] = false;
 					// Reload page to get latest wiget data from server.
-					location.reload(true); // TODO VM: (?) in case of page reloading I can't display success message with current functionality.
+					location.reload(true);
 				}
 			},
 			error: function() {
-				// TODO VM: (?) Do we need to display some kind of error message here?
+				// TODO VM: add error message box
 			}
 		});
 	}
@@ -743,7 +737,7 @@
 			options['widget-height'] = 70;
 			options['widget-width'] = 100 / options['columns'];
 			options['rows'] = 0;
-			options['updated'] = false; // TODO VM: (?) not sure, where this flag in data structure should be
+			options['updated'] = false;
 
 			return this.each(function() {
 				var	$this = $(this),
@@ -760,7 +754,6 @@
 
 				$this.append($placeholder.hide());
 
-				// TODO VM: (?) it is good to have warning, but it looks kinda bad and we have no controll over it.
 				$(window).bind('beforeunload', function() {
 					var res = confirmExit($this, data);
 					// return value only if we need confirmation window, return nothing othervise
@@ -904,7 +897,7 @@
 				// (1) In case of New Dashboard from list, it will open list
 				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
 				// (3) In case of simple editing of current dashboard, it will reload same dashboard
-				location.replace('zabbix.php?action=dashboard.view'); // TODO VM: (?) by such I am limiting usage of dashboard grid to this page.
+				location.replace('zabbix.php?action=dashboard.view');
 			});
 		},
 
@@ -946,7 +939,8 @@
 
 				url.setArgument('action', 'dashbrd.widget.config');
 
-				if (widget !== null) {
+				// Don't send on "Add widget" or on "Edit widget", if widget was not saved yet
+				if (widget !== null && widget['widgetid'] !== '') {
 					ajax_data.widgetid = widget['widgetid'];
 				}
 
@@ -1000,7 +994,7 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					error: function() {
-						// TODO VM: (?) do we need to have error message on failed dialogue form update?
+						// TODO VM: add error message box
 					}
 				});
 			});

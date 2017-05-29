@@ -174,7 +174,6 @@ $dashboard_data = [
 	'id' => $data['dashboard']['dashboardid'],
 	'name' => $data['dashboard']['name'],
 	'dynamic' => $data['dynamic']
-//	'owner' => $data['dashboard']['owner'] // TODO VM: add owner
 ];
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
