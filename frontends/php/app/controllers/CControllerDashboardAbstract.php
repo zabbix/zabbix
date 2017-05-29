@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * abstract class to keep common dashboard controller logic
  *
@@ -25,10 +26,9 @@
 abstract class CControllerDashboardAbstract extends CController {
 
 	/**
-	 * Prepare editable flag
+	 * Prepare editable flag.
 	 *
-	 * @param array $dashboards
-	 * @return void
+	 * @param array  $dashboards
 	 */
 	protected function prepareEditableFlag(array &$dashboards)
 	{
