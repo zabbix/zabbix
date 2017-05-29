@@ -81,8 +81,8 @@
 		var edit_button = jQuery('#dashbrd-edit');
 		var btn_conf = jQuery('<button>')
 			.addClass('<?= ZBX_STYLE_BTN_WIDGET_EDIT ?>')
-			.attr('id','dashbrd-config')
-			.attr('type','button')
+			.attr('id', 'dashbrd-config')
+			.attr('type', 'button')
 			.append(
 				jQuery('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>') // TODO VM: replace by cog icon
 			)
@@ -90,29 +90,29 @@
 
 		var btn_add = jQuery('<button>')
 			.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
-			.attr('id','dashbrd-add-widget')
-			.attr('type','button')
+			.attr('id', 'dashbrd-add-widget')
+			.attr('type', 'button')
 			.append(
 				jQuery('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>'),
 				'<?= _('Add widget') ?>'
-		)
-		.click(dashbrd_add_widget);
+			)
+			.click(dashbrd_add_widget);
 
 		var btn_save = jQuery('<button>')
-			.attr('id','dashbrd-save')
-			.attr('type','button')
+			.attr('id', 'dashbrd-save')
+			.attr('type', 'button')
 			.append('<?= _('Save changes') ?>')
-		.click(dashbrd_save_changes);
+			.click(dashbrd_save_changes);
 
 		var btn_cancel = jQuery('<a>')
-			.attr('id','dashbrd-cancel')
+			.attr('id', 'dashbrd-cancel')
 			.attr('href', '#') // TODO VM: (?) needed for style, but adds # at URL, when clicked. Probably better to create new class with same styles
 			.append('<?= _('Cancel') ?>')
-		.click(dashbrd_cancel);
+			.click(dashbrd_cancel);
 
 		var btn_edit_disabled = jQuery('<button>')
-			.attr('disabled','disabled')
-			.attr('type','button')
+			.attr('disabled', 'disabled')
+			.attr('type', 'button')
 			.append('<?= _('Edit dashboard') ?>');
 
 		edit_button.closest('li').hide();
@@ -135,14 +135,17 @@
 
 		// Update buttons on existing widgets to edit mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
-};
+	};
 
 	function initSharingForm() {
 		var	sharing_form = jQuery('form[name="dashboard_sharing_form"]');
+
 		// overwrite submit action to AJAX call
 		sharing_form.submit(function(event) {
 			var	me = this;
+
 			event.preventDefault();
+
 			function saveErrors(errors) {
 				jQuery(me).data('errors', errors);
 			}
@@ -163,7 +166,6 @@
 						errors.push('<?= _('You need permission to perform this action!') ?>');
 					}
 					saveErrors(errors);
-
 				},
 				error: function (response) {
 					saveErrors(['<?= _('Something went wrong. Please try again later!') ?>']);
@@ -202,6 +204,7 @@
 		function save_previous_form_state(form) {
 			var userElement = form.find('#userid'),
 				owner;
+
 			if (typeof userElement.data('multiSelect') !== 'undefined') {
 				owner = userElement.multiSelect('getData');
 				owner = owner[0];
