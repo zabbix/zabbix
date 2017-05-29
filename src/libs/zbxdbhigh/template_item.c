@@ -54,6 +54,7 @@ typedef struct
 	char		*description;
 	char		*lifetime;
 	char		*port;
+	char		*jmx_endpoint;
 	unsigned char	type;
 	unsigned char	value_type;
 	unsigned char	status;
@@ -155,7 +156,8 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authprotocol,"
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
 				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.description,"
-				"ti.inventory_link,ti.lifetime,ti.snmpv3_contextname,hi.itemid,ti.evaltype,ti.port"
+				"ti.inventory_link,ti.lifetime,ti.snmpv3_contextname,hi.itemid,ti.evaltype,ti.port,"
+				"ti.jmx_endpoint"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -222,6 +224,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->lifetime = zbx_strdup(NULL, row[32]);
 		item->snmpv3_contextname = zbx_strdup(NULL, row[33]);
 		item->port = zbx_strdup(NULL, row[36]);
+		item->jmx_endpoint = zbx_strdup(NULL, row[37]);
 
 		if (SUCCEED != DBis_null(row[34]))
 		{
@@ -499,7 +502,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 					*snmp_community_esc, *snmp_oid_esc, *snmpv3_securityname_esc,
 					*snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc, *username_esc,
 					*password_esc, *publickey_esc, *privatekey_esc, *description_esc, *lifetime_esc,
-					*snmpv3_contextname_esc, *port_esc;
+					*snmpv3_contextname_esc, *port_esc, *jmx_endpoint_esc;
 		zbx_template_item_t	*item = items->values[i];
 
 		/* skip new items */
@@ -529,6 +532,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 		lifetime_esc = DBdyn_escape_string(item->lifetime);
 		snmpv3_contextname_esc = DBdyn_escape_string(item->snmpv3_contextname);
 		port_esc = DBdyn_escape_string(item->port);
+		jmx_endpoint_esc = DBdyn_escape_string(item->jmx_endpoint);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update items"
@@ -567,7 +571,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 					"interfaceid=%s,"
 					"lifetime='%s',"
 					"evaltype=%d,"
-					"port='%s'"
+					"port='%s',"
+					"jmx_endpoint='%s'"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				name_esc, (int)item->type, (int)item->value_type,
 				delay_esc,
@@ -582,10 +587,11 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				password_esc, publickey_esc, privatekey_esc,
 				item->templateid, (int)item->flags, description_esc,
 				(int)item->inventory_link, DBsql_id_ins(item->interfaceid),
-				lifetime_esc, (int)item->evaltype, port_esc, item->itemid);
+				lifetime_esc, (int)item->evaltype, port_esc, jmx_endpoint_esc, item->itemid);
 
 		new_items--;
 
+		zbx_free(jmx_endpoint_esc);
 		zbx_free(port_esc);
 		zbx_free(snmpv3_contextname_esc);
 		zbx_free(lifetime_esc);
@@ -630,7 +636,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 			"snmpv3_authprotocol", "snmpv3_authpassphrase", "snmpv3_privprotocol", "snmpv3_privpassphrase",
 			"authtype", "username", "password", "publickey", "privatekey", "templateid", "flags",
 			"description", "inventory_link", "interfaceid", "lifetime", "snmpv3_contextname", "evaltype",
-			"port", NULL);
+			"port", "jmx_endpoint", NULL);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -650,7 +656,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				(int)item->snmpv3_privprotocol, item->snmpv3_privpassphrase, (int)item->authtype,
 				item->username, item->password, item->publickey, item->privatekey, item->templateid,
 				(int)item->flags, item->description, (int)item->inventory_link, item->interfaceid,
-				item->lifetime, item->snmpv3_contextname, (int)item->evaltype, item->port);
+				item->lifetime, item->snmpv3_contextname, (int)item->evaltype, item->port,
+				item->jmx_endpoint);
 
 		item->itemid = itemid++;
 	}
@@ -992,6 +999,7 @@ out:
  ******************************************************************************/
 static void	free_template_item(zbx_template_item_t *item)
 {
+	zbx_free(item->jmx_endpoint);
 	zbx_free(item->port);
 	zbx_free(item->snmpv3_contextname);
 	zbx_free(item->lifetime);
