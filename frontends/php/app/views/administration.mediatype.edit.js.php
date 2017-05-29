@@ -10,10 +10,13 @@
 </script>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
-		var initialized = false;
+		var old_media_type = $('#type').val();
+
 		// type of media
 		$('#type').change(function() {
-			switch ($(this).val()) {
+			var media_type = $(this).val();
+
+			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication').closest('li').show();
 					$('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #exec_params_table')
@@ -24,7 +27,7 @@
 					// radio button actions
 					toggleSecurityOptions();
 					toggleAuthenticationOptions();
-					setMaxSessionsTypeOther();
+					setMaxSessionsType(media_type);
 					break;
 
 				case '<?= MEDIA_TYPE_EXEC ?>':
@@ -33,7 +36,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
-					setMaxSessionsTypeOther();
+					setMaxSessionsType(media_type);
 					break;
 
 				case '<?= MEDIA_TYPE_SMS ?>':
@@ -42,7 +45,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
-					setMaxSessionsTypeSMS();
+					setMaxSessionsType(media_type);
 					break;
 
 				case '<?= MEDIA_TYPE_JABBER ?>':
@@ -51,7 +54,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
-					setMaxSessionsTypeOther();
+					setMaxSessionsType(media_type);
 					break;
 
 				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
@@ -60,7 +63,7 @@
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_params_table')
 						.closest('li')
 						.hide();
-					setMaxSessionsTypeOther();
+					setMaxSessionsType(media_type);
 					break;
 			}
 		});
@@ -75,16 +78,17 @@
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
 		$('#media_type_form').submit(function() {
-			var attempts = $('#maxattempts');
+			var attempts = $('#maxattempts'),
+				sessions_type = $('#maxsessionsType :radio:checked').val(),
+				inputbox = $('#maxsessions');
+
 			if ($.trim(attempts.val()) === '') {
 				attempts.val(0);
 			}
-			var mstype = $('#maxsessionsType :radio:checked').val(),
-				inputbox = $('#maxsessions');
-			if (mstype !== 'custom') {
-				inputbox.val(mstype === 'one' ? 1 : 0);
+			if (sessions_type !== 'custom') {
+				inputbox.val(sessions_type === 'one' ? 1 : 0);
 			}
-			else if (mstype === 'custom' && $.trim(inputbox.val()) === '') {
+			else if (sessions_type === 'custom' && $.trim(inputbox.val()) === '') {
 				inputbox.val(0);
 			}
 
@@ -95,7 +99,7 @@
 		});
 
 		$('#maxsessionsType :radio').change(function() {
-			toggleMaxSessionsType(this);
+			toggleMaxSessionsVisibility($(this).val());
 		});
 
 		// Refresh field visibility on document load.
@@ -135,53 +139,42 @@
 		}
 
 		/**
-		 * Set maxsessions value according selected radio button.
-		 * Set readonly status according #maxsessionType value
+		 * Show or hide "Max sessions" custom input box.
+		 *
+		 * @param {string} sessions_type	Selected Concurrent sessions value. One of 'one', 'unlimited', 'custom'.
 		 */
-		function toggleMaxSessionsType(radio) {
-			var mstype = $(radio).val();
+		function toggleMaxSessionsVisibility(sessions_type) {
 			var inputbox = $('#maxsessions');
-			switch(mstype) {
-				case 'one' :
-					inputbox.hide();
-					break;
-				case 'unlimited' :
-					inputbox.hide();
-					break;
-				default :
-					inputbox.show();
-					if (initialized == true) {
-						inputbox.select().focus();
-					}
-					break;
+
+			if (sessions_type == 'one' || sessions_type == 'unlimited') {
+				inputbox.hide();
+			}
+			else {
+				inputbox.show().select().focus();
 			}
 		}
 
 		/**
-		 * Set maxsessionsType for MEDIA_TYPE_SMS
+		 * Set maxsessionsType radio buttons accessibility.
+		 *
+		 * @param {int} media_type		Selected media type.
 		 */
-		function setMaxSessionsTypeSMS() {
-			$('#maxsessionsType :radio')
-				.attr('disabled', true)
-				.filter('[value=one]')
-					.attr('disabled', false)
-					.click();
-		}
+		function setMaxSessionsType(media_type) {
+			var radio_items = $('#maxsessionsType :radio');
 
-		/**
-		 * Set maxsessionsType for other media types
-		 */
-		function setMaxSessionsTypeOther() {
-			if (initialized == false) {
-				return;
+			if (media_type == <?= MEDIA_TYPE_SMS ?>) {
+				radio_items.attr('disabled', true).filter('[value=one]').attr('disabled', false);
 			}
-			$('#maxsessionsType :radio')
-				.attr('disabled', false)
-				.filter('[value=one]')
-					.click();
+			else {
+				radio_items.attr('disabled', false);
+			}
+
+			if (old_media_type != media_type) {
+				old_media_type = media_type;
+				radio_items.filter('[value=one]').click();
+			}
 		}
 
 		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
-		initialized = true;
 	});
 </script>
