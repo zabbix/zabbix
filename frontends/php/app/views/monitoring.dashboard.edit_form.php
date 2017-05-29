@@ -17,7 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-$edit_form = (new CForm())
+
+
+$form = (new CForm())
 	->setName('dashboard_form')
 	->setAttribute('style', 'display: none;');
 
@@ -27,16 +29,13 @@ $multiselect = (new CMultiSelect([
 	'objectName' => 'users',
 	'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN),
 	'popup' => [
-		'parameters' => 'srctbl=users&dstfrm='.$edit_form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
 	]
 ]))
-	->setAttribute(
-		'data-default-owner',
-		CJs::encodeJson($data['dashboard']['owner'])
-	)
+	->setAttribute('data-default-owner', CJs::encodeJson($data['dashboard']['owner']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$edit_form->addItem((new CFormList())
+$form->addItem((new CFormList())
 	->addRow(_('Owner'), $multiselect)
 	->addRow(_('Name'),
 		(new CTextBox('name', $data['dashboard']['name']))
@@ -45,5 +44,4 @@ $edit_form->addItem((new CFormList())
 	)
 );
 
-return [$edit_form, $multiselect];
-
+return [$form, $multiselect];
