@@ -109,15 +109,15 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 		if ($this->hasInput('new')) {
 			$dashboard = $this->getNewDashboard();
-		} else if ($this->hasInput('source_dashboardid')) {
+		} elseif ($this->hasInput('source_dashboardid')) {
 			// clone dashboard and show as new
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name'],
-				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
+				'selectWidgets' => ['type', 'name', 'row', 'col', 'height', 'width', 'fields'],
 				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
 
-			if (isset($dashboards[0])) {
+			if (is_array($dashboards)) {
 				$dashboard = $this->getNewDashboard();
 				$dashboard['name'] = $dashboards[0]['name'];
 				$dashboard['widgets'] = $dashboards[0]['widgets'];
@@ -159,7 +159,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	private function getNewDashboard()
 	{
 		return [
-			'name' => _('New Dashboard'),
+			'name' => '',
 			'editable' => true,
 			'widgets' => [],
 			'owner' => $this->getOwnerData(CWebUser::$data['userid'])
