@@ -198,6 +198,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*username;
 	const char	*password;
+	const char	*jmx_endpoint;
 }
 ZBX_DC_JMXITEM;
 

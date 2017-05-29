@@ -2415,6 +2415,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			DCstrpool_replace(found, &jmxitem->username, row[20]);
 			DCstrpool_replace(found, &jmxitem->password, row[21]);
+			DCstrpool_replace(found, &jmxitem->jmx_endpoint, row[37]);
 		}
 		else if (NULL != (jmxitem = zbx_hashset_search(&config->jmxitems, &itemid)))
 		{
@@ -2422,6 +2423,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_strpool_release(jmxitem->username);
 			zbx_strpool_release(jmxitem->password);
+			zbx_strpool_release(jmxitem->jmx_endpoint);
 
 			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
 		}
@@ -2606,6 +2608,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_strpool_release(jmxitem->username);
 			zbx_strpool_release(jmxitem->password);
+			zbx_strpool_release(jmxitem->jmx_endpoint);
 
 			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
 		}
@@ -4876,6 +4879,7 @@ static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 
 	ZBX_RETURN_IF_NOT_EQUAL(j1->username, j2->username);
 	ZBX_RETURN_IF_NOT_EQUAL(j1->password, j2->password);
+	ZBX_RETURN_IF_NOT_EQUAL(j1->jmx_endpoint, j2->jmx_endpoint);
 
 	return 0;
 }
@@ -5612,14 +5616,17 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, zbx_uint6
 			{
 				strscpy(dst_item->username_orig, jmxitem->username);
 				strscpy(dst_item->password_orig, jmxitem->password);
+				strscpy(dst_item->jmx_endpoint_orig, jmxitem->jmx_endpoint);
 			}
 			else
 			{
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
+				*dst_item->jmx_endpoint_orig = '\0';
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
+			dst_item->jmx_endpoint = NULL;
 			break;
 		case ITEM_TYPE_CALCULATED:
 			calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid);

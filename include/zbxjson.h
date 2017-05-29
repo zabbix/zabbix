@@ -83,6 +83,7 @@
 #define ZBX_PROTO_TAG_PARENT_TASKID	"parent_taskid"
 #define ZBX_PROTO_TAG_TASKS		"tasks"
 #define ZBX_PROTO_TAG_ALERTID		"alertid"
+#define ZBX_PROTO_TAG_JMX_ENDPOINT	"jmx_endpoint"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
