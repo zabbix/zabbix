@@ -23,7 +23,7 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$createButton = (new CRedirectButton(_('Create Dashboard'),
+$create_button = (new CRedirectButton(_('Create Dashboard'),
 	(new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.view')
 		->setArgument('new', '1')
@@ -34,7 +34,7 @@ $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem($createButton)
+		->addItem($create_button)
 		->addItem((new CList())
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
