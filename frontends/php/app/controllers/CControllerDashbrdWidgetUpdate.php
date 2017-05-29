@@ -34,8 +34,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'dashboard_id' =>	'db dashboard.dashboardid',
-			'userid' =>         'db dashboard.userid',
-			'name' =>           'not_empty',
+			'userid' =>			'db dashboard.userid',
+			'name' =>			'not_empty',
 			'widgets' =>		'array',
 			'save' =>			'required|in '.implode(',', [WIDGET_CONFIG_DONT_SAVE, WIDGET_CONFIG_DO_SAVE])
 		];
@@ -119,6 +119,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		if (!$ret) {
 			$output = [];
 			if (($messages = getMessages()) !== null) {
+				// TODO AV: "errors" => "messages"
 				$output['errors'] = $messages->toString();
 			}
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
@@ -132,7 +133,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$return = [];
+		$data = [];
 
 		if ($this->getInput('save') == WIDGET_CONFIG_DO_SAVE) {
 			$dashboard = [
@@ -170,17 +171,17 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			}
 
 			if (array_key_exists('dashboardid', $dashboard)) {
-				$result = API::Dashboard()->update([$dashboard]);
+				$result = (bool) API::Dashboard()->update([$dashboard]);
 				$message = _('Dashboard updated');
 				$error_msg =  _('Failed to update dashboard');
 			} else {
-				$result = API::Dashboard()->create([$dashboard]);
+				$result = (bool) API::Dashboard()->create([$dashboard]);
 				$message = _('Dashboard created');
 				$error_msg = _('Failed to create dashboard');
 			}
 
-			if (is_array($result) && array_key_exists('dashboardids', $result)) {
-				$return['redirect'] = (new CUrl('zabbix.php'))
+			if ($result) {
+				$data['redirect'] = (new CUrl('zabbix.php'))
 					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $result['dashboardids'][0])
 					->getUrl();
@@ -189,17 +190,17 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			} else {
 				// TODO AV: improve error messages
 				if (!hasErrorMesssages()) {
-					error(_($error_msg)); // In case of unknown error
+					error(_($error_msg));
 				}
 			}
 		}
 
 		if (($messages = getMessages()) !== null) {
 			// TODO AV: "errors" => "messages"
-			$return['errors'] = $messages->toString();
+			$data['errors'] = $messages->toString();
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($return)])));
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($data)]));
 	}
 
 	/**
