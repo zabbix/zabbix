@@ -83,8 +83,8 @@ class CControllerMediatypeEdit extends CController {
 			$mediatypes = API::Mediatype()->get([
 				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
 					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params',
-					'maxsessions', 'maxattempts', 'attempt_interval'
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions',
+					'maxattempts', 'attempt_interval'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -156,7 +156,6 @@ class CControllerMediatypeEdit extends CController {
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
 			$data['passwd'] = $this->mediatype['passwd'];
 			$data['status'] = $this->mediatype['status'];
-
 			$data['maxsessions'] = $this->mediatype['maxsessions'];
 			$data['maxattempts'] = $this->mediatype['maxattempts'];
 			$data['attempt_interval'] = $this->mediatype['attempt_interval'];

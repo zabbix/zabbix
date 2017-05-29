@@ -61,19 +61,6 @@ class CControllerMediatypeCreate extends CController {
 			}
 		}
 
-		if ($ret && $this->hasInput('attempt_interval')) {
-			$attempt_interval = $this->getInput('attempt_interval');
-			$simple_interval_parser = new CSimpleIntervalParser();
-			$is_valid = ($simple_interval_parser->parse($attempt_interval) == CParser::PARSE_SUCCESS);
-			$interval = convertFunctionValue($attempt_interval);
-			$maximum = convertFunctionValue('1m');
-			if (!$is_valid || $interval > $maximum || $interval < 0) {
-				info(_s('Incorrect value "%1$s" for "%2$s" field.', $attempt_interval, 'attempt_interval'));
-				$ret = false;
-				$error = self::VALIDATION_ERROR;
-			}
-		}
-
 		if (!$ret) {
 			switch ($error) {
 				case self::VALIDATION_ERROR:
