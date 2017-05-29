@@ -1430,13 +1430,11 @@ function getActionCommands(array $alerts, array $r_alerts) {
 				case ALERT_STATUS_SENT:
 					$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 					break;
-
 				case ALERT_STATUS_NEW:
 					// falls through
 				case ALERT_STATUS_NOT_SENT:
 					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 					break;
-
 				default:
 					$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 					break;
@@ -1487,16 +1485,14 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 		foreach ($alerts_data as $alert) {
 			switch ($alert['status']) {
 				case ALERT_STATUS_SENT:
-					$status = (new CSpan($alert['alerttype'] == ALERT_TYPE_COMMAND ? _('Executed') : _('Sent')))
+					$status = (new CSpan(($alert['alerttype'] == ALERT_TYPE_COMMAND) ? _('Executed') : _('Sent')))
 						->addClass(ZBX_STYLE_GREEN);
 					break;
-
 				case ALERT_STATUS_NEW:
 					// falls through
 				case ALERT_STATUS_NOT_SENT:
 					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 					break;
-
 				default:
 					$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 			}
@@ -1511,10 +1507,12 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 						? $mediatypes[$alert['mediatypeid']]['description']
 						: '';
 					break;
+
 				case ALERT_TYPE_COMMAND:
 					$user = '';
 					$message = _('Remote command');
 					break;
+
 				default:
 					$user = '';
 					$message = '';

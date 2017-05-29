@@ -18,7 +18,9 @@
 
 			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication').closest('li').show();
+					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication')
+						.closest('li')
+						.show();
 					$('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #exec_params_table')
 						.closest('li')
 						.hide();
@@ -78,18 +80,19 @@
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
 		$('#media_type_form').submit(function() {
-			var attempts = $('#maxattempts'),
-				sessions_type = $('#maxsessions_type :radio:checked').val(),
-				inputbox = $('#maxsessions');
+			var maxattempts = $('#maxattempts'),
+				maxsessions_type = $('#maxsessions_type :radio:checked').val(),
+				maxsessions = $('#maxsessions');
 
-			if ($.trim(attempts.val()) === '') {
-				attempts.val(0);
+			if ($.trim(maxattempts.val()) === '') {
+				maxattempts.val(0);
 			}
-			if (sessions_type !== 'custom') {
-				inputbox.val(sessions_type === 'one' ? 1 : 0);
+
+			if (maxsessions_type !== 'custom') {
+				maxsessions.val(maxsessions_type === 'one' ? 1 : 0);
 			}
-			else if (sessions_type === 'custom' && $.trim(inputbox.val()) === '') {
-				inputbox.val(0);
+			else if (maxsessions_type === 'custom' && $.trim(maxsessions.val()) === '') {
+				maxsessions.val(0);
 			}
 
 			$(this).trimValues([
@@ -139,39 +142,39 @@
 		}
 
 		/**
-		 * Show or hide "Max sessions" custom input box.
+		 * Show or hide concurrent sessions custom input box.
 		 *
-		 * @param {string} sessions_type	Selected Concurrent sessions value. One of 'one', 'unlimited', 'custom'.
+		 * @param {string} maxsessions_type		Selected concurrent sessions value. One of 'one', 'unlimited', 'custom'.
 		 */
-		function toggleMaxSessionsVisibility(sessions_type) {
-			var inputbox = $('#maxsessions');
+		function toggleMaxSessionsVisibility(maxsessions_type) {
+			var maxsessions = $('#maxsessions');
 
-			if (sessions_type == 'one' || sessions_type == 'unlimited') {
-				inputbox.hide();
+			if (maxsessions_type === 'one' || maxsessions_type === 'unlimited') {
+				maxsessions.hide();
 			}
 			else {
-				inputbox.show().select().focus();
+				maxsessions.show().select().focus();
 			}
 		}
 
 		/**
-		 * Set maxsessions_type radio buttons accessibility.
+		 * Set concurrent sessions accessibility.
 		 *
-		 * @param {int} media_type		Selected media type.
+		 * @param {number} media_type		Selected media type.
 		 */
 		function setMaxSessionsType(media_type) {
-			var radio_items = $('#maxsessions_type :radio');
+			var maxsessions_type = $('#maxsessions_type :radio');
 
 			if (media_type == <?= MEDIA_TYPE_SMS ?>) {
-				radio_items.attr('disabled', true).filter('[value=one]').attr('disabled', false);
+				maxsessions_type.attr('disabled', true).filter('[value=one]').attr('disabled', false);
 			}
 			else {
-				radio_items.attr('disabled', false);
+				maxsessions_type.attr('disabled', false);
 			}
 
 			if (old_media_type != media_type) {
 				old_media_type = media_type;
-				radio_items.filter('[value=one]').click();
+				maxsessions_type.filter('[value=one]').click();
 			}
 		}
 

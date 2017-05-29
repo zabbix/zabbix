@@ -154,15 +154,13 @@ if ($data['type'] == MEDIA_TYPE_SMS) {
 	$max_sessions = 1;
 }
 
-switch($data['maxsessions']) {
+switch ($data['maxsessions']) {
 	case 1:
 		$data['maxsessions_type'] = 'one';
 		break;
-
 	case 0:
 		$data['maxsessions_type'] = 'unlimited';
 		break;
-
 	default:
 		$data['maxsessions_type'] = 'custom';
 }
