@@ -31,12 +31,12 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>		    'in 0,1',
-			'dashboardid' =>        'db dashboard.dashboardid',
-			'source_dashboardid' => 'db dashboard.dashboardid',
-			'groupid' =>            'db groups.groupid',
-			'hostid' =>             'db hosts.hostid',
-			'new' =>                'in 1'
+			'fullscreen' =>			'in 0,1',
+			'dashboardid' =>		'db dashboard.dashboardid',
+			'source_dashboardid' =>	'db dashboard.dashboardid',
+			'groupid' =>			'db groups.groupid',
+			'hostid' =>				'db hosts.hostid',
+			'new' =>				'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -54,16 +54,18 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		}
 
 		$this->dashboard = $this->getDashboard();
-		return !$this->hasInput('dashboardid') || is_array($this->dashboard);
+
+		return !$this->hasInput('dashboardid') || $this->dashboard !== null;
 	}
 
 	protected function doAction() {
-
 		if ($this->dashboard === null) {
 			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 			$this->setResponse((new CControllerResponseRedirect($url->getUrl())));
+
 			return;
 		}
+
 		$pageFilter = new CPageFilter([
 			'groups' => [
 				'monitored_hosts' => true,
@@ -103,8 +105,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 * @return array|null
 	 */
 	private function getDashboard() {
-
 		$dashboard = null;
+
 		if ($this->hasInput('new')) {
 			$dashboard = $this->getNewDashboard();
 		} else if ($this->hasInput('source_dashboardid')) {
@@ -114,10 +116,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
 				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
+
 			if (isset($dashboards[0])) {
 				$dashboard = $this->getNewDashboard();
 				$dashboard['name'] = $dashboards[0]['name'];
-				// cloning widgets
 				$dashboard['widgets'] = $dashboards[0]['widgets'];
 			}
 		} else {
@@ -165,21 +167,24 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	/**
-	 * Get owner data
+	 * Get owner datails.
 	 *
 	 * @param int $userid
+	 *
 	 * @return array
 	 */
 	private function getOwnerData($userid)
 	{
 		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
+
 		$users = API::User()->get([
 			'output' => ['userid', 'name', 'surname', 'alias'],
-			'userids' => [$userid]
+			'userids' => $userid
 		]);
 		if ($users) {
 			$owner['name'] = getUserFullname($users[0]);
 		}
+
 		return $owner;
 	}
 
@@ -226,26 +231,27 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$field_key = CWidgetConfig::getApiFieldKey($field['type']);
 			$ret[$field['name']] = $field[$field_key];
 		}
+
 		return $ret;
 	}
 
 	/**
-	 * Checks, if any of widgets has checked dynamic field
+	 * Checks, if any of widgets has checked dynamic field.
 	 *
 	 * @param array $widgets
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private function hasDynamicWidgets($widgets) {
-		$dynamic = false;
 		foreach ($widgets as $widget) {
 			foreach ($widget['fields'] as $field) {
 				// TODO VM: document 'dynamic' as field with special interraction
-				if ($field['name'] === 'dynamic' && $field['value_int'] === '1') {
-					$dynamic = true;
+				if ($field['name'] === 'dynamic' && $field['value_int'] == 1) {
+					return true;
 				}
 			}
 		}
-		return $dynamic;
+
+		return false;
 	}
 }
