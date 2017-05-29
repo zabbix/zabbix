@@ -42,24 +42,19 @@ if (!$is_new) {
 	$dashboard_options['updated'] = true;
 }
 
-$edit_button = new CButton('dashbrd-edit',_('Edit dashboard'));
-if (!$data['dashboard']['editable']) {
-	$edit_button->setAttribute('disabled', 'disabled');
-}
-
 $item_groupid = null;
 $item_hostid = null;
-if ($data['dynamic']['has_dynamic_widgets'] === true) {
-	$item_groupid = ([
-			new CLabel(_('Group'), 'groupid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$data['pageFilter']->getGroupsCB()
-		]);
-	$item_hostid = ([
-			new CLabel(_('Host'), 'hostid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$data['pageFilter']->getHostsCB()
-		]);
+if ($data['dynamic']['has_dynamic_widgets']) {
+	$item_groupid = [
+		new CLabel(_('Group'), 'groupid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$data['pageFilter']->getGroupsCB()
+	];
+	$item_hostid = [
+		new CLabel(_('Host'), 'hostid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$data['pageFilter']->getHostsCB()
+	];
 }
 
 (new CWidget())
@@ -72,12 +67,11 @@ if ($data['dynamic']['has_dynamic_widgets'] === true) {
 			->addItem($item_hostid)
 			// 'Edit dashboard' should be first one in list,
 			// because it will be visually replaced by last item of new list, when clicked
-			->addItem($edit_button)
+			->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable']))
 			->addItem((new CButton(SPACE))
 				->addClass(ZBX_STYLE_BTN_ACTION)
 				->setTitle(_('Actions'))
-				->setAttribute(
-					'data-menu-popup',
+				->setAttribute('data-menu-popup',
 					CJs::encodeJson([
 						'type' => 'dashboard',
 						'label' => _('Actions'),
