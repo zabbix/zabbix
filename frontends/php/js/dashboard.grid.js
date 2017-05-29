@@ -495,7 +495,7 @@
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboard_id: data['dashboard']['id'],
+				dashboardid: data['dashboard']['id'],
 				widgets: ajax_widgets,
 				save: 0 // WIDGET_CONFIG_DONT_SAVE - only check
 			},
@@ -685,7 +685,7 @@
 		});
 
 		var ajax_data = {
-			dashboard_id: data['dashboard']['id'], // can be undefined if dashboard is new
+			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			widgets: ajax_widgets,
 			save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
 		};

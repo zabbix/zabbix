@@ -42,5 +42,6 @@ abstract class CControllerDashboardAbstract extends CController {
 		foreach ($dashboards as &$dashboard) {
 			$dashboard['editable'] = array_key_exists($dashboard['dashboardid'], $dashboards_rw);
 		}
+		unset($dashboard);
 	}
 }

@@ -33,7 +33,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboard_id' =>	'db dashboard.dashboardid',
+			'dashboardid' =>	'db dashboard.dashboardid',
 			'userid' =>			'db dashboard.userid',
 			'name' =>			'not_empty',
 			'widgets' =>		'array',
@@ -139,14 +139,13 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			$dashboard = [
 				'widgets' => []
 			];
-			if ($this->hasInput('dashboard_id')) {
-				$dashboard['dashboardid'] = $this->getInput('dashboard_id');
+			if ($this->hasInput('dashboardid')) {
+				$dashboard['dashboardid'] = $this->getInput('dashboardid');
 			}
 			if ($this->hasInput('name')) {
 				$dashboard['name'] = $this->getInput('name');
 			}
-			if ($this->hasInput('userid')
-				&& in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])) {
+			if ($this->hasInput('userid')) {
 				$dashboard['userid'] = $this->getInput('userid');
 			}
 
@@ -174,7 +173,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				$result = (bool) API::Dashboard()->update([$dashboard]);
 				$message = _('Dashboard updated');
 				$error_msg =  _('Failed to update dashboard');
-			} else {
+			}
+			else {
 				$result = (bool) API::Dashboard()->create([$dashboard]);
 				$message = _('Dashboard created');
 				$error_msg = _('Failed to create dashboard');
@@ -187,10 +187,11 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					->getUrl();
 
 				CSession::setValue('messageOk', $message);
-			} else {
+			}
+			else {
 				// TODO AV: improve error messages
 				if (!hasErrorMesssages()) {
-					error(_($error_msg));
+					error($error_msg);
 				}
 			}
 		}

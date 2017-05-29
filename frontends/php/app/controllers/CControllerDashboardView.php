@@ -178,7 +178,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
 
 		$users = API::User()->get([
-			'output' => ['userid', 'name', 'surname', 'alias'],
+			'output' => ['name', 'surname', 'alias'],
 			'userids' => $userid
 		]);
 		if ($users) {
