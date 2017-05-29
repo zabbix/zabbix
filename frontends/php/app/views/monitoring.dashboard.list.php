@@ -22,11 +22,13 @@
 if ($data['uncheck']) {
 	uncheckTableRows();
 }
-$createButton = (new CRedirectButton(_('Create Dashboard'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'dashboard.view')
-			->setArgument('new', '1')
-			->getUrl()))
-	->setTitle(_('Create Dashboard'));
+
+$createButton = (new CRedirectButton(_('Create Dashboard'),
+	(new CUrl('zabbix.php'))
+		->setArgument('action', 'dashboard.view')
+		->setArgument('new', '1')
+		->getUrl()
+))->setTitle(_('Create Dashboard'));
 
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
@@ -38,8 +40,7 @@ $widget = (new CWidget())
 		)
 	);
 
-$form = (new CForm())
-	->setName('dashboardForm');
+$form = (new CForm())->setName('dashboardForm');
 
 $table = (new CTableInfo())
 	->setHeader([
