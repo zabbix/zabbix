@@ -22,6 +22,7 @@
 if ($data['uncheck']) {
 	uncheckTableRows();
 }
+
 $createButton = (new CRedirectButton(_('Create Dashboard'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'dashboard.view')
 			->setArgument('new', '1')
