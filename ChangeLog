@@ -68,6 +68,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
 .......PS. [ZBX-12142] fixed Oracle batch insert return value (wiper)
 ..F....... [ZBX-11618] fixed displaying hints with no content inside (miks)
 ..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
@@ -485,6 +486,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
 .......PS. [ZBX-12142] fixed Oracle batch insert return value (wiper)
 ..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
 ..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
@@ -2165,6 +2167,7 @@ Changes for 2.2.19rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
 .......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ........S. [ZBX-12012] fixed resolving of Critical and Verbose event log levels by {ITEM.LOG.SEVERITY} macro (Sasha)
 ..F....... [ZBX-11888] fixed chart name urlencoding for web scenario reports; thanks to Kotaro Miyashita for patch (miks)
