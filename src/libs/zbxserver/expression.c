@@ -2864,10 +2864,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_USER_FULLNAME))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-					{
-						replace_to = zbx_dsprintf(replace_to, "%s",
-								zbx_user_string(ack->userid));
-					}
+						replace_to = zbx_strdup(replace_to, zbx_user_string(ack->userid));
 				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
