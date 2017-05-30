@@ -2997,7 +2997,9 @@ $form-icon-btn: (
 		left: -5px;
 		border: 1px solid $ui-border-color;
 	}
-
+	.dashbrd-edit-list-item {
+		vertical-align: middle;
+	}
 	li:first-child {
 		padding: 0;
 	}

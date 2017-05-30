@@ -50,7 +50,7 @@
 		var form = jQuery('form[name="dashboard_form"]');
 		showDialogForm(
 			form,
-			{"title": t('Dashboard Properties'), "action_title": t('Apply')},
+			{"title": "<?= _('Dashboard Properties') ?>", "action_title": "<?= _('Apply') ?>"},
 			{"name": form.data('data').name, "owner": form.data('data').owner}
 		);
 	};
@@ -119,7 +119,7 @@
 		jQuery('#groupid', edit_button.closest('ul')).closest('li').hide();
 		jQuery('#hostid', edit_button.closest('ul')).closest('li').hide();
 
-		var li = jQuery('<li>').css('vertical-align', 'middle');
+		var li = jQuery('<li>').addClass('<?= ZBX_STYLE_DASHBRD_EDIT_LIST_ITEM ?>');
 		edit_button.closest('ul').before(
 			jQuery('<span>')
 				.addClass('<?= ZBX_STYLE_DASHBRD_EDIT ?>')
@@ -225,10 +225,10 @@
 			event.preventDefault();
 
 			if (!formData['userid']) {
-				errors.push(t('Owner cannot be empty!'));
+				errors.push('<?= _('Owner cannot be empty!') ?>');
 			}
 			if (!formData['name']) {
-				errors.push(t('Name cannot be empty!'));
+				errors.push('<?= _('Name cannot be empty!') ?>');
 			}
 			form.data('errors', errors);
 
