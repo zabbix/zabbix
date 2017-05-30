@@ -69,7 +69,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$select_button
-		]))->addStyle('display: flex;'); // TODO VM: move style to scss
+		]))->addClass(ZBX_STYLE_OVERLAY_FORM_LIST_ITEM);
 
 		$form_list->addRow($field->getLabel(), $cell);
 	}

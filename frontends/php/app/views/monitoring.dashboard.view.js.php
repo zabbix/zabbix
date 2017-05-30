@@ -103,7 +103,7 @@
 
 			var btn_cancel = $('<a>')
 				.attr('id','dashbrd-cancel')
-				.attr('href', '#') // TODO VM: (?) needed for style, but adds # at URL, when clicked. Probably better to create new class with same styles
+				.attr('href', '#') // needed for button to be styled like link
 				.append('<?= _('Cancel') ?>')
 				.click(dashbrd_cancel);
 

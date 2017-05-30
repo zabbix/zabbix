@@ -99,6 +99,21 @@ class CWidgetField
 		return $errors;
 	}
 
+	/**
+	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
+	 *
+	 * @return array  Array for widget field ready for saving in API
+	 */
+	public function toApi() {
+		$widget_field = [
+			'type' => $this->save_type,
+			'name' => $this->name
+		];
+		$widget_field[CWidgetConfig::getApiFieldKey($this->save_type)] = $this->getValue(true);
+
+		return $widget_field;
+	}
+
 	protected function setSaveType($save_type) {
 		$known_save_types = [
 			ZBX_WIDGET_FIELD_TYPE_INT32,

@@ -24,7 +24,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 	protected function checkInput() {
 		$fields = [
 			'widgetid' =>	'db widget.widgetid',
-			'type' =>		'in '.implode(',' ,array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'type' =>		'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
 			'name' =>		'string',
 			'fields' =>		'array'
 		];
