@@ -67,7 +67,7 @@
 		e.preventDefault(); // To prevent going by href link
 
 		// Update buttons on existing widgets to view mode
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
+		// jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
 
 		dashboardButtonsSetView();
 	};
@@ -118,6 +118,7 @@
 		edit_button.closest('li').hide();
 		jQuery('#groupid', edit_button.closest('ul')).closest('li').hide();
 		jQuery('#hostid', edit_button.closest('ul')).closest('li').hide();
+		jQuery('#dashbrd-actions').prop('disabled', true);
 
 		edit_button.closest('ul').before(
 			jQuery('<span>')
@@ -257,6 +258,7 @@
 		jQuery('#dashbrd-edit', $form).closest('li').show();
 		jQuery('#groupid', $form).closest('li').show();
 		jQuery('#hostid', $form).closest('li').show();
+		jQuery('#dashbrd-actions').prop('disabled', false);
 	}
 
 	function dashbaordAddMessages(messages) {

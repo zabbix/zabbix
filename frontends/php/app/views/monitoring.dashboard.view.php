@@ -54,6 +54,7 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 			->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable']))
 			->addItem((new CButton(SPACE))
 				->addClass(ZBX_STYLE_BTN_ACTION)
+				->setId('dashbrd-actions')
 				->setTitle(_('Actions'))
 				->setAttribute('data-menu-popup',
 					CJs::encodeJson([
