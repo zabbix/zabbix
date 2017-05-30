@@ -80,9 +80,6 @@
 			.addClass('<?= ZBX_STYLE_BTN_WIDGET_EDIT ?>')
 			.attr('id', 'dashbrd-config')
 			.attr('type', 'button')
-			.append(
-				jQuery('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>') // TODO VM: replace by cog icon
-			)
 			.click(dashbrd_config);
 
 		var btn_add = jQuery('<button>')
