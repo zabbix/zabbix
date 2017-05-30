@@ -88,7 +88,8 @@ abstract class CItemGeneral extends CApiService {
 			'port'					=> [],
 			'inventory_link'		=> [],
 			'lifetime'				=> [],
-			'preprocessing'			=> ['template' => 1]
+			'preprocessing'			=> ['template' => 1],
+			'jmx_endpoint'			=> []
 		];
 
 		$this->errorMessages = array_merge($this->errorMessages, [
