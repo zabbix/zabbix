@@ -711,7 +711,8 @@
 					// Replace add possibility to remove previous url (as ..&new=1) from the document history
 					// it allows to use back browser button more user-friendly
 					window.location.replace(resp.redirect);
-				} else if ('errors' in resp) {
+				}
+				else if ('errors' in resp) {
 					// Error returned
 					dashbaordAddMessages(resp.errors);
 				}
@@ -750,7 +751,6 @@
 			var default_options = {
 				'widget-height': 70,
 				'columns': 12,
-				'widget-width': 100 / 12,
 				'rows': 0,
 				'updated': false
 			};
@@ -791,10 +791,6 @@
 				dashboard = $.extend({}, data['dashboard'], dashboard);
 				data['dashboard'] = dashboard;
 			});
-		},
-
-		getDashboardData: function() {
-			return $(this).data('dashboardGrid');
 		},
 
 		setWidgetDefaults: function(defaults) {
