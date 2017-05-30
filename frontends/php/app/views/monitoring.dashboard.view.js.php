@@ -67,7 +67,7 @@
 		e.preventDefault(); // To prevent going by href link
 
 		// Update buttons on existing widgets to view mode
-		// jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
 
 		dashboardButtonsSetView();
 	};
