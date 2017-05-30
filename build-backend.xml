@@ -199,7 +199,6 @@
 	<target name="make-gcc" depends="init-build-options">
 		<!-- Build Zabbix with various configuration parameters -->
 		<var name="index" value="1"/>
-		<delete dir="clang-scan-build-reports"/>
 		<propertyselector property="conf-list" delimiter="," match="conf(\d+)"/>
 		<for list="${conf-list}" param="name" delimiter=",">
 			<sequential>
