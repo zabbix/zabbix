@@ -126,7 +126,7 @@ else {
 // Initialize dashboard grid
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
-		'.dashboardGrid('. CJs::encodeJson($dashboard_options) . ')'.
+		'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
 		'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
 		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widgetDefaults']).')'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'

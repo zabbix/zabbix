@@ -19,6 +19,8 @@
 **/
 
 
+$this->addJsFile('multiselect.js');
+
 $form = (new CForm())
 	->setName('dashboard_form')
 	->setAttribute('style', 'display: none;');
