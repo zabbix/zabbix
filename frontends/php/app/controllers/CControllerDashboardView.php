@@ -200,7 +200,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$grid_widgets = [];
 
 		foreach ($widgets as $widget) {
-			$widgetid = (int) $widget['widgetid'];
+			$widgetid = $widget['widgetid'];
 			$default_rf_rate = CWidgetConfig::getDefaultRfRate($widget['type']);
 
 			$grid_widgets[$widgetid] = [
