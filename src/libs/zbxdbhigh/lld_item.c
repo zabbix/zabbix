@@ -143,6 +143,8 @@ typedef struct
 	char			*snmp_oid_orig;
 	char			*description;
 	char			*description_orig;
+	char			*jmx_endpoint;
+	char			*jmx_endpoint_orig;
 	int			lastcheck;
 	int			ts_delete;
 	const zbx_lld_row_t	*lld_row;
@@ -452,6 +454,8 @@ static void	lld_item_free(zbx_lld_item_t *item)
 	zbx_free(item->snmp_oid_orig);
 	zbx_free(item->description);
 	zbx_free(item->description_orig);
+	zbx_free(item->jmx_endpoint);
+	zbx_free(item->jmx_endpoint_orig);
 
 	zbx_vector_ptr_clear_ext(&item->preproc_ops, (zbx_clean_func_t)lld_item_preproc_free);
 	zbx_vector_ptr_destroy(&item->preproc_ops);
@@ -631,8 +635,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		if (0 != strcmp(row[34], item_prototype->snmpv3_contextname))
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME;
 
-		if (0 != strcmp(row[35], item_prototype->jmx_endpoint))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT;
+		item->jmx_endpoint = zbx_strdup(NULL, row[35]);
+		item->jmx_endpoint_orig = NULL;
 
 		item->lld_row = NULL;
 
@@ -777,6 +781,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 				ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID, ITEM_SNMP_OID_LEN, error);
 		lld_validate_item_field(item, &item->description, &item->description_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION, ITEM_DESCRIPTION_LEN, error);
+		lld_validate_item_field(item, &item->jmx_endpoint, &item->jmx_endpoint_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT, ITEM_JMX_ENDPOINT_LEN, error);
 	}
 
 	/* check duplicated item keys */
@@ -1079,6 +1085,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	substitute_lld_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->description, ZBX_WHITESPACE);
 
+	item->jmx_endpoint = zbx_strdup(NULL, item_prototype->jmx_endpoint);
+	item->jmx_endpoint_orig = NULL;
+	substitute_lld_macros(&item->jmx_endpoint, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
+
 	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	item->lld_row = lld_row;
 
@@ -1252,6 +1263,17 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->description = buffer;
 		buffer = NULL;
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->jmx_endpoint);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->jmx_endpoint, buffer))
+	{
+		item->jmx_endpoint_orig = item->jmx_endpoint;
+		item->jmx_endpoint = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT;
 	}
 
 	item->flags |= ZBX_FLAG_LLD_ITEM_DISCOVERED;
@@ -1568,7 +1590,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 					(int)item_prototype->authtype, item_prototype->username,
 					item_prototype->password, item_prototype->publickey, item_prototype->privatekey,
 					item->description, item_prototype->interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-					item_prototype->snmpv3_contextname, item_prototype->jmx_endpoint);
+					item_prototype->snmpv3_contextname, item->jmx_endpoint);
 
 			zbx_db_insert_add_values(&db_insert_idiscovery, itemdiscoveryid++, item->itemid,
 					item->parent_itemid, item_prototype->key);
@@ -1816,7 +1838,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT))
 				{
-					value_esc = DBdyn_escape_string(item_prototype->jmx_endpoint);
+					value_esc = DBdyn_escape_string(item->jmx_endpoint);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%sjmx_endpoint='%s'", d, value_esc);
 					zbx_free(value_esc);
