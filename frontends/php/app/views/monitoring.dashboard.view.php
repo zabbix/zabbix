@@ -23,11 +23,8 @@ $this->addJsFile('dashboard.grid.js');
 $this->addJsFile('multiselect.js');
 $this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
-$is_new = !array_key_exists('dashboardid', $data['dashboard']);
-$dashboardid = $is_new ? null : $data['dashboard']['dashboardid'];
-
 $sharing_form = include 'monitoring.dashboard.sharing_form.php';
-list($edit_form, $user_multiselect) = include 'monitoring.dashboard.edit_form.php';
+$edit_form = include 'monitoring.dashboard.edit_form.php';
 $breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
 $dashboard_data = [
@@ -36,8 +33,8 @@ $dashboard_data = [
 	'dynamic' => $data['dynamic']
 ];
 $dashboard_options = [];
-if (!$is_new) {
-	$dashboard_data['id'] = $dashboardid;
+if (!$data['is_new_dashboard']) {
+	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
 } else {
 	$dashboard_options['updated'] = true;
 }
@@ -80,9 +77,9 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 								'name' => 'sharing',
 								'label' => _('Sharing'),
 								'form_data' => [
-									'dashboardid' => $dashboardid,
+									'dashboardid' => $data['dashboard']['dashboardid'],
 								],
-								'disabled' => !$data['dashboard']['editable'] || $is_new
+								'disabled' => !$data['dashboard']['editable'] || $data['is_new_dashboard']
 							],
 							[
 								'name' => 'create',
@@ -97,9 +94,9 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 								'label' => _('Clone'),
 								'url'  => (new CUrl('zabbix.php'))
 									->setArgument('action', 'dashboard.view')
-									->setArgument('source_dashboardid', $dashboardid)
+									->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
 									->getUrl(),
-								'disabled' => $is_new
+								'disabled' => $data['is_new_dashboard']
 							]
 						]
 					])
@@ -131,13 +128,3 @@ $this->addPostJS(
 		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widgetDefaults']).')'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );
-
-if ($is_new) {
-	// Edit Form should be opened after multiselect initialization
-	$this->addPostJS(
-		'jQuery(document).on("' . $user_multiselect->getJsEventName() . '", function() {
-				showEditMode();
-				dashbrd_config();
-			});'
-	);
-}

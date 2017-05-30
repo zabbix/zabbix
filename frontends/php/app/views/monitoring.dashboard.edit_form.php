@@ -44,4 +44,14 @@ $form->addItem((new CFormList())
 	)
 );
 
-return [$form, $multiselect];
+if ($data['is_new_dashboard']) {
+	// Edit Form should be opened after multiselect initialization
+	$this->addPostJS(
+		'jQuery(document).on("' . $multiselect->getJsEventName() . '", function() {
+				showEditMode();
+				dashbrd_config();
+			});'
+	);
+}
+
+return $form;
