@@ -119,17 +119,16 @@
 		jQuery('#groupid', edit_button.closest('ul')).closest('li').hide();
 		jQuery('#hostid', edit_button.closest('ul')).closest('li').hide();
 
-		var li = jQuery('<li>').addClass('<?= ZBX_STYLE_DASHBRD_EDIT_LIST_ITEM ?>');
 		edit_button.closest('ul').before(
 			jQuery('<span>')
 				.addClass('<?= ZBX_STYLE_DASHBRD_EDIT ?>')
 				.append(jQuery('<ul>')
-					.append(li.clone().append(btn_conf))
-					.append(li.clone().append(btn_add))
-					.append(li.clone().append(btn_save))
-					.append(li.clone().append(btn_cancel))
+					.append(jQuery('<li>').append(btn_conf))
+					.append(jQuery('<li>').append(btn_add))
+					.append(jQuery('<li>').append(btn_save))
+					.append(jQuery('<li>').append(btn_cancel))
 					.append(jQuery('<li>'))
-					.append(li.clone().append(btn_edit_disabled))
+					.append(jQuery('<li>').append(btn_edit_disabled))
 				)
 		);
 
@@ -254,7 +253,7 @@
 	// will be called by setModeViewDashboard() method in dashboard.grid.js
 	function dashboardButtonsSetView() {
 		var $form = jQuery('.article .header-title form');
-		jQuery('.dashbrd-edit', $form).remove();
+		jQuery('.<?= ZBX_STYLE_DASHBRD_EDIT ?>', $form).remove();
 		jQuery('#dashbrd-edit', $form).closest('li').show();
 		jQuery('#groupid', $form).closest('li').show();
 		jQuery('#hostid', $form).closest('li').show();
