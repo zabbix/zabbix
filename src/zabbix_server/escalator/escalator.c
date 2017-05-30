@@ -478,25 +478,26 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
  *                                                                            *
  * Parameters: user_msg    - [IN/OUT] the message list                        *
  *             actionid    - [IN] the action identifie                        *
+ *             mediatypeid - [IN] the media type id defined for the operation *
  *             event       - [IN] the event                                   *
  *             ack         - [IN] the acknowlegment                           *
  *             subject     - [IN] the message subject                         *
  *             message     - [IN] the message body                            *
  *                                                                            *
  ******************************************************************************/
-static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event,
-		const DB_ACKNOWLEDGE *ack, const char *subject, const char *message)
+static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zbx_uint64_t mediatypeid,
+		const DB_EVENT *event, const DB_ACKNOWLEDGE *ack, const char *subject, const char *message)
 {
 	const char	*__function_name = "add_sentusers_ack_msg";
 	char		*subject_dyn, *message_dyn;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	userid, mediatypeid;
+	zbx_uint64_t	userid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select distinct userid,mediatypeid"
+			"select distinct userid"
 			" from acknowledges where eventid=" ZBX_FS_UI64, event->eventid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1526,6 +1527,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 					break;
 
 				ZBX_STR2UCHAR(default_msg, row[3]);
+				ZBX_DBROW2UINT64(mediatypeid, row[6]);
 
 				if (0 == default_msg)
 				{
@@ -1538,7 +1540,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 					message = action->ack_longdata;
 				}
 
-				add_sentusers_ack_msg(&user_msg, action->actionid, event, NULL,
+				add_sentusers_ack_msg(&user_msg, action->actionid, mediatypeid, event, NULL,
 						subject, message);
 				break;
 			case OPERATION_TYPE_COMMAND:
