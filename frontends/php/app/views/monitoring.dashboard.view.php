@@ -20,24 +20,11 @@
 
 
 $this->addJsFile('dashboard.grid.js');
-$this->addJsFile('multiselect.js');
 $this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
 $sharing_form = include 'monitoring.dashboard.sharing_form.php';
 $edit_form = include 'monitoring.dashboard.edit_form.php';
 $breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
-
-$dashboard_data = [
-	// name is required for new dashboard creation
-	'name' => $data['dashboard']['name'],
-	'dynamic' => $data['dynamic']
-];
-$dashboard_options = [];
-if ($data['dashboard']['dashboardid'] != 0) {
-	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
-} else {
-	$dashboard_options['updated'] = true;
-}
 
 $item_groupid = null;
 $item_hostid = null;
@@ -124,6 +111,18 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 // activating blinking
 $this->addPostJS('jqBlink.blink();');
 
+$dashboard_data = [
+	// name is required for new dashboard creation
+	'name' => $data['dashboard']['name'],
+	'dynamic' => $data['dynamic']
+];
+$dashboard_options = [];
+if ($data['dashboard']['dashboardid'] != 0) {
+	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
+}
+else {
+	$dashboard_options['updated'] = true;
+}
 // Initialize dashboard grid
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
