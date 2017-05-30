@@ -77,15 +77,11 @@ class CMultiSelect extends CTag {
 				$params['popup']['parameters'] = $options['popup']['parameters'];
 			}
 		}
-		$params['postInitEvent'] = $this->getJsEventName();
+		if (array_key_exists('callPostEvent', $options) && $options['callPostEvent']) {
+			$params['postInitEvent'] = $this->getJsEventName();
+		}
 
-		$js = sprintf(
-			'jQuery("#%s").multiSelect(%s)',
-			$this->getAttribute('id'),
-			CJs::encodeJson($params)
-		);
-
-		zbx_add_post_js($js);
+		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).');');
 	}
 
 	public function setWidth($value) {
