@@ -2254,7 +2254,6 @@ function hasErrorMesssages() {
 /**
  * Get all messages as array.
  *
- *
  * @return array
  */
 function getMessagesAsArray() {

@@ -76,8 +76,10 @@ class CControllerDashboardUpdate extends CController {
 
 		$result = (bool) API::Dashboard()->update($dashboard);
 
-		$response = ['result' => $result];
-		$response['errors'] = getMessagesAsArray();
+		$response = [
+			'result' => $result,
+			'errors' => getMessagesAsArray()
+		];
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($response)]));
 	}
 }
