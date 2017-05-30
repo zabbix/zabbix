@@ -110,11 +110,12 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 		if ($this->hasInput('new')) {
 			$dashboard = $this->getNewDashboard();
-		} elseif ($this->hasInput('source_dashboardid')) {
+		}
+		elseif ($this->hasInput('source_dashboardid')) {
 			// clone dashboard and show as new
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name'],
-				'selectWidgets' => ['type', 'name', 'row', 'col', 'height', 'width', 'fields'],
+				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
 				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
 
@@ -123,7 +124,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				$dashboard['name'] = $dashboards[0]['name'];
 				$dashboard['widgets'] = $dashboards[0]['widgets'];
 			}
-		} else {
+		}
+		else {
 			// getting existing dashboard
 			$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
 
@@ -199,8 +201,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$grid_widgets = [];
 
 		foreach ($widgets as $widget) {
-			// during dashboard clone action widgetid does not exist
-			$widgetid = array_key_exists('widgetid', $widget) ? (int) $widget['widgetid'] : null;
+			$widgetid = (int) $widget['widgetid'];
 			$default_rf_rate = CWidgetConfig::getDefaultRfRate($widget['type']);
 
 			$grid_widgets[$widgetid] = [
