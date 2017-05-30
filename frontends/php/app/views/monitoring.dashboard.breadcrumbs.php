@@ -30,7 +30,7 @@ $breadcrumbs = [
 	(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
 ];
 
-if (!$data['is_new_dashboard']) {
+if ($data['dashboard']['dashboardid'] != 0) {
 	$url_view = (new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.view')
 		->setArgument('dashboardid', $data['dashboard']['dashboardid']);

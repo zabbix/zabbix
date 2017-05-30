@@ -81,7 +81,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		]);
 
 		$data = [
-			'is_new_dashboard' => $this->dashboard['dashboardid'] === null,
 			'dashboard' => $this->dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
@@ -162,7 +161,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	private function getNewDashboard()
 	{
 		return [
-			'dashboardid' => null,
+			'dashboardid' => 0,
 			'name' => '',
 			'editable' => true,
 			'widgets' => [],

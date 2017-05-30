@@ -44,7 +44,7 @@ $form->addItem((new CFormList())
 	)
 );
 
-if ($data['is_new_dashboard']) {
+if ($data['dashboard']['dashboardid'] == 0) {
 	// Edit Form should be opened after multiselect initialization
 	$this->addPostJS(
 		'jQuery(document).on("'.$multiselect->getJsEventName().'", function() {'.

@@ -33,7 +33,7 @@ $dashboard_data = [
 	'dynamic' => $data['dynamic']
 ];
 $dashboard_options = [];
-if (!$data['is_new_dashboard']) {
+if ($data['dashboard']['dashboardid'] != 0) {
 	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
 } else {
 	$dashboard_options['updated'] = true;
@@ -77,9 +77,11 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 								'name' => 'sharing',
 								'label' => _('Sharing'),
 								'form_data' => [
-									'dashboardid' => $data['dashboard']['dashboardid'],
+									'dashboardid' => ($data['dashboard']['dashboardid'] != 0)
+										? $data['dashboard']['dashboardid']
+										: null,
 								],
-								'disabled' => !$data['dashboard']['editable'] || $data['is_new_dashboard']
+								'disabled' => !$data['dashboard']['editable']
 							],
 							[
 								'name' => 'create',
@@ -92,11 +94,13 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 							[
 								'name' => 'clone',
 								'label' => _('Clone'),
-								'url'  => (new CUrl('zabbix.php'))
-									->setArgument('action', 'dashboard.view')
-									->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
-									->getUrl(),
-								'disabled' => $data['is_new_dashboard']
+								'url'  => ($data['dashboard']['dashboardid'] != 0)
+									? (new CUrl('zabbix.php'))
+										->setArgument('action', 'dashboard.view')
+										->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
+										->getUrl()
+									: null,
+								'disabled' => ($data['dashboard']['dashboardid'] == 0)
 							]
 						]
 					])
