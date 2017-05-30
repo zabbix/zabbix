@@ -3470,21 +3470,26 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
-
 	table = DBget_table(table_name);
 
 	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 			table->recid, table_name, table->recid, min, max);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-		id->lastid = min;
-	else
-		ZBX_STR2UINT64(id->lastid, row[0]);
+	if (NULL != result)
+	{
+		zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
-	nextid = id->lastid + 1;
-	id->lastid += num;
-	lastid = id->lastid;
+		if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			id->lastid = min;
+		else
+			ZBX_STR2UINT64(id->lastid, row[0]);
+
+		nextid = id->lastid + 1;
+		id->lastid += num;
+		lastid = id->lastid;
+	}
+	else
+		nextid = lastid = 0;
 
 	UNLOCK_CACHE_IDS;
 
