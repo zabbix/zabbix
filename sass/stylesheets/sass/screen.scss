@@ -532,7 +532,6 @@ ul.top-nav-icons {
 	.dashbrd-edit {
 		position: relative;
 		display: inline-block;
-		line-height: 24px;
 		background-color: $ui-bg-color;
 		@include box-shadow(0 0 0 4px $ui-bg-color);
 
@@ -557,7 +556,6 @@ ul.top-nav-icons {
 				}
 				.btn-widget-edit {
 					vertical-align: middle;
-					height: 27px;
 				}
 			}
 		}
