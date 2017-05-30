@@ -2252,20 +2252,18 @@ function hasErrorMesssages() {
 }
 
 /**
- * Get messages by given type as array.
+ * Get all messages as array.
  *
  *
  * @return array
  */
-function getMessagesByType($type) {
+function getMessagesAsArray() {
 	global $ZBX_MESSAGES;
 
 	$result = [];
 	if (isset($ZBX_MESSAGES)) {
 		foreach ($ZBX_MESSAGES as $message) {
-			if ($message['type'] === $type) {
-				$result[] = $message['message'];
-			}
+			$result[] = $message['message'];
 		}
 	}
 	return $result;
