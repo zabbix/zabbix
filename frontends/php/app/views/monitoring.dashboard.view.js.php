@@ -59,7 +59,6 @@
 	function dashbrd_save_changes() {
 		// Update buttons on existing widgets to view mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
-		// dashboardButtonsSetView() will be called in case of success of ajax in function 'saveDashboardChanges'
 	};
 
 	// Cancel editing dashboard
@@ -248,16 +247,6 @@
 		initSharingForm();
 		initEditForm(jQuery('.dashbrd-grid-widget-container'));
 	});
-
-	// will be called by setModeViewDashboard() method in dashboard.grid.js
-	function dashboardButtonsSetView() {
-		var $form = jQuery('.article .header-title form');
-		jQuery('.<?= ZBX_STYLE_DASHBRD_EDIT ?>', $form).remove();
-		jQuery('#dashbrd-edit', $form).closest('li').show();
-		jQuery('#groupid', $form).closest('li').show();
-		jQuery('#hostid', $form).closest('li').show();
-		jQuery('#dashbrd-actions').closest('li').show();
-	}
 
 	function dashbaordAddMessages(messages) {
 		var $message_div = jQuery('<div>').attr('id','dashbrd-messages');
