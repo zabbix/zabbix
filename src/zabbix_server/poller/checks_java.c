@@ -181,12 +181,10 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 		{
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_USERNAME, items[j].username, ZBX_JSON_TYPE_STRING);
 		}
-
 		if ('\0' != *items[j].password)
 		{
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_PASSWORD, items[j].password, ZBX_JSON_TYPE_STRING);
 		}
-
 		if ('\0' != *items[j].jmx_endpoint)
 		{
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_JMX_ENDPOINT, items[j].jmx_endpoint,
