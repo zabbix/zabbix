@@ -51,6 +51,7 @@ typedef struct
 	char			*privatekey;
 	char			*description;
 	char			*port;
+	char			*jmx_endpoint;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		status;
@@ -101,6 +102,7 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION		__UINT64_C(0x0000000200000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID		__UINT64_C(0x0000000400000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME	__UINT64_C(0x0000000800000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT		__UINT64_C(0x0000001000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE										\
 		(ZBX_FLAG_LLD_ITEM_UPDATE_NAME | ZBX_FLAG_LLD_ITEM_UPDATE_KEY | ZBX_FLAG_LLD_ITEM_UPDATE_TYPE |	\
 		ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE | 								\
@@ -117,7 +119,8 @@ typedef struct
 		ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE | ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME |				\
 		ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD | ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY |			\
 		ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY | ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID | ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME)
+		ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID | ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME |		\
+		ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT)
 	zbx_uint64_t		flags;
 	char			*key_proto;
 	char			*name;
@@ -413,6 +416,7 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_free(item_prototype->privatekey);
 	zbx_free(item_prototype->description);
 	zbx_free(item_prototype->port);
+	zbx_free(item_prototype->jmx_endpoint);
 
 	zbx_vector_ptr_destroy(&item_prototype->lld_rows);
 
@@ -501,7 +505,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
 				"i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,"
 				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.description,i.interfaceid,i.snmpv3_contextname,id.parent_itemid"
+				"i.description,i.interfaceid,i.snmpv3_contextname,i.jmx_endpoint,id.parent_itemid"
 			" from item_discovery id"
 				" join items i"
 					" on id.itemid=i.itemid"
@@ -514,7 +518,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(itemid, row[35]);
+		ZBX_STR2UINT64(itemid, row[36]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &itemid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -626,6 +630,9 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 		if (0 != strcmp(row[34], item_prototype->snmpv3_contextname))
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME;
+
+		if (0 != strcmp(row[35], item_prototype->jmx_endpoint))
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT;
 
 		item->lld_row = NULL;
 
@@ -1516,7 +1523,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				"snmpv3_securitylevel", "snmpv3_authprotocol", "snmpv3_authpassphrase",
 				"snmpv3_privprotocol", "snmpv3_privpassphrase", "authtype", "username", "password",
 				"publickey", "privatekey", "description", "interfaceid", "flags", "snmpv3_contextname",
-				NULL);
+				"jmx_endpoint", NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", NULL);
@@ -1561,7 +1568,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 					(int)item_prototype->authtype, item_prototype->username,
 					item_prototype->password, item_prototype->publickey, item_prototype->privatekey,
 					item->description, item_prototype->interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-					item_prototype->snmpv3_contextname);
+					item_prototype->snmpv3_contextname, item_prototype->jmx_endpoint);
 
 			zbx_db_insert_add_values(&db_insert_idiscovery, itemdiscoveryid++, item->itemid,
 					item->parent_itemid, item_prototype->key);
@@ -1804,6 +1811,14 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 					value_esc = DBdyn_escape_string(item_prototype->snmpv3_contextname);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%ssnmpv3_contextname='%s'", d, value_esc);
+					zbx_free(value_esc);
+					d = ",";
+				}
+				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT))
+				{
+					value_esc = DBdyn_escape_string(item_prototype->jmx_endpoint);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"%sjmx_endpoint='%s'", d, value_esc);
 					zbx_free(value_esc);
 				}
 
@@ -3481,7 +3496,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 				"i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,"
 				"i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.authtype,"
 				"i.username,i.password,i.publickey,i.privatekey,i.description,i.interfaceid,"
-				"i.snmpv3_contextname"
+				"i.snmpv3_contextname,i.jmx_endpoint"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
@@ -3524,6 +3539,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		item_prototype->description = zbx_strdup(NULL, row[30]);
 		ZBX_DBROW2UINT64(item_prototype->interfaceid, row[31]);
 		item_prototype->snmpv3_contextname = zbx_strdup(NULL, row[32]);
+		item_prototype->jmx_endpoint = zbx_strdup(NULL, row[33]);
 
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_ptr_create(&item_prototype->applications);
