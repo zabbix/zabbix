@@ -537,7 +537,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
@@ -548,10 +547,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
-
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, &items[i].jmx_endpoint, MACRO_TYPE_JMX_ENDPOINT, NULL, 0);
 				break;
