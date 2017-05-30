@@ -22,6 +22,17 @@
 			<property name="with.mysql" value="true"/>
 		</default>
 	</switch>
+	
+	<!-- Zabbix various configuration parameters -->
+	<target name="init-build-options">
+		<property name="conf1" value="--enable-server ${with.db}"/>
+		<property name="conf2" value="--enable-proxy ${with.db}"/>
+		<property name="conf3" value="--enable-agent"/>
+		<property name="conf4" value="--enable-server --enable-agent --enable-proxy ${with.db}"/>
+		<property name="conf5" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap  --with-libcurl"/>
+		<property name="conf6" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
+		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
+	</target>
 
 	<!-- Cppcheck static analysis target -->
 	<target name="cppcheck-static-analysis">
@@ -41,24 +52,36 @@
 		</exec>
 	</target>
 	
-	<!-- Clang Static Analyzer target -->
-	<target name="clang-static-analyzer" depends="init">
-		<exec executable="scan-build" failonerror="on">
-			<arg line="./configure"/>
-			<arg line="--enable-server"/>
-			<arg line="--with-mysql"/>
-		</exec>
-		<exec executable="scan-build" failonerror="on">
-			<arg line="-o"/>
-			<arg line="${WORKSPACE}/clang-scan-build-reports"/>
-			<arg line="make"/>
-			<arg line="-s"/>
-			<arg line="-j5"/>
-		</exec>
+	<!-- Clang Static Analyzer target with various configuration parameters -->
+	<target name="clang-static-analyzer" depends="init,init-build-options">
+		<var name="index" value="1"/>
+		<delete dir="clang-scan-build-reports"/>
+		<propertyselector property="build-list" delimiter="," match="conf(\d+)"/>
+		<for list="${conf-list}" param="name" delimiter=",">
+			<sequential>
+				<exec executable="scan-build" failonerror="on">
+					<arg line="./configure"/>
+					<arg line="${@{name}}"/>
+				</exec>
+				<exec executable="make" failonerror="on">
+					<arg line="-s"/>
+					<arg line="-j5"/>
+					<arg line="clean"/>
+				</exec>
+				<exec executable="scan-build" failonerror="on">
+					<arg line="-o"/>
+					<arg line="./clang-scan-build-reports"/>
+					<arg line="make"/>
+					<arg line="-s"/>
+					<arg line="-j5"/>
+				</exec>
+				<math result="index" operand1="${index}" operation="+" operand2="1" datatype="int" />
+			</sequential>
+		</for>
 	</target>
 	
 	<!-- Static analysis container target -->
-	<target name="static-analysi" depends="cppcheck-static-analysis,clang-static-analyzer"/>
+	<target name="static-analysis" depends="cppcheck-static-analysis,clang-static-analyzer"/>
 
 	<target name="init">
 		<!-- Create database schema -->
@@ -173,17 +196,17 @@
 
 	<target name="create-db" depends="create-db-mysql,create-db-postgresql"/>
 
-	<target name="make-gcc">
+	<target name="make-gcc" depends="init-build-options">
 		<!-- Build Zabbix with various configuration parameters -->
-		<sequential>
-			<make args="--enable-server ${with.db}"/>
-			<make args="--enable-proxy ${with.db}"/>
-			<make args="--enable-agent"/>
-			<make args="--enable-server --enable-agent --enable-proxy ${with.db}"/>
-			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap  --with-libcurl"/>
-			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-			<make args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
-		</sequential>
+		<var name="index" value="1"/>
+		<delete dir="clang-scan-build-reports"/>
+		<propertyselector property="conf-list" delimiter="," match="conf(\d+)"/>
+		<for list="${conf-list}" param="name" delimiter=",">
+			<sequential>
+				<make args="${@{name}}"/>
+				<math result="index" operand1="${index}" operation="+" operand2="1" datatype="int" />
+			</sequential>
+		</for>
 	</target>
 
 	<target name="make-clang">
