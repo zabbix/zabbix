@@ -152,7 +152,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			foreach ($this->widgets as $widget) {
 				$upd_widget = [];
 				if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
-					&& array_key_exists('dashboardid', $dashboard)) {
+						&& array_key_exists('dashboardid', $dashboard)) { // TODO AV: remove check for dashboardid; related CControllerDashboardView:118
 					$upd_widget['widgetid'] = $widget['widgetid'];
 				}
 

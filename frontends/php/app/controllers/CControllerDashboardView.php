@@ -114,6 +114,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			// clone dashboard and show as new
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name'],
+				// TODO AV: remove widgetid from 'selectWidgets'; related CControllerDashbrdWidgetUpdate:155
 				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
 				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
