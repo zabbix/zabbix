@@ -75,7 +75,7 @@ $footer = (new CList())
 	->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
 $output = [
-	'header' => $data['header'],
+	'header' => $data['name'],
 	'body' => (new CUiWidget(uniqid(), [$table]))->toString(),
 	'footer' => (new CList())
 		->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))

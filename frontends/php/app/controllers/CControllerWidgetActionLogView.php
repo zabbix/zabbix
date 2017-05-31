@@ -78,7 +78,7 @@ class CControllerWidgetActionLogView extends CController
 		]);
 
 		$this->setResponse(new CControllerResponseData([
-			'header' => $name,
+			'name' => $name,
 			'actions' => $actions,
 			'alerts'  => $alerts,
 			'db_users' => $dbUsers,
