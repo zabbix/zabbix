@@ -4,26 +4,24 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:output method="xml" indent="yes"/>
 
-<!-- 
-<xsl:variable name="historyDefault">3</xsl:variable> 
-<xsl:variable name="history1week">7</xsl:variable>
-<xsl:variable name="trendsDefault">7</xsl:variable> 
-<xsl:variable name="trends0days">0</xsl:variable>
-<xsl:variable name="updateDefault">30</xsl:variable> 
-<xsl:variable name="update1min">60</xsl:variable>
-<xsl:variable name="update5min">300</xsl:variable>
-<xsl:variable name="update1hour">60</xsl:variable> 
-<xsl:variable name="update1day">300</xsl:variable>
-for output: -->
-<xsl:variable name="historyDefault">30</xsl:variable>  
-<xsl:variable name="history1week">7</xsl:variable>
-<xsl:variable name="trendsDefault">365</xsl:variable> 
+
+<xsl:variable name="historyDefault">30</xsl:variable>
+<xsl:variable name="history30days">30</xsl:variable>
+<xsl:variable name="history14days">14</xsl:variable>  
+<xsl:variable name="history7days">7</xsl:variable>
+<xsl:variable name="trendsDefault">365</xsl:variable>
+<xsl:variable name="trends365days">365</xsl:variable> 
 <xsl:variable name="trends0days">0</xsl:variable>
 <xsl:variable name="updateDefault">300</xsl:variable> 
+<xsl:variable name="update30s">30</xsl:variable>
 <xsl:variable name="update1min">60</xsl:variable>
+<xsl:variable name="update3min">180</xsl:variable>
 <xsl:variable name="update5min">300</xsl:variable>
-<xsl:variable name="update1hour">3600</xsl:variable> 
+<xsl:variable name="update1hour">3600</xsl:variable>
+<xsl:variable name="update4hours">14400</xsl:variable> 
 <xsl:variable name="update1day">86400</xsl:variable>
+
+
 
 
 <xsl:variable name="valueType">3</xsl:variable>
@@ -43,16 +41,49 @@ for output: -->
 <!--  define macros with default values to add into template-->
     <xsl:variable name="MACROS" as="element()*">
         <Performance>
-			<CPU_LOAD_MAX>90</CPU_LOAD_MAX>
+			<CPU_UTIL_MAX>
+				<value>90</value>
+			</CPU_UTIL_MAX>
+			<MEMORY_UTIL_MAX><value>90</value></MEMORY_UTIL_MAX>
         </Performance>
         <Fault>
-        	<TEMP_CRIT>60</TEMP_CRIT>
-        	<TEMP_WARN>50</TEMP_WARN>        
+        	<!-- <TEMP_CRIT>
+        		<value>75</value>
+        		<context>CPU</context>
+       		</TEMP_CRIT>
+       		<TEMP_WARN>
+        		<value>70</value>
+        		<context>CPU</context>
+       		</TEMP_WARN>
+       		<TEMP_CRIT>
+        		<value>35</value>
+        		<context>Ambient</context>
+       		</TEMP_CRIT>
+       		<TEMP_WARN>
+        		<value>30</value>
+        		<context>Ambient</context>
+       		</TEMP_WARN> -->
+       		
+        	<TEMP_CRIT><value>60</value></TEMP_CRIT>
+        	<TEMP_WARN><value>50</value></TEMP_WARN>
+        	<TEMP_CRIT_LOW><value>5</value></TEMP_CRIT_LOW>
+        	<STORAGE_UTIL_CRIT><value>90</value></STORAGE_UTIL_CRIT>
+        	<STORAGE_UTIL_WARN><value>80</value></STORAGE_UTIL_WARN>
         </Fault>
         <General>
-        	<SNMP_TIMEOUT>600</SNMP_TIMEOUT>
+        	<SNMP_TIMEOUT><value>3m</value></SNMP_TIMEOUT>
         </General>
+        <ICMP>
+        	<ICMP_LOSS_WARN><value>20</value></ICMP_LOSS_WARN>
+        	<ICMP_RESPONSE_TIME_WARN><value>0.15</value></ICMP_RESPONSE_TIME_WARN>
+        </ICMP>
     </xsl:variable>
+
+<xsl:variable name="nowEN">now: {ITEM.LASTVALUE1}</xsl:variable>
+<xsl:variable name="nowRU">сейчас: {ITEM.LASTVALUE1}</xsl:variable>
+
+
+
 
 
 <xsl:template match="node()|@*">
@@ -67,29 +98,55 @@ for output: -->
 	</value_maps>
 </xsl:template>
 
+
+<!-- This template modifies update interval if needed -->
+<xsl:template name="updateIntervalTemplate">
+  <xsl:param name="updateMultiplier"/>
+  <xsl:param name="default"/>
+  <xsl:if test="$updateMultiplier">
+      <xsl:value-of select="$updateMultiplier * $default" />
+    </xsl:if>
+    <xsl:if test="not($updateMultiplier)">
+      <xsl:value-of select="$default" />
+  </xsl:if>
+</xsl:template>
+
+<xsl:variable name="defaultAlarmObjectType">Device</xsl:variable>
+<xsl:template name="tagAlarmObjectType">
+  <xsl:param name="alarmObjectType"/>
+  <xsl:param name="alarmObjectDefault"/>
+  <xsl:if test="$alarmObjectType">
+      <xsl:value-of select="$alarmObjectType" />
+  </xsl:if>
+  <xsl:if test="not($alarmObjectType)">
+      <xsl:value-of select="$alarmObjectDefault" />
+  </xsl:if>
+</xsl:template>
+
+
 <xsl:template match="/*/template">
      
 	     <xsl:copy>
 			<xsl:apply-templates select="node()|@*"/>
 			<macros>
-			<xsl:for-each select="./classes">
-	     		<xsl:variable name="template_class" select="./class"/>
-	         <!-- add extra contextual no checks. should be before default $MACROS!-->
-			<xsl:copy-of copy-namespaces="no" select="../macros/macro"/>
-				<xsl:for-each select="$MACROS">
-					<xsl:choose>
-						<xsl:when test="name(.) = $template_class">
-							<xsl:for-each select="./*">
-								<macro>
-					        		<macro>{$<xsl:value-of select ="name(.)"/>}</macro>
-					                <value><xsl:value-of select="."/></value>
-								</macro>
-							</xsl:for-each>
-						</xsl:when>
-					</xsl:choose>
-		         </xsl:for-each>
-         	</xsl:for-each>
-    	</macros>
+				<xsl:for-each select="./classes">
+		     		<xsl:variable name="template_class" select="./class"/>
+			         <!-- add extra contextual no checks. should be before default $MACROS!-->
+					<xsl:copy-of copy-namespaces="no" select="../macros/macro"/>
+						<xsl:for-each select="$MACROS">
+							<xsl:choose>
+								<xsl:when test="name(.) = $template_class">
+									<xsl:for-each select="./*">
+										<macro>
+							        		<macro>{$<xsl:value-of select ="name(.)"/><xsl:if test="./context!=''">:"<xsl:value-of select="./context"/>"</xsl:if>}</macro>
+							                <value><xsl:value-of select="./value"/></value>
+										</macro>
+									</xsl:for-each>
+								</xsl:when>
+							</xsl:choose>
+			         	</xsl:for-each>
+	         	</xsl:for-each>
+    		</macros>
     	<!-- add template name with _SNMP_PLACEHOLDER at the end to make dependency dynamic -->
     	<templates>
     		<!-- copy from templates first -->
@@ -105,15 +162,15 @@ for output: -->
 					</xsl:when>
 					 <xsl:when test="$template_class = 'Fault'">
 							<!-- temp include -->
-
+							
 					</xsl:when>
 					<xsl:when test="$template_class = 'Inventory'">
 							<template>
 				        		<name>Template SNMP Generic_SNMP_PLACEHOLDER</name>
 							</template>
-							<template>
+<!-- 							<template>
 				        		<name>Template ICMP Ping</name>
-							</template>	
+							</template>	 -->
 					</xsl:when>
 				</xsl:choose>
 			</xsl:for-each>
@@ -126,1153 +183,232 @@ for output: -->
 
 <xsl:template match="macros"/><!-- leave it empty -->
 <xsl:template match="template/templates"/><!-- leave it empty -->
- 
-<xsl:template match="template/metrics/cpuLoad">
-	<xsl:copy>
-		<name lang="EN">CPU Load</name>
-		<name lang="RU">Загрузка процессора</name>
-		<group>CPU</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
+
+
+<!-- This block describes basic metric structure. Call it from each metric below-->
+<xsl:template name="defaultMetricBlock">
+		<xsl:param name="metric"/>
+		<xsl:variable name="metricKey">
+		<xsl:choose>
+			<xsl:when test="$metric/zabbixKey"><xsl:value-of select="$metric/zabbixKey"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="name()"/>[<xsl:value-of select="snmpObject"/>]</xsl:otherwise>
+		</xsl:choose>
+		</xsl:variable>
+		<documentation><xsl:value-of select="documentation" /></documentation>
+		<xsl:copy-of select="$metric/name"></xsl:copy-of>
+		<xsl:copy-of select="$metric/group"></xsl:copy-of>
+
+		
+		
+			<xsl:choose>
+				<xsl:when test="itemType">
+					<snmpObject><xsl:value-of select="$metricKey"/></snmpObject>
+					<xsl:copy-of select="itemType"/>
+				</xsl:when>
+				<xsl:when test="$metric/expressionFormula">
+					<snmpObject><xsl:value-of select="$metricKey"/></snmpObject>
+					<xsl:copy-of select="$metric/expressionFormula"></xsl:copy-of>
+					<itemType>calculated</itemType>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:copy-of select="oid"/>
+					<snmpObject><xsl:value-of select="$metricKey"/></snmpObject>
+					<xsl:copy-of select="mib"/>
+					<itemType>snmp</itemType>
+				</xsl:otherwise>
+			</xsl:choose>
+		
 		<xsl:copy-of select="ref"></xsl:copy-of>
 		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>CPU load in %</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>%</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
+		<xsl:copy-of select="$metric/description"></xsl:copy-of>
+		<xsl:copy-of select="$metric/logFormat"></xsl:copy-of>
+		<xsl:choose>
+			<xsl:when test="$metric/inventory_link and not(discoveryRule)">
+				<inventory_link><xsl:value-of select="$metric/inventory_link"/></inventory_link>
+			</xsl:when>
+		</xsl:choose>
+		
+		
+		
+
+		<xsl:choose>
+			<xsl:when test="$metric/history">
+				<xsl:copy-of select="$metric/history"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<history><xsl:copy-of select="$historyDefault"/></history>
+			</xsl:otherwise>
+		</xsl:choose>
+		
+		<xsl:choose>
+			<xsl:when test="$metric/trends">
+				<xsl:copy-of select="$metric/trends"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<trends><xsl:copy-of select="$trendsDefault"/></trends>
+			</xsl:otherwise>
+		</xsl:choose>
+		
+		<xsl:copy-of select="$metric/units"></xsl:copy-of>
+		
+		<xsl:choose>
+			<xsl:when test="$metric/update">
+				<xsl:copy-of select="$metric/update"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<update><xsl:copy-of select="$updateDefault" /></update>
+			</xsl:otherwise>
+		</xsl:choose> 
+		
+		<xsl:choose>
+			<xsl:when test="$metric/valueType">
+				<xsl:copy-of select="$metric/valueType"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<valueType><xsl:copy-of select="$valueType" /></valueType>
+			</xsl:otherwise>
+		</xsl:choose> 
+		
+		
+		<valueMap><xsl:value-of select="valueMap" /></valueMap>
+		<multiplier><xsl:value-of select="multiplier" /></multiplier>
+		
+		<xsl:choose>
+			<xsl:when test="preprocessing">
+				<xsl:copy-of select="preprocessing"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<preprocessing/> <!-- 3.4 -->
+			</xsl:otherwise>
+		</xsl:choose>
+		<alarmObject><xsl:value-of select="./alarmObject"/></alarmObject>
 		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<triggers>
+		<xsl:if test="$metric/triggers/trigger">
+			<triggers>
+				<xsl:for-each select="$metric/triggers/*">
+	    			<xsl:call-template name="defaultTriggerBlock">
+						<xsl:with-param name="trigger" select="." />
+						<xsl:with-param name="metricKey" select="$metricKey" />
+		    		</xsl:call-template>            
+				</xsl:for-each> 
+				
+			</triggers>
+		</xsl:if>
+		<xsl:if test="$metric/graphs/graph">
+			<graphs>
+				<xsl:for-each select="$metric/graphs/*">
+						<xsl:copy-of select="."/>       
+				</xsl:for-each> 
+				
+			</graphs>
+		</xsl:if>
+		
+		<!-- <xsl:copy-of select="$metric/triggers"></xsl:copy-of> -->
+
+</xsl:template>
+
+<!-- This block describes basic trigger structure. Call it from each trigger in metrics below-->
+<xsl:template name="defaultTriggerBlock">
+		<xsl:param name="trigger"/>
+		<xsl:param name="metricKey"/>
 			<trigger>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.avg(300)}>{$CPU_LOAD_MAX}</expression>
-                <name lang="EN">CPU load is too high</name>
-                <name lang="RU">Загрузка ЦПУ слишком велика</name>
-                <url/>
-                <priority>3</priority>
-                <description/>
+					<xsl:copy-of select="$trigger/documentation"></xsl:copy-of>
+					<xsl:copy-of select="$trigger/id"></xsl:copy-of>
+					<!-- <xsl:copy-of select="$trigger/expression"></xsl:copy-of> -->
+					<expression><xsl:value-of select="replace($trigger/expression, 'METRIC', $metricKey)"/></expression>
+					<recovery_expression><xsl:value-of select="replace($trigger/recovery_expression, 'METRIC', $metricKey)"/></recovery_expression>
+		            <xsl:copy-of select="$trigger/recovery_mode"></xsl:copy-of>
+		            <xsl:copy-of select="$trigger/manual_close"></xsl:copy-of>
+					<xsl:copy-of select="$trigger/name"></xsl:copy-of>
+					<xsl:copy-of select="$trigger/url"></xsl:copy-of>
+					<xsl:copy-of select="$trigger/priority"></xsl:copy-of>
+					<xsl:copy-of select="$trigger/description"></xsl:copy-of>
+					<xsl:copy-of select="$trigger/dependsOn"></xsl:copy-of>
+	                <tags>
+	                	<xsl:copy-of select="$trigger/tags/tag"></xsl:copy-of>
+		                <tag><tag>Host</tag><value>{HOST.HOST}</value></tag>
+	                </tags>
 			</trigger>
-		</triggers>
-	</xsl:copy>
 </xsl:template>
 
 
-<xsl:template match="template/metrics/cpuUtil">
-	<xsl:copy>
-		<name>CPU Util</name>
-		<group>CPU</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<!-- memory -->
-<xsl:template match="template/metrics/memoryUnits">
-	<xsl:copy>
-		<name>Memory units</name>
-		<group>Internal Items</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description/>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/memoryUnitsUsed">
-	<xsl:copy>
-		<name>Used memory in units</name>
-		<group>Internal Items</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Used memory in units</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>units</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/memoryUnitsTotal">
-	<xsl:copy>
-		<name>Total memory in units</name>
-		<group>Internal Items</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Total memory in units</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>units</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/memoryUsed">
-	<xsl:copy>
-		<name>Used memory</name>
-		<group>Memory</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-					<xsl:choose>
-						<xsl:when test="../memoryUnitsUsed and  ../memoryUnits">
-							<expressionFormula>(last(<xsl:value-of select="../memoryUnitsUsed/snmpObject"/>)*last(<xsl:value-of select="../memoryUnits/snmpObject"/>))</expressionFormula>
-						</xsl:when>
-					</xsl:choose>				
-			</xsl:when>
-		</xsl:choose>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Used memory in Bytes</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>B</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/memoryFree">
-	<xsl:copy>
-		<name>Free memory</name>
-		<group>Memory</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>B</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-
-<xsl:template match="template/metrics/memoryTotal">
-	<xsl:copy>
-		<name>Total memory</name>
-		<group>Memory</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-					<xsl:choose>
-						<xsl:when test="../memoryUnitsTotal and  ../memoryUnits">
-							<expressionFormula>(last(<xsl:value-of select="../memoryUnitsTotal/snmpObject"/>)*last(<xsl:value-of select="../memoryUnits/snmpObject"/>))</expressionFormula>
-						</xsl:when>
-					</xsl:choose>				
-			</xsl:when>
-		</xsl:choose>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Total memory in Bytes</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>B</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/memoryUsedPercentage">
-	<xsl:copy>
-		<name>Memory utilization</name>
-		<group>Memory</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-					<xsl:choose>
-						<xsl:when test="../memoryUnitsTotal and  ../memoryUnitsUsed">
-							<expressionFormula>(last(<xsl:value-of select="../memoryUnitsUsed/snmpObject"/>)/last(<xsl:value-of select="../memoryUnitsTotal/snmpObject"/>))*100</expressionFormula>
-						</xsl:when>
-						<xsl:when test="../memoryTotal and  ../memoryUsed">
-							<expressionFormula>(last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/last(<xsl:value-of select="../memoryTotal/snmpObject"/>))*100</expressionFormula>
-						</xsl:when>
-						<xsl:when test="../memoryTotal and  ../memoryFree">
-							<expressionFormula>((last(<xsl:value-of select="../memoryTotal/snmpObject"/>)-last(<xsl:value-of select="../memoryFree/snmpObject"/>))/last(<xsl:value-of select="../memoryTotal/snmpObject"/>))*100</expressionFormula>
-						</xsl:when>
-						<xsl:otherwise>
-							<expressionFormula>(last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>)))*100</expressionFormula>
-						</xsl:otherwise>
-					</xsl:choose>				
-			</xsl:when>
-		</xsl:choose>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Memory utilization in %</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>%</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueTypeFloat"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<triggers>
-			<trigger>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.avg(300)}>90</expression>
-                <name lang="EN">Memory utilization is too high</name>
-                <name lang="RU">Мало свободной памяти ОЗУ</name>
-                <url/>
-                <priority>3</priority>
-                <description/>
-			</trigger>
-		</triggers>
-	</xsl:copy>
-</xsl:template>
-
-
-<!-- storage(same as memory) -->
-
-<xsl:template match="template/metrics/storageUnits">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>] Storage units</name>
-		<group>Internal Items</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description/>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/storageUnitsUsed">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>] Used storage in units</name>
-		<group>Internal Items</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Used storage in units</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>units</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/storageUnitsTotal">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>] Total storage in units</name>
-		<group>Internal Items</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Total storage in units</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>units</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/storageUsed">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>] Used space</name>
-		<group>Storage</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-					<xsl:choose>
-						<xsl:when test="../storageUnitsUsed and  ../storageUnits">
-							<expressionFormula>(last(<xsl:value-of select="../storageUnitsUsed/snmpObject"/>)*last(<xsl:value-of select="../storageUnits/snmpObject"/>))</expressionFormula>
-						</xsl:when>
-					</xsl:choose>				
-			</xsl:when>
-		</xsl:choose>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Used storage in Bytes</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>B</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/storageFree">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>] Free space</name>
-		<group>Storage</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="./expressionFormula"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>B</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-
-<xsl:template match="template/metrics/storageTotal">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>] Total storage</name>
-		<group>Storage</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-					<xsl:choose>
-						<xsl:when test="../storageUnitsTotal and  ../storageUnits">
-							<expressionFormula>(last(<xsl:value-of select="../storageUnitsTotal/snmpObject"/>)*last(<xsl:value-of select="../storageUnits/snmpObject"/>))</expressionFormula>
-						</xsl:when>
-					</xsl:choose>				
-			</xsl:when>
-		</xsl:choose>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Total storage in Bytes</description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>B</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/storageUsedPercentage">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>] Storage utilization</name>
-		<group>Storage</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-					<xsl:choose>
-						<xsl:when test="../storageUnitsTotal and  ../storageUnitsUsed">
-							<expressionFormula>(last(<xsl:value-of select="../storageUnitsUsed/snmpObject"/>)/last(<xsl:value-of select="../storageUnitsTotal/snmpObject"/>))*100</expressionFormula>
-						</xsl:when>
-						<xsl:when test="../storageTotal and  ../storageUsed">
-							<expressionFormula>(last(<xsl:value-of select="../storageUsed/snmpObject"/>)/last(<xsl:value-of select="../storageTotal/snmpObject"/>))*100</expressionFormula>
-						</xsl:when>
-						<xsl:when test="../storageTotal and  ../storageFree">
-							<expressionFormula>((last(<xsl:value-of select="../storageTotal/snmpObject"/>)-last(<xsl:value-of select="../storageFree/snmpObject"/>))/last(<xsl:value-of select="../storageTotal/snmpObject"/>))*100</expressionFormula>
-						</xsl:when>
-						<xsl:otherwise>
-							<expressionFormula>(last(<xsl:value-of select="../storageUsed/snmpObject"/>)/(last(<xsl:value-of select="../storageFree/snmpObject"/>)+last(<xsl:value-of select="../storageUsed/snmpObject"/>)))*100</expressionFormula>
-						</xsl:otherwise>
-					</xsl:choose>				
-			</xsl:when>
-		</xsl:choose>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Storage utilization in % for <xsl:value-of select="metricLocation"/></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>%</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueTypeFloat"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<triggers>
-			<trigger>
-				<id>storageCrit</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.avg(300)}>90</expression>
-                <name lang="EN">Free disk space is less than 10% on <xsl:value-of select="metricLocation"/></name>
-                <name lang="RU">Свободного места на <xsl:value-of select="metricLocation"/> меньше 10%</name>
-                <url/>
-                <priority>3</priority>
-                <description/>
-			</trigger>
+<!-- This block describes basic graph structure. Call it for each graph needed-->
+<xsl:template name="defaultGraphBlock">
+		<xsl:param name="graph"/>
+			<xsl:copy-of select="$graph/name"/>
+            <width>900</width>
+            <height>200</height>
+         	<xsl:choose>
+				<xsl:when test="$graph/yaxismin">
+					<xsl:copy-of select="$graph/yaxismin"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<yaxismin>0</yaxismin>
+				</xsl:otherwise>
+			</xsl:choose>
 			
-			<trigger>
-				<id>storageWarn</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.avg(300)}>80</expression>
-                <name lang="EN">Free disk space is less than 20% on <xsl:value-of select="metricLocation"/></name>
-                <name lang="RU">Свободного места на <xsl:value-of select="metricLocation"/> меньше 20%</name>
-                <url/>
-                <priority>2</priority>
-                <description/>
-				<dependsOn>
-                	<dependency>storageCrit</dependency>
-               	</dependsOn>
-			</trigger>
-		</triggers>
-	</xsl:copy>
+			<xsl:choose>
+				<xsl:when test="$graph/yaxismax">
+					<xsl:copy-of select="$graph/yaxismax"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<yaxismin>100</yaxismin>
+				</xsl:otherwise>
+			</xsl:choose>  
+			
+            <show_work_period>1</show_work_period>
+            <show_triggers>1</show_triggers>
+            <type>0</type>
+            <show_legend>1</show_legend>
+            <show_3d>0</show_3d>
+            <percent_left>0.0000</percent_left>
+            <percent_right>0.0000</percent_right>
+            <ymin_type_1>0</ymin_type_1> <!-- type_1: 0 fixed, 1- calculated, 2- item -->
+            <ymax_type_1>0</ymax_type_1>
+            <ymin_item_1>0</ymin_item_1>
+            <ymax_item_1>0</ymax_item_1>
+            <graph_items>
+                <graph_item>
+                    <sortorder>0</sortorder>
+                    <drawtype>0</drawtype>
+                    <color>1A7C11</color>
+                    <yaxisside>0</yaxisside>
+                    <calc_fnc>2</calc_fnc>
+                    <type>0</type>
+                    <item>
+                        <host>Template Cisco IOS Software releases 12.2_3.5_ or later SNMPv2</host>
+                        <key>sysUpTime</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <drawtype>0</drawtype>
+                    <color>F63100</color>
+                    <yaxisside>0</yaxisside>
+                    <calc_fnc>2</calc_fnc>
+                    <type>0</type>
+                    <item>
+                        <host>Template Cisco IOS Software releases 12.2_3.5_ or later SNMPv2</host>
+                        <key>icmppingsec</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+
 </xsl:template>
 
+ 
 
+<xsl:include href="include/cpu.xsl"/>
+<xsl:include href="include/memory.xsl"/>
+<xsl:include href="include/vfs.xsl"/>
+<xsl:include href="include/sensors.xsl"/>
+<xsl:include href="include/status.xsl"/>
+<xsl:include href="include/disks.xsl"/>
+<xsl:include href="include/generic.xsl"/>
+<xsl:include href="include/icmp.xsl"/>
+<xsl:include href="include/inventory.xsl"/>
 
-<xsl:template match="template/metrics/temperatureValue">
-	<xsl:copy>
-		<name lang="EN">[<xsl:value-of select="metricLocation"/>] Temperature</name>
-		<name lang="RU">[<xsl:value-of select="metricLocation"/>] Температура</name>
-		<group>Temperature</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Temperature readings of testpoint: <xsl:value-of select="metricLocation"/></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>C</units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueTypeFloat"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<triggers>
-			<trigger>
-			    <id>tempWarn</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.avg(300)}>{$TEMP_WARN:"<xsl:value-of select="metricLocation"/>"}</expression>
-                <name lang="EN"><xsl:value-of select="metricLocation"/> temperature is above warning threshold: >{$TEMP_WARN:"<xsl:value-of select="metricLocation"/>"}</name>
-                <name lang="RU">[<xsl:value-of select="metricLocation"/>] Температура выше нормы: >{$TEMP_WARN:"<xsl:value-of select="metricLocation"/>"}</name>
-                <url/>
-                <priority>2</priority>
-                <description/>
-                <dependsOn>
-                	<dependency>tempCrit</dependency>
-               	</dependsOn>
-			</trigger>
-			<trigger>
-				<id>tempCrit</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.avg(300)}>{$TEMP_CRIT:"<xsl:value-of select="metricLocation"/>"}</expression>
-                <name lang="EN"><xsl:value-of select="metricLocation"/> temperature is above critical threshold: >{$TEMP_CRIT:"<xsl:value-of select="metricLocation"/>"}</name>
-                <name lang="RU">[<xsl:value-of select="metricLocation"/>]Температура очень высокая: >{$TEMP_CRIT:"<xsl:value-of select="metricLocation"/>"}</name>
-                <url/>
-                <priority>4</priority>
-                <description/>
-			</trigger>
-		</triggers>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/temperatureStatus">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>]Temperature status</name>
-		<group>Temperature</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Temperature status of testpoint: <xsl:value-of select="metricLocation"/></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/temperatureLocale">
-	<xsl:copy>
-		<name>[<xsl:value-of select="metricLocation"/>]Temperature sensor location</name>
-		<group>Temperature</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>Temperature location of testpoint: <xsl:value-of select="metricLocation"/></description>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1hour"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<!-- metric of hw servers fault -->
-<xsl:template match="template/metrics/overallStatus">
-	<xsl:copy>
-		<name lang="EN">Overall system health status</name>
-		<name lang="RU">Общий статус системы</name>
-		<group>Status</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<triggers>
-			<trigger>
-			    <id>health.disaster</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}={$HEALTH_DISASTER_STATUS}</expression>
-                <name lang="EN">System is in unrecoverable state!</name>
-                <name lang="RU">Статус системы: сбой</name>
-                <url/>
-                <priority>5</priority>
-                <description lang="EN">Please check the device for faults</description>
-                <description lang="RU">Проверьте устройство</description>
-			</trigger>
-			<trigger>
-			    <id>health.warning</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}={$HEALTH_WARN_STATUS}</expression>
-                <name lang="EN">System status is in warning state</name>
-                <name lang="RU">Статус системы: предупреждение</name>
-                <url/>
-                <priority>2</priority>
-                <description lang="EN">Please check the device for warnings</description>
-                <description lang="RU">Проверьте устройство</description>
-                <dependsOn>
-                	<dependency>health.critical</dependency>
-               	</dependsOn>
-			</trigger>
-			<trigger>
-				<id>health.critical</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}={$HEALTH_CRIT_STATUS}</expression>
-                <name lang="EN">System status is in critical state</name>
-                <name lang="RU">Статус системы: авария</name>
-                <url/>
-                <priority>4</priority>
-                <description lang="EN">Please check the device for errors</description>
-                <description lang="RU">Проверьте устройство</description>
-                <dependsOn>
-                	<dependency>health.disaster</dependency>
-               	</dependsOn>
-			</trigger>
-		</triggers>
-	</xsl:copy>
-</xsl:template>
-
-
-
-
-<xsl:template match="template/metrics/diskArrayStatus">
-	<xsl:copy>
-		<name lang="EN">[<xsl:value-of select="metricLocation"/>] Disk array controller status</name>
-		<name lang="RU">[<xsl:value-of select="metricLocation"/>] Статус контроллера дискового массива</name>
-		<group>Disk Arrays</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<triggers>
-			<trigger>
-			    <id>disk_array.disaster</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}={$DISK_ARRAY_DISASTER_STATUS}</expression>
-                <name lang="EN">[<xsl:value-of select="metricLocation"/>] Disk array controller is in unrecoverable state!</name>
-                <name lang="RU">[<xsl:value-of select="metricLocation"/>] Статус контроллера дискового массива: сбой</name>
-                <url/>
-                <priority>5</priority>
-                <description lang="EN">Please check the device for faults</description>
-                <description lang="RU">Проверьте устройство</description>
-			</trigger>
-			<trigger>
-			    <id>disk_array.warning</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}={$DISK_ARRAY_WARN_STATUS}</expression>
-                <name lang="EN">[<xsl:value-of select="metricLocation"/>] Disk array controller is in warning state</name>
-                <name lang="RU">[<xsl:value-of select="metricLocation"/>] Статус контроллера дискового массива: предупреждение</name>
-                <url/>
-                <priority>2</priority>
-                <description lang="EN">Please check the device for warnings</description>
-                <description lang="RU">Проверьте устройство</description>
-                <dependsOn>
-                	<dependency>disk_array.critical</dependency>
-               	</dependsOn>
-			</trigger>
-			<trigger>
-				<id>disk_array.critical</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}={$DISK_ARRAY_CRIT_STATUS}</expression>
-                <name lang="EN">[<xsl:value-of select="metricLocation"/>] Disk array controller is in critical state</name>
-                <name lang="RU">[<xsl:value-of select="metricLocation"/>] Статус контроллера дискового массива: авария</name>
-                <url/>
-                <priority>4</priority>
-                <description lang="EN">Please check the device for errors</description>
-                <description lang="RU">Проверьте устройство</description>
-                <dependsOn>
-                	<dependency>disk_array.disaster</dependency>
-               	</dependsOn>
-			</trigger>
-		</triggers>
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/diskArrayModel">
-	<xsl:copy>
-		<name lang="EN">[<xsl:value-of select="metricLocation"/>] Disk array controller model</name>
-		<name lang="RU">[<xsl:value-of select="metricLocation"/>] Модель контроллера дискового массива</name>
-		<group>Disk Arrays</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/physicalDiskStatus">
-	<xsl:copy>
-		<name lang="EN">[<xsl:value-of select="metricLocation"/>] Physical Disk Status</name>
-		<name lang="RU">[<xsl:value-of select="metricLocation"/>] Статус физического диска</name>
-		<group>Disks</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$updateDefault"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<triggers>
-			<trigger>
-			    <id>disk.notok</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.str({$DISK_OK_STATUS})}=0 and 
-				{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.str("")}=0</expression>
-                <name lang="EN">[<xsl:value-of select="metricLocation"/>] Physical disk is not in OK state</name>
-                <name lang="RU">[<xsl:value-of select="metricLocation"/>] Статус физического диска не норма</name>
-                <url/>
-                <priority>2</priority>
-                <description lang="EN">Please check physical disk for warnings or errors</description>
-                <description lang="RU">Проверьте диск</description>
-                <dependsOn>
-                	<dependency>disk.fail</dependency>
-                	<dependency>disk.warning</dependency>
-               	</dependsOn>
-			</trigger>
-
-			<trigger>
-			    <id>disk.warning</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}={$DISK_WARN_STATUS}</expression>
-                <name lang="EN">[<xsl:value-of select="metricLocation"/>] Physical disk is in warning state</name>
-                <name lang="RU">[<xsl:value-of select="metricLocation"/>] Статус физического диска: предупреждение</name>
-                <url/>
-                <priority>2</priority>
-                <description lang="EN">Please check physical disk for warnings or errors</description>
-                <description lang="RU">Проверьте диск</description><dependsOn>
-                	<dependency>disk.fail</dependency>
-               	</dependsOn>
-			</trigger>
-			<trigger>
-				<id>disk.fail</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}={$DISK_FAIL_STATUS}</expression>
-                <name lang="EN">[<xsl:value-of select="metricLocation"/>] Physical disk failed</name>
-                <name lang="RU">[<xsl:value-of select="metricLocation"/>] Статус физического диска: сбой</name>
-                <url/>
-                <priority>4</priority>
-				<description lang="EN">Please check physical disk for warnings or errors</description>
-                <description lang="RU">Проверьте диск</description>                
-            </trigger>
-		</triggers>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/physicalDiskSerialNumber">
-	<xsl:copy>
-		<name lang="EN">[<xsl:value-of select="metricLocation"/>] Physical Disk Serial Number</name>
-		<name lang="RU">[<xsl:value-of select="metricLocation"/>] Серийный номер физического диска</name>
-		<group>Disks</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1day"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<!-- generic template metrics -->
-
-
-<xsl:template match="template/metrics/sysUptime">
-	<xsl:copy>
-		<name>Device uptime</name>
-		<group>General</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>The time since the network management portion of the system was last re-initialized.<xsl:value-of select="metricLocation"/></description>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units>uptime</units>
-		<update><xsl:copy-of select="$update1min"/></update>
-		<valueType><xsl:copy-of select="$valueType"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<triggers>
-			<trigger>
-			    <id>uptime.restarted</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.last(0)}&lt;600</expression>
-                <name lang="EN"><xsl:value-of select="metricLocation"/> The {HOST.NAME} has just been  restarted</name>
-                <name lang="RU"><xsl:value-of select="metricLocation"/>{HOST.NAME} был только что перезагружен</name>
-                <url/>
-                <priority>2</priority>
-                <description lang="EN">The device uptime is less then 10 minutes</description>
-                <description lang="RU">Аптайм устройства менее 10 минут</description>
-                <dependsOn>
-                	<dependency>uptime.nodata</dependency>
-               	</dependsOn>
-			</trigger>
-			<trigger>
-				<id>uptime.nodata</id>
-				<expression>{<xsl:value-of select="../../name"></xsl:value-of>:<xsl:value-of select="snmpObject"></xsl:value-of>.nodata({$SNMP_TIMEOUT})}=1</expression>
-                <name lang="EN"><xsl:value-of select="metricLocation"/> No SNMP data collection</name>
-                <name lang="RU"><xsl:value-of select="metricLocation"/> Нет сбора данных по SNMP</name>
-                <url/>
-                <priority>2</priority>
-                <description lang="EN">SNMP object sysUptime.0 is not available for polling. Please check device connectivity and SNMP settings.</description>
-                <description lang="RU">Не удается опросить sysUptime.0. Проверьте доступность устройства и настройки SNMP.</description>
-			</trigger>
-		</triggers>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/sysContact">
-	<xsl:copy>
-		<name>Device contact details</name>
-		<group>General</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</description>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1hour"/></update>
-		<valueType><xsl:copy-of select="$valueTypeText"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<inventory_link>23</inventory_link>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/sysLocation">
-	<xsl:copy>
-		<name>Device location</name>
-		<group>General</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<description>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</description>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1hour"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<inventory_link>24</inventory_link>
-	</xsl:copy>
-</xsl:template>
-<xsl:template match="template/metrics/sysObjectID">
-	<xsl:copy>
-		<name>system ObjectID</name>
-		<group>General</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$historyDefault"/></history>
-		<trends><xsl:copy-of select="$trendsDefault"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1hour"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/sysName">
-	<xsl:copy>
-		<name>Device name</name>
-		<group>General</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1hour"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<inventory_link>3</inventory_link>
-	</xsl:copy>
-</xsl:template>
-
-
-
-<xsl:template match="template/metrics/sysDescr">
-	<xsl:copy>
-		<name>Device description</name>
-		<group>General</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1hour"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueMap"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<inventory_link>14</inventory_link>
-	</xsl:copy>
-</xsl:template>
-
-<!-- inventory -->
-
-<xsl:template match="template/metrics/osVersion">
-	<xsl:copy>
-		<name>OS</name>
-		<group>Inventory</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1day"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueTypeChar"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<inventory_link>5</inventory_link>
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/hwModel">
-	<xsl:copy>
-		<name lang="EN">Hardware model name</name>
-		<name lang="RU">Модель</name>
-		<group>Inventory</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1day"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueTypeChar"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<inventory_link>29</inventory_link> <!-- model -->
-	</xsl:copy>
-</xsl:template>
-
-
-<xsl:template match="template/metrics/hwSerialNumber">
-	<xsl:copy>
-		<name lang="EN">Hardware Serial Number</name>
-		<name lang="RU">Серийный номер</name>
-		<group>Inventory</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1day"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueTypeChar"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-		<inventory_link>8</inventory_link> <!-- serial_noa-->
-	</xsl:copy>
-</xsl:template>
-
-<xsl:template match="template/metrics/hwFirmwareVersion">
-	<xsl:copy>
-		<name lang="EN">Firmware version</name>
-		<name lang="RU">Версия прошивки</name>
-		<group>Inventory</group>
-		<xsl:copy-of select="oid"></xsl:copy-of>
-		<xsl:copy-of select="snmpObject"></xsl:copy-of>
-		<xsl:copy-of select="mib"></xsl:copy-of>
-<!-- <xsl:choose>
-			<xsl:when test="./calculated = 'true'">
-				<expressionFormula>last(<xsl:value-of select="../memoryUsed/snmpObject"/>)/(last(<xsl:value-of select="../memoryFree/snmpObject"/>)+last(<xsl:value-of select="../memoryUsed/snmpObject"/>))</expressionFormula>
-			</xsl:when>
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>  -->
-		<xsl:copy-of select="ref"></xsl:copy-of>
-		<xsl:copy-of select="vendorDescription"></xsl:copy-of>
-		<history><xsl:copy-of select="$history1week"/></history>
-		<trends><xsl:copy-of select="$trends0days"/></trends>
-		<units></units>
-		<update><xsl:copy-of select="$update1day"/></update>
-		<valueType><xsl:copy-of select="$valueTypeChar"/></valueType>
-		<valueMap><xsl:value-of select="valueTypeChar"/></valueMap>
-		<multiplier><xsl:value-of select="multiplier"/></multiplier>
-		<xsl:copy-of select="./discoveryRule"></xsl:copy-of>
-	</xsl:copy>
-</xsl:template>
+<xsl:include href="include/interfaces.xsl"/>
 
 </xsl:stylesheet>
 

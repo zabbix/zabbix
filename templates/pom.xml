@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>vzhuravlev</groupId>
   <artifactId>zabbix-template-generator</artifactId>
-  <version>0.5</version>
+  <version>0.6</version>
   <name>Zabbix Template Generator</name>
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

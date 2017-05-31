@@ -10,11 +10,29 @@ public class ZabbixTemplateBuilder extends RouteBuilder {
   public void configure() throws Exception {
     from("file:bin/in?noop=true&delay=30000&idempotentKey=${file:name}-${file:modified}")
     .log("Loading file: ${in.headers.CamelFileNameOnly}")
-	.to("xslt:templates/to_metrics_add_name_placeholder.xsl?saxon=true") //will add _SNMP_PLACEHOLDER
-    .to("xslt:templates/to_metrics.xsl?saxon=true")
-    .to("file:bin/merged")
-    .to("validator:templates/metrics.xsd")
-	.multicast().parallelProcessing().to("direct:RU", "direct:EN");
+    .multicast().parallelProcessing().to("direct:zbx3.2", "direct:zbx3.4");
+    
+    from("direct:zbx3.2")
+    		//.filter().xpath("//node()[@zbx_ver = 3.4]") //if there are nodes with zbx_ver flags
+    		.log("Going to do 3.2 template")
+    		//strip metrics marked with zbx_ver not 3.2
+	    	.setHeader("zbx_ver", simple("3.2", Double.class)).to("xslt:templates/to_metrics_zbx_ver.xsl?saxon=true")
+	    	.to("direct:merge");
+    
+    from("direct:zbx3.4")
+    	//.filter().xpath("//node()[@zbx_ver ='3.4']") // only if there are attributes zbx_ver=3.4
+    	.log("Going to do 3.4 template")
+    	.setHeader("zbx_ver", simple("3.4", Double.class)).to("xslt:templates/to_metrics_zbx_ver.xsl?saxon=true")
+		.to("direct:merge");
+    
+    from("direct:merge")
+    	.setHeader("template_ver", simple("0.7", String.class))
+    	.to("xslt:templates/to_metrics_add_name_placeholder.xsl?saxon=true") //will add _SNMP_PLACEHOLDER and generator ver
+	    .to("xslt:templates/to_metrics.xsl?saxon=true")
+	    .to("xslt:templates/to_metrics_add_trigger_desc.xsl?saxon=true") // adds Default trigger description. See inside 
+	    .to("file:bin/merged")
+	    .to("validator:templates/metrics.xsd")
+		.multicast().parallelProcessing().to("direct:RU", "direct:EN");
   
     from("direct:RU")
 	    .filter().xpath("//node()[@lang='RU']")
@@ -22,8 +40,6 @@ public class ZabbixTemplateBuilder extends RouteBuilder {
 		.setHeader("lang", simple("RU", String.class)).to("xslt:templates/to_metrics_lang.xsl?saxon=true")
 		.to("log:result?level=DEBUG").multicast().parallelProcessing().to("direct:snmpv1", "direct:snmpv2");
 	    
-    
-    
     from("direct:EN")
 	    .log("Going to do English template")
 		.setHeader("lang", simple("EN", String.class)).to("xslt:templates/to_metrics_lang.xsl?saxon=true")
@@ -47,11 +63,20 @@ public class ZabbixTemplateBuilder extends RouteBuilder {
 		//with lang.setBody(body().regexReplaceAll("_SNMP_PLACEHOLDER", simple(" ${in.headers.template_suffix} ${in.headers.lang}")))
 		.setBody(body().regexReplaceAll("_SNMP_PLACEHOLDER", simple(" ${in.headers.template_suffix}"))) //w/o lang
 		.setHeader("subfolder",simple("${in.headers.CamelFileName.split('_')[1]}",String.class))
-		.setHeader("CamelOverruleFileName",simple("${in.headers.subfolder}/${in.headers.CamelFileName.replace('.xml','')}_${in.headers.template_suffix}_${in.headers.lang}.xml"))
-		.to("file:bin/out/");
-	
-
-
+		
+		
+		
+		.choice()
+		    .when(header("zbx_ver").isEqualTo("3.4"))
+		    	.setHeader("CamelOverruleFileName",simple("${in.headers.subfolder}/${in.headers.CamelFileName.replace('.xml','')}_${in.headers.template_suffix}_${in.headers.lang}.xml"))
+		    	.to("file:bin/out/")
+		    	.to("validator:templates/zabbix_export_3.4.xsd")
+			.when(header("zbx_ver").isEqualTo("3.2"))
+				.setHeader("CamelOverruleFileName",simple("${in.headers.subfolder}/${in.headers.zbx_ver}/${in.headers.CamelFileName.replace('.xml','')}_${in.headers.template_suffix}_${in.headers.lang}.xml"))
+				.to("file:bin/out/")
+				.to("validator:templates/zabbix_export_3.2.xsd")
+			.otherwise()
+			    .log("Unknown zbx_ver provided")
+	    .end();
   } 
 }
-
