@@ -554,6 +554,10 @@ ul.top-nav-icons {
 				&:first-child {
 					padding: 0;
 				}
+
+				.btn-dashbrd-conf {
+					vertical-align: middle;
+				}
 			}
 		}
 	}
@@ -2189,7 +2193,7 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashbrd-edit {
+.btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
 	@extend %btn-dashbrd;
 }
