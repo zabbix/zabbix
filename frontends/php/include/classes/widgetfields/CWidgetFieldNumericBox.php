@@ -43,11 +43,11 @@ class CWidgetFieldNumericBox extends CWidgetField
 	 *
 	 * @param string $name
 	 * @param null|string $label
-	 * @param string $default
+	 * @param null $default
 	 * @param int $min
 	 * @param int $max
 	 */
-	public function __construct($name, $label, $default = '', $min = 0, $max = ZBX_MAX_INT32) {
+	public function __construct($name, $label, $default = null, $min = 0, $max = ZBX_MAX_INT32) {
 		$this->min = $min;
 		$this->max = $max;
 		parent::__construct($name, $label, $default, null);
@@ -63,7 +63,7 @@ class CWidgetFieldNumericBox extends CWidgetField
 	{
 		$errors = parent::validate();
 
-		if (!($this->getValue() >= $this->min && $this->getValue() <= $this->max)) {
+		if (!($this->getValue(true) >= $this->min && $this->getValue(true) <= $this->max)) {
 			$errors[] = _s(
 				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
 				$this->getValue(), $this->getName(), $this->min, $this->max
