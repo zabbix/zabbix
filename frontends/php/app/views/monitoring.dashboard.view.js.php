@@ -113,7 +113,9 @@
 		jQuery('#groupid', edit_button.closest('ul')).closest('li').hide();
 		jQuery('#hostid', edit_button.closest('ul')).closest('li').hide();
 		jQuery('#dashbrd-actions').closest('li').hide();
+		// hidding fulscreen button in all states
 		jQuery('.btn-max').closest('li').hide();
+		jQuery('.btn-min').closest('li').hide();
 
 		edit_button.closest('ul').before(
 			jQuery('<span>')
