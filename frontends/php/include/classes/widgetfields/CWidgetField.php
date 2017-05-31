@@ -31,6 +31,7 @@ class CWidgetField
 
 	/**
 	 * Create widget field (general)
+	 *
 	 * @param string $name field name in form
 	 * @param string $label label for the field in form
 	 * @param mixed $default default value
@@ -62,6 +63,7 @@ class CWidgetField
 
 	/**
 	 * Get field value
+	 *
 	 * @param bool $with_default replaces missing value with default one
 	 *
 	 * @return mixed
