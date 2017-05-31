@@ -42,6 +42,11 @@ class CControllerWidgetActionLogView extends CController
 		];
 
 		$ret = $this->validateInput($fields);
+		/*
+		 * @var array $fields
+		 * @var int   $fields['sort_triggers']
+		 * @var int   $fields['show_lines']
+		*/
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
