@@ -84,7 +84,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	const char		*regex;
 	char			error[ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
-	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL;
+	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type;
 	zbx_uint64_t		*itemids = NULL;
 	unsigned char		*states = NULL;
 	AGENT_RESULT		*results = NULL;
@@ -151,7 +151,8 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				goto next;
 		}
 
-		set_result_type(&results[i], ITEM_VALUE_TYPE_TEXT, trap);
+		value_type = (ITEM_VALUE_TYPE_LOG == items[i].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);
+		set_result_type(&results[i], value_type, trap);
 		errcodes[i] = SUCCEED;
 		ret = SUCCEED;
 next:
@@ -160,7 +161,8 @@ next:
 
 	if (FAIL == ret && -1 != fb)
 	{
-		set_result_type(&results[fb], ITEM_VALUE_TYPE_TEXT, trap);
+		value_type = (ITEM_VALUE_TYPE_LOG == items[fb].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);
+		set_result_type(&results[fb], value_type, trap);
 		errcodes[fb] = SUCCEED;
 		ret = SUCCEED;
 	}

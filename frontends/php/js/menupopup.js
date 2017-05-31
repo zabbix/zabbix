@@ -310,7 +310,7 @@ function getMenuPopupMap(options) {
 			else {
 				var url = new Curl('zabbix.php');
 				url.setArgument('action', 'problem.view');
-				url.setArgument('filter_triggerids[]', options.gotos.events.triggerid);
+				url.setArgument('filter_triggerids[]', options.gotos.events.triggerids);
 				url.setArgument('filter_set', '1');
 				url.unsetArgument('sid');
 

@@ -169,28 +169,6 @@ function DBconnect(&$error) {
 					$dbBackend = new Db2DbBackend();
 				}
 				break;
-			case ZBX_DB_SQLITE3:
-				if (file_exists($DB['DATABASE'])) {
-					init_sqlite3_access();
-					lock_sqlite3_access();
-					try{
-						$DB['DB'] = @new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
-					}
-					catch (Exception $e) {
-						$error = 'Error connecting to database.';
-						$result = false;
-					}
-					unlock_sqlite3_access();
-				}
-				else {
-					$error = 'Missing database';
-					$result = false;
-				}
-
-				if ($result) {
-					$dbBackend = new SqliteDbBackend();
-				}
-				break;
 			default:
 				$error = 'Unsupported database';
 				$result = false;
@@ -204,6 +182,10 @@ function DBconnect(&$error) {
 
 	if (false == $result) {
 		$DB['DB'] = null;
+	}
+
+	if (!$result && !ZBX_SHOW_SQL_ERRORS) {
+		$error = _('SQL error. Please contact Zabbix administrator.');
 	}
 
 	return $result;
@@ -227,12 +209,6 @@ function DBclose() {
 				break;
 			case ZBX_DB_DB2:
 				$result = db2_close($DB['DB']);
-				break;
-			case ZBX_DB_SQLITE3:
-				lock_sqlite3_access();
-				$DB['DB']->close();
-				unlock_sqlite3_access();
-				$result = true;
 				break;
 		}
 	}
@@ -269,10 +245,6 @@ function DBstart() {
 			break;
 		case ZBX_DB_DB2:
 			$result = db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_OFF);
-			break;
-		case ZBX_DB_SQLITE3:
-			lock_sqlite3_access();
-			$result = DBexecute('BEGIN');
 			break;
 	}
 	return $result;
@@ -334,10 +306,6 @@ function DBcommit() {
 				db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 			}
 			break;
-		case ZBX_DB_SQLITE3:
-			$result = DBexecute('COMMIT');
-			unlock_sqlite3_access();
-			break;
 	}
 	return $result;
 }
@@ -360,10 +328,6 @@ function DBrollback() {
 		case ZBX_DB_DB2:
 			$result = db2_rollback($DB['DB']);
 			db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
-			break;
-		case ZBX_DB_SQLITE3:
-			$result = DBexecute('ROLLBACK');
-			unlock_sqlite3_access();
 			break;
 	}
 	return $result;
@@ -402,22 +366,22 @@ function DBselect($query, $limit = null, $offset = 0) {
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
 			if (!$result = mysqli_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
+				sqlError('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error().']');
+				sqlError('Error in query ['.$query.'] ['.pg_last_error().']');
 			}
 			break;
 		case ZBX_DB_ORACLE:
 			if (!$result = oci_parse($DB['DB'], $query)) {
 				$e = @oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				sqlError('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				sqlError('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			break;
 		case ZBX_DB_DB2:
@@ -428,23 +392,12 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 			if (!$result = db2_prepare($DB['DB'], $query)) {
 				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']');
+				sqlError('SQL error ['.$query.'] in ['.$e.']');
 			}
 			elseif (true !== @db2_execute($result, $options)) {
 				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']');
+				sqlError('SQL error ['.$query.'] in ['.$e.']');
 				$result = false;
-			}
-			break;
-		case ZBX_DB_SQLITE3:
-			if ($DB['TRANSACTIONS'] == 0) {
-				lock_sqlite3_access();
-			}
-			if (false === ($result = $DB['DB']->query($query))) {
-				error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
-			}
-			if ($DB['TRANSACTIONS'] == 0) {
-				unlock_sqlite3_access();
 			}
 			break;
 	}
@@ -488,7 +441,7 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 
 	if ((isset($limit) && ($limit < 0 || !zbx_ctype_digit($limit))) || $offset < 0 || !zbx_ctype_digit($offset)) {
 		$moreDetails = isset($limit) ? ' Limit ['.$limit.'] Offset ['.$offset.']' : ' Offset ['.$offset.']';
-		error('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails);
+		sqlError('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails);
 
 		return false;
 	}
@@ -498,7 +451,6 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
 			case ZBX_DB_POSTGRESQL:
-			case ZBX_DB_SQLITE3:
 				$query .= ' LIMIT '.intval($limit);
 				$query .= $offset != 0 ? ' OFFSET '.intval($offset) : '';
 				break;
@@ -528,22 +480,22 @@ function DBexecute($query, $skip_error_messages = 0) {
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
 			if (!$result = mysqli_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
+				sqlError('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = (bool) pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error().']');
+				sqlError('Error in query ['.$query.'] ['.pg_last_error().']');
 			}
 			break;
 		case ZBX_DB_ORACLE:
 			if (!$result = oci_parse($DB['DB'], $query)) {
 				$e = @oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				sqlError('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				sqlError('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			else {
 				$result = true; // function must return boolean
@@ -552,25 +504,14 @@ function DBexecute($query, $skip_error_messages = 0) {
 		case ZBX_DB_DB2:
 			if (!$result = db2_prepare($DB['DB'], $query)) {
 				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']');
+				sqlError('SQL error ['.$query.'] in ['.$e.']');
 			}
 			elseif (true !== @db2_execute($result)) {
 				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']');
+				sqlError('SQL error ['.$query.'] in ['.$e.']');
 			}
 			else {
 				$result = true; // function must return boolean
-			}
-			break;
-		case ZBX_DB_SQLITE3:
-			if ($DB['TRANSACTIONS'] == 0) {
-				lock_sqlite3_access();
-			}
-			if (!$result = $DB['DB']->exec($query)) {
-				error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
-			}
-			if ($DB['TRANSACTIONS'] == 0) {
-				unlock_sqlite3_access();
 			}
 			break;
 	}
@@ -642,25 +583,6 @@ function DBfetch($cursor, $convertNulls = true) {
 				unset($value);
 			}
 			break;
-		case ZBX_DB_SQLITE3:
-			if ($DB['TRANSACTIONS'] == 0) {
-				lock_sqlite3_access();
-			}
-			if (!$result = $cursor->fetchArray(SQLITE3_ASSOC)) {
-				unset($cursor);
-			}
-			else {
-				// cast all of the values to string to be consistent with other DB drivers: all of them return
-				// only strings.
-				foreach ($result as &$value) {
-					$value = (string) $value;
-				}
-				unset($value);
-			}
-			if ($DB['TRANSACTIONS'] == 0) {
-				unlock_sqlite3_access();
-			}
-			break;
 	}
 
 	if ($result) {
@@ -679,14 +601,7 @@ function DBfetch($cursor, $convertNulls = true) {
 }
 
 function zbx_sql_mod($x, $y) {
-	global $DB;
-
-	switch ($DB['TYPE']) {
-		case ZBX_DB_SQLITE3:
-			return ' (('.$x.') % ('.$y.'))';
-		default:
-			return ' MOD('.$x.','.$y.')';
-	}
+	return ' MOD('.$x.','.$y.')';
 }
 
 function get_dbid($table, $field) {
@@ -748,12 +663,12 @@ function get_dbid($table, $field) {
 }
 
 function zbx_db_distinct($sql_parts) {
-	if (count($sql_parts['from']) > 1) {
-		return ' DISTINCT ';
+	$count = count($sql_parts['from']);
+	if (array_key_exists('left_join', $sql_parts)) {
+		$count += count($sql_parts['left_join']);
 	}
-	else {
-		return ' ';
-	}
+
+	return ($count > 1 ? ' DISTINCT' : '');
 }
 
 function zbx_db_search($table, $options, &$sql_parts) {
@@ -1043,42 +958,6 @@ function DBfetchColumn($cursor, $column, $asHash = false) {
 }
 
 /**
- * Initialize access to SQLite3 database.
- *
- * The function creates a semaphore for exclusive SQLite3 access. It is
- * shared between Zabbix front-end and Zabbix Server.
- *
- * @return bool
- */
-function init_sqlite3_access() {
-	global $DB;
-
-	$DB['SEM_ID'] = sem_get(ftok($DB['DATABASE'], 'z'), 1, 0660);
-}
-
-/**
- * Get exclusive lock on SQLite3 database.
- *
- * @return bool
- */
-function lock_sqlite3_access() {
-	global $DB;
-
-	sem_acquire($DB['SEM_ID']);
-}
-
-/**
- * Release exclusive lock on SQLite3 database.
- *
- * @return bool
- */
-function unlock_sqlite3_access() {
-	global $DB;
-
-	sem_release($DB['SEM_ID']);
-}
-
-/**
  * Returns true if both IDs are equal.
  *
  * @param $id1
@@ -1103,7 +982,7 @@ function pg_connect_escape($string) {
 
 /**
  * Escape string for safe usage in SQL queries.
- * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
+ * Works for ibmdb2, mysql, oracle, postgresql.
  *
  * @param array|string $var
  *
@@ -1153,15 +1032,6 @@ function zbx_dbstr($var) {
 			}
 			return "'".pg_escape_string($var)."'";
 
-		case ZBX_DB_SQLITE3:
-			if (is_array($var)) {
-				foreach ($var as $vnum => $value) {
-					$var[$vnum] = "'".$DB['DB']->escapeString($value)."'";
-				}
-				return $var;
-			}
-			return "'".$DB['DB']->escapeString($var)."'";
-
 		default:
 			return false;
 	}
@@ -1169,7 +1039,7 @@ function zbx_dbstr($var) {
 
 /**
  * Creates db dependent string with sql expression that casts passed value to bigint.
- * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
+ * Works for ibmdb2, mysql, oracle, postgresql.
  *
  * @param int $field
  *
@@ -1185,7 +1055,6 @@ function zbx_dbcast_2bigint($field) {
 	switch ($DB['TYPE']) {
 		case ZBX_DB_DB2:
 		case ZBX_DB_POSTGRESQL:
-		case ZBX_DB_SQLITE3:
 			return 'CAST('.$field.' AS BIGINT)';
 
 		case ZBX_DB_MYSQL:

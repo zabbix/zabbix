@@ -107,9 +107,14 @@ int	DBconnect(int flag)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBinit(void)
+int	DBinit(char **error)
 {
-	zbx_db_init(CONFIG_DBNAME, db_schema);
+	return zbx_db_init(CONFIG_DBNAME, db_schema, error);
+}
+
+void	DBdeinit(void)
+{
+	zbx_db_deinit();
 }
 
 /******************************************************************************
@@ -682,7 +687,9 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host"))
+			0 == strcmp(tablename, "autoreg_host") ||
+			0 == strcmp(tablename, "task_remote_command") ||
+			0 == strcmp(tablename, "task_remote_command_result"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -2048,6 +2055,8 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 	{
 		if (NULL == (pfield = DBget_field(ptable, field)))
 		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot locate table \"%s\" field \"%s\" in database schema",
+					table, field);
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
@@ -2336,7 +2345,7 @@ retry_oracle:
 		goto retry_oracle;
 	}
 
-	ret = (ZBX_DB_OK == rc ? SUCCEED : FAIL);
+	ret = (ZBX_DB_OK <= rc ? SUCCEED : FAIL);
 
 #else
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -2693,32 +2702,52 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 	return SUCCEED;
 }
 
-int	DBget_user_by_active_session(zbx_user_t *user, const char *sessionid)
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_user_by_active_session                                     *
+ *                                                                            *
+ * Purpose: validate that session is active and get associated user data      *
+ *                                                                            *
+ * Parameters: sessionid - [IN] the session id to validate                    *
+ *             user      - [OUT] user information                             *
+ *                                                                            *
+ * Return value:  SUCCEED - session is active and user data was retrieved     *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 {
-	const char	*__function_name = "zbx_sql_get_user_by_active_session";
+	const char	*__function_name = "DBget_user_by_active_session";
+	char		*sessionid_esc;
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __function_name, sessionid);
 
-	result = DBselect(
-		"select u.userid,u.type"
-			" from sessions s,users u"
-		" where s.userid=u.userid"
-			" and s.sessionid='%s'"
-			" and s.status=%d",
-		sessionid, ZBX_SESSION_ACTIVE);
+	sessionid_esc = DBdyn_escape_string(sessionid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL == (result = DBselect(
+			"select u.userid,u.type"
+				" from sessions s,users u"
+			" where s.userid=u.userid"
+				" and s.sessionid='%s'"
+				" and s.status=%d",
+			sessionid_esc, ZBX_SESSION_ACTIVE)))
 	{
-		ZBX_STR2UINT64(user->userid, row[0]);
-		ZBX_STR2UCHAR(user->type, row[1]);
-
-		ret = SUCCEED;
+		goto out;
 	}
 
+	if (NULL == (row = DBfetch(result)))
+		goto out;
+
+	ZBX_STR2UINT64(user->userid, row[0]);
+	user->type = atoi(row[1]);
+
+	ret = SUCCEED;
+out:
 	DBfree_result(result);
+	zbx_free(sessionid_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

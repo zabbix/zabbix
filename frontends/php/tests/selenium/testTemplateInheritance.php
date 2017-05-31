@@ -124,9 +124,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
 		$this->zbxTestInputType('units', 'units');
-		$this->zbxTestInputTypeOverwrite('delay', '33');
-		$this->zbxTestInputTypeOverwrite('history', '54');
-		$this->zbxTestInputTypeOverwrite('trends', '55');
+		$this->zbxTestInputTypeOverwrite('delay', '33s');
+		$this->zbxTestInputTypeOverwrite('history', '54d');
+		$this->zbxTestInputTypeOverwrite('trends', '55d');
 		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
@@ -168,9 +168,9 @@ class testTemplateInheritance extends CWebTest {
 				$this->zbxTestAssertElementValue('type_name', 'Simple check');
 				$this->zbxTestAssertElementValue('value_type_name', 'Numeric (unsigned)');
 				$this->zbxTestAssertElementValue('units', 'units');
-				$this->zbxTestAssertElementValue('delay', '33');
-				$this->zbxTestAssertElementValue('history', '54');
-				$this->zbxTestAssertElementValue('trends', '55');
+				$this->zbxTestAssertElementValue('delay', '33s');
+				$this->zbxTestAssertElementValue('history', '54d');
+				$this->zbxTestAssertElementValue('trends', '55d');
 				$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 				$this->zbxTestTextPresent('Parent items');
 				$this->zbxTestTextPresent($template);
@@ -262,6 +262,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
 		$this->zbxTestCheckboxSelect('show_work_period', false);
 		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
@@ -317,10 +318,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputTypeWait('name', 'Test LLD');
 		$this->zbxTestInputType('key', 'test-lld');
 		$this->zbxTestDropdownSelect('type', 'Simple check');
-		$this->zbxTestInputType('delay', '31');
-		$this->zbxTestInputType('lifetime', '32');
+		$this->zbxTestInputType('delay', '31s');
+		$this->zbxTestInputType('lifetime', '32d');
 		$this->zbxTestInputType('description', 'description');
-		$this->zbxTestInputType('delay_flex_0_delay', '50');
+		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestClickWait('interval_add');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
@@ -338,9 +339,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestAssertElementValue('name', 'Test LLD');
 		$this->zbxTestAssertElementValue('key', 'test-lld');
 		$this->zbxTestAssertElementValue('typename', 'Simple check');
-		$this->zbxTestAssertElementValue('delay', '31');
-		$this->zbxTestAssertElementValue('lifetime', '32');
-		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50');
+		$this->zbxTestAssertElementValue('delay', '31s');
+		$this->zbxTestAssertElementValue('lifetime', '32d');
+		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
@@ -368,13 +369,13 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
 		$this->zbxTestInputType('units', 'units');
-		$this->zbxTestInputType('delay', '33');
-		$this->zbxTestInputType('history', '54');
-		$this->zbxTestInputType('trends', '55');
+		$this->zbxTestInputType('delay', '33s');
+		$this->zbxTestInputType('history', '54d');
+		$this->zbxTestInputType('trends', '55d');
 		$this->zbxTestInputType('description', 'description');
 		$this->zbxTestDropdownSelect('valuemapid', 'APC Battery Status');
 		$this->zbxTestCheckboxSelect('status', false);
-		$this->zbxTestInputType('delay_flex_0_delay', '50');
+		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestClickWait('interval_add');
 
@@ -398,10 +399,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestAssertElementValue('typename', 'Simple check');
 		$this->zbxTestAssertElementValue('value_type_name', 'Numeric (unsigned)');
 		$this->zbxTestAssertElementValue('units', 'units');
-		$this->zbxTestAssertElementValue('delay', '33');
-		$this->zbxTestAssertElementValue('history', '54');
-		$this->zbxTestAssertElementValue('trends', '55');
-		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50');
+		$this->zbxTestAssertElementValue('delay', '33s');
+		$this->zbxTestAssertElementValue('history', '54d');
+		$this->zbxTestAssertElementValue('trends', '55d');
+		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestAssertElementValue('valuemap_name', 'APC Battery Status');
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
@@ -487,8 +488,11 @@ class testTemplateInheritance extends CWebTest {
 		}
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
 		$this->zbxTestCheckboxSelect('show_work_period', false);
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->zbxTestCheckboxSelect('show_triggers', false);
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
 		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->zbxTestInputType('percent_left', '4');
@@ -496,14 +500,12 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClick('add_protoitem');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_protoitem']");
 		$this->zbxTestClickLinkTextWait('itemDiscovery');
 		$this->zbxTestWaitWindowClose();
 		$this->zbxTestTextPresent($this->templateName.': itemDiscovery');
 
-		$this->zbxTestClickWait('add_item');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_item']");
 		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
 		$this->zbxTestWaitWindowClose();
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');

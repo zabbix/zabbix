@@ -173,9 +173,12 @@ class CScreenHistory extends CScreenBase {
 						$options['excludeSearch'] = 1;
 					}
 				}
-				$options['sortfield'] = ['itemid', 'clock'];
 
 				$historyData = API::History()->get($options);
+				CArrayHelper::sort($historyData, [
+					['field' => 'clock', 'order' => SORT_DESC],
+					['field' => 'ns', 'order' => SORT_DESC]
+				]);
 
 				foreach ($historyData as $data) {
 					$data['value'] = rtrim($data['value'], " \t\r\n");
@@ -238,11 +241,9 @@ class CScreenHistory extends CScreenBase {
 										->addClass(ZBX_STYLE_NOWRAP)
 										->addClass(get_item_logtype_style($data['severity']))
 									: '';
-								$row[] = ($data['logeventid'] != 0)
-									? (new CCol($data['logeventid']))
-										->addClass(ZBX_STYLE_NOWRAP)
-										->addClass($color)
-									: '';
+								$row[] = (new CCol($data['logeventid']))
+									->addClass(ZBX_STYLE_NOWRAP)
+									->addClass($color);
 							}
 						}
 
@@ -270,8 +271,11 @@ class CScreenHistory extends CScreenBase {
 					]);
 				}
 
-				$options['sortfield'] = ['itemid', 'clock'];
 				$historyData = API::History()->get($options);
+				CArrayHelper::sort($historyData, [
+					['field' => 'clock', 'order' => SORT_DESC],
+					['field' => 'ns', 'order' => SORT_DESC]
+				]);
 
 				foreach ($historyData as $data) {
 					$item = $items[$data['itemid']];

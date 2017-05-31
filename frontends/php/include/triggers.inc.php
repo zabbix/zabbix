@@ -154,6 +154,8 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 
 		// blinking
 		$timeSinceLastChange = time() - $triggerLastChange;
+		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+
 		if ($blinks && $timeSinceLastChange < $config['blink_period']) {
 			$object->addClass('blink'); // elements with this class will blink
 			$object->setAttribute('data-time-to-blink', $config['blink_period'] - $timeSinceLastChange);
@@ -870,6 +872,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			->addClass(ZBX_STYLE_CURSOR_POINTER);
 	}
 
+	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
 	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
 		$column->addClass('blink');
 		$column->setAttribute('data-toggle-class', $css);
@@ -1074,9 +1077,9 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	foreach ($hosts as $host) {
-		$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION);
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
-		$hostNames[] = $hostName;
+		$hostNames[] = (new CSpan($host['name']))
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]))
+			->addClass(ZBX_STYLE_LINK_ACTION);
 		$hostNames[] = ', ';
 	}
 	array_pop($hostNames);

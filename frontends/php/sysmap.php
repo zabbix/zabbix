@@ -25,7 +25,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['scripts'] = ['class.cmap.js', 'class.cviewswitcher.js', 'multiselect.js'];
+$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'class.cviewswitcher.js',
+	'multiselect.js'
+];
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -76,6 +78,21 @@ if (isset($_REQUEST['favobj'])) {
 
 			$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
 			$sysmapUpdate['sysmapid'] = $sysmapid;
+			$sysmapUpdate['lines'] = [];
+
+			if (array_key_exists('shapes', $sysmapUpdate)) {
+				foreach ($sysmapUpdate['shapes'] as $key => &$shape) {
+					if (array_key_exists('sysmap_shapeid', $shape) && !is_numeric($shape['sysmap_shapeid'])) {
+						unset($shape['sysmap_shapeid']);
+					}
+
+					if ($shape['type'] == SYSMAP_SHAPE_TYPE_LINE) {
+						$sysmapUpdate['lines'][$key] = CMapHelper::convertShapeToLine($shape);
+						unset($sysmapUpdate['shapes'][$key]);
+					}
+				}
+				unset($shape);
+			}
 
 			$result = API::Map()->update($sysmapUpdate);
 
@@ -118,15 +135,20 @@ if (PAGE_TYPE_HTML != $page['type']) {
 if (isset($_REQUEST['sysmapid'])) {
 	$sysmap = API::Map()->get([
 		'output' => ['sysmapid', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
-			'iconmapid'
+			'iconmapid', 'backgroundid'
 		],
+		'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
+			'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
+			'background_color', 'zindex'
+		],
+		'selectLines' => ['sysmap_shapeid', 'x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color', 'zindex'],
 		'selectSelements' => API_OUTPUT_EXTEND,
 		'selectLinks' => API_OUTPUT_EXTEND,
 		'sysmapids' => getRequest('sysmapid'),
 		'editable' => true,
 		'preservekeys' => true
 	]);
-	if (empty($sysmap)) {
+	if (!$sysmap) {
 		access_deny();
 	}
 	else {
@@ -148,7 +170,13 @@ $data = [
 // get selements
 add_elementNames($data['sysmap']['selements']);
 
+foreach ($data['sysmap']['lines'] as $line) {
+	$data['sysmap']['shapes'][] = CMapHelper::convertLineToShape($line);
+}
+unset($data['sysmap']['lines']);
+
 $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
+$data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'sysmap_shapeid');
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 
 // get links
@@ -181,26 +209,33 @@ if ($data['sysmap']['iconmapid']) {
 	$data['defaultAutoIconId'] = $iconMap['default_iconid'];
 }
 
-// get icon list
-$icons = DBselect(
-	'SELECT i.imageid,i.name FROM images i WHERE i.imagetype='.IMAGE_TYPE_ICON
-);
+$images = API::Image()->get([
+	'output' => ['imageid', 'name'],
+	'filter' => ['imagetype' => IMAGE_TYPE_ICON],
+	'select_image' => true
+]);
+foreach ($images as $image) {
+	$image['image'] = base64_decode($image['image']);
+	$ico = imagecreatefromstring($image['image']);
 
-while ($icon = DBfetch($icons)) {
 	$data['iconList'][] = [
-		'imageid' => $icon['imageid'],
-		'name' => $icon['name']
+		'imageid' => $image['imageid'],
+		'name' => $image['name'],
+		'width' => imagesx($ico),
+		'height' => imagesy($ico)
 	];
 
-	if ($icon['name'] == MAP_DEFAULT_ICON || !isset($data['defaultIconId'])) {
-		$data['defaultIconId'] = $icon['imageid'];
-		$data['defaultIconName'] = $icon['name'];
+	if ($image['name'] == MAP_DEFAULT_ICON || !isset($data['defaultIconId'])) {
+		$data['defaultIconId'] = $image['imageid'];
+		$data['defaultIconName'] = $image['name'];
 	}
 }
 if ($data['iconList']) {
 	CArrayHelper::sort($data['iconList'], ['name']);
 	$data['iconList'] = array_values($data['iconList']);
 }
+
+$data['theme'] = getUserGraphTheme();
 
 // render view
 $sysmapView = new CView('monitoring.sysmap.constructor', $data);

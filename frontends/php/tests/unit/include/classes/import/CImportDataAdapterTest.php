@@ -320,8 +320,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmp_community' => '',
 					'snmp_oid' => '',
 					'delay' => '30',
-					'history' => '90',
-					'trends' => '365',
+					'history' => '90d',
+					'trends' => '365d',
 					'status' => '0',
 					'value_type' => '3',
 					'units' => '',
@@ -332,7 +332,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -356,8 +355,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmp_community' => '',
 					'snmp_oid' => '',
 					'delay' => '30',
-					'history' => '90',
-					'trends' => '365',
+					'history' => '90d',
+					'trends' => '365d',
 					'status' => '0',
 					'value_type' => '3',
 					'units' => '',
@@ -368,7 +367,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -398,8 +396,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmp_community' => '',
 					'snmp_oid' => '',
 					'delay' => '30',
-					'history' => '90',
-					'trends' => '365',
+					'history' => '90d',
+					'trends' => '365d',
 					'status' => '0',
 					'value_type' => '3',
 					'units' => '',
@@ -410,7 +408,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -433,8 +430,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmp_community' => '',
 					'snmp_oid' => '',
 					'delay' => '30',
-					'history' => '90',
-					'trends' => '365',
+					'history' => '90d',
+					'trends' => '365d',
 					'status' => '0',
 					'value_type' => '3',
 					'units' => '',
@@ -445,7 +442,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -643,7 +639,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -657,7 +652,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'formula' => '',
 						'conditions' => []
 					],
-					'lifetime' => '30',
+					'lifetime' => '30d',
 					'description' => '',
 					'item_prototypes' => [],
 					'trigger_prototypes' => [],
@@ -681,7 +676,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -708,7 +702,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							]
 						]
 					],
-					'lifetime' => '30',
+					'lifetime' => '30d',
 					'description' => '',
 					'item_prototypes' => [
 						[
@@ -717,8 +711,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmp_community' => '',
 							'snmp_oid' => '',
 							'delay' => '30',
-							'history' => '90',
-							'trends' => '365',
+							'history' => '90d',
+							'trends' => '365d',
 							'status' => '0',
 							'value_type' => '3',
 							'units' => '',
@@ -729,7 +723,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmpv3_authpassphrase' => '',
 							'snmpv3_privprotocol' => '0',
 							'snmpv3_privpassphrase' => '',
-							'delay_flex' => '',
 							'params' => '',
 							'ipmi_sensor' => '',
 							'authtype' => '0',
@@ -753,8 +746,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmp_community' => '',
 							'snmp_oid' => '',
 							'delay' => '30',
-							'history' => '90',
-							'trends' => '365',
+							'history' => '90d',
+							'trends' => '365d',
 							'status' => '0',
 							'value_type' => '3',
 							'units' => '',
@@ -765,7 +758,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmpv3_authpassphrase' => '',
 							'snmpv3_privprotocol' => '0',
 							'snmpv3_privpassphrase' => '',
-							'delay_flex' => '',
 							'params' => '',
 							'ipmi_sensor' => '',
 							'authtype' => '0',
@@ -879,7 +871,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -893,7 +884,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'formula' => '',
 						'conditions' => []
 					],
-					'lifetime' => '30',
+					'lifetime' => '30d',
 					'description' => '',
 					'item_prototypes' => [],
 					'trigger_prototypes' => [],
@@ -916,7 +907,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'snmpv3_authpassphrase' => '',
 					'snmpv3_privprotocol' => '0',
 					'snmpv3_privpassphrase' => '',
-					'delay_flex' => '',
 					'params' => '',
 					'ipmi_sensor' => '',
 					'authtype' => '0',
@@ -943,7 +933,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							]
 						]
 					],
-					'lifetime' => '30',
+					'lifetime' => '30d',
 					'description' => '',
 					'item_prototypes' => [
 						[
@@ -952,8 +942,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmp_community' => '',
 							'snmp_oid' => '',
 							'delay' => '30',
-							'history' => '90',
-							'trends' => '365',
+							'history' => '90d',
+							'trends' => '365d',
 							'status' => '0',
 							'value_type' => '3',
 							'units' => '',
@@ -964,7 +954,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmpv3_authpassphrase' => '',
 							'snmpv3_privprotocol' => '0',
 							'snmpv3_privpassphrase' => '',
-							'delay_flex' => '',
 							'params' => '',
 							'ipmi_sensor' => '',
 							'authtype' => '0',
@@ -987,8 +976,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmp_community' => '',
 							'snmp_oid' => '',
 							'delay' => '30',
-							'history' => '90',
-							'trends' => '365',
+							'history' => '90d',
+							'trends' => '365d',
 							'status' => '0',
 							'value_type' => '3',
 							'units' => '',
@@ -999,7 +988,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'snmpv3_authpassphrase' => '',
 							'snmpv3_privprotocol' => '0',
 							'snmpv3_privpassphrase' => '',
-							'delay_flex' => '',
 							'params' => '',
 							'ipmi_sensor' => '',
 							'authtype' => '0',
@@ -1183,7 +1171,26 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'iconmap' => [],
 				'urls' => [],
 				'selements' => [],
-				'links' => []
+				'links' => [],
+				'shapes' => [[
+					'type' => 0,
+					'x' => '0',
+					'y' => '0',
+					'width' => '800',
+					'height' => 15,
+					'text' => '{MAP.NAME}',
+					'font' => '9',
+					'font_size' => '11',
+					'font_color' => '000000',
+					'text_halign' => '0',
+					'text_valign' => '0',
+					'border_type' => '0',
+					'border_width' => '1',
+					'border_color' => '000000',
+					'background_color' => '',
+					'zindex' => '0'
+				]],
+				'lines' => []
 			],
 			[
 				'name' => 'map',
@@ -1234,11 +1241,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '32',
-						'element' => [
-							'description' => 'trigger',
-							'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
-							'recovery_expression' => ''
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1250,6 +1252,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							[
 								'name' => 'url',
 								'url' => 'http://google.com'
+							]
+						],
+						'elements' => [
+							[
+								'description' => 'trigger',
+								'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
+								'recovery_expression' => ''
 							]
 						]
 					],
@@ -1266,9 +1275,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '33',
-						'element' => [
-							'host' => 'export-host'
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1276,7 +1282,12 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'icon_disabled' => [],
 						'icon_maintenance' => [],
 						'application' => '',
-						'urls' => []
+						'urls' => [],
+						'elements' => [
+							[
+								'host' => 'export-host'
+							]
+						]
 					],
 					[
 						'elementtype' => '3',
@@ -1291,9 +1302,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '34',
-						'element' => [
-							'name' => 'Zabbix servers'
-						],
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
@@ -1301,7 +1309,12 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'icon_disabled' => [],
 						'icon_maintenance' => [],
 						'application' => '',
-						'urls' => []
+						'urls' => [],
+						'elements' => [
+							[
+								'name' => 'Zabbix servers'
+							]
+						]
 					]
 				],
 				'links' => [
@@ -1331,7 +1344,26 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'selementid2' => '34',
 						'linktriggers' => []
 					]
-				]
+				],
+				'shapes' => [[
+					'type' => 0,
+					'x' => '0',
+					'y' => '0',
+					'width' => '800',
+					'height' => 15,
+					'text' => '{MAP.NAME}',
+					'font' => '9',
+					'font_size' => '11',
+					'font_color' => '000000',
+					'text_halign' => '0',
+					'text_valign' => '0',
+					'border_type' => '0',
+					'border_width' => '1',
+					'border_color' => '000000',
+					'background_color' => '',
+					'zindex' => '0'
+				]],
+				'lines' => []
 			]
 		]);
 	}
@@ -1470,12 +1502,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'value_type' => '0',
 						'ipmi_sensor' => '',
 						'delay' => '30',
-						'history' => '7',
-						'trends' => '365',
+						'history' => '7d',
+						'trends' => '365d',
 						'status' => '0',
 						'units' => '%',
 						'logtimefmt' => '',
-						'delay_flex' => '',
 						'authtype' => '0',
 						'username' => '',
 						'password' => '',
@@ -1509,12 +1540,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'value_type' => '3',
 						'ipmi_sensor' => '',
 						'delay' => '30',
-						'history' => '90',
-						'trends' => '365',
+						'history' => '90d',
+						'trends' => '365d',
 						'status' => '0',
 						'units' => '',
 						'logtimefmt' => '',
-						'delay_flex' => '',
 						'authtype' => '0',
 						'username' => '',
 						'password' => '',
@@ -1543,12 +1573,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'value_type' => '3',
 						'ipmi_sensor' => '',
 						'delay' => '30',
-						'history' => '90',
-						'trends' => '365',
+						'history' => '90d',
+						'trends' => '365d',
 						'status' => '0',
 						'units' => '',
 						'logtimefmt' => '',
-						'delay_flex' => '',
 						'authtype' => '0',
 						'username' => '',
 						'password' => '',

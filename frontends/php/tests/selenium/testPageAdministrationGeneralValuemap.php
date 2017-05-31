@@ -61,11 +61,9 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestTextPresent('Value map updated');
 
 		$newHashValuemap = DBhash($sqlValuemaps);
-		$this->assertEquals($oldHashValuemap, $newHashValuemap,
-				"Chuck Norris: no-change valuemap update should not update data in table 'valuemaps'");
+		$this->assertEquals($oldHashValuemap, $newHashValuemap);
 
 		$newHashMappings = DBhash($sqlMappings);
-		$this->assertEquals($oldHashMappings, $newHashMappings,
-				"Chuck Norris: no-change valuemap update should not update data in table 'mappings'");
+		$this->assertEquals($oldHashMappings, $newHashMappings);
 	}
 }

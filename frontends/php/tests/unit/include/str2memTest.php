@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -19,22 +19,35 @@
 **/
 
 
-/**
- * Database backend class for SQLite.
- */
-class SqliteDbBackend extends DbBackend {
+class Cstr2memTest extends PHPUnit_Framework_TestCase {
+
+	public static function testProvider() {
+		return [
+			['1', 1],
+			['1024', 1024],
+			['0', 0],
+			['1K', 1024],
+			['1k', 1024],
+			['1M', 1024 * 1024],
+			['1m', 1024 * 1024],
+			['1G', 1024 * 1024 * 1024],
+			['1g', 1024 * 1024 * 1024],
+			['8K', 8 * 1024],
+			['8k', 8 * 1024],
+			['8M', 8 * 1024 * 1024],
+			['8m', 8 * 1024 * 1024],
+			['8G', 8 * 1024 * 1024 * 1024],
+			['8g', 8 * 1024 * 1024 * 1024]
+		];
+	}
 
 	/**
-	 * Check if 'dbversion' table exists.
+	 * @dataProvider testProvider
 	 *
-	 * @return boolean
-	 */
-	protected function checkDbVersionTable() {
-		if (!DBfetch(DBselect("SELECT name FROM sqlite_master WHERE type='table' AND name='dbversion';"))) {
-			$this->setError(_('The frontend does not match Zabbix database.'));
-			return false;
-		}
-
-		return true;
+	 * @param string $source
+	 * @param string $expected
+	*/
+	public function testTriggerExpressionReplaceHost($source, $expected) {
+		$this->assertSame($expected, str2mem($source));
 	}
 }

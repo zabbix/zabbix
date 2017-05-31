@@ -121,34 +121,206 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 
 		// checking values in the DB
 		$sql = 'SELECT problem_unack_color FROM config WHERE problem_unack_color='.zbx_dbstr('BB0000');
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "problem_unack_color"');
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT problem_ack_color FROM config WHERE problem_ack_color='.zbx_dbstr('BB0000');
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "problem_ack_color"');
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_unack_color FROM config WHERE ok_unack_color='.zbx_dbstr('66FF66');
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "ok_unack_color"');
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_ack_color FROM config WHERE ok_unack_color='.zbx_dbstr('66FF66');
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "ok_ack_color"');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT problem_unack_style FROM config WHERE problem_unack_style=0 AND problem_unack_color='.zbx_dbstr('BB0000');
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "problem_unack_style" for unacknowledged PROBLEM events');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT problem_ack_style FROM config WHERE problem_ack_style=0 AND problem_ack_color='.zbx_dbstr('BB0000');
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "problem_ack_style" for acknowledged PROBLEM events');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_unack_style FROM config WHERE ok_unack_style=0 AND ok_unack_color='.zbx_dbstr('66FF66');
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "ok_unack_style" for unacknowledged OK events');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_ack_style FROM config WHERE ok_ack_style=0 AND ok_ack_color='.zbx_dbstr('66FF66');
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "ok_unack_style" for unacknowledged OK events');
-
-		$sql = 'SELECT ok_period FROM config WHERE ok_period=120';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "ok_period" for displaying OK triggers');
-
-		$sql = 'SELECT blink_period FROM config WHERE blink_period=120';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "blink_period"');
+		$this->assertEquals(1, DBcount($sql));
+		$sql = "SELECT ok_period FROM config WHERE ok_period='120'";
+		$this->assertEquals(1, DBcount($sql));
+		$sql = "SELECT blink_period FROM config WHERE blink_period='120'";
+		$this->assertEquals(1, DBcount($sql));
 
 		$newHash = DBhash($sqlHash);
-		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
+		$this->assertEquals($oldHash, $newHash);
+	}
+
+	public static function ok_period() {
+		return [
+			[[
+				'expected' => TEST_BAD,
+				'period' => ' ',
+				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => 's',
+				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '1.5',
+				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '{$BAD}',
+				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '1441m',
+				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '2d',
+				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '86401',
+				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '1y',
+				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '0'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '86400s'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '1440m'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '1h'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '1d'
+			]]
+		];
+	}
+
+	/**
+	 * @dataProvider ok_period
+	 */
+	public function testFormAdministrationGeneralTrigDisplOptions_OKPeriod($data) {
+	$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+
+		$this->zbxTestInputTypeOverwrite('ok_period', $data['period']);
+		$this->zbxTestClickWait('update');
+
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good' , 'Configuration updated');
+				$this->zbxTestCheckHeader('Trigger displaying options');
+				$this->zbxTestCheckFatalErrors();
+				break;
+			case TEST_BAD:
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update configuration');
+				$this->zbxTestTextPresent($data['error_msg']);
+				$this->zbxTestCheckHeader('Trigger displaying options');
+				$this->zbxTestCheckFatalErrors();
+				break;
+		}
+	}
+
+	public static function blink_period() {
+		return [
+			[[
+				'expected' => TEST_BAD,
+				'period' => ' ',
+				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => 's',
+				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '1.5',
+				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '{$BAD}',
+				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '1441m',
+				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '2d',
+				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '86401',
+				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'period' => '1y',
+				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '0'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '86400s'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '1440m'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '1h'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'period' => '1d'
+			]]
+		];
+	}
+
+	/**
+	 * @dataProvider blink_period
+	 */
+	public function testFormAdministrationGeneralTrigDisplOptions_BlinkPeriod($data) {
+	$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+
+		$this->zbxTestInputTypeOverwrite('blink_period', $data['period']);
+		$this->zbxTestClickWait('update');
+
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good' , 'Configuration updated');
+				$this->zbxTestCheckHeader('Trigger displaying options');
+				$this->zbxTestCheckFatalErrors();
+				break;
+			case TEST_BAD:
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update configuration');
+				$this->zbxTestTextPresent($data['error_msg']);
+				$this->zbxTestCheckHeader('Trigger displaying options');
+				$this->zbxTestCheckFatalErrors();
+				break;
+		}
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetTrigDisplOptions() {
@@ -172,37 +344,28 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
 
 		$sql = 'SELECT problem_unack_color FROM config WHERE problem_unack_color='.zbx_dbstr('DC0000').'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "problem_unack_color"');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT problem_ack_color FROM config WHERE problem_ack_color='.zbx_dbstr('DC0000').'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "problem_ack_color"');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_unack_color FROM config WHERE ok_unack_color='.zbx_dbstr('00AA00').'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "ok_unack_color"');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_ack_color FROM config WHERE ok_unack_color='.zbx_dbstr('00AA00').'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "ok_ack_color"');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT problem_unack_style FROM config WHERE problem_unack_style=1 AND problem_unack_color='.zbx_dbstr('DC0000').'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "problem_unack_style" for unacknowledged PROBLEM events');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT problem_ack_style FROM config WHERE problem_ack_style=1 AND problem_ack_color='.zbx_dbstr('DC0000').'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "problem_ack_style" for acknowledged PROBLEM events');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_unack_style FROM config WHERE ok_unack_style=1 AND ok_unack_color='.zbx_dbstr('00AA00').'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "ok_unack_style" for unacknowledged OK events');
-
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT ok_ack_style FROM config WHERE ok_ack_style=1 AND ok_ack_color='.zbx_dbstr('00AA00').'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "ok_ack_style" for acknowledged OK events');
-
-		$sql = 'SELECT ok_period FROM config WHERE ok_period=1800';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "ok_period" for displaying OK triggers');
-
-		$sql = 'SELECT blink_period FROM config WHERE blink_period=1800';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "blink_period"');
+		$this->assertEquals(1, DBcount($sql));
+		$sql = "SELECT ok_period FROM config WHERE ok_period='30m'";
+		$this->assertEquals(1, DBcount($sql));
+		$sql = "SELECT blink_period FROM config WHERE blink_period='30m'";
+		$this->assertEquals(1, DBcount($sql));
 
 		// hash calculation for the DB fields that should be changed in this report
 		$newHash=DBhash($sqlHash);
-		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
+		$this->assertEquals($oldHash, $newHash);
 	}
 }

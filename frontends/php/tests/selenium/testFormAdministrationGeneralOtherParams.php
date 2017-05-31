@@ -99,7 +99,6 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralOtherParams_OtherParams() {
-
 		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
@@ -112,33 +111,33 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
-		$sql = 'SELECT refresh_unsupported FROM config WHERE refresh_unsupported=700';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "refresh_unsupported"');
+		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='700'";
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=1';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "snmptrap_logging"');
+		$this->assertEquals(1, DBcount($sql));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 
 		// trying to enter max possible value
-		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '65535');
+		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '86400');
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Enabled debug mode');
 		$this->zbxTestCheckboxSelect('snmptrap_logging', false);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
-		$sql = 'SELECT refresh_unsupported FROM config WHERE refresh_unsupported=65535';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "refresh_unsupported"');
+		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='86400'";
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=0';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "snmptrap_logging"');
+		$this->assertEquals(1, DBcount($sql));
 
 		// trying to enter value > max_value
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
-		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '65536');
+		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '86401');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "65536" for "Refresh unsupported items (in sec)" field: must be between 0 and 65535.']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
+		$this->zbxTestTextPresent('Invalid refresh of unsupported items: must be between "0" and "86400"');
 	}
-
 }

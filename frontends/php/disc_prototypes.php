@@ -44,10 +44,10 @@ $fields = [
 	'key' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})',
 		_('Key')
 	],
-	'delay' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
+	'delay' =>						[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO | P_ALLOW_LLD_MACRO, null,
 		'(isset({add}) || isset({update}))'.
 			' && (isset({type}) && ({type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.'))',
-		_('Update interval (in sec)')
+		_('Update interval')
 	],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
@@ -149,10 +149,10 @@ $fields = [
 		'isset({parent_discoveryid}) && (isset({add}) || isset({update}))'
 	],
 	'application_prototypes' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'history' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})',
+	'history' =>					[T_ZBX_STR, O_OPT, null,	null, 'isset({add}) || isset({update})',
 		_('History storage period')
 	],
-	'trends' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
+	'trends' =>						[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type})'.
 			' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Trend storage period')
@@ -248,16 +248,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 
-	/*
-	 * Intially validate "delay_flex" field one by one to make sure it does not have interval separator ";".
-	 * Skip empty fields and convert "delay_flex" array to string glued with ";" which is later validated through API.
-	 */
-	$delay_flex = '';
-	$intervals = [];
+	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
+	$type = getRequest('type', ITEM_TYPE_ZABBIX);
 
-	if (getRequest('delay_flex')) {
+	/*
+	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
+	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
+	 */
+	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP]) && hasRequest('delay_flex')) {
+		$intervals = [];
+
 		foreach (getRequest('delay_flex') as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 				if ($interval['delay'] === '' && $interval['period'] === '') {
 					continue;
 				}
@@ -291,7 +293,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($intervals) {
-			$delay_flex = join(';', $intervals);
+			$delay .= ';'.implode(';', $intervals);
 		}
 	}
 
@@ -342,7 +344,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'key_'			=> getRequest('key'),
 			'hostid'		=> $discoveryRule['hostid'],
 			'interfaceid'	=> getRequest('interfaceid'),
-			'delay'			=> getRequest('delay'),
+			'delay'			=> $delay,
 			'status'		=> getRequest('status', ITEM_STATUS_DISABLED),
 			'type'			=> getRequest('type'),
 			'snmp_community' => getRequest('snmp_community'),
@@ -351,7 +353,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'trapper_hosts'	=> getRequest('trapper_hosts'),
 			'port'			=> getRequest('port'),
 			'history'		=> getRequest('history'),
-			'trends'		=> getRequest('trends'),
 			'units'			=> getRequest('units'),
 			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
 			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
@@ -369,9 +370,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey'	=> getRequest('privatekey'),
 			'params'		=> getRequest('params'),
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
-			'ruleid'		=> getRequest('parent_discoveryid'),
-			'delay_flex'	=> $delay_flex
+			'ruleid'		=> getRequest('parent_discoveryid')
 		];
+
+		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$item['trends'] = getRequest('trends');
+		}
 
 		if (hasRequest('update')) {
 			$itemId = getRequest('itemid');
@@ -380,8 +384,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'output' => ['type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 					'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 					'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt',
-					'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
-					'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
+					'templateid', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
+					'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
 					'snmpv3_privprotocol', 'snmpv3_contextname'
 				],
 				'selectApplications' => ['applicationid'],
@@ -503,9 +507,8 @@ if (isset($_REQUEST['form'])) {
 				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
-				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-				'snmpv3_contextname'
+				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
 			'selectPreprocessing' => ['type', 'params']
 		]);
@@ -518,6 +521,7 @@ if (isset($_REQUEST['form'])) {
 
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
+	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.edit', $data);
@@ -550,21 +554,24 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
-	foreach ($data['items'] as &$item) {
-		if ($item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_LOG
-				|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-			$item['trends'] = '';
-		}
-
-		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
-			$item['delay'] = '';
-		}
-	}
-	unset($item);
-
 	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
-	order_result($data['items'], $sortField, $sortOrder);
+	switch ($sortField) {
+		case 'delay':
+			orderItemsByDelay($data['items'], $sortOrder, ['usermacros' => true, 'lldmacros' => true]);
+			break;
+
+		case 'history':
+			orderItemsByHistory($data['items'], $sortOrder);
+			break;
+
+		case 'trends':
+			orderItemsByTrends($data['items'], $sortOrder);
+			break;
+
+		default:
+			order_result($data['items'], $sortField, $sortOrder);
+	}
 
 	$url = (new CUrl('disc_prototypes.php'))
 		->setArgument('parent_discoveryid', $data['parent_discoveryid']);

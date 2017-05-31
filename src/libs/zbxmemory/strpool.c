@@ -26,8 +26,6 @@
 
 #include "strpool.h"
 
-extern char		*CONFIG_FILE;
-
 static zbx_strpool_t	strpool;
 
 static zbx_hash_t	__strpool_hash_func(const void *data);
@@ -54,39 +52,25 @@ ZBX_MEM_FUNC_IMPL(__strpool, strpool.mem_info);
 
 /* public strpool interface */
 
-void	zbx_strpool_create(size_t size)
+int	zbx_strpool_create(size_t size, char **error)
 {
 	const char	*__function_name = "zbx_strpool_create";
 
-	key_t		shm_key;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_STRPOOL_ID)))
+	if (SUCCEED == (ret = zbx_mem_create(&strpool.mem_info, size, "string pool", "CacheSize", 0, error)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for string pool");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool", "CacheSize", 0);
-
-	strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
-	zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,
+		strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
+		zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,
 				__strpool_hash_func, __strpool_compare_func, NULL,
 				__strpool_mem_malloc_func, __strpool_mem_realloc_func, __strpool_mem_free_func);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
 
-void	zbx_strpool_destroy()
-{
-	const char	*__function_name = "zbx_strpool_destroy";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_mem_destroy(strpool.mem_info);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	return ret;
 }
 
 const char	*zbx_strpool_intern(const char *str)
@@ -128,7 +112,7 @@ void	zbx_strpool_release(const char *str)
 		zbx_hashset_remove(strpool.hashset, str - REFCOUNT_FIELD_SIZE);
 }
 
-void	zbx_strpool_clear()
+void	zbx_strpool_clear(void)
 {
 	const char	*__function_name = "zbx_strpool_clear";
 
@@ -144,7 +128,7 @@ void	zbx_strpool_clear()
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-const zbx_strpool_t	*zbx_strpool_info()
+const zbx_strpool_t	*zbx_strpool_info(void)
 {
 	return &strpool;
 }

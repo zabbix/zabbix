@@ -444,7 +444,7 @@ class CApplication extends CApiService {
 		}
 
 		$db_applications = $this->get([
-			'output' => ['name', 'flags'],
+			'output' => ['applicationid', 'name', 'flags'],
 			'applicationids' => $applicationids,
 			'editable' => true,
 			'preservekeys' => true

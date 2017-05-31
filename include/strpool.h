@@ -31,15 +31,15 @@ typedef struct
 }
 zbx_strpool_t;
 
-void		zbx_strpool_create(size_t size);
-void		zbx_strpool_destroy();
+int		zbx_strpool_create(size_t size, char **error);
+void		zbx_strpool_destroy(void);
 
 const char	*zbx_strpool_intern(const char *str);
 const char	*zbx_strpool_acquire(const char *str);
 void		zbx_strpool_release(const char *str);
 
-void		zbx_strpool_clear();
+void		zbx_strpool_clear(void);
 
-const zbx_strpool_t	*zbx_strpool_info();
+const zbx_strpool_t	*zbx_strpool_info(void);
 
 #endif
