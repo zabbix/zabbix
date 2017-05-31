@@ -554,9 +554,6 @@ ul.top-nav-icons {
 				&:first-child {
 					padding: 0;
 				}
-				.btn-widget-edit {
-					vertical-align: middle;
-				}
 			}
 		}
 	}
@@ -2192,10 +2189,25 @@ $icon-widget-btn: (
 	}
 }
 
+.btn-dashbrd-edit {
+	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
+	@extend %btn-dashbrd;
+}
+
 %btn-widget {
-	border: none;
 	width: 30px;
 	height: 28px;
+	@extend %btn-widget-defaults;
+}
+
+%btn-dashbrd {
+	width: 24px;
+	height: 24px;
+	@extend %btn-widget-defaults;
+}
+
+%btn-widget-defaults {
+	border: none;
 	min-height: 0;
 	padding: 0;
 	-webkit-transform-style: preserve-3d;
