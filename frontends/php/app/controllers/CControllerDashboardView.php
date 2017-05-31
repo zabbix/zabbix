@@ -119,7 +119,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
 
-			if (is_array($dashboards)) {
+			if ($dashboards && array_key_exists(0, $dashboards)) {
 				$dashboard = $this->getNewDashboard();
 				$dashboard['name'] = $dashboards[0]['name'];
 				$dashboard['widgets'] = $dashboards[0]['widgets'];
