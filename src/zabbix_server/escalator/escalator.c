@@ -2194,7 +2194,6 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		DB_ACTION	action;
 		DB_EVENT	event, r_event;
 		char		*error = NULL;
-		int		event_info_flag, r_event_info_flag;
 
 		escalation.nextcheck = atoi(row[5]);
 		ZBX_DBROW2UINT64(escalation.r_eventid, row[4]);
@@ -2230,24 +2229,23 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		}
 
 		/* Cancel escalation if event is absent. */
-		if (SUCCEED != get_event_info(escalation.eventid, &event, &event_info_flag, &error))
+		if (SUCCEED != get_event_info(escalation.eventid, &event, &error))
 		{
 			escalation_log_cancel_warning(&escalation, error);
 			zbx_free(error);
 			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-			free_event_info(&event, event_info_flag);
+			free_event_info(&event);
 			free_db_action(&action);
 			continue;
 		}
 
 		/* Cancel escalation if recovery event is absent. */
-		if ((0 != escalation.r_eventid) && (SUCCEED != get_event_info(escalation.r_eventid, &r_event,
-				&r_event_info_flag, &error)))
+		if ((0 != escalation.r_eventid) && (SUCCEED != get_event_info(escalation.r_eventid, &r_event, &error)))
 		{
 			escalation_cancel(&escalation, &action, &event, error);
 			zbx_free(error);
 			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-			free_event_info(&r_event, event_info_flag);
+			free_event_info(&r_event);
 			free_db_action(&action);
 			continue;
 		}
@@ -2265,8 +2263,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				/* break; is not missing here */
 			case ZBX_ESCALATION_SKIP:
 				if (0 != escalation.r_eventid)
-					free_event_info(&r_event, r_event_info_flag);
-				free_event_info(&event, event_info_flag);
+					free_event_info(&r_event);
+				free_event_info(&event);
 				free_db_action(&action);
 				continue;
 			case ZBX_ESCALATION_PROCESS:
@@ -2314,8 +2312,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		zbx_vector_ptr_append(&diffs, diff);
 
 		if (0 != escalation.r_eventid)
-			free_event_info(&r_event, r_event_info_flag);
-		free_event_info(&event, event_info_flag);
+			free_event_info(&r_event);
+		free_event_info(&event);
 		free_db_action(&action);
 	}
 

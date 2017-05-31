@@ -1983,7 +1983,7 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_t *ackids, zbx_vector_u
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
 	DB_EVENT		*events = NULL;
-	int			i, j, processed_num = 0, events_num, *db_event_flags = NULL;
+	int			i, j, processed_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1996,19 +1996,17 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_t *ackids, zbx_vector_u
 	zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
 				"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
 
-	db_event_flags = zbx_malloc(db_event_flags, sizeof(int) * eventids->values_num);
 	events = zbx_malloc(events, sizeof(DB_EVENT) * eventids->values_num);
 
 	zbx_vector_uint64_sort(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	get_events_info(eventids->values, eventids->values_num, &events, &events_num, db_event_flags);
+	get_events_info(eventids->values, eventids->values_num, events);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < eventids->values_num; i++)
 	{
-		if (EVENT_SOURCE_TRIGGERS != events[i].source
-				|| (0 == (db_event_flags[i] & ZBX_DB_EVENT_INFO_BASE))
-				|| (0 == (db_event_flags[i] & ZBX_DB_EVENT_INFO_TRIGGERS)))
+		if (0 == events[i].eventid || EVENT_SOURCE_TRIGGERS != events[i].source ||
+				0 == events[i].trigger.triggerid)
 		{
 			goto out;
 		}
@@ -2032,14 +2030,13 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_t *ackids, zbx_vector_u
 			}
 		}
 out:
-		free_event_info(&events[i], db_event_flags[i]);
+		free_event_info(&events[i]);
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "escalationid");
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	zbx_free(db_event_flags);
 	zbx_free(events);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed_num:%d", __function_name, processed_num);

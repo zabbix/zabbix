@@ -23,11 +23,6 @@
 #define ZBX_EVENTS_SKIP_CORRELATION	0
 #define ZBX_EVENTS_PROCESS_CORRELATION	1
 
-#define ZBX_DB_EVENT_INFO_EMPTY		0x00
-#define ZBX_DB_EVENT_INFO_BASE		0x01
-#define ZBX_DB_EVENT_INFO_TAGS		0x02
-#define ZBX_DB_EVENT_INFO_TRIGGERS	0x04
-
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);
 int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
@@ -47,8 +42,8 @@ int	process_events(void);
 int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock, int mode);
 int	flush_correlated_events(void);
 
-void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT **events, int *events_num, int *flags);
-int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event, int *flag, char **error);
-void	free_event_info(DB_EVENT *event, int flag);
+void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT *events);
+int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event, char **error);
+void	free_event_info(DB_EVENT *event);
 
 #endif
