@@ -989,7 +989,7 @@ static int	DBpatch_3030076(void)
 				"2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\n"
 				"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}\n\n"
 				"Original event ID: {EVENT.ID}' "
-			"where eventsource=3"))
+			"where eventsource=0"))
 		return FAIL;
 
 	return SUCCEED;
