@@ -62,13 +62,15 @@ class CWidgetFieldNumericBox extends CWidgetField
 	public function validate()
 	{
 		$errors = parent::validate();
+		$value = $this->getValue(true);
 
-		if (!($this->getValue(true) >= $this->min && $this->getValue(true) <= $this->max)) {
+		if ($value !== null && !($value >= $this->min && $value <= $this->max)) {
 			$errors[] = _s(
 				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-				$this->getValue(), $this->getName(), $this->min, $this->max
+				$value, $this->getName(), $this->min, $this->max
 			);
 		}
 		return $errors;
 	}
+
 }

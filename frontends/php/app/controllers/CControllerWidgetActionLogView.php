@@ -37,8 +37,8 @@ class CControllerWidgetActionLogView extends CController
 
 	protected function checkInput() {
 		$fields = [
-			'fields' => 'required|array',
-			'name' =>   'required|string'
+			'fields' =>	'required|array',
+			'name' =>	'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
