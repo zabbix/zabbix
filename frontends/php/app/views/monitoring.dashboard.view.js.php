@@ -113,6 +113,7 @@
 		jQuery('#groupid', edit_button.closest('ul')).closest('li').hide();
 		jQuery('#hostid', edit_button.closest('ul')).closest('li').hide();
 		jQuery('#dashbrd-actions').closest('li').hide();
+		jQuery('.btn-max').closest('li').hide();
 
 		edit_button.closest('ul').before(
 			jQuery('<span>')
