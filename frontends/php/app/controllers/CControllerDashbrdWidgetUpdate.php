@@ -137,16 +137,12 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 		if ($this->getInput('save') == WIDGET_CONFIG_DO_SAVE) {
 			$dashboard = [
+				'name' => $this->getInput('name'),
+				'userid' => $this->getInput('userid', 0),
 				'widgets' => []
 			];
 			if ($this->hasInput('dashboardid')) {
 				$dashboard['dashboardid'] = $this->getInput('dashboardid');
-			}
-			if ($this->hasInput('name')) {
-				$dashboard['name'] = $this->getInput('name');
-			}
-			if ($this->hasInput('userid')) {
-				$dashboard['userid'] = $this->getInput('userid');
 			}
 
 			foreach ($this->widgets as $widget) {

@@ -114,7 +114,8 @@ $this->addPostJS('jqBlink.blink();');
 
 $dashboard_data = [
 	// name is required for new dashboard creation
-	'name' => $data['dashboard']['name'],
+	'name'   => $data['dashboard']['name'],
+	'userid' => $data['dashboard']['owner']['id'],
 	'dynamic' => $data['dynamic']
 ];
 $dashboard_options = [];

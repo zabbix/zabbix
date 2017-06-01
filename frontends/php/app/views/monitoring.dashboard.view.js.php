@@ -176,9 +176,12 @@
 		if (typeof data.name) {
 			this.find('#name').val(data.name);
 		}
-		if (typeof data.owner) {
-			// this method should remove previous selected data because option selectedLimit = 1
-			this.find('#userid').multiSelect('addData', data.owner);
+		if ('owner' in data) {
+			if ('id' in data.owner) {
+				this.find('#userid').multiSelect('addData', data.owner);
+			} else {
+				this.find('#userid').multiSelect('clean');
+			}
 		}
 		if (typeof data.private !== 'undefined') {
 			addPopupValues({'object': 'private', 'values': [data.private] });
@@ -199,43 +202,32 @@
 		var edit_form = jQuery('form[name="dashboard_form"]');
 
 		function save_previous_form_state(form) {
-			var userElement = form.find('#userid'),
-				owner;
+			var userElement = form.find('#userid');
 
 			if (typeof userElement.data('multiSelect') !== 'undefined') {
 				owner = userElement.multiSelect('getData');
 				owner = owner[0];
 			}
-			owner = owner || userElement.data().defaultOwner;
-			form.data('data', {"name": form.find('#name').val(), "owner": owner});
-		};
+			form.data('data', {"name": form.find('#name').val(), "owner": owner || {}});
+		}
 
-		save_previous_form_state(edit_form);
+		edit_form.data(
+			'data',
+			{"name": edit_form.find('#name').val(), "owner": edit_form.find('#userid').data().defaultOwner}
+		);
 
 		edit_form.submit(function(event) {
 			var me = this,
-				errors = [],
 				form = jQuery(me),
 				formData = JSON.parse(form.formToJSON());
 
 			// cancel original event to prevent form submitting
 			event.preventDefault();
 
-			if (!formData['userid']) {
-				errors.push('<?= _('Owner cannot be empty!') ?>');
-			}
-			if (!formData['name']) {
-				errors.push('<?= _('Name cannot be empty!') ?>');
-			}
-			form.data('errors', errors);
-
-			if (errors.length > 0) {
-				return false;
-			}
 			save_previous_form_state(form);
 
 			dashboard.dashboardGrid(
-				"setDashboardData", {"name": formData['name'], "userid": formData['userid']}
+				"setDashboardData", {"name": formData['name'], "userid": formData['userid'] || 0}
 			);
 			jQuery('div.article h1').text(form.data('data').name);
 		});

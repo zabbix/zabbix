@@ -686,17 +686,11 @@
 
 		var ajax_data = {
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
+			name: data['dashboard']['name'],
+			userid: data['dashboard']['userid'],
 			widgets: ajax_widgets,
 			save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
 		};
-
-		if (typeof data['dashboard']['name'] !== 'undefined') {
-			ajax_data['name'] = data['dashboard']['name'];
-		}
-
-		if (typeof data['dashboard']['userid'] !== 'undefined') {
-			ajax_data['userid'] = data['dashboard']['userid'];
-		}
 
 		$.ajax({
 			url: url.getUrl(),
