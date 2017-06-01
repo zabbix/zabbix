@@ -4357,6 +4357,13 @@ return [
 				'ref_table' => 'events',
 				'ref_field' => 'eventid',
 			],
+			'acknowledgeid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid',
+			],
 		],
 	],
 	'history' => [
@@ -5239,7 +5246,7 @@ return [
 				'length' => 20,
 				'ref_table' => 'acknowledges',
 				'ref_field' => 'acknowledgeid',
-			]
+			],
 		],
 	],
 	'globalvars' => [
@@ -6743,6 +6750,25 @@ return [
 			],
 		],
 	],
+	'task_acknowledge' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'acknowledgeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid',
+			],
+		],
+	],
 	'sysmap_shape' => [
 		'key' => 'shapeid',
 		'fields' => [
@@ -6964,23 +6990,4 @@ return [
 			],
 		],
 	],
-	'task_acknowledge' => [
-		'key' => 'acknowledgeid',
-		'fields' => [
-			'taskid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'task',
-				'ref_field' => 'taskid',
-			],
-			'acknowledgeid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'acknowledges',
-				'ref_field' => 'acknowledgeid',
-			]
-		]
-	]
 ];
