@@ -54,6 +54,9 @@ class CWidgetField
 	}
 
 	public function setValue($value) {
+		if ($value === '' || $value === null) {
+			$value = null;
+		}
 		if ($this->save_type === ZBX_WIDGET_FIELD_TYPE_INT32) {
 			$value = (int)$value;
 		}
@@ -98,22 +101,20 @@ class CWidgetField
 			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
 		}
 
-		// If no default value is provided, set value is required
-		// TODO VM: (?) it duplicates check for required value, but having additional 'required' option,
-		//			makes functionality more visible.
-		if ($this->default === null && $this->value === null) {
-			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
-		}
-
 		return $errors;
 	}
 
 	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
 	 *
-	 * @return array  Array for widget field ready for saving in API
+	 * @return array|null  Array for widget field ready for saving in API. Return null, if field has no value.
 	 */
 	public function toApi() {
+		// Don't save field, if it doesn't have value
+		if ($this->getValue(true) === null) {
+			return null;
+		}
+
 		$widget_field = [
 			'type' => $this->save_type,
 			'name' => $this->name

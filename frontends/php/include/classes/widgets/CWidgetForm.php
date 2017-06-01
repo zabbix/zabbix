@@ -53,7 +53,10 @@ class CWidgetForm
 		$fields = [];
 
 		foreach ($this->fields as $field) {
-			$fields[] = $field->toApi();
+			$api_field = $field->toApi();
+			if ($api_field !== null) {
+				$fields[] = $api_field;
+			}
 		}
 
 		return $fields;
