@@ -1785,21 +1785,13 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			}
 		}
 
-		if (count($data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION]) == 1) {
-			$operation = $data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION][0];
-			$new_operation_formlist->addRow(_('Operation type'),
-				[operation_type2str($operation), new CVar('new_ack_operation[operationtype]', $operation)]
-			);
+		$operationtype = new CComboBox('new_ack_operation[operationtype]',
+			$data['new_ack_operation']['operationtype'], 'submit()'
+		);
+		foreach ($data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION] as $operation) {
+			$operationtype->addItem($operation, operation_type2str($operation));
 		}
-		else {
-			$operationtype = new CComboBox('new_ack_operation[operationtype]',
-				$data['new_ack_operation']['operationtype'], 'submit()'
-			);
-			foreach ($data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION] as $operation) {
-				$operationtype->addItem($operation, operation_type2str($operation));
-			}
-			$new_operation_formlist->addRow(_('Operation type'), $operationtype);
-		}
+		$new_operation_formlist->addRow(_('Operation type'), $operationtype);
 
 		$usrgrp_list = null;
 		$user_list = null;
