@@ -41,7 +41,7 @@ $multiselect = (new CMultiSelect([
 $form->addItem((new CFormList())
 	->addRow(_('Owner'), $multiselect)
 	->addRow(_('Name'),
-		(new CTextBox('name', $data['dashboard']['name']))
+		(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)

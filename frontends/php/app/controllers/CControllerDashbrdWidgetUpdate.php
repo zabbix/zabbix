@@ -35,7 +35,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		$fields = [
 			'dashboardid' =>	'db dashboard.dashboardid',
 			'userid' =>			'db dashboard.userid',
-			'name' =>			'not_empty',
+			'name' =>			'db dashboard.name|not_empty',
 			'widgets' =>		'array',
 			'save' =>			'required|in '.implode(',', [WIDGET_CONFIG_DONT_SAVE, WIDGET_CONFIG_DO_SAVE])
 		];
