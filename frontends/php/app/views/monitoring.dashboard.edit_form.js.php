@@ -20,9 +20,11 @@
 			);
 
 			edit_form.submit(function (event) {
-				var me = this,
-					form = jQuery(me),
-					formData = JSON.parse(form.formToJSON());
+				var	form = jQuery(this);
+
+				form.trimValues(['#name']);
+
+				var	formData = JSON.parse(form.formToJSON());
 
 				// cancel original event to prevent form submitting
 				event.preventDefault();
@@ -30,7 +32,7 @@
 				save_previous_form_state(form);
 
 				dashboard.dashboardGrid(
-					"setDashboardData", {"name": jQuery.trim(formData['name']), "userid": formData['userid'] || 0}
+					"setDashboardData", {"name": formData['name'], "userid": formData['userid'] || 0}
 				);
 				jQuery('div.article h1').text(form.data('data').name);
 				jQuery('#dashboard-direct-link').text(form.data('data').name);
