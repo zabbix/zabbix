@@ -503,7 +503,6 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_DBROW2UINT64(userid, row[0]);
-		ZBX_STR2UINT64(mediatypeid, row[1]);
 
 		if (SUCCEED != check_perm2system(userid) || PERM_READ > get_trigger_permission(userid, event->objectid))
 			continue;
@@ -1540,7 +1539,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 					message = action->ack_longdata;
 				}
 
-				add_sentusers_ack_msg(&user_msg, action->actionid, mediatypeid, event, NULL,
+				add_sentusers_ack_msg(&user_msg, action->actionid, mediatypeid, event, ack,
 						subject, message);
 				break;
 			case OPERATION_TYPE_COMMAND:
