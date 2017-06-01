@@ -1026,6 +1026,7 @@ ZABBIX.apps.map = (function($) {
 
 						if ('updatePosition' in node) {
 							var dimensions = node.getDimensions();
+
 							node.updatePosition({
 								x: dimensions.x,
 								y: dimensions.y
@@ -1550,36 +1551,45 @@ ZABBIX.apps.map = (function($) {
 		 * @property {string} id		Shape ID (shapeid).
 		 *
 		 * @param {object} sysmap Map object
-		 * @param {object} [shapeData] shape data from db
+		 * @param {object} [shape_data] shape data from db
 		 */
-		function Shape(sysmap, shapeData) {
+		function Shape(sysmap, shape_data) {
+			var default_data = {
+				type: SVGMapShape.TYPE_RECTANGLE,
+				x: 10,
+				y: 10,
+				width: 50,
+				height: 50,
+				border_color: '000000',
+				background_color: '',
+				border_width: 2,
+				font: 9, // Helvetica
+				font_size: 11,
+				font_color: '000000',
+				text_valign: 0,
+				text_halign: 0,
+				text: '',
+				border_type: 1
+			};
+
 			this.sysmap = sysmap;
 
-			if (!shapeData) {
-				shapeData = {
-					type: SVGMapShape.TYPE_RECTANGLE,
-					x: 10,
-					y: 10,
-					width: 50,
-					height: 50,
-					border_color: '000000',
-					background_color: '',
-					border_width: 2,
-					font: 9, // Helvetica
-					font_size: 11,
-					font_color: '000000',
-					text_valign: 0,
-					text_halign: 0,
-					text: '',
-					border_type: 1
-				};
+			if (!shape_data) {
+				shape_data = default_data;
 
 				// generate unique sysmap_shapeid
-				shapeData.sysmap_shapeid = getUniqueId();
-				shapeData.zindex = Object.keys(sysmap.shapes).length;
+				shape_data.sysmap_shapeid = getUniqueId();
+				shape_data.zindex = Object.keys(sysmap.shapes).length;
+			}
+			else {
+				for (var field in default_data) {
+					if (typeof shape_data[field] === 'undefined') {
+						shape_data[field] = default_data[field];
+					}
+				}
 			}
 
-			this.data = shapeData;
+			this.data = shape_data;
 			this.id = this.data.sysmap_shapeid;
 
 			// assign by reference
@@ -1616,6 +1626,12 @@ ZABBIX.apps.map = (function($) {
 			update: function(data) {
 				var key,
 					dimensions;
+
+				if (typeof data['type'] !== 'undefined' && /^[0-9]+$/.test(this.data.sysmap_shapeid) === true
+						&& (data['type'] == SVGMapShape.TYPE_LINE) != (this.data.type == SVGMapShape.TYPE_LINE)) {
+					delete data['sysmap_shapeid'];
+					this.data.sysmap_shapeid = getUniqueId();
+				}
 
 				for (key in data) {
 					this.data[key] = data[key];

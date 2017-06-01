@@ -47,8 +47,11 @@ A.F....... [ZBXNEXT-3570] removed the deprecated "isReadable" and "isWritable" m
 ..F....... [ZBX-10777] made checkboxes and radio buttons look the same across all browsers (asaveljevs, Pavel)
 A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 bytes; thanks to Patrick Hemmer for patch (Cemeris, Gunars, Oleg, Sasha, viktors)
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
+....I..... [ZBXNEXT-3725] added templates for network devices (internal version 0.7beta) (vzhuravlev)
 
 Bug fixes:
+........S. [ZBX-12201] fixed crash when processing SNMP trap log item, fixed log item processing without pre-processing options (wiper)
+........S. [ZBX-12199] removed condition check for recovery operations (wiper)
 ...GI..PS. [ZBX-3924] switched from POSIX extended to the PCRE regular expression library for enhanced regular expressions and consistency with frontend (vso)
 .......PS. [ZBX-11867] fixed memory leak in history cache and history cache statistics (wiper)
 ...G...... [ZBX-11671] added register information and backtrace to log when metric thread crashes (viktors)
@@ -66,11 +69,15 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-12023,ZBX-12133,ZBX-12225] fixed permissions and performance issues with event.get and problem.get methods (Sasha)
+.......PS. [ZBX-12046] fixed handling of database failure during ID selection (vso)
+..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
+.......PS. [ZBX-12142] fixed Oracle batch insert return value (wiper)
+..F....... [ZBX-11618] fixed displaying hints with no content inside (miks)
 ..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
 ..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
 ..F....... [ZBX-10807] fixed wrongly displayed field in item prototype form (miks)
-..F....... [ZBX-10754] fixed comparison of previously and newly linked web scenarios (miks)
 ..F....... [ZBX-11549] fixed 'numeric value' error in dashboard for php 7 (gcalenko, Sasha)
 ..F....... [ZBX-11559] fixed jquery binded function call on form submit (miks)
 ..F....... [ZBX-11677] fixed history page to display values in chronological order (miks)
@@ -114,7 +121,7 @@ Bug fixes:
 ..F....... [ZBX-11477] fixed lost user name in profile title (miks)
 ........S. [ZBX-11889] fixed lastaccess update for passive proxy (viktors)
 A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
-..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
+..F....... [ZBX-11960] fixed interface dragging in host edit page in the Chrome browser (vmurzins)
 ..F....... [ZBX-11925] fixed parsing of nested host groups (gcalenko, Sasha)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
@@ -481,11 +488,15 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+A......... [ZBX-12023] fixed permission issue with event.get method (Sasha)
+.......PS. [ZBX-12226] fixed configuration synchronization with Oracle databases (wiper)
+.......PS. [ZBX-12046] fixed handling of database failure during ID selection (vso)
+..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
+.......PS. [ZBX-12142] fixed Oracle batch insert return value (wiper)
 ..F....... [ZBX-10546] fixed undefined index error in host import form while importing templates (gcalenko, Ivo)
 ..F....... [ZBX-11285] fixed cookie vulnerability for tabbed forms (gcalenko)
 ..F....... [ZBX-11486] fixed duplicated error messages in screens section (miks)
 ..F....... [ZBX-10807] fixed wrongly displayed field in item prototype form (miks)
-..F....... [ZBX-10754] fixed comparison of previously and newly linked web scenarios (miks)
 ..F....... [ZBX-11549] fixed 'numeric value' error in dashboard for php 7 (gcalenko, Sasha)
 ..F....... [ZBX-11559] fixed jquery binded function call on form submit (miks)
 ..F....... [ZBX-11405] fixed conditions to display treeview button in triggers section (miks)
@@ -511,7 +522,7 @@ Bug fixes:
 ..F....... [ZBX-11477] fixed lost user name in profile title (miks)
 A......... [ZBX-10373] fixed check for screen items overlap (gcalenko, Sasha)
 ........S. [ZBX-11889] fixed lastaccess update for passive proxy (viktors)
-..F....... [ZBX-11960] fixed interface dragging in host edit page in Chome browser (vmurzins)
+..F....... [ZBX-11960] fixed interface dragging in host edit page in the Chrome browser (vmurzins)
 ..F....... [ZBX-11345] fixed webscenario update error when step does not exist (gcalenko)
 ..F....... [ZBX-11975] fixed undefined index error in web scenario step creation (vmurzins)
 .......PS. [ZBX-11980] fixed incorrect type handling in SSH checks (abs)
@@ -2160,6 +2171,10 @@ Changes for 2.2.19rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-12023] fixed permission issue with event.get method (Sasha)
+.......PS. [ZBX-12046] fixed handling of database failure during ID selection (vso)
+..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
+.......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ........S. [ZBX-12012] fixed resolving of Critical and Verbose event log levels by {ITEM.LOG.SEVERITY} macro (Sasha)
 ..F....... [ZBX-11888] fixed chart name urlencoding for web scenario reports; thanks to Kotaro Miyashita for patch (miks)
 

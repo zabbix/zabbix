@@ -2345,7 +2345,7 @@ retry_oracle:
 		goto retry_oracle;
 	}
 
-	ret = (ZBX_DB_OK == rc ? SUCCEED : FAIL);
+	ret = (ZBX_DB_OK <= rc ? SUCCEED : FAIL);
 
 #else
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
