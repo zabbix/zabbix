@@ -1731,8 +1731,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			}
 			$operation = array_merge($operation_defaults, $operation);
 
-			$operations_table
-				->addRow([
+			$operations_table->addRow([
 					(new CSpan($operation_descriptions[0][$operationid]))->setHint($operation_hints[$operationid]),
 					(new CCol(
 						new CHorList([
@@ -1754,7 +1753,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				],
 				null,
 				'ack_operations_'.$operationid
-				);
+			);
 
 			$operation['opmessage_grp'] = isset($operation['opmessage_grp'])
 				? zbx_toHash($operation['opmessage_grp'], 'usrgrpid')
@@ -1780,7 +1779,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 
 			foreach ($populate_vars as $var) {
 				if (array_key_exists($var, $data['new_ack_operation'])) {
-					$new_ack_operation_vars[] = new CVar('new_ack_operation['.$var.']', $data['new_ack_operation'][$var]);
+					$new_ack_operation_vars[] = new CVar('new_ack_operation['.$var.']',
+						$data['new_ack_operation'][$var]
+					);
 				}
 			}
 		}
@@ -1866,9 +1867,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			zbx_add_post_js($js_insert);
 		}
 		elseif ($data['new_ack_operation']['operationtype'] == OPERATION_TYPE_COMMAND) {
-			if (!isset($data['new_ack_operation']['opcommand'])) {
-					$data['new_ack_operation']['opcommand'] = [];
-				}
+			if (!array_key_exists('opcommand', $data['new_ack_operation'])) {
+				$data['new_ack_operation']['opcommand'] = [];
+			}
 			$opcommand_defaults = [
 				'type'			=> ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'scriptid'		=> '',
@@ -1882,24 +1883,26 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				'command'		=> ''
 			];
 			$data['new_ack_operation']['opcommand'] = array_merge($opcommand_defaults,
-				$data['new_ack_operation']['opcommand']);
+				$data['new_ack_operation']['opcommand']
+			);
 
 			$data['new_ack_operation']['opcommand']['script'] = '';
 			if (!zbx_empty($data['new_ack_operation']['opcommand']['scriptid'])) {
-				$userScripts = API::Script()->get([
+				$user_scripts = API::Script()->get([
 					'scriptids' => $data['new_ack_operation']['opcommand']['scriptid'],
 					'output' => API_OUTPUT_EXTEND
 				]);
-				if ($userScript = reset($userScripts)) {
-					$data['new_ack_operation']['opcommand']['script'] = $userScript['name'];
+				$user_script = reset($user_scripts);
+				if ($user_script) {
+					$data['new_ack_operation']['opcommand']['script'] = $user_script['name'];
 				}
 			}
 
 			// add participations
-			if (!isset($data['new_ack_operation']['opcommand_grp'])) {
+			if (!array_key_exists('opcommand_grp', $data['new_ack_operation'])) {
 				$data['new_ack_operation']['opcommand_grp'] = [];
 			}
-			if (!isset($data['new_ack_operation']['opcommand_hst'])) {
+			if (!array_key_exists('opcommand_hst', $data['new_ack_operation'])) {
 				$data['new_ack_operation']['opcommand_hst'] = [];
 			}
 
@@ -1910,9 +1913,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				'editable' => true
 			]);
 
-			$data['new_ack_operation']['opcommand_hst'] = array_values(
-				$data['new_ack_operation']['opcommand_hst']
-			);
+			$data['new_ack_operation']['opcommand_hst'] = array_values($data['new_ack_operation']['opcommand_hst']);
 
 			foreach ($data['new_ack_operation']['opcommand_hst'] as $ohnum => $cmd) {
 				$data['new_ack_operation']['opcommand_hst'][$ohnum]['name'] = ($cmd['hostid'] > 0)
@@ -1977,7 +1978,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			);
 
 			// type
-			$typeComboBox = new CComboBox('new_ack_operation[opcommand][type]',
+			$type_combo_box = new CComboBox('new_ack_operation[opcommand][type]',
 				$data['new_ack_operation']['opcommand']['type'],
 				'showOpTypeForm('.ACTION_ACKNOWLEDGE_OPERATION.')', [
 					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
@@ -1988,7 +1989,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				]
 			);
 
-			$userScript = [
+			$user_script = [
 				new CVar('new_ack_operation[opcommand][scriptid]',
 					$data['new_ack_operation']['opcommand']['scriptid']
 				),
@@ -2000,8 +2001,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					->addClass(ZBX_STYLE_BTN_GREY)
 			];
 
-			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-			$new_operation_formlist->addRow(_('Script name'), $userScript);
+			$new_operation_formlist->addRow(_('Type'), $type_combo_box);
+			$new_operation_formlist->addRow(_('Script name'), $user_script);
 
 			// script
 			$new_operation_formlist->addRow(_('Execute on'),
@@ -2047,7 +2048,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 
 			$passphrase = (new CTextBox('new_ack_operation[opcommand][password]',
 				$data['new_ack_operation']['opcommand']['password']
-			))
+				))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setId('new_ack_operation_opcommand_passphrase');
 			$new_operation_formlist->addRow(_('Key passphrase'), $passphrase);
@@ -2069,26 +2070,24 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				(new CTextBox('new_ack_operation[opcommand][command]',
 					$data['new_ack_operation']['opcommand']['command']
 				))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setId('new_ack_operation_opcommand_command_ipmi')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('new_ack_operation_opcommand_command_ipmi')
 			);
 		}
 
-		if (!is_null($usrgrp_list)) {
-			$new_operation_formlist
-				->addRow(_('Send to User groups'),
-					(new CDiv($usrgrp_list))
-						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-				);
+		if ($usrgrp_list) {
+			$new_operation_formlist->addRow(_('Send to User groups'),
+				(new CDiv($usrgrp_list))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			);
 		}
-		if (!is_null($user_list)) {
-			$new_operation_formlist
-				->addRow(_('Send to Users'),
-					(new CDiv($user_list))
-						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-				);
+		if ($user_list) {
+			$new_operation_formlist->addRow(_('Send to Users'),
+				(new CDiv($user_list))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			);
 		}
 
 		if (array_key_exists('opmessage', $data['new_ack_operation'])
