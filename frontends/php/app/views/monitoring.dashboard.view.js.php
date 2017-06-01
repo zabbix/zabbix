@@ -174,6 +174,7 @@
 
 	function dashboardRemoveMessages() {
 		jQuery('#dashbrd-messages').remove();
+		jQuery('.msg-good').remove();
 	}
 
 	// Function is in global scope, because it should be accessable by html onchange() attribute
