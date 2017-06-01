@@ -278,7 +278,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_uint64_create(&ackids);
 	zbx_vector_uint64_create(&eventids);
 
-	DBadd_condition_alloc(&filter, &sql_alloc, &sql_offset, "ta.taskid", ack_taskids->values,
+	DBadd_condition_alloc(&filter, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values,
 			ack_taskids->values_num);
 
 	result = DBselect(
@@ -312,11 +312,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	if (0 < ackids.values_num)
 		processed_num = process_actions_by_acknowledgments(&ackids, &eventids);
 
-	DBexecute("update task t"
-		" left join task_acknowledge ta"
-			" on ta.taskid=t.taskid"
-		" set t.status=%d"
-		" where %s", ZBX_TM_STATUS_DONE, filter);
+	DBexecute("update task t set t.status=%d where %s", ZBX_TM_STATUS_DONE, filter);
 
 	zbx_free(filter);
 
