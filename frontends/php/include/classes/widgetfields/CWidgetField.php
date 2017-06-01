@@ -98,6 +98,13 @@ class CWidgetField
 			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
 		}
 
+		// If no default value is provided, set value is required
+		// TODO VM: (?) it duplicates check for required value, but having additional 'required' option,
+		//			makes functionality more visible.
+		if ($this->default === null && $this->value === null) {
+			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
+		}
+
 		return $errors;
 	}
 
