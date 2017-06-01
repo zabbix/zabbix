@@ -343,7 +343,7 @@ static int	tm_process_tasks(int now)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
-	int			type, ret, processed_num = 0, clock, ttl;
+	int			type, processed_num = 0, clock, ttl;
 	zbx_uint64_t		taskid;
 	zbx_vector_uint64_t	ack_taskids;
 
@@ -366,30 +366,28 @@ static int	tm_process_tasks(int now)
 		{
 			case ZBX_TM_TASK_CLOSE_PROBLEM:
 				/* close problem tasks will never have 'in progress' status */
-				ret = tm_try_task_close_problem(taskid);
+				if (SUCCEED == tm_try_task_close_problem(taskid))
+					processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND:
 				/* both - 'new' and 'in progress' remote tasks should expire */
 				if (0 != ttl && clock + ttl < now)
 					tm_expire_remote_command(taskid);
-				ret = SUCCEED;
+				processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				/* close problem tasks will never have 'in progress' status */
-				ret = tm_process_remote_command_result(taskid);
+				if (SUCCEED == tm_process_remote_command_result(taskid))
+					processed_num++;
 				break;
 			case ZBX_TM_TASK_ACKNOWLEDGE:
 				zbx_vector_uint64_append(&ack_taskids, taskid);
-				ret = SUCCEED;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				ret = FAIL;
 				break;
 		}
 
-		if (FAIL != ret)
-			processed_num++;
 	}
 	DBfree_result(result);
 
