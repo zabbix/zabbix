@@ -20,6 +20,7 @@
 
 
 $this->addJsFile('multiselect.js');
+$this->includeJSfile('app/views/monitoring.dashboard.edit_form.js.php');
 
 $form = (new CForm())
 	->setName('dashboard_form')

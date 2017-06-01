@@ -20,6 +20,7 @@
 
 
 $this->addJsFile('multiselect.js');
+$this->includeJSfile('app/views/monitoring.dashboard.sharing_form.js.php');
 
 $form = (new CForm('post', (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.update')
