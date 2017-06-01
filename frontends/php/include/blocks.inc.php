@@ -42,14 +42,46 @@ function make_system_status($filter, $backurl) {
 
 	$table->setHeader($header);
 
-	// get host groups
-	$groups = API::HostGroup()->get([
-		'groupids' => $filter['groupids'],
-		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
-		'monitored_hosts' => true,
+	$options = [
 		'output' => ['groupid', 'name'],
+		'groupids' => $filter['groupids'],
+		'monitored_hosts' => true,
 		'preservekeys' => true
+	];
+
+	if (array_key_exists('hostids', $filter)) {
+		$options['hostids'] = $filter['hostids'];
+	}
+
+	$groups = API::HostGroup()->get($options);
+
+	$filter_groups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'groupids' => $filter['groupids']
 	]);
+
+	$filter_groups_names = [];
+
+	foreach ($filter_groups as $group) {
+		$filter_groups_names[] = $group['name'].'/';
+	}
+
+	$options = [
+		'output' => ['groupid', 'name'],
+		'monitored_hosts' => true,
+		'search' => ['name' => $filter_groups_names],
+		'startSearch' => true
+	];
+
+	if (array_key_exists('hostids', $filter)) {
+		$options['hostids'] = $filter['hostids'];
+	}
+
+	$child_groups = API::HostGroup()->get($options);
+
+	foreach ($child_groups as $child_group) {
+		$groups[$child_group['groupid']] = $child_group;
+	}
 
 	CArrayHelper::sort($groups, [
 		['field' => 'name', 'order' => ZBX_SORT_UP]

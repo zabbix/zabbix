@@ -221,9 +221,50 @@ else {
 	}
 }
 
-if (getRequest('filter_groupid') && !isWritableHostGroups([getRequest('filter_groupid')])) {
-	access_deny();
+// Set sub-groups of selected group.
+$filter_groupids = [];
+
+if (hasRequest('filter_groupid')) {
+	$filter_groupids = [getRequest('filter_groupid')];
+
+	$filter_groups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'groupids' => $filter_groupids,
+		'preservekeys' => true
+	]);
+
+	$filter_groups_names = [];
+
+	foreach ($filter_groups as $group) {
+		$filter_groups_names[] = $group['name'].'/';
+	}
+
+	if ($filter_groups_names) {
+		$child_groups = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'search' => ['name' => $filter_groups_names],
+			'searchByAny' => true,
+			'startSearch' => true
+		]);
+
+		foreach ($child_groups as $child_group) {
+			$filter_groupids[] = $child_group['groupid'];
+		}
+	}
 }
+
+if ($filter_groupids) {
+	$count = API::HostGroup()->get([
+		'groupids' => $filter_groupids,
+		'editable' => true,
+		'countOutput' => true
+	]);
+
+	if ($count != count($filter_groupids)) {
+		access_deny();
+	}
+}
+
 if (getRequest('filter_hostid') && !isWritableHostTemplates([getRequest('filter_hostid')])) {
 	access_deny();
 }
@@ -1290,8 +1331,36 @@ else {
 	];
 	$preFilter = count($options, COUNT_RECURSIVE);
 
-	if (isset($_REQUEST['filter_groupid']) && !empty($_REQUEST['filter_groupid'])) {
-		$options['groupids'] = $_REQUEST['filter_groupid'];
+	$filter_groupid = getRequest('filter_groupid', []);
+	if ($filter_groupid) {
+		$filter_groupids = [$filter_groupid];
+		$filter_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter_groupids,
+			'preservekeys' => true
+		]);
+
+		$filter_groups_names = [];
+		foreach ($filter_groups as $group) {
+			$filter_groups_names[] = $group['name'].'/';
+		}
+
+		if ($filter_groups_names) {
+			$child_groups = API::HostGroup()->get([
+				'output' => ['groupid'],
+				'search' => ['name' => $filter_groups_names],
+				'searchByAny' => true,
+				'startSearch' => true
+			]);
+
+			foreach ($child_groups as $child_group) {
+				$filter_groupids[] = $child_group['groupid'];
+			}
+		}
+
+		if ($filter_groupids) {
+			$options['groupids'] = $filter_groupids;
+		}
 	}
 	if (isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
 		$data['filter_hostid'] = $_REQUEST['filter_hostid'];
