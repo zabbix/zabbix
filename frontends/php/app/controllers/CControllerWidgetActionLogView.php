@@ -24,12 +24,6 @@
  */
 class CControllerWidgetActionLogView extends CController
 {
-	/**
-	 * Fields
-	 *
-	 * @var array
-	 */
-	private $fields = [];
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -61,14 +55,14 @@ class CControllerWidgetActionLogView extends CController
 
 	protected function doAction()
 	{
-		$this->fields = $this->getInput('fields');
 		$name = $this->getInput('name');
 		if ($name === '') {
 			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG];
 		}
 
-		list($sortfield, $sortorder) = $this->getSorting();
-		$alerts = $this->getAlerts($sortfield, $sortorder);
+		$fields = $this->getInput('fields');
+		list($sortfield, $sortorder) = $this->getSorting($fields['sort_triggers']);
+		$alerts = $this->getAlerts($sortfield, $sortorder, $fields['show_lines']);
 		$dbUsers = $this->getDbUsers($alerts);
 
 		$actions = API::Action()->get([
@@ -95,10 +89,11 @@ class CControllerWidgetActionLogView extends CController
 	 *
 	 * @param string $sortfield
 	 * @param string $sortorder
+	 * @param int    $show_lines
 	 *
 	 * @return array
 	 */
-	private function getAlerts($sortfield, $sortorder)
+	private function getAlerts($sortfield, $sortorder, $show_lines)
 	{
 		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
 			'a.userid,a.actionid,a.mediatypeid,mt.description'.
@@ -125,7 +120,7 @@ class CControllerWidgetActionLogView extends CController
 		}
 
 		$sql .= ' ORDER BY '.$sortfield.' '.$sortorder;
-		$alerts = DBfetchArray(DBselect($sql, $this->fields['show_lines']));
+		$alerts = DBfetchArray(DBselect($sql, $show_lines));
 		order_result($alerts, $sortfield, $sortorder);
 
 		return $alerts;
@@ -161,12 +156,13 @@ class CControllerWidgetActionLogView extends CController
 	/**
 	 * Get sorting.
 	 *
+	 * @param int $sort_triggers
 	 *
 	 * @return array
 	 */
-	private function getSorting()
+	private function getSorting($sort_triggers)
 	{
-		switch ($this->fields['sort_triggers']) {
+		switch ($sort_triggers) {
 			case SCREEN_SORT_TRIGGERS_TIME_ASC:
 				$sortfield = 'clock';
 				$sortorder = ZBX_SORT_UP;
