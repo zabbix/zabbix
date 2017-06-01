@@ -69,6 +69,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12019] fixed incorrectly displayed calendar date in maintenance edit form (miks)
 ..F....... [ZBX-11304] fixed trigger wizard expressions sorting as well as wizard crash due incorrect expression removal (miks)
 ..F....... [ZBX-11585] fixed nested host group filter in top 100 triggers, item configuration list and dashboard widgets (miks)
 A......... [ZBX-12023,ZBX-12133,ZBX-12225] fixed permissions and performance issues with event.get and problem.get methods (Sasha)
@@ -490,6 +491,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-12019] fixed incorrectly displayed calendar date in maintenance edit form (miks)
 ..F....... [ZBX-11304] fixed trigger wizard expressions sorting as well as wizard crash due incorrect expression removal (miks)
 A......... [ZBX-12023] fixed permission issue with event.get method (Sasha)
 .......PS. [ZBX-12226] fixed configuration synchronization with Oracle databases (wiper)
