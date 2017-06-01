@@ -55,6 +55,34 @@ class CControllerWidgetIssuesView extends CController {
 					$filter['groupids'] = null;
 				}
 
+				// Get sub-groups of selected groups.
+				if ($filter['groupids']) {
+					$filter_groups = API::HostGroup()->get([
+						'output' => ['name'],
+						'groupids' => $filter['groupids'],
+						'preservekeys' => true
+					]);
+
+					$filter_groups_names = [];
+
+					foreach ($filter_groups as $group) {
+						$filter_groups_names[] = $group['name'].'/';
+					}
+
+					if ($filter_groups_names) {
+						$child_groups = API::HostGroup()->get([
+							'output' => ['groupid'],
+							'search' => ['name' => $filter_groups_names],
+							'searchByAny' => true,
+							'startSearch' => true
+						]);
+
+						foreach ($child_groups as $child_group) {
+							$filter['groupids'][] = $child_group['groupid'];
+						}
+					}
+				}
+
 				if ($hide_groupids) {
 					// get all groups if no selected groups defined
 					if ($filter['groupids'] === null) {
