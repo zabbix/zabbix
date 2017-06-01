@@ -715,7 +715,6 @@ class CConfigurationExport {
 			$db_applications = API::Application()->get([
 				'output' => ['name'],
 				'applicationids' => array_keys($applicationids),
-				'inherited' => false,
 				'preservekeys' => true
 			]);
 		}
