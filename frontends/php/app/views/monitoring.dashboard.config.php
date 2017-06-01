@@ -66,14 +66,13 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
 					"&dstfld2=".$field->getName()."_caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
-		$cell = (new CDiv([
+
+		$form_list->addRow($field->getLabel(), [
 			(new CTextBox($field->getName().'_caption', $caption, true))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$select_button
-		]))->addClass(ZBX_STYLE_OVERLAY_FORM_LIST_ITEM);
-
-		$form_list->addRow($field->getLabel(), $cell);
+		]);
 	}
 }
 

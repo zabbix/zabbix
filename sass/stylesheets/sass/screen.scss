@@ -3158,10 +3158,6 @@ $form-icon-btn: (
 				display: block;
 			}
 		}
-
-		.overlay-form-list-item {
-			display: flex;
-		}
 	}
 
 	.dashbrd-widget-head {
@@ -3178,6 +3174,7 @@ $form-icon-btn: (
 
 .overlay-dialogue-body {
 	margin: 0 0 50px 0;
+	white-space: nowrap;
 }
 
 .overlay-dialogue-footer {
