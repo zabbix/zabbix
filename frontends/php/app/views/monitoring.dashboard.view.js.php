@@ -227,7 +227,7 @@
 			save_previous_form_state(form);
 
 			dashboard.dashboardGrid(
-				"setDashboardData", {"name": formData['name'], "userid": formData['userid'] || 0}
+				"setDashboardData", {"name": jQuery.trim(formData['name']), "userid": formData['userid'] || 0}
 			);
 			jQuery('div.article h1').text(form.data('data').name);
 		});
