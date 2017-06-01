@@ -819,7 +819,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 					case OPERATION_TYPE_ACK_MESSAGE:
 						$result[$i][$j][] = bold(
-							_('Notify all who added acknowledgement and involved in discussion')
+							_('Notify all who left acknowledgement and comments')
 						);
 						break;
 				}
@@ -1104,7 +1104,7 @@ function operation_type2str($type = null) {
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
 		OPERATION_TYPE_RECOVERY_MESSAGE => _('Send recovery message'),
-		OPERATION_TYPE_ACK_MESSAGE => _('Send acknowledgement message')
+		OPERATION_TYPE_ACK_MESSAGE => _('Notify all who left acknowledgement and comments')
 	];
 
 	if (is_null($type)) {

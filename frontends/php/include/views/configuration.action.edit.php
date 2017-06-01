@@ -2163,7 +2163,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		);
 	}
 
-	$action_tabs->addTab('acknowledgeTab', _('Acknowledge operations'), $acknowledge_tab);
+	$action_tabs->addTab('acknowledgeTab', _('Acknowledgement operations'), $acknowledge_tab);
 }
 
 if (!hasRequest('form_refresh')) {

@@ -1520,7 +1520,7 @@ class CAction extends CApiService {
 					if (!$userids && !$usrgrpids) {
 						$error_mesage = ($operationtype == OPERATION_TYPE_MESSAGE)
 							? _('No recipients for action operation message.')
-							: _('No recipients for acknowledge operation message.');
+							: _('No recipients for acknowledgement operation message.');
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error_mesage);
 					}
@@ -2824,7 +2824,7 @@ class CAction extends CApiService {
 						$operations_to_validate[] = $ack_operation;
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect acknowledge action operationid.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect acknowledgement action operationid.'));
 					}
 				}
 			}
