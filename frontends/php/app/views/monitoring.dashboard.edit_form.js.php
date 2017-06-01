@@ -1,7 +1,7 @@
 <script type="text/javascript">
 
 	function save_previous_form_state(form) {
-		var userElement = form.find('#userid');
+		var	userElement = form.find('#userid');
 
 		if (typeof userElement.data('multiSelect') !== 'undefined') {
 			owner = userElement.multiSelect('getData');
@@ -11,31 +11,31 @@
 	};
 
 	jQuery(document).ready(function() {
-			var edit_form = jQuery('form[name="dashboard_form"]'),
-				dashboard = jQuery('.dashbrd-grid-widget-container');
+		var	edit_form = jQuery('form[name="dashboard_form"]'),
+			dashboard = jQuery('.dashbrd-grid-widget-container');
 
-			edit_form.data(
-				'data',
-				{"name": edit_form.find('#name').val(), "owner": edit_form.find('#userid').data().defaultOwner}
+		edit_form.data(
+			'data',
+			{"name": edit_form.find('#name').val(), "owner": edit_form.find('#userid').data().defaultOwner}
+		);
+
+		edit_form.submit(function (event) {
+			var	form = jQuery(this);
+
+			form.trimValues(['#name']);
+
+			var	formData = JSON.parse(form.formToJSON());
+
+			// cancel original event to prevent form submitting
+			event.preventDefault();
+
+			save_previous_form_state(form);
+
+			dashboard.dashboardGrid(
+				"setDashboardData", {"name": formData['name'], "userid": formData['userid'] || 0}
 			);
-
-			edit_form.submit(function (event) {
-				var	form = jQuery(this);
-
-				form.trimValues(['#name']);
-
-				var	formData = JSON.parse(form.formToJSON());
-
-				// cancel original event to prevent form submitting
-				event.preventDefault();
-
-				save_previous_form_state(form);
-
-				dashboard.dashboardGrid(
-					"setDashboardData", {"name": formData['name'], "userid": formData['userid'] || 0}
-				);
-				jQuery('div.article h1').text(form.data('data').name);
-				jQuery('#dashboard-direct-link').text(form.data('data').name);
-			});
+			jQuery('div.article h1').text(form.data('data').name);
+			jQuery('#dashboard-direct-link').text(form.data('data').name);
 		});
+	});
 </script>
