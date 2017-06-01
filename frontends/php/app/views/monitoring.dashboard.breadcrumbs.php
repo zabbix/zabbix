@@ -39,7 +39,9 @@ if ($data['dashboard']['dashboardid'] != 0) {
 	}
 	$breadcrumbs[] = '/';
 	$breadcrumbs[] = (new CSpan())
-		->addItem(new CLink($data['dashboard']['name'], $url_view->getUrl()))
+		->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl()))
+			->setId('dashboard-direct-link')
+		)
 		->addClass(ZBX_STYLE_SELECTED);
 }
 

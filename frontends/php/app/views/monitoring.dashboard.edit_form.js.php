@@ -33,6 +33,7 @@
 					"setDashboardData", {"name": jQuery.trim(formData['name']), "userid": formData['userid'] || 0}
 				);
 				jQuery('div.article h1').text(form.data('data').name);
+				jQuery('#dashboard-direct-link').text(form.data('data').name);
 			});
 		});
 </script>
