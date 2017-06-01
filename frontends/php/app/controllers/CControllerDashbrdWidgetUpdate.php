@@ -58,6 +58,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			 */
 			foreach ($this->getInput('widgets', []) as $index => $widget) {
 				// TODO VM: check widgetid - if present in $widget, must be existing widget id
+
 				// TODO VM: (?) instead of adding optional fields, it may be more consistent to add additinal controller
 				//			for checking single widget. That will make this controller more straigt forward.
 				if ($this->getInput('save') == WIDGET_CONFIG_DO_SAVE) {
@@ -103,10 +104,10 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				unset($widget['fields']);
 
 				if (($errors = $widget['form']->validate()) !== []) {
-					// TODO VM: Add widget name to each error message.
+					$widget_name = (array_key_exists('name', $widget) && $widget['name'] !== '')
+						? $widget['name'] : CWidgetConfig::getKnownWidgetTypes()[$widget['type']];
 					foreach ($errors as $key => $error) {
-						// TODO VM: widgetid will not be present in case of new widget - need to find solution
-						error(_s("Error in widget (id='%s'): %s.", $widget['widgetid'], $error)); // TODO VM: (?) improve error message
+						error(_s('Error in widget "%1$s": %2$s.', $widget_name, $error));
 					}
 
 					$ret = false;
@@ -159,7 +160,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					'width' => $widget['pos']['width'],
 					'type' => $widget['type'],
 					'name' => $widget['name'],
-					'fields' => $this->prepareFields($widget['form']),
+					'fields' => $widget['form']->fieldsToApi(),
 				];
 
 				$dashboard['widgets'][] = $upd_widget;
@@ -177,6 +178,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			}
 
 			if ($result) {
+				// TODO VM: (?) we need to find a way to display message next time, page is loaded.
+				// TODO VM: ideas: processRequest in ZBase (CSession::setValue())
 				$data['redirect'] = (new CUrl('zabbix.php'))
 					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $result['dashboardids'][0])
@@ -198,31 +201,5 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($data)]));
-	}
-
-	/**
-	 * Prepares widget fields for saving.
-	 *
-	 * @param CWidgetForm $form  form object with widget fields
-	 *
-	 * @return array  Array of widget fields ready for saving in API
-	 */
-	protected function prepareFields($form) {
-		// TODO VM: (?) may be good idea to move it to CWidgetForm
-		$fields = [];
-
-		foreach ($form->getFields() as $field) {
-			$save_type = $field->getSaveType();
-
-			$widget_field = [
-				'type' => $save_type,
-				'name' => $field->getName()
-			];
-			$widget_field[CWidgetConfig::getApiFieldKey($save_type)] = $field->getValue();
-
-			$fields[] = $widget_field;
-		}
-
-		return $fields;
 	}
 }

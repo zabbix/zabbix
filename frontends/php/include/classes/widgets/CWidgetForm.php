@@ -43,4 +43,19 @@ class CWidgetForm
 
 		return $errors;
 	}
+
+	/**
+	 * Prepares array, ready to be passed to CDashboard API functions
+	 *
+	 * @return array  Array of widget fields ready for saving in API
+	 */
+	public function fieldsToApi() {
+		$fields = [];
+
+		foreach ($this->fields as $field) {
+			$fields[] = $field->toApi();
+		}
+
+		return $fields;
+	}
 }

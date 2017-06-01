@@ -31,6 +31,7 @@ class CWidgetField
 
 	/**
 	 * Create widget field (general)
+	 *
 	 * @param string $name field name in form
 	 * @param string $label label for the field in form
 	 * @param mixed $default default value
@@ -62,6 +63,7 @@ class CWidgetField
 
 	/**
 	 * Get field value
+	 *
 	 * @param bool $with_default replaces missing value with default one
 	 *
 	 * @return mixed
@@ -96,7 +98,29 @@ class CWidgetField
 			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
 		}
 
+		// If no default value is provided, set value is required
+		// TODO VM: (?) it duplicates check for required value, but having additional 'required' option,
+		//			makes functionality more visible.
+		if ($this->default === null && $this->value === null) {
+			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
+		}
+
 		return $errors;
+	}
+
+	/**
+	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
+	 *
+	 * @return array  Array for widget field ready for saving in API
+	 */
+	public function toApi() {
+		$widget_field = [
+			'type' => $this->save_type,
+			'name' => $this->name
+		];
+		$widget_field[CWidgetConfig::getApiFieldKey($this->save_type)] = $this->getValue(true);
+
+		return $widget_field;
 	}
 
 	protected function setSaveType($save_type) {

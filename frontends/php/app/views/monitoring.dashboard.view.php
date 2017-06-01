@@ -118,7 +118,9 @@ $dashboard_data = [
 	'userid' => $data['dashboard']['owner']['id'],
 	'dynamic' => $data['dynamic']
 ];
-$dashboard_options = [];
+$dashboard_options = [
+	'fullscreen' => $data['fullscreen']
+];
 if ($data['dashboard']['dashboardid'] != 0) {
 	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
 }
