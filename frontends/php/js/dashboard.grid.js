@@ -733,7 +733,7 @@
 
 	var	methods = {
 		init: function(options) {
-			options = $.extend({}, {columns: 12}, options);
+			options = $.extend({}, {columns: 12, fullscreen: 0}, options);
 			options['widget-height'] = 70;
 			options['widget-width'] = 100 / options['columns'];
 			options['rows'] = 0;
@@ -897,7 +897,7 @@
 				// (1) In case of New Dashboard from list, it will open list
 				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
 				// (3) In case of simple editing of current dashboard, it will reload same dashboard
-				location.replace('zabbix.php?action=dashboard.view');
+				location.replace('zabbix.php?action=dashboard.view&fullscreen=' + data['options']['fullscreen']);
 			});
 		},
 

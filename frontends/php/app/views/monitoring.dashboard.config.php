@@ -55,23 +55,24 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		);
 	}
 	elseif ($field instanceof CWidgetFieldItem) {
-		$caption = (array_key_exists('items', $data['captions'])
-			&& array_key_exists($field->getValue(true), $data['captions']['items']))
+		$caption = (array_key_exists($field->getValue(true), $data['captions']['items']))
 				? $data['captions']['items'][$field->getValue(true)] : '';
-		$form->addVar($field->getName(), $field->getValue(true)); // needed for popup script
+		// needed for popup script
+		$form->addVar($field->getName(),
+			($field->getValue(true) !== null) ? $field->getValue(true) : ''
+		);
 
 		$select_button = (new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
 					"&dstfld2=".$field->getName()."_caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
-		$cell = (new CDiv([
+
+		$form_list->addRow($field->getLabel(), [
 			(new CTextBox($field->getName().'_caption', $caption, true))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$select_button
-		]))->addClass(ZBX_STYLE_OVERLAY_FORM_LIST_ITEM);
-
-		$form_list->addRow($field->getLabel(), $cell);
+		]);
 	}
 	elseif ($field instanceof CWidgetFieldNumericBox) {
 		$form_list->addRow(

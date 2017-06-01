@@ -25,29 +25,10 @@ class CWidgetFieldItem extends CWidgetField
 	 *
 	 * @param string $name  field name in form
 	 * @param string $label  label for the field in form
-	 * @param string $default  default Item Id value
+	 * @param string|null $default  default Item Id value
 	 */
-	public function __construct($name, $label, $default = '0') {
+	public function __construct($name, $label, $default = null) {
 		parent::__construct($name, $label, $default, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
-	}
-
-	public function setValue($value) {
-		if (in_array($value, [null, 0, '0'])) {
-			$this->value = '0';
-		}
-		else {
-			$this->value = $value;
-		}
-		return $this;
-	}
-
-	public function validate() {
-		$errors = parent::validate();
-		if ($this->required === true && bccomp($this->value, '0') === 0) {
-			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
-		}
-
-		return $errors;
 	}
 }

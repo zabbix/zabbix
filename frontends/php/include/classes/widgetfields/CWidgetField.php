@@ -31,6 +31,7 @@ class CWidgetField
 
 	/**
 	 * Create widget field (general)
+	 *
 	 * @param string $name field name in form
 	 * @param string $label label for the field in form
 	 * @param mixed $default default value
@@ -53,6 +54,9 @@ class CWidgetField
 	}
 
 	public function setValue($value) {
+		if ($value === '' || $value === null) {
+			$value = null;
+		}
 		if ($this->save_type === ZBX_WIDGET_FIELD_TYPE_INT32) {
 			$value = (int)$value;
 		}
@@ -62,6 +66,7 @@ class CWidgetField
 
 	/**
 	 * Get field value
+	 *
 	 * @param bool $with_default replaces missing value with default one
 	 *
 	 * @return mixed
@@ -102,9 +107,14 @@ class CWidgetField
 	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
 	 *
-	 * @return array  Array for widget field ready for saving in API
+	 * @return array|null  Array for widget field ready for saving in API. Return null, if field has no value.
 	 */
 	public function toApi() {
+		// Don't save field, if it doesn't have value
+		if ($this->getValue(true) === null) {
+			return null;
+		}
+
 		$widget_field = [
 			'type' => $this->save_type,
 			'name' => $this->name

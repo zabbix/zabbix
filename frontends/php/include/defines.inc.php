@@ -1348,7 +1348,6 @@ define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
 define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');
 define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
-define('ZBX_STYLE_OVERLAY_FORM_LIST_ITEM', 'overlay-form-list-item');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
