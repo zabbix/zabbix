@@ -69,6 +69,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-12133,ZBX-12225] fixed performance issues with event.get and problem.get methods (Sasha)
 .......PS. [ZBX-12046] fixed handling of database failure during ID selection (vso)
 ..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
 .......PS. [ZBX-12142] fixed Oracle batch insert return value (wiper)
