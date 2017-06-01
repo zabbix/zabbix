@@ -270,15 +270,15 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	int			processed_num = 0;
 	zbx_uint64_t		ackid, eventid;
 	zbx_vector_uint64_t	ackids, eventids;
-	char			*filter_s = NULL, *filter_u = NULL;
-	size_t			sql_s_alloc = 0, sql_s_offset = 0, sql_u_alloc = 0, sql_u_offset = 0;
+	char			*filter = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_create(&ackids);
 	zbx_vector_uint64_create(&eventids);
 
-	DBadd_condition_alloc(&filter_s, &sql_s_alloc, &sql_s_offset, "ta.taskid", ack_taskids->values,
+	DBadd_condition_alloc(&filter, &sql_alloc, &sql_offset, "ta.taskid", ack_taskids->values,
 			ack_taskids->values_num);
 
 	result = DBselect(
@@ -291,7 +291,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 			" left join task t"
 				" on ta.taskid=t.taskid"
 			" where t.status=%d and%s",
-			ZBX_TM_STATUS_NEW, filter_s);
+			ZBX_TM_STATUS_NEW, filter);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -308,21 +308,17 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 		zbx_vector_uint64_append(&ackids, ackid);
 	}
 	DBfree_result(result);
-	zbx_free(filter_s);
 
 	if (0 < ackids.values_num)
 		processed_num = process_actions_by_acknowledgments(&ackids, &eventids);
-
-	DBadd_condition_alloc(&filter_u, &sql_u_alloc, &sql_u_offset, "ta.acknowledgeid", ack_taskids->values,
-			ack_taskids->values_num);
 
 	DBexecute("update task t"
 		" left join task_acknowledge ta"
 			" on ta.taskid=t.taskid"
 		" set t.status=%d"
-		" where %s", ZBX_TM_STATUS_DONE, filter_u);
+		" where %s", ZBX_TM_STATUS_DONE, filter);
 
-	zbx_free(filter_u);
+	zbx_free(filter);
 
 	zbx_vector_uint64_destroy(&ackids);
 	zbx_vector_uint64_destroy(&eventids);
