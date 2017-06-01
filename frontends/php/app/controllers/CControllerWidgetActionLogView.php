@@ -55,14 +55,13 @@ class CControllerWidgetActionLogView extends CController
 
 	protected function doAction()
 	{
-		$name = $this->getInput('name');
-		if ($name === '') {
-			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG];
-		}
+		$data = [
+			'name' => $this->getInput('name') ?: CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG]
+		];
 
-		$fields = $this->getInput('fields');
-		list($sortfield, $sortorder) = $this->getSorting($fields['sort_triggers']);
-		$alerts = $this->getAlerts($sortfield, $sortorder, $fields['show_lines']);
+		$data += $this->getInput('fields');
+		list($sortfield, $sortorder) = $this->getSorting($data['sort_triggers']);
+		$alerts = $this->getAlerts($sortfield, $sortorder, $data['show_lines']);
 		$dbUsers = $this->getDbUsers($alerts);
 
 		$actions = API::Action()->get([
@@ -72,7 +71,7 @@ class CControllerWidgetActionLogView extends CController
 		]);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $name,
+			'name' => $data['name'],
 			'actions' => $actions,
 			'alerts'  => $alerts,
 			'db_users' => $dbUsers,
