@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../src/main/resources/templates/metrics.xsd">
+  <template>
+  <!-- http://community.brocade.com/t5/Fibre-Channel-SAN/Is-Fabric-watch-license-necessary-for-getting-info-CPU-memory/td-p/72057
+  http://community.brocade.com/t5/Ethernet-Fabric-VDX-CNA/I-have-found-CPU-OIDs-of-FC-Switch-1-3-6-1-4-1-1588-2-1-1-1-26/td-p/6375
+  license is required
+  -->
+	  <classes>
+	  	<class>Inventory</class>
+	  	<class>Performance</class>
+	  	<class>Fault</class>
+	  </classes>
+	  <name>Template Brocade</name>
+	  <description>Template Brocade</description>
+	  <sysObjectID>xxx</sysObjectID>
+	  <!--  .1.3.6.1.4.1.1588.2.1.1.1
+			.1.3.6.1.4.1.1588.2.1.1.71
+	   -->
+	  <discoveryRules>
+  	  	<discoveryRule>
+				<name>Entity Discovery</name>
+                <snmp_oid>discovery[{#ENT_CLASS},.1.3.6.1.2.1.47.1.1.1.1.5]</snmp_oid>
+                <key>entity.discovery</key>
+                 <filter>
+                     <evaltype>0</evaltype>
+                     <formula/>
+                     <conditions>
+						<condition>
+                             <macro>{#ENT_CLASS}</macro>
+                             <value>1</value><!-- 1 - chassis-->
+                             <operator>8</operator>
+                             <formulaid>A</formulaid>
+                         </condition>
+                     </conditions>
+                 </filter>                
+		</discoveryRule>
+
+  	  	<discoveryRule>
+				<name>Temperature Discovery</name>
+                <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
+                <key>temperature.discovery</key>
+                 <filter>
+                     <evaltype>0</evaltype>
+                     <formula/>
+                     <conditions>
+						<condition>
+                             <macro>{#SENSOR_TYPE}</macro>
+                             <value>1</value><!-- 1 - temperature, 2 fan, 3 power-supply -->
+                             <operator>8</operator>
+                             <formulaid>A</formulaid>
+                         </condition>
+                     </conditions>
+                 </filter>                
+		</discoveryRule>
+		
+  	  	<discoveryRule>
+				<name>PSU Discovery</name>
+                <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
+                <key>psu.discovery</key>
+                 <filter>
+                     <evaltype>0</evaltype>
+                     <formula/>
+                     <conditions>
+						<condition>
+                             <macro>{#SENSOR_TYPE}</macro>
+                             <value>3</value><!-- 1 - temperature, 2 fan, 3 power-supply -->
+                             <operator>8</operator>
+                             <formulaid>A</formulaid>
+                         </condition>
+                     </conditions>
+                 </filter>                
+		</discoveryRule>		
+
+  	  	<discoveryRule>
+				<name>FAN Discovery</name>
+                <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
+                <key>fan.discovery</key>
+                 <filter>
+                     <evaltype>0</evaltype>
+                     <formula/>
+                     <conditions>
+						<condition>
+                             <macro>{#SENSOR_TYPE}</macro>
+                             <value>2</value><!-- 1 - temperature, 2 fan, 3 power-supply -->
+                             <operator>8</operator>
+                             <formulaid>A</formulaid>
+                         </condition>
+                     </conditions>
+                 </filter>                
+		</discoveryRule>
+		
+	  </discoveryRules>
+	  <metrics>
+	    <system.cpu.util>
+	      <oid>1.3.6.1.4.1.1588.2.1.1.1.26.1.0</oid>
+	      <snmpObject>swCpuUsage.0</snmpObject>
+	      <mib>SW-MIB</mib>
+	      <vendorDescription>System's CPU usage.</vendorDescription>
+	    </system.cpu.util>
+
+	    <vm.memory.pused>
+			<oid>1.3.6.1.4.1.1588.2.1.1.1.26.6.0</oid>
+	        <snmpObject>swMemUsage.0</snmpObject>
+	        <mib>SW-MIB</mib>	    	  
+	    </vm.memory.pused>
+	    
+		<sensor.temp.value>
+	    	  <oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}</oid>
+		      <snmpObject>swSensorValue.{#SNMPINDEX}</snmpObject>
+		      <mib>SW-MIB</mib>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <alarmObject>{#SENSOR_INFO}</alarmObject>
+	    </sensor.temp.value>
+	    
+   		<sensor.temp.status>
+	    	  <oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</oid>
+		      <snmpObject>swSensorStatus.{#SNMPINDEX}</snmpObject>
+		      <mib>SW-MIB</mib>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <alarmObject>{#SENSOR_INFO}</alarmObject>
+		      <valueMap>SW-MIB::swSensorStatus</valueMap>
+	    </sensor.temp.status>
+	    
+     	<system.status>
+	    	  <oid>1.3.6.1.4.1.1588.2.1.1.1.1.7.0</oid>
+		      <snmpObject>swOperStatus.0</snmpObject>
+		      <mib>SW-MIB</mib>
+		      <vendorDescription>The current operational status of the switch.The states are as follow:
+		       online(1) means the switch is accessible by an external  Fibre Channel port;
+		       offline(2) means the switch is not accessible;
+		       testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port;
+		       faulty(4) means the switch is not operational.
+		      </vendorDescription>
+		      <valueMap>SW-MIB::swOperStatus</valueMap>
+	    </system.status>
+	    
+	    <sensor.psu.status>
+	    	  <oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</oid>
+		      <snmpObject>swSensorStatus.{#SNMPINDEX}</snmpObject>
+		      <mib>SW-MIB</mib>
+		      <discoveryRule>PSU Discovery</discoveryRule>
+		      <alarmObject>{#SENSOR_INFO}</alarmObject>
+		      <valueMap>SW-MIB::swSensorStatus</valueMap>
+	    </sensor.psu.status>
+	    
+ 	    <sensor.fan.status>
+	    	  <oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</oid>
+		      <snmpObject>swSensorStatus.{#SNMPINDEX}</snmpObject>
+		      <mib>SW-MIB</mib>
+		      <discoveryRule>FAN Discovery</discoveryRule>
+		      <alarmObject>{#SENSOR_INFO}</alarmObject>
+		      <valueMap>SW-MIB::swSensorStatus</valueMap>
+	    </sensor.fan.status>
+ 	    <sensor.fan.speed>
+	    	  <oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}</oid>
+		      <snmpObject>swSensorValue.{#SNMPINDEX}</snmpObject>
+		      <mib>SW-MIB</mib>
+		      <discoveryRule>FAN Discovery</discoveryRule>
+		      <alarmObject>{#SENSOR_INFO}</alarmObject>
+		      <vendorDescription>
+		      The current value (reading) of the sensor.
+		      The value, -2147483648, represents an unknown quantity.
+			  The fan value will be in RPM(revolution per minute);
+		      </vendorDescription>
+	    </sensor.fan.speed>   	    
+
+ 	   <system.hw.model>  <!-- discovery means you can't populate inventory fields -->
+	    	  <oid>1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}</oid>
+		      <snmpObject>entPhysicalDescr.{#SNMPINDEX}</snmpObject>
+		      <mib>ENTITY-MIB</mib>	 
+		      <discoveryRule>Entity Discovery</discoveryRule>	
+	    </system.hw.model>
+		<system.hw.serialnumber> <!--  do not use ENTITY MIB, its not always available -->
+	    	  <oid>.1.3.6.1.4.1.1588.2.1.1.1.1.10.0</oid>
+		      <snmpObject>swSsn.0</snmpObject>
+		      <mib>SW-MIB</mib>
+	    </system.hw.serialnumber> 
+	    
+	    <system.hw.firmware>
+	    	<oid>1.3.6.1.4.1.1588.2.1.1.1.1.6.0</oid>
+	        <snmpObject>swFirmwareVersion.0</snmpObject>
+		    <mib>SW-MIB</mib>
+	    </system.hw.firmware>
+
+	    
+	   </metrics>
+		<macros>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>75</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>65</value>
+            </macro>
+              
+              <macro>
+                  <macro>{$HEALTH_CRIT_STATUS}</macro>
+                  <value>4</value>
+              </macro>
+              <macro>
+                  <macro>{$HEALTH_WARN_STATUS}</macro>
+                  <value>2</value> <!-- 2 - offline swOperStatus -->
+              </macro>
+              <macro>
+                  <macro>{$TEMP_WARN_STATUS}</macro>
+                  <value>5</value> <!-- above-max(5) -->
+              </macro>
+              <macro>
+                  <macro>{$PSU_CRIT_STATUS}</macro>
+                  <value>2</value> <!-- faulty(2) -->
+              </macro>
+               <macro>
+                  <macro>{$FAN_CRIT_STATUS}</macro>
+                  <value>2</value> <!-- faulty(2) -->
+                </macro>
+		        <macro>
+		            <macro>{$PSU_OK_STATUS}</macro>
+		            <value>4</value> <!-- 4 nominal -->
+		        </macro>
+		        <macro>
+		            <macro>{$FAN_OK_STATUS}</macro>
+		            <value>4</value> <!-- 4 nominal -->
+		        </macro>                  
+              </macros>	   
+  </template>
+      <value_maps>
+      
+      <!-- swSensorStatus 1: unknown(1)
+	2: faulty(2)
+	3: below-min(3)
+	4: nominal(4)
+	5: above-max(5)
+	6: absent(6) -->
+	<value_map>
+            <name>SW-MIB::swSensorStatus</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>faulty</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>below-min</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>nominal</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>above-max</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>absent</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>	      
+      
+        <value_map>
+            <name>SW-MIB::swOperStatus</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>online</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>offline</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>testing</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>faulty</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+    </value_maps>    
+  </tns:root>
