@@ -1697,7 +1697,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 }
 
 // Acknowledge operations
-if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
+if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$action_formname = $actionForm->getName();
 
 	$acknowledge_tab = (new CFormList('operationlist'))
