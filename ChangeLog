@@ -488,6 +488,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+.......PS. [ZBX-12226] fixed configuration synchronization with Oracle databases (wiper)
 .......PS. [ZBX-12046] fixed handling of database failure during ID selection (vso)
 ..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
 .......PS. [ZBX-12142] fixed Oracle batch insert return value (wiper)
