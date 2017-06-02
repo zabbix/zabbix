@@ -36,7 +36,7 @@ zbx_uint32_t	zbx_alerter_serialize_result(unsigned char **data, int errcode, con
 
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, errcode);
-	ptr += zbx_serialize_str(ptr, errmsg, errmsg_len);
+	(void)zbx_serialize_str(ptr, errmsg, errmsg_len);
 
 	return data_len;
 }
@@ -46,7 +46,7 @@ void	zbx_alerter_deserialize_result(const unsigned char *data, int *errcode, cha
 	zbx_uint32_t	errmsg_len;
 
 	data += zbx_deserialize_value(data, errcode);
-	data += zbx_deserialize_str(data, errmsg, errmsg_len);
+	(void)zbx_deserialize_str(data, errmsg, errmsg_len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t alertid, const char *sendto,
@@ -90,7 +90,7 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 	ptr += zbx_serialize_value(ptr, smtp_verify_host);
 	ptr += zbx_serialize_value(ptr, smtp_authentication);
 	ptr += zbx_serialize_str(ptr, username, username_len);
-	ptr += zbx_serialize_str(ptr, password, password_len);
+	(void)zbx_serialize_str(ptr, password, password_len);
 
 	return data_len;
 }
@@ -115,7 +115,7 @@ void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *aler
 	data += zbx_deserialize_value(data, smtp_verify_host);
 	data += zbx_deserialize_value(data, smtp_authentication);
 	data += zbx_deserialize_str(data, username, len);
-	data += zbx_deserialize_str(data, password, len);
+	(void)zbx_deserialize_str(data, password, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_jabber(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
@@ -139,7 +139,7 @@ zbx_uint32_t	zbx_alerter_serialize_jabber(unsigned char **data, zbx_uint64_t ale
 	ptr += zbx_serialize_str(ptr, subject, subject_len);
 	ptr += zbx_serialize_str(ptr, message, message_len);
 	ptr += zbx_serialize_str(ptr, username, username_len);
-	ptr += zbx_serialize_str(ptr, password, password_len);
+	(void)zbx_serialize_str(ptr, password, password_len);
 
 	return data_len;
 }
@@ -154,7 +154,7 @@ void	zbx_alerter_deserialize_jabber(const unsigned char *data, zbx_uint64_t *ale
 	data += zbx_deserialize_str(data, subject, len);
 	data += zbx_deserialize_str(data, message, len);
 	data += zbx_deserialize_str(data, username, len);
-	data += zbx_deserialize_str(data, password, len);
+	(void)zbx_deserialize_str(data, password, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
@@ -174,7 +174,7 @@ zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alerti
 	ptr += zbx_serialize_value(ptr, alertid);
 	ptr += zbx_serialize_str(ptr, sendto, sendto_len);
 	ptr += zbx_serialize_str(ptr, message, message_len);
-	ptr += zbx_serialize_str(ptr, gsm_modem, gsm_modem_len);
+	(void)zbx_serialize_str(ptr, gsm_modem, gsm_modem_len);
 
 	return data_len;
 }
@@ -187,7 +187,7 @@ void	zbx_alerter_deserialize_sms(const unsigned char *data, zbx_uint64_t *alerti
 	data += zbx_deserialize_value(data, alertid);
 	data += zbx_deserialize_str(data, sendto, len);
 	data += zbx_deserialize_str(data, message, len);
-	data += zbx_deserialize_str(data, gsm_modem, len);
+	(void)zbx_deserialize_str(data, gsm_modem, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_eztexting(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
@@ -211,7 +211,7 @@ zbx_uint32_t	zbx_alerter_serialize_eztexting(unsigned char **data, zbx_uint64_t 
 	ptr += zbx_serialize_str(ptr, message, message_len);
 	ptr += zbx_serialize_str(ptr, username, username_len);
 	ptr += zbx_serialize_str(ptr, password, password_len);
-	ptr += zbx_serialize_str(ptr, exec_path, exec_path_len);
+	(void)zbx_serialize_str(ptr, exec_path, exec_path_len);
 
 	return data_len;
 }
@@ -226,7 +226,7 @@ void	zbx_alerter_deserialize_eztexting(const unsigned char *data, zbx_uint64_t *
 	data += zbx_deserialize_str(data, message, len);
 	data += zbx_deserialize_str(data, username, len);
 	data += zbx_deserialize_str(data, password, len);
-	data += zbx_deserialize_str(data, exec_path, len);
+	(void)zbx_deserialize_str(data, exec_path, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alertid, const char *command)
@@ -241,7 +241,7 @@ zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alert
 
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, alertid);
-	ptr += zbx_serialize_str(ptr, command, command_len);
+	(void)zbx_serialize_str(ptr, command, command_len);
 
 	return data_len;
 }
@@ -251,7 +251,7 @@ void	zbx_alerter_deserialize_exec(const unsigned char *data, zbx_uint64_t *alert
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_value(data, alertid);
-	data += zbx_deserialize_str(data, command, len);
+	(void)zbx_deserialize_str(data, command, len);
 }
 
 
