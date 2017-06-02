@@ -1234,6 +1234,9 @@ done:
 			host->jmx_items_num = 0;
 
 			host->reset_availability = 0;
+
+			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
 		}
 		else
 		{
@@ -1413,6 +1416,7 @@ done:
 			}
 		}
 #endif
+		zbx_vector_ptr_destroy(&host->interfaces_v);
 		zbx_hashset_remove_direct(&config->hosts, host);
 	}
 
@@ -1954,6 +1958,36 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		/* with {HOST.IP} and {HOST.DNS} macros                                */
 		if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
 			substitute_host_interface_macros(interface);
+
+		if (0 == found)
+		{
+			/* new interface - add it to a list of host interfaces in 'config->hosts' hashset */
+
+			ZBX_DC_HOST	*host;
+
+			if (NULL != (host = zbx_hashset_search(&config->hosts, &interface->hostid)))
+			{
+				int	exists = 0;
+
+				/* It is an error if the pointer is already in the list. Detect it. */
+
+				for (i = 0; i < host->interfaces_v.values_num; i++)
+				{
+					if (interface == host->interfaces_v.values[i])
+					{
+						exists = 1;
+						break;
+					}
+				}
+
+				if (0 == exists)
+					zbx_vector_ptr_append(&host->interfaces_v, interface);
+				else
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
 	}
 
 	/* resolve macros in other interfaces */
@@ -1969,8 +2003,24 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	/* remove deleted interfaces from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		ZBX_DC_HOST	*host;
+
 		if (NULL == (interface = zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
+
+		/* remove interface from the list of host interfaces in 'config->hosts' hashset */
+
+		if (NULL != (host = zbx_hashset_search(&config->hosts, &interface->hostid)))
+		{
+			for (i = 0; i < host->interfaces_v.values_num; i++)
+			{
+				if (interface == host->interfaces_v.values[i])
+				{
+					zbx_vector_ptr_remove(&host->interfaces_v, i);
+					break;
+				}
+			}
+		}
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 			dc_interface_snmpaddrs_remove(interface);

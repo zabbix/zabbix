@@ -278,6 +278,9 @@ typedef struct
 	const char	*snmp_error;
 	const char	*ipmi_error;
 	const char	*jmx_error;
+
+	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
+						/* 'config->interfaces' hashset */
 }
 ZBX_DC_HOST;
 
