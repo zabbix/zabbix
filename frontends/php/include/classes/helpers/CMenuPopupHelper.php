@@ -274,4 +274,26 @@ class CMenuPopupHelper {
 			'type' => 'triggerMacro'
 		];
 	}
+
+	/**
+	 * Prepare data for dependent items popup menu.
+	 *
+	 * @param string $itemid	Item id.
+	 * @param string $hostid	Host id.
+	 * @param string $name		Item name.
+	 */
+	public static function getDependentItems($itemid, $hostid, $name) {
+		$url = (new CUrl('items.php'))
+					->setArgument('form', _('Create item'))->setArgument('type', ITEM_TYPE_DEPENDENT)
+					->setArgument('hostid', $hostid)->setArgument('master_itemid', $itemid)
+					->getUrl();
+
+		return [
+			'type'		=> 'dependent_items',
+			'itemid' 	=> $itemid,
+			'item_name'	=> $name,
+			'add_label'	=> _('Create dependent item'),
+			'add_url'	=> $url
+		];
+	}
 }

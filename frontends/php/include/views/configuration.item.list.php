@@ -201,7 +201,8 @@ foreach ($this->data['items'] as $item) {
 		$triggerInfo = SPACE;
 	}
 
-	// if item type is 'Log' we must show log menu
+	$item_menu = CMenuPopupHelper::getDependentItems($item['itemid'], $item['hostid'], $item['name']);
+
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
 		$triggers = [];
 
@@ -222,19 +223,20 @@ foreach ($this->data['items'] as $item) {
 			];
 		}
 
-		$menuIcon = (new CSpan(
-			(new CButton(null))
-				->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-				->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers))
-		))->addClass(ZBX_STYLE_REL_CONTAINER);
+		$trigger_menu = CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers);
+		$trigger_menu['dependent_items'] = $item_menu;
+		$item_menu = $trigger_menu;
 	}
-	else {
-		$menuIcon = '';
-	}
+
+	$menu_icon = (new CSpan(
+		(new CButton(null))
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+			->setMenuPopup($item_menu)
+	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
-		$menuIcon,
+		$menu_icon,
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
