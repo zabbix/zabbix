@@ -265,18 +265,18 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
  ******************************************************************************/
 static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
-	int			processed_num = 0;
-	zbx_uint64_t		ackid, eventid;
-	zbx_vector_uint64_t	ackids, eventids;
-	char			*filter = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_ROW				row;
+	DB_RESULT			result;
+	int				processed_num = 0;
+	char				*filter = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_pair_t	event_ack;
+	zbx_uint64_pair_t		pair;
+
 
 	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_uint64_create(&ackids);
-	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_pair_create(&event_ack);
 
 	DBadd_condition_alloc(&filter, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values,
 			ack_taskids->values_num);
@@ -302,22 +302,20 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 			continue;
 		}
 
-		ZBX_STR2UINT64(eventid, row[0]);
-		ZBX_STR2UINT64(ackid, row[1]);
-		zbx_vector_uint64_append(&eventids, eventid);
-		zbx_vector_uint64_append(&ackids, ackid);
+		ZBX_STR2UINT64(pair.first, row[0]);
+		ZBX_STR2UINT64(pair.second, row[1]);
+		zbx_vector_uint64_pair_append_ptr(&event_ack, &pair);
 	}
 	DBfree_result(result);
 
-	if (0 < ackids.values_num)
-		processed_num = process_actions_by_acknowledgments(&ackids, &eventids);
+	if (0 < ack_taskids->values_num)
+		processed_num = process_actions_by_acknowledgments(&event_ack);
 
 	DBexecute("update task t set t.status=%d where %s", ZBX_TM_STATUS_DONE, filter);
 
 	zbx_free(filter);
 
-	zbx_vector_uint64_destroy(&ackids);
-	zbx_vector_uint64_destroy(&eventids);
+	zbx_vector_uint64_pair_destroy(&event_ack);
 
 	return processed_num;
 }

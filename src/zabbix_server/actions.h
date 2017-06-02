@@ -25,6 +25,6 @@
 
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition);
 void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint64_pair_t *closed_events);
-int	process_actions_by_acknowledgments(zbx_vector_uint64_t *ackids, zbx_vector_uint64_t *eventids);
+int	process_actions_by_acknowledgments(zbx_vector_uint64_pair_t *event_ack);
 
 #endif
