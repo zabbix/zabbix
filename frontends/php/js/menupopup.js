@@ -606,16 +606,11 @@ function getMenuPopupTriggerLog(options) {
 
 	items[items.length] = edit_trigger;
 
-	if ('dependent_items' in options) {
-		items = [
-			items,
-			getMenuPopupDependentItems(options.dependent_items)[items]
-		];
-	}
-
 	return [{
 		label: sprintf(t('Item "%1$s"'), options.itemName),
 		items: items
+	}, {
+		items: getMenuPopupDependentItems(options.dependent_items)[items]
 	}];
 }
 
@@ -635,7 +630,7 @@ function getMenuPopupDependentItems(options) {
 			label: options.add_label,
 			url: options.add_url
 		}]
-	}]
+	}];
 }
 
 /**
