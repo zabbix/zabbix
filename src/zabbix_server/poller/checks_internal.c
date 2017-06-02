@@ -281,7 +281,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			error = zbx_strdup(error, "Invalid third parameter.");
 			goto out;
 		}
-
 	}
 	else if (0 == strcmp(tmp, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess"] */
 	{
