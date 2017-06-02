@@ -375,6 +375,7 @@ class ZBase {
 	private function processRequest(CRouter $router) {
 		$controller = $router->getController();
 
+		/** @var \CController $controller */
 		$controller = new $controller();
 		$controller->setAction($router->getAction());
 		$response = $controller->run();

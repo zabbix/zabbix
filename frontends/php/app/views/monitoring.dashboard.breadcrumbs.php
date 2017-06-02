@@ -18,48 +18,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetForm
-{
-	protected $fields;
 
-	public function __construct($data) {
-		$this->fields = [];
-	}
+$url_list = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.list');
 
-	/**
-	 * Return fields for this form
-	 *
-	 * @return array  an array of CWidgetField
-	 */
-	public function getFields() {
-		return $this->fields;
-	}
-
-	public function validate() {
-		$errors = [];
-
-		foreach ($this->fields as $field) {
-			$errors = array_merge($errors, $field->validate());
-		}
-
-		return $errors;
-	}
-
-	/**
-	 * Prepares array, ready to be passed to CDashboard API functions
-	 *
-	 * @return array  Array of widget fields ready for saving in API
-	 */
-	public function fieldsToApi() {
-		$fields = [];
-
-		foreach ($this->fields as $field) {
-			$api_field = $field->toApi();
-			if ($api_field !== null) {
-				$fields[] = $api_field;
-			}
-		}
-
-		return $fields;
-	}
+if ($data['fullscreen']) {
+	$url_list->setArgument('fullscreen', '1');
 }
+
+$breadcrumbs = [
+	(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
+];
+
+if ($data['dashboard']['dashboardid'] != 0) {
+	$url_view = (new CUrl('zabbix.php'))
+		->setArgument('action', 'dashboard.view')
+		->setArgument('dashboardid', $data['dashboard']['dashboardid']);
+	if ($data['fullscreen']) {
+		$url_view->setArgument('fullscreen', '1');
+	}
+	$breadcrumbs[] = '/';
+	$breadcrumbs[] = (new CSpan())
+		->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl()))
+			->setId('dashboard-direct-link')
+		)
+		->addClass(ZBX_STYLE_SELECTED);
+}
+
+return $breadcrumbs;

@@ -42,6 +42,7 @@ class CControllerWidgetClockView extends CController {
 			 * @var string $fields['itemid']             (optional)
 			 */
 			// TODO VM: if fields are present, check that fields have enough data
+			// TODO VM: itemid -> mandotory, if time_type is TIME_TYPE_HOST
 		}
 
 		if (!$ret) {

@@ -33,8 +33,10 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>	'required|db dashboard.dashboardid',
-			'widgets' =>		'required|array',
+			'dashboardid' =>	'db dashboard.dashboardid',
+			'userid' =>			'db dashboard.userid',
+			'name' =>			'db dashboard.name|not_empty',
+			'widgets' =>		'array',
 			'save' =>			'required|in '.implode(',', [WIDGET_CONFIG_DONT_SAVE, WIDGET_CONFIG_DO_SAVE])
 		];
 
@@ -54,7 +56,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			 * @var array  $widget[]['fields']
 			 * @var string $widget[]['fields'][<name>]  (optional)
 			 */
-			foreach ($this->getInput('widgets') as $index => $widget) {
+			foreach ($this->getInput('widgets', []) as $index => $widget) {
 				// TODO VM: check widgetid - if present in $widget, must be existing widget id
 
 				// TODO VM: (?) instead of adding optional fields, it may be more consistent to add additinal controller
@@ -102,10 +104,10 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				unset($widget['fields']);
 
 				if (($errors = $widget['form']->validate()) !== []) {
-					// TODO VM: Add widget name to each error message.
+					$widget_name = (array_key_exists('name', $widget) && $widget['name'] !== '')
+						? $widget['name'] : CWidgetConfig::getKnownWidgetTypes()[$widget['type']];
 					foreach ($errors as $key => $error) {
-						// TODO VM: widgetid will not be present in case of new widget - need to find solution
-						error(_s("Error in widget (id='%s'): %s.", $widget['widgetid'], $error)); // TODO VM: (?) improve error message
+						error(_s('Error in widget "%1$s": %2$s.', $widget_name, $error));
 					}
 
 					$ret = false;
@@ -132,18 +134,24 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$return = [];
+		$data = [];
 
 		if ($this->getInput('save') == WIDGET_CONFIG_DO_SAVE) {
-			$upd_dashboard = [
-				'dashboardid' => $this->getInput('dashboardid'),
+			$dashboard = [
+				'name' => $this->getInput('name'),
+				'userid' => $this->getInput('userid', 0),
 				'widgets' => []
 			];
+			if ($this->hasInput('dashboardid')) {
+				$dashboard['dashboardid'] = $this->getInput('dashboardid');
+			}
 
 			foreach ($this->widgets as $widget) {
-				$upd_widget = [
-					'widgetid' => $widget['widgetid']
-				];
+				$upd_widget = [];
+				if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
+						&& array_key_exists('dashboardid', $dashboard)) { // TODO AV: remove check for dashboardid; related CControllerDashboardView:118
+					$upd_widget['widgetid'] = $widget['widgetid'];
+				}
 
 				$upd_widget += [
 					'row' => $widget['pos']['row'],
@@ -152,51 +160,46 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					'width' => $widget['pos']['width'],
 					'type' => $widget['type'],
 					'name' => $widget['name'],
-					'fields' => $this->prepareFields($widget['form']),
+					'fields' => $widget['form']->fieldsToApi(),
 				];
 
-				$upd_dashboard['widgets'][] = $upd_widget;
+				$dashboard['widgets'][] = $upd_widget;
 			}
 
-			$result = (bool) API::Dashboard()->update([$upd_dashboard]);
+			if (array_key_exists('dashboardid', $dashboard)) {
+				$result = API::Dashboard()->update([$dashboard]);
+				$message = _('Dashboard updated');
+				$error_msg =  _('Failed to update dashboard');
+			}
+			else {
+				$result = API::Dashboard()->create([$dashboard]);
+				$message = _('Dashboard created');
+				$error_msg = _('Failed to create dashboard');
+			}
 
 			if ($result) {
-				$return['messages'] = makeMessageBox(true, [], _('Dashboard updated'))->toString();
+				// TODO VM: (?) we need to find a way to display message next time, page is loaded.
+				// TODO VM: ideas: processRequest in ZBase (CSession::setValue())
+				$data['redirect'] = (new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('dashboardid', $result['dashboardids'][0])
+					->getUrl();
+				// @TODO should be moved from here to base logic by ZBXNEXT-3892
+				CSession::setValue('messageOk', $message);
 			}
 			else {
 				// TODO AV: improve error messages
 				if (!hasErrorMesssages()) {
-					error(_('Failed to update dashboard')); // In case of unknown error
+					error($error_msg);
 				}
-				$return['errors'] = getMessages()->toString();
 			}
 		}
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($return)]));
-	}
 
-	/**
-	 * Prepares widget fields for saving.
-	 *
-	 * @param CWidgetForm $form  form object with widget fields
-	 *
-	 * @return array  Array of widget fields ready for saving in API
-	 */
-	protected function prepareFields($form) {
-		// TODO VM: (?) may be good idea to move it to CWidgetForm
-		$fields = [];
-
-		foreach ($form->getFields() as $field) {
-			$save_type = $field->getSaveType();
-
-			$widget_field = [
-				'type' => $save_type,
-				'name' => $field->getName()
-			];
-			$widget_field[CWidgetConfig::getApiFieldKey($save_type)] = $field->getValue();
-
-			$fields[] = $widget_field;
+		if (($messages = getMessages()) !== null) {
+			// TODO AV: "errors" => "messages"
+			$data['errors'] = $messages->toString();
 		}
 
-		return $fields;
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($data)]));
 	}
 }

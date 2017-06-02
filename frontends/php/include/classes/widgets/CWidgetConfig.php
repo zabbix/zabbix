@@ -44,6 +44,48 @@ class CWidgetConfig
 	}
 
 	/**
+	 * Get default widget dimensions.
+	 *
+	 * @return array
+	 */
+	private static function getDefaultDimensions()
+	{
+		return [
+			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
+			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
+			WIDGET_LAST_ISSUES			=> ['width' => 6, 'height' => 6],
+			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
+			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
+			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 4],
+			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
+			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
+			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
+			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
+			WIDGET_URL					=> ['width' => 7, 'height' => 9]
+		];
+	}
+
+	/**
+	 * Return default values for new widgets
+	 *
+	 * @return array
+	 */
+	public static function getDefaults() {
+		$ret = [];
+		$dimensions = self::getDefaultDimensions();
+
+		foreach (self::getKnownWidgetTypes() as $type => $name) {
+			$ret[$type] = [
+				'header' => $name,
+				'rf_rate' => self::getDefaultRfRate($type),
+				'size' => $dimensions[$type]
+			];
+		}
+
+		return $ret;
+	}
+
+	/**
 	 * Return default refresh rate for widget type.
 	 *
 	 * @static
