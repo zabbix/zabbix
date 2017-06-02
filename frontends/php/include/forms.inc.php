@@ -820,6 +820,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'name' => getRequest('name', ''),
 		'description' => getRequest('description', ''),
 		'key' => getRequest('key', ''),
+		'master_itemid' => getRequest('master_itemid', ''),
 		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', 90),

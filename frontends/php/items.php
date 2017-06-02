@@ -43,6 +43,8 @@ $fields = [
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'key' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Key')],
+	'master_itemid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
+		'(isset({add}) || isset({update})) && isset({type}) && {type}=='.ITEM_TYPE_DEPENDENT, _('Master item')],
 	'delay' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
 		'(isset({add}) || isset({update})) && isset({type}) && {type}!='.ITEM_TYPE_TRAPPER.' && {type}!='.ITEM_TYPE_SNMPTRAP,
 		_('Update interval (in sec)')],
@@ -54,7 +56,7 @@ $fields = [
 	'type' =>					[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP]), 'isset({add}) || isset({update})'],
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT]), 'isset({add}) || isset({update})'],
 	'trends' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), '(isset({add}) || isset({update})) && isset({value_type}) && '.
 		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'), _('Trend storage period')
 	],
@@ -460,6 +462,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'name' => getRequest('name', ''),
 				'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 				'key_' => getRequest('key', ''),
+				'master_itemid' => getRequest('master_itemid'),
 				'interfaceid' => getRequest('interfaceid', 0),
 				'snmp_oid' => getRequest('snmp_oid', ''),
 				'snmp_community' => getRequest('snmp_community', ''),
@@ -506,7 +509,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
 					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'delay_flex',
 					'history', 'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description',
-					'status', 'templateid', 'flags'
+					'status', 'templateid', 'flags', 'master_itemid'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params'],
@@ -628,6 +631,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 				if ($db_item['description'] !== getRequest('description', '')) {
 					$item['description'] = getRequest('description', '');
+				}
+				if (getRequest('type') == ITEM_TYPE_DEPENDENT
+						&& $db_item['master_itemid'] != getRequest('master_itemid')) {
+					$item['master_itemid'] = getRequest('master_itemid');
 				}
 			}
 
@@ -1075,7 +1082,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 				'privatekey', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'master_itemid'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
@@ -1108,6 +1115,15 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
+		$data['master_itemid'] = $item['master_itemid'];
+	}
+
+	if ($data['type'] == ITEM_TYPE_DEPENDENT && $data['master_itemid']) {
+		$master = API::Item()->get([
+			'output' => ['name', 'key_'],
+			'itemids' => $data['master_itemid']
+		])[0];
+		$data['master_itemname'] = $master['name'].NAME_DELIMITER.$master['key_'];
 	}
 
 	// render view

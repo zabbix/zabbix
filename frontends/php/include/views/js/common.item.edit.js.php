@@ -259,6 +259,7 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_CALCULATED, 'params_c
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_CALCULATED, 'row_params');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'trapper_hosts');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DEPENDENT, 'row_master_item');
 foreach ($this->data['types'] as $type => $label) {
 	switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
