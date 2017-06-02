@@ -1341,7 +1341,7 @@ function getActionMessages(array $alerts, array $r_alerts) {
 					// falls through
 				case ALERT_STATUS_NOT_SENT:
 					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
-					$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
+					$retries = (new CSpan($mediaType['maxattempts'] - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
 					break;
 
 				default:

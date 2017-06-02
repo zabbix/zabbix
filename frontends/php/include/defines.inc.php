@@ -537,8 +537,6 @@ define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
 
-define('ALERT_MAX_RETRIES', 3);
-
 define('ALERT_STATUS_NOT_SENT', 0);
 define('ALERT_STATUS_SENT',		1);
 define('ALERT_STATUS_FAILED',	2);
