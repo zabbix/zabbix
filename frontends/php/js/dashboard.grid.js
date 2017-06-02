@@ -689,25 +689,31 @@
 			ajax_widgets.push(ajax_widget);
 		});
 
+		var ajax_data = {
+			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
+			name: data['dashboard']['name'],
+			userid: data['dashboard']['userid'],
+			widgets: ajax_widgets,
+			save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
+		};
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
-			data: {
-				dashboardid: data['dashboard']['id'],
-				widgets: ajax_widgets,
-				save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
-			},
+			data: ajax_data,
 			success: function(resp) {
-				if (typeof(resp.errors) !== 'undefined') {
-					// Error returned
-					dashbaordAddMessages(resp.errors);
-				}
-				else {
+				// we can have redirect with errors
+				if ('redirect' in resp) {
 					// There are no more unsaved changes
 					data['options']['updated'] = false;
-					// Reload page to get latest wiget data from server.
-					location.reload(true);
+					// Replace add possibility to remove previous url (as ..&new=1) from the document history
+					// it allows to use back browser button more user-friendly
+					window.location.replace(resp.redirect);
+				}
+				else if ('errors' in resp) {
+					// Error returned
+					dashbaordAddMessages(resp.errors);
 				}
 			},
 			error: function() {
@@ -741,11 +747,15 @@
 
 	var	methods = {
 		init: function(options) {
-			options = $.extend({}, {columns: 12, fullscreen: 0}, options);
-			options['widget-height'] = 70;
+			var default_options = {
+				'fullscreen': 0,
+				'widget-height': 70,
+				'columns': 12,
+				'rows': 0,
+				'updated': false
+			};
+			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['columns'];
-			options['rows'] = 0;
-			options['updated'] = false;
 
 			return this.each(function() {
 				var	$this = $(this),
