@@ -979,7 +979,6 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
-	time_now = time_stat;
 	time_idle = 0;
 	polled_num = 0;
 	scheduled_num = 0;
