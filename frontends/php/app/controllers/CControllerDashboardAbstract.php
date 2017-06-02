@@ -18,48 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetForm
-{
-	protected $fields;
 
-	public function __construct($data) {
-		$this->fields = [];
-	}
-
-	/**
-	 * Return fields for this form
-	 *
-	 * @return array  an array of CWidgetField
-	 */
-	public function getFields() {
-		return $this->fields;
-	}
-
-	public function validate() {
-		$errors = [];
-
-		foreach ($this->fields as $field) {
-			$errors = array_merge($errors, $field->validate());
-		}
-
-		return $errors;
-	}
+/**
+ * abstract class to keep common dashboard controller logic
+ *
+ */
+abstract class CControllerDashboardAbstract extends CController {
 
 	/**
-	 * Prepares array, ready to be passed to CDashboard API functions
+	 * Prepare editable flag.
 	 *
-	 * @return array  Array of widget fields ready for saving in API
+	 * @param array  $dashboards
 	 */
-	public function fieldsToApi() {
-		$fields = [];
+	protected function prepareEditableFlag(array &$dashboards)
+	{
+		$dashboards_rw = API::Dashboard()->get([
+			'output' => [],
+			'dashboardids' => array_keys($dashboards),
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		foreach ($this->fields as $field) {
-			$api_field = $field->toApi();
-			if ($api_field !== null) {
-				$fields[] = $api_field;
-			}
+		foreach ($dashboards as &$dashboard) {
+			$dashboard['editable'] = array_key_exists($dashboard['dashboardid'], $dashboards_rw);
 		}
-
-		return $fields;
+		unset($dashboard);
 	}
 }

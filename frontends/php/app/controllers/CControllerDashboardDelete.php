@@ -39,13 +39,7 @@ class CControllerDashboardDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		$dashboards = API::Dashboard()->get([
-			'countOutput' => true,
-			'dashboardids' => $this->getInput('dashboardids'),
-			'editable' => true
-		]);
-
-		return ($dashboards == count($this->getInput('dashboardids')));
+		return true;
 	}
 
 	protected function doAction() {

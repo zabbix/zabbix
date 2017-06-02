@@ -55,12 +55,11 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		);
 	}
 	elseif ($field instanceof CWidgetFieldItem) {
-		$caption = (array_key_exists($field->getValue(true), $data['captions']['items']))
-				? $data['captions']['items'][$field->getValue(true)] : '';
+		$caption = array_key_exists($field->getValue(true), $data['captions']['items'])
+			? $data['captions']['items'][$field->getValue(true)]
+			: '';
 		// needed for popup script
-		$form->addVar($field->getName(),
-			($field->getValue(true) !== null) ? $field->getValue(true) : ''
-		);
+		$form->addVar($field->getName(), ($field->getValue(true) !== null) ? $field->getValue(true) : '');
 
 		$select_button = (new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)

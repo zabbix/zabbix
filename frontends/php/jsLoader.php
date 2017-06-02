@@ -104,6 +104,17 @@ $tranStrings = [
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'S_DATE_FORMAT' => DATE_TIME_FORMAT
 	],
+	'dashboard.grid.js' => [
+		'Edit widget' => _('Edit widget'),
+		'Add widget' => _('Add widget'),
+		'Update' => _('Update'),
+		'Add' => _('Add'),
+		'Edit' => _('Edit'),
+		'Cancel' => _('Cancel'),
+		'Delete' => _('Delete'),
+		'You have unsaved changes.' => _('You have unsaved changes.'),
+		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?')
+	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
 		'Execute' => _('Execute'),

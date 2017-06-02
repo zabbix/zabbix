@@ -73,9 +73,11 @@ class CWidgetField
 	 */
 	public function getValue($with_default = false) {
 		$value = $this->value;
+
 		if ($with_default === true) {
 			$value = ($this->value === null) ? $this->default : $this->value; // display default value, if no other given
 		}
+
 		return $value;
 	}
 
@@ -97,6 +99,7 @@ class CWidgetField
 
 	public function validate() {
 		$errors = [];
+
 		if ($this->required === true && $this->value === null) {
 			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
 		}
