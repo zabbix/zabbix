@@ -30,6 +30,17 @@
 
 extern unsigned char	program_type;
 
+static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j, char **error)
+{
+	int	ret = FAIL;
+
+	/* TODO implementation */
+	zabbix_log(LOG_LEVEL_INFORMATION, "zbx_host_interfaces_discovery() called");
+	*error = zbx_strdup(*error, "zbx_host_interfaces_discovery() not yet implemented");
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_value_internal                                               *
@@ -275,6 +286,24 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			}
 
 			SET_UI64_RESULT(result, DCget_item_unsupported_count(item->host.hostid));
+		}
+		else if (0 == strcmp(tmp, "interfaces"))	/* zabbix["host",,"interfaces"] */
+		{
+			struct zbx_json	j;
+
+			/* this item is always processed by server */
+			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
+			{
+				error = zbx_strdup(error, "Invalid second parameter.");
+				goto out;
+			}
+
+			if (SUCCEED != zbx_host_interfaces_discovery(item->host.hostid, &j, &error))
+				goto out;
+
+			SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+			zbx_json_free(&j);
 		}
 		else
 		{
