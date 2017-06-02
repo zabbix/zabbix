@@ -142,7 +142,7 @@ $allowedSrcFields = [
 	'users'					=> '"usergrpid", "alias", "fullname", "userid"',
 	'triggers'				=> '"description", "triggerid", "expression"',
 	'trigger_prototypes'	=> '"description", "triggerid", "expression"',
-	'items'					=> '"itemid", "name"',
+	'items'					=> '"itemid", "name", "master_itemname"',
 	'graphs'				=> '"graphid", "name"',
 	'graph_prototypes'		=> '"graphid", "name"',
 	'item_prototypes'		=> '"itemid", "name", "flags"',
@@ -1282,6 +1282,7 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 
 		$description = new CLink($item['name_expanded'], 'javascript:void(0);');
 		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name_expanded'];
+		$item['master_itemname'] = $item['name_expanded'].NAME_DELIMITER.$item['key_'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
