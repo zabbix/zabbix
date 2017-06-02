@@ -37,6 +37,7 @@ class CWidgetForm
 
 	public function validate() {
 		$errors = [];
+
 		foreach ($this->fields as $field) {
 			$errors = array_merge($errors, $field->validate());
 		}

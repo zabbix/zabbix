@@ -48,7 +48,7 @@ class CWidgetConfig
 	 *
 	 * @return array
 	 */
-	public static function getDefaultDimensions()
+	private static function getDefaultDimensions()
 	{
 		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
@@ -61,7 +61,7 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
 			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
-			WIDGET_URL					=> ['width' => 7, 'height' => 9],
+			WIDGET_URL					=> ['width' => 7, 'height' => 9]
 		];
 	}
 
@@ -72,15 +72,16 @@ class CWidgetConfig
 	 */
 	public static function getDefaults() {
 		$ret = [];
-		$known_widget_types = self::getKnownWidgetTypes();
 		$dimensions = self::getDefaultDimensions();
-		foreach ($known_widget_types as $key => $value) {
-			$ret[$key] = [
-				'header' => $value,
-				'rf_rate' => self::getDefaultRfRate($key),
-				'size' => $dimensions[$key]
+
+		foreach (self::getKnownWidgetTypes() as $type => $name) {
+			$ret[$type] = [
+				'header' => $name,
+				'rf_rate' => self::getDefaultRfRate($type),
+				'size' => $dimensions[$type]
 			];
 		}
+
 		return $ret;
 	}
 

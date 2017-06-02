@@ -247,7 +247,7 @@
 				old_pos = this['pos'],
 				changed = false;
 
-			$.each(['row','col','height','width'], function(index, value) {
+			$.each(['row', 'col', 'height', 'width'], function(index, value) {
 				if (new_pos[value] !== old_pos[value]) {
 					changed = true;
 				}
@@ -433,7 +433,7 @@
 					// NOTE: it is done this way to make sure, this script is executed before script_run function below.
 					var new_script = $('<script>')
 						.attr('type', 'text/javascript')
-						.attr('src',resp.script_file);
+						.attr('src', resp.script_file);
 					widget['content_script'].append(new_script);
 				}
 				if (typeof(resp.script_inline) !== 'undefined') {
@@ -505,15 +505,16 @@
 					// Remove previous errors
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
-				} else {
+				}
+				else {
 					// No errors, proceed with update
 					overlayDialogueDestroy();
 
 					if (widget === null) {
 						// In case of ADD widget
 						// create widget with required selected fields and add it to dashboard
-						var pos = findEmptyPosition($obj, data, type);
-						var widget_data = {
+						var pos = findEmptyPosition($obj, data, type),
+							widget_data = {
 							'type': type,
 							'header': name,
 							'pos': pos,
@@ -524,7 +525,8 @@
 						// new widget is last element in data['widgets'] array
 						widget = data['widgets'].slice(-1)[0];
 						setWidgetModeEdit($obj, data, widget);
-					} else {
+					}
+					else {
 						// In case of EDIT widget
 						widget['type'] = type;
 						widget['header'] = name;
@@ -553,9 +555,10 @@
 		}
 
 		// go row by row and try to position widget in each space
-		var max_col = data['options']['columns'] - pos['width'],
+		var	max_col = data['options']['columns'] - pos['width'],
 			found = false,
 			col, row;
+
 		for (row = 0; !found; row++) {
 			for (col = 0; col <= max_col && !found; col++) {
 				pos['row'] = row;
@@ -569,16 +572,19 @@
 
 	function isPosFree($obj, data, pos) {
 		var free = true;
+
 		$.each(data['widgets'], function() {
 			if (rectOverlap(pos, this['pos'])) {
 				free = false;
 			}
 		});
+
 		return free;
 	}
 
 	function openConfigDialogue($obj, data, widget = null) {
-		var edit_mode = (widget !== null) ? true : false;
+		var edit_mode = (widget !== null);
+
 		data.dialogue = {};
 		data.dialogue.widget = widget;
 
@@ -616,15 +622,15 @@
 	}
 
 	function setWidgetModeEdit($obj, data, widget) {
-		var btn_edit = $('<button>')
+		var	btn_edit = $('<button>')
 			.attr('type', 'button')
 			.addClass('btn-widget-edit')
 			.attr('title', t('Edit'))
-			.click(function(){
+			.click(function() {
 				methods.editWidget.call($obj, widget);
 			});
 
-		var btn_delete = $('<button>')
+		var	btn_delete = $('<button>')
 			.attr('type', 'button')
 			.addClass('btn-widget-delete')
 			.attr('title', t('Delete'))
@@ -632,7 +638,7 @@
 				methods.deleteWidget.call($obj, widget);
 			});
 
-		$('ul',widget['content_header']).hide();
+		$('ul', widget['content_header']).hide();
 		widget['content_header'].append($('<ul>')
 			.addClass('dashbrd-widg-edit')
 			.append($('<li>').append(btn_edit))
@@ -648,7 +654,7 @@
 
 		// remove div from the grid
 		widget['div'].remove();
-		data['widgets'].splice(index,1);
+		data['widgets'].splice(index, 1);
 
 		// update widget-index for all following widgets
 		for (var i = index; i < data['widgets'].length; i++) {
@@ -670,7 +676,8 @@
 		url.setArgument('action', 'dashbrd.widget.update');
 
 		$.each(data['widgets'], function(index, widget) {
-			var ajax_widget = {};
+			var	ajax_widget = {};
+
 			if (widget['widgetid'] !== '') {
 				ajax_widget.widgetid = widget['widgetid'];
 			}
@@ -695,7 +702,8 @@
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned
 					dashbaordAddMessages(resp.errors);
-				} else {
+				}
+				else {
 					// There are no more unsaved changes
 					data['options']['updated'] = false;
 					// Reload page to get latest wiget data from server.
@@ -710,7 +718,7 @@
 
 	function confirmExit($obj, data) {
 		if (data['options']['updated'] === true) {
-			return t('You have unsaved changes.')+"\n"+t('Are you sure, you want to leave this page?');
+			return t('You have unsaved changes.') + "\n" + t('Are you sure, you want to leave this page?');
 		}
 	}
 
@@ -750,12 +758,14 @@
 					widget_defaults: {},
 					placeholder: $placeholder
 				});
-				var data = $this.data('dashboardGrid');
+
+				var	data = $this.data('dashboardGrid');
 
 				$this.append($placeholder.hide());
 
 				$(window).bind('beforeunload', function() {
-					var res = confirmExit($this, data);
+					var	res = confirmExit($this, data);
+
 					// return value only if we need confirmation window, return nothing othervise
 					if (typeof res !== 'undefined') {
 						return res;
@@ -925,7 +935,7 @@
 		// (when opened, as well as when requested by 'onchange' attributes in form itself)
 		updateWidgetConfigDialogue: function() {
 			return this.each(function() {
-				var $this = $(this),
+				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					body = data.dialogue['body'],
 					footer = $('.overlay-dialogue-footer', data.dialogue['div']),
@@ -1013,9 +1023,11 @@
 	$.fn.dashboardGrid = function(method) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || !method) {
+		}
+		else if (typeof method === 'object' || !method) {
 			return methods.init.apply(this, arguments);
-		} else {
+		}
+		else {
 			$.error('Invalid method "' +  method + '".');
 		}
 	}
