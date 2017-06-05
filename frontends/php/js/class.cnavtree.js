@@ -1,3 +1,12 @@
+/*
+ * Since function addPopupValues can be defined by several dashboard widgets, the variable addPopupValues should be
+ * defined in global scope and always re-written with function right before usage. Do this in all widgets where it is
+ * needed.
+ */
+if (typeof addPopupValues === 'undefined') {
+	var addPopupValues = null;
+}
+
 jQuery(function($) {
 	/**
 	 * Create Navigation Tree element.
@@ -475,8 +484,8 @@ jQuery(function($) {
 						.click(function() {
 							addPopupValues = function(data) {
 								var root = (typeof root !== 'undefined') ? root : $('ul.root', $this),
-									widget_data = $this.data('widgetData'),
-									new_item;
+										widget_data = $this.data('widgetData'),
+										new_item;
 
 								$.each(data.values, function() {
 									new_item = {
