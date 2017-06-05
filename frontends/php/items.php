@@ -462,7 +462,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'name' => getRequest('name', ''),
 				'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 				'key_' => getRequest('key', ''),
-				'master_itemid' => getRequest('master_itemid'),
 				'interfaceid' => getRequest('interfaceid', 0),
 				'snmp_oid' => getRequest('snmp_oid', ''),
 				'snmp_community' => getRequest('snmp_community', ''),
@@ -498,6 +497,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($preprocessing) {
 				$item['preprocessing'] = $preprocessing;
+			}
+
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
 			$result = (bool) API::Item()->create($item);
