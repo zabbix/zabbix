@@ -55,10 +55,18 @@ class CNavigationTree extends CDiv {
 			$sysmaps = zbx_objectValues($data['field_items'], 'mapid');
 			$this->error = null;
 			$this->field_items = $data['field_items'];
-			$this->problems = $this->getNumberOfProblemsBySysmap($sysmaps);
 			$this->submaps = $this->getSubMaps($sysmaps);
+
+			// To count also a sub-map problems, add their IDs to the $sysmaps.
+			$submapsids = [];
+			foreach ($this->submaps as $map) {
+				$submapsids = array_merge(zbx_objectValues($map, 'sysmapid'), $submapsids);
+			}
+			$sysmaps = array_merge($sysmaps, $submapsids);
+			$sysmaps = array_keys(array_flip($sysmaps));
+
+			$this->problems = $this->getNumberOfProblemsBySysmap($sysmaps);
 			$this->data = $data;
-			//$this->widgetid = $this->data['widgetid'];
 			$this->script_file = 'js/class.cnavtree.js';
 			$this->script_run = '';
 		}

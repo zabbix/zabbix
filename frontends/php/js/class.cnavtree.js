@@ -120,9 +120,15 @@ jQuery(function($) {
 						if (typeof obj.data('problems'+sev) !== 'undefined') {
 							sum += +obj.data('problems'+sev);
 						}
+
+						/*
+						 * Problems of submaps are not counted in their parent problems. Otherwise, same problems will be counted
+						 * twice.
+						 */
 						$('[data-problems'+sev+']', obj).not('.submap').each(function() {
 							sum += +$(this).data('problems'+sev);
 						});
+
 						if (sum) {
 							obj.attr('data-problems'+sev, sum);
 						}
