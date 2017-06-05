@@ -1146,4 +1146,51 @@ abstract class CItemGeneral extends CApiService {
 
 		return $result;
 	}
+
+	/**
+	 * Validate items with type ITEM_TYPE_DEPENDENT
+	 *
+	 * @throws APIException
+	 *
+	 * @param array $items	Array of items
+	 */
+	public function validateDependentItems($items) {
+		$error = '';
+		$field = '';
+
+		foreach ($items as $item) {
+			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+				continue;
+			}
+
+			if (!array_key_exists('master_itemid', $item)) {
+				$field = 'master_itemid';
+				$error = _('cannot be empty');
+				break;
+			}
+			if ($item['master_itemid'] == $item['itemid']) {
+				$field = 'master_itemid';
+				$error = _('master_itemid and itemid should not match');
+				break;
+			}
+
+			// TODO: Do we need permissions check on master item?!
+
+			$query = 'SELECT hostid FROM items WHERE itemid='.zbx_dbstr($item['master_itemid']);
+			$master = DBfetch(DBselect($query));
+
+			if (!array_key_exists('hostid', $master) || $master['hostid'] != $item['hostid']) {
+				$field = 'hostid';
+				$error = _('item hostid and master hostid should match');
+				break;
+			}
+			// TODO: Validation - Item can not be master item, tree is already at maximum allowed nesting level.
+
+			// TODO: Validation - Tree already have maximum count of children.
+		}
+
+		if ($error) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', $field,	$error));
+		}
+	}
 }
