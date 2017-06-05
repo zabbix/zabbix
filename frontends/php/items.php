@@ -1118,6 +1118,8 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		$data['master_itemid'] = $item['master_itemid'];
 	}
 
+	$data['master_itemname'] = '';
+
 	if ($data['type'] == ITEM_TYPE_DEPENDENT && $data['master_itemid']) {
 		$master = API::Item()->get([
 			'output' => ['name', 'key_'],
@@ -1288,7 +1290,7 @@ else {
 		'search' => [],
 		'output' => [
 			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
-			'templateid', 'flags', 'state'
+			'templateid', 'flags', 'state', 'master_itemid'
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
@@ -1538,6 +1540,13 @@ else {
 			}
 		}
 	}
+
+	$master_itemids = array_unique(zbx_objectValues($data['items'], 'master_itemid'));
+	$data['master_items'] = API::Item()->get([
+		'output' => ['name'],
+		'itemids' => array_filter($master_itemids),
+		'preservekeys' => true
+	]);
 
 	if ($sortField === 'status') {
 		orderItemsByStatus($data['items'], $sortOrder);

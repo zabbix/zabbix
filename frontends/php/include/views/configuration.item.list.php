@@ -98,6 +98,14 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 
+	if ($item['master_itemid']) {
+		$description[] = (new CLink(
+			CHtml::encode($data['master_items'][$item['master_itemid']]['name']),
+			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_itemid']
+		))->addClass(ZBX_STYLE_GREY);
+		$description[] = NAME_DELIMITER;
+	}
+
 	$description[] = new CLink(CHtml::encode($item['name_expanded']),
 		'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
 	);
