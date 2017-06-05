@@ -2055,9 +2055,8 @@ void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT *events)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	char			*filter_e = NULL, *filter_et = NULL, *filter_o = NULL;
-	size_t			sql_e_alloc = 0, sql_e_offset = 0, sql_et_alloc = 0, sql_et_offset = 0,
-				sql_o_alloc = 0, sql_o_offset = 0;
+	char			*filter = NULL;
+	size_t			filter_alloc = 0, filter_offset = 0;
 	zbx_vector_uint64_t	trigger_eventids, triggerids;
 	zbx_uint64_t		last_eventid = 0, triggerid, eventid, *peventid;
 	DB_EVENT 		*event = NULL;
@@ -2067,17 +2066,16 @@ void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT *events)
 	zbx_vector_uint64_create(&trigger_eventids);
 	zbx_vector_uint64_create(&triggerids);
 
-	DBadd_condition_alloc(&filter_e, &sql_e_alloc, &sql_e_offset, "eventid", eventids, ids_num);
+	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "eventid", eventids, ids_num);
 
 	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns"
 			" from events"
 			" where%s order by eventid",
-			filter_e);
+			filter);
 
 
 	for (i = 0; NULL != (row = DBfetch(result)); i++)
 	{
-
 		ZBX_STR2UINT64(eventid, row[0]);
 
 		while (eventids[i] != eventid)
@@ -2114,10 +2112,12 @@ void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT *events)
 
 	if (0 != trigger_eventids.values_num)
 	{
-		DBadd_condition_alloc(&filter_et, &sql_et_alloc, &sql_et_offset, "eventid", trigger_eventids.values,
+		filter_offset = 0;
+
+		DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "eventid", trigger_eventids.values,
 				trigger_eventids.values_num);
 
-		result = DBselect("select eventid,tag,value from event_tag where%s order by eventid", filter_et);
+		result = DBselect("select eventid,tag,value from event_tag where%s order by eventid", filter);
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -2149,7 +2149,8 @@ void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT *events)
 		zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		DBadd_condition_alloc(&filter_o, &sql_o_alloc, &sql_o_offset, "triggerid", triggerids.values,
+		filter_offset = 0;
+		DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "triggerid", triggerids.values,
 				triggerids.values_num);
 
 		result = DBselect(
@@ -2157,7 +2158,7 @@ void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT *events)
 					"recovery_mode"
 				" from triggers"
 				" where%s",
-				filter_o);
+				filter);
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -2185,6 +2186,8 @@ void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT *events)
 		}
 		DBfree_result(result);
 	}
+
+	zbx_free(filter);
 
 	zbx_vector_uint64_destroy(&trigger_eventids);
 	zbx_vector_uint64_destroy(&triggerids);
