@@ -48,7 +48,7 @@ class CMapHelper {
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
 				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
 			],
-			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'],
+			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
 			'selectUrls' => ['sysmapurlid', 'name', 'url'],
 			'sysmapids' => $sysmapids,
 			'expandUrls' => true,
