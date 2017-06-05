@@ -2113,7 +2113,6 @@ void	get_events_info(zbx_uint64_t *eventids, int ids_num, DB_EVENT *events)
 	if (0 != trigger_eventids.values_num)
 	{
 		filter_offset = 0;
-
 		DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "eventid", trigger_eventids.values,
 				trigger_eventids.values_num);
 
