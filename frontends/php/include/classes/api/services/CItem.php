@@ -534,11 +534,11 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$dependent = [];
-		foreach ($items as $item) {
-			$dependent[] = $item + $dbItems[$item['itemid']];
+		foreach ($items as &$item) {
+			$item = $item + $dbItems[(int) $item['itemid']];
 		}
-		$this->validateDependentItems($dependent);
+		unset($item);
+		$this->validateDependentItems($items);
 
 		parent::checkInput($items, true);
 		self::validateInventoryLinks($items, true);

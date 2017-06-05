@@ -702,11 +702,10 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$dependent = [];
-		foreach ($items as $item) {
-			$dependent[] = $item + $dbItems[$item['itemid']];
+		foreach ($items as &$item) {
+			$item = $item + $dbItems[$item['itemid']];
 		}
-		$this->validateDependentItems($dependent);
+		$this->validateDependentItems($items);
 		$this->checkInput($items, true);
 		$this->updateReal($items);
 		$this->inherit($items);
