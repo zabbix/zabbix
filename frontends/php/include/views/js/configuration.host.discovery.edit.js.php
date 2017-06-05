@@ -63,6 +63,9 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				})
 				.on('change', '.macro', function() {
 					updateExpression();
+				})
+				.ready(function() {
+					$('#conditionRow').toggle($('.form_row', $('#conditions')).size() > 1);
 				});
 
 			$('#evaltype').change(function() {

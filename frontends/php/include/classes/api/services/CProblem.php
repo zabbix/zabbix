@@ -42,7 +42,7 @@ class CProblem extends CApiService {
 
 		$sqlParts = [
 			'select'	=> [$this->fieldId('eventid')],
-			'from'		=> ['problem' => 'problem p'],
+			'from'		=> ['p' => 'problem p'],
 			'where'		=> [],
 			'order'		=> [],
 			'group'		=> [],
@@ -94,81 +94,75 @@ class CProblem extends CApiService {
 		$sqlParts['where'][] = 'p.source='.zbx_dbstr($options['source']);
 		$sqlParts['where'][] = 'p.object='.zbx_dbstr($options['object']);
 
-		$sub_sql_parts = [];
-
-		// triggers
-		if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-			// specific triggers
-			if ($options['objectids'] !== null) {
-				$triggers = API::Trigger()->get([
-					'output' => [],
-					'triggerids' => $options['objectids'],
-					'editable' => $options['editable'],
-					'preservekeys' => true
-				]);
-				$options['objectids'] = array_keys($triggers);
-			}
-			// all triggers
-			elseif ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-				$sub_sql_parts['from']['t'] = 'triggers t';
-				$sub_sql_parts['where']['p-t'] = 'p.objectid=t.triggerid';
-			}
-			else {
-				$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM functions f,items i,hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
-					' WHERE p.objectid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY f.triggerid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-					')';
-			}
-		}
-		elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-			// specific items or lld rules
-			if ($options['objectids'] !== null) {
-				if ($options['object'] == EVENT_OBJECT_ITEM) {
-					$items = API::Item()->get([
+		// editable + PERMISSION CHECK
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				// specific triggers
+				if ($options['objectids'] !== null) {
+					$triggers = API::Trigger()->get([
 						'output' => [],
-						'itemids' => $options['objectids'],
+						'triggerids' => $options['objectids'],
 						'editable' => $options['editable'],
 						'preservekeys' => true
 					]);
-					$options['objectids'] = array_keys($items);
+					$options['objectids'] = array_keys($triggers);
 				}
-				elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
-					$items = API::DiscoveryRule()->get([
-						'output' => [],
-						'itemids' => $options['objectids'],
-						'editable' => $options['editable'],
-						'preservekeys' => true
-					]);
-					$options['objectids'] = array_keys($items);
+				// all triggers
+				else {
+					$sqlParts['where'][] = 'NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM functions f,items i,hosts_groups hgg'.
+							' LEFT JOIN rights r'.
+								' ON r.id=hgg.groupid'.
+									' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+						' WHERE p.objectid=f.triggerid'.
+							' AND f.itemid=i.itemid'.
+							' AND i.hostid=hgg.hostid'.
+						' GROUP BY i.hostid'.
+						' HAVING MAX(permission)<'.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
+							' OR MIN(permission) IS NULL'.
+							' OR MIN(permission)='.PERM_DENY.
+						')';
 				}
 			}
-			// all items or lld rules
-			elseif ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
-			}
-			else {
-				$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i,hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
-					' WHERE p.objectid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-					')';
+			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
+				// specific items or lld rules
+				if ($options['objectids'] !== null) {
+					if ($options['object'] == EVENT_OBJECT_ITEM) {
+						$items = API::Item()->get([
+							'output' => [],
+							'itemids' => $options['objectids'],
+							'editable' => $options['editable'],
+							'preservekeys' => true
+						]);
+						$options['objectids'] = array_keys($items);
+					}
+					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
+						$items = API::DiscoveryRule()->get([
+							'output' => [],
+							'itemids' => $options['objectids'],
+							'editable' => $options['editable'],
+							'preservekeys' => true
+						]);
+						$options['objectids'] = array_keys($items);
+					}
+				}
+				// all items or lld rules
+				else {
+					$sqlParts['where'][] = 'EXISTS ('.
+						'SELECT NULL'.
+						' FROM items i,hosts_groups hgg'.
+							' JOIN rights r'.
+								' ON r.id=hgg.groupid'.
+									' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+						' WHERE p.objectid=i.itemid'.
+							' AND i.hostid=hgg.hostid'.
+						' GROUP BY hgg.hostid'.
+						' HAVING MIN(r.permission)>'.PERM_DENY.
+							' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
+						')';
+				}
 			}
 		}
 
@@ -190,21 +184,21 @@ class CProblem extends CApiService {
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sub_sql_parts['from']['f'] = 'functions f';
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
-				$sub_sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
-				$sub_sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sub_sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
-				$sub_sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sqlParts['from']['f'] = 'functions f';
+				$sqlParts['from']['i'] = 'items i';
+				$sqlParts['from']['hg'] = 'hosts_groups hg';
+				$sqlParts['where']['p-f'] = 'p.objectid=f.triggerid';
+				$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
+				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			}
 			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
-				$sub_sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
-				$sub_sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
-				$sub_sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sqlParts['from']['i'] = 'items i';
+				$sqlParts['from']['hg'] = 'hosts_groups hg';
+				$sqlParts['where']['p-i'] = 'p.objectid=i.itemid';
+				$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
+				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			}
 		}
 
@@ -214,17 +208,17 @@ class CProblem extends CApiService {
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sub_sql_parts['from']['f'] = 'functions f';
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
-				$sub_sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sub_sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sqlParts['from']['f'] = 'functions f';
+				$sqlParts['from']['i'] = 'items i';
+				$sqlParts['where']['p-f'] = 'p.objectid=f.triggerid';
+				$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
 			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
-				$sub_sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sqlParts['from']['i'] = 'items i';
+				$sqlParts['where']['p-i'] = 'p.objectid=i.itemid';
+				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
 		}
 
@@ -234,17 +228,17 @@ class CProblem extends CApiService {
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sub_sql_parts['from']['f'] = 'functions f';
-				$sub_sql_parts['from']['ia'] = 'items_applications ia';
-				$sub_sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
-				$sub_sql_parts['where']['f-ia'] = 'f.itemid=ia.itemid';
-				$sub_sql_parts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
+				$sqlParts['from']['f'] = 'functions f';
+				$sqlParts['from']['ia'] = 'items_applications ia';
+				$sqlParts['where']['p-f'] = 'p.objectid=f.triggerid';
+				$sqlParts['where']['f-ia'] = 'f.itemid=ia.itemid';
+				$sqlParts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
 			}
 			// items
 			elseif ($options['object'] == EVENT_OBJECT_ITEM) {
-				$sub_sql_parts['from']['ia'] = 'items_applications ia';
-				$sub_sql_parts['where']['p-ia'] = 'p.objectid=ia.itemid';
-				$sub_sql_parts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
+				$sqlParts['from']['ia'] = 'items_applications ia';
+				$sqlParts['where']['p-ia'] = 'p.objectid=ia.itemid';
+				$sqlParts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
 			}
 			// ignore this filter for lld rules
 		}
@@ -255,19 +249,11 @@ class CProblem extends CApiService {
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sub_sql_parts['from']['t'] = 'triggers t';
-				$sub_sql_parts['where']['p-t'] = 'p.objectid=t.triggerid';
-				$sub_sql_parts['where']['t'] = dbConditionInt('t.priority', $options['severities']);
+				$sqlParts['from']['t'] = 'triggers t';
+				$sqlParts['where']['p-t'] = 'p.objectid=t.triggerid';
+				$sqlParts['where']['t'] = dbConditionInt('t.priority', $options['severities']);
 			}
 			// ignore this filter for items and lld rules
-		}
-
-		if ($sub_sql_parts) {
-			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM '.implode(',', $sub_sql_parts['from']).
-				' WHERE '.implode(' AND ', array_unique($sub_sql_parts['where'])).
-			')';
 		}
 
 		// acknowledged

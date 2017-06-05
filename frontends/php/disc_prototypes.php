@@ -521,6 +521,7 @@ if (isset($_REQUEST['form'])) {
 
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
+	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.edit', $data);

@@ -1026,6 +1026,7 @@ ZABBIX.apps.map = (function($) {
 
 						if ('updatePosition' in node) {
 							var dimensions = node.getDimensions();
+
 							node.updatePosition({
 								x: dimensions.x,
 								y: dimensions.y
@@ -1550,36 +1551,45 @@ ZABBIX.apps.map = (function($) {
 		 * @property {string} id		Shape ID (shapeid).
 		 *
 		 * @param {object} sysmap Map object
-		 * @param {object} [shapeData] shape data from db
+		 * @param {object} [shape_data] shape data from db
 		 */
-		function Shape(sysmap, shapeData) {
+		function Shape(sysmap, shape_data) {
+			var default_data = {
+				type: SVGMapShape.TYPE_RECTANGLE,
+				x: 10,
+				y: 10,
+				width: 50,
+				height: 50,
+				border_color: '000000',
+				background_color: '',
+				border_width: 2,
+				font: 9, // Helvetica
+				font_size: 11,
+				font_color: '000000',
+				text_valign: 0,
+				text_halign: 0,
+				text: '',
+				border_type: 1
+			};
+
 			this.sysmap = sysmap;
 
-			if (!shapeData) {
-				shapeData = {
-					type: SVGMapShape.TYPE_RECTANGLE,
-					x: 10,
-					y: 10,
-					width: 50,
-					height: 50,
-					border_color: '000000',
-					background_color: '',
-					border_width: 2,
-					font: 9, // Helvetica
-					font_size: 11,
-					font_color: '000000',
-					text_valign: 0,
-					text_halign: 0,
-					text: '',
-					border_type: 1
-				};
+			if (!shape_data) {
+				shape_data = default_data;
 
 				// generate unique sysmap_shapeid
-				shapeData.sysmap_shapeid = getUniqueId();
-				shapeData.zindex = Object.keys(sysmap.shapes).length;
+				shape_data.sysmap_shapeid = getUniqueId();
+				shape_data.zindex = Object.keys(sysmap.shapes).length;
+			}
+			else {
+				for (var field in default_data) {
+					if (typeof shape_data[field] === 'undefined') {
+						shape_data[field] = default_data[field];
+					}
+				}
 			}
 
-			this.data = shapeData;
+			this.data = shape_data;
 			this.id = this.data.sysmap_shapeid;
 
 			// assign by reference
@@ -1616,6 +1626,12 @@ ZABBIX.apps.map = (function($) {
 			update: function(data) {
 				var key,
 					dimensions;
+
+				if (typeof data['type'] !== 'undefined' && /^[0-9]+$/.test(this.data.sysmap_shapeid) === true
+						&& (data['type'] == SVGMapShape.TYPE_LINE) != (this.data.type == SVGMapShape.TYPE_LINE)) {
+					delete data['sysmap_shapeid'];
+					this.data.sysmap_shapeid = getUniqueId();
+				}
 
 				for (key in data) {
 					this.data[key] = data[key];
@@ -2121,16 +2137,16 @@ ZABBIX.apps.map = (function($) {
 				);
 
 				if (this.data.elementtype === '2') {
-					// For element type trigger not exist signle element name.
+					// For element type trigger not exist single element name.
 					delete this.data['elementName'];
 				}
 				else if (this.data.elementtype === '4') {
-					// if element is image we unset advanced icons
+					// If element is image, unset advanced icons.
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
 
-					// if image element, set elementName to image name
+					// If image element, set elementName to image name.
 					for (i in this.sysmap.iconList) {
 						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
 							this.data.elementName = this.sysmap.iconList[i].name;
@@ -2383,11 +2399,12 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
-					editable: true
+					editable: true,
+					real_hosts: true
 				},
 				popup: {
-					parameters: 'srctbl=triggers&dstfrm=selementForm&dstfld1=elementNameTriggers' +
-						'&srcfld1=triggerid&multiselect=1'
+					parameters: 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers' +
+						'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
 				}
 			});
 
@@ -2497,19 +2514,26 @@ ZABBIX.apps.map = (function($) {
 							},
 							success: function(data) {
 								data = JSON.parse(data);
-								data.result.each(function(trigger) {
-									if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
-										trigger.name = triggers_to_insert[trigger.triggerid].name;
-										$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
-									}
+								triggers.each(function(sorted_trigger) {
+									data.result.each(function(trigger) {
+										if (sorted_trigger.id == trigger.triggerid) {
+											if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
+												trigger.name = triggers_to_insert[trigger.triggerid].name;
+												$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+
+												return false;
+											}
+										}
+									});
 								});
 
-								$('#elementNameTriggers').multiSelect('clean');
 								SelementForm.prototype.recalculateSortOrder();
 								SelementForm.prototype.initSortable();
 							}
 						});
 					}
+
+					$('#elementNameTriggers').multiSelect('clean');
 				}
 			},
 
@@ -3446,6 +3470,7 @@ ZABBIX.apps.map = (function($) {
 
 						if (typeof this.sysmap.selements[link.selementid1].data.elementName === 'undefined') {
 							fromElementName = this.sysmap.selements[link.selementid1].data.elements[0].elementName;
+
 							if (Object.keys(this.sysmap.selements[link.selementid1].data.elements).length > 1) {
 								fromElementName += '...';
 							}
@@ -3456,6 +3481,7 @@ ZABBIX.apps.map = (function($) {
 
 						if (typeof this.sysmap.selements[link.selementid2].data.elementName === 'undefined') {
 							toElementName = this.sysmap.selements[link.selementid2].data.elements[0].elementName;
+
 							if (Object.keys(this.sysmap.selements[link.selementid2].data.elements).length > 1) {
 								toElementName += '...';
 							}
