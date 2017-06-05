@@ -44,6 +44,8 @@ $fields = [
 	'key' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})',
 		_('Key')
 	],
+	'master_itemid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
+		'(isset({add}) || isset({update})) && isset({type}) && {type}=='.ITEM_TYPE_DEPENDENT, _('Master item')],
 	'delay' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
 		'(isset({add}) || isset({update}))'.
 			' && (isset({type}) && ({type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.'))',
@@ -55,7 +57,7 @@ $fields = [
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED,
-			ITEM_TYPE_SNMPTRAP]
+			ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT]
 		),
 		'isset({add}) || isset({update})'
 	],
@@ -382,7 +384,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt',
 					'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
 					'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
-					'snmpv3_privprotocol', 'snmpv3_contextname'
+					'snmpv3_privprotocol', 'snmpv3_contextname', 'master_itemid'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectApplicationPrototypes' => ['name'],
@@ -429,9 +431,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['preprocessing'] = $preprocessing;
 			}
 
+			if (getRequest('type') == ITEM_TYPE_DEPENDENT
+					&& $db_item['master_itemid'] != getRequest('master_itemid')) {
+				$item['master_itemid'] = getRequest('master_itemid');
+			}
+
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = getRequest('master_itemid');
+			}
+
 			$item['applications'] = $applications;
 			$item['applicationPrototypes'] = $application_prototypes;
 
@@ -505,7 +516,7 @@ if (isset($_REQUEST['form'])) {
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-				'snmpv3_contextname'
+				'snmpv3_contextname', 'master_itemid'
 			],
 			'selectPreprocessing' => ['type', 'params']
 		]);
@@ -518,6 +529,19 @@ if (isset($_REQUEST['form'])) {
 
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
+	$data['master_itemname'] = '';
+
+	if (hasRequest('itemid') && !getRequest('form_refresh')) {
+		$data['master_itemid'] = $itemPrototype['master_itemid'];
+	}
+
+	if ($data['type'] == ITEM_TYPE_DEPENDENT && $data['master_itemid']) {
+		$master = API::Item()->get([
+			'output' => ['name', 'key_'],
+			'itemids' => $data['master_itemid']
+		])[0];
+		$data['master_itemname'] = $master['name'].NAME_DELIMITER.$master['key_'];
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.edit', $data);
@@ -562,6 +586,12 @@ else {
 	}
 	unset($item);
 
+	$master_itemids = array_unique(zbx_objectValues($data['items'], 'master_itemid'));
+	$data['master_items'] = API::Item()->get([
+		'output' => ['name'],
+		'itemids' => array_filter($master_itemids),
+		'preservekeys' => true
+	]);
 	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
 	order_result($data['items'], $sortField, $sortOrder);

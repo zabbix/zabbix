@@ -326,6 +326,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public function create($items) {
 		$items = zbx_toArray($items);
+		$this->validateDependentItems($items);
 		$this->checkInput($items);
 		$this->createReal($items);
 		$this->inherit($items);
@@ -334,6 +335,12 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	protected function createReal(&$items) {
+		foreach ($items as &$item) {
+			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = null;
+			}
+		}
+		unset($item);
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = $insertItemDiscovery = [];
@@ -436,6 +443,10 @@ class CItemPrototype extends CItemGeneral {
 
 		$data = [];
 		foreach ($items as $inum => $item) {
+			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = null;
+			}
+
 			$data[] = ['values' => $item, 'where'=> ['itemid' => $item['itemid']]];
 		}
 
@@ -683,6 +694,19 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
+
+		$dbItems = $this->get([
+			'output' => ['itemid', 'flags', 'type', 'hostid', 'master_itemid'],
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$dependent = [];
+		foreach ($items as $item) {
+			$dependent[] = $item + $dbItems[$item['itemid']];
+		}
+		$this->validateDependentItems($dependent);
 		$this->checkInput($items, true);
 		$this->updateReal($items);
 		$this->inherit($items);
