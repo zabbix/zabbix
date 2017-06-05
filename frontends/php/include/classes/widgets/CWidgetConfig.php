@@ -43,35 +43,6 @@ class CWidgetConfig
 			WIDGET_NAVIGATION_TREE	=> _('Map Navigation Tree'),
 			WIDGET_URL					=> _('URL')
 		];
-
-		$this->rfRates = [
-			WIDGET_SYSTEM_STATUS		=> SEC_PER_MIN,
-			WIDGET_ZABBIX_STATUS		=> 15 * SEC_PER_MIN,
-			WIDGET_LAST_ISSUES			=> SEC_PER_MIN,
-			WIDGET_WEB_OVERVIEW			=> SEC_PER_MIN,
-			WIDGET_DISCOVERY_STATUS		=> SEC_PER_MIN,
-			WIDGET_HOST_STATUS			=> SEC_PER_MIN,
-			WIDGET_FAVOURITE_GRAPHS		=> 15 * SEC_PER_MIN,
-			WIDGET_FAVOURITE_MAPS		=> 15 * SEC_PER_MIN,
-			WIDGET_FAVOURITE_SCREENS	=> 15 * SEC_PER_MIN,
-			WIDGET_CLOCK				=> 15 * SEC_PER_MIN,
-			WIDGET_SYSMAP				=> 15 * SEC_PER_MIN,
-			WIDGET_NAVIGATION_TREE => 15 * SEC_PER_MIN,
-			WIDGET_URL					=> 0,
-		];
-
-		$this->apiFieldKeys = [
-			ZBX_WIDGET_FIELD_TYPE_INT32				=> 'value_int',
-			ZBX_WIDGET_FIELD_TYPE_STR				=> 'value_str',
-			ZBX_WIDGET_FIELD_TYPE_GROUP				=> 'value_groupid',
-			ZBX_WIDGET_FIELD_TYPE_HOST				=> 'value_hostid',
-			ZBX_WIDGET_FIELD_TYPE_ITEM				=> 'value_itemid',
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE	=> 'value_itemid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH				=> 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE	=> 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_MAP				=> 'value_sysmapid',
-			ZBX_WIDGET_FIELD_TYPE_DASHBOARD			=> 'value_dashboardid'
-		];
 	}
 
 	/**
@@ -96,6 +67,7 @@ class CWidgetConfig
 			case WIDGET_FAVOURITE_GRAPHS:
 			case WIDGET_FAVOURITE_MAPS:
 			case WIDGET_FAVOURITE_SCREENS:
+			case WIDGET_NAVIGATION_TREE:
 			case WIDGET_CLOCK:
 			case WIDGET_SYSMAP:
 				return 15 * SEC_PER_MIN;
