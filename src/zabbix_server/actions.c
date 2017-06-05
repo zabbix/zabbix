@@ -2023,6 +2023,9 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_pair_t *event_ack)
 		if (0 == event->eventid || 0 == event->trigger.triggerid)
 			continue;
 
+		if (SUCCEED != check_event_conditions(event, uniq_conditions))
+			continue;
+
 		for (j = 0; j < actions.values_num; j++)
 		{
 			zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
