@@ -28,7 +28,18 @@ class CControllerWidgetFavGraphsView extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'name' =>		'required|string'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -36,6 +47,11 @@ class CControllerWidgetFavGraphsView extends CController {
 	}
 
 	protected function doAction() {
+		$name = $this->getInput('name');
+		if ($name === '') {
+			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_GRAPHS];
+		}
+
 		$graphs = [];
 		$ids = ['graphid' => [], 'itemid' => []];
 
@@ -85,7 +101,8 @@ class CControllerWidgetFavGraphsView extends CController {
 			'graphs' => $graphs,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'name' => $name
 		]));
 	}
 }

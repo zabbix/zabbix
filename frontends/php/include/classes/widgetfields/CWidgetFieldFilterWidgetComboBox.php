@@ -27,15 +27,17 @@ class CWidgetFieldFilterWidgetComboBox extends CWidgetField
 
 	public function getJavascript() {
 		return
-			'var widgets, filters_box;'.
+			'var widgets, filters_box, dashboard_data;'.
 			'widgets = jQuery(".dashbrd-grid-widget-container").dashboardGrid("getWidgetsBy", "type", "navigationtree"),'.
+			'dashboard_data = jQuery(".dashbrd-grid-widget-container").data("dashboardGrid"),'.
 			'filters_box = jQuery("#'.$this->getName().'");'.
 			'if (widgets.length) {'.
 				'jQuery("<option>'._('Select filter widget').'</option>").val("").appendTo(filters_box);'.
 				'jQuery.each(widgets, function(i, widget) {'.
-					'if (typeof widget["fields"]["type"] !== "undefined") {'.
+					'if (typeof widget["type"] !== "undefined") {'.
 						'jQuery("<option></option>")'.
-								'.text(widget["fields"]["widget_name"])'.
+								'.text(widget["header"].length'.
+										'?widget["header"]:dashboard_data["widget_defaults"]["navigationtree"]["header"])'.
 								'.val(widget["fields"]["reference"])'.
 								'.appendTo(filters_box);'.
 					'}'.

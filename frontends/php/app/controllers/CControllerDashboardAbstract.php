@@ -18,19 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldTextBox extends CWidgetField
-{
-	public function __construct($name, $label, $default = null) {
-		parent::__construct($name, $label, $default, null);
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-	}
 
-	public function validate() {
-		$errors = [];
-		if ($this->required === true && $this->value == '') {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
+/**
+ * abstract class to keep common dashboard controller logic
+ *
+ */
+abstract class CControllerDashboardAbstract extends CController {
+
+	/**
+	 * Prepare editable flag.
+	 *
+	 * @param array  $dashboards
+	 */
+	protected function prepareEditableFlag(array &$dashboards)
+	{
+		$dashboards_rw = API::Dashboard()->get([
+			'output' => [],
+			'dashboardids' => array_keys($dashboards),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($dashboards as &$dashboard) {
+			$dashboard['editable'] = array_key_exists($dashboard['dashboardid'], $dashboards_rw);
 		}
-
-		return $errors;
+		unset($dashboard);
 	}
 }

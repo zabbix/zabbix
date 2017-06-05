@@ -23,12 +23,13 @@ class CNavigationTree extends CDiv {
 		private $error;
 		private $script_file;
 		private $script_run;
-		private $widgetid = null;
+		//private $widgetid = null;
 		private $field_items;
 		private $problems;
 		private $problems_per_severity_tpl;
 		private $severity_config;
 		private $severity_min;
+		private $data;
 
 		public function __construct(array $data = []) {
 			parent::__construct();
@@ -56,7 +57,8 @@ class CNavigationTree extends CDiv {
 			$this->field_items = $data['field_items'];
 			$this->problems = $this->getNumberOfProblemsBySysmap($sysmaps);
 			$this->submaps = $this->getSubMaps($sysmaps);
-			$this->widgetid = $data['widgetid'];
+			$this->data = $data;
+			//$this->widgetid = $this->data['widgetid'];
 			$this->script_file = 'js/class.cnavtree.js';
 			$this->script_run = '';
 		}
@@ -72,16 +74,28 @@ class CNavigationTree extends CDiv {
 
 		public function getScriptRun() {
 			if ($this->error === null) {
-					$this->script_run = ''.
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid("setWidgetTriggers", '.$this->widgetid.', '.
-								json_encode(CWidgetConfig::getTriggers(WIDGET_NAVIGATION_TREE)).');'.
-						'jQuery("#'.$this->getId().'").zbx_navtree({'.
-							'problems: '.json_encode($this->problems).','.
-							'severityLevels: '.json_encode($this->getSeverityConfig()).','.
-							'subMaps: '.json_encode($this->submaps).','.
-							'widgetId: '.$this->widgetid.','.
-							'maxDepth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
-						'});';
+				if ($this->data['widgetid']) {
+					$find_widget = $this->data['widgetid'];
+				}
+				elseif ($this->data['fields']['reference']) {
+					$find_widget = $this->data['fields']['reference'];
+				}
+				else {
+					$find_widget = null;
+				}
+
+				if ($find_widget) {
+					$this->script_run .= 'jQuery(".dashbrd-grid-widget-container").dashboardGrid("setWidgetTriggers", "'.
+							$find_widget.'",'.json_encode(CWidgetConfig::getTriggers(WIDGET_NAVIGATION_TREE)).');';
+				}
+				$this->script_run .= ''.
+					'jQuery("#'.$this->getId().'").zbx_navtree({'.
+						'problems: '.json_encode($this->problems).','.
+						'severityLevels: '.json_encode($this->getSeverityConfig()).','.
+						'subMaps: '.json_encode($this->submaps).','.
+						'widgetId: '.(int)$this->data['widgetid'].','.
+						'maxDepth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
+					'});';
 			}
 
 			return $this->script_run;

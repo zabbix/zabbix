@@ -38,7 +38,7 @@ class CControllerDashboardUpdate extends CController {
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['messages' => [getMessages()->toString()]])
+				'main_block' => CJs::encodeJson(['errors' => getMessagesAsArray()])
 			]));
 		}
 
@@ -76,10 +76,10 @@ class CControllerDashboardUpdate extends CController {
 
 		$result = (bool) API::Dashboard()->update($dashboard);
 
-		$response = ['result' => $result];
-		if (($messages = getMessages()) !== null) {
-			$response['messages'] = [$messages->toString()];
-		}
+		$response = [
+			'result' => $result,
+			'errors' => getMessagesAsArray()
+		];
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($response)]));
 	}
 }

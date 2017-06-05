@@ -24,29 +24,29 @@
 	function makeWidgetDiv(data, widget) {
 		widget['content_header'] = $('<div>')
 			.addClass('dashbrd-grid-widget-head')
-			.append($('<h4>').text(widget['header']));
+			.append($('<h4>').text(
+				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
+			));
 		widget['content_body'] = $('<div>')
 			.addClass('dashbrd-grid-widget-content');
 		widget['content_footer'] = $('<div>')
 			.addClass('dashbrd-grid-widget-foot');
 		widget['content_script'] = $('<div>');
 
-		if (widget['rf_rate'] != 0) {
-			widget['content_header'].append($('<ul>')
-				.append($('<li>')
-					.append($('<button>', {
-						'type': 'button',
-						'class': 'btn-widget-action',
-						'data-menu-popup': JSON.stringify({
-							'type': 'refresh',
-							'widgetName': widget['widgetid'],
-							'currentRate': widget['rf_rate'],
-							'multiplier': false
-						})
-					}))
-				)
-			);
-		}
+		widget['content_header'].append($('<ul>')
+			.append($('<li>')
+				.append($('<button>', {
+					'type': 'button',
+					'class': 'btn-widget-action',
+					'data-menu-popup': JSON.stringify({
+						'type': 'refresh',
+						'widgetName': widget['widgetid'],
+						'currentRate': widget['rf_rate'],
+						'multiplier': false
+					})
+				}))
+			)
+		);
 
 		return $('<div>', {
 			'class': 'dashbrd-grid-widget',
@@ -258,17 +258,15 @@
 				old_pos = this['pos'],
 				changed = false;
 
-			$.each(['row','col','height','width'], function(index, value) {
+			$.each(['row', 'col', 'height', 'width'], function(index, value) {
 				if (new_pos[value] !== old_pos[value]) {
 					changed = true;
 				}
 			});
 
 			if (changed === true) {
-				// save original values (only on first widget update before save)
-				if (typeof this['pos_orig'] === 'undefined') {
-					this['pos_orig'] = this['pos'];
-				}
+				// mark dashboard as updated
+				data['options']['updated'] = true;
 				this['pos'] = this['current_pos'];
 			}
 
@@ -407,9 +405,14 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data['widgetid'] = widget['widgetid'];
+		ajax_data['name'] = widget['header'];
 		// display widget with yet unsaved changes
 		if (typeof widget['fields'] !== 'undefined') {
 			ajax_data['fields'] = widget['fields'];
+		}
+		if (typeof(widget['dynamic']) !== 'undefined') {
+			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
+			ajax_data['dynamic_groupid'] = widget['dynamic']['groupid'];
 		}
 
 		startPreloader(widget);
@@ -485,24 +488,33 @@
 
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
-			ajax_data = [],
-			fields = $('form', data.dialogue['body']).serializeJSON();
+			ajax_widgets = [],
+			ajax_widget = {},
+			fields = $('form', data.dialogue['body']).serializeJSON(),
+			type = fields['type'],
+			name = fields['name'];
+
+		delete fields['type'];
+		delete fields['name'];
 
 		url.setArgument('action', 'dashbrd.widget.update');
 
-		ajax_data.push({
-			'widgetid': widget['widgetid'],
-			'fields': fields
-		});
+		if (widget !== null) {
+			ajax_widget.widgetid = widget['widgetid'];
+		}
+		ajax_widget.type = type;
+		ajax_widget.name = name;
+		ajax_widget.fields = fields;
+		ajax_widgets.push(ajax_widget);
 
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboard_id: data['options']['dashboardid'], // TODO VM: (?) will not work without dashboard id
-				widgets: ajax_data,
-				save: 0 // 0 - only check; 1 - check and save
+				dashboardid: data['dashboard']['id'],
+				widgets: ajax_widgets,
+				save: 0 // WIDGET_CONFIG_DONT_SAVE - only check
 			},
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
@@ -510,27 +522,86 @@
 					// Remove previous errors
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
-				} else {
+				}
+				else {
 					// No errors, proceed with update
 					overlayDialogueDestroy();
 
-					// save original values (only on first widget update before save)
-					if (typeof widget['fields_orig'] === 'undefined') {
-						widget['fields_orig'] = widget['fields'];
+					if (widget === null) {
+						// In case of ADD widget
+						// create widget with required selected fields and add it to dashboard
+						var pos = findEmptyPosition($obj, data, type),
+							widget_data = {
+							'type': type,
+							'header': name,
+							'pos': pos,
+							'rf_rate': data['widget_defaults'][type]['rf_rate'],
+							'fields': fields
+						}
+						methods.addWidget.call($obj, widget_data);
+						// new widget is last element in data['widgets'] array
+						widget = data['widgets'].slice(-1)[0];
+						setWidgetModeEdit($obj, data, widget);
 					}
-					widget['fields'] = fields;
-					widget['type'] = widget['fields']['type'];
+					else {
+						// In case of EDIT widget
+						widget['type'] = type;
+						widget['header'] = name;
+						widget['fields'] = fields;
+					}
+
+					updateWidgetDynamic($obj, data, widget);
 					refreshWidget(widget);
+
+					// mark dashboard as updated
+					data['options']['updated'] = true;
 				}
 			},
 			error: function() {
-				// TODO VM: (?) Do we need to display some kind of error message here?
+				// TODO VM: Add error message box in this case
 			}
 		});
 	}
 
-	function openConfigDialogue($obj, data, widget) {
-		var edit_mode = (widget['widgetid'] === '') ? false : true;
+	function findEmptyPosition($obj, data, type) {
+		var pos = {
+			'row': 0,
+			'col': 0,
+			'height': data['widget_defaults'][type]['size']['height'],
+			'width': data['widget_defaults'][type]['size']['width']
+		}
+
+		// go row by row and try to position widget in each space
+		var	max_col = data['options']['columns'] - pos['width'],
+			found = false,
+			col, row;
+
+		for (row = 0; !found; row++) {
+			for (col = 0; col <= max_col && !found; col++) {
+				pos['row'] = row;
+				pos['col'] = col;
+				found = isPosFree($obj, data, pos);
+			}
+		}
+
+		return pos;
+	}
+
+	function isPosFree($obj, data, pos) {
+		var free = true;
+
+		$.each(data['widgets'], function() {
+			if (rectOverlap(pos, this['pos'])) {
+				free = false;
+			}
+		});
+
+		return free;
+	}
+
+	function openConfigDialogue($obj, data, widget = null) {
+		var edit_mode = (widget !== null);
+
 		data.dialogue = {};
 		data.dialogue.widget = widget;
 
@@ -563,61 +634,59 @@
 
 	function setModeEditDashboard($obj, data) {
 		$.each(data['widgets'], function(index, widget) {
-			var btn_edit = $('<button>')
-				.attr('type', 'button')
-				.addClass('btn-widget-edit')
-				.attr('title', t('Edit'))
-				.click(function(){
-					runTrigger($(this), data, 'beforeConfigLoad');
-					methods.editWidget.call($obj, widget);
-				});
-
-			var btn_delete = $('<button>')
-				.attr('type', 'button')
-				.addClass('btn-widget-delete')
-				.attr('title', t('Delete'));
-
-			$('ul',widget['content_header']).hide();
-			widget['content_header'].append($('<ul>')
-				.addClass('dashbrd-widg-edit')
-				.append($('<li>').append(btn_edit))
-				.append($('<li>').append(btn_delete))
-			);
-
-			makeDraggable($obj, data, widget);
-			makeResizable($obj, data, widget);
+			setWidgetModeEdit($obj, data, widget);
 		});
 	}
 
-	function setModeViewDashboard($obj, data) {
-		$.each(data['widgets'], function(index, widget) {
-			// revert all unsaved changes that were done in this edit
-			if (typeof widget['pos_orig'] !== 'undefined') {
-				widget['pos'] = widget['pos_orig'];
-				delete widget['pos_orig'];
-				setDivPosition(widget['div'], data, widget['pos']);
-				resizeDashboardGrid($obj, data);
-			}
-			if (typeof widget['fields_orig'] !== 'undefined') {
-				widget['fields'] = widget['fields_orig'];
-				widget['type'] = widget['fields']['type'];
-				delete widget['fields_orig'];
-				refreshWidget(widget);
-			}
+	function setWidgetModeEdit($obj, data, widget) {
+		var	btn_edit = $('<button>')
+			.attr('type', 'button')
+			.addClass('btn-widget-edit')
+			.attr('title', t('Edit'))
+			.click(function() {
+				runTrigger($(this), data, 'beforeConfigLoad');
+				methods.editWidget.call($obj, widget);
+			});
 
-			$('.dashbrd-widg-edit',widget['content_header']).remove();
-			$('ul',widget['content_header']).show();
+		var	btn_delete = $('<button>')
+			.attr('type', 'button')
+			.addClass('btn-widget-delete')
+			.attr('title', t('Delete'))
+			.click(function(){
+				methods.deleteWidget.call($obj, widget);
+			});
 
-			stopDraggable($obj, data, widget);
-			stopResizable($obj, data, widget);
-		});
-		// update control buttons, controlling dashboard
-		dashboardButtonsSetView();
+		$('ul', widget['content_header']).hide();
+		widget['content_header'].append($('<ul>')
+			.addClass('dashbrd-widg-edit')
+			.append($('<li>').append(btn_edit))
+			.append($('<li>').append(btn_delete))
+		);
+
+		makeDraggable($obj, data, widget);
+		makeResizable($obj, data, widget);
+	}
+
+	function deleteWidget($obj, data, widget) {
+		var index = widget['div'].data('widget-index');
+
+		// remove div from the grid
+		widget['div'].remove();
+		data['widgets'].splice(index, 1);
+
+		// update widget-index for all following widgets
+		for (var i = index; i < data['widgets'].length; i++) {
+			data['widgets'][i]['div'].data('widget-index', i);
+		}
+
+		// mark dashboard as updated
+		data['options']['updated'] = true;
+		resizeDashboardGrid($obj, data);
 	}
 
 	function saveChanges($obj, data) {
 		var	url = new Curl('zabbix.php'),
-			ajax_data = [];
+			ajax_widgets = [];
 
 		// Remove previous messages
 		dashboardRemoveMessages();
@@ -625,65 +694,78 @@
 		url.setArgument('action', 'dashbrd.widget.update');
 
 		$.each(data['widgets'], function(index, widget) {
-			ajax_data.push({
-				'widgetid': widget['widgetid'],
-				'pos': widget['pos'],
-				'fields': widget['fields']
-			});
+			var	ajax_widget = {};
+
+			if (widget['widgetid'] !== '') {
+				ajax_widget.widgetid = widget['widgetid'];
+			}
+			ajax_widget['pos'] = widget['pos'];
+			ajax_widget['type'] = widget['type'];
+			ajax_widget['name'] = widget['header'];
+			ajax_widget['fields'] = widget['fields'];
+
+			ajax_widgets.push(ajax_widget);
 		});
+
+		var ajax_data = {
+			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
+			name: data['dashboard']['name'],
+			userid: data['dashboard']['userid'],
+			widgets: ajax_widgets,
+			save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
+		};
 
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
-			data: {
-				dashboard_id: data['options']['dashboardid'], // TODO VM: (?) will not work without dashboard id
-				widgets: ajax_data,
-				save: 1 // 0 - only check; 1 - check and save
-			},
+			data: ajax_data,
 			success: function(resp) {
-				if (typeof(resp.errors) !== 'undefined') {
+				// we can have redirect with errors
+				if ('redirect' in resp) {
+					// There are no more unsaved changes
+					data['options']['updated'] = false;
+					// Replace add possibility to remove previous url (as ..&new=1) from the document history
+					// it allows to use back browser button more user-friendly
+					window.location.replace(resp.redirect);
+				}
+				else if ('errors' in resp) {
 					// Error returned
 					dashbaordAddMessages(resp.errors);
-				} else {
-					if (typeof(resp.messages) !== 'undefined') {
-						// Success returned
-						dashbaordAddMessages(resp.messages);
-					}
-					$.each(data['widgets'], function(index, data_widget) {
-						// remove original values (new ones were just saved)
-						delete data_widget['fields_orig'];
-						delete data_widget['pos_orig'];
-					});
-
-					setModeViewDashboard($obj, data);
 				}
 			},
 			error: function() {
-				// TODO VM: (?) Do we need to display some kind of error message here?
+				// TODO VM: add error message box
 			}
 		});
 	}
 
 	function confirmExit($obj, data) {
-		var has_changes = false;
-		$.each(data['widgets'], function(index, widget) {
-			if (typeof widget['pos_orig'] !== 'undefined') {
-				has_changes = true;
-			}
-			if (typeof widget['fields_orig'] !== 'undefined') {
-				has_changes = true;
-			}
-		});
+		if (data['options']['updated'] === true) {
+			return t('You have unsaved changes.') + "\n" + t('Are you sure, you want to leave this page?');
+		}
+	}
 
-		if (has_changes === true) {
-			return t('You have unsaved changes.')+"\n"+t('Are you sure, you want to leave this page?');
+	function updateWidgetDynamic($obj, data, widget) {
+		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] === '1') {
+			if (data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
+				widget['dynamic'] = {
+					'hostid': data['dashboard']['dynamic']['hostid'],
+					'groupid': data['dashboard']['dynamic']['groupid']
+				};
+			}
+			else {
+				delete widget['dynamic'];
+			}
+		}
+		else if (typeof(widget['dynamic']) !== 'undefined') {
+			delete widget['dynamic'];
 		}
 	}
 
 	function runTrigger($obj, data, triggerName) {
 		$.each(data['widgets'], function(index, widget) {
-			if (typeof widget['triggers'][triggerName] !== 'undefined') {
+			if (typeof widget['triggers'] !== 'undefined' && typeof widget['triggers'][triggerName] !== 'undefined') {
 				try {
 					eval('$("#"+$("[id]", widget.content_body).attr("id")).'+widget['triggers'][triggerName]);
 				}
@@ -694,29 +776,36 @@
 
 	var	methods = {
 		init: function(options) {
-			options = $.extend({}, {columns: 12}, options);
-			options['widget-height'] = 70;
+			var default_options = {
+				'fullscreen': 0,
+				'widget-height': 70,
+				'columns': 12,
+				'rows': 0,
+				'updated': false
+			};
+			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['columns'];
-			// TODO miks: make it consistant with changes Valdis made in latest versions.
 			options['edit_mode'] = false;
-			options['rows'] = 0;
 
 			return this.each(function() {
 				var	$this = $(this),
 					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'});
 
 				$this.data('dashboardGrid', {
+					dashboard: {},
 					options: options,
 					widgets: [],
+					widget_defaults: {},
 					placeholder: $placeholder
 				});
-				var data = $this.data('dashboardGrid');
+
+				var	data = $this.data('dashboardGrid');
 
 				$this.append($placeholder.hide());
 
-				// TODO VM: (?) it is good to have warning, but it looks kinda bad and we have no controll over it.
 				$(window).bind('beforeunload', function() {
-					var res = confirmExit($this, data);
+					var	res = confirmExit($this, data);
+
 					// return value only if we need confirmation window, return nothing othervise
 					if (typeof res !== 'undefined') {
 						return res;
@@ -725,20 +814,47 @@
 			});
 		},
 
-		setWidgetTriggers: function(widgetid, triggers) {
+		setWidgetTriggers: function(search_by, triggers) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
 				$.each(data['widgets'], function(index, widget) {
-					if (widget['widgetid'] == widgetid) {
+					if (typeof widget['fields']['reference'] !== 'undefined' && widget['fields']['reference'] === search_by) {
+						widget['triggers'] = triggers;
+					}
+					else if (widget['widgetid'] == +search_by) {
 						widget['triggers'] = triggers;
 					}
 				});
 			});
 		},
 
+		setDashboardData: function(dashboard) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				dashboard = $.extend({}, data['dashboard'], dashboard);
+				data['dashboard'] = dashboard;
+			});
+		},
+
+		setWidgetDefaults: function(defaults) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				defaults = $.extend({}, data['widget_defaults'], defaults);
+				data['widget_defaults'] = defaults;
+			});
+		},
+
 		addWidget: function(widget) {
+			// If no fields are given, 'fields' will contain empty array instead of simple object.
+			if (widget['fields'].length === 0) {
+				widget['fields'] = {};
+			}
 			widget = $.extend({}, {
 				'widgetid': '',
 				'type': '',
@@ -753,9 +869,7 @@
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
-				'fields': {
-					'type': '',
-				}
+				'fields': {}
 			}, widget);
 
 			return this.each(function() {
@@ -763,6 +877,7 @@
 					data = $this.data('dashboardGrid');
 
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
+				updateWidgetDynamic($this, data, widget);
 
 				data['widgets'].push(widget);
 				$this.append(widget['div']);
@@ -860,9 +975,15 @@
 					data = $this.data('dashboardGrid');
 
 				runTrigger($this, data, 'onEditStop');
-				dashboardRemoveMessages();
-				data['options']['edit_mode'] = false;
-				setModeViewDashboard($this, data);
+
+				// Don't show warning about existing updates
+				data['options']['updated'] = false;
+
+				// Redirect to last active dashboard.
+				// (1) In case of New Dashboard from list, it will open list
+				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
+				// (3) In case of simple editing of current dashboard, it will reload same dashboard
+				location.replace('zabbix.php?action=dashboard.view&fullscreen=' + data['options']['fullscreen']);
 			});
 		},
 
@@ -876,11 +997,21 @@
 			});
 		},
 
+		// After pressing "delete" button on widget
+		deleteWidget: function(widget) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				deleteWidget($this, data, widget);
+			});
+		},
+
 		// Add or update form on widget configuration dialogue
 		// (when opened, as well as when requested by 'onchange' attributes in form itself)
 		updateWidgetConfigDialogue: function() {
 			return this.each(function() {
-				var $this = $(this),
+				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					body = data.dialogue['body'],
 					footer = $('.overlay-dialogue-footer', data.dialogue['div']),
@@ -894,16 +1025,28 @@
 
 				url.setArgument('action', 'dashbrd.widget.config');
 
-				if (widget['widgetid'] !== '') {
+				// Don't send on "Add widget" or on "Edit widget", if widget was not saved yet
+				if (widget !== null && widget['widgetid'] !== '') {
 					ajax_data.widgetid = widget['widgetid'];
 				}
 
 				if (form.length) {
 					// Take values from form
 					ajax_data.fields = form.serializeJSON();
-				} else {
+					ajax_data.type = ajax_data['fields']['type'];
+					ajax_data.name = ajax_data['fields']['name'];
+					delete ajax_data['fields']['type'];
+					delete ajax_data['fields']['name'];
+				}
+				else if (widget !== null) {
 					// Open form with current config
+					ajax_data.type = widget['type'];
+					ajax_data.name = widget['header'];
 					ajax_data.fields = widget['fields'];
+				}
+				else {
+					// Get default config for new widget
+					ajax_data.fields = [];
 				}
 
 				jQuery.ajax({
@@ -937,7 +1080,7 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					error: function() {
-						// TODO VM: (?) do we need to have error message on failed dialogue form update?
+						// TODO VM: add error message box
 					}
 				});
 			});
@@ -952,7 +1095,7 @@
 						data = $this.data('dashboardGrid');
 
 				$.each(data['widgets'], function(index, widget) {
-					if (typeof widget['fields'][key] !== 'undefined' && widget['fields'][key] === value) {
+					if (typeof widget[key] !== 'undefined' && widget[key] === value) {
 						widgets_found.push(widget);
 					}
 				});
@@ -1027,15 +1170,26 @@
 			});
 
 			return ref;
+		},
+
+		addNewWidget: function() {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				openConfigDialogue($this, data);
+			});
 		}
 	}
 
 	$.fn.dashboardGrid = function(method) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || !method) {
+		}
+		else if (typeof method === 'object' || !method) {
 			return methods.init.apply(this, arguments);
-		} else {
+		}
+		else {
 			$.error('Invalid method "' +  method + '".');
 		}
 	}

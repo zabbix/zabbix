@@ -548,8 +548,8 @@ function overlayDialogue(params) {
 			type: 'button',
 			text: obj.title
 		}).click(function() {
-			obj.action();
-			if (!('keepOpen' in obj) || obj.keepOpen === false) {
+			var res = obj.action();
+			if (res !== false && (!('keepOpen' in obj) || obj.keepOpen === false)) {
 				overlayDialogueDestroy();
 			}
 			return false;
@@ -574,6 +574,10 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
+	var css_body = {"margin-bottom": '50px'};
+	if (typeof params.css_body !== 'undefined') {
+		css_body = params.css_body;
+	}
 	overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
 		class: 'overlay-dialogue',
@@ -600,7 +604,8 @@ function overlayDialogue(params) {
 		)
 		.append(
 			jQuery('<div>', {
-				class: 'overlay-dialogue-body'
+				class: 'overlay-dialogue-body',
+				css: css_body
 			}).append(params.content)
 		)
 		.append(overlay_dialogue_footer)
@@ -716,4 +721,72 @@ function executeScript(hostid, scriptid, confirmation) {
 
 		return json;
 	};
+
+	$.fn.formToJSON = function() {
+		var $form = $(this),
+			$elements = {};
+
+		$form.find('input, select, textarea').each(function() {
+			var name = $(this).attr('name'),
+				type = $(this).attr('type');
+
+			if (name) {
+				var $value;
+
+				if (type == 'radio') {
+					$value = $('input[name=' + name + ']:checked', $form).val();
+				}
+				else if (type == 'checkbox') {
+					$value = $(this).is(':checked');
+				}
+				else {
+					$value = $(this).val();
+				}
+
+				$elements[$(this).attr('name')] = $value;
+			}
+		});
+
+		return JSON.stringify($elements)
+	};
+
+	// TODO AV: this function is unused
+	$.fn.formFromJSON = function(json_string) {
+		var $form = $(this),
+			data = JSON.parse(json_string);
+
+		$.each(data, function(key, value) {
+			var $elem = $('[name="' + key + '"]', $form),
+				type = $elem.first().attr('type');
+
+			if (type === 'radio') {
+				$('[name="' + key + '"][value="' + value + '"]').prop('checked', true);
+			}
+			else if (type === 'checkbox' && (value === true || value === 'true')) {
+				$('[name="' + key + '"]').prop('checked', true);
+			}
+			else {
+				$elem.val(value);
+			}
+		})
+	};
 })(jQuery);
+
+function makeErrorMessageBox(errors, elementId) {
+	var div = jQuery('<div>').addClass('msg-bad').attr('id', elementId);
+	var details = jQuery('<div>').addClass('msg-details'),
+		ul = jQuery('<ul>');
+
+	errors.each(function (error) {
+		// split long messages
+		var msg = '';
+		error.match(/[\s\S]{1,120}/g).each(function (error_part) {
+			msg = msg + jQuery.escapeHtml(error_part) + "\n";
+		});
+		ul.append(jQuery('<li>').append(msg));
+	});
+	details.append(ul);
+	div.append(details);
+
+	return div;
+}

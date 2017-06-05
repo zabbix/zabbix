@@ -29,13 +29,19 @@ class CControllerWidgetUrlView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'required', // TODO VM: in db.widget
-			'fields'		=>	'array',
+			'fields' =>			'required|array',
+			'name' =>			'required|string',
+			'dynamic_hostid' =>	'db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
 		if ($ret) {
-
+			/*
+			 * @var array  $fields
+			 * @var string $fields['url']              (optional)
+			 * @var int    $fields['dynamic']          (optional)
+			 */
+			// TODO VM: validate fields
 		}
 
 		if (!$ret) {
@@ -52,31 +58,26 @@ class CControllerWidgetUrlView extends CController {
 
 	protected function doAction() {
 
-		$data = [];
 		$error = null;
 
 		// Default values
 		$default = [
+			'name' => CWidgetConfig::getKnownWidgetTypes()[WIDGET_URL],
 			'url' => '',
-			'inner_width' => '100%',
-			'inner_height' => '98%',
-			'host_id' => 0,
+			'hostid' => '0',
 			'isTemplatedDashboard' => false, // TODO VM: will dashboards be templated?
 			'dynamic' => WIDGET_SIMPLE_ITEM
 		];
 
-		if ($this->hasInput('fields')) {
-			// Use configured data, if possible
-			$data = $this->getInput('fields');
+		$data = $this->getInput('fields');
+
+		$data['name'] = $this->getInput('name');
+		if ($data['name'] === '') {
+			$data['name'] = $default['name'];
 		}
 
-		if (!array_key_exists('inner_width', $data)
-				|| !array_key_exists('inner_height', $data)
-				|| $data['inner_width'] == 0
-				|| $data['inner_height'] == 0
-		) {
-			$data['inner_width'] = $default['inner_width'];
-			$data['inner_height'] = $default['inner_height'];
+		if ($this->hasInput('dynamic_hostid')) {
+			$data['hostid'] = $this->getInput('dynamic_hostid');
 		}
 
 		// Apply defualt value for data
@@ -86,7 +87,7 @@ class CControllerWidgetUrlView extends CController {
 			}
 		}
 
-		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $data['host_id'] == 0) {
+		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && bccomp($data['hostid'], '0') === 0) {
 			$error = _('No host selected.');
 		}
 		else {
@@ -95,7 +96,7 @@ class CControllerWidgetUrlView extends CController {
 			$resolved_url = CMacrosResolverHelper::resolveWidgetURL([
 				'config' => $resolveHostMacros ? 'widgetURL' : 'widgetURLUser',
 				'url' => $data['url'],
-				'hostid' => $resolveHostMacros ? $data['host_id'] : 0
+				'hostid' => $resolveHostMacros ? $data['hostid'] : '0'
 			]);
 
 			$data['url'] = $resolved_url ? $resolved_url : $data['url'];
@@ -107,10 +108,9 @@ class CControllerWidgetUrlView extends CController {
 			],
 			'url' => [
 				'url' => $data['url'],
-				'inner_width' => $data['inner_width'],
-				'inner_height' => $data['inner_height'],
 				'error' => $error
-			]
+			],
+			'name' => $data['name']
 		]));
 	}
 }

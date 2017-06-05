@@ -25,7 +25,7 @@ if ($this->data['error'] !== null) {
 }
 
 $output = [
-	'header' => $this->data['fields']['widget_name'],
+	'header' => $data['name'],
 	'body' => $item->toString(),
 	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
 	'script_file' => $item->getScriptFile(),

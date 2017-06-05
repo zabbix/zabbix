@@ -24,13 +24,6 @@ class CWidgetForm
 
 	public function __construct($data) {
 		$this->fields = [];
-
-		// Type field
-		$this->fields[] = (new CWidgetFieldComboBox('type', _('Type'), CWidgetConfig::getKnownWidgetTypes(),
-			WIDGET_CLOCK, 'updateWidgetConfigDialogue()'
-		))
-			->setRequired(true)
-			->setValue($data['type']);
 	}
 
 	/**
@@ -44,10 +37,29 @@ class CWidgetForm
 
 	public function validate() {
 		$errors = [];
+
 		foreach ($this->fields as $field) {
 			$errors = array_merge($errors, $field->validate());
 		}
 
 		return $errors;
+	}
+
+	/**
+	 * Prepares array, ready to be passed to CDashboard API functions
+	 *
+	 * @return array  Array of widget fields ready for saving in API
+	 */
+	public function fieldsToApi() {
+		$fields = [];
+
+		foreach ($this->fields as $field) {
+			$api_field = $field->toApi();
+			if ($api_field !== null) {
+				$fields[] = $api_field;
+			}
+		}
+
+		return $fields;
 	}
 }

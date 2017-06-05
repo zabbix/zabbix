@@ -31,7 +31,7 @@ class CWidgetConfig
 		return [
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix'),
-			WIDGET_LAST_ISSUES			=> _('Last issues'),
+			WIDGET_LAST_ISSUES			=> _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
 			WIDGET_WEB_OVERVIEW			=> _('Web monitoring'),
 			WIDGET_DISCOVERY_STATUS		=> _('Discovery status'),
 			WIDGET_HOST_STATUS			=> _('Host status'),
@@ -43,6 +43,50 @@ class CWidgetConfig
 			WIDGET_NAVIGATION_TREE	=> _('Map Navigation Tree'),
 			WIDGET_URL					=> _('URL')
 		];
+	}
+
+	/**
+	 * Get default widget dimensions.
+	 *
+	 * @return array
+	 */
+	private static function getDefaultDimensions()
+	{
+		return [
+			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
+			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
+			WIDGET_LAST_ISSUES			=> ['width' => 6, 'height' => 6],
+			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
+			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
+			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 4],
+			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
+			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
+			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
+			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
+			WIDGET_SYSMAP				=> ['width' => 9, 'height' => 5],
+			WIDGET_NAVIGATION_TREE				=> ['width' => 3, 'height' => 5],
+			WIDGET_URL					=> ['width' => 7, 'height' => 9]
+		];
+	}
+
+	/**
+	 * Return default values for new widgets
+	 *
+	 * @return array
+	 */
+	public static function getDefaults() {
+		$ret = [];
+		$dimensions = self::getDefaultDimensions();
+
+		foreach (self::getKnownWidgetTypes() as $type => $name) {
+			$ret[$type] = [
+				'header' => $name,
+				'rf_rate' => self::getDefaultRfRate($type),
+				'size' => $dimensions[$type]
+			];
+		}
+
+		return $ret;
 	}
 
 	/**
@@ -143,14 +187,14 @@ class CWidgetConfig
 	 *
 	 * @static
 	 *
-	 * @param array  $data          array with all widget's fields, including widget type
-	 * @param string $data['type']
+	 * @param string $type          widget type - 'WIDGET_' constant
+	 * @param array  $data          array with all widget's fields
 	 * @param string $data[<name>]  (optional)
 	 *
 	 * @return CWidgetForm
 	 */
-	public static function getForm($data) {
-		switch ($data['type']) {
+	public static function getForm($type, $data) {
+		switch ($type) {
 			case WIDGET_CLOCK:
 				return new CClockWidgetForm($data);
 

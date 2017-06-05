@@ -29,8 +29,9 @@ class CControllerWidgetNavigationtreeView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'required',
-			'fields'		=>	'array'
+			'widgetid' =>	'required',
+			'name' =>			'required|string',
+			'fields' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -52,12 +53,17 @@ class CControllerWidgetNavigationtreeView extends CController {
 
 		// Default values
 		$default = [
-			'widget_name' => ''
+			'name' => CWidgetConfig::getKnownWidgetTypes()[WIDGET_NAVIGATION_TREE],
 		];
 
 		if ($this->hasInput('fields')) {
 			// Use configured data, if possible
 			$data = $this->getInput('fields');
+		}
+
+		$data['name'] = $this->getInput('name');
+		if ($data['name'] === '') {
+			$data['name'] = $default['name'];
 		}
 
 		// Apply defualt value for data
@@ -96,7 +102,8 @@ class CControllerWidgetNavigationtreeView extends CController {
 			'widgetid' => getRequest('widgetid'),
 			'field_items' => $items,
 			'fields' => $data,
-			'error' => $error
+			'error' => $error,
+			'name' => $data['name']
 		]));
 	}
 }

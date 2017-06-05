@@ -33,8 +33,10 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboard_id' =>	'required|db dashboard.dashboardid',
-			'widgets' =>		'required|array',
+			'dashboardid' =>	'db dashboard.dashboardid',
+			'userid' =>			'db dashboard.userid',
+			'name' =>			'db dashboard.name|not_empty',
+			'widgets' =>		'array',
 			'save' =>			'required|in '.implode(',', [WIDGET_CONFIG_DONT_SAVE, WIDGET_CONFIG_DO_SAVE])
 		];
 
@@ -43,38 +45,74 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $widgets
-			 * @var string $widget[]['widgetid']
-			 * @var array  $widget[]['pos']            (optional)
+			 * @var string $widget[]['widgetid']        (optional)
+			 * @var array  $widget[]['pos']             (optional)
 			 * @var int    $widget[]['pos']['row']
 			 * @var int    $widget[]['pos']['col']
 			 * @var int    $widget[]['pos']['height']
 			 * @var int    $widget[]['pos']['width']
+			 * @var string $widget[]['type']
+			 * @var string $widget[]['name']
 			 * @var array  $widget[]['fields']
+			 * @var string $widget[]['fields'][<name>]  (optional)
 			 */
-			foreach ($this->getInput('widgets') as $widget) {
-				if (array_key_exists('fields', $widget)) {
-					$widget_fields = $widget['fields'];
+			foreach ($this->getInput('widgets', []) as $index => $widget) {
+				// TODO VM: check widgetid - if present in $widget, must be existing widget id
 
-					if (!array_key_exists('type', $widget_fields)) {
-						error(_('No widget type')); // TODO VM: (?) improve message
+				// TODO VM: (?) instead of adding optional fields, it may be more consistent to add additinal controller
+				//			for checking single widget. That will make this controller more straigt forward.
+				if ($this->getInput('save') == WIDGET_CONFIG_DO_SAVE) {
+					if (!array_key_exists('pos', $widget)) {
+						error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+							_s('the parameter "%1$s" is missing', 'pos')
+						));
 						$ret = false;
-						break; // no need to check fields, if widget type is unknown
 					}
-
-					$widget['form'] = CWidgetConfig::getForm($widget_fields);
-					unset($widget['fields']);
-
-					$errors = $widget['form']->validate();
-					if (!empty($errors)) {
-						// Add widget name to each error message.
-						foreach ($errors as $key => $value) {
-							$errors[$key] = _s("Error in widget (id='%s'): %s", $widget['widgetid'], $value); // TODO VM: (?) improve error message
+					else {
+						foreach (['row', 'col', 'height', 'width'] as $field) {
+							if (!array_key_exists($field, $widget['pos'])) {
+								error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][pos]',
+									_s('the parameter "%1$s" is missing', $field)
+								));
+								$ret = false;
+							}
 						}
-
-						error($errors);
-						$ret = false;
 					}
 				}
+
+				if (!array_key_exists('type', $widget)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+						_s('the parameter "%1$s" is missing', 'type')
+					));
+					$ret = false;
+					break;
+				}
+
+				if (!array_key_exists('name', $widget)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+						_s('the parameter "%1$s" is missing', 'name')
+					));
+					$ret = false;
+				}
+
+				// AJAX is not sending empty elements,
+				// absence of 'fields' element means, there are no fields for this widget
+				if (!array_key_exists('fields', $widget)) {
+					$widget['fields'] = [];
+				}
+				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget['fields']);
+				unset($widget['fields']);
+
+				if (($errors = $widget['form']->validate()) !== []) {
+					$widget_name = (array_key_exists('name', $widget) && $widget['name'] !== '')
+						? $widget['name'] : CWidgetConfig::getKnownWidgetTypes()[$widget['type']];
+					foreach ($errors as $key => $error) {
+						error(_s('Error in widget "%1$s": %2$s.', $widget_name, $error));
+					}
+
+					$ret = false;
+				}
+
 				$this->widgets[] = $widget;
 			}
 		}
@@ -82,6 +120,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		if (!$ret) {
 			$output = [];
 			if (($messages = getMessages()) !== null) {
+				// TODO AV: "errors" => "messages"
 				$output['errors'] = $messages->toString();
 			}
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
@@ -95,83 +134,72 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$return = [];
-		$save = (int)$this->getInput('save');
-		if ($save === WIDGET_CONFIG_DO_SAVE) {
-			$dashboard = [];
-			$dashboard['dashboardid'] = $this->getInput('dashboard_id');
-			$dashboard['widgets'] = [];
+		$data = [];
+
+		if ($this->getInput('save') == WIDGET_CONFIG_DO_SAVE) {
+			$dashboard = [
+				'name' => $this->getInput('name'),
+				'userid' => $this->getInput('userid', 0),
+				'widgets' => []
+			];
+			if ($this->hasInput('dashboardid')) {
+				$dashboard['dashboardid'] = $this->getInput('dashboardid');
+			}
 
 			foreach ($this->widgets as $widget) {
-				$widget_to_save = [];
-				$widget_to_save['widgetid'] = $widget['widgetid'];
-
-				if (array_key_exists('pos', $widget)) {
-					$widget_to_save['row'] = $widget['pos']['row'];
-					$widget_to_save['col'] = $widget['pos']['col'];
-					$widget_to_save['height'] = $widget['pos']['height'];
-					$widget_to_save['width'] = $widget['pos']['width'];
+				$upd_widget = [];
+				if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
+						&& array_key_exists('dashboardid', $dashboard)) { // TODO AV: remove check for dashboardid; related CControllerDashboardView:118
+					$upd_widget['widgetid'] = $widget['widgetid'];
 				}
 
-				if (array_key_exists('form', $widget)) {
-					$prepared = $this->prepareFields($widget['form']);
-					if (array_key_exists('type', $prepared)) {
-						$widget_to_save['type'] = $prepared['type'];
-					}
-					if (array_key_exists('name', $prepared)) {
-						$widget_to_save['name'] = $prepared['name'];
-					}
-					if (array_key_exists('fields', $prepared)) {
-						$widget_to_save['fields'] = $prepared['fields'];
-					}
-				}
+				$upd_widget += [
+					'row' => $widget['pos']['row'],
+					'col' => $widget['pos']['col'],
+					'height' => $widget['pos']['height'],
+					'width' => $widget['pos']['width'],
+					'type' => $widget['type'],
+					'name' => $widget['name'],
+					'fields' => $widget['form']->fieldsToApi(),
+				];
 
-				$dashboard['widgets'][] = $widget_to_save;
+				$dashboard['widgets'][] = $upd_widget;
 			}
 
-			$result = API::Dashboard()->update([$dashboard]);
+			if (array_key_exists('dashboardid', $dashboard)) {
+				$result = API::Dashboard()->update([$dashboard]);
+				$message = _('Dashboard updated');
+				$error_msg =  _('Failed to update dashboard');
+			}
+			else {
+				$result = API::Dashboard()->create([$dashboard]);
+				$message = _('Dashboard created');
+				$error_msg = _('Failed to create dashboard');
+			}
 
-			if ($result['dashboardids'][0] == $dashboard['dashboardid']) {
-				$return['messages'] = makeMessageBox(true, [], _('Dashboard updated'))->toString();
-			} else {
+			if ($result) {
+				// TODO VM: (?) we need to find a way to display message next time, page is loaded.
+				// TODO VM: ideas: processRequest in ZBase (CSession::setValue())
+				$data['redirect'] = (new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('dashboardid', $result['dashboardids'][0])
+					->getUrl();
+				// @TODO should be moved from here to base logic by ZBXNEXT-3892
+				CSession::setValue('messageOk', $message);
+			}
+			else {
+				// TODO AV: improve error messages
 				if (!hasErrorMesssages()) {
-					error(_('Failed to update dashboard')); // In case of unknown error
+					error($error_msg);
 				}
-				$return['errors'] = getMessages()->toString();
 			}
 		}
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($return)]));
-	}
 
-	/**
-	 * Prepares widget fields for saving
-	 * @param CWidgetForm $form form object with widget fields
-	 *
-	 * @return array With keys 'type', 'name', 'fields'
-	 */
-	protected function prepareFields($form) {
-		$ret = [];
-		$fields = $form->getFields();
-		foreach ($fields as $field){
-			$name = $field->getName();
-			if ($name === 'type') {
-				$ret['type'] = $field->getValue();
-			} elseif ($name === 'name') {
-				$ret['name'] = $field->getValue();
-			} else {
-				$field_to_save = [];
-				$field_to_save['type'] = $field->getSaveType();
-				$field_to_save['name'] = $field->getName();
-
-				$field_key = CWidgetConfig::getApiFieldKey($field_to_save['type']);
-				$field_to_save[$field_key] = $field->getValue();
-
-				if (!array_key_exists('fields', $ret)) {
-					$ret['fields'] = [];
-				}
-				$ret['fields'][] = $field_to_save;
-			}
+		if (($messages = getMessages()) !== null) {
+			// TODO AV: "errors" => "messages"
+			$data['errors'] = $messages->toString();
 		}
-		return $ret;
+
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($data)]));
 	}
 }

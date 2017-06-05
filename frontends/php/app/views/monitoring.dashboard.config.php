@@ -18,107 +18,107 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$body = '';
-if (array_key_exists('dialogue', $data)) {
-	/* @var $data['dialogue']['form'] CWidgetForm */
-	$formFields = $data['dialogue']['form']->getFields();
 
-	$form = (new CForm('post'))
-		->cleanItems()
-		->setId('widget_dialogue_form')
-		->setName('widget_dialogue_form');
+$form = (new CForm('post'))
+	->cleanItems()
+	->setId('widget_dialogue_form')
+	->setName('widget_dialogue_form');
 
-	$formList = (new CFormList());
+$form_list = (new CFormList());
 
-	foreach ($formFields as $field) {
-		/* ComboBox */
-		if ($field instanceof CWidgetFieldComboBox) {
-			$formList->addRow(
-				$field->getLabel(),
-				(new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues()))
-			);
-		}
+// Common fields
+$form_list->addRow(_('Type'),
+	(new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()',
+		CWidgetConfig::getKnownWidgetTypes()))
+);
 
-		/* TextBox */
-		elseif ($field instanceof CWidgetFieldTextBox) {
-			$formList->addRow(
-				$field->getLabel(),
-				(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			);
-		}
+$form_list->addRow(_('Name'),
+	(new CTextBox('name', $data['dialogue']['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('placeholder', _('default'))
+);
 
-		/* CWidgetFieldReference */
-		elseif ($field instanceof CWidgetFieldReference) {
-			$form->addVar($field->getName(), $field->getValue());
+// Widget specific fields
 
-			if (!$field->getValue()) {
-				$javascript = $field->getJavascript('#'.$form->getAttribute('id'));
-				$form->addItem(new CJsScript(get_js($javascript, true)));
-			}
-		}
+foreach ($data['dialogue']['form']->getFields() as $field) {
+	if ($field instanceof CWidgetFieldComboBox) {
+		$form_list->addRow($field->getLabel(),
+			(new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues()))
+		);
+	}
+	elseif ($field instanceof CWidgetFieldTextBox) {
+		$form_list->addRow($field->getLabel(),
+			(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
+	}
+	elseif ($field instanceof CWidgetFieldCheckbox) {
+		$form_list->addRow($field->getLabel(),
+			(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
+		);
+	}
+	elseif ($field instanceof CWidgetFieldReference) {
+		$form->addVar($field->getName(), $field->getValue()?:'');
 
-		/* CWidgetFieldHidden */
-		elseif ($field instanceof CWidgetFieldHidden) {
-			$form->addVar($field->getName(), $field->getValue());
-		}
-
-		/* RadioButtonList */
-		elseif ($field instanceof CWidgetRadioButtonList) {
-			$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()));
-			$radioButtonsList->setModern($field->getModern());
-
-			foreach ($field->getValues() as $value) {
-				$radioButtonsList->addValue($value['name'], $value['value'], null, $field->getAction());
-			}
-
-			$formList->addRow(_('Source type'), $radioButtonsList);
-		}
-
-		/* CWidgetFieldSelectResource */
-		elseif ($field instanceof CWidgetFieldSelectResource) {
-			$form->addVar($field->getName(), $field->getValue());
-			$formList->addRow($field->getLabel(), [
-				(new CTextBox($field->getCaptionName(), $field->caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton('select', _('Select')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getAttribute('id').'");')
-			]);
-		}
-
-		/* CWidgetFieldFilterWidgetComboBox */
-		elseif ($field instanceof CWidgetFieldFilterWidgetComboBox) {
-			$formList->addRow(
-				$field->getLabel(),
-				(new CComboBox($field->getName(), [], $field->getAction(), []))
-			);
-
-			$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
-		}
-
-		/* ItemId */
-		elseif ($field instanceof CWidgetFieldItemId) {
-			$form->addVar($field->getName(), $field->getValue(true)); // needed for popup script
-
-			$selectButton = (new CButton('select', _('Select')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
-						"&dstfld2=".$field->getCaptionName()."&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
-			$cell = (new CDiv([
-				(new CTextBox($field->getCaptionName(), $field->getCaption(true), true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$selectButton
-			]))->addStyle('display: flex;'); // TODO VM: move style to scss
-			$formList->addRow($field->getLabel(), $cell);
+		if (!$field->getValue()) {
+			$javascript = $field->getJavascript('#'.$form->getAttribute('id'));
+			$form->addItem(new CJsScript(get_js($javascript, true)));
 		}
 	}
+	elseif ($field instanceof CWidgetFieldHidden) {
+		$form->addVar($field->getName(), $field->getValue());
+	}
+	elseif ($field instanceof CWidgetRadioButtonList) {
+		$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()));
+		$radioButtonsList->setModern($field->getModern());
 
-	$form->addItem($formList);
-	$body = $form->toString();
+		foreach ($field->getValues() as $value) {
+			$radioButtonsList->addValue($value['name'], $value['value'], null, $field->getAction());
+		}
+
+		$form_list->addRow(_('Source type'), $radioButtonsList);
+	}
+	elseif ($field instanceof CWidgetFieldSelectResource) {
+		$form->addVar($field->getName(), $field->getValue());
+		$form_list->addRow($field->getLabel(), [
+			(new CTextBox($field->getCaptionName(), $field->caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton('select', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getAttribute('id').'");')
+		]);
+	}
+	elseif ($field instanceof CWidgetFieldFilterWidgetComboBox) {
+		$form_list->addRow(
+			$field->getLabel(),
+			(new CComboBox($field->getName(), [], $field->getAction(), []))
+		);
+
+		$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
+	}
+	elseif ($field instanceof CWidgetFieldItem) {
+		$caption = array_key_exists($field->getValue(true), $data['captions']['items'])
+			? $data['captions']['items'][$field->getValue(true)]
+			: '';
+		// needed for popup script
+		$form->addVar($field->getName(), ($field->getValue(true) !== null) ? $field->getValue(true) : '');
+
+		$select_button = (new CButton('select', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
+					"&dstfld2=".$field->getName()."_caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
+
+		$form_list->addRow($field->getLabel(), [
+			(new CTextBox($field->getName().'_caption', $caption, true))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$select_button
+		]);
+	}
 }
 
+$form->addItem($form_list);
+
 $output = [
-	'body' => $body
+	'body' => $form->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

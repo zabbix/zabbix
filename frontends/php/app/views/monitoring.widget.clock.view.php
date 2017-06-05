@@ -20,14 +20,6 @@
 
 $item = (new CClock());
 
-if ($data['clock']['inner_width'] !== null) {
-	$item->setWidth($data['clock']['inner_width']);
-}
-
-if ($data['clock']['inner_height'] !== null) {
-	$item->setHeight($data['clock']['inner_height']);
-}
-
 if ($data['clock']['error'] !== null) {
 	$item->setError($data['clock']['error']);
 }
@@ -45,7 +37,7 @@ if ($data['clock']['time_zone_string'] !== null) {
 }
 
 $output = [
-	'header' => $data['clock']['title'],
+	'header' => $data['name'],
 	'body' => $item->toString(),
 	'footer' => (new CList([$item->getTimeDiv(),_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
 	'script_file' => $item->getScriptFile(),

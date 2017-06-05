@@ -21,7 +21,9 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerDashboardView extends CController {
+class CControllerDashboardView extends CControllerDashboardAbstract {
+
+	private $dashboard;
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -29,8 +31,12 @@ class CControllerDashboardView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>		'in 0,1',
-			'dashboardid' =>	'db dashboard.dashboardid'
+			'fullscreen' =>			'in 0,1',
+			'dashboardid' =>		'db dashboard.dashboardid',
+			'source_dashboardid' =>	'db dashboard.dashboardid',
+			'groupid' =>			'db groups.groupid',
+			'hostid' =>				'db hosts.hostid',
+			'new' =>				'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,34 +53,45 @@ class CControllerDashboardView extends CController {
 			return false;
 		}
 
-		if ($this->hasInput('dashboardid')) {
-			$dashboards = API::Dashboard()->get([
-				'output' => [],
-				'dashboardids' => $this->getInput('dashboardid')
-			]);
+		$this->dashboard = $this->getDashboard();
 
-			if (!$dashboards) {
-				return false;
-			}
-		}
-
-		return true;
+		return !$this->hasInput('dashboardid') || $this->dashboard !== null;
 	}
 
 	protected function doAction() {
-		$dashboard = $this->getDashboard();
-
-		if ($dashboard === null) {
+		if ($this->dashboard === null) {
 			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 			$this->setResponse((new CControllerResponseRedirect($url->getUrl())));
+
 			return;
 		}
 
+		$pageFilter = new CPageFilter([
+			'groups' => [
+				'monitored_hosts' => true,
+				'with_items' => true
+			],
+			'hosts' => [
+				'monitored_hosts' => true,
+				'with_items' => true,
+				'DDFirstLabel' => _('not selected')
+			],
+			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
+			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
+		]);
+
 		$data = [
-			'dashboard' => $dashboard,
+			'dashboard' => $this->dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
-			'grid_widgets' => $this->getWidgets($dashboard['widgets'])
+			'grid_widgets' => $this->getWidgets($this->dashboard['widgets']),
+			'widget_defaults' => CWidgetConfig::getDefaults(),
+			'pageFilter' => $pageFilter,
+			'dynamic' => [
+				'has_dynamic_widgets' => $this->hasDynamicWidgets($this->dashboard['widgets']),
+				'hostid' => $pageFilter->hostid,
+				'groupid' => $pageFilter->groupid
+			]
 		];
 
 		$response = new CControllerResponseData($data);
@@ -88,36 +105,91 @@ class CControllerDashboardView extends CController {
 	 * @return array|null
 	 */
 	private function getDashboard() {
-		$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
-
-		if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
-			$dashboardid = DASHBOARD_DEFAULT_ID;
-		}
-
 		$dashboard = null;
 
-		if ($dashboardid != 0) {
+		if ($this->hasInput('new')) {
+			$dashboard = $this->getNewDashboard();
+		}
+		elseif ($this->hasInput('source_dashboardid')) {
+			// clone dashboard and show as new
 			$dashboards = API::Dashboard()->get([
-				'output' => ['dashboardid', 'name'],
+				'output' => ['name'],
+				// TODO AV: remove widgetid from 'selectWidgets'; related CControllerDashbrdWidgetUpdate:155
 				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
-				'dashboardids' => $dashboardid
+				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
 
 			if ($dashboards) {
-				$dashboard = $dashboards[0];
-				$dashboards_rw = API::Dashboard()->get([
-					'output' => [],
+				$dashboard = $this->getNewDashboard();
+				$dashboard['name'] = $dashboards[0]['name'];
+				$dashboard['widgets'] = $dashboards[0]['widgets'];
+			}
+		}
+		else {
+			// getting existing dashboard
+			$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
+
+			if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
+				$dashboardid = DASHBOARD_DEFAULT_ID;
+			}
+
+			if ($dashboardid != 0) {
+				$dashboards = API::Dashboard()->get([
+					'output' => ['dashboardid', 'name', 'userid'],
+					'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
 					'dashboardids' => $dashboardid,
-					'editable' => true,
 					'preservekeys' => true
 				]);
-				$dashboard['editable'] = array_key_exists($dashboardid, $dashboards_rw);
 
-				CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
+				if ($dashboards) {
+					$this->prepareEditableFlag($dashboards);
+					$dashboard = array_shift($dashboards);
+					$dashboard['owner'] = $this->getOwnerData($dashboard['userid']);
+
+					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
+				}
 			}
 		}
 
 		return $dashboard;
+	}
+
+	/**
+	 * Get new dashboard.
+	 *
+	 * @return array
+	 */
+	private function getNewDashboard()
+	{
+		return [
+			'dashboardid' => 0,
+			'name' => '',
+			'editable' => true,
+			'widgets' => [],
+			'owner' => $this->getOwnerData(CWebUser::$data['userid'])
+		];
+	}
+
+	/**
+	 * Get owner datails.
+	 *
+	 * @param int $userid
+	 *
+	 * @return array
+	 */
+	private function getOwnerData($userid)
+	{
+		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
+
+		$users = API::User()->get([
+			'output' => ['name', 'surname', 'alias'],
+			'userids' => $userid
+		]);
+		if ($users) {
+			$owner['name'] = getUserFullname($users[0]);
+		}
+
+		return $owner;
 	}
 
 	/**
@@ -127,34 +199,24 @@ class CControllerDashboardView extends CController {
 	 */
 	private function getWidgets($widgets) {
 		$grid_widgets = [];
-		$widget_names = CWidgetConfig::getKnownWidgetTypes();
-		// TODO VM: (?) WIDGET_DISCOVERY_STATUS and WIDGET_ZABBIX_STATUS are displayed only under specidic conditions,
-		// but we currently have these widgets in default dashboard. Should these conditions be be managed by frontend, or API?
-		// Currently these conditions are not managed by any of them.
 
 		foreach ($widgets as $widget) {
-			$widgetid = (int) $widget['widgetid'];
+			$widgetid = $widget['widgetid'];
 			$default_rf_rate = CWidgetConfig::getDefaultRfRate($widget['type']);
 
 			$grid_widgets[$widgetid] = [
 				'widgetid' => $widgetid,
 				'type' => $widget['type'],
 				'triggers' => CWidgetConfig::getTriggers($widget['type']),
-				'header' => ($widget['name'] !== '') ? $widget['name'] : $widget_names[$widget['type']],
-				// TODO VM: widget headers are not affeced by name from database, because it is rewritten by specific widget's API call
+				'header' => $widget['name'],
 				'pos' => [
 					'row' => (int) $widget['row'],
 					'col' => (int) $widget['col'],
 					'height' => (int) $widget['height'],
 					'width' => (int) $widget['width']
 				],
-				// TODO VM: (?) update refresh rate to take into account dashboard id
-				//			(1) Adding dashboard ID will limit reusage of dashboard.grid.js for pages without dashboard ID's
-				//			(2) Each widget has unique ID across all dashboards, so it will still work
-				//			(3) Leaving identification only be widget ID, it will be harder to manage, when deleating dashboards.
-				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $default_rf_rate),
-				// 'type' always should be in fields array
-				'fields' => ['type' => $widget['type']] + $this->convertWidgetFields($widget['fields'])
+				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
+				'fields' => $this->convertWidgetFields($widget['fields'])
 			];
 		}
 
@@ -174,6 +236,27 @@ class CControllerDashboardView extends CController {
 			$field_key = CWidgetConfig::getApiFieldKey($field['type']);
 			$ret[$field['name']] = $field[$field_key];
 		}
+
 		return $ret;
+	}
+
+	/**
+	 * Checks, if any of widgets has checked dynamic field.
+	 *
+	 * @param array $widgets
+	 *
+	 * @return bool
+	 */
+	private function hasDynamicWidgets($widgets) {
+		foreach ($widgets as $widget) {
+			foreach ($widget['fields'] as $field) {
+				// TODO VM: document 'dynamic' as field with special interraction
+				if ($field['name'] === 'dynamic' && $field['value_int'] == 1) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }

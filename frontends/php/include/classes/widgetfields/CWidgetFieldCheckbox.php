@@ -18,19 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldTextBox extends CWidgetField
+class CWidgetFieldCheckbox extends CWidgetField
 {
-	public function __construct($name, $label, $default = null) {
+	public function __construct($name, $label, $default = 0) {
 		parent::__construct($name, $label, $default, null);
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
-	public function validate() {
-		$errors = [];
-		if ($this->required === true && $this->value == '') {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
-		}
-
-		return $errors;
+	public function setValue($value) {
+		// Only values in this array will be considered as true, any other value will be considered as false.
+		$true_values = [true,1,'1'];
+		$value = (in_array($value, $true_values)) ? 1 : 0;
+		return parent::setValue($value);
 	}
 }

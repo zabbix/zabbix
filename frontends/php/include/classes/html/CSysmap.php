@@ -89,7 +89,7 @@ class CSysmap extends CDiv {
 				if ($reference) {
 					$this->script_run =
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'
-						. 'widgetid: '.$this->sysmap_conf['widgetid'].','
+						. 'widgetid: '.(int)$this->sysmap_conf['widgetid'].','
 						. 'sourceWidgetReference: "'.$reference.'",'
 						. 'callback: function(widget, data) {'
 						. ' if(data[0].mapid !== +data[0].mapid) return;'

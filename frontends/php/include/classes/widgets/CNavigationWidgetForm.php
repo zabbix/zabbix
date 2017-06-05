@@ -22,13 +22,6 @@ class CNavigationWidgetForm extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data);
 
-		// widget name field
-		$widget_name = (new CWidgetFieldTextBox('widget_name', _('Name')));
-		if (array_key_exists('widget_name', $data)) {
-			$widget_name->setValue($data['widget_name']);
-		}
-		$this->fields[] = $widget_name;
-
 		// widget reference field
 		$reference_field = (new CWidgetFieldReference());
 		$reference = array_key_exists($reference_field->getName(), $data) ? $data[$reference_field->getName()] : '';

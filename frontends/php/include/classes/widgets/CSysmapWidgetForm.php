@@ -23,13 +23,6 @@ class CSysmapWidgetForm extends CWidgetForm
 	public function __construct($data) {
 		parent::__construct($data);
 
-		// widget name field
-		$widget_name = (new CWidgetFieldTextBox('widget_name', _('Name')));
-		if (array_key_exists('widget_name', $data)) {
-			$widget_name->setValue($data['widget_name']);
-		}
-		$this->fields[] = $widget_name;
-
 		// select source type field
 		$source_type = array_key_exists('source_type', $data) ? (int)$data['source_type'] : WIDGET_SYSMAP_SOURCETYPE_MAP;
 

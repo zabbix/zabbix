@@ -521,12 +521,44 @@ ul.top-nav-icons {
 	}
 
 	ul {
-
 		li {
 			display: inline-block;
 			vertical-align: top;
 			position: relative;
 			padding: 0 0 0 10px;
+		}
+	}
+
+	.dashbrd-edit {
+		position: relative;
+		display: inline-block;
+		background-color: $ui-bg-color;
+		@include box-shadow(0 0 0 4px $ui-bg-color);
+
+		&::after {
+			content: "";
+			position: absolute;
+			min-height: 24px;
+			z-index: -1;
+			top: -5px;
+			right: -5px;
+			bottom: -5px;
+			left: -5px;
+			border: 1px solid $ui-border-color;
+		}
+
+		ul {
+			li {
+				vertical-align: middle;
+
+				&:first-child {
+					padding: 0;
+				}
+
+				.btn-dashbrd-conf {
+					vertical-align: middle;
+				}
+			}
 		}
 	}
 }
@@ -2161,10 +2193,25 @@ $icon-widget-btn: (
 	}
 }
 
+.btn-dashbrd-conf {
+	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
+	@extend %btn-dashbrd;
+}
+
 %btn-widget {
-	border: none;
 	width: 30px;
 	height: 28px;
+	@extend %btn-widget-defaults;
+}
+
+%btn-dashbrd {
+	width: 24px;
+	height: 24px;
+	@extend %btn-widget-defaults;
+}
+
+%btn-widget-defaults {
+	border: none;
 	min-height: 0;
 	padding: 0;
 	-webkit-transform-style: preserve-3d;
@@ -2979,30 +3026,6 @@ $form-icon-btn: (
 	}
 }
 
-.dashbrd-edit {
-	position: relative;
-	display: inline-block;
-	line-height: 24px;
-	background-color: $ui-bg-color;
-	@include box-shadow(0 0 0 4px $ui-bg-color);
-
-	&::after {
-		content: "";
-		position: absolute;
-		min-height: 24px;
-		z-index: -1;
-		top: -5px;
-		right: -5px;
-		bottom: -5px;
-		left: -5px;
-		border: 1px solid $ui-border-color;
-	}
-
-	li:first-child {
-		padding: 0;
-	}
-}
-
 // Action Menus, Pop-up Menus
 .action-menu {
 	position: absolute;
@@ -3173,7 +3196,7 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue-body {
-	margin: 0 0 50px 0;
+	white-space: nowrap;
 }
 
 .overlay-dialogue-footer {

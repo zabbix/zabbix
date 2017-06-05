@@ -22,7 +22,7 @@ class CWidgetFieldComboBox extends CWidgetField
 {
 	protected $values;
 
-	public function __construct($name, $label, $values, $default = 0, $action = null, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
+	public function __construct($name, $label, $values, $default = null, $action = null, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
 		parent::__construct($name, $label, $default, $action);
 		$this->setSaveType($save_type);
 		$this->values = $values;

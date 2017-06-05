@@ -25,13 +25,17 @@ class CControllerDashbrdWidgetRfRate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboard_id' =>	'db dashboard.dashboardid',
-			'widgets' =>		'required|array'
+			'widgets' =>	'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			// TODO AV: validation of 'widgets'
+		}
+
 		if (!$ret) {
+			// TODO AV: improve error reporting
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 		}
 
@@ -45,7 +49,7 @@ class CControllerDashbrdWidgetRfRate extends CController {
 	protected function doAction() {
 		foreach ($this->getInput('widgets') as $widget) {
 			if (array_key_exists('rf_rate', $widget)) {
-				CProfile::update('web.dashbrd.widget.'.$widget['widgetid'].'.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT);
+				CProfile::update('web.dashbrd.widget.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT, $widget['widgetid']);
 			}
 		}
 

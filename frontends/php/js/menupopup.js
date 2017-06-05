@@ -363,6 +363,7 @@ function getMenuPopupRefresh(options) {
 				'x5': 'x5'
 			}
 			: {
+				0: t('No refresh'),
 				10: t('10 seconds'),
 				30: t('30 seconds'),
 				60: t('1 minute'),
@@ -370,7 +371,6 @@ function getMenuPopupRefresh(options) {
 				600: t('10 minutes'),
 				900: t('15 minutes')
 			};
-		// TODO VM: add option with no refresh (for dashboards)
 
 	jQuery.each(intervals, function(value, label) {
 		var item = {
@@ -403,7 +403,6 @@ function getMenuPopupRefresh(options) {
 						method: 'POST',
 						dataType: 'json',
 						data: {
-							dashboard_id: 1, // TODO VM: (?) replace with real (depends on - will we have dashboard id in profile key)
 							widgets: [
 								{
 									'widgetid': options.widgetName,
@@ -495,7 +494,8 @@ function getMenuPopupDashboard(options) {
 
 function showDialogForm(form, options, formData) {
 
-	var oldFormParent = form.parent();
+	var oldFormParent = form.parent(),
+		errorBlockId = 'dialog-form-error-container';
 	// trick to get outerWidth, outerHeight of "display:none" form
 	form.css('visibility', 'hidden');
 	form.css('display', 'block');
@@ -503,9 +503,16 @@ function showDialogForm(form, options, formData) {
 	if (typeof formData !== 'undefined' && typeof form.fillForm === 'function') {
 		form.fillForm(formData);
 	}
+	function removeErrorBlock() {
+		form.find('#' + errorBlockId).remove();
+	}
+
 	overlayDialogue({
 		'title': options.title,
 		'content': form,
+		'css_body': {
+			"margin-bottom": '10px'
+		},
 		'buttons': [
 			{
 				'title': options.action_title,
@@ -513,11 +520,22 @@ function showDialogForm(form, options, formData) {
 				'class': 'dialogue-widget-save',
 				'keepOpen': false,
 				'action': function() {
+					removeErrorBlock();
+
+					form.submit();
+					var errors = form.data('errors');
+					// output errors
+					if (typeof errors === 'object' && errors.length > 0) {
+						var errorBlock = makeErrorMessageBox(errors, errorBlockId);
+						form.prepend(errorBlock);
+						// if form has errors dialog overlay not be destroyed
+						return false;
+					}
+
 					form.css('display', 'none');
 					form.css('visibility', 'hidden');
 					oldFormParent.append(form);
-					form.submit();
-
+					return true;
 				}
 			},
 			{
@@ -525,6 +543,7 @@ function showDialogForm(form, options, formData) {
 				'class': 'btn-alt',
 				'cancel': true,
 				'action': function() {
+					removeErrorBlock();
 					// to not destroy form need to move it to old place
 					form.css('display', 'none');
 					form.css('visibility', 'hidden');

@@ -29,13 +29,20 @@ class CControllerWidgetClockView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'		=>	'required', // TODO VM: in db.widget
-			'fields'		=>	'array',
+			'fields' =>		'required|array',
+			'name' =>		'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
+
 		if ($ret) {
+			/*
+			 * @var array  $fields
+			 * @var int    $fields['time_type']
+			 * @var string $fields['itemid']             (optional)
+			 */
 			// TODO VM: if fields are present, check that fields have enough data
+			// TODO VM: itemid -> mandotory, if time_type is TIME_TYPE_HOST
 		}
 
 		if (!$ret) {
@@ -51,38 +58,25 @@ class CControllerWidgetClockView extends CController {
 	}
 
 	protected function doAction() {
-
 		$time = null;
 		$title = null;
 		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;
-		$data = [];
 
 		// Default values
 		$default = [
+			'name' => '', // If not defined by user, use calculated one
 			'time_type' => null,
 			'itemid' => null,
-			'hostid' => null, // TODO VM: probably will not be used at all
-			'inner_width' => null,
-			'inner_height' => null,
+			'hostid' => null // TODO VM: probably will not be used at all
 		];
 
-		if ($this->hasInput('fields')) {
-			// Use configured data, if possible
-			$data = $this->getInput('fields');
-		}
+		$data = $this->getInput('fields');
 
-		// TODO VM: Should be optional values, should have minimal value.
-		// In case of beeing NULL, will take all available widget's space.
-		// Validation: both null, or both bigger/smaller than.
-		if (!array_key_exists('inner_width', $data)
-				|| !array_key_exists('inner_height', $data)
-				|| $data['inner_width'] == 0
-				|| $data['inner_height'] == 0
-		) {
-			$data['inner_width'] = $default['inner_width'];
-			$data['inner_height'] = $default['inner_height'];
+		$data['name'] = $this->getInput('name');
+		if ($data['name'] === '') {
+			$data['name'] = $default['name'];
 		}
 
 		// Apply defualt value for data
@@ -157,14 +151,12 @@ class CControllerWidgetClockView extends CController {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'clock' => [
-				'title' => $title,
 				'time' => $time,
 				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
-				'error' => $error,
-				'inner_width' => $data['inner_width'],
-				'inner_height' => $data['inner_height']
-			]
+				'error' => $error
+			],
+			'name' => ($data['name'] === '') ? $title : $data['name']
 		]));
 	}
 }

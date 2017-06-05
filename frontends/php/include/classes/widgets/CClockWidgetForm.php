@@ -40,12 +40,9 @@ class CClockWidgetForm extends CWidgetForm
 
 		// Item field
 		if ($field_time_type->getValue(true) === TIME_TYPE_HOST) {
-			$field_item = (new CWidgetFieldItemId('itemid', _('Item')))->setRequired(true);
+			$field_item = (new CWidgetFieldItem('itemid', _('Item')))->setRequired(true);
 			if (array_key_exists('itemid', $data)) {
 				$field_item->setValue($data['itemid']);
-			}
-			if (array_key_exists('caption', $data)) {
-				$field_item->setCaption($data['caption']);
 			}
 			$this->fields[] = $field_item;
 		}

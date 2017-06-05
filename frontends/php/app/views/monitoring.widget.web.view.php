@@ -88,7 +88,7 @@ foreach ($groups as $group) {
 }
 
 $output = [
-	'header' => _('Web monitoring'),
+	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];

@@ -18,19 +18,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldTextBox extends CWidgetField
-{
-	public function __construct($name, $label, $default = null) {
-		parent::__construct($name, $label, $default, null);
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-	}
 
-	public function validate() {
-		$errors = [];
-		if ($this->required === true && $this->value == '') {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
-		}
+$url_list = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.list');
 
-		return $errors;
-	}
+if ($data['fullscreen']) {
+	$url_list->setArgument('fullscreen', '1');
 }
+
+$breadcrumbs = [
+	(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
+];
+
+if ($data['dashboard']['dashboardid'] != 0) {
+	$url_view = (new CUrl('zabbix.php'))
+		->setArgument('action', 'dashboard.view')
+		->setArgument('dashboardid', $data['dashboard']['dashboardid']);
+	if ($data['fullscreen']) {
+		$url_view->setArgument('fullscreen', '1');
+	}
+	$breadcrumbs[] = '/';
+	$breadcrumbs[] = (new CSpan())
+		->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl()))
+			->setId('dashboard-direct-link')
+		)
+		->addClass(ZBX_STYLE_SELECTED);
+}
+
+return $breadcrumbs;
