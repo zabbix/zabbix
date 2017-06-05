@@ -39,6 +39,7 @@ $itemTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Wizard'),
 		make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
@@ -99,8 +100,19 @@ foreach ($this->data['items'] as $item) {
 		$applications = '';
 	}
 
+	$item_menu = CMenuPopupHelper::getDependentItemPrototype($item['itemid'], $data['parent_discoveryid'],
+		$item['name']
+	);
+
+	$wizard = (new CSpan(
+		(new CButton(null))
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+			->setMenuPopup($item_menu)
+	))->addClass(ZBX_STYLE_REL_CONTAINER);
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
+		$wizard,
 		$description,
 		$item['key_'],
 		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
