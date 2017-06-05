@@ -536,7 +536,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if ($data['type'] == ITEM_TYPE_DEPENDENT && $data['master_itemid']) {
-		$master = API::Item()->get([
+		$master = API::ItemPrototype()->get([
 			'output' => ['name', 'key_'],
 			'itemids' => $data['master_itemid']
 		])[0];
@@ -587,7 +587,7 @@ else {
 	unset($item);
 
 	$master_itemids = array_unique(zbx_objectValues($data['items'], 'master_itemid'));
-	$data['master_items'] = API::Item()->get([
+	$data['master_items'] = API::ItemPrototype()->get([
 		'output' => ['name'],
 		'itemids' => array_filter($master_itemids),
 		'preservekeys' => true
