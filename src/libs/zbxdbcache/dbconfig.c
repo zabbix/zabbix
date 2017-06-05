@@ -10400,3 +10400,53 @@ void zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess)
 
 	UNLOCK_CACHE;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_host_interfaces                                       *
+ *                                                                            *
+ * Purpose: get data of all network interfaces for a host in configuration    *
+ *          cache                                                             *
+ *                                                                            *
+ * Parameter: hostid     - [IN] the host identifier                           *
+ *            interfaces - [OUT] array with interface data                    *
+ *            n          - [OUT] number of allocated 'interfaces' elements    *
+ *                                                                            *
+ * Return value: SUCCEED - interface data retrieved successfully              *
+ *               FAIL    - host not found                                     *
+ *                                                                            *
+ * Comments: if host is found but has no interfaces (should not happen) this  *
+ *           function sets 'n' to 0 and no memory is allocated for            *
+ *           'interfaces'. It is a caller responsibility to deallocate        *
+ *           memory of 'interfaces' and its components.                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE **interfaces, int *n)
+{
+	ZBX_DC_HOST	*host;
+	int		i, ret = FAIL;
+
+	if (0 == hostid)
+		goto unlock;
+
+	LOCK_CACHE;
+
+	/* find host entry in 'config->hosts' hashset */
+
+	if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
+		goto unlock;
+
+	/* allocate memory for results */
+
+	if (0 < (*n = host->interfaces_v.values_num))
+		*interfaces = zbx_malloc(NULL, sizeof(DC_INTERFACE) * (size_t)*n);
+
+	/* copy data about all host interfaces */
+
+	for (i = 0; i < *n; i++)
+		DCget_interface(*interfaces + i, (const ZBX_DC_INTERFACE  *)host->interfaces_v.values[i]);
+unlock:
+	UNLOCK_CACHE;
+
+	return ret;
+}
