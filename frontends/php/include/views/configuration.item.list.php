@@ -209,7 +209,7 @@ foreach ($this->data['items'] as $item) {
 		$triggerInfo = SPACE;
 	}
 
-	$item_menu = CMenuPopupHelper::getDependentItems($item['itemid'], $item['hostid'], $item['name']);
+	$item_menu = CMenuPopupHelper::getDependentItem($item['itemid'], $item['hostid'], $item['name']);
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
 		$triggers = [];
@@ -236,7 +236,7 @@ foreach ($this->data['items'] as $item) {
 		$item_menu = $trigger_menu;
 	}
 
-	$menu_icon = (new CSpan(
+	$wizard = (new CSpan(
 		(new CButton(null))
 			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
 			->setMenuPopup($item_menu)
@@ -244,7 +244,7 @@ foreach ($this->data['items'] as $item) {
 
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
-		$menu_icon,
+		$wizard,
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
