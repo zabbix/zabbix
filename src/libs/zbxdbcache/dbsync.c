@@ -196,7 +196,7 @@ static void	dbsync_add_row(zbx_dbsync_t *sync, zbx_uint64_t rowid, unsigned char
 		row->row = (char **)zbx_malloc(NULL, sizeof(char *) * sync->columns_num);
 
 		for (i = 0; i < sync->columns_num; i++)
-			row->row[i] = (SUCCEED == DBis_null(dbrow[i]) ? NULL : dbsync_strdup(dbrow[i]));
+			row->row[i] = (NULL == dbrow[i] ? NULL : dbsync_strdup(dbrow[i]));
 	}
 	else
 		row->row = NULL;

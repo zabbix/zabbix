@@ -1257,7 +1257,7 @@ static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type,
 static int	preprocess_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata, zbx_hashset_t *delta_history)
 {
 	int		i, ret;
-	char		*errmsg = NULL;
+	char		*errmsg = NULL, *logvalue;
 	zbx_variant_t	value_var;
 
 	if (0 != (hdata->flags & ZBX_DC_FLAG_NOVALUE))
@@ -1278,7 +1278,8 @@ static int	preprocess_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata, zbx
 				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_TEXT_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_LOG_VALUE_LEN)] = '\0';
+				logvalue = hdata->value.log->value;
+				logvalue[zbx_db_strlen_n(logvalue, HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 		}
 		return SUCCEED;
@@ -3469,21 +3470,26 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
-
 	table = DBget_table(table_name);
 
 	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 			table->recid, table_name, table->recid, min, max);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-		id->lastid = min;
-	else
-		ZBX_STR2UINT64(id->lastid, row[0]);
+	if (NULL != result)
+	{
+		zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
-	nextid = id->lastid + 1;
-	id->lastid += num;
-	lastid = id->lastid;
+		if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			id->lastid = min;
+		else
+			ZBX_STR2UINT64(id->lastid, row[0]);
+
+		nextid = id->lastid + 1;
+		id->lastid += num;
+		lastid = id->lastid;
+	}
+	else
+		nextid = lastid = 0;
 
 	UNLOCK_CACHE_IDS;
 

@@ -78,6 +78,7 @@ if (isset($_REQUEST['favobj'])) {
 
 			$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
 			$sysmapUpdate['sysmapid'] = $sysmapid;
+			$sysmapUpdate['lines'] = [];
 
 			if (array_key_exists('shapes', $sysmapUpdate)) {
 				foreach ($sysmapUpdate['shapes'] as $key => &$shape) {

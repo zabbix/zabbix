@@ -74,7 +74,7 @@ class CEvent extends CApiService {
 
 		$sqlParts = [
 			'select'	=> [$this->fieldId('eventid')],
-			'from'		=> ['events' => 'events e'],
+			'from'		=> ['e' => 'events e'],
 			'where'		=> [],
 			'order'		=> [],
 			'group'		=> [],
@@ -145,19 +145,19 @@ class CEvent extends CApiService {
 				}
 				// all triggers
 				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-					$sqlParts['where'][] = 'EXISTS ('.
+					$sqlParts['where'][] = 'NOT EXISTS ('.
 							'SELECT NULL'.
 							' FROM functions f,items i,hosts_groups hgg'.
-								' JOIN rights r'.
+								' LEFT JOIN rights r'.
 									' ON r.id=hgg.groupid'.
 										' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
 							' WHERE e.objectid=f.triggerid'.
 								' AND f.itemid=i.itemid'.
 								' AND i.hostid=hgg.hostid'.
-							' GROUP BY f.triggerid'.
-							' HAVING MIN(r.permission)>'.PERM_DENY.
-								' AND MAX(r.permission)>='.zbx_dbstr($permission).
+							' GROUP BY i.hostid'.
+							' HAVING MAX(permission)<'.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
+								' OR MIN(permission) IS NULL'.
+								' OR MIN(permission)='.PERM_DENY.
 							')';
 				}
 			}
@@ -184,7 +184,6 @@ class CEvent extends CApiService {
 				}
 				// all items and LLD rules
 				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 					$sqlParts['where'][] = 'EXISTS ('.
 							'SELECT NULL'.
 							' FROM items i,hosts_groups hgg'.
@@ -195,7 +194,7 @@ class CEvent extends CApiService {
 								' AND i.hostid=hgg.hostid'.
 							' GROUP BY hgg.hostid'.
 							' HAVING MIN(r.permission)>'.PERM_DENY.
-								' AND MAX(r.permission)>='.zbx_dbstr($permission).
+								' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
 							')';
 				}
 			}
@@ -219,29 +218,27 @@ class CEvent extends CApiService {
 			}
 		}
 
-		$sub_sql_parts = [];
-
 		// groupids
 		if ($options['groupids'] !== null) {
 			zbx_value2array($options['groupids']);
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sub_sql_parts['from']['f'] = 'functions f';
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
-				$sub_sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sub_sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sub_sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
-				$sub_sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sqlParts['from']['f'] = 'functions f';
+				$sqlParts['from']['i'] = 'items i';
+				$sqlParts['from']['hg'] = 'hosts_groups hg';
+				$sqlParts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
+				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			}
 			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
-				$sub_sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
-				$sub_sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
-				$sub_sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sqlParts['from']['i'] = 'items i';
+				$sqlParts['from']['hg'] = 'hosts_groups hg';
+				$sqlParts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
+				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			}
 		}
 
@@ -251,17 +248,17 @@ class CEvent extends CApiService {
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sub_sql_parts['from']['f'] = 'functions f';
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sub_sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sub_sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sqlParts['from']['f'] = 'functions f';
+				$sqlParts['from']['i'] = 'items i';
+				$sqlParts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
 			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sub_sql_parts['from']['i'] = 'items i';
-				$sub_sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
-				$sub_sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sqlParts['from']['i'] = 'items i';
+				$sqlParts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
 		}
 
@@ -271,17 +268,17 @@ class CEvent extends CApiService {
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sub_sql_parts['from']['f'] = 'functions f';
-				$sub_sql_parts['from']['ia'] = 'items_applications ia';
-				$sub_sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sub_sql_parts['where']['f-ia'] = 'f.itemid=ia.itemid';
-				$sub_sql_parts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
+				$sqlParts['from']['f'] = 'functions f';
+				$sqlParts['from']['ia'] = 'items_applications ia';
+				$sqlParts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sqlParts['where']['f-ia'] = 'f.itemid=ia.itemid';
+				$sqlParts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
 			}
 			// items
 			elseif ($options['object'] == EVENT_OBJECT_ITEM) {
-				$sub_sql_parts['from']['ia'] = 'items_applications ia';
-				$sub_sql_parts['where']['e-ia'] = 'e.objectid=ia.itemid';
-				$sub_sql_parts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
+				$sqlParts['from']['ia'] = 'items_applications ia';
+				$sqlParts['where']['e-ia'] = 'e.objectid=ia.itemid';
+				$sqlParts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
 			}
 			// ignore this filter for lld rules
 		}
@@ -292,19 +289,11 @@ class CEvent extends CApiService {
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sub_sql_parts['from']['t'] = 'triggers t';
-				$sub_sql_parts['where']['e-t'] = 'e.objectid=t.triggerid';
-				$sub_sql_parts['where']['t'] = dbConditionInt('t.priority', $options['severities']);
+				$sqlParts['from']['t'] = 'triggers t';
+				$sqlParts['where']['e-t'] = 'e.objectid=t.triggerid';
+				$sqlParts['where']['t'] = dbConditionInt('t.priority', $options['severities']);
 			}
 			// ignore this filter for items and lld rules
-		}
-
-		if ($sub_sql_parts) {
-			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM '.implode(',', $sub_sql_parts['from']).
-				' WHERE '.implode(' AND ', array_unique($sub_sql_parts['where'])).
-			')';
 		}
 
 		// acknowledged

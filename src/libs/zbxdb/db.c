@@ -1546,15 +1546,13 @@ error:
 	}
 	else
 	{
-		if (0 != mysql_query(conn, sql))
+		if (0 != mysql_query(conn, sql) || NULL == (result->result = mysql_store_result(conn)))
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 
 			DBfree_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error() ? (DB_RESULT)ZBX_DB_DOWN : NULL);
 		}
-		else
-			result->result = mysql_store_result(conn);
 	}
 #elif defined(HAVE_ORACLE)
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
