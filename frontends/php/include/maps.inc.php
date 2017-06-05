@@ -988,7 +988,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 						$i['problem']++;
 						$lastProblemId = $trigger['triggerid'];
 
-						if ($critical_triggerid != 0) {
+						if ($critical_triggerid == 0) {
 							$critical_triggerid = $trigger['triggerid'];
 						}
 
