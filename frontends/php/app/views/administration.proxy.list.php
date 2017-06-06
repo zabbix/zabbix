@@ -20,7 +20,7 @@
 
 
 if ($data['uncheck']) {
-	uncheckTableRows();
+	uncheckTableRows('proxy');
 }
 
 $widget = (new CWidget())
