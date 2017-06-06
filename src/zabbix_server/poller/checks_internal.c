@@ -20,7 +20,6 @@
 #include "common.h"
 #include "checks_internal.h"
 #include "checks_java.h"
-#include "log.h"
 #include "dbcache.h"
 #include "zbxself.h"
 #include "valuecache.h"
