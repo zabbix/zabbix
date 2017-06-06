@@ -371,11 +371,13 @@ class CMediatype extends CApiService {
 					));
 				}
 
+				$min = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 0;
 				$max = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
 
-				if (!ctype_digit((string) $mediatype['maxsessions']) || $mediatype['maxsessions'] > $max) {
+				if (!ctype_digit((string) $mediatype['maxsessions']) || $mediatype['maxsessions'] > $max
+						|| $mediatype['maxsessions'] < $min) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxsessions', _s('must be between "%1$s" and "%2$s"', 0, $max)
+						'maxsessions', _s('must be between "%1$s" and "%2$s"', $min, $max)
 					));
 				}
 			}
@@ -722,11 +724,13 @@ class CMediatype extends CApiService {
 					));
 				}
 
+				$min = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 0;
 				$max = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
 
-				if (!ctype_digit((string) $mediatype['maxsessions']) || $mediatype['maxsessions'] > $max) {
+				if (!ctype_digit((string) $mediatype['maxsessions']) || $mediatype['maxsessions'] > $max
+						|| $mediatype['maxsessions'] < $min) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxsessions', _s('must be between "%1$s" and "%2$s"', 0, $max)
+						'maxsessions', _s('must be between "%1$s" and "%2$s"', $min, $max)
 					));
 				}
 			}
