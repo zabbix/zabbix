@@ -795,7 +795,7 @@ SVGMapElement.prototype.update = function(options) {
 		}
 	});
 
-	// Inherit label location from map options
+	// Inherit label location from map options.
 	if (options.label_location === SVGMapElement.LABEL_POSITION_DEFAULT) {
 		options.label_location = parseInt(this.map.options.label_location);
 	}

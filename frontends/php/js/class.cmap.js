@@ -316,7 +316,7 @@ ZABBIX.apps.map = (function($) {
 					'elements': elements,
 					'links': links,
 					'shapes': shapes,
-					label_location: this.data.label_location
+					'label_location': this.data.label_location
 				});
 			},
 
