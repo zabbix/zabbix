@@ -23,7 +23,6 @@ class CNavigationTree extends CDiv {
 		private $error;
 		private $script_file;
 		private $script_run;
-		//private $widgetid = null;
 		private $field_items;
 		private $problems;
 		private $problems_per_severity_tpl;
@@ -55,16 +54,6 @@ class CNavigationTree extends CDiv {
 			$sysmaps = zbx_objectValues($data['field_items'], 'mapid');
 			$this->error = null;
 			$this->field_items = $data['field_items'];
-			$this->submaps = $this->getSubMaps($sysmaps);
-
-			// To count also a sub-map problems, add their IDs to the $sysmaps.
-			$submapsids = [];
-			foreach ($this->submaps as $map) {
-				$submapsids = array_merge(zbx_objectValues($map, 'sysmapid'), $submapsids);
-			}
-			$sysmaps = array_merge($sysmaps, $submapsids);
-			$sysmaps = array_keys(array_flip($sysmaps));
-
 			$this->problems = $this->getNumberOfProblemsBySysmap($sysmaps);
 			$this->data = $data;
 			$this->script_file = 'js/class.cnavtree.js';
@@ -100,54 +89,12 @@ class CNavigationTree extends CDiv {
 					'jQuery("#'.$this->getId().'").zbx_navtree({'.
 						'problems: '.json_encode($this->problems).','.
 						'severityLevels: '.json_encode($this->getSeverityConfig()).','.
-						'subMaps: '.json_encode($this->submaps).','.
 						'widgetId: '.(int)$this->data['widgetid'].','.
 						'maxDepth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
 					'});';
 			}
 
 			return $this->script_run;
-		}
-
-		protected function getSubMaps(array $mapsId = []) {
-			$response = [];
-			$mapsId = array_filter(array_keys(array_flip($mapsId)), function($id) {
-				return (is_numeric($id) && $id > 0);
-			});
-
-			if ($mapsId) {
-				$db_mapselements = DBselect(
-					'SELECT DISTINCT se.sysmapid,se.elementid'.
-					' FROM sysmaps_elements se'.
-					' WHERE se.elementtype = '.SYSMAP_ELEMENT_TYPE_MAP.' AND se.sysmapid IN ('.implode(',', $mapsId).')'
-				);
-
-				$sub_mapsids = [];
-
-				while ($db_mapelement = DBfetch($db_mapselements)) {
-					$sub_mapsids[] = $db_mapelement['elementid'];
-					$sysmap_list[] = $db_mapelement;
-				}
-
-				if ($sub_mapsids) {
-					$submaps = API::Map()->get([
-						'output' => ['sysmapid', 'name'],
-						'sysmapids' => $sub_mapsids,
-						'preservekeys' => true,
-						'severity_min' => $this->severity_min
-					]);
-
-					foreach ($sysmap_list as $single_sysmap) {
-						foreach ($submaps as $submap) {
-							if ($single_sysmap['elementid'] == $submap['sysmapid']) {
-								$response[$single_sysmap['sysmapid']][] = $submap;
-							}
-						}
-					}
-				}
-			}
-
-			return $response;
 		}
 
 		protected function getNumberOfProblemsBySysmap(array $mapsId = []) {
@@ -319,12 +266,14 @@ class CNavigationTree extends CDiv {
 								case SYSMAP_ELEMENT_TYPE_MAP:
 									$problems = $this->problems_per_severity_tpl;
 
-									foreach ($problems_by_elements[SYSMAP_ELEMENT_TYPE_MAP][$element['sysmapid']] as $el_type => $el_list) {
-										foreach ($el_list as $el_id) {
-											if (array_key_exists($el_id, $problems_by_elements[$el_type])) {
-												$problems = array_map(function() {
-													return array_sum(func_get_args());
-												}, $problems_by_elements[$el_type][$el_id], $problems);
+									if (array_key_exists(SYSMAP_ELEMENT_TYPE_MAP, $problems_by_elements)) {
+										foreach ($problems_by_elements[SYSMAP_ELEMENT_TYPE_MAP][$element['sysmapid']] as $el_type => $el_list) {
+											foreach ($el_list as $el_id) {
+												if (array_key_exists($el_id, $problems_by_elements[$el_type])) {
+													$problems = array_map(function() {
+														return array_sum(func_get_args());
+													}, $problems_by_elements[$el_type][$el_id], $problems);
+												}
 											}
 										}
 									}

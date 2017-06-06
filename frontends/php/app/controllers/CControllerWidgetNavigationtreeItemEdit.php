@@ -28,8 +28,9 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'add_submaps' => '',
 			'map_name' => '',
-			'map_id' => '',
+			'map_mapid' => '',
 			'mapid' => ''
 		];
 
@@ -47,27 +48,11 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 	}
 
 	protected function doAction() {
-		$title = null;
-		$error = null;
-
+		$add_submaps = $this->getInput('add_submaps', 0);
 		$map_item_name = $this->getInput('map_name', '');
-		$map_mapid = $this->getInput('mapid', 0);
-		$map_id = $this->getInput('map_id', 0);
-
-		// build form
-		$form = (new CForm('post'))
-			->cleanItems()
-			->setId('widget_dialogue_form')
-			->setName('widget_dialogue_form');
-
-		$formList = new CFormList();
-		$formList->addRow(
-			_('Name'),
-			(new CTextBox('map.name.'.$map_id, $map_item_name))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		);
-
-		$sysmap_id = 0;
-		$sysmap_caption = '';
+		$map_id = $this->getInput('mapid', 0);
+		$map_mapid = $this->getInput('map_mapid', 0);
+		$submaps = [];
 
 		if ($map_mapid) {
 			$maps = API::Map()->get([
@@ -75,38 +60,36 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 				'output' => API_OUTPUT_EXTEND
 			]);
 
-			if (($map = reset($maps)) !== false) {
-				$sysmap_caption = $map['name'];
-				$sysmap_id = $map['sysmapid'];
+			if (($map = reset($maps)) === false) {
+				$map_mapid = 0;
 			}
 		}
 
-		$formList->addVar('linked_map_id', $sysmap_id);
-		$formList->addRow(_('Linked map'), [
-			(new CTextBox('caption', $sysmap_caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
-					'&dstfrm='.$form->getName().'&dstfld1=linked_map_id&dstfld2=caption");'
-			)
-		]);
+		if ($map_mapid && $add_submaps == 1) {
+			$db_mapselements = DBselect(
+				'SELECT DISTINCT se.elementid'.
+				' FROM sysmaps_elements se'.
+				' WHERE se.elementtype = '.SYSMAP_ELEMENT_TYPE_MAP.' AND se.sysmapid = '.$map_mapid
+			);
 
-		$form->addItem($formList);
+			$sub_mapsids = [];
+			while ($db_mapelement = DBfetch($db_mapselements)) {
+				$sub_mapsids[] = $db_mapelement['elementid'];
+			}
+
+			$submaps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => $sub_mapsids
+			]);
+		}
 
 		// prepare output
 		$output = [
-			'body' => $form->toString()
+			'map_name' => $map_item_name,
+			'map_mapid' => $map_mapid,
+			'map_id' => $map_id,
+			'submaps' => $submaps
 		];
-
-		if (($messages = getMessages()) !== null) {
-			$output['messages'] = $messages->toString();
-		}
-
-		if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-			CProfiler::getInstance()->stop();
-			$output['debug'] = CProfiler::getInstance()->make()->toString();
-		}
 
 		echo (new CJson())->encode($output);
 	}

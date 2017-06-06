@@ -4507,11 +4507,6 @@ tr.cursor-move {
 		.drop-hover>.row {
 			background: #faebd7;
 		}
-
-		.item-name:before {
-			content: attr(data-prefix);
-			color: #b5b9bb;
-		}
 	}
 }
 

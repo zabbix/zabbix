@@ -107,6 +107,7 @@ class CRouter {
 		'widget.clock.view'		=> ['CControllerWidgetClockView',		'layout.widget',		'monitoring.widget.clock.view'],
 		'widget.sysmap.view'		=> ['CControllerWidgetSysmapView',		'layout.widget',		'monitoring.widget.sysmap.view'],
 		'widget.navigationtree.view'		=> ['CControllerWidgetNavigationtreeView',		'layout.widget',		'monitoring.widget.navigationtree.view'],
+		'widget.navigationtree.edititemdialog'		=> ['CControllerWidgetNavigationtreeItemEditDialog',		null,		null],
 		'widget.navigationtree.edititem'		=> ['CControllerWidgetNavigationtreeItemEdit',		null,		null],
 		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view']
 	];

@@ -121,11 +121,7 @@ jQuery(function($) {
 							sum += +obj.data('problems'+sev);
 						}
 
-						/*
-						 * Problems of submaps are not counted in their parent problems. Otherwise, same problems will be counted
-						 * twice.
-						 */
-						$('[data-problems'+sev+']', obj).not('.submap').each(function() {
+						$('[data-problems'+sev+']', obj).each(function() {
 							sum += +$(this).data('problems'+sev);
 						});
 
@@ -181,7 +177,7 @@ jQuery(function($) {
 			var createTreeItem = function(item, depth) {
 				var widget_data = $this.data('widgetData'),
 					depth = depth||1,
-					link, span, li, ul, arrow, submaps, submaps_list_item, submaps_list_item_row, submaps_list_item_link;
+					link, span, li, ul, arrow;
 
 				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0) {
 					link = $('<a></a>').attr('href', '#');
@@ -193,10 +189,6 @@ jQuery(function($) {
 						e.preventDefault();
 						$(".dashbrd-grid-widget-container").dashboardGrid("widgetDataShare", widget, data_to_share);
 					});
-
-					if (typeof widget_data['subMaps'][item.mapid] !== 'undefined') {
-						submaps = widget_data['subMaps'][item.mapid];
-					}
 				}
 				else {
 					link = $('<span></span>');
@@ -250,34 +242,6 @@ jQuery(function($) {
 					}
 				}
 
-				if (submaps) {
-					li.addClass('is-parent');
-
-					$.each(submaps, function() {
-						submaps_list_item = $('<li></li>')
-							.attr({'data-mapid': this['sysmapid']})
-							.addClass('tree-item submap')
-							.appendTo(ul);
-
-						submaps_list_item_row = $('<span></span>')
-							.appendTo(submaps_list_item)
-							.addClass('row');
-
-						submaps_list_item_link = $('<a></a>')
-							.attr({'href':'#', 'data-mapid':this['sysmapid'], 'data-prefix':t('Submap: ')})
-							.click(function(e) {
-								e.preventDefault();
-								var data_to_share = {mapid: $(this).data('mapid')},
-										widget = getWidgetData();
-
-								$(".dashbrd-grid-widget-container").dashboardGrid("widgetDataShare", widget, data_to_share);
-							})
-							.appendTo(submaps_list_item_row)
-							.addClass('item-name')
-							.text(this['name']);
-					});
-				}
-
 				if (isEditMode()) {
 					var tools = $('<div></div>').addClass('tools').insertAfter(link);
 
@@ -312,16 +276,18 @@ jQuery(function($) {
 
 					$('<input>')
 						.click(function() {
-							var id = $(this).data('id');
-							var url = new Curl('zabbix.php');
+							var id = $(this).data('id'),
+									depth = $('.tree-item[data-id='+id+']', $this).closest('.tree-list').data('depth'),
+									url = new Curl('zabbix.php');
 
 							var ajax_data = {
 								map_name: $('[name="map.name.'+id+'"]', $this).val(),
-								mapid: $('[name="mapid.'+id+'"]', $this).val(),
+								map_mapid: $('[name="mapid.'+id+'"]', $this).val(),
+								depth: depth||1,
 								map_id: id
 							};
 
-							url.setArgument('action', 'widget.navigationtree.edititem');
+							url.setArgument('action', 'widget.navigationtree.edititemdialog');
 
 							jQuery.ajax({
 								url: url.getUrl(),
@@ -337,14 +303,46 @@ jQuery(function($) {
 												'title': t('Update'),
 												'class': 'dialogue-widget-save',
 												'action': function() {
-													var id = ajax_data.map_id,
-														form = $('#widget_dialogue_form'),
-														name = $('[name="map.name.'+id+'"]', form).val(),
-														map = $('[name="linked_map_id"]', form).val();
+													var form = $('#widget_dialogue_form'),
+														url = new Curl('zabbix.php'),
+														ajax_data = {
+															add_submaps: $('[name="add_submaps"]', form).is(':checked') ? 1 : 0,
+															map_name: $('[name="map.name.'+id+'"]', form).val(),
+															map_mapid: $('[name="linked_map_id"]', form).val(),
+															mapid: id
+														};
 
-													$('[name="map.name.'+id+'"]', $this).val(name);
-													$('[name="mapid.'+id+'"]', $this).val(map);
-													$('[data-id='+id+'] > .row > .item-name', $this).html(name);
+													url.setArgument('action', 'widget.navigationtree.edititem');
+
+													jQuery.ajax({
+														url: url.getUrl(),
+														method: 'POST',
+														data: ajax_data,
+														dataType: 'json',
+														success: function(resp) {
+															var id = resp['map_id'];
+															$('[name="map.name.'+id+'"]', $this).val(resp['map_name']);
+															$('[name="mapid.'+id+'"]', $this).val(resp['map_mapid']);
+															$('[data-id='+id+'] > .row > .item-name', $this).html(resp['map_name']);
+
+															if (typeof resp.submaps !== 'undefined') {
+																$.each(resp.submaps, function(){
+																	var root = $('.tree-item[data-id='+id+']>ul.tree-list', $this),
+																		new_item = {
+																			name: this['name'],
+																			mapid: this['sysmapid'],
+																			id: getNextId(),
+																			parent: id
+																		};
+
+																	root.append(createTreeItem(new_item));
+																});
+
+																$(".tree-item").droppable(getDroppableOptions());
+																setTreeHandlers();
+															}
+														}
+													});
 												}
 											},
 											{
@@ -826,7 +824,6 @@ jQuery(function($) {
 							severityLevels: options.severityLevels||[],
 							problems: options.problems||[],
 							maxDepth: options.maxDepth||3,
-							subMaps: options.subMaps||[],
 							lastId: 0
 						});
 
