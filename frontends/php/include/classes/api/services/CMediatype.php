@@ -730,6 +730,12 @@ class CMediatype extends CApiService {
 					));
 				}
 			}
+			elseif ($mediatype['type'] == MEDIA_TYPE_SMS && $mediatype['type'] != $db_mediatype['type']
+						&& $db_mediatype['maxsessions'] != 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'maxsessions', _s('must be between "%1$s" and "%2$s"', 1, 1)
+				));
+			}
 
 			// Validate optional 'maxattempts' field.
 			if (array_key_exists('maxattempts', $mediatype)
