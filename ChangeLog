@@ -70,6 +70,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9213] removed link from uneditable template and host names in all configuration sections (miks)
 ..F....... [ZBX-6533] improved LDAP authentication module status check for authentication form (gcalenko)
 ..F....... [ZBX-12019] fixed incorrectly displayed calendar date in maintenance edit form (miks)
 ..F....... [ZBX-11304] fixed trigger wizard expressions sorting as well as wizard crash due incorrect expression removal (miks)
@@ -493,6 +494,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-9213] removed link from uneditable template and host names in all configuration sections (miks)
 ..F....... [ZBX-6533] improved LDAP authentication module status check for authentication form (gcalenko)
 ..F....... [ZBX-12019] fixed incorrectly displayed calendar date in maintenance edit form (miks)
 ..F....... [ZBX-11304] fixed trigger wizard expressions sorting as well as wizard crash due incorrect expression removal (miks)
