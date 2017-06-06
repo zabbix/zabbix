@@ -10421,13 +10421,13 @@ void zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess)
  *           memory of 'interfaces' and its components.                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE **interfaces, int *n)
+int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n)
 {
 	ZBX_DC_HOST	*host;
 	int		i, ret = FAIL;
 
 	if (0 == hostid)
-		goto unlock;
+		return FAIL;
 
 	LOCK_CACHE;
 
@@ -10439,12 +10439,25 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE **interfaces, i
 	/* allocate memory for results */
 
 	if (0 < (*n = host->interfaces_v.values_num))
-		*interfaces = zbx_malloc(NULL, sizeof(DC_INTERFACE) * (size_t)*n);
+		*interfaces = zbx_malloc(NULL, sizeof(DC_INTERFACE2) * (size_t)*n);
 
 	/* copy data about all host interfaces */
 
 	for (i = 0; i < *n; i++)
-		DCget_interface(*interfaces + i, (const ZBX_DC_INTERFACE  *)host->interfaces_v.values[i]);
+	{
+		const ZBX_DC_INTERFACE	*src = host->interfaces_v.values[i];
+		DC_INTERFACE2		*dst = *interfaces + i;
+
+		strscpy(dst->ip_orig, src->ip);
+		strscpy(dst->dns_orig, src->dns);
+		strscpy(dst->port_orig, src->port);
+		dst->type = src->type;
+		dst->main = src->main;
+		dst->bulk = src->bulk;
+		dst->addr = (1 == src->useip ? dst->ip_orig : dst->dns_orig);
+	}
+
+	ret = SUCCEED;
 unlock:
 	UNLOCK_CACHE;
 

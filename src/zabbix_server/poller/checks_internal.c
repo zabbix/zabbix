@@ -30,15 +30,92 @@
 
 extern unsigned char	program_type;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_interfaces_discovery                                    *
+ *                                                                            *
+ * Purpose: get data of all network interfaces for a host from configuration  *
+ *          cache and pack into JSON for LLD                                  *
+ *                                                                            *
+ * Parameter: hostid - [IN] the host identifier                               *
+ *            j      - [OUT] JSON with interface data                         *
+ *            error  - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - interface data in JSON                             *
+ *               FAIL    - host not found, 'error' message allocated          *
+ *                                                                            *
+ * Comments: if host is found but has no interfaces (should not happen) an    *
+ *           empty JSON {"data":[]} is returned                               *
+ *                                                                            *
+ ******************************************************************************/
 static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j, char **error)
 {
-	int	ret = FAIL;
+	DC_INTERFACE2	*interfaces = NULL;
+	int		n = 0;			/* number of interfaces */
+	int		i;
 
-	/* TODO implementation */
-	zabbix_log(LOG_LEVEL_INFORMATION, "zbx_host_interfaces_discovery() called");
-	*error = zbx_strdup(*error, "zbx_host_interfaces_discovery() not yet implemented");
+	/* get interface data from configuration cache */
 
-	return ret;
+	if (SUCCEED != zbx_dc_get_host_interfaces(hostid, &interfaces, &n))
+	{
+		*error = zbx_strdup(*error, "host not found in configuration cache");
+
+		return FAIL;
+	}
+
+	/* pack results into JSON */
+
+	zbx_json_init(j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < n; i++)
+	{
+		const char	*p;
+		char		buf[16];
+
+		zbx_json_addobject(j, NULL);
+		zbx_json_addstring(j, "{#IF.CONN}", interfaces[i].addr, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, "{#IF.IP}", interfaces[i].ip_orig, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, "{#IF.DNS}", interfaces[i].dns_orig, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, "{#IF.PORT}", interfaces[i].port_orig, ZBX_JSON_TYPE_STRING);
+
+		switch (interfaces[i].type)
+		{
+			case INTERFACE_TYPE_AGENT:
+				p = "AGENT";
+				break;
+			case INTERFACE_TYPE_SNMP:
+				p = "SNMP";
+				break;
+			case INTERFACE_TYPE_IPMI:
+				p = "IPMI";
+				break;
+			case INTERFACE_TYPE_JMX:
+				p = "JMX";
+				break;
+			case INTERFACE_TYPE_UNKNOWN:
+			default:
+				p = "UNKNOWN";
+		}
+		zbx_json_addstring(j, "{#IF.TYPE}", p, ZBX_JSON_TYPE_STRING);
+
+		zbx_snprintf(buf, sizeof(buf), "%hhu", interfaces[i].main);
+		zbx_json_addstring(j, "{#IF.DEFAULT}", buf, ZBX_JSON_TYPE_INT);
+
+		if (INTERFACE_TYPE_SNMP == interfaces[i].type)
+		{
+			zbx_snprintf(buf, sizeof(buf), "%hhu", interfaces[i].bulk);
+			zbx_json_addstring(j, "{#IF.SNMP.BULK}", buf, ZBX_JSON_TYPE_INT);
+		}
+
+		zbx_json_close(j);
+	}
+
+	zbx_json_close(j);
+
+	zbx_free(interfaces);
+
+	return SUCCEED;
 }
 
 /******************************************************************************

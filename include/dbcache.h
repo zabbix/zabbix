@@ -80,6 +80,18 @@ DC_INTERFACE;
 
 typedef struct
 {
+	char		ip_orig[INTERFACE_IP_LEN_MAX];
+	char		dns_orig[INTERFACE_DNS_LEN_MAX];
+	char		port_orig[INTERFACE_PORT_LEN_MAX];
+	unsigned char	type;
+	unsigned char	main;
+	unsigned char	bulk;
+	char		*addr;
+}
+DC_INTERFACE2;
+
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX];
@@ -654,6 +666,6 @@ zbx_agent_value_t;
 
 void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
 void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess);
-int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE **interfaces, int *n);
+int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
 
 #endif
