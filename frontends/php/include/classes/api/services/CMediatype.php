@@ -390,9 +390,10 @@ class CMediatype extends CApiService {
 					));
 				}
 
-				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 10) {
+				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 10
+						|| $mediatype['maxattempts'] < 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxattempts', _s('must be between "%1$s" and "%2$s"', 0, 10)
+						'maxattempts', _s('must be between "%1$s" and "%2$s"', 1, 10)
 					));
 				}
 			}
@@ -750,9 +751,10 @@ class CMediatype extends CApiService {
 					));
 				}
 
-				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 10) {
+				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 10
+						|| $mediatype['maxattempts'] < 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxattempts', _s('must be between "%1$s" and "%2$s"', 0, 10)
+						'maxattempts', _s('must be between "%1$s" and "%2$s"', 1, 10)
 					));
 				}
 			}
