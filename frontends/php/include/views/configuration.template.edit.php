@@ -405,11 +405,17 @@ $linkedTemplateTable = (new CTable())
 
 foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
-	$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-		->setTarget('_blank');
+
+	if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+		$template_link = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
+	}
+	else {
+		$template_link = new CSpan($template['name']);
+	}
 
 	$linkedTemplateTable->addRow([
-		$templateLink,
+		$template_link,
 		(new CCol(
 			new CHorList([
 				(new CSimpleButton(_('Unlink')))
