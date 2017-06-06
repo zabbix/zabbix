@@ -98,6 +98,7 @@ class CMapHelper {
 			],
 			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'],
 			'background' => $map['backgroundid'],
+			'label_location' => $map['label_location'],
 			'shapes' => array_values($map['shapes']),
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),

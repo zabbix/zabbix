@@ -315,7 +315,8 @@ ZABBIX.apps.map = (function($) {
 					'background': this.data.backgroundid,
 					'elements': elements,
 					'links': links,
-					'shapes': shapes
+					'shapes': shapes,
+					label_location: this.data.label_location
 				});
 			},
 
