@@ -1974,18 +1974,22 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
  * Parameters: event_ack        - [IN] vector for eventid/ackid pairs         *
  *                                                                            *
  ******************************************************************************/
-int	process_actions_by_acknowledgments(zbx_vector_uint64_pair_t *event_ack)
+int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 {
 	const char		*__function_name = "process_actions_by_acknowledgments";
 
-	zbx_db_insert_t		db_insert;
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
 	DB_EVENT		*events = NULL;
 	int			i, j, k, processed_num = 0, knext = 0;
 	zbx_vector_uint64_t	eventids;
+	zbx_ack_task_t		*ack_task;
+	zbx_vector_ptr_t	ack_escalations;
+	zbx_ack_escalation_t	*ack_escalation;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&ack_escalations);
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
@@ -1998,13 +2002,11 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_pair_t *event_ack)
 
 	zbx_vector_uint64_create(&eventids);
 
-	zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-					"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
-
-	zbx_vector_uint64_pair_sort(event_ack, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	for (i = 0; i < event_ack->values_num; i++)
-		zbx_vector_uint64_append(&eventids, event_ack->values[i].first);
+	for (i = 0; i < ack_tasks->values_num; i++)
+	{
+		ack_task = (zbx_ack_task_t *)ack_tasks->values[i];
+		zbx_vector_uint64_append(&eventids, ack_task->eventid);
+	}
 
 	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -2017,8 +2019,13 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_pair_t *event_ack)
 		int 		kcurr = knext;
 		DB_EVENT	*event = &events[i];
 
-		while (knext < event_ack->values_num && event_ack->values[knext].first == event->eventid)
+		while (knext < ack_tasks->values_num)
+		{
+			ack_task = (zbx_ack_task_t *)ack_tasks->values[knext];
+			if (ack_task->eventid != event->eventid)
+				break;
 			knext++;
+		}
 
 		if (0 == event->eventid || 0 == event->trigger.triggerid)
 			continue;
@@ -2038,18 +2045,43 @@ int	process_actions_by_acknowledgments(zbx_vector_uint64_pair_t *event_ack)
 
 			for (k = kcurr; k < knext; k++)
 			{
-				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid,
-						(int)ESCALATION_STATUS_ACTIVE, events[i].trigger.triggerid,
-						__UINT64_C(0), event->eventid, __UINT64_C(0),
-						event_ack->values[k].second);
-				processed_num++;
+				ack_task = (zbx_ack_task_t *)ack_tasks->values[k];
+
+				ack_escalation = (zbx_ack_escalation_t *)zbx_malloc(NULL, sizeof(zbx_ack_escalation_t));
+				ack_escalation->taskid = ack_task->taskid;
+				ack_escalation->acknowledgeid = ack_task->acknowledgeid;
+				ack_escalation->actionid = action->actionid;
+				ack_escalation->eventid = event->eventid;
+				ack_escalation->triggerid = event->trigger.triggerid;
+				zbx_vector_ptr_append(&ack_escalations, ack_escalation);
 			}
 		}
 	}
 
-	zbx_db_insert_autoincrement(&db_insert, "escalationid");
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	if (0 != ack_escalations.values_num)
+	{
+		zbx_db_insert_t	db_insert;
+
+		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
+						"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
+
+		zbx_vector_ptr_sort(&ack_escalations, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		for (i = 0; i < ack_escalations.values_num; i++)
+		{
+			ack_escalation = (zbx_ack_escalation_t *)ack_escalations.values[i];
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ack_escalation->actionid,
+				(int)ESCALATION_STATUS_ACTIVE, ack_escalation->triggerid, __UINT64_C(0),
+				ack_escalation->eventid, __UINT64_C(0), ack_escalation->acknowledgeid);
+		}
+
+		zbx_db_insert_autoincrement(&db_insert, "escalationid");
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+
+		processed_num = ack_escalations.values_num;
+	}
 
 	for (i = 0; i < eventids.values_num; i++)
 		free_event_info(&events[i]);
@@ -2065,6 +2097,9 @@ out:
 
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
 	zbx_vector_ptr_destroy(&actions);
+
+	zbx_vector_ptr_clear_ext(&ack_escalations, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&ack_escalations);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed_num:%d", __function_name, processed_num);
 

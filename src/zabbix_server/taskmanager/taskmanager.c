@@ -168,6 +168,13 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_expire_remote_command                                         *
+ *                                                                            *
+ * Purpose: process expired remote command task                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	tm_expire_remote_command(zbx_uint64_t taskid)
 {
 	DB_ROW		row;
@@ -199,6 +206,16 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 	DBcommit();
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_process_remote_command_result                                 *
+ *                                                                            *
+ * Purpose: process remote command result task                                *
+ *                                                                            *
+ * Return value: SUCCEED - the task was processed successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 {
 	DB_ROW		row;
@@ -265,24 +282,23 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
  ******************************************************************************/
 static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 {
-	DB_ROW				row;
-	DB_RESULT			result;
-	int				processed_num = 0;
-	char				*filter = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_pair_t	event_ack;
-	zbx_uint64_pair_t		pair;
-
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			processed_num = 0;
+	char			*filter = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_ptr_t	ack_tasks;
+	zbx_ack_task_t		*ack_task;
 
 	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_uint64_pair_create(&event_ack);
+	zbx_vector_ptr_create(&ack_tasks);
 
 	DBadd_condition_alloc(&filter, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values,
 			ack_taskids->values_num);
 
 	result = DBselect(
-			"select a.eventid,ta.acknowledgeid"
+			"select a.eventid,ta.acknowledgeid,ta.taskid"
 			" from task_acknowledge ta"
 			" left join acknowledges a"
 				" on ta.acknowledgeid=a.acknowledgeid"
@@ -302,20 +318,27 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 			continue;
 		}
 
-		ZBX_STR2UINT64(pair.first, row[0]);
-		ZBX_STR2UINT64(pair.second, row[1]);
-		zbx_vector_uint64_pair_append_ptr(&event_ack, &pair);
+		ack_task = (zbx_ack_task_t *)zbx_malloc(NULL, sizeof(zbx_ack_task_t));
+
+		ZBX_STR2UINT64(ack_task->eventid, row[0]);
+		ZBX_STR2UINT64(ack_task->acknowledgeid, row[1]);
+		ZBX_STR2UINT64(ack_task->taskid, row[2]);
+		zbx_vector_ptr_append(&ack_tasks, ack_task);
 	}
 	DBfree_result(result);
 
-	if (0 < ack_taskids->values_num)
-		processed_num = process_actions_by_acknowledgments(&event_ack);
+	if (0 < ack_tasks.values_num)
+	{
+		zbx_vector_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		processed_num = process_actions_by_acknowledgments(&ack_tasks);
+	}
 
 	DBexecute("update task t set t.status=%d where %s", ZBX_TM_STATUS_DONE, filter);
 
 	zbx_free(filter);
 
-	zbx_vector_uint64_pair_destroy(&event_ack);
+	zbx_vector_ptr_clear_ext(&ack_tasks, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&ack_tasks);
 
 	return processed_num;
 }

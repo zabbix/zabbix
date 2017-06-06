@@ -23,8 +23,26 @@
 #include "common.h"
 #include "db.h"
 
+typedef struct
+{
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	acknowledgeid;
+	zbx_uint64_t	taskid;
+}
+zbx_ack_task_t;
+
+typedef struct
+{
+	zbx_uint64_t	taskid;
+	zbx_uint64_t	actionid;
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	triggerid;
+	zbx_uint64_t	acknowledgeid;
+}
+zbx_ack_escalation_t;
+
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition);
 void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint64_pair_t *closed_events);
-int	process_actions_by_acknowledgments(zbx_vector_uint64_pair_t *event_ack);
+int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks);
 
 #endif
