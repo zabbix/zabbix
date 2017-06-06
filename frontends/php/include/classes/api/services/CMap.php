@@ -1297,22 +1297,6 @@ class CMap extends CMapElement {
 			if (array_key_exists('selements', $maps[$key])) {
 				foreach ($maps[$key]['selements'] as $snum => $selement) {
 					$maps[$key]['selements'][$snum]['sysmapid'] = $sysmapid;
-
-					/*
-					 * If width and height of selement with type = 'Host group' is not defined, and areatype is set to 'fit to
-					 * map', then selement will inherit the dimensions from the map.
-					 */
-					if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-						if (!array_key_exists('areatype', $selement) || $selement['areatype'] == 0) {
-							if (!array_key_exists('width', $selement) || !$selement['width']) {
-								$maps[$key]['selements'][$snum]['width'] = $maps[$key]['width'];
-							}
-
-							if (!array_key_exists('height', $selement) || !$selement['height']) {
-								$maps[$key]['selements'][$snum]['height'] = $maps[$key]['height'];
-							}
-						}
-					}
 				}
 
 				$selements += $maps[$key]['selements'];

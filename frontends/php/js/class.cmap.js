@@ -286,8 +286,16 @@ ZABBIX.apps.map = (function($) {
 
 					// host group elements
 					if (this.selements[key].data.elementtype == '3' && this.selements[key].data.elementsubtype == '1') {
-						element.width = this.selements[key].data.width;
-						element.height = this.selements[key].data.height;
+						if (this.selements[key].data.areatype == '0')
+						{
+							element.width = this.data.width;
+							element.height = this.data.height;
+						}
+						else
+						{
+							element.width = this.selements[key].data.width;
+							element.height = this.selements[key].data.height;
+						}
 					}
 
 					element.icon = this.selements[key].data.iconid_off;
