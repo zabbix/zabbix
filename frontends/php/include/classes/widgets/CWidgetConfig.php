@@ -62,7 +62,7 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
 			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
-			WIDGET_URL					=> ['width' => 7, 'height' => 9]
+			WIDGET_URL					=> ['width' => 7, 'height' => 9],
 			WIDGET_ACTION_LOG			=> ['width' => 8, 'height' => 5]
 		];
 	}

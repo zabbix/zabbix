@@ -39,18 +39,19 @@ class CWidgetFieldNumericBox extends CWidgetField
 	private $max;
 
 	/**
-	 * C widget field numeric box constructor
+	 * A numeric box constructor.
 	 *
 	 * @param string $name
-	 * @param null|string $label
-	 * @param null $default
-	 * @param int $min
-	 * @param int $max
+	 * @param string $label
+	 * @param mixed  $default
+	 * @param int    $min
+	 * @param int    $max
 	 */
 	public function __construct($name, $label, $default = null, $min = 0, $max = ZBX_MAX_INT32) {
+		parent::__construct($name, $label, $default);
+
 		$this->min = $min;
 		$this->max = $max;
-		parent::__construct($name, $label, $default, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
@@ -64,13 +65,12 @@ class CWidgetFieldNumericBox extends CWidgetField
 		$errors = parent::validate();
 		$value = $this->getValue(true);
 
-		if ($value !== null && !($value >= $this->min && $value <= $this->max)) {
-			$errors[] = _s(
-				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-				$value, $this->getName(), $this->min, $this->max
+		if ($value !== null && ($value < $this->min || $value > $this->max)) {
+			$errors[] = _s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+				$value, $this->getLabel(), $this->min, $this->max
 			);
 		}
+
 		return $errors;
 	}
-
 }

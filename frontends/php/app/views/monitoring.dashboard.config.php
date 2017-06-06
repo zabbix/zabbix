@@ -74,8 +74,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldNumericBox) {
-		$form_list->addRow(
-			$field->getLabel(),
+		$form_list->addRow($field->getLabel(),
 			(new CNumericBox($field->getName(), $field->getValue(true), 3))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		);
