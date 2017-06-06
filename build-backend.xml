@@ -25,9 +25,9 @@
 	
 	<!-- Zabbix various configuration parameters -->
 	<target name="init-build-options">
-		<property name="conf1" value="--enable-server ${with.db}"/>
-		<property name="conf2" value="--enable-proxy ${with.db}"/>
-		<property name="conf3" value="--enable-agent"/>
+		<property name="conf1" value="--enable-agent"/>
+		<property name="conf2" value="--enable-server ${with.db}"/>
+		<property name="conf3" value="--enable-proxy ${with.db}"/>
 		<property name="conf4" value="--enable-server --enable-agent --enable-proxy ${with.db}"/>
 		<property name="conf5" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap  --with-libcurl"/>
 		<property name="conf6" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
@@ -54,10 +54,10 @@
 	
 	<!-- Clang Static Analyzer target with various configuration parameters -->
 	<target name="clang-static-analyzer" depends="init,init-build-options">
-		<var name="index" value="1"/>
 		<delete dir="clang-scan-build-reports"/>
-		<propertyselector property="build-list" delimiter="," match="conf(\d+)"/>
-		<for list="${conf-list}" param="name" delimiter=",">
+		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
+		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
+		<for list="${conf.list}" param="name" delimiter=",">
 			<sequential>
 				<exec executable="scan-build" failonerror="on">
 					<arg line="./configure"/>
@@ -75,7 +75,6 @@
 					<arg line="-s"/>
 					<arg line="-j5"/>
 				</exec>
-				<math result="index" operand1="${index}" operation="+" operand2="1" datatype="int" />
 			</sequential>
 		</for>
 	</target>
@@ -198,12 +197,11 @@
 
 	<target name="make-gcc" depends="init-build-options">
 		<!-- Build Zabbix with various configuration parameters -->
-		<var name="index" value="1"/>
-		<propertyselector property="conf-list" delimiter="," match="conf(\d+)"/>
-		<for list="${conf-list}" param="name" delimiter=",">
+		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
+		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
+		<for list="${conf.list}" param="name" delimiter=",">
 			<sequential>
 				<make args="${@{name}}"/>
-				<math result="index" operand1="${index}" operation="+" operand2="1" datatype="int" />
 			</sequential>
 		</for>
 	</target>
