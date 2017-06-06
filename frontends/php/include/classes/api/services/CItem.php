@@ -716,6 +716,62 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
+	 * Sort items in array to ensure that dependent item parent will be present before it child for any nesting level.
+	 *
+	 * @param array $items	Array of items to be sorted.
+	 *
+	 * @return array
+	 */
+	protected function sortByItemDepency($items) {
+		$parent_key = 'master_itemid';
+		$item_key = 'itemid';
+		$items_hash = zbx_toHash($items, $item_key);
+		$result = [];
+
+		do {
+			$insertions = 0;
+
+			// For every item in array scan
+			// - Item with type not equal to ITEM_TYPE_DEPENDENT should be added to result array.
+			// - Item with type ITEM_TYPE_DEPENDENT and having parent in $result array should be added to result.
+			// Every successfull insertion to result array will increase $insertions counter
+			foreach ($items_hash as $key => $item) {
+				if ($item['type'] != ITEM_TYPE_DEPENDENT || array_key_exists($item[$parent_key], $result)) {
+					$result[$key] = $item;
+					++$insertions;
+				}
+			}
+			// Next scan should go for items not present in result array.
+			$items_hash = array_diff_key($items_hash, $result);
+
+			// Repeat array scan until there was at least one insertion.
+		} while ($insertions > 0);
+
+		if ($items_hash) {
+			// We have dependent items with relation to parent not existing in input array,
+			// Check do they exist in database.
+			$db_parentids = zbx_objectValues($items_hash, 'master_itemid');
+			$db_parent_items = $this->get([
+				'output' => ['master_itemid'],
+				'itemids' => array_filter($db_parentids),
+				'preservekeys' => true
+			]);
+			foreach ($items_hash as $item) {
+				if (!array_key_exists($item['master_itemid'], $db_parent_items)) {
+					// Raise exception. Child with relation to non existing parent is found.
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Parent item "%1$s" does not exists.',
+						$item['master_itemid'])
+					);
+				}
+			}
+
+			$result = $result + $items_hash;
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Check item specific fields.
 	 *
 	 * @param array  $item			An array of single item data.
@@ -731,6 +787,8 @@ class CItem extends CItemGeneral {
 		if (empty($items)) {
 			return true;
 		}
+
+		$items = $this->sortByItemDepency($items);
 
 		// prepare the child items
 		$newItems = $this->prepareInheritedItems($items, $hostids);
@@ -759,6 +817,37 @@ class CItem extends CItemGeneral {
 		if (!zbx_empty($updateItems)) {
 			self::validateInventoryLinks($updateItems, true); // true means 'update'
 			$this->updateReal($updateItems);
+		}
+
+		// Fix master_itemid for inserted or updated inherited items.
+		$to_inherit = array_merge($updateItems, $insertItems);
+		$master_protosids = array_filter(zbx_objectValues($to_inherit, 'master_itemid'));
+
+		if ($master_protosids) {
+			$master_protos = DB::select('items', [
+				'output' => ['key_', 'hostid'],
+				'filter' => ['itemid' => $master_protosids],
+				'preservekeys' => true
+			]);
+
+			foreach ($to_inherit as $item) {
+				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+					continue;
+				}
+
+				$master_proto = $master_protos[$item['master_itemid']];
+
+				if ($master_proto['hostid'] != $item['hostid']) {
+					$master_item = DB::select('items', [
+						'output' => ['itemid'],
+						'filter' => ['hostid' => $item['hostid'], 'key_' => $master_proto['key_']]
+					])[0];
+					DB::update('items', [
+						'values' => ['master_itemid' => $master_item['itemid']],
+						'where' => ['itemid' => $item['itemid']]
+					]);
+				}
+			}
 		}
 
 		// propagate the inheritance to the children

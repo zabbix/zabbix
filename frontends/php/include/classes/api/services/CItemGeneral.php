@@ -54,6 +54,7 @@ abstract class CItemGeneral extends CApiService {
 			'name'					=> ['template' => 1],
 			'description'			=> [],
 			'key_'					=> ['template' => 1],
+			'master_itemid'			=> ['template' => 1],
 			'delay'					=> [],
 			'history'				=> [],
 			'trends'				=> [],
@@ -701,7 +702,7 @@ abstract class CItemGeneral extends CApiService {
 
 			// check existing items to decide insert or update
 			$exItems = API::Item()->get([
-				'output' => ['itemid', 'type', 'key_', 'flags', 'templateid'],
+				'output' => ['itemid', 'type', 'key_', 'flags', 'templateid', 'master_itemid'],
 				'hostids' => $hostId,
 				'preservekeys' => true,
 				'nopermissions' => true,
