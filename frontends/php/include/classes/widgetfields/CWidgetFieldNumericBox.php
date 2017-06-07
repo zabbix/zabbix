@@ -70,8 +70,8 @@ class CWidgetFieldNumericBox extends CWidgetField
 		$value = $this->getValue(true);
 
 		if ($value !== null && ($value < $this->min || $value > $this->max)) {
-			$errors[] = _s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-				$value, $this->getLabel(), $this->min, $this->max
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(),
+				_s('the value must be between %1$s and %2$s', $this->min, $this->max)
 			);
 		}
 
