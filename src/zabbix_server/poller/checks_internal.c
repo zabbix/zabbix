@@ -363,12 +363,12 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 			SET_UI64_RESULT(result, DCget_item_unsupported_count(item->host.hostid));
 		}
-		else if (0 == strcmp(tmp, "interfaces"))	/* zabbix["host",,"interfaces"] */
+		else if (0 == strcmp(tmp, "interfaces"))	/* zabbix["host","discovery","interfaces"] */
 		{
 			struct zbx_json	j;
 
 			/* this item is always processed by server */
-			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
+			if (NULL == (tmp = get_rparam(&request, 1)) || 0 != strcmp(tmp, "discovery"))
 			{
 				error = zbx_strdup(error, "Invalid second parameter.");
 				goto out;

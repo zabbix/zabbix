@@ -105,7 +105,7 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
  *           +------------------+--------------------------------------+      *
  *           | Zabbix internal  | zabbix[host,,items]                  |      *
  *           | Zabbix internal  | zabbix[host,,items_unsupported]      |      *
- *           | Zabbix internal  | zabbix[host,,interfaces]]            |      *
+ *           | Zabbix internal  | zabbix[host,discovery,interfaces]    |      *
  *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
  *           | Zabbix aggregate | *                                    |      *
