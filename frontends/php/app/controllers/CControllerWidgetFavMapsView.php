@@ -29,7 +29,7 @@ class CControllerWidgetFavMapsView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>		'required|string'
+			'name' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,11 +49,6 @@ class CControllerWidgetFavMapsView extends CController {
 	protected function doAction() {
 		$maps = [];
 		$mapids = [];
-
-		$name = $this->getInput('name');
-		if ($name === '') {
-			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_MAPS];
-		}
 
 		foreach (CFavorite::get('web.favorite.sysmapids') as $favourite) {
 			$mapids[$favourite['value']] = true;
@@ -76,11 +71,11 @@ class CControllerWidgetFavMapsView extends CController {
 		CArrayHelper::sort($maps, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_MAPS]),
 			'maps' => $maps,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'name' => $name
+			]
 		]));
 	}
 }

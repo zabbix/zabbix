@@ -28,8 +28,8 @@ class CControllerWidgetActionLogView extends CController
 
 	protected function checkInput() {
 		$fields = [
-			'fields' =>	'required|array',
-			'name' =>	'required|string'
+			'name' =>	'string',
+			'fields' =>	'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,6 +40,7 @@ class CControllerWidgetActionLogView extends CController
 		*/
 
 		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 		}
 
@@ -53,7 +54,7 @@ class CControllerWidgetActionLogView extends CController
 	protected function doAction()
 	{
 		$data = [
-			'name' => $this->getInput('name') ?: CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG]
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG])
 		];
 
 		$data += $this->getInput('fields');

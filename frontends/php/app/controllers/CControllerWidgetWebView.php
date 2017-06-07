@@ -29,7 +29,7 @@ class CControllerWidgetWebView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>		'required|string'
+			'name' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,11 +47,6 @@ class CControllerWidgetWebView extends CController {
 	}
 
 	protected function doAction() {
-		$name = $this->getInput('name');
-		if ($name === '') {
-			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_WEB_OVERVIEW];
-		}
-
 		$filter = [
 			'groupids' => null,
 			'maintenance' => null
@@ -105,11 +100,11 @@ class CControllerWidgetWebView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_WEB_OVERVIEW]),
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'name' => $name
+			]
 		]));
 	}
 }
