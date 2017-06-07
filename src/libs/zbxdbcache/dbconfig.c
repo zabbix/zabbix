@@ -10448,12 +10448,13 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 		const ZBX_DC_INTERFACE	*src = host->interfaces_v.values[i];
 		DC_INTERFACE2		*dst = *interfaces + i;
 
-		strscpy(dst->ip_orig, src->ip);
-		strscpy(dst->dns_orig, src->dns);
-		strscpy(dst->port_orig, src->port);
+		dst->interfaceid = src->interfaceid;
 		dst->type = src->type;
 		dst->main = src->main;
 		dst->bulk = src->bulk;
+		strscpy(dst->ip_orig, src->ip);
+		strscpy(dst->dns_orig, src->dns);
+		strscpy(dst->port_orig, src->port);
 		dst->addr = (1 == src->useip ? dst->ip_orig : dst->dns_orig);
 	}
 
