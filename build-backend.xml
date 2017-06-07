@@ -24,7 +24,7 @@
 	</switch>
 	
 	<!-- Zabbix various configuration parameters -->
-	<target name="init-build-options">
+	<target name="init-conf-options">
 		<property name="conf1" value="--enable-agent"/>
 		<property name="conf2" value="--enable-server ${with.db}"/>
 		<property name="conf3" value="--enable-proxy ${with.db}"/>
@@ -53,7 +53,7 @@
 	</target>
 	
 	<!-- Clang Static Analyzer target with various configuration parameters -->
-	<target name="clang-static-analyzer" depends="init,init-build-options">
+	<target name="clang-static-analyzer" depends="init,init-conf-options">
 		<delete dir="clang-scan-build-reports"/>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
@@ -195,7 +195,7 @@
 
 	<target name="create-db" depends="create-db-mysql,create-db-postgresql"/>
 
-	<target name="make-gcc" depends="init-build-options">
+	<target name="make-gcc" depends="init-conf-options">
 		<!-- Build Zabbix with various configuration parameters -->
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
