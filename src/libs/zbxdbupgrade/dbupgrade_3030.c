@@ -975,20 +975,12 @@ static int	DBpatch_3030075(void)
 static int	DBpatch_3030076(void)
 {
 	if (ZBX_DB_OK > DBexecute("update actions set "
-			"ack_shortdata='Acknowledgement message: {TRIGGER.NAME}', "
+			"ack_shortdata='Acknowledged: {TRIGGER.NAME}', "
 			"ack_longdata="
-				"'Acknowledgement message: {ACK.MESSAGE}\n"
-				"Acknowledgement by user: {USER.FULLNAME}\n\n"
-				"Acknowledgement status: {EVENT.ACK.STATUS}\n"
-				"Acknowledgement history: {EVENT.ACK.HISTORY}\n\n"
-				"Trigger: {TRIGGER.NAME}\n"
-				"Trigger status: {TRIGGER.STATUS}\n"
-				"Trigger severity: {TRIGGER.SEVERITY}\n"
-				"Trigger URL: {TRIGGER.URL}\n\nItem values:\n\n"
-				"1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}\n"
-				"2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\n"
-				"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}\n\n"
-				"Original event ID: {EVENT.ID}' "
+				"'User {USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME} "
+				"with the following message:\n"
+				"{ACK.MESSAGE}\n\n"
+				"Current problem status is {EVENT.STATUS}' "
 			"where eventsource=0"))
 		return FAIL;
 
