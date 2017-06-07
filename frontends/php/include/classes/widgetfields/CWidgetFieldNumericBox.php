@@ -55,6 +55,10 @@ class CWidgetFieldNumericBox extends CWidgetField
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
+	public function getMaxLength() {
+		return strlen((string)$this->max);
+	}
+
 	/**
 	 * Validate.
 	 *

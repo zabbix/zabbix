@@ -19,9 +19,6 @@
 **/
 
 
-/**
- * C controller widget action log
- */
 class CControllerWidgetActionLogView extends CController
 {
 
