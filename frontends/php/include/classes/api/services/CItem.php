@@ -788,8 +788,6 @@ class CItem extends CItemGeneral {
 			return true;
 		}
 
-		$items = $this->sortByItemDepency($items);
-
 		// prepare the child items
 		$newItems = $this->prepareInheritedItems($items, $hostids);
 		if (!$newItems) {
