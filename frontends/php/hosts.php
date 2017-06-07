@@ -306,9 +306,9 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			}
 		}
 
-		$templateIds = [];
+		$templateids = [];
 		if (isset($visible['templates'])) {
-			$templateIds = $_REQUEST['templates'];
+			$templateids = $_REQUEST['templates'];
 		}
 
 		// add new or existing host groups
@@ -376,12 +376,12 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				]);
 
 				$hostTemplateIds = zbx_objectValues($hostTemplates, 'templateid');
-				$templatesToDelete = array_diff($hostTemplateIds, $templateIds);
+				$templatesToDelete = array_diff($hostTemplateIds, $templateids);
 
 				$hosts['templates_clear'] = zbx_toObject($templatesToDelete, 'templateid');
 			}
 
-			$hosts['templates'] = $templateIds;
+			$hosts['templates'] = $templateids;
 		}
 
 		$result = API::Host()->massUpdate(array_merge($hosts, $newValues));
@@ -390,8 +390,8 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		}
 
 		$add = [];
-		if ($templateIds && isset($visible['templates'])) {
-			$add['templates'] = $templateIds;
+		if ($templateids && isset($visible['templates'])) {
+			$add['templates'] = $templateids;
 		}
 
 		// add new host groups
@@ -1052,6 +1052,13 @@ elseif (hasRequest('form')) {
 			'templateids' => $data['templates']
 		]);
 		CArrayHelper::sort($data['linked_templates'], ['name']);
+
+		$data['writable_templates'] = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => $data['templates'],
+			'editable' => true,
+			'preservekeys' => true
+		]);
 	}
 
 	$hostView = new CView('configuration.host.edit', $data);
@@ -1106,18 +1113,35 @@ else {
 	order_result($hosts, $sortField, $sortOrder);
 
 	// selecting linked templates to templates linked to hosts
-	$templateIds = [];
+	$templateids = [];
+
 	foreach ($hosts as $host) {
-		$templateIds = array_merge($templateIds, zbx_objectValues($host['parentTemplates'], 'templateid'));
+		$templateids = array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'));
 	}
-	$templateIds = array_unique($templateIds);
+
+	$templateids = array_keys(array_flip($templateids));
 
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
-		'templateids' => $templateIds,
+		'templateids' => $templateids,
 		'selectParentTemplates' => ['hostid', 'name'],
 		'preservekeys' => true
 	]);
+
+	// selecting writable templates IDs
+	$writable_templates = [];
+	if ($templateids) {
+		foreach ($templates as $template) {
+			$templateids = array_merge($templateids, zbx_objectValues($template['parentTemplates'], 'templateid'));
+		}
+
+		$writable_templates = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys(array_flip($templateids)),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+	}
 
 	// get proxy host IDs that that are not 0
 	$proxyHostIds = [];
@@ -1145,6 +1169,7 @@ else {
 		'groupId' => $pageFilter->groupid,
 		'config' => $config,
 		'templates' => $templates,
+		'writable_templates' => $writable_templates,
 		'proxies' => $proxies
 	];
 
