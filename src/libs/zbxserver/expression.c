@@ -1765,6 +1765,8 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ALERT_MESSAGE		"{ALERT.MESSAGE}"
 
 #define MVAR_ACK_MESSAGE                "{ACK.MESSAGE}"
+#define MVAR_ACK_TIME	                "{ACK.TIME}"
+#define MVAR_ACK_DATE	                "{ACK.DATE}"
 #define MVAR_USER_FULLNAME          	"{USER.FULLNAME}"
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
@@ -2860,6 +2862,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
 						replace_to = zbx_strdup(replace_to, ack->message);
+				}
+				else if (0 == strcmp(m, MVAR_ACK_TIME))
+				{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+						replace_to = zbx_strdup(replace_to, zbx_time2str(ack->clock));
+				}
+				else if (0 == strcmp(m, MVAR_ACK_DATE))
+				{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+						replace_to = zbx_strdup(replace_to, zbx_date2str(ack->clock));
 				}
 				else if (0 == strcmp(m, MVAR_USER_FULLNAME))
 				{

@@ -404,6 +404,7 @@ typedef struct
 	zbx_uint64_t	acknowledgeid;
 	zbx_uint64_t	userid;
 	char		*message;
+	int		clock;
 }
 DB_ACKNOWLEDGE;
 
