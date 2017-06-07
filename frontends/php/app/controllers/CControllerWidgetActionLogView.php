@@ -60,7 +60,7 @@ class CControllerWidgetActionLogView extends CController
 		$data += $this->getInput('fields');
 		list($sortfield, $sortorder) = $this->getSorting($data['sort_triggers']);
 		$alerts = $this->getAlerts($sortfield, $sortorder, $data['show_lines']);
-		$dbUsers = $this->getDbUsers($alerts);
+		$db_users = $this->getDbUsers($alerts);
 
 		$actions = API::Action()->get([
 			'output' => ['actionid', 'name'],
@@ -72,7 +72,7 @@ class CControllerWidgetActionLogView extends CController
 			'name' => $data['name'],
 			'actions' => $actions,
 			'alerts'  => $alerts,
-			'db_users' => $dbUsers,
+			'db_users' => $db_users,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'user' => [
@@ -92,6 +92,7 @@ class CControllerWidgetActionLogView extends CController
 	 */
 	private function getAlerts($sortfield, $sortorder, $show_lines)
 	{
+		// TODO AV: remove direct SQL requests
 		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
 			'a.userid,a.actionid,a.mediatypeid,mt.description'.
 			' FROM events e,alerts a'.
@@ -133,21 +134,19 @@ class CControllerWidgetActionLogView extends CController
 	private function getDbUsers(array $alerts)
 	{
 		$userids = [];
+
 		foreach ($alerts as $alert) {
-			if ($alert['userid'] != 0) {
-				$userids[$alert['userid']] = true;
-			}
+			$userids[$alert['userid']] = true;
 		}
-		$dbUsers = [];
-		if ($userids) {
-			$dbUsers = API::User()->get([
+		unset($userids[0]);
+
+		return $userids
+			? API::User()->get([
 				'output' => ['userid', 'alias', 'name', 'surname'],
 				'userids' => array_keys($userids),
 				'preservekeys' => true
-			]);
-		}
-
-		return $dbUsers;
+			])
+			: [];
 	}
 
 	/**

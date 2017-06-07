@@ -39,8 +39,8 @@ class CActionLogWidgetForm extends CWidgetForm
 			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
 		];
 
-		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types, SCREEN_SORT_TRIGGERS_TIME_DESC,
-			null, ZBX_WIDGET_FIELD_TYPE_INT32
+		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types,
+			SCREEN_SORT_TRIGGERS_TIME_DESC, null, ZBX_WIDGET_FIELD_TYPE_INT32
 		))->setRequired(true);
 
 		if (array_key_exists('sort_triggers', $data)) {
