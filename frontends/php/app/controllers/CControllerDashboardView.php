@@ -98,7 +98,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 		$options = [
 			'profileIdx' => 'web.dashbrd',
-			'profileIdx2' => $dashboard['dashboardid']
+			'profileIdx2' => $this->dashboard['dashboardid']
 		];
 
 		$data['timeline'] = calculateTime([

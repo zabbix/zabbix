@@ -27,7 +27,7 @@ class CControllerWidgetGraphView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-//			'name' =>				'string',
+			'name' =>				'string',
 //			'fields' =>				'required|array',
 			'dynamic_groupid' =>	'db groups.groupid', // TODO VM: probably not needed
 			'dynamic_hostid' =>		'db hosts.hostid'
@@ -60,7 +60,6 @@ class CControllerWidgetGraphView extends CController {
 
 		// Default values
 		$default = [
-			'name' => '', // TODO VM: get default widget name from CWidgetConfig
 			'graphid' => null,
 			'dynamic' => 0, // TODO VM: replace by WIDGET_SIMPLE_ITEM
 			'dynamic_hostid' => '0'
@@ -77,7 +76,6 @@ class CControllerWidgetGraphView extends CController {
 		// TODO VM: for testing
 		$data = [
 			'graphid' => '547',
-			'name' => 'My graph',
 			'dynamic' => 0, // TODO VM: WIDGET_SIMPLE_ITEM
 			'width' => '500',
 			'height' => '100',
@@ -262,6 +260,7 @@ class CControllerWidgetGraphView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_GRAPH]),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
@@ -274,8 +273,7 @@ class CControllerWidgetGraphView extends CController {
 			'timeline' => $timeline,
 			'time_control_data' => $time_control_data,
 			'is_default' => $is_default,
-			'fs_data' => $fs_data,
-			'name' => $data['name']
+			'fs_data' => $fs_data
 		]));
 	}
 }

@@ -40,7 +40,8 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_URL					=> _('URL'),
-			WIDGET_ACTION_LOG			=> _('Action log')
+			WIDGET_ACTION_LOG			=> _('Action log'),
+			WIDGET_GRAPH				=> _('Graph')
 		];
 	}
 
@@ -63,7 +64,8 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
 			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
 			WIDGET_URL					=> ['width' => 7, 'height' => 9],
-			WIDGET_ACTION_LOG			=> ['width' => 8, 'height' => 5]
+			WIDGET_ACTION_LOG			=> ['width' => 8, 'height' => 5],
+			WIDGET_GRAPH				=> ['width' => 5, 'height' => 5]
 		];
 	}
 
@@ -104,6 +106,7 @@ class CWidgetConfig
 			case WIDGET_DISCOVERY_STATUS:
 			case WIDGET_HOST_STATUS:
 			case WIDGET_ACTION_LOG:
+			case WIDGET_GRAPH:
 				return SEC_PER_MIN;
 
 			case WIDGET_ZABBIX_STATUS:
