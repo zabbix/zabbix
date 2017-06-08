@@ -636,8 +636,8 @@ abstract class CMapElement extends CApiService {
 			// Change type from trigger to something.
 			if ($selement['elementtype'] != $db_selement['elementtype']
 					&& $db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-				foreach ($selement['elements'] as $element) {
-					$triggers_to_delete[] = $element['triggerid'];
+				foreach ($db_selement['elements'] as $db_element) {
+					$triggers_to_delete[] = $db_element['selement_triggerid'];
 				}
 			}
 

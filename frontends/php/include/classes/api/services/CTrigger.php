@@ -656,10 +656,6 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $triggerIds
 	 */
 	protected function deleteByIds(array $triggerIds) {
-		DB::delete('sysmap_element_trigger', [
-			'triggerid' => $triggerIds
-		]);
-
 		// disable actions
 		$actionIds = [];
 
@@ -693,6 +689,34 @@ class CTrigger extends CTriggerGeneral {
 			]);
 
 			updateItServices();
+		}
+
+		// Remove trigger sysmap elements.
+		$selementids = [];
+
+		$db_trigger_elements = DBselect(
+			'SELECT st.selementid'.
+			' FROM sysmap_element_trigger st'.
+			' WHERE '.dbConditionInt('st.triggerid', $triggerIds)
+		);
+
+		while ($db_trigger_element = DBfetch($db_trigger_elements)) {
+			$selementids[$db_trigger_element['selementid']] = true;
+		}
+
+		if ($selementids) {
+			DB::delete('sysmap_element_trigger', ['triggerid' => $triggerIds]);
+
+			$db_not_empty_elements = DBselect(
+				'SELECT st.selementid'.
+				' FROM sysmap_element_trigger st'.
+				' WHERE '.dbConditionInt('st.selementid', array_keys($selementids))
+			);
+			while ($db_not_empty_element = DBfetch($db_not_empty_elements)) {
+				unset($selementids[$db_not_empty_element['selementid']]);
+			}
+
+			DB::delete('sysmaps_elements', ['selementid' => array_keys($selementids)]);
 		}
 
 		parent::deleteByIds($triggerIds);

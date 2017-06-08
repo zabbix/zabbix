@@ -48,7 +48,7 @@ class CMapHelper {
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
 				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
 			],
-			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'],
+			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
 			'selectUrls' => ['sysmapurlid', 'name', 'url'],
 			'sysmapids' => $sysmapids,
 			'expandUrls' => true,
@@ -98,6 +98,7 @@ class CMapHelper {
 			],
 			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'],
 			'background' => $map['backgroundid'],
+			'label_location' => $map['label_location'],
 			'shapes' => array_values($map['shapes']),
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
