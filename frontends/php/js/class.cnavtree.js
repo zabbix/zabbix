@@ -3,6 +3,7 @@
  * defined in global scope and always re-written with function right before usage. Do this in all widgets where it is
  * needed.
  */
+var old_addPopupValues = null;
 if (typeof addPopupValues === 'undefined') {
 	var addPopupValues = null;
 }
@@ -47,6 +48,14 @@ jQuery(function($) {
 				'height': '15px',
 				'width': '14px'
 			};
+			var buttonCssImport = {
+				'background': "url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjguMyAoMjk4MDIpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjIweDIwL1VwbG9hZDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSIyMHgyMCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgICAgICA8ZyBpZD0iMjB4MjAvVXBsb2FkIiBzdHJva2U9IiMzNTQyNEMiPgogICAgICAgICAgICA8ZyBpZD0iVXBsb2FkIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgMS4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8ZyBpZD0idXBsb2FkIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjUwMDAwMCwgMC41MDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTExLjkxODYyNTYsMTQuNSBMMTMuNSwxNC41IEMxMy41LDE0LjUgMTguOTYxNDcxLDE0Ljg3MDI3MzEgMTksOS41IEMxOC45NjE0NzIxLDQuMDQzOTc4MTEgMTMuNSw0IDEzLjUsNCBDMTIuMjQwNDk2NCwxLjU1MTExMzYzIDkuODYwMjM1MDMsMCA3LDAgQzMuMTg2Njk5MTEsMCAwLDMuMTg2Njk5MTEgMCw3IEMwLDExLjA0ODY4NDIgMywxNC41IDcsMTQuNSIgaWQ9IkxpbmUtNTEiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9InVwbG9hZCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNy4wMDAwMDAsIDYuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSJQYXRoLTIxNjQtKy1MaW5lIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwb2x5bGluZSBpZD0iTGluZS01MCIgcG9pbnRzPSI2LjA0NTczOTE2IDMuNTA1ODM2NTEgMy4wMzQwNjYxNCAwLjQ5NDE2MzQ4OCAwLjA1NzgxOTE4NTIgMy40NzA0MTA0NCI+PC9wb2x5bGluZT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0zLDEuNSBMMywxMS41NDE1OTQ1IiBpZD0iTGluZS00OSI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=')",
+				'background-size': 'cover',
+				'cursor': 'pointer',
+				'border': '0px none',
+				'height': '15px',
+				'width': '14px'
+			};
 
 			var getNextId = function() {
 				var widget_data = $this.data('widgetData');
@@ -66,7 +75,7 @@ jQuery(function($) {
 					hoverClass: 'drop-hover',
 					addClasses: false,
 					accept: function() {
-						return (widget_data.maxDepth >= +$('.tree-list', this).data('depth'));
+						return (widget_data.max_depth >= +$('.tree-list', this).data('depth'));
 					},
 					addClasses: false,
 					tolerance: 'pointer',
@@ -78,13 +87,17 @@ jQuery(function($) {
 			};
 
 			var drawTree = function() {
-				var widget_data = $this.data('widgetData'),
-						root = createTreeBranch('root'),
-						tree_items = getTreeWidgetItems(),
-						tree = buildTree(tree_items, 0);
+				var root = createTreeBranch('root'),
+					tree_items = getTreeWidgetItems(),
+					tree = buildTree(tree_items, 0);
 
 				$('.root', $this).remove();
 				$('.tree', $this).append(root);
+
+				if (isEditMode()) {
+					root.append(createTreeItem({name: t('Root'), id: 0}, 0, false));
+					root = $('.tree-item.root-item[data-id=0] > .tree-list', $this);
+				}
 
 				$.each(tree, function(i, item) {
 					if (typeof item === 'object') {
@@ -97,7 +110,7 @@ jQuery(function($) {
 
 			var parseProblems = function() {
 				var widget_data = $this.data('widgetData');
-				if (isEditMode() || typeof widget_data.severityLevels === 'undefined') {
+				if (typeof widget_data.severity_levels === 'undefined') {
 					return false;
 				}
 
@@ -113,9 +126,9 @@ jQuery(function($) {
 
 				$('.tree-item', $this).each(function() {
 					var id = $(this).data('id'),
-							obj = $(this);
+						obj = $(this);
 
-					$.each(widget_data.severityLevels, function(sev, conf) {
+					$.each(widget_data.severity_levels, function(sev, conf) {
 						var sum = 0;
 						if (typeof obj.data('problems'+sev) !== 'undefined') {
 							sum += +obj.data('problems'+sev);
@@ -131,23 +144,24 @@ jQuery(function($) {
 					});
 				});
 
-				$.each(widget_data.severityLevels, function(sev, conf) {
+				$.each(widget_data.severity_levels, function(sev, conf) {
 					$('[data-problems'+sev+']', $this).each(function() {
-						var obj = $(this),
-								notif = $('<span></span>')
-									.css('background', '#'+conf['color'])
-									.html(obj.attr('data-problems'+sev))
-									.addClass('problems-per-item')
-									.attr('title', conf['name']);
+						var obj = $(this);
 
-						$('>.row', this).append(notif);
+						$('>.row', this).append($('<span>', {
+								'style': 'background: #'+conf['color'],
+								'class': 'problems-per-item',
+								'title': conf['name']
+							})
+							.html(obj.attr('data-problems'+sev))
+						);
 					});
 				});
 			};
 
 			var createTreeBranch = function(className) {
 				var className = className||null,
-						ul = $('<ul></ul>').addClass('tree-list');
+					ul = $('<ul></ul>').addClass('tree-list');
 
 				if (className) {
 					$(ul).addClass(className);
@@ -174,220 +188,334 @@ jQuery(function($) {
 				}
 			};
 
-			var createTreeItem = function(item, depth) {
-				var widget_data = $this.data('widgetData'),
-					depth = depth||1,
-					link, span, li, ul, arrow;
+			/*
+			 * Dialog to create new or edit existing Tree item.
+			 *
+			 * @param {numeric} id - widget field ID or 0 when creating new item.
+			 * @param {numeric} parent - ID of parent item under which new item is created.
+			 * @param {numeric} depth - a depth of parent item under which new item is created.
+			 */
+			var itemEditDialog = function(id, parent, depth) {
+				var url = new Curl('zabbix.php'),
+					item_edit = !!id,
+					ajax_data = {
+						map_name: '',
+						map_mapid: 0,
+						depth: depth,
+						map_id: id
+					};
 
-				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0) {
-					link = $('<a></a>').attr('href', '#');
-
-					link.click(function(e) {
-						var data_to_share = {mapid: $(this).data('mapid')},
-							widget = getWidgetData();
-
-						e.preventDefault();
-						$(".dashbrd-grid-widget-container").dashboardGrid("widgetDataShare", widget, data_to_share);
-					});
+				if (id) {
+					ajax_data['map_name'] = $('[name="map.name.'+id+'"]', $this).val();
+					ajax_data['map_mapid'] = $('[name="mapid.'+id+'"]', $this).val();
 				}
 				else {
-					link = $('<span></span>');
+					ajax_data['map_id'] = getNextId();
 				}
 
-				link.addClass('item-name').text(item.name);
+				url.setArgument('action', 'widget.navigationtree.edititemdialog');
 
-				span = $('<span></span>')
-					.addClass('row')
-					.append(link);
+				jQuery.ajax({
+					url: url.getUrl(),
+					method: 'POST',
+					data: ajax_data,
+					dataType: 'json',
+					success: function(resp) {
+						var id = ajax_data['map_id'];
 
-				li = $('<li></li>').addClass('tree-item').append(span);
+						overlayDialogue({
+							'title': t('Edit Tree Widget item'),
+							'content': resp.body,
+							'buttons': [
+								{
+									'title': item_edit ? t('Update') : t('Add'),
+									'class': 'dialogue-widget-save',
+									'action': function() {
+										var form = $('#widget_dialogue_form'),
+											url = new Curl('zabbix.php'),
+											ajax_data = {
+												add_submaps: $('[name="add_submaps"]', form).is(':checked') ? 1 : 0,
+												map_name: $('[name="map.name.'+id+'"]', form).val(),
+												map_mapid: +$('[name="linked_map_id"]', form).val(),
+												mapid: id
+											};
 
-				if (typeof item.mapid !== 'undefined' && item.mapid) {
-					li.attr('data-mapid', item.mapid);
-					link.attr('data-mapid', item.mapid);
-				}
+										url.setArgument('action', 'widget.navigationtree.edititem');
 
-				ul = createTreeBranch(null);
+										jQuery.ajax({
+											url: url.getUrl(),
+											method: 'POST',
+											data: ajax_data,
+											dataType: 'json',
+											success: function(resp) {
+												var new_item,
+													root;
 
-				arrow = $('<span></span>')
-					.click(function() {
-						var branch = $(this).closest('[data-id]');
-						if (branch.hasClass('opened')) {
-							$(this).addClass('arrow-right').removeClass('arrow-down');
-							branch.removeClass('opened').addClass('closed');
-						}
-						else {
-							$(this).addClass('arrow-down').removeClass('arrow-right');
-							branch.removeClass('closed').addClass('opened');
-						}
-
-						storeUIState();
-					})
-					.addClass(li.hasClass('opened') ? 'arrow-down' : 'arrow-right');
-
-				if (typeof item.children !== 'undefined') {
-					if (item.children.length) {
-						li.addClass('is-parent');
-					}
-
-					if (widget_data.maxDepth > depth) {
-						$.each(item.children, function(i, item) {
-							if (typeof item === 'object') {
-								ul.append(createTreeItem(item, depth+1));
-								if (item.id > widget_data.lastId) {
-									widget_data.lastId = item.id;
-								}
-							}
-						});
-					}
-				}
-
-				if (isEditMode()) {
-					var tools = $('<div></div>').addClass('tools').insertAfter(link);
-
-					$('<input>')
-						.click(function() {
-							var parentId = $(this).data('id'),
-								widget_data = $this.data('widgetData'),
-								depth = +$(this).closest('.tree-list').data('depth'),
-								branch = $('.tree-item[data-id='+parentId+']>ul', $this),
-								new_item = {
-									name: t('New item'),
-									parent: parentId,
-									id: getNextId()
-								};
-
-								if (widget_data.maxDepth > depth) {
-									if (!branch.size()) {
-										branch = createTreeBranch(null);
-										branch.appentTo($('.tree-item[data-id='+parentId+']', $this));
-									}
-
-									$('.tree-item[data-id='+parentId+']', $this).addClass('is-parent opened').removeClass('closed');
-									branch.append(createTreeItem(new_item));
-									$(".tree-item").droppable(getDroppableOptions());
-									storeUIState();
-								}
-						})
-						.addClass('add-child-btn')
-						.attr({'type':'button', 'data-id':item.id})
-						.css(buttonCssAdd)
-						.appendTo(tools);
-
-					$('<input>')
-						.click(function() {
-							var id = $(this).data('id'),
-									depth = $('.tree-item[data-id='+id+']', $this).closest('.tree-list').data('depth'),
-									url = new Curl('zabbix.php');
-
-							var ajax_data = {
-								map_name: $('[name="map.name.'+id+'"]', $this).val(),
-								map_mapid: $('[name="mapid.'+id+'"]', $this).val(),
-								depth: depth||1,
-								map_id: id
-							};
-
-							url.setArgument('action', 'widget.navigationtree.edititemdialog');
-
-							jQuery.ajax({
-								url: url.getUrl(),
-								method: 'POST',
-								data: ajax_data,
-								dataType: 'json',
-								success: function(resp) {
-									overlayDialogue({
-										'title': t('Edit Tree Widget item'),
-										'content': resp.body,
-										'buttons': [
-											{
-												'title': t('Update'),
-												'class': 'dialogue-widget-save',
-												'action': function() {
-													var form = $('#widget_dialogue_form'),
-														url = new Curl('zabbix.php'),
-														ajax_data = {
-															add_submaps: $('[name="add_submaps"]', form).is(':checked') ? 1 : 0,
-															map_name: $('[name="map.name.'+id+'"]', form).val(),
-															map_mapid: $('[name="linked_map_id"]', form).val(),
-															mapid: id
+												$('.msg-bad', form).remove();
+												if (typeof resp.errors === 'object' && resp.errors.length > 0) {
+													form.prepend(resp.errors);
+													return false;
+												}
+												else {
+													if ($('[name="map.name.'+id+'"]', $this).length) {
+														$('[name="map.name.'+id+'"]', $this).val(resp['map_name']);
+														$('[name="mapid.'+id+'"]', $this).val(resp['map_mapid']);
+														$('[data-id='+id+'] > .row > .item-name', $this)
+															.html(resp['map_name']);
+													}
+													else {
+														root = $('.tree-item[data-id='+parent+']>ul.tree-list', $this),
+														new_item = {
+															name: resp['map_name'],
+															mapid: resp['map_mapid'],
+															id: resp['map_id'],
+															parent: parent
 														};
 
-													url.setArgument('action', 'widget.navigationtree.edititem');
+														root.append(createTreeItem(new_item));
+													}
 
-													jQuery.ajax({
-														url: url.getUrl(),
-														method: 'POST',
-														data: ajax_data,
-														dataType: 'json',
-														success: function(resp) {
-															var id = resp['map_id'];
-															$('[name="map.name.'+id+'"]', $this).val(resp['map_name']);
-															$('[name="mapid.'+id+'"]', $this).val(resp['map_mapid']);
-															$('[data-id='+id+'] > .row > .item-name', $this).html(resp['map_name']);
+													if (typeof resp.submaps !== 'undefined') {
+														root = $('.tree-item[data-id='+id+']>ul.tree-list', $this)
+														$.each(resp.submaps, function(){
+															var new_item = {
+																name: this['name'],
+																mapid: this['sysmapid'],
+																id: getNextId(),
+																parent: id
+															};
 
-															if (typeof resp.submaps !== 'undefined') {
-																$.each(resp.submaps, function(){
-																	var root = $('.tree-item[data-id='+id+']>ul.tree-list', $this),
-																		new_item = {
-																			name: this['name'],
-																			mapid: this['sysmapid'],
-																			id: getNextId(),
-																			parent: id
-																		};
+															root.append(createTreeItem(new_item));
+														});
+													}
 
-																	root.append(createTreeItem(new_item));
-																});
-
-																$(".tree-item").droppable(getDroppableOptions());
-																setTreeHandlers();
-															}
-														}
-													});
+													$(".tree-item").droppable(getDroppableOptions());
+													overlayDialogueDestroy();
+													setTreeHandlers();
+													storeUIState();
 												}
-											},
-											{
-												'title': t('Cancel'),
-												'class': 'btn-alt',
-												'action': function() {}
 											}
-										]
-									});
+										});
+
+										return false;
+									}
+								},
+								{
+									'title': t('Cancel'),
+									'class': 'btn-alt',
+									'action': function() {}
 								}
-							});
-						})
-						.addClass('edit-item-btn')
-						.attr({'type':'button', 'data-id':item.id})
-						.css(buttonCssEdit)
-						.appendTo(tools);
+							]
+						});
+					}
+				});
+			};
 
-					$('<input>')
-						.click(function(){
-							removeItem([$(this).data('id')]);
-						})
-						.attr({'type':'button', 'data-id':item.id})
-						.addClass('remove-item-btn')
-						.css(buttonCssRemove)
-						.appendTo(tools);
+			/**
+			 * Create Tree LI item with everything needed inside it.
+			 *
+			 * @param {object} item
+			 * @param {numeric} depth
+			 * @param {boolean} editable - either item in edit-mode will be editable. Root item is not editable.
+			 *
+			 * @returns {object}
+			 */
+			var createTreeItem = function(item, depth, editable) {
+				var opened_nodes = cookie.read(getCookieName('opened_nodes')),
+					widget_data = $this.data('widgetData'),
+					ul = createTreeBranch(null),
+					item_clases = 'tree-item',
+					link;
 
-					$('<input>')
-						.attr({'type':'hidden', 'name':'map.name.'+item.id})
-						.val(item.name)
-						.appendTo(li);
-
-					$('<input>')
-						.attr({'type':'hidden', 'name':'map.parent.'+item.id})
-						.val(item.parent||0)
-						.appendTo(li);
-
-					$('<input>')
-						.attr({'type':'hidden', 'name':'mapid.'+item.id})
-						.val(typeof item.mapid !== 'undefined' ? item.mapid : '0')
-						.appendTo(li);
+				if (typeof depth !== 'number') {
+					depth = 1;
+				}
+				if (typeof editable !== 'boolean') {
+					editable = true;
 				}
 
-				arrow.insertBefore(link);
-				li.attr({'data-id': item.id}).append(ul);
-				return li;
+				opened_nodes = opened_nodes ? opened_nodes.split(',') : [];
+				if (!editable || opened_nodes.indexOf(item.id.toString()) !== -1) {
+					item_clases += ' opened';
+				}
+				else {
+					item_clases += ' closed';
+				}
+
+				if (!editable) {
+					item_clases += ' root-item';
+				}
+
+				if (typeof item.children !== 'undefined' && widget_data.max_depth > depth) {
+					if (item.children.length) {
+						item_clases += ' is-parent';
+					}
+
+					$.each(item.children, function(i, item) {
+						if (typeof item === 'object') {
+							ul.append(createTreeItem(item, depth+1));
+							if (item.id > widget_data.lastId) {
+								widget_data.lastId = item.id;
+							}
+						}
+					});
+				}
+
+				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0) {
+					link = $('<a>', {
+							'data-mapid': item.mapid,
+							'href': '#'
+						})
+						.click(function(e) {
+							var data_to_share = {mapid: $(this).data('mapid')},
+								widget = getWidgetData();
+
+							e.preventDefault();
+							$(".dashbrd-grid-widget-container").dashboardGrid("widgetDataShare", widget, data_to_share);
+						});
+				}
+				else {
+					link = $('<span>');
+				}
+
+				return $('<li>', {
+						'class': item_clases,
+						'data-mapid': item.mapid,
+						'data-id': item.id
+					})
+					.append(
+						$('<span>')
+							.addClass('row')
+							.append(editable ? $('<span>')
+								.addClass((item_clases.indexOf('opened') !== -1) ? 'arrow-right' : 'arrow-down')
+								.click(function() {
+									var branch = $(this).closest('[data-id]');
+
+									if (branch.hasClass('opened')) {
+										$(this).addClass('arrow-right').removeClass('arrow-down');
+										branch.removeClass('opened').addClass('closed');
+									}
+									else {
+										$(this).addClass('arrow-down').removeClass('arrow-right');
+										branch.removeClass('closed').addClass('opened');
+									}
+
+									storeUIState();
+								}) : null
+							)
+							.append($(link)
+								.addClass('item-name')
+								.text(item.name)
+							)
+							.append(isEditMode() ? $('<div>')
+								.addClass('tools')
+								.append($('<input>', {
+										'type': 'button',
+										'data-id': item.id,
+										'class': 'add-child-btn',
+										'css': buttonCssAdd
+									})
+									.click(function() {
+										var parentId = $(this).data('id'),
+											widget_data = $this.data('widgetData'),
+											depth = $(this).closest('.tree-list').data('depth'),
+											branch = $('.tree-item[data-id='+parentId+']>ul', $this);
+
+											if (typeof depth === 'undefined') {
+												depth = 0;
+											}
+
+											if (widget_data.max_depth > depth) {
+												itemEditDialog(0, parentId, depth);
+											}
+									})
+								)
+								.append($('<input>', {
+										'class': 'import-items-btn',
+										'data-id': item.id,
+										'type': 'button',
+										'css': buttonCssImport
+									})
+									.click(function() {
+										var url = new Curl('popup.php'),
+											id = $(this).data('id');
+
+										url.setArgument('srctbl', 'sysmaps');
+										url.setArgument('srcfld1', 'sysmapid');
+										url.setArgument('srcfld2', 'name');
+										url.setArgument('multiselect', '1');
+
+										if (typeof addPopupValues === 'function') {
+											old_addPopupValues = addPopupValues;
+										}
+
+										addPopupValues = function(data) {
+											var root = $('.tree-item[data-id='+id+']>ul.tree-list', $this),
+												new_item;
+
+											$.each(data.values, function() {
+												new_item = {
+													name: this['name'],
+													mapid: +this['sysmapid'],
+													id: getNextId(),
+													parent: id
+												};
+
+												root.append(createTreeItem(new_item));
+											});
+
+											setTreeHandlers();
+
+											if (typeof old_addPopupValues === 'function') {
+												addPopupValues = old_addPopupValues;
+												old_addPopupValues = null;
+											}
+										};
+
+										return PopUp(url.getUrl());
+									})
+								)
+								.append(editable ? $('<input>', {
+										'class': 'edit-item-btn',
+										'type': 'button',
+										'data-id': item.id,
+										'css': buttonCssEdit
+									})
+									.click(function() {
+										itemEditDialog($(this).data('id'))
+									}) : null
+								)
+								.append(editable ? $('<button>', {
+										'type': 'button',
+										'data-id': item.id,
+										'class': 'remove-btn',
+										'style': 'top: 8px;'
+									})
+									.click(function(){
+										removeItem([$(this).data('id')]);
+									}) : null
+								) : null
+							)
+					)
+					.append(ul)
+					.append((isEditMode() && editable) ? $('<input>', {
+							'type': 'hidden',
+							'name': 'map.name.'+item.id
+						})
+						.val(item.name) : null
+					)
+					.append((isEditMode() && editable) ? $('<input>', {
+							'type': 'hidden',
+							'name':'map.parent.'+item.id
+						})
+						.val(item.parent||0) : null
+					)
+					.append((isEditMode() && editable) ? $('<input>', {
+							'type': 'hidden',
+							'name':'mapid.'+item.id
+						})
+						.val(typeof item.mapid === 'number' ? item.mapid : 0) : null
+					);
 			};
 
 			// Returns a number of levels till the deepest branch (ul.tree-list).
@@ -409,7 +537,8 @@ jQuery(function($) {
 
 			var setTreeHandlers = function() {
 				var opened_nodes = cookie.read(getCookieName('opened_nodes')),
-					widget_data = $this.data('widgetData');
+					widget_data = $this.data('widgetData'),
+					tree_list_depth;
 
 				opened_nodes = opened_nodes ? opened_nodes.split(',') : [];
 
@@ -424,7 +553,7 @@ jQuery(function($) {
 				});
 
 				// Set which brances are opened and which ones are closed.
-				$('.tree-item[data-id]').each(function() {
+				$('.tree-item[data-id]').not('.root-item').each(function() {
 					var id = $(this).data('id');
 					if (opened_nodes.indexOf(id.toString()) !== -1) {
 						$(this).addClass('opened').removeClass('closed');
@@ -435,158 +564,26 @@ jQuery(function($) {
 				});
 
 				// Set [data-depth] for list and each sublist.
-				$('.tree-list').each(function() {
-					$(this).attr('data-depth', $(this).parents('.tree-list').size()+1);
+				$('.tree-list').not('.root').each(function() {
+					tree_list_depth = $(this).parents('.tree-list').not('.root').size() + 1;
+					$(this).attr('data-depth', tree_list_depth);
 				});
 
 				// Show/hide 'add new items' buttons.
-				$('.tree-list').filter(function(){return +$(this).data('depth') >= widget_data.maxDepth;}).each(function() {
+				$('.tree-list').filter(function(){
+					return +$(this).data('depth') >= widget_data.max_depth;
+				}).each(function() {
 					$('.add-child-btn', $(this)).hide();
 				});
-				$('.tree-list').filter(function(){return widget_data.maxDepth > +$(this).data('depth');}).each(function() {
+				$('.tree-list').filter(function(){
+					return widget_data.max_depth > +$(this).data('depth');
+				}).each(function() {
 					$('>.tree-item>.row>.tools>.add-child-btn', $(this)).show();
 				});
 
 				// Change arrow style.
 				$('.is-parent.opened .arrow-right', $this).removeClass('arrow-right').addClass('arrow-down');
 				$('.is-parent.closed .arrow-down', $this).removeClass('arrow-down').addClass('arrow-right');
-			};
-
-			var addEditTools = function() {
-					var root = $('ul.root', $this),
-						widget_data = $this.data('widgetData'),
-						toolBar;
-
-					if (!isEditMode()) {
-						return false;
-					}
-
-					removeEditTools();
-
-					toolBar = $('<div></div>')
-						.appendTo($this.closest('.navtree'))
-						.addClass('buttons');
-
-					$('<button></button>')
-						.click(function() {
-							var widget_data = $this.data('widgetData'),
-								new_item = {
-									name: t('New item'),
-									id: getNextId(),
-									parent: 0
-								};
-
-							root = (typeof root !== 'undefined') ? root : $('ul.root', $this);
-							root.append(createTreeItem(new_item));
-							$(".tree-item").droppable(getDroppableOptions());
-						})
-						.appendTo(toolBar)
-						.html(t('Add'));
-
-					$('<button></button>')
-						.css('margin-left', '5px')
-						.click(function() {
-							addPopupValues = function(data) {
-								var root = (typeof root !== 'undefined') ? root : $('ul.root', $this),
-										widget_data = $this.data('widgetData'),
-										new_item;
-
-								$.each(data.values, function() {
-									new_item = {
-										name: this['name'],
-										mapid: this['sysmapid'],
-										id: getNextId(),
-										parent: 0
-									};
-									root.append(createTreeItem(new_item));
-								});
-							};
-
-							var url = new Curl('popup.php');
-							url.setArgument('srctbl', 'sysmaps');
-							url.setArgument('srcfld1', 'sysmapid');
-							url.setArgument('srcfld2', 'name');
-							url.setArgument('multiselect', '1');
-
-							return PopUp(url.getUrl());
-						})
-						.appendTo(toolBar)
-						.html(t('Add maps'));
-
-					$('.tree-list.root').sortable({
-						items: '.tree-item',
-						connectWith: '.tree-list',
-						placeholder: 'sortable-item-placeholder',
-						cursor: 'move',
-						axis: 'y',
-						opacity: .75,
-						distance: 5,
-						cursorAt: {bottom: 5},
-						forcePlaceholderSize: true,
-						forceHelperSize: true,
-						tolerance: 'intersect',
-						zIndex: 9999,
-						update: function(event, ui) {
-							$('.drop-hover').removeClass('drop-hover');
-							setTreeHandlers();
-						},
-						stop: function(event, ui) {
-							var dropped_to_root = false,
-								new_parent_id = 0,
-								overlaped_by = 0,
-								item_height = 33,
-								tolerance = 10;
-
-							if (dropped_to) {
-								// If	$(dropped_to) have [data-depth] > maxDepth, select it's parent.
-								while ($('>ul:first', $(dropped_to)).size()
-									&& +$('>ul:first', $(dropped_to)).data('depth') > widget_data.maxDepth) {
-									dropped_to = $(dropped_to).closest('.tree-list').closest('.tree-item');
-								}
-
-								if (dropped_to.length) {
-									// Cancel sorting if by dropping an item the maxDepth will be exceeded.
-									var num_of_new_levels = $('ul:first', $(dropped_to)).data('depth') + levelsUnder(ui.item);
-									if (num_of_new_levels > widget_data.maxDepth) {
-										alert('Only '+widget_data.maxDepth+' levels are allowed.');
-
-										$('.tree-list.root').sortable('cancel');
-										dropped_to = null;
-										setTreeHandlers();
-										return;
-									}
-
-									dropped_to_root = ($(dropped_to).data('id') === 'undefined');
-									overlaped_by = ui.offset.top - dropped_to.offset().top;
-
-									// Add as child element. Otherwise rely on default sortablility.
-									if (Math.abs(overlaped_by) <= item_height/2) {
-										if (!dropped_to_root) {
-											$('>ul:first', $(dropped_to)).append(ui.item);
-
-											$(dropped_to)
-												.addClass('is-parent opened')
-												.removeClass('closed');
-										}
-									}
-								}
-							}
-
-							new_parent_id = $('.tree-item[data-id='+ui.item.data('id')+']').closest('.tree-list')
-								.closest('.tree-item').data('id');
-
-							$('[name^="map.parent.'+ui.item.data('id')+'"]').val(new_parent_id||0);
-							dropped_to = null;
-							storeUIState();
-							setTreeHandlers();
-						}
-					}).disableSelection();
-
-				$(".tree-item").droppable(getDroppableOptions());
-			};
-
-			var removeEditTools = function() {
-				$('.buttons', $this.closest('.navtree')).remove();
 			};
 
 			var getWidgetData = function() {
@@ -606,9 +603,14 @@ jQuery(function($) {
 				return response;
 			};
 
+			/**
+			 * Detects either the dashboard is in edit mode.
+			 *
+			 * @returns {boolean}
+			 */
 			var isEditMode = function() {
 				var dashboard_data = $(".dashbrd-grid-widget-container").data('dashboardGrid'),
-					response = null;
+					response = false;
 
 				$.each(dashboard_data, function(i, db) {
 					if (typeof db['edit_mode'] !== 'undefined') {
@@ -619,7 +621,11 @@ jQuery(function($) {
 				return response;
 			};
 
-			// Create an array of items from seperate widget fields.
+			/*
+			 * Grouping a seperate widget fields into objects of items. Each items consists of its name, parent, id etc.
+			 *
+			 * @returns {Array} - an array of item objects.
+			 */
 			var getTreeWidgetItems = function() {
 				var widget_data = getWidgetData(),
 					tree_items = [];
@@ -652,7 +658,7 @@ jQuery(function($) {
 				return tree_items;
 			};
 
-			// Create an multi-level array that represents real child-parent dependencies in tree.
+			// Create multi-level array that represents real child-parent dependencies in tree.
 			var buildTree = function(rows, parent_id) {
 				var parent_id = (typeof parent_id === 'number') ? parent_id : 0,
 					widget_data = $this.data('widgetData'),
@@ -704,6 +710,7 @@ jQuery(function($) {
 				return tree;
 			};
 
+			// Remove item from tree.
 			var removeItem = function(id) {
 				var parent_id = $('input[name="map.parent.'+id+'"]', $this).val();
 				if ($('.tree-item', $('[data-id='+parent_id+']', $this)).length == 1) {
@@ -714,8 +721,7 @@ jQuery(function($) {
 
 			// Records data from DOM to dashboard widget[fields] array.
 			var updateWidgetFields = function() {
-				var dashboard_widget = getWidgetData(),
-					widget_data = $this.data('widgetData');
+				var dashboard_widget = getWidgetData();
 
 				if (!dashboard_widget || !isEditMode()) {
 					return false;
@@ -733,8 +739,8 @@ jQuery(function($) {
 					var det = /^map\.name\.(\d+)$/.exec($(this).attr('name'));
 					if (det) {
 						var id = +det[1],
-							parent = $('input[name="map.parent.'+id+'"]', dashboard_widget['content_body']).val(),
-							mapid = $('input[name="mapid.'+id+'"]', dashboard_widget['content_body']).val(),
+							parent = +$('input[name="map.parent.'+id+'"]', dashboard_widget['content_body']).val(),
+							mapid = +$('input[name="mapid.'+id+'"]', dashboard_widget['content_body']).val(),
 							order = $('input[name="map.parent.'+id+'"]', dashboard_widget['content_body']).closest('li')
 										.prevAll().length+1;
 
@@ -750,37 +756,24 @@ jQuery(function($) {
 			};
 
 			var switchToNavigationMode = function() {
-				var widget_data = $this.data('widgetData'),
-					dashboard_widget = getWidgetData();
-
-				if (!dashboard_widget) {
-					return false;
-				}
-
-				removeEditTools();
 				drawTree();
 				parseProblems();
-
-				$(".dashbrd-grid-widget-container").dashboardGrid('setWidgetRefreshRate', dashboard_widget['widgetid'],
-						dashboard_widget['rf_rate']);
 			};
 
 			var switchToEditMode = function() {
-				var widget_data = $this.data('widgetData'),
-					dashboard_widget = getWidgetData();
+				var dashboard_widget = getWidgetData();
 
 				if (!dashboard_widget) {
 					return false;
 				}
 
+				// Before switch to edit mode, stop refreshing.
 				if (typeof dashboard_widget['rf_timeoutid'] !== 'undefined') {
 					clearTimeout(dashboard_widget['rf_timeoutid']);
 					delete dashboard_widget['rf_timeoutid'];
 				}
 
-				removeEditTools();
 				drawTree();
-				addEditTools();
 			};
 
 			var methods = {
@@ -821,9 +814,9 @@ jQuery(function($) {
 					return this.each(function() {
 						$this.data('widgetData', {
 							widgetid: options.widgetId,
-							severityLevels: options.severityLevels||[],
+							severity_levels: options.severity_levels||[],
 							problems: options.problems||[],
-							maxDepth: options.maxDepth||3,
+							max_depth: options.max_depth||10,
 							lastId: 0
 						});
 

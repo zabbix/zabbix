@@ -28,9 +28,9 @@ class CControllerWidgetSysmapView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid' =>	'required',
-			'name' =>			'required|string',
-			'fields' =>		'array'
+			'name'		=>	'string',
+			'widgetid'	=>	'required',
+			'fields'	=>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -82,7 +82,6 @@ class CControllerWidgetSysmapView extends CController {
 
 		// Default values
 		$default = [
-			'name' => CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP],
 			'source_type' => WIDGET_SYSMAP_SOURCETYPE_MAP,
 			'widget_name' => _('Map widget'),
 			'filter_widget_reference' => ''
@@ -93,11 +92,6 @@ class CControllerWidgetSysmapView extends CController {
 			$data = $this->getInput('fields');
 		}
 
-		$data['name'] = $this->getInput('name');
-		if ($data['name'] === '') {
-			$data['name'] = $default['name'];
-		}
-
 		// Apply defualt value for data
 		foreach ($default as $key => $value) {
 			if (!array_key_exists($key, $data)) {
@@ -106,13 +100,13 @@ class CControllerWidgetSysmapView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
 			'widgetid' => getRequest('widgetid'),
 			'fields' => $data,
-			'error' => $error,
-			'name' => $data['name']
+			'error' => $error
 		]));
 	}
 }

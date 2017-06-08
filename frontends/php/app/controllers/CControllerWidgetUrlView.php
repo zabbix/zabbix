@@ -29,12 +29,13 @@ class CControllerWidgetUrlView extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'name' =>			'string',
 			'fields' =>			'required|array',
-			'name' =>			'required|string',
 			'dynamic_hostid' =>	'db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
+
 		if ($ret) {
 			/*
 			 * @var array  $fields
@@ -62,7 +63,6 @@ class CControllerWidgetUrlView extends CController {
 
 		// Default values
 		$default = [
-			'name' => CWidgetConfig::getKnownWidgetTypes()[WIDGET_URL],
 			'url' => '',
 			'hostid' => '0',
 			'isTemplatedDashboard' => false, // TODO VM: will dashboards be templated?
@@ -70,11 +70,6 @@ class CControllerWidgetUrlView extends CController {
 		];
 
 		$data = $this->getInput('fields');
-
-		$data['name'] = $this->getInput('name');
-		if ($data['name'] === '') {
-			$data['name'] = $default['name'];
-		}
 
 		if ($this->hasInput('dynamic_hostid')) {
 			$data['hostid'] = $this->getInput('dynamic_hostid');
@@ -87,7 +82,7 @@ class CControllerWidgetUrlView extends CController {
 			}
 		}
 
-		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && bccomp($data['hostid'], '0') === 0) {
+		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $data['hostid'] == 0) {
 			$error = _('No host selected.');
 		}
 		else {
@@ -103,14 +98,14 @@ class CControllerWidgetUrlView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_URL]),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
 			'url' => [
 				'url' => $data['url'],
 				'error' => $error
-			],
-			'name' => $data['name']
+			]
 		]));
 	}
 }

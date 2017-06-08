@@ -40,8 +40,9 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_SYSMAP				=> _('Map'),
-			WIDGET_NAVIGATION_TREE	=> _('Map Navigation Tree'),
-			WIDGET_URL					=> _('URL')
+			WIDGET_NAVIGATION_TREE		=> _('Map Navigation Tree'),
+			WIDGET_URL					=> _('URL'),
+			WIDGET_ACTION_LOG			=> _('Action log')
 		];
 	}
 
@@ -64,8 +65,9 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
 			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
 			WIDGET_SYSMAP				=> ['width' => 9, 'height' => 5],
-			WIDGET_NAVIGATION_TREE				=> ['width' => 3, 'height' => 5],
-			WIDGET_URL					=> ['width' => 7, 'height' => 9]
+			WIDGET_NAVIGATION_TREE		=> ['width' => 3, 'height' => 5],
+			WIDGET_URL					=> ['width' => 7, 'height' => 9],
+			WIDGET_ACTION_LOG			=> ['width' => 8, 'height' => 5]
 		];
 	}
 
@@ -105,6 +107,7 @@ class CWidgetConfig
 			case WIDGET_WEB_OVERVIEW:
 			case WIDGET_DISCOVERY_STATUS:
 			case WIDGET_HOST_STATUS:
+			case WIDGET_ACTION_LOG:
 				return SEC_PER_MIN;
 
 			case WIDGET_ZABBIX_STATUS:
@@ -197,14 +200,14 @@ class CWidgetConfig
 		switch ($type) {
 			case WIDGET_CLOCK:
 				return new CClockWidgetForm($data);
-
 			case WIDGET_NAVIGATION_TREE:
 				return (new CNavigationWidgetForm($data));
 			case WIDGET_SYSMAP:
 				return (new CSysmapWidgetForm($data));
 			case WIDGET_URL:
 				return new CUrlWidgetForm($data);
-
+			case WIDGET_ACTION_LOG:
+				return new CActionLogWidgetForm($data);
 			default:
 				// TODO VM: delete this case after all widget forms will be created
 				return new CWidgetForm($data);

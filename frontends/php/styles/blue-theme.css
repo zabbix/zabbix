@@ -3007,20 +3007,25 @@ tr.cursor-move td * {
   fill: #acbbc2; }
 
 .navtree {
-  position: relative;
-  height: 100%; }
-  .navtree .buttons {
-    border-top: 1px solid #dfe4e7;
-    position: absolute;
-    padding: 5px 20px 0;
-    height: 25px;
-    bottom: 0;
-    right: 0;
-    left: 0; }
+  	/*
+      position: relative;
+  	height: 100%;
+      */ }
   .navtree .tree {
-    height: calc(100% - 30px);
+    /*height: calc(100% - 30px);*/
     overflow-y: auto;
-    overflow-x: hidden; }
+    overflow-x: hidden;
+        /*
+		ul ul span.row {
+			padding-left: 40px;
+		}
+		ul ul ul span.row {
+			padding-left: 55px;
+		}
+		ul ul ul ul span.row {
+			padding-left: 75px;
+		}
+        */ }
     .navtree .tree span.row {
       border-bottom: 1px solid #dfe4e7;
       padding: 8px 0px 8px 20px;
@@ -3028,10 +3033,28 @@ tr.cursor-move td * {
       display: block; }
     .navtree .tree ul span.row {
       padding-left: 25px; }
-    .navtree .tree ul ul span.row {
+    .navtree .tree .root-item > span.row {
+      padding-left: 10px; }
+    .navtree .tree .tree-list[data-depth="1"] span.row {
       padding-left: 40px; }
-    .navtree .tree ul ul ul span.row {
+    .navtree .tree .tree-list[data-depth="2"] span.row {
       padding-left: 55px; }
+    .navtree .tree .tree-list[data-depth="3"] span.row {
+      padding-left: 70px; }
+    .navtree .tree .tree-list[data-depth="4"] span.row {
+      padding-left: 85px; }
+    .navtree .tree .tree-list[data-depth="5"] span.row {
+      padding-left: 100px; }
+    .navtree .tree .tree-list[data-depth="6"] span.row {
+      padding-left: 115px; }
+    .navtree .tree .tree-list[data-depth="7"] span.row {
+      padding-left: 130px; }
+    .navtree .tree .tree-list[data-depth="8"] span.row {
+      padding-left: 145px; }
+    .navtree .tree .tree-list[data-depth="9"] span.row {
+      padding-left: 160px; }
+    .navtree .tree .tree-list[data-depth="10"] span.row {
+      padding-left: 175px; }
     .navtree .tree .arrow-down, .navtree .tree .arrow-right {
       cursor: pointer;
       position: absolute;
@@ -3046,9 +3069,11 @@ tr.cursor-move td * {
     .navtree .tree .tools {
       margin-left: 20px;
       padding-right: 10px;
+      width: 80px;
       float: right; }
       .navtree .tree .tools .edit-item-btn,
       .navtree .tree .tools .remove-item-btn,
+      .navtree .tree .tools .import-items-btn,
       .navtree .tree .tools .add-child-btn {
         margin-left: 5px;
         float: left; }
@@ -3071,9 +3096,6 @@ tr.cursor-move td * {
       border-style: solid; }
     .navtree .tree .drop-hover > .row {
       background: #faebd7; }
-    .navtree .tree .item-name:before {
-      content: attr(data-prefix);
-      color: #b5b9bb; }
 
 /*doc
 ---

@@ -4416,21 +4416,7 @@ tr.cursor-move {
 }
 
 .navtree {
-	position: relative;
-	height: 100%;
-
-	.buttons {
-		border-top: 1px solid #dfe4e7;
-		position: absolute;
-		padding: 5px 20px 0;
-		height: 25px;
-		bottom: 0;
-		right: 0;
-		left: 0;
-	}
-
 	.tree {
-		height: calc(100% - 30px);
 		overflow-y: auto;
 		overflow-x: hidden;
 
@@ -4443,11 +4429,39 @@ tr.cursor-move {
 		ul span.row {
 			padding-left: 25px;
 		}
-		ul ul span.row {
+		.root-item>span.row {
+			padding-left: 10px;
+		}
+
+		.tree-list[data-depth="1"] span.row {
 			padding-left: 40px;
 		}
-		ul ul ul span.row {
+		.tree-list[data-depth="2"] span.row {
 			padding-left: 55px;
+		}
+		.tree-list[data-depth="3"] span.row {
+			padding-left: 70px;
+		}
+		.tree-list[data-depth="4"] span.row {
+			padding-left: 85px;
+		}
+		.tree-list[data-depth="5"] span.row {
+			padding-left: 100px;
+		}
+		.tree-list[data-depth="6"] span.row {
+			padding-left: 115px;
+		}
+		.tree-list[data-depth="7"] span.row {
+			padding-left: 130px;
+		}
+		.tree-list[data-depth="8"] span.row {
+			padding-left: 145px;
+		}
+		.tree-list[data-depth="9"] span.row {
+			padding-left: 160px;
+		}
+		.tree-list[data-depth="10"] span.row {
+			padding-left: 175px;
 		}
 
 		.arrow-down, .arrow-right {
@@ -4471,10 +4485,12 @@ tr.cursor-move {
 		.tools {
 			margin-left: 20px;
 			padding-right: 10px;
+			width: 80px;
 			float: right;
 
 			.edit-item-btn,
 			.remove-item-btn,
+			.import-items-btn,
 			.add-child-btn {
 				margin-left: 5px;
 				float: left;

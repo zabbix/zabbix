@@ -103,7 +103,7 @@ class CWidgetField
 		$errors = [];
 
 		if ($this->required === true && $this->value === null) {
-			$errors[] = _s('the parameter "%1$s" is missing', $this->label);
+			$errors[] = _s('The parameter "%1$s" is missing.', $this->getLabel());
 		}
 
 		return $errors;

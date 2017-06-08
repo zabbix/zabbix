@@ -29,7 +29,7 @@ class CControllerWidgetFavScreensView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>		'required|string'
+			'name' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,11 +47,6 @@ class CControllerWidgetFavScreensView extends CController {
 	}
 
 	protected function doAction() {
-		$name = $this->getInput('name');
-		if ($name === '') {
-			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_SCREENS];
-		}
-
 		$screens = [];
 		$ids = ['screenid' => [], 'slideshowid' => []];
 
@@ -93,11 +88,11 @@ class CControllerWidgetFavScreensView extends CController {
 		CArrayHelper::sort($screens, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_SCREENS]),
 			'screens' => $screens,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'name' => $name
+			]
 		]));
 	}
 }

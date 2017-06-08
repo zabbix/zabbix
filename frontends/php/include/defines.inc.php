@@ -1151,7 +1151,9 @@ define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
 define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
 
 // max depth of navigation tree
-define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 3);
+define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
+
+define('WIDGET_ACTION_LOG',				'actlog');
 
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');

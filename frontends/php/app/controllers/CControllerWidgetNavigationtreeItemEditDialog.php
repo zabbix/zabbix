@@ -28,10 +28,10 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'depth' => '',
-			'map_name' => '',
-			'map_mapid' => '',
-			'map_id' => ''
+			'depth' => 'ge 0|le '.WIDGET_NAVIGATION_TREE_MAX_DEPTH,
+			'map_mapid' => 'db sysmaps.sysmapid',
+			'map_name' => 'required|string',
+			'map_id' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -48,8 +48,6 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 	}
 
 	protected function doAction() {
-		$error = null;
-
 		$map_item_name = $this->getInput('map_name', '');
 		$map_mapid = $this->getInput('map_mapid', 0);
 		$map_id = $this->getInput('map_id', 0);
@@ -90,7 +88,7 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 					'&dstfrm='.$form->getName().'&dstfld1=linked_map_id&dstfld2=caption");'
-			)
+				)
 		]);
 
 		if ($depth >= WIDGET_NAVIGATION_TREE_MAX_DEPTH) {
@@ -103,7 +101,8 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 			]);
 		}
 
-
+		$form->addItem(new CJsScript(get_js($javascript, true)));
+		$form->addItem($value);
 		$form->addItem($formList);
 
 		// prepare output

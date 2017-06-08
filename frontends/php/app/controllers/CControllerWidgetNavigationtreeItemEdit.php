@@ -28,16 +28,28 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'add_submaps' => '',
-			'map_name' => '',
-			'map_mapid' => '',
-			'mapid' => ''
+			'depth' => 'ge 0|le '.WIDGET_NAVIGATION_TREE_MAX_DEPTH,
+			'map_mapid' => 'db sysmaps.sysmapid',
+			'add_submaps' => 'in 0,1',
+			'map_name' => 'required|string',
+			'mapid' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret && getRequest('map_name', '') === '') {
+			error(_s('Please specify Item name.'));
+			$ret = false;
+		}
+
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+			$output = [];
+
+			if (($messages = getMessages()) !== null) {
+				$output['errors'][] = $messages->toString();
+			}
+
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
 		}
 
 		return $ret;
@@ -50,7 +62,7 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 	protected function doAction() {
 		$add_submaps = $this->getInput('add_submaps', 0);
 		$map_item_name = $this->getInput('map_name', '');
-		$map_id = $this->getInput('mapid', 0);
+		$mapid = $this->getInput('mapid', 0);
 		$map_mapid = $this->getInput('map_mapid', 0);
 		$submaps = [];
 
@@ -87,7 +99,7 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 		$output = [
 			'map_name' => $map_item_name,
 			'map_mapid' => $map_mapid,
-			'map_id' => $map_id,
+			'map_id' => $mapid,
 			'submaps' => $submaps
 		];
 
