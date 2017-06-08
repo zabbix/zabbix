@@ -21,7 +21,10 @@
 
 require_once dirname(__FILE__).'/monitoring.dashboard.view.js.php';
 
+$this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('dashboard.grid.js');
+$this->addJsFile('gtlc.js');
+$this->addJsFile('class.calendar.js');
 
 $url_list = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.list');
@@ -140,6 +143,9 @@ $form
 		])
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 	)
+	// TODO VM: (?) what will happen, if scrollbar will be added in timeControl, but filter will not be added in HTML?
+	//			There will be uncaught exception. Maybe we need to disable adding scrollbar to timeControll as well.
+	->addItem((new CFilter('web.dashboard.filter.state'))->addNavigator())
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->addItem($form)
 	->show();
@@ -156,3 +162,6 @@ $this->addPostJS(
 		'.dashboardGrid()'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );
+
+$this->addPostJS('timeControl.addObject("scrollbar", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($data['timeControlData']).');'
+		. 'timeControl.processObjects();');

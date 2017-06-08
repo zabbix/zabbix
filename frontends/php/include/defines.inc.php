@@ -1138,6 +1138,7 @@ define('WIDGET_LAST_ISSUES',			'lastiss');
 define('WIDGET_SYSTEM_STATUS',			'syssum');
 define('WIDGET_WEB_OVERVIEW',			'webovr');
 define('WIDGET_ZABBIX_STATUS',			'stszbx');
+define('WIDGET_GRAPH',					'graph');
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
 define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');

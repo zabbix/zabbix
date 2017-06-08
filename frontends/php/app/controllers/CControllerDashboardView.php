@@ -30,7 +30,9 @@ class CControllerDashboardView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'fullscreen' =>		'in 0,1',
-			'dashboardid' =>	'db dashboard.dashboardid'
+			'dashboardid' =>	'db dashboard.dashboardid',
+			'period' =>			'int32',
+			'stime' =>			'time'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -75,6 +77,26 @@ class CControllerDashboardView extends CController {
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
 			'grid_widgets' => $this->getWidgets()
+		];
+
+		$options = [
+			'profileIdx' => 'web.dashbrd',
+			'profileIdx2' => $dashboard['dashboardid']
+		];
+
+		$data['timeline'] = calculateTime([
+			'profileIdx' => $options['profileIdx'],
+			'profileIdx2' => $options['profileIdx2'],
+			'updateProfile' => 1,
+			'period' => $this->hasInput('period') ? $this->getInput('period') : null,
+			'stime' => $this->hasInput('stime') ? $this->getInput('stime') : null
+		]);
+
+		$data['timeControlData'] = [
+			'loadScroll' => 1,
+			'mainObject' => 1,
+			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1, $options['profileIdx2']),
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		];
 
 		$response = new CControllerResponseData($data);
