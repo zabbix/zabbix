@@ -136,31 +136,28 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 					goto clean;
 
 				arg1 = get_rparam(&request, 0);
+				arg2 = get_rparam(&request, 1);
+				arg3 = get_rparam(&request, 2);
 
 				if (0 == strcmp(arg1, "host"))
 				{
-					arg2 = get_rparam(&request, 1);
-					arg3 = get_rparam(&request, 2);
-
-					if ((0 != strcmp(arg3, "maintenance") &&
-							0 != strcmp(arg3, "items") &&
-							0 != strcmp(arg3, "items_unsupported") &&
-							0 != strcmp(arg3, "interfaces")) || '\0' != *arg2)
+					if ('\0' == *arg2)
 					{
+						if (0 == strcmp(arg3, "maintenance") || 0 == strcmp(arg3, "items") ||
+								0 == strcmp(arg3, "items_unsupported"))
+						{
+							ret = SUCCEED;
+							goto clean;
+						}
+					}
+					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
+					{
+						ret = SUCCEED;
 						goto clean;
 					}
 				}
-				else if (0 == strcmp(arg1, "proxy"))
-				{
-					arg3 = get_rparam(&request, 2);
-
-					if (0 != strcmp(arg3, "lastaccess"))
-						goto clean;
-				}
-				else
-					goto clean;
-
-				ret = SUCCEED;
+				else if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg3, "lastaccess"))
+					ret = SUCCEED;
 clean:
 				free_request(&request);
 			}
