@@ -56,43 +56,48 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 				->addClass(ZBX_STYLE_BTN_ACTION)
 				->setId('dashbrd-actions')
 				->setTitle(_('Actions'))
-				->setAttribute('data-menu-popup',
-					CJs::encodeJson([
-						'type' => 'dashboard',
-						'label' => _('Actions'),
-						'items' => [
-							[
-								'name' => 'sharing',
-								'label' => _('Sharing'),
-								'form_data' => [
-									'dashboardid' => ($data['dashboard']['dashboardid'] != 0)
-										? $data['dashboard']['dashboardid']
-										: null,
-								],
-								'disabled' => !$data['dashboard']['editable']
-							],
-							[
-								'name' => 'create',
-								'label' => _('Create new'),
-								'url'  => (new CUrl('zabbix.php'))
-									->setArgument('action', 'dashboard.view')
-									->setArgument('new', '1')
-									->getUrl()
-							],
-							[
-								'name' => 'clone',
-								'label' => _('Clone'),
-								'url'  => ($data['dashboard']['dashboardid'] != 0)
-									? (new CUrl('zabbix.php'))
-										->setArgument('action', 'dashboard.view')
-										->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
-										->getUrl()
+				->setMenuPopup([
+					'type' => 'dashboard',
+					'label' => _('Actions'),
+					'items' => [
+						'sharing' => [
+							'label' => _('Sharing'),
+							'form_data' => [
+								'dashboardid' => ($data['dashboard']['dashboardid'] != 0)
+									? $data['dashboard']['dashboardid']
 									: null,
-								'disabled' => ($data['dashboard']['dashboardid'] == 0)
-							]
+							],
+							'disabled' => !$data['dashboard']['editable']
+						],
+						'create' => [
+							'label' => _('Create new'),
+							'url'  => (new CUrl('zabbix.php'))
+								->setArgument('action', 'dashboard.view')
+								->setArgument('new', '1')
+								->getUrl()
+						],
+						'clone' => [
+							'label' => _('Clone'),
+							'url'  => ($data['dashboard']['dashboardid'] != 0)
+								? (new CUrl('zabbix.php'))
+									->setArgument('action', 'dashboard.view')
+									->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
+									->getUrl()
+								: null,
+							'disabled' => ($data['dashboard']['dashboardid'] == 0)
+						],
+						'delete' => [
+							'label' => _('Delete'),
+							'confirmation' => _('Delete dashboard?'),
+							'url' => (new CUrl('zabbix.php'))
+								->setArgument('action', 'dashboard.delete')
+								->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
+								->setArgumentSID()
+								->getUrl(),
+							'disabled' => ($data['dashboard']['dashboardid'] == 0)
 						]
-					])
-				)
+					]
+				])
 			)
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)

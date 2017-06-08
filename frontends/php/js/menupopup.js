@@ -450,8 +450,8 @@ function getMenuPopupRefresh(options) {
 }
 
 function getMenuPopupDashboard(options) {
-	jQuery.map(options.items, function(item) {
-		switch (item.name) {
+	jQuery.map(options.items, function(item, key) {
+		switch (key) {
 			case 'sharing':
 				item.clickCallback = function () {
 					var	obj = jQuery(this),
@@ -484,6 +484,23 @@ function getMenuPopupDashboard(options) {
 					});
 					// hide menu
 					obj.closest('.action-menu').fadeOut(100);
+				}
+				break;
+
+			case 'delete':
+				item.redirect = item.url;
+				item.url = 'javascript:void(0)';
+				item.clickCallback = function () {
+					var	obj = jQuery(this);
+
+					// hide menu
+					obj.closest('.action-menu').hide();
+
+					if (!confirm(item.confirmation)) {
+						return false;
+					}
+
+					redirect(item.redirect, 'post', 'sid', true);
 				}
 				break;
 		}
