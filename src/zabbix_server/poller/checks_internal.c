@@ -29,6 +29,31 @@
 
 extern unsigned char	program_type;
 
+static int	compare_interfaces(const void *p1, const void *p2)
+{
+	const DC_INTERFACE2	*i1 = p1, *i2 = p2;
+
+	if (i1->type > i2->type)		/* 1st criterion: 'type' in ascending order */
+		return 1;
+
+	if (i1->type < i2->type)
+		return -1;
+
+	if (i1->main > i2->main)		/* 2nd criterion: 'main' in descending order */
+		return -1;
+
+	if (i1->main < i2->main)
+		return 1;
+
+	if (i1->interfaceid > i2->interfaceid)	/* 3rd criterion: 'interfaceid' in ascending order */
+		return 1;
+
+	if (i1->interfaceid < i2->interfaceid)
+		return -1;
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_host_interfaces_discovery                                    *
@@ -61,6 +86,11 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 
 		return FAIL;
 	}
+
+	/* sort results */
+
+	if (1 < n)
+		qsort(interfaces, (size_t)n, sizeof(DC_INTERFACE2), compare_interfaces);
 
 	/* pack results into JSON */
 
