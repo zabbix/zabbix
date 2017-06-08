@@ -63,38 +63,35 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 						'sharing' => [
 							'label' => _('Sharing'),
 							'form_data' => [
-								'dashboardid' => ($data['dashboard']['dashboardid'] != 0)
-									? $data['dashboard']['dashboardid']
-									: null,
+								'dashboardid' => $data['dashboard']['dashboardid']
 							],
 							'disabled' => !$data['dashboard']['editable']
 						],
 						'create' => [
 							'label' => _('Create new'),
-							'url'  => (new CUrl('zabbix.php'))
+							'url' => (new CUrl('zabbix.php'))
 								->setArgument('action', 'dashboard.view')
 								->setArgument('new', '1')
 								->getUrl()
 						],
 						'clone' => [
 							'label' => _('Clone'),
-							'url'  => ($data['dashboard']['dashboardid'] != 0)
-								? (new CUrl('zabbix.php'))
-									->setArgument('action', 'dashboard.view')
-									->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
-									->getUrl()
-								: null,
-							'disabled' => ($data['dashboard']['dashboardid'] == 0)
+							'url' => (new CUrl('zabbix.php'))
+								->setArgument('action', 'dashboard.view')
+								->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
+								->getUrl()
 						],
 						'delete' => [
 							'label' => _('Delete'),
 							'confirmation' => _('Delete dashboard?'),
-							'url' => (new CUrl('zabbix.php'))
-								->setArgument('action', 'dashboard.delete')
-								->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
-								->setArgumentSID()
-								->getUrl(),
-							'disabled' => ($data['dashboard']['dashboardid'] == 0)
+							'url' => $data['dashboard']['editable']
+								? (new CUrl('zabbix.php'))
+									->setArgument('action', 'dashboard.delete')
+									->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
+									->setArgumentSID()
+									->getUrl()
+								: null,
+							'disabled' => !$data['dashboard']['editable']
 						]
 					]
 				])

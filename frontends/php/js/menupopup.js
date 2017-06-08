@@ -453,54 +453,58 @@ function getMenuPopupDashboard(options) {
 	jQuery.map(options.items, function(item, key) {
 		switch (key) {
 			case 'sharing':
-				item.clickCallback = function () {
-					var	obj = jQuery(this),
-						url = new Curl('zabbix.php'),
-						error_message = t('Something went wrong. Please try again later!');
-					url.setArgument('action', 'dashboard.get');
+				if (!item.disabled) {
+					item.clickCallback = function () {
+						var	obj = jQuery(this),
+							url = new Curl('zabbix.php'),
+							error_message = t('Something went wrong. Please try again later!');
+						url.setArgument('action', 'dashboard.get');
 
-					jQuery.ajax({
-						data: {"dashboardid": item.form_data.dashboardid, 'editable': '1'},
-						type: 'GET',
-						url: url.getUrl(),
-						success: function(response) {
-							if (typeof response.data !== 'undefined') {
-								var form = jQuery('form[name="dashboard_sharing_form"]');
+						jQuery.ajax({
+							data: {"dashboardid": item.form_data.dashboardid, 'editable': '1'},
+							type: 'GET',
+							url: url.getUrl(),
+							success: function(response) {
+								if (typeof response.data !== 'undefined') {
+									var form = jQuery('form[name="dashboard_sharing_form"]');
 
-								showDialogForm(form, {"title": t('Dashboard sharing'), "action_title": t('Update')},
-									response.data
-								);
-							}
-							else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
-								alert(t('You need permission to perform this action!'))
-							}
-							else {
+									showDialogForm(form, {"title": t('Dashboard sharing'), "action_title": t('Update')},
+										response.data
+									);
+								}
+								else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+									alert(t('You need permission to perform this action!'))
+								}
+								else {
+									alert(error_message);
+								}
+							},
+							error: function() {
 								alert(error_message);
 							}
-						},
-						error: function() {
-							alert(error_message);
-						}
-					});
-					// hide menu
-					obj.closest('.action-menu').fadeOut(100);
+						});
+						// hide menu
+						obj.closest('.action-menu').fadeOut(100);
+					}
 				}
 				break;
 
 			case 'delete':
-				item.redirect = item.url;
-				item.url = 'javascript:void(0)';
-				item.clickCallback = function () {
-					var	obj = jQuery(this);
+				if (!item.disabled) {
+					item.redirect = item.url;
+					item.url = 'javascript:void(0)';
+					item.clickCallback = function () {
+						var	obj = jQuery(this);
 
-					// hide menu
-					obj.closest('.action-menu').hide();
+						// hide menu
+						obj.closest('.action-menu').hide();
 
-					if (!confirm(item.confirmation)) {
-						return false;
+						if (!confirm(item.confirmation)) {
+							return false;
+						}
+
+						redirect(item.redirect, 'post', 'sid', true);
 					}
-
-					redirect(item.redirect, 'post', 'sid', true);
 				}
 				break;
 		}
