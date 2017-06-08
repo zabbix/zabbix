@@ -115,57 +115,47 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
  ******************************************************************************/
 int	is_item_processed_by_server(unsigned char type, const char *key)
 {
-	int	ret = FAIL;
+	AGENT_REQUEST	request;
+	const char	*arg1, *arg2, *arg3;
+	int		ret = SUCCEED;
 
-	switch (type)
+	if (ITEM_TYPE_AGGREGATE == type || ITEM_TYPE_CALCULATED == type)
+		return SUCCEED;
+
+	if (ITEM_TYPE_INTERNAL != type || 0 != strncmp(key, "zabbix[", 7))
+		return FAIL;
+
+	/* type = Zabbix internal, key = zabbix[.... */
+
+	init_request(&request);
+
+	if (SUCCEED != parse_item_key(key, &request) || 3 != request.nparam)
 	{
-		case ITEM_TYPE_AGGREGATE:
-		case ITEM_TYPE_CALCULATED:
-			ret = SUCCEED;
-			break;
-
-		case ITEM_TYPE_INTERNAL:
-			if (0 == strncmp(key, "zabbix[", 7))
-			{
-				AGENT_REQUEST	request;
-				char		*arg1, *arg2, *arg3;
-
-				init_request(&request);
-
-				if (SUCCEED != parse_item_key(key, &request) || 3 != request.nparam)
-					goto clean;
-
-				arg1 = get_rparam(&request, 0);
-
-				if (0 == strcmp(arg1, "host"))
-				{
-					arg2 = get_rparam(&request, 1);
-					arg3 = get_rparam(&request, 2);
-
-					if ((0 != strcmp(arg3, "maintenance") &&
-							0 != strcmp(arg3, "items") &&
-							0 != strcmp(arg3, "items_unsupported") &&
-							0 != strcmp(arg3, "interfaces")) || '\0' != *arg2)
-					{
-						goto clean;
-					}
-				}
-				else if (0 == strcmp(arg1, "proxy"))
-				{
-					arg3 = get_rparam(&request, 2);
-
-					if (0 != strcmp(arg3, "lastaccess"))
-						goto clean;
-				}
-				else
-					goto clean;
-
-				ret = SUCCEED;
-clean:
-				free_request(&request);
-			}
-			break;
+		ret = FAIL;
+		goto clean;
 	}
+
+	arg1 = get_rparam(&request, 0);
+	arg2 = get_rparam(&request, 1);
+	arg3 = get_rparam(&request, 2);
+
+	if (0 == strcmp(arg1, "host"))
+	{
+		if ('\0' == *arg2)
+		{
+			if (0 == strcmp(arg3, "items") || 0 == strcmp(arg3, "items_unsupported") ||
+					0 == strcmp(arg3, "maintenance"))
+			{
+				goto clean;
+			}
+		}
+		else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
+			goto clean;
+	}
+	else if (0 != strcmp(arg1, "proxy") || 0 != strcmp(arg3, "lastaccess"))
+		ret = FAIL;
+clean:
+	free_request(&request);
 
 	return ret;
 }
