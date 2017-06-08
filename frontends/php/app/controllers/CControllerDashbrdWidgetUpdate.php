@@ -108,9 +108,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 						? CWidgetConfig::getKnownWidgetTypes()[$widget['type']]
 						: $widget['name'];
 
-					foreach ($errors as $key => $error) {
-						error(_s('Cannot save widget "%1$s". %2$s', $widget_name, $error));
-					}
+					error_group(['header' => _s('Cannot save widget "%1$s".', $widget_name), 'msgs' => $errors]);
 
 					$ret = false;
 				}
