@@ -491,8 +491,6 @@ function getMenuPopupDashboard(options) {
 
 			case 'delete':
 				if (!item.disabled) {
-					item.redirect = item.url;
-					item.url = 'javascript:void(0)';
 					item.clickCallback = function () {
 						var	obj = jQuery(this);
 

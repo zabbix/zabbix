@@ -84,7 +84,8 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 						'delete' => [
 							'label' => _('Delete'),
 							'confirmation' => _('Delete dashboard?'),
-							'url' => $data['dashboard']['editable']
+							'url' => 'javascript:void(0)',
+							'redirect' => $data['dashboard']['editable']
 								? (new CUrl('zabbix.php'))
 									->setArgument('action', 'dashboard.delete')
 									->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
