@@ -193,7 +193,7 @@ jQuery(function($) {
 					ajax_data = {
 						map_name: '',
 						map_mapid: 0,
-						depth: depth,
+						depth: depth || 1,
 						map_id: id
 					};
 
@@ -487,7 +487,11 @@ jQuery(function($) {
 										'css': buttonCssEdit
 									})
 									.click(function() {
-										itemEditDialog($(this).data('id'))
+										var id = $(this).data('id'),
+											parent = $('input[name="map.parent.'+id+'"]', $this).val(),
+											depth = $(this).closest('[data-depth]').data('depth');
+
+										itemEditDialog(id, parent, depth)
 									}) : null
 								)
 								.append(editable ? $('<button>', {
@@ -578,12 +582,14 @@ jQuery(function($) {
 				$('.tree-list').filter(function(){
 					return +$(this).data('depth') >= widget_data.max_depth;
 				}).each(function() {
-					$('.add-child-btn', $(this)).hide();
+					$('.import-items-btn', $(this)).css('visibility', 'hidden');
+					$('.add-child-btn', $(this)).css('visibility', 'hidden');
 				});
 				$('.tree-list').filter(function(){
 					return widget_data.max_depth > +$(this).data('depth');
 				}).each(function() {
-					$('>.tree-item>.row>.tools>.add-child-btn', $(this)).show();
+					$('>.tree-item>.row>.tools>.import-items-btn', $(this)).css('visibility', 'visible');
+					$('>.tree-item>.row>.tools>.add-child-btn', $(this)).css('visibility', 'visible');
 				});
 
 				// Change arrow style.
