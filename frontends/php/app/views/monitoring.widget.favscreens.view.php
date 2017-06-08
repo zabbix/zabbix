@@ -38,7 +38,7 @@ foreach ($data['screens'] as $screen) {
 }
 
 $output = [
-	'header' => _('Favourite screens'),
+	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' => (new CList([
 		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))

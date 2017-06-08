@@ -192,6 +192,11 @@ function get_icon($type, $params = []) {
 
 			return $icon;
 
+		case 'action':
+			return (new CRedirectButton(SPACE, null))
+				->addClass(ZBX_STYLE_BTN_ACTION)
+				->setTitle(_('Actions'));
+
 		case 'screenconf':
 			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_CONF)

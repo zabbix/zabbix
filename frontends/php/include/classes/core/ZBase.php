@@ -243,6 +243,8 @@ class ZBase {
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
 			$this->rootDir.'/include/classes/pagefilter',
+			$this->rootDir.'/include/classes/widgetfields',
+			$this->rootDir.'/include/classes/widgets',
 			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'
 		];
@@ -373,6 +375,7 @@ class ZBase {
 	private function processRequest(CRouter $router) {
 		$controller = $router->getController();
 
+		/** @var \CController $controller */
 		$controller = new $controller();
 		$controller->setAction($router->getAction());
 		$response = $controller->run();

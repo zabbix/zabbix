@@ -17,9 +17,9 @@
         <meta name="msapplication-TileColor" content="#d40000">
 	</head>
 <body>
-	<header role="banner">
+	<header role="banner">	
 		<div class="nav" role="navigation">
-			<div class="top-nav-container"><a href="#" class="header-logo"><div class="logo"></div></a><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<div class="top-nav-container"><a href="#" class="header-logo"><div class="logo"></div></a><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">Services</a></li></ul>
@@ -29,8 +29,8 @@
 	</header>
 	<div class="article">
 	<div class="header-title table">
-  <div class="cell"><h1>Dashboard</h1></div><div class="cell"><form><ul><!--<li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li>--><li><button type="button" class="btn-conf" title="Configuration"></button><div class="active-indic" title="Enabled"></div></li><li><button type="button" class="btn-max" title="Maximize"></button></li><!--<li><button type="button" class="btn-min" title="Restore"></button></li><li><button type="button" class="btn-add-fav" title="Add to dashboard"></button></li><li><button type="button" class="btn-remove-fav" title="Remove from dashboard"></button></li><li><button type="button" class="btn-action" title="Action"></button></li><li><button type="button" class="btn-info" title="Info"></button></li><li><button type="button" class="btn-reset" title="Reset"></button></li>--></ul></form>
-</div></div>
+  <div class="cell"><h1>Dashboard</h1></div><div class="cell"><form><ul><span class="dashbrd-edit"><li><button type="button" class="btn-alt"><span class="plus-icon"></span>Add widget</button></li><li><button type="button">Save changes</button></li><li><a href="">Cancel</a></li><li></li><li><button type="button" disabled>Edit dashboard</button></li></span><!--<li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li>--><!--<li><button type="button" class="btn-conf" title="Configuration"></button><div class="active-indic" title="Enabled"></div></li>--><li><button type="button" class="btn-max" title="Maximize"></button></li><!--<li><button type="button" class="btn-min" title="Restore"></button></li><li><button type="button" class="btn-add-fav" title="Add to dashboard"></button></li><li><button type="button" class="btn-remove-fav" title="Remove from dashboard"></button></li><li><button type="button" class="btn-action" title="Action"></button></li><li><button type="button" class="btn-info" title="Info"></button></li><li><button type="button" class="btn-reset" title="Reset"></button></li>--></ul></form>
+  </div></div>
 
 <div class="dashbrd-grid-widget-container">
 
@@ -119,7 +119,7 @@
 <div class="dashbrd-grid-widget-padding">
 <div class="dashbrd-grid-widget-head cursor-move">
 <h4>Asdasdad</h4>
-<ul><li><button type="button" class="btn-widget-action" title="Action"></button></li></ul>
+<ul><li><button type="button" class="btn-widget-edit" title="Edit"></button></li><li><button type="button" class="btn-widget-delete" title="Delete"></button></li></ul>
 </div>
 <div class="dashbrd-grid-widget-content">
 <div class="preloader-container"><div class="preloader"></div></div>
@@ -166,6 +166,33 @@
 	<li><a class="action-menu-item-disabled">Remove all</a></li>
 	</ul>
 -->
+
+
+<div class="overlay-dialogue" style="top: 300px; left: 10px">
+<button type="button" class="overlay-close-btn"></button>
+<div class="dashbrd-widget-head cursor-move"><h4>Add/Edit widget</h4></div>
+<ul class="table-forms"><li>
+<div class="table-forms-td-left"><label for="HostName">Name</label></div>
+<div class="table-forms-td-right"><input type="text" id="txt_select" name="txt_select" value="" maxlength="255" style="width: 300px;"></div>
+</li>
+<li>
+<div class="table-forms-td-left"><label for="HostName">Resource</label></div>
+<div class="table-forms-td-right"><select id="resourcetype" name="resourcetype" autocomplete="off"><option value="12">Action log</option><option value="7">Clock</option><option value="10">Data overview</option><option value="0" selected="selected">Graph</option><option value="20">Graph prototype</option><option value="13">History of events</option><option value="14">Host group issues</option><option value="4">Host info</option><option value="16">Host issues</option><option value="2">Map</option><option value="3">Plain text</option><option value="8">Screen</option><option value="1">Simple graph</option><option value="19">Simple graph prototype</option><option value="6">Status of Zabbix</option><option value="15">System status</option><option value="5">Trigger info</option><option value="9">Trigger overview</option><option value="11">URL</option></select></div>
+</li>
+<li>
+<div class="table-forms-td-left"><label for="HostName">Graph prototype</label></div>
+<div class="table-forms-td-right"><input type="text" id="caption" name="caption" value="" readonly="readonly" maxlength="255" style="width: 300px;"><div class="form-input-margin"></div><button type="button" id="select" name="select" class="btn-grey">Select</button></div>
+</li>
+<li>
+<div class="table-forms-td-left"></div>
+<div class="table-forms-td-right"><input type="checkbox" id="UseIconmap" class="checkbox-radio"><label for="UseIconmap"><span></span>Dynamic item</label></div>
+</li>
+<!--<li><div class="table-forms-td-left"></div><div class="table-forms-td-right tfoot-buttons"><button type="button">Apply</button><button type="button" class="btn-alt">Remove</button><button type="button" class="btn-alt">Cancel</button></div>
+</li>--></ul>
+<div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Done</button></div>
+</div>
+
+
 	<div class="overlay-dialogue" style="top: 20px; left: 700px">
 	<button type="button" class="overlay-close-btn"></button>
 		<table class="list-table">
@@ -190,7 +217,7 @@
 		</table>
 	</div>
 
-	</div>
+	</div></div>
 	<div class="footer">
 	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
 	</div>

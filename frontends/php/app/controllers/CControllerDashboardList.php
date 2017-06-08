@@ -22,7 +22,7 @@
  * controller dashboard list
  *
  */
-class CControllerDashboardList extends CController {
+class CControllerDashboardList extends CControllerDashboardAbstract {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -87,17 +87,7 @@ class CControllerDashboardList extends CController {
 		$data['paging'] = getPagingLine($data['dashboards'], $sortOrder, $url);
 
 		if ($data['dashboards']) {
-			$dashboards_rw = API::Dashboard()->get([
-				'output' => [],
-				'dashboardids' => array_keys($data['dashboards']),
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			foreach ($data['dashboards'] as &$dashboard) {
-				$dashboard['editable'] = array_key_exists($dashboard['dashboardid'], $dashboards_rw);
-			}
-			unset($dashboard);
+			$this->prepareEditableFlag($data['dashboards']);
 		}
 
 		$response = new CControllerResponseData($data);

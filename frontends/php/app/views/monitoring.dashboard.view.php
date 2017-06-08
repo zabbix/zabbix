@@ -19,98 +19,44 @@
 **/
 
 
-require_once dirname(__FILE__).'/monitoring.dashboard.view.js.php';
-
 $this->addJsFile('dashboard.grid.js');
+$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
-$url_list = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.list');
-$url_view = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->setArgument('dashboardid', $data['dashboard']['dashboardid']);
-if ($data['fullscreen']) {
-	$url_list->setArgument('fullscreen', '1');
-	$url_view->setArgument('fullscreen', '1');
+$sharing_form = include 'monitoring.dashboard.sharing_form.php';
+$edit_form = include 'monitoring.dashboard.edit_form.php';
+$breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
+
+$item_groupid = null;
+$item_hostid = null;
+if ($data['dynamic']['has_dynamic_widgets']) {
+	$item_groupid = [
+		new CLabel(_('Group'), 'groupid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$data['pageFilter']->getGroupsCB()
+	];
+	$item_hostid = [
+		new CLabel(_('Host'), 'hostid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$data['pageFilter']->getHostsCB()
+	];
 }
-
-$form = (new CForm('post', (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.update')
-	->getUrl()
-))
-	->setName('dashboard_sharing_form')
-	->addStyle('display: none;');
-
-$user_group_shares_table = (new CTable())
-	->setHeader([_('User groups'), _('Permissions'), _('Action')])
-	->addStyle('width: 100%;');
-
-$add_user_group_btn = ([(new CButton(null, _('Add')))
-	->onClick("return PopUp('popup.php?dstfrm=".$form->getName().
-		"&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1')"
-	)
-	->addClass(ZBX_STYLE_BTN_LINK)
-]);
-
-$user_group_shares_table->addRow(
-	(new CRow(
-		(new CCol($add_user_group_btn))->setColSpan(3)
-	))->setId('user_group_list_footer')
-);
-
-// User sharing table.
-$user_shares_table = (new CTable())
-	->setHeader([_('Users'), _('Permissions'), _('Action')])
-	->addStyle('width: 100%;');
-
-$add_user_btn = ([(new CButton(null, _('Add')))
-	->onClick("return PopUp('popup.php?dstfrm=".$form->getName().
-		"&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1')"
-	)
-	->addClass(ZBX_STYLE_BTN_LINK)]);
-
-$user_shares_table->addRow(
-	(new CRow(
-		(new CCol($add_user_btn))->setColSpan(3)
-	))->setId('user_list_footer')
-);
-
-// create form
-$form
-	->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']))
-	// indicator to help delete all users
-	->addItem(new CInput('hidden', 'users['.CControllerDashboardUpdate::EMPTY_USER.']', '1'))
-	// indicator to help delete all user groups
-	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardUpdate::EMPTY_GROUP.']', '1'))
-	->addItem((new CFormList('sharing_form'))
-	->addRow(_('Type'),
-		(new CRadioButtonList('private', PRIVATE_SHARING))
-			->addValue(_('Private'), PRIVATE_SHARING)
-			->addValue(_('Public'), PUBLIC_SHARING)
-			->setModern(true)
-	)
-	->addRow(_('List of user group shares'),
-		(new CDiv($user_group_shares_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-	)
-	->addRow(_('List of user shares'),
-		(new CDiv($user_shares_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-	)
-);
 
 (new CWidget())
 	->setTitle($data['dashboard']['name'])
-	->setControls((new CForm())
+	->setControls((new CForm('post', 'zabbix.php?action=dashboard.view'))
 		->cleanItems()
 		->addItem((new CList())
-			->addItem(get_icon('dashconf', ['enabled' => $data['filter_enabled']]))
+			// $item_groupid and $item_hostid will be hidden, when 'Edit Dashboard' will be clicked.
+			->addItem($item_groupid)
+			->addItem($item_hostid)
+			// 'Edit dashboard' should be first one in list,
+			// because it will be visually replaced by last item of new list, when clicked
+			->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable']))
 			->addItem((new CButton(SPACE))
 				->addClass(ZBX_STYLE_BTN_ACTION)
+				->setId('dashbrd-actions')
 				->setTitle(_('Actions'))
-				->setAttribute(
-					'data-menu-popup',
+				->setAttribute('data-menu-popup',
 					CJs::encodeJson([
 						'type' => 'dashboard',
 						'label' => _('Actions'),
@@ -119,9 +65,30 @@ $form
 								'name' => 'sharing',
 								'label' => _('Sharing'),
 								'form_data' => [
-									'dashboardid' => $data['dashboard']['dashboardid'],
+									'dashboardid' => ($data['dashboard']['dashboardid'] != 0)
+										? $data['dashboard']['dashboardid']
+										: null,
 								],
 								'disabled' => !$data['dashboard']['editable']
+							],
+							[
+								'name' => 'create',
+								'label' => _('Create new'),
+								'url'  => (new CUrl('zabbix.php'))
+									->setArgument('action', 'dashboard.view')
+									->setArgument('new', '1')
+									->getUrl()
+							],
+							[
+								'name' => 'clone',
+								'label' => _('Clone'),
+								'url'  => ($data['dashboard']['dashboardid'] != 0)
+									? (new CUrl('zabbix.php'))
+										->setArgument('action', 'dashboard.view')
+										->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
+										->getUrl()
+									: null,
+								'disabled' => ($data['dashboard']['dashboardid'] == 0)
 							]
 						]
 					])
@@ -131,17 +98,12 @@ $form
 		)
 	)
 	->addItem((new CList())
-		->addItem([
-			(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl())),
-			'/',
-			(new CSpan())
-				->addItem(new CLink($data['dashboard']['name'], $url_view->getUrl()))
-				->addClass(ZBX_STYLE_SELECTED)
-		])
+		->addItem($breadcrumbs)
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
-	->addItem($form)
+	->addItem($edit_form)
+	->addItem($sharing_form)
 	->show();
 
 /*
@@ -150,9 +112,26 @@ $form
 // activating blinking
 $this->addPostJS('jqBlink.blink();');
 
+$dashboard_data = [
+	// name is required for new dashboard creation
+	'name'   => $data['dashboard']['name'],
+	'userid' => $data['dashboard']['owner']['id'],
+	'dynamic' => $data['dynamic']
+];
+$dashboard_options = [
+	'fullscreen' => $data['fullscreen']
+];
+if ($data['dashboard']['dashboardid'] != 0) {
+	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
+}
+else {
+	$dashboard_options['updated'] = true;
+}
 // Initialize dashboard grid
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
-		'.dashboardGrid()'.
+		'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
+		'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
+		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );
