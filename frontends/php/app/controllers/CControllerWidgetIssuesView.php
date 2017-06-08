@@ -28,7 +28,18 @@ class CControllerWidgetIssuesView extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'name' =>	'string'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -53,6 +64,34 @@ class CControllerWidgetIssuesView extends CController {
 				if (!$filter['groupids']) {
 					// null mean all groups
 					$filter['groupids'] = null;
+				}
+
+				// Get sub-groups of selected groups.
+				if ($filter['groupids']) {
+					$filter_groups = API::HostGroup()->get([
+						'output' => ['name'],
+						'groupids' => $filter['groupids'],
+						'preservekeys' => true
+					]);
+
+					$filter_groups_names = [];
+
+					foreach ($filter_groups as $group) {
+						$filter_groups_names[] = $group['name'].'/';
+					}
+
+					if ($filter_groups_names) {
+						$child_groups = API::HostGroup()->get([
+							'output' => ['groupid'],
+							'search' => ['name' => $filter_groups_names],
+							'searchByAny' => true,
+							'startSearch' => true
+						]);
+
+						foreach ($child_groups as $child_group) {
+							$filter['groupids'][] = $child_group['groupid'];
+						}
+					}
 				}
 
 				if ($hide_groupids) {
@@ -104,6 +143,7 @@ class CControllerWidgetIssuesView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_LAST_ISSUES]),
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

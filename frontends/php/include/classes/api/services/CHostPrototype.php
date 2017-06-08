@@ -667,8 +667,26 @@ class CHostPrototype extends CHostBase {
 			$updateHostPrototypes = $this->updateReal($updateHostPrototypes);
 		}
 
+		$host_prototypes = array_merge($updateHostPrototypes, $insertHostPrototypes);
+
+		if ($host_prototypes) {
+			$sql = 'SELECT hd.hostid'.
+					' FROM host_discovery hd,items i,hosts h'.
+					' WHERE hd.parent_itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE.
+						' AND '.dbConditionInt('hd.hostid', zbx_objectValues($host_prototypes, 'hostid'));
+			$valid_prototypes = DBfetchArrayAssoc(DBselect($sql), 'hostid');
+
+			foreach ($host_prototypes as $key => $host_prototype) {
+				if (!array_key_exists($host_prototype['hostid'], $valid_prototypes)) {
+					unset($host_prototypes[$key]);
+				}
+			}
+		}
+
 		// propagate the inheritance to the children
-		return $this->inherit(array_merge($updateHostPrototypes, $insertHostPrototypes));
+		return $this->inherit($host_prototypes);
 	}
 
 

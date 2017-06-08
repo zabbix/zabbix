@@ -121,11 +121,17 @@ else {
 
 		if ($data['show_inherited_macros']) {
 			if (array_key_exists('template', $macro)) {
-				$link = (new CLink(CHtml::encode($macro['template']['name']),
-					'templates.php?form=update&templateid='.$macro['template']['templateid'])
+				if ($macro['template']['rights'] == PERM_READ_WRITE) {
+					$link = (new CLink(CHtml::encode($macro['template']['name']),
+						'templates.php?form=update&templateid='.$macro['template']['templateid'])
 					)
-					->addClass('unknown')
-					->setAttribute('target', '_blank');
+						->addClass('unknown')
+						->setAttribute('target', '_blank');
+				}
+				else {
+					$link = new CSpan(CHtml::encode($macro['template']['name']));
+				}
+
 				$row[] = '&lArr;';
 				$row[] = (new CDiv([$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"']))
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)

@@ -60,9 +60,11 @@ class CRouter {
 		'dashboard.view'		=> ['CControllerDashboardView',			'layout.htmlpage',		'monitoring.dashboard.view'],
 		'dashboard.list'		=> ['CControllerDashboardList',			'layout.htmlpage',		'monitoring.dashboard.list'],
 		'dashboard.delete'		=> ['CControllerDashboardDelete',		null,					null],
+		'dashbrd.widget.config'	=> ['CControllerDashbrdWidgetConfig',	'layout.json',			'monitoring.dashboard.config'],
 		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.json',			null],
 		'dashboard.get'	        => ['CControllerDashboardGet',	        'layout.json',			null],
 		'dashboard.update'	    => ['CControllerDashboardUpdate',	    'layout.json',			null],
+		'dashbrd.widget.rfrate'	=> ['CControllerDashbrdWidgetRfRate',	'layout.json',			null],
 		'discovery.view'		=> ['CControllerDiscoveryView',			'layout.htmlpage',		'monitoring.discovery.view'],
 		'favourite.create'		=> ['CControllerFavouriteCreate',		'layout.javascript',	null],
 		'favourite.delete'		=> ['CControllerFavouriteDelete',		'layout.javascript',	null],
@@ -102,6 +104,9 @@ class CRouter {
 		'widget.stszbx.view'	=> ['CControllerWidgetStatusView',		'layout.widget',		'monitoring.widget.status.view'],
 		'widget.syssum.view'	=> ['CControllerWidgetSystemView',		'layout.widget',		'monitoring.widget.system.view'],
 		'widget.webovr.view'	=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view'],
+		'widget.clock.view'		=> ['CControllerWidgetClockView',		'layout.widget',		'monitoring.widget.clock.view'],
+		'widget.actlog.view'	=> ['CControllerWidgetActionLogView',	'layout.widget',		'monitoring.widget.actionlog.view'],
+		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view'],
 		'widget.graph.view'		=> ['CControllerWidgetGraphView',		'layout.widget',		'monitoring.widget.graph.view']
 	];
 

@@ -84,6 +84,7 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpLibxml();
 		$result[] = $this->checkPhpXmlWriter();
 		$result[] = $this->checkPhpXmlReader();
+		$result[] = $this->checkPhpLdapModule();
 		$result[] = $this->checkPhpCtype();
 		$result[] = $this->checkPhpSession();
 		$result[] = $this->checkPhpSessionAutoStart();
@@ -537,6 +538,25 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
 			'error' => _('PHP xmlreader extension missing.')
+		];
+	}
+
+	/**
+	 * Checks for PHP LDAP extension.
+	 *
+	 * @return array
+	 */
+	public function checkPhpLdapModule() {
+		$current = function_exists('ldap_connect') && function_exists('ldap_set_option') && function_exists('ldap_bind')
+				&& function_exists('ldap_search') && function_exists('ldap_get_entries')
+				&& function_exists('ldap_free_result') && function_exists('ldap_start_tls');
+
+		return [
+			'name' => _('PHP LDAP'),
+			'current' => $current ? _('on') : _('off'),
+			'required' => null,
+			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
+			'error' => _('PHP LDAP extension missing.')
 		];
 	}
 

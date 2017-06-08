@@ -91,9 +91,15 @@ foreach ($data['templates'] as $template) {
 
 		$url = 'templates.php?form=update&templateid='.$parentTemplate['templateid'].url_param('groupid');
 
-		$linkedTemplatesOutput[] = (new CLink($parentTemplate['name'], $url))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
+		if (array_key_exists($parentTemplate['templateid'], $data['writable_templates'])) {
+			$linkedTemplatesOutput[] = (new CLink($parentTemplate['name'], $url))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$linkedTemplatesOutput[] = (new CSpan($parentTemplate['name']))
+				->addClass(ZBX_STYLE_GREY);
+		}
 	}
 
 	$i = 0;
@@ -115,18 +121,26 @@ foreach ($data['templates'] as $template) {
 		}
 
 		if ($linkedToObject['status'] == HOST_STATUS_TEMPLATE) {
-			$url = 'templates.php?form=update&templateid='.$linkedToObject['templateid'].url_param('groupid');
+			if (array_key_exists($linkedToObject['templateid'], $data['writable_templates'])) {
+				$url = 'templates.php?form=update&templateid='.$linkedToObject['templateid'].url_param('groupid');
+				$link = (new CLink($linkedToObject['name'], $url))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY);
+			}
+			else {
+				$link = (new CSpan($linkedToObject['name']))
+					->addClass(ZBX_STYLE_GREY);
+			}
 		}
 		else {
-			$url = 'hosts.php?form=update&hostid='.$linkedToObject['hostid'].url_param('groupid');
-		}
+			if (array_key_exists($linkedToObject['hostid'], $data['writable_hosts'])) {
+				$url = 'hosts.php?form=update&hostid='.$linkedToObject['hostid'].url_param('groupid');
+				$link = (new CLink($linkedToObject['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
+			}
+			else {
+				$link = (new CSpan($linkedToObject['name']));
+			}
 
-		$link = (new CLink($linkedToObject['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
-
-		if ($linkedToObject['status'] == HOST_STATUS_TEMPLATE) {
-			$link->addClass(ZBX_STYLE_GREY);
-		}
-		else {
 			$link->addClass($linkedToObject['status'] == HOST_STATUS_MONITORED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 		}
 
@@ -186,4 +200,3 @@ $form->addItem([
 $widget->addItem($form);
 
 return $widget;
-

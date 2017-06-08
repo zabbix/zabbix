@@ -1139,6 +1139,9 @@ define('WIDGET_SYSTEM_STATUS',			'syssum');
 define('WIDGET_WEB_OVERVIEW',			'webovr');
 define('WIDGET_ZABBIX_STATUS',			'stszbx');
 define('WIDGET_GRAPH',					'graph');
+define('WIDGET_CLOCK',					'clock');
+define('WIDGET_URL',					'url');
+define('WIDGET_ACTION_LOG',				'actlog');
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
 define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
@@ -1152,6 +1155,16 @@ define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
 define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
 // slideshow
 define('WIDGET_SLIDESHOW',				'hat_slides');
+
+// Dashboard widget dynamic state
+define('WIDGET_SIMPLE_ITEM',	0);
+define('WIDGET_DYNAMIC_ITEM',	1);
+// Dashboard widget dynamic state
+define('WIDGET_CONFIG_DONT_SAVE',	0);
+define('WIDGET_CONFIG_DO_SAVE',		1);
+// Widget fields setup types
+define('WIDGET_FIELDS_SETUP_TYPE_CONFIG',	0);
+define('WIDGET_FIELDS_SETUP_TYPE_WIDGET',	1);
 
 // widget field types
 define('ZBX_WIDGET_FIELD_TYPE_INT32',			0);
@@ -1231,6 +1244,7 @@ define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_ACTION', 'btn-action');
+define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
@@ -1256,6 +1270,7 @@ define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
+define('ZBX_STYLE_CLOCK_SVG', 'clock-svg');
 define('ZBX_STYLE_CLOCK_FACE', 'clock-face');
 define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');
 define('ZBX_STYLE_CLOCK_HAND_SEC', 'clock-hand-sec');
@@ -1266,11 +1281,13 @@ define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER', 'dashbrd-grid-widget-container');
 define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DASHBRD_WIDGET_FOOT', 'dashbrd-widget-foot');
+define('ZBX_STYLE_DASHBRD_EDIT', 'dashbrd-edit');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
+define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');

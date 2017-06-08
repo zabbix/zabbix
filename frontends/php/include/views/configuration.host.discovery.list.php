@@ -57,11 +57,18 @@ foreach ($data['discoveries'] as $discovery) {
 	$description = [];
 
 	if ($discovery['templateid']) {
-		$dbTemplate = get_realhost_by_itemid($discovery['templateid']);
+		if (array_key_exists($discovery['dbTemplate']['hostid'], $data['writable_templates'])) {
+			$description[] = (new CLink($discovery['dbTemplate']['name'],
+				'?hostid='.$discovery['dbTemplate']['hostid']
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$description[] = (new CSpan($discovery['dbTemplate']['name']))
+				->addClass(ZBX_STYLE_GREY);
+		}
 
-		$description[] = (new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid']))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 

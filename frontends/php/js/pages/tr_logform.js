@@ -96,7 +96,7 @@ function add_logexpr() {
 
 	var form = jQuery('form[name=sform]');
 
-	form.prepend(jQuery('<input>', {
+	form.append(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][value]',
 		type: 'hidden',
 		value: expression
@@ -107,7 +107,7 @@ function add_logexpr() {
 
 	td.appendChild(document.createTextNode(expr_t.options[expr_t.selectedIndex].text));
 
-	form.prepend(jQuery('<input>', {
+	form.append(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][type]',
 		type: 'hidden',
 		value: expr_t.value
@@ -365,14 +365,14 @@ function remove_keyword(key_id) {
 		var elm_v = document.getElementsByName('keys[' + id + '][value]')[0];
 		var elm_t = document.getElementsByName('keys[' + id + '][type]')[0];
 
-		if (typeof(elm_v) == 'undefined') {
+		if (typeof(elm_v) != 'undefined') {
 			elm_v.parentNode.removeChild(elm_v);
 		}
-		if (typeof(elm_t) == 'undefined') {
+		if (typeof(elm_t) != 'undefined') {
 			elm_t.parentNode.removeChild(elm_t);
 		}
 	}
-	if (typeof(key_tr) != 'undefined') {
+	if (key_tr) {
 		key_tr.parentNode.removeChild(key_tr);
 	}
 
