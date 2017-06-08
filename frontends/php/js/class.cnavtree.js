@@ -40,14 +40,6 @@ jQuery(function($) {
 				'height': '15px',
 				'width': '14px'
 			};
-			var buttonCssRemove = {
-				'background': "url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjguMyAoMjk4MDIpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjIweDIwL0Nyb3NzPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGRlZnM+PC9kZWZzPgogICAgPGcgaWQ9IjIweDIwIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPgogICAgICAgIDxnIGlkPSIyMHgyMC9Dcm9zcyIgc3Ryb2tlPSIjMzY0MzREIj4KICAgICAgICAgICAgPGcgaWQ9IkNyb3NzIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyLjAwMDAwMCwgMi4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNLTEuMzg1NDk3ODMsOCBMMTcuMzg1NDk3OCw4IiBpZD0iTGluZS0yIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg4LjAwMDAwMCwgOC4wMDAwMDApIHJvdGF0ZSgtMzE1LjAwMDAwMCkgdHJhbnNsYXRlKC04LjAwMDAwMCwgLTguMDAwMDAwKSAiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNOCwtMS4zODU0OTc4MyBMOCwxNy4zODU0OTc4IiBpZD0iTGluZS0xIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg4LjAwMDAwMCwgOC4wMDAwMDApIHJvdGF0ZSgtMzE1LjAwMDAwMCkgdHJhbnNsYXRlKC04LjAwMDAwMCwgLTguMDAwMDAwKSAiPjwvcGF0aD4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+')",
-				'background-size': 'cover',
-				'cursor': 'pointer',
-				'border': '0px none',
-				'height': '15px',
-				'width': '14px'
-			};
 			var buttonCssImport = {
 				'background': "url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjguMyAoMjk4MDIpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjIweDIwL1VwbG9hZDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSIyMHgyMCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgICAgICA8ZyBpZD0iMjB4MjAvVXBsb2FkIiBzdHJva2U9IiMzNTQyNEMiPgogICAgICAgICAgICA8ZyBpZD0iVXBsb2FkIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgMS4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8ZyBpZD0idXBsb2FkIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjUwMDAwMCwgMC41MDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTExLjkxODYyNTYsMTQuNSBMMTMuNSwxNC41IEMxMy41LDE0LjUgMTguOTYxNDcxLDE0Ljg3MDI3MzEgMTksOS41IEMxOC45NjE0NzIxLDQuMDQzOTc4MTEgMTMuNSw0IDEzLjUsNCBDMTIuMjQwNDk2NCwxLjU1MTExMzYzIDkuODYwMjM1MDMsMCA3LDAgQzMuMTg2Njk5MTEsMCAwLDMuMTg2Njk5MTEgMCw3IEMwLDExLjA0ODY4NDIgMywxNC41IDcsMTQuNSIgaWQ9IkxpbmUtNTEiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9InVwbG9hZCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNy4wMDAwMDAsIDYuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSJQYXRoLTIxNjQtKy1MaW5lIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwb2x5bGluZSBpZD0iTGluZS01MCIgcG9pbnRzPSI2LjA0NTczOTE2IDMuNTA1ODM2NTEgMy4wMzQwNjYxNCAwLjQ5NDE2MzQ4OCAwLjA1NzgxOTE4NTIgMy40NzA0MTA0NCI+PC9wb2x5bGluZT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0zLDEuNSBMMywxMS41NDE1OTQ1IiBpZD0iTGluZS00OSI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=')",
 				'background-size': 'cover',
@@ -95,7 +87,7 @@ jQuery(function($) {
 				$('.tree', $this).append(root);
 
 				if (isEditMode()) {
-					root.append(createTreeItem({name: t('Root'), id: 0}, 0, false));
+					root.append(createTreeItem({name: t('root'), id: 0}, 0, false));
 					root = $('.tree-item.root-item[data-id=0] > .tree-list', $this);
 				}
 
@@ -160,7 +152,7 @@ jQuery(function($) {
 			};
 
 			var createTreeBranch = function(className) {
-				var className = className||null,
+				var className = className || null,
 					ul = $('<ul></ul>').addClass('tree-list');
 
 				if (className) {
@@ -176,7 +168,7 @@ jQuery(function($) {
 
 			var storeUIState = function() {
 				var opened = [];
-				$('.opened.is-parent', $this).each(function() {
+				$('.opened', $this).each(function() {
 					opened.push($(this).data('id'));
 				});
 
@@ -267,32 +259,40 @@ jQuery(function($) {
 														root = $('.tree-item[data-id='+parent+']>ul.tree-list', $this),
 														new_item = {
 															name: resp['map_name'],
-															mapid: resp['map_mapid'],
-															id: resp['map_id'],
+															mapid: +resp['map_mapid'],
+															id: +resp['map_id'],
 															parent: parent
 														};
 
 														root.append(createTreeItem(new_item));
+
+														$(root).closest('.tree-item')
+															.removeClass('closed')
+															.addClass('opened');
 													}
 
 													if (typeof resp.submaps !== 'undefined') {
 														root = $('.tree-item[data-id='+id+']>ul.tree-list', $this)
-														$.each(resp.submaps, function(){
+														$.each(resp.submaps, function() {
 															var new_item = {
 																name: this['name'],
-																mapid: this['sysmapid'],
+																mapid: +this['sysmapid'],
 																id: getNextId(),
-																parent: id
+																parent: +id
 															};
 
 															root.append(createTreeItem(new_item));
 														});
+
+														$(root).closest('.tree-item')
+															.addClass('is-parent opened')
+															.removeClass('closed');
 													}
 
 													$(".tree-item").droppable(getDroppableOptions());
 													overlayDialogueDestroy();
-													setTreeHandlers();
 													storeUIState();
+													setTreeHandlers();
 												}
 											}
 										});
@@ -464,6 +464,11 @@ jQuery(function($) {
 												root.append(createTreeItem(new_item));
 											});
 
+											$(root).closest('.tree-item')
+												.removeClass('closed')
+												.addClass('opened');
+
+											storeUIState();
 											setTreeHandlers();
 
 											if (typeof old_addPopupValues === 'function') {
@@ -508,7 +513,7 @@ jQuery(function($) {
 							'type': 'hidden',
 							'name':'map.parent.'+item.id
 						})
-						.val(item.parent||0) : null
+						.val(item.parent || 0) : null
 					)
 					.append((isEditMode() && editable) ? $('<input>', {
 							'type': 'hidden',
@@ -662,7 +667,7 @@ jQuery(function($) {
 			var buildTree = function(rows, parent_id) {
 				var parent_id = (typeof parent_id === 'number') ? parent_id : 0,
 					widget_data = $this.data('widgetData'),
-					rows = rows||[],
+					rows = rows || [],
 					tree = [];
 
 				if (!rows.length) {
@@ -745,7 +750,7 @@ jQuery(function($) {
 										.prevAll().length+1;
 
 						dashboard_widget['fields'][$(this).attr('name')] = $(this).val();
-						dashboard_widget['fields']['map.parent.'+id] = parent||0;
+						dashboard_widget['fields']['map.parent.'+id] = parent || 0;
 						dashboard_widget['fields']['map.order.'+id] = order;
 
 						if (mapid) {
@@ -814,9 +819,9 @@ jQuery(function($) {
 					return this.each(function() {
 						$this.data('widgetData', {
 							widgetid: options.widgetId,
-							severity_levels: options.severity_levels||[],
-							problems: options.problems||[],
-							max_depth: options.max_depth||10,
+							severity_levels: options.severity_levels || [],
+							problems: options.problems || [],
+							max_depth: options.max_depth || 10,
 							lastId: 0
 						});
 

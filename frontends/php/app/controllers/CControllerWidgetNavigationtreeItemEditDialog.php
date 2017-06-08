@@ -82,7 +82,11 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 
 		$formList->addVar('linked_map_id', $sysmap_id);
 		$formList->addRow(_('Linked map'), [
-			(new CTextBox('caption', $sysmap_caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			(new CTextBox('caption', $sysmap_caption, true))
+				->setAttribute('onChange',
+					'javascript: if(jQuery("#'.$form->getName().' input[type=text]:first").val() === ""){'.
+						'jQuery("#widget_dialogue_form input[type=text]:first").val(this.value);}')
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -101,7 +105,6 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 			]);
 		}
 
-		$form->addItem(new CJsScript(get_js($javascript, true)));
 		$form->addItem($value);
 		$form->addItem($formList);
 
