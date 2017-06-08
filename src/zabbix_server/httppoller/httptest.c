@@ -26,6 +26,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
+#include "zbxpreproc.h"
 
 #include "httptest.h"
 #include "httpmacro.h"
@@ -197,7 +198,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		}
 
 		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+		zbx_preprocess_item_value(items[i].itemid, 0, &value, ts, items[i].state, NULL);
 
 		free_result(&value);
 	}
@@ -338,7 +339,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		}
 
 		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+		zbx_preprocess_item_value(items[i].itemid, 0, &value, ts, items[i].state, NULL);
 
 		free_result(&value);
 	}
@@ -816,6 +817,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	httpstep.httptest = httptest;
 	httpstep.httpstep = &db_httpstep;
 
+	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		struct curl_slist	*headers_slist = NULL;
@@ -1125,8 +1128,7 @@ clean:
 	process_test_data(httptest->httptest.httptestid, lastfailedstep, speed_download, err_str, &ts);
 
 	zbx_free(err_str);
-
-	dc_flush_history();
+	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -11,8 +11,6 @@
 #include "zbxalgo.h"
 #include "log.h"
 
-#ifdef HAVE_IPCSERVICE
-
 #include <event.h>
 
 #include "zbxipcservice.h"
@@ -1720,6 +1718,4 @@ int	zbx_ipc_client_connected(zbx_ipc_client_t *client)
 {
 	return (NULL == client->rx_event ? FAIL : SUCCEED);
 }
-
-#endif
 

@@ -23,6 +23,7 @@
 #include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"
+#include "zbxpreproc.h"
 
 #include "proxy.h"
 #include "dbcache.h"
@@ -1518,7 +1519,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 	if (SUCCEED == ret)
 	{
-		char 	*sql = NULL;
+		char	*sql = NULL;
 		size_t	sql_alloc = 512, sql_offset = 0;
 
 		sql = zbx_malloc(sql, sql_alloc * sizeof(char));
@@ -2348,7 +2349,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
-		dc_add_history(item->itemid, item->flags, NULL, &value->ts, item->state, value->value);
+		zbx_preprocess_item_value(item->itemid, item->flags, NULL, &value->ts, item->state, value->value);
 	}
 	else
 	{
@@ -2394,7 +2395,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 			set_result_meta(&result, value->lastlogsize, value->mtime);
 
 		item->state = ITEM_STATE_NORMAL;
-		dc_add_history(item->itemid, item->flags, &result, &value->ts, item->state, NULL);
+		zbx_preprocess_item_value(item->itemid, item->flags, &result, &value->ts, item->state, NULL);
 
 		free_result(&result);
 	}
@@ -2426,6 +2427,7 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 	int		processed_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
 
 	for (i = 0; i < values_num; i++)
 	{
@@ -2444,10 +2446,9 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 	}
 
 	if (0 < processed_num)
-	{
 		zbx_dc_items_update_runtime_data(items, values, errcodes, values_num);
-		dc_flush_history();
-	}
+
+	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
 
@@ -3505,7 +3506,7 @@ int	proxy_get_history_count(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	id;
-	int 		count = 0;
+	int		count = 0;
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 

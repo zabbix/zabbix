@@ -157,6 +157,7 @@ typedef struct
 	unsigned char		unreachable;
 
 	zbx_vector_ptr_t	preproc_ops;
+	zbx_vector_uint64_t	dependent_items;
 }
 ZBX_DC_ITEM;
 
@@ -212,6 +213,13 @@ typedef struct
 	const char	*trapper_hosts;
 }
 ZBX_DC_TRAPITEM;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	master_itemid;
+}
+ZBX_DC_DEPENDENTITEM;
 
 typedef struct
 {
@@ -607,6 +615,7 @@ typedef struct
 	zbx_hashset_t		ipmiitems;
 	zbx_hashset_t		flexitems;
 	zbx_hashset_t		trapitems;
+	zbx_hashset_t		dependentitems;
 	zbx_hashset_t		logitems;
 	zbx_hashset_t		dbitems;
 	zbx_hashset_t		sshitems;
@@ -614,7 +623,6 @@ typedef struct
 	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
-	zbx_hashset_t		deltaitems;		/* history data for delta value calculations */
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
@@ -643,7 +651,7 @@ typedef struct
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
 	zbx_hashset_t		hostgroups;
-	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
+	zbx_vector_ptr_t	hostgroups_name;    /* host groups sorted by name */
 	zbx_hashset_t		item_preproc;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
@@ -2458,6 +2466,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 	ZBX_DC_IPMIITEM		*ipmiitem;
 	ZBX_DC_FLEXITEM		*flexitem;
 	ZBX_DC_TRAPITEM		*trapitem;
+	ZBX_DC_DEPENDENTITEM	*dependentitem;
 	ZBX_DC_LOGITEM		*logitem;
 	ZBX_DC_DBITEM		*dbitem;
 	ZBX_DC_SSHITEM		*sshitem;
@@ -2467,7 +2476,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
-	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
 	unsigned char		old_poller_type, status, type, value_type;
@@ -2573,6 +2581,9 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 			zbx_vector_ptr_create_ext(&item->preproc_ops, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
+
+			zbx_vector_uint64_create_ext(&item->dependent_items, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
 		}
 		else
 		{
@@ -2608,11 +2619,16 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 					zbx_vector_ptr_clear(&item->preproc_ops);
 			}
 
-			/* remove deltaitem history if item value type has been changed */
-			if (item->value_type != value_type)
+			if (0 < item->dependent_items.values_alloc)
 			{
-				if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &itemid)))
-					zbx_hashset_remove_direct(&config->deltaitems, deltaitem);
+				if (0 == item->dependent_items.values_num)
+				{
+					zbx_vector_uint64_destroy(&item->dependent_items);
+					zbx_vector_uint64_create_ext(&item->dependent_items, __config_mem_malloc_func,
+							__config_mem_realloc_func, __config_mem_free_func);
+				}
+				else
+					zbx_vector_uint64_clear(&item->dependent_items);
 			}
 		}
 
@@ -2822,6 +2838,18 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			/* remove trapper_hosts parameter */
 			zbx_strpool_release(trapitem->trapper_hosts);
 			zbx_hashset_remove_direct(&config->trapitems, trapitem);
+		}
+
+		/* dependent items */
+
+		if (ITEM_TYPE_DEPENDENT == item->type && NULL != row[38])
+		{
+			dependentitem = DCfind_id(&config->dependentitems, itemid, sizeof(ZBX_DC_DEPENDENTITEM), &found);
+			ZBX_STR2UINT64(dependentitem->master_itemid, row[38]);
+		}
+		else if (NULL != (dependentitem = zbx_hashset_search(&config->dependentitems, &itemid)))
+		{
+			zbx_hashset_remove_direct(&config->dependentitems, dependentitem);
 		}
 
 		/* log items */
@@ -3047,6 +3075,11 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_hashset_remove_direct(&config->trapitems, trapitem);
 		}
 
+		/* dependent items */
+
+		if (NULL != (dependentitem = zbx_hashset_search(&config->dependentitems, &itemid)))
+			zbx_hashset_remove_direct(&config->dependentitems, dependentitem);
+
 		/* log items */
 
 		if (ITEM_VALUE_TYPE_LOG == item->value_type &&
@@ -3129,11 +3162,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
-		/* delta items */
-
-		if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &itemid)))
-			zbx_hashset_remove_direct(&config->deltaitems, deltaitem);
-
 		/* items */
 
 		item_hk_local.hostid = item->hostid;
@@ -3157,10 +3185,20 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			config->items.mem_free_func(item->triggers);
 
 		zbx_vector_ptr_destroy(&item->preproc_ops);
+		zbx_vector_uint64_destroy(&item->dependent_items);
 
 		zbx_hashset_iter_remove(&iter);
 	}
 
+	/* rebuild dependent item index */
+	zbx_hashset_iter_reset(&config->dependentitems, &iter);
+	while (NULL != (dependentitem = zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL != (item = zbx_hashset_search(&config->items, &dependentitem->master_itemid)))
+			zbx_vector_uint64_append(&item->dependent_items, dependentitem->itemid);
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
 	zbx_vector_uint64_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -3590,7 +3628,7 @@ static void	DCsync_expressions(DB_RESULT result)
 	{
 		ZBX_DC_REGEXP	new_regexp;
 		zbx_uint64_t	expressionid;
-		int 		found;
+		int		found;
 
 		new_regexp.name = row[0];
 
@@ -3748,7 +3786,7 @@ static void	DCsync_correlations(DB_RESULT result)
 
 	DB_ROW			row;
 	zbx_vector_uint64_t	syncids;
-	zbx_uint64_t 		correlationid;
+	zbx_uint64_t		correlationid;
 	zbx_dc_correlation_t	*correlation;
 	int			found;
 	zbx_hashset_iter_t	iter;
@@ -3978,7 +4016,7 @@ static void	DCsync_corr_conditions(DB_RESULT result)
 
 	DB_ROW			row;
 	zbx_vector_uint64_t	syncids;
-	zbx_uint64_t 		conditionid, correlationid;
+	zbx_uint64_t		conditionid, correlationid;
 	zbx_dc_corr_condition_t	*condition;
 	zbx_dc_correlation_t	*correlation;
 	int			found;
@@ -4067,7 +4105,7 @@ static void	DCsync_corr_operations(DB_RESULT result)
 
 	DB_ROW			row;
 	zbx_vector_uint64_t	syncids;
-	zbx_uint64_t 		operationid, correlationid;
+	zbx_uint64_t		operationid, correlationid;
 	zbx_dc_corr_operation_t	*operation;
 	zbx_dc_correlation_t	*correlation;
 	int			found;
@@ -4148,8 +4186,8 @@ static void	DCsync_hostgroups(DB_RESULT result)
 
 	DB_ROW			row;
 	zbx_vector_uint64_t	syncids;
-	zbx_uint64_t 		groupid;
-	zbx_dc_hostgroup_t		*group;
+	zbx_uint64_t		groupid;
+	zbx_dc_hostgroup_t	*group;
 	int			found;
 	zbx_hashset_iter_t	iter;
 
@@ -4406,7 +4444,7 @@ static void	DCsync_item_preproc(DB_RESULT result)
 
 	DB_ROW			row;
 	zbx_vector_uint64_t	syncids;
-	zbx_uint64_t 		item_preprocid, itemid, lastitemid = 0;
+	zbx_uint64_t		item_preprocid, itemid, lastitemid = 0;
 	int			found;
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_ITEM		*item = NULL;
@@ -4626,7 +4664,7 @@ void	DCsync_configuration(void)
 				"i.trapper_hosts,i.logtimefmt,i.params,i.state,i.authtype,i.username,i.password,"
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
 				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,"
-				"i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error"
+				"i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error,i.master_itemid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
@@ -4967,6 +5005,8 @@ void	DCsync_configuration(void)
 			config->flexitems.num_data, config->flexitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __function_name,
 			config->trapitems.num_data, config->trapitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() dependentitems  : %d (%d slots)", __function_name,
+			config->dependentitems.num_data, config->dependentitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __function_name,
 			config->logitems.num_data, config->logitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __function_name,
@@ -4981,8 +5021,6 @@ void	DCsync_configuration(void)
 			config->jmxitems.num_data, config->jmxitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
 			config->calcitems.num_data, config->calcitems.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() deltaitems : %d (%d slots)", __function_name,
-			config->deltaitems.num_data, config->deltaitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
 			config->functions.num_data, config->functions.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
@@ -5395,6 +5433,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->ipmiitems, 0);
 	CREATE_HASHSET(config->flexitems, 0);
 	CREATE_HASHSET(config->trapitems, 0);
+	CREATE_HASHSET(config->dependentitems, 0);
 	CREATE_HASHSET(config->logitems, 0);
 	CREATE_HASHSET(config->dbitems, 0);
 	CREATE_HASHSET(config->sshitems, 0);
@@ -5402,7 +5441,6 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->simpleitems, 0);
 	CREATE_HASHSET(config->jmxitems, 0);
 	CREATE_HASHSET(config->calcitems, 0);
-	CREATE_HASHSET(config->deltaitems, 0);
 	CREATE_HASHSET(config->functions, 100);
 	CREATE_HASHSET(config->triggers, 100);
 	CREATE_HASHSET(config->trigdeps, 0);
@@ -6112,6 +6150,25 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, zbx_uint6
 		dst_item->preproc_ops_num = 0;
 		dst_item->preproc_ops = NULL;
 	}
+
+	if (0 != (flags & ZBX_FLAG_ITEM_FIELDS_DEPENDENT))
+	{
+		if (0 != (dst_item->dependent_item_count = src_item->dependent_items.values_num))
+		{
+			dst_item->dependent_items = zbx_malloc(NULL, sizeof(zbx_uint64_t) *
+					src_item->dependent_items.values_num);
+
+			memcpy(dst_item->dependent_items, src_item->dependent_items.values, sizeof(zbx_uint64_t) *
+					src_item->dependent_items.values_num);
+		}
+		else
+			dst_item->dependent_items = NULL;
+	}
+	else
+	{
+		dst_item->dependent_item_count = 0;
+		dst_item->dependent_items = NULL;
+	}
 }
 
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
@@ -6140,6 +6197,7 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 
 		zbx_free(items[i].db_error);
 		zbx_free(items[i].preproc_ops);
+		zbx_free(items[i].dependent_items);
 	}
 }
 
@@ -6316,6 +6374,57 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, 
 		DCget_host(&items[i].host, dc_host);
 		DCget_item(&items[i], dc_item, flags);
 		errcodes[i] = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_preprocessable_items                                *
+ *                                                                            *
+ * Purpose: get preprocessable items:                                         *
+ *              * items with preprocessing steps                              *
+ *              * items with dependent items                                  *
+ *              * internal items                                              *
+ *                                                                            *
+ * Parameters: items       - [IN/OUT] hashset with DC_ITEMs                   *
+ *             timestamp   - [IN/OUT] timestamp of a last update              *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
+{
+	DC_ITEM			*item, item_local;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+	zbx_hashset_iter_t	iter;
+
+	/* no changes */
+	if (0 != *timestamp && *timestamp == config->sync_ts)
+		return;
+
+	zbx_hashset_iter_reset(items, &iter);
+	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+		DCconfig_clean_items(item, NULL, 1);
+
+	zbx_hashset_clear(items);
+	*timestamp = config->sync_ts;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->items, &iter);
+	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
+	{
+		if ((0 < dc_item->preproc_ops.values_num || 0 < dc_item->dependent_items.values_num ||
+				ITEM_TYPE_INTERNAL == dc_item->type) && ITEM_STATUS_ACTIVE == dc_item->status &&
+				NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
+				HOST_STATUS_MONITORED == dc_host->status)
+		{
+			DCget_host(&item_local.host, dc_host);
+			DCget_item(&item_local, dc_item, ZBX_FLAG_ITEM_FIELDS_PREPROC | ZBX_FLAG_ITEM_FIELDS_DEPENDENT);
+
+			zbx_hashset_insert(items, &item_local, sizeof(DC_ITEM));
+		}
 	}
 
 	UNLOCK_CACHE;
@@ -9001,83 +9110,6 @@ char	*DCexpression_expand_user_macros(const char *expression, char **error)
 	UNLOCK_CACHE;
 
 	return expression_ex;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCget_delta_items                                                *
- *                                                                            *
- * Purpose: Get a copy of delta item history stored in configuration cache    *
- *                                                                            *
- * Parameters: items - [OUT] the copy of item history                         *
- *             ids   - [IN] a vector of item ids to get the history for       *
- *                                                                            *
- * Comments: The hashset must be created by the caller like:                  *
- *            zbx_hashset_create(items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,   *
- *                               ZBX_DEFAULT_UINT64_COMPARE_FUNC)             *
- *                                                                            *
- ******************************************************************************/
-void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids)
-{
-	ZBX_DC_DELTAITEM	*deltaitem;
-	int			i;
-
-	LOCK_CACHE;
-
-	/* only FLOAT and UINT64 value types can be used for delta calculations, */
-	/* so just copying data is safe                                          */
-	for (i = 0; i < ids->values_num; i++)
-	{
-		if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &ids->values[i])))
-			zbx_hashset_insert(items, deltaitem, sizeof(ZBX_DC_DELTAITEM));
-	}
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCset_delta_items                                                *
- *                                                                            *
- * Purpose: Updates delta item history data in cache                          *
- *                                                                            *
- * Parameters: items - [IN] the new delta item history data. If the timestamp *
- *                          seconds is set to 0 then item history data is     *
- *                          removed from cache.                               *
- *                                                                            *
- ******************************************************************************/
-void	DCset_delta_items(zbx_hashset_t *items)
-{
-	zbx_hashset_iter_t	iter;
-	ZBX_DC_DELTAITEM	*deltaitem, *item;
-
-	zbx_hashset_iter_reset(items, &iter);
-
-	LOCK_CACHE;
-
-	while (NULL != (item = zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == (deltaitem = zbx_hashset_search(&config->deltaitems, &item->itemid)))
-		{
-			if (0 != item->timestamp.sec)
-				zbx_hashset_insert(&config->deltaitems, item, sizeof(ZBX_DC_DELTAITEM));
-		}
-		else
-		{
-			if (0 != item->timestamp.sec)
-			{
-				if (0 < zbx_timespec_compare(&item->timestamp, &deltaitem->timestamp))
-				{
-					deltaitem->timestamp = item->timestamp;
-					deltaitem->value = item->value;
-				}
-			}
-			else
-				zbx_hashset_remove_direct(&config->deltaitems, deltaitem);
-		}
-	}
-
-	UNLOCK_CACHE;
 }
 
 /******************************************************************************

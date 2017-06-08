@@ -58,6 +58,8 @@
 #include "selfmon/selfmon.h"
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
+#include "preprocessor/manager.h"
+#include "preprocessor/worker.h"
 #include "events.h"
 #include "valuecache.h"
 #include "setproctitle.h"
@@ -157,6 +159,8 @@ int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 1;
 int	CONFIG_IPMIMANAGER_FORKS	= 0;
+int	CONFIG_PREPROCMAN_FORKS		= 1;
+int	CONFIG_PREPROCESSOR_FORKS	= 3;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -366,6 +370,16 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
 		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_PREPROCMAN_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_PREPROCMAN;
+		*local_process_num = local_server_num - server_count + CONFIG_PREPROCMAN_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_PREPROCESSOR_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_PREPROCESSOR;
+		*local_process_num = local_server_num - server_count + CONFIG_PREPROCESSOR_FORKS;
 	}
 	else
 		return FAIL;
@@ -664,6 +678,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"StartPreprocessors",		&CONFIG_PREPROCESSOR_FORKS,		TYPE_INT,
+			PARM_OPT,	1,			1000},
 		{NULL}
 	};
 
@@ -706,7 +722,7 @@ static void	zbx_free_config(void)
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
-	char		ch;
+	char		ch, *error = NULL;
 	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
@@ -785,18 +801,12 @@ int	main(int argc, char **argv)
 
 	zbx_initialize_events();
 
-#ifdef HAVE_IPCSERVICE
+	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
-		char	*error = NULL;
-
-		if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
-		{
-			zbx_error("Cannot initialize IPC services: %s", error);
-			zbx_free(error);
-			exit(EXIT_FAILURE);
-		}
+		zbx_error("Cannot initialize IPC services: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
 	}
-#endif
 
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
@@ -981,7 +991,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
-			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS;
+			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
+			+ CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
@@ -1077,6 +1088,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
 				threads[i] = zbx_thread_start(taskmanager_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				threads[i] = zbx_thread_start(preprocessing_manager_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_PREPROCESSOR:
+				threads[i] = zbx_thread_start(preprocessing_worker_thread, &thread_args);
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:

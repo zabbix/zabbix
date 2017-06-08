@@ -25,7 +25,8 @@ DIST_SUBDIRS = \
 	zbxmodules \
 	zbxregexp \
 	zbxtasks \
-	zbxhttp
+	zbxhttp \
+	zbxpreproc
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -69,6 +70,7 @@ SUBDIRS = \
 	zbxlog \
 	zbxalgo \
 	zbxnix \
+	zbxpreproc \
 	zbxconf \
 	zbxhttp \
 	zbxsysinfo \

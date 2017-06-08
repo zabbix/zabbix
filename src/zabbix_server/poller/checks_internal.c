@@ -25,6 +25,7 @@
 #include "zbxself.h"
 #include "valuecache.h"
 #include "proxy.h"
+#include "zbxpreproc.h"
 
 #include "../vmware/vmware.h"
 
@@ -673,6 +674,19 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			error = zbx_strdup(error, "Invalid second parameter.");
 			goto out;
 		}
+	}
+	else if (0 == strcmp(tmp, "preprocessing_queue"))
+	{
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			goto out;
+
+		if (1 != nparams)
+		{
+			error = zbx_strdup(error, "Invalid number of parameters.");
+			goto out;
+		}
+
+		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
 	}
 	else
 	{

@@ -26,6 +26,7 @@
 #include "snmptrapper.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
+#include "zbxpreproc.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
@@ -165,6 +166,8 @@ next:
 		ret = SUCCEED;
 	}
 
+	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+
 	for (i = 0; i < num; i++)
 	{
 		switch (errcodes[i])
@@ -177,7 +180,8 @@ next:
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
-				dc_add_history(items[i].itemid, items[i].flags, &results[i], ts, items[i].state, NULL);
+				zbx_preprocess_item_value(items[i].itemid, items[i].flags, &results[i], ts,
+						items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
@@ -185,7 +189,7 @@ next:
 				break;
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
-				dc_add_history(items[i].itemid, items[i].flags, NULL, ts, items[i].state,
+				zbx_preprocess_item_value(items[i].itemid, items[i].flags, NULL, ts, items[i].state,
 						results[i].msg);
 
 				itemids[i] = items[i].itemid;
@@ -213,7 +217,7 @@ next:
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
 
-	dc_flush_history();
+	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
 
 	return ret;
 }
