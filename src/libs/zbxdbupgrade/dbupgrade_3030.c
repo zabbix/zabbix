@@ -978,8 +978,8 @@ static int	DBpatch_3030076(void)
 			"ack_shortdata='Acknowledged: {TRIGGER.NAME}', "
 			"ack_longdata="
 				"'{USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME} "
-				"with the following message:\n"
-				"{ACK.MESSAGE}\n\n"
+				"with the following message:\r\n"
+				"{ACK.MESSAGE}\r\n\r\n"
 				"Current problem status is {EVENT.STATUS}' "
 			"where eventsource=0"))
 		return FAIL;
