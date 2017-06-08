@@ -897,45 +897,39 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Initializes multiple elements dragging.
 			 *
-			 * @param {object} event					jQuery UI draggable event.
 			 * @param {object} draggable				Draggable DOM element where drag event was started.
 			 */
-			dragGroupInit: function(event, draggable) {
+			dragGroupInit: function(draggable) {
 				var buffer,
-					draggable_node,
-					body = $(window.document);
+					draggable_node = $(draggable.domNode),
+					draggable_left = parseInt(draggable.data.x, 10),
+					draggable_top = parseInt(draggable.data.y, 10);
 
 				if (draggable.selected) {
 					buffer = draggable.sysmap.getSelectionBuffer(draggable.sysmap);
 				}
 				else {
-					draggable_node = $(draggable.domNode);
 					// Create getSelectionBuffer structure if drag event was started on unselected element.
 					buffer = {
 						items: [{
 							type: draggable_node.attr('data-type'),
 							id: draggable.id
 						}],
-						left: parseInt(draggable.data.x, 10),
-						right: parseInt(draggable.data.x, 10) + draggable_node.width(),
-						top: parseInt(draggable.data.y, 10),
-						bottom: parseInt(draggable.data.y, 10) + draggable_node.height()
+						left: draggable_left,
+						right: draggable_left + draggable_node.width(),
+						top: draggable_top,
+						bottom: draggable_top + draggable_node.height()
 					};
 				}
 
 				buffer.xaxis = {
-					min: event.clientX - buffer.left,
-					max: (draggable.sysmap.container).width() - (buffer.right - event.clientX)
+					min: draggable.data.x - buffer.left,
+					max: (draggable.sysmap.container).width() - (buffer.right - draggable_left)
 				};
 
 				buffer.yaxis = {
-					min: event.clientY - buffer.top,
-					max: (draggable.sysmap.container).height() - (buffer.bottom - event.clientY)
-				};
-
-				buffer.margin = {
-					top: body.scrollTop(),
-					left: body.scrollLeft()
+					min: draggable.data.y - buffer.top,
+					max: (draggable.sysmap.container).height() - (buffer.bottom - draggable_top)
 				};
 
 				draggable.sysmap.draggable_buffer = buffer;
@@ -944,26 +938,36 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Handler for drag event.
 			 *
-			 * @param {object} event					jQuery UI draggable event.
 			 * @param {object} data						jQuery UI draggable data.
 			 * @param {object} draggable				Element where drag event occured.
 			 */
-			dragGroupDrag: function(event, data, draggable) {
+			dragGroupDrag: function(data, draggable) {
 				var cmap = draggable.sysmap,
-					delta_x = data.position.left - parseInt(draggable.data.x, 10),
-					delta_y = data.position.top - parseInt(draggable.data.y, 10),
-					body = $(window.document),
-					xshift = body.scrollLeft() - cmap.draggable_buffer.margin.left,
-					yshift = body.scrollTop() - cmap.draggable_buffer.margin.top;
+					draggable_left = parseInt(draggable.data.x, 10),
+					draggable_top = parseInt(draggable.data.y, 10),
+					delta_x = data.position.left - draggable_left,
+					delta_y = data.position.top - draggable_top;
 
-				if (event.clientX > (cmap.draggable_buffer.xaxis.max - xshift)
-						|| event.clientX < (cmap.draggable_buffer.xaxis.min - xshift)) {
-					delta_x = 0;
+				if (data.position.left < cmap.draggable_buffer.xaxis.min) {
+					delta_x = draggable_left < cmap.draggable_buffer.xaxis.min
+						? 0
+						: cmap.draggable_buffer.xaxis.min - draggable_left;
+				}
+				else if (data.position.left > cmap.draggable_buffer.xaxis.max) {
+					delta_x = draggable_left > cmap.draggable_buffer.xaxis.max
+						? 0
+						: cmap.draggable_buffer.xaxis.max - draggable_left;
 				}
 
-				if (event.clientY > (cmap.draggable_buffer.yaxis.max - yshift)
-						|| event.clientY < (cmap.draggable_buffer.yaxis.min - yshift)) {
-					delta_y = 0;
+				if (data.position.top < cmap.draggable_buffer.yaxis.min) {
+					delta_y = draggable_top < cmap.draggable_buffer.yaxis.min
+						? 0
+						: cmap.draggable_buffer.yaxis.min - draggable_top;
+				}
+				else if (data.position.top > cmap.draggable_buffer.yaxis.max) {
+					delta_y = draggable_top > cmap.draggable_buffer.yaxis.max
+						? 0
+						: cmap.draggable_buffer.yaxis.max - draggable_top;
 				}
 
 				if (delta_x != 0 || delta_y != 0) {
@@ -1737,10 +1741,10 @@ ZABBIX.apps.map = (function($) {
 						return this.sysmap.dragGroupPlaceholder();
 					}, this),
 					start: $.proxy(function(event) {
-						this.sysmap.dragGroupInit(event, this);
+						this.sysmap.dragGroupInit(this);
 					}, this),
 					drag: $.proxy(function(event, data) {
-						this.sysmap.dragGroupDrag(event, data, this);
+						this.sysmap.dragGroupDrag(data, this);
 					}, this),
 					stop: $.proxy(function() {
 						this.sysmap.dragGroupStop(this);
