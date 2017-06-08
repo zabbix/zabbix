@@ -394,7 +394,9 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data['widgetid'] = widget['widgetid'];
-		ajax_data['name'] = widget['header'];
+		if (widget['header'] !== '') {
+			ajax_data['name'] = widget['header'];
+		}
 		// display widget with yet unsaved changes
 		if (typeof widget['fields'] !== 'undefined') {
 			ajax_data['fields'] = widget['fields'];

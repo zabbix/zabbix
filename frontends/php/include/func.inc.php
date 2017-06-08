@@ -1991,6 +1991,19 @@ function error($msgs) {
 }
 
 /**
+ * Add multiple errors under single header.
+ *
+ * @param array  $data
+ * @param string $data['header']  common header for all error messages
+ * @param array  $data['msgs']    array of error messages
+ */
+function error_group($data) {
+	foreach (zbx_toArray($data['msgs']) as $msg) {
+		error($data['header'] . ' ' . $msg);
+	}
+}
+
+/**
  * Add SQL error message to global messages array.
  *
  * @param string $msg		Error message text.

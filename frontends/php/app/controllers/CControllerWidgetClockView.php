@@ -29,8 +29,8 @@ class CControllerWidgetClockView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'fields' =>		'required|array',
-			'name' =>		'required|string'
+			'name' =>	'string',
+			'fields' =>	'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -59,25 +59,19 @@ class CControllerWidgetClockView extends CController {
 
 	protected function doAction() {
 		$time = null;
-		$title = null;
+		$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_CLOCK];
 		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;
 
 		// Default values
 		$default = [
-			'name' => '', // If not defined by user, use calculated one
 			'time_type' => null,
 			'itemid' => null,
 			'hostid' => null // TODO VM: probably will not be used at all
 		];
 
 		$data = $this->getInput('fields');
-
-		$data['name'] = $this->getInput('name');
-		if ($data['name'] === '') {
-			$data['name'] = $default['name'];
-		}
 
 		// Apply defualt value for data
 		foreach ($default as $key => $value) {
@@ -103,7 +97,7 @@ class CControllerWidgetClockView extends CController {
 
 				if ($items) {
 					$item = $items[0];
-					$title = $item['hosts'][0]['name'];
+					$name = $item['hosts'][0]['name'];
 					unset($items, $item['hosts']);
 
 					$last_value = Manager::History()->getLast([$item]);
@@ -133,7 +127,7 @@ class CControllerWidgetClockView extends CController {
 				break;
 
 			case TIME_TYPE_SERVER:
-				$title = _('Server');
+				$name = _('Server');
 
 				$now = new DateTime();
 				$time = $now->getTimestamp();
@@ -142,7 +136,7 @@ class CControllerWidgetClockView extends CController {
 				break;
 
 			default:
-				$title = _('Local');
+				$name = _('Local');
 				break;
 		}
 
@@ -156,7 +150,7 @@ class CControllerWidgetClockView extends CController {
 				'time_zone_offset' => $time_zone_offset,
 				'error' => $error
 			],
-			'name' => ($data['name'] === '') ? $title : $data['name']
+			'name' => $this->getInput('name', $name)
 		]));
 	}
 }
