@@ -29,7 +29,7 @@ class CControllerWidgetHostsView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>		'required|string'
+			'name' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,11 +47,6 @@ class CControllerWidgetHostsView extends CController {
 	}
 
 	protected function doAction() {
-		$name = $this->getInput('name');
-		if ($name === '') {
-			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_HOST_STATUS];
-		}
-
 		$config = select_config();
 
 		$filter = [
@@ -118,6 +113,7 @@ class CControllerWidgetHostsView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_HOST_STATUS]),
 			'filter' => $filter,
 			'config' => [
 				'severity_name_0' => $config['severity_name_0'],
@@ -129,8 +125,7 @@ class CControllerWidgetHostsView extends CController {
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'name' => $name
+			]
 		]));
 	}
 }

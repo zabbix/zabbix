@@ -29,7 +29,7 @@ class CControllerWidgetSystemView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>		'required|string'
+			'name' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,11 +47,6 @@ class CControllerWidgetSystemView extends CController {
 	}
 
 	protected function doAction() {
-		$name = $this->getInput('name');
-		if ($name === '') {
-			$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSTEM_STATUS];
-		}
-
 		$filter = [
 			'groupids' => null,
 			'maintenance' => null,
@@ -117,11 +112,11 @@ class CControllerWidgetSystemView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSTEM_STATUS]),
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'name' => $name
+			]
 		]));
 	}
 }
