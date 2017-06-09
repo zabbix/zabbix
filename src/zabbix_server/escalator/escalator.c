@@ -305,7 +305,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, const char *subject, const char *message, const DB_EVENT *event,
-		const DB_EVENT *r_event)
+		const DB_EVENT *r_event, int macro_type)
 {
 	const char	*__function_name = "add_object_msg";
 	DB_RESULT	result;
@@ -350,9 +350,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		message_dyn = zbx_strdup(NULL, message);
 
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
-				&subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+				&subject_dyn, macro_type, NULL, 0);
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
-				&message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+				&message_dyn, macro_type, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
 
@@ -1232,7 +1232,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 					}
 
 					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg,
-							subject, message, event, NULL);
+							subject, message, event, NULL, MACRO_TYPE_MESSAGE_NORMAL);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, NULL, action->actionid, operationid,
@@ -1315,12 +1315,14 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 	DB_ROW		row;
 	ZBX_USER_MSG	*user_msg = NULL;
 	zbx_uint64_t	operationid;
-	unsigned char	operationtype, evaltype;
+	unsigned char	operationtype, default_msg;
+	char		*subject, *message;
+	zbx_uint64_t	mediatypeid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select o.operationid,o.operationtype,o.evaltype,"
+			"select o.operationid,o.operationtype,"
 				"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
 			" from operations o"
 				" left join opmessage m"
@@ -1336,66 +1338,52 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 	{
 		ZBX_STR2UINT64(operationid, row[0]);
 		operationtype = (unsigned char)atoi(row[1]);
-		evaltype = (unsigned char)atoi(row[2]);
 
-		if (SUCCEED == check_operation_conditions(r_event, operationid, evaltype))
+		switch (operationtype)
 		{
-			unsigned char	default_msg;
-			char		*subject, *message;
-			zbx_uint64_t	mediatypeid;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
-
-			switch (operationtype)
-			{
-				case OPERATION_TYPE_MESSAGE:
-					if (SUCCEED == DBis_null(row[3]))
-						break;
-
-					ZBX_STR2UCHAR(default_msg, row[4]);
-					ZBX_DBROW2UINT64(mediatypeid, row[7]);
-
-					if (0 == default_msg)
-					{
-						subject = row[5];
-						message = row[6];
-					}
-					else
-					{
-						subject = action->r_shortdata;
-						message = action->r_longdata;
-					}
-
-					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
-							message, event, r_event);
+			case OPERATION_TYPE_MESSAGE:
+				if (SUCCEED == DBis_null(row[2]))
 					break;
-				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if (SUCCEED == DBis_null(row[3]))
-						break;
 
-					ZBX_STR2UCHAR(default_msg, row[4]);
+				ZBX_STR2UCHAR(default_msg, row[3]);
+				ZBX_DBROW2UINT64(mediatypeid, row[6]);
 
-					if (0 == default_msg)
-					{
-						subject = row[5];
-						message = row[6];
-					}
-					else
-					{
-						subject = action->r_shortdata;
-						message = action->r_longdata;
-					}
+				if (0 == default_msg)
+				{
+					subject = row[4];
+					message = row[5];
+				}
+				else
+				{
+					subject = action->r_shortdata;
+					message = action->r_longdata;
+				}
 
-					add_sentusers_msg(&user_msg, action->actionid, event, r_event, subject,
-							message);
+				add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
+						message, event, r_event, MACRO_TYPE_MESSAGE_RECOVERY);
+				break;
+			case OPERATION_TYPE_RECOVERY_MESSAGE:
+				if (SUCCEED == DBis_null(row[2]))
 					break;
-				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, r_event, action->actionid, operationid, 1);
-					break;
-			}
+
+				ZBX_STR2UCHAR(default_msg, row[3]);
+
+				if (0 == default_msg)
+				{
+					subject = row[4];
+					message = row[5];
+				}
+				else
+				{
+					subject = action->r_shortdata;
+					message = action->r_longdata;
+				}
+				add_sentusers_msg(&user_msg, action->actionid, event, r_event, subject, message);
+				break;
+			case OPERATION_TYPE_COMMAND:
+				execute_commands(event, r_event, action->actionid, operationid, 1);
+				break;
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
 	}
 	DBfree_result(result);
 

@@ -72,7 +72,7 @@ if ($data['action'] == 'problem.view') {
 	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 	if ($data['uncheck']) {
-		uncheckTableRows();
+		uncheckTableRows('problem');
 	}
 
 	$filter_column1 = (new CFormList())
@@ -262,6 +262,7 @@ if ($data['action'] == 'problem.view') {
 						->addItem(new CRedirectButton(_('Export to CSV'),
 							(new CUrl('zabbix.php'))
 								->setArgument('action', 'problem.view.csv')
+								->setArgument('page',  $data['page'])
 						))
 						->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 				)

@@ -972,28 +972,55 @@ function getItemFormData(array $item = [], array $options = []) {
 			if (!empty($item)) {
 				$host = reset($item['hosts']);
 				if (!empty($item['hosts'])) {
+					if (bccomp($data['itemid'], $itemid) != 0) {
+						$writable = API::Template()->get([
+							'output' => ['templateid'],
+							'templateids' => [$host['hostid']],
+							'editable' => true,
+							'preservekeys' => true
+						]);
+					}
+
 					$host['name'] = CHtml::encode($host['name']);
 					if (bccomp($data['itemid'], $itemid) == 0) {
 					}
 					// discovery rule
 					elseif ($data['is_discovery_rule']) {
-						$data['templates'][] = new CLink($host['name'],
-							'host_discovery.php?form=update&itemid='.$item['itemid']
-						);
+						if (array_key_exists($host['hostid'], $writable)) {
+							$data['templates'][] = new CLink($host['name'],
+								'host_discovery.php?form=update&itemid='.$item['itemid']
+							);
+						}
+						else {
+							$data['templates'][] = new CSpan($host['name']);
+						}
+
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// item prototype
 					elseif ($item['discoveryRule']) {
-						$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
-							'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
-						);
+						if (array_key_exists($host['hostid'], $writable)) {
+							$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
+								'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
+							);
+						}
+						else {
+							$data['templates'][] = new CSpan($host['name']);
+						}
+
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
 					else {
-						$data['templates'][] = new CLink($host['name'],
-							'items.php?form=update&itemid='.$item['itemid']
-						);
+						if (array_key_exists($host['hostid'], $writable)) {
+							$data['templates'][] = new CLink($host['name'],
+								'items.php?form=update&itemid='.$item['itemid']
+							);
+						}
+						else {
+							$data['templates'][] = new CSpan($host['name']);
+						}
+
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 				}
@@ -1424,19 +1451,34 @@ function getTriggerFormData(array $data) {
 					' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 				' WHERE t.triggerid='.zbx_dbstr($tmp_triggerid)
 			));
+
 			if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-				// parent trigger prototype link
-				if ($data['parent_discoveryid']) {
-					$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].
-						'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+				// Test if template is editable by user
+				$writable = API::Template()->get([
+					'output' => ['templateid'],
+					'templateids' => [$db_triggers['hostid']],
+					'preservekeys' => true,
+					'editable' => true
+				]);
+
+				if (array_key_exists($db_triggers['hostid'], $writable)) {
+					// parent trigger prototype link
+					if ($data['parent_discoveryid']) {
+						$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].
+							'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+					}
+					// parent trigger link
+					else {
+						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].
+							'&hostid='.$db_triggers['hostid'];
+					}
+
+					$data['templates'][] = new CLink(CHtml::encode($db_triggers['name']), $link);
 				}
-				// parent trigger link
 				else {
-					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].
-						'&hostid='.$db_triggers['hostid'];
+					$data['templates'][] = new CSpan(CHtml::encode($db_triggers['name']));
 				}
 
-				$data['templates'][] = new CLink(CHtml::encode($db_triggers['name']), $link);
 				$data['templates'][] = SPACE.'&rArr;'.SPACE;
 			}
 			$tmp_triggerid = $db_triggers['templateid'];

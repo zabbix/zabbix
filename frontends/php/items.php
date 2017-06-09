@@ -221,9 +221,50 @@ else {
 	}
 }
 
-if (getRequest('filter_groupid') && !isWritableHostGroups([getRequest('filter_groupid')])) {
-	access_deny();
+// Set sub-groups of selected group.
+$filter_groupids = [];
+
+if (hasRequest('filter_groupid')) {
+	$filter_groupids = [getRequest('filter_groupid')];
+
+	$filter_groups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'groupids' => $filter_groupids,
+		'preservekeys' => true
+	]);
+
+	$filter_groups_names = [];
+
+	foreach ($filter_groups as $group) {
+		$filter_groups_names[] = $group['name'].'/';
+	}
+
+	if ($filter_groups_names) {
+		$child_groups = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'search' => ['name' => $filter_groups_names],
+			'searchByAny' => true,
+			'startSearch' => true
+		]);
+
+		foreach ($child_groups as $child_group) {
+			$filter_groupids[] = $child_group['groupid'];
+		}
+	}
 }
+
+if ($filter_groupids) {
+	$count = API::HostGroup()->get([
+		'groupids' => $filter_groupids,
+		'editable' => true,
+		'countOutput' => true
+	]);
+
+	if ($count != count($filter_groupids)) {
+		access_deny();
+	}
+}
+
 if (getRequest('filter_hostid') && !isWritableHostTemplates([getRequest('filter_hostid')])) {
 	access_deny();
 }
@@ -1109,6 +1150,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['config'] = select_config();
 	$data['host'] = $host;
+	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
@@ -1289,8 +1331,36 @@ else {
 	];
 	$preFilter = count($options, COUNT_RECURSIVE);
 
-	if (isset($_REQUEST['filter_groupid']) && !empty($_REQUEST['filter_groupid'])) {
-		$options['groupids'] = $_REQUEST['filter_groupid'];
+	$filter_groupid = getRequest('filter_groupid', []);
+	if ($filter_groupid) {
+		$filter_groupids = [$filter_groupid];
+		$filter_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter_groupids,
+			'preservekeys' => true
+		]);
+
+		$filter_groups_names = [];
+		foreach ($filter_groups as $group) {
+			$filter_groups_names[] = $group['name'].'/';
+		}
+
+		if ($filter_groups_names) {
+			$child_groups = API::HostGroup()->get([
+				'output' => ['groupid'],
+				'search' => ['name' => $filter_groups_names],
+				'searchByAny' => true,
+				'startSearch' => true
+			]);
+
+			foreach ($child_groups as $child_group) {
+				$filter_groupids[] = $child_group['groupid'];
+			}
+		}
+
+		if ($filter_groupids) {
+			$options['groupids'] = $filter_groupids;
+		}
 	}
 	if (isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
 		$data['filter_hostid'] = $_REQUEST['filter_hostid'];
@@ -1578,6 +1648,30 @@ else {
 		'preservekeys' => true
 	]);
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
+
+	// Select writable templates IDs.
+	$hostids = [];
+
+	foreach ($data['triggerRealHosts'] as $real_host) {
+		$hostids = array_merge($hostids, zbx_objectValues($real_host, 'hostid'));
+	}
+
+	foreach ($data['items'] as $item) {
+		if (array_key_exists('template_host', $item)) {
+			$hostids = array_merge($hostids, zbx_objectValues($item['template_host'], 'itemid'));
+		}
+	}
+
+	$data['writable_templates'] = [];
+
+	if ($hostids) {
+		$data['writable_templates'] = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys(array_flip($hostids)),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+	}
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {

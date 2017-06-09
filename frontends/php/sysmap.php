@@ -78,6 +78,7 @@ if (isset($_REQUEST['favobj'])) {
 
 			$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
 			$sysmapUpdate['sysmapid'] = $sysmapid;
+			$sysmapUpdate['lines'] = [];
 
 			if (array_key_exists('shapes', $sysmapUpdate)) {
 				foreach ($sysmapUpdate['shapes'] as $key => &$shape) {
@@ -134,7 +135,7 @@ if (PAGE_TYPE_HTML != $page['type']) {
 if (isset($_REQUEST['sysmapid'])) {
 	$sysmap = API::Map()->get([
 		'output' => ['sysmapid', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
-			'iconmapid', 'backgroundid'
+			'iconmapid', 'backgroundid', 'label_location'
 		],
 		'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
 			'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',

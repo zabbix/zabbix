@@ -680,22 +680,21 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 
 #define ZBX_USER_ONLINE_TIME	600
 
-typedef struct
-{
-	zbx_uint64_t	userid;
-	unsigned char	type;
-}
-zbx_user_t;
-
 /* user permissions */
 typedef enum
 {
-	USER_TYPE_UNDEFINED = 0,
-	USER_TYPE_ZABBIX_USER,
+	USER_TYPE_ZABBIX_USER = 1,
 	USER_TYPE_ZABBIX_ADMIN,
 	USER_TYPE_SUPER_ADMIN
 }
 zbx_user_type_t;
+
+typedef struct
+{
+	zbx_uint64_t	userid;
+	zbx_user_type_t	type;
+}
+zbx_user_t;
 
 typedef enum
 {
