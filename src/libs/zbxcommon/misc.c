@@ -2061,7 +2061,7 @@ int	is_ip(const char *ip)
 	return SUCCEED == is_ip4(ip) ? SUCCEED : is_ip6(ip);
 }
 
-int	validate_hostname(const char *hostname, int len)
+int	zbx_validate_hostname(const char *hostname, int len)
 {
 	unsigned char	component = 0;	/* periods are only allowed when they serve to delimit components */
 	int		i;

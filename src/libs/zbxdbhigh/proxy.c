@@ -3232,7 +3232,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
 			*dns = '\0';
 
-		if (FAIL == validate_hostname(dns, strlen(dns)))
+		if (FAIL == zbx_validate_hostname(dns, strlen(dns)))
 			*dns = '\0';
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
@@ -3432,7 +3432,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
 			*dns = '\0';
 
-		if (FAIL == validate_hostname(dns, strlen(dns)))
+		if (FAIL == zbx_validate_hostname(dns, strlen(dns)))
 			*dns = '\0';
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
