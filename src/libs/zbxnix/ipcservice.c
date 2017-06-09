@@ -802,7 +802,6 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() clientid:%d", __function_name, client->id);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: ipc_service_remove_client                                        *
