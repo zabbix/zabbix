@@ -70,6 +70,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12182] fixed missed page number in problems export (miks)
 ..F....... [ZBX-11309] fixed unchecked checkboxes after deleting script, mediatype or proxy (miks)
 ..F....... [ZBX-10999] fixed user's access level to display popup content (miks)
 ..F....... [ZBX-9213] removed link from uneditable template and host names in all configuration sections (miks)

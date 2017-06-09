@@ -559,13 +559,15 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE];
 	size_t			url_offset= 0;
 	struct curl_slist	*recipients = NULL;
-	smtp_payload_status_t	payload_status = {};
+	smtp_payload_status_t	payload_status;
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		zbx_strlcpy(error, "cannot initialize cURL library", max_error_len);
 		goto out;
 	}
+
+	memset(&payload_status, 0, sizeof(payload_status));
 
 	if (SMTP_SECURITY_SSL == smtp_security)
 		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "smtps://");
