@@ -66,7 +66,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 	elseif ($field instanceof CWidgetFieldHidden) {
 		$form->addVar($field->getName(), $field->getValue());
 	}
-	elseif ($field instanceof CWidgetRadioButtonList) {
+	elseif ($field instanceof CWidgetFieldRadioButtonList) {
 		$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()))
 			->setModern($field->getModern());
 
@@ -86,7 +86,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getAttribute('id').'");')
 		]);
 	}
-	elseif ($field instanceof CWidgetFieldFilterWidgetComboBox) {
+	elseif ($field instanceof CWidgetFieldWidgetsByTypeComboBox) {
 		$form_list->addRow($field->getLabel(),
 			(new CComboBox($field->getName(), [], $field->getAction(), []))
 		);

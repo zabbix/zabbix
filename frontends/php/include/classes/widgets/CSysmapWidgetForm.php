@@ -26,7 +26,7 @@ class CSysmapWidgetForm extends CWidgetForm
 		// select source type field
 		$source_type = array_key_exists('source_type', $data) ? (int)$data['source_type'] : WIDGET_SYSMAP_SOURCETYPE_MAP;
 
-		$radio_button_field = (new CWidgetRadioButtonList(
+		$radio_button_field = (new CWidgetFieldRadioButtonList(
 				'source_type',
 				_('Source type'),
 				WIDGET_SYSMAP_SOURCETYPE_MAP,
@@ -41,7 +41,7 @@ class CSysmapWidgetForm extends CWidgetForm
 
 		// select filter widget field
 		if ($source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
-			$filter_widget_field = (new CWidgetFieldFilterWidgetComboBox('filter_widget_reference', _('Filter')))
+			$filter_widget_field = (new CWidgetFieldWidgetsByTypeComboBox('filter_widget_reference', _('Filter')))
 					->setRequired(true);
 
 			if (array_key_exists('filter_widget_reference', $data)) {

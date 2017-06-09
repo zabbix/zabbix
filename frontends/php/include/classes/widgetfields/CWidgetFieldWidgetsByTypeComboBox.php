@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldFilterWidgetComboBox extends CWidgetField
+class CWidgetFieldWidgetsByTypeComboBox extends CWidgetField
 {
 	public function __construct($name, $label, $default = '') {
 		parent::__construct($name, $label, $default, null);
