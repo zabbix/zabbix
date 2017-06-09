@@ -338,7 +338,8 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// update interval
-			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
+			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP
+					&& $fullItem['type'] != ITEM_TYPE_DEPENDENT) {
 				// delay must be between 0 and 86400, if delay is 0, delay_flex interval must be set.
 				if ($fullItem['delay'] < 0 || $fullItem['delay'] > SEC_PER_DAY
 					|| ($fullItem['delay'] == 0 && $fullItem['delay_flex'] === '')) {
