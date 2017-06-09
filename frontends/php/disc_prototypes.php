@@ -48,7 +48,8 @@ $fields = [
 		'(isset({add}) || isset({update})) && isset({type}) && {type}=='.ITEM_TYPE_DEPENDENT, _('Master item')],
 	'delay' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
 		'(isset({add}) || isset({update}))'.
-			' && (isset({type}) && ({type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.'))',
+			' && (isset({type}) && ({type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.')'.
+			' && {type}!='.ITEM_TYPE_DEPENDENT.')',
 		_('Update interval (in sec)')
 	],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -580,7 +581,8 @@ else {
 			$item['trends'] = '';
 		}
 
-		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
+				|| $item['type'] == ITEM_TYPE_DEPENDENT) {
 			$item['delay'] = '';
 		}
 	}
