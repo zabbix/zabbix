@@ -1169,7 +1169,7 @@ abstract class CItemGeneral extends CApiService {
 				$error = _('cannot be empty');
 				break;
 			}
-			if ($item['master_itemid'] == $item['itemid']) {
+			if (array_key_exists('itemid', $item) && $item['master_itemid'] == $item['itemid']) {
 				$field = 'master_itemid';
 				$error = _('master_itemid and itemid should not match');
 				break;
