@@ -2061,6 +2061,36 @@ int	is_ip(const char *ip)
 	return SUCCEED == is_ip4(ip) ? SUCCEED : is_ip6(ip);
 }
 
+int	validate_hostname(const char *hostname, int len)
+{
+	unsigned char	component = 0;	/* periods are only allowed when they serve to delimit components */
+	int		i;
+
+	/* single character names or nicknames are not allowed */
+	if (1 >= len)
+		return FAIL;
+
+	/* the first character must be an alphanumeric character */
+	if (0 == isalnum(*hostname))
+		return FAIL;
+
+	/* the last character must not be a minus sign */
+	if ('-' == hostname[len - 1])
+		return FAIL;
+
+	for (i = 0; i < len; i++)
+	{
+		if (0 != isalnum(hostname[i]) || '-' == hostname[i])
+			component = 1;
+		else if ('.' == hostname[i] && 1 == component)
+			component = 0;
+		else
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: ip_in_list                                                       *
