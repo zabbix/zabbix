@@ -20,34 +20,31 @@
 
 class CWidgetFieldRadioButtonList extends CWidgetField
 {
-	private $values = [];
+	private $values;
 	private $modern = false;
 	
-	public function __construct($name, $label, $default = '', $action = null, $dataFieldType = ZBX_WIDGET_FIELD_TYPE_INT32) {
+	public function __construct($name, $label, $values, $default = null, $action = null, $dataFieldType = ZBX_WIDGET_FIELD_TYPE_INT32) {
 		parent::__construct($name, $label, $default, $action);
 		$this->setSaveType($dataFieldType);
-	}
-
-	public function addValue($name, $value, $id = null, $on_change = null) {
-		$this->javascript = '';
-		$this->values[] = [
-			'name' => $name,
-			'value' => $value,
-			'id' => ($id === null ? null : zbx_formatDomId($id)),
-			'on_change' => $on_change
-		];
-
-		return $this;
+		$this->values = $values;
 	}
 
 	public function setModern($modern) {
 		$this->modern = $modern;
-
 		return $this;
 	}
 
 	public function getModern() {
 		return $this->modern;
+	}
+
+	public function setValue($value) {
+		if ($value === null) {
+			parent::setValue($value);
+		} elseif (array_key_exists($value, $this->values)) {
+			parent::setValue($value);
+		}
+		return $this;
 	}
 
 	public function getValues() {

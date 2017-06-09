@@ -45,16 +45,19 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			(new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues()))
 		);
 	}
+
 	elseif ($field instanceof CWidgetFieldTextBox) {
 		$form_list->addRow($field->getLabel(),
 			(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
 	}
+
 	elseif ($field instanceof CWidgetFieldCheckbox) {
 		$form_list->addRow($field->getLabel(),
 			(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
 		);
 	}
+
 	elseif ($field instanceof CWidgetFieldReference) {
 		$form->addVar($field->getName(), $field->getValue()?:'');
 
@@ -63,19 +66,20 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			$form->addItem(new CJsScript(get_js($javascript, true)));
 		}
 	}
+
 	elseif ($field instanceof CWidgetFieldHidden) {
 		$form->addVar($field->getName(), $field->getValue());
 	}
+
 	elseif ($field instanceof CWidgetFieldRadioButtonList) {
 		$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()))
 			->setModern($field->getModern());
-
-		foreach ($field->getValues() as $value) {
-			$radioButtonsList->addValue($value['name'], $value['value'], null, $field->getAction());
+		foreach ($field->getValues() as $key => $value) {
+			$radioButtonsList->addValue($value, $key, null, $field->getAction());
 		}
-
-		$form_list->addRow(_('Source type'), $radioButtonsList);
+		$form_list->addRow($field->getLabel(), $radioButtonsList);
 	}
+
 	elseif ($field instanceof CWidgetFieldSelectResource) {
 		$caption = array_key_exists($field->getValue(true), $data['captions'][$field->getResourceType()])
 			? $data['captions'][$field->getResourceType()][$field->getValue(true)]
@@ -90,6 +94,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getName().'");')
 		]);
 	}
+
 	elseif ($field instanceof CWidgetFieldWidgetsByTypeComboBox) {
 		$form_list->addRow($field->getLabel(),
 			(new CComboBox($field->getName(), [], $field->getAction(), []))
@@ -97,6 +102,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 
 		$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
 	}
+
 	elseif ($field instanceof CWidgetFieldNumericBox) {
 		$form_list->addRow($field->getLabel(),
 			(new CNumericBox($field->getName(), $field->getValue(true), $field->getMaxLength()))
