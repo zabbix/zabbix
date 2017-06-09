@@ -40,7 +40,7 @@ class CControllerWidgetSysmapView extends CController {
 
 			$validationRules = [
 				'widget_name' => 'string',
-				'source_type' =>	'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER
+				'source_type' => 'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER
 			];
 
 			if (array_key_exists('source_type', $input_fields)) {
@@ -66,6 +66,7 @@ class CControllerWidgetSysmapView extends CController {
 		}
 
 		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 		}
 
@@ -83,7 +84,6 @@ class CControllerWidgetSysmapView extends CController {
 		// Default values
 		$default = [
 			'source_type' => WIDGET_SYSMAP_SOURCETYPE_MAP,
-			'widget_name' => _('Map widget'),
 			'filter_widget_reference' => ''
 		];
 

@@ -67,8 +67,8 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$form->addVar($field->getName(), $field->getValue());
 	}
 	elseif ($field instanceof CWidgetRadioButtonList) {
-		$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()));
-		$radioButtonsList->setModern($field->getModern());
+		$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()))
+			->setModern($field->getModern());
 
 		foreach ($field->getValues() as $value) {
 			$radioButtonsList->addValue($value['name'], $value['value'], null, $field->getAction());
@@ -87,8 +87,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldFilterWidgetComboBox) {
-		$form_list->addRow(
-			$field->getLabel(),
+		$form_list->addRow($field->getLabel(),
 			(new CComboBox($field->getName(), [], $field->getAction(), []))
 		);
 

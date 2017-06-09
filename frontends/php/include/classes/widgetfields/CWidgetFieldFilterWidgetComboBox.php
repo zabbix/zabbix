@@ -36,8 +36,8 @@ class CWidgetFieldFilterWidgetComboBox extends CWidgetField
 				'jQuery.each(widgets, function(i, widget) {'.
 					'if (typeof widget["type"] !== "undefined") {'.
 						'jQuery("<option></option>")'.
-								'.text(widget["header"].length'.
-										'?widget["header"]:dashboard_data["widget_defaults"]["navigationtree"]["header"])'.
+								'.text(widget["header"].length ? widget["header"] : '.
+									'dashboard_data["widget_defaults"]["navigationtree"]["header"])'.
 								'.val(widget["fields"]["reference"])'.
 								'.appendTo(filters_box);'.
 					'}'.

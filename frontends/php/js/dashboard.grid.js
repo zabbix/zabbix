@@ -86,8 +86,7 @@
 
 	function generateRandomString(length) {
 		var space = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-				length = length||5,
-				ret = '';
+			ret = '';
 
 		for (var i = 0; length > i; i++) {
 			ret += space.charAt(Math.floor(Math.random() * space.length));
@@ -601,7 +600,7 @@
 		return free;
 	}
 
-	function openConfigDialogue($obj, data, widget = null) {
+	function openConfigDialogue($obj, data, widget) {
 		var edit_mode = (widget !== null);
 
 		data.dialogue = {};
@@ -1158,7 +1157,7 @@
 				var data = $(this).data('dashboardGrid');
 
 				while (!ref) {
-					ref = generateRandomString();
+					ref = generateRandomString(5);
 
 					for (var i = 0, l = data['widgets'].length; l > i; i++) {
 						if (typeof data['widgets'][i]['fields']['reference'] !== 'undefined') {
@@ -1179,7 +1178,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data);
+				openConfigDialogue($this, data, null);
 			});
 		}
 	}

@@ -49,6 +49,8 @@ class CWidgetConfig
 	/**
 	 * Get default widget dimensions.
 	 *
+	 * @static
+	 *
 	 * @return array
 	 */
 	private static function getDefaultDimensions()
@@ -73,6 +75,8 @@ class CWidgetConfig
 
 	/**
 	 * Return default values for new widgets
+	 *
+	 * @static
 	 *
 	 * @return array
 	 */
@@ -126,8 +130,12 @@ class CWidgetConfig
 
 	/**
 	 * Return widget triggers
-	 * @param int $type - WIDGET_ constant
-	 * @return array - list of [onEvent => jsMethodToCall] pairs
+	 *
+	 * @static
+	 *
+	 * @param int $type  WIDGET_ constant
+	 *
+	 * @return array  list of [onEvent => jsMethodToCall] pairs
 	 */
 	public static function getTriggers($type) {
 		switch ($type) {
@@ -148,7 +156,11 @@ class CWidgetConfig
 
 	/**
 	 * Returns key, where value is stored for given field type
+	 *
+	 * @static
+	 *
 	 * @param int $field_type - ZBX_WIDGET_FIELD_TYPE_ constant
+	 *
 	 * @return string field key, where to save the value
 	 */
 	public static function getApiFieldKey($field_type){
