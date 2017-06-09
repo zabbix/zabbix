@@ -108,6 +108,7 @@ class CItem extends CItemGeneral {
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'		=> null,
 			'selectPreprocessing'		=> null,
+			'selectMasterItem'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,

@@ -1146,6 +1146,27 @@ abstract class CItemGeneral extends CApiService {
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
+		if ($options['selectMasterItem'] && $options['selectMasterItem'] != API_OUTPUT_COUNT) {
+			$relation = new CRelationMap();
+
+			foreach ($result as $item) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					$relation->addRelation($item['itemid'], $item['master_itemid']);
+				}
+			}
+			$master_ids = $relation->getRelatedIds();
+
+			if ($master_ids) {
+				$master_items = $this->get([
+					'output' => $options['selectMasterItem'],
+					'filter' => ['itemid' => $master_ids],
+					'preservekeys' => true
+				]);
+
+				$result = $relation->mapOne($result, $master_items, 'masterItem');
+			}
+		}
+
 		return $result;
 	}
 

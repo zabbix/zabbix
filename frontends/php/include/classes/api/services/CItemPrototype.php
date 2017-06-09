@@ -84,6 +84,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectGraphs'					=> null,
 			'selectDiscoveryRule'			=> null,
 			'selectPreprocessing'			=> null,
+			'selectMasterItem'				=> null,
 			'countOutput'					=> null,
 			'groupCount'					=> null,
 			'preservekeys'					=> null,
