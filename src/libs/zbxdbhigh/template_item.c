@@ -1108,7 +1108,7 @@ static void	copy_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 		if (NULL == item->key)
 			zbx_vector_uint64_append(&itemids, item->itemid);
 
-		zbx_hashset_insert(&items_t, &item, sizeof(item));
+		zbx_hashset_insert(&items_t, &item, sizeof(zbx_template_item_t *));
 	}
 
 	if (0 != itemids.values_num)

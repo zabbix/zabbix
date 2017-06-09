@@ -1029,6 +1029,9 @@ static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, 
 {
 	zbx_db_bind_context_t	*context = (zbx_db_bind_context_t *)ctxp;
 
+	ZBX_UNUSED(bindp);
+	ZBX_UNUSED(index);
+
 	switch (context->type)
 	{
 		case ZBX_TYPE_ID: /* handle 0 -> NULL conversion */

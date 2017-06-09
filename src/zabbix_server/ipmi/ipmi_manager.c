@@ -62,6 +62,9 @@ typedef struct
 	/* itemid, set for value requests */
 	zbx_uint64_t		itemid;
 
+	/* the current item state (supported/unsupported) */
+	unsigned char		item_state;
+
 	/* the request message */
 	zbx_ipc_message_t	message;
 
@@ -478,7 +481,7 @@ static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manag
 		poller = (zbx_ipmi_poller_t *)manager->pollers.values[manager->next_poller_index++];
 		poller->client = client;
 
-		zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(poller));
+		zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(zbx_ipmi_poller_t *));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -768,6 +771,10 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(itemid, 0, NULL, &ts, state, value);
+			break;
+		default:
+			/* don't change item's state when network related error occurs */
+			state = poller->request->item_state;
 	}
 
 	dc_flush_history();
@@ -866,6 +873,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 
 		request = ipmi_request_create(items[i].host.hostid);
 		request->itemid = items[i].itemid;
+		request->item_state = items[i].state;
 		ipmi_manager_serialize_request(&items[i], 0, &request->message);
 		ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
 	}
@@ -979,7 +987,6 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
-	time_now = time_stat;
 	time_idle = 0;
 	polled_num = 0;
 	scheduled_num = 0;

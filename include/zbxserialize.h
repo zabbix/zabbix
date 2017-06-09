@@ -30,15 +30,20 @@
 
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 
-#define zbx_serialize_str(buffer, value, len) 					\
-		(memcpy(buffer, (zbx_uint32_t *)&len, sizeof(zbx_uint32_t)),	\
-		memcpy(buffer + sizeof(zbx_uint32_t), value, len),		\
-		len + sizeof(zbx_uint32_t))
-
 #define zbx_serialize_str_null(buffer)	 			\
 	(							\
 		memset(buffer, 0, sizeof(zbx_uint32_t)),	\
 		sizeof(zbx_uint32_t)				\
+	)
+
+#define zbx_serialize_str(buffer, value, len) 						\
+	(										\
+		0 == len ? zbx_serialize_str_null(buffer) :				\
+		(									\
+			memcpy(buffer, (zbx_uint32_t *)&len, sizeof(zbx_uint32_t)),	\
+			memcpy(buffer + sizeof(zbx_uint32_t), value, len),		\
+			len + sizeof(zbx_uint32_t)					\
+		)									\
 	)
 
 #define zbx_deserialize_uint64(buffer, value) \
