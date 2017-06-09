@@ -52,35 +52,11 @@ class CSysmapWidgetForm extends CWidgetForm
 		}
 
 		// select sysmap field
-		$sysmap_caption = '';
-		$sysmap_id = 0;
-
-		if (array_key_exists('sysmap_id', $data) && $data['sysmap_id']) {
-			$maps = API::Map()->get([
-				'sysmapids' => $data['sysmap_id'],
-				'output' => API_OUTPUT_EXTEND
-			]);
-
-			if (($map = reset($maps)) !== false) {
-				$sysmap_id = $map['sysmapid'];
-				$sysmap_caption = $map['name'];
-			}
+		$map_field = (new CWidgetFieldSelectResource('sysmap_id', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP))
+			->setRequired($source_type == WIDGET_SYSMAP_SOURCETYPE_MAP);
+		if (array_key_exists('sysmap_id', $data)) {
+			$map_field->setValue($data['sysmap_id']);
 		}
-
-		$map_field = (new CWidgetFieldSelectResource('sysmap_id', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP, $sysmap_id, $sysmap_caption));
-		$map_field->setRequired($source_type == WIDGET_SYSMAP_SOURCETYPE_MAP);
-		
 		$this->fields[] = $map_field;
-	}
-
-	public function validate() {
-		$errors = [];
-
-		foreach ($this->fields as $field) {
-			// Validate each field seperately
-			$errors = array_merge($errors, $field->validate());
-		}
-
-		return $errors;
 	}
 }

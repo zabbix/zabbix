@@ -20,72 +20,54 @@
 
 class CWidgetFieldSelectResource extends CWidgetField
 {
-	protected $popup_url_srctbl;
-	protected $popup_url_srcfld1;
-	protected $popup_url_srcfld2;
-	protected $popup_url_dstfld1;
-	protected $popup_url_dstfld2;
-	protected $caption_name;
+	protected $srctbl;
+	protected $srcfld1;
+	protected $srcfld2;
+	protected $dstfld1;
+	protected $dstfld2;
 	protected $resource_type;
-	public $caption;
 
-	public function __construct($name, $label, $resource_type, $value, $caption) {
-		parent::__construct($name, $label, null, null);
+	public function __construct($name, $label, $resource_type, $default = null) {
+		parent::__construct($name, $label, $default, null);
 		$this->resource_type = $resource_type;
-		$this->caption = $caption;
-		$this->setValue($value);
 
 		switch ($resource_type) {
 			case WIDGET_FIELD_SELECT_RES_SYSMAP:
-				$this->caption_name = 'sysmap_caption';
-				$this->popup_url_srctbl = 'sysmaps';
-				$this->popup_url_srcfld1 = 'sysmapid';
-				$this->popup_url_srcfld2 = 'name';
-				$this->popup_url_dstfld1 = $name;
-				$this->popup_url_dstfld2 = $this->caption_name;
+				$this->srctbl = 'sysmaps';
+				$this->srcfld1 = 'sysmapid';
+				$this->srcfld2 = 'name';
 
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
+				break;
+			case WIDGET_FIELD_SELECT_RES_ITEM:
+				$this->srctbl = 'items';
+				$this->srcfld1 = 'itemid';
+				$this->srcfld2 = 'name';
+
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 				break;
 			default:
 				break;
 		}
+
+		$this->dstfld1 = $name;
+		$this->dstfld2 = $this->name . '_caption';
+	}
+
+	public function getResourceType() {
+		return $this->resource_type;
 	}
 
 	public function getPopupUrl() {
-		return sprintf('popup.php?srctbl=%s&srcfld1=%s&srcfld2=%s&dstfld1=%s&dstfld2=%s', $this->popup_url_srctbl,
-				$this->popup_url_srcfld1, $this->popup_url_srcfld2, $this->popup_url_dstfld1, $this->popup_url_dstfld2);
-	}
-
-	public function getCaptionName() {
-		return $this->caption_name;
-	}
-
-	public function validate() {
-		if (is_array($this->value)) {
-			$this->value = reset($this->value);
+		$url = sprintf('popup.php?srctbl=%s&srcfld1=%s&srcfld2=%s&dstfld1=%s&dstfld2=%s', $this->srctbl,
+				$this->srcfld1, $this->srcfld2, $this->dstfld1, $this->dstfld2);
+		switch ($this->getResourceType()) {
+			case WIDGET_FIELD_SELECT_RES_ITEM:
+				$url .= '&real_hosts=1';
+				break;
+			default:
+				break;
 		}
-
-		$errors = [];
-		if ($this->required === true && !$this->value) {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
-		}
-		else {
-			switch ($this->resource_type) {
-				case WIDGET_FIELD_SELECT_RES_SYSMAP:
-					$maps = API::Map()->get([
-						'sysmapids' => $this->value,
-						'output' => ['sysmapid'],
-						'preservekeys' => true
-					]);
-
-					if (!array_key_exists($this->value, $maps)) {
-						$errors[] = _(sprintf('No permissions to referred object specified in field \'%s\' or it does not exist!',
-								$this->label));
-					}
-					break;
-			}
-		}
-
-		return $errors;
+		return $url;
 	}
 }

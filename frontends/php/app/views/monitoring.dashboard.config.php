@@ -77,13 +77,17 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$form_list->addRow(_('Source type'), $radioButtonsList);
 	}
 	elseif ($field instanceof CWidgetFieldSelectResource) {
-		$form->addVar($field->getName(), $field->getValue());
+		$caption = array_key_exists($field->getValue(true), $data['captions'][$field->getResourceType()])
+			? $data['captions'][$field->getResourceType()][$field->getValue(true)]
+			: '';
+		// needed for popup script
+		$form->addVar($field->getName(), ($field->getValue(true) !== null) ? $field->getValue(true) : '');
 		$form_list->addRow($field->getLabel(), [
-			(new CTextBox($field->getCaptionName(), $field->caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getAttribute('id').'");')
+				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getName().'");')
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetsByTypeComboBox) {
@@ -92,25 +96,6 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		);
 
 		$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
-	}
-	elseif ($field instanceof CWidgetFieldItem) {
-		$caption = array_key_exists($field->getValue(true), $data['captions']['items'])
-			? $data['captions']['items'][$field->getValue(true)]
-			: '';
-		// needed for popup script
-		$form->addVar($field->getName(), ($field->getValue(true) !== null) ? $field->getValue(true) : '');
-
-		$select_button = (new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
-					"&dstfld2=".$field->getName()."_caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
-
-		$form_list->addRow($field->getLabel(), [
-			(new CTextBox($field->getName().'_caption', $caption, true))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$select_button
-		]);
 	}
 	elseif ($field instanceof CWidgetFieldNumericBox) {
 		$form_list->addRow($field->getLabel(),

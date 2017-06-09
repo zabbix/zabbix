@@ -76,14 +76,14 @@ class CControllerDashbrdWidgetConfig extends CController {
 	private function getCaptions($form) {
 		$captions = [];
 		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldItem) {
-				if (!array_key_exists('items', $captions)) {
-					$captions['items'] = [];
+			if ($field instanceof CWidgetFieldSelectResource) {
+				if (!array_key_exists($field->getResourceType(), $captions)) {
+					$captions[$field->getResourceType()] = [];
 				}
 				if (bccomp($field->getValue(true), '0') === 1
-					&& !array_key_exists($field->getValue(true), $captions['items'])
+					&& !array_key_exists($field->getValue(true), $captions[$field->getResourceType()])
 				){
-					$captions['items'][$field->getValue(true)] = '';
+					$captions[$field->getResourceType()][$field->getValue(true)] = '';
 				}
 			}
 		}
@@ -92,21 +92,36 @@ class CControllerDashbrdWidgetConfig extends CController {
 			if (empty($list)) {
 				continue;
 			}
-			if ($resource === 'items') {
-				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'key_', 'name'],
-					'selectHosts' => ['name'],
-					'itemids' => array_keys($list),
-					'webitems' => true
-				]);
+			switch ($resource) {
+				case WIDGET_FIELD_SELECT_RES_ITEM:
+					$items = API::Item()->get([
+						'output' => ['itemid', 'hostid', 'key_', 'name'],
+						'selectHosts' => ['name'],
+						'itemids' => array_keys($list),
+						'webitems' => true
+					]);
 
-				if ($items) {
-					$items = CMacrosResolverHelper::resolveItemNames($items);
+					if ($items) {
+						$items = CMacrosResolverHelper::resolveItemNames($items);
 
-					foreach ($items as $key => $item) {
-						$captions['items'][$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+						foreach ($items as $key => $item) {
+							$captions[$resource][$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+						}
 					}
-				}
+					break;
+
+				case WIDGET_FIELD_SELECT_RES_SYSMAP:
+					$maps = API::Map()->get([
+						'sysmapids' => array_keys($list),
+						'output' => ['sysmapid', 'name']
+					]);
+
+					if ($maps) {
+						foreach ($maps as $key => $map) {
+							$captions[$resource][$map['sysmapid']] = $map['name'];
+						}
+					}
+					break;
 			}
 		}
 

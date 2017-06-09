@@ -1149,6 +1149,7 @@ define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
 
 // widget select resource field types
 define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
+define('WIDGET_FIELD_SELECT_RES_ITEM',		2);
 
 // max depth of navigation tree
 define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
