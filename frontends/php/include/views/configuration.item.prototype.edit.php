@@ -87,8 +87,8 @@ if (!$readonly) {
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.php?srctbl=items&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
-			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&only_hostid='.$data['hostid'].
+		->onClick('return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
+			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&parent_discoveryid='.$data['parent_discoveryid'].
 			'&excludeids[]='.$data['itemid'].'");'
 		);
 }
