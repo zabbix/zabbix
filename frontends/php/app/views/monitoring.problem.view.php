@@ -72,7 +72,7 @@ if ($data['action'] == 'problem.view') {
 	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 	if ($data['uncheck']) {
-		uncheckTableRows();
+		uncheckTableRows('problem');
 	}
 
 	$filter_column1 = (new CFormList())

@@ -1,7 +1,7 @@
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		<?php if (defined('ZBX_PAGE_DO_REFRESH') && CWebUser::$data['refresh']): ?>
-			PageRefresh.init(<?php echo CWebUser::$data['refresh'] * 1000; ?>);
+		<?php if (defined('ZBX_PAGE_DO_REFRESH') && CWebUser::getRefresh() != 0): ?>
+			PageRefresh.init(<?= CWebUser::getRefresh() * 1000 ?>);
 		<?php endif ?>
 
 		<?php if (isset($page['scripts']) && in_array('flickerfreescreen.js', $page['scripts'])): ?>

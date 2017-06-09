@@ -67,6 +67,18 @@ a img {
   border: none;
   vertical-align: top; }
 
+svg a {
+  fill: #0275b8;
+  cursor: pointer; }
+  svg a:visited {
+    fill: #0275b8; }
+  svg a:hover, svg a:focus {
+    fill: #0275b8;
+    text-decoration: underline; }
+  svg a:active {
+    fill: #0275b8;
+    text-decoration: underline; }
+
 .link-action {
   border-bottom: 1px dotted;
   cursor: pointer; }
@@ -1915,7 +1927,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transform: translateY(-50%); }
 
 .ui-inner-handles .ui-resizable-n {
-  top: 0px; }
+  top: 0; }
 .ui-inner-handles .ui-resizable-ne {
   top: -4px;
   right: -4px; }
@@ -1923,9 +1935,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   top: -4px;
   left: -4px; }
 .ui-inner-handles .ui-resizable-e {
-  right: 0px; }
+  right: 0; }
 .ui-inner-handles .ui-resizable-s {
-  bottom: 0px; }
+  bottom: 0; }
 .ui-inner-handles .ui-resizable-se {
   bottom: -4px;
   right: -4px; }
@@ -1933,7 +1945,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   bottom: -4px;
   left: -4px; }
 .ui-inner-handles .ui-resizable-w {
-  left: 0px; }
+  left: 0; }
 
 .ui-resize-dot, .ui-resizable-ne, .ui-resizable-nw, .ui-resizable-se, .ui-resizable-sw {
   z-index: 90;

@@ -52,5 +52,21 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'v
 				displayKeyButton();
 			})
 			.trigger('change');
+
+		// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
+		jQuery('#value_type').on('focus', function () {
+			old_value = jQuery(this).val();
+		}).change(function() {
+			var new_value = jQuery(this).val(),
+				trends = jQuery('#trends');
+
+			if ((old_value == <?= ITEM_VALUE_TYPE_STR ?> || old_value == <?= ITEM_VALUE_TYPE_LOG ?>
+					|| old_value == <?= ITEM_VALUE_TYPE_TEXT ?>)
+					&& ((new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
+					|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
+					&& trends.val() == 0)) {
+				trends.val('<?= $this->data['trends_default'] ?>');
+			}
+		});
 	});
 </script>

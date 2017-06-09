@@ -363,18 +363,6 @@ class CHostInterface extends CApiService {
 		return ['interfaceids' => zbx_objectValues($interfaces, 'interfaceid')];
 	}
 
-	protected function clearValues(array $interface) {
-		if (isset($interface['port']) && $interface['port'] != '') {
-			$interface['port'] = ltrim($interface['port'], '0');
-
-			if ($interface['port'] == '') {
-				$interface['port'] = 0;
-			}
-		}
-
-		return $interface;
-	}
-
 	/**
 	 * Delete interfaces.
 	 * Interface cannot be deleted if it's main interface and exists other interface of same type on same host.

@@ -78,13 +78,13 @@ typedef struct
 	const char		*key;
 	const char		*port;
 	const char		*db_error;
+	const char		*delay;
 	ZBX_DC_TRIGGER		**triggers;
-	int			delay;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
 	int			data_expected_from;
-	int			history;
+	unsigned char		history;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -95,6 +95,7 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		status;
 	unsigned char		unreachable;
+	unsigned char		schedulable;
 	unsigned char		update_triggers;
 
 	zbx_vector_ptr_t	preproc_ops;
@@ -113,7 +114,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	const char	*units;
-	int		trends;
+	unsigned char	trends;
 }
 ZBX_DC_NUMITEM;
 
@@ -139,13 +140,6 @@ typedef struct
 	const char	*ipmi_sensor;
 }
 ZBX_DC_IPMIITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*delay_flex;
-}
-ZBX_DC_FLEXITEM;
 
 typedef struct
 {
@@ -230,6 +224,12 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	items_active_normal;		/* On enabled hosts these two fields store number of enabled */
+	zbx_uint64_t	items_active_notsupported;	/* and supported items and enabled and not supported items.  */
+	zbx_uint64_t	items_disabled;			/* On "hosts" corresponding to proxies this and two fields   */
+							/* above store cumulative statistics for all hosts monitored */
+							/* by a particular proxy. */
+							/* NOTE: On disabled hosts all items are counted as disabled. */
 	const char	*host;
 	const char	*name;
 	int		maintenance_from;
@@ -298,6 +298,9 @@ ZBX_DC_HOST_H;
 typedef struct
 {
 	zbx_uint64_t	hostid;
+	zbx_uint64_t	hosts_monitored;	/* number of enabled hosts assigned to proxy */
+	zbx_uint64_t	hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
+	double		required_performance;
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
 	int		proxy_tasks_nextcheck;
@@ -430,6 +433,24 @@ ZBX_DC_CONFIG_TABLE;
 
 typedef struct
 {
+	zbx_uint64_t	hosts_monitored;		/* total number of enabled hosts */
+	zbx_uint64_t	hosts_not_monitored;		/* total number of disabled hosts */
+	zbx_uint64_t	items_active_normal;		/* total number of enabled and supported items */
+	zbx_uint64_t	items_active_notsupported;	/* total number of enabled and not supported items */
+	zbx_uint64_t	items_disabled;			/* total number of disabled items */
+							/* (all items of disabled host are counted as disabled) */
+	zbx_uint64_t	triggers_enabled_ok;		/* total number of enabled triggers with value OK */
+	zbx_uint64_t	triggers_enabled_problem;	/* total number of enabled triggers with value PROBLEM */
+	zbx_uint64_t	triggers_disabled;		/* total number of disabled triggers */
+							/* (if at least one item or host involved in trigger is */
+							/* disabled then trigger is counted as disabled) */
+	double		required_performance;		/* required performance of server (values per second) */
+	time_t		last_update;
+}
+ZBX_DC_STATUS;
+
+typedef struct
+{
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
 	unsigned char	conditiontype;
@@ -559,7 +580,6 @@ typedef struct
 	zbx_hashset_t		numitems;
 	zbx_hashset_t		snmpitems;
 	zbx_hashset_t		ipmiitems;
-	zbx_hashset_t		flexitems;
 	zbx_hashset_t		trapitems;
 	zbx_hashset_t		logitems;
 	zbx_hashset_t		dbitems;
@@ -606,6 +626,7 @@ typedef struct
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	ZBX_DC_CONFIG_TABLE	*config;
+	ZBX_DC_STATUS		*status;
 }
 ZBX_DC_CONFIG;
 

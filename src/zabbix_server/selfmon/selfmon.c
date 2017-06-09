@@ -50,6 +50,6 @@ ZBX_THREAD_ENTRY(selfmon_thread, args)
 		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",
 				get_process_type_string(process_type), sec);
 
-		zbx_sleep_loop(1);
+		zbx_sleep_loop(ZBX_SELFMON_DELAY);
 	}
 }

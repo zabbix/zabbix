@@ -176,12 +176,6 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($maps, ['name']);
 
 		foreach ($maps as $map) {
-			foreach ($map['shapes'] as &$shape) {
-				unset($shape['shapeid']);
-				unset($shape['sysmapid']);
-			}
-			unset($shape);
-
 			$tmpSelements = $this->formatMapElements($map['selements']);
 			$this->data['maps'][] = [
 				'name' => $map['name'],
@@ -214,6 +208,7 @@ class CConfigurationExportBuilder {
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $tmpSelements,
 				'shapes' => $map['shapes'],
+				'lines' => $map['lines'],
 				'links' => $this->formatMapLinks($map['links'], $tmpSelements)
 			];
 		}
@@ -335,7 +330,6 @@ class CConfigurationExportBuilder {
 				'snmpv3_authpassphrase' => $discoveryRule['snmpv3_authpassphrase'],
 				'snmpv3_privprotocol' => $discoveryRule['snmpv3_privprotocol'],
 				'snmpv3_privpassphrase' => $discoveryRule['snmpv3_privpassphrase'],
-				'delay_flex' => $discoveryRule['delay_flex'],
 				'params' => $discoveryRule['params'],
 				'ipmi_sensor' => $discoveryRule['ipmi_sensor'],
 				'authtype' => $discoveryRule['authtype'],
@@ -687,7 +681,6 @@ class CConfigurationExportBuilder {
 				'snmpv3_authpassphrase' => $item['snmpv3_authpassphrase'],
 				'snmpv3_privprotocol' => $item['snmpv3_privprotocol'],
 				'snmpv3_privpassphrase' => $item['snmpv3_privpassphrase'],
-				'delay_flex' => $item['delay_flex'],
 				'params' => $item['params'],
 				'ipmi_sensor' => $item['ipmi_sensor'],
 				'authtype' => $item['authtype'],

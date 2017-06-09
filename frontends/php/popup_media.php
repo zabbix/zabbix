@@ -42,7 +42,7 @@ $fields = [
 	'media'=>		[T_ZBX_INT, O_OPT,	P_SYS,	null,			null],
 	'mediatypeid'=>	[T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({add})'],
 	'sendto'=>		[T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({add})'],
-	'period'=>		[T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({add})'],
+	'period' =>		[T_ZBX_TP,  O_OPT,  null,   null,  'isset({add})', _('When active')],
 	'active'=>		[T_ZBX_INT, O_OPT,	null,	IN([MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]), null],
 
 	'severity'=>	[T_ZBX_INT, O_OPT,	null,	NOT_EMPTY,	null],
@@ -57,27 +57,21 @@ check_fields($fields);
 insert_js_function('add_media');
 
 if (isset($_REQUEST['add'])) {
-	$validator = new CTimePeriodValidator();
-	if ($validator->validate($_REQUEST['period'])) {
-		$severity = 0;
-		$_REQUEST['severity'] = getRequest('severity', []);
-		foreach ($_REQUEST['severity'] as $id) {
-			$severity |= 1 << $id;
-		}
+	$severity = 0;
+	$_REQUEST['severity'] = getRequest('severity', []);
+	foreach ($_REQUEST['severity'] as $id) {
+		$severity |= 1 << $id;
+	}
 
-		echo '<script type="text/javascript">
-				add_media('.CJs::encodeJson($_REQUEST['dstfrm']).','.
-				CJs::encodeJson($_REQUEST['media']).','.
-				CJs::encodeJson($_REQUEST['mediatypeid']).','.
-				CJs::encodeJson($_REQUEST['sendto']).','.
-				CJs::encodeJson($_REQUEST['period']).','.
-				CJs::encodeJson(getRequest('active', MEDIA_STATUS_DISABLED)).','.
-				$severity.');'.
-				'</script>';
-	}
-	else {
-		error($validator->getError());
-	}
+	echo '<script type="text/javascript">
+			add_media('.CJs::encodeJson($_REQUEST['dstfrm']).','.
+			CJs::encodeJson($_REQUEST['media']).','.
+			CJs::encodeJson($_REQUEST['mediatypeid']).','.
+			CJs::encodeJson($_REQUEST['sendto']).','.
+			CJs::encodeJson($_REQUEST['period']).','.
+			CJs::encodeJson(getRequest('active', MEDIA_STATUS_DISABLED)).','.
+			$severity.');'.
+			'</script>';
 }
 
 $config = select_config();

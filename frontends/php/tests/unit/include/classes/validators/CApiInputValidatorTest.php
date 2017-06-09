@@ -280,19 +280,25 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_ID],
 				0,
 				'/1/id',
-				0
+				'0'
 			],
 			[
 				['type' => API_ID],
 				12345,
 				'/1/id',
-				12345
+				'12345'
 			],
 			[
 				['type' => API_ID],
 				'012345',
 				'/1/id',
 				'12345'
+			],
+			[
+				['type' => API_ID],
+				'00',
+				'/1/id',
+				'0'
 			],
 			[
 				['type' => API_ID],
@@ -527,7 +533,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_IDS, 'flags' => API_NORMALIZE],
 				46342,
 				'/',
-				[46342]
+				['46342']
+			],
+			[
+				['type' => API_IDS, 'flags' => API_NORMALIZE],
+				'00',
+				'/',
+				['0']
 			],
 			[
 				['type' => API_IDS, 'flags' => API_NORMALIZE],
@@ -543,9 +555,9 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_IDS],
-				[0, 1, 2, 3, '4', '9223372036854775807'],
+				[0, 1, 2, 3, '00', '4', '9223372036854775807'],
 				'/',
-				[0, 1, 2, 3, '4', '9223372036854775807']
+				['0', '1', '2', '3', '0', '4', '9223372036854775807']
 			],
 			[
 				['type' => API_IDS],
@@ -563,7 +575,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_IDS, 'uniq' => true],
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7],
 				'/',
-				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7]
+				['0', '1', '2', '3', '4', '9223372036854775807', '5', '6', '7']
 			],
 			[
 				['type' => API_IDS, 'uniq' => true],
@@ -688,7 +700,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/',
 				[
 					[
-						'valuemapid' => 4,
+						'valuemapid' => '4',
 						'name' => 'APC Battery Replacement Status',
 						'mappings' => [
 							['value' => '1', 'newvalue' => 'unknown'],
@@ -701,7 +713,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					[
-						'valuemapid' => 5,
+						'valuemapid' => '5',
 						'name' => 'APC Battery Status',
 						'mappings' => [
 							['value' => '1', 'newvalue' => 'unknown'],
@@ -789,7 +801,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/',
 				[
 					[
-						'valuemapid' => 5,
+						'valuemapid' => '5',
 						'name' => 'APC Battery Status',
 						'mappings' => [
 							['value' => '1', 'newvalue' => 'unknown']
@@ -874,7 +886,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_SCRIPT_NAME],
 				'',
 				'/1/name',
-				'Invalid parameter "/1/name": directory or script name cannot be empty.'
+				'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				['type' => API_SCRIPT_NAME],
@@ -981,14 +993,20 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'1-7,00:00-24:00'
 			],
 			[
-				['type' => API_TIME_PERIOD, 'flags' => API_MULTIPLE],
+				['type' => API_TIME_PERIOD],
 				'1-5,09:00-18:00;6-7,09:00-15:00',
 				'/1/period',
 				'1-5,09:00-18:00;6-7,09:00-15:00'
 			],
 			[
+				['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/period',
+				'{$MACRO}'
+			],
+			[
 				['type' => API_TIME_PERIOD],
-				'1-5,09:00-18:00;6-7,09:00-15:00',
+				'{$MACRO}',
 				'/1/period',
 				'Invalid parameter "/1/period": a time period is expected.'
 			],
@@ -1337,6 +1355,66 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						'value' => 'value2'
 					]
 				]
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'30h',
+				'/1/time_unit',
+				'30h'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'2147483647s',
+				'/1/time_unit',
+				'2147483647s'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'3550w',
+				'/1/time_unit',
+				'3550w'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'2147483648s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a number is too large.'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'3551w',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a number is too large.'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'30mm',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a time unit is expected.'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:100'],
+				'101s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": value must be one of 1-100.'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:100'],
+				'100s',
+				'/1/time_unit',
+				'100s'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:100'],
+				'{$MACRO}',
+				'/1/time_unit',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'{$MACRO}',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a time unit is expected.'
 			]
 		];
 	}
@@ -1355,14 +1433,14 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(is_bool($rc));
 
 		if ($rc === true) {
-			$this->assertEquals(gettype($expected), gettype($data));
-			$this->assertEquals('string', gettype($error));
-			$this->assertEquals($expected, $data);
-			$this->assertEquals('', $error);
+			$this->assertSame(gettype($expected), gettype($data));
+			$this->assertSame('string', gettype($error));
+			$this->assertSame($expected, $data);
+			$this->assertSame('', $error);
 		}
 		else {
-			$this->assertEquals(gettype($expected), gettype($error));
-			$this->assertEquals($expected, $error);
+			$this->assertSame(gettype($expected), gettype($error));
+			$this->assertSame($expected, $error);
 		}
 	}
 
@@ -1542,9 +1620,9 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 	public function testApiUniqueness(array $rule, $data, $path, $rc_expected, $error_expected) {
 		$rc = CApiInputValidator::validateUniqueness($rule, $data, $path, $error);
 
-		$this->assertEquals(gettype($rc_expected), gettype($rc));
-		$this->assertEquals(gettype($error_expected), gettype($error));
-		$this->assertEquals($rc_expected, $rc);
-		$this->assertEquals($error_expected, $error);
+		$this->assertSame(gettype($rc_expected), gettype($rc));
+		$this->assertSame(gettype($error_expected), gettype($error));
+		$this->assertSame($rc_expected, $rc);
+		$this->assertSame($error_expected, $error);
 	}
 }

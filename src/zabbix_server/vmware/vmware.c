@@ -4179,7 +4179,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 {
 	const char			*__function_name = "zbx_vmware_service_get_perf_entity";
 
-	zbx_vmware_perf_entity_t	*pentity, entity = {(char *)type, (char *)id};
+	zbx_vmware_perf_entity_t	*pentity, entity = {.type = (char *)type, .id = (char *)id};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s", __function_name, type, id);
 
