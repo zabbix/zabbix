@@ -35,25 +35,33 @@ class CNavigationWidgetForm extends CWidgetForm {
 			if ($field_details) {
 				$item_id = $field_details[1];
 
-				$this->fields[] = (new CWidgetFieldHidden($field_key, $value, ZBX_WIDGET_FIELD_TYPE_STR))
-						->setRequired(true);
+				// map.name.#
+				$this->fields[] = (new CWidgetFieldHidden($field_key, null, ZBX_WIDGET_FIELD_TYPE_STR))
+					->setRequired(true)
+					->setValue($value);
 
+				// map.parent.#
+				$field_parent = (new CWidgetFieldHidden('map.parent.'.$item_id, null, ZBX_WIDGET_FIELD_TYPE_INT32))
+					->setRequired(true);
 				if (array_key_exists('map.parent.'.$item_id, $data)) {
-					$value = (int)$data['map.parent.'.$item_id];
-					$this->fields[] = (new CWidgetFieldHidden('map.parent.'.$item_id, $value, ZBX_WIDGET_FIELD_TYPE_INT32))
-							->setRequired(true);
+					$field_parent->setValue((int)$data['map.parent.'.$item_id]);
 				}
+				$this->fields[] = $field_parent;
 
+				// map.order.#
+				$field_order = (new CWidgetFieldHidden('map.order.'.$item_id, null, ZBX_WIDGET_FIELD_TYPE_INT32))
+					->setRequired(true);
 				if (array_key_exists('map.order.'.$item_id, $data)) {
-					$value = (int)$data['map.order.'.$item_id];
-					$this->fields[] = (new CWidgetFieldHidden('map.order.'.$item_id, $value, ZBX_WIDGET_FIELD_TYPE_INT32))
-							->setRequired(true);
+					$field_order->setValue((int)$data['map.order.'.$item_id]);
 				}
+				$this->fields[] = $field_order;
 
+				// mapid.#
+				$field_mapid = (new CWidgetFieldHidden('mapid.'.$item_id, null, ZBX_WIDGET_FIELD_TYPE_MAP));
 				if (array_key_exists('mapid.'.$item_id, $data) && $data['mapid.'.$item_id]) {
-					$value = $data['mapid.'.$item_id];
-					$this->fields[] = (new CWidgetFieldHidden('mapid.'.$item_id, $value, ZBX_WIDGET_FIELD_TYPE_MAP));
+					$field_mapid->setValue($data['mapid.'.$item_id]);
 				}
+				$this->fields[] = $field_mapid;
 			}
 		}
 	}

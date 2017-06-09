@@ -20,23 +20,8 @@
 
 class CWidgetFieldHidden extends CWidgetField
 {
-	public function __construct($name, $value = '', $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
-		parent::__construct($name);
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValue($value);
-
-		switch ($save_type) {
-			case ZBX_WIDGET_FIELD_TYPE_STR:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-				break;
-			case ZBX_WIDGET_FIELD_TYPE_INT32:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-				break;
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
-				break;
-			default:
-				break;
-		}
+	public function __construct($name, $default = null, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
+		parent::__construct($name, null, $default);
+		$this->setSaveType($save_type);
 	}
 }
