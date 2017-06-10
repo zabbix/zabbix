@@ -23,6 +23,7 @@ $form = (new CForm('post'))
 	->cleanItems()
 	->setId('widget_dialogue_form')
 	->setName('widget_dialogue_form');
+$js_scripts = [];
 
 $form_list = (new CFormList());
 
@@ -54,6 +55,24 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
 		);
 	}
+	elseif ($field instanceof CWidgetFieldGroup) {
+		// multiselect.js must be preloaded in parent view`
+
+		$field_groupids = (new CMultiSelect([
+			'name' => 'groupids[]',
+			'objectName' => 'hostGroup',
+			'data' => $data['captions']['groups'],
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=groupids_'.
+					'&srcfld1=groupid&multiselect=1'
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+		$form_list->addRow($field->getLabel(), $field_groupids);
+
+		$js_scripts[] = $field_groupids->getPostJS();
+	}
 	elseif ($field instanceof CWidgetFieldItem) {
 		$caption = array_key_exists($field->getValue(true), $data['captions']['items'])
 			? $data['captions']['items'][$field->getValue(true)]
@@ -79,6 +98,15 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		);
 	}
+	elseif ($field instanceof CWidgetFieldRadioButtonList) {
+		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue(true)))
+			->setModern($field->getModern());
+		foreach ($field->getValues() as $key => $value) {
+			$radio_button_list->addValue($value, $key, null, $field->getAction());
+		}
+
+		$form_list->addRow($field->getLabel(), $radio_button_list);
+	}
 }
 
 $form->addItem($form_list);
@@ -86,6 +114,10 @@ $form->addItem($form_list);
 $output = [
 	'body' => $form->toString()
 ];
+
+if ($js_scripts) {
+	$output['body'] .= get_js(implode("\n", $js_scripts));
+}
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

@@ -1141,6 +1141,7 @@ define('WIDGET_ZABBIX_STATUS',			'stszbx');
 define('WIDGET_CLOCK',					'clock');
 define('WIDGET_URL',					'url');
 define('WIDGET_ACTION_LOG',				'actlog');
+define('WIDGET_DATA_OVERVIEW',			'dataover');
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
 define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');

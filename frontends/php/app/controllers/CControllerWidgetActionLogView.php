@@ -77,7 +77,7 @@ class CControllerWidgetActionLogView extends CController
 			'sortorder' => $sortorder,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
+			]
 		]));
 	}
 

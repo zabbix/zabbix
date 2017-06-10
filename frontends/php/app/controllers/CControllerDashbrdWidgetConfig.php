@@ -74,39 +74,62 @@ class CControllerDashbrdWidgetConfig extends CController {
 	 * @return array
 	 */
 	private function getCaptions($form) {
-		$captions = [];
+		$captions = [
+			'groups' => [],
+			'items' => []
+		];
+
 		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldItem) {
-				if (!array_key_exists('items', $captions)) {
-					$captions['items'] = [];
+			if ($field instanceof CWidgetFieldGroup) {
+				foreach ($field->getValue(true) as $groupid) {
+					$captions['groups'][$groupid] = true;
 				}
-				if (bccomp($field->getValue(true), '0') === 1
-					&& !array_key_exists($field->getValue(true), $captions['items'])
-				){
-					$captions['items'][$field->getValue(true)] = '';
-				}
+			}
+			elseif ($field instanceof CWidgetFieldItem) {
+				$captions['items'][$field->getValue(true)] = '';
 			}
 		}
+		unset($captions['items'][0]);
 
 		foreach ($captions as $resource => $list) {
-			if (empty($list)) {
+			if (!$list) {
 				continue;
 			}
-			if ($resource === 'items') {
-				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'key_', 'name'],
-					'selectHosts' => ['name'],
-					'itemids' => array_keys($list),
-					'webitems' => true
-				]);
 
-				if ($items) {
-					$items = CMacrosResolverHelper::resolveItemNames($items);
+			switch ($resource) {
+				case 'groups':
+					$groups = API::HostGroup()->get([
+						'output' => ['groupid', 'name'],
+						'groupids' => array_keys($list)
+					]);
 
-					foreach ($items as $key => $item) {
-						$captions['items'][$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+					$captions['groups'] = [];
+
+					foreach ($groups as $group) {
+						$captions['groups'][] = [
+							'id' => $group['groupid'],
+							'name' => $group['name']
+						];
 					}
-				}
+					break;
+
+				case 'items'::
+					$items = API::Item()->get([
+						'output' => ['itemid', 'hostid', 'key_', 'name'],
+						'selectHosts' => ['name'],
+						'itemids' => array_keys($list),
+						'webitems' => true
+					]);
+
+					if ($items) {
+						$items = CMacrosResolverHelper::resolveItemNames($items);
+
+						foreach ($items as $item) {
+							$captions['items'][$item['itemid']] =
+								$item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+						}
+					}
+					break;
 			}
 		}
 

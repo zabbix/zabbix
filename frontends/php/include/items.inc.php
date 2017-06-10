@@ -646,19 +646,22 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param array  		$hostIds
- * @param array|null	$applicationIds		IDs of applications to filter items by
- * @param int    		$viewMode
+ * @param array|null $hostIds
+ * @param array|null $applicationIds  IDs of applications to filter items by
+ * @param int        $viewMode
  *
  * @return CTableInfo
  */
-function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode) {
+function getItemsDataOverview(array $hostIds = null, array $applicationIds = null, $viewMode) {
 	$sqlFrom = '';
 	$sqlWhere = '';
 
+	if ($hostIds !== null) {
+		$sqlWhere .= ' AND '.dbConditionInt('h.hostid', $hostIds);
+	}
 	if ($applicationIds !== null) {
-		$sqlFrom = 'items_applications ia,';
-		$sqlWhere = ' AND i.itemid=ia.itemid AND '.dbConditionInt('ia.applicationid', $applicationIds);
+		$sqlFrom .= 'items_applications ia,';
+		$sqlWhere .= ' AND i.itemid=ia.itemid AND '.dbConditionInt('ia.applicationid', $applicationIds);
 	}
 
 	$dbItems = DBfetchArray(DBselect(
@@ -667,9 +670,8 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		' FROM hosts h,'.$sqlFrom.'items i'.
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
 			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-		' WHERE '.dbConditionInt('h.hostid', $hostIds).
+		' WHERE h.hostid=i.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
 				$sqlWhere
@@ -690,6 +692,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		'output' => ['name', 'hostid', 'status'],
 		'monitored_hosts' => true,
 		'hostids' => $hostIds,
+		'applicationids' => $applicationIds,
 		'with_monitored_items' => true,
 		'preservekeys' => true,
 		'selectGraphs' => API_OUTPUT_COUNT,

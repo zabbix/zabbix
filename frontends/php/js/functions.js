@@ -715,8 +715,21 @@ function executeScript(hostid, scriptid, confirmation) {
 	$.fn.serializeJSON = function() {
 		var json = {};
 
-		jQuery.map($(this).serializeArray(), function(n, i) {
-			json[n['name']] = n['value'];
+		jQuery.map($(this).serializeArray(), function(n) {
+			var	pos = n['name'].indexOf('[]');
+
+			if (pos != -1 && n['name'].length == pos + 2) {
+				n['name'] = n['name'].substr(0, pos);
+
+				if (typeof json[n['name']] === 'undefined') {
+					json[n['name']] = [];
+				}
+
+				json[n['name']].push(n['value']);
+			}
+			else {
+				json[n['name']] = n['value'];
+			}
 		});
 
 		return json;
