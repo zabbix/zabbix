@@ -65,7 +65,8 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			'popup' => [
 				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'
-			]
+			],
+			'add_post_js' => false
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 

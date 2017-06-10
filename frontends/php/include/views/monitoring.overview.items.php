@@ -92,8 +92,9 @@ $widget->addItem($filter);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
-	$hostids = $this->data['applicationIds'] ? null : array_keys($this->data['pageFilter']->hosts);
-	$dataTable = getItemsDataOverview($hostids, $this->data['applicationIds'], $this->data['view_style']);
+	$dataTable = getItemsDataOverview($this->data['pageFilter']->groupids, $this->data['applicationIds'],
+		$this->data['view_style']
+	);
 }
 else {
 	$dataTable = new CTableInfo();

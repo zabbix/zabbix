@@ -54,15 +54,13 @@ class CControllerWidgetDataOverView extends CController
 	protected function doAction()
 	{
 		$fields = $this->getInput('fields');
-		$groupids = array_key_exists('groupids', $fields) ? $fields['groupids'] : null;
-		$style = array_key_exists('style', $fields) ? $fields['style'] : STYLE_LEFT;
 		$application = array_key_exists('application', $fields) ? $fields['application'] : '';
 
 		$data = [
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_DATA_OVERVIEW]),
-			'hostids' => null,
+			'groupids' => array_key_exists('groupids', $fields) ? (array) $fields['groupids'] : null,
 			'applicationids' => null,
-			'style' => $style,
+			'style' => array_key_exists('style', $fields) ? $fields['style'] : STYLE_LEFT,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -72,16 +70,8 @@ class CControllerWidgetDataOverView extends CController
 		if ($application !== '') {
 			$data['applicationids'] = array_keys(API::Application()->get([
 				'output' => [],
-				'groupids' => $groupids,
+				'groupids' => $data['groupids'],
 				'search' => ['name' => $application],
-				'preservekeys' => true
-			]));
-		}
-		// host group filter
-		elseif ($groupids) {
-			$data['hostids'] = array_keys(API::Host()->get([
-				'output' => [],
-				'groupids' => $groupids,
 				'preservekeys' => true
 			]));
 		}

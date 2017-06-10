@@ -29,7 +29,8 @@ class CMultiSelect extends CTag {
 	private $js_event_name = '';
 
 	/**
-	 * @param array $options['objectOptions'] 	an array of parameters to be added to the request URL
+	 * @param array $options['objectOptions']  an array of parameters to be added to the request URL
+	 * @param bool  $options['add_post_js']
 	 *
 	 * @see jQuery.multiSelect()
 	 */
@@ -82,7 +83,10 @@ class CMultiSelect extends CTag {
 		}
 
 		$this->params = $params;
-		zbx_add_post_js($this->getPostJS());
+
+		if (!array_key_exists('add_post_js', $options) || $options['add_post_js']) {
+			zbx_add_post_js($this->getPostJS());
+		}
 	}
 
 	public function setWidth($value) {
