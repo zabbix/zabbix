@@ -41,7 +41,8 @@ class CWidgetConfig
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_ACTION_LOG			=> _('Action log'),
-			WIDGET_DATA_OVERVIEW		=> _('Data overview')
+			WIDGET_DATA_OVERVIEW		=> _('Data overview'),
+			WIDGET_TRIG_OVERVIEW		=> _('Trigger overview')
 		];
 	}
 
@@ -65,7 +66,8 @@ class CWidgetConfig
 			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
 			WIDGET_ACTION_LOG			=> ['width' => 6, 'height' => 5],
-			WIDGET_DATA_OVERVIEW		=> ['width' => 6, 'height' => 5]
+			WIDGET_DATA_OVERVIEW		=> ['width' => 6, 'height' => 5],
+			WIDGET_TRIG_OVERVIEW		=> ['width' => 6, 'height' => 5]
 		];
 	}
 
@@ -107,6 +109,7 @@ class CWidgetConfig
 			case WIDGET_HOST_STATUS:
 			case WIDGET_ACTION_LOG:
 			case WIDGET_DATA_OVERVIEW:
+			case WIDGET_TRIG_OVERVIEW:
 				return SEC_PER_MIN;
 
 			case WIDGET_ZABBIX_STATUS:
@@ -188,6 +191,9 @@ class CWidgetConfig
 
 			case WIDGET_DATA_OVERVIEW:
 				return new CDataOverviewWidgetForm($data);
+
+			case WIDGET_TRIG_OVERVIEW:
+				return new CTrigOverviewWidgetForm($data);
 
 			default:
 				// TODO VM: delete this case after all widget forms will be created

@@ -51,8 +51,7 @@ class CControllerWidgetDataOverView extends CController
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction()
-	{
+	protected function doAction() {
 		$fields = $this->getInput('fields');
 		$application = array_key_exists('application', $fields) ? $fields['application'] : '';
 

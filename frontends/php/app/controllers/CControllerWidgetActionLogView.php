@@ -51,8 +51,7 @@ class CControllerWidgetActionLogView extends CController
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction()
-	{
+	protected function doAction() {
 		$data = [
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG])
 		];
