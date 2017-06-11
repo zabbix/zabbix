@@ -29,17 +29,6 @@ class CScreenDataOverview extends CScreenBase {
 	public function get() {
 		$groupid = $this->screenitem['resourceid'];
 
-		// application filter
-		$applicationIds = null;
-		if ($this->screenitem['application'] !== '') {
-			$applications = API::Application()->get([
-				'output' => ['applicationid'],
-				'groupids' => $groupid,
-				'search' => ['name' => $this->screenitem['application']]
-			]);
-			$applicationIds = zbx_objectValues($applications, 'applicationid');
-		}
-
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
 			'groupids' => $groupid
@@ -51,7 +40,7 @@ class CScreenDataOverview extends CScreenBase {
 				->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		$table = getItemsDataOverview((array) $groupid, $applicationIds, $this->screenitem['style']);
+		$table = getItemsDataOverview((array) $groupid, $this->screenitem['application'], $this->screenitem['style']);
 
 		$footer = (new CList())
 			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))

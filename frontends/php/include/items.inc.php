@@ -647,14 +647,24 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  * Retrieve overview table object for items.
  *
  * @param array|null $groupids
- * @param array|null $applicationids  IDs of applications to filter items by
+ * @param string     $application  IDs of applications to filter items by
  * @param int        $viewMode
  *
  * @return CTableInfo
  */
-function getItemsDataOverview(array $groupids = null, array $applicationids = null, $viewMode) {
-	if ($applicationids !== null) {
+function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
+	// application filter
+	if ($application !== '') {
+		$applicationids = array_keys(API::Application()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]));
 		$groupids = null;
+	}
+	else {
+		$applicationids = null;
 	}
 
 	$db_items = API::Item()->get([

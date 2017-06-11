@@ -213,24 +213,9 @@ if ($type == SHOW_TRIGGERS) {
 }
 // fetch item data
 else {
-	// filter data
-	$filter = [
+	$data['filter'] = [
 		'application' => CProfile::get('web.overview.filter.application', '')
 	];
-
-	// application filter
-	$applicationIds = null;
-	if ($filter['application'] !== '') {
-		$applications = API::Application()->get([
-			'output' => ['applicationid'],
-			'groupids' => $data['pageFilter']->groupids,
-			'search' => ['name' => $filter['application']]
-		]);
-		$applicationIds = zbx_objectValues($applications, 'applicationid');
-	}
-
-	$data['filter'] = $filter;
-	$data['applicationIds'] = $applicationIds;
 
 	$overviewView = new CView('monitoring.overview.items', $data);
 }

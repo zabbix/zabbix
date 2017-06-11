@@ -92,7 +92,7 @@ $widget->addItem($filter);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
-	$dataTable = getItemsDataOverview($this->data['pageFilter']->groupids, $this->data['applicationIds'],
+	$dataTable = getItemsDataOverview($this->data['pageFilter']->groupids, $this->data['filter']['application'],
 		$this->data['view_style']
 	);
 }
