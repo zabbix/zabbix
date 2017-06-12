@@ -221,6 +221,27 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 	}
 
+	/**
+	* @dataProvider allMediaTypes
+	*/
+	public function testFormAdministrationMediaTypes_SimpleCancel($mediatype) {
+		$name = $mediatype['description'];
+
+		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
+		$oldHashMediaType = DBhash($sql);
+
+		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->zbxTestCheckTitle('Configuration of media types');
+		$this->zbxTestClickLinkTextWait($name);
+		$this->zbxTestClickWait('cancel');
+		$this->zbxTestCheckTitle('Configuration of media types');
+		$this->zbxTestCheckHeader('Media types');
+		$this->zbxTestTextPresent($name);
+		$this->zbxTestCheckFatalErrors();
+
+		$this->assertEquals($oldHashMediaType, DBhash($sql));
+	}
+
 	public static function newMediaTypes() {
 		$data=[
 			[
@@ -299,27 +320,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestTextNotPresent('Cannot add media type');
 		$this->zbxTestTextPresent('Media type added');
 		$this->zbxTestTextPresent($data['Description']);
-	}
-
-	/**
-	* @dataProvider allMediaTypes
-	*/
-	public function testFormAdministrationMediaTypes_SimpleCancel($mediatype) {
-		$name = $mediatype['description'];
-
-		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
-		$oldHashMediaType = DBhash($sql);
-
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickWait('cancel');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckFatalErrors();
-
-		$this->assertEquals($oldHashMediaType, DBhash($sql));
 	}
 
 	/**
@@ -331,10 +332,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$oldHashMediaType=DBhash($sqlMediaType);
 
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
-		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type updated');
+		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckFatalErrors();
 
 		$newHashMediaType = DBhash($sqlMediaType);
