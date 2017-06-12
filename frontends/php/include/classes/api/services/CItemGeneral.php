@@ -1146,7 +1146,8 @@ abstract class CItemGeneral extends CApiService {
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
-		if ($options['selectMasterItem'] && $options['selectMasterItem'] != API_OUTPUT_COUNT) {
+		if (array_key_exists('selectMasterItem', $options) && $options['selectMasterItem']
+				&& $options['selectMasterItem'] != API_OUTPUT_COUNT) {
 			$relation = new CRelationMap();
 
 			foreach ($result as $item) {

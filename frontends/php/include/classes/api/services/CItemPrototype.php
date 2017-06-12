@@ -235,6 +235,12 @@ class CItemPrototype extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+
+		if ($options['selectMasterItem'] && $options['output'] != API_OUTPUT_EXTEND
+				&& $options['output'] != API_OUTPUT_COUNT) {
+			$sqlParts['select'][] = 'i.master_itemid';
+		}
+
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
