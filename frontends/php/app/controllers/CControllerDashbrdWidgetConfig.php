@@ -113,7 +113,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 					}
 					break;
 
-				case 'items'::
+				case 'items':
 					$items = API::Item()->get([
 						'output' => ['itemid', 'hostid', 'key_', 'name'],
 						'selectHosts' => ['name'],
