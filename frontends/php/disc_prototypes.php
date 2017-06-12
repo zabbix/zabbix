@@ -571,6 +571,7 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'selectApplications' => API_OUTPUT_EXTEND,
+		'selectMasterItem' => ['name'],
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	]);
@@ -588,12 +589,6 @@ else {
 	}
 	unset($item);
 
-	$master_itemids = array_unique(zbx_objectValues($data['items'], 'master_itemid'));
-	$data['master_items'] = API::ItemPrototype()->get([
-		'output' => ['name'],
-		'itemids' => array_filter($master_itemids),
-		'preservekeys' => true
-	]);
 	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
 	order_result($data['items'], $sortField, $sortOrder);
