@@ -706,6 +706,12 @@ class CConfigurationExportBuilder {
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
+				$data['master_item_prototype'] = ($item['type'] == ITEM_TYPE_DEPENDENT)
+					? $item['masterItem']['key_']
+					: '';
+			}
+			else {
+				$data['master_item'] = ($item['type'] == ITEM_TYPE_DEPENDENT) ? $item['masterItem']['key_'] : '';
 			}
 
 			if (isset($item['interface_ref'])) {
