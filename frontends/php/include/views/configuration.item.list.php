@@ -98,10 +98,9 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	if ($item['master_itemid']) {
-		$description[] = (new CLink(
-			CHtml::encode($data['master_items'][$item['master_itemid']]['name']),
-			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_itemid']
+	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+		$description[] = (new CLink(CHtml::encode($item['masterItem']['name']),
+			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['masterItem']['itemid']
 		))->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}

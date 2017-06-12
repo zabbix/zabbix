@@ -1086,11 +1086,12 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 				'privatekey', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'master_itemid'
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectPreprocessing' => ['type', 'params'],
+			'selectMasterItem' => ['name', 'key_'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
@@ -1110,27 +1111,19 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		]);
 		$item = [];
 		$host = $hosts[0];
+		if ($host && hasRequest('master_itemid')) {
+			$item['masterItem'] = API::Item()->get([
+				'itemids' => getRequest('master_itemid'),
+				'output' => ['name', 'key_'],
+				'filter' => ['hostid' => $host['hostid']]
+			])[0];
+		}
 	}
 
 	$data = getItemFormData($item);
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['config'] = select_config();
 	$data['host'] = $host;
-
-	if (hasRequest('itemid') && !getRequest('form_refresh')) {
-		$data['inventory_link'] = $item['inventory_link'];
-		$data['master_itemid'] = $item['master_itemid'];
-	}
-
-	$data['master_itemname'] = '';
-
-	if ($data['type'] == ITEM_TYPE_DEPENDENT && $data['master_itemid']) {
-		$master = API::Item()->get([
-			'output' => ['name', 'key_'],
-			'itemids' => $data['master_itemid']
-		])[0];
-		$data['master_itemname'] = $master['name'].NAME_DELIMITER.$master['key_'];
-	}
 
 	// render view
 	$itemView = new CView('configuration.item.edit', $data);
@@ -1294,7 +1287,7 @@ else {
 		'search' => [],
 		'output' => [
 			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
-			'templateid', 'flags', 'state', 'master_itemid'
+			'templateid', 'flags', 'state'
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
@@ -1302,6 +1295,7 @@ else {
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
+		'selectMasterItem' => ['name'],
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	];
@@ -1545,13 +1539,6 @@ else {
 			}
 		}
 	}
-
-	$master_itemids = array_unique(zbx_objectValues($data['items'], 'master_itemid'));
-	$data['master_items'] = API::Item()->get([
-		'output' => ['name'],
-		'itemids' => array_filter($master_itemids),
-		'preservekeys' => true
-	]);
 
 	if ($sortField === 'status') {
 		orderItemsByStatus($data['items'], $sortOrder);

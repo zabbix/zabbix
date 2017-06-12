@@ -517,9 +517,10 @@ if (isset($_REQUEST['form'])) {
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-				'snmpv3_contextname', 'master_itemid'
+				'snmpv3_contextname'
 			],
-			'selectPreprocessing' => ['type', 'params']
+			'selectPreprocessing' => ['type', 'params'],
+			'selectMasterItem' => ['name', 'key_']
 		]);
 		$itemPrototype = reset($itemPrototype);
 		foreach ($itemPrototype['preprocessing'] as &$step) {
@@ -527,22 +528,23 @@ if (isset($_REQUEST['form'])) {
 		}
 		unset($step);
 	}
+	elseif (hasRequest('master_itemid') && hasRequest('parent_discoveryid')) {
+		$discovery_rule = API::DiscoveryRule()->get([
+			'output' => ['hostid'],
+			'itemids' => getRequest('parent_discoveryid'),
+			'editable' => true
+		])[0];
+		if ($discovery_rule) {
+			$itemPrototype['masterItem'] = API::ItemPrototype()->get([
+				'itemids' => getRequest('master_itemid'),
+				'output' => ['name', 'key_'],
+				'filter' => ['hostid' => $discovery_rule['hostid']]
+			])[0];
+		}
+	}
 
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
-	$data['master_itemname'] = '';
-
-	if (hasRequest('itemid') && !getRequest('form_refresh')) {
-		$data['master_itemid'] = $itemPrototype['master_itemid'];
-	}
-
-	if ($data['type'] == ITEM_TYPE_DEPENDENT && $data['master_itemid']) {
-		$master = API::ItemPrototype()->get([
-			'output' => ['name', 'key_'],
-			'itemids' => $data['master_itemid']
-		])[0];
-		$data['master_itemname'] = $master['name'].NAME_DELIMITER.$master['key_'];
-	}
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.edit', $data);

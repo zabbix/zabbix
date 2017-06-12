@@ -821,6 +821,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'description' => getRequest('description', ''),
 		'key' => getRequest('key', ''),
 		'master_itemid' => getRequest('master_itemid', 0),
+		'master_itemname' => getRequest('master_itemname', ''),
 		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', 90),
@@ -858,6 +859,15 @@ function getItemFormData(array $item = [], array $options = []) {
 		'initial_item_type' => null,
 		'templates' => []
 	];
+
+	// Dependent item initialization by master_itemid.
+	if (array_key_exists('masterItem', $item)) {
+		$data['type'] = ITEM_TYPE_DEPENDENT;
+		$data['master_itemid'] = $item['masterItem']['itemid'];
+		$data['master_itemname'] = $item['masterItem']['name'].NAME_DELIMITER.$item['masterItem']['key_'];
+		// Do not initialize item data if only materItem array was passed.
+		unset($item['masterItem']);
+	}
 
 	// hostid
 	if (!empty($data['parent_discoveryid'])) {
@@ -1157,6 +1167,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['authtype'] = ITEM_AUTHTYPE_PASSWORD;
 		$data['publickey'] = '';
 		$data['privatekey'] = '';
+	}
+
+	if ($data['type'] != ITEM_TYPE_DEPENDENT) {
+		$data['master_itemid'] = 0;
 	}
 
 	return $data;
