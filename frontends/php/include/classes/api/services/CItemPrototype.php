@@ -703,7 +703,7 @@ class CItemPrototype extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$dbItems = $this->get([
-			'output' => ['itemid', 'flags', 'type', 'hostid', 'master_itemid'],
+			'output' => ['itemid', 'flags', 'type', 'hostid', 'master_itemid', 'name'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true

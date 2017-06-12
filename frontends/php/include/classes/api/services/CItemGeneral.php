@@ -1200,20 +1200,13 @@ abstract class CItemGeneral extends CApiService {
 
 			// TODO: Do we need permissions check on master item?!
 
-			$query = 'SELECT hostid FROM items WHERE itemid='.zbx_dbstr($item['master_itemid']);
-			$master = DBfetch(DBselect($query));
-
-			if (!array_key_exists('hostid', $master) || $master['hostid'] != $item['hostid']) {
-				$field = 'hostid';
-				$error = _('item hostid and master hostid should match');
-				break;
-			}
-
 			$master_items = [];
-			$current_level = 1;
+			$current_level = 0;
 			$master_itemid = $item['master_itemid'];
+			$master_items[$master_itemid] = $item;
 
 			do {
+				// Validate maximum master items count.
 				if ($current_level > 3) {
 					$field = 'master_itemid';
 					$error = _('maximum master items count reached');
@@ -1221,17 +1214,34 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				$master_item = API::Item()->get([
-					'output' => ['type', 'master_itemid'],
+					'output' => ['type', 'name', 'hostid', 'master_itemid'],
 					'itemids' => $master_itemid
 				])[0];
-				$master_items[] = $master_item;
-				$master_itemid = ($master_item['type'] == ITEM_TYPE_DEPENDENT) ? $master_item['master_itemid'] : 0;
+				$master_itemid = ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT)
+					? $master_item['master_itemid']
+					: 0;
+				$master_items[$master_itemid] = $master_item;
+
+				if ($master_item['hostid'] != $item['hostid']) {
+					$field = 'hostid';
+					$error = _('item hostid and master hostid should match');
+					break;
+				}
+
+				// Validate for circular references
+				if (array_key_exists($master_itemid, $master_items)) {
+					$dependent_item = $master_items[$master_item['itemid']];
+					$field = 'master_itemid';
+					$error = _s('dependent item "%1$s" is already master of "%2$s"', $dependent_item['name'],
+						$master_item['name']
+					);
+					break;
+				}
+
 				++$current_level;
 			} while ($master_itemid);
 
 			// TODO: Validation - Tree already have maximum count of children.
-
-			// TODO: Validation - Recursion.
 		}
 
 		if ($error) {
