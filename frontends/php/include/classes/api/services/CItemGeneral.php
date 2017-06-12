@@ -1208,9 +1208,30 @@ abstract class CItemGeneral extends CApiService {
 				$error = _('item hostid and master hostid should match');
 				break;
 			}
-			// TODO: Validation - Item can not be master item, tree is already at maximum allowed nesting level.
+
+			$master_items = [];
+			$current_level = 1;
+			$master_itemid = $item['master_itemid'];
+
+			do {
+				if ($current_level > 3) {
+					$field = 'master_itemid';
+					$error = _('maximum parent items count reached');
+					break;
+				}
+
+				$master_item = API::Item()->get([
+					'output' => ['type', 'master_itemid'],
+					'itemids' => $master_itemid
+				])[0];
+				$master_items[] = $master_item;
+				$master_itemid = ($master_item['type'] == ITEM_TYPE_DEPENDENT) ? $master_item['master_itemid'] : 0;
+				++$current_level;
+			} while ($master_itemid);
 
 			// TODO: Validation - Tree already have maximum count of children.
+
+			// TODO: Validation - Recursion.
 		}
 
 		if ($error) {
