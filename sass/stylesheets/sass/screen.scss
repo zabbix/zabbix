@@ -4416,6 +4416,7 @@ tr.cursor-move {
 }
 
 .navtree {
+	$max_depth: 10;
 	.tree {
 		overflow-y: auto;
 		overflow-x: hidden;
@@ -4433,35 +4434,10 @@ tr.cursor-move {
 			padding-left: 10px;
 		}
 
-		.tree-list[data-depth="1"] span.row {
-			padding-left: 40px;
-		}
-		.tree-list[data-depth="2"] span.row {
-			padding-left: 55px;
-		}
-		.tree-list[data-depth="3"] span.row {
-			padding-left: 70px;
-		}
-		.tree-list[data-depth="4"] span.row {
-			padding-left: 85px;
-		}
-		.tree-list[data-depth="5"] span.row {
-			padding-left: 100px;
-		}
-		.tree-list[data-depth="6"] span.row {
-			padding-left: 115px;
-		}
-		.tree-list[data-depth="7"] span.row {
-			padding-left: 130px;
-		}
-		.tree-list[data-depth="8"] span.row {
-			padding-left: 145px;
-		}
-		.tree-list[data-depth="9"] span.row {
-			padding-left: 160px;
-		}
-		.tree-list[data-depth="10"] span.row {
-			padding-left: 175px;
+		@for $i from 1 through $max_depth {
+			.tree-list[data-depth="#{$i}"] span.row {
+				padding-left: 25px + ($i * 15px);
+			}
 		}
 
 		.arrow-down, .arrow-right {
@@ -4475,11 +4451,11 @@ tr.cursor-move {
 			display: none;
 		}
 
-		.opened > ul{
-			display:block;
+		.opened > ul {
+			display: block;
 		}
-		.closed > ul{
-			display:none;
+		.closed > ul {
+			display: none;
 		}
 
 		.tools {
@@ -4510,7 +4486,7 @@ tr.cursor-move {
 
 		.sortable-item-placeholder {
 			background: #f5f5f5;
-			height:33px;
+			height: 33px;
 		}
 
 		.ui-sortable-helper {
@@ -4520,7 +4496,7 @@ tr.cursor-move {
 			border-style: solid;
 		}
 
-		.drop-hover>.row {
+		.drop-hover > .row {
 			background: #faebd7;
 		}
 	}
