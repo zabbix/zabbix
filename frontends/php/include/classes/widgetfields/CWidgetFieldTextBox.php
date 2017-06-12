@@ -24,13 +24,4 @@ class CWidgetFieldTextBox extends CWidgetField
 		parent::__construct($name, $label, $default, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
-
-	public function validate() {
-		$errors = [];
-		if ($this->required === true && $this->value == '') {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
-		}
-
-		return $errors;
-	}
 }
