@@ -1216,7 +1216,7 @@ abstract class CItemGeneral extends CApiService {
 			do {
 				if ($current_level > 3) {
 					$field = 'master_itemid';
-					$error = _('maximum parent items count reached');
+					$error = _('maximum master items count reached');
 					break;
 				}
 
