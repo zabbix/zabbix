@@ -23,10 +23,11 @@ class CNavigationWidgetForm extends CWidgetForm {
 		parent::__construct($data);
 
 		// widget reference field
-		$reference_field = (new CWidgetFieldReference());
-		$reference = array_key_exists($reference_field->getName(), $data) ? $data[$reference_field->getName()] : '';
-		$reference_field->setValue($reference);
-		$this->fields[] = $reference_field;
+		$field_reference = (new CWidgetFieldReference())->setRequired(true);
+		if (array_key_exists($field_reference->getName(), $data)) {
+			$field_reference->setValue($data[$field_reference->getName()]);
+		}
+		$this->fields[] = $field_reference;
 
 		// Register dynamically created item fields.
 		foreach ($data as $field_key => $value) {

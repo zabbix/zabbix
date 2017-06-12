@@ -59,7 +59,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 	}
 
 	elseif ($field instanceof CWidgetFieldReference) {
-		$form->addVar($field->getName(), $field->getValue()?:'');
+		$form->addVar($field->getName(), $field->getValue() ?: '');
 
 		if (!$field->getValue()) {
 			$javascript = $field->getJavascript('#'.$form->getAttribute('id'));

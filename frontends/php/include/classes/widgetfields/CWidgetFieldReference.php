@@ -21,20 +21,11 @@
 class CWidgetFieldReference extends CWidgetField {
 	public function __construct() {
 		/*
-		 * Field name should always be same for all references. It is needed to make possible search if value is not taken 
-		 * by some other widget in same dashboard.
+		 * All reference fields for all widgets on dashboard should share the same name.
+		 * It is needed to make possible search if value is not taken by some other widget in same dashboard.
 		 */
-		parent::__construct('reference', '', '', null);
+		parent::__construct('reference', '', null, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-	}
-
-	public function validate() {
-		$errors = [];
-		if ($this->value === '') {
-			$errors[] = _s('Reference is not set.');
-		}
-
-		return $errors;
 	}
 
 	public function getJavascript($form_selector) {
