@@ -1201,9 +1201,10 @@ abstract class CItemGeneral extends CApiService {
 			// TODO: Do we need permissions check on master item?!
 
 			$master_items = [];
+			$master_item = $item;
 			$current_level = 0;
 			$master_itemid = $item['master_itemid'];
-			$master_items[$master_itemid] = $item;
+			$master_items[$item['itemid']] = $item;
 
 			do {
 				// Validate maximum master items count.
@@ -1220,7 +1221,7 @@ abstract class CItemGeneral extends CApiService {
 				$master_itemid = ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT)
 					? $master_item['master_itemid']
 					: 0;
-				$master_items[$master_itemid] = $master_item;
+				$master_items[$master_item['itemid']] = $master_item;
 
 				if ($master_item['hostid'] != $item['hostid']) {
 					$field = 'hostid';
@@ -1230,7 +1231,7 @@ abstract class CItemGeneral extends CApiService {
 
 				// Validate for circular references
 				if (array_key_exists($master_itemid, $master_items)) {
-					$dependent_item = $master_items[$master_item['itemid']];
+					$dependent_item = $master_items[$master_itemid];
 					$field = 'master_itemid';
 					$error = _s('dependent item "%1$s" is already master of "%2$s"', $dependent_item['name'],
 						$master_item['name']
@@ -1241,7 +1242,24 @@ abstract class CItemGeneral extends CApiService {
 				++$current_level;
 			} while ($master_itemid);
 
-			// TODO: Validation - Tree already have maximum count of children.
+			// Validate children count.
+			if (!$master_item['master_itemid']) {
+				$total_children = 0;
+				$children = [$master_item['itemid']];
+				do {
+					$children = API::Item()->get([
+						'output' => ['itemid'],
+						'filter' => ['master_itemid' => $children]
+					]);
+					$children = zbx_objectValues($children, 'itemid');
+					$total_children = $total_children + count($children);
+				} while ($children);
+
+				if ($total_children > 998) {
+					$field = 'master_itemid';
+					$error = _('maximum dependent items count reached');
+				}
+			}
 		}
 
 		if ($error) {
