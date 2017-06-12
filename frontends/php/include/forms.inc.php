@@ -861,7 +861,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	];
 
 	// Dependent item initialization by master_itemid.
-	if (array_key_exists('masterItem', $item)) {
+	if (!hasRequest('form_refresh') && array_key_exists('masterItem', $item)) {
 		$data['type'] = ITEM_TYPE_DEPENDENT;
 		$data['master_itemid'] = $item['masterItem']['itemid'];
 		$data['master_itemname'] = $item['masterItem']['name'].NAME_DELIMITER.$item['masterItem']['key_'];
