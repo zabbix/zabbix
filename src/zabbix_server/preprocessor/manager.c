@@ -487,7 +487,8 @@ static void	preprocessor_enqueue(preprocessing_manager_t *manager, zbx_ipc_messa
 	else
 		zbx_queue_enqueue_after(&manager->queue, master, &request, &enqueued_at);
 
-	preprocessor_link_delta_items(manager, enqueued_at, item);
+	if (REQUEST_STATE_QUEUED != request.state)
+		preprocessor_link_delta_items(manager, enqueued_at, item);
 
 	/* if no preprocessing is needed, dependent items are enqueued */
 	if (REQUEST_STATE_DONE == request.state)
