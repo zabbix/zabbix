@@ -83,11 +83,17 @@ foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
 	if (!empty($item['template_host'])) {
-		$description[] = (new CLink(CHtml::encode($item['template_host']['name']),
-			'?hostid='.$item['template_host']['hostid'].'&filter_set=1'
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
+		if (array_key_exists($item['template_host']['hostid'], $data['writable_templates'])) {
+			$description[] = (new CLink(CHtml::encode($item['template_host']['name']),
+				'?hostid='.$item['template_host']['hostid'].'&filter_set=1'
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$description[] = (new CSpan(CHtml::encode($item['template_host']['name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
 		$description[] = NAME_DELIMITER;
 	}
 
@@ -140,27 +146,40 @@ foreach ($this->data['items'] as $item) {
 
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
-		$triggerDescription = [];
+		$trigger_description = [];
+
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$triggerDescription[] = (new CSpan('HOST'))->addClass(ZBX_STYLE_GREY);
-				$triggerDescription[] = ':';
+				$trigger_description[] = (new CSpan('HOST'))->addClass(ZBX_STYLE_GREY);
+				$trigger_description[] = ':';
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = (new CLink(
-					CHtml::encode($realHost['name']),
-					'triggers.php?hostid='.$realHost['hostid']))
-					->addClass(ZBX_STYLE_GREY);
-				$triggerDescription[] = ':';
+
+				if (array_key_exists($realHost['hostid'], $data['writable_templates'])) {
+					$trigger_description[] = (new CLink(CHtml::encode($realHost['name']),
+						'triggers.php?hostid='.$realHost['hostid']
+					))->addClass(ZBX_STYLE_GREY);
+				}
+				else {
+					$trigger_description[] = (new CSpan(CHtml::encode($realHost['name'])))->addClass(ZBX_STYLE_GREY);
+				}
+
+				$trigger_description[] = ':';
 			}
 		}
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		$triggerDescription[] = new CLink(CHtml::encode($trigger['description']),
-			'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
-		);
+		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
+		}
+		else {
+			$trigger_description[] = new CLink(
+				CHtml::encode($trigger['description']),
+				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
+			);
+		}
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -180,7 +199,7 @@ foreach ($this->data['items'] as $item) {
 
 		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $this->data['config']),
-			$triggerDescription,
+			$trigger_description,
 			$expression,
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))

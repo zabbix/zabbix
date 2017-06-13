@@ -1273,8 +1273,10 @@ class CUser extends CApiService {
 			}
 		}
 
-		if (!function_exists('ldap_connect')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Probably php-ldap module is missing.'));
+		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
+
+		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $ldap_status['error']);
 		}
 
 		$ldapValidator = new CLdapAuthValidator(['conf' => $cnf]);

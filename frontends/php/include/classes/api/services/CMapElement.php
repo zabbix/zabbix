@@ -91,7 +91,7 @@ abstract class CMapElement extends CApiService {
 
 			if (!$elementtype_validator->validate($selement['elementtype'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'expandproblem', _s('value must be one of %1$s', implode(', ', $element_types))
+					'elementtype', _s('value must be one of %1$s', implode(', ', $element_types))
 				));
 			}
 
@@ -636,8 +636,8 @@ abstract class CMapElement extends CApiService {
 			// Change type from trigger to something.
 			if ($selement['elementtype'] != $db_selement['elementtype']
 					&& $db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-				foreach ($selement['elements'] as $element) {
-					$triggers_to_delete[] = $element['triggerid'];
+				foreach ($db_selement['elements'] as $db_element) {
+					$triggers_to_delete[] = $db_element['selement_triggerid'];
 				}
 			}
 
