@@ -207,7 +207,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$grid_widgets[$widgetid] = [
 				'widgetid' => $widgetid,
 				'type' => $widget['type'],
-				'triggers' => CWidgetConfig::getTriggers($widget['type']),
 				'header' => $widget['name'],
 				'pos' => [
 					'row' => (int) $widget['row'],

@@ -8,13 +8,19 @@ if (typeof addPopupValues === 'undefined') {
 	var addPopupValues = null;
 }
 
+if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
+	function zbx_widget_navtree_trigger(action ,grid){
+		var $navtree = jQuery('.navtree', grid['widget']['content_body']);
+		$navtree.zbx_navtree(action);
+	}
+}
+
 jQuery(function($) {
 	/**
 	 * Create Navigation Tree element.
 	 *
 	 * @return object
 	 */
-
 	if (typeof($.fn.zbx_navtree) === 'undefined') {
 		$.fn.zbx_navtree = function(input) {
 			$this = $(this);
@@ -829,6 +835,19 @@ jQuery(function($) {
 							problems: options.problems || [],
 							max_depth: options.max_depth || 10,
 							lastId: 0
+						});
+						var triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
+							'beforeConfigLoad'];
+
+						$.each(triggers, function(index, trigger) {
+							$(".dashbrd-grid-widget-container").dashboardGrid("addAction", trigger,
+								'zbx_widget_navtree_trigger',
+								{
+									'parameters': [trigger],
+									'grid': {'widget': String(options.uniqueid)},
+									'trigger_name': 'maptree_' + options.uniqueid
+								}
+							);
 						});
 
 						if (isEditMode()) {

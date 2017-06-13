@@ -71,25 +71,12 @@ class CNavigationTree extends CDiv {
 
 		public function getScriptRun() {
 			if ($this->error === null) {
-				if ($this->data['widgetid']) {
-					$find_widget = $this->data['widgetid'];
-				}
-				elseif ($this->data['fields']['reference']) {
-					$find_widget = $this->data['fields']['reference'];
-				}
-				else {
-					$find_widget = null;
-				}
-
-				if ($find_widget) {
-					$this->script_run .= 'jQuery(".dashbrd-grid-widget-container").dashboardGrid("setWidgetTriggers", "'.
-							$find_widget.'",'.json_encode(CWidgetConfig::getTriggers(WIDGET_NAVIGATION_TREE)).');';
-				}
 				$this->script_run .= ''.
 					'jQuery("#'.$this->getId().'").zbx_navtree({'.
 						'problems: '.json_encode($this->problems).','.
 						'severity_levels: '.json_encode($this->getSeverityConfig()).','.
-						'widgetId: '.(int)$this->data['widgetid'].','.
+						'widgetId: '.(int)$this->data['widgetid'].','. // TODO VM: should be string
+						'uniqueid: "'.$this->data['uniqueid'].'",'.
 						'max_depth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
 					'});';
 			}

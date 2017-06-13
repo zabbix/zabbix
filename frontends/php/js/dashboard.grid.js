@@ -404,6 +404,7 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data['widgetid'] = widget['widgetid'];
+		ajax_data['uniqueid'] = widget['uniqueid'];
 		if (widget['header'] !== '') {
 			ajax_data['name'] = widget['header'];
 		}
@@ -645,7 +646,7 @@
 			.addClass('btn-widget-edit')
 			.attr('title', t('Edit'))
 			.click(function() {
-				runTrigger($(this), data, 'beforeConfigLoad');
+				doAction($obj, data, 'beforeConfigLoad');
 				methods.editWidget.call($obj, widget);
 			});
 
@@ -764,14 +765,74 @@
 		}
 	}
 
-	function runTrigger($obj, data, triggerName) {
-		$.each(data['widgets'], function(index, widget) {
-			if (typeof widget['triggers'] !== 'undefined' && typeof widget['triggers'][triggerName] !== 'undefined') {
-				try {
-					eval('$("#"+$("[id]", widget.content_body).attr("id")).'+widget['triggers'][triggerName]);
+	function generateUniqueId($obj, data) {
+		var ref = false;
+
+		while (!ref) {
+			ref = generateRandomString(5);
+
+			$.each(data['widgets'], function(index, widget) {
+				if (widget['uniqueid'] === ref) {
+					ref = false;
+					return false; // break
 				}
-				catch(e) {}
+			});
+		}
+
+		return ref;
+	}
+
+	function doAction($obj, data, trigger_name) {
+		if (typeof(data['triggers'][trigger_name]) === 'undefined') {
+			return;
+		}
+		var triggers = data['triggers'][trigger_name];
+
+		triggers.sort(function(a,b) {
+			var priority_a = (typeof(a['options']['priority']) !== 'undefined') ? a['options']['priority'] : 10;
+			var priority_b = (typeof(b['options']['priority']) !== 'undefined') ? b['options']['priority'] : 10;
+
+			if (priority_a < priority_b) {
+				return -1;
 			}
+			if (priority_a > priority_b) {
+				return 1;
+			}
+			return 0;
+		});
+
+		$.each(triggers, function(index, trigger) {
+			if (typeof(window[trigger['function']]) !== typeof(Function)) {
+				return true; // continue
+			}
+
+			var params = [];
+			if (typeof(trigger['options']['parameters']) !== 'undefined') {
+				params = trigger['options']['parameters'];
+			}
+			if (typeof(trigger['options']['grid']) !== 'undefined') {
+				var grid = {};
+				if (typeof(trigger['options']['grid']['widget']) !== 'undefined') {
+					var widgets = methods.getWidgetsBy.call($obj, 'uniqueid', trigger['options']['grid']['widget']);
+					// will return only first element
+					if (widgets.length > 0) {
+						grid['widget'] = widgets[0];
+					}
+				}
+				if (typeof(trigger['options']['grid']['data']) !== 'undefined' && trigger['options']['grid']['data']) {
+					grid['data'] = data;
+				}
+				if (typeof(trigger['options']['grid']['obj']) !== 'undefined' && trigger['options']['grid']['obj']) {
+					grid['obj'] = $obj;
+				}
+				params.push(grid);
+			}
+
+			// TODO VM: (?) try-catch may be unnecessary, but it prevents from JS from braking, if this function is not working properly
+			try {
+				window[trigger['function']].apply(null, params);
+			}
+			catch(e) {}
 		});
 	}
 
@@ -797,6 +858,7 @@
 					options: options,
 					widgets: [],
 					widget_defaults: {},
+					triggers: {},
 					placeholder: $placeholder
 				});
 
@@ -810,22 +872,6 @@
 					// return value only if we need confirmation window, return nothing othervise
 					if (typeof res !== 'undefined') {
 						return res;
-					}
-				});
-			});
-		},
-
-		setWidgetTriggers: function(search_by, triggers) {
-			return this.each(function() {
-				var	$this = $(this),
-					data = $this.data('dashboardGrid');
-
-				$.each(data['widgets'], function(index, widget) {
-					if (typeof widget['fields']['reference'] !== 'undefined' && widget['fields']['reference'] === search_by) {
-						widget['triggers'] = triggers;
-					}
-					else if (widget['widgetid'] == +search_by) {
-						widget['triggers'] = triggers;
 					}
 				});
 			});
@@ -877,6 +923,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				widget['uniqueid'] = generateUniqueId($this, data);
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
 				updateWidgetDynamic($this, data, widget);
 
@@ -950,7 +997,7 @@
 					data = $this.data('dashboardGrid');
 
 				data['options']['edit_mode'] = true;
-				runTrigger($this, data, 'onEditStart');
+				doAction($this, data, 'onEditStart');
 				dashboardRemoveMessages();
 				setModeEditDashboard($this, data);
 			});
@@ -962,10 +1009,10 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				runTrigger($this, data, 'beforeDashboardSave');
+				doAction($this, data, 'beforeDashboardSave');
 				saveChanges($this, data);
 				data['options']['edit_mode'] = false;
-				runTrigger($this, data, 'afterDashboardSave');
+				doAction($this, data, 'afterDashboardSave');
 			});
 		},
 
@@ -975,7 +1022,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				runTrigger($this, data, 'onEditStop');
+				doAction($this, data, 'onEditStop');
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;
@@ -1090,7 +1137,6 @@
 		// Returns list of widgets filterd by key=>value pair
 		getWidgetsBy: function(key, value) {
 			var widgets_found = [];
-
 			this.each(function() {
 				var	$this = $(this),
 						data = $this.data('dashboardGrid');
@@ -1179,6 +1225,52 @@
 					data = $this.data('dashboardGrid');
 
 				openConfigDialogue($this, data, null);
+			});
+		},
+
+		/**
+		 * Add action, that will be performed on $hook trigger
+		 *
+		 * @param string hook  name of trigger, when $function_to_call should be called
+		 * @param string function_to_call  name of function in global scope that will be called
+		 * @param array options  any key in options is optional
+		 * @param array options['parameters']  array of parameters with which the function will be called
+		 * @param array options['grid']  mark, what data from grid should be passed to $function_to_call.
+		 *									If is empty, parameter 'grid' will not be added to $function_to_call params.
+		 * @param string options['grid']['widget']  should contain unique id of widget. Will add widget object.
+		 * @param string options['grid']['data']  should contain '1'. Will add dashboard grid data object.
+		 * @param string options['grid']['obj']  should contain '1'. Will add dashboard grid object ($this).
+		 * @param int options['priority']  order, when it should be called, compared to others. Default = 10
+		 * @param int options['name']  unique name. There can be only one trigger with this name.
+		 */
+		addAction: function(hook, function_to_call, options) {
+			this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid'),
+					found = false,
+					trigger_name = null;
+
+				if (typeof(data['triggers'][hook]) === 'undefined') {
+					data['triggers'][hook] = [];
+				}
+
+				// add trigger with each name only once
+				if (typeof(options['trigger_name']) !== 'undefined') {
+					trigger_name = options['trigger_name'];
+					$.each(data['triggers'][hook], function(index, trigger) {
+						if (trigger['trigger_name'] === trigger_name) {
+							found = true;
+						}
+					});
+				}
+
+				if (!found) {
+					data['triggers'][hook].push({
+						'trigger_name': trigger_name,
+						'function': function_to_call,
+						'options': options
+					});
+				}
 			});
 		}
 	}

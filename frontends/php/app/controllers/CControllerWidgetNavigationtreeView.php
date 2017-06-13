@@ -31,6 +31,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 		$fields = [
 			'name'		=>	'string',
 			'widgetid'	=>	'required',
+			'uniqueid'	=>	'required',
 			'fields'	=>	'array'
 		];
 
@@ -94,6 +95,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'widgetid' => getRequest('widgetid'),
+			'uniqueid' => getRequest('uniqueid'),
 			'field_items' => $items,
 			'fields' => $data,
 			'error' => $error

@@ -129,32 +129,6 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Return widget triggers
-	 *
-	 * @static
-	 *
-	 * @param int $type  WIDGET_ constant
-	 *
-	 * @return array  list of [onEvent => jsMethodToCall] pairs
-	 */
-	public static function getTriggers($type) {
-		switch ($type) {
-			case WIDGET_NAVIGATION_TREE:
-				return [
-					'onEditStart' => 'zbx_navtree("onEditStart")',
-					'beforeDashboardSave' => 'zbx_navtree("beforeDashboardSave")',
-					'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
-					'onEditStop' => 'zbx_navtree("onEditStop")',
-					'afterDashboardSave' => 'zbx_navtree("afterDashboardSave")',
-					'beforeConfigLoad' => 'zbx_navtree("beforeConfigLoad")'
-				];
-				break;
-			default:
-				return [];
-		}
-	}
-
-	/**
 	 * Returns key, where value is stored for given field type
 	 *
 	 * @static
