@@ -671,6 +671,7 @@ class CConfigurationImport {
 			return;
 		}
 
+		$order_tree = $this->getItemsOrderTree('master_item', API::Item());
 		$itemsToCreate = [];
 		$itemsToUpdate = [];
 
@@ -682,7 +683,8 @@ class CConfigurationImport {
 				continue;
 			}
 
-			foreach ($items as $item) {
+			foreach ($order_tree as $index => $level) {
+				$item = $items[$index];
 				$item['hostid'] = $hostId;
 
 				if (isset($item['applications']) && $item['applications']) {
@@ -718,6 +720,11 @@ class CConfigurationImport {
 					}
 
 					$item['valuemapid'] = $valueMapId;
+				}
+
+				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					$item['master_itemid'] = $this->referencer->resolveItem($hostId, $item['master_item']['key']);
+					unset($item['master_item']);
 				}
 
 				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
@@ -2226,5 +2233,62 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['templateScreens'];
+	}
+
+	/**
+	 * Get items keys order tree, to ensure that master item will be inserted or updated before any
+	 * of it dependent item.
+	 *
+	 * @param string				$master_key_identifier	Contains master item identification key.
+	 * @param CItem|CitemPrototype	$data_provider			Provider for non existing items.
+	 *
+	 * @return array
+	 */
+	protected function getItemsOrderTree($master_key_identifier, $data_provider) {
+		$host_items = $this->getFormattedItems();
+		$tree = [];
+
+		foreach ($host_items as $host => $items) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			$indexed_items = [];
+
+			// Build indexed tree of all host items.
+			foreach ($items as $index => $item) {
+				$indexed_items[$item['key_']] = $index;
+			}
+
+			$host_items_tree = [];
+
+			// Find nesting level for every host item.
+			foreach ($items as $index => $item) {
+				$level = 0;
+
+				// Traverse up searching root parent for current item.
+				while ($item && $item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (array_key_exists($item[$master_key_identifier], $indexed_items)) {
+						$item = $items[$indexed_items[$master_key]];
+					}
+					else {
+						$response = $data_provider->get([
+							'output' => ['key_', 'type', 'master_itemid'],
+							'filter' => ['key_' => $item[$master_key_identifier]]
+						]);
+						$item = $response ? $response[0] : null;
+						// TODO: Populate data for $this->resolver to allow mapping be used when items will be created
+						//		or updated.
+					}
+					// TODO: If $item is not array we have broken relation. Throw exception.
+
+					// TODO: Check nesting level maximum.
+					$level++;
+				}
+				$host_items_tree[$index] = $level;
+			}
+
+			asort($host_items_tree);
+			$tree[$host] = $host_items_tree;
+		}
+
+		return $tree;
 	}
 }
