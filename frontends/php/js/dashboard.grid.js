@@ -1236,12 +1236,12 @@
 		 * @param array options  any key in options is optional
 		 * @param array options['parameters']  array of parameters with which the function will be called
 		 * @param array options['grid']  mark, what data from grid should be passed to $function_to_call.
-		 *									If is empty, parameter 'grid' will not be added to $function_to_call params.
-		 * @param string options['grid']['widget']  should contain unique id of widget. Will add widget object.
+		 *								If is empty, parameter 'grid' will not be added to function_to_call params.
+		 * @param string options['grid']['widget']  should contain uniqueid of widget. Will add widget object.
 		 * @param string options['grid']['data']  should contain '1'. Will add dashboard grid data object.
 		 * @param string options['grid']['obj']  should contain '1'. Will add dashboard grid object ($this).
 		 * @param int options['priority']  order, when it should be called, compared to others. Default = 10
-		 * @param int options['name']  unique name. There can be only one trigger with this name.
+		 * @param int options['name']  unique name. There can be only one trigger with this name for each hook.
 		 */
 		addAction: function(hook, function_to_call, options) {
 			this.each(function() {
