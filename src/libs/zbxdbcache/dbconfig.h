@@ -260,7 +260,7 @@ typedef struct
 	unsigned char	jmx_available;
 	unsigned char	status;
 
-	/* flag to reset host availability to uknown */
+	/* flag to reset host availability to unknown */
 	unsigned char	reset_availability;
 
 	/* flag to force update for all items */
