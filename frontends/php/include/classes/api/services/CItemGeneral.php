@@ -1176,9 +1176,10 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 *
-	 * @param array $items	Array of items
+	 * @param array					$items			Array of items
+	 * @param CItem|CItemPrototype	$data_provider	Item data provider.
 	 */
-	public function validateDependentItems($items) {
+	public function validateDependentItems($items, $data_provider) {
 		$error = '';
 		$field = '';
 
@@ -1214,7 +1215,7 @@ abstract class CItemGeneral extends CApiService {
 					break;
 				}
 
-				$master_item = API::Item()->get([
+				$master_item = $data_provider->get([
 					'output' => ['type', 'name', 'hostid', 'master_itemid'],
 					'itemids' => $master_itemid
 				])[0];
@@ -1247,7 +1248,7 @@ abstract class CItemGeneral extends CApiService {
 				$total_children = 0;
 				$children = [$master_item['itemid']];
 				do {
-					$children = API::Item()->get([
+					$children = $data_provider->get([
 						'output' => ['itemid'],
 						'filter' => ['master_itemid' => $children]
 					]);

@@ -401,7 +401,7 @@ class CItem extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 
-		$this->validateDependentItems($items);
+		$this->validateDependentItems($items, API::Item());
 		parent::checkInput($items);
 		self::validateInventoryLinks($items);
 
@@ -545,7 +545,7 @@ class CItem extends CItemGeneral {
 			$item = $item + $dbItems[(int) $item['itemid']];
 		}
 		unset($item);
-		$this->validateDependentItems($items);
+		$this->validateDependentItems($items, API::Item());
 
 		parent::checkInput($items, true);
 		self::validateInventoryLinks($items, true);

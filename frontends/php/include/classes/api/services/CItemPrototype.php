@@ -333,7 +333,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public function create($items) {
 		$items = zbx_toArray($items);
-		$this->validateDependentItems($items);
+		$this->validateDependentItems($items, API::ItemPrototype());
 		$this->checkInput($items);
 		$this->createReal($items);
 		$this->inherit($items);
@@ -712,7 +712,7 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item = $item + $dbItems[$item['itemid']];
 		}
-		$this->validateDependentItems($items);
+		$this->validateDependentItems($items, API::ItemPrototype());
 		$this->checkInput($items, true);
 		$this->updateReal($items);
 		$this->inherit($items);
