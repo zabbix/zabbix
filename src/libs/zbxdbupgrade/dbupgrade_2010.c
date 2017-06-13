@@ -1310,7 +1310,8 @@ static int	DBpatch_2010158(void)
 					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
@@ -1359,7 +1360,8 @@ static int	DBpatch_2010164(void)
 					{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"parent_interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
@@ -1391,7 +1393,8 @@ static int	DBpatch_2010167(void)
 					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
@@ -1434,7 +1437,8 @@ static int	DBpatch_2010172(void)
 					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
