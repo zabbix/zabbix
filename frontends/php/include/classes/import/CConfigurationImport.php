@@ -683,7 +683,7 @@ class CConfigurationImport {
 				continue;
 			}
 
-			foreach ($order_tree as $index => $level) {
+			foreach ($order_tree[$host] as $index => $level) {
 				$item = $items[$index];
 				$item['hostid'] = $hostId;
 
@@ -2271,7 +2271,7 @@ class CConfigurationImport {
 					else {
 						$response = $data_provider->get([
 							'output' => ['key_', 'type', 'master_itemid'],
-							'filter' => ['key_' => $item[$master_key_identifier]]
+							'filter' => ['key_' => $item[$master_key_identifier]['key']]
 						]);
 						$item = $response ? $response[0] : null;
 						// TODO: Populate data for $this->resolver to allow mapping be used when items will be created
