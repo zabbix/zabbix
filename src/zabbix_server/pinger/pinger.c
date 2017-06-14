@@ -127,7 +127,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 	double		value_dbl;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+	zbx_preprocessor_hold();
 
 	for (h = 0; h < hosts_count; h++)
 	{
@@ -197,7 +197,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 		}
 	}
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
+	zbx_preprocessor_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -420,7 +420,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+	zbx_preprocessor_hold();
 
 	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, items);
 
@@ -458,7 +458,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	DCconfig_clean_items(items, NULL, num);
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
+	zbx_preprocessor_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, *icmp_items_count);
 }

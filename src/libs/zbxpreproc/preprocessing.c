@@ -519,24 +519,33 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_preprocessor_send_command                                    *
+ * Function: zbx_preprocessor_hold                                            *
  *                                                                            *
- * Purpose: send command to preprocessing manager                             *
- *                                                                            *
- * Parameters: command - [IN] bulk or single value flush mode command:        *
- *                            ZBX_PREPROCESSOR_COMMAND_HOLD - bulk            *
- *                            ZBX_PREPROCESSOR_COMMAND_FLUSH - single         *
+ * Purpose: send hold command to preprocessing manager                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_send_command(unsigned char command)
+void	zbx_preprocessor_hold()
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		if (ZBX_PREPROCESSOR_COMMAND_FLUSH == command)
-			dc_flush_history();
-	}
-	else
+	unsigned char command = ZBX_PREPROCESSOR_COMMAND_HOLD;
+
+	preprocessor_send(ZBX_IPC_PREPROCESSOR_COMMAND, &command, 1, NULL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_flush                                           *
+ *                                                                            *
+ * Purpose: send flush command to preprocessing manager                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_flush()
+{
+	unsigned char command = ZBX_PREPROCESSOR_COMMAND_FLUSH;
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		preprocessor_send(ZBX_IPC_PREPROCESSOR_COMMAND, &command, 1, NULL);
+	else
+		dc_flush_history();
 }
 
 /******************************************************************************

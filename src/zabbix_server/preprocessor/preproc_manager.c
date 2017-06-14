@@ -29,8 +29,8 @@
 #include "zbxipcservice.h"
 
 #include "zbxpreproc.h"
-#include "manager.h"
-#include "queue.h"
+#include "preproc_manager.h"
+#include "linked_list.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num, CONFIG_PREPROCESSOR_FORKS;
@@ -63,15 +63,15 @@ preprocessing_request_t;
 typedef struct
 {
 	zbx_ipc_client_t	*client;	/* the connected preprocessing worker client */
-	queue_item_t		*queue_item;	/* queued item */
+	zbx_list_item_t		*queue_item;	/* queued item */
 }
 preprocessing_worker_t;
 
 /* delta item index */
 typedef struct
 {
-	zbx_uint64_t	itemid;		/* item id */
-	queue_item_t	*queue_item;	/* queued item */
+	zbx_uint64_t		itemid;		/* item id */
+	zbx_list_item_t		*queue_item;	/* queued item */
 }
 delta_item_index_t;
 
@@ -80,7 +80,7 @@ typedef struct
 {
 	preprocessing_worker_t	*workers;	/* preprocessing worker array */
 	int			worker_count;	/* preprocessing worker count */
-	queue_t			queue;		/* queue of item values */
+	zbx_list_t		queue;		/* queue of item values */
 	zbx_hashset_t		item_config;	/* item configuration L2 cache */
 	zbx_hashset_t		history_cache;	/* item value history cache for delta preprocessing */
 	zbx_hashset_t		delta_items;	/* delta items placed in queue */
@@ -92,7 +92,7 @@ typedef struct
 preprocessing_manager_t;
 
 static void	preprocessor_enqueue_dependent(preprocessing_manager_t *manager, preprocessing_request_t *request,
-		queue_item_t *master);
+		zbx_list_item_t *master);
 
 /******************************************************************************
  *                                                                            *
@@ -147,18 +147,18 @@ static void	preprocessor_sync_configuration(preprocessing_manager_t *manager)
  * Return value: pointer to the queued item or NULL if none                   *
  *                                                                            *
  ******************************************************************************/
-static queue_item_t	*preprocessor_get_queued_item(preprocessing_manager_t *manager)
+static zbx_list_item_t	*preprocessor_get_queued_item(preprocessing_manager_t *manager)
 {
 	const char		*__function_name = "preprocessor_get_queued_item";
-	queue_iterator_t	iterator;
+	zbx_list_iterator_t	iterator;
 	preprocessing_request_t	*request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_queue_iterator_init(&manager->queue, &iterator);
-	while (SUCCEED == zbx_queue_iterator_next(&iterator))
+	zbx_list_iterator_init(&manager->queue, &iterator);
+	while (SUCCEED == zbx_list_iterator_next(&iterator))
 	{
-		zbx_queue_iterator_peek(&iterator, (void **)&request);
+		zbx_list_iterator_peek(&iterator, (void **)&request);
 
 		if (REQUEST_STATE_QUEUED == request->state && (NULL == request->dependency ||
 				REQUEST_STATE_DONE == request->dependency->state))
@@ -282,7 +282,7 @@ static zbx_uint32_t	preprocessor_create_task(preprocessing_manager_t *manager, p
 static void	preprocessor_assign_tasks(preprocessing_manager_t *manager)
 {
 	const char		*__function_name = "preprocessor_assign_tasks";
-	queue_item_t		*queue_item;
+	zbx_list_item_t		*queue_item;
 	preprocessing_request_t	*request;
 	preprocessing_worker_t	*worker;
 	zbx_uint32_t		size;
@@ -359,12 +359,12 @@ static void	preprocessing_flush_queue(preprocessing_manager_t *manager)
 {
 	preprocessing_request_t	*request;
 
-	while (SUCCEED == zbx_queue_peek(&manager->queue, (void **)&request) && REQUEST_STATE_DONE == request->state &&
+	while (SUCCEED == zbx_list_peek(&manager->queue, (void **)&request) && REQUEST_STATE_DONE == request->state &&
 			0 == request->locks)
 	{
 		preprocessor_flush_request(request);
 		preprocessor_free_request(request);
-		zbx_queue_dequeue(&manager->queue, NULL);
+		zbx_list_pop(&manager->queue, NULL);
 		manager->processed_num++;
 		manager->queued_num--;
 	}
@@ -379,14 +379,14 @@ static void	preprocessing_flush_queue(preprocessing_manager_t *manager)
  * Function: preprocessor_link_delta_items                                    *
  *                                                                            *
  * Purpose: create relation between multiple same delta item values within    *
- *          queue                                                             *
+ *          value queue                                                       *
  *                                                                            *
  * Parameters: manager     - [IN] preprocessing manager                       *
- *             enqueued_at - [IN] position in queue                           *
+ *             enqueued_at - [IN] position in value queue                     *
  *             item        - [IN] item configuration data                     *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_link_delta_items(preprocessing_manager_t *manager, queue_item_t *enqueued_at,
+static void	preprocessor_link_delta_items(preprocessing_manager_t *manager, zbx_list_item_t *enqueued_at,
 		DC_ITEM *item)
 {
 	unsigned char		type;
@@ -439,12 +439,13 @@ static void	preprocessor_link_delta_items(preprocessing_manager_t *manager, queu
  *                            (NULL for the end of the queue)                 *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_enqueue(preprocessing_manager_t *manager, zbx_ipc_message_t *message, queue_item_t *master)
+static void	preprocessor_enqueue(preprocessing_manager_t *manager, zbx_ipc_message_t *message,
+		zbx_list_item_t *master)
 {
 	const char			*__function_name = "preprocessor_enqueue";
 	preprocessing_request_t		request;
 	DC_ITEM				*item, item_local;
-	queue_item_t			*enqueued_at;
+	zbx_list_item_t			*enqueued_at;
 	zbx_preproc_item_value_t	*value;
 
 	zbx_preprocessor_unpack_value(&value, message->data);
@@ -483,11 +484,11 @@ static void	preprocessor_enqueue(preprocessing_manager_t *manager, zbx_ipc_messa
 
 	/* internal items are enqueued at the beginning of the line */
 	if (NULL != item && ITEM_TYPE_INTERNAL == item->type)
-		zbx_queue_enqueue_first(&manager->queue, &request, &enqueued_at);
+		zbx_list_prepend(&manager->queue, &request, &enqueued_at);
 	else
-		zbx_queue_enqueue_after(&manager->queue, master, &request, &enqueued_at);
+		zbx_list_insert_after(&manager->queue, master, &request, &enqueued_at);
 
-	if (REQUEST_STATE_QUEUED != request.state)
+	if (REQUEST_STATE_QUEUED == request.state)
 		preprocessor_link_delta_items(manager, enqueued_at, item);
 
 	/* if no preprocessing is needed, dependent items are enqueued */
@@ -551,7 +552,7 @@ static void	preprocessor_process_command(preprocessing_manager_t *manager, unsig
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_enqueue_dependent(preprocessing_manager_t *manager,
-		preprocessing_request_t *request, queue_item_t *master)
+		preprocessing_request_t *request, zbx_list_item_t *master)
 {
 	const char			*__function_name = "preprocessor_enqueue_dependent";
 	int				i;
@@ -827,7 +828,7 @@ static void	preprocessor_init_manager(preprocessing_manager_t *manager)
 	memset(manager, 0, sizeof(preprocessing_manager_t));
 
 	manager->workers = zbx_calloc(NULL, CONFIG_PREPROCESSOR_FORKS, sizeof(preprocessing_worker_t));
-	zbx_queue_create(&manager->queue, sizeof(preprocessing_request_t));
+	zbx_list_create(&manager->queue, sizeof(preprocessing_request_t));
 	zbx_hashset_create(&manager->item_config, 0, dc_item_hash, dc_item_compare);
 	zbx_hashset_create(&manager->delta_items, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&manager->history_cache, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
@@ -916,10 +917,10 @@ static void	preprocessor_destroy_manager(preprocessing_manager_t *manager)
 	zbx_free(manager->workers);
 
 	/* this is the place where values are lost */
-	while (SUCCEED == zbx_queue_dequeue(&manager->queue, (void **)&request))
+	while (SUCCEED == zbx_list_pop(&manager->queue, (void **)&request))
 		preprocessor_free_request(request);
 
-	zbx_queue_destroy(&manager->queue);
+	zbx_list_destroy(&manager->queue);
 
 	zbx_hashset_iter_reset(&manager->item_config, &iter);
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))

@@ -2427,7 +2427,7 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 	int		processed_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+	zbx_preprocessor_hold();
 
 	for (i = 0; i < values_num; i++)
 	{
@@ -2448,7 +2448,7 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 	if (0 < processed_num)
 		zbx_dc_items_update_runtime_data(items, values, errcodes, values_num);
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
+	zbx_preprocessor_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
 

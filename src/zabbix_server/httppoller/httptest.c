@@ -817,7 +817,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	httpstep.httptest = httptest;
 	httpstep.httpstep = &db_httpstep;
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+	zbx_preprocessor_hold();
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1128,7 +1128,7 @@ clean:
 	process_test_data(httptest->httptest.httptestid, lastfailedstep, speed_download, err_str, &ts);
 
 	zbx_free(err_str);
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
+	zbx_preprocessor_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

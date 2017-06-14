@@ -49,7 +49,8 @@ zbx_preproc_item_value_t;
 
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
 		zbx_timespec_t *ts, unsigned char state, char *error);
-void	zbx_preprocessor_send_command(unsigned char command);
+void	zbx_preprocessor_hold();
+void	zbx_preprocessor_flush();
 zbx_uint64_t	zbx_preprocessor_get_queue_size();
 zbx_uint32_t	zbx_preprocessor_pack_value(unsigned char **data, zbx_preproc_item_value_t *value);
 zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemid, zbx_timespec_t *ts,

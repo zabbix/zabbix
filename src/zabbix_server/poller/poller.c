@@ -580,7 +580,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+	zbx_preprocessor_hold();
 	zbx_timespec(&timespec);
 
 	/* process item values */
@@ -709,7 +709,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	DCconfig_clean_items(items, NULL, num);
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
+	zbx_preprocessor_flush();
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
 

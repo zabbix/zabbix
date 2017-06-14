@@ -847,7 +847,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 	char			*error = NULL;
 
 	num = DCconfig_get_ipmi_poller_items(now, items, MAX_POLLER_ITEMS, nextcheck);
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+	zbx_preprocessor_hold();
 
 	for (i = 0; i < num; i++)
 	{
@@ -871,7 +871,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 		ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
 	}
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
+	zbx_preprocessor_flush();
 	DCconfig_clean_items(items, NULL, num);
 
 	return num;

@@ -166,7 +166,7 @@ next:
 		ret = SUCCEED;
 	}
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_HOLD);
+	zbx_preprocessor_hold();
 
 	for (i = 0; i < num; i++)
 	{
@@ -217,7 +217,7 @@ next:
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
 
-	zbx_preprocessor_send_command(ZBX_PREPROCESSOR_COMMAND_FLUSH);
+	zbx_preprocessor_flush();
 
 	return ret;
 }

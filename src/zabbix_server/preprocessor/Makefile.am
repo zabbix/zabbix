@@ -3,8 +3,8 @@
 noinst_LIBRARIES = libpreprocessor.a
 
 libpreprocessor_a_SOURCES = \
-	queue.c queue.h \
-	worker.c worker.h \
-	manager.c manager.h \
+	linked_list.c linked_list.h \
+	preproc_worker.c preproc_worker.h \
+	preproc_manager.c preproc_manager.h \
 	item_preproc.c \
 	item_preproc.h

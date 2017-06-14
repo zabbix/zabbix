@@ -26,7 +26,7 @@
 #include "zbxpreproc.h"
 
 #include "sysinfo.h"
-#include "worker.h"
+#include "preproc_worker.h"
 #include "item_preproc.h"
 
 extern unsigned char	process_type, program_type;
