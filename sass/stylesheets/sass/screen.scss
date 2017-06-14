@@ -4439,7 +4439,7 @@ tr.cursor-move {
 		}
 
 		@for $i from 1 through $max_depth {
-			.tree-list[data-depth="#{$i}"] span.row {
+			.tree-list[data-depth="#{$i}"] div.row {
 				padding-left: 25px + ($i * 15px);
 			}
 
@@ -4499,11 +4499,32 @@ tr.cursor-move {
 			display: none;
 		}
 
-		.opened > ul {
-			display: block;
+		.tree-item {
+			.drag-icon {
+				margin: 5px 0px 5px -40px;
+				position: absolute;
+				cursor: move;
+				top: 0;
+			}
+
+			&.ui-sortable-helper {
+				background: #f7f7f7;
+				border-color: #d7dadc;
+				border-width: 1px;
+				border-style: solid;
+			}
+
+			&.sortable-error {
+				border-color: transparent;
+				background: #fbe3e4;
+			}
 		}
-		.closed > ul {
-			display: none;
+
+		.opened > ul{
+			display:block;
+		}
+		.closed > ul{
+			display:none;
 		}
 
 		.tools {

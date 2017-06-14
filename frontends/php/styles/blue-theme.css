@@ -3022,52 +3022,52 @@ tr.cursor-move td * {
   .navtree .tree .root-item > div.row {
     padding-left: 10px;
     position: relative; }
-  .navtree .tree .tree-list[data-depth="1"] span.row {
+  .navtree .tree .tree-list[data-depth="1"] div.row {
     padding-left: 40px; }
   .navtree .tree .tree-list[data-depth="1"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="1"] .placeholder {
     margin-left: 0px; }
-  .navtree .tree .tree-list[data-depth="2"] span.row {
+  .navtree .tree .tree-list[data-depth="2"] div.row {
     padding-left: 55px; }
   .navtree .tree .tree-list[data-depth="2"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="2"] .placeholder {
     margin-left: 15px; }
-  .navtree .tree .tree-list[data-depth="3"] span.row {
+  .navtree .tree .tree-list[data-depth="3"] div.row {
     padding-left: 70px; }
   .navtree .tree .tree-list[data-depth="3"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="3"] .placeholder {
     margin-left: 30px; }
-  .navtree .tree .tree-list[data-depth="4"] span.row {
+  .navtree .tree .tree-list[data-depth="4"] div.row {
     padding-left: 85px; }
   .navtree .tree .tree-list[data-depth="4"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="4"] .placeholder {
     margin-left: 45px; }
-  .navtree .tree .tree-list[data-depth="5"] span.row {
+  .navtree .tree .tree-list[data-depth="5"] div.row {
     padding-left: 100px; }
   .navtree .tree .tree-list[data-depth="5"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="5"] .placeholder {
     margin-left: 60px; }
-  .navtree .tree .tree-list[data-depth="6"] span.row {
+  .navtree .tree .tree-list[data-depth="6"] div.row {
     padding-left: 115px; }
   .navtree .tree .tree-list[data-depth="6"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="6"] .placeholder {
     margin-left: 75px; }
-  .navtree .tree .tree-list[data-depth="7"] span.row {
+  .navtree .tree .tree-list[data-depth="7"] div.row {
     padding-left: 130px; }
   .navtree .tree .tree-list[data-depth="7"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="7"] .placeholder {
     margin-left: 90px; }
-  .navtree .tree .tree-list[data-depth="8"] span.row {
+  .navtree .tree .tree-list[data-depth="8"] div.row {
     padding-left: 145px; }
   .navtree .tree .tree-list[data-depth="8"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="8"] .placeholder {
     margin-left: 105px; }
-  .navtree .tree .tree-list[data-depth="9"] span.row {
+  .navtree .tree .tree-list[data-depth="9"] div.row {
     padding-left: 160px; }
   .navtree .tree .tree-list[data-depth="9"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="9"] .placeholder {
     margin-left: 120px; }
-  .navtree .tree .tree-list[data-depth="10"] span.row {
+  .navtree .tree .tree-list[data-depth="10"] div.row {
     padding-left: 175px; }
   .navtree .tree .tree-list[data-depth="10"] .tree-item.ui-sortable-helper,
   .navtree .tree .tree-list[data-depth="10"] .placeholder {
@@ -3103,6 +3103,19 @@ tr.cursor-move td * {
   .navtree .tree .tree-item:not(.is-parent) .arrow-right,
   .navtree .tree .tree-item:not(.is-parent) .arrow-down {
     display: none; }
+  .navtree .tree .tree-item .drag-icon {
+    margin: 5px 0px 5px -40px;
+    position: absolute;
+    cursor: move;
+    top: 0; }
+  .navtree .tree .tree-item.ui-sortable-helper {
+    background: #f7f7f7;
+    border-color: #d7dadc;
+    border-width: 1px;
+    border-style: solid; }
+  .navtree .tree .tree-item.sortable-error {
+    border-color: transparent;
+    background: #fbe3e4; }
   .navtree .tree .opened > ul {
     display: block; }
   .navtree .tree .closed > ul {
