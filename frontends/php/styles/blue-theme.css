@@ -3006,6 +3006,31 @@ tr.cursor-move td * {
 .clock-lines {
   fill: #acbbc2; }
 
+@keyframes fadein {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+@-moz-keyframes fadein {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+@-webkit-keyframes fadein {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+@-ms-keyframes fadein {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+@-o-keyframes fadein {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
 .navtree .tree {
   overflow-y: auto;
   overflow-x: hidden;
@@ -3131,8 +3156,10 @@ tr.cursor-move td * {
     .navtree .tree .tools .add-child-btn {
       margin-left: 5px;
       float: left; }
+  .navtree .tree .tree-item.ui-sortable-helper .tools {
+    display: none; }
   .navtree .tree .highliglted-parent > .row {
-    background: #e6f1ff; }
+    background: #f9f9f9; }
   .navtree .tree .problems-per-item {
     background: gray;
     color: #ffffff;
@@ -3146,7 +3173,12 @@ tr.cursor-move td * {
     background: #f5f5f5;
     height: 33px; }
   .navtree .tree .placeholder {
-    border: 1px dashed red; }
+    background-color: #ebeef0;
+    -webkit-animation: fadein .5s;
+    -moz-animation: fadein .5s;
+    -ms-animation: fadein .5s;
+    -o-animation: fadein .5s;
+    animation: fadein .5s; }
   .navtree .tree .drop-hover > .row {
     background: #faebd7; }
 

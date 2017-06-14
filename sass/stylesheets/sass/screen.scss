@@ -4417,6 +4417,28 @@ tr.cursor-move {
 
 .navtree {
 	$max_depth: 10;
+
+	@keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+	@-moz-keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+	@-webkit-keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+	@-ms-keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+	@-o-keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+
 	.tree {
 		overflow-y: auto;
 		overflow-x: hidden;
@@ -4542,8 +4564,12 @@ tr.cursor-move {
 			}
 		}
 
+		.tree-item.ui-sortable-helper .tools {
+			display: none;
+		}
+
 		.highliglted-parent > .row {
-			background: #e6f1ff;
+			background: #f9f9f9;
 		}
 
 		.problems-per-item {
@@ -4563,7 +4589,12 @@ tr.cursor-move {
 		}
 
 		.placeholder {
-			border: 1px dashed red;
+			background-color: #ebeef0;
+			-webkit-animation: fadein .5s;
+			-moz-animation: fadein .5s;
+			-ms-animation: fadein .5s;
+			-o-animation: fadein .5s;
+			animation: fadein .5s;
 		}
 
 		.drop-hover > .row {
