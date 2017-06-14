@@ -15,16 +15,373 @@ if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
 	}
 }
 
+(function($) {
+	$.widget('zbx.sortable_tree', $.extend({}, $.ui.sortable.prototype, {
+		options: {
+			// jQuery UI sortable options:
+			placeholder: 'placeholder',
+			forcePlaceholderSize: true,
+			toleranceElement: '> div',
+			forceHelperSize: true,
+			tolerance: 'intersect',
+			handle: '.drag-icon',
+			items: '.tree-item',
+			helper:	'clone',
+			opacity: .75,
+			scrollSpeed: 20,
+
+			// Custom options:
+			parent_change_delay: 0,
+			parent_expand_delay: 600,
+			indent_size: 15,
+			max_depth: 10
+		},
+
+		_create: function() {
+			$.ui.sortable.prototype._create.apply(this, arguments);
+		},
+
+		_mouseDrag: function(event) {
+			var o = this.options,
+				prev_offset_top,
+				scrolled;
+
+			// Compute the helpers position
+			this.position = this._generatePosition(event);
+			this.positionAbs = this._convertPositionTo('absolute');
+
+			if (!this.lastPositionAbs) {
+				this.lastPositionAbs = this.positionAbs;
+			}
+
+			// Do scrolling
+			if (this.options.scroll) {
+				scrolled = false;
+				if (this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
+
+					if ((this.overflowOffset.top + this.scrollParent[0].offsetHeight)
+						- event.pageY < o.scrollSensitivity
+					) {
+						this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
+					}
+					else if (event.pageY - this.overflowOffset.top < o.scrollSensitivity) {
+						this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
+					}
+
+					if ((this.overflowOffset.left + this.scrollParent[0].offsetWidth)
+						- event.pageX < o.scrollSensitivity
+					) {
+						this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
+					}
+					else if (event.pageX - this.overflowOffset.left < o.scrollSensitivity) {
+						this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
+					}
+
+				}
+				else {
+					if (event.pageY - $(document).scrollTop() < o.scrollSensitivity) {
+						scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
+					}
+					else if ($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity) {
+						scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+					}
+
+					if (event.pageX - $(document).scrollLeft() < o.scrollSensitivity) {
+						scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
+					}
+					else if ($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity) {
+						scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+					}
+
+				}
+
+				if (scrolled !== false && $.ui.ddmanager && !o.dropBehaviour) {
+					$.ui.ddmanager.prepareOffsets(this, event);
+				}
+			}
+
+			// Regenerate the absolute position used for position checks
+			this.positionAbs = this._convertPositionTo("absolute");
+
+			prev_offset_top = this.placeholder.offset().top;
+
+			// Set the helper position
+			if (!this.options.axis || this.options.axis != "y") this.helper[0].style.left = this.position.left+'px';
+			if (!this.options.axis || this.options.axis != "x") this.helper[0].style.top = this.position.top+'px';
+
+			this.hovering = this.hovering ? this.hovering : null;
+			this.changing_parent = this.changing_parent ? this.changing_parent : null;
+			this.mouseentered = this.mouseentered ? this.mouseentered : false;
+
+			if (this.changing_parent) {
+				clearTimeout(this.changing_parent);
+			}
+
+			// Rearrange
+			for (var i = this.items.length - 1; i >= 0; i--) {
+
+				// Cache variables and intersection, continue if no intersection
+				var item = this.items[i], itemElement = item.item[0], intersection = this._intersectsWithPointer(item);
+				if (!intersection) continue;
+
+				if (itemElement != this.currentItem[0] // cannot intersect with itself
+					&&	this.placeholder[intersection == 1 ? "next" : "prev"]()[0] != itemElement
+					&&	!$.contains(this.placeholder[0], itemElement)
+					&& (this.options.type == 'semi-dynamic' ? !$.contains(this.element[0], itemElement) : true)
+				) {
+					if (!this.hovering && !$(itemElement).hasClass('opened')) {
+						var uiObj = this;
+
+						$(itemElement).addClass('hovering');
+
+						this.hovering = setTimeout(function() {
+							$(itemElement)
+								.removeClass('closed')
+								.addClass('opened');
+
+							uiObj.refreshPositions();
+						}, o.parent_expand_delay);
+					}
+
+					if (!this.mouseentered) {
+						$(itemElement).mouseenter();
+						this.mouseentered = true;
+					}
+
+					this.direction = intersection == 1 ? 'down' : 'up';
+
+					if (this._intersectsWithSides(item)) {
+						$(itemElement).removeClass('hovering').mouseleave();
+						this.mouseentered = false;
+						if (this.hovering) {
+							clearTimeout(this.hovering);
+							this.hovering = null;
+						}
+						this._rearrange(event, item);
+					} else {
+						break;
+					}
+
+					this._trigger('change', event, this._uiHash());
+					break;
+				}
+			}
+
+			var parent_item = $(this.placeholder.parent()).closest('.tree-item'),
+				level = $(this.placeholder.parent()).data('depth'),
+				prev_item = this.placeholder[0].previousSibling ? $(this.placeholder[0].previousSibling) : null,
+				next_item = this.placeholder[0].nextSibling ? $(this.placeholder[0].nextSibling) : null,
+				child_levels = this._levelsUnder(this.currentItem[0]),
+				direction_moved = null,
+				levels_moved = 0;
+
+			if (prev_item !== null) {
+				while (prev_item[0] === this.currentItem[0] || prev_item[0] === this.helper[0]
+					|| prev_item[0].className.indexOf('tree-item') == -1
+				) {
+					if (prev_item[0].previousSibling) {
+						prev_item = $(prev_item[0].previousSibling);
+					}
+					else {
+						prev_item = null;
+						break;
+					}
+				}
+			}
+
+			if (next_item !== null) {
+				while (next_item[0] === this.currentItem[0] || next_item[0] === this.helper[0]
+					|| next_item[0].className.indexOf('tree-item') == -1
+				) {
+					if (next_item[0].nextSibling) {
+						next_item = $(next_item[0].nextSibling);
+					}
+					else {
+						next_item = null;
+						break;
+					}
+				}
+			}
+
+			if (parent_item.get(0) === this.currentItem[0]) {
+				$(this.element[0]).append(this.placeholder[0]);
+				this._trigger('stop', event, this._uiHash());
+				return false;
+			}
+
+			this.beyondMaxLevels = 0;
+
+			/*
+			 * If item is moved to the left and it is last element of the list, add it as a child element to the
+			 * element before.
+			 */
+			if (parent_item !== null && next_item === null
+				&& (this.positionAbs.left <= parent_item.offset().left || this.positionAbs.left <= o.indent_size*-0.6)
+			) {
+				direction_moved = 'left';
+			}
+			// If item is moved to the right and there is sibling element before, put it as a child of it.
+			else if (prev_item !== null && this.positionAbs.left >= prev_item.offset().left + o.indent_size) {
+				direction_moved = 'right';
+			}
+
+			if (direction_moved) {
+				levels_moved = Math.floor(Math.abs(parent_item.offset().left - this.positionAbs.left) / o.indent_size);
+			}
+
+			$('.highliglted-parent').removeClass('highliglted-parent');
+
+			if (direction_moved === 'right' && levels_moved) {
+				var drop_to = prev_item,
+					uiObj = this;
+
+				this._isAllowed(prev_item, level, level+child_levels);
+
+				this.changing_parent = setTimeout(function() {
+					$(drop_to)
+						.addClass('highliglted-parent opened')
+						.removeClass('closed');
+
+					if (prev_offset_top && (prev_offset_top <= prev_item.offset().top)) {
+						$('>.tree-list', drop_to).prepend(uiObj.placeholder);
+					}
+					else {
+						$('>.tree-list', drop_to).append(uiObj.placeholder);
+					}
+
+					uiObj.refreshPositions();
+				}, o.parent_change_delay);
+			}
+
+			else if (direction_moved === 'left' && levels_moved) {
+				var drop_to = $(this.currentItem[0]).closest('.tree-item'),
+					one_before = null,
+					uiObj = this;
+
+				while (levels_moved > 0) {
+					if ($(drop_to).parent().closest('.tree-item').length) {
+						one_before = drop_to;
+						drop_to = $(drop_to).parent().closest('.tree-item');
+					}
+					levels_moved--;
+				}
+
+				$(drop_to).addClass('highliglted-parent');
+
+				this.changing_parent = setTimeout(function() {
+					if (one_before && one_before.length) {
+						$(uiObj.placeholder).insertAfter(one_before);
+					}
+					else {
+						$('>.tree-list', drop_to).append(uiObj.placeholder);
+					}
+
+					if (drop_to.children('.tree-list').children('li:visible:not(.ui-sortable-helper)').length < 1) {
+						drop_to.removeClass('opened');
+					}
+					uiObj.refreshPositions();
+				}, o.parent_change_delay);
+			}
+			else {
+				$(this.placeholder.parent().closest('.tree-item')).addClass('highliglted-parent');
+			}
+
+			// Post events to containers
+			this._contactContainers(event);
+
+			// Interconnect with droppables
+			if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
+
+			// Call callbacks
+			this._trigger('sort', event, this._uiHash());
+
+			this.lastPositionAbs = this.positionAbs;
+			return false;
+		},
+
+		_mouseStop: function(event, noPropagation) {
+			if (!event) return;
+
+			$('.highliglted-parent').removeClass('highliglted-parent');
+
+			if (this.changing_parent) {
+				clearTimeout(this.changing_parent);
+			}
+
+			// If we are using droppables, inform the manager about the drop
+			if ($.ui.ddmanager && !this.options.dropBehaviour) {
+				$.ui.ddmanager.drop(this, event);
+
+				var parent_id = this.placeholder.parent().closest('.tree-item').data('id'),
+					item_id = $(this.currentItem[0]).data('id');
+
+				$('[name="map.parent.'+item_id+'"]').val(parent_id);
+			}
+
+			if (this.options.revert) {
+				var self = this;
+				var cur = self.placeholder.offset();
+
+				self.reverting = true;
+
+				$(this.helper).animate({
+					left: cur.left - this.offset.parent.left - self.margins.left
+						+ (this.offsetParent[0] == document.body ? 0 : this.offsetParent[0].scrollLeft),
+					top: cur.top - this.offset.parent.top - self.margins.top
+						+ (this.offsetParent[0] == document.body ? 0 : this.offsetParent[0].scrollTop)
+				}, parseInt(this.options.revert, 10) || 500, function() {
+					self._clear(event);
+				});
+			}
+			else {
+				this._clear(event, noPropagation);
+			}
+
+			return false;
+		},
+
+		_isAllowed: function(parentItem, level, levels) {
+			if (this.options.max_depth < levels && this.options.max_depth != 0) {
+				this.placeholder.addClass('sortable-error');
+				this.beyondMaxLevels = levels - this.options.max_depth;
+			}
+			else {
+				this.placeholder.removeClass('sortable-error');
+				this.beyondMaxLevels = 0;
+			}
+		},
+
+		_levelsUnder: function(item) {
+			var depths = [], levels;
+
+			$('.tree-list', item).not(':empty').each(function(i, item) {
+				levels = 0;
+				while ($('.tree-list', item).size()) {
+					item = $('.tree-list', item).not(':empty');
+					levels++;
+				}
+
+				depths.push(levels);
+			});
+
+			return depths.length ? Math.max.apply(null, depths) : 0;
+		}
+	}));
+
+	$.zbx.sortable_tree.prototype.options = $.extend({}, $.ui.sortable.prototype.options,
+		$.zbx.sortable_tree.prototype.options
+	);
+})(jQuery);
+
 jQuery(function($) {
 	/**
-	 * Create Navigation Tree element.
+	 * Create Navigation Tree Widget.
 	 *
 	 * @return object
 	 */
 	if (typeof($.fn.zbx_navtree) === 'undefined') {
 		$.fn.zbx_navtree = function(input) {
 			$this = $(this);
-			var dropped_to = null;
 
 			/* TODO miks:
 			 * Button styles should be moved to stylesheet.
@@ -66,22 +423,18 @@ jQuery(function($) {
 				return widget_data.lastId;
 			}
 
-			var getDroppableOptions = function() {
+			var makeSortable = function() {
 				var widget_data = $this.data('widgetData');
 
-				return {
-					hoverClass: 'drop-hover',
-					addClasses: false,
-					accept: function() {
-						return (widget_data.max_depth >= +$('.tree-list', this).data('depth'));
-					},
-					addClasses: false,
-					tolerance: 'pointer',
-					drop: function(event, ui) {
-						dropped_to = $(this);
-					},
-					greedy: true
-				};
+				$('.root-item>.tree-list')
+					.sortable_tree({
+						max_depth: widget_data['max_depth'],
+						stop: function( event, ui ) {
+							storeUIState();
+							setTreeHandlers();
+						}
+					})
+					.disableSelection();
 			};
 
 			var drawTree = function() {
@@ -295,7 +648,6 @@ jQuery(function($) {
 															.removeClass('closed');
 													}
 
-													$(".tree-item").droppable(getDroppableOptions());
 													overlayDialogueDestroy();
 													storeUIState();
 													setTreeHandlers();
@@ -390,8 +742,9 @@ jQuery(function($) {
 						'data-id': item.id
 					})
 					.append(
-						$('<span>')
+						$('<div>')
 							.addClass('row')
+							.append((isEditMode() && editable) ? $('<div>').addClass('drag-icon') : null)
 							.append(editable ? $('<span>')
 								.addClass((item_clases.indexOf('opened') !== -1) ? 'arrow-right' : 'arrow-down')
 								.click(function() {
@@ -494,8 +847,8 @@ jQuery(function($) {
 									})
 									.click(function() {
 										var id = $(this).data('id'),
-											parent = $('input[name="map.parent.'+id+'"]', $this).val(),
-											depth = $(this).closest('[data-depth]').data('depth');
+											parent = +$('input[name="map.parent.'+id+'"]', $this).val(),
+											depth = +$(this).closest('[data-depth]').data('depth');
 
 										itemEditDialog(id, parent, depth)
 									}) : null
@@ -533,23 +886,6 @@ jQuery(function($) {
 					);
 			};
 
-			// Returns a number of levels till the deepest branch (ul.tree-list).
-			var levelsUnder = function(item) {
-				var depths = [], levels;
-
-				$('.tree-list', item).not(':empty').each(function(i, item) {
-					levels = 0;
-					while ($('.tree-list', item).size()) {
-						item = $('.tree-list', item).not(':empty');
-						levels++;
-					}
-
-					depths.push(levels);
-				});
-
-				return depths.length ? Math.max.apply(null, depths) : 0;
-			};
-
 			var setTreeHandlers = function() {
 				var opened_nodes = cookie.read(getCookieName('opened_nodes')),
 					widget_data = $this.data('widgetData'),
@@ -558,8 +894,8 @@ jQuery(function($) {
 				opened_nodes = opened_nodes ? opened_nodes.split(',') : [];
 
 				// Add .is-parent class for branches with sub-items.
-				$('.tree-list', $this).each(function() {
-					if ($('.tree-item', $(this)).size()) {
+				$('.tree-list', $this).not('.ui-sortable, .root').each(function() {
+					if ($('>li', this).length) {
 						$(this).closest('.tree-item').addClass('is-parent');
 					}
 					else {
@@ -585,13 +921,14 @@ jQuery(function($) {
 				});
 
 				// Show/hide 'add new items' buttons.
-				$('.tree-list').filter(function(){
+				$('.tree-list').filter(function() {
 					return +$(this).data('depth') >= widget_data.max_depth;
 				}).each(function() {
 					$('.import-items-btn', $(this)).css('visibility', 'hidden');
 					$('.add-child-btn', $(this)).css('visibility', 'hidden');
 				});
-				$('.tree-list').filter(function(){
+
+				$('.tree-list').filter(function() {
 					return widget_data.max_depth > +$(this).data('depth');
 				}).each(function() {
 					$('>.tree-item>.row>.tools>.import-items-btn', $(this)).css('visibility', 'visible');
@@ -791,6 +1128,7 @@ jQuery(function($) {
 				}
 
 				drawTree();
+				makeSortable();
 			};
 
 			var methods = {

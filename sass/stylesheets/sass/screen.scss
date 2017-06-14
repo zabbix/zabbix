@@ -4420,23 +4420,71 @@ tr.cursor-move {
 	.tree {
 		overflow-y: auto;
 		overflow-x: hidden;
+		min-height: 100%;
+		display: table;
+		width: 100%;
 
-		span.row {
+		div.row {
 			border-bottom: 1px solid $ui-border-color;
-			padding: 8px 0px 8px 20px;
+			padding: 8px 5px 8px 20px;
 			position: relative;
 			display: block;
 		}
-		ul span.row {
+		ul div.row {
 			padding-left: 25px;
 		}
-		.root-item>span.row {
+		.root-item>div.row {
 			padding-left: 10px;
+			position: relative;
 		}
 
 		@for $i from 1 through $max_depth {
 			.tree-list[data-depth="#{$i}"] span.row {
 				padding-left: 25px + ($i * 15px);
+			}
+
+			.tree-list[data-depth="#{$i}"] .tree-item.ui-sortable-helper,
+			.tree-list[data-depth="#{$i}"] .placeholder {
+				margin-left: ($i * 15px) - 15px;
+			}
+		}
+
+		.tree-list[data-depth] .ui-sortable-helper {
+			>div.row {
+				padding-left: 40px;
+			}
+			.tree-list > li > div.row {
+				padding-left: 55px;
+			}
+			.tree-list .tree-list > li > div.row {
+				padding-left: 70px;
+			}
+			.tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 85px;
+			}
+			.tree-list .tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 100px;
+			}
+			.tree-list .tree-list .tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 115px;
+			}
+			.tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 130px;
+			}
+			.tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 145px;
+			}
+			.tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 160px;
+			}
+			.tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 175px;
+			}
+			.tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 180px;
+			}
+			.tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > div.row {
+				padding-left: 195px;
 			}
 		}
 
@@ -4473,6 +4521,10 @@ tr.cursor-move {
 			}
 		}
 
+		.highliglted-parent > .row {
+			background: #e6f1ff;
+		}
+
 		.problems-per-item {
 			background: gray;
 			color: #ffffff;
@@ -4489,11 +4541,8 @@ tr.cursor-move {
 			height: 33px;
 		}
 
-		.ui-sortable-helper {
-			background: #f7f7f7;
-			border-color: #d7dadc;
-			border-width: 1px 0px;
-			border-style: solid;
+		.placeholder {
+			border: 1px dashed red;
 		}
 
 		.drop-hover > .row {
