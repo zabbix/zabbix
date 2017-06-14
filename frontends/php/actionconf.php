@@ -143,7 +143,7 @@ elseif (hasRequest('cancel_new_recovery_operation')) {
 	unset($_REQUEST['new_recovery_operation']);
 }
 elseif (hasRequest('cancel_new_ack_operation')) {
-	unset($_REQUEST['new_ack_operation']);
+	$new_ack_operation = [];
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	$action = [
