@@ -818,9 +818,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 						break;
 
 					case OPERATION_TYPE_ACK_MESSAGE:
-						$result[$i][$j][] = bold(
-							_('Notify all who left acknowledgement and comments')
-						);
+						$result[$i][$j][] = bold(_('Notify all who left acknowledgement and comments'));
 						break;
 				}
 			}
