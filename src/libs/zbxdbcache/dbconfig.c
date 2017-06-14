@@ -10449,6 +10449,7 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 		dst->type = src->type;
 		dst->main = src->main;
 		dst->bulk = src->bulk;
+		dst->useip = src->useip;
 		strscpy(dst->ip_orig, src->ip);
 		strscpy(dst->dns_orig, src->dns);
 		strscpy(dst->port_orig, src->port);

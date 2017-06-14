@@ -85,6 +85,7 @@ typedef struct
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	bulk;
+	unsigned char	useip;
 	char		ip_orig[INTERFACE_IP_LEN_MAX];
 	char		dns_orig[INTERFACE_DNS_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];

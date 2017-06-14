@@ -87,10 +87,15 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 		return FAIL;
 	}
 
-	/* sort results */
+	/* sort results in a predictable order */
 
 	if (1 < n)
 		qsort(interfaces, (size_t)n, sizeof(DC_INTERFACE2), compare_interfaces);
+
+	/* repair 'addr' pointers broken by sorting */
+
+	for (i = 0; i < n; i++)
+		interfaces[i].addr = (1 == interfaces[i].useip ? interfaces[i].ip_orig : interfaces[i].dns_orig);
 
 	/* pack results into JSON */
 
