@@ -3641,26 +3641,24 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *prototypes, zbx_vector_pt
 	for (i = items->values_num - 1; i >= 0; i--)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
-		if (0 != item->master_itemid)
-		{
-			item_index_local.parent_itemid = item->master_itemid;
-			item_index_local.lld_row = (zbx_lld_row_t *)item->lld_row;
+		/* only discovered dependent items should be linked */
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) || 0 == item->master_itemid)
+			continue;
 
-			if (NULL == (item_index = zbx_hashset_search(items_index, &item_index_local)))
-			{
-				if (NULL != item->lld_row)
-				{
-					/* dependent item without master item should be removed */
-					THIS_SHOULD_NEVER_HAPPEN;
-					lld_item_free(item);
-					zbx_vector_ptr_remove(items, i);
-				}
-			}
-			else
-			{
-				master = item_index->item;
-				zbx_vector_ptr_append(&master->dependent_items, item);
-			}
+		item_index_local.parent_itemid = item->master_itemid;
+		item_index_local.lld_row = (zbx_lld_row_t *)item->lld_row;
+
+		if (NULL == (item_index = zbx_hashset_search(items_index, &item_index_local)))
+		{
+			/* dependent item without master item should be removed */
+			THIS_SHOULD_NEVER_HAPPEN;
+			lld_item_free(item);
+			zbx_vector_ptr_remove(items, i);
+		}
+		else
+		{
+			master = item_index->item;
+			zbx_vector_ptr_append(&master->dependent_items, item);
 		}
 	}
 
