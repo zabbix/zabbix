@@ -105,7 +105,6 @@
 			value,
 			tpl,
 			container,
-			inlineContainers,
 			field_variables = {
 				userid: {
 					opmsgUserListFooter: {

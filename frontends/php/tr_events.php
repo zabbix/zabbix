@@ -132,17 +132,15 @@ if ($event['r_eventid'] != 0) {
 	}
 }
 
-// Filter out acknowledgment notification messages
-foreach ($alerts as $index => $alert) {
-	if ($alert['acknowledgeid'] > 0) {
-		unset($alerts[$index]);
+// Filter out acknowledgment notification messages.
+foreach ([&$alerts, &$r_alerts] as &$alerts_data) {
+	foreach ($alerts_data as $index => $alert) {
+		if ($alert['acknowledgeid'] > 0) {
+			unset($alerts_data[$index]);
+		}
 	}
 }
-foreach ($r_alerts as $index => $alert) {
-	if ($alert['acknowledgeid'] > 0) {
-		unset($r_alerts[$index]);
-	}
-}
+unset($alerts_data);
 /*
  * Display
  */
