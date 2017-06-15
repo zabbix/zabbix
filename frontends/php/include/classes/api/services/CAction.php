@@ -2282,7 +2282,7 @@ class CAction extends CApiService {
 				$ack_operations[$operationid]['opconditions'] = [];
 			}
 
-			$conditions = API::getApiService()->select('opconditions', [
+			$conditions = DB::select('opconditions', [
 				'output' => ['opconditionid', 'operationid', 'conditiontype', 'operator', 'value'],
 				'filter' => ['operationid' => $ack_operationids],
 				'preservekeys' => true
@@ -2299,7 +2299,7 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opmessage'] = [];
 				}
 
-				$messages = API::getApiService()->select('opmessage', [
+				$messages = DB::select('opmessage', [
 					'output' => ['operationid', 'default_msg', 'subject', 'message', 'mediatypeid'],
 					'filter' => ['operationid' => $opmessages]
 				]);
@@ -2314,7 +2314,7 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opmessage_grp'] = [];
 				}
 
-				$messages_groups = API::getApiService()->select('opmessage_grp', [
+				$messages_groups = DB::select('opmessage_grp', [
 					'output' => ['operationid', 'usrgrpid'],
 					'filter' => ['operationid' => $opmessages]
 				]);
@@ -2329,7 +2329,7 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opmessage_usr'] = [];
 				}
 
-				$messages_users = API::getApiService()->select('opmessage_usr', [
+				$messages_users = DB::select('opmessage_usr', [
 					'output' => ['operationid', 'userid'],
 					'filter' => ['operationid' => $opmessages]
 				]);
@@ -2346,7 +2346,7 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opcommand'] = [];
 				}
 
-				$commands = API::getApiService()->select('opcommand', [
+				$commands = DB::select('opcommand', [
 					'output' => ['operationid', 'type', 'scriptid', 'execute_on', 'port', 'authtype', 'username',
 						'password', 'publickey', 'privatekey', 'command'
 					],
@@ -2363,7 +2363,7 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opcommand_hst'] = [];
 				}
 
-				$commands_history = API::getApiService()->select('opcommand_hst', [
+				$commands_history = DB::select('opcommand_hst', [
 					'output' => ['opcommand_hstid', 'operationid', 'hostid'],
 					'filter' => ['operationid' => $opcommands]
 				]);
@@ -2378,7 +2378,7 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opcommand_grp'] = [];
 				}
 
-				$commands_groups = API::getApiService()->select('opcommand_grp', [
+				$commands_groups = DB::select('opcommand_grp', [
 					'output' => ['opcommand_hstid', 'operationid', 'hostid'],
 					'filter' => ['operationid' => $opcommands]
 				]);
