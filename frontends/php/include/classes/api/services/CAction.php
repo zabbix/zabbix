@@ -626,8 +626,8 @@ class CAction extends CApiService {
 			'selectFilter' => ['formula', 'conditions'],
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'selectRecoveryOperations' => API_OUTPUT_EXTEND,
-			'selectAcknowledgeOperations' => ['operationid', 'actionid', 'operationtype', 'esc_period', 'esc_step_from',
-				'esc_step_to', 'evaltype', 'recovery'
+			'selectAcknowledgeOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
+				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp', 'opconditions'
 			],
 			'actionids' => $actionIds,
 			'editable' => true,
@@ -652,6 +652,7 @@ class CAction extends CApiService {
 				$actionUpdateValues['filter'],
 				$actionUpdateValues['operations'],
 				$actionUpdateValues['recovery_operations'],
+				$actionUpdateValues['acknowledge_operations'],
 				$actionUpdateValues['conditions'],
 				$actionUpdateValues['formula'],
 				$actionUpdateValues['evaltype']
@@ -879,8 +880,6 @@ class CAction extends CApiService {
 
 		foreach ($operations as $operationId => $operation) {
 			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_ACK_MESSAGE:
-					// falls through
 				case OPERATION_TYPE_MESSAGE:
 					if (isset($operation['opmessage']) && !empty($operation['opmessage'])) {
 						$operation['opmessage']['operationid'] = $operationId;
@@ -954,6 +953,8 @@ class CAction extends CApiService {
 					];
 					break;
 
+				case OPERATION_TYPE_ACK_MESSAGE:
+					// falls through
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 					if (array_key_exists('opmessage', $operation) && $operation['opmessage']) {
 						$operation['opmessage']['operationid'] = $operationId;
@@ -1044,8 +1045,6 @@ class CAction extends CApiService {
 				$type_changed = true;
 
 				switch ($operationDb['operationtype']) {
-					case OPERATION_TYPE_ACK_MESSAGE:
-						// falls through
 					case OPERATION_TYPE_MESSAGE:
 						$opMessagesToDeleteByOpId[] = $operationDb['operationid'];
 						$opMessageGrpsToDeleteByOpId[] = $operationDb['operationid'];
@@ -1084,6 +1083,8 @@ class CAction extends CApiService {
 						$opInventoryToDeleteByOpId[] = $operationDb['operationid'];
 						break;
 
+					case OPERATION_TYPE_ACK_MESSAGE:
+						// falls through
 					case OPERATION_TYPE_RECOVERY_MESSAGE:
 						$opMessagesToDeleteByOpId[] = $operationDb['operationid'];
 						break;
@@ -1095,8 +1096,6 @@ class CAction extends CApiService {
 			}
 
 			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_ACK_MESSAGE:
-					// falls through
 				case OPERATION_TYPE_MESSAGE:
 					if (!isset($operation['opmessage_grp'])) {
 						$operation['opmessage_grp'] = [];
@@ -1293,6 +1292,8 @@ class CAction extends CApiService {
 					}
 					break;
 
+				case OPERATION_TYPE_ACK_MESSAGE:
+					// falls throught
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 					if ($type_changed) {
 						$operation['opmessage']['operationid'] = $operation['operationid'];
@@ -1503,10 +1504,6 @@ class CAction extends CApiService {
 			}
 
 			switch ($operationtype) {
-				case OPERATION_TYPE_ACK_MESSAGE:
-					// Do we need specific validation for messages of such type?
-					break;
-
 				case OPERATION_TYPE_MESSAGE:
 					$userids = array_key_exists('opmessage_usr', $operation)
 						? zbx_objectValues($operation['opmessage_usr'], 'userid')
@@ -1517,11 +1514,7 @@ class CAction extends CApiService {
 						: [];
 
 					if (!$userids && !$usrgrpids) {
-						$error_mesage = ($operationtype == OPERATION_TYPE_MESSAGE)
-							? _('No recipients for action operation message.')
-							: _('No recipients for acknowledgement operation message.');
-
-						self::exception(ZBX_API_ERROR_PARAMETERS, $error_mesage);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
 					}
 
 					$all_userids = array_merge($all_userids, $userids);
@@ -2320,7 +2313,7 @@ class CAction extends CApiService {
 				]);
 
 				foreach ($messages_groups as $messages_group) {
-					$ack_operations[$messages_group['operationid']]['opmessage_grp'][] = $messages_groups;
+					$ack_operations[$messages_group['operationid']]['opmessage_grp'][] = $messages_group;
 				}
 			}
 
@@ -2379,7 +2372,7 @@ class CAction extends CApiService {
 				}
 
 				$commands_groups = DB::select('opcommand_grp', [
-					'output' => ['opcommand_hstid', 'operationid', 'hostid'],
+					'output' => ['opcommand_grpid', 'operationid', 'groupid'],
 					'filter' => ['operationid' => $opcommands]
 				]);
 
