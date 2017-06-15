@@ -521,8 +521,8 @@ jQuery(function($) {
 			};
 
 			var getCookieName = function(key) {
-				var widget_data = $this.data('widgetData')
-				return 'zbx_widget'+widget_data['widgetid']+'_'+key;
+				var widget_data = getWidgetData();
+				return 'zbx_widget'+widget_data['fields']['reference']+'_'+key;
 			}
 
 			var storeUIState = function() {
