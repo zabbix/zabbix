@@ -378,22 +378,22 @@
 		widget['content_footer'].fadeTo(0, 1);
 	}
 
-	function startWidgetRefreshTimer(widget, rf_rate) {
+	function startWidgetRefreshTimer(widget, rf_rate, fullscreen) {
 		if (rf_rate != 0) {
-			widget['rf_timeoutid'] = setTimeout(function () { updateWidgetContent(widget); }, rf_rate * 1000);
+			widget['rf_timeoutid'] = setTimeout(function () { updateWidgetContent(widget, fullscreen); }, rf_rate * 1000);
 		}
 	}
 
-	function startWidgetRefresh(widget) {
+	function startWidgetRefresh(widget, fullscreen) {
 		if (typeof(widget['rf_timeoutid']) != 'undefined') {
 			clearTimeout(widget['rf_timeoutid']);
 			delete widget['rf_timeoutid'];
 		}
 
-		startWidgetRefreshTimer(widget, widget['rf_rate']);
+		startWidgetRefreshTimer(widget, widget['rf_rate'], fullscreen);
 	}
 
-	function updateWidgetContent(widget) {
+	function updateWidgetContent(widget, fullscreen) {
 		if (++widget['update_attempts'] > 1) {
 			return;
 		}
@@ -403,6 +403,7 @@
 
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
+		ajax_data['fullscreen'] = fullscreen || 0;
 		ajax_data['widgetid'] = widget['widgetid'];
 		ajax_data['uniqueid'] = widget['uniqueid'];
 		if (widget['header'] !== '') {
@@ -464,28 +465,28 @@
 
 				if (widget['update_attempts'] == 1) {
 					widget['update_attempts'] = 0;
-					startWidgetRefreshTimer(widget, widget['rf_rate']);
+					startWidgetRefreshTimer(widget, widget['rf_rate'], fullscreen);
 				}
 				else {
 					widget['update_attempts'] = 0;
-					updateWidgetContent(widget);
+					updateWidgetContent(widget, fullscreen);
 				}
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
 				widget['update_attempts'] = 0;
-				startWidgetRefreshTimer(widget, 3);
+				startWidgetRefreshTimer(widget, 3, fullscreen);
 			}
 		});
 	}
 
-	function refreshWidget(widget) {
+	function refreshWidget(widget, fullscreen) {
 		if (typeof(widget['rf_timeoutid']) !== 'undefined') {
 			clearTimeout(widget['rf_timeoutid']);
 			delete widget['rf_timeoutid'];
 		}
 
-		updateWidgetContent(widget);
+		updateWidgetContent(widget, fullscreen);
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
@@ -553,7 +554,7 @@
 					}
 
 					updateWidgetDynamic($obj, data, widget);
-					refreshWidget(widget);
+					refreshWidget(widget, data['options']['fullscreen']);
 
 					// mark dashboard as updated
 					data['options']['updated'] = true;
@@ -936,7 +937,7 @@
 				resizeDashboardGrid($this, data);
 
 				showPreloader(widget);
-				updateWidgetContent(widget);
+				updateWidgetContent(widget, data['options']['fullscreen']);
 			});
 		},
 
@@ -948,7 +949,7 @@
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid) {
 						widget['rf_rate'] = rf_rate;
-						startWidgetRefresh(widget);
+						startWidgetRefresh(widget, data['options']['fullscreen']);
 					}
 				});
 			});
@@ -961,7 +962,7 @@
 
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid) {
-						refreshWidget(widget);
+						refreshWidget(widget, data['options']['fullscreen']);
 					}
 				});
 			});

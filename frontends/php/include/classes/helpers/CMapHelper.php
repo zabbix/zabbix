@@ -24,12 +24,14 @@ class CMapHelper {
 	/**
 	 * Get map data with resolved element / link states.
 	 *
-	 * @param array $sysmapids				Map IDs.
-	 * @param int   $min_severity			Minimum severity.
+	 * @param array $sysmapids					Map IDs.
+	 * @param array $options					Options used to retrieve actions.
+	 * @param int   $options['severity_min']	Minimum severity.
+	 * @param int   $options['fullscreen']		Fullscreen flag.
 	 *
 	 * @return array
 	 */
-	public static function get($sysmapids, $min_severity = null) {
+	public static function get($sysmapids, array $options = []) {
 		$maps = API::Map()->get([
 			'output' => ['sysmapid', 'name', 'width', 'height', 'backgroundid', 'label_type', 'label_location',
 				'highlight', 'expandproblem', 'markelements', 'show_unack', 'label_format', 'label_type_host',
@@ -82,11 +84,9 @@ class CMapHelper {
 			];
 		}
 		else {
-			if ($min_severity !== null) {
-				$map['severity_min'] = $min_severity;
-			}
+			$map['severity_min'] = array_key_exists('severity_min', $options) ? $options['severity_min'] : null;
 
-			self::resolveMapState($map, $map['severity_min'], $theme);
+			self::resolveMapState($map, $options, $theme);
 		}
 
 		return [
@@ -111,13 +111,18 @@ class CMapHelper {
 	 * Resolve map element (selements and links) state.
 	 *
 	 * @param array $sysmap				Map data.
-	 * @param int   $min_severity		Minimum severity.
+	 * @param array $options					Options used to retrieve actions.
+	 * @param int   $options['severity_min']	Minimum severity.
+	 * @param int   $options['fullscreen']		Fullscreen flag.
 	 * @param int   $theme				Theme used to create missing elements (like hostgroup frame).
 	 */
-	protected static function resolveMapState(&$sysmap, $min_severity, $theme) {
-		$severity = ['severity_min' => $min_severity];
+	protected static function resolveMapState(&$sysmap, $options, $theme) {
+		$map_info_options = [
+			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
+		];
+
 		$areas = populateFromMapAreas($sysmap, $theme);
-		$map_info = getSelementsInfo($sysmap, $severity);
+		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
 		add_elementNames($sysmap['selements']);
 
@@ -129,7 +134,7 @@ class CMapHelper {
 
 		$labels = getMapLabels($sysmap, $map_info, true);
 		$highlights = getMapHighligts($sysmap, $map_info);
-		$actions = getActionsBySysmap($sysmap, $severity);
+		$actions = getActionsBySysmap($sysmap, $options);
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			$icon = null;

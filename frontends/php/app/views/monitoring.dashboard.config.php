@@ -72,7 +72,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 	}
 
 	elseif ($field instanceof CWidgetFieldRadioButtonList) {
-		$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue()))
+		$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue(true)))
 			->setModern($field->getModern());
 		foreach ($field->getValues() as $key => $value) {
 			$radioButtonsList->addValue($value, $key, null, $field->getAction());

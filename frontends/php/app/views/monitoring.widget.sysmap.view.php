@@ -18,20 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-if (array_key_exists('sysmap_id', $this->data['fields'])) {
-	$options['sysmapid'] = $this->data['fields']['sysmap_id'];
-}
-if (array_key_exists('filter_widget_reference', $this->data['fields'])) {
-	$options['filter_widget_reference'] = $this->data['fields']['filter_widget_reference'];
-}
-$options['source_type'] = $this->data['fields']['source_type'];
-$options['widgetid'] = $this->data['widgetid'];
-
-$item = (new CSysmap($options));
-
-if ($this->data['error'] !== null) {
-	$item->setError($this->data['error']);
-}
+$options = array_merge($data['fields'], ['widgetid' => $data['widgetid']]);
+$item = new CDashboardWidgetMap($options, $data['fullscreen']);
 
 $output = [
 	'header' => $data['name'],

@@ -26,7 +26,7 @@ class CSysmapWidgetForm extends CWidgetForm
 		// select source type field
 		$source_types = [
 			WIDGET_SYSMAP_SOURCETYPE_MAP => _('Map'),
-			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Filter'),
+			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree'),
 		];
 		$field_source_type = (new CWidgetFieldRadioButtonList('source_type', _('Source type'), $source_types,
 				WIDGET_SYSMAP_SOURCETYPE_MAP, 'updateWidgetConfigDialogue()'))->setModern(true);
@@ -38,7 +38,7 @@ class CSysmapWidgetForm extends CWidgetForm
 		// select filter widget field
 		if ($field_source_type->getValue(true) === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			$field_filter_widget = (new CWidgetFieldWidgetsByTypeComboBox('filter_widget_reference',
-				_('Map navigation tree widget')
+				_('Filter')
 			))
 				->setRequired(true);
 			if (array_key_exists('filter_widget_reference', $data)) {
@@ -48,10 +48,10 @@ class CSysmapWidgetForm extends CWidgetForm
 		}
 
 		// select sysmap field
-		$field_map = (new CWidgetFieldSelectResource('sysmap_id', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP))
+		$field_map = (new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP))
 			->setRequired($field_source_type->getValue(true) === WIDGET_SYSMAP_SOURCETYPE_MAP);
-		if (array_key_exists('sysmap_id', $data)) {
-			$field_map->setValue($data['sysmap_id']);
+		if (array_key_exists('sysmapid', $data)) {
+			$field_map->setValue($data['sysmapid']);
 		}
 		$this->fields[] = $field_map;
 	}

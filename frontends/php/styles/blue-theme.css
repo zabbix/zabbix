@@ -3006,6 +3006,9 @@ tr.cursor-move td * {
 .clock-lines {
   fill: #acbbc2; }
 
+.sysmap {
+  border-style: none; }
+
 @keyframes fadein {
   from {
     opacity: 0; }

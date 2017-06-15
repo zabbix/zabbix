@@ -28,9 +28,10 @@ class CControllerWidgetSysmapView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'		=>	'string',
-			'widgetid'	=>	'required',
-			'fields'	=>	'array'
+			'name'			=>	'string',
+			'widgetid'		=>	'required',
+			'fullscreen'	=>	'in 0,1',
+			'fields'		=>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -39,7 +40,6 @@ class CControllerWidgetSysmapView extends CController {
 			$input_fields = getRequest('fields');
 
 			$validationRules = [
-				'widget_name' => 'string',
 				'source_type' => 'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER
 			];
 
@@ -66,8 +66,13 @@ class CControllerWidgetSysmapView extends CController {
 		}
 
 		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+			$output = [];
+
+			if (($messages = getMessages()) !== null) {
+				$output['errors'][] = $messages->toString();
+			}
+
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
 		}
 
 		return $ret;
@@ -78,7 +83,6 @@ class CControllerWidgetSysmapView extends CController {
 	}
 
 	protected function doAction() {
-		$error = null;
 		$data = [];
 
 		// Default values
@@ -104,9 +108,9 @@ class CControllerWidgetSysmapView extends CController {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
+			'fullscreen' => getRequest('fullscreen', 0),
 			'widgetid' => getRequest('widgetid'),
-			'fields' => $data,
-			'error' => $error
+			'fields' => $data
 		]));
 	}
 }
