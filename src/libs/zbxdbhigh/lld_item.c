@@ -3648,10 +3648,13 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *prototypes, zbx_vector_pt
 
 			if (NULL == (item_index = zbx_hashset_search(items_index, &item_index_local)))
 			{
-				/* dependent item without master item should be removed */
-				THIS_SHOULD_NEVER_HAPPEN;
-				lld_item_free(item);
-				zbx_vector_ptr_remove(items, i);
+				if (NULL != item->lld_row)
+				{
+					/* dependent item without master item should be removed */
+					THIS_SHOULD_NEVER_HAPPEN;
+					lld_item_free(item);
+					zbx_vector_ptr_remove(items, i);
+				}
 			}
 			else
 			{
