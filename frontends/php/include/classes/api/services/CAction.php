@@ -61,34 +61,34 @@ class CAction extends CApiService {
 		];
 
 		$defOptions = [
-			'groupids'					=> null,
-			'hostids'					=> null,
-			'actionids'					=> null,
-			'triggerids'				=> null,
-			'mediatypeids'				=> null,
-			'usrgrpids'					=> null,
-			'userids'					=> null,
-			'scriptids'					=> null,
-			'nopermissions'				=> null,
-			'editable'					=> null,
+			'groupids'						=> null,
+			'hostids'						=> null,
+			'actionids'						=> null,
+			'triggerids'					=> null,
+			'mediatypeids'					=> null,
+			'usrgrpids'						=> null,
+			'userids'						=> null,
+			'scriptids'						=> null,
+			'nopermissions'					=> null,
+			'editable'						=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
-			'searchWildcardsEnabled'	=> null,
+			'filter'						=> null,
+			'search'						=> null,
+			'searchByAny'					=> null,
+			'startSearch'					=> null,
+			'excludeSearch'					=> null,
+			'searchWildcardsEnabled'		=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectFilter'				=> null,
-			'selectOperations'			=> null,
-			'selectRecoveryOperations'	=> null,
+			'output'						=> API_OUTPUT_EXTEND,
+			'selectFilter'					=> null,
+			'selectOperations'				=> null,
+			'selectRecoveryOperations'		=> null,
 			'selectAcknowledgeOperations'	=> null,
-			'countOutput'				=> null,
-			'preservekeys'				=> null,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
+			'countOutput'					=> null,
+			'preservekeys'					=> null,
+			'sortfield'						=> '',
+			'sortorder'						=> '',
+			'limit'							=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -626,7 +626,9 @@ class CAction extends CApiService {
 			'selectFilter' => ['formula', 'conditions'],
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'selectRecoveryOperations' => API_OUTPUT_EXTEND,
-			'selectAcknowledgeOperations' => API_OUTPUT_EXTEND,
+			'selectAcknowledgeOperations' => ['operationid', 'actionid', 'operationtype', 'esc_period', 'esc_step_from',
+				'esc_step_to', 'evaltype', 'recovery'
+			],
 			'actionids' => $actionIds,
 			'editable' => true,
 			'preservekeys' => true
@@ -735,14 +737,10 @@ class CAction extends CApiService {
 						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
 						$operations_to_create[] = $ack_operation;
 					}
-					else {
-						$operationid = $ack_operation['operationid'];
-
-						if (array_key_exists($operationid, $db_ack_operations)) {
-							$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
-							$operations_to_update[] = $ack_operation;
-							unset($db_ack_operations[$operationid]);
-						}
+					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
+						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+						$operations_to_update[] = $ack_operation;
+						unset($db_ack_operations[$ack_operation['operationid']]);
 					}
 				}
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_ack_operations));
@@ -1040,9 +1038,10 @@ class CAction extends CApiService {
 
 			$operationDb = $operationsDb[$operation['operationid']];
 
-			$typeChanged = false;
+			$type_changed = false;
+
 			if (isset($operation['operationtype']) && ($operation['operationtype'] != $operationDb['operationtype'])) {
-				$typeChanged = true;
+				$type_changed = true;
 
 				switch ($operationDb['operationtype']) {
 					case OPERATION_TYPE_ACK_MESSAGE:
@@ -1120,7 +1119,7 @@ class CAction extends CApiService {
 						$operationDb['opmessage_grp'] = [];
 					}
 
-					if ($typeChanged) {
+					if ($type_changed) {
 						$operation['opmessage']['operationid'] = $operation['operationid'];
 						$opMessagesToInsert[] = $operation['opmessage'];
 
@@ -1176,7 +1175,7 @@ class CAction extends CApiService {
 						$operationDb['opcommand_hst'] = [];
 					}
 
-					if ($typeChanged) {
+					if ($type_changed) {
 						$operation['opcommand']['operationid'] = $operation['operationid'];
 						$opCommandsToInsert[] = $operation['opcommand'];
 
@@ -1282,7 +1281,7 @@ class CAction extends CApiService {
 					break;
 
 				case OPERATION_TYPE_HOST_INVENTORY:
-					if ($typeChanged) {
+					if ($type_changed) {
 						$operation['opinventory']['operationid'] = $operation['operationid'];
 						$opInventoryToInsert[] = $operation['opinventory'];
 					}
@@ -1295,7 +1294,7 @@ class CAction extends CApiService {
 					break;
 
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if ($typeChanged) {
+					if ($type_changed) {
 						$operation['opmessage']['operationid'] = $operation['operationid'];
 						$opMessagesToInsert[] = $operation['opmessage'];
 					}
@@ -2260,107 +2259,132 @@ class CAction extends CApiService {
 	 * @return array
 	 */
 	protected function getAcknowledgeOperations($ack_operations, $ack_options) {
-		$ack_operationids = array_keys($ack_operations);
-		$single_child = [];
-		$multiple_childs = [];
 		$opmessages = [];
 		$opcommands = [];
-		$op_ack_messages = [];
 
 		foreach ($ack_operations as $ack_operationid => $ack_operation) {
 			switch ($ack_operation['operationtype']) {
+				case OPERATION_TYPE_ACK_MESSAGE:
+					// falls through
 				case OPERATION_TYPE_MESSAGE:
 					$opmessages[] = $ack_operationid;
 					break;
 				case OPERATION_TYPE_COMMAND:
 					$opcommands[] = $ack_operationid;
 					break;
-				case OPERATION_TYPE_ACK_MESSAGE:
-					$op_ack_messages[] = $ack_operationid;
-					break;
 			}
 		}
 
-		$multiple_childs[] = [
-			'opconditions',
-			'SELECT op.* FROM opconditions op WHERE '.dbConditionInt('op.operationid', $ack_operationids)
-		];
-		foreach ($ack_operationids as $operationid) {
-			$ack_operations[$operationid]['opconditions'] = [];
+		if ($this->outputIsRequested('opconditions', $ack_options)) {
+			$ack_operationids = array_keys($ack_operations);
+
+			foreach ($ack_operationids as $operationid) {
+				$ack_operations[$operationid]['opconditions'] = [];
+			}
+
+			$conditions = API::getApiService()->select('opconditions', [
+				'output' => ['opconditionid', 'operationid', 'conditiontype', 'operator', 'value'],
+				'filter' => ['operationid' => $ack_operationids],
+				'preservekeys' => true
+			]);
+
+			foreach ($conditions as $condition) {
+				$ack_operations[$condition['operationid']]['opconditions'][] = $condition;
+			}
 		}
 
 		if ($opmessages) {
-			$single_child[] = [
-				'opmessage',
-				'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
-				' FROM opmessage o'.
-				' WHERE '.dbConditionInt('operationid', $opmessages)
-			];
-			$multiple_childs[] = [
-				'opmessage_grp',
-				'SELECT og.operationid,og.usrgrpid'.
-				' FROM opmessage_grp og'.
-				' WHERE '.dbConditionInt('operationid', $opmessages)
-			];
-			$multiple_childs[] = [
-				'opmessage_usr',
-				'SELECT ou.operationid,ou.userid'.
-				' FROM opmessage_usr ou'.
-				' WHERE '.dbConditionInt('operationid', $opmessages)
-			];
-		}
+			if ($this->outputIsRequested('opmessage', $ack_options)) {
+				foreach ($opmessages as $operationid) {
+					$ack_operations[$operationid]['opmessage'] = [];
+				}
 
-		if ($opcommands) {
-			$single_child[] = [
-				'opcommand',
-				'SELECT o.* FROM opcommand o WHERE '.dbConditionInt('operationid', $opcommands)
-			];
-			$multiple_childs[] = [
-				'opcommand_hst',
-				'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
-				' FROM opcommand_hst oh'.
-				' WHERE '.dbConditionInt('operationid', $opcommands)
-			];
-			$multiple_childs[] = [
-				'opcommand_grp',
-				'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
-				' FROM opcommand_grp og'.
-				' WHERE '.dbConditionInt('operationid', $opcommands)
-			];
-		}
+				$messages = API::getApiService()->select('opmessage', [
+					'output' => ['operationid', 'default_msg', 'subject', 'message', 'mediatypeid'],
+					'filter' => ['operationid' => $opmessages]
+				]);
 
-		if ($op_ack_messages) {
-			$single_child[] = [
-				'opmessage',
-				'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
-				' FROM opmessage o'.
-				' WHERE '.dbConditionInt('operationid', $op_ack_messages)
-			];
-		}
+				foreach ($messages as $message) {
+					$ack_operations[$message['operationid']]['opmessage'] = $message;
+				}
+			}
 
-		if ($multiple_childs) {
-			foreach ($multiple_childs as $child_getter) {
-				list($opkey, $opquery) = $child_getter;
-				if ($this->outputIsRequested($opkey, $ack_options)) {
-					$db_cursor = DBselect($opquery);
-					while ($db_row = DBfetch($db_cursor)) {
-						if (!array_key_exists($opkey, $ack_operations[$db_row['operationid']])) {
-							$ack_operations[$db_row['operationid']][$opkey] = [];
-						}
-						$ack_operations[$db_row['operationid']][$opkey][] = $db_row;
-					}
+			if ($this->outputIsRequested('opmessage_grp', $ack_options)) {
+				foreach ($opmessages as $operationid) {
+					$ack_operations[$operationid]['opmessage_grp'] = [];
+				}
+
+				$messages_groups = API::getApiService()->select('opmessage_grp', [
+					'output' => ['operationid', 'usrgrpid'],
+					'filter' => ['operationid' => $opmessages]
+				]);
+
+				foreach ($messages_groups as $messages_group) {
+					$ack_operations[$messages_group['operationid']]['opmessage_grp'][] = $messages_groups;
+				}
+			}
+
+			if ($this->outputIsRequested('opmessage_usr', $ack_options)) {
+				foreach ($opmessages as $operationid) {
+					$ack_operations[$operationid]['opmessage_usr'] = [];
+				}
+
+				$messages_users = API::getApiService()->select('opmessage_usr', [
+					'output' => ['operationid', 'userid'],
+					'filter' => ['operationid' => $opmessages]
+				]);
+
+				foreach ($messages_users as $messages_user) {
+					$ack_operations[$messages_user['operationid']]['opmessage_usr'][] = $messages_user;
 				}
 			}
 		}
 
-		if ($single_child) {
-			foreach ($single_child as $child_getter) {
-				list($opkey, $opquery) = $child_getter;
-				if ($this->outputIsRequested($opkey, $ack_options)) {
-					$db_cursor = DBselect($opquery);
-					while ($db_row = DBfetch($db_cursor)) {
-						$ack_operations[$db_row['operationid']][$opkey] = $db_row;
-					}
+		if ($opcommands) {
+			if ($this->outputIsRequested('opcommand', $ack_options)) {
+				foreach ($opcommands as $operationid) {
+					$ack_operations[$operationid]['opcommand'] = [];
+				}
+
+				$commands = API::getApiService()->select('opcommand', [
+					'output' => ['operationid', 'type', 'scriptid', 'execute_on', 'port', 'authtype', 'username',
+						'password', 'publickey', 'privatekey', 'command'
+					],
+					'filter' => ['operationid' => $opcommands]
+				]);
+
+				foreach ($commands as $command) {
+					$ack_operations[$command['operationid']]['opcommand'] = $command;
+				}
+			}
+
+			if ($this->outputIsRequested('opcommand_hst', $ack_options)) {
+				foreach ($opcommands as $operationid) {
+					$ack_operations[$operationid]['opcommand_hst'] = [];
+				}
+
+				$commands_history = API::getApiService()->select('opcommand_hst', [
+					'output' => ['opcommand_hstid', 'operationid', 'hostid'],
+					'filter' => ['operationid' => $opcommands]
+				]);
+
+				foreach ($commands_history as $command_history) {
+					$ack_operations[$command_history['operationid']]['opcommand_hst'][] = $command_history;
+				}
+			}
+
+			if ($this->outputIsRequested('opcommand_grp', $ack_options)) {
+				foreach ($opcommands as $operationid) {
+					$ack_operations[$operationid]['opcommand_grp'] = [];
+				}
+
+				$commands_groups = API::getApiService()->select('opcommand_grp', [
+					'output' => ['opcommand_hstid', 'operationid', 'hostid'],
+					'filter' => ['operationid' => $opcommands]
+				]);
+
+				foreach ($commands_groups as $command_group) {
+					$ack_operations[$command_group['operationid']]['opcommand_grp'][] = $command_history;
 				}
 			}
 		}
