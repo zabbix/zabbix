@@ -52,6 +52,10 @@
 			len + sizeof(zbx_uint32_t)					\
 		)									\
 	)
+	
+#define zbx_serialize_value(buffer, value) (memcpy(buffer, &value, sizeof(value)), sizeof(value))
+
+/* deserialization of primitive types */
 
 #define zbx_deserialize_uint64(buffer, value) \
 	(memcpy(value, buffer, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
