@@ -160,9 +160,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'recovery_operations' => getRequest('recovery_operations', []),
 		'acknowledge_operations' => getRequest('ack_operations', [])
 	];
-	$operation_keys = ['operations', 'recovery_operations', 'acknowledge_operations'];
 
-	foreach ($operation_keys as $operation_key) {
+	foreach (['operations', 'recovery_operations', 'acknowledge_operations'] as $operation_key) {
 		foreach ($action[$operation_key] as &$operation) {
 			if (array_key_exists('opmessage', $operation)
 					&& !array_key_exists('default_msg', $operation['opmessage'])) {
@@ -183,7 +182,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			unset($operation['groupids']);
 		}
 		elseif ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD
-					|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
+				|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
 			$operation['optemplate'] = [];
 
 			foreach ($operation['templateids'] as $templateid) {
@@ -480,7 +479,7 @@ elseif (hasRequest('edit_recovery_operationid')) {
 	}
 }
 elseif (hasRequest('edit_ack_operationid')) {
-	$edit_ack_operationid = array_keys(getRequest('edit_ack_operationid'))[0];
+	$edit_ack_operationid = key(getRequest('edit_ack_operationid'));
 
 	if (array_key_exists($edit_ack_operationid, $ack_operations)) {
 		$new_ack_operation = $ack_operations[$edit_ack_operationid];
@@ -773,7 +772,7 @@ if (hasRequest('form')) {
 		$data['new_recovery_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
 	}
 
-	$data['available_mediatypes'] = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
+	$data['available_mediatypes'] = API::MediaType()->get(['output' => ['mediatypeid', 'description']]);
 	order_result($data['available_mediatypes'], 'description');
 
 	if ($data['new_ack_operation'] && !is_array($data['new_ack_operation'])) {
