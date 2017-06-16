@@ -110,6 +110,8 @@ class CRouter {
 		'widget.navigationtree.edititemdialog'	=> ['CControllerWidgetNavigationtreeItemEditDialog',	'layout.json',		null],
 		'widget.navigationtree.edititem'		=> ['CControllerWidgetNavigationtreeItemEdit',			'layout.json',		null],
 		'widget.actlog.view'	=> ['CControllerWidgetActionLogView',	'layout.widget',		'monitoring.widget.actionlog.view'],
+		'widget.dataover.view'	=> ['CControllerWidgetDataOverView',	'layout.widget',		'monitoring.widget.dataover.view'],
+		'widget.trigover.view'	=> ['CControllerWidgetTrigOverView',	'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view']
 	];
 

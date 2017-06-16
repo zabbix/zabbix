@@ -1142,6 +1142,9 @@ define('WIDGET_CLOCK',					'clock');
 define('WIDGET_SYSMAP',					'sysmap');
 define('WIDGET_NAVIGATION_TREE', 'navigationtree');
 define('WIDGET_URL',					'url');
+define('WIDGET_ACTION_LOG',				'actlog');
+define('WIDGET_DATA_OVERVIEW',			'dataover');
+define('WIDGET_TRIG_OVERVIEW',			'trigover');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
@@ -1153,8 +1156,6 @@ define('WIDGET_FIELD_SELECT_RES_ITEM',		2);
 
 // max depth of navigation tree
 define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
-
-define('WIDGET_ACTION_LOG',				'actlog');
 
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
