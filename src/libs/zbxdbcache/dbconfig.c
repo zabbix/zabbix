@@ -157,7 +157,7 @@ typedef struct
 	unsigned char		unreachable;
 
 	zbx_vector_ptr_t	preproc_ops;
-	zbx_vector_uint64_t	dependent_items;
+	zbx_vector_uint64_t	dep_itemids;
 }
 ZBX_DC_ITEM;
 
@@ -2582,7 +2582,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_vector_ptr_create_ext(&item->preproc_ops, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
 
-			zbx_vector_uint64_create_ext(&item->dependent_items, __config_mem_malloc_func,
+			zbx_vector_uint64_create_ext(&item->dep_itemids, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
 		}
 		else
@@ -2619,16 +2619,16 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 					zbx_vector_ptr_clear(&item->preproc_ops);
 			}
 
-			if (0 < item->dependent_items.values_alloc)
+			if (0 < item->dep_itemids.values_alloc)
 			{
-				if (0 == item->dependent_items.values_num)
+				if (0 == item->dep_itemids.values_num)
 				{
-					zbx_vector_uint64_destroy(&item->dependent_items);
-					zbx_vector_uint64_create_ext(&item->dependent_items, __config_mem_malloc_func,
+					zbx_vector_uint64_destroy(&item->dep_itemids);
+					zbx_vector_uint64_create_ext(&item->dep_itemids, __config_mem_malloc_func,
 							__config_mem_realloc_func, __config_mem_free_func);
 				}
 				else
-					zbx_vector_uint64_clear(&item->dependent_items);
+					zbx_vector_uint64_clear(&item->dep_itemids);
 			}
 		}
 
@@ -3185,7 +3185,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			config->items.mem_free_func(item->triggers);
 
 		zbx_vector_ptr_destroy(&item->preproc_ops);
-		zbx_vector_uint64_destroy(&item->dependent_items);
+		zbx_vector_uint64_destroy(&item->dep_itemids);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -3195,7 +3195,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 	while (NULL != (dependentitem = zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL != (item = zbx_hashset_search(&config->items, &dependentitem->master_itemid)))
-			zbx_vector_uint64_append(&item->dependent_items, dependentitem->itemid);
+			zbx_vector_uint64_append(&item->dep_itemids, dependentitem->itemid);
 		else
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -6153,21 +6153,21 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, zbx_uint6
 
 	if (0 != (flags & ZBX_FLAG_ITEM_FIELDS_DEPENDENT))
 	{
-		if (0 != (dst_item->dependent_item_count = src_item->dependent_items.values_num))
+		if (0 != (dst_item->dep_itemids_num = src_item->dep_itemids.values_num))
 		{
-			dst_item->dependent_items = zbx_malloc(NULL, sizeof(zbx_uint64_t) *
-					src_item->dependent_items.values_num);
+			dst_item->dep_itemids = zbx_malloc(NULL, sizeof(zbx_uint64_t) *
+					src_item->dep_itemids.values_num);
 
-			memcpy(dst_item->dependent_items, src_item->dependent_items.values, sizeof(zbx_uint64_t) *
-					src_item->dependent_items.values_num);
+			memcpy(dst_item->dep_itemids, src_item->dep_itemids.values, sizeof(zbx_uint64_t) *
+					src_item->dep_itemids.values_num);
 		}
 		else
-			dst_item->dependent_items = NULL;
+			dst_item->dep_itemids = NULL;
 	}
 	else
 	{
-		dst_item->dependent_item_count = 0;
-		dst_item->dependent_items = NULL;
+		dst_item->dep_itemids_num = 0;
+		dst_item->dep_itemids = NULL;
 	}
 }
 
@@ -6197,7 +6197,7 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 
 		zbx_free(items[i].db_error);
 		zbx_free(items[i].preproc_ops);
-		zbx_free(items[i].dependent_items);
+		zbx_free(items[i].dep_itemids);
 	}
 }
 
@@ -6415,7 +6415,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	zbx_hashset_iter_reset(&config->items, &iter);
 	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
-		if ((0 < dc_item->preproc_ops.values_num || 0 < dc_item->dependent_items.values_num ||
+		if ((0 < dc_item->preproc_ops.values_num || 0 < dc_item->dep_itemids.values_num ||
 				ITEM_TYPE_INTERNAL == dc_item->type) && ITEM_STATUS_ACTIVE == dc_item->status &&
 				NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
 				HOST_STATUS_MONITORED == dc_host->status)

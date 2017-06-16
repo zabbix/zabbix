@@ -157,7 +157,7 @@ typedef struct
 	int			history;
 	int			trends;
 	int			preproc_ops_num;
-	int			dependent_item_count;
+	int			dep_itemids_num;
 	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
 	char			snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
@@ -176,7 +176,7 @@ typedef struct
 	char			*db_error;
 
 	zbx_item_preproc_t	*preproc_ops;
-	zbx_uint64_t		*dependent_items;
+	zbx_uint64_t		*dep_itemids;
 }
 DC_ITEM;
 
