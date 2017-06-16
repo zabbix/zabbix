@@ -130,8 +130,10 @@ class CNavigationTree extends CDiv {
 										$el_type = $db_mapelement['elementtype'];
 										$el_id = $db_mapelement['elementid'];
 
-										$problems_by_elements[SYSMAP_ELEMENT_TYPE_MAP][$element['sysmapid']][$el_type][] = $el_id;
-										$problems_by_elements[$el_type][$el_id] = $this->problems_per_severity_tpl;
+										if (array_key_exists(SYSMAP_ELEMENT_TYPE_MAP, $problems_by_elements)) {
+											$problems_by_elements[SYSMAP_ELEMENT_TYPE_MAP][$element['sysmapid']][$el_type][] = $el_id;
+											$problems_by_elements[$el_type][$el_id] = $this->problems_per_severity_tpl;
+										}
 									}
 								}
 								break;
