@@ -1718,6 +1718,29 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect inventory mode in action operation.'));
 					}
 					break;
+
+				case OPERATION_TYPE_ACK_MESSAGE:
+					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
+
+					if (!array_key_exists('default_msg', $message) || !$message['default_msg']) {
+						if (!array_key_exists('subject', $message) || !$message['subject']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'subject', _('cannot be empty')
+							));
+						}
+						if (!array_key_exists('message', $message) || !$message['message']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'message', _('cannot be empty')
+							));
+						}
+					}
+
+					if (!array_key_exists('mediatypeid', $message)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'mediatypeid', _('cannot be empty')
+						));
+					}
+					break;
 			}
 		}
 
