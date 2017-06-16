@@ -21,15 +21,20 @@
 class CDashboardWidgetMap extends CDiv {
 	private $severity_min;
 	private $sysmap_conf;
-	private $sysmap_data;
+	private $previous_maps;
 	private $fullscreen;
+	private $uniqueid;
 	private $error;
 
-	public function __construct(array $options = [], $fullscreen = 0) {
+	public function __construct(array $options = [], array $widget_settings) {
 		parent::__construct();
 
 		$this->sysmap_conf = $options;
-		$this->fullscreen = $fullscreen;
+		$this->previous_maps = array_key_exists('previous_maps', $widget_settings)
+			? $widget_settings['previous_maps']
+			: '';
+		$this->fullscreen = array_key_exists('fullscreen', $widget_settings) ? $widget_settings['fullscreen'] : 0;
+		$this->uniqueid = array_key_exists('uniqueid', $widget_settings) ? $widget_settings['uniqueid'] : 0;
 		$this->severity_min = 0;
 
 		$options = [
@@ -37,8 +42,21 @@ class CDashboardWidgetMap extends CDiv {
 			'fullscreen' => $this->fullscreen
 		];
 
-		if ($this->sysmap_conf['sysmapid']) {
-			$this->sysmap_data = CMapHelper::get($this->sysmap_conf['sysmapid'], $options);
+		$sysmapid = array_key_exists('sysmapid', $this->sysmap_conf) ? $this->sysmap_conf['sysmapid'] : [];
+		$this->sysmap_data = CMapHelper::get($sysmapid, $options);
+
+		if ($sysmapid) {
+			foreach ($this->sysmap_data['elements'] as &$elemnet) {
+				$actions = json_decode($elemnet['actions'], true);
+				if (array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
+					$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
+					$actions['navigatetos']['submap']['widget_uniqueid'] = $this->uniqueid;
+					unset($actions['gotos']['submap']);
+				}
+
+				$elemnet['actions'] = json_encode($actions);
+			}
+			unset($elemnet);
 		}
 	}
 
@@ -52,12 +70,14 @@ class CDashboardWidgetMap extends CDiv {
 
 			$script_run =
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
-					'widgetid: '.(int)$this->sysmap_conf['widgetid'].','.
+					'uniqueid: "'.$this->uniqueid.'",'.
 					'sourceWidgetReference: "'.$reference.'",'.
 					'callback: function(widget, data) {'.
 						'if(data[0].mapid !== +data[0].mapid) return;'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-							'\'setWidgetFieldValue\', widget.widgetid, \'sysmapid\', data[0].mapid);'.
+							'\'setWidgetFieldValue\', widget.uniqueid, \'sysmapid\', data[0].mapid);'.
+						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
+							'\'setWidgetFieldValue\', widget.uniqueid, \'previous_maps\', "");'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
 							'\'refreshWidget\', widget.widgetid);'.
 					'}'.
@@ -65,7 +85,7 @@ class CDashboardWidgetMap extends CDiv {
 		}
 
 		if ($this->sysmap_data) {
-			$this->sysmap_data['container'] = "#map_{$this->sysmap_conf['widgetid']}";
+			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
 
 			$script_run .= 'jQuery(document).ready(function(){'.
 				'new SVGMap('.zbx_jsvalue($this->sysmap_data).')'.
@@ -77,11 +97,49 @@ class CDashboardWidgetMap extends CDiv {
 
 	private function build() {
 		$this->addClass(ZBX_STYLE_SYSMAP);
+		$this->setAttribute('data-uniqueid', $this->uniqueid);
 		$this->setId(uniqid());
 
 		if ($this->error === null) {
+			if ($this->previous_maps) {
+				$this->previous_maps = array_filter(explode(',', $this->previous_maps), 'is_numeric');
+
+				if ($this->previous_maps) {
+					// try avoid loops
+					$index = count($this->previous_maps) - 1;
+					while ($index > 0) {
+						if ($this->previous_maps[$index] == $this->sysmap_conf['sysmapid']) {
+							break;
+						}
+
+						$index--;
+					}
+
+					$this->previous_maps = array_slice($this->previous_maps, 0, $index + 1);
+
+					// get previous map
+					$maps = API::Map()->get([
+						'sysmapids' => [array_pop($this->previous_maps)],
+						'output' => ['sysmapid', 'name']
+					]);
+
+					if ($maps) {
+						if (($map = reset($maps)) !== false) {
+							$go_back_url = 'javascript: navigateToSubmap('.$map['sysmapid'].', "'.$this->uniqueid.'", true);';
+							$go_back_div = (new CDiv())
+								->setAttribute('style', 'padding:5px 10px; border-bottom: 1px solid #ebeef0;')
+								->addItem(
+									(new CLink('Go back to '.$map['name'], $go_back_url))
+								);
+
+							$this->addItem($go_back_div);
+						}
+					}
+				}
+			}
+
 			$map_div = (new CDiv())
-				->setId('map_'.$this->sysmap_conf['widgetid'])
+				->setId('map_'.$this->uniqueid)
 				->addStyle('width:'.$this->sysmap_data['canvas']['width'].'px;')
 				->addStyle('height:'.$this->sysmap_data['canvas']['height'].'px;')
 				->addStyle('overflow:hidden;');
@@ -103,7 +161,8 @@ class CDashboardWidgetMap extends CDiv {
 	public function getScriptFile() {
 		return [
 			'js/vector/class.svg.canvas.js',
-			'js/vector/class.svg.map.js'
+			'js/vector/class.svg.map.js',
+			'js/class.mapWidget.js',
 		];
 	}
 }

@@ -964,20 +964,20 @@
 					data = $this.data('dashboardGrid');
 
 				$.each(data['widgets'], function(index, widget) {
-					if (widget['widgetid'] == widgetid) {
+					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
 						refreshWidget(widget, data['options']['fullscreen']);
 					}
 				});
 			});
 		},
 
-		setWidgetFieldValue: function(widgetid, field, value) {
+		setWidgetFieldValue: function(uniqueid, field, value) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
 				$.each(data['widgets'], function(index, widget) {
-					if (widget['widgetid'] == widgetid) {
+					if (widget['uniqueid'] === uniqueid) {
 						widget['fields'][field] = value;
 					}
 				});
@@ -1167,7 +1167,7 @@
 						data = $this.data('dashboardGrid');
 
 				for (var i = 0, l = data['widgets'].length; l > i; i++) {
-					if (data['widgets'][i]['widgetid'] == obj.widgetid) {
+					if (data['widgets'][i]['uniqueid'] == obj.uniqueid) {
 						if (typeof data['widgets'][i]['listenFor'] === 'undefined') {
 							data['widgets'][i]['listenFor'] = [];
 						}

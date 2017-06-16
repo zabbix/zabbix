@@ -18,8 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$options = array_merge($data['fields'], ['widgetid' => $data['widgetid']]);
-$item = new CDashboardWidgetMap($options, $data['fullscreen']);
+$widget_settings = [
+	'previous_maps' => $data['previous_maps'],
+	'fullscreen' => $data['fullscreen'],
+	'uniqueid' => $data['uniqueid']
+];
+
+$item = new CDashboardWidgetMap($data['fields'], $widget_settings);
 
 $output = [
 	'header' => $data['name'],

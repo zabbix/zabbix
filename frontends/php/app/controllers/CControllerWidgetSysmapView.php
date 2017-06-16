@@ -30,6 +30,7 @@ class CControllerWidgetSysmapView extends CController {
 		$fields = [
 			'name'			=>	'string',
 			'widgetid'		=>	'required',
+			'uniqueid'		=>	'required',
 			'fullscreen'	=>	'in 0,1',
 			'fields'		=>	'array'
 		];
@@ -40,7 +41,8 @@ class CControllerWidgetSysmapView extends CController {
 			$input_fields = getRequest('fields');
 
 			$validationRules = [
-				'source_type' => 'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER
+				'source_type' => 'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER,
+				'previous_maps' =>	'string',
 			];
 
 			if (array_key_exists('source_type', $input_fields)) {
@@ -103,13 +105,17 @@ class CControllerWidgetSysmapView extends CController {
 			}
 		}
 
+		$input_fields = getRequest('fields');
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
+			'previous_maps' => array_key_exists('previous_maps', $input_fields) ? $input_fields['previous_maps'] : '',
 			'fullscreen' => getRequest('fullscreen', 0),
 			'widgetid' => getRequest('widgetid'),
+			'uniqueid' => getRequest('uniqueid'),
 			'fields' => $data
 		]));
 	}
