@@ -1757,12 +1757,11 @@ class CAction extends CApiService {
 								'message', _('cannot be empty')
 							));
 						}
-					}
-
-					if (!array_key_exists('mediatypeid', $message)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'mediatypeid', _('cannot be empty')
-						));
+						if (!array_key_exists('mediatypeid', $message)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'mediatypeid', _('cannot be empty')
+							));
+						}
 					}
 
 					if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
