@@ -1467,13 +1467,14 @@ class CAction extends CApiService {
 		$required_fields = ['eventsource', 'recovery', 'operationtype'];
 
 		foreach ($operations as $operation) {
-			foreach ($required_fields as $field) {
-				if (!array_key_exists($field, $operation)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', $field));
-				}
+			if (!check_db_fields($required_fields, $operation)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter for operations.'));
 			}
+			$eventsource = $operation['eventsource'];
+			$recovery = $operation['recovery'];
+			$operationtype = $operation['operationtype'];
 
-			if ($operation['recovery'] == ACTION_OPERATION) {
+			if ($recovery == ACTION_OPERATION) {
 				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
 						&& (!array_key_exists('esc_step_from', $operation)
 							|| !array_key_exists('esc_step_to', $operation))) {
@@ -1499,10 +1500,6 @@ class CAction extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation step duration.'));
 				}
 			}
-
-			$eventsource = $operation['eventsource'];
-			$recovery = $operation['recovery'];
-			$operationtype = $operation['operationtype'];
 
 			if (!array_key_exists($eventsource, $valid_operationtypes[$recovery])
 					|| !in_array($operationtype, $valid_operationtypes[$recovery][$eventsource])) {
@@ -1739,6 +1736,10 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'mediatypeid', _('cannot be empty')
 						));
+					}
+
+					if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter for acknowledge operation.'));
 					}
 					break;
 			}
