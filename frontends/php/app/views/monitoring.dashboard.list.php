@@ -20,7 +20,7 @@
 
 
 if ($data['uncheck']) {
-	uncheckTableRows();
+	uncheckTableRows('dashboard');
 }
 
 $create_button = new CRedirectButton(_('Create dashboard'),

@@ -18,45 +18,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetForm
+class CWidgetFieldGroup extends CWidgetField
 {
-	protected $fields;
-
-	public function __construct($data) {
-		$this->fields = [];
-	}
-
 	/**
-	 * Return fields for this form
+	 * Create widget field for Item selection
 	 *
-	 * @return array  an array of CWidgetField
+	 * @param string      $name     field name in form
+	 * @param string      $label    label for the field in form
+	 * @param string|null $default  default host group id value
 	 */
-	public function getFields() {
-		return $this->fields;
+	public function __construct($name, $label, $default = null) {
+		parent::__construct($name, $label, $default);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GROUP);
 	}
 
-	public function validate() {
-		$errors = [];
+	public function setValue($value) {
+		$this->value = (array) $value;
 
-		foreach ($this->fields as $field) {
-			$errors = array_merge($errors, $field->validate());
-		}
-
-		return $errors;
+		return $this;
 	}
 
-	/**
-	 * Prepares array, ready to be passed to CDashboard API functions
-	 *
-	 * @return array  Array of widget fields ready for saving in API
-	 */
-	public function fieldsToApi() {
-		$api_fields = [];
-
-		foreach ($this->fields as $field) {
-			$api_fields = array_merge($api_fields, $field->toApi());
-		}
-
-		return $api_fields;
-	}
 }
