@@ -1422,7 +1422,7 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Validate operation and recovery operation.
+	 * Validate operation, recovery operation, acknowledge operations.
 	 *
 	 * @param array $operations Operation data array.
 	 *
@@ -1464,7 +1464,15 @@ class CAction extends CApiService {
 			]
 		];
 
+		$required_fields = ['eventsource', 'recovery', 'operationtype'];
+
 		foreach ($operations as $operation) {
+			foreach ($required_fields as $field) {
+				if (!array_key_exists($field, $operation)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', $field));
+				}
+			}
+
 			if ($operation['recovery'] == ACTION_OPERATION) {
 				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
 						&& (!array_key_exists('esc_step_from', $operation)
