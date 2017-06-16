@@ -635,6 +635,48 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
+function getTriggersOverviewData(array $groupids = null, $application, $style, array $host_options = [],
+		array $trigger_options = []) {
+	// fetch hosts
+	$hosts = API::Host()->get([
+		'output' => ['hostid', 'status'],
+		'selectGraphs' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'selectScreens' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'groupids' => $groupids,
+		'preservekeys' => true
+	] + $host_options);
+
+	$hostids = array_keys($hosts);
+
+	$options = [
+		'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'],
+		'selectHosts' => ['hostid', 'name', 'status'],
+		'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+		'hostids' => $hostids,
+		'monitored' => true,
+		'skipDependent' => true,
+		'sortfield' => 'description',
+		'preservekeys' => true
+	] + $trigger_options;
+
+	// application filter
+	if ($application !== '') {
+		$applications = API::Application()->get([
+			'output' => [],
+			'hostids' => $hostids,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]);
+		$options['applicationids'] = array_keys($applications);
+	}
+
+	$triggers = API::Trigger()->get($options);
+
+	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
+
+	return [$hosts, $triggers];
+}
+
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *

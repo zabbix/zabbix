@@ -615,7 +615,11 @@ function getMenuPopupTrigger(options) {
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
-		var url = new Curl('zabbix.php?action=acknowledge.edit&eventids[]=' + options.acknowledge.eventid + '&backurl=' + options.acknowledge.backurl);
+		var url = new Curl('zabbix.php');
+
+		url.setArgument('action', 'acknowledge.edit');
+		url.setArgument('eventids[]', options.acknowledge.eventid);
+		url.setArgument('backurl', options.acknowledge.backurl);
 
 		items[items.length] = {
 			label: t('Acknowledge'),

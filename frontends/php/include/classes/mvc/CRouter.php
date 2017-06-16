@@ -106,6 +106,8 @@ class CRouter {
 		'widget.webovr.view'	=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view'],
 		'widget.clock.view'		=> ['CControllerWidgetClockView',		'layout.widget',		'monitoring.widget.clock.view'],
 		'widget.actlog.view'	=> ['CControllerWidgetActionLogView',	'layout.widget',		'monitoring.widget.actionlog.view'],
+		'widget.dataover.view'	=> ['CControllerWidgetDataOverView',	'layout.widget',		'monitoring.widget.dataover.view'],
+		'widget.trigover.view'	=> ['CControllerWidgetTrigOverView',	'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view']
 	];
 

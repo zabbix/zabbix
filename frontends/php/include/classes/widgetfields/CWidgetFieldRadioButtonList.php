@@ -18,45 +18,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetForm
+class CWidgetFieldRadioButtonList extends CWidgetField
 {
-	protected $fields;
+	private $values;
+	private $modern = false;
 
-	public function __construct($data) {
-		$this->fields = [];
+	public function __construct($name, $label, $values, $default = null, $action = null,
+			$save_type = ZBX_WIDGET_FIELD_TYPE_INT32) {
+		parent::__construct($name, $label, $default, $action);
+
+		$this->setSaveType($save_type);
+		$this->values = $values;
 	}
 
-	/**
-	 * Return fields for this form
-	 *
-	 * @return array  an array of CWidgetField
-	 */
-	public function getFields() {
-		return $this->fields;
+	public function setModern($modern) {
+		$this->modern = $modern;
+
+		return $this;
 	}
 
-	public function validate() {
-		$errors = [];
-
-		foreach ($this->fields as $field) {
-			$errors = array_merge($errors, $field->validate());
-		}
-
-		return $errors;
+	public function getModern() {
+		return $this->modern;
 	}
 
-	/**
-	 * Prepares array, ready to be passed to CDashboard API functions
-	 *
-	 * @return array  Array of widget fields ready for saving in API
-	 */
-	public function fieldsToApi() {
-		$api_fields = [];
+	public function setValue($value) {
+		parent::setValue($value);
 
-		foreach ($this->fields as $field) {
-			$api_fields = array_merge($api_fields, $field->toApi());
-		}
+		return $this;
+	}
 
-		return $api_fields;
+	public function getValues() {
+		return $this->values;
 	}
 }
