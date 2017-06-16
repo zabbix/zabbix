@@ -82,7 +82,9 @@ class CControllerDashbrdWidgetConfig extends CController {
 				if (!array_key_exists($field->getResourceType(), $captions)) {
 					$captions[$field->getResourceType()] = [];
 				}
-				$captions[$field->getResourceType()][$field->getValue(true)] = true;
+				if ($field->getValue(true)) {
+					$captions[$field->getResourceType()][$field->getValue(true)] = true;
+				}
 			}
 			if ($field instanceof CWidgetFieldGroup) {
 				foreach ($field->getValue(true) as $groupid) {
@@ -90,7 +92,6 @@ class CControllerDashbrdWidgetConfig extends CController {
 				}
 			}
 		}
-		unset($captions['items'][0]); // TODO VM: check if resource field is not leaving 0
 
 		foreach ($captions as $resource => $list) {
 			if (!$list) {
