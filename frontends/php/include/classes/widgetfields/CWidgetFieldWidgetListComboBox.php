@@ -65,8 +65,8 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField
 	}
 
 	public function validate() {
-		$errors = [];
-		if ($this->required === true && $this->getValue(true) === '') {
+		$errors = parent::validate();
+		if ($this->value !== null && $this->required === true && $this->getValue(true) === '') {
 			$errors[] = _s('Field \'%s\' is required', $this->label);
 		}
 
