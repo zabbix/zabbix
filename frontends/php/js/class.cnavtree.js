@@ -76,7 +76,6 @@ if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
 					else if (event.pageX - this.overflowOffset.left < o.scrollSensitivity) {
 						this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
 					}
-
 				}
 				else {
 					if (event.pageY - $(document).scrollTop() < o.scrollSensitivity) {
@@ -1108,11 +1107,7 @@ jQuery(function($) {
 					return false;
 				}
 
-				// Before switch to edit mode, stop refreshing.
-				if (typeof dashboard_widget['rf_timeoutid'] !== 'undefined') {
-					clearTimeout(dashboard_widget['rf_timeoutid']);
-					delete dashboard_widget['rf_timeoutid'];
-				}
+				$(".dashbrd-grid-widget-container").dashboardGrid('stopWidgetRefreshTimer', dashboard_widget);
 
 				drawTree();
 				makeSortable();

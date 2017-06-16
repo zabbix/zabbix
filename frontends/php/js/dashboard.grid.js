@@ -384,10 +384,14 @@
 		}
 	}
 
+	function stopWidgetRefreshTimer(widget) {
+		clearTimeout(widget['rf_timeoutid']);
+		delete widget['rf_timeoutid'];
+	}
+
 	function startWidgetRefresh(widget, fullscreen) {
 		if (typeof(widget['rf_timeoutid']) != 'undefined') {
-			clearTimeout(widget['rf_timeoutid']);
-			delete widget['rf_timeoutid'];
+			stopWidgetRefreshTimer(widget);
 		}
 
 		startWidgetRefreshTimer(widget, widget['rf_rate'], fullscreen);
@@ -482,8 +486,7 @@
 
 	function refreshWidget(widget, fullscreen) {
 		if (typeof(widget['rf_timeoutid']) !== 'undefined') {
-			clearTimeout(widget['rf_timeoutid']);
-			delete widget['rf_timeoutid'];
+			stopWidgetRefreshTimer(widget);
 		}
 
 		updateWidgetContent(widget, fullscreen);
@@ -1044,6 +1047,11 @@
 
 				openConfigDialogue($this, data, widget);
 			});
+		},
+
+		// call stopWidgetRefreshTimer on some speciffic widget
+		stopWidgetRefreshTimer: function(widget) {
+			stopWidgetRefreshTimer(widget);
 		},
 
 		// After pressing "delete" button on widget
