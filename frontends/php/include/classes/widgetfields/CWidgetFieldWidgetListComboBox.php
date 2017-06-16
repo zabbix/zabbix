@@ -27,10 +27,10 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField
 	 * Field that creates ComboBox with widgets of current dashboard, filtered by given key of widget array.
 	 *
 	 * @param string $name  Name of field in config form and widget['fields'] array.
-	 * @param type $label  Field label in config form.
-	 * @param type $search_by_key  Key of widget array, by which widgets will be filtered.
-	 * @param type $search_by_value  Value that will be searched in widget[$search_by_key].
-	 * @param type $default  Default value to be used, if no value given.
+	 * @param string $label  Field label in config form.
+	 * @param string $search_by_key  Key of widget array, by which widgets will be filtered.
+	 * @param mixed $search_by_value  Value that will be searched in widget[$search_by_key].
+	 * @param string $default  Default value to be used, if no value given.
 	 */
 	public function __construct($name, $label, $search_by_key, $search_by_value, $default = '') {
 		parent::__construct($name, $label, $default, null);
