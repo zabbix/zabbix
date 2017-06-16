@@ -869,8 +869,8 @@ class CAction extends CApiService {
 
 		$opMessagesToInsert = [];
 		$opCommandsToInsert = [];
-		$opMessageGrpsToInsert = [];
-		$opMessageUsrsToInsert = [];
+		$msggroups_to_insert = [];
+		$msgusers_to_insert = [];
 		$opCommandHstsToInsert = [];
 		$opCommandGroupInserts = [];
 		$opGroupsToInsert = [];
@@ -887,7 +887,7 @@ class CAction extends CApiService {
 					}
 					if (isset($operation['opmessage_usr'])) {
 						foreach ($operation['opmessage_usr'] as $user) {
-							$opMessageUsrsToInsert[] = [
+							$msgusers_to_insert[] = [
 								'operationid' => $operationId,
 								'userid' => $user['userid']
 							];
@@ -895,7 +895,7 @@ class CAction extends CApiService {
 					}
 					if (isset($operation['opmessage_grp'])) {
 						foreach ($operation['opmessage_grp'] as $userGroup) {
-							$opMessageGrpsToInsert[] = [
+							$msggroups_to_insert[] = [
 								'operationid' => $operationId,
 								'usrgrpid' => $userGroup['usrgrpid']
 							];
@@ -969,11 +969,38 @@ class CAction extends CApiService {
 				}
 			}
 		}
+
+		if ($msggroups_to_insert) {
+			$groupsids = zbx_objectValues($msggroups_to_insert, 'usrgrpid');
+			$existing_count = API::UserGroup()->get([
+				'countOutput' => true,
+				'usrgrpids' => $groupsids
+			]);
+			if ($existing_count == count($groupsids)) {
+				DB::insert('opmessage_grp', $msggroups_to_insert);
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation user group. User group does not exist or you have no access to this user group.'));
+			}
+		}
+
+		if ($msgusers_to_insert) {
+			$userids = zbx_objectValues($msgusers_to_insert, 'userid');
+			$existing_count = API::User()->get([
+				'countOutput' => true,
+				'userids' => $userids
+			]);
+			if ($existing_count == count($userids)) {
+				DB::insert('opmessage_usr', $msgusers_to_insert);
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation user. User does not exist or you have no access to this user.'));
+			}
+		}
+
 		DB::insert('opconditions', $opConditionsToInsert);
 		DB::insert('opmessage', $opMessagesToInsert, false);
 		DB::insert('opcommand', $opCommandsToInsert, false);
-		DB::insert('opmessage_grp', $opMessageGrpsToInsert);
-		DB::insert('opmessage_usr', $opMessageUsrsToInsert);
 		DB::insert('opcommand_hst', $opCommandHstsToInsert);
 		DB::insert('opcommand_grp', $opCommandGroupInserts);
 		DB::insert('opgroup', $opGroupsToInsert);
