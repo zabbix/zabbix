@@ -129,7 +129,7 @@ class CDashboardWidgetMap extends CDiv {
 							$go_back_div = (new CDiv())
 								->setAttribute('style', 'padding:5px 10px; border-bottom: 1px solid #ebeef0;')
 								->addItem(
-									(new CLink('Go back to '.$map['name'], $go_back_url))
+									(new CLink(_s('Go back to %1$s', $map['name']), $go_back_url))
 								);
 
 							$this->addItem($go_back_div);
