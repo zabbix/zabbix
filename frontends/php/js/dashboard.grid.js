@@ -1229,6 +1229,16 @@
 			});
 		},
 
+		isEditMode: function() {
+			var response = false;
+
+			this.each(function() {
+				response = $(this).data('dashboardGrid')['options']['edit_mode'];
+			});
+
+			return response;
+		},
+
 		/**
 		 * Add action, that will be performed on $hook trigger
 		 *

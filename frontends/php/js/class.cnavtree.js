@@ -941,20 +941,16 @@ jQuery(function($) {
 			};
 
 			var getWidgetData = function() {
-				var dashboard_data = $(".dashbrd-grid-widget-container").data('dashboardGrid'),
-					widget_data = $this.data('widgetData'),
-					response = null;
+				var widget_data = $this.data('widgetData'),
+					response = $(".dashbrd-grid-widget-container").dashboardGrid('getWidgetsBy', 'uniqueid',
+						widget_data['uniqueid']);
 
-				if (typeof widget_data['widgetid'] !== 'undefined') {
-					$.each(dashboard_data['widgets'], function() {
-						if (this['widgetid'] == widget_data['widgetid']) {
-							response = this;
-							return false;
-						}
-					});
+				if (response.length) {
+					return response[0];
 				}
-
-				return response;
+				else {
+					return null;
+				}
 			};
 
 			/**
@@ -963,16 +959,7 @@ jQuery(function($) {
 			 * @returns {boolean}
 			 */
 			var isEditMode = function() {
-				var dashboard_data = $(".dashbrd-grid-widget-container").data('dashboardGrid'),
-					response = false;
-
-				$.each(dashboard_data, function(i, db) {
-					if (typeof db['edit_mode'] !== 'undefined') {
-						response = db['edit_mode'];
-					}
-				});
-
-				return response;
+				return $(".dashbrd-grid-widget-container").dashboardGrid('isEditMode');
 			};
 
 			/*
@@ -1169,6 +1156,7 @@ jQuery(function($) {
 					return this.each(function() {
 						$this.data('widgetData', {
 							widgetid: options.widgetId,
+							uniqueid: options.uniqueid,
 							severity_levels: options.severity_levels || [],
 							problems: options.problems || [],
 							max_depth: options.max_depth || 10,
