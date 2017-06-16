@@ -37,7 +37,7 @@ class CSysmapWidgetForm extends CWidgetForm
 
 		// select filter widget field
 		if ($field_source_type->getValue(true) === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
-			$field_filter_widget = (new CWidgetFieldWidgetsByTypeComboBox('filter_widget_reference', _('Filter'), '',
+			$field_filter_widget = (new CWidgetFieldWidgetListComboBox('filter_widget_reference', _('Filter'), '',
 					'type', 'navigationtree'
 				))
 				->setRequired(true);

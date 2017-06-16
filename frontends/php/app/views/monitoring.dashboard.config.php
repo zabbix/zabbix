@@ -95,7 +95,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		]);
 	}
 
-	elseif ($field instanceof CWidgetFieldWidgetsByTypeComboBox) {
+	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {
 		$form_list->addRow($field->getLabel(),
 			(new CComboBox($field->getName(), [], $field->getAction(), []))
 		);

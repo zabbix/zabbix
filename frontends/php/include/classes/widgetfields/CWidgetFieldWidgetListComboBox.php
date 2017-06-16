@@ -18,52 +18,41 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldWidgetsByTypeComboBox extends CWidgetField
+class CWidgetFieldWidgetListComboBox extends CWidgetField
 {
-	private $javascript_attributes;
+	private $search_by_key;
+	private $search_by_value;
 
-	public function __construct($name, $label, $default = '', $field, $value) {
+	public function __construct($name, $label, $default = '', $search_by_key, $search_by_value) {
 		parent::__construct($name, $label, $default, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-
-		$this->javascript_attributes = [
-			'field' => $field,
-			'value' => $value
-		];
+		$this->search_by_key = $search_by_key;
+		$this->search_by_value = $search_by_value;
 	}
 
 	public function getJavascript() {
-		$field = array_key_exists('field', $this->javascript_attributes) ? $this->javascript_attributes['field'] : null;
-		$value = array_key_exists('value', $this->javascript_attributes) ? $this->javascript_attributes['value'] : null;
-
-		if (!$field || !$value) {
-			return '';
-		}
-
 		return
 			'var widgets, filters_box, dashboard_data;'.
 			'widgets = jQuery(".dashbrd-grid-widget-container")'.
-				'.dashboardGrid("getWidgetsBy", "'.$field.'", "'.$value.'"),'.
+				'.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
 			'dashboard_data = jQuery(".dashbrd-grid-widget-container").data("dashboardGrid"),'.
 			'filters_box = jQuery("#'.$this->getName().'");'.
+			'jQuery("<option>'._('Select widget').'</option>").val("").appendTo(filters_box);'.
 			'if (widgets.length) {'.
-				'jQuery("<option>'._('Select filter widget').'</option>").val("").appendTo(filters_box);'.
 				'jQuery.each(widgets, function(i, widget) {'.
-					'if (typeof widget["'.$field.'"] !== "undefined") {'.
-						'jQuery("<option></option>")'.
-							'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue().'"))'.
-							'.text(widget["header"].length ? widget["header"] : '.
-								'dashboard_data["widget_defaults"]["'.$value.'"]["header"])'.
-							'.val(widget["fields"]["reference"])'.
-							'.appendTo(filters_box);'.
-					'}'.
+					'jQuery("<option></option>")'.
+						'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue(true).'"))'.
+						'.text(widget["header"].length ? widget["header"] : '.
+							'dashboard_data["widget_defaults"][widget["type"]]["header"])'.
+						'.val(widget["fields"]["reference"])'.
+						'.appendTo(filters_box);'.
 				'});'.
 			'}';
 	}
 
 	public function validate() {
 		$errors = [];
-		if ($this->required === true && $this->value === '') {
+		if ($this->required === true && $this->getValue(true) === '') {
 			$errors[] = _s('Field \'%s\' is required', $this->label);
 		}
 
