@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
+...G...... [ZBXNEXT-3930] increased MaxLinesPerSecond limit and adjusted formula to process more lines per second (vso)
 A.F....... [ZBXNEXT-3869] implemented map lines (vjaceslavs)
 A.F.I..PS. [ZBXNEXT-1675] added support for user macros and time unit suffixes in various time-related settings: update intervals, timeouts, housekeeping settings, time periods, etc. (gleb, Ivo, Sasha, vjaceslavs)
 ..F....... [ZBXNEXT-3762] added browser warning for IE 9 and IE10 (gcalenko)
