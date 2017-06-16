@@ -635,7 +635,7 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
-function getTriggersOverviewData(array $groupids = null, $application = null, $style, array $host_options = [],
+function getTriggersOverviewData(array $groupids = null, $application, $style, array $host_options = [],
 		array $trigger_options = []) {
 	// fetch hosts
 	$hosts = API::Host()->get([

@@ -111,7 +111,7 @@ class CWidgetField
 	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
 	 *
-	 * @return array|null  Array for widget fields ready for saving in API. Return null, if field has no value.
+	 * @return array  Array for widget fields ready for saving in API.
 	 */
 	public function toApi() {
 		$value = $this->getValue(true);
