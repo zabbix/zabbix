@@ -1049,7 +1049,7 @@
 			});
 		},
 
-		// call stopWidgetRefreshTimer on some speciffic widget
+		// Call stopWidgetRefreshTimer on some speciffic widget.
 		stopWidgetRefreshTimer: function(widget) {
 			stopWidgetRefreshTimer(widget);
 		},
