@@ -105,18 +105,6 @@ class CDashboardWidgetMap extends CDiv {
 				$this->previous_maps = array_filter(explode(',', $this->previous_maps), 'is_numeric');
 
 				if ($this->previous_maps) {
-					// try avoid loops
-					$index = count($this->previous_maps) - 1;
-					while ($index > 0) {
-						if ($this->previous_maps[$index] == $this->sysmap_conf['sysmapid']) {
-							break;
-						}
-
-						$index--;
-					}
-
-					$this->previous_maps = array_slice($this->previous_maps, 0, $index + 1);
-
 					// get previous map
 					$maps = API::Map()->get([
 						'sysmapids' => [array_pop($this->previous_maps)],
@@ -125,11 +113,12 @@ class CDashboardWidgetMap extends CDiv {
 
 					if ($maps) {
 						if (($map = reset($maps)) !== false) {
-							$go_back_url = 'javascript: navigateToSubmap('.$map['sysmapid'].', "'.$this->uniqueid.'", true);';
 							$go_back_div = (new CDiv())
 								->setAttribute('style', 'padding:5px 10px; border-bottom: 1px solid #ebeef0;')
 								->addItem(
-									(new CLink(_s('Go back to %1$s', $map['name']), $go_back_url))
+									(new CLink(_s('Go back to %1$s', $map['name']), 'javascript:void(0)'))
+										->onClick('javascript: navigateToSubmap('.$map['sysmapid'].', "' .
+											$this->uniqueid.'", true);')
 								);
 
 							$this->addItem($go_back_div);
