@@ -61,7 +61,6 @@ class CWidgetField
 			$value = (int)$value;
 		}
 		$this->value = $value;
-
 		return $this;
 	}
 
@@ -144,7 +143,8 @@ class CWidgetField
 			ZBX_WIDGET_FIELD_TYPE_INT32,
 			ZBX_WIDGET_FIELD_TYPE_STR,
 			ZBX_WIDGET_FIELD_TYPE_GROUP,
-			ZBX_WIDGET_FIELD_TYPE_ITEM
+			ZBX_WIDGET_FIELD_TYPE_ITEM,
+			ZBX_WIDGET_FIELD_TYPE_MAP
 		];
 
 		if (in_array($save_type, $known_save_types)) {

@@ -18,38 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldRadioButtonList extends CWidgetField
-{
-	private $values;
-	private $modern = false;
-	
-	public function __construct($name, $label, $values, $default = null, $action = null,
-		$save_type = ZBX_WIDGET_FIELD_TYPE_INT32) {
-		parent::__construct($name, $label, $default, $action);
-		$this->setSaveType($save_type);
-		$this->values = $values;
+class CWidgetFieldReference extends CWidgetField {
+	public function __construct() {
+		/*
+		 * All reference fields for all widgets on dashboard should share the same name.
+		 * It is needed to make possible search if value is not taken by some other widget in same dashboard.
+		 */
+		parent::__construct('reference', '', null, null);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	public function setModern($modern) {
-		$this->modern = $modern;
-
-		return $this;
-	}
-
-	public function getModern() {
-		return $this->modern;
-	}
-
-	public function setValue($value) {
-		if ($value === null) {
-			parent::setValue($value);
-		} elseif (array_key_exists($value, $this->values)) {
-			parent::setValue($value);
-		}
-		return $this;
-	}
-
-	public function getValues() {
-		return $this->values;
+	public function getJavascript($form_selector) {
+		return ''.
+			'var reference_field = jQuery("input[name=\"'.$this->getName().'\"]", "'.$form_selector.'");'.
+			'if (!reference_field.val().length) {'.
+				'var reference = jQuery(".dashbrd-grid-widget-container").dashboardGrid("makeReference");'.
+				'reference_field.val(reference);'.
+			'}';
 	}
 }

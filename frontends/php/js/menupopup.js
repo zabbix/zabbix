@@ -297,6 +297,18 @@ function getMenuPopupMap(options) {
 				url: url.getUrl()
 			};
 		}
+		else if (typeof options.navigatetos !== 'undefined'
+			&& typeof options.navigatetos.submap.widget_uniqueid !== 'undefined') {
+				var url = new Curl('javascript: navigateToSubmap('+options.navigatetos.submap.sysmapid+', "'+
+					options.navigatetos.submap.widget_uniqueid+'");');
+
+			url.unsetArgument('sid');
+
+			gotos[gotos.length] = {
+				label: t('Submap'),
+				url: url.getUrl()
+			};
+		}
 
 		// events
 		if (typeof options.gotos.events !== 'undefined') {

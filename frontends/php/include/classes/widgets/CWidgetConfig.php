@@ -39,6 +39,8 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_MAPS		=> _('Favourite maps'),
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
+			WIDGET_SYSMAP				=> _('Map'),
+			WIDGET_NAVIGATION_TREE		=> _('Map Navigation Tree'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_ACTION_LOG			=> _('Action log'),
 			WIDGET_DATA_OVERVIEW		=> _('Data overview'),
@@ -48,6 +50,8 @@ class CWidgetConfig
 
 	/**
 	 * Get default widget dimensions.
+	 *
+	 * @static
 	 *
 	 * @return array
 	 */
@@ -64,6 +68,8 @@ class CWidgetConfig
 			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
 			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
+			WIDGET_SYSMAP				=> ['width' => 9, 'height' => 5],
+			WIDGET_NAVIGATION_TREE		=> ['width' => 3, 'height' => 5],
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
 			WIDGET_ACTION_LOG			=> ['width' => 6, 'height' => 5],
 			WIDGET_DATA_OVERVIEW		=> ['width' => 6, 'height' => 5],
@@ -72,7 +78,9 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Return default values for new widgets
+	 * Return default values for new widgets.
+	 *
+	 * @static
 	 *
 	 * @return array
 	 */
@@ -116,7 +124,9 @@ class CWidgetConfig
 			case WIDGET_FAVOURITE_GRAPHS:
 			case WIDGET_FAVOURITE_MAPS:
 			case WIDGET_FAVOURITE_SCREENS:
+			case WIDGET_NAVIGATION_TREE:
 			case WIDGET_CLOCK:
+			case WIDGET_SYSMAP:
 				return 15 * SEC_PER_MIN;
 
 			case WIDGET_URL:
@@ -182,6 +192,12 @@ class CWidgetConfig
 		switch ($type) {
 			case WIDGET_CLOCK:
 				return new CClockWidgetForm($data);
+
+			case WIDGET_NAVIGATION_TREE:
+				return (new CNavigationWidgetForm($data));
+
+			case WIDGET_SYSMAP:
+				return (new CSysmapWidgetForm($data));
 
 			case WIDGET_URL:
 				return new CUrlWidgetForm($data);
