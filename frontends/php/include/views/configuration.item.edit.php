@@ -114,8 +114,7 @@ if ($data['interfaces']) {
 
 		// add interfaces to groups
 		foreach ($data['interfaces'] as $interface) {
-			$option = new CComboItem(
-				$interface['interfaceid'],
+			$option = new CComboItem($interface['interfaceid'],
 				$interface['useip']
 					? $interface['ip'].' : '.$interface['port']
 					: $interface['dns'].' : '.$interface['port'],

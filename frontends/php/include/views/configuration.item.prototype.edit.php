@@ -80,7 +80,7 @@ $itemFormList->addRow(_('Key'), $key_controls);
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
-	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
+	$interfacesComboBox = new CComboBox('interfaceid', $data['interfaceid']);
 
 	// set up interface groups
 	$interfaceGroups = [];
@@ -90,12 +90,11 @@ if (!empty($this->data['interfaces'])) {
 
 	// add interfaces to groups
 	foreach ($this->data['interfaces'] as $interface) {
-		$option = new CComboItem(
-			$interface['interfaceid'],
+		$option = new CComboItem($interface['interfaceid'],
 			$interface['useip']
 				? $interface['ip'].' : '.$interface['port']
 				: $interface['dns'].' : '.$interface['port'],
-			($interface['interfaceid'] == $this->data['interfaceid'])
+			($interface['interfaceid'] == $data['interfaceid'])
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
 		$interfaceGroups[$interface['type']]->addItem($option);
@@ -110,7 +109,7 @@ if (!empty($this->data['interfaces'])) {
 		->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], 'interface_row');
-	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
+	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
 	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $readonly, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

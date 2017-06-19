@@ -104,7 +104,8 @@ $fields = [
 	'formula' => 			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'conditions' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'jmx_endpoint' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX],
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
+	],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),

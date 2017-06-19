@@ -158,7 +158,8 @@ $fields = [
 		_('Trend storage period')
 	],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX],
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
+	],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 		IN('"itemprototype.massdelete","itemprototype.massdisable","itemprototype.massenable"'), null

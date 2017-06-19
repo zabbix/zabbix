@@ -119,7 +119,8 @@ $fields = [
 	'new_applications' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_history' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX],
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
+	],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.

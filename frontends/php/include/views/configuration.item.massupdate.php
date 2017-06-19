@@ -90,8 +90,8 @@ if ($this->data['displayInterfaces']) {
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[jmx_endpoint]', 'jmx_endpoint', _('Original')))
 		->setLabel(_('JMX endpoint'))
-		->setChecked(isset($this->data['visible']['jmx_endpoint'])),
-	(new CTextBox('jmx_endpoint', $this->data['jmx_endpoint']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setChecked(array_key_exists('jmx_endpoint', $data['visible'])),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append snmp community to form list
