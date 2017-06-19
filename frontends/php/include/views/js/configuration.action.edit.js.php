@@ -654,6 +654,15 @@
 				}
 			});
 
+			// Remove acknowledgment operations IDs
+			var ack_operationid_RegExp = /ack_operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=ack_operations]').each(function() {
+				// Intentional usage of JS Prototype.
+				if ($(this).getAttribute('name').match(ack_operationid_RegExp)) {
+					$(this).remove();
+				}
+			});
+
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
 		});
