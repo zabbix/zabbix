@@ -18,17 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldItem extends CWidgetField
+class CWidgetFieldHidden extends CWidgetField
 {
-	/**
-	 * Create widget field for Item selection
-	 *
-	 * @param string $name  field name in form
-	 * @param string $label  label for the field in form
-	 * @param string|null $default  default Item Id value
-	 */
-	public function __construct($name, $label, $default = null) {
-		parent::__construct($name, $label, $default, null);
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
+	public function __construct($name, $default = null, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
+		parent::__construct($name, null, $default);
+		$this->setSaveType($save_type);
 	}
 }
