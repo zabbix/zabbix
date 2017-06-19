@@ -255,7 +255,14 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$ret = [];
 		foreach ($fields as $field) {
 			$field_key = CWidgetConfig::getApiFieldKey($field['type']);
-			$ret[$field['name']] = $field[$field_key];
+
+			if (array_key_exists($field['name'], $ret)) {
+				$ret[$field['name']] = (array) $ret[$field['name']];
+				$ret[$field['name']][] = $field[$field_key];
+			}
+			else {
+				$ret[$field['name']] = $field[$field_key];
+			}
 		}
 
 		return $ret;

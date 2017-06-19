@@ -23,10 +23,10 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid' =>	'db widget.widgetid',
-			'type' =>		'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
-			'name' =>		'string',
-			'fields' =>		'array'
+			'widgetid'	=> 'db widget.widgetid',
+			'type'		=> 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'name'		=> 'string',
+			'fields'	=> 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -74,39 +74,77 @@ class CControllerDashbrdWidgetConfig extends CController {
 	 * @return array
 	 */
 	private function getCaptions($form) {
-		$captions = [];
+		// TODO VM: (?) currently it will have both, numeric and textual keys. Also, ones will come from defines, others will not.
+		//				(maybe it is good to add 'groups' to defines as well? Or maybe it can be improved, not to mix different key types.
+		$captions = [
+			'groups' => []
+		];
 		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldItem) {
-				if (!array_key_exists('items', $captions)) {
-					$captions['items'] = [];
+			if ($field instanceof CWidgetFieldSelectResource) {
+				if (!array_key_exists($field->getResourceType(), $captions)) {
+					$captions[$field->getResourceType()] = [];
 				}
-				if (bccomp($field->getValue(true), '0') === 1
-					&& !array_key_exists($field->getValue(true), $captions['items'])
-				){
-					$captions['items'][$field->getValue(true)] = '';
+				if ($field->getValue(true)) {
+					$captions[$field->getResourceType()][$field->getValue(true)] = true;
+				}
+			}
+			if ($field instanceof CWidgetFieldGroup) {
+				foreach ($field->getValue(true) as $groupid) {
+					$captions['groups'][$groupid] = true;
 				}
 			}
 		}
 
 		foreach ($captions as $resource => $list) {
-			if (empty($list)) {
+			if (!$list) {
 				continue;
 			}
-			if ($resource === 'items') {
-				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'key_', 'name'],
-					'selectHosts' => ['name'],
-					'itemids' => array_keys($list),
-					'webitems' => true
-				]);
+			switch ($resource) {
+				case WIDGET_FIELD_SELECT_RES_ITEM:
+					$items = API::Item()->get([
+						'output' => ['itemid', 'hostid', 'key_', 'name'],
+						'selectHosts' => ['name'],
+						'itemids' => array_keys($list),
+						'webitems' => true
+					]);
 
-				if ($items) {
-					$items = CMacrosResolverHelper::resolveItemNames($items);
+					if ($items) {
+						$items = CMacrosResolverHelper::resolveItemNames($items);
 
-					foreach ($items as $key => $item) {
-						$captions['items'][$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+						foreach ($items as $key => $item) {
+							$captions[$resource][$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+						}
 					}
-				}
+					break;
+
+				case WIDGET_FIELD_SELECT_RES_SYSMAP:
+					$maps = API::Map()->get([
+						'sysmapids' => array_keys($list),
+						'output' => ['sysmapid', 'name']
+					]);
+
+					if ($maps) {
+						foreach ($maps as $key => $map) {
+							$captions[$resource][$map['sysmapid']] = $map['name'];
+						}
+					}
+					break;
+
+				case 'groups':
+					$groups = API::HostGroup()->get([
+						'output' => ['groupid', 'name'],
+						'groupids' => array_keys($list)
+					]);
+
+					$captions['groups'] = [];
+
+					foreach ($groups as $group) {
+						$captions['groups'][] = [
+							'id' => $group['groupid'],
+							'name' => $group['name']
+						];
+					}
+					break;
 			}
 		}
 

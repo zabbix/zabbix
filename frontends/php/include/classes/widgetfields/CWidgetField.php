@@ -110,28 +110,41 @@ class CWidgetField
 	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
 	 *
-	 * @return array|null  Array for widget field ready for saving in API. Return null, if field has no value.
+	 * @return array  Array for widget fields ready for saving in API.
 	 */
 	public function toApi() {
-		// Don't save field, if it doesn't have value
-		if ($this->getValue(true) === null) {
-			return null;
+		$value = $this->getValue(true);
+		$widget_fields = [];
+
+		if ($value !== null) {
+			$api_field_key = CWidgetConfig::getApiFieldKey($this->save_type);
+			$widget_field = [
+				'type' => $this->save_type,
+				'name' => $this->name
+			];
+
+			if (is_array($value)) {
+				foreach ($value as $val) {
+					$widget_field[$api_field_key] = $val;
+					$widget_fields[] = $widget_field;
+				}
+			}
+			else {
+				$widget_field[$api_field_key] = $value;
+				$widget_fields[] = $widget_field;
+			}
 		}
 
-		$widget_field = [
-			'type' => $this->save_type,
-			'name' => $this->name
-		];
-		$widget_field[CWidgetConfig::getApiFieldKey($this->save_type)] = $this->getValue(true);
-
-		return $widget_field;
+		return $widget_fields;
 	}
 
 	protected function setSaveType($save_type) {
 		$known_save_types = [
 			ZBX_WIDGET_FIELD_TYPE_INT32,
 			ZBX_WIDGET_FIELD_TYPE_STR,
-			ZBX_WIDGET_FIELD_TYPE_ITEM
+			ZBX_WIDGET_FIELD_TYPE_GROUP,
+			ZBX_WIDGET_FIELD_TYPE_ITEM,
+			ZBX_WIDGET_FIELD_TYPE_MAP
 		];
 
 		if (in_array($save_type, $known_save_types)) {

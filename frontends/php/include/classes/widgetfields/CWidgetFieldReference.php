@@ -18,45 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetForm
-{
-	protected $fields;
-
-	public function __construct($data) {
-		$this->fields = [];
+class CWidgetFieldReference extends CWidgetField {
+	public function __construct() {
+		/*
+		 * All reference fields for all widgets on dashboard should share the same name.
+		 * It is needed to make possible search if value is not taken by some other widget in same dashboard.
+		 */
+		parent::__construct('reference', '', null, null);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	/**
-	 * Return fields for this form
-	 *
-	 * @return array  an array of CWidgetField
-	 */
-	public function getFields() {
-		return $this->fields;
-	}
-
-	public function validate() {
-		$errors = [];
-
-		foreach ($this->fields as $field) {
-			$errors = array_merge($errors, $field->validate());
-		}
-
-		return $errors;
-	}
-
-	/**
-	 * Prepares array, ready to be passed to CDashboard API functions
-	 *
-	 * @return array  Array of widget fields ready for saving in API
-	 */
-	public function fieldsToApi() {
-		$api_fields = [];
-
-		foreach ($this->fields as $field) {
-			$api_fields = array_merge($api_fields, $field->toApi());
-		}
-
-		return $api_fields;
+	public function getJavascript($form_selector) {
+		return ''.
+			'var reference_field = jQuery("input[name=\"'.$this->getName().'\"]", "'.$form_selector.'");'.
+			'if (!reference_field.val().length) {'.
+				'var reference = jQuery(".dashbrd-grid-widget-container").dashboardGrid("makeReference");'.
+				'reference_field.val(reference);'.
+			'}';
 	}
 }

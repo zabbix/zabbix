@@ -99,15 +99,21 @@ class CRouter {
 		'widget.favmap.view'	=> ['CControllerWidgetFavMapsView',		'layout.widget',		'monitoring.widget.favmaps.view'],
 		'widget.favscr.view'	=> ['CControllerWidgetFavScreensView',	'layout.widget',		'monitoring.widget.favscreens.view'],
 		'widget.dscvry.view'	=> ['CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'],
+		'widget.graph.view'		=> ['CControllerWidgetGraphView',		'layout.widget',		'monitoring.widget.graph.view'],
 		'widget.hoststat.view'	=> ['CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'],
 		'widget.lastiss.view'	=> ['CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'],
 		'widget.stszbx.view'	=> ['CControllerWidgetStatusView',		'layout.widget',		'monitoring.widget.status.view'],
 		'widget.syssum.view'	=> ['CControllerWidgetSystemView',		'layout.widget',		'monitoring.widget.system.view'],
 		'widget.webovr.view'	=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view'],
 		'widget.clock.view'		=> ['CControllerWidgetClockView',		'layout.widget',		'monitoring.widget.clock.view'],
+		'widget.sysmap.view'	=> ['CControllerWidgetSysmapView',		'layout.widget',		'monitoring.widget.sysmap.view'],
+		'widget.navigationtree.view'			=> ['CControllerWidgetNavigationtreeView',				'layout.widget',	'monitoring.widget.navigationtree.view'],
+		'widget.navigationtree.edititemdialog'	=> ['CControllerWidgetNavigationtreeItemEditDialog',	'layout.json',		null],
+		'widget.navigationtree.edititem'		=> ['CControllerWidgetNavigationtreeItemEdit',			'layout.json',		null],
 		'widget.actlog.view'	=> ['CControllerWidgetActionLogView',	'layout.widget',		'monitoring.widget.actionlog.view'],
-		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view'],
-		'widget.graph.view'		=> ['CControllerWidgetGraphView',		'layout.widget',		'monitoring.widget.graph.view']
+		'widget.dataover.view'	=> ['CControllerWidgetDataOverView',	'layout.widget',		'monitoring.widget.dataover.view'],
+		'widget.trigover.view'	=> ['CControllerWidgetTrigOverView',	'layout.widget',		'monitoring.widget.trigover.view'],
+		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view']
 	];
 
 	public function __construct($action) {

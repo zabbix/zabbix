@@ -34,19 +34,25 @@ class CWidgetConfig
 			WIDGET_LAST_ISSUES			=> _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
 			WIDGET_WEB_OVERVIEW			=> _('Web monitoring'),
 			WIDGET_DISCOVERY_STATUS		=> _('Discovery status'),
+			WIDGET_GRAPH				=> _('Graph'),
 			WIDGET_HOST_STATUS			=> _('Host status'),
 			WIDGET_FAVOURITE_GRAPHS		=> _('Favourite graphs'),
 			WIDGET_FAVOURITE_MAPS		=> _('Favourite maps'),
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
+			WIDGET_SYSMAP				=> _('Map'),
+			WIDGET_NAVIGATION_TREE		=> _('Map Navigation Tree'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_ACTION_LOG			=> _('Action log'),
-			WIDGET_GRAPH				=> _('Graph')
+			WIDGET_DATA_OVERVIEW		=> _('Data overview'),
+			WIDGET_TRIG_OVERVIEW		=> _('Trigger overview')
 		];
 	}
 
 	/**
 	 * Get default widget dimensions.
+	 *
+	 * @static
 	 *
 	 * @return array
 	 */
@@ -58,19 +64,25 @@ class CWidgetConfig
 			WIDGET_LAST_ISSUES			=> ['width' => 6, 'height' => 6],
 			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
 			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
+			WIDGET_GRAPH				=> ['width' => 5, 'height' => 5],
 			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 4],
 			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
 			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
-			WIDGET_URL					=> ['width' => 7, 'height' => 9],
-			WIDGET_ACTION_LOG			=> ['width' => 8, 'height' => 5],
-			WIDGET_GRAPH				=> ['width' => 5, 'height' => 5]
+			WIDGET_SYSMAP				=> ['width' => 9, 'height' => 5],
+			WIDGET_NAVIGATION_TREE		=> ['width' => 3, 'height' => 5],
+			WIDGET_URL					=> ['width' => 6, 'height' => 5],
+			WIDGET_ACTION_LOG			=> ['width' => 6, 'height' => 5],
+			WIDGET_DATA_OVERVIEW		=> ['width' => 6, 'height' => 5],
+			WIDGET_TRIG_OVERVIEW		=> ['width' => 6, 'height' => 5]
 		];
 	}
 
 	/**
-	 * Return default values for new widgets
+	 * Return default values for new widgets.
+	 *
+	 * @static
 	 *
 	 * @return array
 	 */
@@ -104,16 +116,20 @@ class CWidgetConfig
 			case WIDGET_LAST_ISSUES:
 			case WIDGET_WEB_OVERVIEW:
 			case WIDGET_DISCOVERY_STATUS:
+			case WIDGET_GRAPH:
 			case WIDGET_HOST_STATUS:
 			case WIDGET_ACTION_LOG:
-			case WIDGET_GRAPH:
+			case WIDGET_DATA_OVERVIEW:
+			case WIDGET_TRIG_OVERVIEW:
 				return SEC_PER_MIN;
 
 			case WIDGET_ZABBIX_STATUS:
 			case WIDGET_FAVOURITE_GRAPHS:
 			case WIDGET_FAVOURITE_MAPS:
 			case WIDGET_FAVOURITE_SCREENS:
+			case WIDGET_NAVIGATION_TREE:
 			case WIDGET_CLOCK:
+			case WIDGET_SYSMAP:
 				return 15 * SEC_PER_MIN;
 
 			case WIDGET_URL:
@@ -180,11 +196,24 @@ class CWidgetConfig
 			case WIDGET_CLOCK:
 				return new CClockWidgetForm($data);
 
+			case WIDGET_NAVIGATION_TREE:
+				return (new CNavigationWidgetForm($data));
+
+			case WIDGET_SYSMAP:
+				return (new CSysmapWidgetForm($data));
+
 			case WIDGET_URL:
 				return new CUrlWidgetForm($data);
 
 			case WIDGET_ACTION_LOG:
 				return new CActionLogWidgetForm($data);
+
+			case WIDGET_DATA_OVERVIEW:
+				return new CDataOverviewWidgetForm($data);
+
+			case WIDGET_TRIG_OVERVIEW:
+				return new CTrigOverviewWidgetForm($data);
+
 			default:
 				// TODO VM: delete this case after all widget forms will be created
 				return new CWidgetForm($data);

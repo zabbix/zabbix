@@ -23,6 +23,7 @@ $form = (new CForm('post'))
 	->cleanItems()
 	->setId('widget_dialogue_form')
 	->setName('widget_dialogue_form');
+$js_scripts = [];
 
 $form_list = (new CFormList());
 
@@ -54,30 +55,70 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
 		);
 	}
-	elseif ($field instanceof CWidgetFieldItem) {
-		$caption = array_key_exists($field->getValue(true), $data['captions']['items'])
-			? $data['captions']['items'][$field->getValue(true)]
+	elseif ($field instanceof CWidgetFieldGroup) {
+		// multiselect.js must be preloaded in parent view`
+
+		$field_groupids = (new CMultiSelect([
+			'name' => 'groupids[]',
+			'objectName' => 'hostGroup',
+			'data' => $data['captions']['groups'],
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=groupids_'.
+					'&srcfld1=groupid&multiselect=1'
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+		$form_list->addRow($field->getLabel(), $field_groupids);
+
+		$js_scripts[] = $field_groupids->getPostJS();
+	}
+	elseif ($field instanceof CWidgetFieldReference) {
+		$form->addVar($field->getName(), $field->getValue() ?: '');
+
+		if (!$field->getValue()) {
+			$javascript = $field->getJavascript('#'.$form->getAttribute('id'));
+			$form->addItem(new CJsScript(get_js($javascript, true))); // TODO VM: rewrite to use js_scripts
+		}
+	}
+	elseif ($field instanceof CWidgetFieldHidden) {
+		$form->addVar($field->getName(), $field->getValue());
+	}
+	elseif ($field instanceof CWidgetFieldSelectResource) {
+		$caption = array_key_exists($field->getValue(true), $data['captions'][$field->getResourceType()])
+			? $data['captions'][$field->getResourceType()][$field->getValue(true)]
 			: '';
 		// needed for popup script
 		$form->addVar($field->getName(), ($field->getValue(true) !== null) ? $field->getValue(true) : '');
-
-		$select_button = (new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().'&dstfld1='.$field->getName().
-					"&dstfld2=".$field->getName()."_caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
-
 		$form_list->addRow($field->getLabel(), [
-			(new CTextBox($field->getName().'_caption', $caption, true))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$select_button
+			(new CButton('select', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getName().'");')
 		]);
+	}
+	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {
+		$form_list->addRow($field->getLabel(),
+			(new CComboBox($field->getName(), [], $field->getAction(), []))
+		);
+
+		$form->addItem(new CJsScript(get_js($field->getJavascript(), true))); // TODO VM: rewrite to use js_scripts
 	}
 	elseif ($field instanceof CWidgetFieldNumericBox) {
 		$form_list->addRow($field->getLabel(),
 			(new CNumericBox($field->getName(), $field->getValue(true), $field->getMaxLength()))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		);
+	}
+	elseif ($field instanceof CWidgetFieldRadioButtonList) {
+		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue(true)))
+			->setModern($field->getModern());
+		foreach ($field->getValues() as $key => $value) {
+			$radio_button_list->addValue($value, $key, null, $field->getAction());
+		}
+		$form_list->addRow($field->getLabel(), $radio_button_list);
 	}
 }
 
@@ -86,6 +127,10 @@ $form->addItem($form_list);
 $output = [
 	'body' => $form->toString()
 ];
+
+if ($js_scripts) {
+	$output['body'] .= get_js(implode("\n", $js_scripts));
+}
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
