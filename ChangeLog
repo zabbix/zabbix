@@ -71,6 +71,7 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.7rc1
 
 New features:
+...G...... [ZBXNEXT-3930] increased MaxLinesPerSecond limit and adjusted formula to process more lines per second (vso)
 
 Bug fixes:
 ..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
@@ -497,6 +498,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.10rc1
 
 New features:
+...G...... [ZBXNEXT-3930] increased MaxLinesPerSecond limit and adjusted formula to process more lines per second (vso)
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Korean, Romanian, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
