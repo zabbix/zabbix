@@ -578,7 +578,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				snmpv3_contextname_esc, (int)item->authtype, username_esc, password_esc, publickey_esc,
 				privatekey_esc, item->templateid, (int)item->flags, description_esc,
 				(int)item->inventory_link, DBsql_id_ins(item->interfaceid), lifetime_esc,
-				(int)item->evaltype, port_esc, item->itemid, DBsql_id_ins(item->master_itemid));
+				(int)item->evaltype, port_esc, DBsql_id_ins(item->master_itemid), item->itemid);
 
 		zbx_free(port_esc);
 		zbx_free(snmpv3_contextname_esc);
