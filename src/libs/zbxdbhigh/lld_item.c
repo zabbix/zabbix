@@ -3623,13 +3623,11 @@ out:
  *                                                                            *
  * Purpose: create dependent item index in master item data                   *
  *                                                                            *
- * Parameters: prototypes  - [IN] the item prototypes                         *
- *             items       - [IN/OUT] the lld items                           *
+ * Parameters: items       - [IN/OUT] the lld items                           *
  *             items_index - [IN] lld item index                              *
  *                                                                            *
  ******************************************************************************/
-static void	lld_link_dependent_items(zbx_vector_ptr_t *prototypes, zbx_vector_ptr_t *items,
-		zbx_hashset_t *items_index)
+static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *items_index)
 {
 	const char		*__function_name = "lld_link_dependent_items";
 	zbx_lld_item_t		*item, *master;
@@ -3722,7 +3720,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 	lld_items_applications_get(lld_ruleid, &items_applications);
 	lld_items_applications_make(&item_prototypes, &items, &applications_index, &items_applications);
 
-	lld_link_dependent_items(&item_prototypes, &items, &items_index);
+	lld_link_dependent_items(&items, &items_index);
 
 	DBbegin();
 
