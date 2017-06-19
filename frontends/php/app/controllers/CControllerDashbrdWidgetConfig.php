@@ -23,10 +23,10 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid' => 'db widget.widgetid',
-			'type' =>   'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
-			'name' =>   'string',
-			'fields' =>   'array'
+			'widgetid'	=> 'db widget.widgetid',
+			'type'		=> 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'name'		=> 'string',
+			'fields'	=> 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -74,6 +74,8 @@ class CControllerDashbrdWidgetConfig extends CController {
 	 * @return array
 	 */
 	private function getCaptions($form) {
+		// TODO VM: (?) currently it will have both, numeric and textual keys. Also, ones will come from defines, others will not.
+		//				(maybe it is good to add 'groups' to defines as well? Or maybe it can be improved, not to mix different key types.
 		$captions = [
 			'groups' => []
 		];

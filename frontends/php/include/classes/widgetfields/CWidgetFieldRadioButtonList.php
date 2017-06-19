@@ -23,14 +23,16 @@ class CWidgetFieldRadioButtonList extends CWidgetField
 	private $values;
 	private $modern = false;
 	
-	public function __construct($name, $label, $values, $default = null, $action = null, $dataFieldType = ZBX_WIDGET_FIELD_TYPE_INT32) {
+	public function __construct($name, $label, $values, $default = null, $action = null,
+		$save_type = ZBX_WIDGET_FIELD_TYPE_INT32) {
 		parent::__construct($name, $label, $default, $action);
-		$this->setSaveType($dataFieldType);
+		$this->setSaveType($save_type);
 		$this->values = $values;
 	}
 
 	public function setModern($modern) {
 		$this->modern = $modern;
+
 		return $this;
 	}
 

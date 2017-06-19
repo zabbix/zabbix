@@ -78,7 +78,7 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Return default values for new widgets
+	 * Return default values for new widgets.
 	 *
 	 * @static
 	 *
@@ -135,13 +135,13 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Returns key, where value is stored for given field type
+	 * Returns key, where value is stored for given field type.
 	 *
 	 * @static
 	 *
-	 * @param int $field_type - ZBX_WIDGET_FIELD_TYPE_ constant
+	 * @param int $field_type  ZBX_WIDGET_FIELD_TYPE_ constant
 	 *
-	 * @return string field key, where to save the value
+	 * @return string  field key, where to save the value
 	 */
 	public static function getApiFieldKey($field_type){
 		switch ($field_type) {

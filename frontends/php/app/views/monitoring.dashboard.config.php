@@ -113,12 +113,12 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		);
 	}
 	elseif ($field instanceof CWidgetFieldRadioButtonList) {
-		$radioButtonsList = (new CRadioButtonList($field->getName(), $field->getValue(true)))
+		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue(true)))
 			->setModern($field->getModern());
 		foreach ($field->getValues() as $key => $value) {
-			$radioButtonsList->addValue($value, $key, null, $field->getAction());
+			$radio_button_list->addValue($value, $key, null, $field->getAction());
 		}
-		$form_list->addRow($field->getLabel(), $radioButtonsList);
+		$form_list->addRow($field->getLabel(), $radio_button_list);
 	}
 }
 

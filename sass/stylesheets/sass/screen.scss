@@ -4475,7 +4475,20 @@ tr.cursor-move {
 			>div.row {
 				padding-left: 40px;
 			}
-			.tree-list > li > div.row {
+
+			@for $i from 1 through $max_depth - 1 {
+				$class_tree_list: '.tree-list';
+				@for $j from 1 through $i {
+					@if $j != 1 {
+						$class_tree_list: $class_tree_list + ' .tree-list';
+					}
+				}
+				#{$class_tree_list} > li > div.row {
+					padding-left: 40px + ($i * 15px);
+				}
+			}
+			/* TODO VM: delete */
+/*			.tree-list > li > div.row {
 				padding-left: 55px;
 			}
 			.tree-list .tree-list > li > div.row {
@@ -4507,7 +4520,7 @@ tr.cursor-move {
 			}
 			.tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > div.row {
 				padding-left: 195px;
-			}
+			}*/
 		}
 
 		.arrow-down, .arrow-right {

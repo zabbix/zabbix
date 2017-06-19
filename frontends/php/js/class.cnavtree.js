@@ -1169,7 +1169,6 @@ jQuery(function($) {
 
 					return this.each(function() {
 						$this.data('widgetData', {
-							widgetid: options.widgetId,
 							uniqueid: options.uniqueid,
 							severity_levels: options.severity_levels || [],
 							problems: options.problems || [],

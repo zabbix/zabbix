@@ -75,7 +75,6 @@ class CNavigationTree extends CDiv {
 					'jQuery("#'.$this->getId().'").zbx_navtree({'.
 						'problems: '.json_encode($this->problems).','.
 						'severity_levels: '.json_encode($this->getSeverityConfig()).','.
-						'widgetId: '.(int)$this->data['widgetid'].','. // TODO VM: should be string
 						'uniqueid: "'.$this->data['uniqueid'].'",'.
 						'max_depth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
 					'});';

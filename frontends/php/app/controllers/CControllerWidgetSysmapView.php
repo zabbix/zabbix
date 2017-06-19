@@ -27,9 +27,9 @@ class CControllerWidgetSysmapView extends CController {
 	}
 
 	protected function checkInput() {
+		// TODO VM: delete comment. Removed widgetid, becuase it is no longer used, after introduction of uniqueid.
 		$fields = [
 			'name'			=>	'string',
-			'widgetid'		=>	'required',
 			'uniqueid'		=>	'required',
 			'fullscreen'	=>	'in 0,1',
 			'fields'		=>	'array'
@@ -114,7 +114,6 @@ class CControllerWidgetSysmapView extends CController {
 			],
 			'previous_maps' => array_key_exists('previous_maps', $input_fields) ? $input_fields['previous_maps'] : '',
 			'fullscreen' => getRequest('fullscreen', 0),
-			'widgetid' => getRequest('widgetid'),
 			'uniqueid' => getRequest('uniqueid'),
 			'fields' => $data
 		]));

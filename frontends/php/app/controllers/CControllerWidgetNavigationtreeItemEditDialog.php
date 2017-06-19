@@ -105,7 +105,7 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 			]);
 		}
 
-		$form->addItem($value);
+//		$form->addItem($value); // TODO VM: delete. There is no variable "$value".
 		$form->addItem($formList);
 
 		// prepare output
