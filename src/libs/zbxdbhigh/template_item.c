@@ -1244,14 +1244,7 @@ static void	link_template_dependent_items(zbx_vector_ptr_t *items)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&template_index);
-	zbx_vector_ptr_reserve(&template_index, items->values_num);
-
-	for (i = 0; i < items->values_num; i++)
-	{
-		item = (zbx_template_item_t *)items->values[i];
-		zbx_vector_ptr_append(&template_index, item);
-	}
-
+	zbx_vector_ptr_append_array(&template_index, items->values, items->values_num);
 	zbx_vector_ptr_sort(&template_index, compare_template_items);
 
 	for (i = items->values_num - 1; i >= 0; i--)
@@ -1270,7 +1263,7 @@ static void	link_template_dependent_items(zbx_vector_ptr_t *items)
 			}
 			else
 			{
-				master = (zbx_template_item_t *)items->values[index];
+				master = (zbx_template_item_t *)template_index.values[index];
 				zbx_vector_ptr_append(&master->dependent_items, item);
 			}
 		}
