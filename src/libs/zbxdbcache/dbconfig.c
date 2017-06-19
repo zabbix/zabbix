@@ -3035,7 +3035,6 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: dc_regexp_remove_expression                                      *
