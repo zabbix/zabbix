@@ -557,7 +557,7 @@
 					}
 
 					updateWidgetDynamic($obj, data, widget);
-					refreshWidget(widget, data['options']['fullscreen']);
+					refreshWidget($obj, data, widget);
 
 					// mark dashboard as updated
 					data['options']['updated'] = true;
