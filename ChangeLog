@@ -504,6 +504,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
 ..F....... [ZBX-10999] fixed user's access level to display popup content (miks)
 ..F....... [ZBX-9213] removed link from uneditable template and host names in all configuration sections (miks)
 ..F....... [ZBX-6533] improved LDAP authentication module status check for authentication form (gcalenko)
