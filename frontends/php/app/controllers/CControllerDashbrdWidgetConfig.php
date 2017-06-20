@@ -85,12 +85,12 @@ class CControllerDashbrdWidgetConfig extends CController {
 					$captions[$field->getResourceType()] = [];
 				}
 				if ($field->getValue(true)) {
-					$captions[$field->getResourceType()][$field->getValue(true)] = true;
+					$captions[$field->getResourceType()][$field->getValue(true)] = _('Unknown');
 				}
 			}
 			if ($field instanceof CWidgetFieldGroup) {
 				foreach ($field->getValue(true) as $groupid) {
-					$captions['groups'][$groupid] = true;
+					$captions['groups'][$groupid] = _('Unknown');
 				}
 			}
 		}
@@ -126,6 +126,22 @@ class CControllerDashbrdWidgetConfig extends CController {
 					if ($maps) {
 						foreach ($maps as $key => $map) {
 							$captions[$resource][$map['sysmapid']] = $map['name'];
+						}
+					}
+					break;
+
+				case WIDGET_FIELD_SELECT_RES_GRAPH:
+					$graphs = API::Graph()->get([
+						'graphids' => array_keys($list),
+						'selectHosts' => ['name'],
+						'output' => ['graphid', 'name']
+					]);
+
+					if ($graphs) {
+						foreach ($graphs as $key => $graph) {
+							order_result($graph['hosts'], 'name');
+							$graph['host'] = reset($graph['hosts']);
+							$captions[$resource][$graph['graphid']] = $graph['host']['name'].NAME_DELIMITER.$graph['name'];
 						}
 					}
 					break;

@@ -68,6 +68,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return;
 		}
 
+		// Create dropdown lists for dynamic items
 		$pageFilter = new CPageFilter([
 			'groups' => [
 				'monitored_hosts' => true,
@@ -85,7 +86,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$data = [
 			'dashboard' => $this->dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
-			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
 			'grid_widgets' => $this->getWidgets($this->dashboard['widgets']),
 			'widget_defaults' => CWidgetConfig::getDefaults(),
 			'pageFilter' => $pageFilter,

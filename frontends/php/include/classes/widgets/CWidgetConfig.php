@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetConfig
-{
+
+class CWidgetConfig {
 	/**
 	 * Return list of all widget types with names.
 	 *
@@ -213,6 +213,9 @@ class CWidgetConfig
 
 			case WIDGET_TRIG_OVERVIEW:
 				return new CTrigOverviewWidgetForm($data);
+
+			case WIDGET_GRAPH:
+				return new CGraphWidgetForm($data);
 
 			default:
 				// TODO VM: delete this case after all widget forms will be created

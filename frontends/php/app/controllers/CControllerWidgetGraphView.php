@@ -28,7 +28,7 @@ class CControllerWidgetGraphView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>				'string',
-//			'fields' =>				'required|array',
+			'fields' =>				'required|array',
 			'dynamic_groupid' =>	'db groups.groupid', // TODO VM: probably not needed
 			'dynamic_hostid' =>		'db hosts.hostid'
 		];
@@ -61,25 +61,15 @@ class CControllerWidgetGraphView extends CController {
 		// Default values
 		$default = [
 			'graphid' => null,
-			'dynamic' => 0, // TODO VM: replace by WIDGET_SIMPLE_ITEM
+			'dynamic' => WIDGET_SIMPLE_ITEM,
 			'dynamic_hostid' => '0'
 		];
 
-//		$data = $this->getInput('fields'); // TODO VM: uncomment
-
-		// TODO VM: uncomment
-//		$data['name'] = $this->getInput('name');
-//		if ($data['name'] === '') {
-//			$data['name'] = $default['name'];
-//		}
+		$data = $this->getInput('fields');
 
 		// TODO VM: for testing
-		$data = [
-			'graphid' => '547',
-			'dynamic' => 0, // TODO VM: WIDGET_SIMPLE_ITEM
-			'width' => '500',
-			'height' => '100',
-		];
+		$data['width'] = '500';
+		$data['height'] = '100';
 
 		// Apply defualt value for data
 		foreach ($default as $key => $value) {
@@ -135,7 +125,7 @@ class CControllerWidgetGraphView extends CController {
 			'updateProfile' => $updateProfile,
 		];
 
-		if ($data['dynamic'] == SCREEN_DYNAMIC_ITEM && $data['dynamic_hostid']) { // TODO VM: WIDGET_DYNAMIC_ITEM
+		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $data['dynamic_hostid']) {
 			// get host
 			$hosts = API::Host()->get([
 				'hostids' => $data['dynamic_hostid'],
@@ -235,7 +225,7 @@ class CControllerWidgetGraphView extends CController {
 		}
 		else {
 			// $url may be empty, if it is dynamic graph, but no host is selected
-			if ($data['dynamic'] == SCREEN_SIMPLE_ITEM || $url === '') { // TODO VM: WIDGET_SIMPLE_ITEM
+			if ($data['dynamic'] == WIDGET_SIMPLE_ITEM || $url === '') {
 				$url = 'chart2.php?graphid='.$data['graphid']/*.'&screenid='.$this->screenitem['screenid']*/;
 				$is_default = true;
 			}

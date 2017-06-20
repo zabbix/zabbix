@@ -20,8 +20,8 @@
 
 
 $this->addJsFile('flickerfreescreen.js');
-$this->addJsFile('dashboard.grid.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('dashboard.grid.js');
 $this->addJsFile('class.calendar.js');
 
 $this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
@@ -124,9 +124,9 @@ $this->addPostJS('jqBlink.blink();');
 
 $dashboard_data = [
 	// name is required for new dashboard creation
-	'name'   => $data['dashboard']['name'],
-	'userid' => $data['dashboard']['owner']['id'],
-	'dynamic' => $data['dynamic']
+	'name'		=> $data['dashboard']['name'],
+	'userid'	=> $data['dashboard']['owner']['id'],
+	'dynamic'	=> $data['dynamic']
 ];
 $dashboard_options = [
 	'fullscreen' => $data['fullscreen']

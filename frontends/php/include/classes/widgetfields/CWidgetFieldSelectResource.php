@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldSelectResource extends CWidgetField
-{
+class CWidgetFieldSelectResource extends CWidgetField {
 	protected $srctbl;
 	protected $srcfld1;
 	protected $srcfld2;
@@ -46,6 +45,13 @@ class CWidgetFieldSelectResource extends CWidgetField
 
 				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 				break;
+			case WIDGET_FIELD_SELECT_RES_GRAPH:
+				$this->srctbl = 'graphs';
+				$this->srcfld1 = 'graphid';
+				$this->srcfld2 = 'name';
+
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
+				break;
 			default:
 				break;
 		}
@@ -64,6 +70,9 @@ class CWidgetFieldSelectResource extends CWidgetField
 		switch ($this->getResourceType()) {
 			case WIDGET_FIELD_SELECT_RES_ITEM:
 				$url .= '&real_hosts=1';
+				break;
+			case WIDGET_FIELD_SELECT_RES_GRAPH:
+				$url .= '&real_hosts=1&with_graphs=1';
 				break;
 			default:
 				break;

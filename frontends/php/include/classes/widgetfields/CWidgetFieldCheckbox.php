@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldCheckbox extends CWidgetField
-{
+class CWidgetFieldCheckbox extends CWidgetField {
 	public function __construct($name, $label, $default = 0) {
 		parent::__construct($name, $label, $default, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);

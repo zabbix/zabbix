@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CSysmapWidgetForm extends CWidgetForm
-{
+
+class CSysmapWidgetForm extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data);
 

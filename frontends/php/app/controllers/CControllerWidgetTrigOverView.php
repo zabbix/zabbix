@@ -19,8 +19,7 @@
 **/
 
 
-class CControllerWidgetTrigOverView extends CController
-{
+class CControllerWidgetTrigOverView extends CController {
 	protected function init() {
 		$this->disableSIDValidation();
 	}

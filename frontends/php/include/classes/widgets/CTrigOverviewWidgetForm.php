@@ -19,11 +19,7 @@
 **/
 
 
-/**
- * Action log widget form
- */
-class CTrigOverviewWidgetForm extends CWidgetForm
-{
+class CTrigOverviewWidgetForm extends CWidgetForm {
 	public function __construct($data)
 	{
 		parent::__construct($data);

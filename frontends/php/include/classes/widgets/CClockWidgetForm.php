@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CClockWidgetForm extends CWidgetForm
-{
+
+class CClockWidgetForm extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data);
 

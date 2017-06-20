@@ -18,25 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldComboBox extends CWidgetField {
-	protected $values;
 
-	public function __construct($name, $label, $values, $default = null, $action = null, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
-		parent::__construct($name, $label, $default, $action);
-		$this->setSaveType($save_type);
-		$this->values = $values;
-	}
+class CGraphWidgetForm extends CWidgetForm {
+	public function __construct($data)
+	{
+		parent::__construct($data);
 
-	public function setValue($value) {
-		if ($value === null) {
-			parent::setValue($value);
-		} elseif (array_key_exists($value, $this->values)) {
-			parent::setValue($value);
+		// Select graph field
+		$field_graph = (new CWidgetFieldSelectResource('graphid', _('Graph'), WIDGET_FIELD_SELECT_RES_GRAPH))
+			->setRequired(true);
+		if (array_key_exists('graphid', $data)) {
+			$field_graph->setValue($data['graphid']);
 		}
-		return $this;
-	}
+		$this->fields[] = $field_graph;
 
-	public function getValues() {
-		return $this->values;
+		// Dynamic item
+		$field_dynamic = (new CWidgetFieldCheckbox('dynamic', _('Dynamic item')));
+		if (array_key_exists('dynamic', $data)) {
+			$field_dynamic->setValue($data['dynamic']);
+		}
+		else {
+			$field_dynamic->setValue(false);
+		}
+		$this->fields[] = $field_dynamic;
 	}
 }
