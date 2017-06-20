@@ -28,6 +28,8 @@ class CControllerWidgetGraphView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>				'string',
+			'uniqueid' =>			'required|string',
+			'dashboardid' =>		'required|db dashboard.dashboardid',
 			'fields' =>				'required|array',
 			'dynamic_groupid' =>	'db groups.groupid', // TODO VM: probably not needed
 			'dynamic_hostid' =>		'db hosts.hostid'
@@ -61,6 +63,7 @@ class CControllerWidgetGraphView extends CController {
 		// Default values
 		$default = [
 			'graphid' => null,
+			'uniqueid' => $this->getInput('uniqueid'),
 			'dynamic' => WIDGET_SIMPLE_ITEM,
 			'dynamic_hostid' => '0'
 		];
@@ -84,10 +87,10 @@ class CControllerWidgetGraphView extends CController {
 		//			in two widgets. We can't use widgetid, becasue for new widgets, widgetid is empty string => it can be same
 		// TODO VM: (?) Other option is to update gtlc.js script, to delete nonexisting entries from timeControl.objectList,
 		//			each time, we are adding new one. (together with using uniqueid())
-		$dataid = 'graph_'.$data['graphid'];
-		$containerid = 'graph_container_'.$data['graphid'];
+		$dataid = 'graph_'.$data['uniqueid'];
+		$containerid = 'graph_container_'.$data['uniqueid'];
 		$profileIdx = 'web.dashbrd';
-		$profileIdx2 = '1'; // TODO VM: there should be dashboard id
+		$profileIdx2 = $this->getInput('dashboardid');
 		$updateProfile = '1'; // TODO VM: there should be constant
 		$graphDims = getGraphDims($data['graphid']);
 		$graphDims['graphHeight'] = $data['height'];

@@ -408,6 +408,7 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data['fullscreen'] = data['options']['fullscreen'];
+		ajax_data['dashboardid'] = data['dashboard']['id'];
 		ajax_data['widgetid'] = widget['widgetid'];
 		ajax_data['uniqueid'] = widget['uniqueid'];
 		if (widget['header'] !== '') {
