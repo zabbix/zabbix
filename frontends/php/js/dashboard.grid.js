@@ -378,9 +378,9 @@
 		widget['content_footer'].fadeTo(0, 1);
 	}
 
-	function startWidgetRefreshTimer(widget, rf_rate, fullscreen) {
+	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
 		if (rf_rate != 0) {
-			widget['rf_timeoutid'] = setTimeout(function () { updateWidgetContent(widget, fullscreen); }, rf_rate * 1000);
+			widget['rf_timeoutid'] = setTimeout(function () { updateWidgetContent($obj, data, widget); }, rf_rate * 1000);
 		}
 	}
 
@@ -389,15 +389,15 @@
 		delete widget['rf_timeoutid'];
 	}
 
-	function startWidgetRefresh(widget, fullscreen) {
+	function startWidgetRefresh($obj, data, widget) {
 		if (typeof(widget['rf_timeoutid']) != 'undefined') {
 			stopWidgetRefreshTimer(widget);
 		}
 
-		startWidgetRefreshTimer(widget, widget['rf_rate'], fullscreen);
+		startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
 	}
 
-	function updateWidgetContent(widget, fullscreen) {
+	function updateWidgetContent($obj, data, widget) {
 		if (++widget['update_attempts'] > 1) {
 			return;
 		}
@@ -407,7 +407,7 @@
 
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
-		ajax_data['fullscreen'] = fullscreen || 0;
+		ajax_data['fullscreen'] = data['options']['fullscreen'];
 		ajax_data['widgetid'] = widget['widgetid'];
 		ajax_data['uniqueid'] = widget['uniqueid'];
 		if (widget['header'] !== '') {
@@ -469,27 +469,27 @@
 
 				if (widget['update_attempts'] == 1) {
 					widget['update_attempts'] = 0;
-					startWidgetRefreshTimer(widget, widget['rf_rate'], fullscreen);
+					startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
 				}
 				else {
 					widget['update_attempts'] = 0;
-					updateWidgetContent(widget, fullscreen);
+					updateWidgetContent($obj, data, widget);
 				}
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
 				widget['update_attempts'] = 0;
-				startWidgetRefreshTimer(widget, 3, fullscreen);
+				startWidgetRefreshTimer($obj, data, widget, 3);
 			}
 		});
 	}
 
-	function refreshWidget(widget, fullscreen) {
+	function refreshWidget($obj, data, widget) {
 		if (typeof(widget['rf_timeoutid']) !== 'undefined') {
 			stopWidgetRefreshTimer(widget);
 		}
 
-		updateWidgetContent(widget, fullscreen);
+		updateWidgetContent($obj, data, widget);
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
@@ -557,7 +557,7 @@
 					}
 
 					updateWidgetDynamic($obj, data, widget);
-					refreshWidget(widget, data['options']['fullscreen']);
+					refreshWidget($obj, data, widget);
 
 					// mark dashboard as updated
 					data['options']['updated'] = true;
@@ -940,7 +940,7 @@
 				resizeDashboardGrid($this, data);
 
 				showPreloader(widget);
-				updateWidgetContent(widget, data['options']['fullscreen']);
+				updateWidgetContent($this, data, widget);
 			});
 		},
 
@@ -952,7 +952,7 @@
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid) {
 						widget['rf_rate'] = rf_rate;
-						startWidgetRefresh(widget, data['options']['fullscreen']);
+						startWidgetRefresh($this, data, widget);
 					}
 				});
 			});
@@ -965,7 +965,7 @@
 
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
-						refreshWidget(widget, data['options']['fullscreen']);
+						refreshWidget($this, data, widget);
 					}
 				});
 			});
