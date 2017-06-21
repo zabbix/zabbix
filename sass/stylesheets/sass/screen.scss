@@ -4417,6 +4417,8 @@ tr.cursor-move {
 
 .navtree {
 	$max_depth: 10;
+	height: 100%;
+	background: #fff;
 
 	@keyframes fadein {
 		from {opacity: 0;}
@@ -4535,6 +4537,9 @@ tr.cursor-move {
 		}
 
 		.tree-item {
+			&.selected > .row > .item-name {
+				font-weight: bold;
+			}
 			.drag-icon {
 				margin: 5px 0px 5px -40px;
 				position: absolute;
