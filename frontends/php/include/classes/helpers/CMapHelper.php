@@ -68,6 +68,7 @@ class CMapHelper {
 				'height' => 150,
 				'backgroundid' => null,
 				'severity_min' => 0,
+				'label_location' => MAP_LABEL_LOC_BOTTOM,
 				'selements' => [],
 				'links' => [],
 				'shapes' => [[
