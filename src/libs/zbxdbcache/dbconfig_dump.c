@@ -90,9 +90,11 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 
 	for (i = 0; i < index.values_num; i++)
 	{
+		int	j;
+
 		host = (ZBX_DC_HOST *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s'", host->hostid, host->host,
-				host->name);
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u", host->hostid,
+				host->host, host->name, host->status);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid:%d", host->proxy_hostid);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", host->data_expected_from);
@@ -129,6 +131,12 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 					host->tls_dc_psk->refcount);
 		}
 #endif
+		for (j = 0; j < host->interfaces_v.values_num; j++)
+		{
+			ZBX_DC_INTERFACE	*interface = host->interfaces_v.values[j];
+
+			zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, interface->interfaceid);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);

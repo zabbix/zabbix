@@ -57,7 +57,7 @@ static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 {
 	const char	*__function_name = "hv_get";
 
-	zbx_vmware_hv_t	*hv, hv_local = {(char *)uuid};
+	zbx_vmware_hv_t	*hv, hv_local = {.uuid = (char *)uuid};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
 
@@ -72,8 +72,8 @@ static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service,
 {
 	const char	*__function_name = "service_hv_get_by_vm_uuid";
 
-	zbx_vmware_vm_t		vm_local = {(char *)uuid};
-	zbx_vmware_vm_index_t	vmi_local = {&vm_local}, *vmi;
+	zbx_vmware_vm_t		vm_local = {.uuid = (char *)uuid};
+	zbx_vmware_vm_index_t	vmi_local = {&vm_local, NULL}, *vmi;
 	zbx_vmware_hv_t		*hv = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
@@ -93,8 +93,8 @@ static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char
 {
 	const char	*__function_name = "service_vm_get";
 
-	zbx_vmware_vm_t		vm_local = {(char *)uuid}, *vm;
-	zbx_vmware_vm_index_t	vmi_local = {&vm_local}, *vmi;
+	zbx_vmware_vm_t		vm_local = {.uuid = (char *)uuid}, *vm;
+	zbx_vmware_vm_index_t	vmi_local = {&vm_local, NULL}, *vmi;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
 
