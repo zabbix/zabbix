@@ -188,14 +188,10 @@ static int	DBpatch_2050012(void)
 
 		param = get_rparam(&request, 0);
 
-		/* not NULL check to silence the static analyzer waring */
-		if (NULL != param)
+		if (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param))
 		{
-			if (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param))
-			{
-				free_request(&request);
-				continue;
-			}
+			free_request(&request);
+			continue;
 		}
 
 		key = zbx_strdup(key, row[2]);
