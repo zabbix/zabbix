@@ -18,6 +18,15 @@
 **/
 
 #include "common.h"
+
+/* LIBXML2 is used */
+#ifdef HAVE_LIBXML2
+#	include <libxml/parser.h>
+#	include <libxml/tree.h>
+#	include <libxml/xpath.h>
+#endif
+
+#include "log.h"
 #include "zbxregexp.h"
 #include "zbxjson.h"
 
@@ -825,6 +834,129 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_xpath_op                                             *
+ *                                                                            *
+ * Purpose: execute xpath query                                               *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char **errmsg)
+{
+#ifndef HAVE_LIBXML2
+	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+	return FAIL;
+#else
+	xmlDoc		*doc = NULL;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlErrorPtr	pErr;
+	xmlBufferPtr 	xmlBuf;
+	int		ret = FAIL, i;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
+		else
+			*errmsg = zbx_strdup(*errmsg, "cannot parse xml value");
+		return FAIL;
+	}
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
+	{
+		pErr = xmlGetLastError();
+		*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
+		goto out;
+	}
+
+	switch (xpathObj->type)
+	{
+		case XPATH_NODESET:
+			xmlBuf = xmlBufferCreate();
+
+			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+			{
+				nodeset = xpathObj->nodesetval;
+				for (i = 0; i < nodeset->nodeNr; i++)
+					xmlNodeDump(xmlBuf, doc, nodeset->nodeTab[i], 0, 0);
+			}
+
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBuf->content));
+
+			xmlBufferFree(xmlBuf);
+			ret = SUCCEED;
+			break;
+		case XPATH_STRING:
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xpathObj->stringval));
+			ret = SUCCEED;
+			break;
+		case XPATH_BOOLEAN:
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_dsprintf(NULL, "%d", xpathObj->boolval));
+			ret = SUCCEED;
+			break;
+		case XPATH_NUMBER:
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_dsprintf(NULL, ZBX_FS_DBL, xpathObj->floatval));
+			ret = SUCCEED;
+			break;
+		default:
+			*errmsg = zbx_dsprintf(*errmsg, "Unknown result");
+			break;
+	}
+out:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+
+	return ret;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_xpath_op                                             *
+ *                                                                            *
+ * Purpose: execute xpath query                                               *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char		*err = NULL;
+
+	if (SUCCEED == item_preproc_xpath_op(value, params, &err))
+		return SUCCEED;
+
+	*errmsg = zbx_dsprintf(*errmsg, "cannot extract XML value with xpath \"%s\": %s", params, err);
+	zbx_free(err);
+
+	return FAIL;
+}
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -867,6 +999,8 @@ int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timesp
 			return item_preproc_delta_value(item, value, ts, delta_history, errmsg);
 		case ZBX_PREPROC_DELTA_SPEED:
 			return item_preproc_delta_speed(item, value, ts, delta_history, errmsg);
+		case ZBX_PREPROC_XPATH:
+			return item_preproc_xpath(value, op->params, errmsg);
 		case ZBX_PREPROC_JSONPATH:
 			return item_preproc_jsonpath(value, op->params, errmsg);
 	}
