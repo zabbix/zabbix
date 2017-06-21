@@ -1495,7 +1495,7 @@ class CAction extends CApiService {
 
 		foreach ($operations as $operation) {
 			foreach ($required_fields as $field) {
-				if (!array_key_exists($field, $operations)) {
+				if (!array_key_exists($field, $operation)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', $field));
 				}
 			}
