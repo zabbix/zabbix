@@ -287,9 +287,15 @@ foreach ($data['preprocessing'] as $i => $step) {
 			$params[1]->addStyle('display: none;');
 			break;
 
+		case ZBX_PREPROC_XPATH:
+		case ZBX_PREPROC_JSONPATH:
+			$params[0]->setAttribute('placeholder', _('path'));
+			$params[1]->addStyle('display: none;');
+			break;
+
 		case ZBX_PREPROC_REGSUB:
 			$params[0]->setAttribute('placeholder', _('pattern'));
-				break;
+			break;
 
 		case ZBX_PREPROC_BOOL2DEC:
 		case ZBX_PREPROC_OCT2DEC:
