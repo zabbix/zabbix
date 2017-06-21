@@ -1494,8 +1494,10 @@ class CAction extends CApiService {
 		$required_fields = ['eventsource', 'recovery', 'operationtype'];
 
 		foreach ($operations as $operation) {
-			if (!check_db_fields($required_fields, $operation)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter for operations.'));
+			foreach ($required_fields as $field) {
+				if (!array_key_exists($field, $operations)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', $field));
+				}
 			}
 			$eventsource = $operation['eventsource'];
 			$recovery = $operation['recovery'];
