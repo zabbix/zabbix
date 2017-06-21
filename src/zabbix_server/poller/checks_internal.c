@@ -73,6 +73,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	tmp = get_rparam(&request, 0);
+	assert(NULL != tmp);		/* silence scan-build warning */
 
 	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
 	{
