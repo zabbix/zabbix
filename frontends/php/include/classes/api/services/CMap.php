@@ -299,7 +299,7 @@ class CMap extends CMapElement {
 
 						unset($selement['elementids']);
 						$selement['available'] = $available;
-						if ($available && !$sysmap['have_selements_available']) {
+						if ($available) {
 							$sysmap['have_selements_available'] = true;
 						}
 					}

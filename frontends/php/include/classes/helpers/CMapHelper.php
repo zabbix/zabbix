@@ -146,14 +146,15 @@ class CMapHelper {
 			unset($element['width'], $element['height']);
 
 			$element['icon'] = $icon;
-			$element['label'] = $labels[$id];
 			if ($element['available']) {
 				$element['highlight'] = $highlights[$id];
 				$element['actions'] = $actions[$id];
+				$element['label'] = $labels[$id];
 			}
 			else {
-				$element['actions'] = null;
 				$element['highlight'] = '';
+				$element['actions'] = null;
+				$element['label'] = '';
 			}
 
 			if ($sysmap['markelements']) {
