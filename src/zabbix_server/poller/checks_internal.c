@@ -72,7 +72,12 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	tmp = get_rparam(&request, 0);
+	/* NULL check to silence static analyzer waring */
+	if (NULL == (tmp = get_rparam(&request, 0)))
+	{
+		error = zbx_strdup(error, "Invalid number of parameters.");
+		goto out;
+	}
 
 	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
 	{
