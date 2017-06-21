@@ -72,7 +72,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	/* NULL check to silence static analyzer waring */
+	/* NULL check to silence static analyzer warning */
 	if (NULL == (tmp = get_rparam(&request, 0)))
 	{
 		error = zbx_strdup(error, "Invalid number of parameters.");
