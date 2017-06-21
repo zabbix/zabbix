@@ -1296,6 +1296,8 @@ function getParamFieldLabelByType($itemType) {
  *                                               [4] => Trim
  *                                               [2] => Right trim
  *                                               [3] => Left trim
+ *                                               [11] => XML XPath
+ *                                               [12] => JSON Path
  *                                               [1] => Custom multiplier
  *                                               [9] => Simple change
  *                                               [10] => Speed per second
@@ -1317,6 +1319,13 @@ function get_preprocessing_types($type = null, $grouped = true) {
 				ZBX_PREPROC_TRIM => _('Trim'),
 				ZBX_PREPROC_RTRIM => _('Right trim'),
 				ZBX_PREPROC_LTRIM => _('Left trim')
+			]
+		],
+		[
+			'label' => _('Structured data'),
+			'types' => [
+				ZBX_PREPROC_XPATH => _('XML XPath'),
+				ZBX_PREPROC_JSONPATH => _('JSON Path')
 			]
 		],
 		[
