@@ -147,8 +147,14 @@ class CMapHelper {
 
 			$element['icon'] = $icon;
 			$element['label'] = $labels[$id];
-			$element['highlight'] = $highlights[$id];
-			$element['actions'] = $actions[$id];
+			if ($element['available']) {
+				$element['highlight'] = $highlights[$id];
+				$element['actions'] = $actions[$id];
+			}
+			else {
+				$element['actions'] = null;
+				$element['highlight'] = '';
+			}
 
 			if ($sysmap['markelements']) {
 				$element['latelyChanged'] = $map_info[$id]['latelyChanged'];

@@ -706,6 +706,10 @@ SVGMapElement.prototype.updateImage = function() {
 		if (this.image === null || this.image.attributes['xlink:href'] !== href) {
 			options['xlink:href'] = href;
 
+			if (this.options.available === false) {
+				options['class'] = 'gray';
+			}
+
 			var image = this.map.layers.elements.add('image', options);
 			this.removeItem('image');
 			this.image = image;
