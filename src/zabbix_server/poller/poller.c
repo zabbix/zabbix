@@ -234,7 +234,7 @@ void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts)
 			__function_name, item->host.hostid, item->itemid, (int)item->type);
 
 	zbx_host_availability_init(&in, item->host.hostid);
-	zbx_host_availability_init(&out,item->host.hostid);
+	zbx_host_availability_init(&out, item->host.hostid);
 
 	if (ZBX_AGENT_UNKNOWN == (agent_type = host_availability_agent_by_item_type(item->type)))
 		goto out;

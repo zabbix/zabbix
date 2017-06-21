@@ -1,6 +1,8 @@
 Changes for 3.4.0alpha1
 
 New features:
+........S. [ZBXNEXT-3872] implemented new internal item 'zabbix[host,discovery,interfaces]' (Andris)
+...G...... [ZBXNEXT-3930] increased MaxLinesPerSecond limit and adjusted formula to process more lines per second (vso)
 A.F....... [ZBXNEXT-3869] implemented map lines (vjaceslavs)
 A.F.I..PS. [ZBXNEXT-1675] added support for user macros and time unit suffixes in various time-related settings: update intervals, timeouts, housekeeping settings, time periods, etc. (gleb, Ivo, Sasha, vjaceslavs)
 ..F....... [ZBXNEXT-3762] added browser warning for IE 9 and IE10 (gcalenko)
@@ -50,7 +52,9 @@ A.......S. [ZBX-9425] added permission check on the server side for global scrip
 ....I..... [ZBXNEXT-3725] added templates for network devices (internal version 0.7beta) (vzhuravlev)
 
 Bug fixes:
+.......PS. [ZBX-12266] fixed memory leak when executing IPMI commands (wiper)
 ..F....... [ZBX-11938] fixed 'type of condition' dropdown appearing if only one filter condition is set (miks)
+..F....... [ZBX-11530] fixed lost application name in exported host web scenario (miks)
 ........S. [ZBX-12201] fixed crash when processing SNMP trap log item, fixed log item processing without pre-processing options (wiper)
 ........S. [ZBX-12199] removed condition check for recovery operations (wiper)
 ...GI..PS. [ZBX-3924] switched from POSIX extended to the PCRE regular expression library for enhanced regular expressions and consistency with frontend (vso)
@@ -68,8 +72,13 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.7rc1
 
 New features:
+...G...... [ZBXNEXT-3930] increased MaxLinesPerSecond limit and adjusted formula to process more lines per second (vso)
 
 Bug fixes:
+..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
+..F....... [ZBX-12182] fixed missed page number in problems export (miks)
+..F....... [ZBX-11309] fixed unchecked checkboxes after deleting script, mediatype or proxy (miks)
+..F....... [ZBX-10999] fixed user's access level to display popup content (miks)
 ..F....... [ZBX-9213] removed link from uneditable template and host names in all configuration sections (miks)
 ..F....... [ZBX-6533] improved LDAP authentication module status check for authentication form (gcalenko)
 ..F....... [ZBX-12019] fixed incorrectly displayed calendar date in maintenance edit form (miks)
@@ -490,10 +499,13 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.10rc1
 
 New features:
+...G...... [ZBXNEXT-3930] increased MaxLinesPerSecond limit and adjusted formula to process more lines per second (vso)
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Korean, Romanian, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
+..F....... [ZBX-10999] fixed user's access level to display popup content (miks)
 ..F....... [ZBX-9213] removed link from uneditable template and host names in all configuration sections (miks)
 ..F....... [ZBX-6533] improved LDAP authentication module status check for authentication form (gcalenko)
 ..F....... [ZBX-12019] fixed incorrectly displayed calendar date in maintenance edit form (miks)

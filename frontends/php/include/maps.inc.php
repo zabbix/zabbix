@@ -401,7 +401,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 			$msg = $i['problem_title'];
 
 			if ($i['problem'] > 1) {
-				$msg .= "\n".$i['problem'].' '._('Problems');;
+				$msg .= "\n".$i['problem'].' '._('Problems');
 			}
 		}
 
@@ -467,14 +467,26 @@ function getHostsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -548,14 +560,26 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -637,14 +661,26 @@ function getMapsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -1001,7 +1037,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 						$i['problem']++;
 						$lastProblemId = $trigger['triggerid'];
 
-						if ($critical_triggerid != 0) {
+						if ($critical_triggerid == 0) {
 							$critical_triggerid = $trigger['triggerid'];
 						}
 
