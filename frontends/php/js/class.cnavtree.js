@@ -744,7 +744,14 @@ jQuery(function($) {
 						})
 						.click(function(e) {
 							var data_to_share = {mapid: $(this).data('mapid')},
-								widget = getWidgetData();
+								widget = getWidgetData(),
+								step_in_path = $(this).closest('.tree-item');
+
+							$('.selected', $this).removeClass('selected');
+							while ($(step_in_path).length) {
+								$(step_in_path).addClass('selected');
+								step_in_path = $(step_in_path).parent().closest('.tree-item');
+							}
 
 							e.preventDefault();
 							$(".dashbrd-grid-widget-container").dashboardGrid("widgetDataShare", widget, data_to_share);

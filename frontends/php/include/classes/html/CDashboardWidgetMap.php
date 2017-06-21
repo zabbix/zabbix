@@ -48,7 +48,7 @@ class CDashboardWidgetMap extends CDiv {
 		if ($sysmapid) {
 			foreach ($this->sysmap_data['elements'] as &$elemnet) {
 				$actions = json_decode($elemnet['actions'], true);
-				if (array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
+				if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
 					$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
 					$actions['navigatetos']['submap']['widget_uniqueid'] = $this->uniqueid;
 					unset($actions['gotos']['submap']);
@@ -116,7 +116,7 @@ class CDashboardWidgetMap extends CDiv {
 							$go_back_div = (new CDiv())
 								->setAttribute('style', 'padding:5px 10px; border-bottom: 1px solid #ebeef0;')
 								->addItem(
-									(new CLink(_s('Go back to %1$s', $map['name']), 'javascript:void(0)'))
+									(new CLink(_s('Go back to %1$s', $map['name'])))
 										->onClick('javascript: navigateToSubmap('.$map['sysmapid'].', "' .
 											$this->uniqueid.'", true);')
 								);

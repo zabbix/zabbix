@@ -48,10 +48,10 @@ class CControllerWidgetSysmapView extends CController {
 			if (array_key_exists('source_type', $input_fields)) {
 				if ($input_fields['source_type'] == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 					$validationRules['filter_widget_reference'] = 'string';
-					$validationRules['sysmap_id'] = 'db sysmaps.sysmapid';
+					$validationRules['sysmapid'] = 'db sysmaps.sysmapid';
 				}
 				else {
-					$validationRules['sysmap_id'] = 'required|db sysmaps.sysmapid';
+					$validationRules['sysmapid'] = 'required|db sysmaps.sysmapid';
 				}
 
 				$validator = new CNewValidator($input_fields, $validationRules);
