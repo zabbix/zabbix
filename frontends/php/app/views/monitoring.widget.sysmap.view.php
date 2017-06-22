@@ -19,12 +19,13 @@
 **/
 
 $widget_settings = [
-	'previous_maps' => $data['previous_maps'],
-	'fullscreen' => $data['fullscreen'],
+	'filter_widget_reference' => $data['fields']['filter_widget_reference'],
+	'previous_map' => $data['previous_map'],
+	'source_type' => $data['fields']['source_type'],
 	'uniqueid' => $data['uniqueid']
 ];
 
-$item = new CDashboardWidgetMap($data['fields'], $widget_settings);
+$item = new CDashboardWidgetMap($data['sysmap_data'], $widget_settings);
 
 $output = [
 	'header' => $data['name'],

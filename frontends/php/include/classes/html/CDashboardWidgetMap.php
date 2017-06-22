@@ -19,59 +19,37 @@
 **/
 
 class CDashboardWidgetMap extends CDiv {
-	private $severity_min;
-	private $sysmap_conf;
-	private $previous_maps;
-	private $fullscreen;
+	private $filter_widget_reference;
+	private $previous_map;
+	private $sysmap_data;
 	private $uniqueid;
 	private $error;
 
-	public function __construct(array $options = [], array $widget_settings) {
+	public function __construct(array $sysmap_data, array $widget_settings) {
 		parent::__construct();
 
-		$this->sysmap_conf = $options;
-		$this->previous_maps = array_key_exists('previous_maps', $widget_settings)
-			? $widget_settings['previous_maps']
-			: '';
-		$this->fullscreen = array_key_exists('fullscreen', $widget_settings) ? $widget_settings['fullscreen'] : 0;
-		$this->uniqueid = array_key_exists('uniqueid', $widget_settings) ? $widget_settings['uniqueid'] : 0;
-		$this->severity_min = 0;
-
-		$options = [
-			'severity_min' => $this->severity_min,
-			'fullscreen' => $this->fullscreen
-		];
-
-		$sysmapid = array_key_exists('sysmapid', $this->sysmap_conf) ? $this->sysmap_conf['sysmapid'] : [];
-		$this->sysmap_data = CMapHelper::get($sysmapid, $options);
-
-		if ($sysmapid) {
-			foreach ($this->sysmap_data['elements'] as &$element) {
-				$actions = json_decode($element['actions'], true);
-				if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
-					$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
-					$actions['navigatetos']['submap']['widget_uniqueid'] = $this->uniqueid;
-					unset($actions['gotos']['submap']);
-				}
-
-				$element['actions'] = json_encode($actions);
-			}
-			unset($element);
+		if ($sysmap_data['id']) {
+			$this->sysmap_data = $sysmap_data;
 		}
+		else {
+			$this->error = true;
+		}
+
+		$this->filter_widget_reference = $widget_settings['filter_widget_reference'];
+		$this->source_type = $widget_settings['source_type'];
+		$this->previous_map = $widget_settings['previous_map'];
+		$this->uniqueid = $widget_settings['uniqueid'];
 	}
 
 	public function getScriptRun() {
 		$script_run = '';
 
-		if ($this->sysmap_conf['source_type'] == WIDGET_SYSMAP_SOURCETYPE_FILTER
-			&& array_key_exists('filter_widget_reference', $this->sysmap_conf)
-		) {
-			$reference = $this->sysmap_conf['filter_widget_reference'];
-
+		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
+			&& $this->error === null) {
 			$script_run =
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.
-					'sourceWidgetReference: "'.$reference.'",'.
+					'sourceWidgetReference: "'.$this->filter_widget_reference.'",'.
 					'callback: function(widget, data) {'.
 						'if(data[0].mapid !== +data[0].mapid) return;'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
@@ -101,29 +79,15 @@ class CDashboardWidgetMap extends CDiv {
 		$this->setId(uniqid());
 
 		if ($this->error === null) {
-			if ($this->previous_maps) {
-				$this->previous_maps = array_filter(explode(',', $this->previous_maps), 'is_numeric');
+			if ($this->previous_map) {
+				$go_back_div = (new CDiv())
+					->setAttribute('style', 'padding:5px 10px; border-bottom: 1px solid #ebeef0;')
+					->addItem(
+						(new CLink(_s('Go back to %1$s', $this->previous_map['name']), 'javascript: navigateToSubmap('.
+							$this->previous_map['sysmapid'].', "'.$this->uniqueid.'", true);'))
+					);
 
-				if ($this->previous_maps) {
-					// get previous map
-					$maps = API::Map()->get([
-						'sysmapids' => [array_pop($this->previous_maps)],
-						'output' => ['sysmapid', 'name']
-					]);
-
-					if ($maps) {
-						if (($map = reset($maps)) !== false) {
-							$go_back_div = (new CDiv())
-								->setAttribute('style', 'padding:5px 10px; border-bottom: 1px solid #ebeef0;')
-								->addItem(
-									(new CLink(_s('Go back to %1$s', $map['name']), 'javascript: navigateToSubmap('.
-										$map['sysmapid'].', "'.$this->uniqueid.'", true);'))
-								);
-
-							$this->addItem($go_back_div);
-						}
-					}
-				}
+				$this->addItem($go_back_div);
 			}
 
 			$map_div = (new CDiv())
