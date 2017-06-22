@@ -423,7 +423,7 @@ function getMenuPopupRefresh(options) {
 							]
 						},
 						success: function(resp) {
-							jQuery('a').each(function() {
+							jQuery('a', obj.closest('.action-menu')).each(function() {
 								var link = jQuery(this);
 
 								if (link.data('value') == currentRate) {
