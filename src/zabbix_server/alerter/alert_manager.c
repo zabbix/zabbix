@@ -1766,8 +1766,6 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 	{
 		errmsg = zbx_strdup(errmsg, "");
 		status = ALERT_STATUS_SENT;
-
-		am_remove_alert(manager, alerter->alert);
 		ret = SUCCEED;
 	}
 	else
@@ -1780,7 +1778,7 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 
 	am_db_update_alert(manager, alerter->alert->alertid, status, alerter->alert->retries, errmsg);
 
-	if (ALERT_STATUS_FAILED == status)
+	if (ALERT_STATUS_NOT_SENT != status)
 		am_remove_alert(manager, alerter->alert);
 
 	alerter->alert = NULL;
