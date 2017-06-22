@@ -1178,9 +1178,6 @@ jQuery(function($) {
 						switchToNavigationMode();
 					});
 				},
-				onResize: function() {
-					shorten_item_names();
-				},
 				onResizeEnd: function() {
 					shorten_item_names();
 				},
@@ -1197,7 +1194,7 @@ jQuery(function($) {
 							lastId: 0
 						});
 						var triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
-							'beforeConfigLoad', 'onResize', 'onResizeEnd'];
+							'beforeConfigLoad', 'onResizeEnd'];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-widget-container").dashboardGrid("addAction", trigger,
