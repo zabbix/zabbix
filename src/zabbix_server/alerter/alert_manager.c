@@ -1738,33 +1738,27 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 {
 	const char		*__function_name = "am_process_result";
 
-	int			ret, errcode, retries, status;
+	int			ret = FAIL, errcode, status;
 	char			*errmsg;
 	zbx_am_alerter_t	*alerter;
-	zbx_uint64_t		alertid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == (alerter = am_get_alerter_by_client(manager, client)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		ret = FAIL;
 		goto out;
 	}
 
 	if (NULL == alerter->alert)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		ret = FAIL;
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:"
 			ZBX_FS_UI64, __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
 			alerter->alert->alertpoolid);
-
-	retries = alerter->alert->retries;
-	alertid = alerter->alert->alertid;
 
 	zbx_alerter_deserialize_result(message->data, &errcode, &errmsg);
 
@@ -1782,11 +1776,12 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 			status = ALERT_STATUS_NOT_SENT;
 		else
 			status = ALERT_STATUS_FAILED;
-
-		ret = FAIL;
 	}
 
-	am_db_update_alert(manager, alertid, status, retries, errmsg);
+	am_db_update_alert(manager, alerter->alert->alertid, status, alerter->alert->retries, errmsg);
+
+	if (ALERT_STATUS_FAILED == status)
+		am_remove_alert(manager, alerter->alert);
 
 	alerter->alert = NULL;
 	zbx_free(errmsg);
