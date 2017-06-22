@@ -144,6 +144,10 @@ function getActionsBySysmap($sysmap, array $options = []) {
 		$scripts = null;
 		$gotos = null;
 
+		if (!$elem['available']) {
+			continue;
+		}
+
 		switch ($elem['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_HOST:
 				$hostId = $elem['elements'][0]['hostid'];
@@ -325,6 +329,11 @@ function add_elementNames(&$selements) {
 	]);
 
 	foreach ($selements as $snum => &$selement) {
+		if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE && !$selement['available']) {
+			$selements[$snum]['elements'][0]['elementName'] = _('Element is not available');
+			continue;
+		}
+
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_HOST:
 				$selements[$snum]['elements'][0]['elementName'] = $hosts[$selement['elements'][0]['hostid']]['name'];
@@ -392,7 +401,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 			$msg = $i['problem_title'];
 
 			if ($i['problem'] > 1) {
-				$msg .= "\n".$i['problem'].' '._('Problems');;
+				$msg .= "\n".$i['problem'].' '._('Problems');
 			}
 		}
 
@@ -458,14 +467,26 @@ function getHostsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -539,14 +560,26 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -628,14 +661,26 @@ function getMapsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -742,6 +787,10 @@ function getSelementsInfo($sysmap, array $options = []) {
 	foreach ($selements as $selementId => &$selement) {
 		$selement['hosts'] = [];
 		$selement['triggers'] = [];
+
+		if (!$selement['available']) {
+			continue;
+		}
 
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
@@ -988,7 +1037,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 						$i['problem']++;
 						$lastProblemId = $trigger['triggerid'];
 
-						if ($critical_triggerid != 0) {
+						if ($critical_triggerid == 0) {
 							$critical_triggerid = $trigger['triggerid'];
 						}
 
@@ -1300,60 +1349,61 @@ function getSelementHostApplicationFilters(array $selements, array $selementIdTo
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				foreach ($selementIdToSubSysmaps[$selementId] as $subSysmap) {
-					// add all filters set for host elements
-					foreach ($subSysmap['selements'] as $subSysmapSelement) {
-						if ($subSysmapSelement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST
-								|| $subSysmapSelement['application'] === '') {
+				if (array_key_exists($selementId, $selementIdToSubSysmaps)) {
+					foreach ($selementIdToSubSysmaps[$selementId] as $subSysmap) {
+						// add all filters set for host elements
+						foreach ($subSysmap['selements'] as $subSysmapSelement) {
+							if ($subSysmapSelement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST
+									|| $subSysmapSelement['application'] === '') {
 
-							continue;
+								continue;
+							}
+
+							$hostId = $subSysmapSelement['elements'][0]['hostid'];
+							$selementHostApplicationFilters[$selementId][$hostId][] = $subSysmapSelement['application'];
 						}
 
-						$hostId = $subSysmapSelement['elements'][0]['hostid'];
-						$selementHostApplicationFilters[$selementId][$hostId][] = $subSysmapSelement['application'];
-					}
-
-					// Find all selements with host groups and sort them into two arrays:
-					// - with application filter
-					// - without application filter
-					$hostGroupSelementsWithApplication = [];
-					$hostGroupSelementsWithoutApplication = [];
-					foreach ($subSysmap['selements'] as $subSysmapSelement) {
-						if ($subSysmapSelement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-							if ($subSysmapSelement['application'] !== '') {
-								$hostGroupSelementsWithApplication[] = $subSysmapSelement;
-							}
-							else {
-								$hostGroupSelementsWithoutApplication[] = $subSysmapSelement;
+						// Find all selements with host groups and sort them into two arrays:
+						// - with application filter
+						// - without application filter
+						$hostGroupSelementsWithApplication = [];
+						$hostGroupSelementsWithoutApplication = [];
+						foreach ($subSysmap['selements'] as $subSysmapSelement) {
+							if ($subSysmapSelement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+								if ($subSysmapSelement['application'] !== '') {
+									$hostGroupSelementsWithApplication[] = $subSysmapSelement;
+								}
+								else {
+									$hostGroupSelementsWithoutApplication[] = $subSysmapSelement;
+								}
 							}
 						}
-					}
 
-					// Combine application filters for hosts from host group selements with
-					// application filters set.
-					foreach ($hostGroupSelementsWithApplication as $hostGroupSelement) {
-						$hostGroupId = $hostGroupSelement['elements'][0]['groupid'];
+						// Combine application filters for hosts from host group selements with
+						// application filters set.
+						foreach ($hostGroupSelementsWithApplication as $hostGroupSelement) {
+							$hostGroupId = $hostGroupSelement['elements'][0]['groupid'];
 
-						if (isset($hostIdsForHostGroupId[$hostGroupId])) {
-							foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
-								$selementHostApplicationFilters[$selementId][$hostId][] = $hostGroupSelement['application'];
+							if (isset($hostIdsForHostGroupId[$hostGroupId])) {
+								foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
+									$selementHostApplicationFilters[$selementId][$hostId][] = $hostGroupSelement['application'];
+								}
 							}
 						}
-					}
 
-					// Unset all application filters for hosts in host group selements without any filters.
-					// This might reset application filters set by previous foreach.
-					foreach ($hostGroupSelementsWithoutApplication AS $hostGroupSelement) {
-						$hostGroupId = $hostGroupSelement['elements'][0]['groupid'];
+						// Unset all application filters for hosts in host group selements without any filters.
+						// This might reset application filters set by previous foreach.
+						foreach ($hostGroupSelementsWithoutApplication AS $hostGroupSelement) {
+							$hostGroupId = $hostGroupSelement['elements'][0]['groupid'];
 
-						if (isset($hostIdsForHostGroupId[$hostGroupId])) {
-							foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
-								unset($selementHostApplicationFilters[$selementId][$hostId]);
+							if (isset($hostIdsForHostGroupId[$hostGroupId])) {
+								foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
+									unset($selementHostApplicationFilters[$selementId][$hostId]);
+								}
 							}
 						}
 					}
 				}
-
 				break;
 		}
 	}
@@ -1775,20 +1825,22 @@ function getMapLabels($map, $map_info, $resolveMacros) {
 
 		$elementInfo = $map_info[$selementId];
 
-		foreach (['problem', 'unack', 'maintenance', 'ok', 'status'] as $caption) {
-			if (!isset($elementInfo['info'][$caption]) || zbx_empty($elementInfo['info'][$caption]['msg'])) {
-				continue;
-			}
+		if ($selement['available']) {
+			foreach (['problem', 'unack', 'maintenance', 'ok', 'status'] as $caption) {
+				if (!isset($elementInfo['info'][$caption]) || zbx_empty($elementInfo['info'][$caption]['msg'])) {
+					continue;
+				}
 
-			$msgs = explode("\n", $elementInfo['info'][$caption]['msg']);
+				$msgs = explode("\n", $elementInfo['info'][$caption]['msg']);
 
-			foreach ($msgs as $msg) {
-				$statusLines[$selementId][] = [
-					'content' => $msg,
-					'attributes' => [
-						'fill' => '#' . $elementInfo['info'][$caption]['color']
-					]
-				];
+				foreach ($msgs as $msg) {
+					$statusLines[$selementId][] = [
+						'content' => $msg,
+						'attributes' => [
+							'fill' => '#' . $elementInfo['info'][$caption]['color']
+						]
+					];
+				}
 			}
 		}
 	}
@@ -1933,4 +1985,35 @@ function getMapHighligts($map, $map_info) {
 	}
 
 	return $highlights;
+}
+
+/**
+ * Get trigger data for all linktriggers
+ *
+ * @param array $sysmap
+ * @param array $options                  Options used to retrieve actions.
+ * @param int   $options['severity_min']  Minimal severity used.
+ * @param int   $options['fullscreen']    Fullscreen flag.
+ *
+ * @return array
+ */
+function getMapLinktriggerInfo($sysmap, $options) {
+	if (!array_key_exists('severity_min', $options)) {
+		$options['severity_min'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+	}
+
+	$triggerids = [];
+
+	foreach($sysmap['links'] as $link) {
+		foreach($link['linktriggers'] as $linktrigger) {
+			$triggerids[$linktrigger['triggerid']] = $linktrigger['triggerid'];
+		}
+	}
+
+	return API::Trigger()->get([
+		'output' => ['status', 'value', 'priority'],
+		'min_severity' => $options['severity_min'],
+		'preservekeys' => true,
+		'triggerids' => $triggerids,
+	]);
 }

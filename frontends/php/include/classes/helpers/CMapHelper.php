@@ -50,7 +50,7 @@ class CMapHelper {
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
 				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
 			],
-			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'],
+			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
 			'selectUrls' => ['sysmapurlid', 'name', 'url'],
 			'sysmapids' => $sysmapids,
 			'expandUrls' => true,
@@ -68,6 +68,7 @@ class CMapHelper {
 				'height' => 150,
 				'backgroundid' => null,
 				'severity_min' => 0,
+				'label_location' => MAP_LABEL_LOC_BOTTOM,
 				'selements' => [],
 				'links' => [],
 				'shapes' => [[
@@ -98,6 +99,7 @@ class CMapHelper {
 			],
 			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'],
 			'background' => $map['backgroundid'],
+			'label_location' => $map['label_location'],
 			'shapes' => array_values($map['shapes']),
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
@@ -135,6 +137,7 @@ class CMapHelper {
 		$labels = getMapLabels($sysmap, $map_info, true);
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
+		$linktrigger_info = getMapLinktriggerInfo($sysmap, $options);
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			$icon = null;
@@ -146,9 +149,16 @@ class CMapHelper {
 			unset($element['width'], $element['height']);
 
 			$element['icon'] = $icon;
-			$element['label'] = $labels[$id];
-			$element['highlight'] = $highlights[$id];
-			$element['actions'] = $actions[$id];
+			if ($element['available']) {
+				$element['highlight'] = $highlights[$id];
+				$element['actions'] = $actions[$id];
+				$element['label'] = $labels[$id];
+			}
+			else {
+				$element['highlight'] = '';
+				$element['actions'] = null;
+				$element['label'] = '';
+			}
 
 			if ($sysmap['markelements']) {
 				$element['latelyChanged'] = $map_info[$id]['latelyChanged'];
@@ -182,13 +192,14 @@ class CMapHelper {
 			$triggers = [];
 
 			foreach ($linktriggers as $link_trigger) {
-				if ($link_trigger['triggerid'] == 0) {
+				if ($link_trigger['triggerid'] == 0
+						|| !array_key_exists($link_trigger['triggerid'], $linktrigger_info)) {
 					continue;
 				}
 
 				$id = $link_trigger['linktriggerid'];
 
-				$triggers[$id] = zbx_array_merge($link_trigger, get_trigger_by_triggerid($link_trigger['triggerid']));
+				$triggers[$id] = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
 
 				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
 						&& $triggers[$id]['priority'] >= $max_severity) {

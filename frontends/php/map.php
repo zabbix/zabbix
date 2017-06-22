@@ -37,6 +37,7 @@ $options = [
 	'elements' => $map_data['elements'],
 	'links' => $map_data['links'],
 	'shapes' => $map_data['shapes'],
+	'label_location' => $map_data['label_location'],
 	'timestamp' => $map_data['timestamp']
 ];
 

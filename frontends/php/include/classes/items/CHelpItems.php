@@ -919,6 +919,10 @@ class CHelpItems {
 					'description' => _('Returns current maintenance status of the host.')
 				],
 				[
+					'key' => 'zabbix[host,discovery,interfaces]',
+					'description' => _('Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD.')
+				],
+				[
 					'key' => 'zabbix[host,<type>,available]',
 					'description' => _('Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx.')
 				],
