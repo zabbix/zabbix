@@ -696,13 +696,16 @@ SVGMapElement.prototype.updateImage = function() {
 			height: this.height
 		};
 
-	if (this.options.actions !== null) {
+	if (this.options.actions !== null && this.options.actions !== 'null') {
 		options['data-menu-popup'] = this.options.actions;
 		options['style'] = 'cursor: pointer';
 	}
 
 	if (typeof this.options.icon !== 'undefined') {
 		var href = this.map.getImageUrl(this.options.icon);
+		if (this.options.available === false) {
+			href += '&unavailable=1';
+		}
 
 		if (this.image === null || this.image.attributes['xlink:href'] !== href) {
 			options['xlink:href'] = href;
