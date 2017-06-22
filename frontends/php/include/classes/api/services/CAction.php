@@ -1451,11 +1451,12 @@ class CAction extends CApiService {
 	/**
 	 * Validate operation, recovery operation, acknowledge operations.
 	 *
-	 * @param array $operations Operation data array.
+	 * @param array $operations		Operation data array.
+	 * @param bool $action_create	Validate operations integrity for create action (true) or update action (false).
 	 *
 	 * @return bool
 	 */
-	public function validateOperationsIntegrity($operations) {
+	public function validateOperationsIntegrity($operations, $action_create) {
 		$operations = zbx_toArray($operations);
 
 		$all_groupids = [];
@@ -1539,6 +1540,26 @@ class CAction extends CApiService {
 
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
+					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
+
+					if ($action_create || !array_key_exists('default_msg', $message) || !$message['default_msg']) {
+						if ($action_create && (!array_key_exists('subject', $message) || !$message['subject'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'subject', _('cannot be empty')
+							));
+						}
+						if ($action_create && (!array_key_exists('message', $message) || !$message['message'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'message', _('cannot be empty')
+							));
+						}
+						if ($action_create && !array_key_exists('mediatypeid', $message)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'mediatypeid', _('cannot be empty')
+							));
+						}
+					}
+
 					$userids = array_key_exists('opmessage_usr', $operation)
 						? zbx_objectValues($operation['opmessage_usr'], 'userid')
 						: [];
@@ -1748,18 +1769,18 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_ACK_MESSAGE:
 					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
 
-					if (!array_key_exists('default_msg', $message) || !$message['default_msg']) {
-						if (!array_key_exists('subject', $message) || !$message['subject']) {
+					if ($action_create || !array_key_exists('default_msg', $message) || !$message['default_msg']) {
+						if ($action_create && (!array_key_exists('subject', $message) || !$message['subject'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'subject', _('cannot be empty')
 							));
 						}
-						if (!array_key_exists('message', $message) || !$message['message']) {
+						if ($action_create && (!array_key_exists('message', $message) || !$message['message'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'message', _('cannot be empty')
 							));
 						}
-						if (!array_key_exists('mediatypeid', $message)) {
+						if ($action_create && !array_key_exists('mediatypeid', $message)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'mediatypeid', _('cannot be empty')
 							));
@@ -2706,7 +2727,7 @@ class CAction extends CApiService {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
 		if ($operations_to_validate) {
-			$this->validateOperationsIntegrity($operations_to_validate);
+			$this->validateOperationsIntegrity($operations_to_validate, true);
 		}
 	}
 
@@ -2910,7 +2931,7 @@ class CAction extends CApiService {
 		if ($conditionsToValidate) {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
-		$this->validateOperationsIntegrity($operations_to_validate);
+		$this->validateOperationsIntegrity($operations_to_validate, false);
 	}
 
 	/**
