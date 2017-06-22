@@ -4505,6 +4505,17 @@ tr.cursor-move {
 			&.selected > .row > .item-name {
 				font-weight: bold;
 			}
+			.item-name {
+				max-width: calc(100% - 90px);
+				overflow: hidden;
+				padding-right: 12px;
+				line-height: 1.5;
+				display: block;
+				height: 20px;
+			}
+			a.item-name:hover {
+				text-decoration: none !important;
+			}
 			.drag-icon {
 				margin: 5px 0px 5px -40px;
 				position: absolute;
@@ -4535,8 +4546,11 @@ tr.cursor-move {
 		.tools {
 			margin-left: 20px;
 			padding-right: 10px;
+			position: absolute;
 			width: 80px;
 			float: right;
+			right: 0px;
+			top: 8px;
 
 			.edit-item-btn,
 			.remove-item-btn,
@@ -4570,6 +4584,9 @@ tr.cursor-move {
 				height: 15px;
 				width: 14px;
 			}
+			.remove-btn {
+				top: 0px;
+			}
 		}
 
 		.tree-item.ui-sortable-helper .tools {
@@ -4588,7 +4605,9 @@ tr.cursor-move {
 			line-height: 12px;
 			border-radius: 3px;
 			margin: 0px 5px 0px 0px;
+			position: relative;
 			float: right;
+			top: -16px;
 		}
 
 		.sortable-item-placeholder {

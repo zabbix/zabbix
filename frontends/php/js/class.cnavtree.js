@@ -34,6 +34,43 @@ if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
 	}
 }
 
+if (typeof(shorten_item_names) !== typeof(Function)) {
+	function shorten_item_names() {
+		// TODO miks: rewrite this:
+
+		jQuery('.item-name').each(function(){
+			jQuery('span', jQuery(this)).text(jQuery(this).attr('title'));
+
+			if (jQuery('span', jQuery(this)).height() > jQuery(this).height()) {
+				//console.log(jQuery(this).attr('title'));
+				var text = jQuery(this).attr('title'),
+					words = jQuery(this).attr('title').split(' '),
+					max_width_allowed = jQuery('span', jQuery(this)).width(),
+					text_length = text.length,
+					total_width = 0,
+					letters_in = 0,
+					index = 0;
+
+				while (index <= text_length && total_width < max_width_allowed) {
+					var plch = jQuery('<span></span>').addClass('temp').text(words[index] + ' ').appendTo(jQuery(this));
+					if (total_width + plch.width() <= max_width_allowed) {
+						total_width = total_width + plch.width();
+						letters_in = letters_in + words[index].length + 1;
+					}
+
+					plch.remove();
+					index++;
+				}
+
+				var str = text.substring(0, letters_in-10);
+
+				jQuery('span', jQuery(this)).text(str+'...');
+			}
+		});
+	}
+}
+
+
 (function($) {
 	$.widget('zbx.sortable_tree', $.extend({}, $.ui.sortable.prototype, {
 		options: {
@@ -446,6 +483,7 @@ jQuery(function($) {
 				});
 
 				setTreeHandlers();
+				shorten_item_names();
 			};
 
 			var parseProblems = function() {
@@ -601,7 +639,9 @@ jQuery(function($) {
 														$('[name="map.name.'+id+'"]', $this).val(resp['map_name']);
 														$('[name="mapid.'+id+'"]', $this).val(resp['map_mapid']);
 														$('[data-id='+id+'] > .row > .item-name', $this)
-															.html(resp['map_name']);
+															.empty()
+															.attr('title', resp['map_name'])
+															.append($('<span>').text(resp['map_name']));
 													}
 													else {
 														root = $('.tree-item[data-id='+parent+']>ul.tree-list', $this),
@@ -760,7 +800,8 @@ jQuery(function($) {
 							)
 							.append($(link)
 								.addClass('item-name')
-								.text(item.name)
+								.attr('title', item.name)
+								.append($('<span>').text(item.name))
 							)
 							.append(isEditMode() ? $('<div>')
 								.addClass('tools')
@@ -849,8 +890,7 @@ jQuery(function($) {
 								.append(editable ? $('<button>', {
 										'type': 'button',
 										'data-id': item.id,
-										'class': 'remove-btn',
-										'style': 'top: 8px;'
+										'class': 'remove-btn'
 									})
 									.click(function(){
 										removeItem([$(this).data('id')]);
@@ -1138,6 +1178,12 @@ jQuery(function($) {
 						switchToNavigationMode();
 					});
 				},
+				onResize: function() {
+					shorten_item_names();
+				},
+				onResizeEnd: function() {
+					shorten_item_names();
+				},
 				// initialization of widget
 				init: function(options) {
 					options = $.extend({}, options);
@@ -1151,7 +1197,7 @@ jQuery(function($) {
 							lastId: 0
 						});
 						var triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
-							'beforeConfigLoad'];
+							'beforeConfigLoad', 'onResize', 'onResizeEnd'];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-widget-container").dashboardGrid("addAction", trigger,

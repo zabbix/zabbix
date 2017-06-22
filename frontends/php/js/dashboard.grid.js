@@ -325,9 +325,11 @@
 			},
 			resize: function(event, ui) {
 				doWidgetPositioning($obj, $(event.target), data);
+				doAction($obj, data, 'onResize');
 			},
 			stop: function(event, ui) {
 				stopWidgetPositioning($obj, $(event.target), data);
+				doAction($obj, data, 'onResizeEnd');
 			}
 		});
 	}
