@@ -703,13 +703,12 @@ SVGMapElement.prototype.updateImage = function() {
 
 	if (typeof this.options.icon !== 'undefined') {
 		var href = this.map.getImageUrl(this.options.icon);
+		if (this.options.available === false) {
+			href += '&unavailable=1';
+		}
 
 		if (this.image === null || this.image.attributes['xlink:href'] !== href) {
 			options['xlink:href'] = href;
-
-			if (this.options.available === false) {
-				options['class'] = 'gray';
-			}
 
 			var image = this.map.layers.elements.add('image', options);
 			this.removeItem('image');
