@@ -4513,8 +4513,14 @@ tr.cursor-move {
 				display: block;
 				height: 20px;
 			}
+			a.item-name:focus,
 			a.item-name:hover {
 				text-decoration: none !important;
+				border: 0;
+			}
+			a.item-name:focus > span,
+			a.item-name:hover > span {
+				border-bottom: 1px solid rgba($link-hover-color, 0.5);
 			}
 			.drag-icon {
 				margin: 5px 0px 5px -40px;
