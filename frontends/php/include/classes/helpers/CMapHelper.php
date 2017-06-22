@@ -137,6 +137,7 @@ class CMapHelper {
 		$labels = getMapLabels($sysmap, $map_info, true);
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
+		$linktrigger_info = getMapLinktriggerInfo($sysmap, $options);
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			$icon = null;
@@ -191,13 +192,14 @@ class CMapHelper {
 			$triggers = [];
 
 			foreach ($linktriggers as $link_trigger) {
-				if ($link_trigger['triggerid'] == 0) {
+				if ($link_trigger['triggerid'] == 0
+						|| !array_key_exists($link_trigger['triggerid'], $linktrigger_info)) {
 					continue;
 				}
 
 				$id = $link_trigger['linktriggerid'];
 
-				$triggers[$id] = zbx_array_merge($link_trigger, get_trigger_by_triggerid($link_trigger['triggerid']));
+				$triggers[$id] = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
 
 				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
 						&& $triggers[$id]['priority'] >= $max_severity) {

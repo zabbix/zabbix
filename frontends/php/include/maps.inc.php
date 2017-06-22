@@ -1986,3 +1986,34 @@ function getMapHighligts($map, $map_info) {
 
 	return $highlights;
 }
+
+/**
+ * Get trigger data for all linktriggers
+ *
+ * @param array $sysmap
+ * @param array $options                  Options used to retrieve actions.
+ * @param int   $options['severity_min']  Minimal severity used.
+ * @param int   $options['fullscreen']    Fullscreen flag.
+ *
+ * @return array
+ */
+function getMapLinktriggerInfo($sysmap, $options) {
+	if (!array_key_exists('severity_min', $options)) {
+		$options['severity_min'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+	}
+
+	$triggerids = [];
+
+	foreach($sysmap['links'] as $link) {
+		foreach($link['linktriggers'] as $linktrigger) {
+			$triggerids[$linktrigger['triggerid']] = $linktrigger['triggerid'];
+		}
+	}
+
+	return API::Trigger()->get([
+		'output' => ['status', 'value', 'priority'],
+		'min_severity' => $options['severity_min'],
+		'preservekeys' => true,
+		'triggerids' => $triggerids,
+	]);
+}
