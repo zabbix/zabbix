@@ -54,6 +54,29 @@ void	zbx_list_destroy(zbx_list_t *list)
 
 /******************************************************************************
  *                                                                            *
+ * Function: list_create_item                                                 *
+ *                                                                            *
+ * Purpose: allocate memory and copy data for a new list item                 *
+ *                                                                            *
+ * Parameters: list     - [IN] the list                                       *
+ *             value    - [IN] the data to be stored                          *
+ *             created  - [OUT] pointer to the created list item              *
+ *                                                                            *
+ ******************************************************************************/
+static void	list_create_item(zbx_list_t *list, const void *value, zbx_list_item_t **created)
+{
+	zbx_list_item_t *item;
+
+	item = (zbx_list_item_t *)zbx_malloc(NULL, sizeof(zbx_list_item_t));
+	item->next = NULL;
+	item->data = zbx_malloc(NULL, list->size);
+	memcpy(item->data, value, list->size);
+
+	*created = item;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_list_insert_after                                            *
  *                                                                            *
  * Purpose: insert value after specified position in the list                 *
@@ -67,9 +90,9 @@ void	zbx_list_destroy(zbx_list_t *list)
  ******************************************************************************/
 void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, const void *value, zbx_list_item_t **inserted)
 {
-	zbx_list_item_t *item = zbx_malloc(NULL, sizeof(zbx_list_item_t) + list->size - sizeof(void *));
-	item->next = NULL;
-	memcpy(&item->data, value, list->size);
+	zbx_list_item_t *item;
+
+	list_create_item(list, value, &item);
 
 	if (NULL == after)
 		after = list->tail;
@@ -111,15 +134,16 @@ void	zbx_list_append(zbx_list_t *list, const void *value, zbx_list_item_t **inse
  *                                                                            *
  * Purpose: prepend value to the beginning of the list                        *
  *                                                                            *
- * Parameters: list     - [IN] the list                                      *
+ * Parameters: list     - [IN] the list                                       *
  *             value    - [IN] the value to prepend                           *
- *             inserted - [OUT] pointer to the inserted list item            *
+ *             inserted - [OUT] pointer to the inserted list item             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_list_prepend(zbx_list_t *list, const void *value, zbx_list_item_t **inserted)
 {
-	zbx_list_item_t *item = zbx_malloc(NULL, sizeof(zbx_list_item_t) + list->size - sizeof(void *));
-	memcpy(&item->data, value, list->size);
+	zbx_list_item_t *item;
+
+	list_create_item(list, value, &item);
 	item->next = list->head;
 	list->head = item;
 
@@ -151,10 +175,11 @@ int	zbx_list_pop(zbx_list_t *list, void *value)
 		return FAIL;
 
 	if (NULL != value)
-		memcpy(value, &list->head->data, list->size);
+		memcpy(value, list->head->data, list->size);
 
 	head = list->head;
 	list->head = list->head->next;
+	zbx_free(head->data);
 	zbx_free(head);
 
 	if (NULL == list->head)
@@ -180,7 +205,7 @@ int	zbx_list_peek(const zbx_list_t *list, void **value)
 {
 	if (NULL != list->head)
 	{
-		*value = &list->head->data;
+		*value = list->head->data;
 		return SUCCEED;
 	}
 
@@ -246,7 +271,7 @@ int zbx_list_iterator_peek(const zbx_list_iterator_t *iterator, void **value)
 {
 	if (NULL != iterator->current)
 	{
-		*value = &iterator->current->data;
+		*value = iterator->current->data;
 		return SUCCEED;
 	}
 

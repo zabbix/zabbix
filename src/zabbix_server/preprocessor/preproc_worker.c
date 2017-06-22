@@ -83,6 +83,11 @@ static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	size = zbx_preprocessor_pack_result(&data, &value, history_value, error);
 	zbx_variant_clear(&value);
 	zbx_free(error);
+	zbx_free(ts);
+	zbx_free(steps);
+
+	if (history_value != &history_value_local)
+		zbx_free(history_value);
 
 	if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_PREPROCESSOR_RESULT, data, size))
 	{

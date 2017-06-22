@@ -59,7 +59,7 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *value,
 		zbx_item_history_value_t *history_value, char *error);
 
-void	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t **value, unsigned char *data);
+void	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsigned char *data);
 void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, zbx_timespec_t **ts, zbx_variant_t *value,
 		zbx_item_history_value_t **history_value, int *step_count, zbx_item_preproc_t **steps,
 		const unsigned char *data);
