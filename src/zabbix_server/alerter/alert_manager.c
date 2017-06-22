@@ -772,7 +772,7 @@ static void	am_remove_alert(zbx_am_t *manager, zbx_am_alert_t *alert)
  ******************************************************************************/
 static int	am_retry_alert(zbx_am_t *manager, zbx_am_alert_t *alert)
 {
-	const char		*__function_name = "am_register_alerter";
+	const char		*__function_name = "am_retry_alert";
 
 	zbx_am_alertpool_t	*alertpool;
 	zbx_am_mediatype_t	*mediatype;
@@ -781,16 +781,10 @@ static int	am_retry_alert(zbx_am_t *manager, zbx_am_alert_t *alert)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alertid:" ZBX_FS_UI64, __function_name, alert->alertid);
 
 	if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
-	{
-		am_remove_alert(manager, alert);
 		goto out;
-	}
 
 	if (++alert->retries >= mediatype->maxattempts)
-	{
-		am_remove_alert(manager, alert);
 		goto out;
-	}
 
 	alert->nextsend = time(NULL) + mediatype->attempt_interval;
 
