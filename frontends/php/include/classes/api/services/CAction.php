@@ -1533,7 +1533,7 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_ACK_MESSAGE:
 					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
 
-					if (array_key_exists('mediatypeid', $message)) {
+					if (array_key_exists('mediatypeid', $message) && $message['mediatypeid']) {
 						$all_mediatypeids[$message['mediatypeid']] = true;
 					}
 					break;
