@@ -18,7 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$item = (new CNavigationTree($data));
+$options = [
+	'problems' => $data['problems'],
+	'severity_config' => $data['severity_config'],
+	'uniqueid' => $data['uniqueid']
+];
+$item = (new CNavigationTree($options));
 
 if ($data['error'] !== null) {
 	$item->setError($data['error']);
