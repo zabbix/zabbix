@@ -938,7 +938,12 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 				break;
 
 			case OPERATION_TYPE_ACK_MESSAGE:
-				$opmessage = $operation['opmessage'];
+				$opmessage = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
+				$opmessage += [
+					'subject'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+					'message'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+				];
+
 				if (array_key_exists('default_msg', $opmessage) && $opmessage['default_msg']) {
 					$subject = $defaultMessage['subject'];
 					$message = $defaultMessage['message'];

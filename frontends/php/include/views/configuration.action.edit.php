@@ -580,6 +580,19 @@ if (!empty($data['new_operation'])) {
 	}
 
 	switch ($data['new_operation']['operationtype']) {
+		case OPERATION_TYPE_ACK_MESSAGE:
+			if (!array_key_exists('opmessage', $data['new_operation'])) {
+				$data['new_operation']['opmessage'] = [
+					'default_msg'	=> 1,
+					'mediatypeid'	=> 0,
+					'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+					'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+				];
+			}
+			elseif (!array_key_exists('default_msg', $data['new_operation']['opmessage'])) {
+				$data['new_operation']['opmessage']['default_msg'] = 0;
+			}
+			break;
 		case OPERATION_TYPE_MESSAGE:
 			if (!isset($data['new_operation']['opmessage'])) {
 				$data['new_operation']['opmessage_usr'] = [];
