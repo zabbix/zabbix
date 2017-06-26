@@ -970,34 +970,8 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($msggroups_to_insert) {
-			$groupsids = zbx_objectValues($msggroups_to_insert, 'usrgrpid');
-			$existing_count = API::UserGroup()->get([
-				'countOutput' => true,
-				'usrgrpids' => $groupsids
-			]);
-			if ($existing_count == count($groupsids)) {
-				DB::insert('opmessage_grp', $msggroups_to_insert);
-			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation user group. User group does not exist or you have no access to this user group.'));
-			}
-		}
-
-		if ($msgusers_to_insert) {
-			$userids = zbx_objectValues($msgusers_to_insert, 'userid');
-			$existing_count = API::User()->get([
-				'countOutput' => true,
-				'userids' => $userids
-			]);
-			if ($existing_count == count($userids)) {
-				DB::insert('opmessage_usr', $msgusers_to_insert);
-			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation user. User does not exist or you have no access to this user.'));
-			}
-		}
-
+		DB::insert('opmessage_grp', $msggroups_to_insert);
+		DB::insert('opmessage_usr', $msgusers_to_insert);
 		DB::insert('opconditions', $opConditionsToInsert);
 		DB::insert('opmessage', $opMessagesToInsert, false);
 		DB::insert('opcommand', $opCommandsToInsert, false);
@@ -1464,6 +1438,7 @@ class CAction extends CApiService {
 		$all_templateids = [];
 		$all_userids = [];
 		$all_usrgrpids = [];
+		$all_mediatypeids = [];
 
 		$valid_operationtypes = [
 			ACTION_OPERATION => [
@@ -1542,7 +1517,7 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_MESSAGE:
 					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
 
-					if ($action_create || !array_key_exists('default_msg', $message) || !$message['default_msg']) {
+					if (!array_key_exists('default_msg', $message) || !$message['default_msg']) {
 						if ($action_create && (!array_key_exists('subject', $message) || !$message['subject'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'subject', _('cannot be empty')
@@ -1553,11 +1528,16 @@ class CAction extends CApiService {
 								'message', _('cannot be empty')
 							));
 						}
-						if ($action_create && !array_key_exists('mediatypeid', $message)) {
+						if ($operation['operationtype'] != OPERATION_TYPE_RECOVERY_MESSAGE
+								&& $action_create && !array_key_exists('mediatypeid', $message)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'mediatypeid', _('cannot be empty')
 							));
 						}
+					}
+
+					if (array_key_exists('mediatypeid', $message)) {
+						$all_mediatypeids[$message['mediatypeid']] = true;
 					}
 
 					$userids = array_key_exists('opmessage_usr', $operation)
@@ -1769,7 +1749,7 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_ACK_MESSAGE:
 					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
 
-					if ($action_create || !array_key_exists('default_msg', $message) || !$message['default_msg']) {
+					if (!array_key_exists('default_msg', $message) || !$message['default_msg']) {
 						if ($action_create && (!array_key_exists('subject', $message) || !$message['subject'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'subject', _('cannot be empty')
@@ -1787,13 +1767,16 @@ class CAction extends CApiService {
 						}
 					}
 
-					if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter for acknowledge operation.'));
+					if (array_key_exists('mediatypeid', $message)) {
+						$all_mediatypeids[$message['mediatypeid']] = true;
 					}
 					break;
 			}
 		}
 
+		$this->checkMediatypesExists($all_mediatypeids, _s('Incorrect value for field "%1$s": %2$s.', 'mediatypeid',
+			_('value not found')
+		));
 		$this->checkHostGroupsPermissions($all_groupids, _(
 			'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
 		));
@@ -3003,6 +2986,28 @@ class CAction extends CApiService {
 		$this->checkProxiesPermissions($proxyIdsAll,
 			_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
 		);
+	}
+
+	/**
+	 * Checks are given media types valid.
+	 *
+	 * @throws APIException if invalid media types given
+	 *
+	 * @param array $mediatypeids
+	 * @param tring $error
+	 */
+	private function checkMediatypesExists(array $mediatypeids, $error) {
+		if ($mediatypeids) {
+			$count = API::MediaType()->get([
+				'countOutput' => true,
+				'mediatypeids' => array_keys($mediatypeids),
+				'editable' => true
+			]);
+
+			if ($count != count($mediatypeids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
 	}
 
 	/**
