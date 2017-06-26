@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$item = (new CNavigationTree($this->data));
+$item = (new CNavigationTree($data));
 
-if ($this->data['error'] !== null) {
-	$item->setError($this->data['error']);
+if ($data['error'] !== null) {
+	$item->setError($data['error']);
 }
 
 $output = [
