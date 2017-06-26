@@ -36,36 +36,46 @@ if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
 
 if (typeof(shorten_item_names) !== typeof(Function)) {
 	function shorten_item_names() {
-		// TODO miks: rewrite this:
+		jQuery('.item-name > span').each(function() {
+			jQuery(this).text(jQuery(this).parent().attr('title'));
+		});
 
-		jQuery('.item-name').each(function(){
-			jQuery('span', jQuery(this)).text(jQuery(this).attr('title'));
+		jQuery('.item-name').filter(function() {
+			return jQuery('span', jQuery(this)).height() > jQuery(this).height();
+		}).each(function() {
+			var get_word_width = function(text) {
+				var word, width = 0;
 
-			if (jQuery('span', jQuery(this)).height() > jQuery(this).height()) {
-				//console.log(jQuery(this).attr('title'));
-				var text = jQuery(this).attr('title'),
-					words = jQuery(this).attr('title').split(' '),
-					max_width_allowed = jQuery('span', jQuery(this)).width(),
-					text_length = text.length,
-					total_width = 0,
-					letters_in = 0,
-					index = 0;
+				word = jQuery('<span></span>').text(text).appendTo($this);
+				width = word.width();
+				word.remove();
 
-				while (index <= text_length && total_width < max_width_allowed) {
-					var plch = jQuery('<span></span>').addClass('temp').text(words[index] + ' ').appendTo(jQuery(this));
-					if (total_width + plch.width() <= max_width_allowed) {
-						total_width = total_width + plch.width();
-						letters_in = letters_in + words[index].length + 1;
-					}
+				return width;
+			};
 
-					plch.remove();
-					index++;
+			var text = jQuery(this).attr('title'),
+				max_width_allowed = jQuery('span', jQuery(this)).width(),
+				text_length = text.length,
+				words = text.split(' '),
+				total_width = 0,
+				letters_in = 0,
+				word_width = 0,
+				$this = this,
+				index = 0,
+				str;
+
+			// Count number of letters which can be put into {max_width_allowed} px.
+			while (index <= text_length && total_width < max_width_allowed) {
+				word_width = get_word_width(words[index] + ' ');
+				if (total_width + word_width <= max_width_allowed) {
+					total_width = total_width + word_width;
+					letters_in = letters_in + words[index].length + 1;
 				}
-
-				var str = text.substring(0, letters_in-10);
-
-				jQuery('span', jQuery(this)).text(str+'...');
+				index++;
 			}
+
+			str = text.substring(0, letters_in-5);
+			jQuery('span', jQuery(this)).text(str+'...');
 		});
 	}
 }
@@ -458,6 +468,7 @@ jQuery(function($) {
 						stop: function( event, ui ) {
 							storeUIState();
 							setTreeHandlers();
+							shorten_item_names();
 						}
 					})
 					.disableSelection();

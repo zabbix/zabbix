@@ -123,18 +123,6 @@ class CControllerWidgetSysmapView extends CController {
 		}
 		unset($element);
 
-		// Prepare settings for CDashboardWidgetMap.
-		$widget_settings = [
-			'filter_widget_reference' => array_key_exists('filter_widget_reference', $data)
-				? $data['filter_widget_reference']
-				: null,
-			'source_type' => array_key_exists('source_type', $data)
-				? $data['source_type']
-				: WIDGET_SYSMAP_SOURCETYPE_MAP,
-			'previous_map' => $previous_map,
-			'uniqueid' => $uniqueid
-		];
-
 		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
@@ -142,7 +130,16 @@ class CControllerWidgetSysmapView extends CController {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'sysmap_data' => $sysmap_data,
-			'widget_settings' => $widget_settings
+			'widget_settings' => [
+				'filter_widget_reference' => array_key_exists('filter_widget_reference', $data)
+					? $data['filter_widget_reference']
+					: null,
+				'source_type' => array_key_exists('source_type', $data)
+					? $data['source_type']
+					: WIDGET_SYSMAP_SOURCETYPE_MAP,
+				'previous_map' => $previous_map,
+				'uniqueid' => $uniqueid
+			]
 		]));
 	}
 }
