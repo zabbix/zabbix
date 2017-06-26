@@ -1515,31 +1515,6 @@ class CAction extends CApiService {
 
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
-					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
-
-					if (!array_key_exists('default_msg', $message) || !$message['default_msg']) {
-						if ($action_create && (!array_key_exists('subject', $message) || !$message['subject'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'subject', _('cannot be empty')
-							));
-						}
-						if ($action_create && (!array_key_exists('message', $message) || !$message['message'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'message', _('cannot be empty')
-							));
-						}
-						if ($operation['operationtype'] != OPERATION_TYPE_RECOVERY_MESSAGE
-								&& $action_create && !array_key_exists('mediatypeid', $message)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'mediatypeid', _('cannot be empty')
-							));
-						}
-					}
-
-					if (array_key_exists('mediatypeid', $message)) {
-						$all_mediatypeids[$message['mediatypeid']] = true;
-					}
-
 					$userids = array_key_exists('opmessage_usr', $operation)
 						? zbx_objectValues($operation['opmessage_usr'], 'userid')
 						: [];
@@ -1554,6 +1529,13 @@ class CAction extends CApiService {
 
 					$all_userids = array_merge($all_userids, $userids);
 					$all_usrgrpids = array_merge($all_usrgrpids, $usrgrpids);
+					// falls through
+				case OPERATION_TYPE_ACK_MESSAGE:
+					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
+
+					if (array_key_exists('mediatypeid', $message)) {
+						$all_mediatypeids[$message['mediatypeid']] = true;
+					}
 					break;
 				case OPERATION_TYPE_COMMAND:
 					if (!isset($operation['opcommand']['type'])) {
@@ -1743,32 +1725,6 @@ class CAction extends CApiService {
 					if ($operation['opinventory']['inventory_mode'] != HOST_INVENTORY_MANUAL
 							&& $operation['opinventory']['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect inventory mode in action operation.'));
-					}
-					break;
-
-				case OPERATION_TYPE_ACK_MESSAGE:
-					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
-
-					if (!array_key_exists('default_msg', $message) || !$message['default_msg']) {
-						if ($action_create && (!array_key_exists('subject', $message) || !$message['subject'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'subject', _('cannot be empty')
-							));
-						}
-						if ($action_create && (!array_key_exists('message', $message) || !$message['message'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'message', _('cannot be empty')
-							));
-						}
-						if ($action_create && !array_key_exists('mediatypeid', $message)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'mediatypeid', _('cannot be empty')
-							));
-						}
-					}
-
-					if (array_key_exists('mediatypeid', $message)) {
-						$all_mediatypeids[$message['mediatypeid']] = true;
 					}
 					break;
 			}
