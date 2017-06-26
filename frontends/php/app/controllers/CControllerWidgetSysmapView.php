@@ -86,11 +86,7 @@ class CControllerWidgetSysmapView extends CController {
 		$uniqueid = $this->getInput('uniqueid');
 		$data = $this->getInput('fields');
 
-		$this->filter_widget_reference = array_key_exists('filter_widget_reference', $data)
-			? $data['filter_widget_reference']
-			: null;
-
-		// get previous map
+		// Get previous map.
 		$previous_map = null;
 		if (array_key_exists('previous_maps', $data)) {
 			$previous_map = array_filter(explode(',', $data['previous_maps']), 'is_numeric');
@@ -105,7 +101,7 @@ class CControllerWidgetSysmapView extends CController {
 			}
 		}
 
-		// Get requested map:
+		// Get requested map.
 		$options = [
 			'severity_min' => 0,
 			'fullscreen' => getRequest('fullscreen', 0)
@@ -127,6 +123,18 @@ class CControllerWidgetSysmapView extends CController {
 		}
 		unset($element);
 
+		// Prepare settings for CDashboardWidgetMap.
+		$widget_settings = [
+			'filter_widget_reference' => array_key_exists('filter_widget_reference', $data)
+				? $data['filter_widget_reference']
+				: null,
+			'source_type' => array_key_exists('source_type', $data)
+				? $data['source_type']
+				: WIDGET_SYSMAP_SOURCETYPE_MAP,
+			'previous_map' => $previous_map,
+			'uniqueid' => $uniqueid
+		];
+
 		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
@@ -134,9 +142,7 @@ class CControllerWidgetSysmapView extends CController {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'sysmap_data' => $sysmap_data,
-			'previous_map' => $previous_map,
-			'uniqueid' => $uniqueid,
-			'fields' => $data
+			'widget_settings' => $widget_settings
 		]));
 	}
 }

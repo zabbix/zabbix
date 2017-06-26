@@ -18,14 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$widget_settings = [
-	'filter_widget_reference' => $data['fields']['filter_widget_reference'],
-	'previous_map' => $data['previous_map'],
-	'source_type' => $data['fields']['source_type'],
-	'uniqueid' => $data['uniqueid']
-];
-
-$item = new CDashboardWidgetMap($data['sysmap_data'], $widget_settings);
+$item = new CDashboardWidgetMap($data['sysmap_data'], $data['widget_settings']);
 
 $output = [
 	'header' => $data['name'],

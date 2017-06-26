@@ -23,7 +23,7 @@ $options = [
 	'severity_config' => $data['severity_config'],
 	'uniqueid' => $data['uniqueid']
 ];
-$item = (new CNavigationTree($options));
+$item = new CNavigationTree($options);
 
 if ($data['error'] !== null) {
 	$item->setError($data['error']);
