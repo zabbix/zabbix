@@ -347,7 +347,44 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'logtimefmt' => '',
 					'interface_ref' => 'if1',
 					'key_' => 'item',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'jmx_endpoint' => ''
+				],
+				'item-jmx' => [
+					'name' => 'item-jmx',
+					'type' => '16',
+					'snmp_community' => '',
+					'snmp_oid' => '',
+					'delay' => '30',
+					'history' => '90d',
+					'trends' => '365d',
+					'status' => '0',
+					'value_type' => '3',
+					'units' => '',
+					'snmpv3_contextname' => '',
+					'snmpv3_securityname' => '',
+					'snmpv3_securitylevel' => '0',
+					'snmpv3_authprotocol' => '0',
+					'snmpv3_authpassphrase' => '',
+					'snmpv3_privprotocol' => '0',
+					'snmpv3_privpassphrase' => '',
+					'params' => '',
+					'ipmi_sensor' => '',
+					'authtype' => '0',
+					'username' => '',
+					'password' => '',
+					'publickey' => '',
+					'privatekey' => '',
+					'port' => '',
+					'description' => '',
+					'inventory_link' => '0',
+					'applications' => [],
+					'valuemap' => [],
+					'logtimefmt' => '',
+					'interface_ref' => 'if3',
+					'key_' => 'item-jmx',
+					'trapper_hosts' => '',
+					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 				],
 				'item2' => [
 					'name' => 'item2',
@@ -386,7 +423,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'logtimefmt' => '',
 					'interface_ref' => 'if1',
 					'key_' => 'item2',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'jmx_endpoint' => ''
 				]
 			],
 			'export-template' => [
@@ -422,7 +460,43 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'key_' => 'item',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'jmx_endpoint' => ''
+				],
+				'item-jmx' => [
+					'name' => 'item-jmx',
+					'type' => '16',
+					'snmp_community' => '',
+					'snmp_oid' => '',
+					'delay' => '30',
+					'history' => '90d',
+					'trends' => '365d',
+					'status' => '0',
+					'value_type' => '3',
+					'units' => '',
+					'snmpv3_contextname' => '',
+					'snmpv3_securityname' => '',
+					'snmpv3_securitylevel' => '0',
+					'snmpv3_authprotocol' => '0',
+					'snmpv3_authpassphrase' => '',
+					'snmpv3_privprotocol' => '0',
+					'snmpv3_privpassphrase' => '',
+					'params' => '',
+					'ipmi_sensor' => '',
+					'authtype' => '0',
+					'username' => '',
+					'password' => '',
+					'publickey' => '',
+					'privatekey' => '',
+					'port' => '',
+					'description' => '',
+					'inventory_link' => '0',
+					'applications' => [],
+					'valuemap' => [],
+					'logtimefmt' => '',
+					'key_' => 'item-jmx',
+					'trapper_hosts' => '',
+					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 				],
 				'item2' => [
 					'name' => 'item2',
@@ -460,7 +534,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'key_' => 'item2',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'jmx_endpoint' => ''
 				]
 			]
 		]);
@@ -660,7 +735,46 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'host_prototypes' => [],
 					'interface_ref' => 'if1',
 					'key_' => 'empty-lld-rule',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'jmx_endpoint' => ''
+				],
+				'empty-lld-rule-jmx' => [
+					'name' => 'empty-lld-rule-jmx',
+					'type' => '16',
+					'snmp_community' => '',
+					'snmp_oid' => '',
+					'delay' => '30',
+					'status' => '0',
+					'snmpv3_contextname' => '',
+					'snmpv3_securityname' => '',
+					'snmpv3_securitylevel' => '0',
+					'snmpv3_authprotocol' => '0',
+					'snmpv3_authpassphrase' => '',
+					'snmpv3_privprotocol' => '0',
+					'snmpv3_privpassphrase' => '',
+					'params' => '',
+					'ipmi_sensor' => '',
+					'authtype' => '0',
+					'username' => '',
+					'password' => '',
+					'publickey' => '',
+					'privatekey' => '',
+					'port' => '',
+					'filter' => [
+						'evaltype' => 0,
+						'formula' => '',
+						'conditions' => []
+					],
+					'lifetime' => '30d',
+					'description' => '',
+					'item_prototypes' => [],
+					'trigger_prototypes' => [],
+					'graph_prototypes' => [],
+					'host_prototypes' => [],
+					'interface_ref' => 'if3',
+					'key_' => 'empty-lld-rule-jmx',
+					'trapper_hosts' => '',
+					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 				],
 				'lld-rule' => [
 					'name' => 'lld-rule',
@@ -738,7 +852,44 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'logtimefmt' => '',
 							'interface_ref' => 'if1',
 							'key_' => 'lld-item',
-							'trapper_hosts' => ''
+							'trapper_hosts' => '',
+							'jmx_endpoint' => ''
+						],
+						[
+							'name' => 'lld-item-jmx',
+							'type' => '16',
+							'snmp_community' => '',
+							'snmp_oid' => '',
+							'delay' => '30',
+							'history' => '90d',
+							'trends' => '365d',
+							'status' => '0',
+							'value_type' => '3',
+							'units' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_securityname' => '',
+							'snmpv3_securitylevel' => '0',
+							'snmpv3_authprotocol' => '0',
+							'snmpv3_authpassphrase' => '',
+							'snmpv3_privprotocol' => '0',
+							'snmpv3_privpassphrase' => '',
+							'params' => '',
+							'ipmi_sensor' => '',
+							'authtype' => '0',
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'port' => '',
+							'description' => '',
+							'inventory_link' => '0',
+							'applications' => [],
+							'valuemap' => [],
+							'logtimefmt' => '',
+							'interface_ref' => 'if3',
+							'key_' => 'lld-item-jmx',
+							'trapper_hosts' => '',
+							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 						],
 						[
 							'name' => 'lld-item2',
@@ -777,7 +928,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'logtimefmt' => '',
 							'interface_ref' => 'if1',
 							'key_' => 'lld-item2',
-							'trapper_hosts' => ''
+							'trapper_hosts' => '',
+							'jmx_endpoint' => ''
 						]
 					],
 					'trigger_prototypes' => [
@@ -853,7 +1005,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					],
 					'interface_ref' => 'if1',
 					'key_' => 'lld-rule',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'jmx_endpoint' => ''
 				]
 			],
 			'export-template' => [
@@ -891,7 +1044,45 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
 					'key_' => 'empty-lld-rule',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'jmx_endpoint' => ''
+				],
+				'lld-rule-jmx' => [
+					'name' => 'lld-rule-jmx',
+					'type' => '16',
+					'snmp_community' => '',
+					'snmp_oid' => '',
+					'delay' => '30',
+					'status' => '0',
+					'snmpv3_contextname' => '',
+					'snmpv3_securityname' => '',
+					'snmpv3_securitylevel' => '0',
+					'snmpv3_authprotocol' => '0',
+					'snmpv3_authpassphrase' => '',
+					'snmpv3_privprotocol' => '0',
+					'snmpv3_privpassphrase' => '',
+					'params' => '',
+					'ipmi_sensor' => '',
+					'authtype' => '0',
+					'username' => '',
+					'password' => '',
+					'publickey' => '',
+					'privatekey' => '',
+					'port' => '',
+					'filter' => [
+						'evaltype' => 0,
+						'formula' => '',
+						'conditions' => []
+					],
+					'lifetime' => '30d',
+					'description' => '',
+					'item_prototypes' => [],
+					'trigger_prototypes' => [],
+					'graph_prototypes' => [],
+					'host_prototypes' => [],
+					'key_' => 'lld-rule-jmx',
+					'trapper_hosts' => '',
+					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 				],
 				'lld-rule' => [
 					'name' => 'lld-rule',
@@ -968,7 +1159,43 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'key_' => 'lld-item',
-							'trapper_hosts' => ''
+							'trapper_hosts' => '',
+							'jmx_endpoint' => ''
+						],
+						[
+							'name' => 'lld-item-jmx',
+							'type' => '16',
+							'snmp_community' => '',
+							'snmp_oid' => '',
+							'delay' => '30',
+							'history' => '90d',
+							'trends' => '365d',
+							'status' => '0',
+							'value_type' => '3',
+							'units' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_securityname' => '',
+							'snmpv3_securitylevel' => '0',
+							'snmpv3_authprotocol' => '0',
+							'snmpv3_authpassphrase' => '',
+							'snmpv3_privprotocol' => '0',
+							'snmpv3_privpassphrase' => '',
+							'params' => '',
+							'ipmi_sensor' => '',
+							'authtype' => '0',
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'port' => '',
+							'description' => '',
+							'inventory_link' => '0',
+							'applications' => [],
+							'valuemap' => [],
+							'logtimefmt' => '',
+							'key_' => 'lld-item-jmx',
+							'trapper_hosts' => '',
+							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 						],
 						[
 							'name' => 'lld-item2',
@@ -1006,7 +1233,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'key_' => 'lld-item2',
-							'trapper_hosts' => ''
+							'trapper_hosts' => '',
+							'jmx_endpoint' => ''
 						]
 					],
 					'trigger_prototypes' => [
@@ -1081,7 +1309,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					'key_' => 'lld-rule',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'jmx_endpoint' => ''
 				]
 			]
 		]);
@@ -1531,7 +1760,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							]
 						],
 						'name' => 'Free disk space on $1 in %',
-						'key_' => 'vfs.fs.size[/,pfree]'
+						'key_' => 'vfs.fs.size[/,pfree]',
+						'jmx_endpoint' => ''
 					]
 				],
 				'Template_Simple' => [
@@ -1566,7 +1796,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							]
 						],
 						'name' => 'FTP check',
-						'key_' => 'net.tcp.service[ftp,,21]'
+						'key_' => 'net.tcp.service[ftp,,21]',
+						'jmx_endpoint' => ''
 					],
 					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
 						'type' => '3',
@@ -1599,7 +1830,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							]
 						],
 						'name' => 'FTP check with macro',
-						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]',
+						'jmx_endpoint' => ''
 					]
 				]
 			],

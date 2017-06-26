@@ -1710,6 +1710,24 @@ static int	DBpatch_3030140(void)
 	return DBpatch_trailing_semicolon_remove("conditions", "conditionid", "value", " where conditiontype=6");
 }
 
+static int	DBpatch_3030141(void)
+{
+	const ZBX_FIELD	field = {"jmx_endpoint", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3030142(void)
+{
+#define ZBX_DEFAULT_JMX_ENDPOINT	"service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi"
+	/* 16 - ITEM_TYPE_JMX */
+	if (ZBX_DB_OK > DBexecute("update items set jmx_endpoint='" ZBX_DEFAULT_JMX_ENDPOINT "' where type=16"))
+		return FAIL;
+
+	return SUCCEED;
+#undef ZBX_DEFAULT_JMX_ENDPOINT
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -1856,5 +1874,7 @@ DBPATCH_ADD(3030137, 0, 1)
 DBPATCH_ADD(3030138, 0, 1)
 DBPATCH_ADD(3030139, 0, 1)
 DBPATCH_ADD(3030140, 0, 1)
+DBPATCH_ADD(3030141, 0, 1)
+DBPATCH_ADD(3030142, 0, 1)
 
 DBPATCH_END()

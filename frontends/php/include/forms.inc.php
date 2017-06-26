@@ -911,7 +911,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
-		'templates' => []
+		'templates' => [],
+		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT)
 	];
 
 	// hostid
@@ -1089,6 +1090,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['publickey'] = $data['item']['publickey'];
 		$data['privatekey'] = $data['item']['privatekey'];
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
+		$data['jmx_endpoint'] = $data['item']['jmx_endpoint'];
 		$data['new_application'] = getRequest('new_application', '');
 
 		if (!$data['is_discovery_rule']) {

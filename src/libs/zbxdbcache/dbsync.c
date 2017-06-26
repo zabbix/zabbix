@@ -1492,6 +1492,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 
 		if (FAIL == dbsync_compare_str(dbrow[21], jmxitem->password))
 			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[37], jmxitem->jmx_endpoint))
+			return FAIL;
 	}
 	else if (NULL != jmxitem)
 		return FAIL;
@@ -1599,7 +1602,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.trapper_hosts,i.logtimefmt,i.params,i.state,i.authtype,i.username,i.password,"
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
 				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,"
-				"i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error"
+				"i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error,i.jmx_endpoint"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
@@ -1610,7 +1613,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 37, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 38, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

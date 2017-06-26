@@ -66,7 +66,7 @@ $itemFormList->addRow(_('Key'), [
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
-	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
+	$interfacesComboBox = new CComboBox('interfaceid', $data['interfaceid']);
 
 	// Set up interface groups sorted by priority.
 	$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
@@ -79,10 +79,11 @@ if (!empty($this->data['interfaces'])) {
 
 	// add interfaces to groups
 	foreach ($this->data['interfaces'] as $interface) {
-		$option = new CComboItem(
-			$interface['interfaceid'],
-			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
-			($interface['interfaceid'] == $this->data['interfaceid'])
+		$option = new CComboItem($interface['interfaceid'],
+			$interface['useip']
+				? $interface['ip'].' : '.$interface['port']
+				: $interface['dns'].' : '.$interface['port'],
+			($interface['interfaceid'] == $data['interfaceid'])
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
 		$interface_groups[$interface['type']]->addItem($option);
@@ -97,7 +98,7 @@ if (!empty($this->data['interfaces'])) {
 		->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], 'interface_row');
-	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
+	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
 	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $this->data['limited'], 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
@@ -163,6 +164,10 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
+$itemFormList->addRow(_('JMX endpoint'),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'row_jmx_endpoint'
+);
 $itemFormList->addRow(_('User name'),
 	(new CTextBox('username', $this->data['username'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_username'
