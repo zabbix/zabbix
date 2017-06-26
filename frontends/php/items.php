@@ -1152,6 +1152,11 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
+	// Sort interfaces to be listed starting with one selected as 'main'.
+	CArrayHelper::sort($data['interfaces'], [
+		['field' => 'main', 'order' => ZBX_SORT_DOWN]
+	]);
+
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
 	}
@@ -1243,6 +1248,11 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 		if ($hostCount == 1 && $data['displayInterfaces']) {
 			$data['hosts'] = reset($data['hosts']);
+
+			// Sort interfaces to be listed starting with one selected as 'main'.
+			CArrayHelper::sort($data['hosts']['interfaces'], [
+				['field' => 'main', 'order' => ZBX_SORT_DOWN]
+			]);
 
 			// if selected from filter without 'hostid'
 			if (!$data['hostid']) {
