@@ -1165,11 +1165,18 @@ else {
 
 	// get proxy host IDs that that are not 0
 	$proxyHostIds = [];
-	foreach ($hosts as $host) {
+	foreach ($hosts as &$host) {
+		// Sort interfaces to be listed starting with one selected as 'main'.
+		CArrayHelper::sort($host['interfaces'], [
+			['field' => 'main', 'order' => ZBX_SORT_DOWN]
+		]);
+
 		if ($host['proxy_hostid']) {
 			$proxyHostIds[$host['proxy_hostid']] = $host['proxy_hostid'];
 		}
 	}
+	unset($host);
+
 	$proxies = [];
 	if ($proxyHostIds) {
 		$proxies = API::Proxy()->get([
