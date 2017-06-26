@@ -46,7 +46,9 @@ class CControllerWidgetSysmapView extends CController {
 			if (array_key_exists('source_type', $input_fields)) {
 				if ($input_fields['source_type'] == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 					$validationRules['filter_widget_reference'] = 'string';
-					$validationRules['sysmapid'] = 'db sysmaps.sysmapid';
+					if (array_key_exists('sysmapid', $input_fields) && $input_fields['sysmapid'] !== '') {
+						$validationRules['sysmapid'] = 'db sysmaps.sysmapid';
+					}
 				}
 				else {
 					$validationRules['sysmapid'] = 'required|db sysmaps.sysmapid';

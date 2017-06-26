@@ -22,13 +22,14 @@ class CDashboardWidgetMap extends CDiv {
 	private $filter_widget_reference;
 	private $previous_map;
 	private $sysmap_data;
+	private $source_type;
 	private $uniqueid;
 	private $error;
 
 	public function __construct(array $sysmap_data, array $widget_settings) {
 		parent::__construct();
 
-		if ($sysmap_data['id']) {
+		if ($sysmap_data['id'] > 0) {
 			$this->sysmap_data = $sysmap_data;
 		}
 		else {
@@ -44,8 +45,7 @@ class CDashboardWidgetMap extends CDiv {
 	public function getScriptRun() {
 		$script_run = '';
 
-		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
-			&& $this->error === null) {
+		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference) {
 			$script_run =
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.
@@ -75,10 +75,11 @@ class CDashboardWidgetMap extends CDiv {
 
 	private function build() {
 		$this->addClass(ZBX_STYLE_SYSMAP);
-		$this->setAttribute('data-uniqueid', $this->uniqueid);
 		$this->setId(uniqid());
 
 		if ($this->error === null) {
+			$this->setAttribute('data-uniqueid', $this->uniqueid);
+
 			if ($this->previous_map) {
 				$go_back_div = (new CDiv())
 					->setAttribute('style', 'padding:5px 10px; border-bottom: 1px solid #ebeef0;')
@@ -100,6 +101,7 @@ class CDashboardWidgetMap extends CDiv {
 			$this->addItem($map_div);
 		}
 		else {
+			$this->addItem((new CTableInfo())->setNoDataMessage(_('No map selected.')));
 			$this->addClass(ZBX_STYLE_DISABLED);
 		}
 	}
