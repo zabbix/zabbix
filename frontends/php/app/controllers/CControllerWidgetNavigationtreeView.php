@@ -29,7 +29,6 @@ class CControllerWidgetNavigationtreeView extends CController {
 	}
 
 	protected function checkInput() {
-		// TODO VM: delete comment. Removed widgetid, becuase it is no longer used, after introduction of uniqueid.
 		$fields = [
 			'name'		=>	'string',
 			'uniqueid'	=>	'required',
