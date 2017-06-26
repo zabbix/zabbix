@@ -125,6 +125,8 @@ class C32ImportConverter extends CConverter {
 			if ($item['trends'] != 0) {
 				$item['trends'] .= 'd';
 			}
+
+			$item['jmx_endpoint'] = ($item['type'] == ITEM_TYPE_JMX) ? ZBX_DEFAULT_JMX_ENDPOINT : '';
 		}
 		unset($item);
 
@@ -140,8 +142,10 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertDiscoveryRules(array $discovery_rules) {
 		foreach ($discovery_rules as &$discovery_rule) {
-			$discovery_rule['item_prototypes'] =
-				$this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['jmx_endpoint'] = ($discovery_rule['type'] == ITEM_TYPE_JMX)
+				? ZBX_DEFAULT_JMX_ENDPOINT
+				: '';
 
 			// Merge delay_flex into delay separated by a semicolon.
 			$discovery_rule['delay'] = (string) $discovery_rule['delay'];
