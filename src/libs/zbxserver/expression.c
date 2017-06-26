@@ -1047,6 +1047,44 @@ static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_dchecks_value_by_event                                     *
+ *                                                                            *
+ * Purpose: retrieve discovery rule check value by event and field name       *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_dchecks_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	switch (event->object)
+	{
+		case EVENT_OBJECT_DSERVICE:
+			result = DBselect("select %s from dchecks c,dservices s"
+					" where c.dcheckid=s.dcheckid and s.dserviceid=" ZBX_FS_UI64,
+					fieldname, event->objectid);
+			break;
+		default:
+			return ret;
+	}
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		*replace_to = zbx_strdup(*replace_to, row[0]);
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_dservice_value_by_event                                    *
  *                                                                            *
  * Purpose: retrieve discovered service value by event and field name         *
@@ -3101,8 +3139,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_NAME))
 				{
-					if (SUCCEED == (ret = DBget_dservice_value_by_event(c_event, &replace_to,
-							"s.type")))
+					if (SUCCEED == (ret = DBget_dchecks_value_by_event(c_event, &replace_to,
+							"c.type")))
 					{
 						replace_to = zbx_strdup(replace_to,
 								zbx_dservice_type_string(atoi(replace_to)));
