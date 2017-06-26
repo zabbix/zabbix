@@ -115,7 +115,7 @@ if (!$data['alias'] || $data['users']) {
 			'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
 				'retries', 'error', 'alerttype'
 			],
-			'selectMediatypes' => ['mediatypeid', 'description'],
+			'selectMediatypes' => ['mediatypeid', 'description', 'maxattempts'],
 			'userids' => $userId,
 			'time_from' => $from,
 			'time_till' => $till,
