@@ -4472,10 +4472,12 @@ tr.cursor-move {
 			}
 		}
 
-		.tree-list.root,
-		.tree-list.ui-sortable {
-			position: relative;
-			overflow: hidden;
+		.tree-list {
+			&.root,
+			&.ui-sortable {
+				position: relative;
+				overflow: hidden;
+			}
 		}
 		.tree-list[data-depth] .ui-sortable-helper {
 			>div.row {
