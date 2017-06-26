@@ -1240,6 +1240,8 @@ static int	am_db_queue_alerts(zbx_am_t *manager, int now)
 	int			i, ret;
 	zbx_am_alertpool_t	*alertpool;
 	zbx_am_mediatype_t	*mediatype;
+	zbx_vector_uint64_t	mediatypeids;
+	zbx_hashset_iter_t	iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1248,47 +1250,53 @@ static int	am_db_queue_alerts(zbx_am_t *manager, int now)
 	if (FAIL == (ret = am_db_get_alerts(&alerts, now)))
 		goto out;
 
-	if (0 < alerts.values_num)
+	/* update media types for new and queued alerts */
+
+	zbx_vector_uint64_create(&mediatypeids);
+
+	for (i = 0; i < alerts.values_num; i++)
 	{
-		zbx_vector_uint64_t	mediatypeids;
+		alert = (zbx_am_alert_t *)alerts.values[i];
+		zbx_vector_uint64_append(&mediatypeids, alert->mediatypeid);
+	}
 
-		zbx_vector_uint64_create(&mediatypeids);
+	zbx_hashset_iter_reset(&manager->mediatypes, &iter);
+	while (NULL != (mediatype = (zbx_am_mediatype_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_append(&mediatypeids, mediatype->mediatypeid);
 
-		for (i = 0; i < alerts.values_num; i++)
-		{
-			alert = (zbx_am_alert_t *)alerts.values[i];
-			zbx_vector_uint64_append(&mediatypeids, alert->mediatypeid);
-		}
-
+	if (0 != mediatypeids.values_num)
+	{
 		zbx_vector_uint64_sort(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		ret = am_db_update_mediatypes(manager, mediatypeids.values, mediatypeids.values_num);
+	}
 
-		zbx_vector_uint64_destroy(&mediatypeids);
+	zbx_vector_uint64_destroy(&mediatypeids);
 
-		if (FAIL == ret)
-			goto out;
+	if (FAIL == ret)
+		goto out;
 
-		for (i = 0; i < alerts.values_num; i++)
+	/* queue new alerts */
+
+	for (i = 0; i < alerts.values_num; i++)
+	{
+		alert = (zbx_am_alert_t *)alerts.values[i];
+
+		if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 		{
-			alert = (zbx_am_alert_t *)alerts.values[i];
-
-			if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
-			{
-				am_alert_free(alert);
-				continue;
-			}
-
-			alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
-
-			alertpool->refcount++;
-			mediatype->refcount++;
-
-			am_push_alert(alertpool, alert);
-			am_push_alertpool(mediatype, alertpool);
-			am_push_mediatype(manager, mediatype);
+			am_alert_free(alert);
+			continue;
 		}
+
+		alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
+
+		alertpool->refcount++;
+		mediatype->refcount++;
+
+		am_push_alert(alertpool, alert);
+		am_push_alertpool(mediatype, alertpool);
+		am_push_mediatype(manager, mediatype);
 	}
 out:
 	zbx_vector_ptr_destroy(&alerts);
