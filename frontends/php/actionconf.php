@@ -379,7 +379,7 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 	$new_operation['recovery'] = ACTION_OPERATION;
 	$new_operation['eventsource'] = $eventsource;
 
-	if (API::Action()->validateOperationsIntegrity($new_operation, true)) {
+	if (API::Action()->validateOperationsIntegrity($new_operation)) {
 		$_REQUEST['operations'] = getRequest('operations', []);
 
 		$uniqOperations = [
@@ -430,7 +430,7 @@ elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operati
 	$new_recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 	$new_recovery_operation['eventsource'] = $eventsource;
 
-	if (API::Action()->validateOperationsIntegrity($new_recovery_operation, true)) {
+	if (API::Action()->validateOperationsIntegrity($new_recovery_operation)) {
 		$_REQUEST['recovery_operations'] = getRequest('recovery_operations', []);
 
 		if (isset($_REQUEST['new_recovery_operation']['id'])) {
@@ -447,7 +447,7 @@ elseif (hasRequest('add_ack_operation') && $new_ack_operation) {
 	$new_ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
 	$new_ack_operation['eventsource'] = EVENT_SOURCE_TRIGGERS;
 
-	if (API::Action()->validateOperationsIntegrity($new_ack_operation, true)) {
+	if (API::Action()->validateOperationsIntegrity($new_ack_operation)) {
 		if (array_key_exists('id', $new_ack_operation)) {
 			$ack_operations[$new_ack_operation['id']] = $new_ack_operation;
 		}

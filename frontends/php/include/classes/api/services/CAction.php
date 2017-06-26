@@ -1426,11 +1426,10 @@ class CAction extends CApiService {
 	 * Validate operation, recovery operation, acknowledge operations.
 	 *
 	 * @param array $operations		Operation data array.
-	 * @param bool $action_create	Validate operations integrity for create action (true) or update action (false).
 	 *
 	 * @return bool
 	 */
-	public function validateOperationsIntegrity($operations, $action_create) {
+	public function validateOperationsIntegrity($operations) {
 		$operations = zbx_toArray($operations);
 
 		$all_groupids = [];
@@ -2666,7 +2665,7 @@ class CAction extends CApiService {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
 		if ($operations_to_validate) {
-			$this->validateOperationsIntegrity($operations_to_validate, true);
+			$this->validateOperationsIntegrity($operations_to_validate);
 		}
 	}
 
@@ -2870,7 +2869,7 @@ class CAction extends CApiService {
 		if ($conditionsToValidate) {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
-		$this->validateOperationsIntegrity($operations_to_validate, false);
+		$this->validateOperationsIntegrity($operations_to_validate);
 	}
 
 	/**
