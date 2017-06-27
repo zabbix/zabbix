@@ -1077,7 +1077,6 @@ static int	DBget_dchecks_value_by_event(const DB_EVENT *event, char **replace_to
 		*replace_to = zbx_strdup(*replace_to, row[0]);
 		ret = SUCCEED;
 	}
-
 	DBfree_result(result);
 
 	return ret;
