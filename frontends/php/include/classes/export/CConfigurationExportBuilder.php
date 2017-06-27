@@ -208,6 +208,7 @@ class CConfigurationExportBuilder {
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $tmpSelements,
 				'shapes' => $map['shapes'],
+				'lines' => $map['lines'],
 				'links' => $this->formatMapLinks($map['links'], $tmpSelements)
 			];
 		}
@@ -343,7 +344,8 @@ class CConfigurationExportBuilder {
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
 				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
-				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes'])
+				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes']),
+				'jmx_endpoint' => $discoveryRule['jmx_endpoint']
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {
@@ -693,7 +695,8 @@ class CConfigurationExportBuilder {
 				'applications' => $this->formatApplications($item['applications']),
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt'],
-				'preprocessing' => $item['preprocessing']
+				'preprocessing' => $item['preprocessing'],
+				'jmx_endpoint' => $item['jmx_endpoint']
 			];
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {

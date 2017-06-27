@@ -264,9 +264,9 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		$hosts = API::Host()->get([
 			'output' => ['hostid'],
 			'hostids' => $hostIds,
+			'selectInventory' => ['inventory_mode'],
 			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 		]);
-		$hosts = ['hosts' => $hosts];
 
 		$properties = [
 			'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'description'
@@ -281,13 +281,6 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 
 		if (isset($visible['status'])) {
 			$newValues['status'] = getRequest('status', HOST_STATUS_NOT_MONITORED);
-		}
-
-		if (isset($visible['inventory_mode'])) {
-			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
-			$newValues['inventory'] = ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED)
-				? []
-				: getRequest('host_inventory', []);
 		}
 
 		if (array_key_exists('encryption', $visible)) {
@@ -306,9 +299,9 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			}
 		}
 
-		$templateIds = [];
+		$templateids = [];
 		if (isset($visible['templates'])) {
-			$templateIds = $_REQUEST['templates'];
+			$templateids = $_REQUEST['templates'];
 		}
 
 		// add new or existing host groups
@@ -350,14 +343,14 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			}
 
 			if (isset($replaceHostGroupsIds)) {
-				$hosts['groups'] = API::HostGroup()->get([
+				$newValues['groups'] = API::HostGroup()->get([
 					'groupids' => $replaceHostGroupsIds,
 					'editable' => true,
 					'output' => ['groupid']
 				]);
 			}
 			else {
-				$hosts['groups'] = [];
+				$newValues['groups'] = [];
 			}
 		}
 		elseif ($newHostGroupIds) {
@@ -376,22 +369,48 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				]);
 
 				$hostTemplateIds = zbx_objectValues($hostTemplates, 'templateid');
-				$templatesToDelete = array_diff($hostTemplateIds, $templateIds);
+				$templatesToDelete = array_diff($hostTemplateIds, $templateids);
 
-				$hosts['templates_clear'] = zbx_toObject($templatesToDelete, 'templateid');
+				$newValues['templates_clear'] = zbx_toObject($templatesToDelete, 'templateid');
 			}
 
-			$hosts['templates'] = $templateIds;
+			$hosts['templates'] = $templateids;
 		}
 
-		$result = API::Host()->massUpdate(array_merge($hosts, $newValues));
+		$host_inventory = array_intersect_key(getRequest('host_inventory', []), $visible);
+
+		if (hasRequest('inventory_mode') && array_key_exists('inventory_mode', $visible)) {
+			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
+
+			if ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+				$host_inventory = [];
+			}
+		}
+
+		foreach ($hosts as &$host) {
+			if (array_key_exists('inventory_mode', $newValues)) {
+				$host['inventory'] = $host_inventory;
+			}
+			elseif (array_key_exists('inventory_mode', $host['inventory'])
+					&& $host['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+				$host['inventory'] = $host_inventory;
+			}
+			else {
+				$host['inventory'] = [];
+			}
+			$host = array_merge($host, $newValues);
+		}
+		unset($host);
+
+		$result = (bool) API::Host()->update($hosts);
+
 		if ($result === false) {
 			throw new Exception();
 		}
 
 		$add = [];
-		if ($templateIds && isset($visible['templates'])) {
-			$add['templates'] = $templateIds;
+		if ($templateids && isset($visible['templates'])) {
+			$add['templates'] = $templateids;
 		}
 
 		// add new host groups
@@ -400,7 +419,8 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		}
 
 		if ($add) {
-			$add['hosts'] = $hosts['hosts'];
+			$hostsids = zbx_objectValues($hosts, 'hostid');
+			$add['hosts'] = zbx_toObject($hostsids, 'hostid');
 
 			$result = API::Host()->massAdd($add);
 
@@ -1052,6 +1072,13 @@ elseif (hasRequest('form')) {
 			'templateids' => $data['templates']
 		]);
 		CArrayHelper::sort($data['linked_templates'], ['name']);
+
+		$data['writable_templates'] = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => $data['templates'],
+			'editable' => true,
+			'preservekeys' => true
+		]);
 	}
 
 	$hostView = new CView('configuration.host.edit', $data);
@@ -1106,26 +1133,50 @@ else {
 	order_result($hosts, $sortField, $sortOrder);
 
 	// selecting linked templates to templates linked to hosts
-	$templateIds = [];
+	$templateids = [];
+
 	foreach ($hosts as $host) {
-		$templateIds = array_merge($templateIds, zbx_objectValues($host['parentTemplates'], 'templateid'));
+		$templateids = array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'));
 	}
-	$templateIds = array_unique($templateIds);
+
+	$templateids = array_keys(array_flip($templateids));
 
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
-		'templateids' => $templateIds,
+		'templateids' => $templateids,
 		'selectParentTemplates' => ['hostid', 'name'],
 		'preservekeys' => true
 	]);
 
+	// selecting writable templates IDs
+	$writable_templates = [];
+	if ($templateids) {
+		foreach ($templates as $template) {
+			$templateids = array_merge($templateids, zbx_objectValues($template['parentTemplates'], 'templateid'));
+		}
+
+		$writable_templates = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys(array_flip($templateids)),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+	}
+
 	// get proxy host IDs that that are not 0
 	$proxyHostIds = [];
-	foreach ($hosts as $host) {
+	foreach ($hosts as &$host) {
+		// Sort interfaces to be listed starting with one selected as 'main'.
+		CArrayHelper::sort($host['interfaces'], [
+			['field' => 'main', 'order' => ZBX_SORT_DOWN]
+		]);
+
 		if ($host['proxy_hostid']) {
 			$proxyHostIds[$host['proxy_hostid']] = $host['proxy_hostid'];
 		}
 	}
+	unset($host);
+
 	$proxies = [];
 	if ($proxyHostIds) {
 		$proxies = API::Proxy()->get([
@@ -1145,6 +1196,7 @@ else {
 		'groupId' => $pageFilter->groupid,
 		'config' => $config,
 		'templates' => $templates,
+		'writable_templates' => $writable_templates,
 		'proxies' => $proxies
 	];
 

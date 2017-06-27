@@ -190,6 +190,10 @@ class testFormUserProfile extends CWebTest {
 			[[
 				'expected' => TEST_GOOD,
 				'refresh' => '1h'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'refresh' => '30s'
 			]]
 		];
 	}

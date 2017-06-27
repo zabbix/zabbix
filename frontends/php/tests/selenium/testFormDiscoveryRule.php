@@ -909,9 +909,9 @@ class testFormDiscoveryRule extends CWebTest {
 					'name' => 'Discovery delay',
 					'key' => 'discovery-delay-test',
 					'delay' => '-30',
-					'error_msg' => 'Cannot add discovery rule',
+					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Field "Update interval" is not correct: a time unit is expected'
 					]
 				]
 			],

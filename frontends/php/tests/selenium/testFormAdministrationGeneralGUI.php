@@ -329,7 +329,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->zbxTestTextPresent(['GUI', 'Show events not older than']);
 
-		$sql = 'SELECT event_expire FROM config WHERE event_expire=788400000';
+		$sql = "SELECT event_expire FROM config WHERE event_expire='788400000'";
 		$this->assertEquals(1, DBcount($sql));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
@@ -341,7 +341,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestTextPresent('Show events not older than');
 
-		$sql = 'select event_expire from config where event_expire=86400';
+		$sql = "select event_expire from config where event_expire='86400'";
 		$this->assertEquals(1, DBcount($sql));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');

@@ -566,11 +566,18 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-			->setTarget('_blank');
+
+		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+			$template_link = (new CLink($template['name'],
+				'templates.php?form=update&templateid='.$template['templateid']
+			))->setTarget('_blank');
+		}
+		else {
+			$template_link = new CSpan($template['name']);
+		}
 
 		$linkedTemplateTable->addRow([
-			$templateLink,
+			$template_link,
 			(new CCol(
 				new CHorList([
 					(new CSimpleButton(_('Unlink')))
@@ -631,10 +638,10 @@ else {
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+		$template_link = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
 			->setTarget('_blank');
 
-		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
+		$linkedTemplateTable->addRow($template_link, null, 'conditions_'.$template['templateid']);
 	}
 
 	$tmplList->addRow(_('Linked templates'),

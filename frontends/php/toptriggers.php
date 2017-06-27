@@ -92,17 +92,34 @@ $data['multiSelectHostGroupData'] = [];
 $groupids = CProfile::getArray('web.toptriggers.filter.groupids', []);
 
 if ($groupids) {
-	$filterGroups = API::HostGroup()->get([
+	$filter_groups = API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
 		'groupids' => $groupids,
 		'preservekeys' => true
 	]);
 
-	foreach ($filterGroups as $filterGroup) {
+	$filter_groups_names = [];
+
+	foreach ($filter_groups as $filter_group) {
 		$data['multiSelectHostGroupData'][] = [
-			'id' => $filterGroup['groupid'],
-			'name' => $filterGroup['name']
+			'id' => $filter_group['groupid'],
+			'name' => $filter_group['name']
 		];
+
+		$filter_groups_names[] = $filter_group['name'].'/';
+	}
+
+	if ($filter_groups_names) {
+		$child_groups = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'search' => ['name' => $filter_groups_names],
+			'searchByAny' => true,
+			'startSearch' => true
+		]);
+
+		foreach ($child_groups as $child_group) {
+			$groupids[] = $child_group['groupid'];
+		}
 	}
 }
 

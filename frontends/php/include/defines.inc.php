@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.4.0alpha1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030140);
+define('ZABBIX_DB_VERSION',		3030142);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -359,6 +359,7 @@ define('SYSMAP_ELEMENT_ICON_DISABLED',		4);
 
 define('SYSMAP_SHAPE_TYPE_RECTANGLE',		0);
 define('SYSMAP_SHAPE_TYPE_ELLIPSE',			1);
+define('SYSMAP_SHAPE_TYPE_LINE',			2);
 
 define('SYSMAP_SHAPE_BORDER_TYPE_NONE',		0);
 define('SYSMAP_SHAPE_BORDER_TYPE_SOLID',	1);
@@ -427,6 +428,8 @@ define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short 
 define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_JMX',					'jmx[<object name>,<attribute name>]');
+
+define('ZBX_DEFAULT_JMX_ENDPOINT',	'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi');
 
 define('SYSMAP_ELEMENT_USE_ICONMAP_ON',		1);
 define('SYSMAP_ELEMENT_USE_ICONMAP_OFF',	0);

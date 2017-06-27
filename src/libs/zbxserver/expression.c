@@ -3777,6 +3777,66 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
 				replace_to = zbx_strdup(replace_to, alert->message);
 		}
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_JMX_ENDPOINT))
+		{
+			if (ZBX_TOKEN_USER_MACRO == token.type)
+			{
+				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
+				pos = token.token.r;
+			}
+			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				replace_to = zbx_strdup(replace_to, dc_item->host.host);
+			else if (0 == strcmp(m, MVAR_HOST_NAME))
+				replace_to = zbx_strdup(replace_to, dc_item->host.name);
+			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			{
+				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
+					replace_to = zbx_strdup(replace_to, dc_item->interface.ip_orig);
+				}
+				else
+				{
+					ret = get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
+							ZBX_REQUEST_HOST_IP);
+				}
+			}
+			else if	(0 == strcmp(m, MVAR_HOST_DNS))
+			{
+				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
+					replace_to = zbx_strdup(replace_to, dc_item->interface.dns_orig);
+				}
+				else
+				{
+					ret = get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
+							ZBX_REQUEST_HOST_DNS);
+				}
+			}
+			else if (0 == strcmp(m, MVAR_HOST_CONN))
+			{
+				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
+					replace_to = zbx_strdup(replace_to, dc_item->interface.addr);
+				}
+				else
+				{
+					ret = get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
+							ZBX_REQUEST_HOST_CONN);
+				}
+			}
+			else if (0 == strcmp(m, MVAR_HOST_PORT))
+			{
+				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
+					replace_to = zbx_dsprintf(replace_to, "%u", dc_item->interface.port);
+				}
+				else
+				{
+					ret = get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
+							ZBX_REQUEST_HOST_PORT);
+				}
+			}
+		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_TAG)
 		{
 			if (EVENT_SOURCE_TRIGGERS == event->source)

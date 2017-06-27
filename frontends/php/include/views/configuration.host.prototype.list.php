@@ -51,9 +51,18 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name = [];
 	if ($hostPrototype['templateid']) {
 		$sourceTemplate = $hostPrototype['sourceTemplate'];
-		$name[] = (new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId']))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
+
+		if (array_key_exists($sourceTemplate['hostid'], $data['writable_templates'])) {
+			$name[] = (new CLink($sourceTemplate['name'],
+				'?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId']
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$name[] = (new CSpan($sourceTemplate['name']))->addClass(ZBX_STYLE_GREY);
+		}
+
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$this->data['discovery_rule']['itemid'].'&hostid='.$hostPrototype['hostid']);
@@ -67,11 +76,18 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		order_result($hostPrototype['templates'], 'name');
 
 		foreach ($hostPrototype['templates'] as $template) {
-
 			$caption = [];
-			$caption[] = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
+
+			if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+				$caption[] = (new CLink($template['name'],
+					'templates.php?form=update&templateid='.$template['templateid']
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY);
+			}
+			else {
+				$caption[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+			}
 
 			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
 			if ($linkedTemplates) {
@@ -79,9 +95,17 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 				$caption[] = ' (';
 				foreach ($linkedTemplates as $tpl) {
-					$caption[] = (new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid']))
-						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_GREY);
+					if (array_key_exists($tpl['templateid'], $data['writable_templates'])) {
+						$caption[] = (new CLink($tpl['name'],
+							'templates.php?form=update&templateid='.$tpl['templateid']
+						))
+							->addClass(ZBX_STYLE_LINK_ALT)
+							->addClass(ZBX_STYLE_GREY);
+					}
+					else {
+						$caption[] = (new CSpan($tpl['name']))->addClass(ZBX_STYLE_GREY);
+					}
+
 					$caption[] = ', ';
 				}
 				array_pop($caption);

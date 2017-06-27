@@ -51,7 +51,7 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objec
 	ptr += zbx_serialize_str(ptr, username, username_len);
 	ptr += zbx_serialize_str(ptr, password, password_len);
 	ptr += zbx_serialize_str(ptr, sensor, sensor_len);
-	ptr += zbx_serialize_int(ptr, command);
+	(void)zbx_serialize_int(ptr, command);
 
 	return data_len;
 }
@@ -70,12 +70,12 @@ void	zbx_ipmi_deserialize_request(const unsigned char *data, zbx_uint64_t *objec
 	data += zbx_deserialize_str(data, username, value_len);
 	data += zbx_deserialize_str(data, password, value_len);
 	data += zbx_deserialize_str(data, sensor, value_len);
-	data += zbx_deserialize_int(data, command);
+	(void)zbx_deserialize_int(data, command);
 }
 
 void	zbx_ipmi_deserialize_request_objectid(const unsigned char *data, zbx_uint64_t *objectid)
 {
-	data += zbx_deserialize_uint64(data, objectid);
+	(void)zbx_deserialize_uint64(data, objectid);
 }
 
 zbx_uint32_t	zbx_ipmi_serialize_result(unsigned char **data, const zbx_timespec_t *ts, int errcode,
@@ -93,7 +93,7 @@ zbx_uint32_t	zbx_ipmi_serialize_result(unsigned char **data, const zbx_timespec_
 	ptr += zbx_serialize_int(ptr, ts->sec);
 	ptr += zbx_serialize_int(ptr, ts->ns);
 	ptr += zbx_serialize_int(ptr, errcode);
-	ptr += zbx_serialize_str(ptr, value, value_len);
+	(void)zbx_serialize_str(ptr, value, value_len);
 
 	return data_len;
 }
@@ -105,7 +105,7 @@ void	zbx_ipmi_deserialize_result(const unsigned char *data, zbx_timespec_t *ts, 
 	data += zbx_deserialize_int(data, &ts->sec);
 	data += zbx_deserialize_int(data, &ts->ns);
 	data += zbx_deserialize_int(data, errcode);
-	data += zbx_deserialize_str(data, value, value_len);
+	(void)zbx_deserialize_str(data, value, value_len);
 }
 
 #endif

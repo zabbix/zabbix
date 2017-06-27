@@ -125,6 +125,8 @@ class C32ImportConverter extends CConverter {
 			if ($item['trends'] != 0) {
 				$item['trends'] .= 'd';
 			}
+
+			$item['jmx_endpoint'] = ($item['type'] == ITEM_TYPE_JMX) ? ZBX_DEFAULT_JMX_ENDPOINT : '';
 		}
 		unset($item);
 
@@ -140,8 +142,10 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertDiscoveryRules(array $discovery_rules) {
 		foreach ($discovery_rules as &$discovery_rule) {
-			$discovery_rule['item_prototypes'] =
-				$this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['jmx_endpoint'] = ($discovery_rule['type'] == ITEM_TYPE_JMX)
+				? ZBX_DEFAULT_JMX_ENDPOINT
+				: '';
 
 			// Merge delay_flex into delay separated by a semicolon.
 			$discovery_rule['delay'] = (string) $discovery_rule['delay'];
@@ -168,9 +172,28 @@ class C32ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertMaps(array $maps) {
+		$default_shape = [
+			'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
+			'x' => DB::getDefault('sysmap_shape', 'x'),
+			'y' => DB::getDefault('sysmap_shape', 'y'),
+			'height' => 15,
+			'text' => '{MAP.NAME}',
+			'font' => DB::getDefault('sysmap_shape', 'font'),
+			'font_size' => DB::getDefault('sysmap_shape', 'font_size'),
+			'font_color' => DB::getDefault('sysmap_shape', 'font_color'),
+			'text_halign' => DB::getDefault('sysmap_shape', 'text_halign'),
+			'text_valign' => DB::getDefault('sysmap_shape', 'text_valign'),
+			'border_type' => DB::getDefault('sysmap_shape', 'border_type'),
+			'border_width' => DB::getDefault('sysmap_shape', 'border_width'),
+			'border_color' => DB::getDefault('sysmap_shape', 'border_color'),
+			'background_color' => DB::getDefault('sysmap_shape', 'background_color'),
+			'zindex' => DB::getDefault('sysmap_shape', 'zindex')
+		];
+
 		foreach ($maps as &$map) {
 			$map['selements'] = $this->convertMapElements($map['selements']);
-			$map['shapes'] = [];
+			$map['shapes'] = [['width' => $map['width']] + $default_shape];
+			$map['lines'] = [];
 		}
 		unset($map);
 
@@ -186,7 +209,17 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertMapElements(array $selements) {
 		foreach ($selements as &$selement) {
-			$selement['elements'] = [$selement['element']];
+			if (zbx_is_int($selement['elementtype'])) {
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_HOST:
+					case SYSMAP_ELEMENT_TYPE_MAP:
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$selement['elements'] = [$selement['element']];
+						break;
+				}
+			}
+
 			unset($selement['element']);
 		}
 		unset($selement);
