@@ -1699,7 +1699,7 @@ class CAction extends CApiService {
 						foreach ($operation['opcommand_hst'] as $hstCommand) {
 							if (!array_key_exists('hostid', $hstCommand)) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect value for field \"%1$s\": %2$s.', 'hostid', _('cannot be empty'))
+									_s('Incorrect value for field "%1$s": %2$s.', 'hostid', _('cannot be empty'))
 								);
 							}
 
