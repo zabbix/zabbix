@@ -599,6 +599,7 @@ class CAction extends CApiService {
 				foreach ($action['acknowledge_operations'] as $ack_operation) {
 					$ack_operation['actionid'] = $actionid;
 					$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+					unset($ack_operation['esc_period'], $ack_operation['esc_step_from'], $ack_operation['esc_step_to']);
 					$operations_to_create[] = $ack_operation;
 				}
 			}
@@ -766,6 +767,7 @@ class CAction extends CApiService {
 					$opmessage = (array_key_exists('opmessage', $ack_operation) && is_array($ack_operation['opmessage']))
 						? $ack_operation['opmessage']
 						: [];
+					unset($ack_operation['esc_period'], $ack_operation['esc_step_from'], $ack_operation['esc_step_to']);
 
 					if (!array_key_exists('operationid', $ack_operation)) {
 						$ack_operation['actionid'] = $action['actionid'];
@@ -2340,38 +2342,26 @@ class CAction extends CApiService {
 	 */
 	protected function getAcknowledgeOperations($ack_operations, $ack_options) {
 		$opmessages = [];
+		$nonack_messages = [];
 		$opcommands = [];
 
-		foreach ($ack_operations as $ack_operationid => $ack_operation) {
+		foreach ($ack_operations as $ack_operationid => &$ack_operation) {
+			unset($ack_operation['esc_period'], $ack_operation['esc_step_from'], $ack_operation['esc_step_to']);
+
 			switch ($ack_operation['operationtype']) {
 				case OPERATION_TYPE_ACK_MESSAGE:
-					// falls through
+					$opmessages[] = $ack_operationid;
+					break;
 				case OPERATION_TYPE_MESSAGE:
 					$opmessages[] = $ack_operationid;
+					$nonack_messages[] = $ack_operationid;
 					break;
 				case OPERATION_TYPE_COMMAND:
 					$opcommands[] = $ack_operationid;
 					break;
 			}
 		}
-
-		if ($this->outputIsRequested('opconditions', $ack_options)) {
-			$ack_operationids = array_keys($ack_operations);
-
-			foreach ($ack_operationids as $operationid) {
-				$ack_operations[$operationid]['opconditions'] = [];
-			}
-
-			$conditions = DB::select('opconditions', [
-				'output' => ['opconditionid', 'operationid', 'conditiontype', 'operator', 'value'],
-				'filter' => ['operationid' => $ack_operationids],
-				'preservekeys' => true
-			]);
-
-			foreach ($conditions as $condition) {
-				$ack_operations[$condition['operationid']]['opconditions'][] = $condition;
-			}
-		}
+		unset($ack_operation);
 
 		if ($opmessages) {
 			if ($this->outputIsRequested('opmessage', $ack_options)) {
@@ -2389,14 +2379,14 @@ class CAction extends CApiService {
 				}
 			}
 
-			if ($this->outputIsRequested('opmessage_grp', $ack_options)) {
-				foreach ($opmessages as $operationid) {
+			if ($this->outputIsRequested('opmessage_grp', $ack_options) && $nonack_messages) {
+				foreach ($nonack_messages as $operationid) {
 					$ack_operations[$operationid]['opmessage_grp'] = [];
 				}
 
 				$messages_groups = DB::select('opmessage_grp', [
 					'output' => ['operationid', 'usrgrpid'],
-					'filter' => ['operationid' => $opmessages]
+					'filter' => ['operationid' => $nonack_messages]
 				]);
 
 				foreach ($messages_groups as $messages_group) {
@@ -2404,14 +2394,14 @@ class CAction extends CApiService {
 				}
 			}
 
-			if ($this->outputIsRequested('opmessage_usr', $ack_options)) {
-				foreach ($opmessages as $operationid) {
+			if ($this->outputIsRequested('opmessage_usr', $ack_options) && $nonack_messages) {
+				foreach ($nonack_messages as $operationid) {
 					$ack_operations[$operationid]['opmessage_usr'] = [];
 				}
 
 				$messages_users = DB::select('opmessage_usr', [
 					'output' => ['operationid', 'userid'],
-					'filter' => ['operationid' => $opmessages]
+					'filter' => ['operationid' => $nonack_messages]
 				]);
 
 				foreach ($messages_users as $messages_user) {
