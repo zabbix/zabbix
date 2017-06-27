@@ -523,6 +523,31 @@ class CAction extends CApiService {
 			if (isset($action['filter'])) {
 				$action['evaltype'] = $action['filter']['evaltype'];
 			}
+
+			// Set default values for acknowledge operations and their messages.
+			if (array_key_exists('acknowledge_operations', $action)) {
+				$action += [
+					'ack_shortdata'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+					'ack_longdata'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+				];
+
+				foreach ($action['acknowledge_operations'] as &$operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
+							$operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+						$message = (array_key_exists('opmessage', $action) && is_array($action['opmessage']))
+							? $operation['opmessage']
+							: [];
+
+						$operation['opmessage'] = $message + [
+							'default_msg'	=> 1,
+							'mediatypeid'	=> 0,
+							'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+							'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+						];
+					}
+				}
+				unset($operation);
+			}
 		}
 		unset($action);
 
