@@ -182,6 +182,7 @@ typedef struct
 	char			privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
 	char			password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 	char			snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
+	char			jmx_endpoint_orig[ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
 	char			*db_error;
 
 	zbx_item_preproc_t	*preproc_ops;
