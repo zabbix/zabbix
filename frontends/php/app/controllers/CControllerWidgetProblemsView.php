@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetIssuesView extends CController {
+class CControllerWidgetProblemsView extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -29,10 +29,15 @@ class CControllerWidgetIssuesView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>	'string'
+			'name' =>	'string',
+			'fields' =>	'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
+		/*
+		 * @var array $fields
+		 * @var int   $fields['show_lines']
+		*/
 
 		if (!$ret) {
 			// TODO VM: prepare propper response for case of incorrect fields
@@ -47,12 +52,15 @@ class CControllerWidgetIssuesView extends CController {
 	}
 
 	protected function doAction() {
+		$fields = $this->getInput('fields');
+
 		$filter = [
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
 			'trigger_name' => '',
-			'extAck' => 0
+			'extAck' => 0,
+			'limit' => $fields['show_lines']
 		];
 
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
@@ -143,7 +151,7 @@ class CControllerWidgetIssuesView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_LAST_ISSUES]),
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PROBLEMS]),
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

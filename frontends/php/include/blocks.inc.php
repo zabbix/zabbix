@@ -376,7 +376,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'skipDependent' => true,
 		'sortfield' => $sort_field,
 		'sortorder' => $sort_order,
-		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT,
+		'limit' => $filter['limit'],
 		'preservekeys' => true,
 		'expandComment' => true
 	]));

@@ -18,26 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CUrlWidgetForm extends CWidgetForm
+
+/**
+ * Latest problems widget form
+ */
+class CProblemsWidgetForm extends CWidgetForm
 {
-	public function __construct($data) {
+	public function __construct($data)
+	{
 		parent::__construct($data);
 
-		// URL field
-		$field_url = new CWidgetFieldTextBox('url', _('URL'));
-		if (array_key_exists('url', $data)) {
-			$field_url->setValue($data['url']);
+		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), 25, 1, 100))
+			->setRequired(true);
+		if (array_key_exists('show_lines', $data)) {
+			$field_lines->setValue($data['show_lines']);
 		}
-		$this->fields[] = $field_url;
-
-		// Dynamic item
-		$field_dynamic = new CWidgetFieldCheckbox('dynamic', _('Dynamic item'));
-		if (array_key_exists('dynamic', $data)) {
-			$field_dynamic->setValue($data['dynamic']);
-		}
-		else {
-			$field_dynamic->setValue(false);
-		}
-		$this->fields[] = $field_dynamic;
+		$this->fields[] = $field_lines;
 	}
 }
