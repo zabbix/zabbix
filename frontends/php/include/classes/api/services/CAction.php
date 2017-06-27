@@ -1560,6 +1560,14 @@ class CAction extends CApiService {
 					if (array_key_exists('mediatypeid', $message) && $message['mediatypeid']) {
 						$all_mediatypeids[$message['mediatypeid']] = true;
 					}
+
+					if (array_key_exists('default_msg', $message) &&
+							(string)$message['default_msg'] !== '0' && (string)$message['default_msg'] !== '1') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+							$message['default_msg'], 'default_msg', 0, 1
+						));
+					}
 					break;
 				case OPERATION_TYPE_COMMAND:
 					if (!isset($operation['opcommand']['type'])) {
@@ -1594,8 +1602,9 @@ class CAction extends CApiService {
 								);
 							}
 
-							if (!isset($operation['opcommand']['username'])
-									|| zbx_empty($operation['opcommand']['username'])) {
+							if (!array_key_exists('username', $operation['opcommand']) ||
+									!is_string($operation['opcommand']['username']) ||
+									$operation['opcommand']['username'] == '') {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication user name specified for action operation command "%s".',
 										$operation['opcommand']['command']
@@ -1621,10 +1630,16 @@ class CAction extends CApiService {
 									);
 								}
 							}
+							elseif ($operation['opcommand']['authtype'] != ITEM_AUTHTYPE_PASSWORD) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+									$operation['opcommand']['authtype'], 'authtype'
+								));
+							}
 							break;
 						case ZBX_SCRIPT_TYPE_TELNET:
-							if (!isset($operation['opcommand']['username'])
-									|| zbx_empty($operation['opcommand']['username'])) {
+							if (!array_key_exists('username', $operation['opcommand']) ||
+									!is_string($operation['opcommand']['username']) ||
+									$operation['opcommand']['username'] == '') {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication user name specified for action operation command "%s".',
 										$operation['opcommand']['command']
