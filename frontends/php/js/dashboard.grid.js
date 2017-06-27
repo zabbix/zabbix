@@ -57,6 +57,7 @@
 		})
 			.append(
 				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
+					.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 					.append(widget['content_header'])
 					.append(widget['content_body'])
 					.append(widget['content_footer'])
@@ -149,6 +150,7 @@
 
 	function startWidgetPositioning($div, data) {
 		data['placeholder'].show();
+		$('.dashbrd-grid-widget-mask', $div).show();
 
 		$div.addClass('dashbrd-grid-widget-draggable');
 
@@ -248,6 +250,7 @@
 		var	widget = getWidgetByTarget(data['widgets'], $div);
 
 		data['placeholder'].hide();
+		$('.dashbrd-grid-widget-mask', $div).hide();
 
 		$div.removeClass('dashbrd-grid-widget-draggable');
 
