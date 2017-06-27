@@ -1364,7 +1364,8 @@ class CAction extends CApiService {
 
 			self::validateOperationConditions($operation['opconditions']);
 
-			$diff = zbx_array_diff($operation['opconditions'], $operationDb['opconditions'], 'opconditionid');
+			$db_opconditions = array_key_exists('opconditions', $operationDb) ? $operationDb['opconditions'] : [];
+			$diff = zbx_array_diff($operation['opconditions'], $db_opconditions, 'opconditionid');
 			$opConditionsToInsert = array_merge($opConditionsToInsert, $diff['first']);
 
 			$opConditionsIdsToDelete = zbx_objectValues($diff['second'], 'opconditionid');
