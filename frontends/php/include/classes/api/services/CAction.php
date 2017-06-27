@@ -538,6 +538,10 @@ class CAction extends CApiService {
 							? $operation['opmessage']
 							: [];
 
+						if (!array_key_exists('default_msg', $message) || (string)$message['default_msg'] == '1') {
+							$message = array_diff_key($message, ['subject' => '', 'message' => '']);
+						}
+
 						$operation['opmessage'] = $message + [
 							'default_msg'	=> 1,
 							'mediatypeid'	=> 0,
@@ -2442,7 +2446,7 @@ class CAction extends CApiService {
 				]);
 
 				foreach ($commands_groups as $command_group) {
-					$ack_operations[$command_group['operationid']]['opcommand_grp'][] = $command_history;
+					$ack_operations[$command_group['operationid']]['opcommand_grp'][] = $command_group;
 				}
 			}
 		}
