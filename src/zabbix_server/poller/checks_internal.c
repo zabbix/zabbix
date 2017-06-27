@@ -20,7 +20,6 @@
 #include "common.h"
 #include "checks_internal.h"
 #include "checks_java.h"
-#include "log.h"
 #include "dbcache.h"
 #include "zbxself.h"
 #include "valuecache.h"
@@ -29,6 +28,129 @@
 #include "../vmware/vmware.h"
 
 extern unsigned char	program_type;
+
+static int	compare_interfaces(const void *p1, const void *p2)
+{
+	const DC_INTERFACE2	*i1 = p1, *i2 = p2;
+
+	if (i1->type > i2->type)		/* 1st criterion: 'type' in ascending order */
+		return 1;
+
+	if (i1->type < i2->type)
+		return -1;
+
+	if (i1->main > i2->main)		/* 2nd criterion: 'main' in descending order */
+		return -1;
+
+	if (i1->main < i2->main)
+		return 1;
+
+	if (i1->interfaceid > i2->interfaceid)	/* 3rd criterion: 'interfaceid' in ascending order */
+		return 1;
+
+	if (i1->interfaceid < i2->interfaceid)
+		return -1;
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_interfaces_discovery                                    *
+ *                                                                            *
+ * Purpose: get data of all network interfaces for a host from configuration  *
+ *          cache and pack into JSON for LLD                                  *
+ *                                                                            *
+ * Parameter: hostid - [IN] the host identifier                               *
+ *            j      - [OUT] JSON with interface data                         *
+ *            error  - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - interface data in JSON                             *
+ *               FAIL    - host not found, 'error' message allocated          *
+ *                                                                            *
+ * Comments: if host is found but has no interfaces (should not happen) an    *
+ *           empty JSON {"data":[]} is returned                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j, char **error)
+{
+	DC_INTERFACE2	*interfaces = NULL;
+	int		n = 0;			/* number of interfaces */
+	int		i;
+
+	/* get interface data from configuration cache */
+
+	if (SUCCEED != zbx_dc_get_host_interfaces(hostid, &interfaces, &n))
+	{
+		*error = zbx_strdup(*error, "host not found in configuration cache");
+
+		return FAIL;
+	}
+
+	/* sort results in a predictable order */
+
+	if (1 < n)
+		qsort(interfaces, (size_t)n, sizeof(DC_INTERFACE2), compare_interfaces);
+
+	/* repair 'addr' pointers broken by sorting */
+
+	for (i = 0; i < n; i++)
+		interfaces[i].addr = (1 == interfaces[i].useip ? interfaces[i].ip_orig : interfaces[i].dns_orig);
+
+	/* pack results into JSON */
+
+	zbx_json_init(j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < n; i++)
+	{
+		const char	*p;
+		char		buf[16];
+
+		zbx_json_addobject(j, NULL);
+		zbx_json_addstring(j, "{#IF.CONN}", interfaces[i].addr, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, "{#IF.IP}", interfaces[i].ip_orig, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, "{#IF.DNS}", interfaces[i].dns_orig, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, "{#IF.PORT}", interfaces[i].port_orig, ZBX_JSON_TYPE_STRING);
+
+		switch (interfaces[i].type)
+		{
+			case INTERFACE_TYPE_AGENT:
+				p = "AGENT";
+				break;
+			case INTERFACE_TYPE_SNMP:
+				p = "SNMP";
+				break;
+			case INTERFACE_TYPE_IPMI:
+				p = "IPMI";
+				break;
+			case INTERFACE_TYPE_JMX:
+				p = "JMX";
+				break;
+			case INTERFACE_TYPE_UNKNOWN:
+			default:
+				p = "UNKNOWN";
+		}
+		zbx_json_addstring(j, "{#IF.TYPE}", p, ZBX_JSON_TYPE_STRING);
+
+		zbx_snprintf(buf, sizeof(buf), "%hhu", interfaces[i].main);
+		zbx_json_addstring(j, "{#IF.DEFAULT}", buf, ZBX_JSON_TYPE_INT);
+
+		if (INTERFACE_TYPE_SNMP == interfaces[i].type)
+		{
+			zbx_snprintf(buf, sizeof(buf), "%hhu", interfaces[i].bulk);
+			zbx_json_addstring(j, "{#IF.SNMP.BULK}", buf, ZBX_JSON_TYPE_INT);
+		}
+
+		zbx_json_close(j);
+	}
+
+	zbx_json_close(j);
+
+	zbx_free(interfaces);
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -276,12 +398,29 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 			SET_UI64_RESULT(result, DCget_item_unsupported_count(item->host.hostid));
 		}
+		else if (0 == strcmp(tmp, "interfaces"))	/* zabbix["host","discovery","interfaces"] */
+		{
+			struct zbx_json	j;
+
+			/* this item is always processed by server */
+			if (NULL == (tmp = get_rparam(&request, 1)) || 0 != strcmp(tmp, "discovery"))
+			{
+				error = zbx_strdup(error, "Invalid second parameter.");
+				goto out;
+			}
+
+			if (SUCCEED != zbx_host_interfaces_discovery(item->host.hostid, &j, &error))
+				goto out;
+
+			SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+			zbx_json_free(&j);
+		}
 		else
 		{
 			error = zbx_strdup(error, "Invalid third parameter.");
 			goto out;
 		}
-
 	}
 	else if (0 == strcmp(tmp, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess"] */
 	{

@@ -234,7 +234,7 @@ void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts)
 			__function_name, item->host.hostid, item->itemid, (int)item->type);
 
 	zbx_host_availability_init(&in, item->host.hostid);
-	zbx_host_availability_init(&out,item->host.hostid);
+	zbx_host_availability_init(&out, item->host.hostid);
 
 	if (ZBX_AGENT_UNKNOWN == (agent_type = host_availability_agent_by_item_type(item->type)))
 		goto out;
@@ -532,7 +532,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 						NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SIMPLE:
-			case ITEM_TYPE_JMX:
 				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 
@@ -540,6 +539,18 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 						NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
+				break;
+			case ITEM_TYPE_JMX:
+				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
+				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
+				items[i].jmx_endpoint = zbx_strdup(items[i].jmx_endpoint, items[i].jmx_endpoint_orig);
+
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+						NULL, &items[i].jmx_endpoint, MACRO_TYPE_JMX_ENDPOINT, NULL, 0);
 				break;
 		}
 	}
@@ -693,9 +704,13 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SIMPLE:
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
+				break;
 			case ITEM_TYPE_JMX:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
+				zbx_free(items[i].jmx_endpoint);
 				break;
 		}
 

@@ -157,6 +157,9 @@ $fields = [
 			' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Trend storage period')
 	],
+	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
+	],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 		IN('"itemprototype.massdelete","itemprototype.massdisable","itemprototype.massenable"'), null
@@ -373,6 +376,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ruleid'		=> getRequest('parent_discoveryid')
 		];
 
+		if ($item['type'] == ITEM_TYPE_JMX) {
+			$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+		}
+
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 			$item['trends'] = getRequest('trends');
 		}
@@ -386,7 +393,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt',
 					'templateid', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
 					'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
-					'snmpv3_privprotocol', 'snmpv3_contextname'
+					'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectApplicationPrototypes' => ['name'],
@@ -508,7 +515,8 @@ if (isset($_REQUEST['form'])) {
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+				'snmpv3_contextname', 'jmx_endpoint'
 			],
 			'selectPreprocessing' => ['type', 'params']
 		]);
@@ -522,6 +530,11 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+
+	// Sort interfaces to be listed starting with one selected as 'main'.
+	CArrayHelper::sort($data['interfaces'], [
+		['field' => 'main', 'order' => ZBX_SORT_DOWN]
+	]);
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.edit', $data);

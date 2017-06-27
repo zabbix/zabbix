@@ -48,10 +48,13 @@ if ($this->data['displayInterfaces']) {
 	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
 	$interfacesComboBox->addItem(new CComboItem(0, '', false, false));
 
-	// set up interface groups
-	$interfaceGroups = [];
-	foreach (zbx_objectValues($this->data['hosts']['interfaces'], 'type') as $interfaceType) {
-		$interfaceGroups[$interfaceType] = new COptGroup(interfaceType2str($interfaceType));
+	// Set up interface groups sorted by priority.
+	$interface_types = zbx_objectValues($this->data['hosts']['interfaces'], 'type');
+	$interface_groups = [];
+	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
+		if (in_array($interface_type, $interface_types)) {
+			$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
+		}
 	}
 
 	// add interfaces to groups
@@ -64,10 +67,10 @@ if ($this->data['displayInterfaces']) {
 			($interface['interfaceid'] == $this->data['interfaceid'])
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
-		$interfaceGroups[$interface['type']]->addItem($option);
+		$interface_groups[$interface['type']]->addItem($option);
 	}
-	foreach ($interfaceGroups as $interfaceGroup) {
-		$interfacesComboBox->addItem($interfaceGroup);
+	foreach ($interface_groups as $interface_group) {
+		$interfacesComboBox->addItem($interface_group);
 	}
 
 	$span = (new CSpan(_('No interface found')))
@@ -85,6 +88,14 @@ if ($this->data['displayInterfaces']) {
 	);
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
 }
+
+// append jmx endpoint to form list
+$itemFormList->addRow(
+	(new CVisibilityBox('visible[jmx_endpoint]', 'jmx_endpoint', _('Original')))
+		->setLabel(_('JMX endpoint'))
+		->setChecked(array_key_exists('jmx_endpoint', $data['visible'])),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // append snmp community to form list
 $itemFormList->addRow(
