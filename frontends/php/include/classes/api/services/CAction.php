@@ -656,7 +656,7 @@ class CAction extends CApiService {
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'selectRecoveryOperations' => API_OUTPUT_EXTEND,
 			'selectAcknowledgeOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
-				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp', 'opconditions'
+				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
 			],
 			'actionids' => $actionIds,
 			'editable' => true,
@@ -762,13 +762,30 @@ class CAction extends CApiService {
 				$db_ack_operations = zbx_toHash($db_action['acknowledgeOperations'], 'operationid');
 
 				foreach ($action['acknowledge_operations'] as $ack_operation) {
+					$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+					$opmessage = (array_key_exists('opmessage', $ack_operation) && is_array($ack_operation['opmessage']))
+						? $ack_operation['opmessage']
+						: [];
+
 					if (!array_key_exists('operationid', $ack_operation)) {
 						$ack_operation['actionid'] = $action['actionid'];
-						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+						$ack_operationtype = array_key_exists('operationtype', $ack_operation)
+							? $ack_operation['operationtype']
+							: $db_ack_operations[$ack_operation['operationid']]['operationtype'];
+
+						if ($ack_operationtype == OPERATION_TYPE_MESSAGE ||
+								$ack_operationtype == OPERATION_TYPE_ACK_MESSAGE) {
+							$ack_operation['opmessage'] = $opmessage + [
+								'default_msg'	=> 1,
+								'mediatypeid'	=> 0,
+								'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+								'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+							];
+						}
+
 						$operations_to_create[] = $ack_operation;
 					}
 					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
-						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
 						$operations_to_update[] = $ack_operation;
 						unset($db_ack_operations[$ack_operation['operationid']]);
 					}
