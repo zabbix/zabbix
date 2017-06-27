@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template D-Link DES SNMPv1</template>
-         <name>Template D-Link DES SNMPv1</name>
-         <description>Template D-Link DES version: 0.8</description>
+         <template>Template Brocade FC SNMPv1</template>
+         <name>Template Brocade FC SNMPv1</name>
+         <description>Template Brocade FC version: 0.8</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -28,10 +28,13 @@
                <name>Temperature</name>
             </application>
             <application>
-               <name>Fans</name>
+               <name>Status</name>
             </application>
             <application>
                <name>Power Supply</name>
+            </application>
+            <application>
+               <name>Fans</name>
             </application>
             <application>
                <name>Inventory</name>
@@ -42,8 +45,8 @@
                <name>CPU utilization</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.4.1.171.12.1.1.6.2.0</snmp_oid>
-               <key>system.cpu.util[agentCPUutilizationIn1min.0]</key>
+               <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.26.1.0</snmp_oid>
+               <key>system.cpu.util[swCpuUsage.0]</key>
                <delay>180</delay>
                <history>30d</history>
                <trends>365d</trends>
@@ -66,8 +69,8 @@
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>MIB: DLINK-AGENT-MIB
-The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very busy).
+               <description>MIB: SW-MIB
+System's CPU usage.
 </description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -80,16 +83,57 @@ The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very 
                <preprocessing/>
             </item>
             <item>
-               <name>Hardware model name</name>
+               <name>Memory utilization</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
-               <key>system.hw.model</key>
-               <delay>3600</delay>
+               <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.26.6.0</snmp_oid>
+               <key>vm.memory.pused[swMemUsage.0]</key>
+               <delay>180</delay>
+               <history>30d</history>
+               <trends>365d</trends>
+               <status>0</status>
+               <value_type>0</value_type>
+               <allowed_hosts/>
+               <units>%</units>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SW-MIB
+Memory utilization in %
+</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Memory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+            </item>
+            <item>
+               <name>Overall system health status</name>
+               <type>1</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.7.0</snmp_oid>
+               <key>system.status[swOperStatus.0]</key>
+               <delay>30</delay>
                <history>14d</history>
                <trends>0d</trends>
                <status>0</status>
-               <value_type>1</value_type>
+               <value_type>3</value_type>
                <allowed_hosts/>
                <units/>
                <snmpv3_contextname/>
@@ -107,18 +151,23 @@ The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very 
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>MIB: SNMPv2-MIB
-A textual description of the entity.  This value should
-				include the full name and version identification of thesystem's hardware type, software operating-system, and
-				networking software.
+               <description>MIB: SW-MIB
+The current operational status of the switch.The states are as follow:
+		       online(1) means the switch is accessible by an external  Fibre Channel port;
+		       offline(2) means the switch is not accessible;
+		       testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port;
+		       faulty(4) means the switch is not operational.
+		      
 </description>
-               <inventory_link>29</inventory_link>
+               <inventory_link>0</inventory_link>
                <applications>
                   <application>
-                     <name>Inventory</name>
+                     <name>Status</name>
                   </application>
                </applications>
-               <valuemap/>
+               <valuemap>
+                  <name>SW-MIB::swOperStatus</name>
+               </valuemap>
                <logtimefmt/>
                <preprocessing/>
             </item>
@@ -126,7 +175,7 @@ A textual description of the entity.  This value should
                <name>Hardware serial number</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>.1.3.6.1.4.1.171.12.1.1.12.0</snmp_oid>
+               <snmp_oid>.1.3.6.1.4.1.1588.2.1.1.1.1.10.0</snmp_oid>
                <key>system.hw.serialnumber</key>
                <delay>3600</delay>
                <history>14d</history>
@@ -150,8 +199,8 @@ A textual description of the entity.  This value should
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>MIB: DLINK-AGENT-MIB
-A text string containing the serial number of this device.
+               <description>MIB: SW-MIB
+
 </description>
                <inventory_link>8</inventory_link>
                <applications>
@@ -167,7 +216,7 @@ A text string containing the serial number of this device.
                <name>Firmware version</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.9.1</snmp_oid>
+               <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.6.0</snmp_oid>
                <key>system.hw.firmware</key>
                <delay>3600</delay>
                <history>14d</history>
@@ -191,48 +240,7 @@ A text string containing the serial number of this device.
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>MIB: ENTITY-MIB
-
-</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Inventory</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing/>
-            </item>
-            <item>
-               <name>Hardware version(revision)</name>
-               <type>1</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.8.1</snmp_oid>
-               <key>system.hw.version</key>
-               <delay>3600</delay>
-               <history>14d</history>
-               <trends>0d</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port>{$SNMP_PORT}</port>
-               <description>MIB: ENTITY-MIB
+               <description>MIB: SW-MIB
 
 </description>
                <inventory_link>0</inventory_link>
@@ -247,15 +255,12 @@ A text string containing the serial number of this device.
             </item>
          </items>
          <discovery_rules>
-  	  	
-  	   	
-  	  	
   	  	      <discovery_rule>
-               <name>Memory Discovery</name>
+               <name>Entity Discovery</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.171.12.1.1.9.1.1]</snmp_oid>
-               <key>memory.discovery</key>
+               <snmp_oid>discovery[{#ENT_CLASS},.1.3.6.1.2.1.47.1.1.1.1.5]</snmp_oid>
+               <key>entity.discovery</key>
                <delay>3600</delay>
                <status>0</status>
                <allowed_hosts/>
@@ -275,26 +280,34 @@ A text string containing the serial number of this device.
                <privatekey/>
                <port>{$SNMP_PORT}</port>
                <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
+                     <evaltype>0</evaltype>
+                     <formula/>
+                     <conditions>
+						               <condition>
+                             <macro>{#ENT_CLASS}</macro>
+                             <value>3</value>
+                        <!-- 1 - chassis-->
+                             <operator>8</operator>
+                             <formulaid>A</formulaid>
+                         </condition>
+                     </conditions>
+                 </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
                   <item_prototype>
-                     <name>[{#SNMPVALUE}] Memory utilization</name>
+                     <name>Hardware model name</name>
                      <type>1</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.4.1.171.12.1.1.9.1.4.{#SNMPINDEX}</snmp_oid>
-                     <key>vm.memory.pused[agentDRAMutilization.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
+                     <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.model[entPhysicalDescr.{#SNMPINDEX}]</key>
+                     <delay>3600</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
                      <status>0</status>
-                     <value_type>0</value_type>
+                     <value_type>1</value_type>
                      <allowed_hosts/>
-                     <units>%</units>
+                     <units/>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -310,13 +323,13 @@ A text string containing the serial number of this device.
                      <publickey/>
                      <privatekey/>
                      <port>{$SNMP_PORT}</port>
-                     <description>MIB: DLINK-AGENT-MIB
-The percentage of used DRAM memory of the total DRAM memory available.The value will be between 0%(idle) and 100%(very busy)
+                     <description>MIB: ENTITY-MIB
+
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Memory</name>
+                           <name>Inventory</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -325,67 +338,16 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      <application_prototypes/>
                   </item_prototype>
                </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv1:vm.memory.pused[agentDRAMutilization.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>[{#SNMPVALUE}] High memory utilization (now: {ITEM.LASTVALUE1})</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
-               <graph_prototypes>
-                  <graph_prototype>
-                     <name>[{#SNMPVALUE}] Memory utilization</name>
-                     <width>900</width>
-                     <height>200</height>
-                     <yaxismin>0</yaxismin>
-                     <yaxismax>100</yaxismax>
-                     <show_work_period>1</show_work_period>
-                     <show_triggers>1</show_triggers>
-                     <type>0</type>
-                     <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
-                     <percent_left>0.0000</percent_left>
-                     <percent_right>0.0000</percent_right>
-                     <ymin_type_1>1</ymin_type_1>
-                     <ymax_type_1>1</ymax_type_1>
-                     <ymin_item_1>0</ymin_item_1>
-                     <ymax_item_1>0</ymax_item_1>
-                     <graph_items>
-                        <graph_item>
-                           <sortorder>0</sortorder>
-                           <drawtype>5</drawtype>
-                           <color>1A7C11</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
-                           <item>
-                              <host>Template D-Link DES SNMPv1</host>
-                              <key>vm.memory.pused[agentDRAMutilization.{#SNMPINDEX}]</key>
-                           </item>
-                        </graph_item>
-                     </graph_items>
-                  </graph_prototype>
-               </graph_prototypes>
+               <trigger_prototypes/>
+               <graph_prototypes/>
                <host_prototypes/>
             </discovery_rule>
-	  	
-	  	        <discovery_rule>
+
+  	  	      <discovery_rule>
                <name>Temperature Discovery</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.171.12.11.1.8.1.1]</snmp_oid>
+               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
                <key>temperature.discovery</key>
                <delay>3600</delay>
                <status>0</status>
@@ -406,19 +368,27 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                <privatekey/>
                <port>{$SNMP_PORT}</port>
                <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
+                     <evaltype>0</evaltype>
+                     <formula/>
+                     <conditions>
+						               <condition>
+                             <macro>{#SENSOR_TYPE}</macro>
+                             <value>1</value>
+                        <!-- 1 - temperature, 2 fan, 3 power-supply -->
+                             <operator>8</operator>
+                             <formulaid>A</formulaid>
+                         </condition>
+                     </conditions>
+                 </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
                   <item_prototype>
-                     <name>[{#SNMPVALUE}] Temperature</name>
+                     <name>[{#SENSOR_INFO}] Temperature</name>
                      <type>1</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.4.1.171.12.11.1.8.1.2.{#SNMPINDEX}</snmp_oid>
-                     <key>sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}]</key>
+                     <snmp_oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[swSensorValue.{#SNMPINDEX}]</key>
                      <delay>180</delay>
                      <history>30d</history>
                      <trends>365d</trends>
@@ -441,8 +411,8 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      <publickey/>
                      <privatekey/>
                      <port>{$SNMP_PORT}</port>
-                     <description>MIB: EQUIPMENT-MIB
-The shelf current temperature.
+                     <description>MIB: SW-MIB
+Temperature readings of testpoint: {#SENSOR_INFO}
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -455,13 +425,60 @@ The shelf current temperature.
                      <preprocessing/>
                      <application_prototypes/>
                   </item_prototype>
+                  <item_prototype>
+                     <name>[{#SENSOR_INFO}] Temperature status</name>
+                     <type>1</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.status[swSensorStatus.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: SW-MIB
+Temperature status of testpoint: {#SENSOR_INFO}
+</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>SW-MIB::swSensorStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <application_prototypes/>
+                  </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv1:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Brocade FC SNMPv1:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
+							or
+							{Template Brocade FC SNMPv1:sensor.temp.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}
+							</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template D-Link DES SNMPv1:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-5</recovery_expression>
-                     <name>{#SNMPVALUE} temperature is above warning threshold: &gt;{$TEMP_WARN:""} (now: {ITEM.LASTVALUE1})</name>
+                     <recovery_expression>{Template Brocade FC SNMPv1:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-5</recovery_expression>
+                     <name>{#SENSOR_INFO} temperature is above warning threshold: &gt;{$TEMP_WARN:""} (now: {ITEM.LASTVALUE1})({ITEM.VALUE2})</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -473,18 +490,18 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <manual_close>0</manual_close>
                      <dependencies>
                         <dependency>
-                           <name>{#SNMPVALUE} temperature is above critical threshold: &gt;{$TEMP_CRIT:""} (now: {ITEM.LASTVALUE1})</name>
-                           <expression>{Template D-Link DES SNMPv1:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template D-Link DES SNMPv1:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-5</recovery_expression>
+                           <name>{#SENSOR_INFO} temperature is above critical threshold: &gt;{$TEMP_CRIT:""} (now: {ITEM.LASTVALUE1})</name>
+                           <expression>{Template Brocade FC SNMPv1:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Brocade FC SNMPv1:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-5</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv1:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Brocade FC SNMPv1:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template D-Link DES SNMPv1:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-5</recovery_expression>
-                     <name>{#SNMPVALUE} temperature is above critical threshold: &gt;{$TEMP_CRIT:""} (now: {ITEM.LASTVALUE1})</name>
+                     <recovery_expression>{Template Brocade FC SNMPv1:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-5</recovery_expression>
+                     <name>{#SENSOR_INFO} temperature is above critical threshold: &gt;{$TEMP_CRIT:""} (now: {ITEM.LASTVALUE1})</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -498,10 +515,10 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv1:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Brocade FC SNMPv1:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template D-Link DES SNMPv1:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+5</recovery_expression>
-                     <name>{#SNMPVALUE} temperature is too low: &lt;{$TEMP_CRIT_LOW:""} (now: {ITEM.LASTVALUE1})</name>
+                     <recovery_expression>{Template Brocade FC SNMPv1:sensor.temp.value[swSensorValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+5</recovery_expression>
+                     <name>{#SENSOR_INFO} temperature is too low: &lt;{$TEMP_CRIT_LOW:""} (now: {ITEM.LASTVALUE1})</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -519,11 +536,11 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <host_prototypes/>
             </discovery_rule>
 		
-		          <discovery_rule>
+  	  	      <discovery_rule>
                <name>PSU Discovery</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.171.12.11.1.6.1.2,{#STATUS},1.3.6.1.4.1.171.12.11.1.6.1.3]</snmp_oid>
+               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
                <key>psu.discovery</key>
                <delay>3600</delay>
                <status>0</status>
@@ -548,23 +565,23 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <formula/>
                      <conditions>
 						               <condition>
-                             <macro>{#STATUS}</macro>
-                             <value>[^0]</value> 
-                        <!-- (0)other - means not installed actually -->
+                             <macro>{#SENSOR_TYPE}</macro>
+                             <value>3</value>
+                        <!-- 1 - temperature, 2 fan, 3 power-supply -->
                              <operator>8</operator>
                              <formulaid>A</formulaid>
                          </condition>
                      </conditions>
                  </filter>
                <lifetime>30d</lifetime>
-               <description>swPowerID of EQUIPMENT-MIB::swPowerTable</description>
+               <description/>
                <item_prototypes>
                   <item_prototype>
-                     <name>[{#SNMPVALUE}] Power supply status</name>
+                     <name>[{#SENSOR_INFO}] Power supply status</name>
                      <type>1</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.4.1.171.12.11.1.6.1.3.{#SNMPINDEX}</snmp_oid>
-                     <key>sensor.psu.status[swPowerStatus.{#SNMPINDEX}]</key>
+                     <snmp_oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.psu.status[swSensorStatus.{#SNMPINDEX}]</key>
                      <delay>180</delay>
                      <history>14d</history>
                      <trends>0d</trends>
@@ -587,14 +604,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port>{$SNMP_PORT}</port>
-                     <description>MIB: EQUIPMENT-MIB
-Indicates the current power status.
-lowVoltage : The voltage of the power unit is too low.
-overCurrent: The current of the power unit is too high.
-working    : The power unit is working normally.
-fail       : The power unit has failed.
-connect    : The power unit is connected but not powered on.
-disconnect : The power unit is not connected.
+                     <description>MIB: SW-MIB
 
 </description>
                      <inventory_link>0</inventory_link>
@@ -604,7 +614,7 @@ disconnect : The power unit is not connected.
                         </application>
                      </applications>
                      <valuemap>
-                        <name>EQUIPMENT-MIB::swPowerStatus</name>
+                        <name>SW-MIB::swSensorStatus</name>
                      </valuemap>
                      <logtimefmt/>
                      <preprocessing/>
@@ -613,10 +623,10 @@ disconnect : The power unit is not connected.
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv1:sensor.psu.status[swPowerStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Brocade FC SNMPv1:sensor.psu.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
-                     <name>[{#SNMPVALUE}] Power supply is in critical state (now: {ITEM.LASTVALUE1})</name>
+                     <name>[{#SENSOR_INFO}] Power supply is in critical state (now: {ITEM.LASTVALUE1})</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -632,13 +642,13 @@ Please check the power supply unit for errors</description>
                </trigger_prototypes>
                <graph_prototypes/>
                <host_prototypes/>
-            </discovery_rule>
-		
-		          <discovery_rule>
+            </discovery_rule>		
+
+  	  	      <discovery_rule>
                <name>FAN Discovery</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.171.12.11.1.7.1.2,{#STATUS},1.3.6.1.4.1.171.12.11.1.7.1.3]</snmp_oid>
+               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
                <key>fan.discovery</key>
                <delay>3600</delay>
                <status>0</status>
@@ -663,23 +673,23 @@ Please check the power supply unit for errors</description>
                      <formula/>
                      <conditions>
 						               <condition>
-                             <macro>{#STATUS}</macro>
-                             <value>[^0]</value>
-                        <!-- (0)other - means not installed actually -->
+                             <macro>{#SENSOR_TYPE}</macro>
+                             <value>2</value>
+                        <!-- 1 - temperature, 2 fan, 3 power-supply -->
                              <operator>8</operator>
                              <formulaid>A</formulaid>
                          </condition>
                      </conditions>
                  </filter>
                <lifetime>30d</lifetime>
-               <description>swFanID of EQUIPMENT-MIB::swFanTable</description>
+               <description/>
                <item_prototypes>
                   <item_prototype>
-                     <name>[{#SNMPVALUE}] Fan status</name>
+                     <name>[{#SENSOR_INFO}] Fan status</name>
                      <type>1</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.4.1.171.12.11.1.7.1.3.{#SNMPINDEX}</snmp_oid>
-                     <key>sensor.fan.status[swFanStatus.{#SNMPINDEX}]</key>
+                     <snmp_oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.status[swSensorStatus.{#SNMPINDEX}]</key>
                      <delay>180</delay>
                      <history>14d</history>
                      <trends>0d</trends>
@@ -702,12 +712,8 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port>{$SNMP_PORT}</port>
-                     <description>MIB: EQUIPMENT-MIB
-Indicates the current fan status.
-speed-0     : If the fan function is normal and the fan does not spin            due to the temperature not  reaching the threshold,              the status of the fan is speed 0.
-speed-low   : Fan spin using the lowest speed.
-speed-middle: Fan spin using the middle speed.
-speed-high  : Fan spin using the highest speed.
+                     <description>MIB: SW-MIB
+
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -716,8 +722,54 @@ speed-high  : Fan spin using the highest speed.
                         </application>
                      </applications>
                      <valuemap>
-                        <name>EQUIPMENT-MIB::swFanStatus</name>
+                        <name>SW-MIB::swSensorStatus</name>
                      </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <application_prototypes/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>[{#SENSOR_INFO}] Fan speed</name>
+                     <type>1</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.speed[swSensorValue.{#SNMPINDEX}]</key>
+                     <delay>300</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>rpm</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: SW-MIB
+
+		      The current value (reading) of the sensor.
+		      The value, -2147483648, represents an unknown quantity.
+			  The fan value will be in RPM(revolution per minute);
+		      
+</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
                      <logtimefmt/>
                      <preprocessing/>
                      <application_prototypes/>
@@ -725,10 +777,10 @@ speed-high  : Fan spin using the highest speed.
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv1:sensor.fan.status[swFanStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Brocade FC SNMPv1:sensor.fan.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
-                     <name>{#SNMPVALUE} fan is in critical state (now: {ITEM.LASTVALUE1})</name>
+                     <name>{#SENSOR_INFO} fan is in critical state (now: {ITEM.LASTVALUE1})</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -745,6 +797,7 @@ Please check the fan unit</description>
                <graph_prototypes/>
                <host_prototypes/>
             </discovery_rule>
+		
 	        </discovery_rules>
          <httptests/>
          <macros>
@@ -757,12 +810,36 @@ Please check the fan unit</description>
                <value>65</value>
             </macro>
             <macro>
-               <macro>{$PSU_CRIT_STATUS}</macro>
+               <macro>{$HEALTH_CRIT_STATUS}</macro>
                <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$HEALTH_WARN_STATUS:"offline"}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$HEALTH_WARN_STATUS:"testing"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN_STATUS}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_CRIT_STATUS}</macro>
+               <value>2</value>
             </macro>
             <macro>
                <macro>{$FAN_CRIT_STATUS}</macro>
                <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_OK_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_OK_STATUS}</macro>
+               <value>4</value>
             </macro>
             <macro>
                <macro>{$CPU_UTIL_MAX}</macro>
@@ -792,9 +869,6 @@ Please check the fan unit</description>
          <templates>
             <template>
                <name>Template SNMP Interfaces SNMPv1</name>
-            </template>
-            <template>
-               <name>Template SNMP EtherLike-MIB SNMPv1</name>
             </template>
             <template>
                <name>Template SNMP Generic SNMPv1</name>
@@ -830,8 +904,40 @@ Please check the fan unit</description>
                         <calc_fnc>2</calc_fnc>
                         <type>0</type>
                         <item>
-                           <host>Template D-Link DES SNMPv1</host>
-                           <key>system.cpu.util[agentCPUutilizationIn1min.0]</key>
+                           <host>Template Brocade FC SNMPv1</host>
+                           <key>system.cpu.util[swCpuUsage.0]</key>
+                        </item>
+                     </graph_item>
+                  </graph_items>
+      </graph>
+      <graph>
+         <name>Memory utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+                     <graph_item>
+                        <sortorder>0</sortorder>
+                        <drawtype>5</drawtype>
+                        <color>1A7C11</color>
+                        <yaxisside>0</yaxisside>
+                        <calc_fnc>2</calc_fnc>
+                        <type>0</type>
+                        <item>
+                           <host>Template Brocade FC SNMPv1</host>
+                           <key>vm.memory.pused[swMemUsage.0]</key>
                         </item>
                      </graph_item>
                   </graph_items>
@@ -839,7 +945,7 @@ Please check the fan unit</description>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template D-Link DES SNMPv1:system.cpu.util[agentCPUutilizationIn1min.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Brocade FC SNMPv1:system.cpu.util[swCpuUsage.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization (now: {ITEM.LASTVALUE1})</name>
@@ -856,7 +962,64 @@ Please check the fan unit</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template D-Link DES SNMPv1:system.hw.serialnumber.diff()}=1 and {Template D-Link DES SNMPv1:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Brocade FC SNMPv1:vm.memory.pused[swMemUsage.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>High memory utilization (now: {ITEM.LASTVALUE1})</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>3</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Brocade FC SNMPv1:system.status[swOperStatus.0].last(0)}={$HEALTH_CRIT_STATUS}</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>System status is in critical state (now: {ITEM.LASTVALUE1})</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>4</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Please check the device for errors</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Brocade FC SNMPv1:system.status[swOperStatus.0].last(0)}={$HEALTH_WARN_STATUS:"offline"} or {Template Brocade FC SNMPv1:system.status[swOperStatus.0].last(0)}={$HEALTH_WARN_STATUS:"testing"}</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>System status is in warning state (now: {ITEM.LASTVALUE1})</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>2</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Please check the device for warnings</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies>
+            <dependency>
+               <name>System status is in critical state (now: {ITEM.LASTVALUE1})</name>
+               <expression>{Template Brocade FC SNMPv1:system.status[swOperStatus.0].last(0)}={$HEALTH_CRIT_STATUS}</expression>
+               <recovery_expression/>
+            </dependency>
+         </dependencies>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Brocade FC SNMPv1:system.hw.serialnumber.diff()}=1 and {Template Brocade FC SNMPv1:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Device might have been replaced (new serial number:{ITEM.VALUE1})</name>
@@ -873,7 +1036,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template D-Link DES SNMPv1:system.hw.firmware.diff()}=1 and {Template D-Link DES SNMPv1:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Brocade FC SNMPv1:system.hw.firmware.diff()}=1 and {Template Brocade FC SNMPv1:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed: (new:{ITEM.VALUE1})</name>
@@ -892,68 +1055,52 @@ Firmware version has changed. Ack to close</description>
    </triggers>
    <value_maps>
       <value_map>
-            <name>EQUIPMENT-MIB::swFanStatus</name>
+            <name>SW-MIB::swSensorStatus</name>
             <mappings>
                 <mapping>
-                    <value>0</value>
-                    <newvalue>other</newvalue>
-                </mapping>
-                <mapping>
                     <value>1</value>
-                    <newvalue>working</newvalue>
+                    <newvalue>unknown</newvalue>
                 </mapping>
                 <mapping>
                     <value>2</value>
-                    <newvalue>fail</newvalue>
+                    <newvalue>faulty</newvalue>
                 </mapping>
                 <mapping>
                     <value>3</value>
-                    <newvalue>speed-0</newvalue>
+                    <newvalue>below-min</newvalue>
                 </mapping>
                 <mapping>
                     <value>4</value>
-                    <newvalue>speed-low</newvalue>
+                    <newvalue>nominal</newvalue>
                 </mapping>
                 <mapping>
                     <value>5</value>
-                    <newvalue>speed-middle</newvalue>
+                    <newvalue>above-max</newvalue>
                 </mapping>
                 <mapping>
                     <value>6</value>
-                    <newvalue>speed-high</newvalue>
+                    <newvalue>absent</newvalue>
                 </mapping>
             </mappings>
         </value_map>
       <value_map>
-            <name>EQUIPMENT-MIB::swPowerStatus</name>
+            <name>SW-MIB::swOperStatus</name>
             <mappings>
                 <mapping>
-                    <value>0</value>
-                    <newvalue>other</newvalue>
-                </mapping>
-                <mapping>
                     <value>1</value>
-                    <newvalue>lowVoltage</newvalue>
+                    <newvalue>online</newvalue>
                 </mapping>
                 <mapping>
                     <value>2</value>
-                    <newvalue>overCurrent</newvalue>
+                    <newvalue>offline</newvalue>
                 </mapping>
                 <mapping>
                     <value>3</value>
-                    <newvalue>working</newvalue>
+                    <newvalue>testing</newvalue>
                 </mapping>
                 <mapping>
                     <value>4</value>
-                    <newvalue>fail</newvalue>
-                </mapping>
-                <mapping>
-                    <value>5</value>
-                    <newvalue>connect</newvalue>
-                </mapping>
-                <mapping>
-                    <value>6</value>
-                    <newvalue>disconnect</newvalue>
+                    <newvalue>faulty</newvalue>
                 </mapping>
             </mappings>
         </value_map>

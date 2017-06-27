@@ -341,27 +341,6 @@ src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
-templates/src/main/resources/application.properties -text
-templates/src/main/resources/log4j.properties -text
-templates/src/main/resources/templates/include/cpu.xsl -text
-templates/src/main/resources/templates/include/disks.xsl -text
-templates/src/main/resources/templates/include/generic.xsl -text
-templates/src/main/resources/templates/include/icmp.xsl -text
-templates/src/main/resources/templates/include/interfaces.xsl -text
-templates/src/main/resources/templates/include/inventory.xsl -text
-templates/src/main/resources/templates/include/memory.xsl -text
-templates/src/main/resources/templates/include/sensors.xsl -text
-templates/src/main/resources/templates/include/status.xsl -text
-templates/src/main/resources/templates/include/vfs.xsl -text
-templates/src/main/resources/templates/metrics.xsd -text
-templates/src/main/resources/templates/to_metrics.xsl -text
-templates/src/main/resources/templates/to_metrics_add_name_placeholder.xsl -text
-templates/src/main/resources/templates/to_metrics_add_trigger_desc.xsl -text
-templates/src/main/resources/templates/to_metrics_lang.xsl -text
-templates/src/main/resources/templates/to_metrics_zbx_ver.xsl -text
-templates/src/main/resources/templates/to_zabbix_export.xsl -text
-templates/src/main/resources/templates/zabbix_export_3.2.xsd -text
-templates/src/main/resources/templates/zabbix_export_3.4.xsd -text
 tests/images/image.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png

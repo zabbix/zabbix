@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template QTech QSW SNMPv2</template>
-         <name>Template QTech QSW SNMPv2</name>
-         <description>Template QTech QSW version: 0.8</description>
+         <template>Template Brocade ICX SNMPv2</template>
+         <name>Template Brocade ICX SNMPv2</name>
+         <description>Template Brocade ICX version: 0.8</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -25,6 +25,15 @@
                <name>Memory</name>
             </application>
             <application>
+               <name>Temperature</name>
+            </application>
+            <application>
+               <name>Power Supply</name>
+            </application>
+            <application>
+               <name>Fans</name>
+            </application>
+            <application>
                <name>Inventory</name>
             </application>
          </applications>
@@ -33,8 +42,8 @@
                <name>CPU utilization</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.4.1.27514.100.1.11.10.0</snmp_oid>
-               <key>system.cpu.util[switchCpuUsage.0]</key>
+               <snmp_oid>1.3.6.1.4.1.1991.1.1.2.1.52.0</snmp_oid>
+               <key>system.cpu.util[snAgGblCpuUtil1MinAvg.0]</key>
                <delay>180</delay>
                <history>30d</history>
                <trends>365d</trends>
@@ -57,8 +66,8 @@
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>MIB: QTECH-MIB
-CPU utilization in %
+               <description>MIB: FOUNDRY-SN-AGENT-MIB
+The statistics collection of 1 minute CPU utilization.
 </description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -71,93 +80,11 @@ CPU utilization in %
                <preprocessing/>
             </item>
             <item>
-               <name>Used memory</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.4.1.27514.100.1.11.7.0</snmp_oid>
-               <key>vm.memory.used[switchMemoryBusy.0]</key>
-               <delay>180</delay>
-               <history>30d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units>B</units>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port>{$SNMP_PORT}</port>
-               <description>MIB: QTECH-MIB
-Used memory in Bytes
-</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Memory</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing/>
-            </item>
-            <item>
-               <name>Total memory</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.4.1.27514.100.1.11.6.0</snmp_oid>
-               <key>vm.memory.total[switchMemorySize.0]</key>
-               <delay>180</delay>
-               <history>30d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units>B</units>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port>{$SNMP_PORT}</port>
-               <description>MIB: QTECH-MIB
-Total memory in Bytes
-</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Memory</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing/>
-            </item>
-            <item>
                <name>Memory utilization</name>
-               <type>15</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>vm.memory.pused[vm.memory.pused.0]</key>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.1991.1.1.2.1.53.0</snmp_oid>
+               <key>vm.memory.pused[snAgGblDynMemUtil.0]</key>
                <delay>180</delay>
                <history>30d</history>
                <trends>365d</trends>
@@ -172,7 +99,7 @@ Total memory in Bytes
                <snmpv3_authpassphrase/>
                <snmpv3_privprotocol>0</snmpv3_privprotocol>
                <snmpv3_privpassphrase/>
-               <params>(last(vm.memory.used[switchMemoryBusy.0])/last(vm.memory.total[switchMemorySize.0]))*100</params>
+               <params/>
                <ipmi_sensor/>
                <authtype>0</authtype>
                <username/>
@@ -180,7 +107,11 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>Memory utilization in %
+               <description>MIB: FOUNDRY-SN-AGENT-MIB
+The system dynamic memory utilization, in unit of percentage.
+	        Deprecated: Refer to snAgSystemDRAMUtil.
+	        For NI platforms, refer to snAgentBrdMemoryUtil100thPercent
+	        
 </description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -193,18 +124,18 @@ Total memory in Bytes
                <preprocessing/>
             </item>
             <item>
-               <name>Hardware model name</name>
+               <name>Temperature</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.13.1</snmp_oid>
-               <key>system.hw.model</key>
-               <delay>3600</delay>
-               <history>14d</history>
-               <trends>0d</trends>
+               <snmp_oid>1.3.6.1.4.1.1991.1.1.1.1.18.0</snmp_oid>
+               <key>sensor.temp.value[snChasActualTemperature.0]</key>
+               <delay>180</delay>
+               <history>30d</history>
+               <trends>365d</trends>
                <status>0</status>
-               <value_type>1</value_type>
+               <value_type>0</value_type>
                <allowed_hosts/>
-               <units/>
+               <units>°С</units>
                <snmpv3_contextname/>
                <snmpv3_securityname/>
                <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -220,13 +151,15 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>MIB: ENTITY-MIB
-
+               <description>MIB: FOUNDRY-SN-AGENT-MIB
+Temperature of the chassis. Each unit is 0.5 degrees Celcius.
+		      Only management module built with temperature sensor hardware is applicable.
+		       For those non-applicable management module, it returns no-such-name.
 </description>
-               <inventory_link>29</inventory_link>
+               <inventory_link>0</inventory_link>
                <applications>
                   <application>
-                     <name>Inventory</name>
+                     <name>Temperature</name>
                   </application>
                </applications>
                <valuemap/>
@@ -237,7 +170,7 @@ Total memory in Bytes
                <name>Hardware serial number</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.11.1</snmp_oid>
+               <snmp_oid>1.3.6.1.4.1.1991.1.1.1.1.2.0</snmp_oid>
                <key>system.hw.serialnumber</key>
                <delay>3600</delay>
                <history>14d</history>
@@ -261,7 +194,7 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>MIB: ENTITY-MIB
+               <description>MIB: FOUNDRY-SN-AGENT-MIB
 
 </description>
                <inventory_link>8</inventory_link>
@@ -278,7 +211,7 @@ Total memory in Bytes
                <name>Firmware version</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.9.1</snmp_oid>
+               <snmp_oid>1.3.6.1.4.1.1991.1.1.2.1.11.0</snmp_oid>
                <key>system.hw.firmware</key>
                <delay>3600</delay>
                <history>14d</history>
@@ -302,92 +235,10 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port>{$SNMP_PORT}</port>
-               <description>MIB: ENTITY-MIB
-
+               <description>MIB: FOUNDRY-SN-AGENT-MIB
+The version of the running software in the form'major.minor.maintenance[letters]'
 </description>
                <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Inventory</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing/>
-            </item>
-            <item>
-               <name>Hardware version(revision)</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.8.1</snmp_oid>
-               <key>system.hw.version</key>
-               <delay>3600</delay>
-               <history>14d</history>
-               <trends>0d</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port>{$SNMP_PORT}</port>
-               <description>MIB: ENTITY-MIB
-
-</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Inventory</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing/>
-            </item>
-            <item>
-               <name>Operating system</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.4.1.27514.100.1.3.0</snmp_oid>
-               <key>system.sw.os</key>
-               <delay>3600</delay>
-               <history>14d</history>
-               <trends>0d</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port>{$SNMP_PORT}</port>
-               <description>MIB: QTECH-MIB
-
-</description>
-               <inventory_link>5</inventory_link>
                <applications>
                   <application>
                      <name>Inventory</name>
@@ -399,9 +250,209 @@ Total memory in Bytes
             </item>
          </items>
          <discovery_rules>
+
 		
-	
-	  </discovery_rules>
+  	  	      <discovery_rule>
+               <name>PSU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1991.1.1.1.2.2.1.3]</snmp_oid>
+               <key>psu.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port>{$SNMP_PORT}</port>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>snChasPwrSupply2Description: The index to power supply table snChasPwrSupply2Table</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>[{#SNMPVALUE}] Power supply status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>.1.3.6.1.4.1.1991.1.1.1.2.2.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: FOUNDRY-SN-AGENT-MIB
+
+</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Power Supply</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>FOUNDRY-SN-AGENT-MIB::snChasPwrSupply2OperStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <application_prototypes/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Brocade ICX SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>[{#SNMPVALUE}] Power supply is in critical state (now: {ITEM.LASTVALUE1})</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+            </discovery_rule>		
+ 
+  	  	      <discovery_rule>
+               <name>FAN Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1991.1.1.1.3.2.1.3]</snmp_oid>
+               <key>fan.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port>{$SNMP_PORT}</port>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>snChasFan2Description: The index to fan table. snChasFan2Table</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>[{#SNMPVALUE}] Fan status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>.1.3.6.1.4.1.1991.1.1.1.3.2.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: FOUNDRY-SN-AGENT-MIB
+
+</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>FOUNDRY-SN-AGENT-MIB::snChasFan2OperStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <application_prototypes/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Brocade ICX SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SNMPVALUE} fan is in critical state (now: {ITEM.LASTVALUE1})</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+            </discovery_rule>
+		
+	        </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -414,11 +465,19 @@ Total memory in Bytes
             </macro>
             <macro>
                <macro>{$PSU_CRIT_STATUS}</macro>
-               <value>1</value>
+               <value>3</value>
             </macro>
             <macro>
                <macro>{$FAN_CRIT_STATUS}</macro>
-               <value>1</value>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_OK_STATUS}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_OK_STATUS}</macro>
+               <value>2</value>
             </macro>
             <macro>
                <macro>{$CPU_UTIL_MAX}</macro>
@@ -448,9 +507,6 @@ Total memory in Bytes
          <templates>
             <template>
                <name>Template SNMP Interfaces SNMPv2</name>
-            </template>
-            <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
             </template>
             <template>
                <name>Template SNMP Generic SNMPv2</name>
@@ -486,8 +542,8 @@ Total memory in Bytes
                         <calc_fnc>2</calc_fnc>
                         <type>0</type>
                         <item>
-                           <host>Template QTech QSW SNMPv2</host>
-                           <key>system.cpu.util[switchCpuUsage.0]</key>
+                           <host>Template Brocade ICX SNMPv2</host>
+                           <key>system.cpu.util[snAgGblCpuUtil1MinAvg.0]</key>
                         </item>
                      </graph_item>
                   </graph_items>
@@ -518,8 +574,8 @@ Total memory in Bytes
                         <calc_fnc>2</calc_fnc>
                         <type>0</type>
                         <item>
-                           <host>Template QTech QSW SNMPv2</host>
-                           <key>vm.memory.pused[vm.memory.pused.0]</key>
+                           <host>Template Brocade ICX SNMPv2</host>
+                           <key>vm.memory.pused[snAgGblDynMemUtil.0]</key>
                         </item>
                      </graph_item>
                   </graph_items>
@@ -527,7 +583,7 @@ Total memory in Bytes
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template QTech QSW SNMPv2:system.cpu.util[switchCpuUsage.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Brocade ICX SNMPv2:system.cpu.util[snAgGblCpuUtil1MinAvg.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization (now: {ITEM.LASTVALUE1})</name>
@@ -544,7 +600,7 @@ Total memory in Bytes
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template QTech QSW SNMPv2:vm.memory.pused[vm.memory.pused.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+         <expression>{Template Brocade ICX SNMPv2:vm.memory.pused[snAgGblDynMemUtil.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High memory utilization (now: {ITEM.LASTVALUE1})</name>
@@ -561,7 +617,64 @@ Total memory in Bytes
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template QTech QSW SNMPv2:system.hw.serialnumber.diff()}=1 and {Template QTech QSW SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Brocade ICX SNMPv2:sensor.temp.value[snChasActualTemperature.0].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+         <recovery_mode>1</recovery_mode>
+         <recovery_expression>{Template Brocade ICX SNMPv2:sensor.temp.value[snChasActualTemperature.0].max(5m)}&lt;{$TEMP_WARN:""}-5</recovery_expression>
+         <name> temperature is above warning threshold: &gt;{$TEMP_WARN:""} (now: {ITEM.LASTVALUE1})</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>2</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies>
+            <dependency>
+               <name> temperature is above critical threshold: &gt;{$TEMP_CRIT:""} (now: {ITEM.LASTVALUE1})</name>
+               <expression>{Template Brocade ICX SNMPv2:sensor.temp.value[snChasActualTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+               <recovery_expression>{Template Brocade ICX SNMPv2:sensor.temp.value[snChasActualTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-5</recovery_expression>
+            </dependency>
+         </dependencies>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Brocade ICX SNMPv2:sensor.temp.value[snChasActualTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+         <recovery_mode>1</recovery_mode>
+         <recovery_expression>{Template Brocade ICX SNMPv2:sensor.temp.value[snChasActualTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-5</recovery_expression>
+         <name> temperature is above critical threshold: &gt;{$TEMP_CRIT:""} (now: {ITEM.LASTVALUE1})</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>4</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Brocade ICX SNMPv2:sensor.temp.value[snChasActualTemperature.0].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+         <recovery_mode>1</recovery_mode>
+         <recovery_expression>{Template Brocade ICX SNMPv2:sensor.temp.value[snChasActualTemperature.0].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+5</recovery_expression>
+         <name> temperature is too low: &lt;{$TEMP_CRIT_LOW:""} (now: {ITEM.LASTVALUE1})</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>3</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Brocade ICX SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Brocade ICX SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Device might have been replaced (new serial number:{ITEM.VALUE1})</name>
@@ -578,7 +691,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template QTech QSW SNMPv2:system.hw.firmware.diff()}=1 and {Template QTech QSW SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Brocade ICX SNMPv2:system.hw.firmware.diff()}=1 and {Template Brocade ICX SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed: (new:{ITEM.VALUE1})</name>
@@ -597,32 +710,36 @@ Firmware version has changed. Ack to close</description>
    </triggers>
    <value_maps>
       <value_map>
-            <name>QTECH-MIB::sysFanStatus</name>
+            <name>FOUNDRY-SN-AGENT-MIB::snChasPwrSupply2OperStatus</name>
             <mappings>
                 <mapping>
-                    <value>0</value>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
                     <newvalue>normal</newvalue>
                 </mapping>
                 <mapping>
-                    <value>1</value>
-                    <newvalue>abnormal</newvalue>
+                    <value>3</value>
+                    <newvalue>failure</newvalue>
                 </mapping>
             </mappings>
         </value_map>
       <value_map>
-            <name>QTECH-MIB::sysPowerStatus</name>
+            <name>FOUNDRY-SN-AGENT-MIB::snChasFan2OperStatus</name>
             <mappings>
                 <mapping>
-                    <value>0</value>
-                    <newvalue>normal</newvalue>
-                </mapping>
-                <mapping>
                     <value>1</value>
-                    <newvalue>abnormal</newvalue>
+                    <newvalue>other</newvalue>
                 </mapping>
                 <mapping>
                     <value>2</value>
-                    <newvalue>not available</newvalue>
+                    <newvalue>normal</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>failure</newvalue>
                 </mapping>
             </mappings>
         </value_map>
