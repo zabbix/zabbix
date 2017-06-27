@@ -523,14 +523,39 @@ class CAction extends CApiService {
 			if (isset($action['filter'])) {
 				$action['evaltype'] = $action['filter']['evaltype'];
 			}
+			$action += [
+				'r_shortdata'	=> ACTION_DEFAULT_SUBJ_TRIGGER,
+				'r_longdata'	=> ACTION_DEFAULT_MSG_TRIGGER,
+				'ack_shortdata'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+				'ack_longdata'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+			];
+
+			// Set default values for recovery operations and their messages.
+			if (array_key_exists('recovery_operations', $action)) {
+				foreach ($action['recovery_operations'] as &$operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
+							$operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
+						$message = (array_key_exists('opmessage', $action) && is_array($action['opmessage']))
+							? $operation['opmessage']
+							: [];
+
+						if (!array_key_exists('default_msg', $message) || (string)$message['default_msg'] == '1') {
+							$message = array_diff_key($message, ['subject' => '', 'message' => '']);
+						}
+
+						$operation['opmessage'] = $message + [
+							'default_msg'	=> 1,
+							'mediatypeid'	=> 0,
+							'subject'		=> ACTION_DEFAULT_SUBJ_TRIGGER,
+							'message'		=> ACTION_DEFAULT_MSG_TRIGGER
+						];
+					}
+				}
+				unset($operation);
+			}
 
 			// Set default values for acknowledge operations and their messages.
 			if (array_key_exists('acknowledge_operations', $action)) {
-				$action += [
-					'ack_shortdata'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-					'ack_longdata'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
-				];
-
 				foreach ($action['acknowledge_operations'] as &$operation) {
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
 							$operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
