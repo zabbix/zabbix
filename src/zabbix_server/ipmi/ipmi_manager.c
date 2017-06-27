@@ -847,7 +847,6 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 	char			*error = NULL;
 
 	num = DCconfig_get_ipmi_poller_items(now, items, MAX_POLLER_ITEMS, nextcheck);
-	zbx_preprocessor_hold();
 
 	for (i = 0; i < num; i++)
 	{

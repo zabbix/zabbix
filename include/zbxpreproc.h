@@ -26,14 +26,10 @@
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"
 
-#define ZBX_IPC_PREPROCESSOR_COMMAND	1
-#define ZBX_IPC_PREPROCESSOR_WORKER	2
-#define ZBX_IPC_PREPROCESSOR_REQUEST	3
-#define ZBX_IPC_PREPROCESSOR_RESULT	4
-#define ZBX_IPC_PREPROCESSOR_QUEUE	5
-
-#define ZBX_PREPROCESSOR_COMMAND_HOLD	0
-#define ZBX_PREPROCESSOR_COMMAND_FLUSH	1
+#define ZBX_IPC_PREPROCESSOR_WORKER	1
+#define ZBX_IPC_PREPROCESSOR_REQUEST	2
+#define ZBX_IPC_PREPROCESSOR_RESULT	3
+#define ZBX_IPC_PREPROCESSOR_QUEUE	4
 
 /* item value data used in preprocessing manager */
 typedef struct
@@ -49,17 +45,15 @@ zbx_preproc_item_value_t;
 
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
 		zbx_timespec_t *ts, unsigned char state, char *error);
-void	zbx_preprocessor_hold();
 void	zbx_preprocessor_flush();
 zbx_uint64_t	zbx_preprocessor_get_queue_size();
-zbx_uint32_t	zbx_preprocessor_pack_value(unsigned char **data, zbx_preproc_item_value_t *value);
 zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemid, zbx_timespec_t *ts,
 		zbx_variant_t *value, zbx_item_history_value_t *history_value, int step_count,
 		zbx_item_preproc_t *steps);
 zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *value,
 		zbx_item_history_value_t *history_value, char *error);
 
-void	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsigned char *data);
+zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsigned char *data);
 void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, zbx_timespec_t **ts, zbx_variant_t *value,
 		zbx_item_history_value_t **history_value, int *step_count, zbx_item_preproc_t **steps,
 		const unsigned char *data);

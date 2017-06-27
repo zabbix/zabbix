@@ -817,8 +817,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	httpstep.httptest = httptest;
 	httpstep.httpstep = &db_httpstep;
 
-	zbx_preprocessor_hold();
-
 	while (NULL != (row = DBfetch(result)))
 	{
 		struct curl_slist	*headers_slist = NULL;

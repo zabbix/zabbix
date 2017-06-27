@@ -580,9 +580,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
-	if (1 < num || 1 < add_results.values_num)
-		zbx_preprocessor_hold();
-
 	zbx_timespec(&timespec);
 
 	/* process item values */
@@ -706,9 +703,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		free_result(&results[i]);
 	}
 
-	if (1 < num || 1 < add_results.values_num)
-		zbx_preprocessor_flush();
-
+	zbx_preprocessor_flush();
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 

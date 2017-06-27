@@ -166,8 +166,6 @@ next:
 		ret = SUCCEED;
 	}
 
-	zbx_preprocessor_hold();
-
 	for (i = 0; i < num; i++)
 	{
 		switch (errcodes[i])
