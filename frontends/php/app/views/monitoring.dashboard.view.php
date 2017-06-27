@@ -108,9 +108,7 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 		->addItem($breadcrumbs)
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 	)
-	// TODO VM: (?) what will happen, if scrollbar will be added in timeControl, but filter will not be added in HTML?
-	//			There will be uncaught exception. Maybe we need to disable adding scrollbar to timeControll as well.
-	->addItem((new CFilter('web.dashboard.filter.state'))->addNavigator())
+	->addItem(($data['show_timeline']) ? (new CFilter('web.dashboard.filter.state'))->addNavigator() : null)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->addItem($edit_form)
 	->addItem($sharing_form)
@@ -146,5 +144,7 @@ $this->addPostJS(
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );
 
-$this->addPostJS('timeControl.addObject("scrollbar", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($data['timeControlData']).');'
-		. 'timeControl.processObjects();');
+if ($data['show_timeline']) {
+	$this->addPostJS('timeControl.addObject("scrollbar", '.zbx_jsvalue($data['timeline']).', '
+		.zbx_jsvalue($data['timeControlData']).'); timeControl.processObjects();');
+}

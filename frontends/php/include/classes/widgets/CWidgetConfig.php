@@ -138,6 +138,22 @@ class CWidgetConfig {
 	}
 
 	/**
+	 * Does this widget type use timeline
+	 *
+	 * @param type $type  WIDGET_ constant
+	 *
+	 * @return boolean
+	 */
+	public static function usesTimeline($type) {
+		switch ($type) {
+			case WIDGET_GRAPH:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	/**
 	 * Returns key, where value is stored for given field type.
 	 *
 	 * @static

@@ -1683,11 +1683,11 @@ var sbox = Class.create({
 
 			var dims = getDimensions(this.dom_obj);
 
-			this.shifts.left = dims.left;
+			this.shifts.left = dims.offsetleft;
 			this.shifts.top = dims.top;
 
 			this.box.top = 0; // we use only x axis
-			this.box.left = this.mouse_event.left - dims.left;
+			this.box.left = this.mouse_event.left - dims.offsetleft;
 			this.box.height = this.areaHeight;
 
 			this.dom_box.setAttribute('id', 'selection_box');
@@ -1755,7 +1755,7 @@ var sbox = Class.create({
 	},
 
 	moveSBoxByObj: function() {
-		var posxy = jQuery('#' + jQuery(this.grphobj).attr('id')).position();
+		var posxy = jQuery(this.grphobj).position();
 		var dims = getDimensions(this.grphobj);
 
 		this.dom_obj.style.top = (posxy.top + this.shiftT) + 'px';
@@ -1764,7 +1764,7 @@ var sbox = Class.create({
 			this.dom_obj.style.width = dims.width + 'px';
 		}
 
-		this.additionShiftL = posxy.left + this.shiftL;
+		this.additionShiftL = dims.offsetleft + this.shiftL;
 	},
 
 	optimizeEvent: function(e) {

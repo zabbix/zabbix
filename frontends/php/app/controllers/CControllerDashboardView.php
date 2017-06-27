@@ -89,6 +89,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'grid_widgets' => $this->getWidgets($this->dashboard['widgets']),
 			'widget_defaults' => CWidgetConfig::getDefaults(),
 			'pageFilter' => $pageFilter,
+			'show_timeline' => $this->showTimeline($this->dashboard['widgets']),
 			'dynamic' => [
 				'has_dynamic_widgets' => $this->hasDynamicWidgets($this->dashboard['widgets']),
 				'hostid' => $pageFilter->hostid,
@@ -285,6 +286,22 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			}
 		}
 
+		return false;
+	}
+
+	/**
+	 * Checks, if any of widgets needs timeline.
+	 *
+	 * @param array $widgets
+	 *
+	 * @return bool
+	 */
+	private function showTimeline($widgets) {
+		foreach ($widgets as $widget) {
+			if (CWidgetConfig::usesTimeline($widget['type'])) {
+				return true;
+			}
+		}
 		return false;
 	}
 }
