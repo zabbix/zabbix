@@ -19,8 +19,7 @@
 **/
 
 
-class CControllerWidgetActionLogView extends CController
-{
+class CControllerWidgetActionLogView extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();

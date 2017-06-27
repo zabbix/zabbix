@@ -19,6 +19,7 @@
 **/
 
 class CNavigationWidgetForm extends CWidgetForm {
+
 	public function __construct($data) {
 		parent::__construct($data);
 

@@ -19,6 +19,7 @@
 **/
 
 class CWidgetFieldReference extends CWidgetField {
+
 	public function __construct() {
 		/*
 		 * All reference fields for all widgets on dashboard should share the same name.
