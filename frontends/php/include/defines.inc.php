@@ -677,6 +677,11 @@ define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
 define('SCREEN_MIN_SIZE', 1);
 define('SCREEN_MAX_SIZE', 100);
 
+// default, minimum and macimum number of lines for dashboard widgets
+define('ZBX_DEFAULT_WIDGET_LINES', 25);
+define('ZBX_MIN_WIDGET_LINES', 1);
+define('ZBX_MAX_WIDGET_LINES', 100);
+
 // dashboards
 define('DASHBOARD_DEFAULT_ID', 1);
 

@@ -28,8 +28,18 @@ class CProblemsWidgetForm extends CWidgetForm
 	{
 		parent::__construct($data);
 
-		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), 25, 1, 100))
+		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'), []);
+
+		if (array_key_exists('groupids', $data)) {
+			$field_groups->setValue($data['groupids']);
+		}
+		$this->fields[] = $field_groups;
+
+		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_DEFAULT_WIDGET_LINES,
+			ZBX_MIN_WIDGET_LINES, ZBX_MAX_WIDGET_LINES
+		))
 			->setRequired(true);
+
 		if (array_key_exists('show_lines', $data)) {
 			$field_lines->setValue($data['show_lines']);
 		}

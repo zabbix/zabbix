@@ -48,8 +48,11 @@ class CActionLogWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_sort;
 
-		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), 25, 1, 100))
+		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_DEFAULT_WIDGET_LINES,
+			ZBX_MIN_WIDGET_LINES, ZBX_MAX_WIDGET_LINES
+		))
 			->setRequired(true);
+
 		if (array_key_exists('show_lines', $data)) {
 			$field_lines->setValue($data['show_lines']);
 		}

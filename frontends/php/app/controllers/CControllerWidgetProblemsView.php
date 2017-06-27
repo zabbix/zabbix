@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
 class CControllerWidgetProblemsView extends CController {
 
@@ -35,9 +36,10 @@ class CControllerWidgetProblemsView extends CController {
 
 		$ret = $this->validateInput($fields);
 		/*
-		 * @var array $fields
-		 * @var int   $fields['show_lines']
-		*/
+		 * @var array        $fields
+		 * @var array|string $fields['groupids']    (optional)
+		 * @var int          $fields['show_lines']  (optional) BETWEEN 1,100
+		 */
 
 		if (!$ret) {
 			// TODO VM: prepare propper response for case of incorrect fields
@@ -55,52 +57,18 @@ class CControllerWidgetProblemsView extends CController {
 		$fields = $this->getInput('fields');
 
 		$filter = [
-			'groupids' => null,
+			'groupids' => array_key_exists('groupids', $fields) ? getSubGroups((array) $fields['groupids']) : null,
 			'maintenance' => null,
 			'severity' => null,
 			'trigger_name' => '',
 			'extAck' => 0,
-			'limit' => $fields['show_lines']
+			'limit' => array_key_exists('show_lines', $fields) ? $fields['show_lines'] : ZBX_DEFAULT_WIDGET_LINES
 		];
 
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
 			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 1) {
-				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
 				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
-
-				if (!$filter['groupids']) {
-					// null mean all groups
-					$filter['groupids'] = null;
-				}
-
-				// Get sub-groups of selected groups.
-				if ($filter['groupids']) {
-					$filter_groups = API::HostGroup()->get([
-						'output' => ['name'],
-						'groupids' => $filter['groupids'],
-						'preservekeys' => true
-					]);
-
-					$filter_groups_names = [];
-
-					foreach ($filter_groups as $group) {
-						$filter_groups_names[] = $group['name'].'/';
-					}
-
-					if ($filter_groups_names) {
-						$child_groups = API::HostGroup()->get([
-							'output' => ['groupid'],
-							'search' => ['name' => $filter_groups_names],
-							'searchByAny' => true,
-							'startSearch' => true
-						]);
-
-						foreach ($child_groups as $child_group) {
-							$filter['groupids'][] = $child_group['groupid'];
-						}
-					}
-				}
 
 				if ($hide_groupids) {
 					// get all groups if no selected groups defined

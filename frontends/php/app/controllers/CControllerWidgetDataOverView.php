@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
+
 class CControllerWidgetDataOverView extends CController
 {
 	protected function init() {
@@ -56,7 +58,7 @@ class CControllerWidgetDataOverView extends CController
 
 		$data = [
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_DATA_OVERVIEW]),
-			'groupids' => array_key_exists('groupids', $fields) ? (array) $fields['groupids'] : null,
+			'groupids' => array_key_exists('groupids', $fields) ? getSubGroups((array) $fields['groupids']) : null,
 			'application' => array_key_exists('application', $fields) ? $fields['application'] : '',
 			'style' => array_key_exists('style', $fields) ? $fields['style'] : STYLE_LEFT,
 			'user' => [

@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
+
 class CControllerWidgetTrigOverView extends CController
 {
 	protected function init() {
@@ -53,7 +55,7 @@ class CControllerWidgetTrigOverView extends CController
 
 	protected function doAction() {
 		$fields = $this->getInput('fields');
-		$groupids = array_key_exists('groupids', $fields) ? (array) $fields['groupids'] : null;
+		$groupids = array_key_exists('groupids', $fields) ? getSubGroups((array) $fields['groupids']) : null;
 		$application = array_key_exists('application', $fields) ? $fields['application'] : '';
 
 		$data = [
