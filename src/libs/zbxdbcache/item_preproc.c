@@ -24,6 +24,30 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_numeric_type_hint                                   *
+ *                                                                            *
+ * Purpose: returns numeric type hint based on item value type                *
+ *                                                                            *
+ * Parameters: value_type - [IN] the item value type                          *
+ *                                                                            *
+ * Return value: variant numeric type or none                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_numeric_type_hint(unsigned char value_type)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			return ZBX_VARIANT_DBL;
+		case ITEM_VALUE_TYPE_UINT64:
+			return ZBX_VARIANT_UI64;
+		default:
+			return ZBX_VARIANT_NONE;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: item_preproc_convert_value                                       *
  *                                                                            *
  * Purpose: convert variant value to the requested type                       *
@@ -55,6 +79,7 @@ static int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, 
  *                                                                            *
  * Parameters: value_num - [OUT] the converted value                          *
  *             value     - [IN] the value to convert                          *
+ *             type_hint - [IN] the expected type (DBL/UI64) ir NONE          *
  *             errmsg    - [OUT] error message                                *
  *                                                                            *
  * Return value: SUCCEED - the value was converted successfully               *
@@ -62,7 +87,7 @@ static int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, 
  *                                                                            *
  ******************************************************************************/
 static int	item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
-		char **errmsg)
+		unsigned char type_hint, char **errmsg)
 {
 	int	ret = FAIL;
 
@@ -86,6 +111,9 @@ static int	item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const
 		return FAIL;
 	}
 
+	if (ZBX_VARIANT_NONE != type_hint)
+		zbx_variant_convert(value_num, type_hint);
+
 	return SUCCEED;
 }
 
@@ -96,21 +124,26 @@ static int	item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const
  * Purpose: execute custom multiplier preprocessing operation on variant      *
  *          value type                                                        *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the value to process                  *
- *             params        - [IN] the operation parameters                  *
- *             errmsg        - [OUT] error message                            *
+ * Parameters: item   - [IN] the item                                         *
+ *             value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
  *                                                                            *
  * Return value: SUCCEED - the preprocessing step finished successfully       *
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_multiplier_variant(const DC_ITEM *item, zbx_variant_t *value, const char *params,
+		char **errmsg)
 {
 	zbx_uint64_t	multiplier_ui64, value_ui64;
 	double		value_dbl;
 	zbx_variant_t	value_num;
+	int		type_hint;
 
-	if (FAIL == item_preproc_convert_value_to_numeric(&value_num, value, errmsg))
+
+	type_hint = item_preproc_numeric_type_hint(item->value_type);
+	if (FAIL == item_preproc_convert_value_to_numeric(&value_num, value, type_hint, errmsg))
 		return FAIL;
 
 	switch (value_num.type)
@@ -147,19 +180,20 @@ static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *par
  *                                                                            *
  * Purpose: execute custom multiplier preprocessing operation                 *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the value to process                  *
- *             params        - [IN] the operation parameters                  *
- *             errmsg        - [OUT] error message                            *
+ * Parameters: item   - [IN] the item                                         *
+ *             value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
  *                                                                            *
  * Return value: SUCCEED - the preprocessing step finished successfully       *
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_multiplier(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_multiplier(const DC_ITEM *item, zbx_variant_t *value, const char *params, char **errmsg)
 {
 	char	*err = NULL;
 
-	if (SUCCEED == item_preproc_multiplier_variant(value, params, &err))
+	if (SUCCEED == item_preproc_multiplier_variant(item, value, params, &err))
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "Cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
@@ -268,11 +302,12 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
 static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const zbx_timespec_t *ts,
 		unsigned char op_type, zbx_hashset_t *delta_history, char **errmsg)
 {
-	int				ret = FAIL;
+	int				ret = FAIL, type_hint;
 	zbx_item_history_value_t	*deltaitem;
 	zbx_variant_t			value_num;
 
-	if (FAIL == item_preproc_convert_value_to_numeric(&value_num, value, errmsg))
+	type_hint = item_preproc_numeric_type_hint(item->value_type);
+	if (FAIL == item_preproc_convert_value_to_numeric(&value_num, value, type_hint, errmsg))
 		return FAIL;
 
 	if (NULL == (deltaitem = zbx_hashset_search(delta_history, &item->itemid)))
@@ -784,7 +819,7 @@ int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timesp
 	switch (op->type)
 	{
 		case ZBX_PREPROC_MULTIPLIER:
-			return item_preproc_multiplier(value, op->params, errmsg);
+			return item_preproc_multiplier(item, value, op->params, errmsg);
 		case ZBX_PREPROC_RTRIM:
 			return item_preproc_rtrim(value, op->params, errmsg);
 		case ZBX_PREPROC_LTRIM:

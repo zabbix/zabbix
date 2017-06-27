@@ -52,6 +52,7 @@ A.......S. [ZBX-9425] added permission check on the server side for global scrip
 ....I..... [ZBXNEXT-3725] added templates for network devices (internal version 0.7beta) (vzhuravlev)
 
 Bug fixes:
+........S. [ZBX-12296] added type hinting for item preprocessor numeric conversions based on item value type (wiper)
 .......PS. [ZBX-12266] fixed memory leak when executing IPMI commands (wiper)
 ..F....... [ZBX-11938] fixed 'type of condition' dropdown appearing if only one filter condition is set (miks)
 ..F....... [ZBX-11530] fixed lost application name in exported host web scenario (miks)
