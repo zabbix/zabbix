@@ -686,13 +686,12 @@ if (hasRequest('form')) {
 		);
 	}
 
-	// New condition.
-	$new_condition_defaults =[
+	// Add default values for new condition.
+	$data['new_condition'] += [
 		'conditiontype'	=> CONDITION_TYPE_TRIGGER_NAME,
 		'operator'		=> CONDITION_OPERATOR_LIKE,
 		'value'			=> ''
 	];
-	$data['new_condition'] = array_merge($new_condition_defaults, $data['new_condition']);
 
 	if (!str_in_array($data['new_condition']['conditiontype'], $data['allowedConditions'])) {
 		$data['new_condition']['conditiontype'] = $data['allowedConditions'][0];
