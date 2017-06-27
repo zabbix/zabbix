@@ -1697,6 +1697,12 @@ class CAction extends CApiService {
 					$withoutCurrent = true;
 					if (array_key_exists('opcommand_hst', $operation)) {
 						foreach ($operation['opcommand_hst'] as $hstCommand) {
+							if (!array_key_exists('hostid', $hstCommand)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect value for field \"%1$s\": %2$s.', 'hostid', _('cannot be empty'))
+								);
+							}
+
 							if ($hstCommand['hostid'] == 0) {
 								$withoutCurrent = false;
 							}
