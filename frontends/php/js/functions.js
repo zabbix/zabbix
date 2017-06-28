@@ -666,6 +666,47 @@ function overlayDialogue(params) {
 	if (button_focused !== null) {
 		button_focused.focus();
 	}
+
+	overlayDialogueOnLoad(!button_focused);
+}
+
+/**
+ * Makes overlay dialogues more useble by:
+ *  - focusing :focusable input element with lowest tabindex value
+ *  - triggering onclick event on pressing an enter in focused element
+ *
+ * @param boolean focus			focus element with lowest tabindex
+ */
+function overlayDialogueOnLoad(focus) {
+	// Focus element with lowest tabindex attribute.
+	if (focus) {
+		var focusable = jQuery(':focusable', jQuery('#overlay_dialogue')),
+			min_tabinxed = null;
+
+		focusable.attr('tabindex', function(a, b) {
+			if (typeof b !== 'undefined') {
+				min_tabinxed = (typeof min_tabinxed === 'number') ? Math.min(min_tabinxed, +b) : +b;
+			}
+		});
+
+		if (min_tabinxed !== null) {
+			focusable.filter(function() {
+				return jQuery(this).attr('tabindex') == min_tabinxed;
+			}).first().focus();
+		}
+	}
+
+	// Trigger click on the first button if user press enter in textbox.
+	var writable_fields = jQuery('input[type=text], textarea', jQuery('#widget_dialogue_form'));
+	if (writable_fields.length) {
+		writable_fields.on('keydown', function(e) {
+			if (e.keyCode == 13) {
+				jQuery('button:focusable', jQuery('#overlay_dialogue > .overlay-dialogue-footer')).first()
+					.trigger('click');
+				return false;
+			}
+		});
+	}
 }
 
 /**

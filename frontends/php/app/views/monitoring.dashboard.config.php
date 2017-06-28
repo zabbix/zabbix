@@ -36,6 +36,7 @@ $form_list->addRow(_('Type'),
 $form_list->addRow(_('Name'),
 	(new CTextBox('name', $data['dialogue']['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('placeholder', _('default'))
+		->setAttribute('tabindex', 1)
 );
 
 // Widget specific fields

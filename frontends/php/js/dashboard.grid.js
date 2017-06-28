@@ -1137,6 +1137,9 @@
 						// Enable save button after sucessfull form update
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
+					complete: function() {
+						overlayDialogueOnLoad(true);
+					},
 					error: function() {
 						// TODO VM: add error message box
 					}
