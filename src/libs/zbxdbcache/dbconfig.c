@@ -218,6 +218,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	master_itemid;
+	zbx_uint64_t	last_master_itemid;
 }
 ZBX_DC_DEPENDENTITEM;
 
@@ -2460,13 +2461,13 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 	ZBX_DC_HOST		*host;
 
-	ZBX_DC_ITEM		*item;
+	ZBX_DC_ITEM		*item, *master;
 	ZBX_DC_NUMITEM		*numitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_IPMIITEM		*ipmiitem;
 	ZBX_DC_FLEXITEM		*flexitem;
 	ZBX_DC_TRAPITEM		*trapitem;
-	ZBX_DC_DEPENDENTITEM	*dependentitem;
+	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_LOGITEM		*logitem;
 	ZBX_DC_DBITEM		*dbitem;
 	ZBX_DC_SSHITEM		*sshitem;
@@ -2479,7 +2480,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 	time_t			now;
 	unsigned char		old_poller_type, status, type, value_type;
-	int			old_nextcheck, delay, delay_flex_changed, key_changed, found, update_index;
+	int			old_nextcheck, delay, delay_flex_changed, key_changed, found, update_index, i, index;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -2617,18 +2618,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				}
 				else
 					zbx_vector_ptr_clear(&item->preproc_ops);
-			}
-
-			if (0 < item->dep_itemids.values_alloc)
-			{
-				if (0 == item->dep_itemids.values_num)
-				{
-					zbx_vector_uint64_destroy(&item->dep_itemids);
-					zbx_vector_uint64_create_ext(&item->dep_itemids, __config_mem_malloc_func,
-							__config_mem_realloc_func, __config_mem_free_func);
-				}
-				else
-					zbx_vector_uint64_clear(&item->dep_itemids);
 			}
 		}
 
@@ -2844,12 +2833,26 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		if (ITEM_TYPE_DEPENDENT == item->type && NULL != row[38])
 		{
-			dependentitem = DCfind_id(&config->dependentitems, itemid, sizeof(ZBX_DC_DEPENDENTITEM), &found);
-			ZBX_STR2UINT64(dependentitem->master_itemid, row[38]);
+			depitem = DCfind_id(&config->dependentitems, itemid, sizeof(ZBX_DC_DEPENDENTITEM), &found);
+
+			if (1 == found)
+				depitem->last_master_itemid = depitem->master_itemid;
+			else
+				depitem->last_master_itemid = 0;
+
+			ZBX_STR2UINT64(depitem->master_itemid, row[38]);
 		}
-		else if (NULL != (dependentitem = zbx_hashset_search(&config->dependentitems, &itemid)))
+		else if (NULL != (depitem = zbx_hashset_search(&config->dependentitems, &itemid)))
 		{
-			zbx_hashset_remove_direct(&config->dependentitems, dependentitem);
+			/* master exists and dependent item vector contains item */
+			if ((NULL != (master = zbx_hashset_search(&config->items, &depitem->master_itemid))) &&
+					(-1 != (index = zbx_vector_uint64_search(&master->dep_itemids, itemid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))))
+			{
+				zbx_vector_uint64_remove_noorder(&master->dep_itemids, index);
+			}
+
+			zbx_hashset_remove_direct(&config->dependentitems, depitem);
 		}
 
 		/* log items */
@@ -3009,6 +3012,30 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 	}
 
+	/* update dependent item vectors within master items */
+
+	for (i = 0; i < ids.values_num; i++)
+	{
+		itemid = ids.values[i];
+		if (NULL != (depitem = zbx_hashset_search(&config->dependentitems, &itemid)) &&
+				depitem->master_itemid != depitem->last_master_itemid)
+		{
+			/* check for master item change */
+			if ((NULL != (master = zbx_hashset_search(&config->items, &depitem->last_master_itemid))) &&
+					(-1 != (index = zbx_vector_uint64_search(&master->dep_itemids, itemid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))))
+			{
+				zbx_vector_uint64_remove_noorder(&master->dep_itemids, index);
+			}
+
+			/* append item to dependent item vector of master item */
+			if (NULL != (master = zbx_hashset_search(&config->items, &depitem->master_itemid)))
+				zbx_vector_uint64_append(&master->dep_itemids, itemid);
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+
 	/* remove deleted items from buffer */
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -3077,8 +3104,18 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		/* dependent items */
 
-		if (NULL != (dependentitem = zbx_hashset_search(&config->dependentitems, &itemid)))
-			zbx_hashset_remove_direct(&config->dependentitems, dependentitem);
+		if (NULL != (depitem = zbx_hashset_search(&config->dependentitems, &itemid)))
+		{
+			/* master exists and dependent item vector contains item */
+			if ((NULL != (master = zbx_hashset_search(&config->items, &depitem->master_itemid))) &&
+					(-1 != (index = zbx_vector_uint64_search(&master->dep_itemids, itemid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))))
+			{
+				zbx_vector_uint64_remove_noorder(&master->dep_itemids, index);
+			}
+
+			zbx_hashset_remove_direct(&config->dependentitems, depitem);
+		}
 
 		/* log items */
 
@@ -3190,15 +3227,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		zbx_hashset_iter_remove(&iter);
 	}
 
-	/* rebuild dependent item index */
-	zbx_hashset_iter_reset(&config->dependentitems, &iter);
-	while (NULL != (dependentitem = zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL != (item = zbx_hashset_search(&config->items, &dependentitem->master_itemid)))
-			zbx_vector_uint64_append(&item->dep_itemids, dependentitem->itemid);
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
 	zbx_vector_uint64_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
