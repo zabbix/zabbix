@@ -38,6 +38,7 @@ class CControllerWidgetProblemsView extends CController {
 		/*
 		 * @var array        $fields
 		 * @var array|string $fields['groupids']    (optional)
+		 * @var array|string $fields['hostids']     (optional)
 		 * @var int          $fields['show_lines']  (optional) BETWEEN 1,100
 		 */
 
@@ -58,6 +59,7 @@ class CControllerWidgetProblemsView extends CController {
 
 		$filter = [
 			'groupids' => array_key_exists('groupids', $fields) ? getSubGroups((array) $fields['groupids']) : null,
+			'hostids' => array_key_exists('hostids', $fields) ? (array) $fields['hostids'] : null,
 			'maintenance' => null,
 			'severity' => null,
 			'trigger_name' => '',

@@ -77,7 +77,8 @@ class CControllerDashbrdWidgetConfig extends CController {
 		// TODO VM: (?) currently it will have both, numeric and textual keys. Also, ones will come from defines, others will not.
 		//				(maybe it is good to add 'groups' to defines as well? Or maybe it can be improved, not to mix different key types.
 		$captions = [
-			'groups' => []
+			'groups' => [],
+			'hosts' => []
 		];
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldSelectResource) {
@@ -91,6 +92,11 @@ class CControllerDashbrdWidgetConfig extends CController {
 			if ($field instanceof CWidgetFieldGroup) {
 				foreach ($field->getValue(true) as $groupid) {
 					$captions['groups'][$groupid] = true;
+				}
+			}
+			if ($field instanceof CWidgetFieldHost) {
+				foreach ($field->getValue(true) as $hostid) {
+					$captions['hosts'][$hostid] = true;
 				}
 			}
 		}
@@ -142,6 +148,22 @@ class CControllerDashbrdWidgetConfig extends CController {
 						$captions['groups'][] = [
 							'id' => $group['groupid'],
 							'name' => $group['name']
+						];
+					}
+					break;
+
+				case 'hosts':
+					$hosts = API::Host()->get([
+						'output' => ['hostid', 'name'],
+						'hostids' => array_keys($list)
+					]);
+
+					$captions['hosts'] = [];
+
+					foreach ($hosts as $host) {
+						$captions['hosts'][] = [
+							'id' => $host['hostid'],
+							'name' => $host['name']
 						];
 					}
 					break;

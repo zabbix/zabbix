@@ -35,6 +35,13 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_groups;
 
+		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'), []);
+
+		if (array_key_exists('hostids', $data)) {
+			$field_hosts->setValue($data['hostids']);
+		}
+		$this->fields[] = $field_hosts;
+
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_DEFAULT_WIDGET_LINES,
 			ZBX_MIN_WIDGET_LINES, ZBX_MAX_WIDGET_LINES
 		))

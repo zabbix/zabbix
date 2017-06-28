@@ -74,6 +74,24 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 
 		$js_scripts[] = $field_groupids->getPostJS();
 	}
+	elseif ($field instanceof CWidgetFieldHost) {
+		// multiselect.js must be preloaded in parent view`
+
+		$field_hostids = (new CMultiSelect([
+			'name' => 'hostids[]',
+			'objectName' => 'hosts',
+			'data' => $data['captions']['hosts'],
+			'popup' => [
+				'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1=hostids_&srcfld1=hostid&multiselect=1'
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+		$form_list->addRow($field->getLabel(), $field_hostids);
+
+		$js_scripts[] = $field_hostids->getPostJS();
+	}
 	elseif ($field instanceof CWidgetFieldReference) {
 		$form->addVar($field->getName(), $field->getValue() ?: '');
 
