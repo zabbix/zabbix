@@ -770,13 +770,13 @@ class CAction extends CApiService {
 					unset($recovery_operation['esc_period'], $recovery_operation['esc_step_from'],
 						$recovery_operation['esc_step_to']
 					);
+					$recovery_operation['actionid'] = $action['actionid'];
 
 					if (!array_key_exists('operationid', $recovery_operation)) {
 						if ($recovery_operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
 							unset($recovery_operation['opmessage']['mediatypeid']);
 						}
 
-						$recovery_operation['actionid'] = $action['actionid'];
 						$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 						$operations_to_create[] = $recovery_operation;
 					}
@@ -815,9 +815,9 @@ class CAction extends CApiService {
 						? $ack_operation['opmessage']
 						: [];
 					unset($ack_operation['esc_period'], $ack_operation['esc_step_from'], $ack_operation['esc_step_to']);
+					$ack_operation['actionid'] = $action['actionid'];
 
 					if (!array_key_exists('operationid', $ack_operation)) {
-						$ack_operation['actionid'] = $action['actionid'];
 						$ack_operationtype = array_key_exists('operationtype', $ack_operation)
 							? $ack_operation['operationtype']
 							: $db_ack_operations[$ack_operation['operationid']]['operationtype'];
@@ -1226,10 +1226,12 @@ class CAction extends CApiService {
 						$opMessageUsrsToInsert = array_merge($opMessageUsrsToInsert, $operation['opmessage_usr']);
 					}
 					else {
-						$opMessagesToUpdate[] = [
-							'values' => $operation['opmessage'],
-							'where' => ['operationid'=>$operation['operationid']]
-						];
+						if (array_key_exists('opmessage', $operation)) {
+							$opMessagesToUpdate[] = [
+								'values' => $operation['opmessage'],
+								'where' => ['operationid'=>$operation['operationid']]
+							];
+						}
 
 						$diff = zbx_array_diff($operation['opmessage_grp'], $operationDb['opmessage_grp'], 'usrgrpid');
 						$opMessageGrpsToInsert = array_merge($opMessageGrpsToInsert, $diff['first']);
@@ -1399,7 +1401,7 @@ class CAction extends CApiService {
 						$operation['opmessage']['operationid'] = $operation['operationid'];
 						$opMessagesToInsert[] = $operation['opmessage'];
 					}
-					else {
+					elseif (array_key_exists('opmessage', $operation)) {
 						$opMessagesToUpdate[] = [
 							'values' => $operation['opmessage'],
 							'where' => ['operationid'=>$operation['operationid']]
