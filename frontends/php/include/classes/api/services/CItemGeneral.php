@@ -1189,30 +1189,31 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if (!array_key_exists('master_itemid', $item)) {
-				$field = 'master_itemid';
-				$error = _('cannot be empty');
-				break;
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+					_('cannot be empty')
+				));
 			}
 			if (array_key_exists('itemid', $item) && $item['master_itemid'] == $item['itemid']) {
-				$field = 'master_itemid';
-				$error = _('master_itemid and itemid should not match');
-				break;
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+					_('master_itemid and itemid should not match')
+				));
 			}
-
-			// TODO: Do we need permissions check on master item?!
 
 			$master_items = [];
 			$master_item = $item;
 			$current_level = 0;
 			$master_itemid = $item['master_itemid'];
-			$master_items[$item['itemid']] = $item;
+			// If item being created there are no itemid key, set 0 as $master_item array used for validation and
+			// should be set with validated item data.
+			$itemid = array_key_exists('itemid', $item) ? $item['itemid'] : 0;
+			$master_items[$itemid] = $item;
 
 			do {
 				// Validate maximum master items count.
 				if ($current_level > 3) {
-					$field = 'master_itemid';
-					$error = _('maximum master items count reached');
-					break;
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _('maximum master items count reached')
+					));
 				}
 
 				$master_item = $data_provider->get([
@@ -1225,19 +1226,18 @@ abstract class CItemGeneral extends CApiService {
 				$master_items[$master_item['itemid']] = $master_item;
 
 				if ($master_item['hostid'] != $item['hostid']) {
-					$field = 'hostid';
-					$error = _('item hostid and master hostid should match');
-					break;
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'hostid',
+						_('item hostid and master hostid should match')
+					));
 				}
 
 				// Validate for circular references
 				if (array_key_exists($master_itemid, $master_items)) {
-					$dependent_item = $master_items[$master_itemid];
-					$field = 'master_itemid';
-					$error = _s('dependent item "%1$s" is already master of "%2$s"', $dependent_item['name'],
-						$master_item['name']
-					);
-					break;
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _s('dependent item "%1$s" is already master of "%2$s"',
+							$master_items[$master_itemid]['name'], $master_item['name']
+						)
+					));
 				}
 
 				++$current_level;
@@ -1247,6 +1247,7 @@ abstract class CItemGeneral extends CApiService {
 			if (!$master_item['master_itemid']) {
 				$total_children = 0;
 				$children = [$master_item['itemid']];
+
 				do {
 					$children = $data_provider->get([
 						'output' => ['itemid'],
@@ -1257,14 +1258,11 @@ abstract class CItemGeneral extends CApiService {
 				} while ($children);
 
 				if ($total_children > 998) {
-					$field = 'master_itemid';
-					$error = _('maximum dependent items count reached');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _('maximum dependent items count reached')
+					));
 				}
 			}
-		}
-
-		if ($error) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', $field,	$error));
 		}
 	}
 }
