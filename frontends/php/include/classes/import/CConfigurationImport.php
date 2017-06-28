@@ -672,8 +672,8 @@ class CConfigurationImport {
 		}
 
 		$order_tree = $this->getItemsOrderTree('master_item', API::Item());
-		$itemsToCreate = [];
-		$itemsToUpdate = [];
+		$items_to_create = [];
+		$items_to_update = [];
 
 		foreach ($allItems as $host => $items) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -723,7 +723,14 @@ class CConfigurationImport {
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-					$item['master_itemid'] = $this->referencer->resolveItem($hostId, $item['master_item']['key']);
+					$master_itemid = $this->referencer->resolveItem($hostId, $item['master_item']['key']);
+
+					if ($master_itemid !== false) {
+						$item['master_itemid'] = $master_itemid;
+						unset($item['master_item']);
+					}
+				}
+				else {
 					unset($item['master_item']);
 				}
 
@@ -731,21 +738,49 @@ class CConfigurationImport {
 
 				if ($itemsId) {
 					$item['itemid'] = $itemsId;
-					$itemsToUpdate[] = $item;
+					if (!array_key_exists($level, $items_to_update)) {
+						$items_to_update[$level] = [];
+					}
+					$items_to_update[$level] = $item;
 				}
 				else {
-					$itemsToCreate[] = $item;
+					if (!array_key_exists($level, $items_to_create)) {
+						$items_to_create[$level] = [];
+					}
+					$items_to_create[$level][] = $item;
 				}
 			}
 		}
 
 		// create/update the items and create a hash hostid->key_->itemid
-		if ($this->options['items']['createMissing'] && $itemsToCreate) {
-			API::Item()->create($itemsToCreate);
+		if ($this->options['items']['createMissing'] && $items_to_create) {
+			foreach ($items_to_create as $level => $create_items) {
+				foreach ($create_items as &$create_item) {
+					if (array_key_exists('master_item', $create_item)) {
+						$create_item['master_itemid'] = $this->referencer->resolveItem($create_item['hostid'],
+							$create_item['master_item']['key']
+						);
+
+						if ($create_item['master_itemid'] === false) {
+							// TODO: Raise exception! master item does not exists!
+							die('TDOD: ouch!');
+						}
+						unset($create_item['master_item']);
+					}
+				}
+				$itemids = API::Item()->create($create_items)['itemids'];
+				$created_itemid = reset($itemids);
+
+				foreach ($create_items as $created_item) {
+					$this->referencer->addItemRef($created_item['hostid'], $created_item['key_'], $created_itemid);
+					$created_itemid = next($itemids);
+				}
+			}
 		}
 
-		if ($this->options['items']['updateExisting'] && $itemsToUpdate) {
-			API::Item()->update($itemsToUpdate);
+		if ($this->options['items']['updateExisting'] && $items_to_update) {
+			// TODO: add $level for updated items
+			API::Item()->update($items_to_update);
 		}
 
 		// refresh items because templated ones can be inherited to host and used in triggers, graphs, etc.
@@ -2247,47 +2282,86 @@ class CConfigurationImport {
 	protected function getItemsOrderTree($master_key_identifier, $data_provider) {
 		$host_items = $this->getFormattedItems();
 		$tree = [];
+		$db_indexed_items = [];
+		$unresolved_masters = [];
+		$has_unresolved_items = false;
+		$hostkey_to_hostid = array_fill_keys(array_keys($host_items), 0);
 
-		foreach ($host_items as $host => $items) {
-			$hostid = $this->referencer->resolveHostOrTemplate($host);
-			$indexed_items = [];
-
-			// Build indexed tree of all host items.
-			foreach ($items as $index => $item) {
-				$indexed_items[$item['key_']] = $index;
-			}
-
-			$host_items_tree = [];
-
-			// Find nesting level for every host item.
-			foreach ($items as $index => $item) {
-				$level = 0;
-
-				// Traverse up searching root parent for current item.
-				while ($item && $item['type'] == ITEM_TYPE_DEPENDENT) {
-					if (array_key_exists($item[$master_key_identifier], $indexed_items)) {
-						$item = $items[$indexed_items[$master_key]];
-					}
-					else {
-						$response = $data_provider->get([
-							'output' => ['key_', 'type', 'master_itemid'],
-							'filter' => ['key_' => $item[$master_key_identifier]['key']]
-						]);
-						$item = $response ? $response[0] : null;
-						// TODO: Populate data for $this->resolver to allow mapping be used when items will be created
-						//		or updated.
-					}
-					// TODO: If $item is not array we have broken relation. Throw exception.
-
-					// TODO: Check nesting level maximum.
-					$level++;
-				}
-				$host_items_tree[$index] = $level;
-			}
-
-			asort($host_items_tree);
-			$tree[$host] = $host_items_tree;
+		// Resolve host_keys only once.
+		foreach ($hostkey_to_hostid as $host_key => &$hostid) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host_key);
 		}
+
+		do {
+			if ($has_unresolved_items) {
+				// TODO: add check for not existing host cyclic search as unresolved_master.
+				$searcheable_keys = [];
+
+				foreach ($unresolved_masters as $masters) {
+					$searcheable_keys += $masters;
+				}
+				$response = $data_provider->get([
+					'output' => ['key_', 'type', 'master_itemid', 'hostid'],
+					'hostids' => array_keys($unresolved_masters),
+					'filter' => ['key_' => array_keys($searcheable_keys)]
+				]);
+				foreach ($response as $item) {
+					$host_key = array_search($item['hostid'], $hostkey_to_hostid);
+					$index = count($host_items[$host_key]);
+					// Emulate xml array
+					$item[$master_key_identifier]['key'] = $item['key_'];
+					$host_items[$host_key][$index] = $item;
+					$db_indexed_items[$item['hostid']][$item['key_']] = $index;
+				}
+				$has_unresolved_items = false;
+				$unresolved_masters = [];
+			}
+
+			foreach ($host_items as $host_key => $items) {
+				$hostid = $hostkey_to_hostid[$host_key];
+				$host_items_tree = [];
+
+				if (!array_key_exists($hostid, $db_indexed_items)) {
+					foreach ($items as $index => $item) {
+						$indexed_items[$item['key_']] = $index;
+					}
+					$db_indexed_items[$hostid] = $indexed_items;
+				}
+				$indexed_items = $db_indexed_items[$hostid];
+
+				// Find nesting level for every host item.
+				foreach ($items as $index => $item) {
+					$level = 0;
+
+					// Traverse up searching master root item for current item.
+					// If master item data should be requested by data_provider add master itemid for bulk requests.
+					while ($item && $item['type'] == ITEM_TYPE_DEPENDENT) {
+						$master_key = $item[$master_key_identifier]['key'];
+
+						if (array_key_exists($master_key, $indexed_items)) {
+							$item = $items[$indexed_items[$master_key]];
+							$level++;
+						}
+						else {
+							$unresolved_masters[$hostid][$master_key] = true;
+							$has_unresolved_items = true;
+							$level = -1;
+							break;
+						}
+					}
+					$host_items_tree[$index] = $level;
+					// TODO: break if $unresolved_masters greater than 50/100/etc ?
+				}
+				$tree[$host_key] = $host_items_tree;
+			}
+
+		} while ($has_unresolved_items);
+
+		// Order item indexes in descending order by nesting level
+		foreach ($tree as $host_key => &$item_indexes) {
+			asort($item_indexes);
+		}
+		unset($item_indexes);
 
 		return $tree;
 	}
