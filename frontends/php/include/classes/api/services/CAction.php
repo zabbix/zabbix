@@ -2968,7 +2968,13 @@ class CAction extends CApiService {
 							|| array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
 						$ack_operation['eventsource'] = $db_action['eventsource'];
-						$operations_to_validate[] = $ack_operation;
+						$db_ack_operation = array_key_exists($ack_operation['operationid'], $db_ack_operations)
+							? $db_ack_operations[$ack_operation['operationid']]
+							: [];
+						// As documentation defines field 'operationtype' is required.
+						unset($db_ack_operation['operationtype']);
+
+						$operations_to_validate[] = $ack_operation + $db_ack_operation;
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect acknowledgement action operationid.'));
