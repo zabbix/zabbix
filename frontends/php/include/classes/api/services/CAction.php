@@ -533,6 +533,12 @@ class CAction extends CApiService {
 			// Set default values for recovery operations and their messages.
 			if (array_key_exists('recovery_operations', $action)) {
 				foreach ($action['recovery_operations'] as &$operation) {
+					if (array_key_exists('operationid', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+							$operation['operationid'], 'operationid'
+						));
+					}
+
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
 							$operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
 						$message = (array_key_exists('opmessage', $action) && is_array($action['opmessage']))
@@ -557,6 +563,12 @@ class CAction extends CApiService {
 			// Set default values for acknowledge operations and their messages.
 			if (array_key_exists('acknowledge_operations', $action)) {
 				foreach ($action['acknowledge_operations'] as &$operation) {
+					if (array_key_exists('operationid', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+							$operation['operationid'], 'operationid'
+						));
+					}
+
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
 							$operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
 						$message = (array_key_exists('opmessage', $action) && is_array($action['opmessage']))
@@ -741,6 +753,11 @@ class CAction extends CApiService {
 							$operations_to_update[] = $operation;
 							unset($db_operations[$operationid]);
 						}
+						else {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+								$operationid, 'operationid'
+							));
+						}
 					}
 				}
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_operations));
@@ -779,6 +796,11 @@ class CAction extends CApiService {
 							$operations_to_update[] = $recovery_operation;
 							unset($db_recovery_operations[$recovery_operationid]);
 						}
+						else {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+								$recovery_operationid, 'operationid'
+							));
+						}
 					}
 				}
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_recovery_operations));
@@ -815,6 +837,10 @@ class CAction extends CApiService {
 					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 						$operations_to_update[] = $ack_operation;
 						unset($db_ack_operations[$ack_operation['operationid']]);
+					} else {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+							$ack_operation['operationid'], 'operationid'
+						));
 					}
 				}
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_ack_operations));
