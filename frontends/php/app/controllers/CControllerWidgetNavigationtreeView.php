@@ -276,15 +276,6 @@ class CControllerWidgetNavigationtreeView extends CController {
 								}, $problems_per_trigger[$triggerid], $problems);
 							}
 						}
-
-						// Remove problems which are less important than $severity_min.
-						if ($severity_min > 0) {
-							foreach ($problems as $sev => $probl) {
-								if ($severity_min > $sev) {
-									$problems[$sev] = 0;
-								}
-							}
-						}
 					}
 				}
 				break;
@@ -300,15 +291,6 @@ class CControllerWidgetNavigationtreeView extends CController {
 						}, $problems_per_trigger[$triggerid], $problems);
 					}
 				}
-
-				// Remove problems which are less important than $severity_min.
-				if ($severity_min > 0) {
-					foreach ($problems as $sev => $probl) {
-						if ($severity_min > $sev) {
-							$problems[$sev] = 0;
-						}
-					}
-				}
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST:
 				$problems = $this->problems_per_severity_tpl;
@@ -321,15 +303,6 @@ class CControllerWidgetNavigationtreeView extends CController {
 								$problems = array_map(function() {
 									return array_sum(func_get_args());
 								}, $problems_per_trigger[$triggerid], $problems);
-							}
-						}
-					}
-
-					// Remove problems which are less important than $severity_min.
-					if ($severity_min > 0) {
-						foreach ($problems as $sev => $probl) {
-							if ($severity_min > $sev) {
-								$problems[$sev] = 0;
 							}
 						}
 					}
@@ -381,15 +354,6 @@ class CControllerWidgetNavigationtreeView extends CController {
 									$problems_counted[$lt['triggerid']] = true;
 									$add_problems = $problems_per_trigger[$lt['triggerid']];
 
-									// Remove problems which are less important than $severity_min.
-									if ($severity_min > 0) {
-										foreach ($add_problems as $sev => $probl) {
-											if ($severity_min > $sev) {
-												$add_problems[$sev] = 0;
-											}
-										}
-									}
-
 									// Sum problems.
 									$problems = array_map(function() {
 										return array_sum(func_get_args());
@@ -400,6 +364,15 @@ class CControllerWidgetNavigationtreeView extends CController {
 					}
 				}
 				break;
+		}
+
+		// Remove problems which are less important than $severity_min.
+		if (is_array($problems) && $severity_min > 0) {
+			foreach ($problems as $sev => $probl) {
+				if ($severity_min > $sev) {
+					$problems[$sev] = 0;
+				}
+			}
 		}
 
 		return $problems;
