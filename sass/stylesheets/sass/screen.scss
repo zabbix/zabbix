@@ -4515,10 +4515,17 @@ tr.cursor-move {
 			.item-name {
 				max-width: calc(100% - 90px);
 				overflow: hidden;
-				padding-right: 12px;
 				line-height: 1.5;
 				display: block;
 				height: 20px;
+
+				> span {
+					text-overflow: ellipsis;
+					overflow: hidden;
+					display: block;
+					white-space: nowrap;
+					max-width: 20px;
+				}
 			}
 			a.item-name:focus,
 			a.item-name:hover {
