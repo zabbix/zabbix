@@ -1001,9 +1001,7 @@ class CConfigurationImport {
 
 					$prototypeId = $this->referencer->resolveItem($hostId, $prototype['key_']);
 					$prototype['rule'] = ['hostid' => $hostId, 'key' => $item['key_']];
-					$prototype['ruleid'] = $this->referencer->resolveItem($prototype['rule']['hostid'],
-						$prototype['rule']['key']
-					);
+					$prototype['ruleid'] = $this->referencer->resolveItem($hostId, $item['key_']);
 
 					if ($prototypeId) {
 						if (!array_key_exists($level, $prototypes_to_update)) {
@@ -2455,6 +2453,11 @@ class CConfigurationImport {
 
 						if (array_key_exists($master_key, $indexed_items)) {
 							$item = $items[$indexed_items[$master_key]];
+							if ($item[$master_key_identifier] && $master_key == $item[$master_key_identifier]['key']) {
+								throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+									_('master_itemid and itemid should not match')
+								));
+							}
 							$level++;
 						}
 						else {
@@ -2463,10 +2466,11 @@ class CConfigurationImport {
 							break;
 						}
 					}
-					// TODO: add check for not existing entity cyclic search as unresolved_master.
-					//		 if item $level was not changed then we have non existing master item.
-					//		 for $level=0 additional check for array_key_exists($index, $host_items_tree)
-					//		 should be done otherwise first unsuccessfull traversing can be marked as non existing master.
+					if (array_key_exists($index, $host_items_tree) && $host_items_tree[$index] == $level) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('value not found')
+						));
+					}
 					$host_items_tree[$index] = $level;
 					// TODO: break if $unresolved_masters greater than 50/100/etc
 					//		 Do we need to care about memory consumption for unresolved masters array?
