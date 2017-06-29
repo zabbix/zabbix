@@ -1203,10 +1203,11 @@ abstract class CItemGeneral extends CApiService {
 			$master_item = $item;
 			$current_level = 0;
 			$master_itemid = $item['master_itemid'];
-			// If item being created there are no itemid key, set 0 as $master_item array used for validation and
-			// should be set with validated item data.
-			$itemid = array_key_exists('itemid', $item) ? $item['itemid'] : 0;
-			$master_items[$itemid] = $item;
+			// When item being created it should not exists in master items array, because it can not be parent
+			// for existing items at that moment.
+			if (array_key_exists('itemid', $item)) {
+				$master_items[$item['itemid']] = $item;
+			}
 
 			do {
 				// Validate maximum master items count.
@@ -1219,7 +1220,15 @@ abstract class CItemGeneral extends CApiService {
 				$master_item = $data_provider->get([
 					'output' => ['type', 'name', 'hostid', 'master_itemid'],
 					'itemids' => $master_itemid
-				])[0];
+				]);
+
+				if (!$master_item) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _('value not found')
+					));
+				}
+
+				$master_item = $master_item[0];
 				$master_itemid = ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT)
 					? $master_item['master_itemid']
 					: 0;
