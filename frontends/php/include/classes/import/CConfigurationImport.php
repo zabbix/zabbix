@@ -672,7 +672,7 @@ class CConfigurationImport {
 		}
 
 		$xml_itemkey = 'master_item';
-		$order_tree = $this->getItemsOrderTree(API::Item());
+		$order_tree = $this->getItemsOrder($xml_itemkey);
 		$items_to_create = [];
 		$items_to_update = [];
 
@@ -742,7 +742,7 @@ class CConfigurationImport {
 					if (!array_key_exists($level, $items_to_update)) {
 						$items_to_update[$level] = [];
 					}
-					$items_to_update[$level] = $item;
+					$items_to_update[$level][] = $item;
 				}
 				else {
 					if (!array_key_exists($level, $items_to_create)) {
@@ -755,38 +755,92 @@ class CConfigurationImport {
 
 		// create/update the items and create a hash hostid->key_->itemid
 		if ($this->options['items']['createMissing'] && $items_to_create) {
-			foreach ($items_to_create as $level => $create_items) {
-				foreach ($create_items as &$create_item) {
-					if (array_key_exists($xml_itemkey, $create_item)) {
-						$create_item['master_itemid'] = $this->referencer->resolveItem($create_item['hostid'],
-							$create_item[$xml_itemkey]['key']
-						);
-
-						if ($create_item['master_itemid'] === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'master_itemid', _('value not found')
-							));
-						}
-						unset($create_item[$xml_itemkey]);
-					}
-				}
-				$itemids = API::Item()->create($create_items)['itemids'];
-				$created_itemid = reset($itemids);
-
-				foreach ($create_items as $created_item) {
-					$this->referencer->addItemRef($created_item['hostid'], $created_item['key_'], $created_itemid);
-					$created_itemid = next($itemids);
-				}
-			}
+			$this->createEntitiesWithDependency($xml_itemkey, $items_to_create, API::Item());
 		}
 
 		if ($this->options['items']['updateExisting'] && $items_to_update) {
-			// TODO: add $level for updated items
-			API::Item()->update($items_to_update);
+			$this->updateEntitiesWithDependency($xml_itemkey, $items_to_update, API::Item());
 		}
 
 		// refresh items because templated ones can be inherited to host and used in triggers, graphs, etc.
 		$this->referencer->refreshItems();
+	}
+
+
+	/**
+	 * Create or update entities with dependency.
+	 *
+	 * @param string $xml_entitykey					Master entity array key in xml parsed data.
+	 * @param Array $entities_by_level				Associative array of entities to be processed where key is entity
+	 *												dependency level and value is array of entities for this level.
+	 * @param CItem|CItepPrototype $entity_service	Entity service which is capable to proceed with entity create
+	 *												or update.
+	 *
+	 * @throws Exception if entity master entity can not be resolved.
+	 */
+	protected function createEntitiesWithDependency($xml_entitykey, $entities_by_level, $entity_service) {
+		foreach ($entities_by_level as $level => $entities) {
+			foreach ($entities as &$entity) {
+				if (array_key_exists($xml_entitykey, $entity)) {
+					$entity['master_itemid'] = $this->referencer->resolveItem($entity['hostid'],
+						$entity[$xml_entitykey]['key']
+					);
+
+					if ($entity['master_itemid'] === false) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('value not found')
+						));
+					}
+					unset($entity[$xml_entitykey]);
+				}
+			}
+			unset($entity);
+			$entityids = $entity_service->create($entities)['itemids'];
+			$entityid = reset($entityids);
+
+			foreach ($entities as $entity) {
+				$this->referencer->addItemRef($entity['hostid'], $entity['key_'], $entityid);
+				$entityid = next($entityids);
+			}
+		}
+	}
+
+	/**
+	 * Create or update entities with dependency.
+	 *
+	 * @param string $xml_entitykey					Master entity array key in xml parsed data.
+	 * @param Array $entities_by_level				Associative array of entities to be processed where key is entity
+	 *												dependency level and value is array of entities for this level.
+	 * @param CItem|CItepPrototype $entity_service	Entity service which is capable to proceed with entity create
+	 *												or update.
+	 *
+	 * @throws Exception if entity master entity can not be resolved.
+	 */
+	protected function updateEntitiesWithDependency($xml_entitykey, $entities_by_level, $entity_service) {
+		foreach ($entities_by_level as $level => $entities) {
+			foreach ($entities as &$entity) {
+				if (array_key_exists($xml_entitykey, $entity)) {
+					$entity['master_itemid'] = $this->referencer->resolveItem($entity['hostid'],
+						$entity[$xml_entitykey]['key']
+					);
+
+					if ($entity['master_itemid'] === false) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('value not found')
+						));
+					}
+					unset($entity[$xml_entitykey]);
+				}
+			}
+			unset($entity);
+			$entityids = $entity_service->update($entities)['itemids'];
+			$entityid = reset($entityids);
+
+			foreach ($entities as $entity) {
+				$this->referencer->addItemRef($entity['hostid'], $entity['key_'], $entityid);
+				$entityid = next($entityids);
+			}
+		}
 	}
 
 	/**
@@ -816,7 +870,7 @@ class CConfigurationImport {
 		}
 
 		$xml_itemprototype_key = 'master_item_prototype';
-		$order_tree = $this->getItemsOrderTree(API::ItemPrototype());
+		$order_tree = $this->getDiscoveryRulesItemsOrder($xml_itemprototype_key);
 		$itemsToCreate = [];
 		$itemsToUpdate = [];
 
@@ -876,13 +930,14 @@ class CConfigurationImport {
 		$this->referencer->refreshItems();
 
 		// process prototypes
-		$prototypesToUpdate = [];
+		$prototypes_to_update = [];
 		$prototypes_to_create = [];
 		$hostPrototypesToUpdate = [];
 		$hostPrototypesToCreate = [];
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
+			$host_order_tree = $order_tree[$host];
 
 			foreach ($discoveryRules as $item) {
 				// if rule was not processed we should not create/update any of its prototypes
@@ -891,10 +946,11 @@ class CConfigurationImport {
 				}
 
 				$item['hostid'] = $hostId;
-				$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
+				$item_key = $item['key_'];
+				$itemId = $this->referencer->resolveItem($hostId, $item_key);
 
 				// prototypes
-				foreach ($order_tree[$host] as $index => $level) {
+				foreach ($host_order_tree[$item_key] as $index => $level) {
 					$prototype = $item['item_prototypes'][$index];
 					$prototype['hostid'] = $hostId;
 					$applicationsIds = [];
@@ -945,18 +1001,21 @@ class CConfigurationImport {
 
 					$prototypeId = $this->referencer->resolveItem($hostId, $prototype['key_']);
 					$prototype['rule'] = ['hostid' => $hostId, 'key' => $item['key_']];
+					$prototype['ruleid'] = $this->referencer->resolveItem($prototype['rule']['hostid'],
+						$prototype['rule']['key']
+					);
 
 					if ($prototypeId) {
+						if (!array_key_exists($level, $prototypes_to_update)) {
+							$prototypes_to_update[$level] = [];
+						}
 						$prototype['itemid'] = $prototypeId;
-						$prototypesToUpdate[] = $prototype;
+						$prototypes_to_update[$level][] = $prototype;
 					}
 					else {
 						if (!array_key_exists($level, $prototypes_to_create)) {
 							$prototypes_to_create[$level] = [];
 						}
-						$prototype['ruleid'] = $this->referencer->resolveItem($prototype['rule']['hostid'],
-							$prototype['rule']['key']
-						);
 						$prototypes_to_create[$level][] = $prototype;
 					}
 				}
@@ -1040,39 +1099,11 @@ class CConfigurationImport {
 		}
 
 		if ($prototypes_to_create) {
-			foreach ($prototypes_to_create as $level => $create_prototypes) {
-				foreach ($create_prototypes as &$prototype) {
-					if (array_key_exists($xml_itemprototype_key, $prototype)) {
-						$prototype['master_itemid'] = $this->referencer->resolveItem($prototype['hostid'],
-							$prototype[$xml_itemprototype_key]['key']
-						);
-
-						if ($prototype['master_itemid'] === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'master_itemid', _('value not found')
-							));
-						}
-						unset($prototype[$xml_itemprototype_key]);
-					}
-				}
-				$prototypeids = API::ItemPrototype()->create($create_prototypes)['itemids'];
-				$created_prototypeid = reset($prototypeids);
-
-				foreach ($create_prototypes as $prototype) {
-					$this->referencer->addItemRef($prototype['hostid'], $prototype['key_'], $created_prototypeid);
-					$created_prototypeid = next($prototypeids);
-				}
-			}
+			$this->createEntitiesWithDependency($xml_itemprototype_key, $prototypes_to_create, API::ItemPrototype());
 		}
 
-		if ($prototypesToUpdate) {
-			// TODO: implement item prototype import for dependent items
-			foreach ($prototypesToCreate as &$prototype) {
-				$prototype['ruleid'] = $this->referencer->resolveItem($prototype['rule']['hostid'], $prototype['rule']['key']);
-			}
-			unset($prototype);
-
-			API::ItemPrototype()->update($prototypesToUpdate);
+		if ($prototypes_to_update) {
+			$this->updateEntitiesWithDependency($xml_itemprototype_key, $prototypes_to_update, API::ItemPrototype());
 		}
 
 		if ($hostPrototypesToCreate) {
@@ -2310,42 +2341,65 @@ class CConfigurationImport {
 	/**
 	 * Get items keys order tree, to ensure that master item will be inserted or updated before any
 	 * of it dependent item.
+	 * Returns associative array where key is item index and value is item dependency level.
 	 *
-	 * @param CItem|CItemPrototype	$data_provider			Provider for non existing items.
-	 *
-	 * @throws Exception for unsupported $data_povider
+	 * @param string $master_key_identifier	String containing master key name used to identify item master.
 	 *
 	 * @return array
 	 */
-	protected function getItemsOrderTree($data_provider) {
-		if ($data_provider instanceof CItem) {
-			$master_key_identifier = 'master_item';
-			$host_items = $this->getFormattedItems();
-		}
-		elseif ($data_provider instanceof CItemPrototype) {
-			$master_key_identifier = 'master_item_prototype';
-			$host_items = [];
-			$discovery_rules = $this->getFormattedDiscoveryRules();
+	protected function getItemsOrder($master_key_identifier) {
+		$entities = $this->getFormattedItems();
+		$data_provider = API::Item();
+		return $this->getEntitiesOrder($master_key_identifier, $entities, $data_provider);
+	}
 
-			foreach ($discovery_rules as $host_key => $items) {
-				$host_items[$host_key] = [];
+	/**
+	 * Get discovery rules items prototypes keys order tree, to ensure that master item will be inserted or updated
+	 * before any of it dependent item.
+	 * Returns associative array where key is item prototype index and value is item prototype dependency level.
+	 *
+	 * @param string $master_key_identifier	String containing master key name used to identify item master.
+	 *
+	 * @return array
+	 */
+	protected function getDiscoveryRulesItemsOrder($master_key_identifier) {
+		$discovery_rules = $this->getFormattedDiscoveryRules();
+		$data_povider = API::ItemPrototype();
+		$entities_order = [];
 
-				foreach ($items as $item) {
-					$host_items[$host_key] += $item['item_prototypes'];
-				}
+		foreach ($discovery_rules as $host_key => $items) {
+
+			foreach ($items as $item) {
+				$entities = [$host_key => $item['item_prototypes']];
+				$entities_order[$host_key][$item['key_']] = $this->getEntitiesOrder($master_key_identifier, $entities,
+					$data_povider
+				)[$host_key];
 			}
 		}
-		else {
-			throw new Exception(_('Internal error.'));
-		}
 
+		return $entities_order;
+	}
+
+	/**
+	 * Generic method to get entities order tree, to ensure that master entity will be inserted or updated before any
+	 * of it dependent entities.
+	 * Returns associative array where key is entity index in source array grouped by host key and value is entity
+	 * dependency level.
+	 *
+	 * @param string $master_key_identifier	String containing master key name used to identify item master.
+	 * @param array $host_items				Associative array where key is host key and values ae arrays with items.
+	 * @param CItem|CItemPrototype			Not resolved master entities in supplied $host_items array will be requested
+	 *										using this service.
+	 *
+	 * @return array
+	 */
+	protected function getEntitiesOrder($master_key_identifier, $host_items, $data_provider) {
 		$tree = [];
 		$db_indexed_items = [];
 		$unresolved_masters = [];
 		$has_unresolved_items = false;
 		$hostkey_to_hostid = array_fill_keys(array_keys($host_items), 0);
 
-		// Resolve host_keys only once.
 		foreach ($hostkey_to_hostid as $host_key => &$hostid) {
 			$hostid = $this->referencer->resolveHostOrTemplate($host_key);
 		}
@@ -2361,15 +2415,17 @@ class CConfigurationImport {
 				$response = $data_provider->get([
 					'output' => ['key_', 'type', 'master_itemid', 'hostid'],
 					'hostids' => array_keys($unresolved_masters),
-					'filter' => ['key_' => array_keys($searcheable_keys)]
+					'filter' => ['key_' => array_keys($searcheable_keys)],
+					'preservekeys' => true
 				]);
 
-				foreach ($response as $item) {
+				foreach ($response as $itemid => $item) {
 					$host_key = array_search($item['hostid'], $hostkey_to_hostid);
 					$index = count($host_items[$host_key]);
 					$item[$master_key_identifier]['key'] = $item['key_'];
 					$host_items[$host_key][$index] = $item;
 					$db_indexed_items[$item['hostid']][$item['key_']] = $index;
+					$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
 				}
 
 				$has_unresolved_items = false;
