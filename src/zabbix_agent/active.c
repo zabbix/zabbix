@@ -1100,14 +1100,14 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 	if (NULL == (maxlines_persec = get_rparam(&request, 3)) || '\0' == *maxlines_persec)
 	{
-		if (0 == is_count_item)
-			rate = CONFIG_MAX_LINES_PER_SECOND;	/* log[], logrt[] */
-		else
-			rate = 4 * CONFIG_MAX_LINES_PER_SECOND;	/* log.count[], logrt.count[] */
+		if (0 == is_count_item)				/* log[], logrt[] */
+			rate = CONFIG_MAX_LINES_PER_SECOND;
+		else						/* log.count[], logrt.count[] */
+			rate = MAX_VALUE_LINES_MULTIPLIER * CONFIG_MAX_LINES_PER_SECOND;
 	}
 	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) ||
 			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
-			(1 == is_count_item && 4 * MAX_VALUE_LINES < rate))
+			(1 == is_count_item && MAX_VALUE_LINES_MULTIPLIER * MAX_VALUE_LINES < rate))
 	{
 		*error = zbx_strdup(*error, "Invalid fourth parameter.");
 		goto out;
@@ -1151,7 +1151,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	/* do not flood local system if file grows too fast */
 	if (0 == is_count_item)
 	{
-		p_count = 4 * s_count;				/* log[], logrt[] */
+		p_count = MAX_VALUE_LINES_MULTIPLIER * s_count;	/* log[], logrt[] */
 	}
 	else
 	{
@@ -1541,7 +1541,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 					break;
 
 				/* do not flood local system if file grows too fast */
-				if (p_count >= (4 * rate * metric->refresh))
+				if (p_count >= (MAX_VALUE_LINES_MULTIPLIER * rate * metric->refresh))
 					break;
 
 			}	/* while processing an eventlog */
@@ -1685,7 +1685,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 				break;
 
 			/* do not flood local system if file grows too fast */
-			if (p_count >= (4 * rate * metric->refresh))
+			if (p_count >= (MAX_VALUE_LINES_MULTIPLIER * rate * metric->refresh))
 				break;
 		} /* while processing an eventlog */
 	}
