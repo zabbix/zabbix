@@ -902,7 +902,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// item
-	if ($item) {
+	if (array_key_exists('itemid', $item)) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
@@ -1117,7 +1117,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if ($data['limited'] || ($item && $data['parent_discoveryid'] === null
+	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] === null
 			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
 		if ($data['valuemapid'] != 0) {
 			$valuemaps = API::ValueMap()->get([

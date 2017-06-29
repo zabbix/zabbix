@@ -1112,7 +1112,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		]);
 		$item = [];
 		$host = $hosts[0];
-		if ($host && hasRequest('master_itemid')) {
+		if ($host && getRequest('master_itemid')) {
 			$item['masterItem'] = API::Item()->get([
 				'itemids' => getRequest('master_itemid'),
 				'output' => ['name', 'key_'],
