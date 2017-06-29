@@ -681,17 +681,17 @@ function overlayDialogueOnLoad(focus) {
 	// Focus element with lowest tabindex attribute.
 	if (focus) {
 		var focusable = jQuery(':focusable', jQuery('#overlay_dialogue')),
-			min_tabinxed = null;
+			min_tabindex = null;
 
 		focusable.attr('tabindex', function(a, b) {
 			if (typeof b !== 'undefined') {
-				min_tabinxed = (typeof min_tabinxed === 'number') ? Math.min(min_tabinxed, +b) : +b;
+				min_tabindex = (typeof min_tabindex === 'number') ? Math.min(min_tabindex, +b) : +b;
 			}
 		});
 
-		if (min_tabinxed !== null) {
+		if (min_tabindex !== null) {
 			focusable.filter(function() {
-				return jQuery(this).attr('tabindex') == min_tabinxed;
+				return jQuery(this).attr('tabindex') == min_tabindex;
 			}).first().focus();
 		}
 	}
