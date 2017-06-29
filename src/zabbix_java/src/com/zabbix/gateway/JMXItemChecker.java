@@ -160,18 +160,10 @@ class JMXItemChecker extends ItemChecker
 			int mode = DISCOVERY_MODE_ATTRIBUTES;
 			if (0 != argumentCount)
 			{
-				switch (item.getArgument(1))
-				{
-					case "beans":
-						mode = DISCOVERY_MODE_BEANS;
-						break;
-
-					case "attributes":
-						break;
-
-					default:
-						throw new ZabbixException("invalid discovery mode: " + item.getArgument(1));
-				}
+				if (item.getArgument(1).equals("beans"))
+					mode = DISCOVERY_MODE_BEANS;
+				else if (!item.getArgument(1).equals("attributes"))
+					throw new ZabbixException("invalid discovery mode: " + item.getArgument(1));
 			}
 
 			for (ObjectName name : mbsc.queryNames(filter, null))
