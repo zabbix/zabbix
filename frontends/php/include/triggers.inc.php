@@ -111,7 +111,7 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  *
  * @return CCol
  */
-function getSeverityCell($severity, $config, $text = null, $forceNormal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $forceNormal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}

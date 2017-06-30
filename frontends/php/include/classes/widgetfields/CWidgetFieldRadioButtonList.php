@@ -22,11 +22,11 @@ class CWidgetFieldRadioButtonList extends CWidgetField
 {
 	private $values;
 	private $modern = false;
-	
-	public function __construct($name, $label, $values, $default = null, $action = null,
-		$save_type = ZBX_WIDGET_FIELD_TYPE_INT32) {
+
+	public function __construct($name, $label, $values, $default = null, $action = null) {
 		parent::__construct($name, $label, $default, $action);
-		$this->setSaveType($save_type);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 		$this->values = $values;
 	}
 
@@ -41,11 +41,8 @@ class CWidgetFieldRadioButtonList extends CWidgetField
 	}
 
 	public function setValue($value) {
-		if ($value === null) {
-			parent::setValue($value);
-		} elseif (array_key_exists($value, $this->values)) {
-			parent::setValue($value);
-		}
+		parent::setValue($value);
+
 		return $this;
 	}
 

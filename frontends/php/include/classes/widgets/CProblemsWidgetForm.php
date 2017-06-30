@@ -28,6 +28,20 @@ class CProblemsWidgetForm extends CWidgetForm
 	{
 		parent::__construct($data);
 
+		$shows = [
+			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problems'),
+			TRIGGERS_OPTION_IN_PROBLEM => _('Problems'),
+			TRIGGERS_OPTION_ALL => _('History')
+		];
+
+		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), $shows, TRIGGERS_OPTION_IN_PROBLEM))
+			->setModern(true);
+
+		if (array_key_exists('show', $data)) {
+			$field_show->setValue($data['show']);
+		}
+		$this->fields[] = $field_show;
+
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'), []);
 
 		if (array_key_exists('groupids', $data)) {

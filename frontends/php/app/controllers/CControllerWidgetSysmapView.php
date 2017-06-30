@@ -29,16 +29,16 @@ class CControllerWidgetSysmapView extends CController {
 	protected function checkInput() {
 		// TODO VM: delete comment. Removed widgetid, becuase it is no longer used, after introduction of uniqueid.
 		$fields = [
-			'name'			=>	'string',
-			'uniqueid'		=>	'required',
-			'fullscreen'	=>	'in 0,1',
-			'fields'		=>	'array'
+			'name'			=> 'string',
+			'uniqueid'		=> 'required',
+			'fullscreen'	=> 'in 0,1',
+			'fields'		=> 'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$input_fields = getRequest('fields');
+			$input_fields = $this->getRequest('fields');
 
 			$validationRules = [
 				'source_type' => 'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER,

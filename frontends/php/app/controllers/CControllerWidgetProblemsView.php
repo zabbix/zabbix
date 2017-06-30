@@ -30,8 +30,9 @@ class CControllerWidgetProblemsView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>	'string',
-			'fields' =>	'required|array'
+			'name'			=> 'string',
+			'fullscreen'	=> 'in 0,1',
+			'fields'		=> 'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,16 +56,18 @@ class CControllerWidgetProblemsView extends CController {
 	}
 
 	protected function doAction() {
-		$fields = $this->getInput('fields');
+		$fields = $this->getInput('fields') + [
+			'show' => TRIGGERS_OPTION_IN_PROBLEM,
+			'groupids' => [],
+			'hostids' => [],
+			'show_lines' => ZBX_DEFAULT_WIDGET_LINES
+		];
 
-		$filter = [
-			'groupids' => array_key_exists('groupids', $fields) ? getSubGroups((array) $fields['groupids']) : null,
-			'hostids' => array_key_exists('hostids', $fields) ? (array) $fields['hostids'] : null,
+/*		$filter = [
 			'maintenance' => null,
 			'severity' => null,
 			'trigger_name' => '',
 			'extAck' => 0,
-			'limit' => array_key_exists('show_lines', $fields) ? $fields['show_lines'] : ZBX_DEFAULT_WIDGET_LINES
 		];
 
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
@@ -116,13 +119,46 @@ class CControllerWidgetProblemsView extends CController {
 			$filter['severity'] = zbx_toHash($filter['severity']);
 			$filter['trigger_name'] = CProfile::get('web.dashconf.triggers.name', '');
 
-			$config = select_config();
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
+		}*/
+
+		$config = select_config();
+
+		$data = CScreenProblem::getData([
+			'show' => $fields['show'],
+			'groupids' => getSubGroups((array) $fields['groupids']),
+			'hostids' => (array) $fields['hostids'],
+		], $config, true);
+		$data = CScreenProblem::sortData($data, $config, 'clock', ZBX_SORT_DOWN);
+
+		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
+			min($fields['show_lines'], count($data['problems'])),
+			(count($data['problems']) > $config['search_limit']) ? '+' : '',
+			min($config['search_limit'], count($data['problems']))
+		);
+		$data['problems'] = array_slice($data['problems'], 0, $fields['show_lines'], true);
+
+		$data = CScreenProblem::makeData($data, [
+			'show' => $fields['show'],
+			'details' => 0
+		], $config, true);
+
+		if ($data['problems']) {
+			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PROBLEMS]),
-			'filter' => $filter,
+			'fields' => [
+				'show' => $fields['show']
+			],
+			'config' => [
+				'event_ack_enable' => $config['event_ack_enable']
+			],
+			'data' => $data,
+			'info' => $info,
+//			'filter' => $filter,
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
