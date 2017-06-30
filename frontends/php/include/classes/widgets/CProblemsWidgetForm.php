@@ -56,6 +56,26 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_hosts;
 
+		$sort_types = [
+			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_SEVERITY_ASC => _('Severity').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_NAME_DESC => _('Problem').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_NAME_ASC => _('Problem').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_HOST_NAME_DESC => _('Host').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host').' ('._('ascending').')'
+		];
+
+		$field_sort = new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types,
+			SCREEN_SORT_TRIGGERS_TIME_DESC, null, ZBX_WIDGET_FIELD_TYPE_INT32
+		);
+
+		if (array_key_exists('sort_triggers', $data)) {
+			$field_sort->setValue($data['sort_triggers']);
+		}
+		$this->fields[] = $field_sort;
+
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_DEFAULT_WIDGET_LINES,
 			ZBX_MIN_WIDGET_LINES, ZBX_MAX_WIDGET_LINES
 		))

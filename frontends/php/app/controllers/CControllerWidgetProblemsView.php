@@ -38,9 +38,10 @@ class CControllerWidgetProblemsView extends CController {
 		$ret = $this->validateInput($fields);
 		/*
 		 * @var array        $fields
-		 * @var array|string $fields['groupids']    (optional)
-		 * @var array|string $fields['hostids']     (optional)
-		 * @var int          $fields['show_lines']  (optional) BETWEEN 1,100
+		 * @var array|string $fields['groupids']       (optional)
+		 * @var array|string $fields['hostids']        (optional)
+		 * @var int          $fields['sort_triggers']  (optional)
+		 * @var int          $fields['show_lines']     (optional) BETWEEN 1,100
 		 */
 
 		if (!$ret) {
@@ -60,6 +61,7 @@ class CControllerWidgetProblemsView extends CController {
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'groupids' => [],
 			'hostids' => [],
+			'sort_triggers' => SCREEN_SORT_TRIGGERS_TIME_DESC,
 			'show_lines' => ZBX_DEFAULT_WIDGET_LINES
 		];
 
@@ -129,7 +131,8 @@ class CControllerWidgetProblemsView extends CController {
 			'groupids' => getSubGroups((array) $fields['groupids']),
 			'hostids' => (array) $fields['hostids'],
 		], $config, true);
-		$data = CScreenProblem::sortData($data, $config, 'clock', ZBX_SORT_DOWN);
+		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
+		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
 
 		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
 			min($fields['show_lines'], count($data['problems'])),
@@ -158,10 +161,51 @@ class CControllerWidgetProblemsView extends CController {
 			'data' => $data,
 			'info' => $info,
 //			'filter' => $filter,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
+	}
+
+	/**
+	 * Get sorting.
+	 *
+	 * @param int $sort_triggers
+	 *
+	 * @static
+	 *
+	 * @return array
+	 */
+	private static function getSorting($sort_triggers)
+	{
+		switch ($sort_triggers) {
+			case SCREEN_SORT_TRIGGERS_TIME_ASC:
+				return ['clock', ZBX_SORT_UP];
+
+			case SCREEN_SORT_TRIGGERS_TIME_DESC:
+			default:
+				return ['clock', ZBX_SORT_DOWN];
+
+			case SCREEN_SORT_TRIGGERS_SEVERITY_ASC:
+				return ['priority', ZBX_SORT_UP];
+
+			case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
+				return ['priority', ZBX_SORT_DOWN];
+
+			case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
+				return ['host', ZBX_SORT_UP];
+
+			case SCREEN_SORT_TRIGGERS_HOST_NAME_DESC:
+				return ['host', ZBX_SORT_DOWN];
+
+			case SCREEN_SORT_TRIGGERS_NAME_ASC:
+				return ['problem', ZBX_SORT_UP];
+
+			case SCREEN_SORT_TRIGGERS_NAME_DESC:
+				return ['problem', ZBX_SORT_DOWN];
+		}
 	}
 }

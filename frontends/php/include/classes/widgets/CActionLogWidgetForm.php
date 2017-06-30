@@ -29,14 +29,14 @@ class CActionLogWidgetForm extends CWidgetForm
 		parent::__construct($data);
 
 		$sort_types = [
-			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
-			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
+			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient').' ('._('ascending').')'
 		];
 
 		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types,

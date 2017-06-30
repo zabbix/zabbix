@@ -37,7 +37,7 @@ class CControllerWidgetActionLogView extends CController
 		 * @var array $fields
 		 * @var int   $fields['sort_triggers']
 		 * @var int   $fields['show_lines']
-		*/
+		 */
 
 		if (!$ret) {
 			// TODO VM: prepare propper response for case of incorrect fields
@@ -57,7 +57,7 @@ class CControllerWidgetActionLogView extends CController
 		];
 
 		$data += $this->getInput('fields');
-		list($sortfield, $sortorder) = $this->getSorting($data['sort_triggers']);
+		list($sortfield, $sortorder) = self::getSorting($data['sort_triggers']);
 		$alerts = $this->getAlerts($sortfield, $sortorder, $data['show_lines']);
 		$db_users = $this->getDbUsers($alerts);
 
@@ -153,53 +153,37 @@ class CControllerWidgetActionLogView extends CController
 	 *
 	 * @param int $sort_triggers
 	 *
+	 * @static
+	 *
 	 * @return array
 	 */
-	private function getSorting($sort_triggers)
+	private static function getSorting($sort_triggers)
 	{
 		switch ($sort_triggers) {
 			case SCREEN_SORT_TRIGGERS_TIME_ASC:
-				$sortfield = 'clock';
-				$sortorder = ZBX_SORT_UP;
-				break;
+				return ['clock', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_TIME_DESC:
 			default:
-				$sortfield = 'clock';
-				$sortorder = ZBX_SORT_DOWN;
-				break;
+				return ['clock', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
-				$sortfield = 'description';
-				$sortorder = ZBX_SORT_UP;
-				break;
+				return ['description', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
-				$sortfield = 'description';
-				$sortorder = ZBX_SORT_DOWN;
-				break;
+				return ['description', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_STATUS_ASC:
-				$sortfield = 'status';
-				$sortorder = ZBX_SORT_UP;
-				break;
+				return ['status', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_STATUS_DESC:
-				$sortfield = 'status';
-				$sortorder = ZBX_SORT_DOWN;
-				break;
+				return ['status', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_ASC:
-				$sortfield = 'sendto';
-				$sortorder = ZBX_SORT_UP;
-				break;
+				return ['sendto', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_DESC:
-				$sortfield = 'sendto';
-				$sortorder = ZBX_SORT_DOWN;
-				break;
+				return ['sendto', ZBX_SORT_DOWN];
 		}
-
-		return [$sortfield, $sortorder];
 	}
 }

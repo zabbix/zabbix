@@ -19,6 +19,10 @@
 **/
 
 
+// indicator of sort field
+$sort_div = (new CSpan())
+	->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
+
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view');
 if ($data['fullscreen'] == 1) {
@@ -36,15 +40,17 @@ if ($data['fullscreen'] == 1) {
 $show_timeline = true;
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
 
+$header_time = new CColHeader(($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'));
+
 if ($show_timeline) {
 	$header = [
-		(new CColHeader(_('Time')))->addClass(ZBX_STYLE_RIGHT),
+		$header_time->addClass(ZBX_STYLE_RIGHT),
 		(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH),
 		(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH)
 	];
 }
 else {
-	$header = [(new CColHeader(_('Time')))];
+	$header = [$header_time];
 }
 
 $table = (new CTableInfo())
@@ -52,8 +58,12 @@ $table = (new CTableInfo())
 		$show_recovery_data ? _('Recovery time') : null,
 		$show_recovery_data ? _('Status') : null,
 		_('Info'),
-		_('Host'),
-		_('Problem'),
+		($data['sortfield'] === 'host') ? [_('Host'), $sort_div] : _('Host'),
+		[
+			($data['sortfield'] === 'problem') ? [_('Problem'), $sort_div] : _('Problem'),
+			' &bullet; ',
+			($data['sortfield'] === 'priority') ? [_('Severity'), $sort_div] : _('Severity')
+		],
 		_('Duration'),
 		$data['config']['event_ack_enable'] ? _('Ack') : null,
 		_('Actions')
