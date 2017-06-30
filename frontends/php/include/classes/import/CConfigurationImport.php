@@ -672,11 +672,6 @@ class CConfigurationImport {
 		}
 
 		$xml_itemkey = 'master_item';
-		// For existing items, references should be initialized before dependent items sequence tree is built. Sequences
-		// tree building will add non existing master item and store their reference in resolver therefore first call
-		// to $this->referencer->resolveValueMap will not initialize itemsRefs array for items already existing
-		// in database.
-		$this->referencer->initItemsReferences();
 		$order_tree = $this->getItemsOrder($xml_itemkey);
 		$items_to_create = [];
 		$items_to_update = [];
@@ -2424,6 +2419,13 @@ class CConfigurationImport {
 					'preservekeys' => true
 				]);
 
+				if ($response && !$resolved_masters_cache) {
+					// For existing items, 'referencer' should be initialized before 'addItemRef' method will be used.
+					// Registering reference when property 'itemRefs' is empty, will not allow first call of
+					// 'resolveValueMap' method update references to existing items.
+					$this->referencer->initItemsReferences();
+				}
+
 				foreach ($response as $itemid => $item) {
 					$host_key = array_search($item['hostid'], $hostkey_to_hostid);
 					$item_key = $item['key_'];
@@ -2437,6 +2439,7 @@ class CConfigurationImport {
 				}
 
 				if ($searchable_keys) {
+					reset($searchable_keys);
 					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', $master_key_identifier,
 						_s('value "%1$s" not found', key($searchable_keys))
 					));
