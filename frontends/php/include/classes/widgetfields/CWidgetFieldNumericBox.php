@@ -22,8 +22,8 @@
 /**
  * Widget Field for numeric box
  */
-class CWidgetFieldNumericBox extends CWidgetField
-{
+class CWidgetFieldNumericBox extends CWidgetField {
+
 	/**
 	 * Allowed min value
 	 *

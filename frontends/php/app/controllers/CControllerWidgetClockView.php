@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
-
 class CControllerWidgetClockView extends CController {
 
 	protected function init() {

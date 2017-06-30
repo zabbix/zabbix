@@ -22,8 +22,8 @@
 /**
  * Action log widget form
  */
-class CDataOverviewWidgetForm extends CWidgetForm
-{
+class CDataOverviewWidgetForm extends CWidgetForm {
+
 	public function __construct($data)
 	{
 		parent::__construct($data);

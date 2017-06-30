@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldComboBox extends CWidgetField
-{
+class CWidgetFieldComboBox extends CWidgetField {
+
 	protected $values;
 
 	public function __construct($name, $label, $values, $default = null, $action = null, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {

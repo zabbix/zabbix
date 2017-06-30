@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldSelectResource extends CWidgetField
-{
+class CWidgetFieldSelectResource extends CWidgetField {
+
 	protected $srctbl;
 	protected $srcfld1;
 	protected $srcfld2;

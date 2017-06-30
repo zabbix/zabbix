@@ -693,9 +693,9 @@ function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
 				// a little tricky check for attempt to overwrite active trigger (value=1) with
 				// inactive or active trigger with lower priority.
 				if (!array_key_exists('triggerid', $db_item)
-						|| ($db_item['value'] == TRIGGER_VALUE_FALSE && $item['value'] == TRIGGER_VALUE_TRUE)
-						|| (($db_item['value'] == TRIGGER_VALUE_FALSE || $item['value'] == TRIGGER_VALUE_TRUE)
-							&& $db_item['priority'] < $item['priority'])) {
+						|| ($db_item['value'] == TRIGGER_VALUE_FALSE && $db_trigger['value'] == TRIGGER_VALUE_TRUE)
+						|| (($db_item['value'] == TRIGGER_VALUE_FALSE || $db_trigger['value'] == TRIGGER_VALUE_TRUE)
+							&& $db_item['priority'] < $db_trigger['priority'])) {
 					$db_item['triggerid'] = $db_trigger['triggerid'];
 					$db_item['priority'] = $db_trigger['priority'];
 					$db_item['value'] = $db_trigger['value'];
