@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldTextBox extends CWidgetField
-{
+class CWidgetFieldTextBox extends CWidgetField {
+
 	public function __construct($name, $label, $default = null) {
 		parent::__construct($name, $label, $default, null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);

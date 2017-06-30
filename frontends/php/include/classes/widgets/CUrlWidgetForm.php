@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CUrlWidgetForm extends CWidgetForm
-{
+class CUrlWidgetForm extends CWidgetForm {
+
 	public function __construct($data) {
 		parent::__construct($data);
 
