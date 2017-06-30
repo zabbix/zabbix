@@ -71,7 +71,7 @@ class CDashboardWidgetMap extends CDiv {
 			$script_run =
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.
-					'sourceWidgetReference: "'.$reference.'",'.
+					'source_widget_reference: "'.$reference.'",'.
 					'callback: function(widget, data) {'.
 						'if(data[0].mapid !== +data[0].mapid) return;'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
