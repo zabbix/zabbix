@@ -704,7 +704,7 @@ class CConfigurationExportBuilder {
 				'preprocessing' => $item['preprocessing']
 			];
 
-			$master_item = ($item['type'] == ITEM_TYPE_DEPENDENT) ? ['key' => $item['masterItem']['key_']] : [];
+			$master_item = ($item['type'] == ITEM_TYPE_DEPENDENT) ? ['key' => $item['master_item']['key_']] : [];
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);

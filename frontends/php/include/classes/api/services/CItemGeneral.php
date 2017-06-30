@@ -1164,7 +1164,7 @@ abstract class CItemGeneral extends CApiService {
 					'preservekeys' => true
 				]);
 
-				$result = $relation->mapOne($result, $master_items, 'masterItem');
+				$result = $relation->mapOne($result, $master_items, 'master_item');
 			}
 		}
 

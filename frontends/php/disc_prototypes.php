@@ -529,14 +529,14 @@ if (isset($_REQUEST['form'])) {
 		}
 		unset($step);
 	}
-	elseif (hasRequest('master_itemid') && hasRequest('parent_discoveryid')) {
+	elseif (getRequest('master_itemid') && getRequest('parent_discoveryid')) {
 		$discovery_rule = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
 			'itemids' => getRequest('parent_discoveryid'),
 			'editable' => true
 		])[0];
 		if ($discovery_rule) {
-			$itemPrototype['masterItem'] = API::ItemPrototype()->get([
+			$itemPrototype['master_item'] = API::ItemPrototype()->get([
 				'itemids' => getRequest('master_itemid'),
 				'output' => ['name', 'key_'],
 				'filter' => ['hostid' => $discovery_rule['hostid']]

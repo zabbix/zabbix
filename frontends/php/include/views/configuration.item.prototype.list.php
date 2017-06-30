@@ -62,8 +62,8 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		$description[] = (new CLink(CHtml::encode($item['masterItem']['name']),
-			'?form=update&parent_discoveryid='.$data['parent_discoveryid'].'&itemid='.$item['masterItem']['itemid']
+		$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
+			'?form=update&parent_discoveryid='.$data['parent_discoveryid'].'&itemid='.$item['master_item']['itemid']
 		))->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}

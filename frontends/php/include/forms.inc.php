@@ -861,12 +861,12 @@ function getItemFormData(array $item = [], array $options = []) {
 	];
 
 	// Dependent item initialization by master_itemid.
-	if (!hasRequest('form_refresh') && array_key_exists('masterItem', $item)) {
+	if (!hasRequest('form_refresh') && array_key_exists('master_item', $item)) {
 		$data['type'] = ITEM_TYPE_DEPENDENT;
-		$data['master_itemid'] = $item['masterItem']['itemid'];
-		$data['master_itemname'] = $item['masterItem']['name'].NAME_DELIMITER.$item['masterItem']['key_'];
-		// Do not initialize item data if only materItem array was passed.
-		unset($item['masterItem']);
+		$data['master_itemid'] = $item['master_item']['itemid'];
+		$data['master_itemname'] = $item['master_item']['name'].NAME_DELIMITER.$item['master_item']['key_'];
+		// Do not initialize item data if only mater_item array was passed.
+		unset($item['master_item']);
 	}
 
 	// hostid
