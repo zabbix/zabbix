@@ -40,6 +40,7 @@ class CControllerWidgetProblemsView extends CController {
 		 * @var array        $fields
 		 * @var array|string $fields['groupids']       (optional)
 		 * @var array|string $fields['hostids']        (optional)
+		 * @var string       $fields['problem']        (optional)
 		 * @var int          $fields['sort_triggers']  (optional)
 		 * @var int          $fields['show_lines']     (optional) BETWEEN 1,100
 		 */
@@ -61,6 +62,7 @@ class CControllerWidgetProblemsView extends CController {
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'groupids' => [],
 			'hostids' => [],
+			'problem' => '',
 			'sort_triggers' => SCREEN_SORT_TRIGGERS_TIME_DESC,
 			'show_lines' => ZBX_DEFAULT_WIDGET_LINES
 		];
@@ -130,6 +132,7 @@ class CControllerWidgetProblemsView extends CController {
 			'show' => $fields['show'],
 			'groupids' => getSubGroups((array) $fields['groupids']),
 			'hostids' => (array) $fields['hostids'],
+			'problem' => $fields['problem']
 		], $config, true);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);

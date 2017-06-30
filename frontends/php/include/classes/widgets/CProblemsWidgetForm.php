@@ -56,6 +56,13 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_hosts;
 
+		$field_problem = new CWidgetFieldTextBox('problem', _('Problem'), '');
+
+		if (array_key_exists('problem', $data)) {
+			$field_problem->setValue($data['problem']);
+		}
+		$this->fields[] = $field_problem;
+
 		$sort_types = [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
