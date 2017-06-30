@@ -415,7 +415,8 @@
 			'fullscreen': data['options']['fullscreen'],
 			'widgetid': widget['widgetid'],
 			'uniqueid': widget['uniqueid'],
-			'initial_load': widget['initial_load']
+			'initial_load': widget['initial_load'],
+			'edit_mode': data['options']['edit_mode']
 		}
 		widget['initial_load'] = false;
 
