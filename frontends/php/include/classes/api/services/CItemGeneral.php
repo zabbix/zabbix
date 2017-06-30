@@ -1185,6 +1185,11 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($items as $item) {
 			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+				if (array_key_exists('master_itemid', $item) && $item['master_itemid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _('invalid type')
+					));
+				}
 				continue;
 			}
 
