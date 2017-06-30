@@ -4506,18 +4506,17 @@ tr.cursor-move {
 			}
 		}
 
-		.arrow-down, .arrow-right {
-			cursor: pointer;
-			position: absolute;
-			margin: 5px 0 0 -15px;
-		}
-
-		.tree-item:not(.is-parent) .arrow-right,
-		.tree-item:not(.is-parent) .arrow-down {
-			display: none;
-		}
-
 		.tree-item {
+			> .row > .treeview {
+				position: absolute;
+				margin: 2px 0 0 -18px;
+				display: none;
+			}
+
+			&.is-parent > .row > .treeview {
+				display: block;
+			}
+
 			&.selected > .row > .item-name {
 				font-weight: bold;
 			}
@@ -4531,7 +4530,7 @@ tr.cursor-move {
 				> span {
 					text-overflow: ellipsis;
 					overflow: hidden;
-					display: block;
+					display: inline-block;
 					white-space: nowrap;
 					max-width: 20px;
 				}

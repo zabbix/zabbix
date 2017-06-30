@@ -29,6 +29,7 @@ class CControllerWidgetSysmapView extends CController {
 		$fields = [
 			'name'			=>	'string',
 			'uniqueid'		=>	'required|string',
+			'edit_mode'		=>	'in 0,1',
 			'fullscreen'	=>	'in 0,1',
 			'fields'		=>	'array'
 		];
@@ -36,11 +37,11 @@ class CControllerWidgetSysmapView extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$input_fields = getRequest('fields');
+			$input_fields = $this->getInput('fields');
 
 			$validationRules = [
-				'source_type' => 'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER,
-				'previous_maps' =>	'string'
+				'source_type'=> 'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER,
+				'previous_maps'	=>	'string'
 			];
 
 			if (array_key_exists('source_type', $input_fields)) {
@@ -87,6 +88,7 @@ class CControllerWidgetSysmapView extends CController {
 	protected function doAction() {
 		$uniqueid = $this->getInput('uniqueid');
 		$data = $this->getInput('fields');
+		$edit_mode = $this->getInput('edit_mode', 0);
 
 		// Get previous map.
 		$previous_map = null;
@@ -105,8 +107,7 @@ class CControllerWidgetSysmapView extends CController {
 
 		// Get requested map.
 		$options = [
-			'severity_min' => 0,
-			'fullscreen' => getRequest('fullscreen', 0)
+			'fullscreen' => $this->getInput('fullscreen', 0)
 		];
 
 		$sysmapid = array_key_exists('sysmapid', $data) ? [$data['sysmapid']] : [];
@@ -114,14 +115,19 @@ class CControllerWidgetSysmapView extends CController {
 
 		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
 		foreach ($sysmap_data['elements'] as &$element) {
-			$actions = json_decode($element['actions'], true);
-			if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
-				$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
-				$actions['navigatetos']['submap']['widget_uniqueid'] = $uniqueid;
-				unset($actions['gotos']['submap']);
+			if ($edit_mode) {
+				$element['actions'] = json_encode([]);
 			}
+			else {
+				$actions = json_decode($element['actions'], true);
+				if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
+					$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
+					$actions['navigatetos']['submap']['widget_uniqueid'] = $uniqueid;
+					unset($actions['gotos']['submap']);
+				}
 
-			$element['actions'] = json_encode($actions);
+				$element['actions'] = json_encode($actions);
+			}
 		}
 		unset($element);
 

@@ -21,7 +21,10 @@
 $options = [
 	'problems' => $data['problems'],
 	'severity_config' => $data['severity_config'],
-	'uniqueid' => $data['uniqueid']
+	'initial_load' => $data['initial_load'],
+	'uniqueid' => $data['uniqueid'],
+	'navtree_item_selected' => $data['navtree_item_selected'],
+	'navtree_items_opened' => $data['navtree_items_opened']
 ];
 $item = new CNavigationTree($options);
 

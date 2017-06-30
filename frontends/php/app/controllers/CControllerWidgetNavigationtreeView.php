@@ -32,7 +32,9 @@ class CControllerWidgetNavigationtreeView extends CController {
 		$fields = [
 			'name'		=>	'string',
 			'uniqueid'	=>	'required',
-			'fields'	=>	'array'
+			'widgetid'	=>	'int32',
+			'fields'	=>	'array',
+			'initial_load' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -390,7 +392,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 			$data = $this->getInput('fields');
 		}
 
-		// Apply defualt value for data
+		// Apply default value for data
 		foreach ($default as $key => $value) {
 			if (!array_key_exists($key, $data)) {
 				$data[$key] = $value;
@@ -423,14 +425,27 @@ class CControllerWidgetNavigationtreeView extends CController {
 			];
 		}
 
+		$widgetid = $this->getInput('widgetid');
+		$navtree_item_selected = 0;
+		$navtree_items_opened = [];
+		if ($widgetid) {
+			$navtree_items_opened = array_keys(
+				CProfile::findByIDXs('web.dashbrd.navtree-%.toggle', $widgetid, 'idx', true));
+
+			$navtree_item_selected = CProfile::get('web.dashbrd.navtree.item.selected', 0, $widgetid);
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_NAVIGATION_TREE]),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'uniqueid' => getRequest('uniqueid'),
+			'uniqueid' => $this->getInput('uniqueid'),
+			'navtree_item_selected' => $navtree_item_selected,
+			'navtree_items_opened' => $navtree_items_opened,
 			'problems' => $this->getNumberOfProblemsBySysmap($sysmapids),
 			'severity_config' => $severity_config,
+			'initial_load' => $this->getInput('initial_load', 0),
 			'error' => $error
 		]));
 	}

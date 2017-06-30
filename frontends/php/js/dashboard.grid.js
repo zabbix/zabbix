@@ -415,8 +415,8 @@
 			'fullscreen': data['options']['fullscreen'],
 			'widgetid': widget['widgetid'],
 			'uniqueid': widget['uniqueid'],
-			'initial_load': widget['initial_load'],
-			'edit_mode': data['options']['edit_mode']
+			'initial_load': widget['initial_load'] ? 1 : 0,
+			'edit_mode': data['options']['edit_mode'] ? 1 : 0
 		}
 		widget['initial_load'] = false;
 
@@ -799,11 +799,11 @@
 		return ref;
 	}
 
-	function doAction($obj, data, trigger_name) {
-		if (typeof(data['triggers'][trigger_name]) === 'undefined') {
+	function doAction($obj, data, hook_name) {
+		if (typeof(data['triggers'][hook_name]) === 'undefined') {
 			return;
 		}
-		var triggers = data['triggers'][trigger_name];
+		var triggers = data['triggers'][hook_name];
 
 		triggers.sort(function(a,b) {
 			var priority_a = (typeof(a['options']['priority']) !== 'undefined') ? a['options']['priority'] : 10;
@@ -1266,9 +1266,9 @@
 		},
 
 		/**
-		 * Add action, that will be performed on $hook trigger
+		 * Add action, that will be performed on $hook_name trigger
 		 *
-		 * @param string hook  name of trigger, when $function_to_call should be called
+		 * @param string hook_name  name of trigger, when $function_to_call should be called
 		 * @param string function_to_call  name of function in global scope that will be called
 		 * @param array options  any key in options is optional
 		 * @param array options['parameters']  array of parameters with which the function will be called
@@ -1278,23 +1278,23 @@
 		 * @param string options['grid']['data']  should contain '1'. Will add dashboard grid data object.
 		 * @param string options['grid']['obj']  should contain '1'. Will add dashboard grid object ($this).
 		 * @param int options['priority']  order, when it should be called, compared to others. Default = 10
-		 * @param int options['name']  unique name. There can be only one trigger with this name for each hook.
+		 * @param int options['trigger_name']  unique name. There can be only one trigger with this name for each hook.
 		 */
-		addAction: function(hook, function_to_call, options) {
+		addAction: function(hook_name, function_to_call, options) {
 			this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					found = false,
 					trigger_name = null;
 
-				if (typeof(data['triggers'][hook]) === 'undefined') {
-					data['triggers'][hook] = [];
+				if (typeof(data['triggers'][hook_name]) === 'undefined') {
+					data['triggers'][hook_name] = [];
 				}
 
 				// add trigger with each name only once
 				if (typeof(options['trigger_name']) !== 'undefined') {
 					trigger_name = options['trigger_name'];
-					$.each(data['triggers'][hook], function(index, trigger) {
+					$.each(data['triggers'][hook_name], function(index, trigger) {
 						if (trigger['trigger_name'] === trigger_name) {
 							found = true;
 						}
@@ -1302,7 +1302,7 @@
 				}
 
 				if (!found) {
-					data['triggers'][hook].push({
+					data['triggers'][hook_name].push({
 						'trigger_name': trigger_name,
 						'function': function_to_call,
 						'options': options

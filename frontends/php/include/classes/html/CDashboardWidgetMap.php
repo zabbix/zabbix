@@ -59,6 +59,14 @@ class CDashboardWidgetMap extends CDiv {
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
 							'\'refreshWidget\', widget.widgetid);'.
 					'}'.
+				'});'.
+
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart", '.
+					'"zbx_sysmap_widget_trigger", {'.
+						'parameters: ["onEditStart"],'.
+						'grid: {widget: "'.$this->uniqueid.'"'.
+					'},'.
+					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
 				'});';
 		}
 

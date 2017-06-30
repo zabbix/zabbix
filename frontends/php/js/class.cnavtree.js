@@ -28,7 +28,7 @@ if (typeof addPopupValues === 'undefined') {
 }
 
 if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
-	function zbx_widget_navtree_trigger(action ,grid){
+	function zbx_widget_navtree_trigger(action, grid){
 		var $navtree = jQuery('.navtree', grid['widget']['content_body']);
 		$navtree.zbx_navtree(action);
 	}
@@ -426,8 +426,7 @@ jQuery(function($) {
 				$('.root-item>.tree-list')
 					.sortable_tree({
 						max_depth: widget_data['max_depth'],
-						stop: function( event, ui ) {
-							storeUIState();
+						stop: function(event, ui) {
 							setTreeHandlers();
 							shorten_item_names();
 						}
@@ -437,6 +436,7 @@ jQuery(function($) {
 
 			var drawTree = function() {
 				var root = createTreeBranch('root'),
+					widget_data = $this.data('widgetData'),
 					tree_items = getTreeWidgetItems(),
 					tree = buildTree(tree_items, 0);
 
@@ -517,25 +517,6 @@ jQuery(function($) {
 					$(ul).addClass(className);
 				}
 				return ul;
-			};
-
-			var getCookieName = function(key) {
-				var widget_data = getWidgetData();
-				return 'zbx_widget'+widget_data['fields']['reference']+'_'+key;
-			}
-
-			var storeUIState = function() {
-				var opened = [];
-				$('.opened', $this).each(function() {
-					opened.push($(this).data('id'));
-				});
-
-				if (opened.length) {
-					cookie.create(getCookieName('opened_nodes'), opened.join(','));
-				}
-				else {
-					cookie.erase(getCookieName('opened_nodes'));
-				}
 			};
 
 			/*
@@ -649,8 +630,8 @@ jQuery(function($) {
 															.removeClass('closed');
 													}
 
+													shorten_item_names();
 													overlayDialogueDestroy();
-													storeUIState();
 													setTreeHandlers();
 												}
 											}
@@ -680,8 +661,7 @@ jQuery(function($) {
 			 * @returns {object}
 			 */
 			var createTreeItem = function(item, depth, editable) {
-				var opened_nodes = cookie.read(getCookieName('opened_nodes')),
-					widget_data = $this.data('widgetData'),
+				var widget_data = $this.data('widgetData'),
 					ul = createTreeBranch(null),
 					item_clases = 'tree-item',
 					link;
@@ -693,8 +673,7 @@ jQuery(function($) {
 					editable = true;
 				}
 
-				opened_nodes = opened_nodes ? opened_nodes.split(',') : [];
-				if (!editable || opened_nodes.indexOf(item.id.toString()) !== -1) {
+				if (!editable || widget_data['navtree_items_opened'].indexOf(item.id.toString()) !== -1) {
 					item_clases += ' opened';
 				}
 				else {
@@ -727,16 +706,14 @@ jQuery(function($) {
 						})
 						.click(function(e) {
 							var data_to_share = {mapid: $(this).data('mapid')},
-								widget = getWidgetData(),
-								step_in_path = $(this).closest('.tree-item');
+								itemid = $(this).closest('.tree-item').data('id'),
+								widget = getWidgetData();
 
 							$('.selected', $this).removeClass('selected');
-							while ($(step_in_path).length) {
-								$(step_in_path).addClass('selected');
-								step_in_path = $(step_in_path).parent().closest('.tree-item');
-							}
+							$(this).closest('.tree-item').addClass('selected');
 
 							e.preventDefault();
+							updateUserProfile('web.dashbrd.navtree.item.selected', itemid, [widget['widgetid']]);
 							$(".dashbrd-grid-widget-container").dashboardGrid("widgetDataShare", widget, data_to_share);
 						});
 				}
@@ -753,21 +730,35 @@ jQuery(function($) {
 						$('<div>')
 							.addClass('row')
 							.append((isEditMode() && editable) ? $('<div>').addClass('drag-icon') : null)
-							.append(editable ? $('<span>')
-								.addClass((item_clases.indexOf('opened') !== -1) ? 'arrow-right' : 'arrow-down')
+							.append(editable ? $('<button></button>', {'type': 'button'}).addClass('treeview')
+								.append(
+									$('<span></span>').addClass((item_clases.indexOf('opened') !== -1)
+										? 'arrow-right'
+										: 'arrow-down'
+									)
+								)
 								.click(function() {
-									var branch = $(this).closest('[data-id]');
+									var widget_data = getWidgetData(),
+										branch = $(this).closest('[data-id]'),
+										button = $(this),
+										closed_state = '1';
 
 									if (branch.hasClass('opened')) {
-										$(this).addClass('arrow-right').removeClass('arrow-down');
+										$('span', button).addClass('arrow-right').removeClass('arrow-down');
 										branch.removeClass('opened').addClass('closed');
 									}
 									else {
-										$(this).addClass('arrow-down').removeClass('arrow-right');
+										$('span', button).addClass('arrow-down').removeClass('arrow-right');
 										branch.removeClass('closed').addClass('opened');
+										shorten_item_names();
+										closed_state = '0';
 									}
 
-									storeUIState();
+									if (widget_data['widgetid'].length) {
+										updateUserProfile('web.dashbrd.navtree-'+branch.data('id')+'.toggle',
+											closed_state, [widget_data['widgetid']]
+										);
+									}
 								}) : null
 							)
 							.append($(link)
@@ -834,7 +825,7 @@ jQuery(function($) {
 												.removeClass('closed')
 												.addClass('opened');
 
-											storeUIState();
+											shorten_item_names();
 											setTreeHandlers();
 
 											if (typeof old_addPopupValues === 'function') {
@@ -892,11 +883,8 @@ jQuery(function($) {
 			};
 
 			var setTreeHandlers = function() {
-				var opened_nodes = cookie.read(getCookieName('opened_nodes')),
-					widget_data = $this.data('widgetData'),
+				var widget_data = $this.data('widgetData'),
 					tree_list_depth;
-
-				opened_nodes = opened_nodes ? opened_nodes.split(',') : [];
 
 				// Add .is-parent class for branches with sub-items.
 				$('.tree-list', $this).not('.ui-sortable, .root').each(function() {
@@ -911,7 +899,7 @@ jQuery(function($) {
 				// Set which brances are opened and which ones are closed.
 				$('.tree-item[data-id]').not('.root-item').each(function() {
 					var id = $(this).data('id');
-					if (opened_nodes.indexOf(id.toString()) !== -1) {
+					if (widget_data['navtree_items_opened'].indexOf(id.toString()) !== -1) {
 						$(this).addClass('opened').removeClass('closed');
 					}
 					else {
@@ -933,6 +921,7 @@ jQuery(function($) {
 					$('.add-child-btn', $(this)).css('visibility', 'hidden');
 				});
 
+				// Show/hide buttons in deepest levels.
 				$('.tree-list').filter(function() {
 					return widget_data.max_depth > +$(this).data('depth');
 				}).each(function() {
@@ -941,8 +930,15 @@ jQuery(function($) {
 				});
 
 				// Change arrow style.
-				$('.is-parent.opened .arrow-right', $this).removeClass('arrow-right').addClass('arrow-down');
-				$('.is-parent.closed .arrow-down', $this).removeClass('arrow-down').addClass('arrow-right');
+				$('.is-parent', $this).each(function() {
+					var arrow = $('> .row > .treeview > span', $(this));
+					if ($(this).hasClass('opened')) {
+						arrow.removeClass('arrow-right').addClass('arrow-down');
+					}
+					else {
+						$(arrow).removeClass('arrow-down a1').addClass('arrow-right');
+					}
+				});
 			};
 
 			var getWidgetData = function() {
@@ -1150,6 +1146,7 @@ jQuery(function($) {
 						switchToNavigationMode();
 					});
 				},
+				// onResizeEnd trigger method
 				onResizeEnd: function() {
 					shorten_item_names();
 				},
@@ -1161,10 +1158,12 @@ jQuery(function($) {
 						$this.data('widgetData', {
 							uniqueid: options.uniqueid,
 							severity_levels: options.severity_levels || [],
+							navtree_items_opened: options. navtree_items_opened.toString().split(',') || [],
 							problems: options.problems || [],
 							max_depth: options.max_depth || 10,
 							lastId: 0
 						});
+
 						var triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
 							'beforeConfigLoad', 'onResizeEnd'];
 
@@ -1184,6 +1183,38 @@ jQuery(function($) {
 						}
 						else {
 							switchToNavigationMode();
+							if (options.navtree_item_selected) {
+								// Trigger onClick on item left as selected in before.
+								if (options.load_selected) {
+									$('.tree-item[data-id='+options.navtree_item_selected+'] .item-name')
+										.trigger('click');
+								}
+								// Mark item selected before as selected.
+								else {
+									$('.tree-item[data-id='+options.navtree_item_selected+']').addClass('selected');
+								}
+
+								// Open branch if selected item is located in closed branch.
+								if (!$('.tree-item[data-id='+options.navtree_item_selected+']').is(':visible')) {
+									var branch_to_open = $('.tree-item[data-id='+options.navtree_item_selected+']')
+										.closest('.tree-list').not('.root');
+
+									while (branch_to_open.length) {
+										branch_to_open.closest('.tree-item.is-parent')
+											.removeClass('closed')
+											.addClass('opened');
+
+										$('> .row > .treeview > span', branch_to_open.closest('.tree-item.is-parent'))
+											.removeClass('arrow-right')
+											.addClass('arrow-down');
+
+										branch_to_open = branch_to_open.closest('.tree-item.is-parent')
+											.closest('.tree-list').not('.root');
+									}
+								}
+
+								shorten_item_names();
+							}
 						}
 					});
 				}

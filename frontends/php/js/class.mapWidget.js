@@ -17,8 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
+	function zbx_sysmap_widget_trigger(hook_name, grid) {
+		jQuery(".dashbrd-grid-widget-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
+	}
+}
+
 if (typeof(navigateToSubmap) !== typeof(Function)) {
-	function navigateToSubmap(submapid, uniqueid, reset_previous){
+	function navigateToSubmap(submapid, uniqueid, reset_previous) {
 		var widget = jQuery('.dashbrd-grid-widget-container').dashboardGrid('getWidgetsBy', 'uniqueid', uniqueid),
 			reset_previous = reset_previous || false,
 			previous_maps = '';
