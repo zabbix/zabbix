@@ -80,6 +80,8 @@ static void	test_item_preproc_xpath()
 			{"<a>", "", "", FAIL},
 			{"<a/>", "", "", FAIL},
 			{"<a/>", "/a[\"]", "", FAIL},
+			{"<a/>", "1 div 0", "", FAIL},
+			{"<a/>", "-a", "", FAIL},
 			{"<a/>", "/b", "", SUCCEED},
 			{"<a/>", "/a", "<a/>", SUCCEED},
 			{"<a>1</a>", "/a/text()", "1", SUCCEED},

@@ -859,6 +859,7 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 	xmlErrorPtr	pErr;
 	xmlBufferPtr 	xmlBuf;
 	int		ret = FAIL, i;
+	char		buffer[32], *ptr;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -911,8 +912,19 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 			break;
 		case XPATH_NUMBER:
 			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_dsprintf(NULL, ZBX_FS_DBL, xpathObj->floatval));
-			ret = SUCCEED;
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
+
+			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90    */
+			/* so simply check the if the result starts with digit (accounting for -inf) */
+			if (*(ptr = buffer) == '-')
+				ptr++;
+			if (0 != isdigit(*ptr))
+			{
+				zbx_variant_set_str(value, zbx_strdup(NULL, buffer));
+				ret = SUCCEED;
+			}
+			else
+				*errmsg = zbx_dsprintf(*errmsg, "Invalid numeric value");
 			break;
 		default:
 			*errmsg = zbx_dsprintf(*errmsg, "Unknown result");
