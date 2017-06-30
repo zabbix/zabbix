@@ -37,7 +37,7 @@ if ($data['fullscreen'] == 1) {
 	$url_details->setArgument('fullscreen', $data['fullscreen']);
 }
 
-$show_timeline = true;
+$show_timeline = ($data['sortfield'] === 'clock');
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
 
 $header_time = new CColHeader(($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'));
