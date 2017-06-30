@@ -920,6 +920,7 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 				ptr++;
 			if (0 != isdigit(*ptr))
 			{
+				del_zeroes(buffer);
 				zbx_variant_set_str(value, zbx_strdup(NULL, buffer));
 				ret = SUCCEED;
 			}
