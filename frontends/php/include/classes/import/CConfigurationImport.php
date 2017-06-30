@@ -672,6 +672,11 @@ class CConfigurationImport {
 		}
 
 		$xml_itemkey = 'master_item';
+		// For existing items, references should be initialized before dependent items sequence tree is built. Sequences
+		// tree building will add non existing master item and store their reference in resolver therefore first call
+		// to $this->referencer->resolveValueMap will not initialize itemsRefs array for items already existing
+		// in database.
+		$this->referencer->initItemsReferences();
 		$order_tree = $this->getItemsOrder($xml_itemkey);
 		$items_to_create = [];
 		$items_to_update = [];
@@ -869,8 +874,6 @@ class CConfigurationImport {
 			}
 		}
 
-		$xml_itemprototype_key = 'master_item_prototype';
-		$order_tree = $this->getDiscoveryRulesItemsOrder($xml_itemprototype_key);
 		$itemsToCreate = [];
 		$itemsToUpdate = [];
 
@@ -929,6 +932,8 @@ class CConfigurationImport {
 		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
 		$this->referencer->refreshItems();
 
+		$xml_itemprototype_key = 'master_item_prototype';
+		$order_tree = $this->getDiscoveryRulesItemsOrder($xml_itemprototype_key);
 		// process prototypes
 		$prototypes_to_update = [];
 		$prototypes_to_create = [];
@@ -2395,6 +2400,7 @@ class CConfigurationImport {
 		$tree = [];
 		$db_indexed_items = [];
 		$unresolved_masters = [];
+		$resolved_masters_cache = [];
 		$has_unresolved_items = false;
 		$hostkey_to_hostid = array_fill_keys(array_keys($host_items), 0);
 
@@ -2404,26 +2410,36 @@ class CConfigurationImport {
 
 		do {
 			if ($has_unresolved_items) {
-				$searcheable_keys = [];
+				$searchable_keys = [];
 
-				foreach ($unresolved_masters as $masters) {
-					$searcheable_keys += $masters;
+				foreach ($unresolved_masters as $hostid => $masters) {
+					$searchable_keys += $masters;
 				}
 
 				$response = $data_provider->get([
-					'output' => ['key_', 'type', 'master_itemid', 'hostid'],
+					'output' => ['key_', 'type', 'hostid'],
 					'hostids' => array_keys($unresolved_masters),
-					'filter' => ['key_' => array_keys($searcheable_keys)],
+					'filter' => ['key_' => array_keys($searchable_keys)],
+					'selectMasterItem' => ['key_'],
 					'preservekeys' => true
 				]);
 
 				foreach ($response as $itemid => $item) {
 					$host_key = array_search($item['hostid'], $hostkey_to_hostid);
-					$index = count($host_items[$host_key]);
-					$item[$master_key_identifier]['key'] = $item['key_'];
-					$host_items[$host_key][$index] = $item;
-					$db_indexed_items[$item['hostid']][$item['key_']] = $index;
-					$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
+					$item_key = $item['key_'];
+					$item['key'] = $item_key;
+					$item[$master_key_identifier]['key'] = ($item['type'] == ITEM_TYPE_DEPENDENT)
+						? $item['master_item']['key_']
+						: '';
+					$resolved_masters_cache[$host_key][$item_key] = $item;
+					$this->referencer->addItemRef($item['hostid'], $item_key, $itemid);
+					unset($searchable_keys[$item_key]);
+				}
+
+				if ($searchable_keys) {
+					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', $master_key_identifier,
+						_s('value "%1$s" not found', key($searchable_keys))
+					));
 				}
 
 				$has_unresolved_items = false;
@@ -2435,8 +2451,8 @@ class CConfigurationImport {
 				$host_items_tree = [];
 
 				if (!array_key_exists($hostid, $db_indexed_items)) {
-					foreach ($items as $index => $item) {
-						$indexed_items[$item['key_']] = $index;
+					foreach ($items as $item_key => $item) {
+						$indexed_items[$item['key_']] = $item_key;
 					}
 					$db_indexed_items[$hostid] = $indexed_items;
 				}
@@ -2444,7 +2460,7 @@ class CConfigurationImport {
 
 				// Find nesting level for every host item.
 				foreach ($items as $index => $item) {
-					$level = array_key_exists($index, $host_items_tree) ? $host_items_tree[$index] : 0;
+					$level = 0;
 
 					// Traverse up searching master root item for current item.
 					// If master item data should be requested by data_provider add master itemid for bulk requests.
@@ -2460,16 +2476,21 @@ class CConfigurationImport {
 							}
 							$level++;
 						}
+						elseif (array_key_exists($host_key, $resolved_masters_cache)
+								&& array_key_exists($master_key, $resolved_masters_cache[$host_key])) {
+							$item = $resolved_masters_cache[$host_key][$master_key];
+							if ($item[$master_key_identifier] && $master_key == $item[$master_key_identifier]['key']) {
+								throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+									_('master_itemid and itemid should not match')
+								));
+							}
+							$level++;
+						}
 						else {
 							$unresolved_masters[$hostid][$master_key] = true;
 							$has_unresolved_items = true;
 							break;
 						}
-					}
-					if (array_key_exists($index, $host_items_tree) && $host_items_tree[$index] == $level) {
-						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('value not found')
-						));
 					}
 					$host_items_tree[$index] = $level;
 					// TODO: break if $unresolved_masters greater than 50/100/etc
