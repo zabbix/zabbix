@@ -76,6 +76,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 ........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
 ..F....... [ZBX-12305] fixed incorrectly escaped IT Service parent name (Ivo)
 ..F....... [ZBX-11812] fixed sorting of host interfaces (miks)
@@ -507,6 +508,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 ........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
 ..F....... [ZBX-12305] fixed incorrectly escaped IT Service parent name (Ivo)
 ..F....... [ZBX-11812] fixed sorting of host interfaces (miks)
@@ -2199,6 +2201,7 @@ Changes for 2.2.19rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 A......... [ZBX-12023] fixed permission issue with event.get method (Sasha)
 .......PS. [ZBX-12046] fixed handling of database failure during ID selection (vso)
 ..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)
