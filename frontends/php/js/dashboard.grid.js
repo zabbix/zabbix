@@ -413,13 +413,15 @@
 
 		ajax_data = {
 			'fullscreen': data['options']['fullscreen'],
-			'widgetid': widget['widgetid'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0
 		}
 		widget['initial_load'] = false;
 
+		if (widget['widgetid'] !== '') {
+			ajax_data['widgetid'] = widget['widgetid'];
+		}
 		if (widget['header'] !== '') {
 			ajax_data['name'] = widget['header'];
 		}

@@ -32,7 +32,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 		$fields = [
 			'name'		=>	'string',
 			'uniqueid'	=>	'required',
-			'widgetid'	=>	'int32',
+			'widgetid'	=>	'db widget.widgetid',
 			'fields'	=>	'array',
 			'initial_load' => 'in 0,1'
 		];
@@ -385,7 +385,9 @@ class CControllerWidgetNavigationtreeView extends CController {
 		$data = [];
 
 		// Default values
-		$default = [];
+		$default = [
+			'widgetid' => 0
+		];
 
 		if ($this->hasInput('fields')) {
 			// Use configured data, if possible
@@ -425,7 +427,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 			];
 		}
 
-		$widgetid = $this->getInput('widgetid');
+		$widgetid = $this->getInput('widgetid', 0);
 		$navtree_item_selected = 0;
 		$navtree_items_opened = [];
 		if ($widgetid) {
