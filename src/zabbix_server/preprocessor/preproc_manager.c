@@ -801,7 +801,6 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	worker->queue_item = NULL;
 	zbx_variant_clear(&value);
 	zbx_free(history_value);
-	zbx_free(error);
 
 	preprocessor_assign_tasks(manager);
 	preprocessing_flush_queue(manager);
