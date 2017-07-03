@@ -53,7 +53,17 @@ class CControllerDashbrdWidgetConfig extends CController {
 		$type = $this->getInput('type', WIDGET_CLOCK);
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', []));
 
+		$config = select_config();
+
 		$this->setResponse(new CControllerResponseData([
+			'config' => [
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],

@@ -168,6 +168,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['age']                   (optional) usable together with 'age_state' and only for
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
 	 * @param int    $filter['severity']              (optional)
+	 * @param int    $filter['severities']            (optional)
 	 * @param int    $filter['unacknowledged']        (optional)
 	 * @param array  $filter['tags']                  (optional)
 	 * @param string $filter['tags'][]['tag']
@@ -268,6 +269,14 @@ class CScreenProblem extends CScreenBase {
 			}
 			if (array_key_exists('severity', $filter) && $filter['severity'] != TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 				$options['severities'] = range($filter['severity'], TRIGGER_SEVERITY_COUNT - 1);
+			}
+			if (array_key_exists('severities', $filter)) {
+				$filter_severities = implode(',', $filter['severities']);
+				$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
+
+				if ($filter_severities !== '' && $filter_severities !== $all_severities) {
+					$options['severities'] = $filter['severities'];
+				}
 			}
 			if (array_key_exists('unacknowledged', $filter) && $filter['unacknowledged']
 					&& $config['event_ack_enable']) {

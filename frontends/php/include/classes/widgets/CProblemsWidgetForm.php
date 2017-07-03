@@ -63,6 +63,13 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_problem;
 
+		$field_severities = new CWidgetFieldSeverities('severities', _('Severity'), []);
+
+		if (array_key_exists('severities', $data)) {
+			$field_severities->setValue($data['severities']);
+		}
+		$this->fields[] = $field_severities;
+
 		$sort_types = [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',

@@ -41,6 +41,7 @@ class CControllerWidgetProblemsView extends CController {
 		 * @var array|string $fields['groupids']       (optional)
 		 * @var array|string $fields['hostids']        (optional)
 		 * @var string       $fields['problem']        (optional)
+		 * @var array        $fields['severities']     (optional)
 		 * @var int          $fields['sort_triggers']  (optional)
 		 * @var int          $fields['show_lines']     (optional) BETWEEN 1,100
 		 */
@@ -63,13 +64,13 @@ class CControllerWidgetProblemsView extends CController {
 			'groupids' => [],
 			'hostids' => [],
 			'problem' => '',
+			'severities' => [],
 			'sort_triggers' => SCREEN_SORT_TRIGGERS_TIME_DESC,
 			'show_lines' => ZBX_DEFAULT_WIDGET_LINES
 		];
 
 /*		$filter = [
 			'maintenance' => null,
-			'severity' => null,
 			'extAck' => 0,
 		];
 
@@ -117,10 +118,6 @@ class CControllerWidgetProblemsView extends CController {
 			$filter['maintenance'] = ($maintenance == 0) ? 0 : null;
 
 			// triggers
-			$severity = CProfile::get('web.dashconf.triggers.severity', null);
-			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
-			$filter['severity'] = zbx_toHash($filter['severity']);
-
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}*/
 
@@ -130,7 +127,8 @@ class CControllerWidgetProblemsView extends CController {
 			'show' => $fields['show'],
 			'groupids' => getSubGroups((array) $fields['groupids']),
 			'hostids' => (array) $fields['hostids'],
-			'problem' => $fields['problem']
+			'problem' => $fields['problem'],
+			'severities' => $fields['severities']
 		], $config, true);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);

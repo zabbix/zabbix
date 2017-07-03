@@ -138,6 +138,19 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		}
 		$form_list->addRow($field->getLabel(), $radio_button_list);
 	}
+	elseif ($field instanceof CWidgetFieldSeverities) {
+		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$severities->addItem(
+				(new CCheckBox('severities[]', $severity))
+					->setLabel(getSeverityName($severity, $data['config']))
+					->setChecked(in_array($severity, $field->getValue(true)))
+			);
+		}
+
+		$form_list->addRow($field->getLabel(), $severities);
+	}
 }
 
 $form->addItem($form_list);
