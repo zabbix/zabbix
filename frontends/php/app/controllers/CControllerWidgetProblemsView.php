@@ -38,13 +38,14 @@ class CControllerWidgetProblemsView extends CController {
 		$ret = $this->validateInput($fields);
 		/*
 		 * @var array        $fields
-		 * @var array|string $fields['groupids']       (optional)
-		 * @var array|string $fields['hostids']        (optional)
-		 * @var string       $fields['problem']        (optional)
-		 * @var array        $fields['severities']     (optional)
-		 * @var int          $fields['maintenance']    (optional)
-		 * @var int          $fields['sort_triggers']  (optional)
-		 * @var int          $fields['show_lines']     (optional) BETWEEN 1,100
+		 * @var array|string $fields['groupids']        (optional)
+		 * @var array|string $fields['hostids']         (optional)
+		 * @var string       $fields['problem']         (optional)
+		 * @var array        $fields['severities']      (optional)
+		 * @var int          $fields['maintenance']     (optional)
+		 * @var int          $fields['unacknowledged']  (optional)
+		 * @var int          $fields['sort_triggers']   (optional)
+		 * @var int          $fields['show_lines']      (optional) BETWEEN 1,100
 		 */
 
 		if (!$ret) {
@@ -67,15 +68,12 @@ class CControllerWidgetProblemsView extends CController {
 			'problem' => '',
 			'severities' => [],
 			'maintenance' => '1',
+			'unacknowledged' => '0',
 			'sort_triggers' => SCREEN_SORT_TRIGGERS_TIME_DESC,
 			'show_lines' => ZBX_DEFAULT_WIDGET_LINES
 		];
 
-/*		$filter = [
-			'extAck' => 0,
-		];
-
-		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
+/*		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
 			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 1) {
 				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
@@ -113,9 +111,6 @@ class CControllerWidgetProblemsView extends CController {
 					$filter['hostids'] = array_diff($hostids_available, $hostids_hidden);
 				}
 			}
-
-			// triggers
-			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}*/
 
 		$config = select_config();
@@ -126,7 +121,8 @@ class CControllerWidgetProblemsView extends CController {
 			'hostids' => (array) $fields['hostids'],
 			'problem' => $fields['problem'],
 			'severities' => $fields['severities'],
-			'maintenance' => $fields['maintenance']
+			'maintenance' => $fields['maintenance'],
+			'unacknowledged' => $fields['unacknowledged']
 		], $config, true);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);

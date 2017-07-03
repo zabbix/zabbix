@@ -70,12 +70,19 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_severities;
 
-		$field_maintenance = new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance'), 1);
+		$field_maintenance = new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance'), '1');
 
 		if (array_key_exists('maintenance', $data)) {
 			$field_maintenance->setValue($data['maintenance']);
 		}
 		$this->fields[] = $field_maintenance;
+
+		$field_unacknowledged = new CWidgetFieldCheckBox('unacknowledged', _('Show unacknowledged only'), '0');
+
+		if (array_key_exists('unacknowledged', $data)) {
+			$field_unacknowledged->setValue($data['unacknowledged']);
+		}
+		$this->fields[] = $field_unacknowledged;
 
 		$sort_types = [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',

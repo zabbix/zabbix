@@ -168,7 +168,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['age']                   (optional) usable together with 'age_state' and only for
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
 	 * @param int    $filter['severity']              (optional)
-	 * @param int    $filter['severities']            (optional)
+	 * @param array  $filter['severities']            (optional)
 	 * @param int    $filter['unacknowledged']        (optional)
 	 * @param array  $filter['tags']                  (optional)
 	 * @param string $filter['tags'][]['tag']
