@@ -857,7 +857,7 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlErrorPtr	pErr;
-	xmlBufferPtr 	xmlBuf;
+	xmlBufferPtr	xmlBuf;
 	int		ret = FAIL, i;
 	char		buffer[32], *ptr;
 
@@ -958,7 +958,7 @@ out:
  ******************************************************************************/
 static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char		*err = NULL;
+	char	*err = NULL;
 
 	if (SUCCEED == item_preproc_xpath_op(value, params, &err))
 		return SUCCEED;
@@ -968,6 +968,7 @@ static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **e
 
 	return FAIL;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_item_preproc                                                 *
