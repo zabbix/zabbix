@@ -251,14 +251,7 @@ static void	zbx_log_init(zbx_log_t *log)
 
 void	init_result(AGENT_RESULT *result)
 {
-	result->type = 0;
-
-	result->ui64 = 0;
-	result->dbl = 0;
-	result->str = NULL;
-	result->text = NULL;
-	result->log = NULL;
-	result->msg = NULL;
+	memset(result, 0, sizeof(AGENT_RESULT));
 }
 
 static void	zbx_log_clean(zbx_log_t *log)

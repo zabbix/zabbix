@@ -693,20 +693,35 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 				SET_DBL_RESULT(request->value.result, value->data.dbl);
 				break;
 			case ITEM_VALUE_TYPE_STR:
+				UNSET_STR_RESULT(request->value.result);
 				SET_STR_RESULT(request->value.result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				zbx_free(value->data.str);
-				request->value.result->log->value = zbx_strdup(NULL, value->data.str);
+				if (ISSET_LOG(request->value.result))
+				{
+					zbx_free(request->value.result->log->value);
+					request->value.result->log->value = value->data.str;
+				}
+				else
+				{
+					zbx_log_t	*log;
+
+					log = zbx_malloc(NULL, sizeof(zbx_log_t));
+					memset(log, 0, sizeof(zbx_log_t));
+					log->value = value->data.str;
+					SET_LOG_RESULT(request->value.result, log);
+				}
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				SET_DBL_RESULT(request->value.result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				zbx_free(request->value.result->text);
-				SET_TEXT_RESULT(request->value.result, zbx_strdup(NULL, value->data.str));
+				UNSET_TEXT_RESULT(request->value.result);
+				SET_TEXT_RESULT(request->value.result, value->data.str);
 				break;
 		}
+
+		zbx_variant_set_none(value);
 	}
 	else
 	{
