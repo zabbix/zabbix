@@ -83,7 +83,8 @@ class CControllerWidgetNavigationtreeView extends CController {
 			}
 
 			// Gather maps added as submaps for each of map in any depth.
-			while ($diff = array_diff($submaps_found, array_keys($sysmaps))) {
+			$sysmaps_resolved = array_keys($sysmaps);
+			while ($diff = array_diff($submaps_found, $sysmaps_resolved)) {
 				$submaps = API::Map()->get([
 					'sysmapids' => $diff,
 					'preservekeys' => true,
@@ -91,6 +92,8 @@ class CControllerWidgetNavigationtreeView extends CController {
 					'selectLinks' => ['linktriggers'],
 					'selectSelements' => ['elements', 'elementtype']
 				]);
+
+				$sysmaps_resolved = array_merge($sysmaps_resolved, $diff);
 
 				foreach ($submaps as $submap) {
 					$sysmaps[$submap['sysmapid']] = $submap;
