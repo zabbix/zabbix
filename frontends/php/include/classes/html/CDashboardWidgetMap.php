@@ -30,13 +30,8 @@ class CDashboardWidgetMap extends CDiv {
 	public function __construct(array $sysmap_data, array $widget_settings) {
 		parent::__construct();
 
-		if ($sysmap_data['id'] > 0) {
-			$this->sysmap_data = $sysmap_data;
-		}
-		else {
-			$this->error = true;
-		}
-
+		$this->error = $widget_settings['error'];
+		$this->sysmap_data = $sysmap_data;
 		$this->filter_widget_reference = $widget_settings['filter_widget_reference'];
 		$this->source_type = $widget_settings['source_type'];
 		$this->previous_map = $widget_settings['previous_map'];
@@ -113,7 +108,7 @@ class CDashboardWidgetMap extends CDiv {
 			$this->addItem($map_div);
 		}
 		else {
-			$this->addItem((new CTableInfo())->setNoDataMessage(_('No map selected.')));
+			$this->addItem((new CTableInfo())->setNoDataMessage($this->error));
 			$this->addClass(ZBX_STYLE_DISABLED);
 		}
 	}

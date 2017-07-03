@@ -91,6 +91,7 @@ class CControllerWidgetSysmapView extends CController {
 		$data = $this->getInput('fields');
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$initial_load = $this->getInput('initial_load', 1);
+		$error = null;
 
 		// Get previous map.
 		$previous_map = null;
@@ -114,6 +115,13 @@ class CControllerWidgetSysmapView extends CController {
 
 		$sysmapid = array_key_exists('sysmapid', $data) ? [$data['sysmapid']] : [];
 		$sysmap_data = CMapHelper::get($sysmapid, $options);
+
+		if (!array_key_exists('sysmapid', $data) || !$data['sysmapid']) {
+			$error = _('No map selected.');
+		}
+		elseif ($sysmap_data['id'] < 0) {
+			$error = _('No permissions to selected map or it does not exist.');
+		}
 
 		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
 		foreach ($sysmap_data['elements'] as &$element) {
@@ -149,7 +157,8 @@ class CControllerWidgetSysmapView extends CController {
 					: WIDGET_SYSMAP_SOURCETYPE_MAP,
 				'previous_map' => $previous_map,
 				'initial_load' => $initial_load,
-				'uniqueid' => $uniqueid
+				'uniqueid' => $uniqueid,
+				'error' => $error
 			]
 		]));
 	}
