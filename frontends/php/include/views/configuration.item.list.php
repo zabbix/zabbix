@@ -103,7 +103,7 @@ foreach ($this->data['items'] as $item) {
 			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
 		))
 		->addClass(ZBX_STYLE_LINK_ALT)
-		->addClass(ZBX_STYLE_TIAL);
+		->addClass(ZBX_STYLE_TEAL);
 		$description[] = NAME_DELIMITER;
 	}
 

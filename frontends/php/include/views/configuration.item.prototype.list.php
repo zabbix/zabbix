@@ -66,7 +66,7 @@ foreach ($this->data['items'] as $item) {
 			'?form=update&parent_discoveryid='.$data['parent_discoveryid'].'&itemid='.$item['master_item']['itemid']
 		))
 		->addClass(ZBX_STYLE_LINK_ALT)
-		->addClass(ZBX_STYLE_TIAL);
+		->addClass(ZBX_STYLE_TEAL);
 		$description[] = NAME_DELIMITER;
 	}
 
