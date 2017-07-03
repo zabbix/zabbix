@@ -76,6 +76,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
 ..F....... [ZBX-12305] fixed incorrectly escaped IT Service parent name (Ivo)
 ..F....... [ZBX-11812] fixed sorting of host interfaces (miks)
 ..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
@@ -506,6 +507,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
 ..F....... [ZBX-12305] fixed incorrectly escaped IT Service parent name (Ivo)
 ..F....... [ZBX-11812] fixed sorting of host interfaces (miks)
 ..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
