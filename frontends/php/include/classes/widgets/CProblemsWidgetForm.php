@@ -49,6 +49,13 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_groups;
 
+		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'), []);
+
+		if (array_key_exists('exclude_groupids', $data)) {
+			$field_exclude_groups->setValue($data['exclude_groupids']);
+		}
+		$this->fields[] = $field_exclude_groups;
+
 		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'), []);
 
 		if (array_key_exists('hostids', $data)) {

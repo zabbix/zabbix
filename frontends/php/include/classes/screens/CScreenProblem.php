@@ -151,6 +151,7 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @param array  $filter
 	 * @param array  $filter['groupids']              (optional)
+	 * @param array  $filter['exclude_groupids']      (optional)
 	 * @param array  $filter['hostids']               (optional)
 	 * @param array  $filter['triggerids']            (optional)
 	 * @param array  $filter['inventory']             (optional)
@@ -190,6 +191,35 @@ class CScreenProblem extends CScreenBase {
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
 			? $filter['triggerids']
 			: null;
+
+		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
+			if ($filter_hostids === null) {
+				// get all groups if no selected groups defined
+				if ($filter_groupids === null) {
+					$filter_groupids = array_keys(API::HostGroup()->get([
+						'output' => [],
+						'preservekeys' => true
+					]));
+				}
+
+				$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
+
+				// get available hosts
+				$filter_hostids = array_keys(API::Host()->get([
+					'output' => [],
+					'groupids' => $filter_groupids,
+					'preservekeys' => true
+				]));
+			}
+
+			$exclude_hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => $filter['exclude_groupids'],
+				'preservekeys' => true
+			]));
+
+			$filter_hostids = array_diff($filter_hostids, $exclude_hostids);
+		}
 
 		if (array_key_exists('inventory', $filter) && $filter['inventory']) {
 			$options = [

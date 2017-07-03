@@ -60,11 +60,11 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		// multiselect.js must be preloaded in parent view`
 
 		$field_groupids = (new CMultiSelect([
-			'name' => 'groupids[]',
+			'name' => $field->getName().'[]',
 			'objectName' => 'hostGroup',
-			'data' => $data['captions']['groups'],
+			'data' => $data['captions']['groups'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=groupids_'.
+				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
 					'&srcfld1=groupid&multiselect=1'
 			],
 			'add_post_js' => false
@@ -79,11 +79,12 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		// multiselect.js must be preloaded in parent view`
 
 		$field_hostids = (new CMultiSelect([
-			'name' => 'hostids[]',
+			'name' => $field->getName().'[]',
 			'objectName' => 'hosts',
-			'data' => $data['captions']['hosts'],
+			'data' => $data['captions']['hosts'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1=hostids_&srcfld1=hostid&multiselect=1'
+				'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
+					'&srcfld1=hostid&multiselect=1'
 			],
 			'add_post_js' => false
 		]))
@@ -146,6 +147,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			$severities->addItem(
 				(new CCheckBox('severities[]', $severity))
 					->setLabel(getSeverityName($severity, $data['config']))
+					->setId('severities_'.$severity)
 					->setChecked(in_array($severity, $field->getValue(true)))
 			);
 		}

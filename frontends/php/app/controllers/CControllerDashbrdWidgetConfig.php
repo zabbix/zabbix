@@ -86,10 +86,8 @@ class CControllerDashbrdWidgetConfig extends CController {
 	private function getCaptions($form) {
 		// TODO VM: (?) currently it will have both, numeric and textual keys. Also, ones will come from defines, others will not.
 		//				(maybe it is good to add 'groups' to defines as well? Or maybe it can be improved, not to mix different key types.
-		$captions = [
-			'groups' => [],
-			'hosts' => []
-		];
+		$captions = [];
+
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldSelectResource) {
 				if (!array_key_exists($field->getResourceType(), $captions)) {
@@ -97,16 +95,6 @@ class CControllerDashbrdWidgetConfig extends CController {
 				}
 				if ($field->getValue(true)) {
 					$captions[$field->getResourceType()][$field->getValue(true)] = true;
-				}
-			}
-			if ($field instanceof CWidgetFieldGroup) {
-				foreach ($field->getValue(true) as $groupid) {
-					$captions['groups'][$groupid] = true;
-				}
-			}
-			if ($field instanceof CWidgetFieldHost) {
-				foreach ($field->getValue(true) as $hostid) {
-					$captions['hosts'][$hostid] = true;
 				}
 			}
 		}
@@ -145,38 +133,63 @@ class CControllerDashbrdWidgetConfig extends CController {
 						}
 					}
 					break;
+			}
+		}
 
-				case 'groups':
-					$groups = API::HostGroup()->get([
-						'output' => ['groupid', 'name'],
-						'groupids' => array_keys($list)
-					]);
+		// Prepare data for CMultiselect controls.
+		$groupids = [];
+		$hostids = [];
 
-					$captions['groups'] = [];
+		foreach ($form->getFields() as $field) {
+			if ($field instanceof CWidgetFieldGroup) {
+				$field_name = $field->getName();
+				$captions['groups'][$field_name] = [];
 
-					foreach ($groups as $group) {
-						$captions['groups'][] = [
-							'id' => $group['groupid'],
-							'name' => $group['name']
-						];
-					}
-					break;
+				foreach ($field->getValue(true) as $groupid) {
+					$groupids[$groupid][] = $field_name;
+				}
+			}
+			elseif ($field instanceof CWidgetFieldHost) {
+				$field_name = $field->getName();
+				$captions['hosts'][$field_name] = [];
 
-				case 'hosts':
-					$hosts = API::Host()->get([
-						'output' => ['hostid', 'name'],
-						'hostids' => array_keys($list)
-					]);
+				foreach ($field->getValue(true) as $hostid) {
+					$hostids[$hostid][] = $field_name;
+				}
+			}
+		}
 
-					$captions['hosts'] = [];
+		if ($groupids) {
+			$groups = API::HostGroup()->get([
+				'output' => ['name'],
+				'groupids' => array_keys($groupids),
+				'preservekeys' => true
+			]);
 
-					foreach ($hosts as $host) {
-						$captions['hosts'][] = [
-							'id' => $host['hostid'],
-							'name' => $host['name']
-						];
-					}
-					break;
+			foreach ($groups as $groupid => $group) {
+				foreach ($groupids[$groupid] as $field_name) {
+					$captions['groups'][$field_name][] = [
+						'id' => $groupid,
+						'name' => $group['name']
+					];
+				}
+			}
+		}
+
+		if ($hostids) {
+			$hosts = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => array_keys($hostids),
+				'preservekeys' => true
+			]);
+
+			foreach ($hosts as $hostid => $host) {
+				foreach ($hostids[$hostid] as $field_name) {
+					$captions['hosts'][$field_name][] = [
+						'id' => $hostid,
+						'name' => $host['name']
+					];
+				}
 			}
 		}
 

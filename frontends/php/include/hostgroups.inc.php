@@ -118,11 +118,13 @@ function inheritPermissions($groupid, $name) {
  * @return array
  */
 function getSubGroups(array $groupids, array &$ms_groups = null) {
-	$db_groups = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $groupids,
-		'preservekeys' => true
-	]);
+	$db_groups = $groupids
+		? API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		])
+		: [];
 
 	if ($ms_groups !== null) {
 		$ms_groups = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);

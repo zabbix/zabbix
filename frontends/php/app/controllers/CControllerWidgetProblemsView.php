@@ -38,14 +38,15 @@ class CControllerWidgetProblemsView extends CController {
 		$ret = $this->validateInput($fields);
 		/*
 		 * @var array        $fields
-		 * @var array|string $fields['groupids']        (optional)
-		 * @var array|string $fields['hostids']         (optional)
-		 * @var string       $fields['problem']         (optional)
-		 * @var array        $fields['severities']      (optional)
-		 * @var int          $fields['maintenance']     (optional)
-		 * @var int          $fields['unacknowledged']  (optional)
-		 * @var int          $fields['sort_triggers']   (optional)
-		 * @var int          $fields['show_lines']      (optional) BETWEEN 1,100
+		 * @var array|string $fields['groupids']          (optional)
+		 * @var array|string $fields['exclude_groupids']  (optional)
+		 * @var array|string $fields['hostids']           (optional)
+		 * @var string       $fields['problem']           (optional)
+		 * @var array        $fields['severities']        (optional)
+		 * @var int          $fields['maintenance']       (optional)
+		 * @var int          $fields['unacknowledged']    (optional)
+		 * @var int          $fields['sort_triggers']     (optional)
+		 * @var int          $fields['show_lines']        (optional) BETWEEN 1,100
 		 */
 
 		if (!$ret) {
@@ -64,6 +65,7 @@ class CControllerWidgetProblemsView extends CController {
 		$fields = $this->getInput('fields') + [
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'groupids' => [],
+			'exclude_groupids' => [],
 			'hostids' => [],
 			'problem' => '',
 			'severities' => [],
@@ -73,51 +75,12 @@ class CControllerWidgetProblemsView extends CController {
 			'show_lines' => ZBX_DEFAULT_WIDGET_LINES
 		];
 
-/*		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
-			// groups
-			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 1) {
-				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
-
-				if ($hide_groupids) {
-					// get all groups if no selected groups defined
-					if ($filter['groupids'] === null) {
-						$filter['groupids'] = array_keys(
-							API::HostGroup()->get([
-								'output' => [],
-								'preservekeys' => true
-							])
-						);
-					}
-
-					$filter['groupids'] = array_diff($filter['groupids'], $hide_groupids);
-
-					// get available hosts
-					$hostids_available = array_keys(
-						API::Host()->get([
-							'output' => [],
-							'groupids' => $filter['groupids'],
-							'preservekeys' => true
-						])
-					);
-
-					$hostids_hidden = array_keys(
-						API::Host()->get([
-							'output' => [],
-							'groupids' => $hide_groupids,
-							'preservekeys' => true
-						])
-					);
-
-					$filter['hostids'] = array_diff($hostids_available, $hostids_hidden);
-				}
-			}
-		}*/
-
 		$config = select_config();
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
 			'groupids' => getSubGroups((array) $fields['groupids']),
+			'exclude_groupids' => getSubGroups((array) $fields['exclude_groupids']),
 			'hostids' => (array) $fields['hostids'],
 			'problem' => $fields['problem'],
 			'severities' => $fields['severities'],
@@ -153,7 +116,6 @@ class CControllerWidgetProblemsView extends CController {
 			],
 			'data' => $data,
 			'info' => $info,
-//			'filter' => $filter,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'fullscreen' => $this->getInput('fullscreen', 0),
