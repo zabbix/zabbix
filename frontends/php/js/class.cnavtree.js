@@ -598,6 +598,7 @@ jQuery(function($) {
 													}
 													else {
 														root = $('.tree-item[data-id='+parent+']>ul.tree-list', $this),
+														id = +resp['map_id'];
 														new_item = {
 															name: resp['map_name'],
 															mapid: +resp['map_mapid'],
@@ -612,18 +613,28 @@ jQuery(function($) {
 															.addClass('opened');
 													}
 
-													if (typeof resp.submaps !== 'undefined') {
-														root = $('.tree-item[data-id='+id+']>ul.tree-list', $this)
-														$.each(resp.submaps, function() {
-															var new_item = {
-																name: this['name'],
-																mapid: +this['sysmapid'],
-																id: getNextId(),
-																parent: +id
-															};
+													if (typeof resp.hierarchy !== 'undefined') {
+														var add_child_levels = function(mapid, itemid) {
+															if (typeof resp.hierarchy[mapid] !== 'undefined') {
+																var root = $('.tree-item[data-id='+itemid+']>ul.tree-list', $this);
 
-															root.append(createTreeItem(new_item));
-														});
+																$.each(resp.hierarchy[mapid], function(i, submapid) {
+																	var submap_item = resp.submaps[submapid],
+																		submap_itemid = getNextId(),
+																		new_item = {
+																			name: submap_item['name'],
+																			mapid: +submap_item['sysmapid'],
+																			id: submap_itemid,
+																			parent: +itemid
+																		};
+
+																	root.append(createTreeItem(new_item));
+																	add_child_levels(+submapid, submap_itemid);
+																});
+															}
+														};
+
+														add_child_levels(resp['map_mapid'], id);
 
 														$(root).closest('.tree-item')
 															.addClass('is-parent opened')
