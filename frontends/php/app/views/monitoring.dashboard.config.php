@@ -50,10 +50,11 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
 	}
-	elseif ($field instanceof CWidgetFieldCheckbox) {
-		$form_list->addRow($field->getLabel(),
-			(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
-		);
+	elseif ($field instanceof CWidgetFieldCheckBox) {
+		$form_list->addRow($field->getLabel(), [
+			new CVar($field->getName(), '0'),
+			(new CCheckBox($field->getName(), '1'))->setChecked((bool) $field->getValue(true))
+		]);
 	}
 	elseif ($field instanceof CWidgetFieldGroup) {
 		// multiselect.js must be preloaded in parent view`

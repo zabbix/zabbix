@@ -70,6 +70,13 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_severities;
 
+		$field_maintenance = new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance'), 1);
+
+		if (array_key_exists('maintenance', $data)) {
+			$field_maintenance->setValue($data['maintenance']);
+		}
+		$this->fields[] = $field_maintenance;
+
 		$sort_types = [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
