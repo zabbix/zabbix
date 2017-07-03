@@ -69,7 +69,7 @@ class CDashboardWidgetMap extends CDiv {
 				'});';
 		}
 
-		if ($this->sysmap_data) {
+		if ($this->sysmap_data && $this->error === null) {
 			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
 
 			$script_run .= 'jQuery(document).ready(function(){'.
