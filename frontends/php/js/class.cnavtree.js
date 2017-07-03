@@ -718,9 +718,14 @@ jQuery(function($) {
 						.click(function(e) {
 							var data_to_share = {mapid: $(this).data('mapid')},
 								itemid = $(this).closest('.tree-item').data('id'),
+								step_in_path = $(this).closest('.tree-item');
 								widget = getWidgetData();
 
 							$('.selected', $this).removeClass('selected');
+							while ($(step_in_path).length) {
+								$(step_in_path).addClass('selected');
+								step_in_path = $(step_in_path).parent().closest('.tree-item');
+							}
 							$(this).closest('.tree-item').addClass('selected');
 
 							e.preventDefault();
