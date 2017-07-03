@@ -23,6 +23,7 @@ class CDashboardWidgetMap extends CDiv {
 	private $previous_map;
 	private $sysmap_data;
 	private $source_type;
+	private $initial_load;
 	private $uniqueid;
 	private $error;
 
@@ -39,13 +40,16 @@ class CDashboardWidgetMap extends CDiv {
 		$this->filter_widget_reference = $widget_settings['filter_widget_reference'];
 		$this->source_type = $widget_settings['source_type'];
 		$this->previous_map = $widget_settings['previous_map'];
+		$this->initial_load = $widget_settings['initial_load'];
 		$this->uniqueid = $widget_settings['uniqueid'];
 	}
 
 	public function getScriptRun() {
 		$script_run = '';
 
-		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference) {
+		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
+			&& $this->initial_load
+		) {
 			$script_run =
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.

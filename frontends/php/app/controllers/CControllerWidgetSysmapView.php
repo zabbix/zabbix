@@ -30,6 +30,7 @@ class CControllerWidgetSysmapView extends CController {
 			'name'			=>	'string',
 			'uniqueid'		=>	'required|string',
 			'edit_mode'		=>	'in 0,1',
+			'initial_load'	=>	'in 0,1',
 			'fullscreen'	=>	'in 0,1',
 			'fields'		=>	'array'
 		];
@@ -89,6 +90,7 @@ class CControllerWidgetSysmapView extends CController {
 		$uniqueid = $this->getInput('uniqueid');
 		$data = $this->getInput('fields');
 		$edit_mode = $this->getInput('edit_mode', 0);
+		$initial_load = $this->getInput('initial_load', 1);
 
 		// Get previous map.
 		$previous_map = null;
@@ -146,6 +148,7 @@ class CControllerWidgetSysmapView extends CController {
 					? $data['source_type']
 					: WIDGET_SYSMAP_SOURCETYPE_MAP,
 				'previous_map' => $previous_map,
+				'initial_load' => $initial_load,
 				'uniqueid' => $uniqueid
 			]
 		]));
