@@ -181,7 +181,7 @@ class CMap extends CMapElement {
 			// }
 
 			$result[$sysmap['sysmapid']] = $sysmap;
-			$result[$sysmap['sysmapid']]['have_selements_available'] = false;
+			$result[$sysmap['sysmapid']]['selements_available'] = 0;
 		}
 
 		// If Selements are not required, request only details needed to validate map permissions:
@@ -300,10 +300,13 @@ class CMap extends CMapElement {
 						unset($selement['elementids']);
 						$selement['available'] = $available;
 						if ($available) {
-							$sysmap['have_selements_available'] = true;
+							$sysmap['selements_available'] = 1;
 						}
 					}
 					unset($selement);
+				}
+				else {
+					$sysmap['selements_available'] = -1;
 				}
 			}
 			unset($sysmap);
@@ -321,7 +324,7 @@ class CMap extends CMapElement {
 			if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN
 				&& !$options['nopermissions']) {
 
-				if (!$sysmap['selements'] || !$sysmap['have_selements_available']) {
+				if ($sysmap['selements_available'] == 0) {
 					unset($result[$sysmap_key]);
 					continue;
 				}
@@ -331,7 +334,7 @@ class CMap extends CMapElement {
 				unset($result[$sysmap_key]['selements']);
 			}
 
-			unset($result[$sysmap_key]['have_selements_available']);
+			unset($result[$sysmap_key]['selements_available']);
 		}
 
 		if ($count_output) {
