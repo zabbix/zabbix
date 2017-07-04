@@ -1067,10 +1067,26 @@ class CDashboard extends CApiService {
 		}
 
 		if ($db_widgets) {
-			DB::delete('widget', ['widgetid' => array_keys($db_widgets)]);
+			self::deleteWidgets(array_keys($db_widgets));
 		}
 
 		$this->updateWidgetField($dashboards, $method);
+	}
+
+	/**
+	 * Delete widgets.
+	 *
+	 * @static
+	 *
+	 * @param array  $widgetids
+	 */
+	private static function deleteWidgets(array $widgetids) {
+		DB::delete('profiles', [
+			'idx' => 'web.dashbrd.widget.rf_rate',
+			'idx2' => $widgetids
+		]);
+
+		DB::delete('widget', ['widgetid' => $widgetids]);
 	}
 
 	/**
@@ -1182,8 +1198,6 @@ class CDashboard extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $dashboardids) {
-		// TODO AV: delete refresh rate from all user profiles when deleting widget
-		// TODO AV: delete refresh rate from all user profiles when deleting dashboard
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $dashboardids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1191,10 +1205,13 @@ class CDashboard extends CApiService {
 
 		$db_dashboards = $this->get([
 			'output' => ['dashboardid', 'name'],
+			'selectWidgets' => ['widgetid'],
 			'dashboardids' => $dashboardids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		$widgetids = [];
 
 		foreach ($dashboardids as $dashboardid) {
 			if (!array_key_exists($dashboardid, $db_dashboards)) {
@@ -1202,6 +1219,12 @@ class CDashboard extends CApiService {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
+
+			$widgetids = array_merge($widgetids, zbx_objectValues($db_dashboards[$dashboardid]['widgets'], 'widgetid'));
+		}
+
+		if ($widgetids) {
+			self::deleteWidgets($widgetids);
 		}
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
