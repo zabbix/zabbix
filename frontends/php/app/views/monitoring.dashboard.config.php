@@ -25,24 +25,27 @@ $form = (new CForm('post'))
 	->setName('widget_dialogue_form');
 $js_scripts = [];
 
-$form_list = (new CFormList());
+$form_list = new CFormList();
+
+$known_widget_types = CWidgetConfig::getKnownWidgetTypes();
+natsort($known_widget_types);
 
 // Common fields
 $form_list->addRow(_('Type'),
-	(new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()',
-		CWidgetConfig::getKnownWidgetTypes()))
+	new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $known_widget_types)
 );
 
 $form_list->addRow(_('Name'),
-	(new CTextBox('name', $data['dialogue']['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextBox('name', $data['dialogue']['name']))
 		->setAttribute('placeholder', _('default'))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // Widget specific fields
 foreach ($data['dialogue']['form']->getFields() as $field) {
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow($field->getLabel(),
-			(new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues()))
+			new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues())
 		);
 	}
 	elseif ($field instanceof CWidgetFieldTextBox) {
@@ -100,9 +103,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {
-		$form_list->addRow($field->getLabel(),
-			(new CComboBox($field->getName(), [], $field->getAction(), []))
-		);
+		$form_list->addRow($field->getLabel(), new CComboBox($field->getName(), [], $field->getAction(), []));
 
 		$form->addItem(new CJsScript(get_js($field->getJavascript(), true))); // TODO VM: rewrite to use js_scripts
 	}

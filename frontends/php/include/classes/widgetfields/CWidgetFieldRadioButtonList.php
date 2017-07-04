@@ -22,7 +22,7 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 
 	private $values;
 	private $modern = false;
-	
+
 	public function __construct($name, $label, $values, $default = null, $action = null,
 		$save_type = ZBX_WIDGET_FIELD_TYPE_INT32) {
 		parent::__construct($name, $label, $default, $action);

@@ -61,38 +61,49 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	protected function doAction() {
 		if ($this->dashboard === null) {
 			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
-			$this->setResponse((new CControllerResponseRedirect($url->getUrl())));
+			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;
 		}
 
-		$pageFilter = new CPageFilter([
-			'groups' => [
-				'monitored_hosts' => true,
-				'with_items' => true
-			],
-			'hosts' => [
-				'monitored_hosts' => true,
-				'with_items' => true,
-				'DDFirstLabel' => _('not selected')
-			],
-			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
-			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
-		]);
+		$dashboard = $this->dashboard;
+		unset($dashboard['widgets']);
 
 		$data = [
-			'dashboard' => $this->dashboard,
+			'dashboard' => $dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
-			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
-			'grid_widgets' => $this->getWidgets($this->dashboard['widgets']),
-			'widget_defaults' => CWidgetConfig::getDefaults(),
-			'pageFilter' => $pageFilter,
-			'dynamic' => [
-				'has_dynamic_widgets' => $this->hasDynamicWidgets($this->dashboard['widgets']),
-				'hostid' => $pageFilter->hostid,
-				'groupid' => $pageFilter->groupid
-			]
+			'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
+			'widget_defaults' => CWidgetConfig::getDefaults()
 		];
+
+		if (self::hasDynamicWidgets($data['grid_widgets'])) {
+			$data['pageFilter'] = new CPageFilter([
+				'groups' => [
+					'monitored_hosts' => true,
+					'with_items' => true
+				],
+				'hosts' => [
+					'monitored_hosts' => true,
+					'with_items' => true,
+					'DDFirstLabel' => _('not selected')
+				],
+				'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null,
+				'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null
+			]);
+
+			$data['dynamic'] = [
+				'has_dynamic_widgets' => true,
+				'groupid' => $data['pageFilter']->groupid,
+				'hostid' => $data['pageFilter']->hostid
+			];
+		}
+		else {
+			$data['dynamic'] = [
+				'has_dynamic_widgets' => false,
+				'groupid' => 0,
+				'hostid' => 0
+			];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboard'));
@@ -100,7 +111,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	/**
-	 * Get dashboard data from API
+	 * Get dashboard data from API.
 	 *
 	 * @return array|null
 	 */
@@ -173,7 +184,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	/**
 	 * Get owner datails.
 	 *
-	 * @param int $userid
+	 * @param string $userid
 	 *
 	 * @return array
 	 */
@@ -193,11 +204,13 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	/**
-	 * Get widgets for dashboard
+	 * Get widgets for dashboard.
+	 *
+	 * @static
 	 *
 	 * @return array
 	 */
-	private function getWidgets($widgets) {
+	private static function getWidgets($widgets) {
 		$grid_widgets = [];
 
 		foreach ($widgets as $widget) {
@@ -215,7 +228,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'width' => (int) $widget['width']
 				],
 				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
-				'fields' => $this->convertWidgetFields($widget['fields'])
+				'fields' => self::convertWidgetFields($widget['fields'])
 			];
 		}
 
@@ -223,13 +236,15 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	/**
-	 * Converts fields, received from API to key/value format
+	 * Converts fields, received from API to key/value format.
 	 *
 	 * @param array $fields  fields as received from API
 	 *
+	 * @static
+	 *
 	 * @return array
 	 */
-	private function convertWidgetFields($fields) {
+	private static function convertWidgetFields($fields) {
 		$ret = [];
 		foreach ($fields as $field) {
 			$field_key = CWidgetConfig::getApiFieldKey($field['type']);
@@ -249,17 +264,17 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	/**
 	 * Checks, if any of widgets has checked dynamic field.
 	 *
-	 * @param array $widgets
+	 * @param array $grid_widgets
+	 *
+	 * @static
 	 *
 	 * @return bool
 	 */
-	private function hasDynamicWidgets($widgets) {
-		foreach ($widgets as $widget) {
-			foreach ($widget['fields'] as $field) {
-				// TODO VM: document 'dynamic' as field with special interraction
-				if ($field['name'] === 'dynamic' && $field['value_int'] == 1) {
-					return true;
-				}
+	private static function hasDynamicWidgets($grid_widgets) {
+		foreach ($grid_widgets as $widget) {
+			// TODO VM: document 'dynamic' as field with special interraction
+			if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {
+				return true;
 			}
 		}
 

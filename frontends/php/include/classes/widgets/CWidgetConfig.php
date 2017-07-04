@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CWidgetConfig {
 
 	/**
@@ -57,6 +58,7 @@ class CWidgetConfig {
 	 */
 	private static function getDefaultDimensions()
 	{
+		// TODO AV: review and accept default dimentions
 		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
@@ -194,10 +196,10 @@ class CWidgetConfig {
 				return new CClockWidgetForm($data);
 
 			case WIDGET_NAVIGATION_TREE:
-				return (new CNavigationWidgetForm($data));
+				return new CNavigationWidgetForm($data);
 
 			case WIDGET_SYSMAP:
-				return (new CSysmapWidgetForm($data));
+				return new CSysmapWidgetForm($data);
 
 			case WIDGET_URL:
 				return new CUrlWidgetForm($data);

@@ -56,7 +56,6 @@ class CControllerWidgetUrlView extends CController {
 	}
 
 	protected function doAction() {
-
 		$error = null;
 
 		// Default values
