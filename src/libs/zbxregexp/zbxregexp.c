@@ -642,6 +642,7 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 		int case_sensitive, const char *output_template, char **output)
 {
 	int	i, ret = FAIL;
+	char	*output_accu;		/* accumulator for 'output' when looping over global regexp subexpressions */
 
 	if (NULL == pattern || '\0' == *pattern)
 	{
@@ -657,6 +658,7 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 	}
 
 	pattern++;
+	output_accu = NULL;
 
 	for (i = 0; i < regexps->values_num; i++)	/* loop over global regexp subexpressions */
 	{
@@ -668,8 +670,23 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 		switch (regexp->expression_type)
 		{
 			case EXPRESSION_TYPE_TRUE:
-				ret = regexp_match_ex_regsub(string, regexp->expression, regexp->case_sensitive,
-						output_template, output);
+				if (NULL != output)
+				{
+					char	*output_tmp = NULL;
+
+					if (ZBX_REGEXP_MATCH == (ret = regexp_match_ex_regsub(string,
+							regexp->expression, regexp->case_sensitive, output_template,
+							&output_tmp)))
+					{
+						zbx_free(output_accu);
+						output_accu = output_tmp;
+					}
+				}
+				else
+				{
+					ret = regexp_match_ex_regsub(string, regexp->expression, regexp->case_sensitive,
+							NULL, NULL);
+				}
 				break;
 			case EXPRESSION_TYPE_FALSE:
 				ret = regexp_match_ex_regsub(string, regexp->expression, regexp->case_sensitive,
@@ -695,7 +712,16 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 		}
 
 		if (FAIL == ret || ZBX_REGEXP_NO_MATCH == ret)
+		{
+			zbx_free(output_accu);
 			break;
+		}
+	}
+
+	if (ZBX_REGEXP_MATCH == ret && NULL != output_accu)
+	{
+		*output = output_accu;
+		return ZBX_REGEXP_MATCH;
 	}
 out:
 	if (ZBX_REGEXP_MATCH == ret && NULL != output && NULL == *output)
