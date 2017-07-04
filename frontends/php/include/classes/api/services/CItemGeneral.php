@@ -1246,6 +1246,10 @@ abstract class CItemGeneral extends CApiService {
 				$item_masters = [];
 				$level_item = $item;
 
+				if (array_key_exists('itemid', $item)) {
+					$item_masters[$item['itemid']] = true;
+				}
+
 				// Traversing up to root item, if next parent should be requested from database store it itemid,
 				// missing parents will be requested in bulk request on next $items scan.
 				while ($level_item && $level_item['type'] == ITEM_TYPE_DEPENDENT) {
@@ -1265,8 +1269,8 @@ abstract class CItemGeneral extends CApiService {
 
 					if ($item_masters && array_key_exists($master_itemid, $item_masters)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _s('dependent item "%1$s" is already master of "%2$s"',
-								$master_items_cache[$master_itemid]['name'], $item['name']
+							'master_itemid', _s('"%1$s" is already master item for "%2$s"',
+								$item['name'], $master_items_cache[$item['master_itemid']]['name']
 							)
 						));
 					}
