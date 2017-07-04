@@ -633,9 +633,9 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *               FAIL                - invalid regular expression                 *
  *                                                                                *
  * Comments: For regular expressions and global regular expressions with 'Result  *
- *           is TRUE' type the output_template substitution result is stored into *
- *           output variable. For the other global regular expression types the   *
- *           whole string is stored into output variable.                         *
+ *           is TRUE' type the 'output_template' substitution result is stored    *
+ *           into 'output' variable. For other global regular expression types    *
+ *           the whole string is stored into 'output' variable.                   *
  *                                                                                *
  **********************************************************************************/
 int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
@@ -650,7 +650,7 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 		goto out;
 	}
 
-	if ('@' != *pattern)
+	if ('@' != *pattern)				/* not a global regexp */
 	{
 		ret = regexp_match_ex_regsub(string, pattern, case_sensitive, output_template, output);
 		goto out;
@@ -658,7 +658,7 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 
 	pattern++;
 
-	for (i = 0; i < regexps->values_num; i++)
+	for (i = 0; i < regexps->values_num; i++)	/* loop over global regexp subexpressions */
 	{
 		const zbx_expression_t	*regexp = regexps->values[i];
 
