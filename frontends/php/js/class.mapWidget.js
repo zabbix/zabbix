@@ -53,6 +53,8 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetFieldValue', uniqueid, 'previous_maps',
 				previous_maps);
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', uniqueid);
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget[0],
+				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0});
 			jQuery('.action-menu').fadeOut(100);
 		}
 	}

@@ -23,6 +23,13 @@ class CSysmapWidgetForm extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data);
 
+		// widget reference field
+		$field_reference = (new CWidgetFieldReference())->setRequired(true);
+		if (array_key_exists($field_reference->getName(), $data)) {
+			$field_reference->setValue($data[$field_reference->getName()]);
+		}
+		$this->fields[] = $field_reference;
+
 		// select source type field
 		$source_types = [
 			WIDGET_SYSMAP_SOURCETYPE_MAP => _('Map'),

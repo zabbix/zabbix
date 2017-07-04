@@ -1124,6 +1124,26 @@ jQuery(function($) {
 				});
 			};
 
+			var openBranch = function(id) {
+				if (!$('.tree-item[data-id='+id+']').is(':visible')) {
+					var branch_to_open = $('.tree-item[data-id='+id+']')
+						.closest('.tree-list').not('.root');
+
+					while (branch_to_open.length) {
+						branch_to_open.closest('.tree-item.is-parent')
+							.removeClass('closed')
+							.addClass('opened');
+
+						$('> .row > .treeview > span', branch_to_open.closest('.tree-item.is-parent'))
+							.removeClass('arrow-right')
+							.addClass('arrow-down');
+
+						branch_to_open = branch_to_open.closest('.tree-item.is-parent')
+							.closest('.tree-list').not('.root');
+					}
+				}
+			};
+
 			var switchToNavigationMode = function() {
 				drawTree();
 				parseProblems();
@@ -1191,7 +1211,8 @@ jQuery(function($) {
 							lastId: 0
 						});
 
-						var triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
+						var widget_data = getWidgetData(),
+							triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
 							'beforeConfigLoad', 'onResizeEnd'];
 
 						$.each(triggers, function(index, trigger) {
@@ -1209,6 +1230,53 @@ jQuery(function($) {
 							switchToEditMode();
 						}
 						else {
+							if (!widget_data['initial_load'] && widget_data['fields']['map_widget_reference'].length) {
+								$('.dashbrd-grid-widget-container').dashboardGrid('registerAsSharedDataReceiver', {
+									uniqueid: widget_data['uniqueid'],
+									source_widget_reference: widget_data['fields']['map_widget_reference'],
+									callback: function(widget, data) {
+										var selector = '',
+											mapid_selector = '',
+											previous_mapid_selector = '';
+
+										mapid_selector = '.tree-item[data-mapid='+data[0]['submapid']+']';
+
+										if (data[0]['previous_maps']) {
+											var previous_maps = data[0]['previous_maps'].split(',');
+											previous_maps = previous_maps.length
+												? previous_maps[previous_maps.length-1]
+												: null;
+
+											if (previous_maps && !data[0]['moving_upward']) {
+												previous_mapid_selector = '.tree-item.selected[data-mapid='+previous_maps+'] ';
+											}
+											else if (previous_maps) {
+												previous_mapid_selector = '.tree-item[data-mapid='+previous_maps+'] ';
+											}
+										}
+
+										if (data[0]['moving_upward']) {
+											selector = previous_mapid_selector + ' ' + mapid_selector;
+										}
+										else {
+											selector = previous_mapid_selector + ' ' + mapid_selector+':first';
+										}
+
+										var item = $(selector, $this),
+											step_in_path = $(item).closest('.tree-item');
+
+										$('.selected', $this).removeClass('selected');
+										$(item).addClass('selected');
+
+										while ($(step_in_path).length) {
+											$(step_in_path).addClass('selected');
+											step_in_path = $(step_in_path).parent().closest('.tree-item');
+										}
+										openBranch($(item).data('id'));
+									}
+								});
+							}
+
 							switchToNavigationMode();
 							if (options.navtree_item_selected) {
 								// Trigger onClick on item left as selected in before.
@@ -1221,25 +1289,7 @@ jQuery(function($) {
 									$('.tree-item[data-id='+options.navtree_item_selected+']').addClass('selected');
 								}
 
-								// Open branch if selected item is located in closed branch.
-								if (!$('.tree-item[data-id='+options.navtree_item_selected+']').is(':visible')) {
-									var branch_to_open = $('.tree-item[data-id='+options.navtree_item_selected+']')
-										.closest('.tree-list').not('.root');
-
-									while (branch_to_open.length) {
-										branch_to_open.closest('.tree-item.is-parent')
-											.removeClass('closed')
-											.addClass('opened');
-
-										$('> .row > .treeview > span', branch_to_open.closest('.tree-item.is-parent'))
-											.removeClass('arrow-right')
-											.addClass('arrow-down');
-
-										branch_to_open = branch_to_open.closest('.tree-item.is-parent')
-											.closest('.tree-list').not('.root');
-									}
-								}
-
+								openBranch(options.navtree_item_selected);
 								shorten_item_names();
 							}
 						}
