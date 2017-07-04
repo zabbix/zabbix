@@ -55,9 +55,9 @@
 				'min-width': '' + data['options']['widget-width'] + '%'
 			}
 		})
+			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 			.append(
 				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
-					.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 					.append(widget['content_header'])
 					.append(widget['content_body'])
 					.append(widget['content_footer'])
