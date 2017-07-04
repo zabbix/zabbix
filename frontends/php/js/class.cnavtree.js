@@ -54,6 +54,7 @@ if (typeof(shorten_item_names) !== typeof(Function)) {
 			handle: '.drag-icon',
 			items: '.tree-item',
 			helper:	'clone',
+			revert:	10,
 			opacity: .75,
 			scrollSpeed: 20,
 
@@ -307,9 +308,12 @@ if (typeof(shorten_item_names) !== typeof(Function)) {
 					}
 					uiObj.refreshPositions();
 				}, o.parent_change_delay);
+
+				this._isAllowed(prev_item, level, level+child_levels);
 			}
 			else {
 				$(this.placeholder.parent().closest('.tree-item')).addClass('highliglted-parent');
+				this._isAllowed(prev_item, level, level+child_levels);
 			}
 
 			// Post events to containers
@@ -329,45 +333,63 @@ if (typeof(shorten_item_names) !== typeof(Function)) {
 			if (!event) return;
 
 			$('.highliglted-parent').removeClass('highliglted-parent');
+			this.placeholder.removeClass('sortable-error');
 
 			if (this.changing_parent) {
 				clearTimeout(this.changing_parent);
 			}
 
-			// If we are using droppables, inform the manager about the drop
-			if ($.ui.ddmanager && !this.options.dropBehaviour) {
-				$.ui.ddmanager.drop(this, event);
+			if (this.beyondMaxLevels > 0) {
+				this.reverting = true;
 
-				var parent_id = this.placeholder.parent().closest('.tree-item').data('id'),
-					item_id = $(this.currentItem[0]).data('id');
+				if (this.domPosition.prev) {
+					$(this.domPosition.prev).after(this.placeholder);
+				} else {
+					$(this.domPosition.parent).prepend(this.placeholder);
+				}
 
-				$('[name="map.parent.'+item_id+'"]').val(parent_id);
-			}
-
-			if (this.options.revert) {
-				var self = this;
-				var cur = self.placeholder.offset();
-
-				self.reverting = true;
-
-				$(this.helper).animate({
-					left: cur.left - this.offset.parent.left - self.margins.left
-						+ (this.offsetParent[0] == document.body ? 0 : this.offsetParent[0].scrollLeft),
-					top: cur.top - this.offset.parent.top - self.margins.top
-						+ (this.offsetParent[0] == document.body ? 0 : this.offsetParent[0].scrollTop)
-				}, parseInt(this.options.revert, 10) || 500, function() {
-					self._clear(event);
-				});
+				this._trigger("revert", event, this._uiHash());
+				this.refreshPositions();
+				this._clear(event, noPropagation);
 			}
 			else {
-				this._clear(event, noPropagation);
+				// If we are using droppables, inform the manager about the drop
+				if ($.ui.ddmanager && !this.options.dropBehaviour) {
+					$.ui.ddmanager.drop(this, event);
+
+					var parent_id = this.placeholder.parent().closest('.tree-item').data('id'),
+						item_id = $(this.currentItem[0]).data('id');
+
+					$('[name="map.parent.'+item_id+'"]').val(parent_id);
+				}
+
+				if (this.options.revert) {
+					var self = this,
+						cur = self.placeholder.offset();
+
+					self.reverting = true;
+
+					$(this.helper).animate({
+						left: cur.left - this.offset.parent.left - self.margins.left
+							+ (this.offsetParent[0] == document.body ? 0 : this.offsetParent[0].scrollLeft),
+						top: cur.top - this.offset.parent.top - self.margins.top
+							+ (this.offsetParent[0] == document.body ? 0 : this.offsetParent[0].scrollTop)
+					}, parseInt(this.options.revert, 10) || 500, function() {
+						self._clear(event);
+					});
+				}
+				else {
+					this._clear(event, noPropagation);
+				}
 			}
 
 			return false;
 		},
 
 		_isAllowed: function(parentItem, level, levels) {
-			if (this.options.max_depth < levels && this.options.max_depth != 0) {
+			if (this.options.max_depth != 0 && (this.options.max_depth < levels
+				|| +this.placeholder.closest('[data-depth]').data('depth') > this.options.max_depth)
+			) {
 				this.placeholder.addClass('sortable-error');
 				this.beyondMaxLevels = levels - this.options.max_depth;
 			}
@@ -610,7 +632,7 @@ jQuery(function($) {
 
 														$(root).closest('.tree-item')
 															.removeClass('closed')
-															.addClass('opened');
+															.addClass('opened is-parent');
 													}
 
 													if (typeof resp.hierarchy !== 'undefined') {
@@ -909,17 +931,6 @@ jQuery(function($) {
 					}
 					else {
 						$(this).closest('.tree-item').removeClass('is-parent');
-					}
-				});
-
-				// Set which brances are opened and which ones are closed.
-				$('.tree-item[data-id]').not('.root-item').each(function() {
-					var id = $(this).data('id');
-					if (widget_data['navtree_items_opened'].indexOf(id.toString()) !== -1) {
-						$(this).addClass('opened').removeClass('closed');
-					}
-					else {
-						$(this).addClass('closed').removeClass('opened');
 					}
 				});
 
