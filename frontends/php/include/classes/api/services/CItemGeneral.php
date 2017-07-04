@@ -1172,7 +1172,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate items with type ITEM_TYPE_DEPENDENT
+	 * Validate items with type ITEM_TYPE_DEPENDENT for create or update operation.
 	 *
 	 * @throws APIException
 	 *
@@ -1180,103 +1180,153 @@ abstract class CItemGeneral extends CApiService {
 	 * @param CItem|CItemPrototype	$data_provider	Item data provider.
 	 */
 	public function validateDependentItems($items, $data_provider) {
-		$error = '';
-		$field = '';
+		$updated_items = zbx_toHash($items, 'itemid');
+		$root_items = [];
 
-		foreach ($items as $item) {
-			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-				if (array_key_exists('master_itemid', $item) && $item['master_itemid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('invalid type')
-					));
-				}
-				continue;
+		$master_items_cache = [];
+		$unresolved_master_itemids = [];
+		$has_unresolved_masters = false;
+
+		if ($updated_items) {
+			// Populate updated items in $master_items_cache with updated data.
+			$db_items = $data_provider->get([
+				'output' => ['type', 'name', 'hostid', 'master_itemid'],
+				'itemids' => array_keys($updated_items),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_items as $db_itemid => $db_item) {
+				$master_items_cache[$db_itemid] = $updated_items[$db_itemid] + $db_item;
 			}
+		}
 
-			if (!array_key_exists('master_itemid', $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-					_('cannot be empty')
-				));
-			}
-			if (array_key_exists('itemid', $item) && $item['master_itemid'] == $item['itemid']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-					_('master_itemid and itemid should not match')
-				));
-			}
-
-			$master_items = [];
-			$master_item = $item;
-			$current_level = 0;
-			$master_itemid = $item['master_itemid'];
-			// When item being created it should not exists in master items array, because it can not be parent
-			// for existing items at that moment.
-			if (array_key_exists('itemid', $item)) {
-				$master_items[$item['itemid']] = $item;
-			}
-
-			do {
-				// Validate maximum master items count.
-				if ($current_level > 3) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('maximum master items count reached')
-					));
-				}
-
-				$master_item = $data_provider->get([
+		do {
+			if ($has_unresolved_masters) {
+				$db_masters = $data_provider->get([
 					'output' => ['type', 'name', 'hostid', 'master_itemid'],
-					'itemids' => $master_itemid
+					'itemids' => array_keys($unresolved_master_itemids)
 				]);
 
-				if (!$master_item) {
+				foreach ($db_masters as $db_master) {
+					$master_items_cache[$db_master['itemid']] = $db_master;
+					unset($unresolved_master_itemids[$db_master['itemid']]);
+				}
+
+				if ($unresolved_master_itemids) {
+					reset($unresolved_master_itemids);
+					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+						_s('value "%1$s" not found', key($unresolved_master_itemids))
+					));
+				}
+
+				$has_unresolved_masters = false;
+			}
+
+			foreach ($items as $item) {
+				// TODO: Do not validate already checked items. If traversing up finished succesfully we do not need
+				//		 to calculate and validate item one more time.
+
+				if (array_key_exists('itemid', $item)) {
+					$master_items_cache[$item['itemid']] = $item + $updated_items[$item['itemid']];
+				}
+
+				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+					if (array_key_exists('master_itemid', $item) && $item['master_itemid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('invalid type')
+						));
+					}
+					continue;
+				}
+				else if (!array_key_exists('master_itemid', $item) || !$item['master_itemid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('value not found')
+						'master_itemid', _('cannot be empty')
 					));
 				}
 
-				$master_item = $master_item[0];
-				$master_itemid = ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT)
-					? $master_item['master_itemid']
-					: 0;
-				$master_items[$master_item['itemid']] = $master_item;
+				$dependency_level = 0;
+				$item_masters = [];
+				$level_item = $item;
 
-				if ($master_item['hostid'] != $item['hostid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'hostid',
-						_('item hostid and master hostid should match')
-					));
+				// Traversing up to root item, if next parent should be requested from database store it itemid,
+				// missing parents will be requested in bulk request on next $items scan.
+				while ($level_item && $level_item['type'] == ITEM_TYPE_DEPENDENT) {
+					$master_itemid = $level_item['master_itemid'];
+
+					if (array_key_exists('itemid', $level_item) && $master_itemid == $level_item['itemid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('master_itemid and itemid should not match')
+						));
+					}
+
+					if ($dependency_level > 3) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('maximum master items count reached')
+						));
+					}
+
+					if ($item_masters && array_key_exists($master_itemid, $item_masters)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _s('dependent item "%1$s" is already master of "%2$s"',
+								$master_items_cache[$master_itemid]['name'], $item['name']
+							)
+						));
+					}
+
+					if (array_key_exists($master_itemid, $master_items_cache)) {
+						$level_item = $master_items_cache[$master_itemid];
+						$item_masters[$master_itemid] = true;
+						$dependency_level++;
+					}
+					else {
+						$unresolved_master_itemids[$master_itemid] = true;
+						$has_unresolved_masters = true;
+						break;
+					}
 				}
 
-				// Validate for circular references
-				if (array_key_exists($master_itemid, $master_items)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _s('dependent item "%1$s" is already master of "%2$s"',
-							$master_items[$master_itemid]['name'], $master_item['name']
-						)
-					));
+				// Dependency tree root item is resolved successfully.
+				if ($dependency_level > 0 && $level_item && $level_item['type'] != ITEM_TYPE_DEPENDENT) {
+					$level_itemid = $level_item['itemid'];
+					$root_items[$level_itemid] = true;
+					if (array_key_exists('itemid', $item) &&
+							$item['type'] == ITEM_TYPE_DEPENDENT &&
+							$item['master_itemid'] != $db_items[$item['itemid']]['master_itemid']) {
+						// TODO: Add calculation for moved childrens from one master item to another.
+						//$root_children_moved[$level_item['itemid']] += 1;
+					}
+					elseif (!array_key_exists('itemid', $item)) {
+						$root_children_created[$level_itemid] = array_key_exists($level_itemid, $root_children_created)
+							? $root_children_created[$level_itemid] + 1
+							: 1;
+					}
 				}
+			}
+		} while ($has_unresolved_masters);
 
-				++$current_level;
-			} while ($master_itemid);
+		// Validate every root mater items childrens count.
+		foreach (array_keys($root_items) as $root_itemid) {
+			$total_children = array_key_exists($root_itemid, $root_children_created)
+				? $root_children_created[$root_itemid]
+				: 0;
+			// TODO: Calculate updated items childrens count, if child item having children and is moved from one
+			//		 parent to another, it childrens count should be added to new parent childrens count.
+			$find_itemids = [$root_itemid];
 
-			// Validate children count.
-			if (!$master_item['master_itemid']) {
-				$total_children = 0;
-				$children = [$master_item['itemid']];
+			do {
+				$find_itemids = $data_provider->get([
+					'output' => ['itemid'],
+					'filter' => ['master_itemid' => $find_itemids]
+				]);
+				$find_itemids = zbx_objectValues($find_itemids, 'itemid');
+				$total_children = $total_children + count($find_itemids);
 
-				do {
-					$children = $data_provider->get([
-						'output' => ['itemid'],
-						'filter' => ['master_itemid' => $children]
-					]);
-					$children = zbx_objectValues($children, 'itemid');
-					$total_children = $total_children + count($children);
-				} while ($children);
-
-				if ($total_children > 998) {
+				if ($total_children > 999) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _('maximum dependent items count reached')
 					));
 				}
-			}
+			} while ($find_itemids);
 		}
 	}
 }
