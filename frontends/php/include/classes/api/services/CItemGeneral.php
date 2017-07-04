@@ -1184,11 +1184,11 @@ abstract class CItemGeneral extends CApiService {
 		$root_items = [];
 
 		$master_items_cache = [];
+		$processed_items = [];
 		$unresolved_master_itemids = [];
 		$has_unresolved_masters = false;
 
 		if ($updated_items) {
-			// Populate updated items in $master_items_cache with updated data.
 			$db_items = $data_provider->get([
 				'output' => ['type', 'name', 'hostid', 'master_itemid'],
 				'itemids' => array_keys($updated_items),
@@ -1214,8 +1214,8 @@ abstract class CItemGeneral extends CApiService {
 
 				if ($unresolved_master_itemids) {
 					reset($unresolved_master_itemids);
-					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-						_s('value "%1$s" not found', key($unresolved_master_itemids))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _s('value "%1$s" not found', key($unresolved_master_itemids))
 					));
 				}
 
@@ -1223,11 +1223,9 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			foreach ($items as $item) {
-				// TODO: Do not validate already checked items. If traversing up finished succesfully we do not need
-				//		 to calculate and validate item one more time.
-
-				if (array_key_exists('itemid', $item)) {
-					$master_items_cache[$item['itemid']] = $item + $updated_items[$item['itemid']];
+				if (array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $processed_items)) {
+					// Do not validate already checked items.
+					continue;
 				}
 
 				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
@@ -1300,6 +1298,7 @@ abstract class CItemGeneral extends CApiService {
 							? $root_children_created[$level_itemid] + 1
 							: 1;
 					}
+					$processed_items[$item['itemid']] = true;
 				}
 			}
 		} while ($has_unresolved_masters);
