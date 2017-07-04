@@ -137,49 +137,6 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Returns key, where value is stored for given field type.
-	 *
-	 * @static
-	 *
-	 * @param int $field_type  ZBX_WIDGET_FIELD_TYPE_ constant
-	 *
-	 * @return string  field key, where to save the value
-	 */
-	public static function getApiFieldKey($field_type){
-		switch ($field_type) {
-			case ZBX_WIDGET_FIELD_TYPE_INT32:
-				return 'value_int';
-
-			case ZBX_WIDGET_FIELD_TYPE_STR:
-				return 'value_str';
-
-			case ZBX_WIDGET_FIELD_TYPE_GROUP:
-				return 'value_groupid';
-
-			case ZBX_WIDGET_FIELD_TYPE_HOST:
-				return 'value_hostid';
-
-			case ZBX_WIDGET_FIELD_TYPE_ITEM:
-				return 'value_itemid';
-
-			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-				return 'value_itemid';
-
-			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-				return 'value_graphid';
-
-			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-				return 'value_graphid';
-
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				return 'value_sysmapid';
-
-			case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
-				return 'value_dashboardid';
-		}
-	}
-
-	/**
 	 * Return Form object for widget with provided data.
 	 *
 	 * @static

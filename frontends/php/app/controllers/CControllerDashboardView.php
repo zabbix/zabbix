@@ -247,14 +247,12 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	private static function convertWidgetFields($fields) {
 		$ret = [];
 		foreach ($fields as $field) {
-			$field_key = CWidgetConfig::getApiFieldKey($field['type']);
-
 			if (array_key_exists($field['name'], $ret)) {
 				$ret[$field['name']] = (array) $ret[$field['name']];
-				$ret[$field['name']][] = $field[$field_key];
+				$ret[$field['name']][] = $field['value'];
 			}
 			else {
-				$ret[$field['name']] = $field[$field_key];
+				$ret[$field['name']] = $field['value'];
 			}
 		}
 

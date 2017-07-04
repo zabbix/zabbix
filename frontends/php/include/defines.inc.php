@@ -1037,6 +1037,8 @@ define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
 
 // API validation
+// multiple types
+define('API_MULTIPLE',			0);
 // scalar data types
 define('API_STRING_UTF8',		1);
 define('API_INT32',				2);

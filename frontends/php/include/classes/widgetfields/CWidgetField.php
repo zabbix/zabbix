@@ -117,7 +117,6 @@ class CWidgetField {
 		$widget_fields = [];
 
 		if ($value !== null) {
-			$api_field_key = CWidgetConfig::getApiFieldKey($this->save_type);
 			$widget_field = [
 				'type' => $this->save_type,
 				'name' => $this->name
@@ -125,12 +124,12 @@ class CWidgetField {
 
 			if (is_array($value)) {
 				foreach ($value as $val) {
-					$widget_field[$api_field_key] = $val;
+					$widget_field['value'] = $val;
 					$widget_fields[] = $widget_field;
 				}
 			}
 			else {
-				$widget_field[$api_field_key] = $value;
+				$widget_field['value'] = $value;
 				$widget_fields[] = $widget_field;
 			}
 		}
