@@ -191,7 +191,7 @@ class CDashboard extends CApiService {
 	private function validateCreate(array &$dashboards) {
 		$ids_widget_field_types = [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
-			ZBX_WIDGET_FIELD_TYPE_MAP, ZBX_WIDGET_FIELD_TYPE_DASHBOARD
+			ZBX_WIDGET_FIELD_TYPE_MAP
 		];
 		$widget_field_types = array_merge($ids_widget_field_types,
 			[ZBX_WIDGET_FIELD_TYPE_INT32, ZBX_WIDGET_FIELD_TYPE_STR]
@@ -300,7 +300,7 @@ class CDashboard extends CApiService {
 	private function validateUpdate(array &$dashboards, array &$db_dashboards = null) {
 		$ids_widget_field_types = [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
-			ZBX_WIDGET_FIELD_TYPE_MAP, ZBX_WIDGET_FIELD_TYPE_DASHBOARD
+			ZBX_WIDGET_FIELD_TYPE_MAP
 		];
 		$widget_field_types = array_merge($ids_widget_field_types,
 			[ZBX_WIDGET_FIELD_TYPE_INT32, ZBX_WIDGET_FIELD_TYPE_STR]
@@ -585,8 +585,7 @@ class CDashboard extends CApiService {
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => 'value_itemid',
 			ZBX_WIDGET_FIELD_TYPE_GRAPH => 'value_graphid',
 			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_MAP => 'value_sysmapid',
-			ZBX_WIDGET_FIELD_TYPE_DASHBOARD => 'value_dashboardid'
+			ZBX_WIDGET_FIELD_TYPE_MAP => 'value_sysmapid'
 		];
 	}
 
@@ -610,8 +609,7 @@ class CDashboard extends CApiService {
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
 			ZBX_WIDGET_FIELD_TYPE_GRAPH => [],
 			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => [],
-			ZBX_WIDGET_FIELD_TYPE_MAP => [],
-			ZBX_WIDGET_FIELD_TYPE_DASHBOARD => []
+			ZBX_WIDGET_FIELD_TYPE_MAP => []
 		];
 
 		foreach ($dashboards as $dashboard) {
@@ -740,22 +738,6 @@ class CDashboard extends CApiService {
 			foreach ($sysmapids as $sysmapid) {
 				if (!array_key_exists($sysmapid, $db_sysmaps)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with ID "%1$s" is not available.', $sysmapid));
-				}
-			}
-		}
-
-		if ($ids[ZBX_WIDGET_FIELD_TYPE_DASHBOARD]) {
-			$dashboardids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_DASHBOARD]);
-
-			$db_dashboards = $this->get([
-				'output' => [],
-				'dashboardids' => $dashboardids,
-				'preservekeys' => true
-			]);
-
-			foreach ($dashboardids as $dashboardid) {
-				if (!array_key_exists($dashboardid, $db_dashboards)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with ID "%1$s" is not available.', $dashboardid));
 				}
 			}
 		}
@@ -1065,7 +1047,7 @@ class CDashboard extends CApiService {
 		$db_widget_fields = ($method === 'update')
 			? DB::select('widget_field', [
 				'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str', 'value_groupid',
-					'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid', 'value_dashboardid'
+					'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
 				],
 				'filter' => ['widgetid' => array_keys($widgets_fields)],
 				'sortfield' => ['widgetid', 'type', 'name']
@@ -1079,9 +1061,7 @@ class CDashboard extends CApiService {
 		$field_names = [
 			'str' => ['name', 'value_str'],
 			'int' => ['type', 'value_int'],
-			'ids' => ['value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid',
-				'value_dashboardid'
-			]
+			'ids' => ['value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid']
 		];
 
 		foreach ($db_widget_fields as $db_widget_field) {
@@ -1285,7 +1265,7 @@ class CDashboard extends CApiService {
 
 				$db_widget_fields = DB::select('widget_field', [
 					'output' => ['widgetid', 'type', 'name', 'value_int', 'value_str', 'value_groupid', 'value_hostid',
-						'value_itemid', 'value_graphid', 'value_sysmapid', 'value_dashboardid'
+						'value_itemid', 'value_graphid', 'value_sysmapid'
 					],
 					'filter' => ['widgetid' => array_keys($db_widgets)]
 				]);

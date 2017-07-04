@@ -1193,7 +1193,6 @@ define('ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE',	5);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
-define('ZBX_WIDGET_FIELD_TYPE_DASHBOARD',		9);
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
