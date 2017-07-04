@@ -933,7 +933,6 @@
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
-				'update_attempts': 0,
 				'initial_load': true,
 				'fields': {}
 			}, widget);
