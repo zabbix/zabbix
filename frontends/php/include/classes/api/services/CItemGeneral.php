@@ -1323,6 +1323,7 @@ abstract class CItemGeneral extends CApiService {
 
 		// Validate every root mater items childrens count.
 		foreach (array_keys($root_items) as $root_itemid) {
+			$dependency_level = 0;
 			$total_children = array_key_exists($root_itemid, $children_created)
 				? $children_created[$root_itemid]
 				: 0;
@@ -1336,13 +1337,12 @@ abstract class CItemGeneral extends CApiService {
 				// If item was moved to another master item, do not count moved item (and its childrens) in old master
 				// childrens count calculation.
 				$ignoreids = array_intersect_key($find_itemids, $children_moved);
+				$find_itemids = array_diff_key($find_itemids, $ignoreids);
 				$find_itemids = $data_provider->get([
 					'output' => ['itemid'],
 					'filter' => ['master_itemid' => array_keys($find_itemids)],
 					'preservekeys' => true
 				]);
-
-				$find_itemids = array_diff_key($find_itemids, $ignoreids);
 				$total_children = $total_children + count($find_itemids);
 
 				if ($total_children > 999) {
@@ -1350,7 +1350,14 @@ abstract class CItemGeneral extends CApiService {
 						'master_itemid', _('maximum dependent items count reached')
 					));
 				}
-			} while ($find_itemids);
+				++$dependency_level;
+			} while ($find_itemids && $dependency_level < 4);
+
+			if ($dependency_level > 3) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'master_itemid', _('maximum master items count reached')
+				));
+			}
 		}
 	}
 }
