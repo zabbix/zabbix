@@ -2628,6 +2628,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$delay = $this->items[$item]['delay'];
 
 				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
+						|| $this->items[$item]['type'] == ITEM_TYPE_DEPENDENT
 						|| ($this->hasSchedulingIntervals($this->items[$item]['intervals']) && $delay == 0)) {
 					$draw = true;
 				}
