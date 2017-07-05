@@ -155,6 +155,14 @@
 						$(inputs[1]).hide();
 						break;
 
+					case '<?= ZBX_PREPROC_XPATH ?>':
+					case '<?= ZBX_PREPROC_JSONPATH ?>':
+						$(inputs[0])
+							.show()
+							.attr('placeholder', '<?= _('path') ?>');
+						$(inputs[1]).hide();
+						break;
+
 					case '<?= ZBX_PREPROC_REGSUB ?>':
 						$(inputs[0])
 							.show()

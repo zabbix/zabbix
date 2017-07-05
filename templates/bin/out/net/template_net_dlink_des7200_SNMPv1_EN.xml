@@ -4,17 +4,17 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates</name>
+         <name>Templates/Network Devices</name>
       </group>
    </groups>
    <templates>
       <template>
          <template>Template D-Link DES 7200 SNMPv1</template>
          <name>Template D-Link DES 7200 SNMPv1</name>
-         <description>Template D-Link DES 7200 version: 0.7</description>
+         <description>Template D-Link DES 7200 version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Network Devices</name>
             </group>
          </groups>
          <applications>
@@ -65,8 +65,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>MY-PROCESS-MIB CPU utilization in %</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: MY-PROCESS-MIB
+CPU utilization in %
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -104,10 +106,12 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB A textual description of the entity.  This value should
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+A textual description of the entity.  This value should
 				include the full name and version identification of thesystem's hardware type, software operating-system, and
-				networking software.</description>
+				networking software.
+</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -145,8 +149,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -184,8 +190,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -223,8 +231,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>MY-SYSTEM-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: MY-SYSTEM-MIB
+
+</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -261,7 +271,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -297,8 +307,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>MY-MEMORY-MIB This is the memory pool utilization currently.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: MY-MEMORY-MIB
+This is the memory pool utilization currently.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -322,14 +334,48 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template D-Link DES 7200 SNMPv1</host>
+                              <key>vm.memory.pused[myMemoryPoolCurrentUtilization.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
 	  	
@@ -356,7 +402,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -392,8 +438,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>MY-SYSTEM-MIB Return the current temperature of the FastSwitch.The temperature display is not supported for the current temperature returns to 0.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: MY-SYSTEM-MIB
+Return the current temperature of the FastSwitch.The temperature display is not supported for the current temperature returns to 0.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -417,7 +465,8 @@
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
@@ -439,7 +488,8 @@
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -455,7 +505,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -489,7 +540,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -525,8 +576,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>MY-SYSTEM-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: MY-SYSTEM-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -552,7 +605,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the power supply unit for errors</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -586,7 +640,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -622,8 +676,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>MY-SYSTEM-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: MY-SYSTEM-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -649,7 +705,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the fan unit</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -698,8 +755,15 @@
                <macro>{$STORAGE_UTIL_WARN}</macro>
                <value>80</value>
             </macro>
+            <macro>
+               <macro>{$SNMP_PORT}</macro>
+               <value>161</value>
+            </macro>
          </macros>
          <templates>
+            <template>
+               <name>Template SNMP Interfaces SNMPv1</name>
+            </template>
             <template>
                <name>Template SNMP Generic SNMPv1</name>
             </template>
@@ -707,7 +771,40 @@
          <screens/>
       </template>
    </templates>
-   <graphs/>
+   <graphs>
+      <graph>
+         <name>CPU utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+                     <graph_item>
+                        <sortorder>0</sortorder>
+                        <drawtype>5</drawtype>
+                        <color>1A7C11</color>
+                        <yaxisside>0</yaxisside>
+                        <calc_fnc>2</calc_fnc>
+                        <type>0</type>
+                        <item>
+                           <host>Template D-Link DES 7200 SNMPv1</host>
+                           <key>system.cpu.util[myCPUUtilization5Min.0]</key>
+                        </item>
+                     </graph_item>
+                  </graph_items>
+      </graph>
+   </graphs>
    <triggers>
       <trigger>
          <expression>{Template D-Link DES 7200 SNMPv1:system.cpu.util[myCPUUtilization5Min.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
@@ -719,7 +816,8 @@
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -735,7 +833,8 @@
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Firmware version has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>

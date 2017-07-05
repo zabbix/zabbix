@@ -88,7 +88,8 @@ abstract class CItemGeneral extends CApiService {
 			'port'					=> [],
 			'inventory_link'		=> [],
 			'lifetime'				=> [],
-			'preprocessing'			=> ['template' => 1]
+			'preprocessing'			=> ['template' => 1],
+			'jmx_endpoint'			=> []
 		];
 
 		$this->errorMessages = array_merge($this->errorMessages, [
@@ -387,6 +388,28 @@ abstract class CItemGeneral extends CApiService {
 				if ($fullItem['trapper_hosts'] !== '' && !$ip_range_parser->parse($fullItem['trapper_hosts'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', $ip_range_parser->getError())
+					);
+				}
+			}
+
+			// jmx
+			if ($fullItem['type'] == ITEM_TYPE_JMX) {
+				if (!array_key_exists('jmx_endpoint', $fullItem) && !$update) {
+					$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+				}
+				if (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('cannot be empty'))
+					);
+				}
+			}
+			else {
+				if (!array_key_exists('jmx_endpoint', $fullItem) && $update) {
+					$item['jmx_endpoint'] = '';
+				}
+				if (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] !== '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('should be empty'))
 					);
 				}
 			}
@@ -864,7 +887,9 @@ abstract class CItemGeneral extends CApiService {
 	 *															7 - ZBX_PREPROC_OCT2DEC;
 	 *															8 - ZBX_PREPROC_HEX2DEC;
 	 *															9 - ZBX_PREPROC_DELTA_VALUE;
-	 *															10 - ZBX_PREPROC_DELTA_SPEED.
+	 *															10 - ZBX_PREPROC_DELTA_SPEED;
+	 *															11 - ZBX_PREPROC_XPATH;
+	 *															12 - ZBX_PREPROC_JSONPATH.
 	 * @param string $item['preprocessing'][]['params']		Additional parameters used by preprocessing option. In case
 	 *														of regular expression (ZBX_PREPROC_REGSUB), multiple
 	 *														parameters are separated by LF (\n)character.
@@ -930,6 +955,8 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_RTRIM:
 					case ZBX_PREPROC_LTRIM:
 					case ZBX_PREPROC_TRIM:
+					case ZBX_PREPROC_XPATH:
+					case ZBX_PREPROC_JSONPATH:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
