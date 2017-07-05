@@ -348,8 +348,8 @@
 #	include <math.h>
 #endif
 
-#ifdef HAVE_REGEX_H
-#	include <regex.h>
+#ifdef HAVE_PCREPOSIX_H
+#	include <pcreposix.h>
 #endif
 
 #ifdef HAVE_VM_VM_PARAM_H
@@ -368,9 +368,17 @@
 #	include <sys/timeb.h>
 #endif
 
+#ifdef HAVE_SYS_UN_H
+#	include <sys/un.h>
+#endif
+
 #ifdef HAVE_PROCINFO_H
 #	undef T_NULL /* to solve definition conflict */
 #	include <procinfo.h>
+#endif
+
+#ifdef HAVE_EVENT_H
+#	include <event.h>
 #endif
 
 #ifdef HAVE_LIBCURL

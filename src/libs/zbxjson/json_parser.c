@@ -387,10 +387,6 @@ static int	json_parse_object(const char *start, char **error)
 	/* parse object name */
 	SKIP_WHITESPACE(ptr);
 
-	/* not an object, failing */
-	if ('{' != *ptr)
-		return json_error("invalid object format, expected opening character '{'", ptr, error);
-
 	ptr++;
 	SKIP_WHITESPACE(ptr);
 
@@ -458,8 +454,23 @@ int	zbx_json_validate(const char *start, char **error)
 {
 	int	len;
 
-	if (0 == (len = json_parse_object(start, error)))
-		return 0;
+	/* parse object name */
+	SKIP_WHITESPACE(start);
+
+	switch (*start)
+	{
+		case '{':
+			if (0 == (len = json_parse_object(start, error)))
+				return 0;
+			break;
+		case '[':
+			if (0 == (len = json_parse_array(start, error)))
+				return 0;
+			break;
+		default:
+			/* not an json data, failing */
+			return json_error("invalid object format, expected opening character '{' or '['", start, error);
+	}
 
 	start += len;
 	SKIP_WHITESPACE(start);

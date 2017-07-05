@@ -305,7 +305,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, const char *subject, const char *message, const DB_EVENT *event,
-		const DB_EVENT *r_event)
+		const DB_EVENT *r_event, int macro_type)
 {
 	const char	*__function_name = "add_object_msg";
 	DB_RESULT	result;
@@ -350,9 +350,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		message_dyn = zbx_strdup(NULL, message);
 
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
-				&subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+				&subject_dyn, macro_type, NULL, 0);
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
-				&message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+				&message_dyn, macro_type, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
 
@@ -907,8 +907,8 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		now, severity, medias_num = 0, status;
-	char		error[MAX_STRING_LEN], *perror;
+	int		now, severity, medias_num = 0, status, res;
+	char		error[MAX_STRING_LEN], *perror, *period = NULL;
 	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -943,9 +943,12 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	{
 		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity = atoi(row[2]);
+		period = zbx_strdup(period, row[3]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period, MACRO_TYPE_COMMON,
+				NULL, 0);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "trigger severity:%d, media severity:%d, period:'%s'",
-				(int)event->trigger.priority, severity, row[3]);
+				(int)event->trigger.priority, severity, period);
 
 		if (((1 << event->trigger.priority) & severity) == 0)
 		{
@@ -953,15 +956,19 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 			continue;
 		}
 
-		if (FAIL == check_time_period(row[3], (time_t)0))
+		if (SUCCEED != zbx_check_time_period(period, time(NULL), &res))
+		{
+			status = ALERT_STATUS_FAILED;
+			perror = "Invalid media activity period";
+		}
+		else if (SUCCEED != res)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (period)");
 			continue;
 		}
-
-		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
+		else if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
-			status = ALERT_STATUS_NOT_SENT;
+			status = ALERT_STATUS_NEW;
 			perror = "";
 		}
 		else
@@ -993,6 +1000,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	}
 
 	DBfree_result(result);
+	zbx_free(period);
 
 	if (0 == mediatypeid)
 	{
@@ -1133,6 +1141,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	ZBX_USER_MSG	*user_msg = NULL;
 	zbx_uint64_t	operationid;
 	unsigned char	operationtype, evaltype, operations = 0;
+	char		*tmp = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1176,7 +1185,16 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	{
 		ZBX_STR2UINT64(operationid, row[0]);
 		operationtype = (unsigned char)atoi(row[1]);
-		esc_period = atoi(row[2]);
+
+		tmp = zbx_strdup(tmp, row[2]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+		if (SUCCEED != is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid step duration \"%s\" for operation of action \"%s\","
+					" using default operation step duration of the action", tmp, action->name);
+			esc_period = 0;
+		}
+
 		evaltype = (unsigned char)atoi(row[3]);
 
 		if (0 == esc_period)
@@ -1214,7 +1232,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 					}
 
 					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg,
-							subject, message, event, NULL);
+							subject, message, event, NULL, MACRO_TYPE_MESSAGE_NORMAL);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, NULL, action->actionid, operationid,
@@ -1269,6 +1287,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	if (ESCALATION_STATUS_SLEEP == escalation->status)
 		escalation->nextcheck = time(NULL) + SEC_PER_MIN;
 
+	zbx_free(tmp);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1295,12 +1315,14 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 	DB_ROW		row;
 	ZBX_USER_MSG	*user_msg = NULL;
 	zbx_uint64_t	operationid;
-	unsigned char	operationtype, evaltype;
+	unsigned char	operationtype, default_msg;
+	char		*subject, *message;
+	zbx_uint64_t	mediatypeid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select o.operationid,o.operationtype,o.evaltype,"
+			"select o.operationid,o.operationtype,"
 				"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
 			" from operations o"
 				" left join opmessage m"
@@ -1316,66 +1338,52 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 	{
 		ZBX_STR2UINT64(operationid, row[0]);
 		operationtype = (unsigned char)atoi(row[1]);
-		evaltype = (unsigned char)atoi(row[2]);
 
-		if (SUCCEED == check_operation_conditions(r_event, operationid, evaltype))
+		switch (operationtype)
 		{
-			unsigned char	default_msg;
-			char		*subject, *message;
-			zbx_uint64_t	mediatypeid;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
-
-			switch (operationtype)
-			{
-				case OPERATION_TYPE_MESSAGE:
-					if (SUCCEED == DBis_null(row[3]))
-						break;
-
-					ZBX_STR2UCHAR(default_msg, row[4]);
-					ZBX_DBROW2UINT64(mediatypeid, row[7]);
-
-					if (0 == default_msg)
-					{
-						subject = row[5];
-						message = row[6];
-					}
-					else
-					{
-						subject = action->r_shortdata;
-						message = action->r_longdata;
-					}
-
-					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
-							message, event, r_event);
+			case OPERATION_TYPE_MESSAGE:
+				if (SUCCEED == DBis_null(row[2]))
 					break;
-				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if (SUCCEED == DBis_null(row[3]))
-						break;
 
-					ZBX_STR2UCHAR(default_msg, row[4]);
+				ZBX_STR2UCHAR(default_msg, row[3]);
+				ZBX_DBROW2UINT64(mediatypeid, row[6]);
 
-					if (0 == default_msg)
-					{
-						subject = row[5];
-						message = row[6];
-					}
-					else
-					{
-						subject = action->r_shortdata;
-						message = action->r_longdata;
-					}
+				if (0 == default_msg)
+				{
+					subject = row[4];
+					message = row[5];
+				}
+				else
+				{
+					subject = action->r_shortdata;
+					message = action->r_longdata;
+				}
 
-					add_sentusers_msg(&user_msg, action->actionid, event, r_event, subject,
-							message);
+				add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
+						message, event, r_event, MACRO_TYPE_MESSAGE_RECOVERY);
+				break;
+			case OPERATION_TYPE_RECOVERY_MESSAGE:
+				if (SUCCEED == DBis_null(row[2]))
 					break;
-				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, r_event, action->actionid, operationid, 1);
-					break;
-			}
+
+				ZBX_STR2UCHAR(default_msg, row[3]);
+
+				if (0 == default_msg)
+				{
+					subject = row[4];
+					message = row[5];
+				}
+				else
+				{
+					subject = action->r_shortdata;
+					message = action->r_longdata;
+				}
+				add_sentusers_msg(&user_msg, action->actionid, event, r_event, subject, message);
+				break;
+			case OPERATION_TYPE_COMMAND:
+				execute_commands(event, r_event, action->actionid, operationid, 1);
+				break;
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
 	}
 	DBfree_result(result);
 
@@ -1880,6 +1888,7 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 {
 	DB_ROW		row;
 	DB_RESULT	result;
+	char		*tmp = NULL;
 	int		ret = SUCCEED;
 
 	result = DBselect(
@@ -1901,7 +1910,16 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 		ZBX_STR2UCHAR(action->status, row[2]);
 		ZBX_STR2UINT64(action->actionid, row[0]);
 		ZBX_STR2UCHAR(action->eventsource, row[3]);
-		action->esc_period = atoi(row[4]);
+
+		tmp = zbx_strdup(tmp, row[4]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+		if (SUCCEED != is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid default operation step duration \"%s\" for action"
+					" \"%s\", using default value of 1 hour", tmp, row[1]);
+			action->esc_period = SEC_PER_HOUR;
+		}
+
 		action->shortdata = zbx_strdup(NULL, row[5]);
 		action->longdata = zbx_strdup(NULL, row[6]);
 		action->r_shortdata = zbx_strdup(NULL, row[7]);
@@ -1926,6 +1944,7 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 
 out:
 	DBfree_result(result);
+	zbx_free(tmp);
 
 	return ret;
 }

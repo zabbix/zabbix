@@ -22,6 +22,13 @@
 
 #include "common.h"
 
+#define zbx_serialize_prepare_str(len, str)			\
+	str##_len = (NULL != str ? strlen(str) + 1 : 0);	\
+	len += str##_len + sizeof(zbx_uint32_t)
+
+#define zbx_serialize_prepare_value(len, value)			\
+	len += sizeof(value)
+
 #define zbx_serialize_uint64(buffer, value) (memcpy(buffer, &value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
 
 #define zbx_serialize_int(buffer, value) (memcpy(buffer, (int *)&value, sizeof(int)), sizeof(int))
@@ -32,16 +39,25 @@
 
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 
-#define zbx_serialize_str(buffer, value, len)					\
-		(memcpy(buffer, (zbx_uint32_t *)&len, sizeof(zbx_uint32_t)),	\
-		memcpy(buffer + sizeof(zbx_uint32_t), value, len),		\
-		len + sizeof(zbx_uint32_t))
-
-#define zbx_serialize_str_null(buffer)				\
+#define zbx_serialize_str_null(buffer)	 			\
 	(							\
 		memset(buffer, 0, sizeof(zbx_uint32_t)),	\
 		sizeof(zbx_uint32_t)				\
 	)
+
+#define zbx_serialize_str(buffer, value, len) 						\
+	(										\
+		0 == len ? zbx_serialize_str_null(buffer) :				\
+		(									\
+			memcpy(buffer, (zbx_uint32_t *)&len, sizeof(zbx_uint32_t)),	\
+			memcpy(buffer + sizeof(zbx_uint32_t), value, len),		\
+			len + sizeof(zbx_uint32_t)					\
+		)									\
+	)
+	
+#define zbx_serialize_value(buffer, value) (memcpy(buffer, &value, sizeof(value)), sizeof(value))
+
+/* deserialization of primitive types */
 
 #define zbx_deserialize_uint64(buffer, value) \
 	(memcpy(value, buffer, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
@@ -83,5 +99,8 @@
 		0 < value_len ? (value = (char *)(buffer + sizeof(zbx_uint32_t))) :	\
 		(value = NULL), value_len + sizeof(zbx_uint32_t)			\
 	)
+
+#define zbx_deserialize_value(buffer, value) \
+	(memcpy(value, buffer, sizeof(*value)), sizeof(*value))
 
 #endif /* ZABBIX_SERIALIZE_H */

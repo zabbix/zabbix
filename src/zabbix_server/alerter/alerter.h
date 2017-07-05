@@ -23,7 +23,6 @@
 #include "db.h"
 #include "threads.h"
 
-extern int	CONFIG_SENDER_FREQUENCY;
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 
 ZBX_THREAD_ENTRY(alerter_thread, args);

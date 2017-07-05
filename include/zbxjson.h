@@ -83,6 +83,7 @@
 #define ZBX_PROTO_TAG_PARENT_TASKID	"parent_taskid"
 #define ZBX_PROTO_TAG_TASKS		"tasks"
 #define ZBX_PROTO_TAG_ALERTID		"alertid"
+#define ZBX_PROTO_TAG_JMX_ENDPOINT	"jmx_endpoint"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -100,12 +101,16 @@
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL	"java gateway internal"
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX	"java gateway jmx"
 #define ZBX_PROTO_VALUE_GET_QUEUE		"queue.get"
+#define ZBX_PROTO_VALUE_GET_STATUS		"status.get"
 #define ZBX_PROTO_VALUE_PROXY_DATA		"proxy data"
 #define ZBX_PROTO_VALUE_PROXY_TASKS		"proxy tasks"
 
 #define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
 #define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"
 #define ZBX_PROTO_VALUE_GET_QUEUE_DETAILS	"details"
+
+#define ZBX_PROTO_VALUE_GET_STATUS_PING		"ping"
+#define ZBX_PROTO_VALUE_GET_STATUS_FULL		"full"
 
 typedef enum
 {
@@ -169,5 +174,8 @@ int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *out);
 int		zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(const struct zbx_json_parse *jp);
 int		zbx_json_count(const struct zbx_json_parse *jp);
+
+int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
+void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc);
 
 #endif /* ZABBIX_ZJSON_H */

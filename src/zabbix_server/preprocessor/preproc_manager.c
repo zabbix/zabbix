@@ -261,7 +261,7 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
-	size = zbx_preprocessor_pack_task(task, request->value.itemid, request->value.ts, &value,
+	size = zbx_preprocessor_pack_task(task, request->value.itemid, request->value_type, request->value.ts, &value,
 			zbx_hashset_search(&manager->history_cache, &request->value.itemid), request->step_count,
 			request->steps);
 

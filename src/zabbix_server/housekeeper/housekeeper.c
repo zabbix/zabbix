@@ -24,6 +24,7 @@
 #include "daemon.h"
 #include "zbxself.h"
 #include "zbxalgo.h"
+#include "zbxserver.h"
 
 #include "housekeeper.h"
 
@@ -58,7 +59,7 @@ typedef struct
 	/* housekeeping procedures updated to the last 'cutoff' value.                  */
 	int	min_clock;
 
-	/* a reference to the settings value specifying number of days the records must be kept */
+	/* a reference to the settings value specifying number of seconds the records must be kept */
 	int	*phistory;
 }
 zbx_hk_rule_t;
@@ -210,7 +211,7 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
  *             now         - [IN] the current timestamp                       *
  *             item_record - [IN/OUT] the record from item cache containing   *
  *                           item to process and its oldest record timestamp  *
- *             history     - [IN] a number of days the history data for       *
+ *             history     - [IN] a number of seconds the history data for    *
  *                           item_record must be kept.                        *
  *                                                                            *
  * Author: Andris Zeila                                                       *
@@ -224,10 +225,10 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 {
 	int	keep_from;
 
-	if ((zbx_uint64_t)history * SEC_PER_DAY > (zbx_uint64_t)now)
-		keep_from = 0;
-	else
-		keep_from = now - history * SEC_PER_DAY;
+	if (history > now)
+		return;	/* there shouldn't be any records with negative timestamps, nothing to do */
+
+	keep_from = now - history;
 
 	if (keep_from > item_record->min_clock)
 	{
@@ -370,9 +371,10 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		*tmp = NULL;
 
 	result = DBselect(
-			"select i.itemid,i.value_type,i.history,i.trends"
+			"select i.itemid,i.value_type,i.history,i.trends,h.hostid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)",
@@ -380,39 +382,69 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t		itemid;
+		zbx_uint64_t		itemid, hostid;
 		int			history, trends, value_type;
 		zbx_hk_history_rule_t	*rule;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
-		history = atoi(row[2]);
-		trends = atoi(row[3]);
+		ZBX_STR2UINT64(hostid, row[4]);
 
 		if (value_type < ITEM_VALUE_TYPE_MAX)
 		{
 			rule = rules + value_type;
-			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
-				history = *rule->poption;
-			hk_history_item_update(rule, now, itemid, history);
-		}
-		if (value_type == ITEM_VALUE_TYPE_FLOAT)
-		{
-			rule = rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT;
-			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
-				trends = *rule->poption;
-			hk_history_item_update(rule, now, itemid, trends);
-		}
-		else if (value_type == ITEM_VALUE_TYPE_UINT64)
-		{
-			rule = rules + HK_UPDATE_CACHE_OFFSET_TREND_UINT;
+			if (ZBX_HK_OPTION_DISABLED == *rule->poption_global)
+			{
+				tmp = zbx_strdup(tmp, row[2]);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, &tmp,
+						MACRO_TYPE_COMMON, NULL, 0);
 
-			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
-				trends = *rule->poption;
-			hk_history_item_update(rule, now, itemid, trends);
+				if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "invalid history storage '%s' for itemid '%s'", tmp,
+							row[0]);
+				}
+				else if (0 != history && ZBX_HK_HISTORY_MIN > history)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "history storage too low for itemid '%s'", row[0]);
+				}
+				else
+					hk_history_item_update(rule, now, itemid, history);
+			}
+			else
+				hk_history_item_update(rule, now, itemid, *rule->poption);
+		}
+
+		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
+		{
+			rule = rules + (value_type == ITEM_VALUE_TYPE_FLOAT ?
+					HK_UPDATE_CACHE_OFFSET_TREND_FLOAT : HK_UPDATE_CACHE_OFFSET_TREND_UINT);
+
+			if (ZBX_HK_OPTION_DISABLED == *rule->poption_global)
+			{
+				tmp = zbx_strdup(tmp, row[3]);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, &tmp,
+						MACRO_TYPE_COMMON, NULL, 0);
+
+				if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "invalid trends storage '%s' for itemid '%s'", tmp,
+							row[0]);
+				}
+				else if (0 != trends && ZBX_HK_TRENDS_MIN > trends)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "trends storage too low for itemid '%s'", row[0]);
+				}
+				else
+					hk_history_item_update(rule, now, itemid, trends);
+			}
+			else
+				hk_history_item_update(rule, now, itemid, *rule->poption);
 		}
 	}
 	DBfree_result(result);
+
+	zbx_free(tmp);
 }
 
 /******************************************************************************
@@ -566,7 +598,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 
 	/* Delete the old records from database. Don't remove more than 4 x housekeeping */
 	/* periods worth of data to prevent database stalling.                           */
-	keep_from = now - *rule->phistory * SEC_PER_DAY;
+	keep_from = now - *rule->phistory;
 	if (keep_from > rule->min_clock)
 	{
 		rule->min_clock = MIN(keep_from, rule->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
@@ -734,7 +766,7 @@ static int	housekeeping_sessions(int now)
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.sessions_mode)
 	{
-		rc = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_DAY * cfg.hk.sessions);
+		rc = DBexecute("delete from sessions where lastaccess<%d", now - cfg.hk.sessions);
 
 		if (ZBX_DB_OK <= rc)
 			deleted = rc;

@@ -133,8 +133,7 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 	char		error[MAX_STRING_LEN];
 	int		i, j, err = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
-			__function_name, items[0].host.host, items[0].interface.addr, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jmx_endpoint:'%s' num:%d", __function_name, items[0].jmx_endpoint, num);
 
 	for (j = 0; j < num; j++)	/* locate first supported item to use as a reference */
 	{
@@ -156,7 +155,8 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 
 	if (ZBX_JAVA_GATEWAY_REQUEST_INTERNAL == request)
 	{
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL,
+				ZBX_JSON_TYPE_STRING);
 	}
 	else if (ZBX_JAVA_GATEWAY_REQUEST_JMX == request)
 	{
@@ -165,10 +165,9 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			if (0 != strcmp(items[j].interface.addr, items[i].interface.addr) ||
-					items[j].interface.port != items[i].interface.port ||
-					0 != strcmp(items[j].username, items[i].username) ||
-					0 != strcmp(items[j].password, items[i].password))
+			if (0 != strcmp(items[j].username, items[i].username) ||
+					0 != strcmp(items[j].password, items[i].password) ||
+					0 != strcmp(items[j].jmx_endpoint, items[i].jmx_endpoint))
 			{
 				err = GATEWAY_ERROR;
 				strscpy(error, "Java poller received items with different connection parameters");
@@ -178,12 +177,19 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_CONN, items[j].interface.addr, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, items[j].interface.port);
 		if ('\0' != *items[j].username)
+		{
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_USERNAME, items[j].username, ZBX_JSON_TYPE_STRING);
+		}
 		if ('\0' != *items[j].password)
+		{
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_PASSWORD, items[j].password, ZBX_JSON_TYPE_STRING);
+		}
+		if ('\0' != *items[j].jmx_endpoint)
+		{
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_JMX_ENDPOINT, items[j].jmx_endpoint,
+					ZBX_JSON_TYPE_STRING);
+		}
 	}
 	else
 		assert(0);

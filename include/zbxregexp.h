@@ -34,10 +34,6 @@ typedef struct
 }
 zbx_expression_t;
 
-#ifdef _WINDOWS
-#	include "gnuregex.h"
-#endif
-
 /* regular expressions */
 int	zbx_regexp_compile(const char *regex_txt, int flags, regex_t *regex_compiled, char **error);
 int	zbx_regexp_exec(const char *string, const regex_t *regex_compiled, int flags, size_t count,

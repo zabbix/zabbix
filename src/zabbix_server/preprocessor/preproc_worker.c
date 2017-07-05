@@ -45,7 +45,7 @@ extern int		server_num, process_num;
 static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
 	zbx_uint32_t			size = 0;
-	unsigned char			*data = NULL;
+	unsigned char			*data = NULL, value_type;
 	zbx_uint64_t			itemid;
 	zbx_variant_t			value, value_num;
 	int				i, step_count;
@@ -54,16 +54,16 @@ static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_timespec_t			*ts;
 	zbx_item_history_value_t	*history_value, history_value_local;
 
-	zbx_preprocessor_unpack_task(&itemid, &ts, &value, &history_value, &step_count, &steps, message->data);
+	zbx_preprocessor_unpack_task(&itemid, &value_type, &ts, &value, &history_value, &step_count, &steps,
+			message->data);
 
 	for (i = 0; i < step_count; i++)
 	{
 		if ((ZBX_PREPROC_DELTA_VALUE == steps[i].type || ZBX_PREPROC_DELTA_SPEED == steps[i].type) &&
 				NULL == history_value)
 		{
-			if (FAIL != zbx_item_preproc_convert_value_to_numeric(&value_num, &value, &error))
+			if (FAIL != zbx_item_preproc_convert_value_to_numeric(&value_num, &value, value_type, &error))
 			{
-				history_value_local.itemid = itemid;
 				history_value_local.timestamp = *ts;
 				zbx_variant_set_variant(&history_value_local.value, &value_num);
 				history_value = &history_value_local;
@@ -73,7 +73,7 @@ static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			break;
 		}
 
-		if (SUCCEED != zbx_item_preproc(NULL, &value, ts, &steps[i], history_value, &error) ||
+		if (SUCCEED != zbx_item_preproc(value_type, &value, ts, &steps[i], history_value, &error) ||
 				ZBX_VARIANT_NONE == value.type)
 		{
 			break;

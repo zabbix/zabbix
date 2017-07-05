@@ -22,9 +22,10 @@
 
 #include "dbcache.h"
 
-int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timespec_t *ts,
+int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		const zbx_item_preproc_t *op, zbx_item_history_value_t *history_value, char **errmsg);
 
-int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value, char **errmsg);
+int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
+		unsigned char value_type, char **errmsg);
 
 #endif
