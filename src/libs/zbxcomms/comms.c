@@ -1834,36 +1834,6 @@ static int	validate_cidr(const char *ip, const char *cidr, void *value)
 	return FAIL;
 }
 
-static int	validate_hostname(const char *hostname, int len)
-{
-	unsigned char	component = 0;	/* periods are only allowed when they serve to delimit components */
-	int		i;
-
-	/* single character names or nicknames are not allowed */
-	if (1 >= len)
-		return FAIL;
-
-	/* the first character must be an alphanumeric character */
-	if (0 == isalnum(*hostname))
-		return FAIL;
-
-	/* the last character must not be a minus sign */
-	if ('-' == hostname[len - 1])
-		return FAIL;
-
-	for (i = 0; i < len; i++)
-	{
-		if (0 != isalnum(hostname[i]) || '-' == hostname[i])
-			component = 1;
-		else if ('.' == hostname[i] && 1 == component)
-			component = 0;
-		else
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 int	zbx_validate_peer_list(const char *peer_list, char **error)
 {
 	char	*start, *end, *cidr_sep;
@@ -1887,7 +1857,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 				return FAIL;
 			}
 		}
-		else if (FAIL == is_supported_ip(start) && FAIL == validate_hostname(start, strlen(start)))
+		else if (FAIL == is_supported_ip(start) && FAIL == zbx_validate_hostname(start))
 		{
 			*error = zbx_dsprintf(NULL, "\"%s\"", start);
 			return FAIL;
