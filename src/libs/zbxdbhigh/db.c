@@ -26,8 +26,6 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
-#define ZBX_DB_WAIT_DOWN	10
-
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
@@ -272,6 +270,29 @@ int	__zbx_DBexecute(const char *fmt, ...)
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
+
+	va_end(args);
+
+	return rc;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_DBexecute_once                                             *
+ *                                                                            *
+ * Purpose: execute a non-select statement                                    *
+ *                                                                            *
+ * Comments: don't retry if DB is down                                        *
+ *                                                                            *
+ ******************************************************************************/
+int	__zbx_DBexecute_once(const char *fmt, ...)
+{
+	va_list	args;
+	int	rc;
+
+	va_start(args, fmt);
+
+	rc = zbx_db_vexecute(fmt, args);
 
 	va_end(args);
 

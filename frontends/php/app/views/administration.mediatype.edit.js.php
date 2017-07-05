@@ -10,11 +10,17 @@
 </script>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
+		var old_media_type = $('#type').val();
+
 		// type of media
 		$('#type').change(function() {
-			switch ($(this).val()) {
+			var media_type = $(this).val();
+
+			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication').closest('li').show();
+					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication')
+						.closest('li')
+						.show();
 					$('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #exec_params_table')
 						.closest('li')
 						.hide();
@@ -23,6 +29,7 @@
 					// radio button actions
 					toggleSecurityOptions();
 					toggleAuthenticationOptions();
+					setMaxSessionsType(media_type);
 					break;
 
 				case '<?= MEDIA_TYPE_EXEC ?>':
@@ -31,6 +38,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
+					setMaxSessionsType(media_type);
 					break;
 
 				case '<?= MEDIA_TYPE_SMS ?>':
@@ -39,6 +47,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
+					setMaxSessionsType(media_type);
 					break;
 
 				case '<?= MEDIA_TYPE_JABBER ?>':
@@ -47,6 +56,7 @@
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
+					setMaxSessionsType(media_type);
 					break;
 
 				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
@@ -55,6 +65,7 @@
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_params_table')
 						.closest('li')
 						.hide();
+					setMaxSessionsType(media_type);
 					break;
 			}
 		});
@@ -69,14 +80,34 @@
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
 		$('#media_type_form').submit(function() {
+			var maxattempts = $('#maxattempts'),
+				maxsessions_type = $('#maxsessions_type :radio:checked').val(),
+				maxsessions = $('#maxsessions');
+
+			if ($.trim(maxattempts.val()) === '') {
+				maxattempts.val(0);
+			}
+
+			if (maxsessions_type !== 'custom') {
+				maxsessions.val(maxsessions_type === 'one' ? 1 : 0);
+			}
+			else if (maxsessions_type === 'custom' && $.trim(maxsessions.val()) === '') {
+				maxsessions.val(0);
+			}
+
 			$(this).trimValues([
 				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
-				'#jabber_username', '#eztext_username', '#smtp_username'
+				'#jabber_username', '#eztext_username', '#smtp_username', '#maxsessions'
 			]);
+		});
+
+		$('#maxsessions_type :radio').change(function() {
+			toggleMaxSessionsVisibility($(this).val());
 		});
 
 		// Refresh field visibility on document load.
 		$('#type').trigger('change');
+		$('#maxsessions_type :radio:checked').trigger('change');
 
 		$('input[name=smtp_security]').change(function() {
 			toggleSecurityOptions();
@@ -107,6 +138,43 @@
 			}
 			else {
 				$('#smtp_username, #passwd').val('').closest('li').hide();
+			}
+		}
+
+		/**
+		 * Show or hide concurrent sessions custom input box.
+		 *
+		 * @param {string} maxsessions_type		Selected concurrent sessions value. One of 'one', 'unlimited', 'custom'.
+		 */
+		function toggleMaxSessionsVisibility(maxsessions_type) {
+			var maxsessions = $('#maxsessions');
+
+			if (maxsessions_type === 'one' || maxsessions_type === 'unlimited') {
+				maxsessions.hide();
+			}
+			else {
+				maxsessions.show().select().focus();
+			}
+		}
+
+		/**
+		 * Set concurrent sessions accessibility.
+		 *
+		 * @param {number} media_type		Selected media type.
+		 */
+		function setMaxSessionsType(media_type) {
+			var maxsessions_type = $('#maxsessions_type :radio');
+
+			if (media_type == <?= MEDIA_TYPE_SMS ?>) {
+				maxsessions_type.attr('disabled', true).filter('[value=one]').attr('disabled', false);
+			}
+			else {
+				maxsessions_type.attr('disabled', false);
+			}
+
+			if (old_media_type != media_type) {
+				old_media_type = media_type;
+				maxsessions_type.filter('[value=one]').click();
 			}
 		}
 

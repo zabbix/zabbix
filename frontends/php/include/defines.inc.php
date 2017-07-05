@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.4.0alpha1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030142);
+define('ZABBIX_DB_VERSION',		3030147);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -541,11 +541,10 @@ define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
 
-define('ALERT_MAX_RETRIES', 3);
-
 define('ALERT_STATUS_NOT_SENT', 0);
 define('ALERT_STATUS_SENT',		1);
 define('ALERT_STATUS_FAILED',	2);
+define('ALERT_STATUS_NEW',		3);
 
 define('ALERT_TYPE_MESSAGE',	0);
 define('ALERT_TYPE_COMMAND',	1);
