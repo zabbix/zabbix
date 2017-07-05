@@ -577,7 +577,8 @@ class testFormItem extends CWebTest {
 		}
 
 		if ($type == 'JMX agent' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'jmx[<object name>,<attribute name>]');
+			$this->zbxTestAssertElementValue('key', '');
+			$this->zbxTestAssertElementNotPresentXpath("//button[@id='keyButton'][@disabled]");
 		}
 
 		if ($type == 'SNMPv3 agent') {
@@ -2070,9 +2071,9 @@ class testFormItem extends CWebTest {
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
-					'error_msg' => 'Cannot add item',
+					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+							'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			]
@@ -2307,7 +2308,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//li[28]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText("//li[29]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99d)');
 		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('adm.gui.php');
