@@ -518,28 +518,33 @@ if (isset($_REQUEST['form'])) {
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-				'snmpv3_contextname'
+				'snmpv3_contextname', 'master_itemid'
 			],
-			'selectPreprocessing' => ['type', 'params'],
-			'selectMasterItem' => ['name', 'key_']
+			'selectPreprocessing' => ['type', 'params']
 		]);
 		$itemPrototype = reset($itemPrototype);
 		foreach ($itemPrototype['preprocessing'] as &$step) {
 			$step['params'] = explode("\n", $step['params']);
 		}
 		unset($step);
+		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
+			$itemPrototype['master_item'] = API::ItemPrototype()->get([
+				'itemids'	=> $itemPrototype['master_itemid'],
+				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
+			])[0];
+		}
 	}
 	elseif (getRequest('master_itemid') && getRequest('parent_discoveryid')) {
 		$discovery_rule = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
 			'itemids' => getRequest('parent_discoveryid'),
 			'editable' => true
-		])[0];
+		]);
 		if ($discovery_rule) {
 			$itemPrototype['master_item'] = API::ItemPrototype()->get([
 				'itemids' => getRequest('master_itemid'),
-				'output' => ['name', 'key_'],
-				'filter' => ['hostid' => $discovery_rule['hostid']]
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'filter' => ['hostid' => $discovery_rule[0]['hostid']]
 			])[0];
 		}
 	}

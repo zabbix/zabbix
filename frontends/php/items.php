@@ -1087,12 +1087,11 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 				'privatekey', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'master_itemid'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectPreprocessing' => ['type', 'params'],
-			'selectMasterItem' => ['name', 'key_'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
@@ -1103,6 +1102,12 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 			$step['params'] = explode("\n", $step['params']);
 		}
 		unset($step);
+		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+			$item['master_item'] = API::Item()->get([
+				'itemids'	=> $item['master_itemid'],
+				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
+			])[0];
+		}
 	}
 	else {
 		$hosts = API::Host()->get([
@@ -1115,7 +1120,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		if ($host && getRequest('master_itemid')) {
 			$item['master_item'] = API::Item()->get([
 				'itemids' => getRequest('master_itemid'),
-				'output' => ['name', 'key_'],
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
 				'filter' => ['hostid' => $host['hostid']]
 			])[0];
 		}
