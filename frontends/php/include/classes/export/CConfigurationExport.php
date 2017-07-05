@@ -83,7 +83,7 @@ class CConfigurationExport {
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt'
+				'logtimefmt', 'master_itemid'
 			],
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
@@ -97,7 +97,7 @@ class CConfigurationExport {
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt'
+				'logtimefmt', 'master_itemid'
 			]
 		];
 	}
@@ -418,12 +418,18 @@ class CConfigurationExport {
 			'output' => $this->dataFields['item'],
 			'selectApplications' => ['name', 'flags'],
 			'selectPreprocessing' => ['type', 'params'],
-			'selectMasterItem' => ['key_'],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
 		]);
+
+		foreach ($items as &$item) {
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$item['master_item'] = ['key_' => $items[$item['master_itemid']]['key_']];
+			}
+		}
+		unset($item);
 
 		$items = $this->prepareItems($items);
 
@@ -547,7 +553,6 @@ class CConfigurationExport {
 			'selectApplicationPrototypes' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectPreprocessing' => ['type', 'params'],
-			'selectMasterItem' => ['key_'],
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true
@@ -555,8 +560,11 @@ class CConfigurationExport {
 
 		$valuemapids = [];
 
-		foreach ($prototypes as $prototype) {
+		foreach ($prototypes as &$prototype) {
 			$valuemapids[$prototype['valuemapid']] = true;
+			if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
+				$prototype['master_item'] = ['key_' => $prototypes[$prototype['master_itemid']]['key_']];
+			}
 		}
 
 		// Value map IDs that are zeroes, should be skipped.
