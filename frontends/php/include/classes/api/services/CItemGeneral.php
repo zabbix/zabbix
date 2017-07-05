@@ -1182,6 +1182,9 @@ abstract class CItemGeneral extends CApiService {
 	public function validateDependentItems($items, $data_provider) {
 		$updated_items = zbx_toHash($items, 'itemid');
 		$root_items = [];
+		$children_added = [];
+		$children_moved = [];
+		$children_created = [];
 
 		$master_items_cache = [];
 		$processed_items = [];
@@ -1244,7 +1247,7 @@ abstract class CItemGeneral extends CApiService {
 
 				$dependency_level = 0;
 				$item_masters = [];
-				$level_item = $item;
+				$master_item = $item;
 
 				if (array_key_exists('itemid', $item)) {
 					$item_masters[$item['itemid']] = true;
@@ -1252,10 +1255,10 @@ abstract class CItemGeneral extends CApiService {
 
 				// Traversing up to root item, if next parent should be requested from database store it itemid,
 				// missing parents will be requested in bulk request on next $items scan.
-				while ($level_item && $level_item['type'] == ITEM_TYPE_DEPENDENT) {
-					$master_itemid = $level_item['master_itemid'];
+				while ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT) {
+					$master_itemid = $master_item['master_itemid'];
 
-					if (array_key_exists('itemid', $level_item) && $master_itemid == $level_item['itemid']) {
+					if (array_key_exists('itemid', $master_item) && $master_itemid == $master_item['itemid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'master_itemid', _('master_itemid and itemid should not match')
 						));
@@ -1276,7 +1279,7 @@ abstract class CItemGeneral extends CApiService {
 					}
 
 					if (array_key_exists($master_itemid, $master_items_cache)) {
-						$level_item = $master_items_cache[$master_itemid];
+						$master_item = $master_items_cache[$master_itemid];
 						$item_masters[$master_itemid] = true;
 						$dependency_level++;
 					}
@@ -1288,18 +1291,29 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				// Dependency tree root item is resolved successfully.
-				if ($dependency_level > 0 && $level_item && $level_item['type'] != ITEM_TYPE_DEPENDENT) {
-					$level_itemid = $level_item['itemid'];
-					$root_items[$level_itemid] = true;
+				if ($dependency_level > 0 && $master_item && $master_item['type'] != ITEM_TYPE_DEPENDENT) {
+					$master_itemid = $master_item['itemid'];
+					$root_items[$master_itemid] = true;
+
 					if (array_key_exists('itemid', $item) &&
 							$item['type'] == ITEM_TYPE_DEPENDENT &&
 							$item['master_itemid'] != $db_items[$item['itemid']]['master_itemid']) {
-						// TODO: Add calculation for moved childrens from one master item to another.
-						//$root_children_moved[$level_item['itemid']] += 1;
+						$itemid = $item['itemid'];
+						$old_master_itemid = $db_items[$itemid]['master_itemid'];
+
+						if (!array_key_exists($master_itemid, $children_added)) {
+							$children_added[$master_itemid] = [];
+						}
+						$children_added[$master_itemid][$itemid] = true;
+
+						if (!array_key_exists($old_master_itemid, $children_moved)) {
+							$children_moved[$old_master_itemid] = [];
+						}
+						$children_moved[$old_master_itemid][$itemid] = true;
 					}
 					elseif (!array_key_exists('itemid', $item)) {
-						$root_children_created[$level_itemid] = array_key_exists($level_itemid, $root_children_created)
-							? $root_children_created[$level_itemid] + 1
+						$children_created[$master_itemid] = array_key_exists($master_itemid, $children_created)
+							? $children_created[$master_itemid] + 1
 							: 1;
 					}
 					$processed_items[$item['itemid']] = true;
@@ -1309,19 +1323,26 @@ abstract class CItemGeneral extends CApiService {
 
 		// Validate every root mater items childrens count.
 		foreach (array_keys($root_items) as $root_itemid) {
-			$total_children = array_key_exists($root_itemid, $root_children_created)
-				? $root_children_created[$root_itemid]
+			$total_children = array_key_exists($root_itemid, $children_created)
+				? $children_created[$root_itemid]
 				: 0;
-			// TODO: Calculate updated items childrens count, if child item having children and is moved from one
-			//		 parent to another, it childrens count should be added to new parent childrens count.
-			$find_itemids = [$root_itemid];
+
+			$find_itemids = [$root_itemid => true];
+			if (array_key_exists($root_itemid, $children_added)) {
+				$find_itemids += $children_added[$root_itemid];
+			}
 
 			do {
+				// If item was moved to another master item, do not count moved item (and its childrens) in old master
+				// childrens count calculation.
+				$ignoreids = array_intersect_key($find_itemids, $children_moved);
 				$find_itemids = $data_provider->get([
 					'output' => ['itemid'],
-					'filter' => ['master_itemid' => $find_itemids]
+					'filter' => ['master_itemid' => array_keys($find_itemids)],
+					'preservekeys' => true
 				]);
-				$find_itemids = zbx_objectValues($find_itemids, 'itemid');
+
+				$find_itemids = array_diff_key($find_itemids, $ignoreids);
 				$total_children = $total_children + count($find_itemids);
 
 				if ($total_children > 999) {
