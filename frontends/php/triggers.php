@@ -743,6 +743,24 @@ else {
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
+	// Select writable template IDs.
+	$hostids = [];
+
+	foreach ($data['realHosts'] as $realHost) {
+		$hostids = array_merge($hostids, zbx_objectValues($realHost, 'hostid'));
+	}
+
+	$data['writable_templates'] = [];
+
+	if ($hostids) {
+		$data['writable_templates'] = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => $hostids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+	}
+
 	// do not show 'Info' column, if it is a template
 	if ($data['hostid']) {
 		$data['showInfoColumn'] = (bool) API::Host()->get([

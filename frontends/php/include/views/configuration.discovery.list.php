@@ -50,10 +50,11 @@ $discoveryTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		_('IP range'),
-		_('Delay'),
+		_('Interval'),
 		_('Checks'),
 		_('Status')
 	]);
+
 foreach ($data['drules'] as $drule) {
 	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
 
@@ -72,7 +73,7 @@ foreach ($data['drules'] as $drule) {
 		new CCheckBox('g_druleid['.$drule['druleid'].']', $drule['druleid']),
 		$drule['description'],
 		$drule['iprange'],
-		convertUnitsS($drule['delay']),
+		$drule['delay'],
 		!empty($drule['checks']) ? implode(', ', $drule['checks']) : '',
 		$status
 	]);

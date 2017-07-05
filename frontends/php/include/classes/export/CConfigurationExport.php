@@ -81,23 +81,23 @@ class CConfigurationExport {
 			'item' => ['hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
 				'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
-				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt'
+				'snmpv3_privpassphrase', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
+				'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
+				'logtimefmt', 'jmx_endpoint'
 			],
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype',
-				'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description',
-				'inventory_link', 'flags', 'filter', 'lifetime'
+				'snmpv3_privpassphrase', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
+				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
+				'filter', 'lifetime', 'jmx_endpoint'
 			],
 			'item_prototype' => ['hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
-				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt'
+				'snmpv3_privpassphrase', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
+				'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
+				'logtimefmt', 'jmx_endpoint'
 			]
 		];
 	}
@@ -717,7 +717,6 @@ class CConfigurationExport {
 			$db_applications = API::Application()->get([
 				'output' => ['name'],
 				'applicationids' => array_keys($applicationids),
-				'inherited' => false,
 				'preservekeys' => true
 			]);
 		}
@@ -959,6 +958,7 @@ class CConfigurationExport {
 				'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
 				'zindex'
 			],
+			'selectLines' => ['x1', 'x2', 'y1', 'y2', 'line_type', 'line_width', 'line_color', 'zindex'],
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectIconMap' => API_OUTPUT_EXTEND,

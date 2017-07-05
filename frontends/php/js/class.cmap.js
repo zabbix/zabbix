@@ -267,14 +267,15 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			updateImage: function() {
-				if (this.data.grid_show === '1') {
-					this.map.setGrid(parseInt(this.data.grid_size));
-				}
-				else {
-					this.map.setGrid(0);
-				}
+				var shapes = [],
+					links = [],
+					elements = [],
+					grid_size = (this.data.grid_show === '1') ? parseInt(this.data.grid_size, 10) : 0;
 
-				var elements = [];
+				if (grid_size !== this.data.last_grid_size) {
+					this.map.setGrid(grid_size);
+					this.data.last_grid_size = grid_size;
+				}
 
 				Object.keys(this.selements).forEach(function(key) {
 					var element = {};
@@ -285,15 +286,19 @@ ZABBIX.apps.map = (function($) {
 
 					// host group elements
 					if (this.selements[key].data.elementtype == '3' && this.selements[key].data.elementsubtype == '1') {
-						element.width = this.selements[key].data.width;
-						element.height = this.selements[key].data.height;
+						if (this.selements[key].data.areatype == '0') {
+							element.width = this.data.width;
+							element.height = this.data.height;
+						}
+						else {
+							element.width = this.selements[key].data.width;
+							element.height = this.selements[key].data.height;
+						}
 					}
 
 					element.icon = this.selements[key].data.iconid_off;
 					elements.push(element);
 				}, this);
-
-				var links = [];
 
 				Object.keys(this.links).forEach(function(key) {
 					var link = {};
@@ -303,8 +308,6 @@ ZABBIX.apps.map = (function($) {
 
 					links.push(link);
 				}, this);
-
-				var shapes = [];
 
 				Object.keys(this.shapes).forEach(function(key) {
 					var shape = {};
@@ -318,7 +321,8 @@ ZABBIX.apps.map = (function($) {
 					'background': this.data.backgroundid,
 					'elements': elements,
 					'links': links,
-					'shapes': shapes
+					'shapes': shapes,
+					'label_location': this.data.label_location
 				});
 			},
 
@@ -850,6 +854,195 @@ ZABBIX.apps.map = (function($) {
 					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));
 					$('#mass_border_color').prop("disabled", disable || !$('#chkboxBorderColor').is(":checked"));
 				});
+
+				$('#shapeForm input[type=radio][name=type]').on('change', function() {
+					var value = parseInt(this.value, 10),
+						last_value = parseInt($('#shapeForm #last_shape_type').val(), 10);
+
+					$('#shape-text-row, #shape-background-row').toggle(value !== SVGMapShape.TYPE_LINE);
+					$('.switchable-content').each(function (i, element) {
+						element.textContent = element.hasAttribute('data-value-' + value) ?
+								element.getAttribute('data-value-' + value) :
+								element.getAttribute('data-value');
+					});
+
+					if ((last_value === SVGMapShape.TYPE_LINE) !== (value === SVGMapShape.TYPE_LINE)) {
+						var x = parseInt($('#shapeForm #x').val(), 10),
+							y = parseInt($('#shapeForm #y').val(), 10),
+							width = parseInt($('#shapeForm #areaSizeWidth').val(), 10),
+							height = parseInt($('#shapeForm #areaSizeHeight').val(), 10);
+
+						if (value === SVGMapShape.TYPE_LINE) {
+							// Switching from figures to line.
+							$('#shapeForm #areaSizeWidth').val(x + width);
+							$('#shapeForm #areaSizeHeight').val(y + height);
+						}
+						else {
+							// Switching from line to figures.
+							var mx = Math.min(x, width),
+								my = Math.min(y, height);
+
+							$('#shapeForm #x').val(mx);
+							$('#shapeForm #y').val(my);
+							$('#shapeForm #areaSizeWidth').val(Math.max(x, width) - mx);
+							$('#shapeForm #areaSizeHeight').val(Math.max(y, height) - my);
+						}
+					}
+
+					$('#last_shape_type').val(value);
+				});
+
+				$('input[type=radio][name=type]:checked').change();
+			},
+
+			/**
+			 * Buffer for draggable elements and elements group bounds.
+			 */
+			draggable_buffer: null,
+
+			/**
+			 * Returns virtual DOM element used by draggable.
+			 *
+			 * @return {object}
+			 */
+			dragGroupPlaceholder: function() {
+				return $('<div/>').css({
+					width: $(this.domNode).width(),
+					height: $(this.domNode).height()
+				});
+			},
+
+			/**
+			 * Recalculate x and y position of moved elements.
+			 *
+			 * @param {int} delta_x						Shift between old and new x position.
+			 * @param {int} delta_y						Shift between old and new y position.
+			 *
+			 * @return {object}							Object of elements with recalculated positions.
+			 */
+			dragGroupRecalculate: function(cmap, delta_x, delta_y) {
+				var dragged = cmap.draggable_buffer;
+
+				dragged.items.forEach(function(item) {
+					var node = cmap[item.type][item.id];
+
+					if ('updatePosition' in node) {
+						var dimensions = node.getDimensions();
+
+						node.updatePosition({
+							x: dimensions.x + delta_x,
+							y: dimensions.y + delta_y
+						}, false);
+					}
+				});
+			},
+
+			/**
+			 * Initializes multiple elements dragging.
+			 *
+			 * @param {object} draggable				Draggable DOM element where drag event was started.
+			 */
+			dragGroupInit: function(draggable) {
+				var buffer,
+					draggable_node = $(draggable.domNode),
+					draggable_left = parseInt(draggable.data.x, 10),
+					draggable_top = parseInt(draggable.data.y, 10);
+
+				if (draggable.selected) {
+					buffer = draggable.sysmap.getSelectionBuffer(draggable.sysmap);
+				}
+				else {
+					draggable_node = $(draggable.domNode);
+					// Create getSelectionBuffer structure if drag event was started on unselected element.
+					buffer = {
+						items: [{
+							type: draggable_node.attr('data-type'),
+							id: draggable.id
+						}],
+						left: parseInt(draggable.data.x, 10),
+						right: parseInt(draggable.data.x, 10) + draggable_node.width(),
+						top: parseInt(draggable.data.y, 10),
+						bottom: parseInt(draggable.data.y, 10) + draggable_node.height()
+					};
+				}
+
+				buffer.xaxis = {
+					min: draggable.data.x - buffer.left,
+					max: (draggable.sysmap.container).width() - (buffer.right - draggable_left)
+				};
+
+				buffer.yaxis = {
+					min: draggable.data.y - buffer.top,
+					max: (draggable.sysmap.container).height() - (buffer.bottom - draggable_top)
+				};
+
+				draggable.sysmap.draggable_buffer = buffer;
+			},
+
+			/**
+			 * Handler for drag event.
+			 *
+			 * @param {object} data						jQuery UI draggable data.
+			 * @param {object} draggable				Element where drag event occured.
+			 */
+			dragGroupDrag: function(data, draggable) {
+				var cmap = draggable.sysmap,
+					draggable_left = parseInt(draggable.data.x, 10),
+					draggable_top = parseInt(draggable.data.y, 10),
+					delta_x = data.position.left - parseInt(draggable.data.x, 10),
+					delta_y = data.position.top - parseInt(draggable.data.y, 10);
+
+				if (data.position.left < cmap.draggable_buffer.xaxis.min) {
+					delta_x = draggable_left < cmap.draggable_buffer.xaxis.min
+						? 0
+						: cmap.draggable_buffer.xaxis.min - draggable_left;
+				}
+				else if (data.position.left > cmap.draggable_buffer.xaxis.max) {
+					delta_x = draggable_left > cmap.draggable_buffer.xaxis.max
+						? 0
+						: cmap.draggable_buffer.xaxis.max - draggable_left;
+				}
+
+				if (data.position.top < cmap.draggable_buffer.yaxis.min) {
+					delta_y = draggable_top < cmap.draggable_buffer.yaxis.min
+						? 0
+						: cmap.draggable_buffer.yaxis.min - draggable_top;
+				}
+				else if (data.position.top > cmap.draggable_buffer.yaxis.max) {
+					delta_y = draggable_top > cmap.draggable_buffer.yaxis.max
+						? 0
+						: cmap.draggable_buffer.yaxis.max - draggable_top;
+				}
+
+				if (delta_x != 0 || delta_y != 0) {
+					cmap.dragGroupRecalculate(cmap, Math.round(delta_x), Math.round(delta_y));
+					cmap.updateImage();
+				}
+			},
+
+			/**
+			 * Final tasks for dragged element on drag stop event.
+			 *
+			 * @param {object} draggable				Element where drag stop event occured.
+			 */
+			dragGroupStop: function(draggable) {
+				var cmap = draggable.sysmap,
+					should_align = (cmap.data.grid_align === '1');
+
+				if (should_align) {
+					cmap.draggable_buffer.items.forEach(function(item) {
+						var node = cmap[item.type][item.id];
+
+						if ('updatePosition' in node) {
+							var dimensions = node.getDimensions();
+
+							node.updatePosition({
+								x: dimensions.x,
+								y: dimensions.y
+							});
+						}
+					});
+				}
 			},
 
 			/**
@@ -890,6 +1083,13 @@ ZABBIX.apps.map = (function($) {
 					if (element) {
 						data.x = parseInt(data.x, 10) + delta_x;
 						data.y = parseInt(data.y, 10) + delta_y;
+
+						if (type === 'shapes' && data.type == SVGMapShape.TYPE_LINE) {
+							// Additional shift for line shape.
+							data.width = parseInt(data.width, 10) + delta_x;
+							data.height = parseInt(data.height, 10) + delta_y;
+						}
+
 						element.update(data);
 						that[type][element.id] = element;
 						selectedids.push({
@@ -952,6 +1152,7 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					var data,
+						dimensions,
 						dom_node,
 						x,
 						y;
@@ -963,9 +1164,10 @@ ZABBIX.apps.map = (function($) {
 
 						// Get current data without observers.
 						data = $.extend({}, that[type][id].getData(), false);
+						dimensions = that[type][id].getDimensions();
 						dom_node = that[type][id].domNode;
-						x = parseInt(data.x, 10);
-						y = parseInt(data.y, 10);
+						x = dimensions.x;
+						y = dimensions.y;
 						left = Math.min(x, (left === null) ? x : left);
 						top = Math.min(y, (top === null) ? y : top);
 						right = Math.max(x + dom_node.outerWidth(true), (right === null) ? 0 : right);
@@ -1007,7 +1209,7 @@ ZABBIX.apps.map = (function($) {
 					left: left,
 					right: right,
 					bottom: bottom
-				}
+				};
 			},
 
 			clearSelection: function() {
@@ -1156,10 +1358,13 @@ ZABBIX.apps.map = (function($) {
 
 				for (i = 0, ln = ids.length; i < ln; i++) {
 					var id = ids[i].id,
-						type = ids[i].type,
-						selected = this[type][id].toggleSelect();
+						type = ids[i].type;
 
-					if (selected) {
+					if (typeof id === 'undefined' || typeof type === 'undefined') {
+						continue;
+					}
+
+					if (this[type][id].toggleSelect()) {
 						this.selection.count[type]++;
 						this.selection[type][id] = id;
 					}
@@ -1224,11 +1429,24 @@ ZABBIX.apps.map = (function($) {
 
 					// multiple shapes selected
 					else {
+						var figures = null;
+						for (id in this.selection.shapes) {
+							if (figures === null) {
+								figures = (this.shapes[id].data.type != SVGMapShape.TYPE_LINE);
+							}
+							else if (figures !== (this.shapes[id].data.type != SVGMapShape.TYPE_LINE)) {
+								// Different shape types are selected (lines and figures).
+								$('#map-window').hide();
+								this.massShapeForm.hide();
+								return;
+							}
+						}
+
 						this.form.hide();
 						this.massForm.hide();
 						$('#link-connect-to').hide();
 
-						this.massShapeForm.show();
+						this.massShapeForm.show(figures);
 					}
 				}
 			}
@@ -1342,36 +1560,45 @@ ZABBIX.apps.map = (function($) {
 		 * @property {string} id		Shape ID (shapeid).
 		 *
 		 * @param {object} sysmap Map object
-		 * @param {object} [shapeData] shape data from db
+		 * @param {object} [shape_data] shape data from db
 		 */
-		function Shape(sysmap, shapeData) {
+		function Shape(sysmap, shape_data) {
+			var default_data = {
+				type: SVGMapShape.TYPE_RECTANGLE,
+				x: 10,
+				y: 10,
+				width: 50,
+				height: 50,
+				border_color: '000000',
+				background_color: '',
+				border_width: 2,
+				font: 9, // Helvetica
+				font_size: 11,
+				font_color: '000000',
+				text_valign: 0,
+				text_halign: 0,
+				text: '',
+				border_type: 1
+			};
+
 			this.sysmap = sysmap;
 
-			if (!shapeData) {
-				shapeData = {
-					type: 0,
-					x: 10,
-					y: 10,
-					width: 50,
-					height: 50,
-					border_color: '000000',
-					background_color: '',
-					border_width: 2,
-					font: 9, // Helvetica
-					font_size: 11,
-					font_color: '000000',
-					text_valign: 0,
-					text_halign: 0,
-					text: '',
-					border_type: 1
-				};
+			if (!shape_data) {
+				shape_data = default_data;
 
 				// generate unique sysmap_shapeid
-				shapeData.sysmap_shapeid = getUniqueId();
-				shapeData.zindex = Object.keys(sysmap.shapes).length;
+				shape_data.sysmap_shapeid = getUniqueId();
+				shape_data.zindex = Object.keys(sysmap.shapes).length;
+			}
+			else {
+				for (var field in default_data) {
+					if (typeof shape_data[field] === 'undefined') {
+						shape_data[field] = default_data[field];
+					}
+				}
 			}
 
-			this.data = shapeData;
+			this.data = shape_data;
 			this.id = this.data.sysmap_shapeid;
 
 			// assign by reference
@@ -1387,25 +1614,15 @@ ZABBIX.apps.map = (function($) {
 				.attr('data-id', this.id)
 				.attr('data-type', 'shapes');
 
-			this.domNode.draggable({
-				containment: 'parent',
-				opacity: 0.5,
-				helper: 'clone',
-				stop: $.proxy(function(event, data) {
-					this.updatePosition({
-						x: parseInt(data.position.left, 10),
-						y: parseInt(data.position.top, 10)
-					});
-				}, this)
-			});
+			this.makeDraggable(true);
+			this.makeResizable(this.data.type != SVGMapShape.TYPE_LINE);
 
-			this.makeResizable(true);
-
+			var dimensions = this.getDimensions();
 			this.domNode.css({
-				top: this.data.y + 'px',
-				left: this.data.x + 'px',
-				width: this.data.width + 'px',
-				height: this.data.height + 'px'
+				top: dimensions.y + 'px',
+				left: dimensions.x + 'px',
+				width: dimensions.width + 'px',
+				height: dimensions.height + 'px'
 			});
 		}
 
@@ -1416,17 +1633,33 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} data
 			 */
 			update: function(data) {
-				var key;
+				var key,
+					dimensions;
+
+				if (typeof data['type'] !== 'undefined' && /^[0-9]+$/.test(this.data.sysmap_shapeid) === true
+						&& (data['type'] == SVGMapShape.TYPE_LINE) != (this.data.type == SVGMapShape.TYPE_LINE)) {
+					delete data['sysmap_shapeid'];
+					this.data.sysmap_shapeid = getUniqueId();
+				}
 
 				for (key in data) {
 					this.data[key] = data[key];
 				}
 
+				['x', 'y', 'width', 'height'].forEach(function(name) {
+					this[name] = parseInt(this[name], 10);
+				}, this.data);
+
+				dimensions = this.getDimensions();
+
 				this.domNode
 					.css({
-						width: this.data.width + 'px',
-						height: this.data.height + 'px'
+						width: dimensions.width + 'px',
+						height: dimensions.height + 'px'
 					});
+
+				this.makeDraggable(true);
+				this.makeResizable(this.data.type != SVGMapShape.TYPE_LINE);
 
 				this.align(false);
 				this.trigger('afterMove', this);
@@ -1435,13 +1668,143 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Gets shape dimensions.
+			 */
+			getDimensions: function () {
+				var dimensions = {
+					x: parseInt(this.data.x, 10),
+					y: parseInt(this.data.y, 10),
+					width: parseInt(this.data.width, 10),
+					height: parseInt(this.data.height, 10)
+				};
+
+				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
+					var width = parseInt(this.sysmap.data.width),
+						height = parseInt(this.sysmap.data.height),
+						x = Math.min(Math.max(0, Math.min(dimensions.x, dimensions.width)), width),
+						y = Math.min(Math.max(0, Math.min(dimensions.y, dimensions.height)), height),
+						dx = Math.max(dimensions.x, dimensions.width) - x,
+						dy = Math.max(dimensions.y, dimensions.height) - y;
+
+					dimensions = {
+						x: x,
+						y: y,
+						width: Math.min(Math.max(0, dx), width - x),
+						height: Math.min(Math.max(0, dy), height - y)
+					};
+				}
+
+				return dimensions;
+			},
+
+			updateHandles: function() {
+				if (typeof this.handles === 'undefined') {
+					this.handles = [
+						$('<div>', {'class': 'ui-resize-dot cursor-move'}),
+						$('<div>', {'class': 'ui-resize-dot cursor-move'})
+					];
+
+					this.domNode.parent().append(this.handles);
+
+					for (var i = 0; i < 2; i++) {
+						this.handles[i].data('id', i);
+						this.handles[i].draggable({
+							containment: 'parent',
+							drag: $.proxy(function(event, data) {
+								var dimensions;
+								if (data.helper.data('id') === 0) {
+									this.data.x = parseInt(data.position.left, 10) + 4;
+									this.data.y = parseInt(data.position.top, 10) + 4;
+								}
+								else {
+									this.data.width = parseInt(data.position.left, 10) + 4;
+									this.data.height = parseInt(data.position.top, 10) + 4;
+								}
+
+								dimensions = this.getDimensions();
+								this.domNode.css({
+									top: dimensions.y + 'px',
+									left: dimensions.x + 'px',
+									width: dimensions.width + 'px',
+									height: dimensions.height + 'px'
+								});
+
+								this.trigger('afterMove', this);
+							}, this)
+						});
+					}
+				}
+
+				this.handles[0].css({
+					left: (this.data.x - 3) + 'px',
+					top: (this.data.y - 3) + 'px'
+				});
+
+				this.handles[1].css({
+					left: (this.data.width - 3) + 'px',
+					top: (this.data.height - 3) + 'px'
+				});
+			},
+
+			/**
+			 * Allow dragging of shape.
+			 */
+			makeDraggable: function(enable) {
+				var node = this.domNode;
+
+				if (enable) {
+					if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
+						this.updateHandles();
+					}
+					else {
+						if (typeof this.handles !== 'undefined') {
+							this.handles.forEach(function (handle) {
+								handle.remove();
+							});
+							delete this.handles;
+						}
+					}
+
+					if (!node.hasClass('ui-draggable')) {
+						node.draggable({
+							containment: 'parent',
+							helper: $.proxy(function() {
+								return this.sysmap.dragGroupPlaceholder();
+							}, this),
+							start: $.proxy(function() {
+								this.sysmap.dragGroupInit(this);
+							}, this),
+							drag: $.proxy(function(event, data) {
+								this.sysmap.dragGroupDrag(data, this);
+							}, this),
+							stop: $.proxy(function() {
+								this.sysmap.dragGroupStop(this);
+							}, this)
+						});
+					}
+				}
+				else {
+					if (typeof this.handles !== 'undefined') {
+						this.handles.forEach(function (handle) {
+							handle.remove();
+						});
+						delete this.handles;
+					}
+
+					if (node.hasClass('ui-draggable')) {
+						node.draggable("destroy");
+					}
+				}
+			},
+
+			/**
 			 * Allow resizing of shape.
 			 */
 			makeResizable: function(enable) {
 				var node = this.domNode,
-					isEnabled = node.hasClass('ui-resizable');
+					enabled = node.hasClass('ui-resizable');
 
-				if (enable === isEnabled) {
+				if (enable === enabled) {
 					return;
 				}
 
@@ -1508,8 +1871,9 @@ ZABBIX.apps.map = (function($) {
 						height: this.domNode.height(),
 						width: this.domNode.width()
 					},
-					x = parseInt(this.data.x, 10),
-					y = parseInt(this.data.y, 10),
+					dimensions = this.getDimensions(),
+					x = dimensions.x,
+					y = dimensions.y,
 					shiftX = Math.round(dims.width / 2),
 					shiftY = Math.round(dims.height / 2),
 					newX = x,
@@ -1518,8 +1882,21 @@ ZABBIX.apps.map = (function($) {
 					newHeight = dims.height,
 					gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
+				// Lines should not be aligned
+				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
+					this.domNode.css({
+						top: dimensions.y + 'px',
+						left: dimensions.x + 'px',
+						width: dimensions.width + 'px',
+						height: dimensions.height + 'px'
+					});
+
+					return;
+				}
+
 				// if 'fit to map' area coords are 0 always
-				if (this.data.elementsubtype === '1' && this.data.areatype === '0') {
+				if (this.data.elementsubtype === '1' && this.data.areatype === '0'
+						&& this.data.elementtype === '3') {
 					newX = 0;
 					newY = 0;
 				}
@@ -1587,17 +1964,42 @@ ZABBIX.apps.map = (function($) {
 			 *
 			 * @param {object} coords
 			 */
-			updatePosition: function(coords) {
-				this.data.x = coords.x;
-				this.data.y = coords.y;
-				this.align();
-				this.trigger('afterMove', this);
+			updatePosition: function(coords, invalidate) {
+				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
+					var dx = coords.x - Math.min(parseInt(this.data.x, 10), parseInt(this.data.width, 10)),
+						dy = coords.y - Math.min(parseInt(this.data.y, 10), parseInt(this.data.height, 10));
+
+					this.data.x = parseInt(this.data.x, 10) + dx;
+					this.data.y = parseInt(this.data.y, 10) + dy;
+					this.data.width = parseInt(this.data.width, 10) + dx;
+					this.data.height = parseInt(this.data.height, 10) + dy;
+
+					this.updateHandles();
+				}
+				else {
+					this.data.x = coords.x;
+					this.data.y = coords.y;
+				}
+
+				if (invalidate !== false) {
+					this.align();
+					this.trigger('afterMove', this);
+				}
+				else {
+					var dimensions = this.getDimensions();
+
+					this.domNode.css({
+						top: dimensions.y + 'px',
+						left: dimensions.x + 'px'
+					});
+				}
 			},
 
 			/**
 			 * Removes Shape object, delete all reference to it.
 			 */
 			remove: function() {
+				this.makeDraggable(false);
 				this.domNode.remove();
 				delete this.sysmap.data.shapes[this.id];
 				delete this.sysmap.shapes[this.id];
@@ -1672,18 +2074,7 @@ ZABBIX.apps.map = (function($) {
 				.attr('data-id', this.id)
 				.attr('data-type', 'selements');
 
-			this.domNode.draggable({
-				containment: 'parent',
-				opacity: 0.5,
-				helper: 'clone',
-				stop: $.proxy(function(event, data) {
-					this.updatePosition({
-						x: parseInt(data.position.left, 10),
-						y: parseInt(data.position.top, 10)
-					});
-				}, this)
-			});
-
+			this.makeDraggable(true);
 			this.makeResizable(this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1);
 
 			this.updateIcon();
@@ -1699,6 +2090,11 @@ ZABBIX.apps.map = (function($) {
 			 * Returns element data.
 			 */
 			getData: Shape.prototype.getData,
+
+			/**
+			 * Allows dragging of element
+			 */
+			makeDraggable: Shape.prototype.makeDraggable,
 
 			/**
 			 * Allows resizing of element
@@ -1751,16 +2147,16 @@ ZABBIX.apps.map = (function($) {
 				);
 
 				if (this.data.elementtype === '2') {
-					// For element type trigger not exist signle element name.
+					// For element type trigger not exist single element name.
 					delete this.data['elementName'];
 				}
 				else if (this.data.elementtype === '4') {
-					// if element is image we unset advanced icons
+					// If element is image, unset advanced icons.
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
 
-					// if image element, set elementName to image name
+					// If image element, set elementName to image name.
 					for (i in this.sysmap.iconList) {
 						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
 							this.data.elementName = this.sysmap.iconList[i].name;
@@ -1811,6 +2207,11 @@ ZABBIX.apps.map = (function($) {
 			 * @param {bool} doAutoAlign if we should align element to grid
 			 */
 			align: Shape.prototype.align,
+
+			/**
+			 * Get element dimensions.
+			 */
+			getDimensions: Shape.prototype.getDimensions,
 
 			/**
 			 * Updates element icon and height/witdh in case element is area type.
@@ -2008,11 +2409,12 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
-					editable: true
+					editable: true,
+					real_hosts: true
 				},
 				popup: {
-					parameters: 'srctbl=triggers&dstfrm=selementForm&dstfld1=elementNameTriggers' +
-						'&srcfld1=triggerid&multiselect=1'
+					parameters: 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers' +
+						'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
 				}
 			});
 
@@ -2122,19 +2524,26 @@ ZABBIX.apps.map = (function($) {
 							},
 							success: function(data) {
 								data = JSON.parse(data);
-								data.result.each(function(trigger) {
-									if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
-										trigger.name = triggers_to_insert[trigger.triggerid].name;
-										$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
-									}
+								triggers.each(function(sorted_trigger) {
+									data.result.each(function(trigger) {
+										if (sorted_trigger.id == trigger.triggerid) {
+											if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
+												trigger.name = triggers_to_insert[trigger.triggerid].name;
+												$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
+
+												return false;
+											}
+										}
+									});
 								});
 
-								$('#elementNameTriggers').multiSelect('clean');
 								SelementForm.prototype.recalculateSortOrder();
 								SelementForm.prototype.initSortable();
 							}
 						});
 					}
+
+					$('#elementNameTriggers').multiSelect('clean');
 				}
 			},
 
@@ -2634,6 +3043,9 @@ ZABBIX.apps.map = (function($) {
 
 				$('.input-color-picker input', this.domNode).change();
 				$('#border_type').change();
+
+				$('#last_shape_type').val(shape.type);
+				$('input[type=radio][name=type]:checked').change();
 			},
 
 			/**
@@ -2645,11 +3057,31 @@ ZABBIX.apps.map = (function($) {
 				var values = $('#shapeForm').serializeArray(),
 					data = {},
 					i,
-					ln;
+					ln,
+					min_size,
+					width = parseInt(this.sysmap.data.width),
+					height = parseInt(this.sysmap.data.height);
 
 				for (i = 0, ln = values.length; i < ln; i++) {
 					data[values[i].name] = values[i].value.toString();
 				}
+
+				data.x = parseInt(data.x, 10);
+				data.y = parseInt(data.y, 10);
+				data.width = parseInt(data.width, 10);
+				data.height = parseInt(data.height, 10);
+
+				data.x = isNaN(data.x) || (data.x < 0) ? 0 : data.x;
+				data.y = isNaN(data.y) || (data.y < 0) ? 0 : data.y;
+
+				min_size = (data.type != SVGMapShape.TYPE_LINE) ? 1 : 0;
+				data.width = isNaN(data.width) || (data.width < min_size) ? min_size : data.width;
+				data.height = isNaN(data.height) || (data.height < min_size) ? min_size : data.height;
+
+				data.x = (data.x >= width) ? width : data.x;
+				data.y = (data.y >= height) ? height : data.y;
+				data.width = (data.width >= width) ? width : data.width;
+				data.height = (data.height >= height) ? height : data.height;
 
 				return data;
 			}
@@ -2702,7 +3134,16 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Show form.
 			 */
-			show: function() {
+			show: function(figures) {
+				var value = figures ? 0 : 2;
+
+				$('.shape_figure_row', this.domNode).toggle(figures);
+				$('.switchable-content', this.domNode).each(function (i, element) {
+					element.textContent = element.hasAttribute('data-value-' + value) ?
+							element.getAttribute('data-value-' + value) :
+							element.getAttribute('data-value');
+				});
+
 				this.formContainer.draggable('option', 'handle', '#massShapeDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
@@ -2720,7 +3161,8 @@ ZABBIX.apps.map = (function($) {
 					var select = $(this);
 					select.val($('option:first', select).val());
 				});
-				$('textarea', this.domNode).val('');
+				$('textarea, input[type=text]', this.domNode).val('');
+				$('.input-color-picker input', this.domNode).change();
 				this.actionProcessor.process();
 			},
 
@@ -3038,6 +3480,7 @@ ZABBIX.apps.map = (function($) {
 
 						if (typeof this.sysmap.selements[link.selementid1].data.elementName === 'undefined') {
 							fromElementName = this.sysmap.selements[link.selementid1].data.elements[0].elementName;
+
 							if (Object.keys(this.sysmap.selements[link.selementid1].data.elements).length > 1) {
 								fromElementName += '...';
 							}
@@ -3048,6 +3491,7 @@ ZABBIX.apps.map = (function($) {
 
 						if (typeof this.sysmap.selements[link.selementid2].data.elementName === 'undefined') {
 							toElementName = this.sysmap.selements[link.selementid2].data.elements[0].elementName;
+
 							if (Object.keys(this.sysmap.selements[link.selementid2].data.elements).length > 1) {
 								toElementName += '...';
 							}

@@ -209,11 +209,22 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_TP) {
-		$timePeriodValidator = new CTimePeriodValidator();
+		$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
 
-		if (!$timePeriodValidator->validate($var)) {
+		if ($time_period_parser->parse($var) != CParser::PARSE_SUCCESS) {
 			$error = true;
-			$message = _s('Field "%1$s" is not correct: %2$s', $caption, $timePeriodValidator->getError());
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a time period is expected'));
+		}
+	}
+	elseif ($type == T_ZBX_TU) {
+		$simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => ($flags & P_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & P_ALLOW_LLD_MACRO)
+		]);
+
+		if ($simple_interval_parser->parse($var) != CParser::PARSE_SUCCESS) {
+			$error = true;
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a time unit is expected'));
 		}
 	}
 
@@ -458,4 +469,44 @@ function validateDateTime($year, $month, $day, $hours, $minutes, $seconds = null
  */
 function validateDateInterval($year, $month, $day) {
 	return !($year < 1970 || $year > 2038 || ($year == 2038 && (($month > 1) || ($month == 1 && $day > 18))));
+}
+
+/**
+ * Validate a configuration value. Use simple interval parser to parse the string, convert to seconds and check
+ * if the value is in between given min and max values. In some cases it's possible to enter 0, or even 0s or 0d.
+ * If the value is incorrect, set an error.
+ *
+ * @param string $value                  Value to parse and validate.
+ * @param int    $min                    Lowed bound.
+ * @param int    $max                    Upper bound.
+ * @param bool   $allow_zero             Set to "true" to allow value to be zero.
+ * @param string $error
+ * @param array  $options
+ * @param bool   $options['usermacros']
+ * @param bool   $options['lldmacros']
+ *
+ * @return bool
+ */
+function validateTimeUnit($value, $min, $max, $allow_zero, &$error, array $options = []) {
+	$simple_interval_parser = new CSimpleIntervalParser($options);
+
+	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
+		if ($value[0] != '{') {
+			$value = timeUnitToSeconds($value);
+
+			if ($allow_zero && $value == 0) {
+				return true;
+			}
+			elseif ($min > $value || $value > $max) {
+				$error = _s('must be between "%1$s" and "%2$s"', $min, $max);
+				return false;
+			}
+		}
+	}
+	else {
+		$error = _('a time unit is expected');
+		return false;
+	}
+
+	return true;
 }

@@ -260,7 +260,7 @@ calendar.prototype = {
 		var dateHolder = new Date(y, m - 1, d, 0, 0, 0);
 
 		if (y >= 1970 && dateHolder.getFullYear() == y && dateHolder.getMonth() == m - 1 && dateHolder.getDate() == d) {
-			this.sdt.setTime(dateHolder.getTime());
+			this.sdt.setTimeObject(y, m - 1, d);
 			return true;
 		}
 
@@ -499,7 +499,7 @@ calendar.prototype = {
 		this.clndr_calendar.className = 'overlay-dialogue calendar';
 		this.clndr_calendar.hide();
 
-		if (typeof(parentNodeid) == 'undefined') {
+		if (typeof(parentNodeid) === 'undefined' || !parentNodeid) {
 			document.body.appendChild(this.clndr_calendar);
 		}
 		else {

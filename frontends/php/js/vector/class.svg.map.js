@@ -439,6 +439,8 @@ SVGMap.prototype.update = function (options, incremental) {
 		});
 	}
 
+	this.options.label_location = options.label_location;
+
 	// Collect the list of images.
 	Object.keys(options.elements).forEach(function (key) {
 		var element = options.elements[key];
@@ -579,8 +581,7 @@ SVGMapElement.prototype.updateHighlight = function() {
 		var radius = Math.floor(this.width / 2) + 12,
 			markers = [];
 
-		if (this.options.label_location !== SVGMapElement.LABEL_POSITION_DEFAULT
-				&& this.options.label_location !== SVGMapElement.LABEL_POSITION_BOTTOM) {
+		if (this.options.label_location !== SVGMapElement.LABEL_POSITION_BOTTOM) {
 			markers.push({
 				type: 'path',
 				attributes: {
@@ -731,7 +732,6 @@ SVGMapElement.prototype.updateLabel = function() {
 		};
 
 	switch (this.options.label_location) {
-		case SVGMapElement.LABEL_POSITION_DEFAULT:
 		case SVGMapElement.LABEL_POSITION_BOTTOM:
 			y = this.y + this.height + this.map.canvas.textPadding;
 			anchor.horizontal = 'center';
@@ -794,6 +794,11 @@ SVGMapElement.prototype.update = function(options) {
 			options[name] = parseInt(options[name]);
 		}
 	});
+
+	// Inherit label location from map options.
+	if (options.label_location === SVGMapElement.LABEL_POSITION_DEFAULT) {
+		options.label_location = parseInt(this.map.options.label_location);
+	}
 
 	if (typeof options.width !== 'undefined' && typeof options.height !== 'undefined') {
 		options.x += Math.floor(options.width / 2) - Math.floor(image.naturalWidth / 2);
@@ -969,6 +974,7 @@ function SVGMapShape(map, options) {
 // Predefined set of map shape types.
 SVGMapShape.TYPE_RECTANGLE	= 0;
 SVGMapShape.TYPE_ELLIPSE	= 1;
+SVGMapShape.TYPE_LINE		= 2;
 
 // Predefined label horizontal alignments.
 SVGMapShape.LABEL_HALIGN_CENTER	= 0;
@@ -1101,6 +1107,19 @@ SVGMapShape.prototype.update = function(options) {
 				ry: this.ry
 			};
 			break;
+
+		case SVGMapShape.TYPE_LINE:
+			type = 'line';
+
+			delete attributes['fill'];
+			delete options['text'];
+			attributes = SVGElement.mergeAttributes(attributes, {
+				x1: this.x,
+				y1: this.y,
+				x2: this.width,
+				y2: this.height
+			});
+		break;
 
 		default:
 			throw "Invalid shape configuration!";

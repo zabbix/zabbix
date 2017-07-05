@@ -104,6 +104,9 @@ struct	_DC_TRIGGER;
 
 #define ITEM_NAME_LEN			255
 #define ITEM_KEY_LEN			255
+#define ITEM_DELAY_LEN			1024
+#define ITEM_HISTORY_LEN		255
+#define ITEM_TRENDS_LEN			255
 #define ITEM_UNITS_LEN			255
 #define ITEM_SNMP_COMMUNITY_LEN		64
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
@@ -123,8 +126,6 @@ struct	_DC_TRIGGER;
 #define ITEM_SNMPV3_CONTEXTNAME_LEN_MAX		(ITEM_SNMPV3_CONTEXTNAME_LEN + 1)
 #define ITEM_LOGTIMEFMT_LEN		64
 #define ITEM_LOGTIMEFMT_LEN_MAX		(ITEM_LOGTIMEFMT_LEN + 1)
-#define ITEM_DELAY_FLEX_LEN		1024
-#define ITEM_DELAY_FLEX_LEN_MAX		(ITEM_DELAY_FLEX_LEN + 1)
 #define ITEM_IPMI_SENSOR_LEN		128
 #define ITEM_IPMI_SENSOR_LEN_MAX	(ITEM_IPMI_SENSOR_LEN + 1)
 #define ITEM_USERNAME_LEN		64
@@ -135,6 +136,8 @@ struct	_DC_TRIGGER;
 #define ITEM_PUBLICKEY_LEN_MAX		(ITEM_PUBLICKEY_LEN + 1)
 #define ITEM_PRIVATEKEY_LEN		64
 #define ITEM_PRIVATEKEY_LEN_MAX		(ITEM_PRIVATEKEY_LEN + 1)
+#define ITEM_JMX_ENDPOINT_LEN		255
+#define ITEM_JMX_ENDPOINT_LEN_MAX	(ITEM_JMX_ENDPOINT_LEN + 1)
 #if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
 #	define ITEM_PARAM_LEN		2048
 #	define ITEM_DESCRIPTION_LEN	2048
@@ -360,6 +363,7 @@ typedef struct
 	char		*ssl_cert_file;
 	char		*ssl_key_file;
 	char		*ssl_key_password;
+	char		*delay;
 	int		authentication;
 	int		retries;
 	int		verify_peer;
@@ -645,6 +649,6 @@ zbx_host_availability_t;
 
 int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_host_availability_t *ha);
-int	DBget_user_by_active_session(zbx_user_t *user, const char *sessionid);
+int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 
 #endif

@@ -80,6 +80,20 @@ DC_INTERFACE;
 
 typedef struct
 {
+	zbx_uint64_t	interfaceid;
+	char		*addr;
+	unsigned char	type;
+	unsigned char	main;
+	unsigned char	bulk;
+	unsigned char	useip;
+	char		ip_orig[INTERFACE_IP_LEN_MAX];
+	char		dns_orig[INTERFACE_DNS_LEN_MAX];
+	char		port_orig[INTERFACE_PORT_LEN_MAX];
+}
+DC_INTERFACE2;
+
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX];
@@ -134,7 +148,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		lastlogsize;
 	zbx_uint64_t		valuemapid;
-	unsigned char 		type;
+	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		state;
 	unsigned char		db_state;
@@ -145,15 +159,14 @@ typedef struct
 	unsigned char		snmpv3_privprotocol;
 	unsigned char		inventory_link;
 	unsigned char		status;
-	unsigned char		unreachable;
+	unsigned char		history;
+	unsigned char		trends;
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char			*units;
-	int			delay;
+	char			*delay;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
-	int			history;
-	int			trends;
 	int			preproc_ops_num;
 	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
@@ -164,16 +177,15 @@ typedef struct
 	char			snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
 	char			ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
 	char			*params;
-	char			delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
 	char			username_orig[ITEM_USERNAME_LEN_MAX], *username;
 	char			publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
 	char			privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
 	char			password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 	char			snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
+	char			jmx_endpoint_orig[ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
 	char			*db_error;
 
 	zbx_item_preproc_t	*preproc_ops;
-
 }
 DC_ITEM;
 
@@ -412,6 +424,27 @@ typedef struct
 }
 zbx_queue_item_t;
 
+typedef union
+{
+	zbx_uint64_t	ui64;
+	double		dbl;
+}
+zbx_counter_value_t;
+
+typedef struct
+{
+	zbx_uint64_t		proxyid;
+	zbx_counter_value_t	counter_value;
+}
+zbx_proxy_counter_t;
+
+typedef enum
+{
+	ZBX_COUNTER_TYPE_UI64,
+	ZBX_COUNTER_TYPE_DBL
+}
+zbx_counter_type_t;
+
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
@@ -493,10 +526,14 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
-		int *mtimes, int *errcodes, size_t num);
-void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
-		int *mtimes, int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+#define ZBX_HK_HISTORY_MIN	SEC_PER_HOUR
+#define ZBX_HK_TRENDS_MIN	SEC_PER_DAY
+
+void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num);
+void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num,
+		unsigned char poller_type, int *nextcheck);
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
@@ -544,11 +581,17 @@ void	DCset_delta_items(zbx_hashset_t *items);
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
-int	DCget_item_count(zbx_uint64_t hostid);
-int	DCget_item_unsupported_count(zbx_uint64_t hostid);
-int	DCget_trigger_count(void);
-double	DCget_required_performance(void);
-int	DCget_host_count(void);
+zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid);
+zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid);
+zbx_uint64_t	DCget_trigger_count(void);
+double		DCget_required_performance(void);
+zbx_uint64_t	DCget_host_count(void);
+
+void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not_monitored,
+		zbx_vector_ptr_t *items_active_normal, zbx_vector_ptr_t *items_active_notsupported,
+		zbx_vector_ptr_t *items_disabled, zbx_uint64_t *triggers_enabled_ok,
+		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
+		zbx_vector_ptr_t *required_performance);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
@@ -558,6 +601,7 @@ int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 
 /* global configuration support */
+#define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 
@@ -625,5 +669,6 @@ zbx_agent_value_t;
 
 void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
 void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess);
+int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
 
 #endif

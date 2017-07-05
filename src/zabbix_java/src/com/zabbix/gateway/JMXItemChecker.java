@@ -52,10 +52,7 @@ class JMXItemChecker extends ItemChecker
 
 		try
 		{
-			String conn = request.getString(JSON_TAG_CONN);
-			int port = request.getInt(JSON_TAG_PORT);
-
-			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://[" + conn + "]:" + port + "/jmxrmi");
+			url = new JMXServiceURL(request.getString(JSON_TAG_JMX_ENDPOINT));
 			jmxc = null;
 			mbsc = null;
 

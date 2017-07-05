@@ -295,36 +295,32 @@ function add_elementNames(&$selements) {
 	$hosts = API::Host()->get([
 		'hostids' => $hostids,
 		'output' => ['name'],
-		'nopermissions' => true,
 		'preservekeys' => true
 	]);
 
 	$maps = API::Map()->get([
 		'mapids' => $mapids,
 		'output' => ['name'],
-		'nopermissions' => true,
 		'preservekeys' => true
 	]);
 
 	$triggers = API::Trigger()->get([
+		'output' => ['description', 'expression', 'priority'],
 		'triggerids' => $triggerids,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['hostid', 'name'],
-		'nopermissions' => true,
+		'selectHosts' => ['name'],
 		'preservekeys' => true
 	]);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	$hostgroups = API::HostGroup()->get([
 		'hostgroupids' => $hostgroupids,
 		'output' => ['name'],
-		'nopermissions' => true,
 		'preservekeys' => true
 	]);
 
 	$images = API::image()->get([
 		'imageids' => $imageids,
 		'output' => API_OUTPUT_EXTEND,
-		'nopermissions' => true,
 		'preservekeys' => true
 	]);
 
@@ -337,13 +333,10 @@ function add_elementNames(&$selements) {
 				$selements[$snum]['elements'][0]['elementName'] = $maps[$selement['elements'][0]['sysmapid']]['name'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				CArrayHelper::sort($triggers, ['field' => 'priority', 'order' => ZBX_SORT_DOWN]);
-
 				foreach ($selement['elements'] as &$element) {
 					$trigger = $triggers[$element['triggerid']];
-					$hostname = reset($trigger['hosts']);
-					$element['elementName'] = $hostname['name'].NAME_DELIMITER.
-						CMacrosResolverHelper::resolveTriggerName($triggers[$element['triggerid']]);
+					$element['elementName'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
+					$element['elementExpressionTrigger'] = $trigger['expression'];
 					$element['priority'] = $trigger['priority'];
 				}
 				unset($element);
@@ -356,42 +349,6 @@ function add_elementNames(&$selements) {
 					$selements[$snum]['elements'][0]['elementName'] = $images[$selement['iconid_off']]['name'];
 				}
 				break;
-		}
-	}
-	unset($selement);
-
-	if (!empty($triggers)) {
-		add_triggerExpressions($selements, $triggers);
-	}
-}
-
-function add_triggerExpressions(&$selements, $triggers = []) {
-	if (empty($triggers)) {
-		$triggerIds = [];
-
-		foreach ($selements as $selement) {
-			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-				foreach ($selement['elements'] as $element) {
-					$triggerIds[] = $element['triggerid'];
-				}
-			}
-		}
-
-		$triggers = API::Trigger()->get([
-			'triggerids' => $triggerIds,
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['name'],
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-	}
-
-	foreach ($selements as $snum => &$selement) {
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-			foreach ($selement['elements'] as &$element) {
-				$element['elementExpressionTrigger'] = $triggers[$element['triggerid']]['expression'];
-			}
-			unset($element);
 		}
 	}
 	unset($selement);
@@ -417,8 +374,30 @@ function getTriggersInfo($selement, $i, $showUnack) {
 
 	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
 			|| in_array($showUnack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))) {
+		// Number of problems.
+		if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+			if ($i['problem'] == 1) {
+				$msg = _('PROBLEM');
+			}
+			else {
+				$msg = $i['problem'].' '._('Problems');
+			}
+		}
+		// Expand single problem.
+		elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
+			$msg = $i['problem_title'];
+		}
+		// Number of problems and expand most critical one.
+		elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+			$msg = $i['problem_title'];
+
+			if ($i['problem'] > 1) {
+				$msg .= "\n".$i['problem'].' '._('Problems');
+			}
+		}
+
 		$info['info']['unack'] = [
-			'msg' => _('PROBLEM'),
+			'msg' => $msg,
 			'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
 		];
 
@@ -479,14 +458,26 @@ function getHostsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -560,14 +551,26 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -649,14 +652,26 @@ function getMapsInfo($selement, $i, $show_unack) {
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			if ($i['problem'] > 1) {
-				$msg = $i['problem'].' '._('Problems');
+			// Number of problems.
+			if ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+				if ($i['problem'] == 1) {
+					$msg = _('PROBLEM');
+				}
+				else {
+					$msg = $i['problem'].' '._('Problems');
+				}
 			}
-			elseif (isset($i['problem_title'])) {
+			// Expand single problem.
+			elseif ($i['expandproblem'] == SYSMAP_SINGLE_PROBLEM) {
 				$msg = $i['problem_title'];
 			}
-			else {
-				$msg = '1 '._('Problem');
+			// Number of problems and expand most critical one.
+			elseif ($i['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL) {
+				$msg = $i['problem_title'];
+
+				if ($i['problem'] > 1) {
+					$msg .= "\n".$i['problem'].' '._('Problems');
+				}
 			}
 
 			$info['info']['problem'] = [
@@ -1009,7 +1024,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 						$i['problem']++;
 						$lastProblemId = $trigger['triggerid'];
 
-						if ($critical_triggerid != 0) {
+						if ($critical_triggerid == 0) {
 							$critical_triggerid = $trigger['triggerid'];
 						}
 
@@ -1027,7 +1042,8 @@ function getSelementsInfo($sysmap, array $options = []) {
 						}
 					}
 
-					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
+					$i['latelyChanged'] |=
+						((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
 				}
 			}
 		}
@@ -1035,12 +1051,19 @@ function getSelementsInfo($sysmap, array $options = []) {
 		// If there are no events, problems cannot be unacknowledged. Hide the green line in this case.
 		$i['ack'] = ($last_event) ? (bool) !($i['problem_unack']) : false;
 
-		if ($sysmap['expandproblem'] == SYSMAP_SINGLE_PROBLEM && $i['problem'] == 1) {
-			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
+		// Number of problems.
+		if ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
+			$i['expandproblem'] = SYSMAP_PROBLEMS_NUMBER;
 		}
-
-		if ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL && $i['problem']) {
+		// Expand single problem.
+		elseif ($sysmap['expandproblem'] == SYSMAP_SINGLE_PROBLEM && $i['problem']) {
+			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
+			$i['expandproblem'] = SYSMAP_SINGLE_PROBLEM;
+		}
+		// Number of problems and expand most critical one.
+		elseif ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL && $i['problem']) {
 			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$critical_triggerid]);
+			$i['expandproblem'] = SYSMAP_PROBLEMS_NUMBER_CRITICAL;
 		}
 
 		// replace default icons
@@ -1110,7 +1133,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 	// get names if needed
 	$elems = separateMapElements($sysmap);
 
-	if (!empty($elems['sysmaps']) && $mlabel) {
+	if ($elems['sysmaps'] && $mlabel) {
 		$sysmapids = [];
 
 		foreach ($elems['sysmaps'] as $sysmap_elem) {
@@ -1128,10 +1151,10 @@ function getSelementsInfo($sysmap, array $options = []) {
 			$info[$elem['selementid']]['name'] = $subSysmaps[$elem['elements'][0]['sysmapid']]['name'];
 		}
 	}
-	if (!empty($elems['hostgroups']) && $hglabel) {
+	if ($elems['hostgroups'] && $hglabel) {
 		$groupids = [];
 
-		foreach ($elems['sysmaps'] as $sysmap_elem) {
+		foreach ($elems['hostgroups'] as $sysmap_elem) {
 			$groupids[$sysmap_elem['elements'][0]['groupid']] = true;
 		}
 
@@ -1146,8 +1169,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 			$info[$elem['selementid']]['name'] = $hostgroups[$elem['elements'][0]['groupid']]['name'];
 		}
 	}
-
-	if (!empty($elems['triggers']) && $tlabel) {
+	if ($elems['triggers'] && $tlabel) {
 		$selements = zbx_toHash($selements, 'selementid');
 		foreach ($elems['triggers'] as $selementid => $elem) {
 			foreach ($elem['elements'] as $element) {
@@ -1156,7 +1178,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 			}
 		}
 	}
-	if (!empty($elems['hosts']) && $hlabel) {
+	if ($elems['hosts'] && $hlabel) {
 		foreach ($elems['hosts'] as $elem) {
 			$info[$elem['selementid']]['name'] = $allHosts[$elem['elements'][0]['hostid']]['name'];
 		}
@@ -1794,12 +1816,16 @@ function getMapLabels($map, $map_info, $resolveMacros) {
 				continue;
 			}
 
-			$statusLines[$selementId][] = [
-				'content' => $elementInfo['info'][$caption]['msg'],
-				'attributes' => [
-					'fill' => '#' . $elementInfo['info'][$caption]['color']
-				]
-			];
+			$msgs = explode("\n", $elementInfo['info'][$caption]['msg']);
+
+			foreach ($msgs as $msg) {
+				$statusLines[$selementId][] = [
+					'content' => $msg,
+					'attributes' => [
+						'fill' => '#' . $elementInfo['info'][$caption]['color']
+					]
+				];
+			}
 		}
 	}
 

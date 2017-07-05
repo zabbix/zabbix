@@ -666,7 +666,7 @@ class CScreenBuilder {
 	 * @static
 	 */
 	public static function insertScreenRefreshTimeJs() {
-		zbx_add_post_js('timeControl.useTimeRefresh('.CWebUser::$data['refresh'].');');
+		zbx_add_post_js('timeControl.useTimeRefresh('.CWebUser::getRefresh().');');
 	}
 
 	/**

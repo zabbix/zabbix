@@ -36,28 +36,28 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertElementPresentId('hk_events_mode');
 		$this->assertTrue($this->zbxTestCheckboxSelected('hk_events_mode'));
 
-		$this->zbxTestTextPresent('Trigger data storage period (in days)');
+		$this->zbxTestTextPresent('Trigger data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_trigger');
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_trigger']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_trigger']", "value", 365);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_trigger']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_trigger']", "value", '365d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_trigger'][@disabled]");
 
-		$this->zbxTestTextPresent('Internal data storage period (in days)');
+		$this->zbxTestTextPresent('Internal data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_internal');
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "value", 1);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "value", '1d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_internal'][@disabled]");
 
-		$this->zbxTestTextPresent('Network discovery data storage period (in days)');
+		$this->zbxTestTextPresent('Network discovery data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_discovery');
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "value", 1);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "value", '1d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_discovery'][@disabled]");
 
-		$this->zbxTestTextPresent('Auto-registration data storage period (in days)');
+		$this->zbxTestTextPresent('Auto-registration data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_autoreg');
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "value", 1);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "value", '1d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_autoreg'][@disabled]");
 
 		$this->zbxTestCheckboxSelect('hk_events_mode', false);
@@ -73,10 +73,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertElementPresentId('hk_services_mode');
 		$this->assertTrue($this->zbxTestCheckboxSelected('hk_services_mode'));
 
-		$this->zbxTestTextPresent('Data storage period (in days)');
+		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertElementPresentId('hk_services');
-		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "value", 365);
+		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "value", '365d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_services'][@disabled]");
 
 		$this->zbxTestCheckboxSelect('hk_services_mode', false);
@@ -89,10 +89,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertElementPresentId('hk_audit_mode');
 		$this->assertTrue($this->zbxTestCheckboxSelected('hk_audit_mode'));
 
-		$this->zbxTestTextPresent('Data storage period (in days)');
+		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertElementPresentId('hk_audit');
-		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "value", 365);
+		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "value", '365d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_audit'][@disabled]");
 
 		$this->zbxTestCheckboxSelect('hk_audit_mode', false);
@@ -105,10 +105,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertElementPresentId('hk_sessions_mode');
 		$this->assertTrue($this->zbxTestCheckboxSelected('hk_sessions_mode'));
 
-		$this->zbxTestTextPresent('Data storage period (in days)');
+		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertVisibleId('hk_sessions');
-		$this->zbxTestAssertAttribute("//input[@id='hk_sessions']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_sessions']", "value", 365);
+		$this->zbxTestAssertAttribute("//input[@id='hk_sessions']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_sessions']", "value", '365d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_sessions'][@disabled]");
 
 		$this->zbxTestCheckboxSelect('hk_sessions_mode', false);
@@ -125,10 +125,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertElementPresentId('hk_history_global');
 		$this->assertFalse($this->zbxTestCheckboxSelected('hk_history_global'));
 
-		$this->zbxTestTextPresent('Data storage period (in days)');
+		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertVisibleId('hk_history');
-		$this->zbxTestAssertAttribute("//input[@id='hk_history']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_history']", "value", 90);
+		$this->zbxTestAssertAttribute("//input[@id='hk_history']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_history']", "value", '90d');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_history'][@disabled]");
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
@@ -149,10 +149,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertElementPresentId('hk_trends_global');
 		$this->assertFalse($this->zbxTestCheckboxSelected('hk_trends_global'));
 
-		$this->zbxTestTextPresent('Data storage period (in days)');
+		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertVisibleId('hk_trends');
-		$this->zbxTestAssertAttribute("//input[@id='hk_trends']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_trends']", "value", 365);
+		$this->zbxTestAssertAttribute("//input[@id='hk_trends']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_trends']", "value", '365d');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_trends'][@disabled]");
 
 		$this->zbxTestCheckboxSelect('hk_trends_global');
@@ -176,24 +176,23 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-//					'resetDefaults' => true,
 					'hk_events_mode' => true,
-					'hk_events_trigger' => 101,
-					'hk_events_internal' => 102,
-					'hk_events_discovery' => 103,
-					'hk_events_autoreg' => 104,
+					'hk_events_trigger' => 86400,
+					'hk_events_internal' => 86400,
+					'hk_events_discovery' => 86400,
+					'hk_events_autoreg' => 86400,
 					'hk_services_mode' => true,
-					'hk_services' => 105,
+					'hk_services' => 86400,
 					'hk_audit_mode' => true,
-					'hk_audit' => 107,
+					'hk_audit' => 86400,
 					'hk_sessions_mode' => true,
-					'hk_sessions' => 108,
+					'hk_sessions' => 86400,
 					'hk_history_mode' => true,
 					'hk_history_global' => true,
-					'hk_history' => 109,
+					'hk_history' => 3600,
 					'hk_trends_mode' => true,
 					'hk_trends_global' => true,
-					'hk_trends' => 110
+					'hk_trends' => 86400
 				]
 			],
 			[
@@ -225,32 +224,150 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'expected' => TEST_BAD,
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 0,
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '1439m',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '23h',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '13140001m',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '219001h',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '9126d',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '1304w',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
 					'hk_events_internal' => 0,
+					'errors' => [
+						'Invalid internal data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
 					'hk_events_discovery' => 0,
+					'errors' => [
+						'Invalid network discovery data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
 					'hk_events_autoreg' => 0,
+					'errors' => [
+						'Invalid auto-registration data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'hk_services_mode' => true,
 					'hk_services' => 0,
+					'errors' => [
+						'Invalid IT services data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'hk_audit_mode' => true,
 					'hk_audit' => 0,
+					'errors' => [
+						'Invalid audit data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'hk_sessions_mode' => true,
 					'hk_sessions' => 0,
+					'errors' => [
+						'Invalid user sessions data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'hk_history_mode' => true,
 					'hk_history_global' => true,
 					'hk_history' => -1,
+					'errors' => [
+						'Invalid history data storage period: a time unit is expected.',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'hk_trends_mode' => true,
 					'hk_trends_global' => true,
 					'hk_trends' => -1,
 					'errors' => [
-						'Page received incorrect data',
-						'Incorrect value "0" for "Trigger event and alert data storage period" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Internal event and alert data storage period" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Network discovery event and alert data storage period" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Auto-registration event and alert data storage period" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Service data storage period" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Audit data storage period" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "User session data storage period" field: must be between 1 and 99999.',
-						'Incorrect value "-1" for "History data storage period" field: must be between 0 and 99999.',
-						'Incorrect value "-1" for "Trend data storage period" field: must be between 0 and 99999.'
+						'Invalid trends data storage period: a time unit is expected.',
 					]
 				]
 			],
@@ -259,16 +376,16 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'expected' => TEST_GOOD,
 					'resetDefaults' => true,
 					'hk_events_mode' => true,
-					'hk_events_trigger' => 365,
-					'hk_events_internal' => 1,
-					'hk_events_discovery' => 1,
-					'hk_events_autoreg' => 1,
+					'hk_events_trigger' => '365d',
+					'hk_events_internal' => '1d',
+					'hk_events_discovery' => '1d',
+					'hk_events_autoreg' => '1d',
 					'hk_services_mode' => true,
-					'hk_services' => 365,
+					'hk_services' => '365d',
 					'hk_audit_mode' => true,
-					'hk_audit' => 365,
+					'hk_audit' => '365d',
 					'hk_sessions_mode' => true,
-					'hk_sessions' => 365,
+					'hk_sessions' => '365d',
 					'hk_history_mode' => true,
 					'hk_history_global' => false,
 					'hk_trends_mode' => true,
@@ -381,6 +498,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 			case TEST_BAD:
 				$this->zbxTestTextNotPresent('Configuration updated');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

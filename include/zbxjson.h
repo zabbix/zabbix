@@ -83,6 +83,7 @@
 #define ZBX_PROTO_TAG_PARENT_TASKID	"parent_taskid"
 #define ZBX_PROTO_TAG_TASKS		"tasks"
 #define ZBX_PROTO_TAG_ALERTID		"alertid"
+#define ZBX_PROTO_TAG_JMX_ENDPOINT	"jmx_endpoint"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -100,12 +101,16 @@
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL	"java gateway internal"
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX	"java gateway jmx"
 #define ZBX_PROTO_VALUE_GET_QUEUE		"queue.get"
+#define ZBX_PROTO_VALUE_GET_STATUS		"status.get"
 #define ZBX_PROTO_VALUE_PROXY_DATA		"proxy data"
 #define ZBX_PROTO_VALUE_PROXY_TASKS		"proxy tasks"
 
 #define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
 #define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"
 #define ZBX_PROTO_VALUE_GET_QUEUE_DETAILS	"details"
+
+#define ZBX_PROTO_VALUE_GET_STATUS_PING		"ping"
+#define ZBX_PROTO_VALUE_GET_STATUS_FULL		"full"
 
 typedef enum
 {
