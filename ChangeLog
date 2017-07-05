@@ -79,7 +79,7 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki for report (vso)
+........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
 ...G...... [ZBX-12231] fixed memory leak in agent if log[], logrt[] items use global regexps with multiple subexpressions (Andris)
 ...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 ........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
@@ -513,7 +513,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
-........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki for report (vso)
+........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
 ...G...... [ZBX-12231] fixed memory leak in agent if log[], logrt[] items use global regexps with multiple subexpressions (Andris)
 ...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 ........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
@@ -2208,7 +2208,7 @@ Changes for 2.2.19rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki for report (vso)
+........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
 ...G...... [ZBX-12231] fixed memory leak in agent if log[], logrt[] items use global regexps with multiple subexpressions (Andris)
 ...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 A......... [ZBX-12023] fixed permission issue with event.get method (Sasha)
