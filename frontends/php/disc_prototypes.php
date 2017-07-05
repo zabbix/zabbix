@@ -574,7 +574,6 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'selectApplications' => API_OUTPUT_EXTEND,
-		'selectMasterItem' => ['name'],
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	]);
@@ -592,7 +591,7 @@ else {
 	}
 	unset($item);
 
-	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+	$data['items'] = expandItemNamesWithMasterItems($data['items'], API::ItemPrototype());
 
 	order_result($data['items'], $sortField, $sortOrder);
 

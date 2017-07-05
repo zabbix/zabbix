@@ -1330,3 +1330,52 @@ function quoteItemKeyParam($param, $forced = false) {
 
 	return '"'.str_replace('"', '\\"', $param).'"';
 }
+
+
+/**
+ * Expands items name and for dependent items master item name.
+ *
+ * @param array					Array of items.
+ * @param CItem|CItemPrototype	Object capable to provide data for master items.
+ *
+ * @return array
+ */
+function expandItemNamesWithMasterItems($items, $data_provider) {
+	$items = CMacrosResolverHelper::resolveItemNames($items);
+	$itemids = [];
+	$master_itemids = [];
+
+	foreach ($items as $item_index => $item) {
+		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_itemids[$item['master_itemid']] = true;
+		}
+		$itemids[$item_index] = $item['itemid'];
+	}
+	$master_itemids = array_diff(array_keys($master_itemids), $itemids);
+
+	if ($master_itemids) {
+		$master_items = $data_provider->get([
+			'output'		=> ['itemid', 'type', 'hostid', 'name', 'key_'],
+			'itemids'		=> $master_itemids,
+			'editable'		=> true,
+			'preservekeys'	=> true
+		]);
+		$master_items = CMacrosResolverHelper::resolveItemNames($master_items);
+	}
+
+	foreach ($items as &$item) {
+		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_itemid = $item['master_itemid'];
+			$items_index = array_search($master_itemid, $itemids);
+			$item['master_item'] = [
+				'itemid'		=> $master_itemid,
+				'name_expanded'	=> ($items_index === false)
+									? $master_items[$master_itemid]['name_expanded']
+									: $items[$items_index]['name_expanded']
+			];
+		}
+	}
+	unset($item);
+
+	return $items;
+}

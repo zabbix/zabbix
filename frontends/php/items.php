@@ -1288,7 +1288,7 @@ else {
 		'search' => [],
 		'output' => [
 			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
-			'templateid', 'flags', 'state'
+			'templateid', 'flags', 'state', 'master_itemid'
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
@@ -1296,7 +1296,6 @@ else {
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
-		'selectMasterItem' => ['name'],
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	];
@@ -1431,7 +1430,7 @@ else {
 		}
 
 		// resolve name macros
-		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+		$data['items'] = expandItemNamesWithMasterItems($data['items'], API::Item());
 
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');

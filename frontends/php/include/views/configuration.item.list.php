@@ -99,7 +99,7 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
+		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
 			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
 		))
 		->addClass(ZBX_STYLE_LINK_ALT)
