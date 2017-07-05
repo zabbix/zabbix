@@ -43,6 +43,7 @@ class CControllerDashbrdWidgetRfRate extends CController {
 	}
 
 	protected function checkPermissions() {
+		// TODO AV: permissions needs to be added
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
