@@ -1,8 +1,8 @@
 Changes for 3.4.0alpha1
 
 New features:
-A.F.....S. [ZBXNEXT-3863] aaded jsonpath based item pre-processing option (Ivo, wiper) 
-A.F.....S. [ZBXNEXT-3864] aaded xmlpath based item pre-processing option (Ivo, wiper)
+A.F.....S. [ZBXNEXT-3863] added jsonpath based item pre-processing option (Ivo, wiper) 
+A.F.....S. [ZBXNEXT-3864] added xmlpath based item pre-processing option (Ivo, wiper)
 ...G...... [ZBXNEXT-3930] improved log monitoring by adjusting formula to process 10 times more new lines than set in MaxLinesPerSecond (vso)
 A.F..J.PS. [ZBXNEXT-1274] added support of configurable jmx endpoint url for jmx items (gcalenko, Ivo, Sasha, vso)
 ........S. [ZBXNEXT-3872] implemented new internal item 'zabbix[host,discovery,interfaces]' (Andris)
