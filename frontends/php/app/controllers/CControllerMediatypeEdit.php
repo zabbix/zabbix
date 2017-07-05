@@ -48,7 +48,11 @@ class CControllerMediatypeEdit extends CController {
 			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
+			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'maxsessions' =>			'db media_type.maxsessions',
+			'maxattempts' =>			'db media_type.maxattempts',
+			'attempt_interval' =>		'db media_type.attempt_interval',
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -79,7 +83,8 @@ class CControllerMediatypeEdit extends CController {
 			$mediatypes = API::Mediatype()->get([
 				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
 					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params'
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions',
+					'maxattempts', 'attempt_interval'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -97,19 +102,20 @@ class CControllerMediatypeEdit extends CController {
 
 	protected function doAction() {
 		// default values
+		$db_defaults = DB::getDefaults('media_type');
 		$data = [
 			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
 			'description' => '',
 			'smtp_server' => 'localhost',
-			'smtp_port' => '25',
+			'smtp_port' => $db_defaults['smtp_port'],
 			'smtp_helo' => 'localhost',
 			'smtp_email' => 'zabbix@localhost',
-			'smtp_security' => '0',
-			'smtp_verify_peer' => '0',
-			'smtp_verify_host' => '0',
-			'smtp_authentication' => '0',
+			'smtp_security' => $db_defaults['smtp_security'],
+			'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
+			'smtp_verify_host' => $db_defaults['smtp_verify_host'],
+			'smtp_authentication' => $db_defaults['smtp_authentication'],
 			'exec_params' => [],
 			'exec_path' => '',
 			'gsm_modem' => '/dev/ttyS0',
@@ -118,7 +124,11 @@ class CControllerMediatypeEdit extends CController {
 			'eztext_limit' => EZ_TEXTING_LIMIT_USA,
 			'smtp_username' => '',
 			'passwd' => '',
-			'status' => MEDIA_TYPE_STATUS_ACTIVE
+			'status' => MEDIA_TYPE_STATUS_ACTIVE,
+			'maxsessions' => $db_defaults['maxsessions'],
+			'maxattempts' => $db_defaults['maxattempts'],
+			'attempt_interval' => $db_defaults['attempt_interval'],
+			'form_refresh' => 0
 		];
 
 		// get values from the dabatase
@@ -146,6 +156,9 @@ class CControllerMediatypeEdit extends CController {
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
 			$data['passwd'] = $this->mediatype['passwd'];
 			$data['status'] = $this->mediatype['status'];
+			$data['maxsessions'] = $this->mediatype['maxsessions'];
+			$data['maxattempts'] = $this->mediatype['maxattempts'];
+			$data['attempt_interval'] = $this->mediatype['attempt_interval'];
 
 			switch ($data['type']) {
 				case MEDIA_TYPE_EMAIL:
@@ -159,6 +172,10 @@ class CControllerMediatypeEdit extends CController {
 				case MEDIA_TYPE_EZ_TEXTING:
 					$data['eztext_username'] = $this->mediatype['username'];
 					$data['eztext_limit'] = $this->mediatype['exec_path'];
+					break;
+
+				case MEDIA_TYPE_SMS:
+					$data['maxsessions'] = 1;
 					break;
 			}
 		}
@@ -183,7 +200,12 @@ class CControllerMediatypeEdit extends CController {
 			'eztext_username',
 			'smtp_username',
 			'passwd',
-			'status'
+			'status',
+			'maxsessions',
+			'maxattempts',
+			'attempt_interval',
+			'maxsessionsType',
+			'form_refresh'
 		]);
 
 		$response = new CControllerResponseData($data);

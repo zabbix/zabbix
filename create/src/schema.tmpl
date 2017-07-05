@@ -374,6 +374,9 @@ FIELD		|smtp_verify_peer|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_host|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_authentication|t_integer	|'0'	|NOT NULL	|0
 FIELD		|exec_params	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|maxsessions	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|maxattempts	|t_integer	|'3'	|NOT NULL	|0
+FIELD		|attempt_interval|t_varchar(32)	|'10s'	|NOT NULL	|0
 UNIQUE		|1		|description
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
@@ -1523,4 +1526,4 @@ INDEX		|1			|httpstepid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030142	|3030142
+ROW		|3030147	|3030147
