@@ -1225,8 +1225,8 @@ abstract class CItemGeneral extends CApiService {
 				$has_unresolved_masters = false;
 			}
 
-			foreach ($items as $item) {
-				if (array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $processed_items)) {
+			foreach ($items as $item_index => $item) {
+				if (array_key_exists($item_index, $processed_items)) {
 					// Do not validate already checked items.
 					continue;
 				}
@@ -1292,6 +1292,7 @@ abstract class CItemGeneral extends CApiService {
 
 				// Dependency tree root item is resolved successfully.
 				if ($dependency_level > 0 && $master_item && $master_item['type'] != ITEM_TYPE_DEPENDENT) {
+					$processed_items[$item_index] = true;
 					$master_itemid = $master_item['itemid'];
 					$root_items[$master_itemid] = true;
 
@@ -1316,7 +1317,6 @@ abstract class CItemGeneral extends CApiService {
 							? $children_created[$master_itemid] + 1
 							: 1;
 					}
-					$processed_items[$item['itemid']] = true;
 				}
 			}
 		} while ($has_unresolved_masters);
