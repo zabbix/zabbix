@@ -167,8 +167,6 @@ typedef struct
 	int		retries;
 	int		status;
 	char		*error;
-
-	zbx_uint64_t	flags;
 }
 zbx_am_alertstatus_t;
 
@@ -350,7 +348,10 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, int
 
 	if (NULL == (mediatype = am_get_mediatype(manager, mediatypeid)))
 	{
-		zbx_am_mediatype_t	mediatype_local = {mediatypeid, ZBX_AM_LOCATION_NOWHERE, 0, 0};
+		zbx_am_mediatype_t	mediatype_local = {
+				.mediatypeid = mediatypeid,
+				.location = ZBX_AM_LOCATION_NOWHERE
+		};
 
 		mediatype = (zbx_am_mediatype_t *)zbx_hashset_insert(&manager->mediatypes, &mediatype_local,
 				sizeof(mediatype_local));
@@ -681,9 +682,8 @@ static void	am_alert_free(zbx_am_alert_t *alert)
  ******************************************************************************/
 static void	am_push_alert(zbx_am_alertpool_t *alertpool, zbx_am_alert_t *alert)
 {
-	zbx_binary_heap_elem_t	elem;
+	zbx_binary_heap_elem_t	elem = {0, alert};
 
-	elem.data = alert;
 	zbx_binary_heap_insert(&alertpool->queue, &elem);
 }
 
@@ -1334,7 +1334,7 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int stat
 	{
 		if (NULL == (update = (zbx_am_alertstatus_t *)zbx_hashset_search(&manager->alertupdates, &alertid)))
 		{
-			zbx_am_alertstatus_t	update_local = {alertid};
+			zbx_am_alertstatus_t	update_local = {.alertid = alertid};
 
 			update = (zbx_am_alertstatus_t *)zbx_hashset_insert(&manager->alertupdates, &update_local,
 					sizeof(update_local));
