@@ -23,6 +23,12 @@ $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Media types'));
 
+$tabs = new CTabView();
+
+if ($data['form_refresh'] == 0) {
+	$tabs->setSelected(0);
+}
+
 // create form
 $mediaTypeForm = (new CForm())
 	->setId('media_type_form')
@@ -140,9 +146,50 @@ $mediaTypeFormList
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
 	);
+$tabs->addTab('mediaTab', _('Media type'), $mediaTypeFormList);
 
-// append form list to tab
-$mediaTypeTab = (new CTabView())->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
+// media options tab
+$max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;
+if ($data['type'] == MEDIA_TYPE_SMS) {
+	$max_sessions = 1;
+}
+
+switch ($data['maxsessions']) {
+	case 1:
+		$data['maxsessions_type'] = 'one';
+		break;
+	case 0:
+		$data['maxsessions_type'] = 'unlimited';
+		break;
+	default:
+		$data['maxsessions_type'] = 'custom';
+}
+
+$mediaOptionsForm = (new CFormList('options'))
+	->addRow(_('Concurrent sessions'),
+		(new CDiv())
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addItem([
+				(new CDiv(
+					(new CRadioButtonList('maxsessions_type', $data['maxsessions_type']))
+						->addValue(_('One'), 'one')
+						->addValue(_('Unlimited'), 'unlimited')
+						->addValue(_('Custom'), 'custom')
+						->setModern(true)
+				))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CNumericBox('maxsessions', $max_sessions, 3, false, false, false))
+					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			])
+	)
+	->addRow(_('Attempts'),
+		(new CNumericBox('maxattempts', $data['maxattempts'], 3, false, false, false))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	)
+	->addRow(_('Attempt interval'),
+		(new CTextBox('attempt_interval', $data['attempt_interval'], false, 12))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	);
+$tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
 
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list'))->setId('cancel');
@@ -150,7 +197,7 @@ $cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.l
 if ($data['mediatypeid'] == 0) {
 	$addButton = (new CSubmitButton(_('Add'), 'action', 'mediatype.create'))->setId('add');
 
-	$mediaTypeTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		$addButton,
 		[$cancelButton]
 	));
@@ -164,7 +211,7 @@ else {
 	))
 		->setId('delete');
 
-	$mediaTypeTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		$updateButton,
 		[
 			$cloneButton,
@@ -175,7 +222,7 @@ else {
 }
 
 // append tab to form
-$mediaTypeForm->addItem($mediaTypeTab);
+$mediaTypeForm->addItem($tabs);
 
 // append form to widget
 $widget->addItem($mediaTypeForm)->show();

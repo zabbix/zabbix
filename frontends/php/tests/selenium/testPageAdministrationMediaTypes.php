@@ -66,22 +66,6 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	/**
 	 * @dataProvider allMediaTypes
 	 */
-	public function testPageAdministrationMediaTypes_SimpleUpdate($mediatype) {
-		$this->calculateHash($mediatype['mediatypeid']);
-
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
-		$this->zbxTestClickLinkText($mediatype['description']);
-		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type updated');
-		$this->zbxTestTextPresent($mediatype['description']);
-
-		$this->verifyHash();
-	}
-
-	/**
-	 * @dataProvider allMediaTypes
-	 */
 	public function testPageAdministrationMediaTypes_Disable($mediatype) {
 		DBexecute(
 			'UPDATE media_type'.

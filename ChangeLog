@@ -1,6 +1,10 @@
 Changes for 3.4.0alpha1
 
 New features:
+A.F.....S. [ZBXNEXT-2442] implemented parallel alert processing (gcalenko, wiper)
+A.F.....S. [ZBXNEXT-3863] added jsonpath based item pre-processing option (Ivo, wiper) 
+A.F.....S. [ZBXNEXT-3864] added xmlpath based item pre-processing option (Ivo, wiper)
+...G...... [ZBXNEXT-3930] improved log monitoring by adjusting formula to process 10 times more new lines than set in MaxLinesPerSecond (vso)
 A.F..J.PS. [ZBXNEXT-1274] added support of configurable jmx endpoint url for jmx items (gcalenko, Ivo, Sasha, vso)
 ........S. [ZBXNEXT-3872] implemented new internal item 'zabbix[host,discovery,interfaces]' (Andris)
 A.F....... [ZBXNEXT-3869] implemented map lines (vjaceslavs)
@@ -75,6 +79,10 @@ Changes for 3.2.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
+...G...... [ZBX-12231] fixed memory leak in agent if log[], logrt[] items use global regexps with multiple subexpressions (Andris)
+...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
+........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
 ..F....... [ZBX-12305] fixed incorrectly escaped IT Service parent name (Ivo)
 ..F....... [ZBX-11812] fixed sorting of host interfaces (miks)
 ..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
@@ -505,6 +513,10 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), K
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 
 Bug fixes:
+........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
+...G...... [ZBX-12231] fixed memory leak in agent if log[], logrt[] items use global regexps with multiple subexpressions (Andris)
+...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
+........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
 ..F....... [ZBX-12305] fixed incorrectly escaped IT Service parent name (Ivo)
 ..F....... [ZBX-11812] fixed sorting of host interfaces (miks)
 ..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
@@ -2196,6 +2208,9 @@ Changes for 2.2.19rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
+...G...... [ZBX-12231] fixed memory leak in agent if log[], logrt[] items use global regexps with multiple subexpressions (Andris)
+...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 A......... [ZBX-12023] fixed permission issue with event.get method (Sasha)
 .......PS. [ZBX-12046] fixed handling of database failure during ID selection (vso)
 ..F....... [ZBX-11683] fixed problem with lost IDs of unlinkable templates (miks)

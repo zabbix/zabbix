@@ -2063,6 +2063,51 @@ int	is_ip(const char *ip)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_validate_hostname                                            *
+ *                                                                            *
+ * Purpose: check if string is a valid internet hostname                      *
+ *                                                                            *
+ * Parameters: hostname - [IN] hostname string to be checked                  *
+ *                                                                            *
+ * Return value: SUCCEED - could be a valid hostname,                         *
+ *               FAIL - definitely not a valid hostname                       *
+ * Comments:                                                                  *
+ *     Validation is not strict. Restrictions not checked:                    *
+ *         - individual label (component) length 1-63,                        *
+ *         - hyphens ('-') allowed only as interior characters in labels,     *
+ *         - underscores ('_') allowed in domain name, but not in hostname.   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_validate_hostname(const char *hostname)
+{
+	int		component;	/* periods ('.') are only allowed when they serve to delimit components */
+	int		len = 255;	/* maximum hostname length comes from RFC 1035 (without terminating '\0') */
+	const char	*p;
+
+	/* the first character must be an alphanumeric character */
+	if (0 == isalnum(*hostname))
+		return FAIL;
+
+	/* check only up to the first 'len' characters, the 1st character is already successfully checked */
+	for (p = hostname + 1, component = 1; '\0' != *p; p++)
+	{
+		if (0 == --len)				/* hostname too long */
+			return FAIL;
+
+		/* check for allowed characters */
+		if (0 != isalnum(*p) || '-' == *p || '_' == *p)
+			component = 1;
+		else if ('.' == *p && 1 == component)
+			component = 0;
+		else
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ip_in_list                                                       *
  *                                                                            *
  * Purpose: check if ip matches range of ip addresses                         *
