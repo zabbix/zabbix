@@ -265,7 +265,6 @@ void	zbx_cu_run(int argc, char *argv[])
 		CU_list_tests_to_file();
 		ret = EXIT_SUCCESS;
 	}
-
 out:
 	zbx_free(suite);
 	zbx_free(output);

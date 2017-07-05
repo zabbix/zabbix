@@ -491,6 +491,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
+				case ZBX_PREPROC_XPATH:
+				case ZBX_PREPROC_JSONPATH:
 					$step['params'] = $step['params'][0];
 					break;
 
@@ -923,6 +925,8 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 						case ZBX_PREPROC_RTRIM:
 						case ZBX_PREPROC_LTRIM:
 						case ZBX_PREPROC_TRIM:
+						case ZBX_PREPROC_XPATH:
+						case ZBX_PREPROC_JSONPATH:
 							$step['params'] = $step['params'][0];
 							break;
 

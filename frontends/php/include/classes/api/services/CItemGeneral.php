@@ -887,7 +887,9 @@ abstract class CItemGeneral extends CApiService {
 	 *															7 - ZBX_PREPROC_OCT2DEC;
 	 *															8 - ZBX_PREPROC_HEX2DEC;
 	 *															9 - ZBX_PREPROC_DELTA_VALUE;
-	 *															10 - ZBX_PREPROC_DELTA_SPEED.
+	 *															10 - ZBX_PREPROC_DELTA_SPEED;
+	 *															11 - ZBX_PREPROC_XPATH;
+	 *															12 - ZBX_PREPROC_JSONPATH.
 	 * @param string $item['preprocessing'][]['params']		Additional parameters used by preprocessing option. In case
 	 *														of regular expression (ZBX_PREPROC_REGSUB), multiple
 	 *														parameters are separated by LF (\n)character.
@@ -953,6 +955,8 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_RTRIM:
 					case ZBX_PREPROC_LTRIM:
 					case ZBX_PREPROC_TRIM:
+					case ZBX_PREPROC_XPATH:
+					case ZBX_PREPROC_JSONPATH:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
