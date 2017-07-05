@@ -54,7 +54,7 @@ class CNavigationTree extends CDiv {
 						'severity_levels: '.json_encode($this->data['severity_config']).','.
 						'navtree_items_opened: "'.implode(',', $this->data['navtree_items_opened']).'",'.
 						'navtree_item_selected: '.intval($this->data['navtree_item_selected']).','.
-						'load_selected: '.$this->data['initial_load'].','.
+						'initial_load: '.$this->data['initial_load'].','.
 						'uniqueid: "'.$this->data['uniqueid'].'",'.
 						'max_depth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
 					'});';

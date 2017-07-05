@@ -437,7 +437,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 			$navtree_items_opened = array_keys(
 				CProfile::findByIDXs('web.dashbrd.navtree-%.toggle', $widgetid, 'idx', true));
 
-			//$navtree_item_selected = CProfile::get('web.dashbrd.navtree.item.selected', 0, $widgetid);
+			$navtree_item_selected = CProfile::get('web.dashbrd.navtree.item.selected', 0, $widgetid);
 		}
 
 		$this->setResponse(new CControllerResponseData([

@@ -1230,7 +1230,7 @@ jQuery(function($) {
 							switchToEditMode();
 						}
 						else {
-							if (!widget_data['initial_load'] && widget_data['fields']['map_widget_reference'].length) {
+							if (options['initial_load'] && widget_data['fields']['map_widget_reference'].length) {
 								$('.dashbrd-grid-widget-container').dashboardGrid('registerAsSharedDataReceiver', {
 									uniqueid: widget_data['uniqueid'],
 									source_widget_reference: widget_data['fields']['map_widget_reference'],
@@ -1286,20 +1286,25 @@ jQuery(function($) {
 							}
 
 							switchToNavigationMode();
+
 							if (options.navtree_item_selected) {
-								// Trigger onClick on item left as selected in before.
-								if (options.load_selected) {
-									$('.tree-item[data-id='+options.navtree_item_selected+'] .item-name')
-										.trigger('click');
+								var selected_item = $('.tree-item[data-id='+options.navtree_item_selected+']'),
+									step_in_path = selected_item;
+
+								while ($(step_in_path).length) {
+									$(step_in_path).addClass('selected');
+									step_in_path = $(step_in_path).parent().closest('.tree-item');
 								}
-								// Mark item selected before as selected.
-								else {
-									$('.tree-item[data-id='+options.navtree_item_selected+']').addClass('selected');
+
+								if (options['initial_load']) {
+									$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare',
+										widget_data, {mapid: $(selected_item).data('mapid')});
 								}
 
 								openBranch(options.navtree_item_selected);
-								shorten_item_names();
 							}
+
+							shorten_item_names();
 						}
 					});
 				}
