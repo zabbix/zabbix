@@ -1235,7 +1235,8 @@ jQuery(function($) {
 									uniqueid: widget_data['uniqueid'],
 									source_widget_reference: widget_data['fields']['map_widget_reference'],
 									callback: function(widget, data) {
-										var selector = '',
+										var item,
+											selector = '',
 											mapid_selector = '',
 											previous_mapid_selector = '';
 
@@ -1255,24 +1256,31 @@ jQuery(function($) {
 											}
 										}
 
-										if (data[0]['moving_upward']) {
-											selector = previous_mapid_selector + ' ' + mapid_selector;
+										if (previous_mapid_selector.length && mapid_selector.length) {
+											selector = previous_mapid_selector + ' > .tree-list > ' + mapid_selector;
+											if (!data[0]['moving_upward']) {
+												selector = selector + ':first';
+											}
+											item = $(selector.trim(selector), $this);
 										}
 										else {
-											selector = previous_mapid_selector + ' ' + mapid_selector+':first';
+											item = $('.selected', $this).closest(mapid_selector);
 										}
 
-										var item = $(selector, $this),
-											step_in_path = $(item).closest('.tree-item');
+										if (item.length) {
+											item = item.first();
 
-										$('.selected', $this).removeClass('selected');
-										$(item).addClass('selected');
+											var step_in_path = $(item).closest('.tree-item');
 
-										while ($(step_in_path).length) {
-											$(step_in_path).addClass('selected');
-											step_in_path = $(step_in_path).parent().closest('.tree-item');
+											$('.selected', $this).removeClass('selected');
+											$(item).addClass('selected');
+
+											while ($(step_in_path).length) {
+												$(step_in_path).addClass('selected');
+												step_in_path = $(step_in_path).parent().closest('.tree-item');
+											}
+											openBranch($(item).data('id'));
 										}
-										openBranch($(item).data('id'));
 									}
 								});
 							}
