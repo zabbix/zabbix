@@ -60,6 +60,8 @@ class CDashboardWidgetMap extends CDiv {
 					'}'.
 				'});'.
 
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("callWidgetDataShare", false);'.
+
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart", '.
 					'"zbx_sysmap_widget_trigger", {'.
 						'parameters: ["onEditStart"],'.

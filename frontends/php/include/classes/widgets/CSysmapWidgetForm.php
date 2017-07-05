@@ -55,13 +55,15 @@ class CSysmapWidgetForm extends CWidgetForm {
 
 			$this->fields[] = $field_filter_widget;
 		}
+		else {
+			// select sysmap field
+			$field_map = (new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP))
+				->setRequired(true);
 
-		// select sysmap field
-		$field_map = (new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP))
-			->setRequired($field_source_type->getValue(true) === WIDGET_SYSMAP_SOURCETYPE_MAP);
-		if (array_key_exists('sysmapid', $data)) {
-			$field_map->setValue($data['sysmapid']);
+			if (array_key_exists('sysmapid', $data)) {
+				$field_map->setValue($data['sysmapid']);
+			}
+			$this->fields[] = $field_map;
 		}
-		$this->fields[] = $field_map;
 	}
 }

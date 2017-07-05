@@ -878,7 +878,8 @@
 					widgets: [],
 					widget_defaults: {},
 					triggers: {},
-					placeholder: $placeholder
+					placeholder: $placeholder,
+					data_buffer: []
 				});
 
 				var	data = $this.data('dashboardGrid');
@@ -1184,7 +1185,7 @@
 		registerAsSharedDataReceiver: function(obj) {
 			return this.each(function() {
 				var $this = $(this),
-						data = $this.data('dashboardGrid');
+					data = $this.data('dashboardGrid');
 
 				for (var i = 0, l = data['widgets'].length; l > i; i++) {
 					if (data['widgets'][i]['uniqueid'] == obj.uniqueid) {
@@ -1197,32 +1198,80 @@
 			});
 		},
 
-		widgetDataShare: function(widget) {
-			var args = Array.prototype.slice.call(arguments, 1),
-					reference = '';
+		widgetDataShare: function(widget, data_key) {
+			var args = Array.prototype.slice.call(arguments, 2);
 
 			if (!args.length) {
 				return false;
 			}
 
-			if (typeof widget['fields']['reference'] !== 'undefined') {
+			if (typeof widget['fields'] === 'object' && typeof widget['fields']['reference'] !== 'undefined') {
 				var reference = widget['fields']['reference'];
 
 				return this.each(function() {
 					var $this = $(this),
-							data = $this.data('dashboardGrid');
+						data = $this.data('dashboardGrid'),
+						indx = -1;
 
-					for (var i = 0, l = data['widgets'].length; l > i; i++) {
-						if (typeof(data['widgets'][i]['listen_for']) != 'undefined') {
-							for (var t = 0, j = data['widgets'][i]['listen_for'].length; j > t; t++) {
-								if (data['widgets'][i]['listen_for'][t]['source_widget_reference'] === reference) {
-									data['widgets'][i]['listen_for'][t].callback.apply(this, [data['widgets'][i], args]);
-								}
+					if (typeof data['data_buffer'][reference] === 'undefined') {
+						data['data_buffer'][reference] = [];
+					}
+					else if (typeof data['data_buffer'][reference] !== 'undefined') {
+						$.each(data['data_buffer'][reference], function(i, arr) {
+							if (arr['data_key'] === data_key) {
+								indx = i;
 							}
+						});
+					}
+
+					if (indx === -1) {
+						data['data_buffer'][reference].push({
+							data_key: data_key,
+							args: args,
+							old: false
+						});
+					}
+					else {
+						if (data['data_buffer'][reference][indx]['args'] !== args) {
+							data['data_buffer'][reference][indx]['args'] = args;
+							data['data_buffer'][reference][indx]['old'] = false;
 						}
 					}
+
+					methods.callWidgetDataShare.call($(this), true);
 				});
 			}
+		},
+
+		callWidgetDataShare: function($obj) {
+			var ignore_old_data = arguments[0];
+
+			return this.each(function() {
+				var $this = $(this),
+					data = $this.data('dashboardGrid');
+
+				for (var reference in data['data_buffer']) {
+					if (typeof data['data_buffer'][reference] === 'object') {
+						$.each(data['data_buffer'][reference], function(i, shared_data) {
+							if (!shared_data['old'] || !ignore_old_data) {
+								for (var i = 0, l = data['widgets'].length; l > i; i++) {
+									if (typeof(data['widgets'][i]['listen_for']) != 'undefined') {
+										for (var t = 0, j = data['widgets'][i]['listen_for'].length; j > t; t++) {
+											var wr = data['widgets'][i]['listen_for'][t]['source_widget_reference'];
+											if (wr === reference) {
+												data['widgets'][i]['listen_for'][t].callback.apply($obj,
+													[data['widgets'][i], shared_data['args']]
+												);
+											}
+										}
+									}
+								}
+							}
+							shared_data['old'] = true;
+						});
+					}
+				}
+			});
 		},
 
 		makeReference: function() {

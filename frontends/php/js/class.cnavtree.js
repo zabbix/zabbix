@@ -752,7 +752,8 @@ jQuery(function($) {
 
 							e.preventDefault();
 							updateUserProfile('web.dashbrd.navtree.item.selected', itemid, [widget['widgetid']]);
-							$(".dashbrd-grid-widget-container").dashboardGrid("widgetDataShare", widget, data_to_share);
+							$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+								'selected_mapid', data_to_share);
 						});
 				}
 				else {
@@ -1287,6 +1288,9 @@ jQuery(function($) {
 
 							switchToNavigationMode();
 
+							if (!options.navtree_item_selected) {
+								options.navtree_item_selected = $('.tree-item', $this).first().data('id');
+							}
 							if (options.navtree_item_selected) {
 								var selected_item = $('.tree-item[data-id='+options.navtree_item_selected+']'),
 									step_in_path = selected_item;
@@ -1298,7 +1302,7 @@ jQuery(function($) {
 
 								if (options['initial_load']) {
 									$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare',
-										widget_data, {mapid: $(selected_item).data('mapid')});
+										widget_data, 'selected_mapid', {mapid: $(selected_item).data('mapid')});
 								}
 
 								openBranch(options.navtree_item_selected);
