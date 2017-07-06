@@ -108,7 +108,6 @@ class CItem extends CItemGeneral {
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'		=> null,
 			'selectPreprocessing'		=> null,
-			'selectMasterItem'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -352,12 +351,6 @@ class CItem extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
-		if ($options['selectMasterItem'] && $options['output'] != API_OUTPUT_EXTEND
-				&& $options['output'] != API_OUTPUT_COUNT) {
-			$sqlParts['select'][] = 'i.master_itemid';
-		}
-
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
