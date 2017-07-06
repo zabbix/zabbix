@@ -78,16 +78,6 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	public function getShifts() {
-		$shifts = [];
-		$shifts['shiftXleft'] = $this->shiftXleft;
-		$shifts['shiftXright'] = $this->shiftXright;
-		$shifts['shiftY'] = $this->shiftY;
-		$shifts['height'] = $this->sizeY;
-		$shifts['width'] = $this->sizeX;
-		return $shifts;
-	}
-
 	public function showWorkPeriod($value) {
 		$this->m_showWorkPeriod = ($value == 1) ? 1 : 0;
 	}
