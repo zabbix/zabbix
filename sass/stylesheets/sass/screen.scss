@@ -4466,10 +4466,28 @@ tr.cursor-move {
 			}
 		}
 
+		.tree-list[data-depth] .ui-sortable-helper {
+			> .tree-row > .content > .margin-lvl {
+				flex: 0 0 15px;
+			}
+
+			@for $i from 1 through $max_depth - 1 {
+				$class_tree_list: '.tree-list';
+				@for $j from 1 through $i {
+					@if $j != 1 {
+						$class_tree_list: $class_tree_list + ' .tree-list';
+					}
+				}
+				#{$class_tree_list} > li > .tree-row > .content > .margin-lvl {
+					flex: 0 0 ($i * 15px + 15px);
+				}
+			}
+		}
+
 		.tree-item {
 			> .tree-row {
 				width: 100%;
-				min-width: 300px;
+				min-width: 320px;
 				border-bottom: 1px solid $ui-border-color;
 				padding: 8px 0;
 

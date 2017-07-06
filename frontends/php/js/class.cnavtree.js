@@ -44,6 +44,7 @@ if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
 			forceHelperSize: true,
 			tolerance: 'intersect',
 			handle: '.drag-icon',
+			cursorAt: {left: 15},
 			items: '.tree-item',
 			helper:	'clone',
 			revert:	10,
@@ -722,9 +723,12 @@ jQuery(function($) {
 					});
 				}
 
-				var map_accessible = (widget_data['maps_accessible'].indexOf(item.mapid) !== -1);
-				if (!map_accessible && !isEditMode()) {
-					item_clases += ' inaccessible';
+				var map_accessible = false;
+				if (item.mapid) {
+					map_accessible = (widget_data['maps_accessible'].indexOf(item.mapid) !== -1);
+					if (!map_accessible && !isEditMode()) {
+						item_clases += ' inaccessible';
+					}
 				}
 
 				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0 && map_accessible) {
