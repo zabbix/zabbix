@@ -95,6 +95,60 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->m_showTriggers = ($value == 1) ? 1 : 0;
 	}
 
+	/**
+	 * Add single item object to graph
+	 *
+	 * @param array $item					Array of item properties.
+	 * @param string $item['name_expanded']	Item name already expanded.
+	 * @param string $item['hostname']		Item name, if name uses macro it should be resolved first.
+	 * @param string $item['host']			Item host visible name.
+	 * @param string $item['delay']			Item delay.
+	 * @param array $item['intervals']		Item name, if name uses macro it should be resolved first.
+	 * @param string $item['units']			Item units value.
+	 * @param string $item['unitsLong']		Item units value.
+	 * @param array $options				Array ot item presentation options.
+	 * @param string $options['color']		Item presentation color.
+	 * @param int $options['drawtype']		Item presentation draw type, could be one of GRAPH_ITEM_DRAWTYPE_* constants.
+	 * @param int $options['axisside']		Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
+	 * @param int $options['calc_fnc']		Item calculation function, could be one of CALC_FNC_* contants.
+	 * @param int $options['calc_type']		Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or GRAPH_ITEM_SUM
+	 */
+	public function addGraphItem(array $item, array $options) {
+		if ($this->type == GRAPH_TYPE_STACKED) {
+			$options['drawtype'] = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
+		}
+
+		// Set graph item safe default values.
+		$item += [
+			'type'			=> ITEM_TYPE_TRAPPER,
+			'name_expanded'	=> '',
+			'hostname'		=> '',
+			'host'			=> '',
+			'dealy'			=> '',
+			'intervals'		=> [],
+			'units'			=> '',
+			'unitsLong'		=> ''
+		];
+		// Set default values.
+		$options += [
+			'color'		=> 'Dark Green',
+			'drawtype'	=> GRAPH_ITEM_DRAWTYPE_LINE,
+			'axisside'	=> GRAPH_YAXIS_SIDE_DEFAULT,
+			'calc_fnc'	=> CALC_FNC_AVG,
+			'calc_type'	=> GRAPH_ITEM_SIMPLE
+		];
+		$this->items[$this->num] = $options + $item;
+
+		if ($options['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+			$this->yaxisleft = 1;
+		}
+		else if ($options['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
+			$this->yaxisright = 1;
+		}
+
+		$this->num++;
+	}
+
 	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null, $drawtype = null, $type = null) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
@@ -2628,7 +2682,6 @@ class CLineGraphDraw extends CGraphDraw {
 				$delay = $this->items[$item]['delay'];
 
 				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
-						|| $this->items[$item]['type'] == ITEM_TYPE_DEPENDENT
 						|| ($this->hasSchedulingIntervals($this->items[$item]['intervals']) && $delay == 0)) {
 					$draw = true;
 				}
