@@ -2196,21 +2196,20 @@ function get_status() {
 	return $status;
 }
 
-function set_image_header($format = null) {
+function set_image_header() {
 	global $IMAGE_FORMAT_DEFAULT;
 
-	if (is_null($format)) {
-		$format = $IMAGE_FORMAT_DEFAULT;
-	}
+	switch ($IMAGE_FORMAT_DEFAULT) {
+		case IMAGE_FORMAT_JPEG:
+			header('Content-type: image/jpeg');
+			break;
 
-	if (IMAGE_FORMAT_JPEG == $format) {
-		header('Content-type: image/jpeg');
-	}
-	if (IMAGE_FORMAT_TEXT == $format) {
-		header('Content-type: text/html');
-	}
-	else {
-		header('Content-type: image/png');
+		case IMAGE_FORMAT_TEXT:
+			header('Content-type: text/html');
+			break;
+
+		default:
+			header('Content-type: image/png');
 	}
 
 	header('Expires: Mon, 17 Aug 1998 12:51:50 GMT');

@@ -57,6 +57,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->gridStep = []; // grid step
 		$this->gridPixels = 30; // optimal grid size
 		$this->gridPixelsVert = 40;
+		$this->axis_valuetype = []; // overal items type (int/float)
 	}
 
 	/********************************************************************************************************/
@@ -2516,58 +2517,59 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->selectData();
 
-		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])) {
+		$sides = [];
+
+		if (array_key_exists(GRAPH_YAXIS_SIDE_RIGHT, $this->axis_valuetype)) {
 			$sides[] = GRAPH_YAXIS_SIDE_RIGHT;
 		}
-
-		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT]) || !isset($sides)) {
+		if (array_key_exists(GRAPH_YAXIS_SIDE_LEFT, $this->axis_valuetype) || !$sides) {
 			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
 		}
 
-		foreach ($sides as $graphSide) {
-			$this->m_minY[$graphSide] = $this->calculateMinY($graphSide);
-			$this->m_maxY[$graphSide] = $this->calculateMaxY($graphSide);
+		foreach ($sides as $side) {
+			$this->m_minY[$side] = $this->calculateMinY($side);
+			$this->m_maxY[$side] = $this->calculateMaxY($side);
 
-			if ($this->m_minY[$graphSide] === null) {
-				$this->m_minY[$graphSide] = 0;
+			if ($this->m_minY[$side] === null) {
+				$this->m_minY[$side] = 0;
 			}
-			if ($this->m_maxY[$graphSide] === null) {
-				$this->m_maxY[$graphSide] = 1;
+			if ($this->m_maxY[$side] === null) {
+				$this->m_maxY[$side] = 1;
 			}
 
-			if ($this->m_minY[$graphSide] == $this->m_maxY[$graphSide]) {
-				if ($this->graphOrientation[$graphSide] == '-') {
-					$this->m_maxY[$graphSide] = 0;
+			if ($this->m_minY[$side] == $this->m_maxY[$side]) {
+				if ($this->graphOrientation[$side] == '-') {
+					$this->m_maxY[$side] = 0;
 				}
-				elseif ($this->m_minY[$graphSide] == 0) {
-					$this->m_maxY[$graphSide] = 1;
+				elseif ($this->m_minY[$side] == 0) {
+					$this->m_maxY[$side] = 1;
 				}
 				else {
-					$this->m_minY[$graphSide] = 0;
+					$this->m_minY[$side] = 0;
 				}
 			}
-			elseif ($this->m_minY[$graphSide] > $this->m_maxY[$graphSide]) {
-				if ($this->graphOrientation[$graphSide] == '-') {
-					$this->m_minY[$graphSide] = bcmul($this->m_maxY[$graphSide], 0.2);
+			elseif ($this->m_minY[$side] > $this->m_maxY[$side]) {
+				if ($this->graphOrientation[$side] == '-') {
+					$this->m_minY[$side] = bcmul($this->m_maxY[$side], 0.2);
 				}
 				else {
-					$this->m_minY[$graphSide] = 0;
+					$this->m_minY[$side] = 0;
 				}
 			}
 
 			// If max Y-scale bigger min Y-scale only for 10% or less, then we don't allow Y-scale duplicate
-			if ($this->m_maxY[$graphSide] && $this->m_minY[$graphSide]) {
-				if ($this->m_minY[$graphSide] < 0) {
-					$absMinY = bcmul($this->m_minY[$graphSide], '-1');
+			if ($this->m_maxY[$side] && $this->m_minY[$side]) {
+				if ($this->m_minY[$side] < 0) {
+					$absMinY = bcmul($this->m_minY[$side], '-1');
 				}
 				else {
-					$absMinY = $this->m_minY[$graphSide];
+					$absMinY = $this->m_minY[$side];
 				}
-				if ($this->m_maxY[$graphSide] < 0) {
-					$absMaxY = bcmul($this->m_maxY[$graphSide], '-1');
+				if ($this->m_maxY[$side] < 0) {
+					$absMaxY = bcmul($this->m_maxY[$side], '-1');
 				}
 				else {
-					$absMaxY = $this->m_maxY[$graphSide];
+					$absMaxY = $this->m_maxY[$side];
 				}
 
 				if ($absMaxY < $absMinY) {
@@ -2577,17 +2579,17 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 
 				if (bcdiv((bcsub($absMaxY, $absMinY)), $absMaxY) <= 0.1) {
-					if ($this->m_minY[$graphSide] > 0) {
-						$this->m_minY[$graphSide] = bcmul($this->m_minY[$graphSide], 0.95);
+					if ($this->m_minY[$side] > 0) {
+						$this->m_minY[$side] = bcmul($this->m_minY[$side], 0.95);
 					}
 					else {
-						$this->m_minY[$graphSide] = bcmul($this->m_minY[$graphSide], 1.05);
+						$this->m_minY[$side] = bcmul($this->m_minY[$side], 1.05);
 					}
-					if ($this->m_maxY[$graphSide] > 0) {
-						$this->m_maxY[$graphSide] = bcmul($this->m_maxY[$graphSide], 1.05);
+					if ($this->m_maxY[$side] > 0) {
+						$this->m_maxY[$side] = bcmul($this->m_maxY[$side], 1.05);
 					}
 					else {
-						$this->m_maxY[$graphSide] = bcmul($this->m_maxY[$graphSide], 0.95);
+						$this->m_maxY[$side] = bcmul($this->m_maxY[$side], 0.95);
 					}
 				}
 			}
