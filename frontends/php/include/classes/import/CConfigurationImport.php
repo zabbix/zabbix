@@ -2385,125 +2385,175 @@ class CConfigurationImport {
 	 * dependency level.
 	 *
 	 * @param string $master_key_identifier	String containing master key name used to identify item master.
-	 * @param array $host_items				Associative array where key is host key and values ae arrays with items.
-	 * @param CItem|CItemPrototype			Not resolved master entities in supplied $host_items array will be requested
-	 *										using this service.
+	 * @param array $host_entities			Associative array where key is host key and values ae arrays with items.
+	 * @param CItem|CItemPrototype			Not resolved master entities in supplied $host_entities array will be
+	 *										requested using this service.
 	 *
 	 * @return array
 	 */
-	protected function getEntitiesOrder($master_key_identifier, $host_items, $data_provider) {
-		$tree = [];
-		$db_indexed_items = [];
-		$unresolved_masters = [];
+	protected function getEntitiesOrder($master_key_identifier, $host_entities, $data_provider) {
+		// Maximum allowed dependency level.
+		// 0..1..2..3, level 0 is counted as root master item level.
+		$max_dependency_level = 3;
+		// Resolve all master entities from database
+		$find_keys = [];
+		$find_hosts = [];
 		$resolved_masters_cache = [];
-		$has_unresolved_items = false;
-		$hostkey_to_hostid = array_fill_keys(array_keys($host_items), 0);
+		$hostkey_to_hostid = array_fill_keys(array_keys($host_entities), 0);
 
 		foreach ($hostkey_to_hostid as $host_key => &$hostid) {
 			$hostid = $this->referencer->resolveHostOrTemplate($host_key);
 		}
 
-		do {
-			if ($has_unresolved_items) {
-				$searchable_keys = [];
-
-				foreach ($unresolved_masters as $hostid => $masters) {
-					$searchable_keys += $masters;
-				}
-
-				$response = $data_provider->get([
-					'output' => ['key_', 'type', 'hostid'],
-					'hostids' => array_keys($unresolved_masters),
-					'filter' => ['key_' => array_keys($searchable_keys)],
-					'selectMasterItem' => ['key_'],
-					'preservekeys' => true
-				]);
-
-				if ($response && !$resolved_masters_cache) {
-					// For existing items, 'referencer' should be initialized before 'addItemRef' method will be used.
-					// Registering reference when property 'itemRefs' is empty, will not allow first call of
-					// 'resolveValueMap' method update references to existing items.
-					$this->referencer->initItemsReferences();
-				}
-
-				foreach ($response as $itemid => $item) {
-					$host_key = array_search($item['hostid'], $hostkey_to_hostid);
-					$item_key = $item['key_'];
-					$item['key'] = $item_key;
-					$item[$master_key_identifier]['key'] = ($item['type'] == ITEM_TYPE_DEPENDENT)
-						? $item['master_item']['key_']
-						: '';
-					$resolved_masters_cache[$host_key][$item_key] = $item;
-					$this->referencer->addItemRef($item['hostid'], $item_key, $itemid);
-					unset($searchable_keys[$item_key]);
-				}
-
-				if ($searchable_keys) {
-					reset($searchable_keys);
-					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', $master_key_identifier,
-						_s('value "%1$s" not found', key($searchable_keys))
-					));
-				}
-
-				$has_unresolved_items = false;
-				$unresolved_masters = [];
+		foreach ($host_entities as $host_key => $entities) {
+			if (!array_key_exists($host_key, $hostkey_to_hostid)) {
+				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'host',
+					_('value not found')
+				));
 			}
 
-			foreach ($host_items as $host_key => $items) {
-				$hostid = $hostkey_to_hostid[$host_key];
-				$host_items_tree = [];
+			if (!array_key_exists($host_key, $resolved_masters_cache)) {
+				$resolved_masters_cache[$host_key] = [];
+			}
 
-				if (!array_key_exists($hostid, $db_indexed_items)) {
-					foreach ($items as $item_key => $item) {
-						$indexed_items[$item['key_']] = $item_key;
-					}
-					$db_indexed_items[$hostid] = $indexed_items;
+			foreach ($entities as $entity_key => $entity) {
+				$resolved_masters_cache[$host_key][$entity_key] = [
+					'type'					=> $entity['type'],
+					$master_key_identifier	=> $entity[$master_key_identifier]
+				];
+
+				if ($entity['type'] = ITEM_TYPE_DEPENDENT
+						&& array_key_exists('key', $entity[$master_key_identifier])) {
+					$find_hosts[$hostkey_to_hostid[$host_key]] = true;
+					$find_keys[$entity[$master_key_identifier]['key']] = true;
 				}
-				$indexed_items = $db_indexed_items[$hostid];
+			}
+		}
 
-				// Find nesting level for every host item.
-				foreach ($items as $index => $item) {
-					$level = 0;
+		// There are entities to resolve from database, resolve and cache them recursively.
+		if ($find_keys) {
+			// For existing items, 'referencer' should be initialized before 'addItemRef' method will be used.
+			// Registering reference when property 'itemRefs' is empty, will not allow first call of
+			// 'resolveValueMap' method update references to existing items.
+			$this->referencer->initItemsReferences();
+			$resolved_entities = $data_provider->get([
+				'output'		=> ['key_', 'type', 'hostid', 'master_itemid'],
+				'hostids'		=> array_keys($find_hosts),
+				'filter'		=> ['key_' => array_keys($find_keys)],
+				'preservekeys'	=> true
+			]);
+			$resolve_entity_keys = [];
+			$host_entity_idkey_hash = [];
 
-					// Traverse up searching master root item for current item.
-					// If master item data should be requested by data_provider add master itemid for bulk requests.
-					while ($item && $item['type'] == ITEM_TYPE_DEPENDENT) {
-						$master_key = $item[$master_key_identifier]['key'];
+			for ($level = 0; $level < $max_dependency_level; $level++) {
+				$find_ids = [];
 
-						if (array_key_exists($master_key, $indexed_items)) {
-							$item = $items[$indexed_items[$master_key]];
-							if ($item[$master_key_identifier] && $master_key == $item[$master_key_identifier]['key']) {
-								throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-									_('master_itemid and itemid should not match')
-								));
-							}
-							$level++;
-						}
-						elseif (array_key_exists($host_key, $resolved_masters_cache)
-								&& array_key_exists($master_key, $resolved_masters_cache[$host_key])) {
-							$item = $resolved_masters_cache[$host_key][$master_key];
-							if ($item[$master_key_identifier] && $master_key == $item[$master_key_identifier]['key']) {
-								throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-									_('master_itemid and itemid should not match')
-								));
-							}
-							$level++;
+				foreach ($resolved_entities as $entityid => $entity) {
+					$host_key = array_search($entity['hostid'], $hostkey_to_hostid);
+					$entity['key'] = $entity['key_'];
+					unset($entity['key_']);
+					$host_entity_idkey_hash[$host_key][$entityid] = $entity['key'];
+					$this->referencer->addItemRef($entity['hostid'], $entity['key'], $entityid);
+					$cache_entity = [
+						'type'	=> $entity['type']
+					];
+
+					if ($entity['type'] == ITEM_TYPE_DEPENDENT) {
+						$master_itemid = $entity['master_itemid'];
+						if (array_key_exists($master_itemid, $host_entity_idkey_hash[$host_key])) {
+							$cache_entity[$master_key_identifier] = [
+								'key'	=> $host_entity_idkey_hash[$host_key][$master_itemid]
+							];
 						}
 						else {
-							$unresolved_masters[$hostid][$master_key] = true;
-							$has_unresolved_items = true;
-							break;
+							$find_ids[] = $entity['master_itemid'];
+							$resolve_entity_keys[] = [
+								'host'			=> $host_key,
+								'key'			=> $entity['key'],
+								'master_itemid'	=> $entity['master_itemid']
+							];
 						}
 					}
-					$host_items_tree[$index] = $level;
-					// TODO: break if $unresolved_masters greater than 50/100/etc
-					//		 Do we need to care about memory consumption for unresolved masters array?
+					$resolved_masters_cache[$host_key][$entity['key']] = $cache_entity;
 				}
-				$tree[$host_key] = $host_items_tree;
+
+				if ($find_ids) {
+					$resolved_entities = $data_provider->get([
+						'output'		=> ['key_', 'type', 'hostid', 'master_itemid'],
+						'itemids'		=> $find_ids,
+						'preservekeys'	=> true
+					]);
+				}
+				else {
+					break;
+				}
 			}
 
-		} while ($has_unresolved_items);
+			if ($find_ids) {
+				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+					_('maximum master items count reached')
+				));
+			}
 
+			foreach ($resolve_entity_keys as $entity) {
+				$master_itemid = $entity['master_itemid'];
+				if (!array_key_exists($entity['host'], $host_entity_idkey_hash) ||
+						!array_key_exists($master_itemid, $host_entity_idkey_hash[$entity['host']])) {
+					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+						_('value not found')
+					));
+				}
+				$master_key = $host_entity_idkey_hash[$entity['host']][$master_itemid];
+				$resolved_masters_cache[$entity['host']][$entity['key']] += [
+					$master_key_identifier => ['key' => $master_key]
+				];
+			}
+			unset($resolve_entity_keys);
+			unset($host_entity_idkey_hash);
+		}
+		// Resolve every entity dependency level.
+		$tree = [];
+
+		foreach ($host_entities as $host_key => $entities) {
+			$hostid = $hostkey_to_hostid[$host_key];
+			$host_items_tree = [];
+
+			foreach ($entities as $entity_index => $entity) {
+				$level = 0;
+				$traversal_path = [$entity['key_']];
+
+				while ($entity && $entity['type'] == ITEM_TYPE_DEPENDENT) {
+					$master_key = $entity[$master_key_identifier]['key'];
+
+					if (array_key_exists($host_key, $resolved_masters_cache)
+							&& array_key_exists($master_key, $resolved_masters_cache[$host_key])) {
+						$entity = $resolved_masters_cache[$host_key][$master_key];
+						$traversal_path[] = $master_key;
+						if ($entity['type'] == ITEM_TYPE_DEPENDENT && $entity[$master_key_identifier]
+								&& $master_key == $entity[$master_key_identifier]['key']) {
+							throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+								_('master_itemid and itemid should not match')
+							));
+						}
+						$level++;
+					}
+					else {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('value not found')
+						));
+					}
+
+					if ($level > $max_dependency_level) {
+						$traversal = '"'. implode('" => "', $traversal_path) . '"';
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('maximum master items count reached')
+						));
+					}
+				}
+				$host_items_tree[$entity_index] = $level;
+			}
+			$tree[$host_key] = $host_items_tree;
+		}
 		// Order item indexes in descending order by nesting level
 		foreach ($tree as $host_key => &$item_indexes) {
 			asort($item_indexes);
