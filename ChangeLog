@@ -77,8 +77,6 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 --------------------------------------------------------------------------------
 Changes for 3.2.7rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
 ...G...... [ZBX-12231] fixed memory leak in agent if log[], logrt[] items use global regexps with multiple subexpressions (Andris)
