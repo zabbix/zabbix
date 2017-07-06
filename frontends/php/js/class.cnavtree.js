@@ -34,14 +34,6 @@ if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
 	}
 }
 
-if (typeof(shorten_item_names) !== typeof(Function)) {
-	function shorten_item_names() {
-		jQuery('.item-name > span').each(function() {
-			jQuery(this).css('max-width', jQuery(this).parent().width());
-		});
-	}
-}
-
 (function($) {
 	$.widget('zbx.sortable_tree', $.extend({}, $.ui.sortable.prototype, {
 		options: {
@@ -348,7 +340,7 @@ if (typeof(shorten_item_names) !== typeof(Function)) {
 					$(this.domPosition.parent).prepend(this.placeholder);
 				}
 
-				this._trigger("revert", event, this._uiHash());
+				this._trigger('revert', event, this._uiHash());
 				this.refreshPositions();
 				this._clear(event, noPropagation);
 			}
@@ -450,7 +442,6 @@ jQuery(function($) {
 						max_depth: widget_data['max_depth'],
 						stop: function(event, ui) {
 							setTreeHandlers();
-							shorten_item_names();
 						}
 					})
 					.disableSelection();
@@ -477,7 +468,6 @@ jQuery(function($) {
 				});
 
 				setTreeHandlers();
-				shorten_item_names();
 			};
 
 			var parseProblems = function() {
@@ -520,7 +510,7 @@ jQuery(function($) {
 					$('[data-problems'+sev+']', $this).each(function() {
 						var obj = $(this);
 
-						$('>.row', this).append($('<span>', {
+						$('>.tree-row>.problems', this).append($('<span>', {
 								'style': 'background: #'+conf['color'],
 								'class': 'problems-per-item',
 								'title': conf['name']
@@ -613,7 +603,7 @@ jQuery(function($) {
 													if ($('[name="map.name.'+id+'"]', $this).length) {
 														$('[name="map.name.'+id+'"]', $this).val(resp['map_name']);
 														$('[name="mapid.'+id+'"]', $this).val(resp['map_mapid']);
-														$('[data-id='+id+'] > .row > .item-name', $this)
+														$('[data-id='+id+'] > .tree-row > .content > .item-name', $this)
 															.empty()
 															.attr('title', resp['map_name'])
 															.append($('<span>').text(resp['map_name']));
@@ -638,7 +628,8 @@ jQuery(function($) {
 													if (typeof resp.hierarchy !== 'undefined') {
 														var add_child_levels = function(mapid, itemid) {
 															if (typeof resp.hierarchy[mapid] !== 'undefined') {
-																var root = $('.tree-item[data-id='+itemid+']>ul.tree-list', $this);
+																var sel = '.tree-item[data-id='+itemid+']>ul.tree-list',
+																	root = $(sel, $this);
 
 																$.each(resp.hierarchy[mapid], function(i, submapid) {
 																	var submap_item = resp.submaps[submapid],
@@ -663,7 +654,6 @@ jQuery(function($) {
 															.removeClass('closed');
 													}
 
-													shorten_item_names();
 													overlayDialogueDestroy();
 													setTreeHandlers();
 												}
@@ -733,7 +723,7 @@ jQuery(function($) {
 				}
 
 				var map_accessible = (widget_data['maps_accessible'].indexOf(item.mapid) !== -1);
-				if (!map_accessible) {
+				if (!map_accessible && !isEditMode()) {
 					item_clases += ' inaccessible';
 				}
 
@@ -771,46 +761,9 @@ jQuery(function($) {
 						'data-id': item.id
 					})
 					.append(
-						$('<div>')
-							.addClass('row')
-							.append((isEditMode() && editable) ? $('<div>').addClass('drag-icon') : null)
-							.append(editable ? $('<button></button>', {'type': 'button'}).addClass('treeview')
-								.append(
-									$('<span></span>').addClass((item_clases.indexOf('opened') !== -1)
-										? 'arrow-right'
-										: 'arrow-down'
-									)
-								)
-								.click(function() {
-									var widget_data = getWidgetData(),
-										branch = $(this).closest('[data-id]'),
-										button = $(this),
-										closed_state = '1';
-
-									if (branch.hasClass('opened')) {
-										$('span', button).addClass('arrow-right').removeClass('arrow-down');
-										branch.removeClass('opened').addClass('closed');
-									}
-									else {
-										$('span', button).addClass('arrow-down').removeClass('arrow-right');
-										branch.removeClass('closed').addClass('opened');
-										shorten_item_names();
-										closed_state = '0';
-									}
-
-									if (widget_data['widgetid'].length) {
-										updateUserProfile('web.dashbrd.navtree-'+branch.data('id')+'.toggle',
-											closed_state, [widget_data['widgetid']]
-										);
-									}
-								}) : null
-							)
-							.append($(link)
-								.addClass('item-name')
-								.attr('title', item.name)
-								.append($('<span>').text(item.name))
-							)
-							.append(isEditMode() ? $('<div>')
+						$('<div>', {'class': 'tree-row'})
+							.append(!isEditMode() ? $('<div></div>', {'class': 'problems'}) : null)
+							.append(isEditMode() ? $('<div></div>')
 								.addClass('tools')
 								.append($('<input>', {
 										'type': 'button',
@@ -869,7 +822,6 @@ jQuery(function($) {
 												.removeClass('closed')
 												.addClass('opened');
 
-											shorten_item_names();
 											setTreeHandlers();
 
 											if (typeof old_addPopupValues === 'function') {
@@ -903,6 +855,58 @@ jQuery(function($) {
 										removeItem([$(this).data('id')]);
 									}) : null
 								) : null
+							)
+							.append(
+								$('<div>', {'class': 'content'})
+									.append('<div class="margin-lvl"></div>')
+									.append(
+										(isEditMode() && editable) ? $('<div></div>', {'class': 'drag-icon'}) : null
+									)
+									.append(
+										$('<div></div>', {'class': 'arrow'})
+											.append(editable ? $('<button>', {'type': 'button'}).addClass('treeview')
+												.append(
+													$('<span></span>').addClass((item_clases.indexOf('opened') !== -1)
+														? 'arrow-right'
+														: 'arrow-down'
+													)
+												)
+												.click(function() {
+													var widget_data = getWidgetData(),
+														branch = $(this).closest('[data-id]'),
+														button = $(this),
+														closed_state = '1';
+
+													if (branch.hasClass('opened')) {
+														$('span', button)
+															.addClass('arrow-right')
+															.removeClass('arrow-down');
+
+														branch.removeClass('opened').addClass('closed');
+													}
+													else {
+														$('span', button)
+															.addClass('arrow-down')
+															.removeClass('arrow-right');
+
+														branch.removeClass('closed').addClass('opened');
+														closed_state = '0';
+													}
+
+													if (widget_data['widgetid'].length) {
+														updateUserProfile(
+															'web.dashbrd.navtree-'+branch.data('id')+'.toggle',
+															closed_state, [widget_data['widgetid']]
+														);
+													}
+												}) : null
+											)
+									)
+									.append($(link)
+										.addClass('item-name')
+										.attr('title', item.name)
+										.text(item.name)
+									)
 							)
 					)
 					.append(ul)
@@ -958,13 +962,13 @@ jQuery(function($) {
 				$('.tree-list').filter(function() {
 					return widget_data.max_depth > +$(this).data('depth');
 				}).each(function() {
-					$('>.tree-item>.row>.tools>.import-items-btn', $(this)).css('visibility', 'visible');
-					$('>.tree-item>.row>.tools>.add-child-btn', $(this)).css('visibility', 'visible');
+					$('>.tree-item>.tree-row>.tools>.import-items-btn', $(this)).css('visibility', 'visible');
+					$('>.tree-item>.tree-row>.tools>.add-child-btn', $(this)).css('visibility', 'visible');
 				});
 
 				// Change arrow style.
 				$('.is-parent', $this).each(function() {
-					var arrow = $('> .row > .treeview > span', $(this));
+					var arrow = $('> .tree-row > .content > .arrow > .treeview > span', $(this));
 					if ($(this).hasClass('opened')) {
 						arrow.removeClass('arrow-right').addClass('arrow-down');
 					}
@@ -1132,15 +1136,15 @@ jQuery(function($) {
 
 			var openBranch = function(id) {
 				if (!$('.tree-item[data-id='+id+']').is(':visible')) {
-					var branch_to_open = $('.tree-item[data-id='+id+']')
-						.closest('.tree-list').not('.root');
+					var selector = '> .tree-row > .content > .arrow > .treeview > span',
+						branch_to_open = $('.tree-item[data-id='+id+']').closest('.tree-list').not('.root');
 
 					while (branch_to_open.length) {
 						branch_to_open.closest('.tree-item.is-parent')
 							.removeClass('closed')
 							.addClass('opened');
 
-						$('> .row > .treeview > span', branch_to_open.closest('.tree-item.is-parent'))
+						$(selector, branch_to_open.closest('.tree-item.is-parent'))
 							.removeClass('arrow-right')
 							.addClass('arrow-down');
 
@@ -1199,10 +1203,6 @@ jQuery(function($) {
 						switchToNavigationMode();
 					});
 				},
-				// onResizeEnd trigger method
-				onResizeEnd: function() {
-					shorten_item_names();
-				},
 				// initialization of widget
 				init: function(options) {
 					options = $.extend({}, options);
@@ -1220,7 +1220,7 @@ jQuery(function($) {
 
 						var widget_data = getWidgetData(),
 							triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
-							'beforeConfigLoad', 'onResizeEnd'];
+							'beforeConfigLoad'];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-widget-container").dashboardGrid("addAction", trigger,
@@ -1245,26 +1245,26 @@ jQuery(function($) {
 										var item,
 											selector = '',
 											mapid_selector = '',
-											previous_mapid_selector = '';
+											prev_map_selector = '';
 
 										mapid_selector = '.tree-item[data-mapid='+data[0]['submapid']+']';
 
 										if (data[0]['previous_maps']) {
-											var previous_maps = data[0]['previous_maps'].split(',');
-											previous_maps = previous_maps.length
-												? previous_maps[previous_maps.length-1]
+											var prev_maps = data[0]['previous_maps'].split(',');
+											prev_maps = prev_maps.length
+												? prev_maps[prev_maps.length-1]
 												: null;
 
-											if (previous_maps && !data[0]['moving_upward']) {
-												previous_mapid_selector = '.tree-item.selected[data-mapid='+previous_maps+'] ';
+											if (prev_maps && !data[0]['moving_upward']) {
+												prev_map_selector = '.tree-item.selected[data-mapid='+prev_maps+'] ';
 											}
-											else if (previous_maps) {
-												previous_mapid_selector = '.tree-item[data-mapid='+previous_maps+'] ';
+											else if (prev_maps) {
+												prev_map_selector = '.tree-item[data-mapid='+prev_maps+'] ';
 											}
 										}
 
-										if (previous_mapid_selector.length && mapid_selector.length) {
-											selector = previous_mapid_selector + ' > .tree-list > ' + mapid_selector;
+										if (prev_map_selector.length && mapid_selector.length) {
+											selector = prev_map_selector + ' > .tree-list > ' + mapid_selector;
 											if (!data[0]['moving_upward']) {
 												selector = selector + ':first';
 											}
@@ -1313,8 +1313,6 @@ jQuery(function($) {
 
 								openBranch(options.navtree_item_selected);
 							}
-
-							shorten_item_names();
 						}
 					});
 				}
