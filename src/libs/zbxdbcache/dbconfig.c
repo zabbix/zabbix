@@ -2144,10 +2144,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	unsigned char		status, type, value_type;
 	int			found, update_index, ret, i, index;
 	zbx_uint64_t		itemid, hostid;
-	zbx_vector_uint64_t	ids;
+	zbx_vector_ptr_t	dep_items;
 
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_reserve(&ids, config->items.num_data + 32);
+	zbx_vector_ptr_create(&dep_items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2168,9 +2167,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
-
-		/* array of selected items */
-		zbx_vector_uint64_append(&ids, itemid);
 
 		item = DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
@@ -2396,6 +2392,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 				depitem->last_master_itemid = 0;
 
 			ZBX_STR2UINT64(depitem->master_itemid, row[38]);
+
+			if (depitem->last_master_itemid != depitem->master_itemid)
+				zbx_vector_ptr_append(&dep_items, depitem);
 		}
 		else if (NULL != (depitem = zbx_hashset_search(&config->dependentitems, &itemid)))
 		{
@@ -2583,29 +2582,27 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 	/* update dependent item vectors within master items */
 
-	for (i = 0; i < ids.values_num; i++)
+	for (i = 0; i < dep_items.values_num; i++)
 	{
-		itemid = ids.values[i];
-		if (NULL != (depitem = zbx_hashset_search(&config->dependentitems, &itemid)) &&
-				depitem->master_itemid != depitem->last_master_itemid)
-		{
-			/* check for master item change */
-			if ((NULL != (master = zbx_hashset_search(&config->items, &depitem->last_master_itemid))) &&
-					(-1 != (index = zbx_vector_uint64_search(&master->dep_itemids, itemid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))))
-			{
-				zbx_vector_uint64_remove_noorder(&master->dep_itemids, index);
-			}
+		depitem = dep_items.values[i];
+		itemid = depitem->itemid;
 
-			/* append item to dependent item vector of master item */
-			if (NULL != (master = zbx_hashset_search(&config->items, &depitem->master_itemid)))
-				zbx_vector_uint64_append(&master->dep_itemids, itemid);
-			else
-				THIS_SHOULD_NEVER_HAPPEN;
+		/* check for master item change */
+		if ((NULL != (master = zbx_hashset_search(&config->items, &depitem->last_master_itemid))) &&
+				(-1 != (index = zbx_vector_uint64_search(&master->dep_itemids, itemid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))))
+		{
+			zbx_vector_uint64_remove_noorder(&master->dep_itemids, index);
 		}
+
+		/* append item to dependent item vector of master item */
+		if (NULL != (master = zbx_hashset_search(&config->items, &depitem->master_itemid)))
+			zbx_vector_uint64_append(&master->dep_itemids, itemid);
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
-	zbx_vector_uint64_destroy(&ids);
+	zbx_vector_ptr_destroy(&dep_items);
 
 	/* remove deleted items from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
