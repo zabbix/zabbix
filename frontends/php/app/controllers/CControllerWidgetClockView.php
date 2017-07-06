@@ -30,7 +30,7 @@ class CControllerWidgetClockView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>	'string',
-			'fields' =>	'required|array'
+			'fields' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,7 +41,7 @@ class CControllerWidgetClockView extends CController {
 			 * @var int    $fields['time_type']
 			 * @var id     $fields['itemid']
 			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_CLOCK, $this->getInput('fields'));
+			$this->form = CWidgetConfig::getForm(WIDGET_CLOCK, $this->getInput('fields', []));
 			if (!empty($errors = $this->form->validate())) {
 				$ret = false;
 			}

@@ -34,7 +34,7 @@ class CControllerWidgetSysmapView extends CController {
 			'name'			=>	'string',
 			'uniqueid'		=>	'required',
 			'fullscreen'	=>	'in 0,1',
-			'fields'		=>	'required|array'
+			'fields'		=>	'array'
 //			'storage'		=>	'array' // TODO VM: implement for previous_maps
 		];
 
@@ -49,7 +49,7 @@ class CControllerWidgetSysmapView extends CController {
 			 * @var array  $storage
 			 * @var string $storage['previous_maps']
 			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields'));
+			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields', []));
 			if (!empty($errors = $this->form->validate())) {
 				$ret = false;
 			}

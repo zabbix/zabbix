@@ -30,7 +30,7 @@ class CControllerWidgetTrigOverView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>	'string',
-			'fields' =>	'required|array'
+			'fields' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,7 +41,7 @@ class CControllerWidgetTrigOverView extends CController {
 			 * @var string $fields['application']
 			 * @var int    $fields['style']        in (STYLE_LEFT,STYLE_TOP)
 			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_TRIG_OVERVIEW, $this->getInput('fields'));
+			$this->form = CWidgetConfig::getForm(WIDGET_TRIG_OVERVIEW, $this->getInput('fields', []));
 			if (!empty($errors = $this->form->validate())) {
 				$ret = false;
 			}

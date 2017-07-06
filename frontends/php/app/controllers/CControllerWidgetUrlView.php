@@ -30,7 +30,7 @@ class CControllerWidgetUrlView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>			'string',
-			'fields' =>			'required|array',
+			'fields' =>			'array',
 			'dynamic_hostid' =>	'db hosts.hostid'
 		];
 
@@ -42,7 +42,7 @@ class CControllerWidgetUrlView extends CController {
 			 * @var string $fields['url']
 			 * @var int    $fields['dynamic']
 			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_URL, $this->getInput('fields'));
+			$this->form = CWidgetConfig::getForm(WIDGET_URL, $this->getInput('fields', []));
 			if (!empty($errors = $this->form->validate())) {
 				$ret = false;
 			}

@@ -139,11 +139,10 @@ class CWidgetField {
 	 * @return array  Array for widget fields ready for saving in API.
 	 */
 	public function toApi() {
-		// TODO VM: if value is same as defualt, don't save this value in API
 		$value = $this->getValue(true);
 		$widget_fields = [];
 
-		if ($value !== null) {
+		if ($value !== null && $value !== $this->default) {
 			$widget_field = [
 				'type' => $this->save_type,
 				'name' => $this->name

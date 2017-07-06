@@ -34,7 +34,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 		$fields = [
 			'name'		=>	'string',
 			'uniqueid'	=>	'required',
-			'fields'	=>	'required|array'
+			'fields'	=>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,7 +47,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 			 * @var int    $fields['map.order.#']
 			 * @var id     $fields['mapid.#']
 			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_NAVIGATION_TREE, $this->getInput('fields'));
+			$this->form = CWidgetConfig::getForm(WIDGET_NAVIGATION_TREE, $this->getInput('fields', []));
 			if (!empty($errors = $this->form->validate())) {
 				$ret = false;
 			}
