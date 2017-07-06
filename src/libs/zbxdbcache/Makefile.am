@@ -14,5 +14,4 @@ libzbxdbcache_a_SOURCES = \
 
 libzbxdbcache_a_CFLAGS = \
 	-I@top_srcdir@/src/zabbix_server/ \
-	 -I@top_srcdir@/src/libs/zbxalgo \
-	 @LIBXML2_CFLAGS@ 
+	-I@top_srcdir@/src/libs/zbxalgo

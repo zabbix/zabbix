@@ -530,7 +530,7 @@ static void	DCdump_items(ZBX_DC_CONFIG *config)
 
 		if (0 != item->dep_itemids.values_num)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "  dependent:", item->unreachable, item->schedulable);
+			zabbix_log(LOG_LEVEL_TRACE, "  dependent:");
 
 			for (j = 0; j < item->dep_itemids.values_num; j++)
 				zabbix_log(LOG_LEVEL_TRACE, "    " ZBX_FS_UI64, item->dep_itemids.values[j]);
