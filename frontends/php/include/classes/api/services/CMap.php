@@ -195,8 +195,7 @@ class CMap extends CMapElement {
 			$result = $this->addRelatedObjects($options, $result);
 		}
 
-		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN
-			&& !$options['nopermissions']) {
+		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 				$hostgroupids_to_check = [];
 				$triggerids_to_check = [];
 				$sysmapids_to_check = [];
