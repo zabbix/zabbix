@@ -1242,12 +1242,6 @@ abstract class CItemGeneral extends CApiService {
 						));
 					}
 
-					if ($dependency_level > 3) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('maximum master items count reached')
-						));
-					}
-
 					if ($item_masters && array_key_exists($master_itemid, $item_masters)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'master_itemid', _s('"%1$s" is already master item for "%2$s"',
@@ -1265,6 +1259,12 @@ abstract class CItemGeneral extends CApiService {
 						$unresolved_master_itemids[$master_itemid] = true;
 						$has_unresolved_masters = true;
 						break;
+					}
+
+					if ($dependency_level > 3) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('maximum master items count reached')
+						));
 					}
 				}
 
@@ -1312,26 +1312,27 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			do {
-				// If item was moved to another master item, do not count moved item (and its childrens) in old master
-				// childrens count calculation.
-				$ignoreids = array_intersect_key($find_itemids, $children_moved);
-				$find_itemids = array_diff_key($find_itemids, $ignoreids);
-				$find_itemids = $data_provider->get([
-					'output' => ['itemid'],
-					'filter' => ['master_itemid' => array_keys($find_itemids)],
-					'preservekeys' => true
-				]);
-				$total_children = $total_children + count($find_itemids);
-
+				if ($find_itemids) {
+					$find_itemids = $data_provider->get([
+						'output' => ['itemid'],
+						'filter' => ['master_itemid' => array_keys($find_itemids)],
+						'preservekeys' => true
+					]);
+					$total_children = $total_children + count($find_itemids);
+					// If item was moved to another master item, do not count moved item (and its childrens) in old master
+					// childrens count calculation.
+					$ignoreids = array_intersect_key($find_itemids, $children_moved);
+					$find_itemids = array_diff_key($find_itemids, $ignoreids);
+					++$dependency_level;
+				}
 				if ($total_children > 999) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _('maximum dependent items count reached')
 					));
 				}
-				++$dependency_level;
 			} while ($find_itemids && $dependency_level < 4);
 
-			if ($dependency_level > 3) {
+			if ($find_itemids && $dependency_level > 3) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 					'master_itemid', _('maximum master items count reached')
 				));
