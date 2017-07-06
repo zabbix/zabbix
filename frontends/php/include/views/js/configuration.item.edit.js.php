@@ -44,6 +44,7 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 				&& type != <?php echo ITEM_TYPE_AGGREGATE; ?>
 				&& type != <?php echo ITEM_TYPE_DB_MONITOR; ?>
 				&& type != <?php echo ITEM_TYPE_SNMPTRAP; ?>
+				&& type != <?php echo ITEM_TYPE_JMX; ?>
 		)
 	}
 
@@ -72,7 +73,7 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 					&& ((new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 					|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
 					&& trends.val() == 0)) {
-				trends.val(<?= DAY_IN_YEAR ?>);
+				trends.val('<?= $this->data['trends_default'] ?>');
 			}
 		});
 	});

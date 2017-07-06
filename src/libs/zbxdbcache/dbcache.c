@@ -1309,7 +1309,11 @@ static int	preprocess_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata, zbx
 		if (SUCCEED != (ret = zbx_item_preproc(item,  &value_var, &hdata->ts, &item->preproc_ops[i],
 				delta_history, &errmsg)))
 		{
-			dc_history_set_error(hdata, errmsg);
+			char	*errmsg_full;
+
+			errmsg_full = zbx_dsprintf(NULL, "Item preprocessing step #%d failed: %s", i + 1, errmsg);
+			dc_history_set_error(hdata, errmsg_full);
+			zbx_free(errmsg);
 			goto out;
 		}
 
@@ -3470,21 +3474,26 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
-
 	table = DBget_table(table_name);
 
 	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 			table->recid, table_name, table->recid, min, max);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-		id->lastid = min;
-	else
-		ZBX_STR2UINT64(id->lastid, row[0]);
+	if (NULL != result)
+	{
+		zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
-	nextid = id->lastid + 1;
-	id->lastid += num;
-	lastid = id->lastid;
+		if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			id->lastid = min;
+		else
+			ZBX_STR2UINT64(id->lastid, row[0]);
+
+		nextid = id->lastid + 1;
+		id->lastid += num;
+		lastid = id->lastid;
+	}
+	else
+		nextid = lastid = 0;
 
 	UNLOCK_CACHE_IDS;
 

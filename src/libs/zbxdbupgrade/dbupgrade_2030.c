@@ -222,7 +222,8 @@ static int	DBpatch_2030021(void)
 					{"macro", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);

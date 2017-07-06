@@ -52,6 +52,10 @@ AC_HELP_STRING([--with-libpcre=@<:@DIR@:>@], [use libpcre from given base instal
 
 	LIBPCRE_LIBS="-lpcreposix -lpcre"
 
+	if test "x$enable_static" = "xyes"; then
+		LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
+	fi
+
 	if test -n "$_libpcre_dir_set" -o -f /usr/include/pcreposix.h; then
 		found_libpcre="yes"
 	elif test -f /usr/local/include/pcreposix.h; then

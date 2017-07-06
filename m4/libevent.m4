@@ -31,7 +31,7 @@ AC_DEFUN([LIBEVENT_CHECK_CONFIG],
 [
 	AC_ARG_WITH([libevent],[
 If you want to specify libevent installation directories:
-AC_HELP_STRING([--with-libevent=@<:@DIR@:>@], [use libevent from given base install directory (DIR), default is to search through a number of common places for the libevent files.])],
+AC_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base install directory (DIR), default is to search through a number of common places for the libevent files.])],
 		[
 			LIBEVENT_CFLAGS="-I$withval/include"
 			LIBEVENT_LDFLAGS="-L$withval/lib"
@@ -40,7 +40,7 @@ AC_HELP_STRING([--with-libevent=@<:@DIR@:>@], [use libevent from given base inst
 	)
 
 	AC_ARG_WITH([libevent-include],
-		AC_HELP_STRING([--with-libevent-include=@<:@DIR@:>@],
+		AC_HELP_STRING([--with-libevent-include@<:@=DIR@:>@],
 			[use libevent include headers from given path.]
 		),
 		[
@@ -50,7 +50,7 @@ AC_HELP_STRING([--with-libevent=@<:@DIR@:>@], [use libevent from given base inst
 	)
 
 	AC_ARG_WITH([libevent-lib],
-		AC_HELP_STRING([--with-libevent-lib=@<:@DIR@:>@],
+		AC_HELP_STRING([--with-libevent-lib@<:@=DIR@:>@],
 			[use libevent libraries from given path.]
 		),
 		[

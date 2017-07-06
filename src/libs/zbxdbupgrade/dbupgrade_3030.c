@@ -1735,6 +1735,55 @@ static int	DBpatch_3030140(void)
 	return DBpatch_trailing_semicolon_remove("conditions", "conditionid", "value", " where conditiontype=6");
 }
 
+static int	DBpatch_3030141(void)
+{
+	const ZBX_FIELD	field = {"jmx_endpoint", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3030142(void)
+{
+#define ZBX_DEFAULT_JMX_ENDPOINT	"service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi"
+	/* 16 - ITEM_TYPE_JMX */
+	if (ZBX_DB_OK > DBexecute("update items set jmx_endpoint='" ZBX_DEFAULT_JMX_ENDPOINT "' where type=16"))
+		return FAIL;
+
+	return SUCCEED;
+#undef ZBX_DEFAULT_JMX_ENDPOINT
+}
+
+static int	DBpatch_3030143(void)
+{
+	const ZBX_FIELD field = {"maxsessions", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_3030144(void)
+{
+	const ZBX_FIELD field = {"maxattempts", "3", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_3030145(void)
+{
+	const ZBX_FIELD field = {"attempt_interval", "10s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_3030146(void)
+{
+	return DBdrop_index("alerts", "alerts_4");
+}
+
+static int	DBpatch_3030147(void)
+{
+	return DBcreate_index("alerts", "alerts_4", "status", 0);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -1881,5 +1930,12 @@ DBPATCH_ADD(3030137, 0, 1)
 DBPATCH_ADD(3030138, 0, 1)
 DBPATCH_ADD(3030139, 0, 1)
 DBPATCH_ADD(3030140, 0, 1)
+DBPATCH_ADD(3030141, 0, 1)
+DBPATCH_ADD(3030142, 0, 1)
+DBPATCH_ADD(3030143, 0, 1)
+DBPATCH_ADD(3030144, 0, 1)
+DBPATCH_ADD(3030145, 0, 1)
+DBPATCH_ADD(3030146, 0, 1)
+DBPATCH_ADD(3030147, 0, 1)
 
 DBPATCH_END()

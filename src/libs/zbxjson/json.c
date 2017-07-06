@@ -385,7 +385,7 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
 	if ('n' == p[0] && 'u' == p[1] && 'l' == p[2] && 'l' == p[3])
 		return ZBX_JSON_TYPE_NULL;
 
-	zbx_set_json_strerror("Invalid type of JSON value \"%.64s\"", p);
+	zbx_set_json_strerror("invalid type of JSON value \"%.64s\"", p);
 
 	return ZBX_JSON_TYPE_UNKNOWN;
 }
@@ -807,7 +807,7 @@ const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *n
 		if (0 == strcmp(name, buffer))
 			return p;
 
-	zbx_set_json_strerror("Can't find pair with name \"%s\"", name);
+	zbx_set_json_strerror("cannot find pair with name \"%s\"", name);
 
 	return NULL;
 }
@@ -903,7 +903,7 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
 {
 	if (NULL == (jp->end = __zbx_json_rbracket(p)))
 	{
-		zbx_set_json_strerror("Can't open JSON object or array \"%.64s\"", p);
+		zbx_set_json_strerror("cannot open JSON object or array \"%.64s\"", p);
 		return FAIL;
 	}
 
@@ -971,3 +971,228 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 
 	return num;
 }
+
+
+/*
+ * limited JSONPath support
+ */
+
+#define ZBX_JSONPATH_COMPONENT_DOT	0
+#define ZBX_JSONPATH_COMPONENT_BRACKET	1
+#define ZBX_JSONPATH_ARRAY_INDEX	2
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_jsonpath_error                                               *
+ *                                                                            *
+ * Purpose: sets json error message and returns FAIL                          *
+ *                                                                            *
+ * Comments: This function is used to return from json path parsing functions *
+ *           in the case of failure.                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_jsonpath_error(const char *path)
+{
+	zbx_set_json_strerror("unsupported character in json path starting with: \"%s\"", path);
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_jsonpath_next                                                *
+ *                                                                            *
+ * Purpose: returns next component of json path                               *
+ *                                                                            *
+ * Parameters: path  - [IN] the json path                                     *
+ *             pnext - [IN/OUT] the reference to the next path component      *
+ *             loc   - [OUT] the location of the path component               *
+ *             type  - [OUT] json path component type, see ZBX_JSONPATH_      *
+ *                     defines                                                *
+ *                                                                            *
+ * Return value: SUCCEED - the json path component was parsed successfully    *
+ *               FAIL    - json path parsing error                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
+{
+	const char	*next = *pnext;
+	size_t		pos;
+	char		quotes;
+
+	if (NULL == next)
+	{
+		if ('$' != *path)
+			return zbx_jsonpath_error(path);
+
+		next = path + 1;
+		*pnext = next;
+	}
+
+	/* process dot notation component */
+	if (*next == '.')
+	{
+		if ('\0' == *(++next))
+			return zbx_jsonpath_error(*pnext);
+
+		loc->l = next - path;
+
+		while (0 != isalnum(*next) || '_' == *next)
+			next++;
+
+		if ((pos = next - path) == loc->l)
+			return zbx_jsonpath_error(*pnext);
+
+		loc->r = pos - 1;
+		*pnext = next;
+		*type = ZBX_JSONPATH_COMPONENT_DOT;
+
+		return SUCCEED;
+	}
+
+	if ('[' != *next)
+		return zbx_jsonpath_error(*pnext);
+
+	while (*(++next) == ' ')
+		;
+
+	/* process array index component */
+	if (0 != isdigit(*next))
+	{
+		for (pos = 0; 0 != isdigit(next[pos]); pos++)
+			;
+
+		if (0 == pos)
+			return zbx_jsonpath_error(*pnext);
+
+		loc->l = next - path;
+		loc->r = loc->l + pos - 1;
+
+		next += pos;
+
+		while (*next == ' ')
+			next++;
+
+		if (']' != *next++)
+			return zbx_jsonpath_error(*pnext);
+
+		*pnext = next;
+		*type = ZBX_JSONPATH_ARRAY_INDEX;
+
+		return SUCCEED;
+	}
+
+	loc->l = next - path + 1;
+
+	for (quotes = *next++; quotes != *next; next++)
+	{
+		if ('\0' == *next)
+			return zbx_jsonpath_error(*pnext);
+	}
+
+	if ((pos = next - path) == loc->l)
+		return zbx_jsonpath_error(*pnext);
+
+	loc->r = pos - 1;
+
+	while (*(++next) == ' ')
+		;
+
+	if (']' != *next++)
+		return zbx_jsonpath_error(*pnext);
+
+	*pnext = next;
+	*type = ZBX_JSONPATH_COMPONENT_BRACKET;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_brackets_by_name                                        *
+ *                                                                            *
+ * Return value: SUCCESS - processed successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
+{
+	const char		*p, *next = 0;
+	char			buffer[MAX_STRING_LEN];
+	zbx_strloc_t		loc;
+	int			type, index;
+	struct zbx_json_parse	object;
+
+	object = *jp;
+
+	do
+	{
+		if (FAIL == zbx_jsonpath_next(path, &next, &loc, &type))
+			return FAIL;
+
+		if (ZBX_JSONPATH_ARRAY_INDEX == type)
+		{
+			if ('[' != *object.start)
+				return FAIL;
+
+			if (FAIL == is_uint_n_range(path + loc.l, loc.r - loc.l + 1, &index, sizeof(index), 0,
+					0xFFFFFFFF))
+			{
+				return FAIL;
+			}
+
+			for (p = NULL; NULL != (p = zbx_json_next(&object, p)) && 0 != index; index--)
+				;
+
+			if (0 != index || NULL == p)
+			{
+				zbx_set_json_strerror("array index out of bounds starting with json path: \"%s\"",
+						path + loc.l);
+				return FAIL;
+			}
+		}
+		else
+		{
+			zbx_strlcpy(buffer, path + loc.l, loc.r - loc.l + 2);
+
+			if (NULL == (p = zbx_json_pair_by_name(&object, buffer)))
+			{
+				zbx_set_json_strerror("object not found starting with json path: \"%s\"", path + loc.l);
+				return FAIL;
+			}
+		}
+
+		object.start = p;
+
+		if (NULL == (object.end = __zbx_json_rbracket(p)))
+			object.end = p + json_parse_value(p, NULL) - 1;
+	}
+	while ('\0' != *next);
+
+	*out = object;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_value_dyn                                               *
+ *                                                                            *
+ * Purpose: return json fragment or value located at json parse location      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc)
+{
+	if (NULL == zbx_json_decodevalue_dyn(jp->start, string, string_alloc, NULL))
+	{
+		size_t	len = jp->end - jp->start + 2;
+
+		if (*string_alloc < len)
+			*string = zbx_realloc(*string, len);
+
+		zbx_strlcpy(*string, jp->start, len);
+	}
+}
+
+

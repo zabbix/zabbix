@@ -105,6 +105,7 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
  *           +------------------+--------------------------------------+      *
  *           | Zabbix internal  | zabbix[host,,items]                  |      *
  *           | Zabbix internal  | zabbix[host,,items_unsupported]      |      *
+ *           | Zabbix internal  | zabbix[host,discovery,interfaces]    |      *
  *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
  *           | Zabbix aggregate | *                                    |      *
@@ -135,29 +136,28 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 					goto clean;
 
 				arg1 = get_rparam(&request, 0);
+				arg2 = get_rparam(&request, 1);
+				arg3 = get_rparam(&request, 2);
 
 				if (0 == strcmp(arg1, "host"))
 				{
-					arg2 = get_rparam(&request, 1);
-					arg3 = get_rparam(&request, 2);
-
-					if ((0 != strcmp(arg3, "maintenance") && 0 != strcmp(arg3, "items") &&
-							0 != strcmp(arg3, "items_unsupported")) || '\0' != *arg2)
+					if ('\0' == *arg2)
 					{
+						if (0 == strcmp(arg3, "maintenance") || 0 == strcmp(arg3, "items") ||
+								0 == strcmp(arg3, "items_unsupported"))
+						{
+							ret = SUCCEED;
+							goto clean;
+						}
+					}
+					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
+					{
+						ret = SUCCEED;
 						goto clean;
 					}
 				}
-				else if (0 == strcmp(arg1, "proxy"))
-				{
-					arg3 = get_rparam(&request, 2);
-
-					if (0 != strcmp(arg3, "lastaccess"))
-						goto clean;
-				}
-				else
-					goto clean;
-
-				ret = SUCCEED;
+				else if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg3, "lastaccess"))
+					ret = SUCCEED;
 clean:
 				free_request(&request);
 			}
@@ -451,6 +451,23 @@ static void	DCincrease_disable_until(const ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCfind_id                                                        *
+ *                                                                            *
+ * Purpose: Find an element in a hashset by its 'id' or create the element if *
+ *          it does not exist                                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     hashset - [IN] hashset to search                                       *
+ *     id      - [IN] id of element to search for                             *
+ *     size    - [IN] size of element to search for                           *
+ *     found   - [OUT flag. 0 - element did not exist, it was created.        *
+ *                          1 - existing element was found.                   *
+ *                                                                            *
+ * Return value: pointer to the found or created element                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
 {
 	void		*ptr;
@@ -1214,6 +1231,9 @@ done:
 			host->jmx_items_num = 0;
 
 			host->reset_availability = 0;
+
+			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
 		}
 		else
 		{
@@ -1393,6 +1413,7 @@ done:
 			}
 		}
 #endif
+		zbx_vector_ptr_destroy(&host->interfaces_v);
 		zbx_hashset_remove_direct(&config->hosts, host);
 	}
 
@@ -1934,6 +1955,36 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		/* with {HOST.IP} and {HOST.DNS} macros                                */
 		if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
 			substitute_host_interface_macros(interface);
+
+		if (0 == found)
+		{
+			/* new interface - add it to a list of host interfaces in 'config->hosts' hashset */
+
+			ZBX_DC_HOST	*host;
+
+			if (NULL != (host = zbx_hashset_search(&config->hosts, &interface->hostid)))
+			{
+				int	exists = 0;
+
+				/* It is an error if the pointer is already in the list. Detect it. */
+
+				for (i = 0; i < host->interfaces_v.values_num; i++)
+				{
+					if (interface == host->interfaces_v.values[i])
+					{
+						exists = 1;
+						break;
+					}
+				}
+
+				if (0 == exists)
+					zbx_vector_ptr_append(&host->interfaces_v, interface);
+				else
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
 	}
 
 	/* resolve macros in other interfaces */
@@ -1949,8 +2000,24 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	/* remove deleted interfaces from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		ZBX_DC_HOST	*host;
+
 		if (NULL == (interface = zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
+
+		/* remove interface from the list of host interfaces in 'config->hosts' hashset */
+
+		if (NULL != (host = zbx_hashset_search(&config->hosts, &interface->hostid)))
+		{
+			for (i = 0; i < host->interfaces_v.values_num; i++)
+			{
+				if (interface == host->interfaces_v.values[i])
+				{
+					zbx_vector_ptr_remove(&host->interfaces_v, i);
+					break;
+				}
+			}
+		}
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 			dc_interface_snmpaddrs_remove(interface);
@@ -2415,6 +2482,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			DCstrpool_replace(found, &jmxitem->username, row[20]);
 			DCstrpool_replace(found, &jmxitem->password, row[21]);
+			DCstrpool_replace(found, &jmxitem->jmx_endpoint, row[37]);
 		}
 		else if (NULL != (jmxitem = zbx_hashset_search(&config->jmxitems, &itemid)))
 		{
@@ -2422,6 +2490,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_strpool_release(jmxitem->username);
 			zbx_strpool_release(jmxitem->password);
+			zbx_strpool_release(jmxitem->jmx_endpoint);
 
 			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
 		}
@@ -2606,6 +2675,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_strpool_release(jmxitem->username);
 			zbx_strpool_release(jmxitem->password);
+			zbx_strpool_release(jmxitem->jmx_endpoint);
 
 			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
 		}
@@ -2967,7 +3037,6 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -4876,6 +4945,7 @@ static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 
 	ZBX_RETURN_IF_NOT_EQUAL(j1->username, j2->username);
 	ZBX_RETURN_IF_NOT_EQUAL(j1->password, j2->password);
+	ZBX_RETURN_IF_NOT_EQUAL(j1->jmx_endpoint, j2->jmx_endpoint);
 
 	return 0;
 }
@@ -5612,14 +5682,17 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, zbx_uint6
 			{
 				strscpy(dst_item->username_orig, jmxitem->username);
 				strscpy(dst_item->password_orig, jmxitem->password);
+				strscpy(dst_item->jmx_endpoint_orig, jmxitem->jmx_endpoint);
 			}
 			else
 			{
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
+				*dst_item->jmx_endpoint_orig = '\0';
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
+			dst_item->jmx_endpoint = NULL;
 			break;
 		case ITEM_TYPE_CALCULATED:
 			calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid);
@@ -10329,4 +10402,69 @@ void zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess)
 		proxy->lastaccess = lastaccess;
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_host_interfaces                                       *
+ *                                                                            *
+ * Purpose: get data of all network interfaces for a host in configuration    *
+ *          cache                                                             *
+ *                                                                            *
+ * Parameter: hostid     - [IN] the host identifier                           *
+ *            interfaces - [OUT] array with interface data                    *
+ *            n          - [OUT] number of allocated 'interfaces' elements    *
+ *                                                                            *
+ * Return value: SUCCEED - interface data retrieved successfully              *
+ *               FAIL    - host not found                                     *
+ *                                                                            *
+ * Comments: if host is found but has no interfaces (should not happen) this  *
+ *           function sets 'n' to 0 and no memory is allocated for            *
+ *           'interfaces'. It is a caller responsibility to deallocate        *
+ *           memory of 'interfaces' and its components.                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n)
+{
+	ZBX_DC_HOST	*host;
+	int		i, ret = FAIL;
+
+	if (0 == hostid)
+		return FAIL;
+
+	LOCK_CACHE;
+
+	/* find host entry in 'config->hosts' hashset */
+
+	if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
+		goto unlock;
+
+	/* allocate memory for results */
+
+	if (0 < (*n = host->interfaces_v.values_num))
+		*interfaces = zbx_malloc(NULL, sizeof(DC_INTERFACE2) * (size_t)*n);
+
+	/* copy data about all host interfaces */
+
+	for (i = 0; i < *n; i++)
+	{
+		const ZBX_DC_INTERFACE	*src = host->interfaces_v.values[i];
+		DC_INTERFACE2		*dst = *interfaces + i;
+
+		dst->interfaceid = src->interfaceid;
+		dst->type = src->type;
+		dst->main = src->main;
+		dst->bulk = src->bulk;
+		dst->useip = src->useip;
+		strscpy(dst->ip_orig, src->ip);
+		strscpy(dst->dns_orig, src->dns);
+		strscpy(dst->port_orig, src->port);
+		dst->addr = (1 == src->useip ? dst->ip_orig : dst->dns_orig);
+	}
+
+	ret = SUCCEED;
+unlock:
+	UNLOCK_CACHE;
+
+	return ret;
 }

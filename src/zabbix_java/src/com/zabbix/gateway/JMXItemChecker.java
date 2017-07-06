@@ -20,9 +20,9 @@
 package com.zabbix.gateway;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
@@ -46,16 +46,16 @@ class JMXItemChecker extends ItemChecker
 	private String username;
 	private String password;
 
+	static final int DISCOVERY_MODE_ATTRIBUTES = 0;
+	static final int DISCOVERY_MODE_BEANS = 1;
+
 	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
 		super(request);
 
 		try
 		{
-			String conn = request.getString(JSON_TAG_CONN);
-			int port = request.getInt(JSON_TAG_PORT);
-
-			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://[" + conn + "]:" + port + "/jmxrmi");
+			url = new JMXServiceURL(request.getString(JSON_TAG_JMX_ENDPOINT));
 			jmxc = null;
 			mbsc = null;
 
@@ -149,37 +149,33 @@ class JMXItemChecker extends ItemChecker
 		}
 		else if (item.getKeyId().equals("jmx.discovery"))
 		{
-			if (0 != item.getArgumentCount())
-				throw new ZabbixException("required key format: jmx.discovery");
+			int argumentCount = item.getArgumentCount();
+
+			if (2 < argumentCount)
+				throw new ZabbixException("required key format: jmx.discovery[<discovery mode>,<object name>]");
 
 			JSONArray counters = new JSONArray();
+			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
+			
+			int mode = DISCOVERY_MODE_ATTRIBUTES;
+			if (0 != argumentCount)
+			{
+				String modeName = item.getArgument(1);
 
-			for (ObjectName name : mbsc.queryNames(null, null))
+				if (modeName.equals("beans"))
+					mode = DISCOVERY_MODE_BEANS;
+				else if (!modeName.equals("attributes"))
+					throw new ZabbixException("invalid discovery mode: " + modeName);
+			}
+
+			for (ObjectName name : mbsc.queryNames(filter, null))
 			{
 				logger.trace("discovered object '{}'", name);
 
-				for (MBeanAttributeInfo attrInfo : mbsc.getMBeanInfo(name).getAttributes())
-				{
-					logger.trace("discovered attribute '{}'", attrInfo.getName());
-
-					if (!attrInfo.isReadable())
-					{
-						logger.trace("attribute not readable, skipping");
-						continue;
-					}
-
-					try
-					{
-						logger.trace("looking for attributes of primitive types");
-						String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
-						findPrimitiveAttributes(counters, name, descr, attrInfo.getName(), mbsc.getAttribute(name, attrInfo.getName()));
-					}
-					catch (Exception e)
-					{
-						Object[] logInfo = {name, attrInfo.getName(), e};
-						logger.trace("processing '{},{}' failed", logInfo);
-					}
-				}
+				if (DISCOVERY_MODE_ATTRIBUTES == mode)
+					discoverAttributes(counters, name);
+				else
+					discoverBeans(counters, name);
 			}
 
 			JSONObject mapping = new JSONObject();
@@ -231,6 +227,52 @@ class JMXItemChecker extends ItemChecker
 		}
 		else
 			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
+	}
+
+	private void discoverAttributes(JSONArray counters, ObjectName name) throws Exception
+	{
+		for (MBeanAttributeInfo attrInfo : mbsc.getMBeanInfo(name).getAttributes())
+		{
+			logger.trace("discovered attribute '{}'", attrInfo.getName());
+
+			if (!attrInfo.isReadable())
+			{
+				logger.trace("attribute not readable, skipping");
+				continue;
+			}
+
+			try
+			{
+				logger.trace("looking for attributes of primitive types");
+				String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
+				findPrimitiveAttributes(counters, name, descr, attrInfo.getName(), mbsc.getAttribute(name, attrInfo.getName()));
+			}
+			catch (Exception e)
+			{
+				Object[] logInfo = {name, attrInfo.getName(), e};
+				logger.trace("processing '{},{}' failed", logInfo);
+			}
+		}
+	}
+
+	private void discoverBeans(JSONArray counters, ObjectName name)
+	{
+		try
+		{
+			JSONObject counter = new JSONObject();
+
+			counter.put("{#JMXOBJ}", name);
+			counter.put("{#JMXDOMAIN}", name.getDomain());
+
+			for (Map.Entry<String, String> property : name.getKeyPropertyList().entrySet())
+				counter.put("{#JMX" + property.getKey().toUpperCase() + "}" , property.getValue());
+
+			counters.put(counter);
+		}
+		catch (Exception e)
+		{
+			logger.trace("bean processing '{}' failed", name);
+		}
 	}
 
 	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws JSONException

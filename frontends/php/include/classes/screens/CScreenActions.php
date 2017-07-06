@@ -73,7 +73,7 @@ class CScreenActions extends CScreenBase {
 		}
 
 		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
-					'a.userid,a.actionid,a.mediatypeid,mt.description'.
+					'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
 				' FROM events e,alerts a'.
 					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 				' WHERE e.eventid=a.eventid'.
@@ -142,11 +142,11 @@ class CScreenActions extends CScreenBase {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
 				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
 			}
-			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
+			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
 				$status = (new CSpan([
 					_('In progress').':',
 					BR(),
-					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries'])])
+					_n('%1$s retry left', '%1$s retries left', $alert['maxattempts'] - $alert['retries'])])
 				)
 					->addClass(ZBX_STYLE_YELLOW);
 			}
