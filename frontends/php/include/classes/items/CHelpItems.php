@@ -1008,6 +1008,16 @@ class CHelpItems {
 					'key' => 'db.odbc.discovery[<unique short description>,<dsn>]',
 					'description' => _('Transform SQL query result into a JSON object for low-level discovery.')
 				]
+			],
+			ITEM_TYPE_JMX => [
+				[
+					'key' => 'jmx[object_name,attribute_name]',
+					'description' => _('Return value of an attribute of MBean object.')
+				],
+				[
+					'key' => 'jmx.discovery[<discovery mode>,<object name>]',
+					'description' => _('Return a JSON object describing the MBean objects or their attributes. Can be used for LLD.')
+				]
 			]
 		];
 	}

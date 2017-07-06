@@ -338,9 +338,6 @@ class testFormDiscoveryRule extends CWebTest {
 				case 'TELNET agent':
 					$this->zbxTestAssertElementValue('key', 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 					break;
-				case 'JMX agent':
-					$this->zbxTestAssertElementValue('key', 'jmx[<object name>,<attribute name>]');
-					break;
 				default:
 					$this->zbxTestAssertElementValue('key', '');
 					break;
@@ -1580,9 +1577,9 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
-					'error_msg' => 'Cannot add discovery rule',
+					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Check the key, please. Default example was passed.'
+						'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			]
