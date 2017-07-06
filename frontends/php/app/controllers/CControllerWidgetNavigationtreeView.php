@@ -422,6 +422,14 @@ class CControllerWidgetNavigationtreeView extends CController {
 		$config = select_config();
 		$severity_config = [];
 
+		$maps_accessible = API::Map()->get([
+			'output' => ['sysmapid'],
+			'sysmapids' => $sysmapids,
+			'preservekeys' => true
+		]);
+
+		$maps_accessible = array_keys($maps_accessible);
+
 		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
 			$this->problems_per_severity_tpl[$severity] = 0;
 			$severity_config[$severity] = [
@@ -449,6 +457,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,
 			'problems' => $this->getNumberOfProblemsBySysmap($sysmapids),
+			'maps_accessible' => $maps_accessible,
 			'severity_config' => $severity_config,
 			'initial_load' => $this->getInput('initial_load', 0),
 			'error' => $error

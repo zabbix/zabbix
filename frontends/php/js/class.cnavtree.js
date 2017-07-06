@@ -732,7 +732,12 @@ jQuery(function($) {
 					});
 				}
 
-				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0) {
+				var map_accessible = (widget_data['maps_accessible'].indexOf(item.mapid) !== -1);
+				if (!map_accessible) {
+					item_clases += ' inaccessible';
+				}
+
+				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0 && map_accessible) {
 					link = $('<a>', {
 							'data-mapid': item.mapid,
 							'href': '#'
@@ -1206,7 +1211,8 @@ jQuery(function($) {
 						$this.data('widgetData', {
 							uniqueid: options.uniqueid,
 							severity_levels: options.severity_levels || [],
-							navtree_items_opened: options. navtree_items_opened.toString().split(',') || [],
+							navtree_items_opened: options.navtree_items_opened.toString().split(',') || [],
+							maps_accessible: options.maps_accessible || [],
 							problems: options.problems || [],
 							max_depth: options.max_depth || 10,
 							lastId: 0

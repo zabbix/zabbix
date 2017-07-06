@@ -4535,6 +4535,11 @@ tr.cursor-move {
 					max-width: 20px;
 				}
 			}
+
+			&.inaccessible > .row > .item-name > span {
+				color: $form-border-color;
+			}
+
 			a.item-name:focus,
 			a.item-name:hover {
 				text-decoration: none !important;
