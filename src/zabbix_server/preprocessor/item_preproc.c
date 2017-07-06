@@ -865,6 +865,8 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
 #ifndef HAVE_LIBXML2
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(params);
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else

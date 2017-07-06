@@ -528,6 +528,14 @@ static void	DCdump_items(ZBX_DC_CONFIG *config)
 		if (0 != item->preproc_ops.values_num)
 			DCdump_item_preproc(item);
 
+		if (0 != item->dep_itemids.values_num)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "  dependent:", item->unreachable, item->schedulable);
+
+			for (j = 0; j < item->dep_itemids.values_num; j++)
+				zabbix_log(LOG_LEVEL_TRACE, "    " ZBX_FS_UI64, item->dep_itemids.values[j]);
+		}
+
 		if (NULL != item->triggers)
 		{
 			ZBX_DC_TRIGGER	*trigger;
