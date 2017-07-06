@@ -36,6 +36,22 @@ class CWidgetForm {
 		return $this->fields;
 	}
 
+	/**
+	 * Returns widget fields data as array
+	 *
+	 * @return array  key/value pairs where key is field name and value is it's data
+	 */
+	public function getFieldsData() {
+		$data = [];
+
+		foreach ($this->fields as $field) {
+			/* @var $field CWidgetField */
+			$data[$field->getName()] = $field->getValue(true);
+		}
+
+		return $data;
+	}
+
 	public function validate() {
 		$errors = [];
 

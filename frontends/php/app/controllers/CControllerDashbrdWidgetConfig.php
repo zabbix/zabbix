@@ -89,7 +89,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 				}
 			}
 			if ($field instanceof CWidgetFieldGroup) {
-				foreach ($field->getValue(true) as $groupid) {
+				foreach ((array)$field->getValue(true) as $groupid) {
 					$captions['groups'][$groupid] = true;
 				}
 			}

@@ -21,6 +21,8 @@
 
 class CControllerWidgetUrlView extends CController {
 
+	private $form;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -37,10 +39,13 @@ class CControllerWidgetUrlView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
-			 * @var string $fields['url']              (optional)
-			 * @var int    $fields['dynamic']          (optional)
+			 * @var string $fields['url']
+			 * @var int    $fields['dynamic']
 			 */
-			// TODO VM: validate fields
+			$this->form = CWidgetConfig::getForm(WIDGET_URL, $this->getInput('fields'));
+			if (!empty($errors = $this->form->validate())) {
+				$ret = false;
+			}
 		}
 
 		if (!$ret) {
@@ -56,42 +61,24 @@ class CControllerWidgetUrlView extends CController {
 	}
 
 	protected function doAction() {
+		$fields = $this->form->getFieldsData();
 		$error = null;
+		$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
+		$isTemplatedDashboard = false; // TODO VM: will dashboards be templated?
 
-		// Default values
-		$default = [
-			'url' => '',
-			'hostid' => '0',
-			'isTemplatedDashboard' => false, // TODO VM: will dashboards be templated?
-			'dynamic' => WIDGET_SIMPLE_ITEM
-		];
-
-		$data = $this->getInput('fields');
-
-		if ($this->hasInput('dynamic_hostid')) {
-			$data['hostid'] = $this->getInput('dynamic_hostid');
-		}
-
-		// Apply defualt value for data
-		foreach ($default as $key => $value) {
-			if (!array_key_exists($key, $data)) {
-				$data[$key] = $value;
-			}
-		}
-
-		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $data['hostid'] == 0) {
+		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid == 0) {
 			$error = _('No host selected.');
 		}
 		else {
-			$resolveHostMacros = ($data['dynamic'] == WIDGET_DYNAMIC_ITEM || $data['isTemplatedDashboard']);
+			$resolveHostMacros = ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM || $isTemplatedDashboard);
 
 			$resolved_url = CMacrosResolverHelper::resolveWidgetURL([
 				'config' => $resolveHostMacros ? 'widgetURL' : 'widgetURLUser',
-				'url' => $data['url'],
-				'hostid' => $resolveHostMacros ? $data['hostid'] : '0'
+				'url' => $fields['url'],
+				'hostid' => $resolveHostMacros ? $dynamic_hostid : '0'
 			]);
 
-			$data['url'] = $resolved_url ? $resolved_url : $data['url'];
+			$fields['url'] = $resolved_url ? $resolved_url : $fields['url'];
 		}
 
 		$this->setResponse(new CControllerResponseData([
@@ -100,7 +87,7 @@ class CControllerWidgetUrlView extends CController {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'url' => [
-				'url' => $data['url'],
+				'url' => $fields['url'],
 				'error' => $error
 			]
 		]));

@@ -40,16 +40,16 @@ class CActionLogWidgetForm extends CWidgetForm {
 		];
 
 		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types,
-			SCREEN_SORT_TRIGGERS_TIME_DESC, null, ZBX_WIDGET_FIELD_TYPE_INT32
-		))->setRequired(true);
+			ZBX_WIDGET_FIELD_TYPE_INT32
+		))
+			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
 		if (array_key_exists('sort_triggers', $data)) {
 			$field_sort->setValue($data['sort_triggers']);
 		}
 		$this->fields[] = $field_sort;
 
-		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), 25, 1, 100))
-			->setRequired(true);
+		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), 1, 100))->setDefault(25);
 		if (array_key_exists('show_lines', $data)) {
 			$field_lines->setValue($data['show_lines']);
 		}

@@ -28,14 +28,14 @@ class CTrigOverviewWidgetForm extends CWidgetForm {
 	{
 		parent::__construct($data);
 
-		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'), []);
+		$field_groups = (new CWidgetFieldGroup('groupids', _('Host groups')))->setDefault(null);
 
 		if (array_key_exists('groupids', $data)) {
 			$field_groups->setValue($data['groupids']);
 		}
 		$this->fields[] = $field_groups;
 
-		$field_application = new CWidgetFieldTextBox('application', _('Application'), '');
+		$field_application = (new CWidgetFieldTextBox('application', _('Application')))->setDefault('');
 
 		if (array_key_exists('application', $data)) {
 			$field_application->setValue($data['application']);
@@ -47,7 +47,8 @@ class CTrigOverviewWidgetForm extends CWidgetForm {
 			STYLE_TOP => _('Top')
 		];
 
-		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), $styles, STYLE_LEFT))
+		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), $styles))
+			->setDefault(STYLE_LEFT)
 			->setModern(true);
 
 		if (array_key_exists('style', $data)) {

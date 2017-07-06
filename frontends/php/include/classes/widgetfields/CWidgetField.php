@@ -26,31 +26,20 @@ class CWidgetField {
 	protected $default;
 	protected $save_type;
 	protected $action;
-	protected $required;
 	protected $setup_type;
 
 	/**
 	 * Create widget field (general)
 	 *
-	 * @param string $name field name in form
-	 * @param string $label label for the field in form
-	 * @param mixed $default default value
-	 * @param string $action JS function to call on field change
+	 * @param string $name   field name in form
+	 * @param string $label  label for the field in form
 	 */
-	public function __construct($name, $label = null, $default = null, $action = null) {
+	public function __construct($name, $label = null) {
 		$this->name = $name;
 		$this->label = $label;
 		$this->value = null;
-		$this->default = $default;
 		$this->save_type = ZBX_WIDGET_FIELD_TYPE_STR;
-		$this->action = $action;
-		$this->required = false;
 		$this->setup_type = WIDGET_FIELDS_SETUP_TYPE_CONFIG;
-	}
-
-	public function setRequired($value) {
-		$this->required = ($value === true) ? true : false;
-		return $this;
 	}
 
 	public function setValue($value) {
@@ -64,10 +53,27 @@ class CWidgetField {
 		return $this;
 	}
 
+	public function setDefault($value) {
+		$this->default = $value;
+		return $this;
+	}
+
+	/**
+	 * Set JS code that will be called on field change
+	 *
+	 * @param string $action  JS function to call on field change
+	 *
+	 * @return $this
+	 */
+	public function setAction($action) {
+		$this->action = $action;
+		return $this;
+	}
+
 	/**
 	 * Get field value
 	 *
-	 * @param bool $with_default replaces missing value with default one
+	 * @param bool $with_default  replaces missing value with default one
 	 *
 	 * @return mixed
 	 */
@@ -75,7 +81,8 @@ class CWidgetField {
 		$value = $this->value;
 
 		if ($with_default === true) {
-			$value = ($this->value === null) ? $this->default : $this->value; // display default value, if no other given
+			// display default value, if no other given
+			$value = ($this->value === null) ? $this->default : $this->value;
 		}
 
 		return $value;
@@ -100,8 +107,27 @@ class CWidgetField {
 	public function validate() {
 		$errors = [];
 
-		if ($this->required === true && $this->value === null) {
-			$errors[] = _s('The parameter "%1$s" is missing.', $this->getLabel());
+		// Check based on save type
+		switch ($this->save_type) {
+			case ZBX_WIDGET_FIELD_TYPE_INT32:
+				if ($this->value < ZBX_MIN_INT32 && $this->value > ZBX_MAX_INT32) {
+					$errors[] = _s('Incorrect value "%1$s" for "%2$s" field.', $this->getLabel());
+				}
+				break;
+			case ZBX_WIDGET_FIELD_TYPE_STR:
+				// TODO VM: (?) should we have define for this?
+				if (mb_strlen($this->value) > 255) {
+					$errors[] = _s('Parameter "%1$s" should be shorter than %2$s characters.', $this->getLabel(), 255);
+				}
+				break;
+			case ZBX_WIDGET_FIELD_TYPE_GROUP:
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
+				// TODO VM: write validation for ID type
+				break;
+
+			default:
+				break;
 		}
 
 		return $errors;
@@ -113,6 +139,7 @@ class CWidgetField {
 	 * @return array  Array for widget fields ready for saving in API.
 	 */
 	public function toApi() {
+		// TODO VM: if value is same as defualt, don't save this value in API
 		$value = $this->getValue(true);
 		$widget_fields = [];
 

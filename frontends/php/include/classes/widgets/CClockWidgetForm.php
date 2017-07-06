@@ -29,10 +29,11 @@ class CClockWidgetForm extends CWidgetForm {
 			TIME_TYPE_SERVER => _('Server time'),
 			TIME_TYPE_HOST => _('Host time')
 		];
-
-		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), $time_types, TIME_TYPE_LOCAL,
-			'updateWidgetConfigDialogue()', ZBX_WIDGET_FIELD_TYPE_INT32
-		))->setRequired(true);
+		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), $time_types,
+			ZBX_WIDGET_FIELD_TYPE_INT32
+		))
+			->setDefault(TIME_TYPE_LOCAL)
+			->setAction('updateWidgetConfigDialogue()');
 		if (array_key_exists('time_type', $data)) {
 			$field_time_type->setValue($data['time_type']);
 		}
@@ -40,8 +41,7 @@ class CClockWidgetForm extends CWidgetForm {
 
 		// Item field
 		if ($field_time_type->getValue(true) === TIME_TYPE_HOST) {
-			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
-				->setRequired(true);
+			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM));
 			if (array_key_exists('itemid', $data)) {
 				$field_item->setValue($data['itemid']);
 			}
