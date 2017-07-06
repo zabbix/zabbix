@@ -577,7 +577,8 @@ class testFormItem extends CWebTest {
 		}
 
 		if ($type == 'JMX agent' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'jmx[<object name>,<attribute name>]');
+			$this->zbxTestAssertElementValue('key', '');
+			$this->zbxTestAssertElementNotPresentXpath("//button[@id='keyButton'][@disabled]");
 		}
 
 		if ($type == 'SNMPv3 agent') {
@@ -2070,9 +2071,9 @@ class testFormItem extends CWebTest {
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
-					'error_msg' => 'Cannot add item',
+					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+							'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			]
