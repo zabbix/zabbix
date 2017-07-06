@@ -734,16 +734,21 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (130,15
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (131,15093,7,7,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (132,15093,8,8,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (133,15093,9,9,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (134,15094,1,1,'123');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (135,15094,2,2,'abc');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (136,15094,3,3,'def');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (137,15094,4,4,'1a2b3c');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (138,15094,5,5,'regular expression pattern
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (134,15093,10,11,'/document/item/value/text()');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (135,15093,11,12,'$.document.item.value parameter.');
+
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (136,15094,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (137,15094,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (138,15094,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (139,15094,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (140,15094,5,5,'regular expression pattern
 output formatting template');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (139,15094,6,6,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (140,15094,7,7,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (141,15094,8,8,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (142,15094,9,9,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (141,15094,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (142,15094,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (143,15094,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (144,15094,9,9,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (145,15094,10,11,'/document/item/value/text()');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (146,15094,11,12,'$.document.item.value parameter.');
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments)             VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', '');
@@ -829,26 +834,30 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (1508
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15084, 15084, 15082);
 
 -- testFormItemPrototype.Preprocessing
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (143,15095,1,1,'123');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (144,15095,2,2,'abc');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (145,15095,3,3,'def');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (146,15095,4,4,'1a2b3c');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (147,15095,5,5,'regular expression pattern
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (147,15095,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (148,15095,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (149,15095,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (150,15095,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (151,15095,5,5,'regular expression pattern
 output formatting template');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (148,15095,6,6,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (149,15095,7,7,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (150,15095,8,8,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (151,15095,9,9,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (152,15096,1,1,'123');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (153,15096,2,2,'abc');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (154,15096,3,3,'def');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (155,15096,4,4,'1a2b3c');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (156,15096,5,5,'regular expression pattern
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (152,15095,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (153,15095,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (154,15095,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (155,15095,9,9,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (156,15095,10,11,'/document/item/value/text()');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (157,15095,11,12,'$.document.item.value parameter.');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (158,15096,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (159,15096,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (160,15096,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (161,15096,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (162,15096,5,5,'regular expression pattern
 output formatting template');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (157,15096,6,6,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (158,15096,7,7,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (159,15096,8,8,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (160,15096,9,9,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (163,15096,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (164,15096,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (165,15096,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (166,15096,9,9,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (167,15096,10,11,'/document/item/value/text()');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (168,15096,11,12,'$.document.item.value parameter.');
 
 -- testFormGraphPrototype.LayoutCheck and testInheritanceGraphPrototype.SimpleUpdate
 INSERT INTO graphs (graphid, name, flags)             VALUES (15008, 'testInheritanceGraphPrototype1', 2);
