@@ -889,7 +889,7 @@ static int	DBpatch_2030093(void)
 {
 	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("items", &field);
+	return DBmodify_field_type("items", &field, NULL);
 }
 
 static int	DBpatch_2030094(void)
@@ -1251,7 +1251,7 @@ static int	DBpatch_2030102(void)
 {
 	const ZBX_FIELD field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("httpstep", &field);
+	return DBmodify_field_type("httpstep", &field, NULL);
 }
 
 static int	DBpatch_2030103(void)
@@ -1358,14 +1358,14 @@ static int	DBpatch_2030116(void)
 {
 	const ZBX_FIELD	field = {"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("hosts", &field);
+	return DBmodify_field_type("hosts", &field, NULL);
 }
 
 static int	DBpatch_2030117(void)
 {
 	const ZBX_FIELD	field = {"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("hosts", &field);
+	return DBmodify_field_type("hosts", &field, NULL);
 }
 
 static int	DBpatch_2030118(void)
