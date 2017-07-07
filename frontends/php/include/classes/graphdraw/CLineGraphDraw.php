@@ -104,6 +104,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * @param string $item['type']          Item type.
 	 * @param string $item['master_itemid'] Item of type ITEM_TYPE_DEPENDENT it master item id.
 	 * @param string $item['name']          Item name.
+	 * @param string $item['key_']          Item key_ field value.
 	 * @param string $item['value_type']    Item value type.
 	 * @param string $item['history']       Item history field value.
 	 * @param string $item['trends']        Item trends field value.
