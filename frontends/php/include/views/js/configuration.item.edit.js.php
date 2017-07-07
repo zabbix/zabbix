@@ -44,6 +44,7 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 				&& type != <?php echo ITEM_TYPE_AGGREGATE; ?>
 				&& type != <?php echo ITEM_TYPE_DB_MONITOR; ?>
 				&& type != <?php echo ITEM_TYPE_SNMPTRAP; ?>
+				&& type != <?php echo ITEM_TYPE_JMX; ?>
 		)
 	}
 

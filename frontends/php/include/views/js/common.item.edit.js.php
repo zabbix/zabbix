@@ -300,11 +300,6 @@ foreach ($this->data['types'] as $type => $label) {
 				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
 			);
 			break;
-		case ITEM_TYPE_JMX:
-			zbx_subarray_push($this->data['typeVisibility'], $type,
-				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX]
-			);
-			break;
 		default:
 			zbx_subarray_push($this->data['typeVisibility'], $type, ['id' => 'key', 'defaultValue' => '']);
 	}

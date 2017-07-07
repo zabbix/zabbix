@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha1
 
 New features:
+..F..J.... [ZBXNEXT-1223] implemented jmx discovery item (vjaceslavs)
 A.F.....S. [ZBXNEXT-2442] implemented parallel alert processing (gcalenko, wiper)
 A.F.....S. [ZBXNEXT-3863] added jsonpath based item pre-processing option (Ivo, wiper) 
 A.F.....S. [ZBXNEXT-3864] added xmlpath based item pre-processing option (Ivo, wiper)
@@ -74,9 +75,13 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
-Changes for 3.2.7rc1
+Changes for 3.2.7
 
 New features:
+A.F....... [ZBX-1357] updated Catalan, Chinese (China), English (United States), Japanese, Korean, Polish, Portuguese (Brazil), Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.7rc1
 
 Bug fixes:
 ........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
@@ -84,7 +89,7 @@ Bug fixes:
 ...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 ........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
 ..F....... [ZBX-12305] fixed incorrectly escaped IT Service parent name (Ivo)
-..F....... [ZBX-11812] fixed sorting of host interfaces (miks)
+..F....... [ZBX-11812] fixed sorting of host interfaces; fixed selection of the default host interface (miks)
 ..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
 ..F....... [ZBX-12182] fixed missed page number in problems export (miks)
 ..F....... [ZBX-11309] fixed unchecked checkboxes after deleting script, mediatype or proxy (miks)
@@ -506,6 +511,12 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.10
+
+New features:
+A.F....... [ZBX-1357] updated Chinese (China), English (United States), Japanese, Korean, Polish, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.10rc1
 
 New features:
@@ -518,7 +529,7 @@ Bug fixes:
 ...G...... [ZBX-12187] fixed memory leak when using UserParameter with suppressed characters passed in arguments (viktors)
 ........S. [ZBX-12328] fixed collecting value of VMware host memory balloon size (viktors)
 ..F....... [ZBX-12305] fixed incorrectly escaped IT Service parent name (Ivo)
-..F....... [ZBX-11812] fixed sorting of host interfaces (miks)
+..F....... [ZBX-11812] fixed sorting of host interfaces; fixed selection of the default host interface (miks)
 ..F....... [ZBX-11277] fixed update in mass update form when inventory mode is not set explicitly (gcalenko)
 ..F....... [ZBX-10999] fixed user's access level to display popup content (miks)
 ..F....... [ZBX-9213] removed link from uneditable template and host names in all configuration sections (miks)
@@ -2204,8 +2215,6 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 
 --------------------------------------------------------------------------------
 Changes for 2.2.19rc1
-
-New features:
 
 Bug fixes:
 ........S. [ZBX-12349] fixed security vulnerability with execution of the remote commands on server; thanks to MATSUDA Daiki, Ron Waisberg for report (vso)
