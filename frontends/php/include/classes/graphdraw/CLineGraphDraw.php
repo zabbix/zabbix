@@ -157,15 +157,26 @@ class CLineGraphDraw extends CGraphDraw {
 		// TODO: graphs shouldn't retrieve items and resolve macros themselves
 		// all of the data must be passed as parameters
 		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($itemid)]);
+		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay']);
 		$item = reset($items);
 
 		$item['name'] = $item['name_expanded'];
 
 		$this->items[$this->num] = $item;
 
-		$parser = new CItemDelayFlexParser($item['delay_flex']);
-		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $parser->getFlexibleIntervals());
-		$this->items[$this->num]['intervals'] = $parser->getIntervals();
+		$update_interval_parser = new CUpdateIntervalParser();
+
+		if ($update_interval_parser->parse($item['delay']) != CParser::PARSE_SUCCESS) {
+			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('invalid delay')));
+			exit;
+		}
+
+		// getItemDelay will internally convert delay and flexible delay to seconds.
+		$this->items[$this->num]['delay'] = getItemDelay($update_interval_parser->getDelay(),
+			$update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE)
+		);
+		$this->items[$this->num]['has_scheduling_intervals']
+			= (bool) $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING);
 
 		if (strpos($item['units'], ',') === false) {
 			$this->items[$this->num]['unitsLong'] = '';
@@ -279,16 +290,52 @@ class CLineGraphDraw extends CGraphDraw {
 			$to_time = $this->to_time;
 			$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)'; // required for 'group by' support of Oracle
 
-			// override item history setting with housekeeping settings
+			$to_resolve = [];
+
+			// Override item history setting with housekeeping settings, if they are enabled in config.
 			if ($config['hk_history_global']) {
-				$item['history'] = $config['hk_history'];
+				$item['history'] = timeUnitToSeconds($config['hk_history']);
+			}
+			else {
+				$to_resolve[] = 'history';
 			}
 
-			$trendsEnabled = $config['hk_trends_global'] ? ($config['hk_trends'] > 0) : ($item['trends'] > 0);
+			if ($config['hk_trends_global']) {
+				$item['trends'] = timeUnitToSeconds($config['hk_trends']);
+			}
+			else {
+				$to_resolve[] = 'trends';
+			}
 
-			if (!$trendsEnabled
-					|| (($item['history'] * SEC_PER_DAY) > (time() - ($this->from_time + $this->period / 2))
-						&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))) {
+			// Otherwise, resolve user macro and parse the string. If successfull, convert to seconds.
+			if ($to_resolve) {
+				$item = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve)[0];
+
+				$simple_interval_parser = new CSimpleIntervalParser();
+
+				if (!$config['hk_history_global']) {
+					if ($simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
+						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'history',
+							_('invalid history storage period')
+						));
+						exit;
+					}
+					$item['history'] = timeUnitToSeconds($item['history']);
+				}
+
+				if (!$config['hk_trends_global']) {
+					if ($simple_interval_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
+						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
+							_('invalid trend storage period')
+						));
+						exit;
+					}
+					$item['trends'] = timeUnitToSeconds($item['trends']);
+				}
+			}
+
+			if ($item['trends'] == 0 || ($item['history'] > time() - ($this->from_time + $this->period / 2)
+						&& $this->period / $this->sizeX <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)) {
 				$this->dataFrom = 'history';
 
 				$sql_select = 'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';
@@ -297,7 +344,7 @@ class CLineGraphDraw extends CGraphDraw {
 			else {
 				$this->dataFrom = 'trends';
 
-				if (!$this->hasSchedulingIntervals($this->items[$i]['intervals']) || $this->items[$i]['delay'] != 0) {
+				if (!$this->items[$i]['has_scheduling_intervals'] || $this->items[$i]['delay'] != 0) {
 					$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
 				}
 
@@ -1907,7 +1954,7 @@ class CLineGraphDraw extends CGraphDraw {
 		imagefilledrectangle($this->im,
 			$this->shiftXleft + 1,
 			$this->shiftY,
-			$this->sizeX + $this->shiftXleft-1, // -2 border
+			$this->sizeX + $this->shiftXleft - 1, // -2 border
 			$this->sizeY + $this->shiftY,
 			$this->getColor($this->graphtheme['graphcolor'], 0)
 		);
@@ -1919,13 +1966,10 @@ class CLineGraphDraw extends CGraphDraw {
 			return;
 		}
 
-		$db_work_period = DBselect('SELECT c.work_period FROM config c');
-		$work_period = DBfetch($db_work_period);
-		if (!$work_period) {
-			return;
-		}
+		$config = select_config();
+		$config = CMacrosResolverHelper::resolveTimeUnitMacros([$config], ['work_period'])[0];
 
-		$periods = parse_period($work_period['work_period']);
+		$periods = parse_period($config['work_period']);
 		if (!$periods) {
 			return;
 		}
@@ -2682,7 +2726,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$delay = $this->items[$item]['delay'];
 
 				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
-						|| ($this->hasSchedulingIntervals($this->items[$item]['intervals']) && $delay == 0)) {
+						|| ($this->items[$item]['has_scheduling_intervals'] && $delay == 0)) {
 					$draw = true;
 				}
 				else {
@@ -2747,22 +2791,5 @@ class CLineGraphDraw extends CGraphDraw {
 		unset($this->items, $this->data);
 
 		imageOut($this->im);
-	}
-
-	/**
-	 * Checks if item intervals has at least one scheduling interval.
-	 *
-	 * @param array $intervals
-	 *
-	 * @return bool
-	 */
-	private function hasSchedulingIntervals($intervals) {
-		foreach ($intervals as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_SCHEDULING) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

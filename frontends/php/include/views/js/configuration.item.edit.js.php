@@ -72,7 +72,7 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 					&& ((new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 					|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
 					&& trends.val() == 0)) {
-				trends.val(<?= DAY_IN_YEAR ?>);
+				trends.val('<?= $this->data['trends_default'] ?>');
 			}
 		});
 	});

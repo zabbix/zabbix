@@ -52,20 +52,7 @@ abstract class CGraphDraw {
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
 		$this->axis_valuetype = []; // overal items type (int/float)
-		$this->graphtheme = [
-			'theme' => 'blue-theme',
-			'textcolor' => '1F2C33',
-			'highlightcolor' => 'E33734',
-			'backgroundcolor' => 'FFFFFF',
-			'graphcolor' => 'FFFFFF',
-			'gridcolor' => 'CCD5D9',
-			'maingridcolor' => 'ACBBC2',
-			'gridbordercolor' => 'ACBBC2',
-			'nonworktimecolor' => 'EBEBEB',
-			'leftpercentilecolor' => '429E47',
-			'righttpercentilecolor' => 'E33734'
-		];
-		$this->applyGraphTheme();
+		$this->graphtheme = getUserGraphTheme();
 	}
 
 	public function initColors() {
@@ -106,18 +93,6 @@ abstract class CGraphDraw {
 			else {
 				$this->colors[$name] = imagecolorallocate($this->im, $RGBA[0], $RGBA[1], $RGBA[2]);
 			}
-		}
-	}
-
-	/**
-	 * Load the graph theme from the database.
-	 */
-	public function applyGraphTheme() {
-		$themes = DB::find('graph_theme', [
-			'theme' => getUserTheme(CWebUser::$data)
-		]);
-		if ($themes) {
-			$this->graphtheme = $themes[0];
 		}
 	}
 

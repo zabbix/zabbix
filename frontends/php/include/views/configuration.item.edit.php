@@ -124,26 +124,28 @@ if ($data['interfaces']) {
 	else {
 		$interfacesComboBox = new CComboBox('interfaceid', $data['interfaceid']);
 
-		// set up interface groups
-		$interfaceGroups = [];
-		foreach (zbx_objectValues($data['interfaces'], 'type') as $interfaceType) {
-			$interfaceGroups[$interfaceType] = new COptGroup(interfaceType2str($interfaceType));
+		// Set up interface groups sorted by priority.
+		$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
+		$interface_groups = [];
+		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
+			if (in_array($interface_type, $interface_types)) {
+				$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
+			}
 		}
 
 		// add interfaces to groups
 		foreach ($data['interfaces'] as $interface) {
-			$option = new CComboItem(
-				$interface['interfaceid'],
+			$option = new CComboItem($interface['interfaceid'],
 				$interface['useip']
 					? $interface['ip'].' : '.$interface['port']
 					: $interface['dns'].' : '.$interface['port'],
-				($interface['interfaceid'] == $data['interfaceid']) ? 'yes' : 'no'
+				($interface['interfaceid'] == $data['interfaceid'])
 			);
 			$option->setAttribute('data-interfacetype', $interface['type']);
-			$interfaceGroups[$interface['type']]->addItem($option);
+			$interface_groups[$interface['type']]->addItem($option);
 		}
-		foreach ($interfaceGroups as $interfaceGroup) {
-			$interfacesComboBox->addItem($interfaceGroup);
+		foreach ($interface_groups as $interface_group) {
+			$interfacesComboBox->addItem($interface_group);
 		}
 
 		$span = (new CSpan(_('No interface found')))
@@ -268,6 +270,10 @@ else {
 }
 
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
+$itemFormList->addRow(_('JMX endpoint'),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $discovered_item, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'row_jmx_endpoint'
+);
 $itemFormList->addRow(_('User name'),
 	(new CTextBox('username', $data['username'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_username'
@@ -326,10 +332,8 @@ $itemFormList->addRow(_('Units'),
 	'row_units'
 );
 
-$itemFormList->addRow(_('Update interval (in sec)'),
-	(new CNumericBox('delay', $data['delay'], 5, $discovered_item))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-	'row_delay'
+$itemFormList->addRow(_('Update interval'),
+	(new CTextBox('delay', $data['delay'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_delay'
 );
 
 // Append custom intervals to form list.
@@ -342,37 +346,36 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 	if ($discovered_item) {
 		$itemForm->addVar('delay_flex['.$i.'][type]', (int) $delay_flex['type']);
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type_name]', (int) $delay_flex['type']))
-			->addValue(_('Flexible'), ITEM_DELAY_FLEX_TYPE_FLEXIBLE)
-			->addValue(_('Scheduling'), ITEM_DELAY_FLEX_TYPE_SCHEDULING)
+			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true)
 			->setEnabled(!$discovered_item);
 	}
 	else {
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
-			->addValue(_('Flexible'), ITEM_DELAY_FLEX_TYPE_FLEXIBLE)
-			->addValue(_('Scheduling'), ITEM_DELAY_FLEX_TYPE_SCHEDULING)
+			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true);
 	}
 
-	if ($delay_flex['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
-		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', $delay_flex['delay'], 5, $discovered_item, true,
-			false
-		))->setAttribute('placeholder', 50);
-		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], $discovered_item, 255))
+	if ($delay_flex['type'] == ITEM_DELAY_FLEXIBLE) {
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay'], $discovered_item))
+			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT);
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], $discovered_item))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
-		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', $discovered_item, 255))
-			->setAttribute('placeholder', 'wd1-5h9-18')
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', $discovered_item))
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
 			->setAttribute('style', 'display: none;');
 	}
 	else {
-		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', '', 5, $discovered_item, true, false))
-			->setAttribute('placeholder', 50)
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $discovered_item))
+			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
 			->setAttribute('style', 'display: none;');
-		$period_input = (new CTextBox('delay_flex['.$i.'][period]', '', $discovered_item, 255))
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', '', $discovered_item))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
 			->setAttribute('style', 'display: none;');
-		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule'], $discovered_item, 255))
-			->setAttribute('placeholder', 'wd1-5h9-18');
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule'], $discovered_item))
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
 	}
 
 	$button = $discovered_item
@@ -399,8 +402,7 @@ $itemFormList->addRow(_('Custom intervals'),
 
 // Append history storage to form list.
 $keepHistory = [];
-$keepHistory[] = (new CNumericBox('history', $data['history'], 8, $discovered_item))
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+$keepHistory[] = (new CTextBox('history', $data['history'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 if ($data['config']['hk_history_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
@@ -415,15 +417,14 @@ if ($data['config']['hk_history_global']
 		$keepHistory[] = _x('global housekeeping settings', 'item_form');
 	}
 
-	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_history']).')';
+	$keepHistory[] = ' ('.$data['config']['hk_history'].')';
 }
 
-$itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
+$itemFormList->addRow(_('History storage period'), $keepHistory);
 
 // Append trend storage to form list.
 $keepTrend = [];
-$keepTrend[] = (new CNumericBox('trends', $data['trends'], 8, $discovered_item))
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 if ($data['config']['hk_trends_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
@@ -438,10 +439,10 @@ if ($data['config']['hk_trends_global']
 		$keepTrend[] = _x('global housekeeping settings', 'item_form');
 	}
 
-	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_trends']).')';
+	$keepTrend[] = ' ('.$data['config']['hk_trends'].')';
 }
 
-$itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, 'row_trends');
+$itemFormList->addRow(_('Trend storage period'), $keepTrend, 'row_trends');
 
 $itemFormList->addRow(_('Log time format'),
 	(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
@@ -592,9 +593,15 @@ foreach ($data['preprocessing'] as $i => $step) {
 			$params[1]->addStyle('display: none;');
 			break;
 
+		case ZBX_PREPROC_XPATH:
+		case ZBX_PREPROC_JSONPATH:
+			$params[0]->setAttribute('placeholder', _('path'));
+			$params[1]->addStyle('display: none;');
+			break;
+
 		case ZBX_PREPROC_REGSUB:
 			$params[0]->setAttribute('placeholder', _('pattern'));
-				break;
+			break;
 
 		case ZBX_PREPROC_BOOL2DEC:
 		case ZBX_PREPROC_OCT2DEC:
@@ -610,6 +617,18 @@ foreach ($data['preprocessing'] as $i => $step) {
 		$itemForm->addVar('preprocessing['.$i.'][type]', $step['type']);
 	}
 
+	$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
+
+	foreach (get_preprocessing_types() as $group) {
+		$cb_group = new COptGroup($group['label']);
+
+		foreach ($group['types'] as $type => $label) {
+			$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
+		}
+
+		$preproc_types_cbbox->addItem($cb_group);
+	}
+
 	$preprocessing->addRow(
 		(new CRow([
 			$readonly
@@ -620,7 +639,7 @@ foreach ($data['preprocessing'] as $i => $step) {
 			$readonly
 				? (new CTextBox('preprocessing['.$i.'][type_name]', get_preprocessing_types($step['type'])))
 						->setReadonly(true)
-				: (new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+				: $preproc_types_cbbox,
 			$params[0],
 			$params[1],
 			$readonly
@@ -643,7 +662,7 @@ $preprocessing->addRow(
 );
 
 $item_preproc_list = (new CFormList('item_preproc_list'))
-	->addRow(_('Preprocessing'), $preprocessing);
+	->addRow(_('Preprocessing steps'), $preprocessing);
 
 // Append tabs to form.
 $itemTab = (new CTabView())

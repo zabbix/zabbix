@@ -42,9 +42,14 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'maxsessions' =>			'db media_type.maxsessions',
+			'maxattempts' =>			'db media_type.maxattempts',
+			'attempt_interval' =>		'db media_type.attempt_interval',
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
+		$error = $this->GetValidationError();
 
 		if ($ret && $this->hasInput('exec_params')) {
 			foreach ($this->getInput('exec_params') as $exec_param) {
@@ -57,7 +62,7 @@ class CControllerMediatypeCreate extends CController {
 		}
 
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
+			switch ($error) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
 					$response->setFormData($this->getInputAll());
@@ -81,7 +86,7 @@ class CControllerMediatypeCreate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['type', 'description', 'status']);
+		$this->getInputs($mediatype, ['type', 'description', 'status', 'maxsessions', 'maxattempts', 'attempt_interval']);
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
@@ -110,6 +115,7 @@ class CControllerMediatypeCreate extends CController {
 
 			case MEDIA_TYPE_SMS:
 				$this->getInputs($mediatype, ['gsm_modem']);
+				$mediatype['maxsessions'] = 1;
 				break;
 
 			case MEDIA_TYPE_JABBER:

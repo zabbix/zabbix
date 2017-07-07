@@ -141,8 +141,6 @@ if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
 	$_REQUEST['templates'] = array_merge($templateIds, $_REQUEST['add_templates']);
 }
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
-	$_REQUEST['clear_templates'] = getRequest('clear_templates', []);
-
 	$unlinkTemplates = [];
 
 	if (hasRequest('unlink') && is_array(getRequest('unlink'))) {
@@ -150,7 +148,7 @@ if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 	}
 	elseif (hasRequest('unlink_and_clear') && is_array(getRequest('unlink_and_clear'))) {
 		$unlinkTemplates = array_keys(getRequest('unlink_and_clear'));
-		$_REQUEST['clear_templates'] = array_merge(getRequest('unlink_and_clear'), $unlinkTemplates);
+		$_REQUEST['clear_templates'] = array_merge($unlinkTemplates, getRequest('clear_templates', []));
 	}
 
 	foreach ($unlinkTemplates as $id) {
@@ -482,6 +480,14 @@ if (hasRequest('form')) {
 		'templateids' => $templateIds,
 		'preservekeys' => true
 	]);
+
+	$data['writable_templates'] = API::Template()->get([
+		'output' => ['templateid'],
+		'templateids' => $templateIds,
+		'editable' => true,
+		'preservekeys' => true
+	]);
+
 	CArrayHelper::sort($data['linkedTemplates'], ['name']);
 
 	// Get user allowed host groups and sort them by name.
@@ -628,6 +634,43 @@ else {
 
 	order_result($templates, $sortField, $sortOrder);
 
+	// Select writable templates:
+	$linked_template_ids = [];
+	$writable_templates = [];
+	$linked_hosts_ids = [];
+	$writable_hosts = [];
+	foreach ($templates as $template) {
+		$linked_template_ids = array_merge(
+			$linked_template_ids,
+			zbx_objectValues($template['parentTemplates'], 'templateid'),
+			zbx_objectValues($template['templates'], 'templateid'),
+			zbx_objectValues($template['hosts'], 'hostid')
+		);
+
+		$linked_hosts_ids = array_merge(
+			$linked_hosts_ids,
+			zbx_objectValues($template['hosts'], 'hostid')
+		);
+	}
+	if ($linked_template_ids) {
+		$linked_template_ids = array_unique($linked_template_ids);
+		$writable_templates = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => $linked_template_ids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+	}
+	if ($linked_hosts_ids) {
+		$linked_hosts_ids = array_unique($linked_hosts_ids);
+		$writable_hosts = API::Host()->get([
+			'output' => ['hostid'],
+			'hostsids' => $linked_hosts_ids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+	}
+
 	$data = [
 		'pageFilter' => $pageFilter,
 		'templates' => $templates,
@@ -637,7 +680,9 @@ else {
 		'sortOrder' => $sortOrder,
 		'config' => [
 			'max_in_table' => $config['max_in_table']
-		]
+		],
+		'writable_templates' => $writable_templates,
+		'writable_hosts' => $writable_hosts
 	];
 
 	$view = new CView('configuration.template.list', $data);

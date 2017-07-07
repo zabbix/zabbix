@@ -44,7 +44,7 @@ class CComboBox extends CTag {
 
 	public function addItems(array $items) {
 		foreach ($items as $value => $caption) {
-			$selected = (int) (strcmp($value, $this->value) == 0);
+			$selected = (strcmp($value, $this->value) == 0);
 			parent::addItem(new CComboItem($value, $caption, $selected));
 		}
 		return $this;
@@ -53,7 +53,7 @@ class CComboBox extends CTag {
 	public function addItemsInGroup($label, $items) {
 		$group = new COptGroup($label);
 		foreach ($items as $value => $caption) {
-			$selected = (int) (strcmp($value, $this->value) == 0);
+			$selected = (strcmp($value, $this->value) == 0);
 			$group->addItem(new CComboItem($value, $caption, $selected));
 		}
 		parent::addItem($group);
@@ -66,18 +66,18 @@ class CComboBox extends CTag {
 		}
 		else {
 			if (is_null($selected)) {
-				$selected = 'no';
+				$selected = false;
 				if (is_array($this->value)) {
 					if (str_in_array($value, $this->value)) {
-						$selected = 'yes';
+						$selected = true;
 					}
 				}
 				elseif (strcmp($value, $this->value) == 0) {
-					$selected = 'yes';
+					$selected = true;
 				}
 			}
 			else {
-				$selected = 'yes';
+				$selected = true;
 			}
 
 			$citem = new CComboItem($value, $caption, $selected, $enabled);
