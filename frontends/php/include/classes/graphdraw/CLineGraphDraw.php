@@ -20,6 +20,9 @@
 
 
 class CLineGraphDraw extends CGraphDraw {
+	const GRAPH_WIDTH_MIN = 20;
+	const GRAPH_HEIGHT_MIN = 20;
+	const legendOffsetY = 90;
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		parent::__construct($type);
@@ -28,23 +31,25 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->triggers = [];
 		$this->ymin_type = GRAPH_YAXIS_TYPE_CALCULATED;
 		$this->ymax_type = GRAPH_YAXIS_TYPE_CALCULATED;
-		$this->yaxisright = 0;
-		$this->yaxisleft = 0;
+		$this->yaxis = [
+			GRAPH_YAXIS_SIDE_LEFT => false,
+			GRAPH_YAXIS_SIDE_RIGHT => false
+		];
 		$this->skipLeftScale = 0; // in case if left axis should be drawn but doesn't contain any data
 		$this->skipRightScale = 0; // in case if right axis should be drawn but doesn't contain any data
 		$this->ymin_itemid = 0;
 		$this->ymax_itemid = 0;
-		$this->legendOffsetY = 90;
 		$this->percentile = [
-			'left' => [
+			GRAPH_YAXIS_SIDE_LEFT => [
 				'percent' => 0, // draw percentage line
 				'value' => 0 // calculated percentage value left y axis
 			],
-			'right' => [
+			GRAPH_YAXIS_SIDE_RIGHT => [
 				'percent' => 0, // draw percentage line
 				'value' => 0 // calculated percentage value right y axis
 			]
 		];
+		$this->outer = false;
 		$this->m_showWorkPeriod = 1;
 		$this->m_showTriggers = 1;
 		$this->zero = [];
@@ -58,26 +63,13 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->gridPixels = 30; // optimal grid size
 		$this->gridPixelsVert = 40;
 		$this->axis_valuetype = []; // overal items type (int/float)
+		$this->drawItemsLegend = false; // draw items legend
+		$this->drawExLegend = false; // draw percentile and triggers legend
 	}
 
 	/********************************************************************************************************/
 	// PRE CONFIG:	ADD / SET / APPLY
 	/********************************************************************************************************/
-	public function updateShifts() {
-		if ($this->yaxisleft == 1 && $this->yaxisright == 1) {
-			$this->shiftXleft = 85;
-			$this->shiftXright = 85;
-		}
-		elseif ($this->yaxisleft == 1) {
-			$this->shiftXleft = 85;
-			$this->shiftXright = 30;
-		}
-		elseif ($this->yaxisright == 1) {
-			$this->shiftXleft = 30;
-			$this->shiftXright = 85;
-		}
-	}
-
 	public function showWorkPeriod($value) {
 		$this->m_showWorkPeriod = ($value == 1) ? 1 : 0;
 	}
@@ -131,14 +123,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_DEFAULT : $axis;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
-
-		if ($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
-			$this->yaxisleft = 1;
-		}
-
-		if ($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
-			$this->yaxisright = 1;
-		}
+		$this->yaxis[$this->items[$this->num]['axisside']] = true;
 
 		$this->num++;
 	}
@@ -178,11 +163,15 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	public function setLeftPercentage($percentile) {
-		$this->percentile['left']['percent'] = $percentile;
+		$this->percentile[GRAPH_YAXIS_SIDE_LEFT]['percent'] = $percentile;
 	}
 
 	public function setRightPercentage($percentile) {
-		$this->percentile['right']['percent'] = $percentile;
+		$this->percentile[GRAPH_YAXIS_SIDE_RIGHT]['percent'] = $percentile;
+	}
+
+	public function setOuter($outer) {
+		$this->outer = $outer;
 	}
 
 	protected function selectData() {
@@ -445,10 +434,7 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	/********************************************************************************************************/
-	// CALCULATIONS
-	/********************************************************************************************************/
-	protected function calcTriggers() {
+	protected function selectTriggers() {
 		$this->triggers = [];
 		if ($this->m_showTriggers != 1) {
 			return;
@@ -457,7 +443,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$max = 3;
 		$cnt = 0;
 
-		foreach ($this->items as $inum => $item) {
+		foreach ($this->items as $item) {
 			$db_triggers = DBselect(
 				'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,tr.value'.
 				' FROM triggers tr,functions f,items i,hosts h'.
@@ -487,23 +473,23 @@ class CLineGraphDraw extends CGraphDraw {
 					continue;
 				}
 
-				$val = convert($arr[3].$arr[4]);
-
-				$minY = $this->m_minY[$this->items[$inum]['axisside']];
-				$maxY = $this->m_maxY[$this->items[$inum]['axisside']];
+				$constant = $arr[3].$arr[4];
 
 				$this->triggers[] = [
-					'skipdraw' => ($val <= $minY || $val >= $maxY),
-					'y' => $this->sizeY - (($val - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY,
+					'axisside' => $item['axisside'],
+					'val' => convert($constant),
 					'color' => getSeverityColor($trigger['priority']),
 					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
-					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
+					'constant' => '['.$arr[2].' '.$constant.']'
 				];
 				++$cnt;
 			}
 		}
 	}
 
+	/********************************************************************************************************/
+	// CALCULATIONS
+	/********************************************************************************************************/
 	// calculates percentages for left & right Y axis
 	protected function calcPercentile() {
 		if ($this->type != GRAPH_TYPE_NORMAL) {
@@ -511,8 +497,8 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		$values = [
-			'left' => [],
-			'right'=> []
+			GRAPH_YAXIS_SIDE_LEFT => [],
+			GRAPH_YAXIS_SIDE_RIGHT=> []
 		];
 
 		$maxX = $this->sizeX;
@@ -527,7 +513,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// for each X
 			for ($i = 0; $i < $maxX; $i++) { // new point
-				if ($data['count'][$i] == 0 && $i != ($maxX - 1)) {
+				if ($data['count'][$i] == 0) {
 					continue;
 				}
 
@@ -548,23 +534,16 @@ class CLineGraphDraw extends CGraphDraw {
 						$value = $avg;
 				}
 
-				if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
-					$values['left'][] = $value;
-				}
-				else {
-					$values['right'][] = $value;
-				}
+				$values[$this->items[$item]['axisside']][] = $value;
 			}
 		}
 
 		foreach ($this->percentile as $side => $percentile) {
-			if ($percentile['percent'] > 0 && !empty($values[$side])) {
+			if ($percentile['percent'] > 0 && $values[$side]) {
 				sort($values[$side]);
 				// Using "Nearest Rank" method: http://en.wikipedia.org/wiki/Percentile#Definition_of_the_Nearest_Rank_method
 				$percent = (int) ceil($percentile['percent'] / 100 * count($values[$side]));
-				// - 1 is necessary because array starts with the 0 index
 				$this->percentile[$side]['value'] = $values[$side][$percent - 1];
-				unset($values[$side]);
 			}
 		}
 	}
@@ -1077,7 +1056,7 @@ class CLineGraphDraw extends CGraphDraw {
 	public function drawXYAxisScale() {
 		$gbColor = $this->getColor($this->graphtheme['gridbordercolor'], 0);
 
-		if ($this->yaxisleft) {
+		if ($this->yaxis[GRAPH_YAXIS_SIDE_LEFT]) {
 			zbx_imageline(
 				$this->im,
 				$this->shiftXleft + $this->shiftXCaption,
@@ -1120,7 +1099,7 @@ class CLineGraphDraw extends CGraphDraw {
 			);
 		}
 
-		if ($this->yaxisright) {
+		if ($this->yaxis[GRAPH_YAXIS_SIDE_RIGHT]) {
 			zbx_imageline(
 				$this->im,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
@@ -1199,7 +1178,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Draws Y scale grid.
 	 */
 	private function drawHorizontalGrid() {
-		$yAxis = $this->yaxisleft ? GRAPH_YAXIS_SIDE_LEFT : GRAPH_YAXIS_SIDE_RIGHT;
+		$yAxis = $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? GRAPH_YAXIS_SIDE_LEFT : GRAPH_YAXIS_SIDE_RIGHT;
 
 		$stepY = $this->gridStepX[$yAxis];
 
@@ -1674,12 +1653,12 @@ class CLineGraphDraw extends CGraphDraw {
 
 	private function drawSides() {
 		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])
-				&& ($this->yaxisright != 0 || $this->skipRightScale != 1)) {
+				&& ($this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] || $this->skipRightScale != 1)) {
 			$sides[] = GRAPH_YAXIS_SIDE_RIGHT;
 		}
 
 		if (((isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT]))
-				&& ($this->yaxisleft != 0 || $this->skipLeftScale != 1)) || !isset($sides)) {
+				&& ($this->yaxis[GRAPH_YAXIS_SIDE_LEFT] || $this->skipLeftScale != 1)) || !isset($sides)) {
 			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
 		}
 
@@ -1957,23 +1936,17 @@ class CLineGraphDraw extends CGraphDraw {
 
 	protected function drawPercentile() {
 		if ($this->type != GRAPH_TYPE_NORMAL) {
-			return ;
+			return;
 		}
 
 		foreach ($this->percentile as $side => $percentile) {
 			if ($percentile['percent'] > 0 && $percentile['value']) {
-				if ($side == 'left') {
-					$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
-					$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
+				$minY = $this->m_minY[$side];
+				$maxY = $this->m_maxY[$side];
 
-					$color = $this->graphtheme['leftpercentilecolor'];
-				}
-				else {
-					$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
-					$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
-
-					$color = $this->graphtheme['rightpercentilecolor'];
-				}
+				$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
+					? $this->graphtheme['leftpercentilecolor']
+					: $this->graphtheme['rightpercentilecolor'];
 
 				$y = $this->sizeY - (($percentile['value'] - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY;
 				zbx_imageline(
@@ -1995,40 +1968,34 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$oppColor = $this->getColor(GRAPH_TRIGGER_LINE_OPPOSITE_COLOR);
 
-		foreach ($this->triggers as $tnum => $trigger) {
-			if ($trigger['skipdraw']) {
+		foreach ($this->triggers as $trigger) {
+			$minY = $this->m_minY[$trigger['axisside']];
+			$maxY = $this->m_maxY[$trigger['axisside']];
+
+			if ($minY >= $trigger['val'] || $trigger['val'] >= $maxY) {
 				continue;
 			}
 
+			$y = $this->sizeY - (($trigger['val'] - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY;
 			$triggerColor = $this->getColor($trigger['color']);
 			$lineStyle = [$triggerColor, $triggerColor, $triggerColor, $triggerColor, $triggerColor, $oppColor, $oppColor, $oppColor];
 
-			dashedLine(
-				$this->im,
-				$this->shiftXleft,
-				$trigger['y'],
-				$this->sizeX + $this->shiftXleft,
-				$trigger['y'],
-				$lineStyle
-			);
-
-			dashedLine(
-				$this->im,
-				$this->shiftXleft,
-				$trigger['y'] + 1,
-				$this->sizeX + $this->shiftXleft,
-				$trigger['y'] + 1,
-				$lineStyle
-			);
+			dashedLine( $this->im, $this->shiftXleft, $y, $this->sizeX + $this->shiftXleft, $y, $lineStyle);
+			dashedLine( $this->im, $this->shiftXleft, $y + 1, $this->sizeX + $this->shiftXleft, $y + 1, $lineStyle);
 		}
 	}
 
 	protected function drawLegend() {
+		// if graph is small, we are not drawing legend
+		if (!$this->drawItemsLegend) {
+			return true;
+		}
+
 		$leftXShift = 20;
-		$units = ['left' => 0, 'right' => 0];
+		$units = [GRAPH_YAXIS_SIDE_LEFT => 0, GRAPH_YAXIS_SIDE_RIGHT => 0];
 
 		// draw item legend
-		$legend = new CImageTextTable($this->im, $leftXShift - 5, $this->sizeY + $this->shiftY + $this->legendOffsetY);
+		$legend = new CImageTextTable($this->im, $leftXShift - 5, $this->sizeY + $this->shiftY + self::legendOffsetY);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
 		$legend->fontsize = 9;
@@ -2087,10 +2054,10 @@ class CLineGraphDraw extends CGraphDraw {
 			// draw legend of an item with data
 			if (isset($data) && isset($data['min'])) {
 				if ($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
-					$units['left'] = $this->items[$i]['units'];
+					$units[GRAPH_YAXIS_SIDE_LEFT] = $this->items[$i]['units'];
 				}
 				else {
-					$units['right'] = $this->items[$i]['units'];
+					$units[GRAPH_YAXIS_SIDE_RIGHT] = $this->items[$i]['units'];
 				}
 
 				$legend->addCell($rowNum, ['image' => $colorSquare, 'marginRight' => 5]);
@@ -2151,14 +2118,14 @@ class CLineGraphDraw extends CGraphDraw {
 		$legend->draw();
 
 		// if graph is small, we are not drawing percent line and trigger legends
-		if ($this->sizeY < ZBX_GRAPH_LEGEND_HEIGHT) {
+		if (!$this->drawExLegend) {
 			return true;
 		}
 
 		$legend = new CImageTextTable(
 			$this->im,
 			$leftXShift + 10,
-			$this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY
+			$this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY
 		);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
@@ -2167,29 +2134,29 @@ class CLineGraphDraw extends CGraphDraw {
 		// draw percentile
 		if ($this->type == GRAPH_TYPE_NORMAL) {
 			foreach ($this->percentile as $side => $percentile) {
-				if ($percentile['percent'] > 0 && $percentile['value']) {
+				if ($percentile['percent'] > 0 && $this->yaxis[$side]) {
 					$percentile['percent'] = (float) $percentile['percent'];
-					$convertedUnit = convert_units([
-						'value' => $percentile['value'],
-						'units' => $units[$side]
-					]);
+					$convertedUnit = $percentile['value']
+						? convert_units([
+							'value' => $percentile['value'],
+							'units' => $units[$side]
+						])
+						: '-';
+					$side_str = ($side == GRAPH_YAXIS_SIDE_LEFT) ? _('left') : _('right');
 					$legend->addCell($rowNum, [
-						'text' => $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side.')',
+						'text' => $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side_str.')',
 						ITEM_CONVERT_NO_UNITS
 					]);
-					if ($side == 'left') {
-						$color = $this->graphtheme['leftpercentilecolor'];
-					}
-					else {
-						$color = $this->graphtheme['rightpercentilecolor'];
-					}
+					$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
+						? $this->graphtheme['leftpercentilecolor']
+						: $this->graphtheme['rightpercentilecolor'];
 
 					imagefilledpolygon(
 						$this->im,
 						[
-							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
-							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
-							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY - 10
+							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
+							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
+							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY - 10
 						],
 						3,
 						$this->getColor($color)
@@ -2198,9 +2165,9 @@ class CLineGraphDraw extends CGraphDraw {
 					imagepolygon(
 						$this->im,
 						[
-							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
-							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
-							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY - 10
+							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
+							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
+							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY - 10
 						],
 						3,
 						$this->getColor('Black No Alpha')
@@ -2215,7 +2182,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$legend = new CImageTextTable(
 			$this->im,
 			$leftXShift + 10,
-			$this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY + 5
+			$this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY + 5
 		);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
@@ -2226,7 +2193,7 @@ class CLineGraphDraw extends CGraphDraw {
 			imagefilledellipse(
 				$this->im,
 				$leftXShift,
-				$this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
+				$this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
 				10,
 				10,
 				$this->getColor($trigger['color'])
@@ -2235,7 +2202,7 @@ class CLineGraphDraw extends CGraphDraw {
 			imageellipse(
 				$this->im,
 				$leftXShift,
-				$this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
+				$this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
 				10,
 				10,
 				$this->getColor('Black No Alpha')
@@ -2500,13 +2467,7 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	public function draw() {
-		$start_time = microtime(true);
-
-		set_image_header();
-
-		$this->selectData();
-
+	private function calcSides() {
 		$sides = [];
 
 		if (array_key_exists(GRAPH_YAXIS_SIDE_RIGHT, $this->axis_valuetype)) {
@@ -2584,28 +2545,91 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 		}
+	}
 
-		$this->calcMinMaxInterval();
-		$this->updateShifts();
-		$this->calcTriggers();
-		$this->calcZero();
-		$this->calcPercentile();
+	private function calcDimentions() {
+		$this->shiftXleft = $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
+		$this->shiftXright = $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
 
-		$this->fullSizeX = $this->sizeX + $this->shiftXleft + $this->shiftXright + 1;
-		$this->fullSizeY = $this->sizeY + $this->shiftY + $this->legendOffsetY;
+		$x_offsets = $this->shiftXleft + $this->shiftXright + 1;
+		$y_offsets = $this->shiftY + self::legendOffsetY;
+		$this->fullSizeX = $this->sizeX;
+		$this->fullSizeY = $this->sizeY;
 
 		if ($this->drawLegend) {
-			$this->fullSizeY += 14 * ($this->num + 1 + (($this->sizeY < 120) ? 0 : count($this->triggers))) + 8;
-		}
+			$h_legend_items = 14 * ($this->num + 1) + 8;
+			$h_legend_triggers = 14 * count($this->triggers);
+			$h_legend_percentile = 0;
 
-		// if graph height is big enough, we reserve space for percent line legend
-		if ($this->sizeY >= ZBX_GRAPH_LEGEND_HEIGHT) {
-			foreach ($this->percentile as $percentile) {
-				if ($percentile['percent'] > 0 && $percentile['value']) {
-					$this->fullSizeY += 14;
+			foreach ($this->percentile as $side => $percentile) {
+				if ($percentile['percent'] > 0 && $this->yaxis[$side]) {
+					$h_legend_percentile += 14;
 				}
 			}
 		}
+
+		if ($this->outer) {
+			$this->sizeX = $this->fullSizeX - $x_offsets;
+			$this->sizeY = $this->fullSizeY - $y_offsets;
+
+			if ($this->drawLegend) {
+				if ($this->sizeY - $h_legend_items >= self::GRAPH_HEIGHT_MIN) {
+					$this->sizeY -= $h_legend_items;
+					$this->drawItemsLegend = true;
+
+					if ($this->sizeY - $h_legend_triggers - $h_legend_percentile >= ZBX_GRAPH_LEGEND_HEIGHT) {
+						$this->sizeY -= $h_legend_triggers + $h_legend_percentile;
+						$this->drawExLegend = true;
+					}
+				}
+			}
+		}
+		else {
+			$this->fullSizeX += $x_offsets;
+			$this->fullSizeY += $y_offsets;
+
+			if ($this->drawLegend) {
+				$this->fullSizeY += $h_legend_items;
+				$this->drawItemsLegend = true;
+
+				if ($this->sizeY >= ZBX_GRAPH_LEGEND_HEIGHT) {
+					$this->fullSizeY += $h_legend_triggers + $h_legend_percentile;
+					$this->drawExLegend = true;
+				}
+			}
+		}
+	}
+
+	public function getMinDimensions() {
+		$min_dimentions = [
+			'width' => self::GRAPH_WIDTH_MIN,
+			'height' => self::GRAPH_HEIGHT_MIN
+		];
+
+		if ($this->outer) {
+			$min_dimentions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
+			$min_dimentions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
+			$min_dimentions['width'] ++;
+			$min_dimentions['height'] += $this->shiftY + self::legendOffsetY;
+		}
+
+		return $min_dimentions;
+	}
+
+	public function draw() {
+		$start_time = microtime(true);
+
+		set_image_header();
+
+		// $this->sizeX is required for selectData() method
+		$this->selectData();
+		$this->selectTriggers();
+
+		$this->calcDimentions();
+		$this->calcSides();
+		$this->calcPercentile();
+		$this->calcMinMaxInterval();
+		$this->calcZero();
 
 		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
 			$this->im = imagecreatetruecolor($this->fullSizeX, $this->fullSizeY);

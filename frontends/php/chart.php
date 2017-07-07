@@ -36,8 +36,8 @@ $fields = [
 	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'from' =>			[T_ZBX_INT, O_OPT, null,	'{} >= 0',	null],
-	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(20, 65535),	null],
-	'height' =>			[T_ZBX_INT, O_OPT, null,	'{} > 0',	null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
 	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 ];
 if (!check_fields($fields)) {
