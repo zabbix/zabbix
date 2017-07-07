@@ -2382,7 +2382,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* dependent items */
 
-		if (ITEM_TYPE_DEPENDENT == item->type && NULL != row[38])
+		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[38]))
 		{
 			depitem = DCfind_id(&config->dependentitems, itemid, sizeof(ZBX_DC_DEPENDENTITEM), &found);
 
