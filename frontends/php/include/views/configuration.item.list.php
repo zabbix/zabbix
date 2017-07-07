@@ -262,8 +262,9 @@ foreach ($this->data['items'] as $item) {
 		$item['trends'] = '';
 	}
 
-	// hide zeroes for trapper and SNMP trap items
-	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+	// Hide zeroes for trapper, SNMP trap and dependent items.
+	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
+			|| $item['type'] == ITEM_TYPE_DEPENDENT) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
