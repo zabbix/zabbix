@@ -555,7 +555,8 @@ function getMenuPopupTrigger(options) {
  * @return array
  */
 function getMenuPopupTriggerLog(options) {
-	var items = [];
+	var items = [],
+		dependent_items = getMenuPopupDependentItems(options.dependent_items);
 
 	// create
 	items[items.length] = {
@@ -606,11 +607,12 @@ function getMenuPopupTriggerLog(options) {
 
 	items[items.length] = edit_trigger;
 
+	dependent_items = dependent_items.pop();
+	items[items.length] = dependent_items.items.pop();
+
 	return [{
 		label: sprintf(t('Item "%1$s"'), options.itemName),
 		items: items
-	}, {
-		items: getMenuPopupDependentItems(options.dependent_items)[items]
 	}];
 }
 
