@@ -555,10 +555,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($preprocessing) {
 				$item['preprocessing'] = $preprocessing;
 			}
-
-			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				$item['master_itemid'] = getRequest('master_itemid');
-			}
+			$item['master_itemid'] = ($item['type'] == ITEM_TYPE_DEPENDENT) ? getRequest('master_itemid') : 0;
 
 			$result = (bool) API::Item()->create($item);
 		}
@@ -692,10 +689,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['description'] !== getRequest('description', '')) {
 					$item['description'] = getRequest('description', '');
 				}
-				if (getRequest('type') == ITEM_TYPE_DEPENDENT
-						&& $db_item['master_itemid'] != getRequest('master_itemid')) {
-					$item['master_itemid'] = getRequest('master_itemid');
-				}
 			}
 
 			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
@@ -708,6 +701,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($item) {
 				$item['itemid'] = getRequest('itemid');
+				$item['master_itemid'] = ($item['type'] == ITEM_TYPE_DEPENDENT) ? getRequest('master_itemid') : 0;
 
 				$result = (bool) API::Item()->update($item);
 			}

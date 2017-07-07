@@ -389,6 +389,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 			$item['trends'] = getRequest('trends');
 		}
+		$item['master_itemid'] = ($item['type'] == ITEM_TYPE_DEPENDENT) ? getRequest('master_itemid') : 0;
 
 		if (hasRequest('update')) {
 			$itemId = getRequest('itemid');
@@ -445,19 +446,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_item['preprocessing'] !== $preprocessing) {
 				$item['preprocessing'] = $preprocessing;
 			}
-
-			if (getRequest('type') == ITEM_TYPE_DEPENDENT
-					&& $db_item['master_itemid'] != getRequest('master_itemid')) {
-				$item['master_itemid'] = getRequest('master_itemid');
-			}
-
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
-			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				$item['master_itemid'] = getRequest('master_itemid');
-			}
-
 			$item['applications'] = $applications;
 			$item['applicationPrototypes'] = $application_prototypes;
 
