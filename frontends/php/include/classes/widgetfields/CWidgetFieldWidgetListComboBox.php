@@ -55,7 +55,7 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 			'if (widgets.length) {'.
 				'jQuery.each(widgets, function(i, widget) {'.
 					'jQuery("<option></option>")'.
-						'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue(true).'"))'.
+						'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue().'"))'.
 						'.text(widget["header"].length ? widget["header"] : '.
 							'dashboard_data["widget_defaults"][widget["type"]]["header"])'.
 						'.val(widget["fields"]["reference"])'.

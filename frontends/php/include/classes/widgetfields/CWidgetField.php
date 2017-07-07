@@ -43,12 +43,6 @@ class CWidgetField {
 	}
 
 	public function setValue($value) {
-		if ($value === '' || $value === null) {
-			$value = null;
-		}
-		if ($this->save_type === ZBX_WIDGET_FIELD_TYPE_INT32) {
-			$value = (int)$value;
-		}
 		$this->value = $value;
 		return $this;
 	}
@@ -71,21 +65,12 @@ class CWidgetField {
 	}
 
 	/**
-	 * Get field value
-	 *
-	 * @param bool $with_default  replaces missing value with default one
+	 * Get field value. If no value is set, will return default value.
 	 *
 	 * @return mixed
 	 */
-	public function getValue($with_default = false) {
-		$value = $this->value;
-
-		if ($with_default === true) {
-			// display default value, if no other given
-			$value = ($this->value === null) ? $this->default : $this->value;
-		}
-
-		return $value;
+	public function getValue() {
+		return ($this->value === null) ? $this->default : $this->value;
 	}
 
 	public function getLabel() {
@@ -139,7 +124,7 @@ class CWidgetField {
 	 * @return array  Array for widget fields ready for saving in API.
 	 */
 	public function toApi() {
-		$value = $this->getValue(true);
+		$value = $this->getValue();
 		$widget_fields = [];
 
 		if ($value !== null && $value !== $this->default) {

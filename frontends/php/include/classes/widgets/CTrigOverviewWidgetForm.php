@@ -52,7 +52,7 @@ class CTrigOverviewWidgetForm extends CWidgetForm {
 			->setModern(true);
 
 		if (array_key_exists('style', $data)) {
-			$field_style->setValue($data['style']);
+			$field_style->setValue((int)$data['style']);
 		}
 		$this->fields[] = $field_style;
 	}

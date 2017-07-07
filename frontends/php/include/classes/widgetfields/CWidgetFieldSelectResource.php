@@ -66,6 +66,10 @@ class CWidgetFieldSelectResource extends CWidgetField {
 		return $this->resource_type;
 	}
 
+	public function setValue($value) {
+		return parent::setValue(($value === '') ? null : $value);
+	}
+
 	public function getPopupUrl() {
 		$url = sprintf('popup.php?srctbl=%s&srcfld1=%s&srcfld2=%s&dstfld1=%s&dstfld2=%s', $this->srctbl,
 				$this->srcfld1, $this->srcfld2, $this->dstfld1, $this->dstfld2);

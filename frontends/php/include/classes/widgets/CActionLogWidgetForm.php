@@ -45,7 +45,7 @@ class CActionLogWidgetForm extends CWidgetForm {
 			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
 		if (array_key_exists('sort_triggers', $data)) {
-			$field_sort->setValue($data['sort_triggers']);
+			$field_sort->setValue((int)$data['sort_triggers']);
 		}
 		$this->fields[] = $field_sort;
 

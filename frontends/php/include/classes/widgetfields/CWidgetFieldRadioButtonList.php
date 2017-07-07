@@ -64,7 +64,7 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 	{
 		$errors = parent::validate();
 
-		if (!in_array($this->getValue(true), array_keys($this->values))) {
+		if (!in_array($this->getValue(), array_keys($this->values))) {
 			$errors[] = _s('Invalid parameter "%1$s".', $this->getLabel());
 		}
 

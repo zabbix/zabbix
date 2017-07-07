@@ -58,6 +58,10 @@ class CWidgetFieldNumericBox extends CWidgetField {
 		return strlen((string)$this->max);
 	}
 
+	public function setValue($value) {
+		return parent::setValue((int)$value);
+	}
+
 	/**
 	 * Validate.
 	 *
@@ -66,7 +70,7 @@ class CWidgetFieldNumericBox extends CWidgetField {
 	public function validate()
 	{
 		$errors = parent::validate();
-		$value = $this->getValue(true);
+		$value = $this->getValue();
 
 		if ($value !== null && ($value < $this->min || $value > $this->max)) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(),

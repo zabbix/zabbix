@@ -45,17 +45,17 @@ $form_list->addRow(_('Name'),
 foreach ($data['dialogue']['form']->getFields() as $field) {
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow($field->getLabel(),
-			new CComboBox($field->getName(), $field->getValue(true), $field->getAction(), $field->getValues())
+			new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues())
 		);
 	}
 	elseif ($field instanceof CWidgetFieldTextBox) {
 		$form_list->addRow($field->getLabel(),
-			(new CTextBox($field->getName(), $field->getValue(true)))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldCheckbox) {
 		$form_list->addRow($field->getLabel(),
-			(new CCheckBox($field->getName()))->setChecked($field->getValue(true) == 1)
+			(new CCheckBox($field->getName()))->setChecked($field->getValue() == 1)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldGroup) {
@@ -89,11 +89,11 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$form->addVar($field->getName(), $field->getValue());
 	}
 	elseif ($field instanceof CWidgetFieldSelectResource) {
-		$caption = array_key_exists($field->getValue(true), $data['captions'][$field->getResourceType()])
-			? $data['captions'][$field->getResourceType()][$field->getValue(true)]
+		$caption = array_key_exists($field->getValue(), $data['captions'][$field->getResourceType()])
+			? $data['captions'][$field->getResourceType()][$field->getValue()]
 			: '';
 		// needed for popup script
-		$form->addVar($field->getName(), ($field->getValue(true) !== null) ? $field->getValue(true) : '');
+		$form->addVar($field->getName(), ($field->getValue() !== null) ? $field->getValue() : '');
 		$form_list->addRow($field->getLabel(), [
 			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -109,12 +109,12 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 	}
 	elseif ($field instanceof CWidgetFieldNumericBox) {
 		$form_list->addRow($field->getLabel(),
-			(new CNumericBox($field->getName(), $field->getValue(true), $field->getMaxLength()))
+			(new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength()))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldRadioButtonList) {
-		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue(true)))
+		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue()))
 			->setModern($field->getModern());
 		foreach ($field->getValues() as $key => $value) {
 			$radio_button_list->addValue($value, $key, null, $field->getAction());

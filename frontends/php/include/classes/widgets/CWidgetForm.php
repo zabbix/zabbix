@@ -46,7 +46,7 @@ class CWidgetForm {
 
 		foreach ($this->fields as $field) {
 			/* @var $field CWidgetField */
-			$data[$field->getName()] = $field->getValue(true);
+			$data[$field->getName()] = $field->getValue();
 		}
 
 		return $data;

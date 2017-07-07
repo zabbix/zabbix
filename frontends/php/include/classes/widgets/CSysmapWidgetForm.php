@@ -33,12 +33,12 @@ class CSysmapWidgetForm extends CWidgetForm {
 			->setAction('updateWidgetConfigDialogue()')
 			->setModern(true);
 		if (array_key_exists('source_type', $data)) {
-			$field_source_type->setValue($data['source_type']);
+			$field_source_type->setValue((int)$data['source_type']);
 		}
 		$this->fields[] = $field_source_type;
 
 		// select filter widget field
-		if ($field_source_type->getValue(true) === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+		if ($field_source_type->getValue() === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			$field_filter_widget = (new CWidgetFieldWidgetListComboBox('filter_widget_reference', _('Filter'),
 				'type', 'navigationtree'))->setDefault('');
 
