@@ -1229,7 +1229,7 @@ class CAction extends CApiService {
 						if (array_key_exists('opmessage', $operation)) {
 							$opMessagesToUpdate[] = [
 								'values' => $operation['opmessage'],
-								'where' => ['operationid'=>$operation['operationid']]
+								'where' => ['operationid' => $operation['operationid']]
 							];
 						}
 

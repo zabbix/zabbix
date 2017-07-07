@@ -589,7 +589,7 @@ if (hasRequest('form')) {
 				];
 			}
 			elseif ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD
-						|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
+					|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
 				$operation = [
 					'actionid' => $operation['actionid'],
 					'operationid' => $operation['operationid'],
