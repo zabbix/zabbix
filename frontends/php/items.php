@@ -701,7 +701,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($item) {
 				$item['itemid'] = getRequest('itemid');
-				$item['master_itemid'] = ($item['type'] == ITEM_TYPE_DEPENDENT) ? getRequest('master_itemid') : 0;
+				$item['master_itemid'] = (getRequest('type') == ITEM_TYPE_DEPENDENT) ? getRequest('master_itemid') : 0;
 
 				$result = (bool) API::Item()->update($item);
 			}
