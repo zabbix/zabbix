@@ -48,7 +48,10 @@ if (!check_fields($fields)) {
 $dbGraph = API::Graph()->get([
 	'output' => API_OUTPUT_EXTEND,
 	'selectGraphItems' => API_OUTPUT_EXTEND,
-	'selectHosts' => ['name'],
+	'selectHosts' => ['hostid', 'name'],
+	'selectItems' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
+		'value_type', 'key_'
+	],
 	'graphids' => $_REQUEST['graphid']
 ]);
 
@@ -80,56 +83,18 @@ CArrayHelper::sort($dbGraph['gitems'], [
 	['field' => 'itemid', 'order' => ZBX_SORT_DOWN]
 ]);
 
-// Resolve item data and master item data if dependent items exists in graph.
-$resolved_masters = [];
-$unresolved_masterids = zbx_objectValues($dbGraph['gitems'], 'itemid');
-$level = 3;
-do {
-	$items = API::Item()->get([
-		'output'		=> ['type', 'master_itemid', 'name', 'delay', 'units', 'delay_flex'],
-		'itemids'		=> $unresolved_masterids,
-		'selectHosts'	=> ['name', 'host'],
-		'preservekeys'	=> true
+$hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
+$graph_item = reset($dbGraph['gitems']);
+
+foreach ($dbGraph['items'] as $item) {
+	$graph->addItem($item + [
+		'host'			=> $hosts[$item['hostid']],
+		'color'			=> $graph_item['color'],
+		'drawtype'		=> $graph_item['drawtype'],
+		'axisside'		=> $graph_item['yaxisside'],
+		'calc_fnc'		=> $graph_item['calc_fnc']
 	]);
-	$unresolved_masterids = [];
-
-	foreach ($items as $itemid => $item) {
-		if ($item['type'] == ITEM_TYPE_DEPENDENT && !array_key_exists($itemid, $resolved_masters)) {
-			$unresolved_masterids[$item['master_itemid']] = true;
-		}
-		$resolved_masters[$itemid] = $item;
-	}
-	$unresolved_masterids = array_keys($unresolved_masterids);
-} while ($unresolved_masterids && $level-- > 0);
-
-// get graph items
-foreach ($dbGraph['gitems'] as $gItem) {
-	$options = $gItem;
-	$item = $resolved_masters[$gItem['itemid']];
-	$item['hostname'] = $item['host']['name'];
-	$item['host'] = $item['host']['host'];
-
-	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		$master_item = $item;
-
-		while ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT) {
-			$master_item = $resolved_masters[$master_item['master_itemid']];
-		}
-		$item['type'] = $master_item['type'];
-		$item['delay'] = $master_item['delay'];
-		$item['delay_flex'] = $master_item['delay_flex'];
-	}
-
-	$item['name_expanded'] = CMacrosResolverHelper::resolveItemNames([$item])[0]['name_expanded'];
-	$parser = new CItemDelayFlexParser($item['delay_flex']);
-	$item['delay'] = getItemDelay($item['delay'], $parser->getFlexibleIntervals());
-	$item['intervals'] = $parser->getIntervals();
-
-	if (strpos($item['units'], ',') !== false) {
-		list($item['units'], $item['unitsLong']) = explode(',', $item['units']);
-	}
-
-	$graph->addGraphItem($item, $options);
+	$graph_item = next($dbGraph['gitems']);
 }
 
 $hostName = '';

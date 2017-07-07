@@ -54,6 +54,7 @@ $fields = [
 if (!check_fields($fields)) {
 	exit();
 }
+$graph_items = [];
 
 if ($httptestid = getRequest('httptestid', false)) {
 	$httptests = API::HttpTest()->get([
@@ -65,26 +66,14 @@ if ($httptestid = getRequest('httptestid', false)) {
 		access_deny();
 	}
 
-	$color = [
-		'current' => 0,
-		0 => ['next' => '1'],
-		1 => ['color' => 'Red', 'next' => '2'],
-		2 => ['color' => 'Dark Green', 'next' => '3'],
-		3 => ['color' => 'Blue', 'next' => '4'],
-		4 => ['color' => 'Dark Yellow', 'next' => '5'],
-		5 => ['color' => 'Cyan', 'next' => '6'],
-		6 => ['color' => 'Gray', 'next' => '7'],
-		7 => ['color' => 'Dark Red', 'next' => '8'],
-		8 => ['color' => 'Green', 'next' => '9'],
-		9 => ['color' => 'Dark Blue', 'next' => '10'],
-		10 => ['color' => 'Yellow', 'next' => '11'],
-		11 => ['color' => 'Black', 'next' => '1']
+	$colors = ['Red', 'Dark Green', 'Blue', 'Dark Yellow', 'Cyan', 'Gray', 'Dark Red', 'Green', 'Dark Blue', 'Yellow',
+		'Black'
 	];
-
+	$color = false;
 	$items = [];
 
 	$dbItems = DBselect(
-		'SELECT i.itemid'.
+		'SELECT i.itemid, i.type, i.name, i.delay, i.units, i.hostid, i.history, i.trends, i.value_type, i.key_'.
 		' FROM httpstepitem hi,items i,httpstep hs'.
 		' WHERE i.itemid=hi.itemid'.
 			' AND hs.httptestid='.zbx_dbstr($httptestid).
@@ -93,9 +82,8 @@ if ($httptestid = getRequest('httptestid', false)) {
 		' ORDER BY hs.no DESC'
 	);
 	while ($item = DBfetch($dbItems)) {
-		$itemColor = $color[$color['current'] = $color[$color['current']]['next']]['color'];
-
-		$items[] = ['itemid' => $item['itemid'], 'color' => $itemColor];
+		$graph_items[] = $item + ['color' => ($color === false) ? reset($colors) : $color];
+		$color = next($colors);
 	}
 
 	$name = getRequest('name', '');
@@ -105,7 +93,9 @@ elseif ($items = getRequest('items', [])) {
 
 	$dbItems = API::Item()->get([
 		'itemids' => zbx_objectValues($items, 'itemid'),
-		'output' => ['itemid'],
+		'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
+			'value_type', 'key_'
+		],
 		'filter' => [
 			'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 		],
@@ -114,9 +104,10 @@ elseif ($items = getRequest('items', [])) {
 	]);
 
 	foreach ($items as $item) {
-		if (!isset($dbItems[$item['itemid']])) {
+		if (!array_key_exists($item['itemid'], $dbItems)) {
 			access_deny();
 		}
+		$graph_items[] = $dbItems[$item['itemid']] + $item;
 	}
 	$name = getRequest('name', '');
 }
@@ -158,14 +149,8 @@ $graph->setYMaxItemId(getRequest('ymax_itemid', 0));
 $graph->setLeftPercentage(getRequest('percent_left', 0));
 $graph->setRightPercentage(getRequest('percent_right', 0));
 
-foreach ($items as $item) {
-	$graph->addItem(
-		$item['itemid'],
-		isset($item['yaxisside']) ? $item['yaxisside'] : null,
-		isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
-		isset($item['color']) ? $item['color'] : null,
-		isset($item['drawtype']) ? $item['drawtype'] : null
-	);
+foreach ($graph_items as $graph_item) {
+	$graph->addItem($graph_item);
 }
 
 $graph->draw();
