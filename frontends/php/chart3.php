@@ -59,7 +59,8 @@ $graph_items = [];
 if ($httptestid = getRequest('httptestid', false)) {
 	$httptests = API::HttpTest()->get([
 		'output' => [],
-		'httptestids' => $httptestid
+		'httptestids' => $httptestid,
+		'selectHosts' => ['hostid', 'name', 'host']
 	]);
 
 	if (!$httptests) {
@@ -71,6 +72,7 @@ if ($httptestid = getRequest('httptestid', false)) {
 	];
 	$color = false;
 	$items = [];
+	$hosts = zbx_toHash($httptests[0]['hosts'], 'hostid');
 
 	$dbItems = DBselect(
 		'SELECT i.itemid, i.type, i.name, i.delay, i.units, i.hostid, i.history, i.trends, i.value_type, i.key_'.
@@ -82,7 +84,11 @@ if ($httptestid = getRequest('httptestid', false)) {
 		' ORDER BY hs.no DESC'
 	);
 	while ($item = DBfetch($dbItems)) {
-		$graph_items[] = $item + ['color' => ($color === false) ? reset($colors) : $color];
+		$graph_items[] = $item + [
+			'color' 	=> ($color === false) ? reset($colors) : $color,
+			'host'		=> $hosts[$item['hostid']]['host'],
+			'hostname'	=> $hosts[$item['hostid']]['name']
+		];
 		$color = next($colors);
 	}
 
@@ -96,6 +102,7 @@ elseif ($items = getRequest('items', [])) {
 		'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
 			'value_type', 'key_'
 		],
+		'selectHosts' => ['hostid', 'name', 'host'],
 		'filter' => [
 			'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 		],
@@ -107,7 +114,12 @@ elseif ($items = getRequest('items', [])) {
 		if (!array_key_exists($item['itemid'], $dbItems)) {
 			access_deny();
 		}
-		$graph_items[] = $dbItems[$item['itemid']] + $item;
+		$host = reset($dbItems[$item['itemid']]['hosts']);
+		unset($dbItems[$item['itemid']]['hosts']);
+		$graph_items[] = $dbItems[$item['itemid']] + $item + [
+			'host'		=> $host['host'],
+			'hostname'	=> $host['name']
+		];
 	}
 	$name = getRequest('name', '');
 }

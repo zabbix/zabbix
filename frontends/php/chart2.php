@@ -48,7 +48,7 @@ if (!check_fields($fields)) {
 $dbGraph = API::Graph()->get([
 	'output' => API_OUTPUT_EXTEND,
 	'selectGraphItems' => API_OUTPUT_EXTEND,
-	'selectHosts' => ['hostid', 'name'],
+	'selectHosts' => ['hostid', 'name', 'host'],
 	'selectItems' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
 		'value_type', 'key_'
 	],
@@ -88,11 +88,12 @@ $graph_item = reset($dbGraph['gitems']);
 
 foreach ($dbGraph['items'] as $item) {
 	$graph->addItem($item + [
-		'host'			=> $hosts[$item['hostid']],
-		'color'			=> $graph_item['color'],
-		'drawtype'		=> $graph_item['drawtype'],
-		'axisside'		=> $graph_item['yaxisside'],
-		'calc_fnc'		=> $graph_item['calc_fnc']
+		'host'		=> $hosts[$item['hostid']]['host'],
+		'hostname'	=> $hosts[$item['hostid']]['name'],
+		'color'		=> $graph_item['color'],
+		'drawtype'	=> $graph_item['drawtype'],
+		'axisside'	=> $graph_item['yaxisside'],
+		'calc_fnc'	=> $graph_item['calc_fnc']
 	]);
 	$graph_item = next($dbGraph['gitems']);
 }
