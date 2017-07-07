@@ -1251,6 +1251,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_CALCITEM		*calcitem;
+	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
 	unsigned char		value_type, type;
 
@@ -1509,6 +1510,18 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 	else if (NULL != calcitem)
+		return FAIL;
+
+	depitem = (ZBX_DC_DEPENDENTITEM *)zbx_hashset_search(&dbsync_env.cache->dependentitems, &item->itemid);
+	if (ITEM_TYPE_DEPENDENT == item->type)
+	{
+		if (NULL == depitem)
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uint64(dbrow[38], depitem->master_itemid))
+			return FAIL;
+	}
+	else if (NULL != depitem)
 		return FAIL;
 
 	return SUCCEED;
