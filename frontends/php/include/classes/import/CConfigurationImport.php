@@ -2392,9 +2392,6 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getEntitiesOrder($master_key_identifier, $host_entities, $data_provider) {
-		// Maximum allowed dependency level.
-		// 0..1..2..3, level 0 is counted as root master item level.
-		$max_dependency_level = 3;
 		// Resolve all master entities from database
 		$find_keys = [];
 		$find_hosts = [];
@@ -2445,7 +2442,7 @@ class CConfigurationImport {
 			$resolve_entity_keys = [];
 			$host_entity_idkey_hash = [];
 
-			for ($level = 0; $level < $max_dependency_level; $level++) {
+			for ($level = 0; $level < ZBX_DEPENDENT_ITEM_MAX_LEVELS; $level++) {
 				$find_ids = [];
 
 				foreach ($resolved_entities as $entityid => $entity) {
@@ -2543,7 +2540,7 @@ class CConfigurationImport {
 						));
 					}
 
-					if ($level > $max_dependency_level) {
+					if ($level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 						$traversal = '"'. implode('" => "', $traversal_path) . '"';
 						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 							_('maximum master items count reached')

@@ -413,6 +413,9 @@ define('ITEM_TYPE_JMX',				16);
 define('ITEM_TYPE_SNMPTRAP',		17);
 define('ITEM_TYPE_DEPENDENT',		18);
 
+define('ZBX_DEPENDENT_ITEM_MAX_LEVELS',	3);
+define('ZBX_DEPENDENT_ITEM_MAX_COUNT',	999);
+
 define('ITEM_VALUE_TYPE_FLOAT',		0);
 define('ITEM_VALUE_TYPE_STR',		1); // aka Character
 define('ITEM_VALUE_TYPE_LOG',		2);

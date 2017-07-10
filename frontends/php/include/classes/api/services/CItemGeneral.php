@@ -1280,7 +1280,7 @@ abstract class CItemGeneral extends CApiService {
 						break;
 					}
 
-					if ($dependency_level > 3) {
+					if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'master_itemid', _('maximum master items count reached')
 						));
@@ -1344,14 +1344,14 @@ abstract class CItemGeneral extends CApiService {
 					$find_itemids = array_diff_key($find_itemids, $ignoreids);
 					++$dependency_level;
 				}
-				if ($total_children > 999) {
+				if ($total_children > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _('maximum dependent items count reached')
 					));
 				}
-			} while ($find_itemids && $dependency_level < 4);
+			} while ($find_itemids);
 
-			if ($find_itemids && $dependency_level > 3) {
+			if ($find_itemids && $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 					'master_itemid', _('maximum master items count reached')
 				));
