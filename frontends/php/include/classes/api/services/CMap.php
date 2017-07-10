@@ -430,7 +430,7 @@ class CMap extends CMapElement {
 
 		foreach ($result as $sysmap_key => $sysmap) {
 			if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']
-				&& !$sysmap['accessible_elements']) {
+					&& !$sysmap['accessible_elements']) {
 				unset($result[$sysmap_key]);
 				continue;
 			}
