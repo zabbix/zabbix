@@ -1191,14 +1191,14 @@ abstract class CItemGeneral extends CApiService {
 
 		if ($updated_items) {
 			$db_items = $data_provider->get([
-				'output' => ['type', 'name', 'hostid', 'master_itemid'],
-				'itemids' => array_keys($updated_items),
-				'preservekeys' => true
+				'output' => ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
+				'itemids' => array_keys($updated_items)
 			]);
 
-			foreach ($db_items as $db_itemid => $db_item) {
-				$items_cache[$db_itemid] = $updated_items[$db_itemid] + $db_item;
+			foreach ($db_items as $db_item) {
+				$items_cache[$db_item['itemid']] = $updated_items[$db_item['itemid']] + $db_item;
 			}
+			unset($updated_items);
 		}
 
 		do {
@@ -1283,7 +1283,7 @@ abstract class CItemGeneral extends CApiService {
 
 					if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('maximum master items count reached')
+							'master_itemid', _('maximum dependent items dependency level reached')
 						));
 					}
 				}
@@ -1354,7 +1354,7 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($find_itemids && $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _('maximum master items count reached')
+					'master_itemid', _('maximum dependent items dependency level reached')
 				));
 			}
 		}
