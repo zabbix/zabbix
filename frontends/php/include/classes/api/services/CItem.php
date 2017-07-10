@@ -550,7 +550,7 @@ class CItem extends CItemGeneral {
 		foreach ($items as &$item) {
 			if (!array_key_exists($item['itemid'], $dbItems)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
-					'Item \"%1$s\" does not exist or you have no access to this item.', $item['itemid']
+					'Item "%1$s" does not exist or you have no access to this item.', $item['itemid']
 				));
 			}
 			$item = $item + $dbItems[(int) $item['itemid']];
