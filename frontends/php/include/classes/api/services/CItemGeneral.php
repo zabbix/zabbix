@@ -1178,27 +1178,25 @@ abstract class CItemGeneral extends CApiService {
 	 * @param CItem|CItemPrototype	$data_provider	Item data provider.
 	 */
 	public function validateDependentItems($items, $data_provider) {
-		$updated_items = zbx_toHash($items, 'itemid');
+		$items_cache = zbx_toHash($items, 'itemid');
 		$root_items = [];
 		$items_added = [];
 		$items_moved = [];
 		$items_created = [];
 
-		$items_cache = [];
 		$processed_items = [];
 		$unresolved_master_itemids = [];
 		$has_unresolved_masters = false;
 
-		if ($updated_items) {
+		if ($items_cache) {
 			$db_items = $data_provider->get([
 				'output' => ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
-				'itemids' => array_keys($updated_items)
+				'itemids' => array_keys($items_cache)
 			]);
 
 			foreach ($db_items as $db_item) {
-				$items_cache[$db_item['itemid']] = $updated_items[$db_item['itemid']] + $db_item;
+				$items_cache[$db_item['itemid']] = $items_cache[$db_item['itemid']] + $db_item;
 			}
-			unset($updated_items);
 		}
 
 		do {
