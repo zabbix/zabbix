@@ -199,7 +199,8 @@ abstract class CItemGeneral extends CApiService {
 
 			$fullItem = $items[$inum];
 
-			if (!check_db_fields($itemDbFields, $item)) {
+			if (!check_db_fields($itemDbFields, $item) ||
+					(!$update && array_key_exists('itemid', $item))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
