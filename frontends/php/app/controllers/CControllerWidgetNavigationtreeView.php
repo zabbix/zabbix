@@ -197,18 +197,19 @@ class CControllerWidgetNavigationtreeView extends CController {
 					'preservekeys' => true
 				]);
 
-				$events = API::Event()->get([
+				$problems = API::Problem()->get([
 					'output' => ['objectid'],
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
-					'value' => TRIGGER_VALUE_TRUE,
-					'objectids' => zbx_objectValues($triggers, 'triggerid')
+					'objectids' => zbx_objectValues($triggers, 'triggerid'),
+					'severities' => range($severity_min, TRIGGER_SEVERITY_COUNT - 1),
+					'preservekeys' => true
 				]);
 
-				if ($events) {
-					foreach ($events as $event) {
-						$trigger = $triggers[$event['objectid']];
-						$problems_per_trigger[$event['objectid']][$trigger['priority']]++;
+				if ($problems) {
+					foreach ($problems as $problem) {
+						$trigger = $triggers[$problem['objectid']];
+						$problems_per_trigger[$problem['objectid']][$trigger['priority']]++;
 					}
 				}
 			}
