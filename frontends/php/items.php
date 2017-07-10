@@ -699,9 +699,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['preprocessing'] = $preprocessing;
 			}
 
+			if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = getRequest('master_itemid');
+			}
+			elseif ($db_item['type'] == ITEM_TYPE_DEPENDENT && $db_item['master_itemid']) {
+				$item['master_itemid'] = 0;
+			}
+
 			if ($item) {
 				$item['itemid'] = getRequest('itemid');
-				$item['master_itemid'] = (getRequest('type') == ITEM_TYPE_DEPENDENT) ? getRequest('master_itemid') : 0;
 
 				$result = (bool) API::Item()->update($item);
 			}
