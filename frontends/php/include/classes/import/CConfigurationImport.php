@@ -768,13 +768,12 @@ class CConfigurationImport {
 
 
 	/**
-	 * Create or update entities with dependency.
+	 * Create CItem or CItemPrototype with dependency.
 	 *
-	 * @param string $xml_entitykey					Master entity array key in xml parsed data.
-	 * @param Array $entities_by_level				Associative array of entities to be processed where key is entity
-	 *												dependency level and value is array of entities for this level.
-	 * @param CItem|CItepPrototype $entity_service	Entity service which is capable to proceed with entity create
-	 *												or update.
+	 * @param string               $xml_entitykey       Master entity array key in xml parsed data.
+	 * @param array                $entities_by_level   Associative array of entities where key is entity dependency
+	 *                                                  level and value is array of entities for this level.
+	 * @param CItem|CItepPrototype $entity_service      Entity service which is capable to proceed with entity create.
 	 *
 	 * @throws Exception if entity master entity can not be resolved.
 	 */
@@ -788,7 +787,7 @@ class CConfigurationImport {
 
 					if ($entity['master_itemid'] === false) {
 						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('value not found')
+							'master_itemid', _s('value "%1$s" not found', $entity[$xml_entitykey]['key'])
 						));
 					}
 					unset($entity[$xml_entitykey]);
@@ -806,13 +805,12 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Create or update entities with dependency.
+	 * Update CItem or CItemPrototype with dependency.
 	 *
-	 * @param string $xml_entitykey					Master entity array key in xml parsed data.
-	 * @param Array $entities_by_level				Associative array of entities to be processed where key is entity
-	 *												dependency level and value is array of entities for this level.
-	 * @param CItem|CItepPrototype $entity_service	Entity service which is capable to proceed with entity create
-	 *												or update.
+	 * @param string               $xml_entitykey       Master entity array key in xml parsed data.
+	 * @param array                $entities_by_level   Associative array of entities where key is entity dependency
+	 *                                                  level and value is array of entities for this level.
+	 * @param CItem|CItepPrototype $entity_service      Entity service which is capable to proceed with entity update.
 	 *
 	 * @throws Exception if entity master entity can not be resolved.
 	 */
@@ -826,7 +824,7 @@ class CConfigurationImport {
 
 					if ($entity['master_itemid'] === false) {
 						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('value not found')
+							'master_itemid', _s('value "%1$s" not found', $entity[$xml_entitykey]['key'])
 						));
 					}
 					unset($entity[$xml_entitykey]);
@@ -2337,11 +2335,10 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get items keys order tree, to ensure that master item will be inserted or updated before any
-	 * of it dependent item.
-	 * Returns associative array where key is item index and value is item dependency level.
+	 * Get items keys order tree, to ensure that master item will be inserted or updated before any of it dependent
+	 * item. Returns associative array where key is item index and value is item dependency level.
 	 *
-	 * @param string $master_key_identifier	String containing master key name used to identify item master.
+	 * @param string $master_key_identifier     String containing master key name used to identify item master.
 	 *
 	 * @return array
 	 */
@@ -2353,10 +2350,10 @@ class CConfigurationImport {
 
 	/**
 	 * Get discovery rules items prototypes keys order tree, to ensure that master item will be inserted or updated
-	 * before any of it dependent item.
-	 * Returns associative array where key is item prototype index and value is item prototype dependency level.
+	 * before any of it dependent item. Returns associative array where key is item prototype index and value is item
+	 * prototype dependency level.
 	 *
-	 * @param string $master_key_identifier	String containing master key name used to identify item master.
+	 * @param string $master_key_identifier     String containing master key name used to identify item master.
 	 *
 	 * @return array
 	 */
@@ -2384,15 +2381,15 @@ class CConfigurationImport {
 	 * Returns associative array where key is entity index in source array grouped by host key and value is entity
 	 * dependency level.
 	 *
-	 * @param string $master_key_identifier	String containing master key name used to identify item master.
-	 * @param array $host_entities			Associative array where key is host key and values ae arrays with items.
-	 * @param CItem|CItemPrototype			Not resolved master entities in supplied $host_entities array will be
-	 *										requested using this service.
+	 * @param string               $master_key_identifier   String containing master key name to identify item master.
+	 * @param array                $host_entities           Associative array of host key and host items.
+	 * @param CItem|CItemPrototype $data_provider           Service to get master items not found in supplied input.
+	 *
+	 * @throws Exception if data is invalid.
 	 *
 	 * @return array
 	 */
 	protected function getEntitiesOrder($master_key_identifier, $host_entities, $data_provider) {
-		// Resolve all master entities from database
 		$find_keys = [];
 		$find_hosts = [];
 		$resolved_masters_cache = [];
@@ -2405,7 +2402,7 @@ class CConfigurationImport {
 		foreach ($host_entities as $host_key => $entities) {
 			if (!array_key_exists($host_key, $hostkey_to_hostid)) {
 				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'host',
-					_('value not found')
+					_s('value "%1$s" not found', $host_key)
 				));
 			}
 
@@ -2497,7 +2494,7 @@ class CConfigurationImport {
 				if (!array_key_exists($entity['host'], $host_entity_idkey_hash) ||
 						!array_key_exists($master_itemid, $host_entity_idkey_hash[$entity['host']])) {
 					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-						_('value not found')
+						_s('value "%1$s" not found', $master_itemid)
 					));
 				}
 				$master_key = $host_entity_idkey_hash[$entity['host']][$master_itemid];
@@ -2529,14 +2526,14 @@ class CConfigurationImport {
 						if ($entity['type'] == ITEM_TYPE_DEPENDENT && $entity[$master_key_identifier]
 								&& $master_key == $entity[$master_key_identifier]['key']) {
 							throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-								_('master_itemid and itemid should not match')
+								_('dependent item recursion')
 							));
 						}
 						$level++;
 					}
 					else {
 						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-							_('value not found')
+							_s('value "%1$s" not found', $master_key)
 						));
 					}
 

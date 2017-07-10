@@ -1172,10 +1172,10 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Validate items with type ITEM_TYPE_DEPENDENT for create or update operation.
 	 *
-	 * @throws APIException
+	 * @param array                 $items          Array of items.
+	 * @param CItem|CItemPrototype  $data_provider  Item data provider.
 	 *
-	 * @param array					$items			Array of items
-	 * @param CItem|CItemPrototype	$data_provider	Item data provider.
+	 * @throws APIException for invalid data.
 	 */
 	public function validateDependentItems($items, $data_provider) {
 		$items_cache = zbx_toHash($items, 'itemid');
