@@ -839,14 +839,17 @@ function getSelementsInfo($sysmap, array $options = []) {
 									$sysmapIds[] = $subSysmapSelement['elements'][0]['sysmapid'];
 									break;
 								case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-									$hostGroupIdToSelementIds[$subSysmapSelement['elements'][0]['groupid']][$selementId] = $selementId;
+									$hostGroupIdToSelementIds[$subSysmapSelement['elements'][0]['groupid']][$selementId]
+										= $selementId;
 									break;
 								case SYSMAP_ELEMENT_TYPE_HOST:
-									$hostIdToSelementIds[$subSysmapSelement['elements'][0]['hostid']][$selementId] = $selementId;
+									$hostIdToSelementIds[$subSysmapSelement['elements'][0]['hostid']][$selementId]
+										= $selementId;
 									break;
 								case SYSMAP_ELEMENT_TYPE_TRIGGER:
 									foreach ($subSysmapSelement['elements'] as $element) {
-										$subSysmapTriggerIdToSelementIds[$element['triggerid']][$selementId] = $selementId;
+										$subSysmapTriggerIdToSelementIds[$element['triggerid']][$selementId]
+											= $selementId;
 									}
 									break;
 							}
@@ -1232,7 +1235,8 @@ function getSelementsInfo($sysmap, array $options = []) {
  *
  * @return array
  */
-function filterSysmapTriggers(array $selements, array $selementHostApplicationFilters, array $triggersFromMonitoredHosts, array $subSysmapTriggerIdToSelementIds) {
+function filterSysmapTriggers(array $selements, array $selementHostApplicationFilters,
+		array $triggersFromMonitoredHosts, array $subSysmapTriggerIdToSelementIds) {
 	// pick only host, host group or map selements
 	$filterableSelements = [];
 	foreach ($selements as $selementId => $selement) {
@@ -1344,7 +1348,8 @@ function filterSysmapTriggers(array $selements, array $selementHostApplicationFi
  * @return array    a two-dimensional array with selement IDs as the primary key, host IDs as the secondary key
  *                  application names as values
  */
-function getSelementHostApplicationFilters(array $selements, array $selementIdToSubSysmaps, array $hostsFromHostGroups) {
+function getSelementHostApplicationFilters(array $selements, array $selementIdToSubSysmaps,
+		array $hostsFromHostGroups) {
 	$hostIdsForHostGroupId = [];
 	foreach ($hostsFromHostGroups as $host) {
 		$hostId = $host['hostid'];
@@ -1407,7 +1412,8 @@ function getSelementHostApplicationFilters(array $selements, array $selementIdTo
 
 							if (isset($hostIdsForHostGroupId[$hostGroupId])) {
 								foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
-									$selementHostApplicationFilters[$selementId][$hostId][] = $hostGroupSelement['application'];
+									$selementHostApplicationFilters[$selementId][$hostId][]
+										= $hostGroupSelement['application'];
 								}
 							}
 						}
