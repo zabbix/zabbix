@@ -450,7 +450,6 @@ jQuery(function($) {
 
 			var drawTree = function() {
 				var root = createTreeBranch('root'),
-					widget_data = $this.data('widgetData'),
 					tree_items = getTreeWidgetItems(),
 					tree = buildTree(tree_items, 0);
 
@@ -511,7 +510,7 @@ jQuery(function($) {
 					$('[data-problems'+sev+']', $this).each(function() {
 						var obj = $(this);
 
-						$('>.tree-row>.problems', this).append($('<span>', {
+						$('>.tree-row>.problems', this).append($('<span/>', {
 								'style': 'background: #'+conf['color'],
 								'class': 'problems-per-item',
 								'title': conf['name']
@@ -524,7 +523,7 @@ jQuery(function($) {
 
 			var createTreeBranch = function(className) {
 				var className = className || null,
-					ul = $('<ul></ul>').addClass('tree-list');
+					ul = $('<ul/>').addClass('tree-list');
 
 				if (className) {
 					$(ul).addClass(className);
@@ -607,7 +606,7 @@ jQuery(function($) {
 														$('[data-id='+id+'] > .tree-row > .content > .item-name', $this)
 															.empty()
 															.attr('title', resp['map_name'])
-															.append($('<span>').text(resp['map_name']));
+															.append($('<span/>').text(resp['map_name']));
 													}
 													else {
 														root = $('.tree-item[data-id='+parent+']>ul.tree-list', $this),
@@ -732,7 +731,7 @@ jQuery(function($) {
 				}
 
 				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0 && map_accessible) {
-					link = $('<a>', {
+					link = $('<a/>', {
 							'data-mapid': item.mapid,
 							'href': '#'
 						})
@@ -756,20 +755,20 @@ jQuery(function($) {
 						});
 				}
 				else {
-					link = $('<span>');
+					link = $('<span/>');
 				}
 
-				return $('<li>', {
+				return $('<li/>', {
 						'class': item_clases,
 						'data-mapid': item.mapid,
 						'data-id': item.id
 					})
 					.append(
-						$('<div>', {'class': 'tree-row'})
-							.append(!isEditMode() ? $('<div></div>', {'class': 'problems'}) : null)
-							.append(isEditMode() ? $('<div></div>')
+						$('<div/>', {'class': 'tree-row'})
+							.append(!isEditMode() ? $('<div/>', {'class': 'problems'}) : null)
+							.append(isEditMode() ? $('<div/>')
 								.addClass('tools')
-								.append($('<input>', {
+								.append($('<input/>', {
 										'type': 'button',
 										'data-id': item.id,
 										'class': 'add-child-btn'
@@ -789,7 +788,7 @@ jQuery(function($) {
 											}
 									})
 								)
-								.append($('<input>', {
+								.append($('<input/>', {
 										'class': 'import-items-btn',
 										'data-id': item.id,
 										'type': 'button'
@@ -837,7 +836,7 @@ jQuery(function($) {
 										return PopUp(url.getUrl());
 									})
 								)
-								.append(editable ? $('<input>', {
+								.append(editable ? $('<input/>', {
 										'class': 'edit-item-btn',
 										'type': 'button',
 										'data-id': item.id
@@ -850,7 +849,7 @@ jQuery(function($) {
 										itemEditDialog(id, parent, depth)
 									}) : null
 								)
-								.append(editable ? $('<button>', {
+								.append(editable ? $('<button/>', {
 										'type': 'button',
 										'data-id': item.id,
 										'class': 'remove-btn'
@@ -861,16 +860,16 @@ jQuery(function($) {
 								) : null
 							)
 							.append(
-								$('<div>', {'class': 'content'})
-									.append('<div class="margin-lvl"></div>')
+								$('<div/>', {'class': 'content'})
+									.append($('<div/>', {'class': 'margin-lvl'}))
 									.append(
-										(isEditMode() && editable) ? $('<div></div>', {'class': 'drag-icon'}) : null
+										(isEditMode() && editable) ? $('<div/>', {'class': 'drag-icon'}) : null
 									)
 									.append(
-										$('<div></div>', {'class': 'arrow'})
-											.append(editable ? $('<button>', {'type': 'button'}).addClass('treeview')
+										$('<div/>', {'class': 'arrow'})
+											.append(editable ? $('<button/>', {'type': 'button'}).addClass('treeview')
 												.append(
-													$('<span></span>').addClass((item_clases.indexOf('opened') !== -1)
+													$('<span/>').addClass((item_clases.indexOf('opened') !== -1)
 														? 'arrow-right'
 														: 'arrow-down'
 													)
@@ -914,19 +913,19 @@ jQuery(function($) {
 							)
 					)
 					.append(ul)
-					.append((isEditMode() && editable) ? $('<input>', {
+					.append((isEditMode() && editable) ? $('<input/>', {
 							'type': 'hidden',
 							'name': 'map.name.'+item.id
 						})
 						.val(item.name) : null
 					)
-					.append((isEditMode() && editable) ? $('<input>', {
+					.append((isEditMode() && editable) ? $('<input/>', {
 							'type': 'hidden',
 							'name':'map.parent.'+item.id
 						})
 						.val(item.parent || 0) : null
 					)
-					.append((isEditMode() && editable) ? $('<input>', {
+					.append((isEditMode() && editable) ? $('<input/>', {
 							'type': 'hidden',
 							'name':'mapid.'+item.id
 						})

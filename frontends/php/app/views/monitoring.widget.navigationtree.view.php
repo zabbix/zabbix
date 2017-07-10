@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$options = [
+$item = new CNavigationTree([
 	'problems' => $data['problems'],
 	'severity_config' => $data['severity_config'],
 	'initial_load' => $data['initial_load'],
@@ -26,8 +26,7 @@ $options = [
 	'maps_accessible' => $data['maps_accessible'],
 	'navtree_item_selected' => $data['navtree_item_selected'],
 	'navtree_items_opened' => $data['navtree_items_opened']
-];
-$item = new CNavigationTree($options);
+]);
 
 if ($data['error'] !== null) {
 	$item->setError($data['error']);
