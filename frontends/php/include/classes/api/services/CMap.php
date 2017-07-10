@@ -191,6 +191,11 @@ class CMap extends CMapElement {
 			$options['selectSelements'] = ['selementid', 'elements', 'elementtype'];
 			$remove_selements = true;
 		}
+		$remove_links = false;
+		if ($options['selectLinks'] === null) {
+			$options['selectLinks'] = ['sysmapid', 'linkid', 'linktriggers'];
+			$remove_links = true;
+		}
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
@@ -432,11 +437,20 @@ class CMap extends CMapElement {
 				unset($result[$sysmap_key]['selements']);
 			}
 
-			if ($sysmap['accessible_elements']) {
-				$result[$sysmap_key]['rights'] = ($sysmap['rights'] >= PERM_READ) ?: PERM_READ;
+			if ($remove_links) {
+				unset($result[$sysmap_key]['links']);
 			}
 
-			unset($result[$sysmap_key]['accessible_elements']);
+			/*
+			 * At this point editable means that all elemenets must be at least visible (user has permissions to
+			 * read or read-write). This does not cancel previous conditions.
+			 */
+			if ($options['editable'] && PERM_READ > $sysmap['rights']) {
+				unset($result[$sysmap_key]);
+				continue;
+			}
+
+			unset($result[$sysmap_key]['accessible_elements'], $result[$sysmap_key]['rights']);
 		}
 
 		if ($count_output) {
