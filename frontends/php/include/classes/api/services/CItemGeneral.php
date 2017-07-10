@@ -525,7 +525,8 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_DEPENDENT) {
+		if (array_key_exists('type', $item) &&
+				($item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_TRAPPER)) {
 			$item['delay'] = 0;
 		}
 
