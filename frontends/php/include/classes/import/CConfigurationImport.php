@@ -773,7 +773,7 @@ class CConfigurationImport {
 	 * @param string               $xml_entitykey       Master entity array key in xml parsed data.
 	 * @param array                $entities_by_level   Associative array of entities where key is entity dependency
 	 *                                                  level and value is array of entities for this level.
-	 * @param CItem|CItepPrototype $entity_service      Entity service which is capable to proceed with entity create.
+	 * @param CItem|CItemPrototype $entity_service      Entity service which is capable to proceed with entity create.
 	 *
 	 * @throws Exception if entity master entity can not be resolved.
 	 */
@@ -810,7 +810,7 @@ class CConfigurationImport {
 	 * @param string               $xml_entitykey       Master entity array key in xml parsed data.
 	 * @param array                $entities_by_level   Associative array of entities where key is entity dependency
 	 *                                                  level and value is array of entities for this level.
-	 * @param CItem|CItepPrototype $entity_service      Entity service which is capable to proceed with entity update.
+	 * @param CItem|CItemPrototype $entity_service      Entity service which is capable to proceed with entity update.
 	 *
 	 * @throws Exception if entity master entity can not be resolved.
 	 */

@@ -1335,7 +1335,7 @@ class C34XmlValidator {
 	}
 
 	/**
-	 * Validate mester item.
+	 * Validate master item.
 	 *
 	 * @param string $data          import data
 	 * @param array  $parent_data   data's parent array
@@ -1345,7 +1345,7 @@ class C34XmlValidator {
 	 */
 	public function validateMasterItem($data, array $parent_data = null, $path) {
 		$prefix = substr(strrchr($path, '/'), 1);
-		$rules = ['type' => XML_ARRAY, 'prefix' => $prefix, 'rules' => ['key'	=>	['type' => XML_STRING]]];
+		$rules = ['type' => XML_ARRAY, 'prefix' => $prefix, 'rules' => ['key' => ['type' => XML_STRING]]];
 
 		if ($parent_data['type'] == ITEM_TYPE_DEPENDENT) {
 			$rules['rules']['key']['type'] |= XML_REQUIRED;
