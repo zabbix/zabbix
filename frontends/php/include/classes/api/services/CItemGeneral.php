@@ -1180,11 +1180,11 @@ abstract class CItemGeneral extends CApiService {
 	public function validateDependentItems($items, $data_provider) {
 		$updated_items = zbx_toHash($items, 'itemid');
 		$root_items = [];
-		$children_added = [];
-		$children_moved = [];
-		$children_created = [];
+		$items_added = [];
+		$items_moved = [];
+		$items_created = [];
 
-		$master_items_cache = [];
+		$items_cache = [];
 		$processed_items = [];
 		$unresolved_master_itemids = [];
 		$has_unresolved_masters = false;
@@ -1197,7 +1197,7 @@ abstract class CItemGeneral extends CApiService {
 			]);
 
 			foreach ($db_items as $db_itemid => $db_item) {
-				$master_items_cache[$db_itemid] = $updated_items[$db_itemid] + $db_item;
+				$items_cache[$db_itemid] = $updated_items[$db_itemid] + $db_item;
 			}
 		}
 
@@ -1209,7 +1209,7 @@ abstract class CItemGeneral extends CApiService {
 				]);
 
 				foreach ($db_masters as $db_master) {
-					$master_items_cache[$db_master['itemid']] = $db_master;
+					$items_cache[$db_master['itemid']] = $db_master;
 					unset($unresolved_master_itemids[$db_master['itemid']]);
 				}
 
@@ -1230,9 +1230,9 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-					if (array_key_exists('master_itemid', $item) && $item['master_itemid']) {
+					if (array_key_exists('master_itemid', $item)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('invalid type')
+							'type', _('invalid type')
 						));
 					}
 					continue;
@@ -1265,13 +1265,13 @@ abstract class CItemGeneral extends CApiService {
 					if ($item_masters && array_key_exists($master_itemid, $item_masters)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'master_itemid', _s('"%1$s" is already master item for "%2$s"',
-								$item['name'], $master_items_cache[$item['master_itemid']]['name']
+								$item['name'], $items_cache[$item['master_itemid']]['name']
 							)
 						));
 					}
 
-					if (array_key_exists($master_itemid, $master_items_cache)) {
-						$master_item = $master_items_cache[$master_itemid];
+					if (array_key_exists($master_itemid, $items_cache)) {
+						$master_item = $items_cache[$master_itemid];
 						$item_masters[$master_itemid] = true;
 						$dependency_level++;
 					}
@@ -1300,19 +1300,19 @@ abstract class CItemGeneral extends CApiService {
 						$itemid = $item['itemid'];
 						$old_master_itemid = $db_items[$itemid]['master_itemid'];
 
-						if (!array_key_exists($master_itemid, $children_added)) {
-							$children_added[$master_itemid] = [];
+						if (!array_key_exists($master_itemid, $items_added)) {
+							$items_added[$master_itemid] = [];
 						}
-						$children_added[$master_itemid][$itemid] = true;
+						$items_added[$master_itemid][$itemid] = true;
 
-						if (!array_key_exists($old_master_itemid, $children_moved)) {
-							$children_moved[$old_master_itemid] = [];
+						if (!array_key_exists($old_master_itemid, $items_moved)) {
+							$items_moved[$old_master_itemid] = [];
 						}
-						$children_moved[$old_master_itemid][$itemid] = true;
+						$items_moved[$old_master_itemid][$itemid] = true;
 					}
 					elseif (!array_key_exists('itemid', $item)) {
-						$children_created[$master_itemid] = array_key_exists($master_itemid, $children_created)
-							? $children_created[$master_itemid] + 1
+						$items_created[$master_itemid] = array_key_exists($master_itemid, $items_created)
+							? $items_created[$master_itemid] + 1
 							: 1;
 					}
 				}
@@ -1322,13 +1322,13 @@ abstract class CItemGeneral extends CApiService {
 		// Validate every root mater items childrens count.
 		foreach (array_keys($root_items) as $root_itemid) {
 			$dependency_level = 0;
-			$total_children = array_key_exists($root_itemid, $children_created)
-				? $children_created[$root_itemid]
+			$items_count = array_key_exists($root_itemid, $items_created)
+				? $items_created[$root_itemid]
 				: 0;
 
 			$find_itemids = [$root_itemid => true];
-			if (array_key_exists($root_itemid, $children_added)) {
-				$find_itemids += $children_added[$root_itemid];
+			if (array_key_exists($root_itemid, $items_added)) {
+				$find_itemids += $items_added[$root_itemid];
 			}
 
 			do {
@@ -1338,14 +1338,14 @@ abstract class CItemGeneral extends CApiService {
 						'filter' => ['master_itemid' => array_keys($find_itemids)],
 						'preservekeys' => true
 					]);
-					$total_children = $total_children + count($find_itemids);
-					// If item was moved to another master item, do not count moved item (and its childrens) in old master
-					// childrens count calculation.
-					$ignoreids = array_intersect_key($find_itemids, $children_moved);
+					$items_count = $items_count + count($find_itemids);
+					// If item was moved to another master item, do not count moved item (and its dependent items)
+					// in old master dependent items count calculation.
+					$ignoreids = array_intersect_key($find_itemids, $items_moved);
 					$find_itemids = array_diff_key($find_itemids, $ignoreids);
 					++$dependency_level;
 				}
-				if ($total_children > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
+				if ($items_count > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _('maximum dependent items count reached')
 					));
