@@ -1213,9 +1213,10 @@ abstract class CItemGeneral extends CApiService {
 
 				if ($unresolved_master_itemids) {
 					reset($unresolved_master_itemids);
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _s('value "%1$s" not found', key($unresolved_master_itemids))
-					));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _s('Item "%1$s" does not exist or you have no access to this item.',
+							key($unresolved_master_itemids)
+					)));
 				}
 
 				$has_unresolved_masters = false;
@@ -1230,7 +1231,7 @@ abstract class CItemGeneral extends CApiService {
 				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
 					if (array_key_exists('master_itemid', $item)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'type', _('invalid type')
+							'master_itemid', _('field can be set only for items of type ITEM_TYPE_DEPENDENT')
 						));
 					}
 					continue;
@@ -1256,15 +1257,13 @@ abstract class CItemGeneral extends CApiService {
 
 					if (array_key_exists('itemid', $master_item) && $master_itemid == $master_item['itemid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('master_itemid and itemid should not match')
+							'master_itemid', _('dependent item recursion')
 						));
 					}
 
 					if ($item_masters && array_key_exists($master_itemid, $item_masters)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _s('"%1$s" is already master item for "%2$s"',
-								$item['name'], $items_cache[$item['master_itemid']]['name']
-							)
+							'master_itemid', _('dependent item recursion')
 						));
 					}
 
