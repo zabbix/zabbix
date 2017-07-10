@@ -525,6 +525,10 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		if (array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_DEPENDENT) {
+			$item['delay'] = 0;
+		}
+
 		return $item;
 	}
 
