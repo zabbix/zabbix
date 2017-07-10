@@ -378,7 +378,7 @@ function add_elementNames(&$selements) {
 			}
 		}
 		else {
-			$selements[$snum]['elements'][0]['elementName'] = _('Element is not available');
+			$selements[$snum]['elements'][0]['elementName'] = '';
 		}
 	}
 	unset($selement);
