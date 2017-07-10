@@ -181,7 +181,7 @@ class CMap extends CMapElement {
 			// }
 
 			$result[$sysmap['sysmapid']] = $sysmap;
-			$result[$sysmap['sysmapid']]['rights'] = PERM_READ_WRITE;
+			$result[$sysmap['sysmapid']]['permission'] = PERM_READ_WRITE;
 			$result[$sysmap['sysmapid']]['accessible_elements'] = 0;
 		}
 
@@ -330,55 +330,55 @@ class CMap extends CMapElement {
 			foreach ($result as $sysmapid => &$sysmap) {
 				if ($sysmap['selements']) {
 					foreach ($sysmap['selements'] as &$selement) {
-						$rights = PERM_NONE;
+						$permission = PERM_NONE;
 
 						switch ($selement['elementtype']) {
 							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 								if (!array_diff($selement['elementids'], array_intersect($db_hostgroups_rw, $selement['elementids']))) {
-									$rights = PERM_READ_WRITE;
+									$permission = PERM_READ_WRITE;
 								}
 								elseif (!array_diff($selement['elementids'], array_intersect($db_hostgroups_r, $selement['elementids']))) {
-									$rights = PERM_READ;
+									$permission = PERM_READ;
 								}
 								break;
 							case SYSMAP_ELEMENT_TYPE_HOST:
 								if (!array_diff($selement['elementids'], array_intersect($db_hosts_rw, $selement['elementids']))) {
-									$rights = PERM_READ_WRITE;
+									$permission = PERM_READ_WRITE;
 								}
 								elseif (!array_diff($selement['elementids'], array_intersect($db_hosts_r, $selement['elementids']))) {
-									$rights = PERM_READ;
+									$permission = PERM_READ;
 								}
 								break;
 							case SYSMAP_ELEMENT_TYPE_TRIGGER:
 								if (!array_diff($selement['elementids'], array_intersect($db_triggers_rw, $selement['elementids']))) {
-									$rights = PERM_READ_WRITE;
+									$permission = PERM_READ_WRITE;
 								}
 								elseif (!array_diff($selement['elementids'], array_intersect($db_triggers_r, $selement['elementids']))) {
-									$rights = PERM_READ;
+									$permission = PERM_READ;
 								}
 								break;
 							case SYSMAP_ELEMENT_TYPE_MAP:
 								if (!array_diff($selement['elementids'], array_intersect($db_sysmaps_rw, $selement['elementids']))) {
-									$rights = PERM_READ_WRITE;
+									$permission = PERM_READ_WRITE;
 								}
 								elseif (!array_diff($selement['elementids'], array_intersect($db_sysmaps_r, $selement['elementids']))) {
-									$rights = PERM_READ;
+									$permission = PERM_READ;
 								}
 								break;
 							case SYSMAP_ELEMENT_TYPE_IMAGE:
-								$rights = ($user_data['type'] == USER_TYPE_SUPER_ADMIN) ? PERM_READ_WRITE : PERM_READ;
+								$permission = ($user_data['type'] == USER_TYPE_SUPER_ADMIN) ? PERM_READ_WRITE : PERM_READ;
 								break;
 						}
 
 						unset($selement['elementids']);
-						$selement['rights'] = $rights;
+						$selement['permission'] = $permission;
 
-						if ($rights >= PERM_READ) {
+						if ($permission >= PERM_READ) {
 							$sysmap['accessible_elements']++;
 						}
 
-						if ($sysmap['rights'] > $rights) {
-							$sysmap['rights'] = $rights;
+						if ($sysmap['permission'] > $permission) {
+							$sysmap['permission'] = $permission;
 						}
 					}
 					unset($selement);
@@ -386,24 +386,24 @@ class CMap extends CMapElement {
 
 				if (array_key_exists('links', $sysmap) && $sysmap['links']) {
 					foreach ($sysmap['links'] as &$link) {
-						$rights = PERM_NONE;
+						$permission = PERM_NONE;
 
 						if (!array_diff($link['triggerids'], array_intersect($db_triggers_rw, $link['triggerids']))) {
-							$rights = PERM_READ_WRITE;
+							$permission = PERM_READ_WRITE;
 						}
 						elseif (!array_diff($link['triggerids'], array_intersect($db_triggers_r, $link['triggerids']))) {
-							$rights = PERM_READ;
+							$permission = PERM_READ;
 						}
 
 						unset($link['triggerids']);
-						$link['rights'] = $rights;
+						$link['permission'] = $permission;
 
-						if ($rights >= PERM_READ) {
+						if ($permission >= PERM_READ) {
 							$sysmap['accessible_elements']++;
 						}
 
-						if ($sysmap['rights'] > $rights) {
-							$sysmap['rights'] = $rights;
+						if ($sysmap['permission'] > $permission) {
+							$sysmap['permission'] = $permission;
 						}
 					}
 					unset($link);
@@ -416,11 +416,11 @@ class CMap extends CMapElement {
 			foreach ($result as $sysmapid => &$sysmap) {
 				if (array_key_exists('links', $sysmap)) {
 					foreach ($sysmap['links'] as &$link) {
-						$link['rights'] = PERM_READ_WRITE;
+						$link['permission'] = PERM_READ_WRITE;
 					}
 				}
 				foreach ($sysmap['selements'] as &$selement) {
-					$selement['rights'] = PERM_READ_WRITE;
+					$selement['permission'] = PERM_READ_WRITE;
 				}
 			}
 			unset($sysmap, $selement, $link);
@@ -445,12 +445,12 @@ class CMap extends CMapElement {
 			 * At this point editable means that all elemenets must be at least visible (user has permissions to
 			 * read or read-write). This does not cancel previous conditions.
 			 */
-			if ($options['editable'] && PERM_READ > $sysmap['rights']) {
+			if ($options['editable'] && PERM_READ > $sysmap['permission']) {
 				unset($result[$sysmap_key]);
 				continue;
 			}
 
-			unset($result[$sysmap_key]['accessible_elements'], $result[$sysmap_key]['rights']);
+			unset($result[$sysmap_key]['accessible_elements'], $result[$sysmap_key]['permission']);
 		}
 
 		if ($count_output) {

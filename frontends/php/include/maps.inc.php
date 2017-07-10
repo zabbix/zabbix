@@ -144,7 +144,7 @@ function getActionsBySysmap($sysmap, array $options = []) {
 		$scripts = null;
 		$gotos = null;
 
-		if ($elem['rights'] < PERM_READ) {
+		if ($elem['permission'] < PERM_READ) {
 			continue;
 		}
 
@@ -275,7 +275,7 @@ function add_elementNames(&$selements) {
 	$imageids = [];
 
 	foreach ($selements as $selement) {
-		if ($selement['rights'] >= PERM_READ) {
+		if ($selement['permission'] >= PERM_READ) {
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
 					$hostids[$selement['elements'][0]['hostid']] = $selement['elements'][0]['hostid'];
@@ -347,7 +347,7 @@ function add_elementNames(&$selements) {
 	}
 
 	foreach ($selements as $snum => &$selement) {
-		if ($selement['rights'] >= PERM_READ) {
+		if ($selement['permission'] >= PERM_READ) {
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
 					$selements[$snum]['elements'][0]['elementName']
@@ -809,7 +809,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 		$selement['hosts'] = [];
 		$selement['triggers'] = [];
 
-		if (PERM_READ > $selement['rights']) {
+		if (PERM_READ > $selement['permission']) {
 			continue;
 		}
 
@@ -1846,7 +1846,7 @@ function getMapLabels($map, $map_info, $resolveMacros) {
 
 		$elementInfo = $map_info[$selementId];
 
-		if ($selement['rights'] >= PERM_READ) {
+		if ($selement['permission'] >= PERM_READ) {
 			foreach (['problem', 'unack', 'maintenance', 'ok', 'status'] as $caption) {
 				if (!isset($elementInfo['info'][$caption]) || zbx_empty($elementInfo['info'][$caption]['msg'])) {
 					continue;

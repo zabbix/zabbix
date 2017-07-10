@@ -126,7 +126,7 @@ class CMapHelper {
 		if ($sysmap['selements']) {
 			foreach ($sysmap['selements'] as &$selement) {
 				// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
-				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['rights'] < PERM_READ
+				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['permission'] < PERM_READ
 					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 					$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
 				}
@@ -160,7 +160,7 @@ class CMapHelper {
 			unset($element['width'], $element['height']);
 
 			$element['icon'] = $icon;
-			if ($element['rights'] >= PERM_READ) {
+			if ($element['permission'] >= PERM_READ) {
 				$element['highlight'] = $highlights[$id];
 				$element['actions'] = $actions[$id];
 				$element['label'] = $labels[$id];
@@ -189,7 +189,7 @@ class CMapHelper {
 		}
 
 		foreach ($sysmap['links'] as &$link) {
-			if ($link['rights'] >= PERM_READ) {
+			if ($link['permission'] >= PERM_READ) {
 				$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
 
 				if (empty($link['linktriggers'])) {
