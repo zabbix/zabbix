@@ -119,7 +119,6 @@ class CDashboardWidgetMap extends CDiv {
 		}
 		else {
 			$this->addItem((new CTableInfo())->setNoDataMessage($this->error));
-			$this->addClass(ZBX_STYLE_DISABLED);
 		}
 	}
 
