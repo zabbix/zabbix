@@ -85,7 +85,12 @@ class CMapHelper {
 			];
 		}
 		else {
-			$map['severity_min'] = array_key_exists('severity_min', $options) ? $options['severity_min'] : null;
+			if (array_key_exists('severity_min', $options)) {
+				$map['severity_min'] = $options['severity_min'];
+			}
+			else {
+				$options['severity_min'] = $map['severity_min'];
+			}
 
 			self::resolveMapState($map, $options, $theme);
 		}
