@@ -21,6 +21,8 @@
 
 class CControllerWidgetTrigOverView extends CController {
 
+	private $form;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -28,16 +30,22 @@ class CControllerWidgetTrigOverView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>	'string',
-			'fields' =>	'required|array'
+			'fields' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
-		/*
-		 * @var array  $fields
-		 * @var array  $fields['groupids']     (optional)
-		 * @var string $fields['application']  (optional)
-		 * @var int    $fields['style']        (optional) in (STYLE_LEFT,STYLE_TOP)
-		 */
+		if ($ret) {
+			/*
+			 * @var array  $fields
+			 * @var array  $fields['groupids']
+			 * @var string $fields['application']
+			 * @var int    $fields['style']        in (STYLE_LEFT,STYLE_TOP)
+			 */
+			$this->form = CWidgetConfig::getForm(WIDGET_TRIG_OVERVIEW, $this->getInput('fields', []));
+			if (!empty($errors = $this->form->validate())) {
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			// TODO VM: prepare propper response for case of incorrect fields
@@ -52,19 +60,18 @@ class CControllerWidgetTrigOverView extends CController {
 	}
 
 	protected function doAction() {
-		$fields = $this->getInput('fields');
-		$groupids = array_key_exists('groupids', $fields) ? (array) $fields['groupids'] : null;
-		$application = array_key_exists('application', $fields) ? $fields['application'] : '';
+		$fields = $this->form->getFieldsData();
 
 		$data = [
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_TRIG_OVERVIEW]),
-			'style' => array_key_exists('style', $fields) ? $fields['style'] : STYLE_LEFT,
+			'style' => $fields['style'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		list($data['hosts'], $data['triggers']) = getTriggersOverviewData($groupids, $application, $data['style']);
+		list($data['hosts'], $data['triggers']) = getTriggersOverviewData($fields['groupids'], $fields['application'],
+			$data['style']);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

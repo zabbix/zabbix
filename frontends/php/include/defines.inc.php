@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.4.0alpha1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030172);
+define('ZABBIX_DB_VERSION',		3030168);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -1037,6 +1037,8 @@ define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
 
 // API validation
+// multiple types
+define('API_MULTIPLE',			0);
 // scalar data types
 define('API_STRING_UTF8',		1);
 define('API_INT32',				2);
@@ -1191,7 +1193,6 @@ define('ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE',	5);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
-define('ZBX_WIDGET_FIELD_TYPE_DASHBOARD',		9);
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");

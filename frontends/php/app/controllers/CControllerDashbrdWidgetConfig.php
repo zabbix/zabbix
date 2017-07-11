@@ -84,12 +84,12 @@ class CControllerDashbrdWidgetConfig extends CController {
 				if (!array_key_exists($field->getResourceType(), $captions)) {
 					$captions[$field->getResourceType()] = [];
 				}
-				if ($field->getValue(true)) {
-					$captions[$field->getResourceType()][$field->getValue(true)] = true;
+				if ($field->getValue()) {
+					$captions[$field->getResourceType()][$field->getValue()] = true;
 				}
 			}
 			if ($field instanceof CWidgetFieldGroup) {
-				foreach ($field->getValue(true) as $groupid) {
+				foreach ((array)$field->getValue() as $groupid) {
 					$captions['groups'][$groupid] = true;
 				}
 			}

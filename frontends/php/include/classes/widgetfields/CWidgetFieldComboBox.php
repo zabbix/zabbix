@@ -22,8 +22,16 @@ class CWidgetFieldComboBox extends CWidgetField {
 
 	protected $values;
 
-	public function __construct($name, $label, $values, $default = null, $action = null, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
-		parent::__construct($name, $label, $default, $action);
+	/**
+	 * Combo box widget field. Can use both, string and integer type keys.
+	 *
+	 * @param string $name       field name in form
+	 * @param string $label      label for the field in form
+	 * @param array  $values     key/value pairs of combo box values. Key - saved in DB. Value - visible to user.
+	 * @param int    $save_type  ZBX_WIDGET_FIELD_TYPE_ constant. Defines how field will be saved in database.
+	 */
+	public function __construct($name, $label, $values, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
+		parent::__construct($name, $label);
 		$this->setSaveType($save_type);
 		$this->values = $values;
 	}
@@ -39,5 +47,16 @@ class CWidgetFieldComboBox extends CWidgetField {
 
 	public function getValues() {
 		return $this->values;
+	}
+
+	public function validate()
+	{
+		$errors = parent::validate();
+
+		if (!in_array($this->getValue(), array_keys($this->values))) {
+			$errors[] = _s('Invalid parameter "%1$s".', $this->getLabel()); // TODO VM: (?) improve error message
+		}
+
+		return $errors;
 	}
 }

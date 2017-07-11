@@ -27,8 +27,16 @@ class CWidgetFieldSelectResource extends CWidgetField {
 	protected $dstfld2;
 	protected $resource_type;
 
-	public function __construct($name, $label, $resource_type, $default = null) {
-		parent::__construct($name, $label, $default, null);
+	/**
+	 * Select resource type widget field. Will create text box field with select button,
+	 * that will allow to select specified resource.
+	 *
+	 * @param string $name           field name in form
+	 * @param string $label          label for the field in form
+	 * @param int    $resource_type  WIDGET_FIELD_SELECT_RES_ constant.
+	 */
+	public function __construct($name, $label, $resource_type) {
+		parent::__construct($name, $label);
 		$this->resource_type = $resource_type;
 
 		switch ($resource_type) {
@@ -56,6 +64,10 @@ class CWidgetFieldSelectResource extends CWidgetField {
 
 	public function getResourceType() {
 		return $this->resource_type;
+	}
+
+	public function setValue($value) {
+		return parent::setValue(($value === '') ? null : $value);
 	}
 
 	public function getPopupUrl() {
