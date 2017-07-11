@@ -4491,6 +4491,10 @@ tr.cursor-move {
 				border-bottom: 1px solid $ui-border-color;
 				padding: 8px 0;
 
+				&:hover {
+					background-color: $ui-hover-color;
+				}
+
 				> .problems {
 					float: right;
 					position: relative;
@@ -4602,10 +4606,10 @@ tr.cursor-move {
 
 			&.selected {
 				> .tree-row {
-					> .content {
-						> .item-name {
-							font-weight: bold;
-						}
+					@extend %found-bg;
+
+					&:hover {
+						@extend %found-bg;
 					}
 				}
 			}
