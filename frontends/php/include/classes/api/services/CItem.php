@@ -786,35 +786,53 @@ class CItem extends CItemGeneral {
 		}
 
 		// Fix master_itemid for inserted or updated inherited items.
-		$to_inherit = array_merge($updateItems, $insertItems);
-		$master_protosids = array_filter(zbx_objectValues($to_inherit, 'master_itemid'));
+		$items = array_merge($updateItems, $insertItems);
+		$master_itemids = [];
 
-		if ($master_protosids) {
-			$master_protos = DB::select('items', [
+		foreach ($items as $item) {
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_itemids[$item['master_itemid']] = true;
+			}
+		}
+
+		if ($master_itemids) {
+			$master_items = DB::select('items', [
 				'output' => ['key_', 'hostid'],
-				'filter' => ['itemid' => $master_protosids],
+				'filter' => ['itemid' => array_keys($master_itemids)],
 				'preservekeys' => true
 			]);
+			$data = [];
+			$host_master_items = [];
 
-			foreach ($to_inherit as $item) {
+			foreach ($items as $item) {
 				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
 					continue;
 				}
+				$master_item = $master_items[$item['master_itemid']];
 
-				$master_proto = $master_protos[$item['master_itemid']];
-
-				if ($master_proto['hostid'] != $item['hostid']) {
-					$master_item = DB::select('items', [
-						'output' => ['itemid'],
-						'filter' => ['hostid' => $item['hostid'], 'key_' => $master_proto['key_']]
-					])[0];
-					DB::update('items', [
-						'values' => ['master_itemid' => $master_item['itemid']],
-						'where' => ['itemid' => $item['itemid']]
-					]);
+				if (!array_key_exists($item['hostid'], $host_master_items)) {
+					$host_master_items[$item['hostid']] = [];
+				}
+				if ($master_item['hostid'] != $item['hostid']) {
+					if (!array_key_exists($master_item['key_'], $host_master_items[$item['hostid']])) {
+						$inherited_master_items = DB::select('items', [
+							'output' => ['itemid'],
+							'filter' => ['hostid' => $item['hostid'], 'key_' => $master_item['key_']]
+						]);
+						$host_master_items[$item['hostid']][$master_item['key_']] = reset($inherited_master_items);
+					}
+					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
+					$data[] = [
+						'values'	=> ['master_itemid' => $inherited_master_item['itemid']],
+						'where'		=> ['itemid' => $item['itemid']]
+					];
 				}
 			}
+			if ($data) {
+				DB::update('items', $data);
+			}
 		}
+		unset($items);
 
 		// propagate the inheritance to the children
 		return $this->inherit(array_merge($updateItems, $insertItems));
