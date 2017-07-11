@@ -21,14 +21,13 @@
 class CWidgetFieldGroup extends CWidgetField {
 
 	/**
-	 * Create widget field for Item selection
+	 * Create widget field for Host Group selection
 	 *
-	 * @param string      $name     field name in form
-	 * @param string      $label    label for the field in form
-	 * @param string|null $default  default host group id value
+	 * @param string $name   field name in form
+	 * @param string $label  label for the field in form
 	 */
-	public function __construct($name, $label, $default = null) {
-		parent::__construct($name, $label, $default);
+	public function __construct($name, $label) {
+		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GROUP);
 	}

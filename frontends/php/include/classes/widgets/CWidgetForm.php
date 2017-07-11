@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CWidgetForm {
 
 	protected $fields;
@@ -33,6 +34,22 @@ class CWidgetForm {
 	 */
 	public function getFields() {
 		return $this->fields;
+	}
+
+	/**
+	 * Returns widget fields data as array
+	 *
+	 * @return array  key/value pairs where key is field name and value is it's data
+	 */
+	public function getFieldsData() {
+		$data = [];
+
+		foreach ($this->fields as $field) {
+			/* @var $field CWidgetField */
+			$data[$field->getName()] = $field->getValue();
+		}
+
+		return $data;
 	}
 
 	public function validate() {

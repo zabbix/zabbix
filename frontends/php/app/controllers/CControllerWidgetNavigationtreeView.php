@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 class CControllerWidgetNavigationtreeView extends CController {
 	private $problems_per_severity_tpl;
 
+	private $form;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -38,6 +40,20 @@ class CControllerWidgetNavigationtreeView extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			/*
+			 * @var array  $fields
+			 * @var string $fields['map.name.#']
+			 * @var int    $fields['map.parent.#']
+			 * @var int    $fields['map.order.#']
+			 * @var id     $fields['mapid.#']
+			 */
+			$this->form = CWidgetConfig::getForm(WIDGET_NAVIGATION_TREE, $this->getInput('fields', []));
+			if (!empty($errors = $this->form->validate())) {
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
@@ -385,36 +401,19 @@ class CControllerWidgetNavigationtreeView extends CController {
 	}
 
 	protected function doAction() {
+		$fields = $this->form->getFieldsData();
 		$error = null;
-		$data = [];
-
-		// Default values
-		$default = [
-			'widgetid' => 0
-		];
-
-		if ($this->hasInput('fields')) {
-			// Use configured data, if possible
-			$data = $this->getInput('fields');
-		}
-
-		// Apply default value for data
-		foreach ($default as $key => $value) {
-			if (!array_key_exists($key, $data)) {
-				$data[$key] = $value;
-			}
-		}
 
 		// Get list of sysmapids.
 		$sysmapids = [];
-		foreach ($data as $field_key => $field_value) {
+		foreach ($fields as $field_key => $field_value) {
 			if (is_numeric($field_value)) {
 				preg_match('/^mapid\.\d+$/', $field_key, $field_details);
 				if ($field_details) {
 					$sysmapids[] = $field_value;
 				}
 			}
-			unset($data[$field_key]);
+			unset($fields[$field_key]);
 		}
 
 		// Get severity levels and colors and select list of sysmapids to count problems per maps.

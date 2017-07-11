@@ -55,9 +55,9 @@
 				'min-width': '' + data['options']['widget-width'] + '%'
 			}
 		})
+			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 			.append(
 				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
-					.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 					.append(widget['content_header'])
 					.append(widget['content_body'])
 					.append(widget['content_footer'])
@@ -935,7 +935,6 @@
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
-				'update_attempts': 0,
 				'update_attempts': 0,
 				'initial_load': true,
 				'fields': {}

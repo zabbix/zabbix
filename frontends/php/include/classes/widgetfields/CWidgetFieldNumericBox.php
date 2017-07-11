@@ -39,16 +39,15 @@ class CWidgetFieldNumericBox extends CWidgetField {
 	private $max;
 
 	/**
-	 * A numeric box constructor.
+	 * A numeric box widget field.
 	 *
-	 * @param string $name
-	 * @param string $label
-	 * @param mixed  $default
-	 * @param int    $min
-	 * @param int    $max
+	 * @param string $name   field name in form
+	 * @param string $label  label for the field in form
+	 * @param int    $min    minimal allowed value (this included)
+	 * @param int    $max    maximal allowed value (this included)
 	 */
-	public function __construct($name, $label, $default = null, $min = 0, $max = ZBX_MAX_INT32) {
-		parent::__construct($name, $label, $default);
+	public function __construct($name, $label, $min = 0, $max = ZBX_MAX_INT32) {
+		parent::__construct($name, $label);
 
 		$this->min = $min;
 		$this->max = $max;
@@ -59,6 +58,10 @@ class CWidgetFieldNumericBox extends CWidgetField {
 		return strlen((string)$this->max);
 	}
 
+	public function setValue($value) {
+		return parent::setValue((int)$value);
+	}
+
 	/**
 	 * Validate.
 	 *
@@ -67,7 +70,7 @@ class CWidgetFieldNumericBox extends CWidgetField {
 	public function validate()
 	{
 		$errors = parent::validate();
-		$value = $this->getValue(true);
+		$value = $this->getValue();
 
 		if ($value !== null && ($value < $this->min || $value > $this->max)) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(),

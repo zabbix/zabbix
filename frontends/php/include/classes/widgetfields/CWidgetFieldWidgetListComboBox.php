@@ -26,14 +26,14 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 	/**
 	 * Field that creates ComboBox with widgets of current dashboard, filtered by given key of widget array.
 	 *
-	 * @param string $name  Name of field in config form and widget['fields'] array.
-	 * @param string $label  Field label in config form.
-	 * @param string $search_by_key  Key of widget array, by which widgets will be filtered.
-	 * @param mixed $search_by_value  Value that will be searched in widget[$search_by_key].
-	 * @param string $default  Default value to be used, if no value given.
+	 * @param string $name             Name of field in config form and widget['fields'] array.
+	 * @param string $label            Field label in config form.
+	 * @param string $search_by_key    Key of widget array, by which widgets will be filtered.
+	 * @param mixed  $search_by_value  Value that will be searched in widget[$search_by_key].
+	 * @param string $default          Default value to be used, if no value given.
 	 */
-	public function __construct($name, $label, $search_by_key, $search_by_value, $default = '') {
-		parent::__construct($name, $label, $default, null);
+	public function __construct($name, $label, $search_by_key, $search_by_value) {
+		parent::__construct($name, $label);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->search_by_key = $search_by_key;
 		$this->search_by_value = $search_by_value;
@@ -55,21 +55,12 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 			'if (widgets.length) {'.
 				'jQuery.each(widgets, function(i, widget) {'.
 					'jQuery("<option></option>")'.
-						'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue(true).'"))'.
+						'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue().'"))'.
 						'.text(widget["header"].length ? widget["header"] : '.
 							'dashboard_data["widget_defaults"][widget["type"]]["header"])'.
 						'.val(widget["fields"]["reference"])'.
 						'.appendTo(filters_box);'.
 				'});'.
 			'}';
-	}
-
-	public function validate() {
-		$errors = parent::validate();
-		if ($this->value !== null && $this->required === true && $this->getValue(true) === '') {
-			$errors[] = _s('Field \'%s\' is required', $this->label);
-		}
-
-		return $errors;
 	}
 }
