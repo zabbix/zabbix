@@ -245,8 +245,9 @@ SVGTextArea.prototype.wrapLine = function (line) {
 	var max_width = this.clip.attributes.width,
 		current;
 
-	if (typeof max_width === "undefined" && typeof this.clip.attributes.rx !== 'undefined')
+	if (typeof max_width === 'undefined' && typeof this.clip.attributes.rx !== 'undefined') {
 		max_width = parseInt(this.clip.attributes.rx * 2, 10);
+	}
 
 	max_width -= this.canvas.textPadding * 2;
 
@@ -258,8 +259,9 @@ SVGTextArea.prototype.wrapLine = function (line) {
 
 		this.canvas.wrapper.text.element.appendChild(this.canvas.wrapper.node);
 	}
-	else
+	else {
 		this.canvas.wrapper.text.update(this.attributes);
+	}
 
 	var text = this.canvas.wrapper.text.element,
 		node = this.canvas.wrapper.node,
@@ -271,7 +273,7 @@ SVGTextArea.prototype.wrapLine = function (line) {
 
 	// Check length of the line in pixels.
 	if (Math.ceil(size.width) > max_width) {
-		var words = line.split(" ");
+		var words = line.split(' ');
 			current = [];
 
 		while (words.length > 0) {
@@ -279,24 +281,25 @@ SVGTextArea.prototype.wrapLine = function (line) {
 			node.textContent = current.join(' ');
 			size = text.getBBox();
 
-			if (Math.ceil(size.width) > max_width)
-			{
-				if (current.length > 1)
-				{
+			if (Math.ceil(size.width) > max_width) {
+				if (current.length > 1) {
 					words.unshift(current.pop());
 					wrapped.push(current.join(' '));
 					current = [];
 				}
-				else
+				else {
 					break; // Word is too long to fit the line.
+				}
 			}
 		}
 
-		if (current.length > 0)
+		if (current.length > 0) {
 			wrapped.push(current.join(' '));
+		}
 	}
-	else
+	else {
 		wrapped.push(line);
+	}
 
 	return wrapped;
 };
@@ -330,8 +333,9 @@ SVGTextArea.prototype.getHorizontalAnchor = function() {
 		right: 'end'
 	};
 
-	if (typeof mapping[this.anchor.horizontal] === 'string')
+	if (typeof mapping[this.anchor.horizontal] === 'string') {
 		return mapping[this.anchor.horizontal];
+	}
 
 	return mapping.left;
 };
@@ -437,8 +441,7 @@ SVGTextArea.prototype.createClipping = function() {
 			this.clip.attributes.fill = '#ffffff';
 			this.element.add('mask', {
 				id: 'mask-' + unique_id
-			}, [
-				{
+			}, [{
 					type: 'rect',
 					attributes: {
 						x: -offset,
@@ -510,8 +513,9 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 		this.y -= this.canvas.textPadding;
 		this.offset = this.canvas.textPadding;
 	}
-	else
+	else {
 		this.background = null;
+	}
 
 	this.parseContent(content, parse_links);
 	this.text = this.element.add('text', attributes, this.lines);
