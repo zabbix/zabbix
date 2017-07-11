@@ -113,7 +113,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			? $data['captions'][$field->getResourceType()][$field->getValue()]
 			: '';
 		// needed for popup script
-		$form->addVar($field->getName(), ($field->getValue() !== null) ? $field->getValue() : '');
+		$form->addVar($field->getName(), $field->getValue());
 		$form_list->addRow($field->getLabel(), [
 			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

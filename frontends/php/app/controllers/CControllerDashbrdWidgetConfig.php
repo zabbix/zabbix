@@ -93,7 +93,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 				if (!array_key_exists($field->getResourceType(), $captions)) {
 					$captions[$field->getResourceType()] = [];
 				}
-				if ($field->getValue()) {
+				if ($field->getValue() != 0) {
 					$captions[$field->getResourceType()][$field->getValue()] = true;
 				}
 			}
