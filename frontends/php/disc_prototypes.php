@@ -389,7 +389,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 			$item['trends'] = getRequest('trends');
 		}
-		$item['master_itemid'] = ($item['type'] == ITEM_TYPE_DEPENDENT) ? getRequest('master_itemid') : 0;
+
+		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+			$item['master_itemid'] = getRequest('master_itemid');
+		}
 
 		if (hasRequest('update')) {
 			$itemId = getRequest('itemid');
