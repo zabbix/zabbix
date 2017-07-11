@@ -415,7 +415,8 @@
 			'fullscreen': data['options']['fullscreen'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
-			'edit_mode': data['options']['edit_mode'] ? 1 : 0
+			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
+			'storage': widget['storage']
 		}
 		widget['initial_load'] = false;
 
@@ -937,7 +938,8 @@
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
 				'initial_load': true,
-				'fields': {}
+				'fields': {},
+				'storage': {}
 			}, widget);
 
 			return this.each(function() {
@@ -988,14 +990,14 @@
 			});
 		},
 
-		setWidgetFieldValue: function(uniqueid, field, value) {
+		setWidgetStorageValue: function(uniqueid, field, value) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['uniqueid'] === uniqueid) {
-						widget['fields'][field] = value;
+						widget['storage'][field] = value;
 					}
 				});
 			});

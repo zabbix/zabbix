@@ -22,6 +22,7 @@ class CDashboardWidgetMap extends CDiv {
 	private $filter_widget_reference;
 	private $previous_map;
 	private $sysmap_data;
+	private $current_sysmapid;
 	private $source_type;
 	private $initial_load;
 	private $uniqueid;
@@ -32,6 +33,7 @@ class CDashboardWidgetMap extends CDiv {
 
 		$this->error = $widget_settings['error'];
 		$this->sysmap_data = $sysmap_data;
+		$this->current_sysmapid = $widget_settings['current_sysmapid'];
 		$this->filter_widget_reference = $widget_settings['filter_widget_reference'];
 		$this->source_type = $widget_settings['source_type'];
 		$this->previous_map = $widget_settings['previous_map'];
@@ -45,16 +47,22 @@ class CDashboardWidgetMap extends CDiv {
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
 			&& $this->initial_load
 		) {
-			$script_run =
+			$script_run = '';
+			if ($this->current_sysmapid !== null) {
+				// this should be before other scripts
+				$script_run .= 'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
+					'\'setWidgetStorageValue\', widget.uniqueid, \'current_sysmapid\', '.$this->current_sysmapid.');';
+			}
+			$script_run .=
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.
 					'source_widget_reference: "'.$this->filter_widget_reference.'",'.
 					'callback: function(widget, data) {'.
 						'if(data[0].mapid !== +data[0].mapid) return;'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-							'\'setWidgetFieldValue\', widget.uniqueid, \'sysmapid\', data[0].mapid);'.
+							'\'setWidgetStorageValue\', widget.uniqueid, \'current_sysmapid\', data[0].mapid);'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-							'\'setWidgetFieldValue\', widget.uniqueid, \'previous_maps\', "");'.
+							'\'setWidgetStorageValue\', widget.uniqueid, \'previous_maps\', "");'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
 							'\'refreshWidget\', widget.widgetid);'.
 					'}'.

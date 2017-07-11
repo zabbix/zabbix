@@ -34,8 +34,8 @@ class CControllerWidgetSysmapView extends CController {
 			'edit_mode'		=>	'in 0,1',
 			'initial_load'	=>	'in 0,1',
 			'fullscreen'	=>	'in 0,1',
-			'fields'		=>	'array'
-//			'storage'		=>	'array' // TODO VM: implement for previous_maps
+			'fields'		=>	'array',
+			'storage'		=>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,6 +47,7 @@ class CControllerWidgetSysmapView extends CController {
 			 * @var string $fields['filter_widget_reference']
 			 * @var id     $fields['sysmapid']
 			 * @var array  $storage
+			 * @var string $storage['current_sysmapid']
 			 * @var string $storage['previous_maps']
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields', []));
@@ -54,7 +55,7 @@ class CControllerWidgetSysmapView extends CController {
 				$ret = false;
 			}
 
-			// TODO VM: implement validation for previous_maps in storage
+			// TODO VM: implement validation for previous_maps and current_sysmapid in storage
 		}
 
 		if (!$ret) {
@@ -102,10 +103,10 @@ class CControllerWidgetSysmapView extends CController {
 			'fullscreen' => $this->getInput('fullscreen', 0)
 		];
 
-		$sysmapid = array_key_exists('sysmapid', $fields) ? [$fields['sysmapid']] : [];
-		$sysmap_data = CMapHelper::get($sysmapid, $options);
+		$sysmapid = array_key_exists('current_sysmapid', $storage) ? $storage['current_sysmapid'] : null;
+		$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
 
-		if (!array_key_exists('sysmapid', $fields) || !$fields['sysmapid']) {
+		if ($sysmapid === null) {
 			$error = _('No map selected.');
 		}
 		elseif ($sysmap_data['id'] < 0) {
@@ -138,6 +139,7 @@ class CControllerWidgetSysmapView extends CController {
 			],
 			'sysmap_data' => $sysmap_data,
 			'widget_settings' => [
+				'current_sysmapid' => $sysmapid,
 				'filter_widget_reference' => array_key_exists('filter_widget_reference', $fields)
 					? $fields['filter_widget_reference']
 					: null,

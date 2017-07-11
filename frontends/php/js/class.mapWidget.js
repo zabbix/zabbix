@@ -30,27 +30,29 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 			previous_maps = '';
 
 		if (widget.length) {
-			if (typeof widget[0]['fields']['sysmapid'] !== 'undefined' && widget[0]['fields']['sysmapid'] !== '') {
-				if (typeof widget[0]['fields']['previous_maps'] === 'undefined') {
+			if (typeof widget[0]['storage']['current_sysmapid'] !== 'undefined'
+				&& widget[0]['storage']['current_sysmapid'] !== ''
+			) {
+				if (typeof widget[0]['storage']['previous_maps'] === 'undefined') {
 					if (!reset_previous) {
-						previous_maps = widget[0]['fields']['sysmapid'];
+						previous_maps = widget[0]['storage']['current_sysmapid'];
 					}
 				}
 				else {
 					if (reset_previous) {
-						previous_maps = widget[0]['fields']['previous_maps'].split(',').filter(Number);
+						previous_maps = widget[0]['storage']['previous_maps'].split(',').filter(Number);
 						delete previous_maps[previous_maps.length-1];
 						previous_maps = previous_maps.filter(Number).join(',');
 					}
 					else {
-						previous_maps = widget[0]['fields']['previous_maps']+','+widget[0]['fields']['sysmapid'];
+						previous_maps = widget[0]['storage']['previous_maps']+','+widget[0]['storage']['current_sysmapid'];
 					}
 				}
 			}
 
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetFieldValue', uniqueid, 'sysmapid',
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'sysmapid',
 				submapid);
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetFieldValue', uniqueid, 'previous_maps',
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'previous_maps',
 				previous_maps);
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', uniqueid);
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget[0], 'selected_mapid',
