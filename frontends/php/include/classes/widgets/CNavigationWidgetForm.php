@@ -30,6 +30,14 @@ class CNavigationWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_reference;
 
+		// map widget reference
+		$field_map_widget = (new CWidgetFieldWidgetListComboBox('map_widget_reference', _('Map'), 'type', 'sysmap'));
+		if (array_key_exists('map_widget_reference', $data)) {
+			$field_map_widget->setValue($data['map_widget_reference']);
+		}
+
+		$this->fields[] = $field_map_widget;
+
 		// Register dynamically created item fields.
 		foreach ($data as $field_key => $value) {
 			preg_match('/^map\.name\.(\d+)$/', $field_key, $field_details);

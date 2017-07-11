@@ -323,13 +323,14 @@ class CMap extends CMapElement {
 
 				if (!$sysmap['selements'] || !$sysmap['have_selements_available']) {
 					unset($result[$sysmap_key]);
+					continue;
 				}
 				elseif ($remove_selements) {
 					unset($result[$sysmap_key]['selements']);
 				}
 			}
 
-			unset($sysmap['have_selements_available']);
+			unset($result[$sysmap_key]['have_selements_available']);
 		}
 
 		if ($count_output) {
