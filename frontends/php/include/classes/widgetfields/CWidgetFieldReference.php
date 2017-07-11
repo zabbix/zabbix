@@ -19,12 +19,17 @@
 **/
 
 class CWidgetFieldReference extends CWidgetField {
+
+	/**
+	 * Reference widget field. If added to widget, will generate unique value across the dashboard
+	 * and will be saved to database. This field should be used to save relations between widgets.
+	 */
 	public function __construct() {
 		/*
 		 * All reference fields for all widgets on dashboard should share the same name.
 		 * It is needed to make possible search if value is not taken by some other widget in same dashboard.
 		 */
-		parent::__construct('reference', '', null, null);
+		parent::__construct('reference', null);
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 

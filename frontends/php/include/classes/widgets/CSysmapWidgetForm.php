@@ -18,29 +18,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CSysmapWidgetForm extends CWidgetForm
-{
+class CSysmapWidgetForm extends CWidgetForm {
+
 	public function __construct($data) {
 		parent::__construct($data);
+
+		// widget reference field
+		$field_reference = (new CWidgetFieldReference());
+		if (array_key_exists($field_reference->getName(), $data)) {
+			$field_reference->setValue($data[$field_reference->getName()]);
+		}
+		$this->fields[] = $field_reference;
 
 		// select source type field
 		$source_types = [
 			WIDGET_SYSMAP_SOURCETYPE_MAP => _('Map'),
 			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree'),
 		];
-		$field_source_type = (new CWidgetFieldRadioButtonList('source_type', _('Source type'), $source_types,
-				WIDGET_SYSMAP_SOURCETYPE_MAP, 'updateWidgetConfigDialogue()'))->setModern(true);
+		$field_source_type = (new CWidgetFieldRadioButtonList('source_type', _('Source type'), $source_types))
+			->setDefault(WIDGET_SYSMAP_SOURCETYPE_MAP)
+			->setAction('updateWidgetConfigDialogue()')
+			->setModern(true);
 		if (array_key_exists('source_type', $data)) {
-			$field_source_type->setValue($data['source_type']);
+			$field_source_type->setValue((int)$data['source_type']);
 		}
 		$this->fields[] = $field_source_type;
 
 		// select filter widget field
-		if ($field_source_type->getValue(true) === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+		if ($field_source_type->getValue() === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			$field_filter_widget = (new CWidgetFieldWidgetListComboBox('filter_widget_reference', _('Filter'),
-					'type', 'navigationtree'
-				))
-				->setRequired(true);
+				'type', 'navigationtree'))->setDefault('');
 
 			if (array_key_exists('filter_widget_reference', $data)) {
 				$field_filter_widget->setValue($data['filter_widget_reference']);
@@ -48,13 +55,14 @@ class CSysmapWidgetForm extends CWidgetForm
 
 			$this->fields[] = $field_filter_widget;
 		}
+		else {
+			// select sysmap field
+			$field_map = new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP);
 
-		// select sysmap field
-		$field_map = (new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP))
-			->setRequired($field_source_type->getValue(true) === WIDGET_SYSMAP_SOURCETYPE_MAP);
-		if (array_key_exists('sysmapid', $data)) {
-			$field_map->setValue($data['sysmapid']);
+			if (array_key_exists('sysmapid', $data)) {
+				$field_map->setValue($data['sysmapid']);
+			}
+			$this->fields[] = $field_map;
 		}
-		$this->fields[] = $field_map;
 	}
 }

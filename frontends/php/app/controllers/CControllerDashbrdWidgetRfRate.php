@@ -43,13 +43,16 @@ class CControllerDashbrdWidgetRfRate extends CController {
 	}
 
 	protected function checkPermissions() {
+		// TODO AV: permissions needs to be added
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
 		foreach ($this->getInput('widgets') as $widget) {
 			if (array_key_exists('rf_rate', $widget)) {
-				CProfile::update('web.dashbrd.widget.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT, $widget['widgetid']);
+				CProfile::update('web.dashbrd.widget.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT,
+					$widget['widgetid']
+				);
 			}
 		}
 

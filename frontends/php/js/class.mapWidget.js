@@ -17,36 +17,46 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
+	function zbx_sysmap_widget_trigger(hook_name, grid) {
+		jQuery(".dashbrd-grid-widget-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
+	}
+}
+
 if (typeof(navigateToSubmap) !== typeof(Function)) {
-	function navigateToSubmap(submapid, uniqueid, reset_previous){
+	function navigateToSubmap(submapid, uniqueid, reset_previous) {
 		var widget = jQuery('.dashbrd-grid-widget-container').dashboardGrid('getWidgetsBy', 'uniqueid', uniqueid),
 			reset_previous = reset_previous || false,
 			previous_maps = '';
 
 		if (widget.length) {
-			if (typeof widget[0]['fields']['sysmapid'] !== 'undefined' && widget[0]['fields']['sysmapid'] !== '') {
-				if (typeof widget[0]['fields']['previous_maps'] === 'undefined') {
+			if (typeof widget[0]['storage']['current_sysmapid'] !== 'undefined'
+				&& widget[0]['storage']['current_sysmapid'] !== ''
+			) {
+				if (typeof widget[0]['storage']['previous_maps'] === 'undefined') {
 					if (!reset_previous) {
-						previous_maps = widget[0]['fields']['sysmapid'];
+						previous_maps = widget[0]['storage']['current_sysmapid'];
 					}
 				}
 				else {
 					if (reset_previous) {
-						previous_maps = widget[0]['fields']['previous_maps'].split(',').filter(Number);
+						previous_maps = widget[0]['storage']['previous_maps'].split(',').filter(Number);
 						delete previous_maps[previous_maps.length-1];
 						previous_maps = previous_maps.filter(Number).join(',');
 					}
 					else {
-						previous_maps = widget[0]['fields']['previous_maps']+','+widget[0]['fields']['sysmapid'];
+						previous_maps = widget[0]['storage']['previous_maps']+','+widget[0]['storage']['current_sysmapid'];
 					}
 				}
 			}
 
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetFieldValue', uniqueid, 'sysmapid',
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'sysmapid',
 				submapid);
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetFieldValue', uniqueid, 'previous_maps',
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'previous_maps',
 				previous_maps);
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', uniqueid);
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget[0], 'selected_mapid',
+				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0});
 			jQuery('.action-menu').fadeOut(100);
 		}
 	}

@@ -18,8 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetConfig
-{
+
+class CWidgetConfig {
+
 	/**
 	 * Return list of all widget types with names.
 	 *
@@ -57,6 +58,7 @@ class CWidgetConfig
 	 */
 	private static function getDefaultDimensions()
 	{
+		// TODO AV: review and accept default dimentions
 		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
@@ -135,49 +137,6 @@ class CWidgetConfig
 	}
 
 	/**
-	 * Returns key, where value is stored for given field type.
-	 *
-	 * @static
-	 *
-	 * @param int $field_type  ZBX_WIDGET_FIELD_TYPE_ constant
-	 *
-	 * @return string  field key, where to save the value
-	 */
-	public static function getApiFieldKey($field_type){
-		switch ($field_type) {
-			case ZBX_WIDGET_FIELD_TYPE_INT32:
-				return 'value_int';
-
-			case ZBX_WIDGET_FIELD_TYPE_STR:
-				return 'value_str';
-
-			case ZBX_WIDGET_FIELD_TYPE_GROUP:
-				return 'value_groupid';
-
-			case ZBX_WIDGET_FIELD_TYPE_HOST:
-				return 'value_hostid';
-
-			case ZBX_WIDGET_FIELD_TYPE_ITEM:
-				return 'value_itemid';
-
-			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-				return 'value_itemid';
-
-			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-				return 'value_graphid';
-
-			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-				return 'value_graphid';
-
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				return 'value_sysmapid';
-
-			case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
-				return 'value_dashboardid';
-		}
-	}
-
-	/**
 	 * Return Form object for widget with provided data.
 	 *
 	 * @static
@@ -194,10 +153,10 @@ class CWidgetConfig
 				return new CClockWidgetForm($data);
 
 			case WIDGET_NAVIGATION_TREE:
-				return (new CNavigationWidgetForm($data));
+				return new CNavigationWidgetForm($data);
 
 			case WIDGET_SYSMAP:
-				return (new CSysmapWidgetForm($data));
+				return new CSysmapWidgetForm($data);
 
 			case WIDGET_URL:
 				return new CUrlWidgetForm($data);

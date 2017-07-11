@@ -24,7 +24,7 @@ class CControllerProfileUpdate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'idx' =>		'required|string',
-			'value_int' =>	'required|in 0,1',
+			'value_int' =>	'required|int32',
 			'idx2' =>		'array_id'
 		];
 
@@ -70,6 +70,8 @@ class CControllerProfileUpdate extends CController {
 
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
+				case 'web.dashbrd.navtree.item.selected':
+				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 					$ret = $this->hasInput('idx2');
 					break;
 
@@ -97,6 +99,7 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			case 'web.latest.toggle':
 			case 'web.latest.toggle_other':
+			case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));
 				}
@@ -104,6 +107,12 @@ class CControllerProfileUpdate extends CController {
 					foreach ($this->getInput('idx2') as $idx2) {
 						CProfile::update($idx, $value_int, PROFILE_TYPE_INT, $idx2);
 					}
+				}
+				break;
+
+			case 'web.dashbrd.navtree.item.selected':
+				foreach ($this->getInput('idx2') as $idx2) {
+					CProfile::update($idx, $value_int, PROFILE_TYPE_INT, $idx2);
 				}
 				break;
 

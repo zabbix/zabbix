@@ -1027,6 +1027,59 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32],
+						['if' => ['field' => 'type', 'in' => '3,4'], 'type' => API_STRING_UTF8],
+						['if' => ['field' => 'type', 'in' => '5:9'], 'type' => API_ID]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125'],
+					['type' => '3', 'value' => 'text'],
+					['type' => '4', 'value' => 'text3'],
+					['type' => '7', 'value' => '123456789012345']
+				],
+				'/',
+				[
+					['type' => 1, 'value' => -5],
+					['type' => 2, 'value' => 125],
+					['type' => 3, 'value' => 'text'],
+					['type' => 4, 'value' => 'text3'],
+					['type' => 7, 'value' => '123456789012345']
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => 'a125']
+				],
+				'/',
+				'Invalid parameter "/2/value": a number is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,3'], 'type' => API_INT32]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125']
+				],
+				'/',
+				'Incorrect validation rules.'
+			],
+			[
 				['type' => API_HG_NAME, 'length' => 16],
 				'Zabbix servers',
 				'/1/name',

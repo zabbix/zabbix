@@ -64,11 +64,18 @@ class CApiInputValidator {
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
+	 * @param array  $parent_data
 	 *
 	 * @return bool
 	 */
-	private static function validateData($rule, &$data, $path, &$error) {
+	private static function validateData($rule, &$data, $path, &$error, array $parent_data = null) {
 		switch ($rule['type']) {
+			case API_MULTIPLE:
+				if ($parent_data !== null) {
+					return self::validateMultiple($rule, $data, $path, $error, $parent_data);
+				}
+				break;
+
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
@@ -145,6 +152,7 @@ class CApiInputValidator {
 	 */
 	private static function validateDataUniqueness($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
+			case API_MULTIPLE:
 			case API_STRING_UTF8:
 			case API_INT32:
 			case API_ID:
@@ -204,6 +212,33 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Myltiple data types validator.
+	 *
+	 * @param array  $rule
+	 * @param array  $rule['rules']
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 * @param array  $parent_data
+	 *
+	 * @return bool
+	 */
+	private static function validateMultiple($rule, &$data, $path, &$error, array $parent_data) {
+		foreach ($rule['rules'] as $field_rule) {
+			if (self::Int32In($parent_data[$field_rule['if']['field']], $field_rule['if']['in'])) {
+				unset($field_rule['if']);
+
+				return self::validateData($field_rule, $data, $path, $error);
+			}
+		}
+
+		// This message can be untranslated because warn about incorrect validation rules at a development stage.
+		$error = 'Incorrect validation rules.';
+
+		return false;
 	}
 
 	/**
@@ -337,6 +372,27 @@ class CApiInputValidator {
 		return true;
 	}
 
+	private static function Int32In($data, $in) {
+		$valid = false;
+
+		foreach (explode(',', $in) as $in) {
+			if (strpos($in, ':') !== false) {
+				list($from, $to) = explode(':', $in);
+			}
+			else {
+				$from = $in;
+				$to = $in;
+			}
+
+			if ($from <= $data && $data <= $to) {
+				$valid = true;
+				break;
+			}
+		}
+
+		return $valid;
+	}
+
 	/**
 	 * @param array  $rule
 	 * @param int    $rule['in']  (optional)
@@ -351,22 +407,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$valid = false;
-
-		foreach (explode(',', $rule['in']) as $in) {
-			if (strpos($in, ':') !== false) {
-				list($from, $to) = explode(':', $in);
-			}
-			else {
-				$from = $in;
-				$to = $in;
-			}
-
-			if ($from <= $data && $data <= $to) {
-				$valid = true;
-				break;
-			}
-		}
+		$valid = self::Int32In($data, $rule['in']);
 
 		if (!$valid) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
@@ -558,7 +599,7 @@ class CApiInputValidator {
 
 			if (array_key_exists($field_name, $data)) {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
-				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
+				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error, $data)) {
 					return false;
 				}
 				if ($flags & API_DEPRECATED) {
