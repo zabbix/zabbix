@@ -1219,7 +1219,6 @@ abstract class CItemGeneral extends CApiService {
 							key($unresolved_master_itemids)
 					)));
 				}
-
 				$has_unresolved_masters = false;
 			}
 
@@ -1241,10 +1240,10 @@ abstract class CItemGeneral extends CApiService {
 						'master_itemid', _('cannot be empty')
 					));
 				}
-
 				$dependency_level = 0;
 				$item_masters = [];
 				$master_item = $item;
+				$hostid = $master_item['hostid'];
 
 				if (array_key_exists('itemid', $item)) {
 					$item_masters[$item['itemid']] = true;
@@ -1276,6 +1275,12 @@ abstract class CItemGeneral extends CApiService {
 						$unresolved_master_itemids[$master_itemid] = true;
 						$has_unresolved_masters = true;
 						break;
+					}
+
+					if ($hostid != $master_item['hostid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('hostid of dependent item and master item should match')
+						));
 					}
 
 					if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
