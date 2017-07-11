@@ -250,7 +250,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 
 						// Count problems occurred in linked elements.
 						foreach ($map['selements'] as $selement) {
-							if ($selement['available']) {
+							if ($selement['permission'] >= PERM_READ) {
 								$problems = $this->getElementProblems($selement, $problems_per_trigger, $sysmaps,
 									$submaps_relations, $map['severity_min'], $problems_counted, $triggers_per_hosts,
 									$triggers_per_host_groups
@@ -371,7 +371,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 					foreach ($maps_to_process as $sysmapid => $val) {
 						// Count problems in elements assigned to selements.
 						foreach ($sysmaps[$sysmapid]['selements'] as $submap_selement) {
-							if ($submap_selement['available']) {
+							if ($submap_selement['permission'] >= PERM_READ) {
 								$problems_in_submap = $this->getElementProblems($submap_selement, $problems_per_trigger,
 									$sysmaps, $submaps_relations, $sysmaps[$sysmapid]['severity_min'],
 									$problems_counted, $triggers_per_hosts, $triggers_per_host_groups

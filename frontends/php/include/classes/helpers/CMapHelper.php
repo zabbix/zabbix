@@ -123,6 +123,17 @@ class CMapHelper {
 			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
 		];
 
+		if ($sysmap['selements']) {
+			foreach ($sysmap['selements'] as &$selement) {
+				// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
+				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['permission'] < PERM_READ
+					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+					$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
+				}
+			}
+			unset($selement);
+		}
+
 		$areas = populateFromMapAreas($sysmap, $theme);
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
@@ -149,7 +160,7 @@ class CMapHelper {
 			unset($element['width'], $element['height']);
 
 			$element['icon'] = $icon;
-			if ($element['available']) {
+			if ($element['permission'] >= PERM_READ) {
 				$element['highlight'] = $highlights[$id];
 				$element['actions'] = $actions[$id];
 				$element['label'] = $labels[$id];
@@ -178,39 +189,44 @@ class CMapHelper {
 		}
 
 		foreach ($sysmap['links'] as &$link) {
-			$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
+			if ($link['permission'] >= PERM_READ) {
+				$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
 
-			if (empty($link['linktriggers'])) {
-				continue;
-			}
-
-			$drawtype = $link['drawtype'];
-			$color = $link['color'];
-			$linktriggers = $link['linktriggers'];
-			order_result($linktriggers, 'triggerid');
-			$max_severity = 0;
-			$triggers = [];
-
-			foreach ($linktriggers as $link_trigger) {
-				if ($link_trigger['triggerid'] == 0
-						|| !array_key_exists($link_trigger['triggerid'], $linktrigger_info)) {
+				if (empty($link['linktriggers'])) {
 					continue;
 				}
 
-				$id = $link_trigger['linktriggerid'];
+				$drawtype = $link['drawtype'];
+				$color = $link['color'];
+				$linktriggers = $link['linktriggers'];
+				order_result($linktriggers, 'triggerid');
+				$max_severity = 0;
+				$triggers = [];
 
-				$triggers[$id] = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
+				foreach ($linktriggers as $link_trigger) {
+					if ($link_trigger['triggerid'] == 0
+							|| !array_key_exists($link_trigger['triggerid'], $linktrigger_info)) {
+						continue;
+					}
 
-				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
-						&& $triggers[$id]['priority'] >= $max_severity) {
-					$drawtype = $triggers[$id]['drawtype'];
-					$color = $triggers[$id]['color'];
-					$max_severity = $triggers[$id]['priority'];
+					$id = $link_trigger['linktriggerid'];
+
+					$triggers[$id] = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
+
+					if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
+							&& $triggers[$id]['priority'] >= $max_severity) {
+						$drawtype = $triggers[$id]['drawtype'];
+						$color = $triggers[$id]['color'];
+						$max_severity = $triggers[$id]['priority'];
+					}
 				}
-			}
 
-			$link['color'] = $color;
-			$link['drawtype'] = $drawtype;
+				$link['color'] = $color;
+				$link['drawtype'] = $drawtype;
+			}
+			else {
+				$link['label'] = '';
+			}
 		}
 		unset($link);
 	}

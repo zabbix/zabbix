@@ -181,7 +181,8 @@ class CMap extends CMapElement {
 			// }
 
 			$result[$sysmap['sysmapid']] = $sysmap;
-			$result[$sysmap['sysmapid']]['have_selements_available'] = false;
+			$result[$sysmap['sysmapid']]['permission'] = PERM_READ_WRITE;
+			$result[$sysmap['sysmapid']]['accessible_elements'] = 0;
 		}
 
 		// If Selements are not required, request only details needed to validate map permissions:
@@ -190,13 +191,17 @@ class CMap extends CMapElement {
 			$options['selectSelements'] = ['selementid', 'elements', 'elementtype'];
 			$remove_selements = true;
 		}
+		$remove_links = false;
+		if ($options['selectLinks'] === null) {
+			$options['selectLinks'] = ['sysmapid', 'linkid', 'linktriggers'];
+			$remove_links = true;
+		}
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 		}
 
-		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN
-			&& !$options['nopermissions']) {
+		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 				$hostgroupids_to_check = [];
 				$triggerids_to_check = [];
 				$sysmapids_to_check = [];
@@ -204,133 +209,250 @@ class CMap extends CMapElement {
 
 			foreach ($result as $sysmapid => &$sysmap) {
 				if ($sysmap['selements']) {
-
 					foreach ($sysmap['selements'] as &$selement) {
 						switch ($selement['elementtype']) {
 							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-								$selement['elementids'] = zbx_objectValues($selement['elements'], 'groupid');
-								$hostgroupids_to_check = array_merge($hostgroupids_to_check, $selement['elementids']);
+								$selement['elmids'] = zbx_objectValues($selement['elements'], 'groupid');
+								$hostgroupids_to_check = array_merge($hostgroupids_to_check, $selement['elmids']);
 								break;
 							case SYSMAP_ELEMENT_TYPE_HOST:
-								$selement['elementids'] = zbx_objectValues($selement['elements'], 'hostid');
-								$hostids_to_check = array_merge($hostids_to_check, $selement['elementids']);
+								$selement['elmids'] = zbx_objectValues($selement['elements'], 'hostid');
+								$hostids_to_check = array_merge($hostids_to_check, $selement['elmids']);
 								break;
 							case SYSMAP_ELEMENT_TYPE_TRIGGER:
-								$selement['elementids'] = zbx_objectValues($selement['elements'], 'triggerid');
-								$triggerids_to_check = array_merge($triggerids_to_check, $selement['elementids']);
+								$selement['elmids'] = zbx_objectValues($selement['elements'], 'triggerid');
+								$triggerids_to_check = array_merge($triggerids_to_check, $selement['elmids']);
 								break;
 							case SYSMAP_ELEMENT_TYPE_MAP:
-								$selement['elementids'] = zbx_objectValues($selement['elements'], 'sysmapid');
-								$sysmapids_to_check = array_merge($sysmapids_to_check, $selement['elementids']);
+								$selement['elmids'] = zbx_objectValues($selement['elements'], 'sysmapid');
+								$sysmapids_to_check = array_merge($sysmapids_to_check, $selement['elmids']);
 								break;
 						}
 					}
+
 					unset($selement);
+				}
+
+				if (array_key_exists('links', $sysmap) && $sysmap['links']) {
+					foreach ($sysmap['links'] as &$links) {
+						if ($links['linktriggers']) {
+							$links['triggerids'] = zbx_objectValues($links['linktriggers'], 'triggerid');
+							$triggerids_to_check = array_merge($triggerids_to_check, $links['triggerids']);
+						}
+					}
+
+					unset($links);
+				}
+
+				// Grant permissions to access map if map has no elements with possibility to limit permissions.
+				if (!$sysmap['selements'] && (!array_key_exists('links', $sysmap) || !$sysmap['links'])) {
+					$sysmap['accessible_elements'] = 1;
 				}
 			}
 			unset($sysmap);
 
 			if ($hostgroupids_to_check) {
-				$db_hostgroups = API::HostGroup()->get([
+				$hostgroupids_to_check = array_keys(array_flip($hostgroupids_to_check));
+
+				$db_hostgrps_r = API::HostGroup()->get([
 					'output' => [],
-					'groupids' => array_keys(array_flip($hostgroupids_to_check)),
+					'groupids' => $hostgroupids_to_check,
 					'preservekeys' => true
 				]);
-				$db_hostgroups = array_keys($db_hostgroups);
+				$db_hostgrps_r = array_keys($db_hostgrps_r);
+
+				$db_hostgrps_rw = API::HostGroup()->get([
+					'output' => [],
+					'groupids' => $hostgroupids_to_check,
+					'preservekeys' => true,
+					'editable' => true
+				]);
+				$db_hostgrps_rw = array_keys($db_hostgrps_rw);
 			}
 
 			if ($hostids_to_check) {
-				$db_hosts = API::Host()->get([
+				$hostids_to_check = array_keys(array_flip($hostids_to_check));
+
+				$db_hosts_r = API::Host()->get([
 					'output' => [],
-					'hostids' => array_keys(array_flip($hostids_to_check)),
+					'hostids' => $hostids_to_check,
 					'preservekeys' => true
 				]);
-				$db_hosts = array_keys($db_hosts);
+				$db_hosts_r = array_keys($db_hosts_r);
+
+				$db_hosts_rw = API::Host()->get([
+					'output' => [],
+					'hostids' => $hostids_to_check,
+					'preservekeys' => true,
+					'editable' => true
+				]);
+				$db_hosts_rw = array_keys($db_hosts_rw);
 			}
 
 			if ($triggerids_to_check) {
-				$db_triggers = API::Trigger()->get([
+				$triggerids_to_check = array_keys(array_flip($triggerids_to_check));
+
+				$db_triggers_r = API::Trigger()->get([
 					'output' => [],
-					'triggerids' => array_keys(array_flip($triggerids_to_check)),
+					'triggerids' => $triggerids_to_check,
 					'preservekeys' => true
 				]);
-				$db_triggers = array_keys($db_triggers);
+				$db_triggers_r = array_keys($db_triggers_r);
+
+				$db_triggers_rw = API::Trigger()->get([
+					'output' => [],
+					'triggerids' => $triggerids_to_check,
+					'preservekeys' => true,
+					'editable' => true
+				]);
+				$db_triggers_rw = array_keys($db_triggers_rw);
 			}
 
 			if ($sysmapids_to_check) {
-				$db_sysmaps = $this->get([
+				$sysmapids_to_check = array_keys(array_flip($sysmapids_to_check));
+
+				$db_sysmaps_r = $this->get([
 					'output' => [],
-					'sysmapids' => array_keys(array_flip($sysmapids_to_check)),
+					'sysmapids' => $sysmapids_to_check,
 					'preservekeys' => true
 				]);
-				$db_sysmaps = array_keys($db_sysmaps);
+				$db_sysmaps_r = array_keys($db_sysmaps_r);
+
+				$db_sysmaps_rw = $this->get([
+					'output' => [],
+					'sysmapids' => $sysmapids_to_check,
+					'preservekeys' => true,
+					'editable' => true
+				]);
+				$db_sysmaps_rw = array_keys($db_sysmaps_rw);
 			}
 
 			foreach ($result as $sysmapid => &$sysmap) {
 				if ($sysmap['selements']) {
-					foreach ($sysmap['selements'] as &$selement) {
-						$available = false;
+					foreach ($sysmap['selements'] as &$sel) {
+						$permission = PERM_NONE;
 
-						switch ($selement['elementtype']) {
+						switch ($sel['elementtype']) {
 							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-								if (array_intersect($db_hostgroups, $selement['elementids'])) {
-									$available = true;
+								if (!array_diff($sel['elmids'], array_intersect($db_hostgrps_rw, $sel['elmids']))) {
+									$permission = PERM_READ_WRITE;
+								}
+								elseif (!array_diff($sel['elmids'], array_intersect($db_hostgrps_r, $sel['elmids']))) {
+									$permission = PERM_READ;
 								}
 								break;
-								case SYSMAP_ELEMENT_TYPE_HOST:
-									if (array_intersect($db_hosts, $selement['elementids'])) {
-										$available = true;
-									}
-									break;
+							case SYSMAP_ELEMENT_TYPE_HOST:
+								if (!array_diff($sel['elmids'], array_intersect($db_hosts_rw, $sel['elmids']))) {
+									$permission = PERM_READ_WRITE;
+								}
+								elseif (!array_diff($sel['elmids'], array_intersect($db_hosts_r, $sel['elmids']))) {
+									$permission = PERM_READ;
+								}
+								break;
 							case SYSMAP_ELEMENT_TYPE_TRIGGER:
-								if (array_intersect($db_triggers, $selement['elementids'])) {
-									$available = true;
+								if (!array_diff($sel['elmids'], array_intersect($db_triggers_rw, $sel['elmids']))) {
+									$permission = PERM_READ_WRITE;
+								}
+								elseif (!array_diff($sel['elmids'], array_intersect($db_triggers_r, $sel['elmids']))) {
+									$permission = PERM_READ;
 								}
 								break;
 							case SYSMAP_ELEMENT_TYPE_MAP:
-								if (array_intersect($db_sysmaps, $selement['elementids'])) {
-									$available = true;
+								if (!array_diff($sel['elmids'], array_intersect($db_sysmaps_rw, $sel['elmids']))) {
+									$permission = PERM_READ_WRITE;
+								}
+								elseif (!array_diff($sel['elmids'], array_intersect($db_sysmaps_r, $sel['elmids']))) {
+									$permission = PERM_READ;
 								}
 								break;
-							default:
-								$available = true;
+							case SYSMAP_ELEMENT_TYPE_IMAGE:
+								$permission = ($user_data['type'] == USER_TYPE_SUPER_ADMIN)
+									? PERM_READ_WRITE
+									: PERM_READ;
 								break;
 						}
 
-						unset($selement['elementids']);
-						$selement['available'] = $available;
-						if ($available) {
-							$sysmap['have_selements_available'] = true;
+						unset($sel['elmids']);
+						$sel['permission'] = $permission;
+
+						if ($permission >= PERM_READ) {
+							$sysmap['accessible_elements']++;
+						}
+
+						if ($sysmap['permission'] > $permission) {
+							$sysmap['permission'] = $permission;
 						}
 					}
-					unset($selement);
+					unset($sel);
+				}
+
+				if (array_key_exists('links', $sysmap) && $sysmap['links']) {
+					foreach ($sysmap['links'] as &$lnk) {
+						$permission = PERM_NONE;
+
+						if (!array_diff($lnk['triggerids'], array_intersect($db_triggers_rw, $lnk['triggerids']))) {
+							$permission = PERM_READ_WRITE;
+						}
+						elseif (!array_diff($lnk['triggerids'], array_intersect($db_triggers_r, $lnk['triggerids']))) {
+							$permission = PERM_READ;
+						}
+
+						unset($lnk['triggerids']);
+						$lnk['permission'] = $permission;
+
+						if ($permission >= PERM_READ) {
+							$sysmap['accessible_elements']++;
+						}
+
+						if ($sysmap['permission'] > $permission) {
+							$sysmap['permission'] = $permission;
+						}
+					}
+					unset($lnk);
 				}
 			}
+
 			unset($sysmap);
 		}
 		elseif ($result) {
 			foreach ($result as $sysmapid => &$sysmap) {
+				if (array_key_exists('links', $sysmap)) {
+					foreach ($sysmap['links'] as &$link) {
+						$link['permission'] = PERM_READ_WRITE;
+					}
+				}
 				foreach ($sysmap['selements'] as &$selement) {
-					$selement['available'] = true;
+					$selement['permission'] = PERM_READ_WRITE;
 				}
 			}
-			unset($sysmap, $selement);
+			unset($sysmap, $selement, $link);
 		}
 
 		foreach ($result as $sysmap_key => $sysmap) {
-			if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN
-				&& !$options['nopermissions']) {
-
-				if (!$sysmap['selements'] || !$sysmap['have_selements_available']) {
-					unset($result[$sysmap_key]);
-					continue;
-				}
-				elseif ($remove_selements) {
-					unset($result[$sysmap_key]['selements']);
-				}
+			if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']
+					&& !$sysmap['accessible_elements']) {
+				unset($result[$sysmap_key]);
+				continue;
 			}
 
-			unset($result[$sysmap_key]['have_selements_available']);
+			if ($remove_selements) {
+				unset($result[$sysmap_key]['selements']);
+			}
+
+			if ($remove_links) {
+				unset($result[$sysmap_key]['links']);
+			}
+
+			/*
+			 * At this point editable means that all elemenets must be at least visible (user has permissions to
+			 * read or read-write). This does not cancel previous conditions.
+			 */
+			if ($options['editable'] && PERM_READ > $sysmap['permission']) {
+				unset($result[$sysmap_key]);
+				continue;
+			}
+
+			unset($result[$sysmap_key]['accessible_elements'], $result[$sysmap_key]['permission']);
 		}
 
 		if ($count_output) {
