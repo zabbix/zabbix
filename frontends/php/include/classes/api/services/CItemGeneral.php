@@ -1182,6 +1182,7 @@ abstract class CItemGeneral extends CApiService {
 		$items_added = [];
 		$items_moved = [];
 		$items_created = [];
+		$db_items = [];
 
 		$processed_items = [];
 		$unresolved_master_itemids = [];
@@ -1189,12 +1190,13 @@ abstract class CItemGeneral extends CApiService {
 
 		if ($items_cache) {
 			$db_items = $data_provider->get([
-				'output' => ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
-				'itemids' => array_keys($items_cache)
+				'output' 		=> ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
+				'itemids' 		=> array_keys($items_cache),
+				'preservekeys'	=> true
 			]);
 
-			foreach ($db_items as $db_item) {
-				$items_cache[$db_item['itemid']] = $items_cache[$db_item['itemid']] + $db_item;
+			foreach ($db_items as $db_itemid => $db_item) {
+				$items_cache[$db_itemid] = $items_cache[$db_itemid] + $db_item;
 			}
 		}
 
@@ -1227,12 +1229,11 @@ abstract class CItemGeneral extends CApiService {
 					continue;
 				}
 
+				if (array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $items_cache)) {
+					$item = $item + $items_cache[$item['itemid']];
+				}
+
 				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-					if (array_key_exists('master_itemid', $item)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('field can be set only for items of type ITEM_TYPE_DEPENDENT')
-						));
-					}
 					continue;
 				}
 				else if (!array_key_exists('master_itemid', $item) || !$item['master_itemid']) {

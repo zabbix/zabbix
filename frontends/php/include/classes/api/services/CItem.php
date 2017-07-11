@@ -409,12 +409,13 @@ class CItem extends CItemGeneral {
 
 		parent::checkInput($items);
 		self::validateInventoryLinks($items);
-		$this->validateDependentItems($items, API::Item());
 
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+			unset($item['itemid']);
 		}
 		unset($item);
+		$this->validateDependentItems($items, API::Item());
 
 		$this->createReal($items);
 		$this->inherit($items);
@@ -486,9 +487,6 @@ class CItem extends CItemGeneral {
 		$itemids = [];
 		$data = [];
 		foreach ($items as $item) {
-			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-				$item['master_itemid'] = null;
-			}
 			unset($item['flags']); // flags cannot be changed
 			$data[] = ['values' => $item, 'where' => ['itemid' => $item['itemid']]];
 			$itemids[] = $item['itemid'];
@@ -546,16 +544,6 @@ class CItem extends CItemGeneral {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-
-		foreach ($items as &$item) {
-			if (!array_key_exists($item['itemid'], $dbItems)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
-					'Item "%1$s" does not exist or you have no access to this item.', $item['itemid']
-				));
-			}
-			$item = $item + $dbItems[(int) $item['itemid']];
-		}
-		unset($item);
 
 		parent::checkInput($items, true);
 		self::validateInventoryLinks($items, true);

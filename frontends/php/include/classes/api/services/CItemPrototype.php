@@ -340,6 +340,10 @@ class CItemPrototype extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
+
+		foreach ($items as &$item) {
+			unset($item['itemid']);
+		}
 		$this->validateDependentItems($items, API::ItemPrototype());
 		$this->createReal($items);
 		$this->inherit($items);
@@ -707,22 +711,6 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
-
-		$dbItems = $this->get([
-			'output' => ['itemid', 'flags', 'type', 'hostid', 'master_itemid', 'name'],
-			'itemids' => zbx_objectValues($items, 'itemid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($items as &$item) {
-			if (!array_key_exists($item['itemid'], $dbItems)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
-					'Item "%1$s" does not exist or you have no access to this item.', $item['itemid']
-				));
-			}
-			$item = $item + $dbItems[$item['itemid']];
-		}
 		$this->checkInput($items, true);
 		$this->validateDependentItems($items, API::ItemPrototype());
 		$this->updateReal($items);
