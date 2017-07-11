@@ -1490,7 +1490,6 @@ function quoteItemKeyParam($param, $forced = false) {
 	return '"'.str_replace('"', '\\"', $param).'"';
 }
 
-
 /**
  * Expands items name and for dependent items master item name.
  *

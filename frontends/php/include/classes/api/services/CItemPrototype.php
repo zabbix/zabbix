@@ -345,6 +345,7 @@ class CItemPrototype extends CItemGeneral {
 			unset($item['itemid']);
 		}
 		$this->validateDependentItems($items, API::ItemPrototype());
+
 		$this->createReal($items);
 		$this->inherit($items);
 

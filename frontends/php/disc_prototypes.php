@@ -449,6 +449,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_item['preprocessing'] !== $preprocessing) {
 				$item['preprocessing'] = $preprocessing;
 			}
+
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
@@ -535,10 +536,11 @@ if (isset($_REQUEST['form'])) {
 		}
 		unset($step);
 		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
-			$itemPrototype['master_item'] = API::ItemPrototype()->get([
+			$master_prototypes = API::ItemPrototype()->get([
 				'itemids'	=> $itemPrototype['master_itemid'],
 				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
-			])[0];
+			]);
+			$itemPrototype['master_item'] = reset($master_prototypes);
 		}
 	}
 	elseif (getRequest('master_itemid') && getRequest('parent_discoveryid')) {
@@ -548,11 +550,12 @@ if (isset($_REQUEST['form'])) {
 			'editable' => true
 		]);
 		if ($discovery_rule) {
-			$itemPrototype['master_item'] = API::ItemPrototype()->get([
+			$master_prototypes = API::ItemPrototype()->get([
 				'itemids' => getRequest('master_itemid'),
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
 				'filter' => ['hostid' => $discovery_rule[0]['hostid']]
-			])[0];
+			]);
+			$itemPrototype['master_item'] = reset($master_prototypes);
 		}
 	}
 

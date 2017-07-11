@@ -1169,10 +1169,11 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		}
 		unset($step);
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-			$item['master_item'] = API::Item()->get([
+			$master_items = API::Item()->get([
 				'itemids'	=> $item['master_itemid'],
 				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
-			])[0];
+			]);
+			$item['master_item'] = reset($master_items);
 		}
 	}
 	else {
@@ -1184,11 +1185,12 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		$item = [];
 		$host = $hosts[0];
 		if ($host && getRequest('master_itemid')) {
-			$item['master_item'] = API::Item()->get([
+			$master_items = API::Item()->get([
 				'itemids' => getRequest('master_itemid'),
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
 				'filter' => ['hostid' => $host['hostid']]
-			])[0];
+			]);
+			$item['master_item'] = reset($master_items);
 		}
 	}
 

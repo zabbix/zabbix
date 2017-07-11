@@ -1278,7 +1278,7 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 
 	foreach ($items as $item) {
 		if ($excludeids && array_key_exists($item['itemid'], $excludeids)) {
-			// Exclude item from list. Is used by dependent item list to not allow set self as master item.
+			// Exclude item from list.
 			continue;
 		}
 
