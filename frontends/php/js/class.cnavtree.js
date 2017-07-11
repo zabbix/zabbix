@@ -1218,7 +1218,8 @@ jQuery(function($) {
 							switchToEditMode();
 						}
 						else {
-							if (options['initial_load'] && widget_data['fields']['map_widget_reference'].length) {
+							if (typeof widget_data['fields']['map_widget_reference'] !== 'undefined'
+								&& widget_data['fields']['map_widget_reference'].length && options['initial_load']) {
 								$('.dashbrd-grid-widget-container').dashboardGrid('registerAsSharedDataReceiver', {
 									uniqueid: widget_data['uniqueid'],
 									source_widget_reference: widget_data['fields']['map_widget_reference'],

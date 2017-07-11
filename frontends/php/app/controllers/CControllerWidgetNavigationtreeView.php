@@ -370,32 +370,38 @@ class CControllerWidgetNavigationtreeView extends CController {
 					// Count problems in each of selected submap.
 					foreach ($maps_to_process as $sysmapid => $val) {
 						// Count problems in elements assigned to selements.
-						foreach ($sysmaps[$sysmapid]['selements'] as $submap_selement) {
-							if ($submap_selement['permission'] >= PERM_READ) {
-								$problems_in_submap = $this->getElementProblems($submap_selement, $problems_per_trigger,
-									$sysmaps, $submaps_relations, $sysmaps[$sysmapid]['severity_min'],
-									$problems_counted, $triggers_per_hosts, $triggers_per_host_groups
-								);
+						if (array_key_exists($sysmapid, $sysmaps)) {
+							foreach ($sysmaps[$sysmapid]['selements'] as $submap_selement) {
+								if ($submap_selement['permission'] >= PERM_READ) {
+									$problems_in_submap = $this->getElementProblems($submap_selement, $problems_per_trigger,
+										$sysmaps, $submaps_relations, $sysmaps[$sysmapid]['severity_min'],
+										$problems_counted, $triggers_per_hosts, $triggers_per_host_groups
+									);
 
-								if (is_array($problems_in_submap)) {
-									$problems = array_map(function () {
-										return array_sum(func_get_args());
-									}, $problems, $problems_in_submap);
+									if (is_array($problems_in_submap)) {
+										$problems = array_map(function () {
+											return array_sum(func_get_args());
+										}, $problems, $problems_in_submap);
+									}
 								}
 							}
 						}
 
 						// Count problems in triggers assigned to linked.
-						foreach ($sysmaps[$sysmapid]['links'] as $link) {
-							foreach ($link['linktriggers'] as $lt) {
-								if (!array_key_exists($lt['triggerid'], $problems_counted)) {
-									$problems_counted[$lt['triggerid']] = true;
-									$add_problems = $problems_per_trigger[$lt['triggerid']];
+						if (array_key_exists($sysmapid, $sysmaps)) {
+							foreach ($sysmaps[$sysmapid]['links'] as $link) {
+								if ($link['permission'] >= PERM_READ) {
+									foreach ($link['linktriggers'] as $lt) {
+										if (!array_key_exists($lt['triggerid'], $problems_counted)) {
+											$problems_counted[$lt['triggerid']] = true;
+											$add_problems = $problems_per_trigger[$lt['triggerid']];
 
-									// Sum problems.
-									$problems = array_map(function() {
-										return array_sum(func_get_args());
-									}, $add_problems, $problems);
+											// Sum problems.
+											$problems = array_map(function() {
+												return array_sum(func_get_args());
+											}, $add_problems, $problems);
+										}
+									}
 								}
 							}
 						}

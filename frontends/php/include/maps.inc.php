@@ -270,8 +270,8 @@ function get_map_elements($db_element, &$elements) {
 function add_elementNames(&$selements) {
 	$hostids = [];
 	$triggerids = [];
-	$mapids = [];
-	$hostgroupids = [];
+	$sysmapids = [];
+	$groupids = [];
 	$imageids = [];
 
 	foreach ($selements as $selement) {
@@ -281,7 +281,7 @@ function add_elementNames(&$selements) {
 					$hostids[$selement['elements'][0]['hostid']] = $selement['elements'][0]['hostid'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_MAP:
-					$mapids[$selement['elements'][0]['sysmapid']] = $selement['elements'][0]['sysmapid'];
+					$sysmapids[$selement['elements'][0]['sysmapid']] = $selement['elements'][0]['sysmapid'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
 					foreach ($selement['elements'] as $element) {
@@ -289,7 +289,7 @@ function add_elementNames(&$selements) {
 					}
 					break;
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$hostgroupids[$selement['elements'][0]['groupid']] = $selement['elements'][0]['groupid'];
+					$groupids[$selement['elements'][0]['groupid']] = $selement['elements'][0]['groupid'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
 					$imageids[$selement['iconid_off']] = $selement['iconid_off'];
@@ -312,9 +312,9 @@ function add_elementNames(&$selements) {
 		]);
 	}
 
-	if ($mapids) {
+	if ($sysmapids) {
 		$maps = API::Map()->get([
-			'mapids' => $mapids,
+			'mapids' => $sysmapids,
 			'output' => ['name'],
 			'preservekeys' => true
 		]);
@@ -330,9 +330,9 @@ function add_elementNames(&$selements) {
 		$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 	}
 
-	if ($hostgroupids) {
+	if ($groupids) {
 		$hostgroups = API::HostGroup()->get([
-			'hostgroupids' => $hostgroupids,
+			'hostgroupids' => $groupids,
 			'output' => ['name'],
 			'preservekeys' => true
 		]);
@@ -353,10 +353,12 @@ function add_elementNames(&$selements) {
 					$selements[$snum]['elements'][0]['elementName']
 						= $hosts[$selement['elements'][0]['hostid']]['name'];
 					break;
+
 				case SYSMAP_ELEMENT_TYPE_MAP:
 					$selements[$snum]['elements'][0]['elementName']
 						= $maps[$selement['elements'][0]['sysmapid']]['name'];
 					break;
+
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
 					foreach ($selement['elements'] as &$element) {
 						$trigger = $triggers[$element['triggerid']];
@@ -366,12 +368,14 @@ function add_elementNames(&$selements) {
 					}
 					unset($element);
 					break;
+
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 					$selements[$snum]['elements'][0]['elementName']
 						= $hostgroups[$selement['elements'][0]['groupid']]['name'];
 					break;
+
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
-					if (isset($images[$selement['iconid_off']]['name'])) {
+					if (array_key_exists($selement['iconid_off'], $images)) {
 						$selements[$snum]['elements'][0]['elementName'] = $images[$selement['iconid_off']]['name'];
 					}
 					break;
