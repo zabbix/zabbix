@@ -431,7 +431,8 @@ static void	DCdump_simpleitem(const ZBX_DC_SIMPLEITEM *simpleitem)
 
 static void	DCdump_jmxitem(const ZBX_DC_JMXITEM *jmxitem)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "  jmx:[username:'%s' password:'%s']", jmxitem->username, jmxitem->password);
+	zabbix_log(LOG_LEVEL_TRACE, "  jmx:[username:'%s' password:'%s' endpoint:'%s']",
+			jmxitem->username, jmxitem->password, jmxitem->jmx_endpoint);
 }
 
 static void	DCdump_calcitem(const ZBX_DC_CALCITEM *calcitem)

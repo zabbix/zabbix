@@ -1015,7 +1015,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				if (delta_x != 0 || delta_y != 0) {
-					cmap.dragGroupRecalculate(cmap, delta_x, delta_y);
+					cmap.dragGroupRecalculate(cmap, Math.round(delta_x), Math.round(delta_y));
 					cmap.updateImage();
 				}
 			},
@@ -1895,7 +1895,8 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// if 'fit to map' area coords are 0 always
-				if (this.data.elementsubtype === '1' && this.data.areatype === '0') {
+				if (this.data.elementsubtype === '1' && this.data.areatype === '0'
+						&& this.data.elementtype === '3') {
 					newX = 0;
 					newY = 0;
 				}

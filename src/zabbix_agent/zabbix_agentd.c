@@ -208,7 +208,6 @@ int	CONFIG_SNMPTRAPPER_FORKS	= 0;
 int	CONFIG_JAVAPOLLER_FORKS		= 0;
 int	CONFIG_ESCALATOR_FORKS		= 0;
 int	CONFIG_SELFMON_FORKS		= 0;
-int	CONFIG_WATCHDOG_FORKS		= 0;
 int	CONFIG_DATASENDER_FORKS		= 0;
 int	CONFIG_HEARTBEAT_FORKS		= 0;
 int	CONFIG_PROXYPOLLER_FORKS	= 0;
@@ -220,6 +219,7 @@ int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive che
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 0;
 int	CONFIG_IPMIMANAGER_FORKS	= 0;
+int	CONFIG_ALERTMANAGER_FORKS	= 0;
 
 char	*opt = NULL;
 
@@ -736,7 +736,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
 			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
-			PARM_OPT,	1,			4000},
+			PARM_OPT,	1,			1000},
 		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,

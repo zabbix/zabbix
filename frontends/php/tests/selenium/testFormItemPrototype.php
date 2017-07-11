@@ -763,7 +763,8 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		if ($type == 'JMX agent' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'jmx[<object name>,<attribute name>]');
+			$this->zbxTestAssertElementValue('key', '');
+			$this->zbxTestAssertElementNotPresentXpath("//button[@id='keyButton'][@disabled]");
 		}
 
 		if ($type == 'SNMPv3 agent') {
@@ -2227,9 +2228,9 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
-					'error_msg' => 'Cannot add item prototype',
+					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+							'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			]
@@ -2535,6 +2536,29 @@ class testFormItemPrototype extends CWebTest {
 					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
+			// Structured data
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item XML XPath',
+					'key' => 'item-empty-xpath',
+					'preprocessing' => [
+						['type' => 'XML XPath', 'params' => ''],
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item JSON Path',
+					'key' => 'item-empty-jsonpath',
+					'preprocessing' => [
+						['type' => 'JSON Path', 'params' => ''],
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
 			// Regular expression
 			[
 				[
@@ -2633,6 +2657,8 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Right trim', 'params' => '1a!@#$%^&*()-='],
 						['type' => 'Left trim', 'params' => '2b!@#$%^&*()-='],
 						['type' => 'Trim', 'params' => '3c!@#$%^&*()-='],
+						['type' => 'XML XPath', 'params' => '3c!@#$%^&*()-='],
+						['type' => 'JSON Path', 'params' => '3c!@#$%^&*()-='],
 						['type' => 'Custom multiplier', 'params' => '4e+10'],
 						['type' => 'Regular expression', 'params' => '5d!@#$%^&*()-=', 'output' => '6e!@#$%^&*()-=']
 					]
@@ -2650,6 +2676,10 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Left trim', 'params' => 'def'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
+						['type' => 'XML XPath', 'params' => '1a2b3c'],
+						['type' => 'XML XPath', 'params' => '1a2b3c'],
+						['type' => 'JSON Path', 'params' => '1a2b3c'],
+						['type' => 'JSON Path', 'params' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'params' => '123'],
 						['type' => 'Custom multiplier', 'params' => '123'],
 						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
@@ -2722,6 +2752,8 @@ class testFormItemPrototype extends CWebTest {
 						case 'Right trim':
 						case 'Left trim ':
 						case 'Trim':
+						case 'XML XPath':
+						case 'JSON Path':
 							$this->assertEquals($options['params'], $dbParams[$key]);
 							break;
 						case 'Regular expression':
