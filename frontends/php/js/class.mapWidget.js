@@ -50,7 +50,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 				}
 			}
 
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'sysmapid',
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'current_sysmapid',
 				submapid);
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'previous_maps',
 				previous_maps);
