@@ -235,10 +235,8 @@ class CMap extends CMapElement {
 
 				if (array_key_exists('links', $sysmap) && $sysmap['links']) {
 					foreach ($sysmap['links'] as &$links) {
-						if ($links['linktriggers']) {
-							$links['triggerids'] = zbx_objectValues($links['linktriggers'], 'triggerid');
-							$triggerids_to_check = array_merge($triggerids_to_check, $links['triggerids']);
-						}
+						$links['triggerids'] = zbx_objectValues($links['linktriggers'], 'triggerid');
+						$triggerids_to_check = array_merge($triggerids_to_check, $links['triggerids']);
 					}
 
 					unset($links);
