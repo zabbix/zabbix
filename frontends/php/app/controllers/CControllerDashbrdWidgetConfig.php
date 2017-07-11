@@ -93,8 +93,8 @@ class CControllerDashbrdWidgetConfig extends CController {
 				if (!array_key_exists($field->getResourceType(), $captions)) {
 					$captions[$field->getResourceType()] = [];
 				}
-				if ($field->getValue(true)) {
-					$captions[$field->getResourceType()][$field->getValue(true)] = true;
+				if ($field->getValue()) {
+					$captions[$field->getResourceType()][$field->getValue()] = true;
 				}
 			}
 		}
@@ -145,7 +145,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 				$field_name = $field->getName();
 				$captions['groups'][$field_name] = [];
 
-				foreach ($field->getValue(true) as $groupid) {
+				foreach ($field->getValue() as $groupid) {
 					$groupids[$groupid][] = $field_name;
 				}
 			}
@@ -153,7 +153,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 				$field_name = $field->getName();
 				$captions['hosts'][$field_name] = [];
 
-				foreach ($field->getValue(true) as $hostid) {
+				foreach ($field->getValue() as $hostid) {
 					$hostids[$hostid][] = $field_name;
 				}
 			}

@@ -55,6 +55,7 @@
 				'min-width': '' + data['options']['widget-width'] + '%'
 			}
 		})
+			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 			.append(
 				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
 					.append(widget['content_header'])
@@ -149,6 +150,7 @@
 
 	function startWidgetPositioning($div, data) {
 		data['placeholder'].show();
+		$('.dashbrd-grid-widget-mask', $div).show();
 
 		$div.addClass('dashbrd-grid-widget-draggable');
 
@@ -248,6 +250,7 @@
 		var	widget = getWidgetByTarget(data['widgets'], $div);
 
 		data['placeholder'].hide();
+		$('.dashbrd-grid-widget-mask', $div).hide();
 
 		$div.removeClass('dashbrd-grid-widget-draggable');
 
@@ -404,13 +407,19 @@
 		}
 
 		var url = new Curl('zabbix.php'),
-			ajax_data = {};
+			ajax_data;
 
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
-		ajax_data['fullscreen'] = data['options']['fullscreen'];
-		ajax_data['widgetid'] = widget['widgetid'];
-		ajax_data['uniqueid'] = widget['uniqueid'];
+		ajax_data = {
+			'fullscreen': data['options']['fullscreen'],
+			'widgetid': widget['widgetid'],
+			'uniqueid': widget['uniqueid'],
+			'initial_load': widget['initial_load'],
+			'edit_mode': data['options']['edit_mode']
+		}
+		widget['initial_load'] = false;
+
 		if (widget['header'] !== '') {
 			ajax_data['name'] = widget['header'];
 		}
@@ -552,7 +561,10 @@
 					}
 					else {
 						// In case of EDIT widget
-						widget['type'] = type;
+						if (widget['type'] !== type) {
+							widget['type'] = type;
+							widget['initial_load'] = true;
+						}
 						widget['header'] = name;
 						widget['fields'] = fields;
 					}
@@ -921,6 +933,7 @@
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
+				'initial_load': true,
 				'fields': {}
 			}, widget);
 
@@ -1169,10 +1182,10 @@
 
 				for (var i = 0, l = data['widgets'].length; l > i; i++) {
 					if (data['widgets'][i]['uniqueid'] == obj.uniqueid) {
-						if (typeof data['widgets'][i]['listenFor'] === 'undefined') {
-							data['widgets'][i]['listenFor'] = [];
+						if (typeof data['widgets'][i]['listen_for'] === 'undefined') {
+							data['widgets'][i]['listen_for'] = [];
 						}
-						data['widgets'][i]['listenFor'].push(obj);
+						data['widgets'][i]['listen_for'].push(obj);
 					}
 				}
 			});
@@ -1194,10 +1207,10 @@
 							data = $this.data('dashboardGrid');
 
 					for (var i = 0, l = data['widgets'].length; l > i; i++) {
-						if (typeof(data['widgets'][i]['listenFor']) != 'undefined') {
-							for (var t = 0, j = data['widgets'][i]['listenFor'].length; j > t; t++) {
-								if (data['widgets'][i]['listenFor'][t]['sourceWidgetReference'] === reference) {
-									data['widgets'][i]['listenFor'][t].callback.apply(this, [data['widgets'][i], args]);
+						if (typeof(data['widgets'][i]['listen_for']) != 'undefined') {
+							for (var t = 0, j = data['widgets'][i]['listen_for'].length; j > t; t++) {
+								if (data['widgets'][i]['listen_for'][t]['source_widget_reference'] === reference) {
+									data['widgets'][i]['listen_for'][t].callback.apply(this, [data['widgets'][i], args]);
 								}
 							}
 						}

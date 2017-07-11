@@ -20,10 +20,15 @@
 
 class CWidgetFieldSeverities extends CWidgetField
 {
-	public function __construct($name, $label, array $default) {
-		parent::__construct($name, $label, $default);
+	public function __construct($name, $label) {
+		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
+		$this->setDefault([]);
+		$this->setValidationRules(['type' => API_INTS32]);
+		$this->setExValidationRules(
+			['in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))
+		]);
 	}
 
 	public function setValue($value) {

@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CUrlWidgetForm extends CWidgetForm
-{
+class CUrlWidgetForm extends CWidgetForm {
+
 	public function __construct($data) {
 		parent::__construct($data);
 
@@ -31,9 +31,9 @@ class CUrlWidgetForm extends CWidgetForm
 		$this->fields[] = $field_url;
 
 		// Dynamic item
-		$field_dynamic = new CWidgetFieldCheckBox('dynamic', _('Dynamic item'));
+		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 		if (array_key_exists('dynamic', $data)) {
-			$field_dynamic->setValue($data['dynamic']);
+			$field_dynamic->setValue((int) $data['dynamic']);
 		}
 		$this->fields[] = $field_dynamic;
 	}

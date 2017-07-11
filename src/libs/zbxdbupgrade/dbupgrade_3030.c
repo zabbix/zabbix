@@ -1855,8 +1855,6 @@ static int	DBpatch_3030154(void)
 					{"value_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"value_graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"value_sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"value_dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"value_widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{0}
 				},
 				NULL
@@ -1897,71 +1895,47 @@ static int	DBpatch_3030160(void)
 
 static int	DBpatch_3030161(void)
 {
-	return DBcreate_index("widget_field", "widget_field_7", "value_dashboardid", 0);
-}
-
-static int	DBpatch_3030162(void)
-{
-	return DBcreate_index("widget_field", "widget_field_8", "value_widgetid", 0);
-}
-
-static int	DBpatch_3030163(void)
-{
 	const ZBX_FIELD	field = {"widgetid", NULL, "widget", "widgetid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 1, &field);
 }
 
-static int	DBpatch_3030164(void)
+static int	DBpatch_3030162(void)
 {
 	const ZBX_FIELD	field = {"value_groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 2, &field);
 }
 
-static int	DBpatch_3030165(void)
+static int	DBpatch_3030163(void)
 {
 	const ZBX_FIELD	field = {"value_hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 3, &field);
 }
 
-static int	DBpatch_3030166(void)
+static int	DBpatch_3030164(void)
 {
 	const ZBX_FIELD	field = {"value_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 4, &field);
 }
 
-static int	DBpatch_3030167(void)
+static int	DBpatch_3030165(void)
 {
 	const ZBX_FIELD	field = {"value_graphid", NULL, "graphs", "graphid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 5, &field);
 }
 
-static int	DBpatch_3030168(void)
+static int	DBpatch_3030166(void)
 {
 	const ZBX_FIELD	field = {"value_sysmapid", NULL, "sysmaps", "sysmapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 6, &field);
 }
 
-static int	DBpatch_3030169(void)
-{
-	const ZBX_FIELD	field = {"value_dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("widget_field", 7, &field);
-}
-
-static int	DBpatch_3030170(void)
-{
-	const ZBX_FIELD	field = {"value_widgetid", NULL, "widget", "widgetid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("widget_field", 8, &field);
-}
-
-static int	DBpatch_3030171(void)
+static int	DBpatch_3030167(void)
 {
 	zbx_db_insert_t	db_insert;
 	int		ret;
@@ -1976,7 +1950,7 @@ static int	DBpatch_3030171(void)
 	return ret;
 }
 
-static int	DBpatch_3030172(void)
+static int	DBpatch_3030168(void)
 {
 	int		i;
 	const char	*columns = "widgetid,dashboardid,type,name,row,col,height,width";
@@ -2175,9 +2149,5 @@ DBPATCH_ADD(3030165, 0, 1)
 DBPATCH_ADD(3030166, 0, 1)
 DBPATCH_ADD(3030167, 0, 1)
 DBPATCH_ADD(3030168, 0, 1)
-DBPATCH_ADD(3030169, 0, 1)
-DBPATCH_ADD(3030170, 0, 1)
-DBPATCH_ADD(3030171, 0, 1)
-DBPATCH_ADD(3030172, 0, 1)
 
 DBPATCH_END()

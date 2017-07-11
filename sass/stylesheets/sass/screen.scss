@@ -2650,6 +2650,15 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
+.dashbrd-grid-widget-mask {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	z-index: 80;
+	display: none;
+}
+
 .dashbrd-grid-widget-draggable {
 	border-color: $action-border-color !important;
 	border-bottom-color: darken($action-border-color, 1%) !important;

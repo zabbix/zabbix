@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerWidgetSysmapView extends CController {
 
+	private $form;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -29,42 +31,31 @@ class CControllerWidgetSysmapView extends CController {
 	protected function checkInput() {
 		// TODO VM: delete comment. Removed widgetid, becuase it is no longer used, after introduction of uniqueid.
 		$fields = [
-			'name'			=> 'string',
-			'uniqueid'		=> 'required',
-			'fullscreen'	=> 'in 0,1',
-			'fields'		=> 'array'
+			'name' =>		'string',
+			'uniqueid' =>	'required',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array',
+			'storage' =>	'array' // TODO VM: implement for previous_maps
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$input_fields = $this->getRequest('fields');
+			/*
+			 * @var array  $fields
+			 * @var int    $fields['source_type']              (optional)
+			 * @var string $fields['filter_widget_reference']  (optional)
+			 * @var string $fields['sysmapid']                 (optional)
+			 * @var array  $storage
+			 * @var string $storage['previous_maps']
+			 */
+			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields', []));
 
-			$validationRules = [
-				'source_type' => 'fatal|required|in '.WIDGET_SYSMAP_SOURCETYPE_MAP.','.WIDGET_SYSMAP_SOURCETYPE_FILTER,
-				'previous_maps' =>	'string',
-			];
-
-			if (array_key_exists('source_type', $input_fields)) {
-				if ($input_fields['source_type'] == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
-					$validationRules['filter_widget_reference'] = 'string';
-					$validationRules['sysmapid'] = 'db sysmaps.sysmapid';
-				}
-				else {
-					$validationRules['sysmapid'] = 'required|db sysmaps.sysmapid';
-				}
-
-				$validator = new CNewValidator($input_fields, $validationRules);
-
-				$errors = $validator->getAllErrors();
-				if ($errors) {
-					$ret = false;
-
-					foreach ($validator->getAllErrors() as $error) {
-						info($error);
-					}
-				}
+			if ($errors = $this->form->validate()) {
+				$ret = false;
 			}
+
+			// TODO VM: implement validation for previous_maps in storage
 		}
 
 		if (!$ret) {
@@ -85,37 +76,18 @@ class CControllerWidgetSysmapView extends CController {
 	}
 
 	protected function doAction() {
-		$data = [];
-
-		// Default values
-		$default = [
-			'source_type' => WIDGET_SYSMAP_SOURCETYPE_MAP,
-			'filter_widget_reference' => ''
-		];
-
-		if ($this->hasInput('fields')) {
-			// Use configured data, if possible
-			$data = $this->getInput('fields');
-		}
-
-		// Apply defualt value for data
-		foreach ($default as $key => $value) {
-			if (!array_key_exists($key, $data)) {
-				$data[$key] = $value;
-			}
-		}
-
-		$input_fields = getRequest('fields');
+		$fields = $this->form->getFieldsData();
+		$storage = $this->getInput('storage', []);
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
-			'previous_maps' => array_key_exists('previous_maps', $input_fields) ? $input_fields['previous_maps'] : '',
+			'previous_maps' => array_key_exists('previous_maps', $storage) ? $storage['previous_maps'] : '',
 			'fullscreen' => getRequest('fullscreen', 0),
 			'uniqueid' => getRequest('uniqueid'),
-			'fields' => $data
+			'fields' => $fields,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		]));
 	}
 }

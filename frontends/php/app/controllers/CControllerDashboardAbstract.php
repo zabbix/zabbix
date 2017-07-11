@@ -21,14 +21,13 @@
 
 /**
  * abstract class to keep common dashboard controller logic
- *
  */
 abstract class CControllerDashboardAbstract extends CController {
 
 	/**
 	 * Prepare editable flag.
 	 *
-	 * @param array  $dashboards
+	 * @param array $dashboards  An associative array of the dashboards.
 	 */
 	protected function prepareEditableFlag(array &$dashboards)
 	{
@@ -39,8 +38,8 @@ abstract class CControllerDashboardAbstract extends CController {
 			'preservekeys' => true
 		]);
 
-		foreach ($dashboards as &$dashboard) {
-			$dashboard['editable'] = array_key_exists($dashboard['dashboardid'], $dashboards_rw);
+		foreach ($dashboards as $dashboardid => &$dashboard) {
+			$dashboard['editable'] = array_key_exists($dashboardid, $dashboards_rw);
 		}
 		unset($dashboard);
 	}

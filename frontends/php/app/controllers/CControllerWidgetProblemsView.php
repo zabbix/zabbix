@@ -32,22 +32,30 @@ class CControllerWidgetProblemsView extends CController {
 		$fields = [
 			'name'			=> 'string',
 			'fullscreen'	=> 'in 0,1',
-			'fields'		=> 'required|array'
+			'fields'		=> 'array'
 		];
 
 		$ret = $this->validateInput($fields);
-		/*
-		 * @var array        $fields
-		 * @var array|string $fields['groupids']          (optional)
-		 * @var array|string $fields['exclude_groupids']  (optional)
-		 * @var array|string $fields['hostids']           (optional)
-		 * @var string       $fields['problem']           (optional)
-		 * @var array        $fields['severities']        (optional)
-		 * @var int          $fields['maintenance']       (optional)
-		 * @var int          $fields['unacknowledged']    (optional)
-		 * @var int          $fields['sort_triggers']     (optional)
-		 * @var int          $fields['show_lines']        (optional) BETWEEN 1,100
-		 */
+
+		if ($ret) {
+			/*
+			 * @var array        $fields
+			 * @var array|string $fields['groupids']          (optional)
+			 * @var array|string $fields['exclude_groupids']  (optional)
+			 * @var array|string $fields['hostids']           (optional)
+			 * @var string       $fields['problem']           (optional)
+			 * @var array        $fields['severities']        (optional)
+			 * @var int          $fields['maintenance']       (optional)
+			 * @var int          $fields['unacknowledged']    (optional)
+			 * @var int          $fields['sort_triggers']     (optional)
+			 * @var int          $fields['show_lines']        (optional) BETWEEN 1,100
+			 */
+			$this->form = CWidgetConfig::getForm(WIDGET_PROBLEMS, $this->getInput('fields', []));
+
+			if ($errors = $this->form->validate()) {
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			// TODO VM: prepare propper response for case of incorrect fields
@@ -62,18 +70,7 @@ class CControllerWidgetProblemsView extends CController {
 	}
 
 	protected function doAction() {
-		$fields = $this->getInput('fields') + [
-			'show' => TRIGGERS_OPTION_IN_PROBLEM,
-			'groupids' => [],
-			'exclude_groupids' => [],
-			'hostids' => [],
-			'problem' => '',
-			'severities' => [],
-			'maintenance' => '1',
-			'unacknowledged' => '0',
-			'sort_triggers' => SCREEN_SORT_TRIGGERS_TIME_DESC,
-			'show_lines' => ZBX_DEFAULT_WIDGET_LINES
-		];
+		$fields = $this->form->getFieldsData();
 
 		$config = select_config();
 

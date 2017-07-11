@@ -19,11 +19,12 @@
 **/
 
 class CNavigationWidgetForm extends CWidgetForm {
+
 	public function __construct($data) {
 		parent::__construct($data);
 
-		// widget reference field
-		$field_reference = (new CWidgetFieldReference())->setRequired(true);
+		// Widget reference field.
+		$field_reference = new CWidgetFieldReference();
 		if (array_key_exists($field_reference->getName(), $data)) {
 			$field_reference->setValue($data[$field_reference->getName()]);
 		}
@@ -37,44 +38,31 @@ class CNavigationWidgetForm extends CWidgetForm {
 				$item_id = $field_details[1];
 
 				// map.name.#
-				$this->fields[] = (new CWidgetFieldHidden($field_key, null, ZBX_WIDGET_FIELD_TYPE_STR))
-					->setRequired(true)
+				$this->fields[] = (new CWidgetFieldHidden($field_key, ZBX_WIDGET_FIELD_TYPE_STR))
 					->setValue($value);
 
 				// map.parent.#
-				$field_parent = (new CWidgetFieldHidden('map.parent.'.$item_id, null, ZBX_WIDGET_FIELD_TYPE_INT32))
-					->setRequired(true);
+				$field_parent = (new CWidgetFieldHidden('map.parent.'.$item_id, ZBX_WIDGET_FIELD_TYPE_INT32))
+					->setDefault(0);
 				if (array_key_exists('map.parent.'.$item_id, $data)) {
-					$field_parent->setValue((int)$data['map.parent.'.$item_id]);
+					$field_parent->setValue((int) $data['map.parent.'.$item_id]);
 				}
 				$this->fields[] = $field_parent;
 
 				// map.order.#
-				$field_order = (new CWidgetFieldHidden('map.order.'.$item_id, null, ZBX_WIDGET_FIELD_TYPE_INT32))
-					->setRequired(true);
+				$field_order = new CWidgetFieldHidden('map.order.'.$item_id, ZBX_WIDGET_FIELD_TYPE_INT32);
 				if (array_key_exists('map.order.'.$item_id, $data)) {
-					$field_order->setValue((int)$data['map.order.'.$item_id]);
+					$field_order->setValue((int) $data['map.order.'.$item_id]);
 				}
 				$this->fields[] = $field_order;
 
 				// mapid.#
-				$field_mapid = (new CWidgetFieldHidden('mapid.'.$item_id, null, ZBX_WIDGET_FIELD_TYPE_MAP));
+				$field_mapid = new CWidgetFieldHidden('mapid.'.$item_id, ZBX_WIDGET_FIELD_TYPE_MAP);
 				if (array_key_exists('mapid.'.$item_id, $data) && $data['mapid.'.$item_id]) {
 					$field_mapid->setValue($data['mapid.'.$item_id]);
 				}
 				$this->fields[] = $field_mapid;
 			}
 		}
-	}
-
-	public function validate() {
-		$errors = [];
-
-		foreach ($this->fields as $field) {
-			// Validate each field seperately
-			$errors = array_merge($errors, $field->validate());
-		}
-
-		return $errors;
 	}
 }

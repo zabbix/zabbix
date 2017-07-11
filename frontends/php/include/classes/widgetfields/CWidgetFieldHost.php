@@ -18,19 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldHost extends CWidgetField
-{
+class CWidgetFieldHost extends CWidgetField {
+
 	/**
 	 * Create widget field for Item selection
 	 *
 	 * @param string      $name     field name in form
 	 * @param string      $label    label for the field in form
-	 * @param string|null $default  default host id value
 	 */
-	public function __construct($name, $label, $default = null) {
-		parent::__construct($name, $label, $default);
+	public function __construct($name, $label) {
+		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
+		$this->setDefault([]);
 	}
 
 	public function setValue($value) {
