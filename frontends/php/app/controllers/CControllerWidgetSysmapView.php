@@ -104,7 +104,8 @@ class CControllerWidgetSysmapView extends CController {
 			'fullscreen' => $this->getInput('fullscreen', 0)
 		];
 
-		$sysmapid = array_key_exists('current_sysmapid', $storage) ? $storage['current_sysmapid'] : null;
+		$sysmapid = array_key_exists('current_sysmapid', $storage) ? $storage['current_sysmapid']
+			: (array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null);
 		$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
 
 		if ($sysmapid === null) {
