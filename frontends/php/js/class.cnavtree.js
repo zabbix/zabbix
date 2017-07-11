@@ -685,6 +685,10 @@ jQuery(function($) {
 					item_clases += ' root-item';
 				}
 
+				if (isEditMode() && item.mapid == 0) {
+					item_clases += ' no-map';
+				}
+
 				if (typeof item.children !== 'undefined' && widget_data.max_depth > depth) {
 					if (item.children.length) {
 						item_clases += ' is-parent';

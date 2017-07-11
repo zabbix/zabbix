@@ -4614,6 +4614,7 @@ tr.cursor-move {
 				}
 			}
 
+			&.no-map,
 			&.inaccessible {
 				> .tree-row {
 					> .content {
