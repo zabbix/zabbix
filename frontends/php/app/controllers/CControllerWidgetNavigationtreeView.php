@@ -66,8 +66,10 @@ class CControllerWidgetNavigationtreeView extends CController {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function getNumberOfProblemsBySysmap(array $sysmapids = []) {
+	protected function getNumberOfProblemsBySysmap(array $navtree_items = []) {
 		$response = [];
+		$sysmapids = array_keys(array_flip(zbx_objectValues($navtree_items, 'mapid')));
+
 		$sysmaps = API::Map()->get([
 			'sysmapids' => $sysmapids,
 			'preservekeys' => true,
@@ -77,7 +79,6 @@ class CControllerWidgetNavigationtreeView extends CController {
 		]);
 
 		if ($sysmaps) {
-			$navtree_sysmapids = array_keys($sysmaps);
 			$triggers_per_hosts = [];
 			$triggers_per_host_groups = [];
 			$problems_per_trigger = [];
@@ -231,45 +232,59 @@ class CControllerWidgetNavigationtreeView extends CController {
 			}
 
 			// Count problems in each submap included in navigation tree:
-			foreach ($navtree_sysmapids as $sysmapids) {
-				$map = $sysmaps[$sysmapids];
-				$response[$map['sysmapid']] = $this->problems_per_severity_tpl;
-				$problems_counted = [];
-
-				foreach ($map['selements'] as $selement) {
-					if ($selement['available']) {
-						$problems = $this->getElementProblems($selement, $problems_per_trigger, $sysmaps,
-							$submaps_relations, $map['severity_min'], $problems_counted, $triggers_per_hosts,
-							$triggers_per_host_groups
-						);
-
-						if (is_array($problems)) {
-							$response[$map['sysmapid']] = array_map(function () {
-								return array_sum(func_get_args());
-							}, $response[$map['sysmapid']], $problems);
-						}
-					}
+			foreach ($navtree_items as $itemid => $item_details) {
+				$maps_need_to_count_in = $item_details['children_mapids'];
+				if ($item_details['mapid']) {
+					$maps_need_to_count_in[] = $item_details['mapid'];
 				}
 
-				foreach ($map['links'] as $link) {
-					foreach ($link['linktriggers'] as $lt) {
-						if (!array_key_exists($lt['triggerid'], $problems_counted)) {
-							$problems_to_add = $problems_per_trigger[$lt['triggerid']];
-							$problems_counted[$lt['triggerid']] = true;
+				$maps_need_to_count_in = array_keys(array_flip($maps_need_to_count_in));
 
-							// Remove problems which are less important than map's min-severity.
-							if ($map['severity_min'] > 0) {
-								foreach ($problems_to_add as $sev => $probl) {
-									if ($map['severity_min'] > $sev) {
-										$problems_to_add[$sev] = 0;
-									}
+				$response[$itemid] = $this->problems_per_severity_tpl;
+				$problems_counted = [];
+
+				foreach ($maps_need_to_count_in as $mapid) {
+					if (array_key_exists($mapid, $sysmaps)) {
+						$map = $sysmaps[$mapid];
+
+						// Count problems occurred in linked elements.
+						foreach ($map['selements'] as $selement) {
+							if ($selement['available']) {
+								$problems = $this->getElementProblems($selement, $problems_per_trigger, $sysmaps,
+									$submaps_relations, $map['severity_min'], $problems_counted, $triggers_per_hosts,
+									$triggers_per_host_groups
+								);
+
+								if (is_array($problems)) {
+									$response[$itemid] = array_map(function () {
+										return array_sum(func_get_args());
+									}, $response[$itemid], $problems);
 								}
 							}
+						}
 
-							// Sum problems.
-							$response[$map['sysmapid']] = array_map(function() {
-								return array_sum(func_get_args());
-							}, $problems_to_add, $response[$map['sysmapid']]);
+						// Count problems occurred in triggers which are related to links.
+						foreach ($map['links'] as $link) {
+							foreach ($link['linktriggers'] as $lt) {
+								if (!array_key_exists($lt['triggerid'], $problems_counted)) {
+									$problems_to_add = $problems_per_trigger[$lt['triggerid']];
+									$problems_counted[$lt['triggerid']] = true;
+
+									// Remove problems which are less important than map's min-severity.
+									if ($map['severity_min'] > 0) {
+										foreach ($problems_to_add as $sev => $probl) {
+											if ($map['severity_min'] > $sev) {
+												$problems_to_add[$sev] = 0;
+											}
+										}
+									}
+
+									// Sum problems.
+									$response[$itemid] = array_map(function() {
+										return array_sum(func_get_args());
+									}, $problems_to_add, $response[$itemid]);
+								}
+							}
 						}
 					}
 				}
@@ -405,23 +420,40 @@ class CControllerWidgetNavigationtreeView extends CController {
 		$error = null;
 
 		// Get list of sysmapids.
-		$sysmapids = [];
+		$navtree_items = [];
 		foreach ($fields as $field_key => $field_value) {
 			if (is_numeric($field_value)) {
-				preg_match('/^mapid\.\d+$/', $field_key, $field_details);
+				preg_match('/^map\.parent\.(\d+)$/', $field_key, $field_details);
 				if ($field_details) {
-					$sysmapids[] = $field_value;
+					$fieldid = $field_details[1];
+					$navtree_items[$fieldid] = [
+						'parent' => $field_value,
+						'mapid' => array_key_exists('mapid.'.$fieldid, $fields) ? $fields['mapid.'.$fieldid] : 0,
+						'children_mapids' => []
+					];
 				}
 			}
-			unset($fields[$field_key]);
+		}
+
+		// Propagate item mapids to all its parent items.
+		foreach ($navtree_items as $field_details) {
+			$parentid = $field_details['parent'];
+			if ($field_details['parent'] != 0 && array_key_exists($parentid, $navtree_items)) {
+				while (array_key_exists($parentid, $navtree_items)) {
+					if ($field_details['mapid'] != 0) {
+						$navtree_items[$parentid]['children_mapids'][] = $field_details['mapid'];
+					}
+					$parentid = $navtree_items[$parentid]['parent'];
+				}
+			}
 		}
 
 		// Get severity levels and colors and select list of sysmapids to count problems per maps.
-		$sysmapids = array_keys(array_flip($sysmapids));
 		$this->problems_per_severity_tpl = [];
 		$config = select_config();
 		$severity_config = [];
 
+		$sysmapids = array_keys(array_flip(zbx_objectValues($navtree_items, 'mapid')));
 		$maps_accessible = API::Map()->get([
 			'output' => ['sysmapid'],
 			'sysmapids' => $sysmapids,
@@ -456,7 +488,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 			'uniqueid' => $this->getInput('uniqueid'),
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,
-			'problems' => $this->getNumberOfProblemsBySysmap($sysmapids),
+			'problems' => $this->getNumberOfProblemsBySysmap($navtree_items),
 			'maps_accessible' => $maps_accessible,
 			'severity_config' => $severity_config,
 			'initial_load' => $this->getInput('initial_load', 0),

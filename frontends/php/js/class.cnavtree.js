@@ -476,32 +476,10 @@ jQuery(function($) {
 					return false;
 				}
 
-				$.each(widget_data.problems, function(map) {
-					if (typeof widget_data.problems[map] === 'object') {
-						$.each(widget_data.problems[map], function(sev, numb) {
-							if (numb) {
-								$('.tree-item[data-mapid='+map+']').attr('data-problems'+sev, numb);
-							}
-						});
-					}
-				});
-
-				$('.tree-item', $this).each(function() {
-					var id = $(this).data('id'),
-						obj = $(this);
-
-					$.each(widget_data.severity_levels, function(sev, conf) {
-						var sum = 0;
-						if (typeof obj.data('problems'+sev) !== 'undefined') {
-							sum += +obj.data('problems'+sev);
-						}
-
-						$('[data-problems'+sev+']', obj).each(function() {
-							sum += +$(this).data('problems'+sev);
-						});
-
-						if (sum) {
-							obj.attr('data-problems'+sev, sum);
+				$.each(widget_data.problems, function(itemid, problems) {
+					$.each(problems, function(sev, numb) {
+						if (numb) {
+							$('.tree-item[data-id='+itemid+']').attr('data-problems'+sev, numb);
 						}
 					});
 				});
