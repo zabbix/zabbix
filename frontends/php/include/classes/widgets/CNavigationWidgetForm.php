@@ -30,6 +30,14 @@ class CNavigationWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_reference;
 
+		// map widget reference
+		$field_map_widget = (new CWidgetFieldWidgetListComboBox('map_widget_reference', _('Map'), 'type', 'sysmap'));
+		if (array_key_exists('map_widget_reference', $data)) {
+			$field_map_widget->setValue($data['map_widget_reference']);
+		}
+
+		$this->fields[] = $field_map_widget;
+
 		// Register dynamically created item fields.
 		foreach ($data as $field_key => $value) {
 			preg_match('/^map\.name\.(\d+)$/', $field_key, $field_details);
@@ -57,11 +65,12 @@ class CNavigationWidgetForm extends CWidgetForm {
 				$this->fields[] = $field_order;
 
 				// mapid.#
-				$field_mapid = new CWidgetFieldHidden('mapid.'.$item_id, ZBX_WIDGET_FIELD_TYPE_MAP);
+				// TODO VM: make defualt value 0
 				if (array_key_exists('mapid.'.$item_id, $data) && $data['mapid.'.$item_id]) {
-					$field_mapid->setValue($data['mapid.'.$item_id]);
+					$field_mapid = (new CWidgetFieldHidden('mapid.'.$item_id, ZBX_WIDGET_FIELD_TYPE_MAP))
+						->setValue($data['mapid.'.$item_id]);
+					$this->fields[] = $field_mapid;
 				}
-				$this->fields[] = $field_mapid;
 			}
 		}
 	}

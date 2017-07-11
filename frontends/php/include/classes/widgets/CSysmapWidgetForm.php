@@ -23,6 +23,13 @@ class CSysmapWidgetForm extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data);
 
+		// widget reference field
+		$field_reference = (new CWidgetFieldReference());
+		if (array_key_exists($field_reference->getName(), $data)) {
+			$field_reference->setValue($data[$field_reference->getName()]);
+		}
+		$this->fields[] = $field_reference;
+
 		// select source type field
 		$source_types = [
 			WIDGET_SYSMAP_SOURCETYPE_MAP => _('Map'),
@@ -49,12 +56,14 @@ class CSysmapWidgetForm extends CWidgetForm {
 
 			$this->fields[] = $field_filter_widget;
 		}
+		else {
+			// select sysmap field
+			$field_map = new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP);
 
-		// select sysmap field
-		$field_map = new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP);
-		if (array_key_exists('sysmapid', $data)) {
-			$field_map->setValue($data['sysmapid']);
+			if (array_key_exists('sysmapid', $data)) {
+				$field_map->setValue($data['sysmapid']);
+			}
+			$this->fields[] = $field_map;
 		}
-		$this->fields[] = $field_map;
 	}
 }

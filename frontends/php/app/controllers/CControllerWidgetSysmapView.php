@@ -21,7 +21,6 @@
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerWidgetSysmapView extends CController {
-
 	private $form;
 
 	protected function init() {
@@ -29,13 +28,14 @@ class CControllerWidgetSysmapView extends CController {
 	}
 
 	protected function checkInput() {
-		// TODO VM: delete comment. Removed widgetid, becuase it is no longer used, after introduction of uniqueid.
 		$fields = [
-			'name' =>		'string',
-			'uniqueid' =>	'required',
-			'fullscreen' =>	'in 0,1',
-			'fields' =>		'array',
-			'storage' =>	'array' // TODO VM: implement for previous_maps
+			'name' =>			'string',
+			'uniqueid' =>		'required|string',
+			'edit_mode' =>		'in 0,1',
+			'initial_load' =>	'in 0,1',
+			'fullscreen' =>		'in 0,1',
+			'fields' =>			'array',
+			'storage' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,6 +47,7 @@ class CControllerWidgetSysmapView extends CController {
 			 * @var string $fields['filter_widget_reference']  (optional)
 			 * @var string $fields['sysmapid']                 (optional)
 			 * @var array  $storage
+			 * @var string $storage['current_sysmapid']
 			 * @var string $storage['previous_maps']
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields', []));
@@ -55,7 +56,7 @@ class CControllerWidgetSysmapView extends CController {
 				$ret = false;
 			}
 
-			// TODO VM: implement validation for previous_maps in storage
+			// TODO VM: implement validation for previous_maps and current_sysmapid in storage
 		}
 
 		if (!$ret) {
@@ -78,13 +79,74 @@ class CControllerWidgetSysmapView extends CController {
 	protected function doAction() {
 		$fields = $this->form->getFieldsData();
 		$storage = $this->getInput('storage', []);
+		$uniqueid = $this->getInput('uniqueid');
+		$edit_mode = $this->getInput('edit_mode', 0);
+		$initial_load = $this->getInput('initial_load', 1);
+		$error = null;
 
+		// Get previous map.
+		$previous_map = null;
+		if (array_key_exists('previous_maps', $storage)) {
+			$previous_map = array_filter(explode(',', $storage['previous_maps']), 'is_numeric');
+
+			if ($previous_map) {
+				$previous_map = API::Map()->get([
+					'sysmapids' => [array_pop($previous_map)],
+					'output' => ['sysmapid', 'name']
+				]);
+
+				$previous_map = reset($previous_map);
+			}
+		}
+
+		// Get requested map.
+		$options = [
+			'fullscreen' => $this->getInput('fullscreen', 0)
+		];
+
+		$sysmapid = array_key_exists('current_sysmapid', $storage) ? $storage['current_sysmapid'] : null;
+		$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
+
+		if ($sysmapid === null) {
+			$error = _('No map selected.');
+		}
+		elseif ($sysmap_data['id'] < 0) {
+			$error = _('No permissions to selected map or it does not exist.');
+		}
+
+		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
+		foreach ($sysmap_data['elements'] as &$element) {
+			if ($edit_mode) {
+				$element['actions'] = json_encode([]);
+			}
+			else {
+				$actions = json_decode($element['actions'], true);
+				if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
+					$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
+					$actions['navigatetos']['submap']['widget_uniqueid'] = $uniqueid;
+					unset($actions['gotos']['submap']);
+				}
+
+				$element['actions'] = json_encode($actions);
+			}
+		}
+		unset($element);
+
+		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
-			'previous_maps' => array_key_exists('previous_maps', $storage) ? $storage['previous_maps'] : '',
-			'fullscreen' => getRequest('fullscreen', 0),
-			'uniqueid' => getRequest('uniqueid'),
-			'fields' => $fields,
+			'sysmap_data' => $sysmap_data,
+			'widget_settings' => [
+				'current_sysmapid' => $sysmapid,
+				'filter_widget_reference' => array_key_exists('filter_widget_reference', $fields)
+					? $fields['filter_widget_reference']
+					: null,
+				'source_type' => $fields['source_type'],
+				'previous_map' => $previous_map,
+				'initial_load' => $initial_load,
+				'uniqueid' => $uniqueid,
+				'error' => $error
+			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

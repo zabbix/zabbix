@@ -703,7 +703,8 @@ SVGMapElement.prototype.updateImage = function() {
 
 	if (typeof this.options.icon !== 'undefined') {
 		var href = this.map.getImageUrl(this.options.icon);
-		if (this.options.available === false) {
+		// 2 - PERM_READ
+		if (2 > this.options.permission) {
 			href += '&unavailable=1';
 		}
 

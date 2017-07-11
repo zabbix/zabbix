@@ -77,22 +77,47 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 			}
 		}
 
-		if ($map_mapid && $add_submaps == 1) {
-			$db_mapselements = DBselect(
-				'SELECT DISTINCT se.elementid'.
-				' FROM sysmaps_elements se'.
-				' WHERE se.elementtype = '.SYSMAP_ELEMENT_TYPE_MAP.' AND se.sysmapid = '.$map_mapid
-			);
+		$maps_relations = [];
 
-			$sub_mapsids = [];
-			while ($db_mapelement = DBfetch($db_mapselements)) {
-				$sub_mapsids[] = $db_mapelement['elementid'];
+		if ($map_mapid && $add_submaps == 1) {
+			// Recursively select submaps.
+			$maps_found = [$map_mapid];
+			$maps_resolved = [];
+
+			while ($diff = array_diff($maps_found, $maps_resolved)) {
+				$submaps = API::Map()->get([
+					'sysmapids' => $diff,
+					'preservekeys' => true,
+					'output' => ['sysmapid'],
+					'selectSelements' => ['elements', 'elementtype']
+				]);
+
+				foreach ($submaps as $submap) {
+					$maps_resolved[] = $submap['sysmapid'];
+
+					foreach ($submap['selements'] as $selement) {
+						if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+							$element = reset($selement['elements']);
+							if ($element) {
+								$maps_relations[$submap['sysmapid']][] = $element['sysmapid'];
+								$maps_found[] = $element['sysmapid'];
+							}
+						}
+					}
+				}
 			}
 
+			// Get names and ids of all submaps.
 			$submaps = API::Map()->get([
 				'output' => ['sysmapid', 'name'],
-				'sysmapids' => $sub_mapsids
+				'sysmapids' => array_keys(array_flip($maps_found)),
+				'preservekeys' => true,
 			]);
+
+			foreach ($submaps as &$submap) {
+				unset($submap['selements']);
+			}
+			unset($submap);
 		}
 
 		// prepare output
@@ -100,6 +125,7 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 			'map_name' => $map_item_name,
 			'map_mapid' => $map_mapid,
 			'map_id' => $mapid,
+			'hierarchy' => $maps_relations,
 			'submaps' => $submaps
 		];
 
