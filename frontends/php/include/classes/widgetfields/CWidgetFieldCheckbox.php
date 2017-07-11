@@ -23,19 +23,17 @@ class CWidgetFieldCheckbox extends CWidgetField {
 	/**
 	 * Check box widget field.
 	 *
-	 * @param string $name  field name in form
-	 * @param string $label  label for the field in form
+	 * @param string $name   Field name in form.
+	 * @param string $label  Label for the field in form.
 	 */
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
+
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 		$this->setDefault(0);
 	}
 
 	public function setValue($value) {
-		// Only values in this array will be considered as true, any other value will be considered as false.
-		$true_values = [true,1,'1'];
-		$value = (in_array($value, $true_values)) ? 1 : 0;
-		return parent::setValue($value);
+		return parent::setValue((int) $value);
 	}
 }

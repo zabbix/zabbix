@@ -24,7 +24,7 @@ class CUrlWidgetForm extends CWidgetForm {
 		parent::__construct($data);
 
 		// URL field
-		$field_url = (new CWidgetFieldTextBox('url', _('URL')))->setDefault('');
+		$field_url = new CWidgetFieldTextBox('url', _('URL'));
 		if (array_key_exists('url', $data)) {
 			$field_url->setValue($data['url']);
 		}

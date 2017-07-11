@@ -39,10 +39,11 @@ class CControllerWidgetClockView extends CController {
 			/*
 			 * @var array  $fields
 			 * @var int    $fields['time_type']
-			 * @var id     $fields['itemid']
+			 * @var string $fields['itemid']
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_CLOCK, $this->getInput('fields', []));
-			if (!empty($errors = $this->form->validate())) {
+
+			if ($errors = $this->form->validate()) {
 				$ret = false;
 			}
 		}
@@ -61,7 +62,6 @@ class CControllerWidgetClockView extends CController {
 
 	protected function doAction() {
 		$fields = $this->form->getFieldsData();
-		$hostid = null; // TODO VM: probably will not be used at all
 
 		$time = null;
 		$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_CLOCK];
@@ -71,22 +71,10 @@ class CControllerWidgetClockView extends CController {
 
 		switch ($fields['time_type']) {
 			case TIME_TYPE_HOST:
-				if ($fields['itemid'] === null) {
-					$error = _('No data');
-					break;
-				}
-
-				$itemid = $fields['itemid'];
-
-				if (!empty($hostid)) {
-					$new_itemid = get_same_item_for_host($itemid, $hostid);
-					$itemid = !empty($new_itemid) ? $new_itemid : '';
-				}
-
 				$items = API::Item()->get([
 					'output' => ['itemid', 'value_type'],
 					'selectHosts' => ['name'],
-					'itemids' => [$itemid]
+					'itemids' => $fields['itemid']
 				]);
 
 				if ($items) {
@@ -135,16 +123,16 @@ class CControllerWidgetClockView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
+			'name' => $this->getInput('name', $name),
 			'clock' => [
 				'time' => $time,
 				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
 				'error' => $error
 			],
-			'name' => $this->getInput('name', $name)
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		]));
 	}
 }

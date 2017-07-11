@@ -28,7 +28,7 @@ class CWidgetForm {
 	}
 
 	/**
-	 * Return fields for this form
+	 * Return fields for this form.
 	 *
 	 * @return array  an array of CWidgetField
 	 */
@@ -37,7 +37,7 @@ class CWidgetForm {
 	}
 
 	/**
-	 * Returns widget fields data as array
+	 * Returns widget fields data as array.
 	 *
 	 * @return array  key/value pairs where key is field name and value is it's data
 	 */

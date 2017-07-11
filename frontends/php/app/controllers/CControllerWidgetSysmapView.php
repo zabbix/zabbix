@@ -29,13 +29,13 @@ class CControllerWidgetSysmapView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'			=>	'string',
-			'uniqueid'		=>	'required|string',
-			'edit_mode'		=>	'in 0,1',
-			'initial_load'	=>	'in 0,1',
-			'fullscreen'	=>	'in 0,1',
-			'fields'		=>	'array',
-			'storage'		=>	'array'
+			'name' =>			'string',
+			'uniqueid' =>		'required|string',
+			'edit_mode' =>		'in 0,1',
+			'initial_load' =>	'in 0,1',
+			'fullscreen' =>		'in 0,1',
+			'fields' =>			'array',
+			'storage' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -43,15 +43,16 @@ class CControllerWidgetSysmapView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
-			 * @var int    $fields['source_type']
-			 * @var string $fields['filter_widget_reference']
-			 * @var id     $fields['sysmapid']
+			 * @var int    $fields['source_type']              (optional)
+			 * @var string $fields['filter_widget_reference']  (optional)
+			 * @var string $fields['sysmapid']                 (optional)
 			 * @var array  $storage
 			 * @var string $storage['current_sysmapid']
 			 * @var string $storage['previous_maps']
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields', []));
-			if (!empty($errors = $this->form->validate())) {
+
+			if ($errors = $this->form->validate()) {
 				$ret = false;
 			}
 
@@ -134,9 +135,6 @@ class CControllerWidgetSysmapView extends CController {
 		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
 			'sysmap_data' => $sysmap_data,
 			'widget_settings' => [
 				'current_sysmapid' => $sysmapid,
@@ -148,6 +146,9 @@ class CControllerWidgetSysmapView extends CController {
 				'initial_load' => $initial_load,
 				'uniqueid' => $uniqueid,
 				'error' => $error
+			],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
 			]
 		]));
 	}

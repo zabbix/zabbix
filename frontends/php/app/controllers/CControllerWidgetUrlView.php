@@ -39,11 +39,12 @@ class CControllerWidgetUrlView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
-			 * @var string $fields['url']
-			 * @var int    $fields['dynamic']
+			 * @var string $fields['url']      (optional)
+			 * @var int    $fields['dynamic']  (optional)
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_URL, $this->getInput('fields', []));
-			if (!empty($errors = $this->form->validate())) {
+
+			if ($errors = $this->form->validate()) {
 				$ret = false;
 			}
 		}
@@ -83,12 +84,12 @@ class CControllerWidgetUrlView extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_URL]),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
 			'url' => [
 				'url' => $fields['url'],
 				'error' => $error
+			],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
 			]
 		]));
 	}

@@ -28,14 +28,14 @@ class CTrigOverviewWidgetForm extends CWidgetForm {
 	{
 		parent::__construct($data);
 
-		$field_groups = (new CWidgetFieldGroup('groupids', _('Host groups')))->setDefault(null);
+		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $data)) {
 			$field_groups->setValue($data['groupids']);
 		}
 		$this->fields[] = $field_groups;
 
-		$field_application = (new CWidgetFieldTextBox('application', _('Application')))->setDefault('');
+		$field_application = new CWidgetFieldTextBox('application', _('Application'));
 
 		if (array_key_exists('application', $data)) {
 			$field_application->setValue($data['application']);

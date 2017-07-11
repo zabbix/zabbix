@@ -20,48 +20,84 @@
 
 class CWidgetField {
 
-	protected $name;
-	protected $label;
-	protected $value;
-	protected $default;
-	protected $save_type;
-	protected $action;
-	protected $setup_type;
+	protected	$name;
+	protected	$label;
+	protected	$value;
+	protected	$default;
+	protected	$save_type;
+	protected	$action;
+	private		$validation_rules = [];
+	private		$ex_validation_rules = [];
 
 	/**
 	 * Create widget field (general)
 	 *
-	 * @param string $name   field name in form
-	 * @param string $label  label for the field in form
+	 * @param string $name   Field name in form.
+	 * @param string $label  Label for the field in form.
 	 */
 	public function __construct($name, $label = null) {
 		$this->name = $name;
 		$this->label = $label;
 		$this->value = null;
-		$this->save_type = ZBX_WIDGET_FIELD_TYPE_STR;
-		$this->setup_type = WIDGET_FIELDS_SETUP_TYPE_CONFIG;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
 	public function setValue($value) {
 		$this->value = $value;
+
 		return $this;
 	}
 
 	public function setDefault($value) {
 		$this->default = $value;
+
 		return $this;
 	}
 
 	/**
-	 * Set JS code that will be called on field change
+	 * Set JS code that will be called on field change.
 	 *
-	 * @param string $action  JS function to call on field change
+	 * @param string $action  JS function to call on field change.
 	 *
 	 * @return $this
 	 */
 	public function setAction($action) {
 		$this->action = $action;
+
 		return $this;
+	}
+
+	protected function setSaveType($save_type) {
+		switch ($save_type) {
+			case ZBX_WIDGET_FIELD_TYPE_INT32:
+				$this->validation_rules = ['type' => API_INT32];
+				break;
+
+			case ZBX_WIDGET_FIELD_TYPE_STR:
+				// TODO VM: (?) should we have define for this?
+				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
+				break;
+
+			case ZBX_WIDGET_FIELD_TYPE_GROUP:
+				$this->validation_rules = ['type' => API_IDS];
+				break;
+
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
+				$this->validation_rules = ['type' => API_ID];
+				break;
+
+			default:
+				exit(_('Internal error'));
+		}
+
+		$this->save_type = $save_type;
+
+		return $this;
+	}
+
+	protected function setExValidationRules(array $ex_validation_rules) {
+		$this->ex_validation_rules = $ex_validation_rules;
 	}
 
 	/**
@@ -92,27 +128,12 @@ class CWidgetField {
 	public function validate() {
 		$errors = [];
 
-		// Check based on save type
-		switch ($this->save_type) {
-			case ZBX_WIDGET_FIELD_TYPE_INT32:
-				if ($this->value < ZBX_MIN_INT32 && $this->value > ZBX_MAX_INT32) {
-					$errors[] = _s('Incorrect value "%1$s" for "%2$s" field.', $this->getLabel());
-				}
-				break;
-			case ZBX_WIDGET_FIELD_TYPE_STR:
-				// TODO VM: (?) should we have define for this?
-				if (mb_strlen($this->value) > 255) {
-					$errors[] = _s('Parameter "%1$s" should be shorter than %2$s characters.', $this->getLabel(), 255);
-				}
-				break;
-			case ZBX_WIDGET_FIELD_TYPE_GROUP:
-			case ZBX_WIDGET_FIELD_TYPE_ITEM:
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				// TODO VM: write validation for ID type
-				break;
+		$validation_rules = $this->validation_rules + $this->ex_validation_rules;
+		$value = $this->getValue();
+		$label = ($this->label === null) ? $this->name : $this->label;
 
-			default:
-				break;
+		if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
+			$errors[] = $error;
 		}
 
 		return $errors;
@@ -121,7 +142,7 @@ class CWidgetField {
 	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
 	 *
-	 * @return array  Array for widget fields ready for saving in API.
+	 * @return array  An array of widget fields ready for saving in API.
 	 */
 	public function toApi() {
 		$value = $this->getValue();
@@ -146,19 +167,5 @@ class CWidgetField {
 		}
 
 		return $widget_fields;
-	}
-
-	protected function setSaveType($save_type) {
-		$known_save_types = [
-			ZBX_WIDGET_FIELD_TYPE_INT32,
-			ZBX_WIDGET_FIELD_TYPE_STR,
-			ZBX_WIDGET_FIELD_TYPE_GROUP,
-			ZBX_WIDGET_FIELD_TYPE_ITEM,
-			ZBX_WIDGET_FIELD_TYPE_MAP
-		];
-
-		if (in_array($save_type, $known_save_types)) {
-			$this->save_type = $save_type;
-		}
 	}
 }
