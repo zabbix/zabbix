@@ -652,16 +652,16 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  *
  * @return CTableInfo
  */
-function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
+function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	// application filter
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
-			'groupids' => $groupids,
+			'groupids' => $groupids ? $groupids : null,
 			'search' => ['name' => $application],
 			'preservekeys' => true
 		]));
-		$groupids = null;
+		$groupids = [];
 	}
 	else {
 		$applicationids = null;
@@ -670,7 +670,7 @@ function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
 	$db_items = API::Item()->get([
 		'output' => ['itemid', 'hostid', 'key_', 'name', 'value_type', 'units', 'valuemapid'],
 		'selectHosts' => ['name'],
-		'groupids' => $groupids,
+		'groupids' => $groupids ? $groupids : null,
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'webitems' => true,
@@ -680,7 +680,7 @@ function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
 	$db_triggers = API::Trigger()->get([
 		'output' => ['triggerid', 'priority', 'value'],
 		'selectItems' => ['itemid'],
-		'groupids' => $groupids,
+		'groupids' => $groupids ? $groupids : null,
 		'applicationids' => $applicationids,
 		'monitored' => true
 	]);
@@ -720,7 +720,7 @@ function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
 	$hosts = API::Host()->get([
 		'output' => ['name', 'hostid', 'status'],
 		'monitored_hosts' => true,
-		'groupids' => $groupids,
+		'groupids' => $groupids ? $groupids : null,
 		'applicationids' => $applicationids,
 		'with_monitored_items' => true,
 		'preservekeys' => true,

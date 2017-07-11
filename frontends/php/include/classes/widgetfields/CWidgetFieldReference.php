@@ -30,11 +30,12 @@ class CWidgetFieldReference extends CWidgetField {
 		 * It is needed to make possible search if value is not taken by some other widget in same dashboard.
 		 */
 		parent::__construct('reference', null);
+
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
 	public function getJavascript($form_selector) {
-		return ''.
+		return
 			'var reference_field = jQuery("input[name=\"'.$this->getName().'\"]", "'.$form_selector.'");'.
 			'if (!reference_field.val().length) {'.
 				'var reference = jQuery(".dashbrd-grid-widget-container").dashboardGrid("makeReference");'.

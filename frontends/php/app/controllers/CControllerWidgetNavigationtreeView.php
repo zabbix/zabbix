@@ -33,7 +33,7 @@ class CControllerWidgetNavigationtreeView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name'		=>	'string',
-			'uniqueid'	=>	'required',
+			'uniqueid' =>	'required|string',
 			'widgetid'	=>	'db widget.widgetid',
 			'fields'	=>	'array',
 			'initial_load' => 'in 0,1'
@@ -50,7 +50,8 @@ class CControllerWidgetNavigationtreeView extends CController {
 			 * @var id     $fields['mapid.#']
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_NAVIGATION_TREE, $this->getInput('fields', []));
-			if (!empty($errors = $this->form->validate())) {
+
+			if ($errors = $this->form->validate()) {
 				$ret = false;
 			}
 		}
@@ -482,9 +483,6 @@ class CControllerWidgetNavigationtreeView extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_NAVIGATION_TREE]),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
 			'uniqueid' => $this->getInput('uniqueid'),
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,
@@ -492,7 +490,10 @@ class CControllerWidgetNavigationtreeView extends CController {
 			'maps_accessible' => $maps_accessible,
 			'severity_config' => $severity_config,
 			'initial_load' => $this->getInput('initial_load', 0),
-			'error' => $error
+			'error' => $error,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		]));
 	}
 }

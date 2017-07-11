@@ -99,7 +99,6 @@
 			.click(dashbrd_save_changes);
 
 		var btn_cancel = jQuery('<a>')
-			.attr('id', 'dashbrd-cancel')
 			.attr('href', '#') // needed for button to be styled like link
 			.append('<?= _('Cancel') ?>')
 			.click(dashbrd_cancel);

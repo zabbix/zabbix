@@ -34,14 +34,16 @@ class CControllerWidgetActionLogView extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+
 		if ($ret) {
 			/*
 			 * @var array $fields
-			 * @var int   $fields['sort_triggers']
-			 * @var int   $fields['show_lines']
-			*/
+			 * @var int   $fields['sort_triggers']  (optional)
+			 * @var int   $fields['show_lines']     (optional)
+			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_ACTION_LOG, $this->getInput('fields', []));
-			if (!empty($errors = $this->form->validate())) {
+
+			if ($errors = $this->form->validate()) {
 				$ret = false;
 			}
 		}

@@ -38,12 +38,13 @@ class CControllerWidgetDataOverView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
-			 * @var array  $fields['groupids']
-			 * @var string $fields['application']
-			 * @var int    $fields['style']        in (STYLE_LEFT,STYLE_TOP)
+			 * @var array  $fields['groupids']     (optional)
+			 * @var string $fields['application']  (optional)
+			 * @var int    $fields['style']        (optional) in (STYLE_LEFT,STYLE_TOP)
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_DATA_OVERVIEW, $this->getInput('fields', []));
-			if (!empty($errors = $this->form->validate())) {
+
+			if ($errors = $this->form->validate()) {
 				$ret = false;
 			}
 		}
