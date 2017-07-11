@@ -30,10 +30,10 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 	 * @param string $label            Field label in config form.
 	 * @param string $search_by_key    Key of widget array, by which widgets will be filtered.
 	 * @param mixed  $search_by_value  Value that will be searched in widget[$search_by_key].
-	 * @param string $default          Default value to be used, if no value given.
 	 */
 	public function __construct($name, $label, $search_by_key, $search_by_value) {
 		parent::__construct($name, $label);
+
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->search_by_key = $search_by_key;
 		$this->search_by_value = $search_by_value;

@@ -1179,9 +1179,6 @@ define('WIDGET_DYNAMIC_ITEM',	1);
 // Dashboard widget dynamic state
 define('WIDGET_CONFIG_DONT_SAVE',	0);
 define('WIDGET_CONFIG_DO_SAVE',		1);
-// Widget fields setup types
-define('WIDGET_FIELDS_SETUP_TYPE_CONFIG',	0);
-define('WIDGET_FIELDS_SETUP_TYPE_WIDGET',	1);
 
 // widget field types
 define('ZBX_WIDGET_FIELD_TYPE_INT32',			0);

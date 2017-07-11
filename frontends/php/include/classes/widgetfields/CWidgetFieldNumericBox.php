@@ -49,35 +49,17 @@ class CWidgetFieldNumericBox extends CWidgetField {
 	public function __construct($name, $label, $min = 0, $max = ZBX_MAX_INT32) {
 		parent::__construct($name, $label);
 
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 		$this->min = $min;
 		$this->max = $max;
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
+		$this->setExValidationRules(['in' => $this->min.':'.$this->max]);
 	}
 
 	public function getMaxLength() {
-		return strlen((string)$this->max);
+		return strlen((string) $this->max);
 	}
 
 	public function setValue($value) {
-		return parent::setValue((int)$value);
-	}
-
-	/**
-	 * Validate.
-	 *
-	 * @return array
-	 */
-	public function validate()
-	{
-		$errors = parent::validate();
-		$value = $this->getValue();
-
-		if ($value !== null && ($value < $this->min || $value > $this->max)) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(),
-				_s('must be between "%1$s" and "%2$s"', $this->min, $this->max)
-			);
-		}
-
-		return $errors;
+		return parent::setValue((int) $value);
 	}
 }

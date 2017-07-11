@@ -31,11 +31,11 @@ class CControllerWidgetSysmapView extends CController {
 	protected function checkInput() {
 		// TODO VM: delete comment. Removed widgetid, becuase it is no longer used, after introduction of uniqueid.
 		$fields = [
-			'name'			=>	'string',
-			'uniqueid'		=>	'required',
-			'fullscreen'	=>	'in 0,1',
-			'fields'		=>	'array'
-//			'storage'		=>	'array' // TODO VM: implement for previous_maps
+			'name' =>		'string',
+			'uniqueid' =>	'required',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array',
+			'storage' =>	'array' // TODO VM: implement for previous_maps
 		];
 
 		$ret = $this->validateInput($fields);
@@ -43,14 +43,15 @@ class CControllerWidgetSysmapView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
-			 * @var int    $fields['source_type']
-			 * @var string $fields['filter_widget_reference']
-			 * @var id     $fields['sysmapid']
+			 * @var int    $fields['source_type']              (optional)
+			 * @var string $fields['filter_widget_reference']  (optional)
+			 * @var string $fields['sysmapid']                 (optional)
 			 * @var array  $storage
 			 * @var string $storage['previous_maps']
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields', []));
-			if (!empty($errors = $this->form->validate())) {
+
+			if ($errors = $this->form->validate()) {
 				$ret = false;
 			}
 
@@ -80,13 +81,13 @@ class CControllerWidgetSysmapView extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
 			'previous_maps' => array_key_exists('previous_maps', $storage) ? $storage['previous_maps'] : '',
 			'fullscreen' => getRequest('fullscreen', 0),
 			'uniqueid' => getRequest('uniqueid'),
-			'fields' => $fields
+			'fields' => $fields,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		]));
 	}
 }

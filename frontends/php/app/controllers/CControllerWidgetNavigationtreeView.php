@@ -32,9 +32,9 @@ class CControllerWidgetNavigationtreeView extends CController {
 	protected function checkInput() {
 		// TODO VM: delete comment. Removed widgetid, becuase it is no longer used, after introduction of uniqueid.
 		$fields = [
-			'name'		=>	'string',
-			'uniqueid'	=>	'required',
-			'fields'	=>	'array'
+			'name' =>		'string',
+			'uniqueid' =>	'required|string',
+			'fields' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -48,7 +48,8 @@ class CControllerWidgetNavigationtreeView extends CController {
 			 * @var id     $fields['mapid.#']
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_NAVIGATION_TREE, $this->getInput('fields', []));
-			if (!empty($errors = $this->form->validate())) {
+
+			if ($errors = $this->form->validate()) {
 				$ret = false;
 			}
 		}
@@ -92,13 +93,12 @@ class CControllerWidgetNavigationtreeView extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_NAVIGATION_TREE]),
+			'uniqueid' => $this->getInput('uniqueid'),
+			'field_items' => $items,
+			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'uniqueid' => getRequest('uniqueid'),
-			'field_items' => $items,
-//			'fields' => $data, // TODO VM: delete, as unused
-			'error' => $error
+			]
 		]));
 	}
 }

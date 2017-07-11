@@ -29,12 +29,13 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 	 * @param string $name       field name in form
 	 * @param string $label      label for the field in form
 	 * @param array  $values     key/value pairs of radio button values. Key - saved in DB. Value - visible to user.
-	 * @param int    $save_type  ZBX_WIDGET_FIELD_TYPE_ constant. Defines how field will be saved in database.
 	 */
-	public function __construct($name, $label, $values, $save_type = ZBX_WIDGET_FIELD_TYPE_INT32) {
+	public function __construct($name, $label, $values) {
 		parent::__construct($name, $label);
-		$this->setSaveType($save_type);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 		$this->values = $values;
+		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
 	}
 
 	public function setModern($modern) {
@@ -47,27 +48,7 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 		return $this->modern;
 	}
 
-	public function setValue($value) {
-		if ($value === null) {
-			parent::setValue($value);
-		} elseif (array_key_exists($value, $this->values)) {
-			parent::setValue($value);
-		}
-		return $this;
-	}
-
 	public function getValues() {
 		return $this->values;
-	}
-
-	public function validate()
-	{
-		$errors = parent::validate();
-
-		if (!in_array($this->getValue(), array_keys($this->values))) {
-			$errors[] = _s('Invalid parameter "%1$s".', $this->getLabel());
-		}
-
-		return $errors;
 	}
 }

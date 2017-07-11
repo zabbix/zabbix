@@ -201,7 +201,8 @@ if ($type == SHOW_TRIGGERS) {
 		$trigger_options['filter']['value'] = TRIGGER_VALUE_TRUE;
 	}
 
-	list($hosts, $triggers) = getTriggersOverviewData($data['pageFilter']->groupids, $filter['application'], $viewStyle,
+	$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
+	list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
 		$host_options, $trigger_options
 	);
 

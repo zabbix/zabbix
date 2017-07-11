@@ -37,29 +37,27 @@ class CWidgetFieldSelectResource extends CWidgetField {
 	 */
 	public function __construct($name, $label, $resource_type) {
 		parent::__construct($name, $label);
+
 		$this->resource_type = $resource_type;
 
 		switch ($resource_type) {
 			case WIDGET_FIELD_SELECT_RES_SYSMAP:
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
 				$this->srctbl = 'sysmaps';
 				$this->srcfld1 = 'sysmapid';
 				$this->srcfld2 = 'name';
-
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
 				break;
+
 			case WIDGET_FIELD_SELECT_RES_ITEM:
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 				$this->srctbl = 'items';
 				$this->srcfld1 = 'itemid';
 				$this->srcfld2 = 'name';
-
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
-				break;
-			default:
 				break;
 		}
 
 		$this->dstfld1 = $name;
-		$this->dstfld2 = $this->name . '_caption';
+		$this->dstfld2 = $this->name.'_caption';
 	}
 
 	public function getResourceType() {
@@ -71,15 +69,19 @@ class CWidgetFieldSelectResource extends CWidgetField {
 	}
 
 	public function getPopupUrl() {
-		$url = sprintf('popup.php?srctbl=%s&srcfld1=%s&srcfld2=%s&dstfld1=%s&dstfld2=%s', $this->srctbl,
-				$this->srcfld1, $this->srcfld2, $this->dstfld1, $this->dstfld2);
+		$url = (new CUrl('popup.php'))
+			->setArgument('srctbl', $this->srctbl)
+			->setArgument('srcfld1', $this->srcfld1)
+			->setArgument('srcfld2', $this->srcfld2)
+			->setArgument('dstfld1', $this->dstfld1)
+			->setArgument('dstfld2', $this->dstfld2);
+
 		switch ($this->getResourceType()) {
 			case WIDGET_FIELD_SELECT_RES_ITEM:
-				$url .= '&real_hosts=1';
-				break;
-			default:
+				$url->setArgument('real_hosts', '1');
 				break;
 		}
-		return $url;
+
+		return $url->getUrl();
 	}
 }

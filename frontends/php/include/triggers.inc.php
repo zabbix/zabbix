@@ -635,14 +635,14 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
-function getTriggersOverviewData(array $groupids = null, $application, $style, array $host_options = [],
+function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
 		array $trigger_options = []) {
 	// fetch hosts
 	$hosts = API::Host()->get([
 		'output' => ['hostid', 'status'],
 		'selectGraphs' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
 		'selectScreens' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
-		'groupids' => $groupids,
+		'groupids' => $groupids ? $groupids : null,
 		'preservekeys' => true
 	] + $host_options);
 
