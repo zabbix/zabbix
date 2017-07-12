@@ -22,10 +22,9 @@
 /**
  * Latest problems widget form
  */
-class CProblemsWidgetForm extends CWidgetForm
-{
-	public function __construct($data)
-	{
+class CProblemsWidgetForm extends CWidgetForm {
+
+	public function __construct($data) {
 		parent::__construct($data);
 
 		$shows = [

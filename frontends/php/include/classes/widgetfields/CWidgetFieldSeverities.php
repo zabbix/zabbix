@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldSeverities extends CWidgetField
-{
+class CWidgetFieldSeverities extends CWidgetField {
+
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
