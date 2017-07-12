@@ -361,10 +361,12 @@ function add_elementNames(&$selements) {
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
 					foreach ($selement['elements'] as &$element) {
-						$trigger = $triggers[$element['triggerid']];
-						$element['elementName'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
-						$element['elementExpressionTrigger'] = $trigger['expression'];
-						$element['priority'] = $trigger['priority'];
+						if (array_key_exists($element['triggerid'], $triggers)) {
+							$trigger = $triggers[$element['triggerid']];
+							$element['elementName'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
+							$element['elementExpressionTrigger'] = $trigger['expression'];
+							$element['priority'] = $trigger['priority'];
+						}
 					}
 					unset($element);
 					break;

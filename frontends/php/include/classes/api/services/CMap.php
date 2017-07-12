@@ -355,7 +355,7 @@ class CMap extends CMapElement {
 								if (!array_diff($sel['elmids'], array_intersect($db_triggers_rw, $sel['elmids']))) {
 									$permission = PERM_READ_WRITE;
 								}
-								elseif (!array_diff($sel['elmids'], array_intersect($db_triggers_r, $sel['elmids']))) {
+								elseif (array_intersect($sel['elmids'], $db_triggers_r) && !$options['editable']) {
 									$permission = PERM_READ;
 								}
 								break;
@@ -395,7 +395,7 @@ class CMap extends CMapElement {
 						if (!array_diff($lnk['triggerids'], array_intersect($db_triggers_rw, $lnk['triggerids']))) {
 							$permission = PERM_READ_WRITE;
 						}
-						elseif (!array_diff($lnk['triggerids'], array_intersect($db_triggers_r, $lnk['triggerids']))) {
+						elseif (array_intersect($lnk['triggerids'], $db_triggers_r) && !$options['editable']) {
 							$permission = PERM_READ;
 						}
 
