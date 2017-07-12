@@ -7162,20 +7162,6 @@ return [
 				'ref_table' => 'sysmaps',
 				'ref_field' => 'sysmapid',
 			],
-			'value_dashboardid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'dashboard',
-				'ref_field' => 'dashboardid',
-			],
-			'value_widgetid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'widget',
-				'ref_field' => 'widgetid',
-			],
 		],
 	],
 	'dbversion' => [
