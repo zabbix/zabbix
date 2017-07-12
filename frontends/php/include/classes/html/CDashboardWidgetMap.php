@@ -44,15 +44,15 @@ class CDashboardWidgetMap extends CDiv {
 	public function getScriptRun() {
 		$script_run = '';
 
+		if ($this->current_sysmapid !== null && $this->initial_load) {
+			// this should be before other scripts
+			$script_run .= 'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
+				'\'setWidgetStorageValue\', "'.$this->uniqueid.'", \'current_sysmapid\', '.$this->current_sysmapid.');';
+		}
+
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
 			&& $this->initial_load
 		) {
-			$script_run = '';
-			if ($this->current_sysmapid !== null) {
-				// this should be before other scripts
-				$script_run .= 'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-					'\'setWidgetStorageValue\', widget.uniqueid, \'current_sysmapid\', '.$this->current_sysmapid.');';
-			}
 			$script_run .=
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.

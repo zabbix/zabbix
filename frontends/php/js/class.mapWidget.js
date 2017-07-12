@@ -40,7 +40,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 				}
 				else {
 					if (reset_previous) {
-						previous_maps = widget[0]['storage']['previous_maps'].split(',').filter(Number);
+						previous_maps = widget[0]['storage']['previous_maps'].toString().split(',').filter(Number);
 						delete previous_maps[previous_maps.length-1];
 						previous_maps = previous_maps.filter(Number).join(',');
 					}
