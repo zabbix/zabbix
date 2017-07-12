@@ -653,11 +653,6 @@ class CHostGroup extends CApiService {
 
 		DB::delete('groups', ['groupid' => $groupids]);
 
-		DB::delete('profiles', [
-			'idx' => ['web.dashconf.groups.groupids', 'web.dashconf.groups.hide.groupids'],
-			'value_id' => $groupids
-		]);
-
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $db_groups);
 
 		return ['groupids' => $groupids];
