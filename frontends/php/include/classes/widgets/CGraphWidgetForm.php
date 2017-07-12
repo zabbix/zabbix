@@ -25,8 +25,7 @@ class CGraphWidgetForm extends CWidgetForm {
 		parent::__construct($data);
 
 		// Select graph field
-		$field_graph = (new CWidgetFieldSelectResource('graphid', _('Graph'), WIDGET_FIELD_SELECT_RES_GRAPH))
-			->setRequired(true);
+		$field_graph = (new CWidgetFieldSelectResource('graphid', _('Graph'), WIDGET_FIELD_SELECT_RES_GRAPH));
 		if (array_key_exists('graphid', $data)) {
 			$field_graph->setValue($data['graphid']);
 		}
