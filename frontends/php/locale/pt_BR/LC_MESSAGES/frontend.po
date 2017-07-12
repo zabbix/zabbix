@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-12 12:14+0300\n"
-"PO-Revision-Date: 2016-08-27 17:26+0300\n"
+"POT-Creation-Date: 2017-07-12 12:23+0300\n"
+"PO-Revision-Date: 2017-05-31 19:06+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1472311595.000000\n"
+"X-POOTLE-MTIME: 1496250363.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -696,7 +696,7 @@ msgstr "Todos"
 #: include/views/administration.users.edit.php:401
 #: include/views/administration.users.edit.php:407
 msgid "All groups"
-msgstr ""
+msgstr "Todos os grupos"
 
 #: include/html.inc.php:352
 msgid "All hosts"
@@ -1335,7 +1335,7 @@ msgstr[1] "Não foi possível reconhecer evento"
 #: include/classes/api/services/CEvent.php:768
 #, c-format
 msgid "Cannot acknowledge problem: %1$s."
-msgstr ""
+msgstr "Não foi possível reconhecer o incidente: %1$s."
 
 #: include/classes/api/services/CHttpTest.php:713
 #, c-format
@@ -2527,11 +2527,10 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "Não foi possível atualizar as configurações de criptografia do host. As configurações de conexão em ambas as direções deverá ser especificada."
 
 #: host_prototypes.php:192 host_prototypes.php:235
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Não foi possível atualizar o protótipo de host"
-msgstr[1] "Não foi possível atualizar o protótipo de host"
+msgstr[1] "Não foi possível atualizar os protótipos de host"
 
 #: hosts.php:441
 msgid "Cannot update hosts"
@@ -2555,11 +2554,10 @@ msgid "Cannot update item"
 msgstr "Item não foi atualizado"
 
 #: disc_prototypes.php:465 disc_prototypes.php:491
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
-msgstr[0] "Protótipo de item não foi atualizado"
-msgstr[1] "Protótipo de item não foi atualizado"
+msgstr[0] "O protótipo de item não foi atualizado"
+msgstr[1] "Os protótipos de item não foram atualizados"
 
 #: items.php:992
 msgid "Cannot update items"
@@ -2644,11 +2642,10 @@ msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Não foi possível atualizar a trigger \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:455
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "Protótipo de trigger não foi atualizado"
-msgstr[1] "Protótipo de trigger não foi atualizado"
+msgstr[0] "O protótipo de trigger não foi atualizado"
+msgstr[1] "Os protótipos de triggers não foram atualizados"
 
 #: include/classes/api/services/CTriggerGeneral.php:1441
 #, c-format
@@ -2689,7 +2686,7 @@ msgstr "Distinguir maiúscula/minúscula"
 
 #: include/locales.inc.php:55
 msgid "Catalan (ca_ES)"
-msgstr ""
+msgstr "Catalão (ca_ES)"
 
 #: include/classes/items/CHelpItems.php:881
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
@@ -3433,7 +3430,7 @@ msgstr "O nome do correlacionamento não pode ser vazio."
 
 #: include/events.inc.php:218
 msgid "Correlation rule"
-msgstr ""
+msgstr "Regra de correlação"
 
 #: correlation.php:139
 msgid "Correlation updated"
@@ -3454,11 +3451,11 @@ msgstr "Número de trocas de contexto. Retorna: número inteiro"
 
 #: include/classes/items/CHelpItems.php:379
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
-msgstr ""
+msgstr "Quantidade de linhas compatíveis no arquivo de log monitorado com suporte a rotação. Retorna Inteiro"
 
 #: include/classes/items/CHelpItems.php:371
 msgid "Count of matched lines in log file monitoring. Returns integer"
-msgstr ""
+msgstr "Quantidade de linhas compatíveis no arquivo de log monitorado. Retorna inteiro"
 
 #: include/views/configuration.action.list.php:37
 msgid "Create action"
@@ -3484,7 +3481,7 @@ msgstr "Criar correlacionamento"
 #: include/views/configuration.item.prototype.list.php:132
 #: include/views/configuration.trigger.prototype.list.php:170
 msgid "Create disabled"
-msgstr ""
+msgstr "Criar inativo"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3501,7 +3498,7 @@ msgstr "Criar regra de descoberta"
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.trigger.prototype.list.php:167
 msgid "Create enabled"
-msgstr ""
+msgstr "Criar ativo"
 
 #: include/views/configuration.graph.list.php:34
 msgid "Create graph"
@@ -4954,7 +4951,7 @@ msgstr "O valor informado para o \"nome\" do mapa \"%1$s\" está duplicado."
 #: include/classes/api/services/CScreen.php:809
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
-msgstr "O valor do nome \"%1$s\" está duplicado na tela."
+msgstr "O campo \"name\" possui valor duplicado \"%1$s\" na tela."
 
 #: include/classes/api/services/CTrigger.php:1184
 #, c-format
@@ -5690,7 +5687,7 @@ msgstr "Falha de Auditoria"
 
 #: include/actions.inc.php:1688
 msgid "Failures"
-msgstr ""
+msgstr "Falhas"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
@@ -6434,7 +6431,7 @@ msgstr "Cabeçalhos"
 
 #: include/locales.inc.php:65
 msgid "Hebrew (he_IL)"
-msgstr ""
+msgstr "Hebreu (he_IL)"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:82
 #: include/views/configuration.graph.list.php:81
@@ -6589,7 +6586,7 @@ msgstr "O host \"%1$s\" já existe."
 #: include/classes/api/services/CHost.php:1750
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "O host \"%1$s\" não pode ficar sem grupo."
 
 #: include/classes/api/services/CProxy.php:499
 #, c-format
@@ -6774,7 +6771,7 @@ msgstr "O protótipo de host \"%1$s\" já existe em \"%2$s\"."
 #: include/classes/api/services/CHostPrototype.php:191
 #, c-format
 msgid "Host prototype \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "O protótipo de host \"%1$s\" não pode ficar sem grupo."
 
 #: host_prototypes.php:206
 msgid "Host prototype added"
@@ -6785,11 +6782,10 @@ msgid "Host prototype deleted"
 msgstr "Protótipo de host foi excluído"
 
 #: host_prototypes.php:192 host_prototypes.php:234
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
-msgstr[0] "Protótipo de host foi atualizado"
-msgstr[1] "Protótipo de host foi atualizado"
+msgstr[0] "O protótipo de host foi atualizado"
+msgstr[1] "Os protótipos de hosts foram atualizados"
 
 #: include/classes/api/services/CHostPrototype.php:1148
 #, c-format
@@ -7109,7 +7105,7 @@ msgstr "Ícones"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:551
 msgid "Identification of the system. Returns string"
-msgstr ""
+msgstr "Identificação do sistema. Retorna texto"
 
 #: include/func.inc.php:1727 include/func.inc.php:1746
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -7244,7 +7240,7 @@ msgstr "Incluir"
 
 #: include/views/administration.usergroups.edit.php:152
 msgid "Include subgroups"
-msgstr ""
+msgstr "Incluir subgrupos"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:395
@@ -7935,7 +7931,7 @@ msgstr "ID de template de tela inválido."
 
 #: include/classes/api/services/CHttpTest.php:748
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "Contagem incorreta de cenários web oriundos de template."
 
 #: include/classes/api/services/CService.php:931
 #, c-format
@@ -8458,7 +8454,7 @@ msgstr ""
 
 #: include/classes/validators/CFunctionValidator.php:315
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "O quinto parâmetro é inválido."
 
 #: include/classes/validators/CFunctionValidator.php:311
 msgid "Invalid first parameter."
@@ -8823,11 +8819,10 @@ msgid "Item prototype deleted"
 msgstr "Protótipo de item excluído"
 
 #: disc_prototypes.php:465 disc_prototypes.php:490
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
-msgstr[0] "Protótipo de item atualizado"
-msgstr[1] "Protótipo de item atualizado"
+msgstr[0] "O protótipo de item foi atualizado"
+msgstr[1] "Os protótipos de itens foram atualizados"
 
 #: include/html.inc.php:463
 #: include/views/configuration.host.discovery.list.php:121
@@ -9769,12 +9764,12 @@ msgstr "Máximo de eventos por trigger a exibir"
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:359
 msgid "Maximum number of opened files supported by OS. Returns integer"
-msgstr "Número máximo de arquivos abertos suportado pelo S.O.. Retorna: inteiro"
+msgstr "Número máximo de arquivos abertos suportado pelo S.O. Retorna: inteiro"
 
 #: include/classes/items/CHelpItems.php:81
 #: include/classes/items/CHelpItems.php:363
 msgid "Maximum number of processes supported by OS. Returns integer"
-msgstr "Quantidade máxima de processos suportada pelo S.O.. Retorna: número inteiro"
+msgstr "Quantidade máxima de processos suportada pelo S.O. Retorna: número inteiro"
 
 #: include/classes/screens/CScreenBase.php:497 include/graphs.inc.php:416
 #, c-format
@@ -11425,8 +11420,8 @@ msgstr "Apenas um nome de grupo de usuário pode ser modificado por vez."
 #: app/views/monitoring.acknowledge.edit.php:64
 msgid "Only selected problem"
 msgid_plural "Only selected problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Apenas o incidente selecionado"
+msgstr[1] "Apenas os incidentes selecionados"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
@@ -12777,7 +12772,7 @@ msgstr "Substituir grupos de hosts"
 #: include/views/configuration.trigger.prototype.massupdate.php:139
 #: include/views/configuration.triggers.massupdate.php:133
 msgid "Replace tags"
-msgstr ""
+msgstr "Substituir etiquetas"
 
 #: include/menu.inc.php:144
 msgid "Reports"
@@ -12845,25 +12840,25 @@ msgstr "Resolvido"
 #: include/events.inc.php:238 include/events.inc.php:241
 #: include/events.inc.php:246
 msgid "Resolved by"
-msgstr ""
+msgstr "Resolvido por"
 
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
-msgstr ""
+msgstr "Solucionado pela regra de correlação \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:761
 msgid "Resolved by correlation rule."
-msgstr ""
+msgstr "Solucionado por regra de correlação."
 
 #: include/classes/screens/CScreenProblem.php:767
 #, c-format
 msgid "Resolved by user \"%1$s\"."
-msgstr ""
+msgstr "Solucionado pelo usuário \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:768
 msgid "Resolved by user."
-msgstr ""
+msgstr "Solucionado por usuário."
 
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.auditlogs.list.php:64
@@ -13534,7 +13529,7 @@ msgstr "A ação selecionada foi excluída"
 
 #: app/views/monitoring.acknowledge.edit.php:69
 msgid "Selected and all other unacknowledged problems of related triggers"
-msgstr ""
+msgstr "Incidente selecionado e todos os demais não reconhecidos e associados à triggers"
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
@@ -14496,7 +14491,7 @@ msgstr "O template \"%1$s\" já existe."
 #: include/classes/api/services/CTemplate.php:965
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "O template \"%1$s\" não pode ficar sem grupo."
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -14650,12 +14645,12 @@ msgstr "O método \"%1$s.%2$s\" precisa ser invocado sem o parâmetro <auth>."
 #: include/classes/api/services/CScreenItem.php:907
 #, c-format
 msgid "The X coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
-msgstr "A coordenada X do elemento localizado entre X - %1$s  e Y - %2$s na tela \"%3$s\" é muito grande."
+msgstr "A coordenada X do elemento localizado entre X - %1$s e Y - %2$s na tela \"%3$s\" é muito grande."
 
 #: include/classes/api/services/CScreenItem.php:919
 #, c-format
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
-msgstr "A coordenada Y do elemento localizado entre X - %1$s  e Y - %2$s na tela \"%3$s\" é muito grande."
+msgstr "A coordenada Y do elemento localizado entre X - %1$s e Y - %2$s na tela \"%3$s\" é muito grande."
 
 #: include/html.inc.php:687
 #, c-format
@@ -15118,11 +15113,10 @@ msgid "Trigger prototype deleted"
 msgstr "Protótipo de trigger excluído"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:454
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
-msgstr[0] "Protótipo de trigger atualizado"
-msgstr[1] "Protótipo de trigger atualizado"
+msgstr[0] "O protótipo de trigger foi atualizado"
+msgstr[1] "Os protótipos de triggers foram atualizados"
 
 #: include/html.inc.php:473
 #: include/views/configuration.host.discovery.list.php:128
@@ -15825,7 +15819,7 @@ msgstr "Usuário"
 #: include/classes/api/services/CUserGroup.php:925
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
-msgstr ""
+msgstr "O usuário \"%1$s\" não pode ficar sem grupo."
 
 #: include/classes/api/services/CUser.php:871
 #, c-format
@@ -16083,7 +16077,7 @@ msgstr "Status do cluster VMware, <url> URL de serviço do VMware, <name> nome d
 
 #: include/classes/items/CHelpItems.php:695
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Estatísticas de capacidade do datastore em bytes ou em percentual do total. Retorna inteiro para bytes, ponto flutuante para percentual"
 
 #: include/classes/items/CHelpItems.php:675
 msgid "VMware event log, <url> - VMware service URL"
@@ -16235,7 +16229,7 @@ msgstr "Tamanho da memória privada da máquina virtual VMware, <url> - URL de s
 
 #: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Tempo em prontidão do processador da máquina virtual em milisegundos, <url> - URL do serviço VMWare, <uuid> - Nome da máquina virtual no VMWare"
 
 #: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -16432,7 +16426,7 @@ msgstr "A visão não foi apresentada."
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:615
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Espaço virtual em bytes ou percentual do total. Retorna inteiro para bytes; Ponto flutuante para percentual"
 
 #: include/views/configuration.host.edit.php:69
 #: include/views/configuration.host.prototype.edit.php:78
@@ -17080,7 +17074,7 @@ msgstr "um texto vazio é esperado"
 
 #: include/classes/api/services/CHost.php:1515
 msgid "an even number of hexadecimal characters is expected"
-msgstr ""
+msgstr "é aguardado um par de caracteres hexadecimais"
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
@@ -17293,7 +17287,7 @@ msgstr "em"
 #: include/views/administration.usergroups.edit.php:106
 #: include/views/administration.users.edit.php:408
 msgid "including subgroups"
-msgstr ""
+msgstr "incluindo subgrupos"
 
 #: include/classes/api/services/CMapElement.php:183
 msgid "incorrect element count"
@@ -17328,7 +17322,7 @@ msgstr ""
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:47
 #, c-format
 msgid "invalid group name \"%1$s\""
-msgstr ""
+msgstr "nome de grupo inválido \"%1$s\""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:265
 #: include/classes/graphdraw/CPieGraphDraw.php:198
@@ -17438,7 +17432,7 @@ msgstr "mín"
 #: include/classes/api/services/CHost.php:1521
 #, c-format
 msgid "minimum length is %1$s characters"
-msgstr ""
+msgstr "o tamanho mínimo é %1$s caracteres"
 
 #: include/html.inc.php:765 include/html.inc.php:788
 #: include/views/configuration.services.edit.php:273
@@ -17453,7 +17447,7 @@ msgstr "ms"
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:35
 msgid "must be a string"
-msgstr ""
+msgstr "precisa ser um texto"
 
 #: include/views/administration.authentication.edit.php:101
 msgid "must be a valid LDAP user"

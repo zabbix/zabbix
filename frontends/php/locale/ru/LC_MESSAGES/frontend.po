@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-12 12:14+0300\n"
-"PO-Revision-Date: 2016-09-07 21:05+0300\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"POT-Creation-Date: 2017-07-12 12:23+0300\n"
+"PO-Revision-Date: 2017-05-03 19:05+0300\n"
+"Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1473275105.000000\n"
+"X-POOTLE-MTIME: 1493831116.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -708,7 +708,7 @@ msgstr "Все"
 #: include/views/administration.users.edit.php:401
 #: include/views/administration.users.edit.php:407
 msgid "All groups"
-msgstr ""
+msgstr "Все группы"
 
 #: include/html.inc.php:352
 msgid "All hosts"
@@ -730,7 +730,7 @@ msgstr "Все проблемы"
 #: include/views/configuration.trigger.prototype.edit.php:459
 #: include/views/configuration.triggers.edit.php:479
 msgid "All problems if tag values match"
-msgstr "Все проблемы если значения тэгов совпадают"
+msgstr "Все проблемы если значения тегов совпадают"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
@@ -2735,7 +2735,7 @@ msgstr "Регистрозависимое"
 
 #: include/locales.inc.php:55
 msgid "Catalan (ca_ES)"
-msgstr ""
+msgstr "Каталонский (ca_ES)"
 
 #: include/classes/items/CHelpItems.php:881
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
@@ -3503,11 +3503,11 @@ msgstr "Количество переключений контекста. Воз
 
 #: include/classes/items/CHelpItems.php:379
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
-msgstr ""
+msgstr "Количество совпадающих строк в мониторинге файлов журналов с поддержкой ротации журналов. Возвращает целое число"
 
 #: include/classes/items/CHelpItems.php:371
 msgid "Count of matched lines in log file monitoring. Returns integer"
-msgstr ""
+msgstr "Количество совпадающих строк в мониторинге файлов журналов. Возвращает целое число"
 
 #: include/views/configuration.action.list.php:37
 msgid "Create action"
@@ -5542,7 +5542,7 @@ msgstr "Детали источника события"
 
 #: include/correlation.inc.php:52
 msgid "Event tag pair"
-msgstr "Пара тэгов событий"
+msgstr "Пара тегов событий"
 
 #: include/actions.inc.php:60
 msgid "Event type"
@@ -6642,7 +6642,7 @@ msgstr "Узел сети \"%1$s\" уже существует."
 #: include/classes/api/services/CHost.php:1750
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Узел сети \"%1$s\" не может быть без группы узлов сети."
 
 #: include/classes/api/services/CProxy.php:499
 #, c-format
@@ -6829,7 +6829,7 @@ msgstr "Прототип узлов сети \"%1$s\" уже существуе�
 #: include/classes/api/services/CHostPrototype.php:191
 #, c-format
 msgid "Host prototype \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Прототип узлов сети \"%1$s\" не может быть без группы узлов сети."
 
 #: host_prototypes.php:206
 msgid "Host prototype added"
@@ -7164,7 +7164,7 @@ msgstr "Иконки"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:551
 msgid "Identification of the system. Returns string"
-msgstr ""
+msgstr "Идентификация системы. Возвращает строку"
 
 #: include/func.inc.php:1727 include/func.inc.php:1746
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -7299,7 +7299,7 @@ msgstr "Включено"
 
 #: include/views/administration.usergroups.edit.php:152
 msgid "Include subgroups"
-msgstr ""
+msgstr "Включая подгруппы"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:395
@@ -7990,7 +7990,7 @@ msgstr "Некорректный ID шаблонного комплексног�
 
 #: include/classes/api/services/CHttpTest.php:748
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "Некорректное количество шагов у шаблонного веб-сценария."
 
 #: include/classes/api/services/CService.php:931
 #, c-format
@@ -8511,7 +8511,7 @@ msgstr ""
 
 #: include/classes/validators/CFunctionValidator.php:315
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "Ошибочный пятый параметр."
 
 #: include/classes/validators/CFunctionValidator.php:311
 msgid "Invalid first parameter."
@@ -8677,7 +8677,7 @@ msgstr "Ошибочный второй параметр."
 #: include/classes/import/validators/CXmlValidator.php:65
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr "Ошибочный тэг \"%1$s\": %2$s."
+msgstr "Ошибочный тег \"%1$s\": %2$s."
 
 #: include/classes/validators/CFunctionValidator.php:313
 msgid "Invalid third parameter."
@@ -9293,7 +9293,7 @@ msgstr "Длина в символах последнего (самого нов
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:43
 msgid "Limit for search and filter results"
-msgstr "Лимит элементов в поиске/фильтре"
+msgstr "Лимит элементов в результатах поиска и фильтрах"
 
 #: include/graphs.inc.php:55 include/views/js/monitoring.sysmaps.js.php:288
 #: include/views/js/monitoring.sysmaps.js.php:336
@@ -10168,7 +10168,7 @@ msgstr "Mozilla Firefox"
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:472
 msgid "Multiple"
-msgstr "Многократные"
+msgstr "Множественный"
 
 #: include/triggers.inc.php:1120
 msgid "Multiple PROBLEM events"
@@ -10384,11 +10384,11 @@ msgstr "Группа узлов нового события"
 #: include/correlation.inc.php:50 include/correlation.inc.php:202
 #: include/correlation.inc.php:226
 msgid "New event tag"
-msgstr "Тэг нового события"
+msgstr "Тег нового события"
 
 #: include/correlation.inc.php:54
 msgid "New event tag value"
-msgstr "Значение тэга нового события"
+msgstr "Значение тега нового события"
 
 #: include/views/configuration.host.edit.php:92
 #: include/views/configuration.template.edit.php:122
@@ -11366,11 +11366,11 @@ msgstr "Ok"
 #: include/correlation.inc.php:49 include/correlation.inc.php:197
 #: include/correlation.inc.php:212 include/correlation.inc.php:219
 msgid "Old event tag"
-msgstr "Тэг старого события"
+msgstr "Тег старого события"
 
 #: include/correlation.inc.php:53
 msgid "Old event tag value"
-msgstr "Значение тэга старого события"
+msgstr "Значение тега старого события"
 
 #: include/views/monitoring.sysmap.constructor.php:52 jsLoader.php:140
 msgid "On"
@@ -12905,7 +12905,7 @@ msgstr "Решено"
 #: include/events.inc.php:238 include/events.inc.php:241
 #: include/events.inc.php:246
 msgid "Resolved by"
-msgstr ""
+msgstr "Решено"
 
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
@@ -14489,16 +14489,16 @@ msgstr "Этикетка"
 #: include/classes/api/services/CTriggerGeneral.php:267
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
-msgstr "Тэг \"%1$s\" со значением \"%2$s\" уже существует."
+msgstr "Тег \"%1$s\" со значением \"%2$s\" уже существует."
 
 #: include/views/configuration.trigger.prototype.edit.php:464
 #: include/views/configuration.triggers.edit.php:484
 msgid "Tag for matching"
-msgstr "Тэги для совпадения"
+msgstr "Теги для совпадения"
 
 #: include/actions.inc.php:63
 msgid "Tag value"
-msgstr "Значение тэга"
+msgstr "Значение тега"
 
 #: app/views/monitoring.problem.view.php:227
 #: include/classes/screens/CScreenProblem.php:681
@@ -14506,7 +14506,7 @@ msgstr "Значение тэга"
 #: include/views/configuration.trigger.prototype.edit.php:494
 #: include/views/configuration.triggers.edit.php:522
 msgid "Tags"
-msgstr "Тэги"
+msgstr "Теги"
 
 #: include/views/configuration.action.edit.php:826
 #: include/views/configuration.action.edit.php:1543
@@ -14557,7 +14557,7 @@ msgstr "Шаблон \"%1$s\" уже существует."
 #: include/classes/api/services/CTemplate.php:965
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Шаблон \"%1$s\" не может быть без группы узлов сети."
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -15891,7 +15891,7 @@ msgstr "Пользователь"
 #: include/classes/api/services/CUserGroup.php:925
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
-msgstr ""
+msgstr "Пользователь \"%1$s\" не может быть без группы пользователей."
 
 #: include/classes/api/services/CUser.php:871
 #, c-format
@@ -16147,7 +16147,7 @@ msgstr "Состояние кластера VMware, <url> - URL службы VMw
 
 #: include/classes/items/CHelpItems.php:695
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Статистика пространства на VMware хранилище в байтах или в процентах от общего размера. Возвращает целое число для байт; число с плавающей точкой для процентов"
 
 #: include/classes/items/CHelpItems.php:675
 msgid "VMware event log, <url> - VMware service URL"
@@ -16299,7 +16299,7 @@ msgstr "Размер частной памяти витруальной маши
 
 #: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Время готовности процессора виртуальной машины VMware в мс, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -16497,7 +16497,7 @@ msgstr "Вид не отображается."
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:615
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Размер виртуального пространства в байтах или в процентах от общего размера. Возвращает целое число для байт; число с плавающей точкой для процентов"
 
 #: include/views/configuration.host.edit.php:69
 #: include/views/configuration.host.prototype.edit.php:78
@@ -17147,7 +17147,7 @@ msgstr "ожидается пустая строка"
 
 #: include/classes/api/services/CHost.php:1515
 msgid "an even number of hexadecimal characters is expected"
-msgstr ""
+msgstr "ожидается четное количество шестнадцатеричных символов"
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
@@ -17360,7 +17360,7 @@ msgstr "в"
 #: include/views/administration.usergroups.edit.php:106
 #: include/views/administration.users.edit.php:408
 msgid "including subgroups"
-msgstr ""
+msgstr "включая подгруппы"
 
 #: include/classes/api/services/CMapElement.php:183
 msgid "incorrect element count"
@@ -17504,7 +17504,7 @@ msgstr "мин"
 #: include/classes/api/services/CHost.php:1521
 #, c-format
 msgid "minimum length is %1$s characters"
-msgstr ""
+msgstr "минимальная длина %1$s символов"
 
 #: include/html.inc.php:765 include/html.inc.php:788
 #: include/views/configuration.services.edit.php:273
@@ -17557,7 +17557,7 @@ msgstr "новый"
 #: include/correlation.inc.php:214
 #: include/views/configuration.correlation.edit.php:135
 msgid "new event tag"
-msgstr "тэг нового события"
+msgstr "тег нового события"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2145
 #: include/classes/graphdraw/CPieGraphDraw.php:353
@@ -17621,7 +17621,7 @@ msgstr "выкл"
 
 #: include/views/configuration.correlation.edit.php:138
 msgid "old event tag"
-msgstr "тэг старого события"
+msgstr "тег старого события"
 
 #: include/classes/setup/CFrontendSetup.php:308
 #: include/classes/setup/CFrontendSetup.php:325
@@ -17749,7 +17749,7 @@ msgstr "показать преобразования значений"
 #: include/views/configuration.triggers.massupdate.php:112
 #: include/views/js/configuration.triggers.edit.js.php:6
 msgid "tag"
-msgstr "тэг"
+msgstr "тег"
 
 #: include/classes/api/services/CHostBase.php:57
 #, c-format
@@ -17766,7 +17766,7 @@ msgstr ""
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr "тэг \"%1$s\" пропущен"
+msgstr "тег \"%1$s\" пропущен"
 
 #: include/classes/api/services/CMap.php:622
 #: include/classes/api/services/CMap.php:1053 include/events.inc.php:34
@@ -17809,7 +17809,7 @@ msgstr ""
 #: include/classes/import/validators/CXmlValidatorGeneral.php:151
 #, c-format
 msgid "unexpected tag \"%1$s\""
-msgstr "неожиданный тэг \"%1$s\""
+msgstr "неожиданный тег \"%1$s\""
 
 #: include/classes/import/readers/CXmlImportReader.php:78
 #: include/classes/import/readers/CXmlImportReader.php:117

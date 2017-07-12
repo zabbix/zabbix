@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-12 12:14+0300\n"
-"PO-Revision-Date: 2016-09-08 13:54+0300\n"
+"POT-Creation-Date: 2017-07-12 12:23+0300\n"
+"PO-Revision-Date: 2017-05-18 02:27+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1473335672.000000\n"
+"X-POOTLE-MTIME: 1495067234.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -682,7 +682,7 @@ msgstr "모두"
 #: include/views/administration.users.edit.php:401
 #: include/views/administration.users.edit.php:407
 msgid "All groups"
-msgstr ""
+msgstr "모든 그룹"
 
 #: include/html.inc.php:352
 msgid "All hosts"
@@ -2635,7 +2635,7 @@ msgstr "대문자소문자의 구별"
 
 #: include/locales.inc.php:55
 msgid "Catalan (ca_ES)"
-msgstr ""
+msgstr "카탈루냐어 (ca_ES)"
 
 #: include/classes/items/CHelpItems.php:881
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
@@ -3397,11 +3397,11 @@ msgstr "컨텍스트 스위치의 횟수. integer를 리턴."
 
 #: include/classes/items/CHelpItems.php:379
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
-msgstr ""
+msgstr "로그의 일치하는 행의 개수. (로그 로테이션 대응) integer를 리턴."
 
 #: include/classes/items/CHelpItems.php:371
 msgid "Count of matched lines in log file monitoring. Returns integer"
-msgstr ""
+msgstr "로그의 일치하는 행의 개수. integer를 리턴"
 
 #: include/views/configuration.action.list.php:37
 msgid "Create action"
@@ -4811,7 +4811,7 @@ msgstr "조건식을 치환하시겠습니까?"
 
 #: include/actions.inc.php:1680 jsLoader.php:136
 msgid "Done"
-msgstr "Done"
+msgstr "완료"
 
 #: include/graphs.inc.php:61 include/views/js/monitoring.sysmaps.js.php:684
 #: include/views/js/monitoring.sysmaps.js.php:764 jsLoader.php:151
@@ -6523,7 +6523,7 @@ msgstr "호스트 \"%1$s\"는 이미 존재합니다."
 #: include/classes/api/services/CHost.php:1750
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "호스트\"%1$s\"에 호스트 그룹을 설정해 주세요."
 
 #: include/classes/api/services/CProxy.php:499
 #, c-format
@@ -6706,7 +6706,7 @@ msgstr "호스트 프로토타입 \"%1$s\"는 \"%2$s\"에 이미 존재하고 �
 #: include/classes/api/services/CHostPrototype.php:191
 #, c-format
 msgid "Host prototype \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "호스트의 프로토타입 \"%1$s\"에 호스트 그룹을 설정해주세요."
 
 #: host_prototypes.php:206
 msgid "Host prototype added"
@@ -7039,7 +7039,7 @@ msgstr "아이콘"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:551
 msgid "Identification of the system. Returns string"
-msgstr ""
+msgstr "시스템의 식별문자. string을 리턴."
 
 #: include/func.inc.php:1727 include/func.inc.php:1746
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -7174,7 +7174,7 @@ msgstr "포함"
 
 #: include/views/administration.usergroups.edit.php:152
 msgid "Include subgroups"
-msgstr ""
+msgstr "서브 그룹을 포함"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:395
@@ -7865,7 +7865,7 @@ msgstr "템플릿 스크린ID가 올바르지 않습니다."
 
 #: include/classes/api/services/CHttpTest.php:748
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "템플릿의 웹 시나리오의 스텝 카운트가 올바르지 않습니다."
 
 #: include/classes/api/services/CService.php:931
 #, c-format
@@ -8386,7 +8386,7 @@ msgstr ""
 
 #: include/classes/validators/CFunctionValidator.php:315
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "5번째의 파라미터가 올바르지 않습니다."
 
 #: include/classes/validators/CFunctionValidator.php:311
 msgid "Invalid first parameter."
@@ -10201,7 +10201,7 @@ msgstr "네트워크 맵"
 #: app/views/administration.proxy.list.php:137 include/func.inc.php:207
 #: tr_status.php:647
 msgid "Never"
-msgstr "감시 안함"
+msgstr "없음"
 
 #: include/views/configuration.action.edit.php:528
 #: include/views/configuration.action.edit.php:830
@@ -12753,7 +12753,7 @@ msgstr "해결됨"
 #: include/events.inc.php:238 include/events.inc.php:241
 #: include/events.inc.php:246
 msgid "Resolved by"
-msgstr ""
+msgstr "해결 이유"
 
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
@@ -14403,7 +14403,7 @@ msgstr "템플릿\"%1$s\"은 이미 존재합니다."
 #: include/classes/api/services/CTemplate.php:965
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "템플릿 \"%1$s\"에 호스트그룹을 설정해주세요."
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -15723,7 +15723,7 @@ msgstr "유저"
 #: include/classes/api/services/CUserGroup.php:925
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
-msgstr ""
+msgstr "유저 \"%1$s\"에 유저 그룹을 설정해주세요."
 
 #: include/classes/api/services/CUser.php:871
 #, c-format
@@ -15975,7 +15975,7 @@ msgstr "VMware 클래스터의 상태, <url> - VMware서비스URL, <name> - VMwa
 
 #: include/classes/items/CHelpItems.php:695
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "VMware datastore의 바이트 단위 혹은 전체에서 퍼센트 용량에서의 통계치. 바이트 단위라면 integer, 퍼센트라면 float 로 리턴"
 
 #: include/classes/items/CHelpItems.php:675
 msgid "VMware event log, <url> - VMware service URL"
@@ -16127,7 +16127,7 @@ msgstr "VMware가상 머신 private 메모리 사이즈, <url> - VMware 서비�
 
 #: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware가상머신의 프로세서 유효시간(ms)、<url> - VMware 서비스 URL、<uuid> - VMware 가상 머신 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -16323,7 +16323,7 @@ msgstr "뷰를 랜더링 할 수 없었습니다."
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:615
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "가상 메모리 사이즈의 바이트 단위 혹은 전체에서 퍼센트값. 바이트 단위라면 integer를 리턴, 퍼센트라면 float를 리턴"
 
 #: include/views/configuration.host.edit.php:69
 #: include/views/configuration.host.prototype.edit.php:78
@@ -16969,7 +16969,7 @@ msgstr "공백문자(empty string)로 지정해 주십시오."
 
 #: include/classes/api/services/CHost.php:1515
 msgid "an even number of hexadecimal characters is expected"
-msgstr ""
+msgstr "16진수 문자로 입력해주세요"
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
@@ -17183,7 +17183,7 @@ msgstr "범위 내"
 #: include/views/administration.usergroups.edit.php:106
 #: include/views/administration.users.edit.php:408
 msgid "including subgroups"
-msgstr ""
+msgstr "서브 그룹을 포함"
 
 #: include/classes/api/services/CMapElement.php:183
 msgid "incorrect element count"
@@ -17327,7 +17327,7 @@ msgstr "최소"
 #: include/classes/api/services/CHost.php:1521
 #, c-format
 msgid "minimum length is %1$s characters"
-msgstr ""
+msgstr "%1$s 문자 이상 입력해주세요"
 
 #: include/html.inc.php:765 include/html.inc.php:788
 #: include/views/configuration.services.edit.php:273
