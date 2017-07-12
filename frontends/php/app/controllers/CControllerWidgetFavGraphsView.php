@@ -28,7 +28,18 @@ class CControllerWidgetFavGraphsView extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'name' =>	'string'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -82,6 +93,7 @@ class CControllerWidgetFavGraphsView extends CController {
 		CArrayHelper::sort($graphs, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_GRAPHS]),
 			'graphs' => $graphs,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

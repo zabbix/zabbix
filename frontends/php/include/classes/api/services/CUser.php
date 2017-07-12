@@ -65,8 +65,8 @@ class CUser extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
@@ -75,8 +75,8 @@ class CUser extends CApiService {
 			'selectMedias'				=> null,
 			'selectMediatypes'			=> null,
 			'getAccess'					=> null,
-			'countOutput'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -173,7 +173,7 @@ class CUser extends CApiService {
 		while ($user = DBfetch($res)) {
 			unset($user['passwd']);
 
-			if ($options['countOutput'] !== null) {
+			if ($options['countOutput']) {
 				$result = $user['rowscount'];
 			}
 			else {
@@ -183,7 +183,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		if ($options['countOutput'] !== null) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -214,7 +214,7 @@ class CUser extends CApiService {
 		}
 
 		// removing keys
-		if ($options['preservekeys'] === null) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 

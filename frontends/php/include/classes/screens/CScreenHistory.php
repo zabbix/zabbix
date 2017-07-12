@@ -170,7 +170,7 @@ class CScreenHistory extends CScreenBase {
 				if ($this->filter !== '' && in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {
 					$options['search'] = ['value' => $this->filter];
 					if ($this->filterTask == FILTER_TASK_HIDE) {
-						$options['excludeSearch'] = 1;
+						$options['excludeSearch'] = true;
 					}
 				}
 

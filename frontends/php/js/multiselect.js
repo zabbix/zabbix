@@ -561,6 +561,10 @@ jQuery(function($) {
 					'class': 'multiselect-button'
 				}).append(popupButton));
 			}
+
+			if ('postInitEvent' in options) {
+				jQuery(document).trigger(options.postInitEvent);
+			}
 		});
 	};
 

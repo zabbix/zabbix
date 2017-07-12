@@ -67,15 +67,15 @@ class CTemplateScreen extends CScreen {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectScreenItems'			=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -180,7 +180,7 @@ class CTemplateScreen extends CScreen {
 					createParentToChildRelation($templatesChain, $link, 'templateid', 'hostid');
 				}
 			}
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['templateid'] = 's.templateid';
 			}
 			$sqlParts['where']['templateid'] = dbConditionInt('s.templateid', $linkedTemplateids);
@@ -205,8 +205,8 @@ class CTemplateScreen extends CScreen {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount'])) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $screen;
 				}
 				else {
@@ -218,7 +218,7 @@ class CTemplateScreen extends CScreen {
 			}
 		}
 
-		if ($options['countOutput'] !== null && $options['groupCount'] === null) {
+		if ($options['countOutput'] && !$options['groupCount']) {
 			return $result;
 		}
 
@@ -386,8 +386,7 @@ class CTemplateScreen extends CScreen {
 
 		// hashing
 		$options['hostids'] = zbx_toHash($options['hostids']);
-		if (is_null($options['countOutput'])
-				|| (!is_null($options['countOutput']) && !is_null($options['groupCount']))) {
+		if (!$options['countOutput'] || ($options['countOutput'] && $options['groupCount'])) {
 			// creating copies of templated screens (inheritance)
 			// screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
 			$screenNum = 0;
@@ -443,7 +442,7 @@ class CTemplateScreen extends CScreen {
 			$result = array_values($vrtResult);
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -452,7 +451,7 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 		elseif (!is_null($options['noInheritance'])) {
@@ -785,7 +784,7 @@ class CTemplateScreen extends CScreen {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			// request the templateid field for inheritance to work
 			$sqlParts = $this->addQuerySelect($this->fieldId('templateid'), $sqlParts);
 		}

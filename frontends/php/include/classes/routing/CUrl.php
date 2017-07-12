@@ -120,6 +120,12 @@ class CUrl {
 		return $this;
 	}
 
+	public function setArgumentSID() {
+		$this->arguments['sid'] = substr($_COOKIE['zbx_sessionid'], 16, 16);
+
+		return $this;
+	}
+
 	public function toString() {
 		return $this->getUrl();
 	}

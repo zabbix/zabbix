@@ -113,7 +113,7 @@ $params = [
 		'dns' => $search,
 		'ip' => $search
 	],
-	'countOutput' => 1,
+	'countOutput' => true,
 	'searchByAny' => true
 ];
 
@@ -278,7 +278,7 @@ $rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
 $params = [
 	'search' => ['name' => $search],
-	'countOutput' => 1
+	'countOutput' => true
 ];
 $overalCount = API::HostGroup()->get($params);
 $viewCount = count($hostGroups);
@@ -396,7 +396,7 @@ if ($admin) {
 			'host' => $search,
 			'name' => $search
 		],
-		'countOutput' => 1,
+		'countOutput' => true,
 		'searchByAny' => true
 	];
 

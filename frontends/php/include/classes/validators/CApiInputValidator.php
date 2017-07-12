@@ -64,16 +64,29 @@ class CApiInputValidator {
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
+	 * @param array  $parent_data
 	 *
 	 * @return bool
 	 */
-	private static function validateData($rule, &$data, $path, &$error) {
+	private static function validateData($rule, &$data, $path, &$error, array $parent_data = null) {
 		switch ($rule['type']) {
+			case API_MULTIPLE:
+				if ($parent_data !== null) {
+					return self::validateMultiple($rule, $data, $path, $error, $parent_data);
+				}
+				break;
+
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
+			case API_STRINGS_UTF8:
+				return self::validateStringsUtf8($rule, $data, $path, $error);
+
 			case API_INT32:
 				return self::validateInt32($rule, $data, $path, $error);
+
+			case API_INTS32:
+				return self::validateInts32($rule, $data, $path, $error);
 
 			case API_ID:
 				return self::validateId($rule, $data, $path, $error);
@@ -86,6 +99,9 @@ class CApiInputValidator {
 
 			case API_OBJECT:
 				return self::validateObject($rule, $data, $path, $error);
+
+			case API_OUTPUT:
+				return self::validateOutput($rule, $data, $path, $error);
 
 			case API_IDS:
 				return self::validateIds($rule, $data, $path, $error);
@@ -136,12 +152,14 @@ class CApiInputValidator {
 	 */
 	private static function validateDataUniqueness($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
+			case API_MULTIPLE:
 			case API_STRING_UTF8:
 			case API_INT32:
 			case API_ID:
 			case API_BOOLEAN:
 			case API_FLAG:
 			case API_OBJECT:
+			case API_OUTPUT:
 			case API_HG_NAME:
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
@@ -153,7 +171,9 @@ class CApiInputValidator {
 				return true;
 
 			case API_IDS:
-				return self::validateIdsUniqueness($rule, $data, $path, $error);
+			case API_STRINGS_UTF8:
+			case API_INTS32:
+				return self::validateStringsUniqueness($rule, $data, $path, $error);
 
 			case API_OBJECTS:
 				return self::validateObjectsUniqueness($rule, $data, $path, $error);
@@ -195,6 +215,33 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Myltiple data types validator.
+	 *
+	 * @param array  $rule
+	 * @param array  $rule['rules']
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 * @param array  $parent_data
+	 *
+	 * @return bool
+	 */
+	private static function validateMultiple($rule, &$data, $path, &$error, array $parent_data) {
+		foreach ($rule['rules'] as $field_rule) {
+			if (self::Int32In($parent_data[$field_rule['if']['field']], $field_rule['if']['in'])) {
+				unset($field_rule['if']);
+
+				return self::validateData($field_rule, $data, $path, $error);
+			}
+		}
+
+		// This message can be untranslated because warn about incorrect validation rules at a development stage.
+		$error = 'Incorrect validation rules.';
+
+		return false;
+	}
+
+	/**
 	 * String validator.
 	 *
 	 * @param array  $rule
@@ -229,6 +276,58 @@ class CApiInputValidator {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Array of strings validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: 'xml,json'
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateStringsUtf8($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateStringUtf8([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && !$data) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_STRING_UTF8];
+
+		if (array_key_exists('in', $rule)) {
+			$rules['in'] = $rule['in'];
+		}
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
 
 		return true;
 	}
@@ -273,23 +372,10 @@ class CApiInputValidator {
 		return true;
 	}
 
-	/**
-	 * @param array  $rule
-	 * @param int    $rule['in']  (optional)
-	 * @param int    $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function checkInt32In($rule, $data, $path, &$error) {
-		if (!array_key_exists('in', $rule)) {
-			return true;
-		}
-
+	private static function Int32In($data, $in) {
 		$valid = false;
 
-		foreach (explode(',', $rule['in']) as $in) {
+		foreach (explode(',', $in) as $in) {
 			if (strpos($in, ':') !== false) {
 				list($from, $to) = explode(':', $in);
 			}
@@ -304,6 +390,25 @@ class CApiInputValidator {
 			}
 		}
 
+		return $valid;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['in']  (optional)
+	 * @param int    $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkInt32In($rule, $data, $path, &$error) {
+		if (!array_key_exists('in', $rule)) {
+			return true;
+		}
+
+		$valid = self::Int32In($data, $rule['in']);
+
 		if (!$valid) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_s('value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']))
@@ -311,6 +416,58 @@ class CApiInputValidator {
 		}
 
 		return $valid;
+	}
+
+	/**
+	 * Array of integers validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: 'xml,json'
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateInts32($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateInt32([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && !$data) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_INT32];
+
+		if (array_key_exists('in', $rule)) {
+			$rules['in'] = $rule['in'];
+		}
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
+
+		return true;
 	}
 
 	/**
@@ -401,9 +558,11 @@ class CApiInputValidator {
 	/**
 	 * Object validator.
 	 *
-	 * @param array  $rule
+	 * @param array  $rul
+	 * @param int    $rule['flags']                           (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
 	 * @param int    $rule['fields'][<field_name>]['flags']   (optional) API_REQUIRED, API_DEPRECATED
+	 * @param mixed  $rule['fields'][<field_name>]['default'] (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -411,6 +570,12 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateObject($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
 		if (!is_array($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
 			return false;
@@ -428,9 +593,13 @@ class CApiInputValidator {
 		foreach ($rule['fields'] as $field_name => $field_rule) {
 			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
 
+			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
+				$data[$field_name] = $field_rule['default'];
+			}
+
 			if (array_key_exists($field_name, $data)) {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
-				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
+				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error, $data)) {
 					return false;
 				}
 				if ($flags & API_DEPRECATED) {
@@ -446,6 +615,46 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * APPI output validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_COUNT, API_ALLOW_NULL
+	 * @param string $rule['in']      (optional) comma-delimited field names, for example: 'hostid,name'
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateOutput($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (is_array($data)) {
+			$rules = ['type' => API_STRINGS_UTF8, 'uniq' => true];
+
+			if (array_key_exists('in', $rule)) {
+				$rules['in'] = $rule['in'];
+			}
+
+			return self::validateData($rules, $data, $path, $error)
+				&& self::validateDataUniqueness($rules, $data, $path, $error);
+		}
+		elseif (is_string($data)) {
+			$in = ($flags & API_ALLOW_COUNT) ? implode(',', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]) : API_OUTPUT_EXTEND;
+
+			return self::validateData(['type' => API_STRING_UTF8, 'in' => $in], $data, $path, $error);
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or a character string is expected'));
+
+		return false;
 	}
 
 	/**
@@ -728,12 +937,13 @@ class CApiInputValidator {
 		 * It's possible to enter seconds as integers, but by default now we look for strings. For example: "30m".
 		 * Other rules like emptiness and invalid characters are validated by parsers.
 		 */
-		if (!is_int($data) && !is_string($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
-			return false;
+		if (is_int($data)) {
+			$data = (string) $data;
 		}
 
-		$data = (string) $data;
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
 
 		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => ($flags & API_ALLOW_USER_MACRO)]);
 
@@ -757,18 +967,17 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Array of ids uniqueness validator.
+	 * Array of ids, int32 or strings uniqueness validator.
 	 *
 	 * @param array  $rule
 	 * @param bool   $rule['uniq']    (optional)
-	 * @param array  $rule['fields']
 	 * @param array  $data
 	 * @param string $path
 	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	private static function validateIdsUniqueness($rule, array $data = null, $path, &$error) {
+	private static function validateStringsUniqueness($rule, array $data = null, $path, &$error) {
 		// $data can be NULL when API_ALLOW_NULL is set
 		if ($data === null) {
 			return true;

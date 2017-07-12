@@ -27,54 +27,19 @@ class CScreenTriggersOverview extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		// fetch hosts
-		$hosts = API::Host()->get([
-			'output' => ['hostid', 'status'],
-			'selectGraphs' => ($this->screenitem['style'] == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
-			'selectScreens' => ($this->screenitem['style'] == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
-			'groupids' => $this->screenitem['resourceid'],
-			'preservekeys' => true
-		]);
-
-		$hostids = array_keys($hosts);
-
-		$options = [
-			'output' => [
-				'triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'
-			],
-			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
-			'hostids' => $hostids,
-			'monitored' => true,
-			'skipDependent' => true,
-			'sortfield' => 'description',
-			'preservekeys' => true
-		];
-
-		// application filter
-		if ($this->screenitem['application'] !== '') {
-			$applications = API::Application()->get([
-				'output' => [],
-				'hostids' => $hostids,
-				'search' => ['name' => $this->screenitem['application']],
-				'preservekeys' => true
-			]);
-			$options['applicationids'] = array_keys($applications);
-		}
-
-		$triggers = API::Trigger()->get($options);
-
-		$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
-
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
-			'groupids' => [$this->screenitem['resourceid']]
+			'groupids' => $this->screenitem['resourceid']
 		]);
 
 		$header = (new CDiv([
 			new CTag('h4', true, _('Trigger overview')),
 			(new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
+
+		list($hosts, $triggers) = getTriggersOverviewData((array) $this->screenitem['resourceid'],
+			$this->screenitem['application'], $this->screenitem['style']
+		);
 
 		$table = getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'], $this->screenid);
 

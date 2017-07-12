@@ -76,8 +76,8 @@ class CAlert extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'time_from'					=> null,
 			'time_till'					=> null,
 			'searchWildcardsEnabled'	=> null,
@@ -86,8 +86,8 @@ class CAlert extends CApiService {
 			'selectMediatypes'			=> null,
 			'selectUsers'				=> null,
 			'selectHosts'				=> null,
-			'countOutput'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'preservekeys'				=> false,
 			'editable'					=> null,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
@@ -314,7 +314,7 @@ class CAlert extends CApiService {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -324,7 +324,7 @@ class CAlert extends CApiService {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -362,7 +362,7 @@ class CAlert extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			if ($options['selectUsers'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('userid'), $sqlParts);
 			}
