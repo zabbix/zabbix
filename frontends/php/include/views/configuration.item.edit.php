@@ -99,7 +99,7 @@ if (!$readonly) {
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.php?srctbl=items&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
 			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&only_hostid='.$data['hostid'].
-			'&excludeids[]='.$data['itemid'].'");'
+			'&with_webitems=0&excludeids[]='.$data['itemid'].'");'
 		);
 }
 

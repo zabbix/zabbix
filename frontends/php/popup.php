@@ -198,7 +198,8 @@ $fields = [
 	'noempty' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'select' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'submitParent' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
-	'templateid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null]
+	'templateid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'with_webitems' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 
 // unset disabled item types
@@ -274,6 +275,7 @@ $host = getRequest('host', '');
 $onlyHostid = getRequest('only_hostid');
 $parentDiscoveryId = getRequest('parent_discoveryid');
 $templateid = getRequest('templateid');
+$with_webitems = (bool) getRequest('with_webitems', true);
 
 if (isset($onlyHostid)) {
 	$_REQUEST['hostid'] = $onlyHostid;
@@ -1260,7 +1262,9 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 		$items = API::ItemPrototype()->get($options);
 	}
 	else {
-		$options['webitems'] = true;
+		if ($with_webitems) {
+			$options['webitems'] = true;
+		}
 
 		if ($normalOnly !== null) {
 			$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
