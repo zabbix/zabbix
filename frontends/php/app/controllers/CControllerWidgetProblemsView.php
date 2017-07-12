@@ -19,10 +19,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
 class CControllerWidgetProblemsView extends CController {
+
+	private $form;
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -76,9 +77,9 @@ class CControllerWidgetProblemsView extends CController {
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
-			'groupids' => getSubGroups((array) $fields['groupids']),
-			'exclude_groupids' => getSubGroups((array) $fields['exclude_groupids']),
-			'hostids' => (array) $fields['hostids'],
+			'groupids' => getSubGroups($fields['groupids']),
+			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
+			'hostids' => $fields['hostids'],
 			'problem' => $fields['problem'],
 			'severities' => $fields['severities'],
 			'maintenance' => $fields['maintenance'],

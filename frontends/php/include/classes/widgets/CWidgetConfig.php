@@ -173,6 +173,9 @@ class CWidgetConfig {
 			case WIDGET_PROBLEMS:
 				return new CProblemsWidgetForm($data);
 
+			case WIDGET_WEB_OVERVIEW:
+				return new CWebWidgetForm($data);
+
 			default:
 				// TODO VM: delete this case after all widget forms will be created
 				return new CWidgetForm($data);
