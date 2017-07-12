@@ -45,8 +45,10 @@ function SVGCanvas(options, shadowBuffer) {
 	this.buffer = null;
 
 	this.root = this.createElement('svg', {
-		'width': options.width,
-		'height': options.height
+		'viewBox': '0 0 ' + options.width + ' ' + options.height,
+		'width': '100%',
+		'height': '100%',
+		'style': 'max-width: ' + options.width + 'px; max-height: ' + options.height + 'px;'
 	}, null);
 
 	if (shadowBuffer === true) {

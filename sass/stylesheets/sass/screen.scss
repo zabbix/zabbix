@@ -4424,6 +4424,12 @@ tr.cursor-move {
 	fill: $clock-lines-color;
 }
 
+.sysmap-widget-container {
+	overflow: hidden;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
 .navtree {
 	$max_depth: 10;
 	height: 100%;

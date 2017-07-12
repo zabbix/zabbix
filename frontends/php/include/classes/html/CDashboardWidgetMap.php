@@ -110,9 +110,7 @@ class CDashboardWidgetMap extends CDiv {
 
 			$map_div = (new CDiv())
 				->setId('map_'.$this->uniqueid)
-				->addStyle('width:'.$this->sysmap_data['canvas']['width'].'px;')
-				->addStyle('height:'.$this->sysmap_data['canvas']['height'].'px;')
-				->addStyle('overflow:hidden;');
+				->addClass('sysmap-widget-container');
 
 			$this->addStyle('position:relative;');
 			$this->addItem($map_div);
