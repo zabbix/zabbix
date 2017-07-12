@@ -588,6 +588,25 @@ class CItem extends CItemGeneral {
 			'editable' => true,
 			'preservekeys' => true
 		]);
+		$dependent_items = [];
+		$db_dependent_items = $delItems;
+
+		do {
+			$db_dependent_items = $this->get([
+				'output'		=> ['itemid', 'master_itemid'],
+				'filter'		=> ['master_itemid' => array_keys($db_dependent_items)],
+				'preservekeys'	=> true
+			]);
+			$dependent_items = $dependent_items + $db_dependent_items;
+		} while ($db_dependent_items);
+
+		foreach ($dependent_items as $dependent_item) {
+			if (!array_key_exists($dependent_item['itemid'], $delItems)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" have dependent item and can not be removed.',
+					$delItems[$dependent_item['master_itemid']]['name']
+				));
+			}
+		}
 
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
