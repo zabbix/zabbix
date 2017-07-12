@@ -185,20 +185,24 @@ class CMap extends CMapElement {
 			$result[$sysmap['sysmapid']]['accessible_elements'] = 0;
 		}
 
-		// If Selements are not required, request only details needed to validate map permissions:
-		$remove_selements = false;
-		if ($options['selectSelements'] === null) {
-			$options['selectSelements'] = ['selementid', 'elements', 'elementtype'];
-			$remove_selements = true;
-		}
-		$remove_links = false;
-		if ($options['selectLinks'] === null) {
-			$options['selectLinks'] = ['sysmapid', 'linkid', 'linktriggers'];
-			$remove_links = true;
-		}
-
 		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
+			// If Selements are not required, request only details needed to validate map permissions:
+			$rewritten_options['selectSelements'] = [];
+			$rewritten_options['selectLinks'] = [];
+
+			if ($options['selectSelements'] !== null && $options['selectSelements'] !== API_OUTPUT_COUNT) {
+				$rewritten_options['selectSelements'] = $options['selectSelements'];
+			}
+			if ($options['selectLinks'] !== null && $options['selectLinks'] !== API_OUTPUT_COUNT) {
+				$rewritten_options['selectLinks'] = $options['selectLinks'];
+			}
+
+			$rewritten_options['selectSelements'] = $this->outputExtend($rewritten_options['selectSelements'],
+				['selementid', 'elements', 'elementtype']);
+			$rewritten_options['selectLinks'] = $this->outputExtend($rewritten_options['selectLinks'],
+				['linkid', 'linktriggers']);
+
+			$result = $this->addRelatedObjects(zbx_array_merge($options, $rewritten_options), $result);
 		}
 
 		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -433,12 +437,19 @@ class CMap extends CMapElement {
 				continue;
 			}
 
-			if ($remove_selements) {
+			// Convert selected elements and links in the form they was originaly requested.
+			if ($options['selectSelements'] === null) {
 				unset($result[$sysmap_key]['selements']);
 			}
+			elseif ($options['selectSelements'] === API_OUTPUT_COUNT) {
+				$result[$sysmap_key]['selements'] = count($result[$sysmap_key]['selements']);
+			}
 
-			if ($remove_links) {
+			if ($options['selectLinks'] === null) {
 				unset($result[$sysmap_key]['links']);
+			}
+			elseif ($options['selectLinks'] === API_OUTPUT_COUNT) {
+				$result[$sysmap_key]['links'] = count($result[$sysmap_key]['links']);
 			}
 
 			/*
