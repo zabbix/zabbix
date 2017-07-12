@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 $item = ($data['url']['error'] !== null)
 	? (new CTableInfo())->setNoDataMessage($data['url']['error'])
 	: (new CIFrame($data['url']['url'], '100%', '98%', 'auto')); // height is 98% to remove vertical scroll on widget

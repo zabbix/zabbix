@@ -18,22 +18,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CWidgetFieldComboBox extends CWidgetField {
+
 	protected $values;
 
-	public function __construct($name, $label, $values, $default = null, $action = null, $save_type = ZBX_WIDGET_FIELD_TYPE_STR) {
-		parent::__construct($name, $label, $default, $action);
-		$this->setSaveType($save_type);
-		$this->values = $values;
-	}
+	/**
+	 * Combo box widget field. Can use both, string and integer type keys.
+	 *
+	 * @param string $name    field name in form
+	 * @param string $label   label for the field in form
+	 * @param array  $values  key/value pairs of combo box values. Key - saved in DB. Value - visible to user.
+	 */
+	public function __construct($name, $label, $values) {
+		parent::__construct($name, $label);
 
-	public function setValue($value) {
-		if ($value === null) {
-			parent::setValue($value);
-		} elseif (array_key_exists($value, $this->values)) {
-			parent::setValue($value);
-		}
-		return $this;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
+		$this->values = $values;
+		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
 	}
 
 	public function getValues() {

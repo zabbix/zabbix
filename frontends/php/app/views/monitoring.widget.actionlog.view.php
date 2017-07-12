@@ -26,7 +26,7 @@ $sort_div = (new CSpan())
 // create alert table
 $table = (new CTableInfo())
 	->setHeader([
-		($data['sortfield'] === 'clock') ? [('Time'), $sort_div] : _('Time'),
+		($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'),
 		_('Action'),
 		($data['sortfield'] === 'description') ? [_('Type'), $sort_div] : _('Type'),
 		($data['sortfield'] === 'sendto') ? [_('Recipient'), $sort_div] : _('Recipient'),

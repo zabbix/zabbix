@@ -20,32 +20,34 @@
 
 
 class CActionLogWidgetForm extends CWidgetForm {
+
 	public function __construct($data)
 	{
 		parent::__construct($data);
 
 		$sort_types = [
-			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
-			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
+			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient').' ('._('ascending').')'
 		];
 
-		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types,
-			SCREEN_SORT_TRIGGERS_TIME_DESC, null, ZBX_WIDGET_FIELD_TYPE_INT32
-		))->setRequired(true);
+		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types))
+			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
 		if (array_key_exists('sort_triggers', $data)) {
-			$field_sort->setValue($data['sort_triggers']);
+			$field_sort->setValue((int)$data['sort_triggers']);
 		}
 		$this->fields[] = $field_sort;
 
-		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), 25, 1, 100))
-			->setRequired(true);
+		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
+			ZBX_MAX_WIDGET_LINES
+		))->setDefault(25);
+
 		if (array_key_exists('show_lines', $data)) {
 			$field_lines->setValue($data['show_lines']);
 		}

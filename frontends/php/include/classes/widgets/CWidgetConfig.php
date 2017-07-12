@@ -20,6 +20,7 @@
 
 
 class CWidgetConfig {
+
 	/**
 	 * Return list of all widget types with names.
 	 *
@@ -31,7 +32,7 @@ class CWidgetConfig {
 		return [
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix'),
-			WIDGET_LAST_ISSUES			=> _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
+			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_WEB_OVERVIEW			=> _('Web monitoring'),
 			WIDGET_DISCOVERY_STATUS		=> _('Discovery status'),
 			WIDGET_GRAPH				=> _('Graph'),
@@ -58,10 +59,11 @@ class CWidgetConfig {
 	 */
 	private static function getDefaultDimensions()
 	{
+		// TODO AV: review and accept default dimentions
 		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
-			WIDGET_LAST_ISSUES			=> ['width' => 6, 'height' => 6],
+			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
 			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
 			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 5, 'height' => 5],
@@ -113,7 +115,7 @@ class CWidgetConfig {
 	public static function getDefaultRfRate($type) {
 		switch ($type) {
 			case WIDGET_SYSTEM_STATUS:
-			case WIDGET_LAST_ISSUES:
+			case WIDGET_PROBLEMS:
 			case WIDGET_WEB_OVERVIEW:
 			case WIDGET_DISCOVERY_STATUS:
 			case WIDGET_GRAPH:
@@ -154,49 +156,6 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Returns key, where value is stored for given field type.
-	 *
-	 * @static
-	 *
-	 * @param int $field_type  ZBX_WIDGET_FIELD_TYPE_ constant
-	 *
-	 * @return string  field key, where to save the value
-	 */
-	public static function getApiFieldKey($field_type){
-		switch ($field_type) {
-			case ZBX_WIDGET_FIELD_TYPE_INT32:
-				return 'value_int';
-
-			case ZBX_WIDGET_FIELD_TYPE_STR:
-				return 'value_str';
-
-			case ZBX_WIDGET_FIELD_TYPE_GROUP:
-				return 'value_groupid';
-
-			case ZBX_WIDGET_FIELD_TYPE_HOST:
-				return 'value_hostid';
-
-			case ZBX_WIDGET_FIELD_TYPE_ITEM:
-				return 'value_itemid';
-
-			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-				return 'value_itemid';
-
-			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-				return 'value_graphid';
-
-			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-				return 'value_graphid';
-
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				return 'value_sysmapid';
-
-			case ZBX_WIDGET_FIELD_TYPE_DASHBOARD:
-				return 'value_dashboardid';
-		}
-	}
-
-	/**
 	 * Return Form object for widget with provided data.
 	 *
 	 * @static
@@ -213,10 +172,10 @@ class CWidgetConfig {
 				return new CClockWidgetForm($data);
 
 			case WIDGET_NAVIGATION_TREE:
-				return (new CNavigationWidgetForm($data));
+				return new CNavigationWidgetForm($data);
 
 			case WIDGET_SYSMAP:
-				return (new CSysmapWidgetForm($data));
+				return new CSysmapWidgetForm($data);
 
 			case WIDGET_URL:
 				return new CUrlWidgetForm($data);
@@ -232,6 +191,9 @@ class CWidgetConfig {
 
 			case WIDGET_GRAPH:
 				return new CGraphWidgetForm($data);
+
+			case WIDGET_PROBLEMS:
+				return new CProblemsWidgetForm($data);
 
 			default:
 				// TODO VM: delete this case after all widget forms will be created

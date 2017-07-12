@@ -20,23 +20,21 @@
 
 
 class CUrlWidgetForm extends CWidgetForm {
+
 	public function __construct($data) {
 		parent::__construct($data);
 
 		// URL field
-		$field_url = (new CWidgetFieldTextBox('url', _('URL')));
+		$field_url = new CWidgetFieldTextBox('url', _('URL'));
 		if (array_key_exists('url', $data)) {
 			$field_url->setValue($data['url']);
 		}
 		$this->fields[] = $field_url;
 
 		// Dynamic item
-		$field_dynamic = (new CWidgetFieldCheckbox('dynamic', _('Dynamic item')));
+		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 		if (array_key_exists('dynamic', $data)) {
-			$field_dynamic->setValue($data['dynamic']);
-		}
-		else {
-			$field_dynamic->setValue(false);
+			$field_dynamic->setValue((int) $data['dynamic']);
 		}
 		$this->fields[] = $field_dynamic;
 	}

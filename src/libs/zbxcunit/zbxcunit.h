@@ -150,6 +150,17 @@ typedef int (*zbx_cu_init_suite_func_t)(void);
 			__FILE__, "", CU_TRUE);									\
 		}
 
+#define ZBX_CU_ASSERT_PTR_NULL_FATAL(desc, ptr) {								\
+		CU_assertImplementation((ptr == NULL) , __LINE__,						\
+			zbx_cu_assert_args_str(desc, "==", #ptr, "", "NULL", ""),				\
+			__FILE__, "", CU_TRUE);									\
+		}
+
+#define ZBX_CU_ASSERT_PTR_NOT_NULL_FATAL(desc, ptr) {								\
+		CU_assertImplementation((ptr != NULL) , __LINE__,						\
+			zbx_cu_assert_args_str(desc, "!=", #ptr, "", "NULL", ""),				\
+			__FILE__, "", CU_TRUE);									\
+		}
 
 const char	*zbx_cu_assert_args_str(const char *description, const char *operation, const char *expression1,
 		const char *actual, const char *expression2, const char *expected);

@@ -4,17 +4,17 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates</name>
+         <name>Templates/Network Devices</name>
       </group>
    </groups>
    <templates>
       <template>
          <template>Template Alcatel Timetra TiMOS SNMPv1</template>
          <name>Template Alcatel Timetra TiMOS SNMPv1</name>
-         <description>Template Alcatel Timetra TiMOS version: 0.7</description>
+         <description>Template Alcatel Timetra TiMOS version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Network Devices</name>
             </group>
          </groups>
          <applications>
@@ -62,8 +62,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>TIMETRA-SYSTEM-MIB The value of sgiCpuUsage indicates the current CPU utilization for the system.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: TIMETRA-SYSTEM-MIB
+The value of sgiCpuUsage indicates the current CPU utilization for the system.
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -101,8 +103,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>TIMETRA-SYSTEM-MIB The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in kilobytes, currently in use on the system.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: TIMETRA-SYSTEM-MIB
+The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in kilobytes, currently in use on the system.
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -145,8 +149,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>TIMETRA-SYSTEM-MIB The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobytes, in the overall system that is not allocated to memory pools, but is available in case a memory pool needs to grow.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: TIMETRA-SYSTEM-MIB
+The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobytes, in the overall system that is not allocated to memory pools, but is available in case a memory pool needs to grow.
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -189,8 +195,9 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>Memory utilization in %</description>
+               <port>{$SNMP_PORT}</port>
+               <description>Memory utilization in %
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -228,8 +235,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+
+</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -273,8 +282,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+
+</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -318,7 +329,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                      <evaltype>0</evaltype>
                      <formula/>
@@ -362,8 +373,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>TIMETRA-SYSTEM-MIB The current temperature reading in degrees celsius from this hardware component's temperature sensor.  If this component does not contain a temperature sensor, then the value -1 is returned.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: TIMETRA-SYSTEM-MIB
+The current temperature reading in degrees celsius from this hardware component's temperature sensor.  If this component does not contain a temperature sensor, then the value -1 is returned.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -387,7 +400,8 @@
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
@@ -409,7 +423,8 @@
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -425,7 +440,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -460,7 +476,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                      <evaltype>0</evaltype>
                      <formula/>
@@ -504,8 +520,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>TIMETRA-SYSTEM-MIB Current status of the Fan tray.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: TIMETRA-SYSTEM-MIB
+Current status of the Fan tray.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -531,7 +549,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the fan unit</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -565,7 +584,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                         <evaltype>1</evaltype>
                         <formula/>
@@ -608,8 +627,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>TIMETRA-CHASSIS-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: TIMETRA-CHASSIS-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -633,7 +654,8 @@
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.{#ENT_NAME} serial number has changed. Ack to close</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+{#ENT_NAME} serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
                      <dependencies/>
@@ -684,8 +706,18 @@
                <macro>{$STORAGE_UTIL_WARN}</macro>
                <value>80</value>
             </macro>
+            <macro>
+               <macro>{$SNMP_PORT}</macro>
+               <value>161</value>
+            </macro>
          </macros>
          <templates>
+            <template>
+               <name>Template SNMP Interfaces SNMPv1</name>
+            </template>
+            <template>
+               <name>Template SNMP EtherLike-MIB SNMPv1</name>
+            </template>
             <template>
                <name>Template SNMP Generic SNMPv1</name>
             </template>
@@ -693,7 +725,72 @@
          <screens/>
       </template>
    </templates>
-   <graphs/>
+   <graphs>
+      <graph>
+         <name>CPU utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+                     <graph_item>
+                        <sortorder>0</sortorder>
+                        <drawtype>5</drawtype>
+                        <color>1A7C11</color>
+                        <yaxisside>0</yaxisside>
+                        <calc_fnc>2</calc_fnc>
+                        <type>0</type>
+                        <item>
+                           <host>Template Alcatel Timetra TiMOS SNMPv1</host>
+                           <key>system.cpu.util[sgiCpuUsage.0]</key>
+                        </item>
+                     </graph_item>
+                  </graph_items>
+      </graph>
+      <graph>
+         <name>Memory utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+                     <graph_item>
+                        <sortorder>0</sortorder>
+                        <drawtype>5</drawtype>
+                        <color>1A7C11</color>
+                        <yaxisside>0</yaxisside>
+                        <calc_fnc>2</calc_fnc>
+                        <type>0</type>
+                        <item>
+                           <host>Template Alcatel Timetra TiMOS SNMPv1</host>
+                           <key>vm.memory.pused[vm.memory.pused.0]</key>
+                        </item>
+                     </graph_item>
+                  </graph_items>
+      </graph>
+   </graphs>
    <triggers>
       <trigger>
          <expression>{Template Alcatel Timetra TiMOS SNMPv1:system.cpu.util[sgiCpuUsage.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
@@ -705,7 +802,8 @@
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -721,7 +819,8 @@
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>

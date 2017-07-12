@@ -23,6 +23,7 @@
  * Widget Field for numeric box
  */
 class CWidgetFieldNumericBox extends CWidgetField {
+
 	/**
 	 * Allowed min value
 	 *
@@ -38,42 +39,27 @@ class CWidgetFieldNumericBox extends CWidgetField {
 	private $max;
 
 	/**
-	 * A numeric box constructor.
+	 * A numeric box widget field.
 	 *
-	 * @param string $name
-	 * @param string $label
-	 * @param mixed  $default
-	 * @param int    $min
-	 * @param int    $max
+	 * @param string $name   field name in form
+	 * @param string $label  label for the field in form
+	 * @param int    $min    minimal allowed value (this included)
+	 * @param int    $max    maximal allowed value (this included)
 	 */
-	public function __construct($name, $label, $default = null, $min = 0, $max = ZBX_MAX_INT32) {
-		parent::__construct($name, $label, $default);
+	public function __construct($name, $label, $min = 0, $max = ZBX_MAX_INT32) {
+		parent::__construct($name, $label);
 
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 		$this->min = $min;
 		$this->max = $max;
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
+		$this->setExValidationRules(['in' => $this->min.':'.$this->max]);
 	}
 
 	public function getMaxLength() {
-		return strlen((string)$this->max);
+		return strlen((string) $this->max);
 	}
 
-	/**
-	 * Validate.
-	 *
-	 * @return array
-	 */
-	public function validate()
-	{
-		$errors = parent::validate();
-		$value = $this->getValue(true);
-
-		if ($value !== null && ($value < $this->min || $value > $this->max)) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(),
-				_s('must be between "%1$s" and "%2$s"', $this->min, $this->max)
-			);
-		}
-
-		return $errors;
+	public function setValue($value) {
+		return parent::setValue((int) $value);
 	}
 }

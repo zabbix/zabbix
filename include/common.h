@@ -435,7 +435,8 @@ typedef enum
 {
 	ALERT_STATUS_NOT_SENT = 0,
 	ALERT_STATUS_SENT,
-	ALERT_STATUS_FAILED
+	ALERT_STATUS_FAILED,
+	ALERT_STATUS_NEW
 }
 zbx_alert_status_t;
 const char	*zbx_alert_status_string(unsigned char type, unsigned char status);
@@ -1057,6 +1058,8 @@ int	is_ip4(const char *ip);
 int	is_supported_ip(const char *ip);
 int	is_ip(const char *ip);
 
+int	zbx_validate_hostname(const char *hostname);
+
 void	zbx_on_exit(void); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
@@ -1367,7 +1370,9 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_OCT2DEC		7
 #define ZBX_PREPROC_HEX2DEC		8
 #define ZBX_PREPROC_DELTA_VALUE		9
-#define ZBX_PREPROC_DELTA_SPEED 	10
+#define ZBX_PREPROC_DELTA_SPEED		10
+#define ZBX_PREPROC_XPATH		11
+#define ZBX_PREPROC_JSONPATH		12
 
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1

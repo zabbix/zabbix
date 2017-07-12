@@ -53,7 +53,17 @@ class CControllerDashbrdWidgetConfig extends CController {
 		$type = $this->getInput('type', WIDGET_CLOCK);
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', []));
 
+		$config = select_config();
+
 		$this->setResponse(new CControllerResponseData([
+			'config' => [
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
@@ -74,23 +84,15 @@ class CControllerDashbrdWidgetConfig extends CController {
 	 * @return array
 	 */
 	private function getCaptions($form) {
-		// TODO VM: (?) currently it will have both, numeric and textual keys. Also, ones will come from defines, others will not.
-		//				(maybe it is good to add 'groups' to defines as well? Or maybe it can be improved, not to mix different key types.
-		$captions = [
-			'groups' => []
-		];
+		$captions = [];
+
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldSelectResource) {
 				if (!array_key_exists($field->getResourceType(), $captions)) {
 					$captions[$field->getResourceType()] = [];
 				}
-				if ($field->getValue(true)) {
-					$captions[$field->getResourceType()][$field->getValue(true)] = _('Unknown');
-				}
-			}
-			if ($field instanceof CWidgetFieldGroup) {
-				foreach ($field->getValue(true) as $groupid) {
-					$captions['groups'][$groupid] = _('Unknown');
+				if ($field->getValue() != 0) {
+					$captions[$field->getResourceType()][$field->getValue()] = true;
 				}
 			}
 		}
@@ -145,22 +147,63 @@ class CControllerDashbrdWidgetConfig extends CController {
 						}
 					}
 					break;
+			}
+		}
 
-				case 'groups':
-					$groups = API::HostGroup()->get([
-						'output' => ['groupid', 'name'],
-						'groupids' => array_keys($list)
-					]);
+		// Prepare data for CMultiselect controls.
+		$groupids = [];
+		$hostids = [];
 
-					$captions['groups'] = [];
+		foreach ($form->getFields() as $field) {
+			if ($field instanceof CWidgetFieldGroup) {
+				$field_name = $field->getName();
+				$captions['groups'][$field_name] = [];
 
-					foreach ($groups as $group) {
-						$captions['groups'][] = [
-							'id' => $group['groupid'],
-							'name' => $group['name']
-						];
-					}
-					break;
+				foreach ($field->getValue() as $groupid) {
+					$groupids[$groupid][] = $field_name;
+				}
+			}
+			elseif ($field instanceof CWidgetFieldHost) {
+				$field_name = $field->getName();
+				$captions['hosts'][$field_name] = [];
+
+				foreach ($field->getValue() as $hostid) {
+					$hostids[$hostid][] = $field_name;
+				}
+			}
+		}
+
+		if ($groupids) {
+			$groups = API::HostGroup()->get([
+				'output' => ['name'],
+				'groupids' => array_keys($groupids),
+				'preservekeys' => true
+			]);
+
+			foreach ($groups as $groupid => $group) {
+				foreach ($groupids[$groupid] as $field_name) {
+					$captions['groups'][$field_name][] = [
+						'id' => $groupid,
+						'name' => $group['name']
+					];
+				}
+			}
+		}
+
+		if ($hostids) {
+			$hosts = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => array_keys($hostids),
+				'preservekeys' => true
+			]);
+
+			foreach ($hosts as $hostid => $host) {
+				foreach ($hostids[$hostid] as $field_name) {
+					$captions['hosts'][$field_name][] = [
+						'id' => $hostid,
+						'name' => $host['name']
+					];
+				}
 			}
 		}
 

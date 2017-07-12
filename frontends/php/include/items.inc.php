@@ -392,7 +392,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
 			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port', 'description', 'inventory_link'
+			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
@@ -460,7 +460,7 @@ function copyItems($srcHostId, $dstHostId) {
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
 			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port',	'description', 'inventory_link'
+			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
@@ -652,16 +652,16 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  *
  * @return CTableInfo
  */
-function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
+function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	// application filter
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
-			'groupids' => $groupids,
+			'groupids' => $groupids ? $groupids : null,
 			'search' => ['name' => $application],
 			'preservekeys' => true
 		]));
-		$groupids = null;
+		$groupids = [];
 	}
 	else {
 		$applicationids = null;
@@ -670,7 +670,7 @@ function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
 	$db_items = API::Item()->get([
 		'output' => ['itemid', 'hostid', 'key_', 'name', 'value_type', 'units', 'valuemapid'],
 		'selectHosts' => ['name'],
-		'groupids' => $groupids,
+		'groupids' => $groupids ? $groupids : null,
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'webitems' => true,
@@ -680,7 +680,7 @@ function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
 	$db_triggers = API::Trigger()->get([
 		'output' => ['triggerid', 'priority', 'value'],
 		'selectItems' => ['itemid'],
-		'groupids' => $groupids,
+		'groupids' => $groupids ? $groupids : null,
 		'applicationids' => $applicationids,
 		'monitored' => true
 	]);
@@ -693,9 +693,9 @@ function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
 				// a little tricky check for attempt to overwrite active trigger (value=1) with
 				// inactive or active trigger with lower priority.
 				if (!array_key_exists('triggerid', $db_item)
-						|| ($db_item['value'] == TRIGGER_VALUE_FALSE && $item['value'] == TRIGGER_VALUE_TRUE)
-						|| (($db_item['value'] == TRIGGER_VALUE_FALSE || $item['value'] == TRIGGER_VALUE_TRUE)
-							&& $db_item['priority'] < $item['priority'])) {
+						|| ($db_item['value'] == TRIGGER_VALUE_FALSE && $db_trigger['value'] == TRIGGER_VALUE_TRUE)
+						|| (($db_item['value'] == TRIGGER_VALUE_FALSE || $db_trigger['value'] == TRIGGER_VALUE_TRUE)
+							&& $db_item['priority'] < $db_trigger['priority'])) {
 					$db_item['triggerid'] = $db_trigger['triggerid'];
 					$db_item['priority'] = $db_trigger['priority'];
 					$db_item['value'] = $db_trigger['value'];
@@ -720,7 +720,7 @@ function getItemsDataOverview(array $groupids = null, $application, $viewMode) {
 	$hosts = API::Host()->get([
 		'output' => ['name', 'hostid', 'status'],
 		'monitored_hosts' => true,
-		'groupids' => $groupids,
+		'groupids' => $groupids ? $groupids : null,
 		'applicationids' => $applicationids,
 		'with_monitored_items' => true,
 		'preservekeys' => true,
@@ -1433,6 +1433,8 @@ function getParamFieldLabelByType($itemType) {
  *                                               [4] => Trim
  *                                               [2] => Right trim
  *                                               [3] => Left trim
+ *                                               [11] => XML XPath
+ *                                               [12] => JSON Path
  *                                               [1] => Custom multiplier
  *                                               [9] => Simple change
  *                                               [10] => Speed per second
@@ -1454,6 +1456,13 @@ function get_preprocessing_types($type = null, $grouped = true) {
 				ZBX_PREPROC_TRIM => _('Trim'),
 				ZBX_PREPROC_RTRIM => _('Right trim'),
 				ZBX_PREPROC_LTRIM => _('Left trim')
+			]
+		],
+		[
+			'label' => _('Structured data'),
+			'types' => [
+				ZBX_PREPROC_XPATH => _('XML XPath'),
+				ZBX_PREPROC_JSONPATH => _('JSON Path')
 			]
 		],
 		[

@@ -111,7 +111,7 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  *
  * @return CCol
  */
-function getSeverityCell($severity, $config, $text = null, $forceNormal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $forceNormal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
@@ -635,14 +635,14 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
-function getTriggersOverviewData(array $groupids = null, $application, $style, array $host_options = [],
+function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
 		array $trigger_options = []) {
 	// fetch hosts
 	$hosts = API::Host()->get([
 		'output' => ['hostid', 'status'],
 		'selectGraphs' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
 		'selectScreens' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
-		'groupids' => $groupids,
+		'groupids' => $groupids ? $groupids : null,
 		'preservekeys' => true
 	] + $host_options);
 

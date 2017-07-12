@@ -21,6 +21,8 @@
 
 class CControllerWidgetActionLogView extends CController {
 
+	private $form;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -28,15 +30,23 @@ class CControllerWidgetActionLogView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>	'string',
-			'fields' =>	'required|array'
+			'fields' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
-		/*
-		 * @var array $fields
-		 * @var int   $fields['sort_triggers']
-		 * @var int   $fields['show_lines']
-		*/
+
+		if ($ret) {
+			/*
+			 * @var array $fields
+			 * @var int   $fields['sort_triggers']  (optional)
+			 * @var int   $fields['show_lines']     (optional)
+			 */
+			$this->form = CWidgetConfig::getForm(WIDGET_ACTION_LOG, $this->getInput('fields', []));
+
+			if ($errors = $this->form->validate()) {
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			// TODO VM: prepare propper response for case of incorrect fields
@@ -51,13 +61,10 @@ class CControllerWidgetActionLogView extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG])
-		];
+		$fields = $this->form->getFieldsData();
 
-		$data += $this->getInput('fields');
-		list($sortfield, $sortorder) = $this->getSorting($data['sort_triggers']);
-		$alerts = $this->getAlerts($sortfield, $sortorder, $data['show_lines']);
+		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
+		$alerts = $this->getAlerts($sortfield, $sortorder, $fields['show_lines']);
 		$db_users = $this->getDbUsers($alerts);
 
 		$actions = API::Action()->get([
@@ -67,7 +74,7 @@ class CControllerWidgetActionLogView extends CController {
 		]);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $data['name'],
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG]),
 			'actions' => $actions,
 			'alerts'  => $alerts,
 			'db_users' => $db_users,
@@ -152,53 +159,37 @@ class CControllerWidgetActionLogView extends CController {
 	 *
 	 * @param int $sort_triggers
 	 *
+	 * @static
+	 *
 	 * @return array
 	 */
-	private function getSorting($sort_triggers)
+	private static function getSorting($sort_triggers)
 	{
 		switch ($sort_triggers) {
 			case SCREEN_SORT_TRIGGERS_TIME_ASC:
-				$sortfield = 'clock';
-				$sortorder = ZBX_SORT_UP;
-				break;
+				return ['clock', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_TIME_DESC:
 			default:
-				$sortfield = 'clock';
-				$sortorder = ZBX_SORT_DOWN;
-				break;
+				return ['clock', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
-				$sortfield = 'description';
-				$sortorder = ZBX_SORT_UP;
-				break;
+				return ['description', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
-				$sortfield = 'description';
-				$sortorder = ZBX_SORT_DOWN;
-				break;
+				return ['description', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_STATUS_ASC:
-				$sortfield = 'status';
-				$sortorder = ZBX_SORT_UP;
-				break;
+				return ['status', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_STATUS_DESC:
-				$sortfield = 'status';
-				$sortorder = ZBX_SORT_DOWN;
-				break;
+				return ['status', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_ASC:
-				$sortfield = 'sendto';
-				$sortorder = ZBX_SORT_UP;
-				break;
+				return ['sendto', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_DESC:
-				$sortfield = 'sendto';
-				$sortorder = ZBX_SORT_DOWN;
-				break;
+				return ['sendto', ZBX_SORT_DOWN];
 		}
-
-		return [$sortfield, $sortorder];
 	}
 }

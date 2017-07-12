@@ -45,6 +45,26 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 	];
 }
 
+$url_create = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.view')
+	->setArgument('new', '1');
+$url_clone = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.view')
+	->setArgument('source_dashboardid', $data['dashboard']['dashboardid']);
+if ($data['dashboard']['editable']) {
+	$url_delete = (new CUrl('zabbix.php'))
+		->setArgument('action', 'dashboard.delete')
+		->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
+		->setArgumentSID();
+}
+if ($data['fullscreen']) {
+	$url_create->setArgument('fullscreen', '1');
+	$url_clone->setArgument('fullscreen', '1');
+	if ($data['dashboard']['editable']) {
+		$url_delete->setArgument('fullscreen', '1');
+	}
+}
+
 (new CWidget())
 	->setTitle($data['dashboard']['name'])
 	->setControls((new CForm('post', 'zabbix.php?action=dashboard.view'))
@@ -73,28 +93,18 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 						],
 						'create' => [
 							'label' => _('Create new'),
-							'url' => (new CUrl('zabbix.php'))
-								->setArgument('action', 'dashboard.view')
-								->setArgument('new', '1')
-								->getUrl()
+							'url' => $url_create->getUrl()
 						],
 						'clone' => [
 							'label' => _('Clone'),
-							'url' => (new CUrl('zabbix.php'))
-								->setArgument('action', 'dashboard.view')
-								->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
-								->getUrl()
+							'url' => $url_clone->getUrl()
 						],
 						'delete' => [
 							'label' => _('Delete'),
 							'confirmation' => _('Delete dashboard?'),
 							'url' => 'javascript:void(0)',
 							'redirect' => $data['dashboard']['editable']
-								? (new CUrl('zabbix.php'))
-									->setArgument('action', 'dashboard.delete')
-									->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
-									->setArgumentSID()
-									->getUrl()
+								? $url_delete->getUrl()
 								: null,
 							'disabled' => !$data['dashboard']['editable']
 						]

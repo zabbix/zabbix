@@ -4,17 +4,17 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates</name>
+         <name>Templates/Network Devices</name>
       </group>
    </groups>
    <templates>
       <template>
          <template>Template Juniper SNMPv2</template>
          <name>Template Juniper SNMPv2</name>
-         <description>Template Juniper version: 0.7</description>
+         <description>Template Juniper version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Network Devices</name>
             </group>
          </groups>
          <applications>
@@ -68,8 +68,9 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>JUNIPER-ALARM-MIB The red alarm indication on the craft interface 
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: JUNIPER-ALARM-MIB
+The red alarm indication on the craft interface 
 		panel.
 
 		The red alarm is on when there is some system 
@@ -79,7 +80,8 @@
 
 		This red alarm state could be turned off by the
 		ACO/LT (Alarm Cut Off / Lamp Test) button on the
-		front panel module.</description>
+		front panel module.
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -119,8 +121,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>JUNIPER-MIB The serial number of this subject, blank if unknown or unavailable.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: JUNIPER-MIB
+The serial number of this subject, blank if unknown or unavailable.
+</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -158,8 +162,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>JUNIPER-MIB The name, model, or detailed description of the box,indicating which product the box is about, for example 'M40'.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: JUNIPER-MIB
+The name, model, or detailed description of the box,indicating which product the box is about, for example 'M40'.
+</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -197,8 +203,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+
+</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -240,7 +248,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                         <evaltype>0</evaltype>
                         <formula/>
@@ -285,8 +293,11 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>JUNIPER-MIB http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf The CPU Load Average over the last 5 minutes Here it will be shown as percentage valueZero if unavailable or inapplicable.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: JUNIPER-MIB
+The CPU Load Average over the last 5 minutes Here it will be shown as percentage valueZero if unavailable or inapplicable.
+Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -325,8 +336,11 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>JUNIPER-MIB http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf The buffer pool utilization in percentage of this subject.  Zero if unavailable or inapplicable.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: JUNIPER-MIB
+The buffer pool utilization in percentage of this subject.  Zero if unavailable or inapplicable.
+Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -350,7 +364,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -366,14 +381,80 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>[{#SNMPVALUE}] CPU utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Juniper SNMPv2</host>
+                              <key>system.cpu.util[jnxOperating5MinLoadAvg.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>[{#SNMPVALUE}] Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Juniper SNMPv2</host>
+                              <key>vm.memory.pused[jnxOperatingBuffer.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
 		          <discovery_rule>
@@ -399,7 +480,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                         <evaltype>0</evaltype>
                         <formula/>
@@ -443,8 +524,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>JUNIPER-MIB The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: JUNIPER-MIB
+The temperature in Celsius (degrees C) of {#SENSOR_INFO}
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -468,7 +551,8 @@
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
@@ -490,7 +574,8 @@
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -506,7 +591,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -539,7 +625,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -575,8 +661,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>JUNIPER-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: JUNIPER-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -602,7 +690,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the fan unit</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -636,7 +725,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -672,9 +761,11 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>JUNIPER-MIB If they are using DC power supplies there is a a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.
-This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK-MX104/m-p/289644#M14122</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: JUNIPER-MIB
+If they are using DC power supplies there is a a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.
+This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK-MX104/m-p/289644#M14122
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -700,7 +791,8 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the power supply unit for errors</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -761,8 +853,18 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                <macro>{$STORAGE_UTIL_WARN}</macro>
                <value>80</value>
             </macro>
+            <macro>
+               <macro>{$SNMP_PORT}</macro>
+               <value>161</value>
+            </macro>
          </macros>
          <templates>
+            <template>
+               <name>Template SNMP Interfaces SNMPv2</name>
+            </template>
+            <template>
+               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+            </template>
             <template>
                <name>Template SNMP Generic SNMPv2</name>
             </template>
@@ -782,7 +884,8 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
          <url/>
          <status>0</status>
          <priority>4</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Please check the device for errors</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Please check the device for errors</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -798,7 +901,8 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Device serial number has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>

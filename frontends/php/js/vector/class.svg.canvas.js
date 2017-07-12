@@ -365,11 +365,13 @@ SVGCanvas.prototype.add = function (type, attributes, content) {
  * @param {object}     container       DOM node.
  */
 SVGCanvas.prototype.render = function (container) {
-	if (this.root.element.parentNode) {
-		this.root.element.parentNode.removeChild(this.root.element);
-	}
+	if (typeof container !== 'undefined') {
+		if (this.root.element.parentNode) {
+			this.root.element.parentNode.removeChild(this.root.element);
+		}
 
-	container.appendChild(this.root.element);
+		container.appendChild(this.root.element);
+	}
 };
 
 /**

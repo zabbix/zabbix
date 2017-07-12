@@ -806,7 +806,7 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
  *                                                                            *
  * Function: ipc_service_remove_client                                        *
  *                                                                            *
- * Purpose: adds a new IPC service client                                     *
+ * Purpose: removes IPC service client                                        *
  *                                                                            *
  * Parameters: service - [IN] the IPC service                                 *
  *             client  - [IN] the client to remove                            *
@@ -814,24 +814,13 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
  ******************************************************************************/
 static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client_t *client)
 {
-	const char	*__function_name = "ipc_service_remove_client";
 	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clientid:%d", __function_name, client->id);
-
-	zbx_ipc_socket_close(&client->csocket);
 
 	for (i = 0; i < service->clients.values_num; i++)
 	{
 		if (service->clients.values[i] == client)
 			zbx_vector_ptr_remove_noorder(&service->clients, i);
 	}
-
-	zbx_queue_ptr_remove_value(&service->clients_recv, client);
-
-	zbx_ipc_client_release(client);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -849,7 +838,10 @@ static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
 	ZBX_UNUSED(what);
 
 	if (SUCCEED != ipc_client_read(client))
+	{
 		ipc_client_free_events(client);
+		ipc_service_remove_client(client->service, client);
+	}
 
 	ipc_service_push_client(client->service, client);
 }
@@ -872,7 +864,7 @@ static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to IPC client");
 		ipc_client_free_events(client);
-		ipc_service_remove_client(client->service, client);
+		zbx_ipc_client_close(client);
 		return;
 	}
 
@@ -1689,7 +1681,10 @@ void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_ipc_socket_close(&client->csocket);
 	ipc_service_remove_client(client->service, client);
+	zbx_queue_ptr_remove_value(&client->service->clients_recv, client);
+	zbx_ipc_client_release(client);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
