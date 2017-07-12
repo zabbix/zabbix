@@ -118,7 +118,7 @@ class CControllerWidgetSysmapView extends CController {
 		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
 		foreach ($sysmap_data['elements'] as &$element) {
 			if ($edit_mode) {
-				$element['actions'] = json_encode([]);
+				$element['actions'] = json_encode(null);
 			}
 			else {
 				$actions = json_decode($element['actions'], true);
