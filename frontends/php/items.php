@@ -927,7 +927,8 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'privatekey' => getRequest('privatekey'),
 				'ipmi_sensor' => getRequest('ipmi_sensor'),
 				'applications' => $applications,
-				'status' => getRequest('status')
+				'status' => getRequest('status'),
+				'master_itemid' => getRequest('master_itemid')
 			];
 			if (hasRequest('preprocessing')) {
 				$preprocessing = getRequest('preprocessing');
@@ -986,6 +987,9 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			foreach ($items_to_update as $index => $update_item) {
 				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_JMX) {
 					unset($items_to_update[$index]['jmx_endpoint']);
+				}
+				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_DEPENDENT) {
+					unset($items_to_update[$index]['master_itemid']);
 				}
 			}
 
