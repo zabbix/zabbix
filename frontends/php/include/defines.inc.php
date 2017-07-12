@@ -660,6 +660,10 @@ define('SCREEN_SORT_TRIGGERS_STATUS_ASC',			7);
 define('SCREEN_SORT_TRIGGERS_STATUS_DESC',			8);
 define('SCREEN_SORT_TRIGGERS_RECIPIENT_ASC',		11);
 define('SCREEN_SORT_TRIGGERS_RECIPIENT_DESC',		12);
+define('SCREEN_SORT_TRIGGERS_SEVERITY_ASC',			13);
+define('SCREEN_SORT_TRIGGERS_HOST_NAME_DESC',		14);
+define('SCREEN_SORT_TRIGGERS_NAME_ASC',				15);
+define('SCREEN_SORT_TRIGGERS_NAME_DESC',			16);
 
 define('SCREEN_MODE_PREVIEW',	0);
 define('SCREEN_MODE_EDIT',		1);
@@ -679,7 +683,10 @@ define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
 define('SCREEN_MIN_SIZE', 1);
 define('SCREEN_MAX_SIZE', 100);
 
-define('DEFAULT_LATEST_ISSUES_CNT', 20);
+// default, minimum and macimum number of lines for dashboard widgets
+define('ZBX_DEFAULT_WIDGET_LINES', 25);
+define('ZBX_MIN_WIDGET_LINES', 1);
+define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
 define('DASHBOARD_DEFAULT_ID', 1);
@@ -1138,13 +1145,13 @@ define('WIDGET_FAVOURITE_GRAPHS',		'favgrph');
 define('WIDGET_FAVOURITE_MAPS',			'favmap');
 define('WIDGET_FAVOURITE_SCREENS',		'favscr');
 define('WIDGET_HOST_STATUS',			'hoststat');
-define('WIDGET_LAST_ISSUES',			'lastiss');
+define('WIDGET_PROBLEMS',				'problems');
 define('WIDGET_SYSTEM_STATUS',			'syssum');
 define('WIDGET_WEB_OVERVIEW',			'webovr');
 define('WIDGET_ZABBIX_STATUS',			'stszbx');
 define('WIDGET_CLOCK',					'clock');
 define('WIDGET_SYSMAP',					'sysmap');
-define('WIDGET_NAVIGATION_TREE', 'navigationtree');
+define('WIDGET_NAVIGATION_TREE',		'navigationtree');
 define('WIDGET_URL',					'url');
 define('WIDGET_ACTION_LOG',				'actlog');
 define('WIDGET_DATA_OVERVIEW',			'dataover');

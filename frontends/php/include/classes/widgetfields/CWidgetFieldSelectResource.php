@@ -58,14 +58,11 @@ class CWidgetFieldSelectResource extends CWidgetField {
 
 		$this->dstfld1 = $name;
 		$this->dstfld2 = $this->name.'_caption';
+		$this->setDefault(0);
 	}
 
 	public function getResourceType() {
 		return $this->resource_type;
-	}
-
-	public function setValue($value) {
-		return parent::setValue(($value === '') ? null : $value);
 	}
 
 	public function getPopupUrl() {
@@ -84,4 +81,15 @@ class CWidgetFieldSelectResource extends CWidgetField {
 
 		return $url->getUrl();
 	}
+
+	public function validate() {
+		$errors = parent::validate();
+
+		if (!$errors && $this->getValue() == 0) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
+		}
+
+		return $errors;
+	}
+
 }

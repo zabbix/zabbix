@@ -31,7 +31,7 @@ class CUrlWidgetForm extends CWidgetForm {
 		$this->fields[] = $field_url;
 
 		// Dynamic item
-		$field_dynamic = (new CWidgetFieldCheckbox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
+		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 		if (array_key_exists('dynamic', $data)) {
 			$field_dynamic->setValue((int) $data['dynamic']);
 		}

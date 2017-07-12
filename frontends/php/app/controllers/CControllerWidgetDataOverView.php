@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
+
 class CControllerWidgetDataOverView extends CController {
 
 	private $form;
@@ -66,7 +68,7 @@ class CControllerWidgetDataOverView extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_DATA_OVERVIEW]),
-			'groupids' => $fields['groupids'],
+			'groupids' => getSubGroups($fields['groupids']),
 			'application' => $fields['application'],
 			'style' => $fields['style'],
 			'user' => [

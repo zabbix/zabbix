@@ -18,41 +18,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldRadioButtonList extends CWidgetField {
-
-	private $values;
-	private $modern = false;
+class CWidgetFieldHost extends CWidgetField {
 
 	/**
-	 * Radio button widget field. Can use both, string and integer type keys.
+	 * Create widget field for Item selection
 	 *
-	 * @param string $name       field name in form
-	 * @param string $label      label for the field in form
-	 * @param array  $values     key/value pairs of radio button values. Key - saved in DB. Value - visible to user.
+	 * @param string      $name     field name in form
+	 * @param string      $label    label for the field in form
 	 */
-	public function __construct($name, $label, $values) {
+	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->values = $values;
-		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
+		$this->setDefault([]);
 	}
 
 	public function setValue($value) {
-		return parent::setValue((int) $value);
-	}
-
-	public function setModern($modern) {
-		$this->modern = $modern;
+		$this->value = (array) $value;
 
 		return $this;
 	}
 
-	public function getModern() {
-		return $this->modern;
-	}
-
-	public function getValues() {
-		return $this->values;
-	}
 }

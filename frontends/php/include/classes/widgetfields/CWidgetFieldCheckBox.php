@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldCheckbox extends CWidgetField {
+class CWidgetFieldCheckBox extends CWidgetField {
 
 	/**
 	 * Check box widget field.
