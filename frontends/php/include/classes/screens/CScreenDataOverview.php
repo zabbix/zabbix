@@ -27,26 +27,11 @@ class CScreenDataOverview extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$hostids = [];
-		$dbHostGroups = DBselect('SELECT DISTINCT hg.hostid FROM hosts_groups hg WHERE hg.groupid='.zbx_dbstr($this->screenitem['resourceid']));
-		while ($dbHostGroup = DBfetch($dbHostGroups)) {
-			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
-		}
-
-		// application filter
-		$applicationIds = null;
-		if ($this->screenitem['application'] !== '') {
-			$applications = API::Application()->get([
-				'output' => ['applicationid'],
-				'hostids' => $hostids,
-				'search' => ['name' => $this->screenitem['application']]
-			]);
-			$applicationIds = zbx_objectValues($applications, 'applicationid');
-		}
+		$groupid = $this->screenitem['resourceid'];
 
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
-			'groupids' => [$this->screenitem['resourceid']]
+			'groupids' => $groupid
 		]);
 
 		$header = (new CDiv([
@@ -55,7 +40,7 @@ class CScreenDataOverview extends CScreenBase {
 				->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		$table = getItemsDataOverview($hostids, $applicationIds, $this->screenitem['style']);
+		$table = getItemsDataOverview((array) $groupid, $this->screenitem['application'], $this->screenitem['style']);
 
 		$footer = (new CList())
 			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))

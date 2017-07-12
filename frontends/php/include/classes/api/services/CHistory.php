@@ -67,16 +67,16 @@ class CHistory extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			'time_from'					=> null,
 			'time_till'					=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -144,12 +144,12 @@ class CHistory extends CApiService {
 		}
 
 		// countOutput
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			$options['sortfield'] = '';
 			$sqlParts['select'] = ['count(DISTINCT h.hostid) as rowscount'];
 
 			// groupCount
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				foreach ($sqlParts['group'] as $key => $fields) {
 					$sqlParts['select'][$key] = $fields;
 				}
@@ -198,7 +198,7 @@ class CHistory extends CApiService {
 			}
 		}
 
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 		return $result;

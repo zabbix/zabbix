@@ -28,7 +28,18 @@ class CControllerWidgetWebView extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'name' =>	'string'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			// TODO VM: prepare propper response for case of incorrect fields
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -89,6 +100,7 @@ class CControllerWidgetWebView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_WEB_OVERVIEW]),
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

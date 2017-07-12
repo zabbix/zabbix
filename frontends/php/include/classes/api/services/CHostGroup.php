@@ -74,8 +74,8 @@ class CHostGroup extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
@@ -83,9 +83,9 @@ class CHostGroup extends CApiService {
 			'selectTemplates'			=> null,
 			'selectGroupDiscovery'		=> null,
 			'selectDiscoveryRule'		=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
@@ -317,8 +317,8 @@ class CHostGroup extends CApiService {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($group = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount'])) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $group;
 				}
 				else {
@@ -330,7 +330,7 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -339,7 +339,7 @@ class CHostGroup extends CApiService {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 		return $result;

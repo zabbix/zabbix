@@ -18,13 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+$item = new CNavigationTree([
+	'problems' => $data['problems'],
+	'severity_config' => $data['severity_config'],
+	'initial_load' => $data['initial_load'],
+	'uniqueid' => $data['uniqueid'],
+	'maps_accessible' => $data['maps_accessible'],
+	'navtree_item_selected' => $data['navtree_item_selected'],
+	'navtree_items_opened' => $data['navtree_items_opened']
+]);
 
-list($table, $info) = make_latest_issues($data['filter'], 'zabbix.php?action=dashboard.view');
+if ($data['error'] !== null) {
+	$item->setError($data['error']);
+}
 
 $output = [
-	'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-	'body' => $table->toString(),
-	'footer' =>(new CList([$info, _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'header' => $data['name'],
+	'body' => $item->toString(),
+	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
+	'script_file' => $item->getScriptFile(),
+	'script_inline' => $item->getScriptRun()
 ];
 
 if (($messages = getMessages()) !== null) {

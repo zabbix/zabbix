@@ -548,8 +548,10 @@ function overlayDialogue(params) {
 			type: 'button',
 			text: obj.title
 		}).click(function() {
-			obj.action();
-			overlayDialogueDestroy();
+			var res = obj.action();
+			if (res !== false && (!('keepOpen' in obj) || obj.keepOpen === false)) {
+				overlayDialogueDestroy();
+			}
 			return false;
 		});
 
@@ -572,13 +574,14 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
+	var css_body = {"margin-bottom": '50px'};
+	if (typeof params.css_body !== 'undefined') {
+		css_body = params.css_body;
+	}
 	overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
 		class: 'overlay-dialogue',
 		css: {
-			'position': 'fixed',
-			'top': '40%',
-			'left': '50%',
 			'display': 'none'
 		}
 	})
@@ -601,7 +604,8 @@ function overlayDialogue(params) {
 		)
 		.append(
 			jQuery('<div>', {
-				class: 'overlay-dialogue-body'
+				class: 'overlay-dialogue-body',
+				css: css_body
 			}).append(params.content)
 		)
 		.append(overlay_dialogue_footer)
@@ -619,11 +623,21 @@ function overlayDialogue(params) {
 		.appendTo('body')
 		.show();
 	overlay_dialogue
-		.appendTo('body')
-		.css({
-			'margin-top': '-' + (overlay_dialogue.outerHeight() / 2) + 'px',
-			'margin-left': '-' + (overlay_dialogue.outerWidth() / 2) + 'px'
-		})
+		.appendTo('body');
+
+	// position of window should be centred on 40% of top offset line and 30px max
+	var	top = Math.max(jQuery(window).innerHeight() * 0.4 - overlay_dialogue.outerHeight() / 2, 30),
+		left = Math.max((jQuery(window).innerWidth() - overlay_dialogue.outerWidth()) / 2, 0),
+		css = {
+			'position': 'fixed',
+			'top': top + 'px',
+			'left': left + 'px',
+			'max-height': (jQuery(window).innerHeight() - top) * 0.95 + 'px',
+			'overflow': 'auto'
+		};
+
+	overlay_dialogue
+		.css(css)
 		.show();
 
 	var focusable = jQuery(':focusable', overlay_dialogue);
@@ -651,6 +665,47 @@ function overlayDialogue(params) {
 
 	if (button_focused !== null) {
 		button_focused.focus();
+	}
+
+	overlayDialogueOnLoad(!button_focused);
+}
+
+/**
+ * Makes overlay dialogues more useble by:
+ *  - focusing :focusable input element with lowest tabindex value
+ *  - triggering onclick event on pressing an enter in focused element
+ *
+ * @param boolean focus			focus element with lowest tabindex
+ */
+function overlayDialogueOnLoad(focus) {
+	// Focus element with lowest tabindex attribute.
+	if (focus) {
+		var focusable = jQuery(':focusable', jQuery('#overlay_dialogue')),
+			min_tabindex = null;
+
+		focusable.attr('tabindex', function(a, b) {
+			if (typeof b !== 'undefined') {
+				min_tabindex = (typeof min_tabindex === 'number') ? Math.min(min_tabindex, +b) : +b;
+			}
+		});
+
+		if (min_tabindex !== null) {
+			focusable.filter(function() {
+				return jQuery(this).attr('tabindex') == min_tabindex;
+			}).first().focus();
+		}
+	}
+
+	// Trigger click on the first button if user press enter in textbox.
+	var writable_fields = jQuery('input[type=text], textarea', jQuery('#widget_dialogue_form'));
+	if (writable_fields.length) {
+		writable_fields.on('keydown', function(e) {
+			if (e.keyCode == 13) {
+				jQuery('button:focusable', jQuery('#overlay_dialogue > .overlay-dialogue-footer')).first()
+					.trigger('click');
+				return false;
+			}
+		});
 	}
 }
 
@@ -695,4 +750,97 @@ function executeScript(hostid, scriptid, confirmation) {
 	else {
 		execute();
 	}
+}
+
+(function($) {
+	$.fn.serializeJSON = function() {
+		var json = {};
+
+		jQuery.map($(this).serializeArray(), function(n) {
+			var	pos = n['name'].indexOf('[]');
+
+			if (pos != -1 && n['name'].length == pos + 2) {
+				n['name'] = n['name'].substr(0, pos);
+
+				if (typeof json[n['name']] === 'undefined') {
+					json[n['name']] = [];
+				}
+
+				json[n['name']].push(n['value']);
+			}
+			else {
+				json[n['name']] = n['value'];
+			}
+		});
+
+		return json;
+	};
+
+	$.fn.formToJSON = function() {
+		var $form = $(this),
+			$elements = {};
+
+		$form.find('input, select, textarea').each(function() {
+			var name = $(this).attr('name'),
+				type = $(this).attr('type');
+
+			if (name) {
+				var $value;
+
+				if (type == 'radio') {
+					$value = $('input[name=' + name + ']:checked', $form).val();
+				}
+				else if (type == 'checkbox') {
+					$value = $(this).is(':checked');
+				}
+				else {
+					$value = $(this).val();
+				}
+
+				$elements[$(this).attr('name')] = $value;
+			}
+		});
+
+		return JSON.stringify($elements)
+	};
+
+	// TODO AV: this function is unused
+	$.fn.formFromJSON = function(json_string) {
+		var $form = $(this),
+			data = JSON.parse(json_string);
+
+		$.each(data, function(key, value) {
+			var $elem = $('[name="' + key + '"]', $form),
+				type = $elem.first().attr('type');
+
+			if (type === 'radio') {
+				$('[name="' + key + '"][value="' + value + '"]').prop('checked', true);
+			}
+			else if (type === 'checkbox' && (value === true || value === 'true')) {
+				$('[name="' + key + '"]').prop('checked', true);
+			}
+			else {
+				$elem.val(value);
+			}
+		})
+	};
+})(jQuery);
+
+function makeErrorMessageBox(errors, elementId) {
+	var div = jQuery('<div>').addClass('msg-bad').attr('id', elementId);
+	var details = jQuery('<div>').addClass('msg-details'),
+		ul = jQuery('<ul>');
+
+	errors.each(function (error) {
+		// split long messages
+		var msg = '';
+		error.match(/[\s\S]{1,120}/g).each(function (error_part) {
+			msg = msg + jQuery.escapeHtml(error_part) + "\n";
+		});
+		ul.append(jQuery('<li>').append(msg));
+	});
+	details.append(ul);
+	div.append(details);
+
+	return div;
 }

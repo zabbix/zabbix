@@ -76,16 +76,16 @@ class CDHost extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectDRules'				=> null,
 			'selectDServices'			=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
@@ -114,7 +114,7 @@ class CDHost extends CApiService {
 
 			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['druleid'] = 'dh.druleid';
 			}
 		}
@@ -127,7 +127,7 @@ class CDHost extends CApiService {
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceids'] = 'ds.dserviceid';
 			}
 		}
@@ -152,18 +152,20 @@ class CDHost extends CApiService {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dhost = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount']))
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $dhost;
-				else
+				}
+				else {
 					$result = $dhost['rowscount'];
+				}
 			}
 			else {
 				$result[$dhost['dhostid']] = $dhost;
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -173,7 +175,7 @@ class CDHost extends CApiService {
 		}
 
 // removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -183,7 +185,7 @@ class CDHost extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			if ($options['selectDRules'] !== null) {
 				$sqlParts = $this->addQuerySelect('dh.druleid', $sqlParts);
 			}

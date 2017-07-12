@@ -376,7 +376,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'skipDependent' => true,
 		'sortfield' => $sort_field,
 		'sortorder' => $sort_order,
-		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT,
+		'limit' => $filter['limit'],
 		'preservekeys' => true,
 		'expandComment' => true
 	]));
@@ -541,8 +541,9 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 		// description
 		if (array_key_exists('lastEvent', $trigger) || $trigger['comments'] !== '' || $trigger['url'] !== '') {
+			$eventid = array_key_exists('lastEvent', $trigger) ? $trigger['lastEvent']['eventid'] : 0;
 			$description = (new CSpan($description))
-				->setHint(make_popup_eventlist($trigger, $backurl), '', true, 'max-width: 500px')
+				->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $config),'', true, 'max-width: 500px')
 				->addClass(ZBX_STYLE_LINK_ACTION);
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
