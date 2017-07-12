@@ -1758,7 +1758,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, uniq_conditions);
+	zbx_dc_get_actions_eval(&actions, uniq_conditions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
@@ -1995,7 +1995,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, uniq_conditions);
+	zbx_dc_get_actions_eval(&actions, uniq_conditions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
 
 	if (0 == actions.values_num)
 		goto out;

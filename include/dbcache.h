@@ -255,12 +255,18 @@ typedef struct
 }
 DC_PROXY;
 
+#define ZBX_ACTION_OPCLASS_NONE			0
+#define ZBX_ACTION_OPCLASS_NORMAL		1
+#define ZBX_ACTION_OPCLASS_RECOVERY		2
+#define ZBX_ACTION_OPCLASS_ACKNOWLEDGE		4
+
 typedef struct
 {
 	zbx_uint64_t		actionid;
 	char			*formula;
 	unsigned char		eventsource;
 	unsigned char		evaltype;
+	unsigned char		opflags;
 	zbx_vector_ptr_t	conditions;
 }
 zbx_action_eval_t;
@@ -572,7 +578,7 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
 void	DCupdate_hosts_availability(void);
 
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions);
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions, unsigned char opflags);
 void	zbx_action_eval_free(zbx_action_eval_t *action);
 void	zbx_conditions_eval_clean(zbx_hashset_t *uniq_conditions);
 

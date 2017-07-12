@@ -494,6 +494,7 @@ typedef struct
 	const char		*formula;
 	unsigned char		eventsource;
 	unsigned char		evaltype;
+	unsigned char		opflags;
 	zbx_vector_ptr_t	conditions;
 }
 zbx_dc_action_t;
@@ -3694,6 +3695,8 @@ static void	DCsync_actions(DB_RESULT result)
 					__config_mem_realloc_func, __config_mem_free_func);
 
 			zbx_vector_ptr_reserve(&action->conditions, 1);
+
+			action->opflags = ZBX_ACTION_OPCLASS_NONE;
 		}
 
 		ZBX_STR2UCHAR(action->eventsource, row[1]);
@@ -3724,6 +3727,62 @@ static void	DCsync_actions(DB_RESULT result)
 	}
 
 	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_action_operations                                         *
+ *                                                                            *
+ * Purpose: Updates operation of actions in configuration cache               *
+ *                                                                            *
+ * Parameters: result - [IN] the result of actions database select            *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - actionid                                                     *
+ *           1 - opclass (ZBX_ACTION_OPCLASS_*)                               *
+ *                                                                            *
+ ******************************************************************************/
+static void DCsync_action_operations(DB_RESULT result)
+{
+	const char		*__function_name = "DC_sync_action_operation";
+
+	DB_ROW			row;
+	zbx_uint64_t		actionid;
+	unsigned char		opclass;
+	int			found = 0;
+	zbx_dc_action_t		*action = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(actionid, row[0]);
+		opclass = atoi(row[1]);
+
+		if (NULL == action || action->actionid != actionid)
+		{
+			found = 0;
+			action = DCfind_id(&config->actions, actionid, sizeof(zbx_dc_action_t), &found);
+		}
+
+		if (1 == found)
+		{
+			switch (opclass)
+			{
+				case ZBX_OPERATION_MODE_NORMAL:
+					action->opflags |= ZBX_ACTION_OPCLASS_NORMAL;
+					break;
+				case ZBX_OPERATION_MODE_RECOVERY:
+					action->opflags |= ZBX_ACTION_OPCLASS_RECOVERY;
+					break;
+				case ZBX_OPERATION_MODE_ACK:
+					action->opflags |= ZBX_ACTION_OPCLASS_ACKNOWLEDGE;
+					break;
+			}
+		}
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4512,6 +4571,7 @@ void	DCsync_configuration(void)
 	DB_RESULT		func_result = NULL;
 	DB_RESULT		expr_result = NULL;
 	DB_RESULT		action_result = NULL;
+	DB_RESULT		action_op_result = NULL;
 	DB_RESULT		action_condition_result = NULL;
 	DB_RESULT		trigger_tag_result = NULL;
 	DB_RESULT		correlation_result = NULL;
@@ -4523,11 +4583,10 @@ void	DCsync_configuration(void)
 	int			i, refresh_unsupported_changed;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
 				csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2,
-				expr_sec2, action_sec, action_sec2, action_condition_sec, action_condition_sec2,
-				trigger_tag_sec, trigger_tag_sec2, correlation_sec, correlation_sec2,
-				corr_condition_sec, corr_condition_sec2, corr_operation_sec, corr_operation_sec2,
-				hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2,
-				total, total2;
+				expr_sec2, action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
+				action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, correlation_sec,
+				correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
+				corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, total, total2;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -4705,6 +4764,21 @@ void	DCsync_configuration(void)
 	action_sec = zbx_time() - sec;
 
 	sec = zbx_time();
+	if (NULL == (action_op_result = DBselect(
+			"select a.actionid,o.recovery"
+			" from actions a"
+			" left join operations o"
+			" on a.actionid=o.actionid"
+			" where a.status=%d"
+			" group by a.actionid,o.recovery"
+			" order by a.actionid",
+			ACTION_STATUS_ACTIVE)))
+	{
+		goto out;
+	}
+	action_op_sec = zbx_time() - sec;
+
+	sec = zbx_time();
 	if (NULL == (action_condition_result = DBselect(
 			"select c.conditionid,c.actionid,c.conditiontype,c.operator,c.value,c.value2"
 			" from conditions c,actions a"
@@ -4840,6 +4914,10 @@ void	DCsync_configuration(void)
 	action_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
+	DCsync_action_operations(action_op_result);
+	action_op_sec2 = zbx_time() - sec;
+
+	sec = zbx_time();
 	DCsync_action_conditions(action_condition_result);
 	action_condition_sec2 = zbx_time() - sec;
 
@@ -4870,11 +4948,11 @@ void	DCsync_configuration(void)
 	strpool = zbx_strpool_info();
 
 	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
-			action_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
+			action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
 			corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec;
 	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
-			expr_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 + correlation_sec2 +
-			corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 + itempp_sec2;
+			expr_sec2 + action_sec2 + action_op_sec2 + action_condition_sec2 + trigger_tag_sec2 +
+			correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 + itempp_sec2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			csec, csec2);
@@ -5054,6 +5132,7 @@ out:
 	DBfree_result(func_result);
 	DBfree_result(expr_result);
 	DBfree_result(action_result);
+	DBfree_result(action_op_result);
 	DBfree_result(action_condition_result);
 	DBfree_result(trigger_tag_result);
 	DBfree_result(correlation_result);
@@ -9946,6 +10025,7 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 	action->actionid = dc_action->actionid;
 	action->eventsource = dc_action->eventsource;
 	action->evaltype = dc_action->evaltype;
+	action->opflags = dc_action->opflags;
 	action->formula = zbx_strdup(NULL, dc_action->formula);
 	zbx_vector_ptr_create(&action->conditions);
 
@@ -10032,13 +10112,16 @@ static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_
  * Parameters: actions         - [OUT] the action evaluation data             *
  *             uniq_conditions - [OUT] unique conditions that actions         *
  *                                     point to (several sources)             *
+ *             opflags         - [IN] flags specifying which actions to get   *
+ *                                    based on their operation classes        *
+ *                                    (see ZBX_ACTION_OPCLASS_* defines)      *
  *                                                                            *
  * Comments: The returned actions and conditions must be freed with           *
  *           zbx_action_eval_free() and zbx_conditions_eval_clean()           *
  *           functions later.                                                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions)
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions, unsigned char opflags)
 {
 	const char			*__function_name = "zbx_dc_get_actions_eval";
 	zbx_dc_action_t			*dc_action;
@@ -10051,7 +10134,10 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_cond
 	zbx_hashset_iter_reset(&config->actions, &iter);
 
 	while (NULL != (dc_action = (zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
+	{
+		if (0 != (opflags & dc_action->opflags))
+			zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
+	}
 
 	UNLOCK_CACHE;
 
