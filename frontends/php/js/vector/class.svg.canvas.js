@@ -288,7 +288,8 @@ SVGTextArea.prototype.wrapLine = function (line) {
 					current = [];
 				}
 				else {
-					break; // Word is too long to fit the line.
+					// Word is too long to fit the line.
+					wrapped.push(current.pop());
 				}
 			}
 		}
