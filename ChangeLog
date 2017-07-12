@@ -1,9 +1,10 @@
 Changes for 3.4.0alpha1
 
 New features:
+A.F.I..... [ZBXNEXT-2102] added support of multiple dashboards; implemented API for dashboards (pavels, maximt, miks, Sasha, vmurzins)
 ..F..J.... [ZBXNEXT-1223] implemented jmx discovery item (vjaceslavs)
 A.F.....S. [ZBXNEXT-2442] implemented parallel alert processing (gcalenko, wiper)
-A.F.....S. [ZBXNEXT-3863] added jsonpath based item pre-processing option (Ivo, wiper) 
+A.F.....S. [ZBXNEXT-3863] added jsonpath based item pre-processing option (Ivo, wiper)
 A.F.....S. [ZBXNEXT-3864] added xmlpath based item pre-processing option (Ivo, wiper)
 ...G...... [ZBXNEXT-3930] improved log monitoring by adjusting formula to process 10 times more new lines than set in MaxLinesPerSecond (vso)
 A.F..J.PS. [ZBXNEXT-1274] added support of configurable jmx endpoint url for jmx items (gcalenko, Ivo, Sasha, vso)

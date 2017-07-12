@@ -184,7 +184,7 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, array $config, bool $get_comments = false) {
+	public static function getData(array $filter, array $config, $get_comments = false) {
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
