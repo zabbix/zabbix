@@ -27,8 +27,6 @@ class testGeneric extends CWebTest {
 			// monitoring
 			['zabbix.php?action=dashboard.view',					'Dashboard'],
 
-			['dashconf.php',					'Dashboard configuration'],
-
 			['overview.php',												'Overview [refreshed every 30 sec.]'],
 			['overview.php?form_refresh=1&groupid=0&type=0&view_style=0',	'Overview [refreshed every 30 sec.]'],
 

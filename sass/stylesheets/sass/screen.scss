@@ -3913,17 +3913,6 @@ td.inactive-bg {
 	background-color: $lighter-yellow;
 }
 
-.active-indic {
-	width: 8px;
-	height: 8px;
-	position: absolute;
-	top: -6px;
-	right: -6px;
-	border: 2px solid $body-bg-color;
-	background-color: darken(desaturate($alt-green, 10%), 16%);
-	@include border-radius(4px);
-}
-
 .msg-good {
 	color: darken(desaturate($green, 10%), 20%);
 	border: 1px solid $light-green;
