@@ -24,98 +24,100 @@ require_once dirname(__FILE__).'/screens.inc.php';
 require_once dirname(__FILE__).'/maps.inc.php';
 require_once dirname(__FILE__).'/users.inc.php';
 
+/**
+ * @param array  $filter['groupids']          (optional)
+ * @param array  $filter['exclude_groupids']  (optional)
+ * @param string $filter['problem']           (optional)
+ * @param array  $filter['severities']        (optional)
+ * @param array  $filter['maintenance']       (optional)
+ * @param int    $filter['ext_ack']           (optional)
+ * @param string $backurl
+ *
+ * @return CDiv
+ */
 function make_system_status($filter, $backurl) {
 	$config = select_config();
 
-	$table = new CTableInfo();
+	$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
+	$filter_hostids = null;
+	$filter_problem = array_key_exists('problem', $filter) ? $filter['problem'] : '';
+	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
+		? $filter['severities']
+		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
+	$filter_maintenance = array_key_exists('maintenance', $filter) ? $filter['maintenance'] : 1;
+	$filter_ext_ack = array_key_exists('ext_ack', $filter) ? $filter['ext_ack'] : EXTACK_OPTION_ALL;
+
+	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
+		// get all groups if no selected groups defined
+		if ($filter_groupids === null) {
+			$filter_groupids = array_keys(API::HostGroup()->get([
+				'output' => [],
+				'preservekeys' => true
+			]));
+		}
+
+		$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
+
+		// get available hosts
+		$filter_hostids = array_keys(API::Host()->get([
+			'output' => [],
+			'groupids' => $filter_groupids,
+			'preservekeys' => true
+		]));
+
+		$exclude_hostids = array_keys(API::Host()->get([
+			'output' => [],
+			'groupids' => $filter['exclude_groupids'],
+			'preservekeys' => true
+		]));
+
+		$filter_hostids = array_diff($filter_hostids, $exclude_hostids);
+	}
 
 	// set trigger severities as table header starting from highest severity
-	$header = [];
+	$header = [_('Host group')];
+	$def_tab_priority = [];
 
-	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$header[] = ($filter['severity'] === null || isset($filter['severity'][$severity]))
-			? getSeverityName($severity, $config)
-			: null;
+	foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
+		if (in_array($severity, $filter_severities)) {
+			$header[] = getSeverityName($severity, $config);
+			$def_tab_priority[$severity] = ['count' => 0, 'triggers' => [], 'count_unack' => 0, 'triggers_unack' => []];
+		}
 	}
-	krsort($header);
-	array_unshift($header, _('Host group'));
 
-	$table->setHeader($header);
+	$table = (new CTableInfo())->setHeader($header);
 
-	$options = [
+	$groups = API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groupids'],
+		'groupids' => $filter_groupids,
+		'hostids' => $filter_hostids,
 		'monitored_hosts' => true,
 		'preservekeys' => true
-	];
-
-	if (array_key_exists('hostids', $filter)) {
-		$options['hostids'] = $filter['hostids'];
-	}
-
-	$groups = API::HostGroup()->get($options);
-
-	$filter_groups = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groupids']
 	]);
-
-	$filter_groups_names = [];
-
-	foreach ($filter_groups as $group) {
-		$filter_groups_names[] = $group['name'].'/';
-	}
-
-	$options = [
-		'output' => ['groupid', 'name'],
-		'monitored_hosts' => true,
-		'search' => ['name' => $filter_groups_names],
-		'startSearch' => true
-	];
-
-	if (array_key_exists('hostids', $filter)) {
-		$options['hostids'] = $filter['hostids'];
-	}
-
-	$child_groups = API::HostGroup()->get($options);
-
-	foreach ($child_groups as $child_group) {
-		$groups[$child_group['groupid']] = $child_group;
-	}
 
 	CArrayHelper::sort($groups, [
 		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
 
-	$groupIds = [];
-	foreach ($groups as $group) {
-		$groupIds[$group['groupid']] = $group['groupid'];
-
-		$group['tab_priority'] = [
-			TRIGGER_SEVERITY_DISASTER => ['count' => 0, 'triggers' => [], 'count_unack' => 0, 'triggers_unack' => []],
-			TRIGGER_SEVERITY_HIGH => ['count' => 0, 'triggers' => [], 'count_unack' => 0, 'triggers_unack' => []],
-			TRIGGER_SEVERITY_AVERAGE => ['count' => 0, 'triggers' => [], 'count_unack' => 0, 'triggers_unack' => []],
-			TRIGGER_SEVERITY_WARNING => ['count' => 0, 'triggers' => [], 'count_unack' => 0, 'triggers_unack' => []],
-			TRIGGER_SEVERITY_INFORMATION => ['count' => 0, 'triggers' => [], 'count_unack' => 0, 'triggers_unack' => []],
-			TRIGGER_SEVERITY_NOT_CLASSIFIED => ['count' => 0, 'triggers' => [], 'count_unack' => 0, 'triggers_unack' => []]
-		];
-		$groups[$group['groupid']] = $group;
+	foreach ($groups as &$group) {
+		$group['tab_priority'] = $def_tab_priority;
 	}
+	unset($group);
 
 	// get triggers
 	$triggers = API::Trigger()->get([
 		'output' => ['triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange', 'expression'],
 		'selectGroups' => ['groupid'],
 		'selectHosts' => ['name'],
-		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
+		'withLastEventUnacknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
-		'groupids' => $groupIds,
-		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
+		'groupids' => array_keys($groups),
+		'hostids' => $filter_hostids,
 		'monitored' => true,
-		'maintenance' => $filter['maintenance'],
-		'search' => ($filter['trigger_name'] !== '') ? ['description' => $filter['trigger_name']] : null,
+		'maintenance' => ($filter_maintenance == 0) ? false : null,
+		'search' => ($filter_problem !== '') ? ['description' => $filter_problem] : null,
 		'filter' => [
-			'priority' => $filter['severity'],
+			'priority' => $filter_severities,
 			'value' => TRIGGER_VALUE_TRUE
 		],
 		'sortfield' => 'lastchange',
@@ -167,7 +169,7 @@ function make_system_status($filter, $backurl) {
 				continue;
 			}
 
-			if (in_array($filter['extAck'], [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
+			if (in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
 				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < ZBX_WIDGET_ROWS) {
 					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
 				}
@@ -175,7 +177,7 @@ function make_system_status($filter, $backurl) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 			}
 
-			if (in_array($filter['extAck'], [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH])
+			if (in_array($filter_ext_ack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH])
 					&& isset($trigger['event']) && !$trigger['event']['acknowledged']) {
 				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < ZBX_WIDGET_ROWS) {
 					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
@@ -197,10 +199,6 @@ function make_system_status($filter, $backurl) {
 		$groupRow->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
-			if (!is_null($filter['severity']) && !isset($filter['severity'][$severity])) {
-				continue;
-			}
-
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CSpan($allTriggersNum))
@@ -215,7 +213,7 @@ function make_system_status($filter, $backurl) {
 					->setHint(makeTriggersPopup($data['triggers_unack'], $backurl, $actions, $config));
 			}
 
-			switch ($filter['extAck']) {
+			switch ($filter_ext_ack) {
 				case EXTACK_OPTION_ALL:
 					$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, $data['count'] == 0));
 					break;
