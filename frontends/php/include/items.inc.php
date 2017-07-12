@@ -1493,8 +1493,8 @@ function quoteItemKeyParam($param, $forced = false) {
 /**
  * Expands items name and for dependent items master item name.
  *
- * @param array					Array of items.
- * @param CItem|CItemPrototype	Object capable to provide data for master items.
+ * @param array                 Array of items.
+ * @param CItem|CItemPrototype  Object capable to provide data for master items.
  *
  * @return array
  */

@@ -105,7 +105,6 @@ if (!$readonly) {
 
 $itemFormList->addRow(_('Master item'), $master_item, 'row_master_item');
 
-
 // Append interface(s) to form list.
 if ($data['interfaces']) {
 	if ($discovered_item) {

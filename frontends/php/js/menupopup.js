@@ -619,9 +619,9 @@ function getMenuPopupTriggerLog(options) {
 /**
  * Get menu structure for dependent items.
  *
- * @param array options['item_name']		Menu label.
- * @param array options['add_label']		Add dependent item menu element label
- * @param array options['add_url']			Add dependent item menu element url
+ * @param array options['item_name']    Menu label.
+ * @param array options['add_label']    Add dependent item menu element label
+ * @param array options['add_url']      Add dependent item menu element url
  *
  * @return array
  */

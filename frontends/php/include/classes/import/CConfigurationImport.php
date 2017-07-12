@@ -2363,7 +2363,6 @@ class CConfigurationImport {
 		$entities_order = [];
 
 		foreach ($discovery_rules as $host_key => $items) {
-
 			foreach ($items as $item) {
 				$entities = [$host_key => $item['item_prototypes']];
 				$entities_order[$host_key][$item['key_']] = $this->getEntitiesOrder($master_key_identifier, $entities,
@@ -2491,6 +2490,7 @@ class CConfigurationImport {
 
 			foreach ($resolve_entity_keys as $entity) {
 				$master_itemid = $entity['master_itemid'];
+
 				if (!array_key_exists($entity['host'], $host_entity_idkey_hash) ||
 						!array_key_exists($master_itemid, $host_entity_idkey_hash[$entity['host']])) {
 					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',

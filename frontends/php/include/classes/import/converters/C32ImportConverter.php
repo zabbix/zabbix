@@ -70,11 +70,11 @@ class C32ImportConverter extends CConverter {
 	 * Convert item elements.
 	 *
 	 * @param array $items
-	 * @param array $default_fields Default values to add to every item.
+	 * @param array $default_fields     Default values to add to every item.
 	 *
 	 * @return array
 	 */
-	protected function convertItems(array $items, $default_fields) {
+	protected function convertItems(array $items,array $default_fields) {
 		foreach ($items as &$item) {
 			// Item preprocessing.
 			$item['preprocessing'] = [];

@@ -110,8 +110,8 @@ foreach ($this->data['items'] as $item) {
 		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
 			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
 		))
-		->addClass(ZBX_STYLE_LINK_ALT)
-		->addClass(ZBX_STYLE_TEAL);
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_TEAL);
 		$description[] = NAME_DELIMITER;
 	}
 

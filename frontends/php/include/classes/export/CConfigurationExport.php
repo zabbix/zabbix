@@ -566,6 +566,7 @@ class CConfigurationExport {
 				$prototype['master_item'] = ['key_' => $prototypes[$prototype['master_itemid']]['key_']];
 			}
 		}
+		unset($prototype);
 
 		// Value map IDs that are zeroes, should be skipped.
 		unset($valuemapids[0]);

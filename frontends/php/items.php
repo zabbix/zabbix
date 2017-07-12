@@ -988,6 +988,7 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_JMX) {
 					unset($items_to_update[$index]['jmx_endpoint']);
 				}
+
 				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_DEPENDENT) {
 					unset($items_to_update[$index]['master_itemid']);
 				}
@@ -1173,6 +1174,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 			$step['params'] = explode("\n", $step['params']);
 		}
 		unset($step);
+
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_items = API::Item()->get([
 				'itemids'	=> $item['master_itemid'],
@@ -1189,11 +1191,12 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		]);
 		$item = [];
 		$host = $hosts[0];
+
 		if ($host && getRequest('master_itemid')) {
 			$master_items = API::Item()->get([
-				'itemids' => getRequest('master_itemid'),
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'filter' => ['hostid' => $host['hostid']]
+				'itemids'	=> getRequest('master_itemid'),
+				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'filter'	=> ['hostid' => $host['hostid']]
 			]);
 			$item['master_item'] = reset($master_items);
 		}
