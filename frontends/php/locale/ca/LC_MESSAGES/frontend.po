@@ -2,15 +2,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-12 12:14+0300\n"
-"PO-Revision-Date: 2016-09-26 15:50+0300\n"
-"Last-Translator: Automatically generated\n"
+"POT-Creation-Date: 2017-07-12 12:23+0300\n"
+"PO-Revision-Date: 2017-05-04 06:55+0300\n"
+"Last-Translator: marti.cardus <marti.cardus@ilimit.net>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.5.1.3\n"
+"X-POOTLE-MTIME: 1493873722.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -20,7 +22,7 @@ msgstr ""
 #: include/classes/import/validators/C34XmlValidator.php:1099
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "s'esperava \"%1$s\""
 
 #: include/classes/api/services/CMaintenance.php:350
 #: include/classes/api/services/CMaintenance.php:355
@@ -29,13 +31,13 @@ msgstr ""
 #: maintenance.php:164 services.php:194 services.php:208
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" ha de ser entre 1970.01.01 i 2038.01.18."
 
 #: include/classes/import/validators/C10XmlValidator.php:393
 #: include/classes/import/validators/C10XmlValidator.php:415
 #: include/classes/import/validators/C10XmlValidator.php:436
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "s'espera una parella \"amfitrió:clau\""
 
 #: include/classes/api/services/CDRule.php:518
 #, c-format
@@ -46,69 +48,69 @@ msgstr ""
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d dia"
+msgstr[1] "%1$d dies"
 
 #: include/blocks.inc.php:577
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Es mostra %1$d de %2$d problemes"
+msgstr[1] "Es mostren %1$d de %2$d problemes"
 
 #: chart4.php:91 chart5.php:86
 #, c-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (any %2$s)"
 
 #: latest.php:645 latest.php:795
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ítem"
+msgstr[1] "%1$s ítems"
 
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Línia: %2$s | Columna: %3$s]"
 
 #: app/views/monitoring.acknowledge.edit.php:66
 #: app/views/monitoring.acknowledge.edit.php:71
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s event"
+msgstr[1] "%1$s events"
 
 #: include/views/monitoring.history.php:27
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s element"
+msgstr[1] "%1$s elements"
 
 #: jsLoader.php:223 jsLoader.php:224 jsLoader.php:225 jsLoader.php:226
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s minut"
+msgstr[1] "%1$s minuts"
 
 #: include/classes/screens/CScreenActions.php:149
 #: include/views/administration.auditacts.list.php:68
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Queda %1$s intent"
+msgstr[1] "Queden %1$s intents"
 
 #: jsLoader.php:221 jsLoader.php:222
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s segon"
+msgstr[1] "%1$s segons"
 
 #: app/views/layout.htmlpage.php:80 include/page_header.php:246
 #, c-format
