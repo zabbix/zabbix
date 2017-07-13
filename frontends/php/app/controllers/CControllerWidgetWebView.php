@@ -42,6 +42,7 @@ class CControllerWidgetWebView extends CController {
 			 * @var array        $fields
 			 * @var array|string $fields['groupids']          (optional)
 			 * @var array|string $fields['exclude_groupids']  (optional)
+			 * @var array|string $fields['hostids']           (optional)
 			 * @var int          $fields['maintenance']       (optional)
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_WEB_OVERVIEW, $this->getInput('fields', []));
@@ -67,28 +68,30 @@ class CControllerWidgetWebView extends CController {
 		$fields = $this->form->getFieldsData();
 
 		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
-		$filter_hostids = null;
+		$filter_hostids = $fields['hostids'] ? $fields['hostids'] : null;
 		$filter_maintenance = ($fields['maintenance'] == 0) ? 0 : null;
 
 		if ($fields['exclude_groupids']) {
 			$exclude_groupids = getSubGroups($fields['exclude_groupids']);
 
-			// get all groups if no selected groups defined
-			if ($filter_groupids === null) {
-				$filter_groupids = array_keys(API::HostGroup()->get([
+			if ($filter_hostids === null) {
+				// get all groups if no selected groups defined
+				if ($filter_groupids === null) {
+					$filter_groupids = array_keys(API::HostGroup()->get([
+						'output' => [],
+						'preservekeys' => true
+					]));
+				}
+
+				$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
+
+				// get available hosts
+				$filter_hostids = array_keys(API::Host()->get([
 					'output' => [],
+					'groupids' => $filter_groupids,
 					'preservekeys' => true
 				]));
 			}
-
-			$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
-
-			// get available hosts
-			$hostids = array_keys(API::Host()->get([
-				'output' => [],
-				'groupids' => $filter_groupids,
-				'preservekeys' => true
-			]));
 
 			$exclude_hostids = array_keys(API::Host()->get([
 				'output' => [],
@@ -97,7 +100,7 @@ class CControllerWidgetWebView extends CController {
 			]));
 
 			$filter_groupids = null;
-			$filter_hostids = array_diff($hostids, $exclude_hostids);
+			$filter_hostids = array_diff($filter_hostids, $exclude_hostids);
 		}
 
 		$groups = API::HostGroup()->get([

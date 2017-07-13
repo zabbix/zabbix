@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/users.inc.php';
 /**
  * @param array  $filter['groupids']          (optional)
  * @param array  $filter['exclude_groupids']  (optional)
+ * @param array  $filter['hostids']           (optional)
  * @param string $filter['problem']           (optional)
  * @param array  $filter['severities']        (optional)
  * @param array  $filter['maintenance']       (optional)
@@ -39,7 +40,7 @@ function make_system_status($filter, $backurl) {
 	$config = select_config();
 
 	$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
-	$filter_hostids = null;
+	$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 	$filter_problem = array_key_exists('problem', $filter) ? $filter['problem'] : '';
 	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
 		? $filter['severities']
@@ -48,22 +49,24 @@ function make_system_status($filter, $backurl) {
 	$filter_ext_ack = array_key_exists('ext_ack', $filter) ? $filter['ext_ack'] : EXTACK_OPTION_ALL;
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
-		// get all groups if no selected groups defined
-		if ($filter_groupids === null) {
-			$filter_groupids = array_keys(API::HostGroup()->get([
+		if ($filter_hostids === null) {
+			// get all groups if no selected groups defined
+			if ($filter_groupids === null) {
+				$filter_groupids = array_keys(API::HostGroup()->get([
+					'output' => [],
+					'preservekeys' => true
+				]));
+			}
+
+			$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
+
+			// get available hosts
+			$filter_hostids = array_keys(API::Host()->get([
 				'output' => [],
+				'groupids' => $filter_groupids,
 				'preservekeys' => true
 			]));
 		}
-
-		$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
-
-		// get available hosts
-		$filter_hostids = array_keys(API::Host()->get([
-			'output' => [],
-			'groupids' => $filter_groupids,
-			'preservekeys' => true
-		]));
 
 		$exclude_hostids = array_keys(API::Host()->get([
 			'output' => [],

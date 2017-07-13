@@ -43,6 +43,14 @@ class CWebWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_exclude_groups;
 
+		// Hosts
+		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
+
+		if (array_key_exists('hostids', $data)) {
+			$field_hosts->setValue($data['hostids']);
+		}
+		$this->fields[] = $field_hosts;
+
 		// Show hosts in maintenance
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
 			->setDefault(1);

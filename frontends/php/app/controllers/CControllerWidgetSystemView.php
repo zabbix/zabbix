@@ -43,6 +43,7 @@ class CControllerWidgetSystemView extends CController {
 			 * @var array        $fields
 			 * @var array|string $fields['groupids']          (optional)
 			 * @var array|string $fields['exclude_groupids']  (optional)
+			 * @var array|string $fields['hostids']           (optional)
 			 * @var string       $fields['problem']           (optional)
 			 * @var array        $fields['severities']        (optional)
 			 * @var int          $fields['maintenance']       (optional)
@@ -74,6 +75,7 @@ class CControllerWidgetSystemView extends CController {
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSTEM_STATUS]),
 			'filter' => [
 				'groupids' => getSubGroups($fields['groupids']),
+				'hostids' => $fields['hostids'],
 				'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
 				'problem' => $fields['problem'],
 				'severities' => $fields['severities'],

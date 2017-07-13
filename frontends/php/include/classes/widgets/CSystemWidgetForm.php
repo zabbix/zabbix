@@ -27,6 +27,7 @@ class CSystemWidgetForm extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data);
 
+		// Host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $data)) {
@@ -34,6 +35,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_groups;
 
+		// Exclude host groups
 		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'));
 
 		if (array_key_exists('exclude_groupids', $data)) {
@@ -41,6 +43,15 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_exclude_groups;
 
+		// Hosts
+		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
+
+		if (array_key_exists('hostids', $data)) {
+			$field_hosts->setValue($data['hostids']);
+		}
+		$this->fields[] = $field_hosts;
+
+		// Problem
 		$field_problem = new CWidgetFieldTextBox('problem', _('Problem'));
 
 		if (array_key_exists('problem', $data)) {
@@ -48,6 +59,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_problem;
 
+		// Severity
 		$field_severities = new CWidgetFieldSeverities('severities', _('Severity'));
 
 		if (array_key_exists('severities', $data)) {
@@ -55,6 +67,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_severities;
 
+		// Show hosts in maintenance
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
 			->setDefault(1);
 
@@ -63,6 +76,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_maintenance;
 
+		// Problem display
 		$field_ext_ack = (new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [
 			EXTACK_OPTION_ALL => _('All'),
 			EXTACK_OPTION_BOTH => _('Separated'),
