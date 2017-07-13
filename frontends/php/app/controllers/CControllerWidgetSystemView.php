@@ -32,8 +32,9 @@ class CControllerWidgetSystemView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>	'string',
-			'fields' =>	'array'
+			'name' =>		'string',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -82,6 +83,7 @@ class CControllerWidgetSystemView extends CController {
 				'maintenance' => $fields['maintenance'],
 				'ext_ack' => $fields['ext_ack']
 			],
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

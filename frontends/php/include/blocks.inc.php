@@ -33,10 +33,11 @@ require_once dirname(__FILE__).'/users.inc.php';
  * @param array  $filter['maintenance']       (optional)
  * @param int    $filter['ext_ack']           (optional)
  * @param string $backurl
+ * @param int    $fullscreen
  *
  * @return CDiv
  */
-function make_system_status($filter, $backurl) {
+function make_system_status($filter, $backurl, $fullscreen = 0) {
 	$config = select_config();
 
 	$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
@@ -192,12 +193,23 @@ function make_system_status($filter, $backurl) {
 	}
 	unset($triggers);
 
+	$url_group = (new CUrl('zabbix.php'))
+		->setArgument('action', 'problem.view')
+		->setArgument('filter_set', 1)
+		->setArgument('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM)
+		->setArgument('filter_groupids', null)
+		->setArgument('filter_hostids', array_key_exists('hostids', $filter) ? $filter['hostids'] : null)
+		->setArgument('filter_problem', $filter_problem)
+		->setArgument('filter_maintenance', $filter_maintenance == 1 ? 1 : null);
+	if ($fullscreen == 1) {
+		$url_group->setArgument('fullscreen', '1');
+	}
+
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
 
-		$name = new CLink($group['name'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].'&hostid=0'.
-			'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
-		);
+		$url_group->setArgument('filter_groupids', [$group['groupid']]);
+		$name = new CLink($group['name'], $url_group->getUrl());
 
 		$groupRow->addItem($name);
 
