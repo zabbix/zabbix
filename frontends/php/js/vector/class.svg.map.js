@@ -944,6 +944,8 @@ SVGMapLink.prototype.update = function(options) {
 			anchor: {
 				horizontal: 'center',
 				vertical: 'middle'
+			},
+			background: {
 			}
 		}, options.label
 	);

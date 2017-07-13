@@ -41,6 +41,10 @@ $options = [
 	'timestamp' => $map_data['timestamp']
 ];
 
+if (getRequest('add_widget_footer', 0)) {
+	$options['map_widget_footer'] = (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString();
+}
+
 if ($map_data['id'] == -1) {
 	$options['timestamp'] = null;
 	$options['homepage'] = null;

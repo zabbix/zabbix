@@ -53,7 +53,8 @@ class CDashboardWidgetMap extends CDiv {
 		if ($this->initial_load) {
 			$script_run .=
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
-					'"zbx_sysmap_widget_timer_refresh", "'.$this->uniqueid.'", {'.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
+						'parameters: ["onWidgetRefresh"],'.
 						'grid: {widget: 1},'.
 					'trigger_name: "map_widget_timer_refresh_'.$this->uniqueid.'"'.
 				'});';

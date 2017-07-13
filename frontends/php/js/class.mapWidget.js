@@ -19,13 +19,15 @@
 
 if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 	function zbx_sysmap_widget_trigger(hook_name, grid) {
-		jQuery(".dashbrd-grid-widget-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
-	}
-}
-
-if (typeof(zbx_sysmap_widget_timer_refresh) !== typeof(Function)) {
-	function zbx_sysmap_widget_timer_refresh(grid) {
-		// TODO VM: add refresh functionality
+		switch(hook_name) {
+			case 'onWidgetRefresh':
+				var div_id = jQuery('[data-uniqueid="'+grid['widget']['uniqueid']+'"]').attr('id');
+				jQuery('#'+div_id).zbx_mapwidget('update', grid['widget']);
+				break;
+			case 'onEditStart':
+				jQuery(".dashbrd-grid-widget-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
+				break;
+		}
 	}
 }
 
@@ -75,7 +77,7 @@ jQuery(function($) {
 	 * @return object
 	 */
 	if (typeof($.fn.zbx_mapwidget) === 'undefined') {
-		$.fn.zbx_mapwidget = function(input) {
+		$.fn.zbx_mapwidget = function(input, widget) {
 			var methods = {
 				// Update map.
 				update: function() {
@@ -89,6 +91,7 @@ jQuery(function($) {
 
 							var url = new Curl(widget_data['map_instance'].options.refresh);
 							url.setArgument('curtime', new CDate().getTime());
+							url.setArgument('add_widget_footer', 1);
 
 							$.ajax( {
 								'url': url.getUrl()
@@ -96,6 +99,7 @@ jQuery(function($) {
 							.done(function(data) {
 								widget_data['is_refreshing'] = false;
 								widget_data['map_instance'].update(data);
+								widget['content_footer'].html(data.map_widget_footer);
 							});
 						}
 					});
