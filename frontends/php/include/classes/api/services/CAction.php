@@ -1853,7 +1853,7 @@ class CAction extends CApiService {
 		}
 
 		$this->checkMediatypesExists($all_mediatypeids, _s('Incorrect value for field "%1$s": %2$s.', 'mediatypeid',
-			_('value not found')
+			_('No permissions to referred object or it does not exist!')
 		));
 		$this->checkHostGroupsPermissions($all_groupids, _(
 			'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
@@ -3061,12 +3061,12 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Checks are given media types valid.
+	 * Checks if all given media types are valid.
 	 *
-	 * @throws APIException if invalid media types given
+	 * @param array  $mediatypeids  Array of media type ids where key is checked media type id.
+	 * @param string $error         Error message to throw if invalid media type id was supplied.
 	 *
-	 * @param array $mediatypeids
-	 * @param tring $error
+	 * @throws APIException if invalid media types given.
 	 */
 	private function checkMediatypesExists(array $mediatypeids, $error) {
 		if ($mediatypeids) {
