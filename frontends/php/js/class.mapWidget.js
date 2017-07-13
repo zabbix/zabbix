@@ -17,12 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
-	function zbx_sysmap_widget_trigger(hook_name, grid) {
-		jQuery(".dashbrd-grid-widget-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
-	}
-}
-
 if (typeof(navigateToSubmap) !== typeof(Function)) {
 	function navigateToSubmap(submapid, uniqueid, reset_previous) {
 		var widget = jQuery('.dashbrd-grid-widget-container').dashboardGrid('getWidgetsBy', 'uniqueid', uniqueid),
@@ -61,3 +55,61 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 		}
 	}
 }
+
+jQuery(function($) {
+	/**
+	 * Create Map Widget.
+	 *
+	 * @return object
+	 */
+	if (typeof($.fn.zbx_mapwidget) === 'undefined') {
+		$.fn.zbx_mapwidget = function(input) {
+			var methods = {
+				// Update map.
+				update: function() {
+					var $this = $(this);
+
+					return this.each(function() {
+						var widget_data = $this.data('widgetData');
+
+						if (widget_data['is_refreshing'] === false) {
+							widget_data['is_refreshing'] = true;
+
+							var url = new Curl(widget_data['map_instance'].options.refresh);
+							url.setArgument('curtime', new CDate().getTime());
+
+							$.ajax( {
+								'url': url.getUrl()
+							})
+							.done(function(data) {
+								widget_data['is_refreshing'] = false;
+								widget_data['map_instance'].update(data);
+							});
+						}
+					});
+				},
+
+				// initialization of widget
+				init: function(options) {
+					var widget_data = $.extend({}, options);
+
+					return this.each(function() {
+						var $this = $(this);
+
+						widget_data['map_instance'] = new SVGMap(options['map_options']);
+						widget_data['is_refreshing'] = false;
+						$this.data('widgetData', widget_data);
+					});
+				}
+			};
+
+			if (methods[input]) {
+				return methods[input].apply(this, Array.prototype.slice.call(arguments, 1));
+			} else if (typeof input === 'object') {
+				return methods.init.apply(this, arguments);
+			} else {
+				return null;
+			}
+		}
+	}
+});

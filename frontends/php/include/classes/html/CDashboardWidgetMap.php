@@ -82,9 +82,11 @@ class CDashboardWidgetMap extends CDiv {
 		if ($this->sysmap_data && $this->error === null) {
 			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
 
-			$script_run .= 'jQuery(document).ready(function(){'.
-				'new SVGMap('.zbx_jsvalue($this->sysmap_data).')'.
-			'});';
+			$script_run .= ''.
+				'jQuery("#'.$this->getId().'").zbx_mapwidget({'.
+					'uniqueid: "'.$this->uniqueid.'",'.
+					'map_options: '.zbx_jsvalue($this->sysmap_data).
+				'});';
 		}
 
 		return $script_run;
