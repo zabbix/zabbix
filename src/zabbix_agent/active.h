@@ -36,8 +36,8 @@ extern int	CONFIG_LISTEN_PORT;
 /* define minimal and maximal values of lines to send by agent */
 /* per second for checks `log' and `eventlog', used to parse key parameters */
 #define	MIN_VALUE_LINES			1
-#define	MAX_VALUE_LINES			4000
-#define	MAX_VALUE_LINES_MULTIPLIER	5
+#define	MAX_VALUE_LINES			1000
+#define	MAX_VALUE_LINES_MULTIPLIER	10
 
 #define HOST_METADATA_LEN	255	/* UTF-8 characters, not bytes */
 

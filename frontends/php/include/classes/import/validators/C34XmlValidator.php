@@ -146,7 +146,8 @@ class C34XmlValidator {
 									'params' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
-							'interface_ref' =>			['type' => XML_STRING]
+							'interface_ref' =>			['type' => XML_STRING],
+							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
@@ -240,7 +241,8 @@ class C34XmlValidator {
 											'params' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'interface_ref' =>			['type' => XML_STRING]
+									'interface_ref' =>			['type' => XML_STRING],
+									'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
@@ -331,7 +333,8 @@ class C34XmlValidator {
 										]]
 									]]
 								]]
-							]]
+							]],
+							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
@@ -543,7 +546,8 @@ class C34XmlValidator {
 									'params' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
-							'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED]
+							'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
+							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
@@ -635,7 +639,8 @@ class C34XmlValidator {
 											'params' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED]
+									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
+									'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
@@ -726,7 +731,8 @@ class C34XmlValidator {
 										]]
 									]]
 								]]
-							]]
+							]],
+							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [

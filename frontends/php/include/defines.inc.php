@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.4.0alpha1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030168);
+define('ZABBIX_DB_VERSION',		3030175);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -428,7 +428,8 @@ define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description
 define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,<dsn>]');
 define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
-define('ZBX_DEFAULT_KEY_JMX',					'jmx[<object name>,<attribute name>]');
+
+define('ZBX_DEFAULT_JMX_ENDPOINT',	'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi');
 
 define('SYSMAP_ELEMENT_USE_ICONMAP_ON',		1);
 define('SYSMAP_ELEMENT_USE_ICONMAP_OFF',	0);
@@ -483,6 +484,8 @@ define('ZBX_PREPROC_OCT2DEC',		7);
 define('ZBX_PREPROC_HEX2DEC',		8);
 define('ZBX_PREPROC_DELTA_VALUE',	9);
 define('ZBX_PREPROC_DELTA_SPEED',	10);
+define('ZBX_PREPROC_XPATH',			11);
+define('ZBX_PREPROC_JSONPATH',		12);
 
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
@@ -538,11 +541,10 @@ define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
 
-define('ALERT_MAX_RETRIES', 3);
-
 define('ALERT_STATUS_NOT_SENT', 0);
 define('ALERT_STATUS_SENT',		1);
 define('ALERT_STATUS_FAILED',	2);
+define('ALERT_STATUS_NEW',		3);
 
 define('ALERT_TYPE_MESSAGE',	0);
 define('ALERT_TYPE_COMMAND',	1);
@@ -658,6 +660,10 @@ define('SCREEN_SORT_TRIGGERS_STATUS_ASC',			7);
 define('SCREEN_SORT_TRIGGERS_STATUS_DESC',			8);
 define('SCREEN_SORT_TRIGGERS_RECIPIENT_ASC',		11);
 define('SCREEN_SORT_TRIGGERS_RECIPIENT_DESC',		12);
+define('SCREEN_SORT_TRIGGERS_SEVERITY_ASC',			13);
+define('SCREEN_SORT_TRIGGERS_HOST_NAME_DESC',		14);
+define('SCREEN_SORT_TRIGGERS_NAME_ASC',				15);
+define('SCREEN_SORT_TRIGGERS_NAME_DESC',			16);
 
 define('SCREEN_MODE_PREVIEW',	0);
 define('SCREEN_MODE_EDIT',		1);
@@ -677,10 +683,15 @@ define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
 define('SCREEN_MIN_SIZE', 1);
 define('SCREEN_MAX_SIZE', 100);
 
-define('DEFAULT_LATEST_ISSUES_CNT', 20);
+// default, minimum and macimum number of lines for dashboard widgets
+define('ZBX_DEFAULT_WIDGET_LINES', 25);
+define('ZBX_MIN_WIDGET_LINES', 1);
+define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
 define('DASHBOARD_DEFAULT_ID', 1);
+define('DASHBOARD_COLUMNS', 12);
+define('DASHBOARD_MAX_ROWS', 64);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
@@ -1136,13 +1147,13 @@ define('WIDGET_FAVOURITE_GRAPHS',		'favgrph');
 define('WIDGET_FAVOURITE_MAPS',			'favmap');
 define('WIDGET_FAVOURITE_SCREENS',		'favscr');
 define('WIDGET_HOST_STATUS',			'hoststat');
-define('WIDGET_LAST_ISSUES',			'lastiss');
+define('WIDGET_PROBLEMS',				'problems');
 define('WIDGET_SYSTEM_STATUS',			'syssum');
 define('WIDGET_WEB_OVERVIEW',			'webovr');
 define('WIDGET_ZABBIX_STATUS',			'stszbx');
 define('WIDGET_CLOCK',					'clock');
 define('WIDGET_SYSMAP',					'sysmap');
-define('WIDGET_NAVIGATION_TREE', 'navigationtree');
+define('WIDGET_NAVIGATION_TREE',		'navigationtree');
 define('WIDGET_URL',					'url');
 define('WIDGET_ACTION_LOG',				'actlog');
 define('WIDGET_DATA_OVERVIEW',			'dataover');

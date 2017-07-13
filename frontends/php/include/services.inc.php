@@ -112,7 +112,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 			'caption' => new CLink($service['name'], 'services.php?form=1&serviceid='.$service['serviceid']),
 			'action' => new CHorList([
 				(new CLink(_('Add child'),
-					'services.php?form=1&parentid='.$service['serviceid'].'&parentname='.$service['name']
+					'services.php?form=1&parentid='.$service['serviceid'].'&parentname='.urlencode($service['name'])
 				))->addClass(ZBX_STYLE_LINK_ACTION),
 				$deletable
 					? (new CLink(_('Delete'), 'services.php?delete=1&serviceid='.$service['serviceid']))

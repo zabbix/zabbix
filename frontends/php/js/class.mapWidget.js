@@ -23,6 +23,12 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 	}
 }
 
+if (typeof(zbx_sysmap_widget_timer_refresh) !== typeof(Function)) {
+	function zbx_sysmap_widget_timer_refresh(grid) {
+		// TODO VM: add refresh functionality
+	}
+}
+
 if (typeof(navigateToSubmap) !== typeof(Function)) {
 	function navigateToSubmap(submapid, uniqueid, reset_previous) {
 		var widget = jQuery('.dashbrd-grid-widget-container').dashboardGrid('getWidgetsBy', 'uniqueid', uniqueid),

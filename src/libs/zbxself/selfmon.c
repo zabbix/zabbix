@@ -102,7 +102,6 @@ extern int	CONFIG_DISCOVERER_FORKS;
 extern int	CONFIG_ALERTER_FORKS;
 extern int	CONFIG_TIMER_FORKS;
 extern int	CONFIG_HOUSEKEEPER_FORKS;
-extern int	CONFIG_WATCHDOG_FORKS;
 extern int	CONFIG_DATASENDER_FORKS;
 extern int	CONFIG_CONFSYNCER_FORKS;
 extern int	CONFIG_HEARTBEAT_FORKS;
@@ -113,6 +112,7 @@ extern int	CONFIG_PASSIVE_FORKS;
 extern int	CONFIG_ACTIVE_FORKS;
 extern int	CONFIG_TASKMANAGER_FORKS;
 extern int	CONFIG_IPMIMANAGER_FORKS;
+extern int	CONFIG_ALERTMANAGER_FORKS;
 
 extern unsigned char	process_type;
 extern int		process_num;
@@ -164,8 +164,6 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_TIMER_FORKS;
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return CONFIG_HOUSEKEEPER_FORKS;
-		case ZBX_PROCESS_TYPE_WATCHDOG:
-			return CONFIG_WATCHDOG_FORKS;
 		case ZBX_PROCESS_TYPE_DATASENDER:
 			return CONFIG_DATASENDER_FORKS;
 		case ZBX_PROCESS_TYPE_CONFSYNCER:
@@ -186,6 +184,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_TASKMANAGER_FORKS;
 		case ZBX_PROCESS_TYPE_IPMIMANAGER:
 			return CONFIG_IPMIMANAGER_FORKS;
+		case ZBX_PROCESS_TYPE_ALERTMANAGER:
+			return CONFIG_ALERTMANAGER_FORKS;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -240,8 +240,6 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "timer";
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return "housekeeper";
-		case ZBX_PROCESS_TYPE_WATCHDOG:
-			return "db watchdog";
 		case ZBX_PROCESS_TYPE_DATASENDER:
 			return "data sender";
 		case ZBX_PROCESS_TYPE_CONFSYNCER:
@@ -262,6 +260,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "task manager";
 		case ZBX_PROCESS_TYPE_IPMIMANAGER:
 			return "ipmi manager";
+		case ZBX_PROCESS_TYPE_ALERTMANAGER:
+			return "alert manager";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

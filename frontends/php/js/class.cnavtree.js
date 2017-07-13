@@ -1152,8 +1152,6 @@ jQuery(function($) {
 					return false;
 				}
 
-				$(".dashbrd-grid-widget-container").dashboardGrid('stopWidgetRefreshTimer', dashboard_widget);
-
 				drawTree($obj);
 				makeSortable($obj);
 			};
@@ -1221,10 +1219,10 @@ jQuery(function($) {
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-widget-container").dashboardGrid("addAction", trigger,
-								'zbx_widget_navtree_trigger',
+								'zbx_widget_navtree_trigger', options.uniqueid,
 								{
 									'parameters': [trigger],
-									'grid': {'widget': String(options.uniqueid)},
+									'grid': {'widget': 1},
 									'trigger_name': 'maptree_' + options.uniqueid
 								}
 							);

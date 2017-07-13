@@ -79,6 +79,7 @@ class CWidgetField {
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_GROUP:
+			case ZBX_WIDGET_FIELD_TYPE_HOST:
 				$this->validation_rules = ['type' => API_IDS];
 				break;
 
@@ -94,6 +95,10 @@ class CWidgetField {
 		$this->save_type = $save_type;
 
 		return $this;
+	}
+
+	protected function setValidationRules(array $validation_rules) {
+		$this->validation_rules = $validation_rules;
 	}
 
 	protected function setExValidationRules(array $ex_validation_rules) {

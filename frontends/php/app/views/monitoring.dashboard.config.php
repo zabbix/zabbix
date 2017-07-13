@@ -54,20 +54,21 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			(new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
 	}
-	elseif ($field instanceof CWidgetFieldCheckbox) {
-		$form_list->addRow($field->getLabel(),
-			(new CCheckBox($field->getName()))->setChecked($field->getValue() == 1)
-		);
+	elseif ($field instanceof CWidgetFieldCheckBox) {
+		$form_list->addRow($field->getLabel(), [
+			new CVar($field->getName(), '0'),
+			(new CCheckBox($field->getName()))->setChecked((bool) $field->getValue())
+		]);
 	}
 	elseif ($field instanceof CWidgetFieldGroup) {
 		// multiselect.js must be preloaded in parent view`
 
 		$field_groupids = (new CMultiSelect([
-			'name' => 'groupids[]',
+			'name' => $field->getName().'[]',
 			'objectName' => 'hostGroup',
-			'data' => $data['captions']['groups'],
+			'data' => $data['captions']['groups'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=groupids_'.
+				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
 					'&srcfld1=groupid&multiselect=1'
 			],
 			'add_post_js' => false
@@ -77,6 +78,25 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$form_list->addRow($field->getLabel(), $field_groupids);
 
 		$js_scripts[] = $field_groupids->getPostJS();
+	}
+	elseif ($field instanceof CWidgetFieldHost) {
+		// multiselect.js must be preloaded in parent view`
+
+		$field_hostids = (new CMultiSelect([
+			'name' => $field->getName().'[]',
+			'objectName' => 'hosts',
+			'data' => $data['captions']['hosts'][$field->getName()],
+			'popup' => [
+				'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
+					'&srcfld1=hostid&multiselect=1'
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+		$form_list->addRow($field->getLabel(), $field_hostids);
+
+		$js_scripts[] = $field_hostids->getPostJS();
 	}
 	elseif ($field instanceof CWidgetFieldReference) {
 		$form->addVar($field->getName(), $field->getValue() ?: '');
@@ -94,7 +114,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			? $data['captions'][$field->getResourceType()][$field->getValue()]
 			: '';
 		// needed for popup script
-		$form->addVar($field->getName(), ($field->getValue() !== null) ? $field->getValue() : '');
+		$form->addVar($field->getName(), $field->getValue());
 		$form_list->addRow($field->getLabel(), [
 			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -121,6 +141,20 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 			$radio_button_list->addValue($value, $key, null, $field->getAction());
 		}
 		$form_list->addRow($field->getLabel(), $radio_button_list);
+	}
+	elseif ($field instanceof CWidgetFieldSeverities) {
+		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$severities->addItem(
+				(new CCheckBox('severities[]', $severity))
+					->setLabel(getSeverityName($severity, $data['config']))
+					->setId('severities_'.$severity)
+					->setChecked(in_array($severity, $field->getValue(true)))
+			);
+		}
+
+		$form_list->addRow($field->getLabel(), $severities);
 	}
 }
 
