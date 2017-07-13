@@ -1147,8 +1147,6 @@ jQuery(function($) {
 					return false;
 				}
 
-				$(".dashbrd-grid-widget-container").dashboardGrid('stopWidgetRefreshTimer', dashboard_widget);
-
 				drawTree();
 				makeSortable();
 			};
