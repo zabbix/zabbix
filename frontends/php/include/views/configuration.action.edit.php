@@ -593,6 +593,7 @@ if (!empty($data['new_operation'])) {
 				$data['new_operation']['opmessage']['default_msg'] = 0;
 			}
 			break;
+
 		case OPERATION_TYPE_MESSAGE:
 			if (!isset($data['new_operation']['opmessage'])) {
 				$data['new_operation']['opmessage_usr'] = [];
