@@ -111,6 +111,10 @@
 			row = 0;
 		}
 
+		if (row > data['options']['max-rows'] - height) {
+			row = data['options']['max-rows'] - height;
+		}
+
 		if (col > data['options']['columns'] - width) {
 			col = data['options']['columns'] - width;
 		}
@@ -862,6 +866,7 @@
 				'fullscreen': 0,
 				'widget-height': 70,
 				'columns': 12,
+				'max-rows': 64,
 				'rows': 0,
 				'updated': false
 			};
