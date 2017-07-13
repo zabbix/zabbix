@@ -74,7 +74,7 @@ function make_system_status($filter, $backurl) {
 		$filter_hostids = array_diff($filter_hostids, $exclude_hostids);
 	}
 
-	// set trigger severities as table header starting from highest severity
+	// Set trigger severities as table header starting from highest severity.
 	$header = [_('Host group')];
 	$def_tab_priority = [];
 

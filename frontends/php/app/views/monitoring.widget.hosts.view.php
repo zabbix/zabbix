@@ -40,24 +40,18 @@ foreach ($data['groups'] as $group) {
 	$group_row->addItem($name);
 	$group_row->addItem((new CCol($data['hosts_data'][$group['groupid']]['ok']))->addClass(ZBX_STYLE_NORMAL_BG));
 
-	if ($data['filter']['extAck']) {
+	if ($data['ext_ack'] != EXTACK_OPTION_ALL) {
 		if ($data['hosts_data'][$group['groupid']]['lastUnack']) {
-			$table_inf = new CTableInfo();
-
 			// Set trigger severities as table header starting from highest severity.
-			$header = [];
+			$header = [_('Host')];
 
-			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-				$header[] = ($data['filter']['severity'] === null
-						|| array_key_exists($severity, $data['filter']['severity']))
-					? getSeverityName($severity, $data['config'])
-					: null;
+			foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
+				if (in_array($severity, $data['severities'])) {
+					$header[] = getSeverityName($severity, $data['config']);
+				}
 			}
 
-			krsort($header);
-			array_unshift($header, _('Host'));
-
-			$table_inf->setHeader($header);
+			$table_inf = (new CTableInfo())->setHeader($header);
 
 			$popup_rows = 0;
 
@@ -79,11 +73,6 @@ foreach ($data['groups'] as $group) {
 				);
 
 				foreach ($data['lastUnack_host_list'][$host['hostid']]['severities'] as $severity => $trigger_count) {
-					if (!is_null($data['filter']['severity'])
-							&& !array_key_exists($severity, $data['filter']['severity'])) {
-						continue;
-					}
-
 					$r->addItem((new CCol($trigger_count))->addClass(getSeverityStyle($severity, $trigger_count)));
 				}
 
@@ -104,22 +93,16 @@ foreach ($data['groups'] as $group) {
 
 	// if hostgroup contains problematic hosts, hint should be built
 	if ($data['hosts_data'][$group['groupid']]['problematic']) {
-		$table_inf = new CTableInfo();
+		// Set trigger severities as table header starting from highest severity.
+		$header = [_('Host')];
 
-		// set trigger severities as table header starting from highest severity
-		$header = [];
-
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$header[] = ($data['filter']['severity'] === null
-					|| array_key_exists($severity, $data['filter']['severity']))
-				? getSeverityName($severity, $data['config'])
-				: null;
+		foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
+			if (in_array($severity, $data['severities'])) {
+				$header[] = getSeverityName($severity, $data['config']);
+			}
 		}
 
-		krsort($header);
-		array_unshift($header, _('Host'));
-
-		$table_inf->setHeader($header);
+		$table_inf = (new CTableInfo())->setHeader($header);
 
 		$popup_rows = 0;
 
@@ -138,11 +121,6 @@ foreach ($data['groups'] as $group) {
 			));
 
 			foreach ($data['problematic_host_list'][$host['hostid']]['severities'] as $severity => $trigger_count) {
-				if (!is_null($data['filter']['severity'])
-						&& !array_key_exists($severity, $data['filter']['severity'])) {
-					continue;
-				}
-
 				$r->addItem((new CCol($trigger_count))->addClass(getSeverityStyle($severity, $trigger_count)));
 			}
 
@@ -160,7 +138,7 @@ foreach ($data['groups'] as $group) {
 		$problematic_count = 0;
 	}
 
-	switch ($data['filter']['extAck']) {
+	switch ($data['ext_ack'] != EXTACK_OPTION_ALL) {
 		case EXTACK_OPTION_ALL:
 			$group_row->addItem((new CCol($problematic_count))
 				->addClass(getSeverityStyle($data['highest_severity'][$group['groupid']],

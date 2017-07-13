@@ -20,8 +20,11 @@
 
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
 class CControllerWidgetHostsView extends CController {
+
+	private $form;
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -29,10 +32,28 @@ class CControllerWidgetHostsView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>	'string'
+			'name' =>	'string',
+			'fields' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			/*
+			 * @var array        $fields
+			 * @var array|string $fields['groupids']          (optional)
+			 * @var array|string $fields['exclude_groupids']  (optional)
+			 * @var string       $fields['problem']           (optional)
+			 * @var array        $fields['severities']        (optional)
+			 * @var int          $fields['maintenance']       (optional)
+			 * @var int          $fields['ext_ack']           (optional)
+			 */
+			$this->form = CWidgetConfig::getForm(WIDGET_HOST_STATUS, $this->getInput('fields', []));
+
+			if ($errors = $this->form->validate()) {
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			// TODO VM: prepare propper response for case of incorrect fields
@@ -47,123 +68,64 @@ class CControllerWidgetHostsView extends CController {
 	}
 
 	protected function doAction() {
+		$fields = $this->form->getFieldsData();
+
 		$config = select_config();
 
-		$filter = [
-			'groupids' => null,
-			'maintenance' => null,
-			'severity' => null,
-			'trigger_name' => '',
-			'extAck' => 0
-		];
+		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
+		$filter_hostids = null;
+		$filter_problem = $fields['problem'] != '' ? $fields['problem'] : null;
+		$filter_severities = $fields['severities']
+			? $fields['severities']
+			: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
+		$filter_maintenance = $fields['maintenance'];
+		$filter_ext_ack = $fields['ext_ack'];
 
-		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
-			// groups
-			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 0) {
-				// null mean all groups
-				$filter['groupids'] = null;
-			}
-			else {
-				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+		if ($fields['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($fields['exclude_groupids']);
 
-				if ($hide_groupids) {
-					// get all groups if no selected groups defined
-					if (!$filter['groupids']) {
-						$dbHostGroups = API::HostGroup()->get([
-							'output' => ['groupid']
-						]);
-						$filter['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
-					}
-
-					$filter['groupids'] = array_diff($filter['groupids'], $hide_groupids);
-
-					// get available hosts
-					$dbAvailableHosts = API::Host()->get([
-						'output' => ['hostid'],
-						'groupids' => $filter['groupids']
-					]);
-					$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
-
-					$dbDisabledHosts = API::Host()->get([
-						'output' => ['hostid'],
-						'groupids' => $hide_groupids
-					]);
-					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
-
-					$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
-				}
-				elseif (!$filter['groupids']) {
-					// null mean all groups
-					$filter['groupids'] = null;
-				}
+			// get all groups if no selected groups defined
+			if ($filter_groupids === null) {
+				$filter_groupids = array_keys(API::HostGroup()->get([
+					'output' => [],
+					'preservekeys' => true
+				]));
 			}
 
-			// hosts
-			$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
-			$filter['maintenance'] = ($maintenance == 0) ? 0 : null;
+			$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
 
-			// triggers
-			$severity = CProfile::get('web.dashconf.triggers.severity', null);
-			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
-			$filter['severity'] = zbx_toHash($filter['severity']);
-			$filter['trigger_name'] = CProfile::get('web.dashconf.triggers.name', '');
+			// get available hosts
+			$hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => $filter_groupids,
+				'preservekeys' => true
+			]));
 
-			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
+			$exclude_hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => $exclude_groupids,
+				'preservekeys' => true
+			]));
+
+			$filter_groupids = null;
+			$filter_hostids = array_diff($hostids, $exclude_hostids);
 		}
 
-		// get host groups
-		$options = [
+		$groups = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
-			'groupids' => $filter['groupids'],
+			'groupids' => $filter_groupids,
+			'hostids' => $filter_hostids,
 			'monitored_hosts' => true,
 			'preservekeys' => true
-		];
-
-		if (array_key_exists('hostids', $filter)) {
-			$options['hostids'] = $filter['hostids'];
-		}
-
-		$groups = API::HostGroup()->get($options);
-
-		$filter_groups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => $filter['groupids']
 		]);
-
-		$filter_groups_names = [];
-		foreach ($filter_groups as $group) {
-			$filter_groups_names[] = $group['name'].'/';
-		}
-
-		if ($filter_groups_names) {
-			$options = [
-				'output' => ['groupid', 'name'],
-				'search' => ['name' => $filter_groups_names],
-				'monitored_hosts' => true,
-				'searchByAny' => true,
-				'startSearch' => true
-			];
-
-			if (array_key_exists('hostids', $filter)) {
-				$options['hostids'] = $filter['hostids'];
-			}
-
-			$child_groups = API::HostGroup()->get($options);
-			if ($child_groups) {
-				foreach ($child_groups as $child_group) {
-					$groups[$child_group['groupid']] = $child_group;
-				}
-			}
-		}
 
 		// get hosts
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name'],
 			'selectGroups' => ['groupid'],
 			'groupids' => array_keys($groups),
-			'hostids' => array_key_exists('hostids', $filter) ? $filter['hostids'] : null,
-			'filter' => ['maintenance_status' => $filter['maintenance']],
+			'hostids' => $filter_hostids,
+			'filter' => ['maintenance_status' => ($filter_maintenance == 0) ? 0 : null],
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
@@ -175,30 +137,28 @@ class CControllerWidgetHostsView extends CController {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'priority'],
 			'selectHosts' => ['hostid'],
-			'search' => ($filter['trigger_name'] !== '') ? ['description' => $filter['trigger_name']] : null,
+			'search' => ['description' => $filter_problem],
 			'filter' => [
-				'priority' => $filter['severity'],
+				'priority' => $filter_severities,
 				'value' => TRIGGER_VALUE_TRUE
 			],
-			'maintenance' => $filter['maintenance'],
+			'maintenance' => ($filter_maintenance == 0) ? false : null,
 			'monitored' => true
 		]);
 
-		if ($filter['extAck']) {
+		if ($filter_ext_ack != EXTACK_OPTION_ALL) {
 			$hosts_with_unack_triggers = [];
 
 			$triggers_unack = API::Trigger()->get([
 				'output' => ['triggerid'],
 				'selectHosts' => ['hostid'],
-				'search' => ($filter['trigger_name'] !== '')
-					? ['description' => $filter['trigger_name']]
-					: null,
+				'search' => ['description' => $filter_problem],
 				'filter' => [
-					'priority' => $filter['severity'],
+					'priority' => $filter_severities,
 					'value' => TRIGGER_VALUE_TRUE
 				],
 				'withLastEventUnacknowledged' => true,
-				'maintenance' => $filter['maintenance'],
+				'maintenance' => ($filter_maintenance == 0) ? false : null,
 				'monitored' => true,
 				'preservekeys' => true
 			]);
@@ -225,18 +185,18 @@ class CControllerWidgetHostsView extends CController {
 					$host = $hosts[$trigger_host['hostid']];
 				}
 
-				if ($filter['extAck'] && array_key_exists($host['hostid'], $hosts_with_unack_triggers)) {
+				if ($filter_ext_ack != EXTACK_OPTION_ALL
+						&& array_key_exists($host['hostid'], $hosts_with_unack_triggers)) {
 					if (!array_key_exists($host['hostid'], $lastUnack_host_list)) {
 						$lastUnack_host_list[$host['hostid']] = [];
 						$lastUnack_host_list[$host['hostid']]['host'] = $host['name'];
 						$lastUnack_host_list[$host['hostid']]['hostid'] = $host['hostid'];
+
 						$lastUnack_host_list[$host['hostid']]['severities'] = [];
-						$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
-						$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_HIGH] = 0;
-						$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_AVERAGE] = 0;
-						$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_WARNING] = 0;
-						$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
-						$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
+
+						foreach ($filter_severities as $severity) {
+							$lastUnack_host_list[$host['hostid']]['severities'][$severity] = 0;
+						}
 					}
 					if (array_key_exists($trigger['triggerid'], $triggers_unack)) {
 						$lastUnack_host_list[$host['hostid']]['severities'][$trigger['priority']]++;
@@ -275,7 +235,7 @@ class CControllerWidgetHostsView extends CController {
 
 					$problematic_host_list[$host['hostid']]['severities'] = [];
 
-					for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+					foreach ($filter_severities as $severity) {
 						$problematic_host_list[$host['hostid']]['severities'][$severity] = 0;
 					}
 
@@ -310,7 +270,7 @@ class CControllerWidgetHostsView extends CController {
 						 * enabled and is set to display "Unacknowledged only". Host and trigger must not be in
 						 * unacknowledged lists. Count as problematic host otherwise.
 						 */
-						if ($filter['extAck'] == EXTACK_OPTION_UNACK
+						if ($filter_ext_ack == EXTACK_OPTION_UNACK
 								&& !array_key_exists($host['hostid'], $hosts_with_unack_triggers)
 								&& !array_key_exists($trigger['triggerid'], $triggers_unack)) {
 							$hosts_data[$group['groupid']]['ok']++;
@@ -350,7 +310,8 @@ class CControllerWidgetHostsView extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_HOST_STATUS]),
-			'filter' => $filter,
+			'severities' => $filter_severities,
+			'ext_ack' => $filter_ext_ack,
 			'config' => [
 				'severity_name_0' => $config['severity_name_0'],
 				'severity_name_1' => $config['severity_name_1'],
@@ -359,16 +320,16 @@ class CControllerWidgetHostsView extends CController {
 				'severity_name_4' => $config['severity_name_4'],
 				'severity_name_5' => $config['severity_name_5']
 			],
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
 			'problematic_host_list' => $problematic_host_list,
 			'lastUnack_host_list' => $lastUnack_host_list,
 			'highest_severity2' => $highest_severity2,
 			'highest_severity' => $highest_severity,
 			'hosts_data' => $hosts_data,
 			'groups' => $groups,
-			'hosts' => $hosts
+			'hosts' => $hosts,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		]));
 	}
 }
