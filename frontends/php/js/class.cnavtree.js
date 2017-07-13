@@ -422,10 +422,8 @@ jQuery(function($) {
 	 */
 	if (typeof($.fn.zbx_navtree) === 'undefined') {
 		$.fn.zbx_navtree = function(input) {
-			$this = $(this);
-
-			var getNextId = function() {
-				var widget_data = $this.data('widgetData');
+			var getNextId = function($obj) {
+				var widget_data = $obj.data('widgetData');
 
 				widget_data.lastId++;
 				while ($('[name="map.name.'+widget_data.lastId+'"]').length) {
@@ -433,45 +431,45 @@ jQuery(function($) {
 				}
 
 				return widget_data.lastId;
-			}
+			};
 
-			var makeSortable = function() {
-				var widget_data = $this.data('widgetData');
+			var makeSortable = function($obj) {
+				var widget_data = $obj.data('widgetData');
 
 				$('.root-item>.tree-list')
 					.sortable_tree({
 						max_depth: widget_data['max_depth'],
 						stop: function(event, ui) {
-							setTreeHandlers();
+							setTreeHandlers($obj);
 						}
 					})
 					.disableSelection();
 			};
 
-			var drawTree = function() {
-				var root = createTreeBranch('root'),
-					tree_items = getTreeWidgetItems(),
-					tree = buildTree(tree_items, 0);
+			var drawTree = function($obj) {
+				var root = createTreeBranch($obj, 'root'),
+					tree_items = getTreeWidgetItems($obj),
+					tree = buildTree($obj, tree_items, 0);
 
-				$('.root', $this).remove();
-				$('.tree', $this).append(root);
+				$('.root', $obj).remove();
+				$('.tree', $obj).append(root);
 
 				if (isEditMode()) {
-					root.append(createTreeItem({name: t('root'), id: 0}, 0, false));
-					root = $('.tree-item.root-item[data-id=0] > .tree-list', $this);
+					root.append(createTreeItem($obj, {name: t('root'), id: 0}, 0, false));
+					root = $('.tree-item.root-item[data-id=0] > .tree-list', $obj);
 				}
 
 				$.each(tree, function(i, item) {
 					if (typeof item === 'object') {
-						root.append(createTreeItem(item));
+						root.append(createTreeItem($obj, item));
 					}
 				});
 
-				setTreeHandlers();
+				setTreeHandlers($obj);
 			};
 
-			var parseProblems = function() {
-				var widget_data = $this.data('widgetData');
+			var parseProblems = function($obj) {
+				var widget_data = $obj.data('widgetData');
 				if (typeof widget_data.severity_levels === 'undefined') {
 					return false;
 				}
@@ -485,7 +483,7 @@ jQuery(function($) {
 				});
 
 				$.each(widget_data.severity_levels, function(sev, conf) {
-					$('[data-problems'+sev+']', $this).each(function() {
+					$('[data-problems'+sev+']', $obj).each(function() {
 						var obj = $(this);
 
 						$('>.tree-row>.problems', this).append($('<span/>', {
@@ -499,7 +497,7 @@ jQuery(function($) {
 				});
 			};
 
-			var createTreeBranch = function(className) {
+			var createTreeBranch = function($obj, className) {
 				var className = className || null,
 					ul = $('<ul/>').addClass('tree-list');
 
@@ -516,7 +514,7 @@ jQuery(function($) {
 			 * @param {numeric} parent - ID of parent item under which new item is created.
 			 * @param {numeric} depth - a depth of parent item under which new item is created.
 			 */
-			var itemEditDialog = function(id, parent, depth) {
+			var itemEditDialog = function($obj, id, parent, depth) {
 				var url = new Curl('zabbix.php'),
 					item_edit = !!id,
 					ajax_data = {
@@ -527,11 +525,11 @@ jQuery(function($) {
 					};
 
 				if (id) {
-					ajax_data['map_name'] = $('[name="map.name.'+id+'"]', $this).val();
-					ajax_data['map_mapid'] = $('[name="mapid.'+id+'"]', $this).val();
+					ajax_data['map_name'] = $('[name="map.name.'+id+'"]', $obj).val();
+					ajax_data['map_mapid'] = $('[name="mapid.'+id+'"]', $obj).val();
 				}
 				else {
-					ajax_data['map_id'] = getNextId();
+					ajax_data['map_id'] = getNextId($obj);
 				}
 
 				url.setArgument('action', 'widget.navigationtree.edititemdialog');
@@ -578,16 +576,16 @@ jQuery(function($) {
 													return false;
 												}
 												else {
-													if ($('[name="map.name.'+id+'"]', $this).length) {
-														$('[name="map.name.'+id+'"]', $this).val(resp['map_name']);
-														$('[name="mapid.'+id+'"]', $this).val(resp['map_mapid']);
-														$('[data-id='+id+'] > .tree-row > .content > .item-name', $this)
+													if ($('[name="map.name.'+id+'"]', $obj).length) {
+														$('[name="map.name.'+id+'"]', $obj).val(resp['map_name']);
+														$('[name="mapid.'+id+'"]', $obj).val(resp['map_mapid']);
+														$('[data-id='+id+'] > .tree-row > .content > .item-name', $obj)
 															.empty()
 															.attr('title', resp['map_name'])
 															.append($('<span/>').text(resp['map_name']));
 													}
 													else {
-														root = $('.tree-item[data-id='+parent+']>ul.tree-list', $this),
+														root = $('.tree-item[data-id='+parent+']>ul.tree-list', $obj),
 														id = +resp['map_id'];
 														new_item = {
 															name: resp['map_name'],
@@ -596,7 +594,7 @@ jQuery(function($) {
 															parent: parent
 														};
 
-														root.append(createTreeItem(new_item));
+														root.append(createTreeItem($obj, new_item));
 
 														$(root).closest('.tree-item')
 															.removeClass('closed')
@@ -604,28 +602,30 @@ jQuery(function($) {
 													}
 
 													if (typeof resp.hierarchy !== 'undefined') {
-														var add_child_levels = function(mapid, itemid) {
+														var add_child_levels = function($obj, mapid, itemid) {
 															if (typeof resp.hierarchy[mapid] !== 'undefined') {
 																var sel = '.tree-item[data-id='+itemid+']>ul.tree-list',
-																	root = $(sel, $this);
+																	root = $(sel, $obj);
 
 																$.each(resp.hierarchy[mapid], function(i, submapid) {
-																	var submap_item = resp.submaps[submapid],
-																		submap_itemid = getNextId(),
-																		new_item = {
-																			name: submap_item['name'],
-																			mapid: +submap_item['sysmapid'],
-																			id: submap_itemid,
-																			parent: +itemid
-																		};
+																	if (typeof resp.submaps[submapid] !== 'undefined') {
+																		var submap_item = resp.submaps[submapid],
+																			submap_itemid = getNextId($obj),
+																			new_item = {
+																				name: submap_item['name'],
+																				mapid: +submap_item['sysmapid'],
+																				id: submap_itemid,
+																				parent: +itemid
+																			};
 
-																	root.append(createTreeItem(new_item));
-																	add_child_levels(+submapid, submap_itemid);
+																		root.append(createTreeItem($obj, new_item));
+																		add_child_levels($obj, +submapid, submap_itemid);
+																	}
 																});
 															}
 														};
 
-														add_child_levels(resp['map_mapid'], id);
+														add_child_levels($obj, +resp['map_mapid'], id);
 
 														$(root).closest('.tree-item')
 															.addClass('is-parent opened')
@@ -633,7 +633,7 @@ jQuery(function($) {
 													}
 
 													overlayDialogueDestroy();
-													setTreeHandlers();
+													setTreeHandlers($obj);
 												}
 											}
 										});
@@ -661,9 +661,9 @@ jQuery(function($) {
 			 *
 			 * @returns {object}
 			 */
-			var createTreeItem = function(item, depth, editable) {
-				var widget_data = $this.data('widgetData'),
-					ul = createTreeBranch(null),
+			var createTreeItem = function($obj, item, depth, editable) {
+				var widget_data = $obj.data('widgetData'),
+					ul = createTreeBranch($obj, null),
 					item_clases = 'tree-item',
 					link;
 
@@ -696,7 +696,7 @@ jQuery(function($) {
 
 					$.each(item.children, function(i, item) {
 						if (typeof item === 'object') {
-							ul.append(createTreeItem(item, depth+1));
+							ul.append(createTreeItem($obj, item, depth+1));
 							if (item.id > widget_data.lastId) {
 								widget_data.lastId = item.id;
 							}
@@ -720,10 +720,10 @@ jQuery(function($) {
 						.click(function(e) {
 							var data_to_share = {mapid: $(this).data('mapid')},
 								itemid = $(this).closest('.tree-item').data('id'),
-								step_in_path = $(this).closest('.tree-item');
-								widget = getWidgetData();
+								step_in_path = $(this).closest('.tree-item'),
+								widget = getWidgetData($obj);
 
-							$('.selected', $this).removeClass('selected');
+							$('.selected', $obj).removeClass('selected');
 							while ($(step_in_path).length) {
 								$(step_in_path).addClass('selected');
 								step_in_path = $(step_in_path).parent().closest('.tree-item');
@@ -757,16 +757,16 @@ jQuery(function($) {
 									})
 									.click(function() {
 										var parentId = $(this).data('id'),
-											widget_data = $this.data('widgetData'),
+											widget_data = $obj.data('widgetData'),
 											depth = $(this).closest('.tree-list').data('depth'),
-											branch = $('.tree-item[data-id='+parentId+']>ul', $this);
+											branch = $('.tree-item[data-id='+parentId+']>ul', $obj);
 
 											if (typeof depth === 'undefined') {
 												depth = 0;
 											}
 
 											if (widget_data.max_depth > depth) {
-												itemEditDialog(0, parentId, depth);
+												itemEditDialog($obj, 0, parentId, depth);
 											}
 									})
 								)
@@ -789,25 +789,25 @@ jQuery(function($) {
 										}
 
 										addPopupValues = function(data) {
-											var root = $('.tree-item[data-id='+id+']>ul.tree-list', $this),
+											var root = $('.tree-item[data-id='+id+']>ul.tree-list', $obj),
 												new_item;
 
 											$.each(data.values, function() {
 												new_item = {
 													name: this['name'],
 													mapid: +this['sysmapid'],
-													id: getNextId(),
+													id: getNextId($obj),
 													parent: id
 												};
 
-												root.append(createTreeItem(new_item));
+												root.append(createTreeItem($obj, new_item));
 											});
 
 											$(root).closest('.tree-item')
 												.removeClass('closed')
 												.addClass('opened');
 
-											setTreeHandlers();
+											setTreeHandlers($obj);
 
 											if (typeof old_addPopupValues === 'function') {
 												addPopupValues = old_addPopupValues;
@@ -825,10 +825,10 @@ jQuery(function($) {
 									})
 									.click(function() {
 										var id = $(this).data('id'),
-											parent = +$('input[name="map.parent.'+id+'"]', $this).val(),
+											parent = +$('input[name="map.parent.'+id+'"]', $obj).val(),
 											depth = +$(this).closest('[data-depth]').data('depth');
 
-										itemEditDialog(id, parent, depth)
+										itemEditDialog($obj, id, parent, depth)
 									}) : null
 								)
 								.append(editable ? $('<button/>', {
@@ -837,7 +837,7 @@ jQuery(function($) {
 										'class': 'remove-btn'
 									})
 									.click(function(){
-										removeItem([$(this).data('id')]);
+										removeItem($obj, [$(this).data('id')]);
 									}) : null
 								) : null
 							)
@@ -857,7 +857,7 @@ jQuery(function($) {
 													)
 												)
 												.click(function() {
-													var widget_data = getWidgetData(),
+													var widget_data = getWidgetData($obj),
 														branch = $(this).closest('[data-id]'),
 														button = $(this),
 														closed_state = '1';
@@ -915,12 +915,12 @@ jQuery(function($) {
 					);
 			};
 
-			var setTreeHandlers = function() {
-				var widget_data = $this.data('widgetData'),
+			var setTreeHandlers = function($obj) {
+				var widget_data = $obj.data('widgetData'),
 					tree_list_depth;
 
 				// Add .is-parent class for branches with sub-items.
-				$('.tree-list', $this).not('.ui-sortable, .root').each(function() {
+				$('.tree-list', $obj).not('.ui-sortable, .root').each(function() {
 					if ($('>li', this).length) {
 						$(this).closest('.tree-item').addClass('is-parent');
 					}
@@ -952,7 +952,7 @@ jQuery(function($) {
 				});
 
 				// Change arrow style.
-				$('.is-parent', $this).each(function() {
+				$('.is-parent', $obj).each(function() {
 					var arrow = $('> .tree-row > .content > .arrow > .treeview > span', $(this));
 					if ($(this).hasClass('opened')) {
 						arrow.removeClass('arrow-right').addClass('arrow-down');
@@ -963,8 +963,8 @@ jQuery(function($) {
 				});
 			};
 
-			var getWidgetData = function() {
-				var widget_data = $this.data('widgetData'),
+			var getWidgetData = function($obj) {
+				var widget_data = $obj.data('widgetData'),
 					response = $(".dashbrd-grid-widget-container").dashboardGrid('getWidgetsBy', 'uniqueid',
 						widget_data['uniqueid']);
 
@@ -990,8 +990,8 @@ jQuery(function($) {
 			 *
 			 * @returns {Array} - an array of item objects.
 			 */
-			var getTreeWidgetItems = function() {
-				var widget_data = getWidgetData(),
+			var getTreeWidgetItems = function($obj) {
+				var widget_data = getWidgetData($obj),
 					tree_items = [];
 
 					$.each(widget_data['fields'], function(field_name, value) {
@@ -1023,9 +1023,9 @@ jQuery(function($) {
 			};
 
 			// Create multi-level array that represents real child-parent dependencies in tree.
-			var buildTree = function(rows, parent_id) {
+			var buildTree = function($obj, rows, parent_id) {
 				var parent_id = (typeof parent_id === 'number') ? parent_id : 0,
-					widget_data = $this.data('widgetData'),
+					widget_data = $obj.data('widgetData'),
 					rows = rows || [],
 					tree = [];
 
@@ -1040,7 +1040,7 @@ jQuery(function($) {
 						}
 
 						if (item['parent'] == parent_id) {
-							var children = buildTree(rows, item['id']);
+							var children = buildTree($obj, rows, item['id']);
 
 							if (children.length) {
 								item['children'] = children;
@@ -1075,17 +1075,18 @@ jQuery(function($) {
 			};
 
 			// Remove item from tree.
-			var removeItem = function(id) {
-				var parent_id = $('input[name="map.parent.'+id+'"]', $this).val();
-				if ($('.tree-item', $('[data-id='+parent_id+']', $this)).length == 1) {
+			var removeItem = function($obj, id) {
+				var parent_id = $('input[name="map.parent.'+id+'"]', $obj).val();
+				if ($('.tree-item', $('[data-id='+parent_id+']', $obj)).length == 1) {
 					$('[data-id='+parent_id+']').removeClass('is-parent');
 				}
 				$('[data-id='+id+']').remove();
+				setTreeHandlers($obj);
 			};
 
 			// Records data from DOM to dashboard widget[fields] array.
-			var updateWidgetFields = function() {
-				var dashboard_widget = getWidgetData();
+			var updateWidgetFields = function($obj) {
+				var dashboard_widget = getWidgetData($obj);
 
 				if (!dashboard_widget || !isEditMode()) {
 					return false;
@@ -1119,7 +1120,7 @@ jQuery(function($) {
 				});
 			};
 
-			var openBranch = function(id) {
+			var openBranch = function($obj, id) {
 				if (!$('.tree-item[data-id='+id+']').is(':visible')) {
 					var selector = '> .tree-row > .content > .arrow > .treeview > span',
 						branch_to_open = $('.tree-item[data-id='+id+']').closest('.tree-list').not('.root');
@@ -1139,13 +1140,13 @@ jQuery(function($) {
 				}
 			};
 
-			var switchToNavigationMode = function() {
-				drawTree();
-				parseProblems();
+			var switchToNavigationMode = function($obj) {
+				drawTree($obj);
+				parseProblems($obj);
 			};
 
-			var switchToEditMode = function() {
-				var dashboard_widget = getWidgetData();
+			var switchToEditMode = function($obj) {
+				var dashboard_widget = getWidgetData($obj);
 
 				if (!dashboard_widget) {
 					return false;
@@ -1153,46 +1154,57 @@ jQuery(function($) {
 
 				$(".dashbrd-grid-widget-container").dashboardGrid('stopWidgetRefreshTimer', dashboard_widget);
 
-				drawTree();
-				makeSortable();
+				drawTree($obj);
+				makeSortable($obj);
 			};
 
 			var methods = {
 				// beforeConfigLoad trigger method
 				beforeConfigLoad: function() {
+					var $this = $(this);
 					return this.each(function() {
-						updateWidgetFields();
+						updateWidgetFields($this);
 					});
 				},
+
 				// beforeDashboardSave trigger method
 				beforeDashboardSave: function() {
+					var $this = $(this);
 					return this.each(function() {
-						updateWidgetFields();
+						updateWidgetFields($this);
 					});
 				},
+
 				// afterDashboardSave trigger method
 				afterDashboardSave: function() {
 					return this.each(function() {
-						switchToNavigationMode();
+						switchToNavigationMode($this);
 					});
 				},
+
 				// onEditStart trigger method
 				onEditStart: function() {
+					var $this = $(this);
 					return this.each(function() {
-						switchToEditMode();
+						switchToEditMode($this);
 					});
 				},
+
 				// onEditStop trigger method
 				onEditStop: function() {
+					var $this = $(this);
 					return this.each(function() {
-						switchToNavigationMode();
+						switchToNavigationMode($this);
 					});
 				},
+
 				// initialization of widget
 				init: function(options) {
 					options = $.extend({}, options);
 
 					return this.each(function() {
+						var $this = $(this);
+
 						$this.data('widgetData', {
 							uniqueid: options.uniqueid,
 							severity_levels: options.severity_levels || [],
@@ -1203,7 +1215,7 @@ jQuery(function($) {
 							lastId: 0
 						});
 
-						var widget_data = getWidgetData(),
+						var widget_data = getWidgetData($this),
 							triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
 							'beforeConfigLoad'];
 
@@ -1219,7 +1231,7 @@ jQuery(function($) {
 						});
 
 						if (isEditMode()) {
-							switchToEditMode();
+							switchToEditMode($this);
 						}
 						else {
 							if (typeof widget_data['fields']['map_widget_reference'] !== 'undefined'
@@ -1272,13 +1284,13 @@ jQuery(function($) {
 												$(step_in_path).addClass('selected');
 												step_in_path = $(step_in_path).parent().closest('.tree-item');
 											}
-											openBranch($(item).data('id'));
+											openBranch($this, $(item).data('id'));
 										}
 									}
 								});
 							}
 
-							switchToNavigationMode();
+							switchToNavigationMode($this);
 
 							if (!options.navtree_item_selected) {
 								options.navtree_item_selected = $('.tree-item', $this).first().data('id');
@@ -1297,9 +1309,10 @@ jQuery(function($) {
 										widget_data, 'selected_mapid', {mapid: $(selected_item).data('mapid')});
 								}
 
-								openBranch(options.navtree_item_selected);
+								openBranch($this, options.navtree_item_selected);
 							}
 						}
+
 					});
 				}
 			};
