@@ -32,8 +32,9 @@ class CControllerWidgetHostsView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>	'string',
-			'fields' =>	'array'
+			'name' =>		'string',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -313,8 +314,13 @@ class CControllerWidgetHostsView extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_HOST_STATUS]),
-			'severities' => $filter_severities,
-			'ext_ack' => $filter_ext_ack,
+			'filter' => [
+				'hostids' => $fields['hostids'],
+				'problem' => $fields['problem'],
+				'severities' => $filter_severities,
+				'maintenance' => $fields['maintenance'],
+				'ext_ack' => $fields['ext_ack']
+			],
 			'config' => [
 				'severity_name_0' => $config['severity_name_0'],
 				'severity_name_1' => $config['severity_name_1'],
@@ -330,6 +336,7 @@ class CControllerWidgetHostsView extends CController {
 			'hosts_data' => $hosts_data,
 			'groups' => $groups,
 			'hosts' => $hosts,
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

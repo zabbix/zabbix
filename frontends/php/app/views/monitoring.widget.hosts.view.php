@@ -27,6 +27,27 @@ $table = (new CTableInfo())
 		_('Total')
 	]);
 
+$url_group = (new CUrl('zabbix.php'))
+	->setArgument('action', 'problem.view')
+	->setArgument('filter_set', 1)
+	->setArgument('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM)
+	->setArgument('filter_groupids', null)
+	->setArgument('filter_hostids', $data['filter']['hostids'])
+	->setArgument('filter_problem', $data['filter']['problem'])
+	->setArgument('filter_maintenance', $data['filter']['maintenance'] == 1 ? 1 : null);
+$url_host = (new CUrl('zabbix.php'))
+	->setArgument('action', 'problem.view')
+	->setArgument('filter_set', 1)
+	->setArgument('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM)
+	->setArgument('filter_groupids', null)
+	->setArgument('filter_hostids', null)
+	->setArgument('filter_problem', $data['filter']['problem'])
+	->setArgument('filter_maintenance', $data['filter']['maintenance'] == 1 ? 1 : null);
+if ($data['fullscreen'] == 1) {
+	$url_group->setArgument('fullscreen', '1');
+	$url_host->setArgument('fullscreen', '1');
+}
+
 foreach ($data['groups'] as $group) {
 	if (!array_key_exists($group['groupid'], $data['hosts_data'])) {
 		continue;
@@ -34,19 +55,19 @@ foreach ($data['groups'] as $group) {
 
 	$group_row = new CRow();
 
-	$name = new CLink($group['name'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].'&hostid=0'.
-		'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
-	);
+	$url_group->setArgument('filter_groupids', [$group['groupid']]);
+	$url_host->setArgument('filter_groupids', [$group['groupid']]);
+	$name = new CLink($group['name'], $url_group->getUrl());
 	$group_row->addItem($name);
 	$group_row->addItem((new CCol($data['hosts_data'][$group['groupid']]['ok']))->addClass(ZBX_STYLE_NORMAL_BG));
 
-	if ($data['ext_ack'] != EXTACK_OPTION_ALL) {
+	if ($data['filter']['ext_ack'] != EXTACK_OPTION_ALL) {
 		if ($data['hosts_data'][$group['groupid']]['lastUnack']) {
 			// Set trigger severities as table header starting from highest severity.
 			$header = [_('Host')];
 
 			foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
-				if (in_array($severity, $data['severities'])) {
+				if (in_array($severity, $data['filter']['severities'])) {
 					$header[] = getSeverityName($severity, $data['config']);
 				}
 			}
@@ -64,11 +85,11 @@ foreach ($data['groups'] as $group) {
 
 				$host_data = $data['lastUnack_host_list'][$hostid];
 
+				$url_host->setArgument('filter_hostids', [$host['hostid']]);
 				$r = new CRow();
 				$r->addItem(
 					(new CCol(
-						new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
-							'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM)
+						new CLink($host_data['host'], $url_host->getUrl())
 					))->addClass(ZBX_STYLE_NOWRAP)
 				);
 
@@ -97,7 +118,7 @@ foreach ($data['groups'] as $group) {
 		$header = [_('Host')];
 
 		foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
-			if (in_array($severity, $data['severities'])) {
+			if (in_array($severity, $data['filter']['severities'])) {
 				$header[] = getSeverityName($severity, $data['config']);
 			}
 		}
@@ -115,10 +136,9 @@ foreach ($data['groups'] as $group) {
 
 			$host_data = $data['problematic_host_list'][$hostid];
 
+			$url_host->setArgument('filter_hostids', [$host['hostid']]);
 			$r = new CRow();
-			$r->addItem(new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
-				'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
-			));
+			$r->addItem(new CLink($host_data['host'], $url_host->getUrl()));
 
 			foreach ($data['problematic_host_list'][$host['hostid']]['severities'] as $severity => $trigger_count) {
 				$r->addItem((new CCol($trigger_count))->addClass(getSeverityStyle($severity, $trigger_count)));
@@ -138,7 +158,7 @@ foreach ($data['groups'] as $group) {
 		$problematic_count = 0;
 	}
 
-	switch ($data['ext_ack']) {
+	switch ($data['filter']['ext_ack']) {
 		case EXTACK_OPTION_ALL:
 			$group_row->addItem((new CCol($problematic_count))
 				->addClass(getSeverityStyle($data['highest_severity'][$group['groupid']],
