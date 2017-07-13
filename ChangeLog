@@ -82,6 +82,7 @@ New features:
 A.F....... [ZBX-1357] updated Catalan, Chinese (China), English (United States), Japanese, Korean, Polish, Portuguese (Brazil), Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-12252] fixed history page to display values in chronological order (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.7rc1
