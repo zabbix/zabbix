@@ -1293,7 +1293,8 @@ jQuery(function($) {
 							switchToNavigationMode($this);
 
 							if (!options.navtree_item_selected) {
-								options.navtree_item_selected = $('.tree-item', $this).first().data('id');
+								options.navtree_item_selected = $('.tree-item', $this).not('[data-mapid="0"]').first()
+									.data('id');
 							}
 							if (options.navtree_item_selected) {
 								var selected_item = $('.tree-item[data-id='+options.navtree_item_selected+']'),
