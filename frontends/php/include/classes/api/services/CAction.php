@@ -2982,12 +2982,10 @@ class CAction extends CApiService {
 							$db_ack_operation = $db_ack_operations[$ack_operation['operationid']];
 							// As documentation defines field 'operationtype' is required.
 							unset($db_ack_operation['operationtype']);
-						}
-						else {
-							$db_ack_operation = [];
+							$ack_operation += $db_ack_operation;
 						}
 
-						$operations_to_validate[] = $ack_operation + $db_ack_operation;
+						$operations_to_validate[] = $ack_operation;
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect acknowledgement action operationid.'));
