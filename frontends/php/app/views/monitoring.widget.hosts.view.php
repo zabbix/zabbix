@@ -138,7 +138,7 @@ foreach ($data['groups'] as $group) {
 		$problematic_count = 0;
 	}
 
-	switch ($data['ext_ack'] != EXTACK_OPTION_ALL) {
+	switch ($data['ext_ack']) {
 		case EXTACK_OPTION_ALL:
 			$group_row->addItem((new CCol($problematic_count))
 				->addClass(getSeverityStyle($data['highest_severity'][$group['groupid']],
