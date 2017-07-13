@@ -541,16 +541,17 @@ class CAction extends CApiService {
 
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
 							$operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
-						$message = (array_key_exists('opmessage', $action) && is_array($action['opmessage']))
+						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
 							? $operation['opmessage']
 							: [];
 
-						if (!array_key_exists('default_msg', $message) || (string)$message['default_msg'] == '1') {
-							$message = array_diff_key($message, ['subject' => '', 'message' => '']);
+						if (array_key_exists('default_msg', $message) && (string)$message['default_msg'] == '1') {
+							$message['subject'] = $action['r_shortdata'];
+							$message['message'] = $action['r_longdata'];
 						}
 
 						$operation['opmessage'] = $message + [
-							'default_msg'	=> 1,
+							'default_msg'	=> 0,
 							'mediatypeid'	=> 0,
 							'subject'		=> ACTION_DEFAULT_SUBJ_TRIGGER,
 							'message'		=> ACTION_DEFAULT_MSG_TRIGGER
@@ -571,16 +572,17 @@ class CAction extends CApiService {
 
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
 							$operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-						$message = (array_key_exists('opmessage', $action) && is_array($action['opmessage']))
+						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
 							? $operation['opmessage']
 							: [];
 
-						if (!array_key_exists('default_msg', $message) || (string)$message['default_msg'] == '1') {
-							$message = array_diff_key($message, ['subject' => '', 'message' => '']);
+						if (array_key_exists('default_msg', $message) && (string)$message['default_msg'] == '1') {
+							$message['subject'] = $action['ack_shortdata'];
+							$message['message'] = $action['ack_longdata'];
 						}
 
 						$operation['opmessage'] = $message + [
-							'default_msg'	=> 1,
+							'default_msg'	=> 0,
 							'mediatypeid'	=> 0,
 							'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
 							'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
@@ -824,12 +826,19 @@ class CAction extends CApiService {
 
 						if ($ack_operationtype == OPERATION_TYPE_MESSAGE ||
 								$ack_operationtype == OPERATION_TYPE_ACK_MESSAGE) {
-							$ack_operation['opmessage'] = $opmessage + [
-								'default_msg'	=> 1,
+							$opmessage += [
+								'default_msg'	=> 0,
 								'mediatypeid'	=> 0,
 								'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
 								'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
 							];
+
+							if ((string)$opmessage['default_msg'] == '1') {
+								$opmessage['subject'] = $action['ack_shortdata'];
+								$opmessage['message'] = $action['ack_longdata'];
+							}
+
+							$ack_operation['opmessage'] = $opmessage;
 						}
 
 						$operations_to_create[] = $ack_operation;
