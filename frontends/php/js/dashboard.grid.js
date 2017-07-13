@@ -111,6 +111,10 @@
 			row = 0;
 		}
 
+		if (row > data['options']['max-rows'] - height) {
+			row = data['options']['max-rows'] - height;
+		}
+
 		if (col > data['options']['columns'] - width) {
 			col = data['options']['columns'] - width;
 		}
@@ -557,6 +561,7 @@
 							'rf_rate': data['widget_defaults'][type]['rf_rate'],
 							'fields': fields
 						}
+						updateWidgetDynamic($obj, data, widget_data);
 						methods.addWidget.call($obj, widget_data);
 						// new widget is last element in data['widgets'] array
 						widget = data['widgets'].slice(-1)[0];
@@ -570,10 +575,10 @@
 						}
 						widget['header'] = name;
 						widget['fields'] = fields;
-					}
 
-					updateWidgetDynamic($obj, data, widget);
-					refreshWidget($obj, data, widget);
+						updateWidgetDynamic($obj, data, widget);
+						refreshWidget($obj, data, widget);
+					}
 
 					// mark dashboard as updated
 					data['options']['updated'] = true;
@@ -685,6 +690,7 @@
 			.append($('<li>').append(btn_delete))
 		);
 
+		stopWidgetRefreshTimer(widget);
 		makeDraggable($obj, data, widget);
 		makeResizable($obj, data, widget);
 	}
@@ -769,6 +775,7 @@
 	}
 
 	function updateWidgetDynamic($obj, data, widget) {
+		// this function may be called for widget that is not in data['widgets'] array yet.
 		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] === '1') {
 			if (data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
@@ -862,6 +869,7 @@
 				'fullscreen': 0,
 				'widget-height': 70,
 				'columns': 12,
+				'max-rows': 64,
 				'rows': 0,
 				'updated': false
 			};
@@ -1066,11 +1074,6 @@
 
 				openConfigDialogue($this, data, widget);
 			});
-		},
-
-		// Call stopWidgetRefreshTimer on some speciffic widget.
-		stopWidgetRefreshTimer: function(widget) {
-			stopWidgetRefreshTimer(widget);
 		},
 
 		// After pressing "delete" button on widget

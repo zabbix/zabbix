@@ -748,7 +748,7 @@ class testUsers extends CZabbixTest {
 					'autologout' => ''
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologout": a time unit is expected.'
+				'expected_error' => 'Invalid parameter "/1/autologout": cannot be empty.'
 			],
 			[
 				'user' => [
@@ -909,7 +909,7 @@ class testUsers extends CZabbixTest {
 					'refresh' => ''
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+				'expected_error' => 'Invalid parameter "/1/refresh": cannot be empty.'
 			],
 			[
 				'user' => [
