@@ -66,28 +66,27 @@ class CControllerWidgetWebView extends CController {
 	protected function doAction() {
 		$fields = $this->form->getFieldsData();
 
-		$groupids = getSubGroups($fields['groupids']);
-		$exclude_groupids = getSubGroups($fields['exclude_groupids']);
+		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
+		$filter_hostids = null;
+		$filter_maintenance = ($fields['maintenance'] == 0) ? 0 : null;
 
-		$filter = [
-			'maintenance' => ($fields['maintenance'] == 0) ? 0 : null
-		];
+		if ($fields['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($fields['exclude_groupids']);
 
-		if ($exclude_groupids) {
 			// get all groups if no selected groups defined
-			if (!$groupids) {
-				$groupids = array_keys(API::HostGroup()->get([
+			if ($filter_groupids === null) {
+				$filter_groupids = array_keys(API::HostGroup()->get([
 					'output' => [],
 					'preservekeys' => true
 				]));
 			}
 
-			$groupids = array_diff($groupids, $exclude_groupids);
+			$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
 
 			// get available hosts
 			$hostids = array_keys(API::Host()->get([
 				'output' => [],
-				'groupids' => $groupids,
+				'groupids' => $filter_groupids,
 				'preservekeys' => true
 			]));
 
@@ -97,16 +96,66 @@ class CControllerWidgetWebView extends CController {
 				'preservekeys' => true
 			]));
 
-			$filter['groupids'] = null;
-			$filter['hostids'] = array_diff($hostids, $exclude_hostids);
+			$filter_groupids = null;
+			$filter_hostids = array_diff($hostids, $exclude_hostids);
 		}
-		else {
-			$filter['groupids'] = $groupids ? $groupids : null;
+
+		$groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter_groupids,
+			'hostids' => $filter_hostids,
+			'monitored_hosts' => true,
+			'with_monitored_httptests' => true,
+			'preservekeys' => true
+		]);
+
+		CArrayHelper::sort($groups, ['name']);
+
+		$groupids = array_keys($groups);
+
+		$hosts = API::Host()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'hostids' => $filter_hostids,
+			'filter' => ['maintenance_status' => $filter_maintenance],
+			'monitored_hosts' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($groups as &$group) {
+			$group += ['ok' => 0, 'failed' => 0, 'unknown' => 0];
+		}
+		unset($group);
+
+		// fetch links between HTTP tests and host groups
+		$result = DbFetchArray(DBselect(
+			'SELECT DISTINCT ht.httptestid,hg.groupid'.
+			' FROM httptest ht,hosts_groups hg'.
+			' WHERE ht.hostid=hg.hostid'.
+				' AND '.dbConditionInt('hg.hostid', array_keys($hosts)).
+				' AND '.dbConditionInt('hg.groupid', $groupids).
+				' AND ht.status='.HTTPTEST_STATUS_ACTIVE
+		));
+
+		// fetch HTTP test execution data
+		$httptest_data = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
+
+		foreach ($result as $row) {
+			$group = &$groups[$row['groupid']];
+
+			if (array_key_exists($row['httptestid'], $httptest_data)
+					&& $httptest_data[$row['httptestid']]['lastfailedstep'] !== null) {
+				$group[$httptest_data[$row['httptestid']]['lastfailedstep'] != 0 ? 'failed' : 'ok']++;
+			}
+			else {
+				$group['unknown']++;
+			}
+			unset($group);
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_WEB_OVERVIEW]),
-			'filter' => $filter,
+			'groups' => $groups,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
