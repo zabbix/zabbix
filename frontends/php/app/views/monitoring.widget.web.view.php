@@ -21,9 +21,19 @@
 
 $table = (new CTableInfo())->setHeader([_('Host group'), _('Ok'), _('Failed'), _('Unknown')]);
 
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'web.view')
+	->setArgument('groupid', '')
+	->setArgument('hostid', '0');
+if ($data['fullscreen'] == 1) {
+	$url->setArgument('fullscreen', '1');
+}
+
 foreach ($data['groups'] as $group) {
+	$url->setArgument('groupid', $group['groupid']);
+
 	$table->addRow([
-		new CLink($group['name'], 'zabbix.php?action=web.view&groupid='.$group['groupid'].'&hostid=0'),
+		new CLink($group['name'], $url->getUrl()),
 		(new CSpan($group['ok']))->addClass(ZBX_STYLE_GREEN),
 		(new CSpan($group['failed']))->addClass($group['failed'] == 0 ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
 		(new CSpan($group['unknown']))->addClass(ZBX_STYLE_GREY)

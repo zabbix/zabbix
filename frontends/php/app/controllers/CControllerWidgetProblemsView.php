@@ -31,9 +31,9 @@ class CControllerWidgetProblemsView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'			=> 'string',
-			'fullscreen'	=> 'in 0,1',
-			'fields'		=> 'array'
+			'name' =>		'string',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);

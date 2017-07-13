@@ -31,8 +31,9 @@ class CControllerWidgetWebView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>	'string',
-			'fields' =>	'array'
+			'name' =>		'string',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -159,6 +160,7 @@ class CControllerWidgetWebView extends CController {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_WEB_OVERVIEW]),
 			'groups' => $groups,
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
