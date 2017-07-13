@@ -2004,9 +2004,19 @@ class CAction extends CApiService {
 				'filter' => ['actionid' => $actionIds, 'recovery' => ACTION_ACKNOWLEDGE_OPERATION],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($ack_operations, 'actionid', 'operationid');
+
 			$ack_operations = $this->getAcknowledgeOperations($ack_operations, $options['selectAcknowledgeOperations']);
-			$result = $relationMap->mapMany($result, $ack_operations, 'acknowledgeOperations');
+
+			foreach ($ack_operations as $ack_operation) {
+				$actionid = $ack_operation['actionid'];
+				unset($ack_operation['actionid']);
+
+				if (!array_key_exists('acknowledgeOperations', $result[$actionid])) {
+					$result[$actionid]['acknowledgeOperations'] = [];
+				}
+
+				$result[$actionid]['acknowledgeOperations'][] = $ack_operation;
+			}
 		}
 
 		// adding operations
@@ -2437,7 +2447,9 @@ class CAction extends CApiService {
 				]);
 
 				foreach ($messages as $message) {
-					$ack_operations[$message['operationid']]['opmessage'] = $message;
+					$operationid = $message['operationid'];
+					unset($message['operationid']);
+					$ack_operations[$operationid]['opmessage'] = $message;
 				}
 			}
 
@@ -2452,7 +2464,9 @@ class CAction extends CApiService {
 				]);
 
 				foreach ($messages_groups as $messages_group) {
-					$ack_operations[$messages_group['operationid']]['opmessage_grp'][] = $messages_group;
+					$operationid = $messages_group['operationid'];
+					unset($messages_group['operationid']);
+					$ack_operations[$operationid]['opmessage_grp'][] = $messages_group;
 				}
 			}
 
@@ -2467,7 +2481,9 @@ class CAction extends CApiService {
 				]);
 
 				foreach ($messages_users as $messages_user) {
-					$ack_operations[$messages_user['operationid']]['opmessage_usr'][] = $messages_user;
+					$operationid = $messages_user['operationid'];
+					unset($messages_user['operationid']);
+					$ack_operations[$operationid]['opmessage_usr'][] = $messages_user;
 				}
 			}
 		}
@@ -2486,7 +2502,9 @@ class CAction extends CApiService {
 				]);
 
 				foreach ($commands as $command) {
-					$ack_operations[$command['operationid']]['opcommand'] = $command;
+					$operationid = $command['operationid'];
+					unset($command['operationid']);
+					$ack_operations[$operationid]['opcommand'] = $command;
 				}
 			}
 
@@ -2501,7 +2519,9 @@ class CAction extends CApiService {
 				]);
 
 				foreach ($commands_history as $command_history) {
-					$ack_operations[$command_history['operationid']]['opcommand_hst'][] = $command_history;
+					$operationid = $command_history['operationid'];
+					unset($command_history['operationid']);
+					$ack_operations[$operationid]['opcommand_hst'][] = $command_history;
 				}
 			}
 
@@ -2516,7 +2536,9 @@ class CAction extends CApiService {
 				]);
 
 				foreach ($commands_groups as $command_group) {
-					$ack_operations[$command_group['operationid']]['opcommand_grp'][] = $command_group;
+					$operationid = $command_group['operationid'];
+					unset($command_group['operationid']);
+					$ack_operations[$operationid]['opcommand_grp'][] = $command_group;
 				}
 			}
 		}
