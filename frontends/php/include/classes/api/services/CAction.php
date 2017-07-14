@@ -820,12 +820,8 @@ class CAction extends CApiService {
 					$ack_operation['actionid'] = $action['actionid'];
 
 					if (!array_key_exists('operationid', $ack_operation)) {
-						$ack_operationtype = array_key_exists('operationtype', $ack_operation)
-							? $ack_operation['operationtype']
-							: $db_ack_operations[$ack_operation['operationid']]['operationtype'];
-
-						if ($ack_operationtype == OPERATION_TYPE_MESSAGE ||
-								$ack_operationtype == OPERATION_TYPE_ACK_MESSAGE) {
+						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
+								$ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
 							$opmessage += [
 								'default_msg'	=> 0,
 								'mediatypeid'	=> 0,
@@ -834,8 +830,12 @@ class CAction extends CApiService {
 							];
 
 							if ((string)$opmessage['default_msg'] == '1') {
-								$opmessage['subject'] = $action['ack_shortdata'];
-								$opmessage['message'] = $action['ack_longdata'];
+								$opmessage['subject'] = array_key_exists('ack_shortdata', $action)
+									? $action['ack_shortdata']
+									: $db_action['ack_shortdata'];
+								$opmessage['message'] = array_key_exists('ack_longdata', $action)
+									? $action['ack_longdata']
+									: $db_action['ack_longdata'];
 							}
 
 							$ack_operation['opmessage'] = $opmessage;
@@ -844,6 +844,24 @@ class CAction extends CApiService {
 						$operations_to_create[] = $ack_operation;
 					}
 					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
+						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
+								$ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+							$db_opmessage = $db_ack_operations[$ack_operation['operationid']]['opmessage'];
+							$default_msg = array_key_exists('default_msg', $opmessage)
+								? (string)$opmessage['default_msg']
+								: $db_opmessage['default_msg'];
+
+							if ($default_msg == '1') {
+								$opmessage['subject'] = array_key_exists('ack_shortdata', $action)
+									? $action['ack_shortdata']
+									: $db_action['ack_shortdata'];
+								$opmessage['message'] = array_key_exists('ack_longdata', $action)
+									? $action['ack_longdata']
+									: $db_action['ack_longdata'];
+								$ack_operation['opmessage'] = $opmessage;
+							}
+						}
+
 						$operations_to_update[] = $ack_operation;
 						unset($db_ack_operations[$ack_operation['operationid']]);
 					} else {
