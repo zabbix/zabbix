@@ -34,9 +34,9 @@ foreach ($data['groups'] as $group) {
 
 	$table->addRow([
 		new CLink($group['name'], $url->getUrl()),
-		(new CSpan($group['ok']))->addClass(ZBX_STYLE_GREEN),
-		(new CSpan($group['failed']))->addClass($group['failed'] == 0 ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
-		(new CSpan($group['unknown']))->addClass(ZBX_STYLE_GREY)
+		($group['ok'] != 0) ? (new CSpan($group['ok']))->addClass(ZBX_STYLE_GREEN) : '',
+		($group['failed'] != 0) ? (new CSpan($group['failed']))->addClass(ZBX_STYLE_RED) : '',
+		($group['unknown'] != 0) ? (new CSpan($group['unknown']))->addClass(ZBX_STYLE_GREY) : ''
 	]);
 }
 

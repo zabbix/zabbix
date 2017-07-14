@@ -243,8 +243,6 @@ class CControllerWidgetHostsView extends CController {
 					foreach ($filter_severities as $severity) {
 						$problematic_host_list[$host['hostid']]['severities'][$severity] = 0;
 					}
-
-					krsort($problematic_host_list[$host['hostid']]['severities']);
 				}
 				$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]++;
 

@@ -51,8 +51,8 @@ $table = (new CTableInfo())
 foreach ($drules as $drule) {
 	$table->addRow([
 		new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
-		(new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN),
-		(new CSpan($drule['down']))->addClass(($drule['down'] != 0) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
+		($drule['up'] != 0) ? (new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN) : '',
+		($drule['down'] != 0) ? (new CSpan($drule['down']))->addClass(ZBX_STYLE_RED) : ''
 	]);
 }
 

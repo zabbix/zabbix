@@ -223,6 +223,11 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 		$groupRow->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
+			if ($data['count'] == 0) {
+				$groupRow->addItem('');
+				continue;
+			}
+
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CSpan($allTriggersNum))
@@ -239,13 +244,11 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 
 			switch ($filter_ext_ack) {
 				case EXTACK_OPTION_ALL:
-					$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, $data['count'] == 0));
+					$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum));
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$groupRow->addItem(getSeverityCell($severity, $config, $unackTriggersNum,
-						$data['count_unack'] == 0
-					));
+					$groupRow->addItem(getSeverityCell($severity, $config, $unackTriggersNum));
 					break;
 
 				case EXTACK_OPTION_BOTH:
@@ -255,7 +258,7 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 						]));
 					}
 					else {
-						$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, $data['count'] == 0));
+						$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum));
 					}
 					break;
 			}
