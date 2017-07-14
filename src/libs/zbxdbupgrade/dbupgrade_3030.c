@@ -2011,17 +2011,13 @@ static int	DBpatch_3030173(void)
 
 static int	DBpatch_3030174(void)
 {
-	zbx_db_insert_t	db_insert;
-	int		ret;
+	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
+	if (ZBX_DB_OK > DBexecute(
+			"insert into dashboard (dashboardid,name,userid,private)"
+			" values (1,'Dashboard',(select min(userid) from users where type=3),0)"))
+		return FAIL;
 
-	zbx_db_insert_prepare(&db_insert, "dashboard", "dashboardid", "name", "userid", "private", NULL);
-
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(1), "Dashboard", __UINT64_C(1), 0);
-
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	return ret;
+	return SUCCEED;
 }
 
 static int	DBpatch_3030175(void)
