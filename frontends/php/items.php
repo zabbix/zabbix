@@ -985,11 +985,15 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 
 		if ($items_to_update) {
 			foreach ($items_to_update as $index => $update_item) {
+				$type = array_key_exists('type', $update_item)
+					? $update_item['type']
+					: $items[$update_item['itemid']]['type'];
+
 				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_JMX) {
 					unset($items_to_update[$index]['jmx_endpoint']);
 				}
 
-				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_DEPENDENT) {
+				if ($type != ITEM_TYPE_DEPENDENT) {
 					unset($items_to_update[$index]['master_itemid']);
 				}
 			}
