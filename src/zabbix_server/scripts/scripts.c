@@ -399,6 +399,14 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, &script->command,
 					MACRO_TYPE_SCRIPT, NULL, 0);
 
+			/* DBget_script_by_scriptid() may overwrite script type with anything but global script... */
+			if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out;
+			}
+
+			/* ...therefore this recursion is no more than two layers deep */
 			if (FAIL == zbx_script_prepare(script, host, user, error, max_error_len))
 				goto out;
 

@@ -87,9 +87,11 @@ foreach ($this->data['users'] as $user) {
 
 	// online time
 	if ($session['lastaccess']) {
-		$online_time = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout'])
+		$autologout = timeUnitToSeconds($user['autologout']);
+
+		$online_time = ($autologout == 0 || ZBX_USER_ONLINE_TIME < $autologout)
 			? ZBX_USER_ONLINE_TIME
-			: $user['autologout'];
+			: $autologout;
 
 		$online = ($session['status'] == ZBX_SESSION_ACTIVE && $user['users_status'] == GROUP_STATUS_ENABLED
 				&& ($session['lastaccess'] + $online_time) >= time())

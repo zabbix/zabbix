@@ -95,8 +95,8 @@ class CItem extends CItemGeneral {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
@@ -108,9 +108,9 @@ class CItem extends CItemGeneral {
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'		=> null,
 			'selectPreprocessing'		=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
@@ -163,7 +163,7 @@ class CItem extends CItemGeneral {
 
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.hostid';
 			}
 		}
@@ -174,7 +174,7 @@ class CItem extends CItemGeneral {
 
 			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.interfaceid';
 			}
 		}
@@ -187,7 +187,7 @@ class CItem extends CItemGeneral {
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=i.hostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
 			}
 		}
@@ -200,7 +200,7 @@ class CItem extends CItemGeneral {
 			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
 			$sqlParts['where'][] = 'h.hostid=i.hostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['h'] = 'h.proxy_hostid';
 			}
 		}
@@ -281,6 +281,19 @@ class CItem extends CItemGeneral {
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('delay', $options['filter']) && $options['filter']['delay'] !== null) {
+				$sqlParts['where'][] = makeUpdateIntervalFilter('i.delay', $options['filter']['delay']);
+				unset($options['filter']['delay']);
+			}
+
+			if (array_key_exists('history', $options['filter']) && $options['filter']['history'] !== null) {
+				$options['filter']['history'] = getTimeUnitFilters($options['filter']['history']);
+			}
+
+			if (array_key_exists('trends', $options['filter']) && $options['filter']['trends'] !== null) {
+				$options['filter']['trends'] = getTimeUnitFilters($options['filter']['trends']);
+			}
+
 			$this->dbFilter('items i', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
@@ -353,8 +366,8 @@ class CItem extends CItemGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount'])) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $item;
 				}
 				else {
@@ -366,7 +379,7 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -377,7 +390,7 @@ class CItem extends CItemGeneral {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -699,14 +712,32 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Check item specific fields.
+	 * Check item specific fields:
+	 *		- validate history and trends using simple interval parser and user macro parser;
+	 *		- validate item preprocessing.
 	 *
-	 * @param array  $item			An array of single item data.
-	 * @param string $method		A string of "create" or "update" method.
+	 * @param array  $item    An array of single item data.
+	 * @param string $method  A string of "create" or "update" method.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function checkSpecificFields(array $item, $method) {
+		if (array_key_exists('history', $item)
+				&& !validateTimeUnit($item['history'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
+					['usermacros' => true])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
+			);
+		}
+
+		if (array_key_exists('trends', $item)
+				&& !validateTimeUnit($item['trends'], SEC_PER_DAY, 25 * SEC_PER_YEAR, true, $error,
+					['usermacros' => true])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
+			);
+		}
+
 		$this->validateItemPreprocessing($item, $method);
 	}
 
@@ -1139,7 +1170,7 @@ class CItem extends CItemGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 			}

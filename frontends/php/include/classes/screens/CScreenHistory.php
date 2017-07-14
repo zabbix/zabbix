@@ -128,6 +128,7 @@ class CScreenHistory extends CScreenBase {
 				'history' => $firstItem['value_type'],
 				'itemids' => $this->itemids,
 				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => ['itemid', 'clock'],
 				'sortorder' => ZBX_SORT_DOWN
 			];
 			if ($this->action == HISTORY_LATEST) {
@@ -170,12 +171,15 @@ class CScreenHistory extends CScreenBase {
 				if ($this->filter !== '' && in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {
 					$options['search'] = ['value' => $this->filter];
 					if ($this->filterTask == FILTER_TASK_HIDE) {
-						$options['excludeSearch'] = 1;
+						$options['excludeSearch'] = true;
 					}
 				}
-				$options['sortfield'] = ['itemid', 'clock'];
 
 				$historyData = API::History()->get($options);
+				CArrayHelper::sort($historyData, [
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				]);
 
 				foreach ($historyData as $data) {
 					$data['value'] = rtrim($data['value'], " \t\r\n");
@@ -268,8 +272,11 @@ class CScreenHistory extends CScreenBase {
 					]);
 				}
 
-				$options['sortfield'] = ['itemid', 'clock'];
 				$historyData = API::History()->get($options);
+				CArrayHelper::sort($historyData, [
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				]);
 
 				foreach ($historyData as $data) {
 					$item = $items[$data['itemid']];

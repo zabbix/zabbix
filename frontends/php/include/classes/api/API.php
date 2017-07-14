@@ -137,6 +137,13 @@ class API {
 	}
 
 	/**
+	 * @return CDashboard
+	 */
+	public static function Dashboard() {
+		return self::getApi('dashboard');
+	}
+
+	/**
 	 * @return CDCheck
 	 */
 	public static function DCheck() {

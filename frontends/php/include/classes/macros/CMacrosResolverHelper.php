@@ -560,27 +560,43 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve macros in screen element URL.
+	 * Resolve macros in dashboard widget URL.
 	 *
 	 * @static
 	 *
-	 * @param array $screenElement
+	 * @param array $widget
 	 *
 	 * @return string
 	 */
-	public static function resolveScreenElementURL(array $screenElement) {
+	public static function resolveWidgetURL(array $widget) {
 		self::init();
 
 		$macros = self::$macrosResolver->resolve([
-			'config' => $screenElement['config'],
+			'config' => $widget['config'],
 			'data' => [
-				$screenElement['hostid'] => [
-					'url' => $screenElement['url']
+				$widget['hostid'] => [
+					'url' => $widget['url']
 				]
 			]
 		]);
 		$macros = reset($macros);
 
 		return $macros['url'];
+	}
+
+	/**
+	 * Resolve time unit macros.
+	 *
+	 * @static
+	 *
+	 * @param array $data
+	 * @param array $field_names
+	 *
+	 * @return string
+	 */
+	public static function resolveTimeUnitMacros(array $data, array $field_names) {
+		self::init();
+
+		return self::$macrosResolver->resolveTimeUnitMacros($data, ['sources' => $field_names]);
 	}
 }

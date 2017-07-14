@@ -367,6 +367,7 @@ if ($config['event_ack_enable']) {
 
 if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 	foreach ($triggers as &$trigger) {
+		$trigger['display_events'] = false;
 		$trigger['events'] = [];
 	}
 	unset($trigger);
@@ -377,7 +378,7 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
 		'objectids' => zbx_objectValues($triggers, 'triggerid'),
-		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
+		'time_from' => time() - timeUnitToSeconds($config['event_expire']),
 		'time_till' => time(),
 		'sortfield' => ['clock', 'eventid'],
 		'sortorder' => ZBX_SORT_DOWN
@@ -417,8 +418,21 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 			}
 
 			$triggers[$event['objectid']]['events'][] = $event;
+
+			if ($showEvents == EVENTS_OPTION_ALL) {
+				$triggers[$event['objectid']]['display_events'] = true;
+			}
+			elseif (!$event['acknowledged']) {
+				$triggers[$event['objectid']]['display_events'] = true;
+			}
 		}
 	}
+}
+else {
+	foreach ($triggers as &$trigger) {
+		$trigger['display_events'] = false;
+	}
+	unset($trigger);
 }
 
 // get trigger dependencies
@@ -597,7 +611,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
-		$openOrCloseButton = $trigger['events']
+		$openOrCloseButton = $trigger['display_events']
 			? (new CSimpleButton())
 				->addClass(ZBX_STYLE_TREEVIEW)
 				->setAttribute('data-switcherid', $trigger['triggerid'])

@@ -20,89 +20,103 @@
 
 
 $this->addJsFile('dashboard.grid.js');
+$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
-/*
- * Dashboard grid
- */
-$widgets = [
-	WIDGET_FAVOURITE_GRAPHS => [
-		'header' => _('Favourite graphs'),
-		'pos' => ['row' => 0, 'col' => 0, 'height' => 3, 'width' => 2],
-		'rf_rate' => 15 * SEC_PER_MIN
-	],
-	WIDGET_FAVOURITE_SCREENS => [
-		'header' => _('Favourite screens'),
-		'pos' => ['row' => 0, 'col' => 2, 'height' => 3, 'width' => 2],
-		'rf_rate' => 15 * SEC_PER_MIN
-	],
-	WIDGET_FAVOURITE_MAPS => [
-		'header' => _('Favourite maps'),
-		'pos' => ['row' => 0, 'col' => 4, 'height' => 3, 'width' => 2],
-		'rf_rate' => 15 * SEC_PER_MIN
-	],
-	WIDGET_LAST_ISSUES => [
-		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-		'pos' => ['row' => 3, 'col' => 0, 'height' => 6, 'width' => 6],
-		'rf_rate' => SEC_PER_MIN
-	],
-	WIDGET_WEB_OVERVIEW => [
-		'header' => _('Web monitoring'),
-		'pos' => ['row' => 9, 'col' => 0, 'height' => 4, 'width' => 3],
-		'rf_rate' => SEC_PER_MIN
-	],
-	WIDGET_HOST_STATUS => [
-		'header' => _('Host status'),
-		'pos' => ['row' => 0, 'col' => 6, 'height' => 4, 'width' => 6],
-		'rf_rate' => SEC_PER_MIN
-	],
-	WIDGET_SYSTEM_STATUS => [
-		'header' => _('System status'),
-		'pos' => ['row' => 4, 'col' => 6, 'height' => 4, 'width' => 6],
-		'rf_rate' => SEC_PER_MIN
-	]
-];
+$sharing_form = include 'monitoring.dashboard.sharing_form.php';
+$edit_form = include 'monitoring.dashboard.edit_form.php';
+$breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
-if ($data['show_status_widget']) {
-	$widgets[WIDGET_ZABBIX_STATUS] = [
-		'header' => _('Status of Zabbix'),
-		'pos' => ['row' => 8, 'col' => 6, 'height' => 5, 'width' => 6],
-		'rf_rate' => 15 * SEC_PER_MIN
+$item_groupid = null;
+$item_hostid = null;
+if ($data['dynamic']['has_dynamic_widgets']) {
+	$item_groupid = [
+		new CLabel(_('Group'), 'groupid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$data['pageFilter']->getGroupsCB()
 	];
-}
-if ($data['show_discovery_widget']) {
-	$widgets[WIDGET_DISCOVERY_STATUS] = [
-		'header' => _('Discovery status'),
-		'pos' => ['row' => 9, 'col' => 3, 'height' => 4, 'width' => 3],
-		'rf_rate' => SEC_PER_MIN
+	$item_hostid = [
+		new CLabel(_('Host'), 'hostid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$data['pageFilter']->getHostsCB()
 	];
 }
 
-$grid_widgets = [];
-
-foreach ($widgets as $widgetid => $widget) {
-	$grid_widgets[] = [
-		'widgetid' => $widgetid,
-		'header' => $widget['header'],
-		'pos' => [
-			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col']),
-			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row']),
-			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height']),
-			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'])
-		],
-		'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate'])
-	];
+$url_create = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.view')
+	->setArgument('new', '1');
+$url_clone = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.view')
+	->setArgument('source_dashboardid', $data['dashboard']['dashboardid']);
+if ($data['dashboard']['editable']) {
+	$url_delete = (new CUrl('zabbix.php'))
+		->setArgument('action', 'dashboard.delete')
+		->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
+		->setArgumentSID();
+}
+if ($data['fullscreen']) {
+	$url_create->setArgument('fullscreen', '1');
+	$url_clone->setArgument('fullscreen', '1');
+	if ($data['dashboard']['editable']) {
+		$url_delete->setArgument('fullscreen', '1');
+	}
 }
 
 (new CWidget())
-	->setTitle(_('Dashboard'))
-	->setControls((new CForm())
+	->setTitle($data['dashboard']['name'])
+	->setControls((new CForm('post', 'zabbix.php?action=dashboard.view'))
 		->cleanItems()
 		->addItem((new CList())
-			->addItem(get_icon('dashconf', ['enabled' => $data['filter_enabled']]))
+			// $item_groupid and $item_hostid will be hidden, when 'Edit Dashboard' will be clicked.
+			->addItem($item_groupid)
+			->addItem($item_hostid)
+			// 'Edit dashboard' should be first one in list,
+			// because it will be visually replaced by last item of new list, when clicked
+			->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable']))
+			->addItem((new CButton(SPACE))
+				->addClass(ZBX_STYLE_BTN_ACTION)
+				->setId('dashbrd-actions')
+				->setTitle(_('Actions'))
+				->setMenuPopup([
+					'type' => 'dashboard',
+					'label' => _('Actions'),
+					'items' => [
+						'sharing' => [
+							'label' => _('Sharing'),
+							'form_data' => [
+								'dashboardid' => $data['dashboard']['dashboardid']
+							],
+							'disabled' => !$data['dashboard']['editable']
+						],
+						'create' => [
+							'label' => _('Create new'),
+							'url' => $url_create->getUrl()
+						],
+						'clone' => [
+							'label' => _('Clone'),
+							'url' => $url_clone->getUrl()
+						],
+						'delete' => [
+							'label' => _('Delete'),
+							'confirmation' => _('Delete dashboard?'),
+							'url' => 'javascript:void(0)',
+							'redirect' => $data['dashboard']['editable']
+								? $url_delete->getUrl()
+								: null,
+							'disabled' => !$data['dashboard']['editable']
+						]
+					]
+				])
+			)
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	)
+	->addItem((new CList())
+		->addItem($breadcrumbs)
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
+	->addItem($edit_form)
+	->addItem($sharing_form)
 	->show();
 
 /*
@@ -111,9 +125,26 @@ foreach ($widgets as $widgetid => $widget) {
 // activating blinking
 $this->addPostJS('jqBlink.blink();');
 
+$dashboard_data = [
+	// name is required for new dashboard creation
+	'name'   => $data['dashboard']['name'],
+	'userid' => $data['dashboard']['owner']['id'],
+	'dynamic' => $data['dynamic']
+];
+$dashboard_options = [
+	'fullscreen' => $data['fullscreen']
+];
+if ($data['dashboard']['dashboardid'] != 0) {
+	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
+}
+else {
+	$dashboard_options['updated'] = true;
+}
 // Initialize dashboard grid
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
-		'.dashboardGrid()'.
-		'.dashboardGrid("addWidgets", '.CJs::encodeJson($grid_widgets).');'
+		'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
+		'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
+		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
+		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );

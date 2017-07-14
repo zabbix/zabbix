@@ -72,23 +72,23 @@ class CAction extends CApiService {
 			'nopermissions'					=> null,
 			'editable'						=> null,
 			// filter
-			'filter'						=> null,
-			'search'						=> null,
-			'searchByAny'					=> null,
-			'startSearch'					=> null,
-			'excludeSearch'					=> null,
-			'searchWildcardsEnabled'		=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'						=> API_OUTPUT_EXTEND,
-			'selectFilter'					=> null,
-			'selectOperations'				=> null,
-			'selectRecoveryOperations'		=> null,
+			'output'					=> API_OUTPUT_EXTEND,
+			'selectFilter'				=> null,
+			'selectOperations'			=> null,
+			'selectRecoveryOperations'	=> null,
 			'selectAcknowledgeOperations'	=> null,
-			'countOutput'					=> null,
-			'preservekeys'					=> null,
-			'sortfield'						=> '',
-			'sortorder'						=> '',
-			'limit'							=> null
+			'countOutput'				=> false,
+			'preservekeys'				=> false,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -235,6 +235,10 @@ class CAction extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('esc_period', $options['filter']) && $options['filter']['esc_period'] !== null) {
+				$options['filter']['esc_period'] = getTimeUnitFilters($options['filter']['esc_period']);
+			}
+
 			$this->dbFilter('actions a', $options, $sqlParts);
 		}
 
@@ -457,7 +461,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -490,7 +494,7 @@ class CAction extends CApiService {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -1628,9 +1632,12 @@ class CAction extends CApiService {
 					}
 				}
 
-				if (array_key_exists('esc_period', $operation) && $operation['esc_period'] != 0
-						&& $operation['esc_period'] < SEC_PER_MIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation step duration.'));
+				if (array_key_exists('esc_period', $operation)
+						&& !validateTimeUnit($operation['esc_period'], SEC_PER_MIN, SEC_PER_WEEK, true, $error,
+							['usermacros' => true])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'esc_period', $error)
+					);
 				}
 			}
 
@@ -2663,7 +2670,7 @@ class CAction extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			// add filter fields
 			if ($this->outputIsRequested('formula', $options['selectFilter'])
 				|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
@@ -2710,6 +2717,7 @@ class CAction extends CApiService {
 		];
 
 		$duplicates = [];
+
 		foreach ($actions as $action) {
 			if (!check_db_fields($actionDbFields, $action)) {
 				self::exception(
@@ -2717,19 +2725,16 @@ class CAction extends CApiService {
 					_s('Incorrect parameter for action "%1$s".', $action['name'])
 				);
 			}
-			if (isset($action['esc_period']) && $action['esc_period'] < SEC_PER_MIN
-					&& $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
-					$action['name'], SEC_PER_MIN
-				));
-			}
 			if (isset($duplicates[$action['name']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
 			}
 			else {
 				$duplicates[$action['name']] = $action['name'];
+			}
+
+			if (array_key_exists('esc_period', $action) && $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+				self::validateStepDuration($action['esc_period']);
 			}
 		}
 
@@ -2830,6 +2835,21 @@ class CAction extends CApiService {
 	}
 
 	/**
+	 * Validate default step duration and operation step duration values.
+	 *
+	 * @param string $esc_period  Step duration.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function validateStepDuration($esc_period) {
+		if (!validateTimeUnit($esc_period, SEC_PER_MIN, SEC_PER_WEEK, false, $error, ['usermacros' => true])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'esc_period', $error)
+			);
+		}
+	}
+
+	/**
 	 * Validate input given to action.update API call.
 	 *
 	 * @param array $actions
@@ -2852,6 +2872,7 @@ class CAction extends CApiService {
 
 		// check fields
 		$duplicates = [];
+
 		foreach ($actions as $action) {
 			$actionName = isset($action['name']) ? $action['name'] : $db_actions[$action['actionid']]['name'];
 
@@ -2862,14 +2883,9 @@ class CAction extends CApiService {
 			}
 
 			// check if user changed esc_period for trigger eventsource
-			if (isset($action['esc_period'])
-					&& $action['esc_period'] < SEC_PER_MIN
+			if (array_key_exists('esc_period', $action)
 					&& $db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
-					$actionName, SEC_PER_MIN
-				));
+				self::validateStepDuration($action['esc_period']);
 			}
 
 			$this->checkNoParameters(

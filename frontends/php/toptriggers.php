@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['title'] = _('100 busiest triggers');
 $page['file'] = 'toptriggers.php';
@@ -92,18 +93,7 @@ $data['multiSelectHostGroupData'] = [];
 $groupids = CProfile::getArray('web.toptriggers.filter.groupids', []);
 
 if ($groupids) {
-	$filterGroups = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $groupids,
-		'preservekeys' => true
-	]);
-
-	foreach ($filterGroups as $filterGroup) {
-		$data['multiSelectHostGroupData'][] = [
-			'id' => $filterGroup['groupid'],
-			'name' => $filterGroup['name']
-		];
-	}
+	$groupids = getSubGroups($groupids, $data['multiSelectHostGroupData']);
 }
 
 // multiselect hosts

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class testScripts extends CZabbixTest {
@@ -27,14 +28,14 @@ class testScripts extends CZabbixTest {
 			// Check script command.
 			[
 				'script' => [
-					'name' => 'Api create script'
+					'name' => 'API create script'
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "command" is missing.'
 			],
 			[
 				'script' => [
-					'name' => 'Api create script',
+					'name' => 'API create script',
 					'command' => ''
 				],
 				'success_expected' => false,
@@ -54,11 +55,11 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'script' => [
-					'name' => 'Api/Script/',
+					'name' => 'API/Script/',
 					'command' => 'reboot server'
 				],
 				'success_expected' => false,
@@ -136,7 +137,7 @@ class testScripts extends CZabbixTest {
 			[
 				'script' => [
 					[
-						'name' => 'Api create one script',
+						'name' => 'API create one script',
 						'command' => 'reboot server 1'
 					],
 					[
@@ -187,7 +188,7 @@ class testScripts extends CZabbixTest {
 			// Check script id.
 			[
 				'script' => [[
-					'name' => 'Api updated script',
+					'name' => 'API updated script',
 					'command' => 'reboot'
 				]],
 				'success_expected' => false,
@@ -195,7 +196,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [[
-					'name' => 'Api updated script',
+					'name' => 'API updated script',
 					'command' => 'reboot',
 					'scriptid' => ''
 				]],
@@ -204,7 +205,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [[
-					'name' => 'Api updated script',
+					'name' => 'API updated script',
 					'command' => 'reboot',
 					'scriptid' => 'abc'
 				]],
@@ -213,7 +214,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [[
-					'name' => 'Api updated script',
+					'name' => 'API updated script',
 					'command' => 'reboot',
 					'scriptid' => '1.1'
 				]],
@@ -222,7 +223,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [[
-					'name' => 'Api updated script',
+					'name' => 'API updated script',
 					'command' => 'reboot',
 					'scriptid' => '123456'
 				]],
@@ -247,7 +248,7 @@ class testScripts extends CZabbixTest {
 			[
 				'script' => [[
 					'scriptid' => '6',
-					'name' => 'Api updated script',
+					'name' => 'API updated script',
 					'command' => ''
 				]],
 				'success_expected' => false,
@@ -261,12 +262,12 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server'
 				]],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'script' => [[
 					'scriptid' => '6',
-					'name' => 'Api/Update/',
+					'name' => 'API/Update/',
 					'command' => 'reboot server'
 				]],
 				'success_expected' => false,
@@ -350,12 +351,12 @@ class testScripts extends CZabbixTest {
 				'script' => [
 					[
 						'scriptid' => '6',
-						'name' => 'Api updated one script',
+						'name' => 'API updated one script',
 						'command' => 'reboot server 1'
 					],
 					[
 						'scriptid' => '7',
-						'name' => 'Api updated two script',
+						'name' => 'API updated two script',
 						'command' => 'reboot server 2'
 					]
 				],
@@ -408,7 +409,7 @@ class testScripts extends CZabbixTest {
 			// Check host_access.
 			[
 				'script' => [
-					'name' => 'Api empty host_access',
+					'name' => 'API empty host_access',
 					'command' => 'reboot server',
 					'host_access' => ''
 				],
@@ -417,7 +418,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api host_access string',
+					'name' => 'API host_access string',
 					'command' => 'reboot server',
 					'host_access' => 'abc'
 				],
@@ -426,7 +427,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api invalid host_access',
+					'name' => 'API invalid host_access',
 					'command' => 'reboot server',
 					'host_access' => '0'
 				],
@@ -435,7 +436,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api invalid host_access ',
+					'name' => 'API invalid host_access ',
 					'command' => 'reboot server',
 					'host_access' => '1'
 				],
@@ -445,7 +446,7 @@ class testScripts extends CZabbixTest {
 			// Check usrgrpid.
 			[
 				'script' => [
-					'name' => 'Api empty usrgrpid',
+					'name' => 'API empty usrgrpid',
 					'command' => 'reboot server',
 					'usrgrpid' => ''
 				],
@@ -454,7 +455,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api usrgrpid string',
+					'name' => 'API usrgrpid string',
 					'command' => 'reboot server',
 					'usrgrpid' => 'abc'
 				],
@@ -463,7 +464,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api invalid usrgrpid',
+					'name' => 'API invalid usrgrpid',
 					'command' => 'reboot server',
 					'usrgrpid' => '1.1'
 				],
@@ -472,7 +473,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api nonexistent usrgrpid ',
+					'name' => 'API nonexistent usrgrpid ',
 					'command' => 'reboot server',
 					'usrgrpid' => '123456'
 				],
@@ -482,7 +483,7 @@ class testScripts extends CZabbixTest {
 			// Check groupid.
 			[
 				'script' => [
-					'name' => 'Api empty groupid',
+					'name' => 'API empty groupid',
 					'command' => 'reboot server',
 					'groupid' => ''
 				],
@@ -491,7 +492,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api groupid string',
+					'name' => 'API groupid string',
 					'command' => 'reboot server',
 					'groupid' => 'abc'
 				],
@@ -500,7 +501,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api invalid groupid',
+					'name' => 'API invalid groupid',
 					'command' => 'reboot server',
 					'groupid' => '1.1'
 				],
@@ -509,7 +510,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api nonexistent groupid',
+					'name' => 'API nonexistent groupid',
 					'command' => 'reboot server',
 					'groupid' => '123456'
 				],
@@ -519,7 +520,7 @@ class testScripts extends CZabbixTest {
 			// Check type.
 			[
 				'script' => [
-					'name' => 'Api empty type',
+					'name' => 'API empty type',
 					'command' => 'reboot server',
 					'type' => ''
 				],
@@ -528,7 +529,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api type string',
+					'name' => 'API type string',
 					'command' => 'reboot server',
 					'type' => 'abc'
 				],
@@ -537,7 +538,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api invalid type',
+					'name' => 'API invalid type',
 					'command' => 'reboot server',
 					'type' => '1.1'
 				],
@@ -546,7 +547,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api nonexistent type',
+					'name' => 'API nonexistent type',
 					'command' => 'reboot server',
 					'type' => '2'
 				],
@@ -556,7 +557,7 @@ class testScripts extends CZabbixTest {
 			// Check execute_on.
 			[
 				'script' => [
-					'name' => 'Api empty execute_on',
+					'name' => 'API empty execute_on',
 					'command' => 'reboot server',
 					'execute_on' => ''
 				],
@@ -565,7 +566,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api execute_on string',
+					'name' => 'API execute_on string',
 					'command' => 'reboot server',
 					'execute_on' => 'abc'
 				],
@@ -574,7 +575,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api invalid execute_on',
+					'name' => 'API invalid execute_on',
 					'command' => 'reboot server',
 					'execute_on' => '1.1'
 				],
@@ -583,7 +584,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api nonexistent execute_on',
+					'name' => 'API nonexistent execute_on',
 					'command' => 'reboot server',
 					'execute_on' => '3'
 				],
@@ -592,7 +593,7 @@ class testScripts extends CZabbixTest {
 			],
 			[
 				'script' => [
-					'name' => 'Api IPMI execute_on agent',
+					'name' => 'API IPMI execute_on agent',
 					'command' => 'reboot server',
 					'type' => '1',
 					'execute_on' => '0'
@@ -603,7 +604,7 @@ class testScripts extends CZabbixTest {
 			// Check successfully creation and update with all properties.
 			[
 				'script' => [
-						'name' => 'Api script with all properties',
+						'name' => 'API script with all properties',
 						'command' => 'reboot agent',
 						'host_access' => '3',
 						'usrgrpid' => '13',
@@ -691,7 +692,7 @@ class testScripts extends CZabbixTest {
 			[
 				'script' => ['11'],
 				'success_expected' => false,
-				'expected_error' => 'Cannot delete scripts. Script "Api script in action" is used in action operation "Api action with script".'
+				'expected_error' => 'Cannot delete scripts. Script "API script in action" is used in action operation "API action with script".'
 			],
 			// Successfully delete scripts.
 			[
@@ -938,7 +939,7 @@ Connection refused'
 				'method' => 'script.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
-							'name' => 'Api script create as zabbix admin',
+							'name' => 'API script create as zabbix admin',
 							'command' => 'reboot server 1'
 						],
 				'expected_error' => 'You do not have permission to perform this operation.'
@@ -948,7 +949,7 @@ Connection refused'
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
 							'scriptid' => '6',
-							'name' => 'Api script update as zabbix admin',
+							'name' => 'API script update as zabbix admin',
 						],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
@@ -972,7 +973,7 @@ Connection refused'
 				'method' => 'script.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'script' => [
-							'name' => 'Api script create as zabbix user',
+							'name' => 'API script create as zabbix user',
 							'command' => 'reboot server 1'
 						],
 				'expected_error' => 'You do not have permission to perform this operation.'
@@ -982,7 +983,7 @@ Connection refused'
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'script' => [
 							'scriptid' => '6',
-							'name' => 'Api script update as zabbix user',
+							'name' => 'API script update as zabbix user',
 						],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],

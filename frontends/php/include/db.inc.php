@@ -184,6 +184,10 @@ function DBconnect(&$error) {
 		$DB['DB'] = null;
 	}
 
+	if (!$result && !ZBX_SHOW_SQL_ERRORS) {
+		$error = _('SQL error. Please contact Zabbix administrator.');
+	}
+
 	return $result;
 }
 
@@ -362,22 +366,22 @@ function DBselect($query, $limit = null, $offset = 0) {
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
 			if (!$result = mysqli_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
+				sqlError('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error().']');
+				sqlError('Error in query ['.$query.'] ['.pg_last_error().']');
 			}
 			break;
 		case ZBX_DB_ORACLE:
 			if (!$result = oci_parse($DB['DB'], $query)) {
 				$e = @oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				sqlError('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				sqlError('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			break;
 		case ZBX_DB_DB2:
@@ -388,14 +392,13 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 			if (!$result = db2_prepare($DB['DB'], $query)) {
 				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']');
+				sqlError('SQL error ['.$query.'] in ['.$e.']');
 			}
 			elseif (true !== @db2_execute($result, $options)) {
 				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']');
+				sqlError('SQL error ['.$query.'] in ['.$e.']');
 				$result = false;
 			}
-			break;
 			break;
 	}
 
@@ -438,7 +441,7 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 
 	if ((isset($limit) && ($limit < 0 || !zbx_ctype_digit($limit))) || $offset < 0 || !zbx_ctype_digit($offset)) {
 		$moreDetails = isset($limit) ? ' Limit ['.$limit.'] Offset ['.$offset.']' : ' Offset ['.$offset.']';
-		error('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails);
+		sqlError('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails);
 
 		return false;
 	}
@@ -477,22 +480,22 @@ function DBexecute($query, $skip_error_messages = 0) {
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
 			if (!$result = mysqli_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
+				sqlError('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = (bool) pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error().']');
+				sqlError('Error in query ['.$query.'] ['.pg_last_error().']');
 			}
 			break;
 		case ZBX_DB_ORACLE:
 			if (!$result = oci_parse($DB['DB'], $query)) {
 				$e = @oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				sqlError('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				sqlError('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			else {
 				$result = true; // function must return boolean
@@ -501,11 +504,11 @@ function DBexecute($query, $skip_error_messages = 0) {
 		case ZBX_DB_DB2:
 			if (!$result = db2_prepare($DB['DB'], $query)) {
 				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']');
+				sqlError('SQL error ['.$query.'] in ['.$e.']');
 			}
 			elseif (true !== @db2_execute($result)) {
 				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']');
+				sqlError('SQL error ['.$query.'] in ['.$e.']');
 			}
 			else {
 				$result = true; // function must return boolean
@@ -660,12 +663,12 @@ function get_dbid($table, $field) {
 }
 
 function zbx_db_distinct($sql_parts) {
-	if (count($sql_parts['from']) > 1) {
-		return ' DISTINCT ';
+	$count = count($sql_parts['from']);
+	if (array_key_exists('left_join', $sql_parts)) {
+		$count += count($sql_parts['left_join']);
 	}
-	else {
-		return ' ';
-	}
+
+	return ($count > 1 ? ' DISTINCT' : '');
 }
 
 function zbx_db_search($table, $options, &$sql_parts) {
@@ -676,8 +679,8 @@ function zbx_db_search($table, $options, &$sql_parts) {
 		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
-	$start = is_null($options['startSearch']) ? '%' : '';
-	$exclude = is_null($options['excludeSearch']) ? '' : ' NOT ';
+	$start = $options['startSearch'] ? '' : '%';
+	$exclude = $options['excludeSearch'] ? ' NOT ' : '';
 	$glue = (!$options['searchByAny']) ? ' AND ' : ' OR ';
 
 	$search = [];

@@ -317,7 +317,7 @@ int	zabbix_open_log(int type, int level, const char *filename, char **error)
 		if (-1 == dup2(STDOUT_FILENO, STDERR_FILENO))
 			zbx_error("cannot redirect stderr to stdout: %s", zbx_strerror(errno));
 	}
-	else
+	else if (LOG_TYPE_UNDEFINED != type)
 	{
 		*error = zbx_strdup(*error, "unknown log type");
 		return FAIL;

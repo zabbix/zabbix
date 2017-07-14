@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,6 +97,21 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	script.publickey = row[6];
 	script.privatekey = row[7];
 	script.command = row[8];
+
+	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type && ZBX_SCRIPT_EXECUTE_ON_PROXY == script.execute_on)
+	{
+		if (0 == CONFIG_ENABLE_REMOTE_COMMANDS)
+		{
+			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
+					"Remote commands are not enabled");
+			goto finish;
+		}
+
+		if (1 == CONFIG_LOG_REMOTE_COMMANDS)
+			zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", script.command);
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", script.command);
+	}
 
 	if (SUCCEED != (ret = zbx_script_execute(&script, &host, &info, error, sizeof(error))))
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);

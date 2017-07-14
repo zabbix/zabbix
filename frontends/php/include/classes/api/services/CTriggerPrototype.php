@@ -74,8 +74,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'filter'						=> null,
 			'search'						=> null,
 			'searchByAny'					=> null,
-			'startSearch'					=> null,
-			'excludeSearch'					=> null,
+			'startSearch'					=> false,
+			'excludeSearch'					=> false,
 			'searchWildcardsEnabled'		=> null,
 			// output
 			'expandExpression'				=> null,
@@ -87,9 +87,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'selectDependencies'			=> null,
 			'selectDiscoveryRule'			=> null,
 			'selectTags'					=> null,
-			'countOutput'					=> null,
-			'groupCount'					=> null,
-			'preservekeys'					=> null,
+			'countOutput'					=> false,
+			'groupCount'					=> false,
+			'preservekeys'					=> false,
 			'sortfield'						=> '',
 			'sortorder'						=> '',
 			'limit'							=> null,
@@ -131,7 +131,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['groupid'] = dbConditionInt('hg.groupid', $options['groupids']);
 
-			if ($options['groupCount'] !== null) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
 			}
 		}
@@ -159,7 +159,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
-			if ($options['groupCount'] !== null) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.hostid';
 			}
 		}
@@ -179,7 +179,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where']['itemid'] = dbConditionInt('f.itemid', $options['itemids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 
-			if ($options['groupCount'] !== null) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['f'] = 'f.itemid';
 			}
 		}
@@ -207,7 +207,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
 
-			if ($options['groupCount'] !== null) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['id'] = 'id.parent_itemid';
 			}
 		}
@@ -378,8 +378,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($triggerPrototype = DBfetch($dbRes)) {
-			if ($options['countOutput'] !== null) {
-				if ($options['groupCount'] !== null) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $triggerPrototype;
 				}
 				else {
@@ -391,7 +391,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 		}
 
-		if ($options['countOutput'] !== null) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -417,7 +417,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		// removing keys (hash -> array)
-		if ($options['preservekeys'] === null) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 

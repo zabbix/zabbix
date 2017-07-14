@@ -27,12 +27,39 @@
 
 #	define MAX_HISTORY	60
 
+#define ZBX_SELFMON_FLUSH_DELAY		(ZBX_SELFMON_DELAY * 0.5)
+
+/* process state cache, updated only by the processes themselves */
 typedef struct
 {
-	unsigned short	h_counter[ZBX_PROCESS_STATE_COUNT][MAX_HISTORY];
-	unsigned short	counter[ZBX_PROCESS_STATE_COUNT];
-	clock_t		last_ticks;
-	unsigned char	last_state;
+	/* the current usage statistics */
+	zbx_uint64_t	counter[ZBX_PROCESS_STATE_COUNT];
+
+	/* ticks of the last self monitoring update */
+	clock_t		ticks;
+
+	/* ticks of the last self monitoring cache flush */
+	clock_t		ticks_flush;
+
+	/* the current process state (see ZBX_PROCESS_STATE_* defines) */
+	unsigned char	state;
+}
+zxb_stat_process_cache_t;
+
+/* process state statistics */
+typedef struct
+{
+	/* historical process state data */
+	unsigned short			h_counter[ZBX_PROCESS_STATE_COUNT][MAX_HISTORY];
+
+	/* process state data for the current data gathering cycle */
+	unsigned short			counter[ZBX_PROCESS_STATE_COUNT];
+
+	/* the process state that was already applied to the historical state data */
+	zbx_uint64_t			counter_used[ZBX_PROCESS_STATE_COUNT];
+
+	/* the process state cache */
+	zxb_stat_process_cache_t	cache;
 }
 zbx_stat_process_t;
 
@@ -41,6 +68,12 @@ typedef struct
 	zbx_stat_process_t	**process;
 	int			first;
 	int			count;
+
+	/* number of ticks per second */
+	int			ticks_per_sec;
+
+	/* ticks of the last self monitoring sync (data gathering) */
+	clock_t			ticks_sync;
 }
 zbx_selfmon_collector_t;
 
@@ -69,7 +102,6 @@ extern int	CONFIG_DISCOVERER_FORKS;
 extern int	CONFIG_ALERTER_FORKS;
 extern int	CONFIG_TIMER_FORKS;
 extern int	CONFIG_HOUSEKEEPER_FORKS;
-extern int	CONFIG_WATCHDOG_FORKS;
 extern int	CONFIG_DATASENDER_FORKS;
 extern int	CONFIG_CONFSYNCER_FORKS;
 extern int	CONFIG_HEARTBEAT_FORKS;
@@ -80,6 +112,7 @@ extern int	CONFIG_PASSIVE_FORKS;
 extern int	CONFIG_ACTIVE_FORKS;
 extern int	CONFIG_TASKMANAGER_FORKS;
 extern int	CONFIG_IPMIMANAGER_FORKS;
+extern int	CONFIG_ALERTMANAGER_FORKS;
 
 extern unsigned char	process_type;
 extern int		process_num;
@@ -131,8 +164,6 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_TIMER_FORKS;
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return CONFIG_HOUSEKEEPER_FORKS;
-		case ZBX_PROCESS_TYPE_WATCHDOG:
-			return CONFIG_WATCHDOG_FORKS;
 		case ZBX_PROCESS_TYPE_DATASENDER:
 			return CONFIG_DATASENDER_FORKS;
 		case ZBX_PROCESS_TYPE_CONFSYNCER:
@@ -153,6 +184,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_TASKMANAGER_FORKS;
 		case ZBX_PROCESS_TYPE_IPMIMANAGER:
 			return CONFIG_IPMIMANAGER_FORKS;
+		case ZBX_PROCESS_TYPE_ALERTMANAGER:
+			return CONFIG_ALERTMANAGER_FORKS;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -207,8 +240,6 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "timer";
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return "housekeeper";
-		case ZBX_PROCESS_TYPE_WATCHDOG:
-			return "db watchdog";
 		case ZBX_PROCESS_TYPE_DATASENDER:
 			return "data sender";
 		case ZBX_PROCESS_TYPE_CONFSYNCER:
@@ -229,6 +260,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "task manager";
 		case ZBX_PROCESS_TYPE_IPMIMANAGER:
 			return "ipmi manager";
+		case ZBX_PROCESS_TYPE_ALERTMANAGER:
+			return "alert manager";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -264,7 +297,6 @@ int	init_selfmon_collector(char **error)
 	const char	*__function_name = "init_selfmon_collector";
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
 	char		*p;
-	clock_t		ticks;
 	struct tms	buf;
 	unsigned char	proc_type;
 	int		proc_num, process_forks, ret = FAIL;
@@ -303,8 +335,8 @@ int	init_selfmon_collector(char **error)
 
 	collector = (zbx_selfmon_collector_t *)p; p += sz;
 	collector->process = (zbx_stat_process_t **)p; p += sz_array;
-
-	ticks = times(&buf);
+	collector->ticks_per_sec = sysconf(_SC_CLK_TCK);
+	collector->ticks_sync = times(&buf);
 
 	for (proc_type = 0; ZBX_PROCESS_TYPE_COUNT > proc_type; proc_type++)
 	{
@@ -314,8 +346,9 @@ int	init_selfmon_collector(char **error)
 		process_forks = get_process_type_forks(proc_type);
 		for (proc_num = 0; proc_num < process_forks; proc_num++)
 		{
-			collector->process[proc_type][proc_num].last_ticks = ticks;
-			collector->process[proc_type][proc_num].last_state = ZBX_PROCESS_STATE_BUSY;
+			collector->process[proc_type][proc_num].cache.ticks = collector->ticks_sync;
+			collector->process[proc_type][proc_num].cache.state = ZBX_PROCESS_STATE_BUSY;
+			collector->process[proc_type][proc_num].cache.ticks_flush = collector->ticks_sync;
 		}
 	}
 
@@ -375,6 +408,7 @@ void	update_selfmon_counter(unsigned char state)
 	zbx_stat_process_t	*process;
 	clock_t			ticks;
 	struct tms		buf;
+	int			i;
 
 	if (ZBX_PROCESS_TYPE_UNKNOWN == process_type)
 		return;
@@ -382,14 +416,39 @@ void	update_selfmon_counter(unsigned char state)
 	process = &collector->process[process_type][process_num - 1];
 	ticks = times(&buf);
 
-	LOCK_SM;
+	/* update process statistics in local cache */
+	process->cache.counter[process->cache.state] += ticks - process->cache.ticks;
 
-	if (ticks > process->last_ticks)
-		process->counter[process->last_state] += ticks - process->last_ticks;
-	process->last_ticks = ticks;
-	process->last_state = state;
+	if (ZBX_SELFMON_FLUSH_DELAY < (double)(ticks - process->cache.ticks_flush) / collector->ticks_per_sec)
+	{
+		LOCK_SM;
 
-	UNLOCK_SM;
+		for (i = 0; i < ZBX_PROCESS_STATE_COUNT; i++)
+		{
+			/* If process did not update selfmon counter during one self monitoring data   */
+			/* collection interval, then self monitor will collect statistics based on the */
+			/* current process state and the ticks passed since last self monitoring data  */
+			/* collection. This value is stored in counter_used and the local statistics   */
+			/* must be adjusted by this (already collected) value.                         */
+			if (process->cache.counter[i] > process->counter_used[i])
+			{
+				process->cache.counter[i] -= process->counter_used[i];
+				process->counter[i] += process->cache.counter[i];
+			}
+
+			/* reset current cache statistics */
+			process->counter_used[i] = 0;
+			process->cache.counter[i] = 0;
+		}
+
+		process->cache.ticks_flush = ticks;
+
+		UNLOCK_SM;
+	}
+
+	/* update local self monitoring cache */
+	process->cache.state = state;
+	process->cache.ticks = ticks;
 }
 
 /******************************************************************************
@@ -403,16 +462,12 @@ void	collect_selfmon_stats(void)
 {
 	const char		*__function_name = "collect_selfmon_stats";
 	zbx_stat_process_t	*process;
-	clock_t			ticks;
+	clock_t			ticks, ticks_done;
 	struct tms		buf;
-	unsigned char		proc_type, state;
-	int			proc_num, process_forks, index;
+	unsigned char		proc_type, i;
+	int			proc_num, process_forks, index, last;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	ticks = times(&buf);
-
-	LOCK_SM;
 
 	if (MAX_HISTORY <= (index = collector->first + collector->count))
 		index -= MAX_HISTORY;
@@ -422,18 +477,45 @@ void	collect_selfmon_stats(void)
 	else if (++collector->first == MAX_HISTORY)
 		collector->first = 0;
 
+	if (0 > (last = index - 1))
+		last += MAX_HISTORY;
+
+	LOCK_SM;
+
+	ticks = times(&buf);
+	ticks_done = ticks - collector->ticks_sync;
+
 	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
 	{
 		process_forks = get_process_type_forks(proc_type);
 		for (proc_num = 0; proc_num < process_forks; proc_num++)
 		{
 			process = &collector->process[proc_type][proc_num];
-			for (state = 0; state < ZBX_PROCESS_STATE_COUNT; state++)
-				process->h_counter[state][index] = process->counter[state];
-			if (ticks > process->last_ticks)
-				process->h_counter[process->last_state][index] += ticks - process->last_ticks;
+
+			if (process->cache.ticks_flush < collector->ticks_sync)
+			{
+				/* If the process local cache was not flushed during the last self monitoring  */
+				/* data collection interval update the process statistics based on the current */
+				/* process state and ticks passed during the collection interval. Store this   */
+				/* value so the process local self monitoring cache can be adjusted before     */
+				/* flushing.                                                                   */
+				process->counter[process->cache.state] += ticks_done;
+				process->counter_used[process->cache.state] += ticks_done;
+			}
+
+			for (i = 0; i < ZBX_PROCESS_STATE_COUNT; i++)
+			{
+				/* The data is gathered as ticks spent in corresponding states during the */
+				/* self monitoring data collection interval. But in history the data are  */
+				/* stored as relative values. To achieve it we add the collected data to  */
+				/* the last values.                                                       */
+				process->h_counter[i][index] = process->h_counter[i][last] + process->counter[i];
+				process->counter[i] = 0;
+			}
 		}
 	}
+
+	collector->ticks_sync = ticks;
 
 	UNLOCK_SM;
 

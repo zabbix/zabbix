@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="delayFlexRow">
+<script type="text/x-jquery-tmpl" id="custom_intervals_row">
 	<tr class="form_row">
 		<td>
 			<ul class="<?= ZBX_STYLE_RADIO_SEGMENTED ?>" id="delay_flex_#{rowNum}_type">
@@ -12,8 +12,8 @@
 			</ul>
 		</td>
 		<td>
-			<input type="text" id="delay_flex_#{rowNum}_delay" name="delay_flex[#{rowNum}][delay]" maxlength="5" onchange="validateNumericBox(this, true, false);" placeholder="50" style="text-align: right;">
-			<input type="text" id="delay_flex_#{rowNum}_schedule" name="delay_flex[#{rowNum}][schedule]" maxlength="255" placeholder="wd1-5h9-18" style="display: none;">
+			<input type="text" id="delay_flex_#{rowNum}_delay" name="delay_flex[#{rowNum}][delay]" maxlength="255" placeholder="<?= ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT ?>">
+			<input type="text" id="delay_flex_#{rowNum}_schedule" name="delay_flex[#{rowNum}][schedule]" maxlength="255" placeholder="<?= ZBX_ITEM_SCHEDULING_DEFAULT ?>" style="display: none;">
 		</td>
 		<td>
 			<input type="text" id="delay_flex_#{rowNum}_period" name="delay_flex[#{rowNum}][period]" maxlength="255" placeholder="<?= ZBX_DEFAULT_INTERVAL ?>">
@@ -24,17 +24,26 @@
 	</tr>
 </script>
 <script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
-	<?=
-		(new CRow([
+	<?php
+		$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
+
+		foreach (get_preprocessing_types() as $group) {
+			$cb_group = new COptGroup($group['label']);
+
+			foreach ($group['types'] as $type => $label) {
+				$cb_group->addItem(new CComboItem($type, $label));
+			}
+
+			$preproc_types_cbbox->addItem($cb_group);
+		}
+
+		echo (new CRow([
 			(new CCol(
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CComboBox('preprocessing[#{rowNum}][type]', '', null, get_preprocessing_types())),
-			(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-				->setAttribute('placeholder', _('number')),
-			(new CTextBox('preprocessing[#{rowNum}][params][1]'))
-				->setAttribute('placeholder', _('output'))
-				->addStyle('display: none;'),
+			$preproc_types_cbbox,
+			(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', _('number')),
+			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', _('output')),
 			(new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
@@ -64,10 +73,10 @@
 			})
 			.trigger('change');
 
-		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
+		$('#custom_intervals').on('click', 'input[type="radio"]', function() {
 			var rowNum = $(this).attr('id').split('_')[2];
 
-			if ($(this).val() == <?= ITEM_DELAY_FLEX_TYPE_FLEXIBLE; ?>) {
+			if ($(this).val() == <?= ITEM_DELAY_FLEXIBLE; ?>) {
 				$('#delay_flex_' + rowNum + '_schedule').hide();
 				$('#delay_flex_' + rowNum + '_delay').show();
 				$('#delay_flex_' + rowNum + '_period').show();
@@ -79,8 +88,8 @@
 			}
 		});
 
-		$('#delayFlexTable').dynamicRows({
-			template: '#delayFlexRow'
+		$('#custom_intervals').dynamicRows({
+			template: '#custom_intervals_row'
 		});
 
 		var preproc_row_tpl = new Template($('#preprocessing_steps_row').html()),
@@ -143,6 +152,14 @@
 						$(inputs[0])
 							.show()
 							.attr('placeholder', '<?= _('list of characters') ?>');
+						$(inputs[1]).hide();
+						break;
+
+					case '<?= ZBX_PREPROC_XPATH ?>':
+					case '<?= ZBX_PREPROC_JSONPATH ?>':
+						$(inputs[0])
+							.show()
+							.attr('placeholder', '<?= _('path') ?>');
 						$(inputs[1]).hide();
 						break;
 

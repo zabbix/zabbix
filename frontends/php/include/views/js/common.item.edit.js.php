@@ -12,8 +12,8 @@
 			</ul>
 		</td>
 		<td>
-			<input type="text" id="delay_flex_#{rowNum}_delay" name="delay_flex[#{rowNum}][delay]" maxlength="5" onchange="validateNumericBox(this, true, false);" placeholder="50" style="text-align: right;">
-			<input type="text" id="delay_flex_#{rowNum}_schedule" name="delay_flex[#{rowNum}][schedule]" maxlength="255" placeholder="wd1-5h9-18" style="display: none;">
+			<input type="text" id="delay_flex_#{rowNum}_delay" name="delay_flex[#{rowNum}][delay]" maxlength="255" placeholder="<?= ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT ?>">
+			<input type="text" id="delay_flex_#{rowNum}_schedule" name="delay_flex[#{rowNum}][schedule]" maxlength="255" placeholder="<?= ZBX_ITEM_SCHEDULING_DEFAULT ?>" style="display: none;">
 		</td>
 		<td>
 			<input type="text" id="delay_flex_#{rowNum}_period" name="delay_flex[#{rowNum}][period]" maxlength="255" placeholder="<?= ZBX_DEFAULT_INTERVAL ?>">
@@ -25,19 +25,28 @@
 </script>
 <?php if (!$data['is_discovery_rule']) : ?>
 	<script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
-	<?=
-		(new CRow([
+	<?php
+		$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
+
+		foreach (get_preprocessing_types() as $group) {
+			$cb_group = new COptGroup($group['label']);
+
+			foreach ($group['types'] as $type => $label) {
+				$cb_group->addItem(new CComboItem($type, $label));
+			}
+
+			$preproc_types_cbbox->addItem($cb_group);
+		}
+
+		echo (new CRow([
 			$readonly
 				? null
 				: (new CCol(
 					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CComboBox('preprocessing[#{rowNum}][type]', '', null, get_preprocessing_types())),
-				(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-					->setAttribute('placeholder', _('number')),
-				(new CTextBox('preprocessing[#{rowNum}][params][1]'))
-					->setAttribute('placeholder', _('output'))
-					->addStyle('display: none;'),
+				$preproc_types_cbbox,
+				(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', _('pattern')),
+				(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', _('output')),
 				(new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
@@ -52,7 +61,7 @@
 		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
 			var rowNum = $(this).attr('id').split('_')[2];
 
-			if ($(this).val() == <?= ITEM_DELAY_FLEX_TYPE_FLEXIBLE; ?>) {
+			if ($(this).val() == <?= ITEM_DELAY_FLEXIBLE; ?>) {
 				$('#delay_flex_' + rowNum + '_schedule').hide();
 				$('#delay_flex_' + rowNum + '_delay').show();
 				$('#delay_flex_' + rowNum + '_period').show();
@@ -73,7 +82,7 @@
 				preprocessing = $('#preprocessing');
 
 			preprocessing.sortable({
-				disabled: (preprocessing.find('tr.sortable') < 2),
+				disabled: (preprocessing.find('tr.sortable').length < 2),
 				items: 'tr.sortable',
 				axis: 'y',
 				cursor: 'move',
@@ -132,6 +141,14 @@
 							$(inputs[1]).hide();
 							break;
 
+						case '<?= ZBX_PREPROC_XPATH ?>':
+						case '<?= ZBX_PREPROC_JSONPATH ?>':
+							$(inputs[0])
+								.show()
+								.attr('placeholder', '<?= _('path') ?>');
+							$(inputs[1]).hide();
+							break;
+
 						case '<?= ZBX_PREPROC_REGSUB ?>':
 							$(inputs[0])
 								.show()
@@ -159,10 +176,12 @@
  */
 $this->data['typeVisibility'] = [];
 $i = 0;
+
 foreach ($this->data['delay_flex'] as $delayFlex) {
 	if (!isset($delayFlex['delay']) && !isset($delayFlex['period'])) {
 		continue;
 	}
+
 	foreach ($this->data['types'] as $type => $label) {
 		if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_ZABBIX_ACTIVE || $type == ITEM_TYPE_SNMPTRAP) {
 			continue;
@@ -170,11 +189,10 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		zbx_subarray_push($this->data['typeVisibility'], $type, 'delay_flex['.$i.'][delay]');
 		zbx_subarray_push($this->data['typeVisibility'], $type, 'delay_flex['.$i.'][period]');
 	}
+
 	$i++;
-	if ($i == 7) {
-		break;
-	}
 }
+
 if (!empty($this->data['interfaces'])) {
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interface_row');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interfaceid');
@@ -237,6 +255,8 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'username
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'row_username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_username');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'jmx_endpoint');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_jmx_endpoint');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'row_password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'password');
@@ -277,11 +297,6 @@ foreach ($this->data['types'] as $type => $label) {
 		case ITEM_TYPE_TELNET:
 			zbx_subarray_push($this->data['typeVisibility'], $type,
 				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
-			);
-			break;
-		case ITEM_TYPE_JMX:
-			zbx_subarray_push($this->data['typeVisibility'], $type,
-				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX]
 			);
 			break;
 		default:

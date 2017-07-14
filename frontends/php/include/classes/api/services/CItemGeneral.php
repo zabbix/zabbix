@@ -74,7 +74,6 @@ abstract class CItemGeneral extends CApiService {
 			'logtimefmt'			=> [],
 			'templateid'			=> ['system' => 1],
 			'valuemapid'			=> ['template' => 1],
-			'delay_flex'			=> [],
 			'params'				=> [],
 			'ipmi_sensor'			=> ['template' => 1],
 			'authtype'				=> [],
@@ -89,7 +88,8 @@ abstract class CItemGeneral extends CApiService {
 			'port'					=> [],
 			'inventory_link'		=> [],
 			'lifetime'				=> [],
-			'preprocessing'			=> ['template' => 1]
+			'preprocessing'			=> ['template' => 1],
+			'jmx_endpoint'			=> []
 		];
 
 		$this->errorMessages = array_merge($this->errorMessages, [
@@ -141,8 +141,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostid' => null,
 				'type' => null,
 				'value_type' => null,
-				'delay' => '0',
-				'delay_flex' => ''
+				'delay' => null
 			];
 
 			$dbHosts = API::Host()->get([
@@ -189,6 +188,10 @@ abstract class CItemGeneral extends CApiService {
 
 		$item_key_parser = new CItemKey();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+		$update_interval_parser = new CUpdateIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => (get_class($this) === 'CItemPrototype')
+		]);
 
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
@@ -254,15 +257,60 @@ abstract class CItemGeneral extends CApiService {
 
 			$host = $dbHosts[$fullItem['hostid']];
 
-			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-				$item['delay_flex'] = '';
-				$fullItem['delay_flex'] = '';
+			// Validate update interval.
+			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
+				if ($update_interval_parser->parse($fullItem['delay']) != CParser::PARSE_SUCCESS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('invalid delay'))
+					);
+				}
+
+				$delay = $update_interval_parser->getDelay();
+
+				// Check if not macros. If delay is a macro, skip this step, otherwise check if delay is valid.
+				if ($delay[0] !== '{') {
+					$delay_sec = timeUnitToSeconds($delay);
+					$intervals = $update_interval_parser->getIntervals();
+					$flexible_intervals = $update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE);
+					$has_scheduling_intervals = (bool) $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING);
+					$has_macros = false;
+
+					foreach ($intervals as $interval) {
+						if (strpos($interval['interval'], '{') !== false) {
+							$has_macros = true;
+							break;
+						}
+					}
+
+					// If delay is 0, there must be at least one either flexible or scheduling interval.
+					if ($delay_sec < 0 || $delay_sec > SEC_PER_DAY || ($delay_sec == 0 && !$intervals)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Item will not be refreshed. Please enter a correct update interval.')
+						);
+					}
+
+					if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+						// Remove flexible and scheduling intervals and leave only the delay part.
+						$item['delay'] = $delay;
+					}
+					// If there are scheduling intervals or intervals with macros, skip the next check calculation.
+					elseif (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
+							&& calculateItemNextCheck(0, $delay_sec, $flexible_intervals, time()) == ZBX_JAN_2038) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Item will not be refreshed. Please enter a correct update interval.')
+						);
+					}
+				}
+				elseif ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+					// Remove flexible and scheduling intervals and leave only the delay part.
+					$item['delay'] = $delay;
+				}
 			}
 
 			// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
 			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR || $fullItem['value_type'] == ITEM_VALUE_TYPE_LOG
 					|| $fullItem['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-				$item['trends'] = 0;
+				$item['trends'] = '0';
 			}
 
 			// check if the item requires an interface
@@ -301,8 +349,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 			elseif (($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0)
-					|| ($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0)
-					|| ($fullItem['type'] == ITEM_TYPE_JMX && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_JMX) == 0)) {
+					|| ($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
 			}
 
@@ -336,61 +383,32 @@ abstract class CItemGeneral extends CApiService {
 						_('Type of information must be "Numeric (unsigned)" or "Numeric (float)" for aggregate items.'));
 			}
 
-			// update interval
-			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
-				// delay must be between 0 and 86400, if delay is 0, delay_flex interval must be set.
-				if ($fullItem['delay'] < 0 || $fullItem['delay'] > SEC_PER_DAY
-					|| ($fullItem['delay'] == 0 && $fullItem['delay_flex'] === '')) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Item will not be refreshed. Please enter a correct update interval.')
-					);
-				}
-
-				// Don't parse empty strings, they will not be valid.
-				if ($fullItem['delay_flex'] !== '') {
-					// Validate item delay_flex string. First check syntax with parser, then validate time ranges.
-					$item_delay_flex_parser = new CItemDelayFlexParser($fullItem['delay_flex']);
-
-					if ($item_delay_flex_parser->isValid()) {
-						$delay_flex_validator = new CItemDelayFlexValidator();
-
-						if ($delay_flex_validator->validate($item_delay_flex_parser->getIntervals())) {
-							// Some valid intervals exist at this point.
-							$flexible_intervals = $item_delay_flex_parser->getFlexibleIntervals();
-
-							// If there are no flexible intervals, skip the next check calculation.
-							if (!$flexible_intervals) {
-								continue;
-							}
-
-							$nextCheck = calculateItemNextCheck(0, $fullItem['delay'],
-								$item_delay_flex_parser->getFlexibleIntervals($flexible_intervals),
-								time()
-							);
-
-							if ($nextCheck == ZBX_JAN_2038) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_('Item will not be refreshed. Please enter a correct update interval.')
-								);
-							}
-						}
-						else {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $delay_flex_validator->getError());
-						}
-					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid interval "%1$s": %2$s.',
-							$fullItem['delay_flex'],
-							$item_delay_flex_parser->getError())
-						);
-					}
-				}
-			}
-
 			if ($fullItem['type'] == ITEM_TYPE_TRAPPER) {
 				if ($fullItem['trapper_hosts'] !== '' && !$ip_range_parser->parse($fullItem['trapper_hosts'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', $ip_range_parser->getError())
+					);
+				}
+			}
+
+			// jmx
+			if ($fullItem['type'] == ITEM_TYPE_JMX) {
+				if (!array_key_exists('jmx_endpoint', $fullItem) && !$update) {
+					$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+				}
+				if (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('cannot be empty'))
+					);
+				}
+			}
+			else {
+				if (!array_key_exists('jmx_endpoint', $fullItem) && $update) {
+					$item['jmx_endpoint'] = '';
+				}
+				if (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] !== '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('should be empty'))
 					);
 				}
 			}
@@ -489,8 +507,8 @@ abstract class CItemGeneral extends CApiService {
 	 * Check item specific fields. Each API like Item, Itemprototype and Discovery rule may inherit different fields
 	 * to validate.
 	 *
-	 * @param array  $item			An array of single item data.
-	 * @param string $method		A string of "create" or "update" method.
+	 * @param array  $item    An array of single item data.
+	 * @param string $method  A string of "create" or "update" method.
 	 *
 	 * @return bool
 	 */
@@ -503,13 +521,6 @@ abstract class CItemGeneral extends CApiService {
 			$item['port'] = ltrim($item['port'], '0');
 			if ($item['port'] == '') {
 				$item['port'] = 0;
-			}
-		}
-
-		if (isset($item['lifetime']) && $item['lifetime'] != '') {
-			$item['lifetime'] = ltrim($item['lifetime'], '0');
-			if ($item['lifetime'] == '') {
-				$item['lifetime'] = 0;
 			}
 		}
 
@@ -875,7 +886,9 @@ abstract class CItemGeneral extends CApiService {
 	 *															7 - ZBX_PREPROC_OCT2DEC;
 	 *															8 - ZBX_PREPROC_HEX2DEC;
 	 *															9 - ZBX_PREPROC_DELTA_VALUE;
-	 *															10 - ZBX_PREPROC_DELTA_SPEED.
+	 *															10 - ZBX_PREPROC_DELTA_SPEED;
+	 *															11 - ZBX_PREPROC_XPATH;
+	 *															12 - ZBX_PREPROC_JSONPATH.
 	 * @param string $item['preprocessing'][]['params']		Additional parameters used by preprocessing option. In case
 	 *														of regular expression (ZBX_PREPROC_REGSUB), multiple
 	 *														parameters are separated by LF (\n)character.
@@ -887,7 +900,7 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types())]);
+			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types(null, false))]);
 
 			$required_fields = ['type', 'params'];
 			$delta = false;
@@ -941,6 +954,8 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_RTRIM:
 					case ZBX_PREPROC_LTRIM:
 					case ZBX_PREPROC_TRIM:
+					case ZBX_PREPROC_XPATH:
+					case ZBX_PREPROC_JSONPATH:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1010,7 +1025,7 @@ abstract class CItemGeneral extends CApiService {
 
 						// Check if one of the deltas (Delta per second or Delta value) already exists.
 						if ($delta) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one "Delta" step is allowed.'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
 						}
 						else {
 							$delta = true;

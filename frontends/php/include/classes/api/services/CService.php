@@ -34,7 +34,7 @@ class CService extends CApiService {
 		$this->getOptions = array_merge($this->getOptions, [
 			'parentids' => null,
 			'childids' => null,
-			'countOutput' => null,
+			'countOutput' => false,
 			'selectParent' => null,
 			'selectDependencies' => null,
 			'selectParentDependencies' => null,
@@ -77,7 +77,7 @@ class CService extends CApiService {
 		$result = [];
 		while ($row = DBfetch($res)) {
 			// a count query, return a single result
-			if ($options['countOutput'] !== null) {
+			if ($options['countOutput']) {
 				$result = $row['rowscount'];
 			}
 			// a normal select query
@@ -86,7 +86,7 @@ class CService extends CApiService {
 			}
 		}
 
-		if ($options['countOutput'] !== null) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -95,7 +95,7 @@ class CService extends CApiService {
 			$result = $this->unsetExtraFields($result, ['triggerid'], $options['output']);
 		}
 
-		if ($options['preservekeys'] === null) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -1332,7 +1332,7 @@ class CService extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			if ($options['selectTrigger'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('triggerid'), $sqlParts);
 			}

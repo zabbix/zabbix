@@ -72,8 +72,8 @@ class CItemPrototype extends CItemGeneral {
 			'filter'						=> null,
 			'search'						=> null,
 			'searchByAny'					=> null,
-			'startSearch'					=> null,
-			'excludeSearch'					=> null,
+			'startSearch'					=> false,
+			'excludeSearch'					=> false,
 			'searchWildcardsEnabled'		=> null,
 			// output
 			'output'						=> API_OUTPUT_EXTEND,
@@ -84,9 +84,9 @@ class CItemPrototype extends CItemGeneral {
 			'selectGraphs'					=> null,
 			'selectDiscoveryRule'			=> null,
 			'selectPreprocessing'			=> null,
-			'countOutput'					=> null,
-			'groupCount'					=> null,
-			'preservekeys'					=> null,
+			'countOutput'					=> false,
+			'groupCount'					=> false,
+			'preservekeys'					=> false,
 			'sortfield'						=> '',
 			'sortorder'						=> '',
 			'limit'							=> null,
@@ -132,7 +132,7 @@ class CItemPrototype extends CItemGeneral {
 
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.hostid';
 			}
 		}
@@ -152,7 +152,7 @@ class CItemPrototype extends CItemGeneral {
 			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
 			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['id'] = 'id.parent_itemid';
 			}
 		}
@@ -215,6 +215,19 @@ class CItemPrototype extends CItemGeneral {
 
 // --- FILTER ---
 		if (is_array($options['filter'])) {
+			if (array_key_exists('delay', $options['filter']) && $options['filter']['delay'] !== null) {
+				$sqlParts['where'][] = makeUpdateIntervalFilter('i.delay', $options['filter']['delay']);
+				unset($options['filter']['delay']);
+			}
+
+			if (array_key_exists('history', $options['filter']) && $options['filter']['history'] !== null) {
+				$options['filter']['history'] = getTimeUnitFilters($options['filter']['history']);
+			}
+
+			if (array_key_exists('trends', $options['filter']) && $options['filter']['trends'] !== null) {
+				$options['filter']['trends'] = getTimeUnitFilters($options['filter']['trends']);
+			}
+
 			$this->dbFilter('items i', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
@@ -236,8 +249,8 @@ class CItemPrototype extends CItemGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount']))
+			if ($options['countOutput']) {
+				if ($options['groupCount'])
 					$result[] = $item;
 				else
 					$result = $item['rowscount'];
@@ -247,7 +260,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -257,7 +270,7 @@ class CItemPrototype extends CItemGeneral {
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
 
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -852,9 +865,15 @@ class CItemPrototype extends CItemGeneral {
 				' WHERE '.dbConditionInt('ad.application_prototypeid', $application_prototypeids)
 			));
 
-			DB::delete('application_prototype', [
-				'application_prototypeid' => zbx_objectValues($db_application_prototypes, 'application_prototypeid')
+			$db_application_prototypeids = zbx_objectValues($db_application_prototypes, 'application_prototypeid');
+
+			// unlink templated application prototype
+			DB::update('application_prototype', [
+				'values' => ['templateid' => null],
+				'where' => ['templateid' => $db_application_prototypeids]
 			]);
+
+			DB::delete('application_prototype', ['application_prototypeid' => $db_application_prototypeids]);
 
 			/*
 			 * Deleting an application prototype will automatically delete the link in 'item_application_prototype',
@@ -911,14 +930,32 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Check item prototype specific fields.
+	 * Check item prototype specific fields:
+	 *		- validate history and trends using simple interval parser, user macro parser and lld macro parser;
+	 *		- validate item preprocessing.
 	 *
-	 * @param array  $item			An array of single item prototype data.
-	 * @param string $method		A string of "create" or "update" method.
+	 * @param array  $item    An array of single item data.
+	 * @param string $method  A string of "create" or "update" method.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function checkSpecificFields(array $item, $method) {
+		if (array_key_exists('history', $item)
+				&& !validateTimeUnit($item['history'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
+					['usermacros' => true, 'lldmacros' => true])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
+			);
+		}
+
+		if (array_key_exists('trends', $item)
+				&& !validateTimeUnit($item['trends'], SEC_PER_DAY, 25 * SEC_PER_YEAR, true, $error,
+					['usermacros' => true, 'lldmacros' => true])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
+			);
+		}
+
 		$this->validateItemPreprocessing($item, $method);
 	}
 
@@ -979,7 +1016,7 @@ class CItemPrototype extends CItemGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 			}

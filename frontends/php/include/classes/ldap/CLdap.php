@@ -48,8 +48,10 @@ class CLdap {
 			$this->cnf = zbx_array_merge($this->cnf, $arg);
 		}
 
-		if (!function_exists('ldap_connect')) {
-			error('LDAP lib error. Cannot find needed functions.');
+		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
+
+		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
+			error($ldap_status['error']);
 			return false;
 		}
 	}

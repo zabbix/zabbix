@@ -72,6 +72,7 @@ $fields = [
 	'ldap_bind_dn' => true,
 	'ldap_bind_password' => true
 ];
+$ldap_extension_enabled = false;
 
 foreach ($config as $field => $value) {
 	if (array_key_exists($field, $fields)) {
@@ -113,9 +114,12 @@ if ($config['authentication_type'] == ZBX_AUTH_INTERNAL) {
 	}
 }
 elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
-	if (hasRequest('update') || hasRequest('test')) {
-		// check LDAP login/password
-		$ldapValidator = new CLdapAuthValidator([
+	$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
+	$ldap_extension_enabled = ($ldap_status['result'] == CFrontendSetup::CHECK_OK);
+	$login = false;
+
+	if ($ldap_extension_enabled && (hasRequest('update') || hasRequest('test'))) {
+		$ldap_validator = new CLdapAuthValidator([
 			'conf' => [
 				'host' => $config['ldap_host'],
 				'port' => $config['ldap_port'],
@@ -126,13 +130,13 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 			]
 		]);
 
-		$login = $ldapValidator->validate([
+		$login = $ldap_validator->validate([
 			'user' => getRequest('user', CWebUser::$data['alias']),
 			'password' => getRequest('user_password', '')
 		]);
 
 		if (!$login) {
-			error(_('Login name or password is incorrect!'));
+			show_error_message(_('Login name or password is incorrect!'));
 		}
 
 		if (hasRequest('update')) {
@@ -174,6 +178,9 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 		elseif (hasRequest('test')) {
 			show_messages($login, _('LDAP login successful'), _('LDAP login was not successful'));
 		}
+	}
+	elseif (!$ldap_extension_enabled) {
+		show_error_message($ldap_status['error']);
 	}
 }
 elseif ($config['authentication_type'] == ZBX_AUTH_HTTP) {
@@ -229,7 +236,8 @@ $data = [
 	'user' => getRequest('user', CWebUser::$data['alias']),
 	'user_password' => getRequest('user_password', ''),
 	'user_list' => null,
-	'change_bind_password' => getRequest('change_bind_password')
+	'change_bind_password' => getRequest('change_bind_password'),
+	'ldap_extension_enabled' => $ldap_extension_enabled
 ];
 
 // get tab title

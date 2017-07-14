@@ -49,6 +49,7 @@ frontends/php/include/views/.configuration.host.edit.php.swp
 frontends/php/js/jsDump.js
 frontends/php/locale/POTFILES.in
 frontends/php/locale/bg/LC_MESSAGES/frontend.mo
+frontends/php/locale/ca/LC_MESSAGES/frontend.mo
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo
 frontends/php/locale/el/LC_MESSAGES/frontend.mo
@@ -135,6 +136,10 @@ src/libs/zbxconf/Makefile.in
 src/libs/zbxcrypto/.deps
 src/libs/zbxcrypto/Makefile
 src/libs/zbxcrypto/Makefile.in
+src/libs/zbxcunit/.deps
+src/libs/zbxcunit/Makefile
+src/libs/zbxcunit/Makefile.in
+src/libs/zbxcunit/cu_modules.h
 src/libs/zbxdb/.deps
 src/libs/zbxdb/Makefile
 src/libs/zbxdb/Makefile.in
@@ -337,9 +342,6 @@ src/zabbix_server/trapper/Makefile.in
 src/zabbix_server/vmware/.deps
 src/zabbix_server/vmware/Makefile
 src/zabbix_server/vmware/Makefile.in
-src/zabbix_server/watchdog/.deps
-src/zabbix_server/watchdog/Makefile
-src/zabbix_server/watchdog/Makefile.in
 src/zabbix_server/zabbix_server
 /tags
 upgrades/Makefile

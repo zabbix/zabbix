@@ -19,14 +19,45 @@
 **/
 
 
-$groups = API::HostGroup()->get([
+$options = [
 	'output' => ['groupid', 'name'],
 	'groupids' => $data['filter']['groupids'],
-	'hostids' => isset($data['filter']['hostids']) ? $data['filter']['hostids'] : null,
 	'monitored_hosts' => true,
 	'with_monitored_httptests' => true,
 	'preservekeys' => true
+];
+
+if (isset($data['filter']['hostids'])) {
+	$options['hostids'] = $data['filter']['hostids'];
+}
+
+$groups = API::HostGroup()->get($options);
+
+$filter_groups = API::HostGroup()->get([
+	'output' => ['groupid', 'name'],
+	'groupids' => $data['filter']['groupids']
 ]);
+
+foreach ($filter_groups as $group) {
+	$options = [
+		'output' => ['groupid', 'name'],
+		'monitored_hosts' => true,
+		'with_monitored_httptests' => true,
+		'search' => ['name' => $group['name'].'/'],
+		'startSearch' => true
+	];
+
+	if (isset($data['filter']['hostids'])) {
+		$options['hostids'] = $data['filter']['hostids'];
+	}
+
+	$child_groups = API::HostGroup()->get($options);
+
+	foreach ($child_groups as $child_group) {
+		$groups[$child_group['groupid']] = $child_group;
+	}
+}
+
 CArrayHelper::sort($groups, ['name']);
 
 $groupIds = array_keys($groups);
@@ -88,7 +119,7 @@ foreach ($groups as $group) {
 }
 
 $output = [
-	'header' => _('Web monitoring'),
+	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];

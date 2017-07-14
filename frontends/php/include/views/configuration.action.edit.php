@@ -374,9 +374,7 @@ $operation_tab = new CFormList('operationlist');
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operation_tab->addRow(_('Default operation step duration'), [
-		(new CNumericBox('esc_period', $data['action']['esc_period'], 6))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-		' ('._('minimum 60 seconds').')'
+		(new CTextBox('esc_period', $data['action']['esc_period']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	]);
 }
 
@@ -398,8 +396,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 // create operation table
 $operationsTable = (new CTable())->setAttribute('style', 'width: 100%;');
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')]);
-	$delay = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
+	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
+	$delays = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
 }
 else {
 	$operationsTable->setHeader([_('Details'), _('Action')]);
@@ -415,6 +413,8 @@ if ($data['action']['operations']) {
 
 	$action_operation_hints = getActionOperationHints($data['action']['operations'], $default_message);
 
+	$simple_interval_parser = new CSimpleIntervalParser();
+
 	foreach ($data['action']['operations'] as $operationid => $operation) {
 		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
 			continue;
@@ -426,8 +426,15 @@ if ($data['action']['operations']) {
 			$operation['mediatypeid'] = 0;
 		}
 
-		$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
-			->setHint($action_operation_hints[$operationid]);
+		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
+
+		if (array_key_exists($operationid, $action_operation_hints)) {
+			$action_operation_hints[$operationid] = array_filter($action_operation_hints[$operationid]);
+
+			if ($action_operation_hints[$operationid]) {
+				$details->setHint($action_operation_hints[$operationid]);
+			}
+		}
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 			$esc_steps_txt = null;
@@ -445,10 +452,17 @@ if ($data['action']['operations']) {
 				? $operation['esc_step_from']
 				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
-			$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
-			$esc_delay_txt = $delay[$operation['esc_step_from']]
-				? convert_units(['value' => $delay[$operation['esc_step_from']], 'units' => 'uptime'])
-				: _('Immediately');
+			$esc_period_txt = ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS
+					&& timeUnitToSeconds($operation['esc_period']) == 0)
+				? _('Default')
+				: $operation['esc_period'];
+
+			$esc_delay_txt = ($delays[$operation['esc_step_from']] === null)
+				? _('Unknown')
+				: ($delays[$operation['esc_step_from']] != 0
+					? convert_units(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
+					: _('Immediately')
+				);
 
 			$operationRow = [
 				$esc_steps_txt,
@@ -554,10 +568,10 @@ if (!empty($data['new_operation'])) {
 		]);
 
 		$new_operation_formlist->addRow(_('Step duration'), [
-			(new CNumericBox('new_operation[esc_period]', $data['new_operation']['esc_period'], 6))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CTextBox('new_operation[esc_period]', $data['new_operation']['esc_period']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			_('(minimum 60 seconds, 0 - use action default)')
+			_('(0 - use action default)')
 		]);
 	}
 
@@ -1196,7 +1210,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$operation['mediatypeid'] = 0;
 			}
 
-			$details = (new CSpan($actionOperationDescriptions[0][$operationid]));
+			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
 
 			if (array_key_exists($operationid, $action_operation_hints)) {
 				$action_operation_hints[$operationid] = array_filter($action_operation_hints[$operationid]);

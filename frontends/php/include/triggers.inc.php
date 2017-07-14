@@ -111,7 +111,7 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  *
  * @return CCol
  */
-function getSeverityCell($severity, $config, $text = null, $forceNormal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $forceNormal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
@@ -154,6 +154,8 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 
 		// blinking
 		$timeSinceLastChange = time() - $triggerLastChange;
+		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+
 		if ($blinks && $timeSinceLastChange < $config['blink_period']) {
 			$object->addClass('blink'); // elements with this class will blink
 			$object->setAttribute('data-time-to-blink', $config['blink_period'] - $timeSinceLastChange);
@@ -633,6 +635,48 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
+function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
+		array $trigger_options = []) {
+	// fetch hosts
+	$hosts = API::Host()->get([
+		'output' => ['hostid', 'status'],
+		'selectGraphs' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'selectScreens' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'groupids' => $groupids ? $groupids : null,
+		'preservekeys' => true
+	] + $host_options);
+
+	$hostids = array_keys($hosts);
+
+	$options = [
+		'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'],
+		'selectHosts' => ['hostid', 'name', 'status'],
+		'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+		'hostids' => $hostids,
+		'monitored' => true,
+		'skipDependent' => true,
+		'sortfield' => 'description',
+		'preservekeys' => true
+	] + $trigger_options;
+
+	// application filter
+	if ($application !== '') {
+		$applications = API::Application()->get([
+			'output' => [],
+			'hostids' => $hostids,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]);
+		$options['applicationids'] = array_keys($applications);
+	}
+
+	$triggers = API::Trigger()->get($options);
+
+	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
+
+	return [$hosts, $triggers];
+}
+
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *
@@ -870,6 +914,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			->addClass(ZBX_STYLE_CURSOR_POINTER);
 	}
 
+	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
 	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
 		$column->addClass('blink');
 		$column->setAttribute('data-toggle-class', $css);

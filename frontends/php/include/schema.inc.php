@@ -46,9 +46,9 @@ return [
 			],
 			'autologout' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '900',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '15m',
 			],
 			'lang' => [
 				'null' => false,
@@ -58,9 +58,9 @@ return [
 			],
 			'refresh' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '30',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '30s',
 			],
 			'type' => [
 				'null' => false,
@@ -721,9 +721,9 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '30s',
 			],
 			'userid' => [
 				'null' => false,
@@ -830,8 +830,8 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
 				'default' => '0',
 			],
 		],
@@ -865,9 +865,9 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '3600',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '1h',
 			],
 			'nextcheck' => [
 				'null' => false,
@@ -1030,9 +1030,9 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '60',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '1m',
 			],
 			'status' => [
 				'null' => false,
@@ -1157,9 +1157,9 @@ return [
 			],
 			'timeout' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '15',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '15s',
 			],
 			'posts' => [
 				'null' => false,
@@ -1320,21 +1320,21 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
 				'default' => '0',
 			],
 			'history' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '90',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '90d',
 			],
 			'trends' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '365d',
 			],
 			'status' => [
 				'null' => false,
@@ -1422,12 +1422,6 @@ return [
 				'ref_table' => 'valuemaps',
 				'ref_field' => 'valuemapid',
 			],
-			'delay_flex' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
-				'default' => '',
-			],
 			'params' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
@@ -1508,8 +1502,8 @@ return [
 			'lifetime' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '30',
+				'length' => 255,
+				'default' => '30d',
 			],
 			'snmpv3_authprotocol' => [
 				'null' => false,
@@ -1540,6 +1534,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+			'jmx_endpoint' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
 			],
 		],
 	],
@@ -1707,6 +1707,24 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'maxsessions' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'maxattempts' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '3',
+			],
+			'attempt_interval' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '10s',
+			],
 		],
 	],
 	'usrgrp' => [
@@ -1866,9 +1884,9 @@ return [
 			],
 			'esc_period' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '1h',
 			],
 			'def_shortdata' => [
 				'null' => false,
@@ -1940,8 +1958,8 @@ return [
 			],
 			'esc_period' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => '0',
 			],
 			'esc_step_from' => [
@@ -2308,15 +2326,15 @@ return [
 			],
 			'refresh_unsupported' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '10m',
 			],
 			'work_period' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
-				'default' => '1-5,00:00-24:00',
+				'length' => 255,
+				'default' => '1-5,09:00-18:00',
 			],
 			'alert_usrgrpid' => [
 				'null' => true,
@@ -2333,9 +2351,9 @@ return [
 			],
 			'event_expire' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '7',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1w',
 			],
 			'event_show_max' => [
 				'null' => false,
@@ -2496,15 +2514,15 @@ return [
 			],
 			'ok_period' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1800',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '30m',
 			],
 			'blink_period' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1800',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '30m',
 			],
 			'problem_unack_color' => [
 				'null' => false,
@@ -2574,27 +2592,27 @@ return [
 			],
 			'hk_events_trigger' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'hk_events_internal' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1d',
 			],
 			'hk_events_discovery' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1d',
 			],
 			'hk_events_autoreg' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1d',
 			],
 			'hk_services_mode' => [
 				'null' => false,
@@ -2604,9 +2622,9 @@ return [
 			],
 			'hk_services' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'hk_audit_mode' => [
 				'null' => false,
@@ -2616,9 +2634,9 @@ return [
 			],
 			'hk_audit' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'hk_sessions_mode' => [
 				'null' => false,
@@ -2628,9 +2646,9 @@ return [
 			],
 			'hk_sessions' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'hk_history_mode' => [
 				'null' => false,
@@ -2646,9 +2664,9 @@ return [
 			],
 			'hk_history' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '90',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '90d',
 			],
 			'hk_trends_mode' => [
 				'null' => false,
@@ -2664,9 +2682,9 @@ return [
 			],
 			'hk_trends' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '365d',
 			],
 			'default_inventory_mode' => [
 				'null' => false,
@@ -6770,9 +6788,9 @@ return [
 		],
 	],
 	'sysmap_shape' => [
-		'key' => 'shapeid',
+		'key' => 'sysmap_shapeid',
 		'fields' => [
-			'shapeid' => [
+			'sysmap_shapeid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -6841,19 +6859,19 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'text_valign' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'border_type' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 			'border_width' => [
 				'null' => false,
@@ -6877,7 +6895,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '-1',
+				'default' => '0',
 			],
 		],
 	],
@@ -6970,6 +6988,223 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
+			],
+		],
+	],
+	'dashboard' => [
+		'key' => 'dashboardid',
+		'fields' => [
+			'dashboardid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+			],
+			'userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid',
+			],
+			'private' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+		],
+	],
+	'dashboard_user' => [
+		'key' => 'dashboard_userid',
+		'fields' => [
+			'dashboard_userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'dashboardid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'dashboard',
+				'ref_field' => 'dashboardid',
+			],
+			'userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid',
+			],
+			'permission' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2',
+			],
+		],
+	],
+	'dashboard_usrgrp' => [
+		'key' => 'dashboard_usrgrpid',
+		'fields' => [
+			'dashboard_usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'dashboardid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'dashboard',
+				'ref_field' => 'dashboardid',
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid',
+			],
+			'permission' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2',
+			],
+		],
+	],
+	'widget' => [
+		'key' => 'widgetid',
+		'fields' => [
+			'widgetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'dashboardid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'dashboard',
+				'ref_field' => 'dashboardid',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'row' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'col' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'height' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'width' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+		],
+	],
+	'widget_field' => [
+		'key' => 'widget_fieldid',
+		'fields' => [
+			'widget_fieldid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'widgetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'widget',
+				'ref_field' => 'widgetid',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value_int' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'value_str' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value_groupid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'groups',
+				'ref_field' => 'groupid',
+			],
+			'value_hostid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			],
+			'value_itemid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
+			'value_graphid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'graphs',
+				'ref_field' => 'graphid',
+			],
+			'value_sysmapid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'sysmaps',
+				'ref_field' => 'sysmapid',
 			],
 		],
 	],

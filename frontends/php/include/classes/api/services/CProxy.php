@@ -63,13 +63,13 @@ class CProxy extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
-			'countOutput'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'preservekeys'				=> false,
 			'selectHosts'				=> null,
 			'selectInterface'			=> null,
 			'sortfield'					=> '',
@@ -111,7 +111,7 @@ class CProxy extends CApiService {
 		}
 
 		// countOutput
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			$options['sortfield'] = '';
 			$sqlParts['select'] = ['COUNT(DISTINCT h.hostid) AS rowscount'];
 		}
@@ -136,7 +136,7 @@ class CProxy extends CApiService {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -146,7 +146,7 @@ class CProxy extends CApiService {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -503,7 +503,7 @@ class CProxy extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null && $options['selectInterface'] !== null) {
+		if (!$options['countOutput'] && $options['selectInterface'] !== null) {
 			$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
 		}
 

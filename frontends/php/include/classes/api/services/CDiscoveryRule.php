@@ -24,9 +24,6 @@
  */
 class CDiscoveryRule extends CItemGeneral {
 
-	const MIN_LIFETIME = 0;
-	const MAX_LIFETIME = 3650;
-
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'type', 'status'];
@@ -73,8 +70,8 @@ class CDiscoveryRule extends CItemGeneral {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
@@ -84,9 +81,9 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectGraphs'				=> null,
 			'selectHostPrototypes'		=> null,
 			'selectFilter'				=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
@@ -132,7 +129,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.hostid';
 			}
 		}
@@ -150,7 +147,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.interfaceid';
 			}
 		}
@@ -199,6 +196,15 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('delay', $options['filter']) && $options['filter']['delay'] !== null) {
+				$sqlParts['where'][] = makeUpdateIntervalFilter('i.delay', $options['filter']['delay']);
+				unset($options['filter']['delay']);
+			}
+
+			if (array_key_exists('lifetime', $options['filter']) && $options['filter']['lifetime'] !== null) {
+				$options['filter']['lifetime'] = getTimeUnitFilters($options['filter']['lifetime']);
+			}
+
 			$this->dbFilter('items i', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
@@ -219,8 +225,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount'])) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $item;
 				}
 				else {
@@ -232,7 +238,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -263,7 +269,7 @@ class CDiscoveryRule extends CItemGeneral {
 			unset($rule);
 		}
 
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -997,16 +1003,17 @@ class CDiscoveryRule extends CItemGeneral {
 	/**
 	 * Check discovery rule specific fields.
 	 *
-	 * @param array  $item			An array of single discovery rule data.
-	 * @param string $method		A string of "create" or "update" method.
+	 * @param array  $item    An array of single item data.
+	 * @param string $method  A string of "create" or "update" method.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function checkSpecificFields(array $item, $method) {
-		if (isset($item['lifetime']) && !$this->validateLifetime($item['lifetime'])) {
+		if (array_key_exists('lifetime', $item)
+				&& !validateTimeUnit($item['lifetime'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
+					['usermacros' => true])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Discovery rule "%1$s:%2$s" has incorrect lifetime: "%3$s". (min: %4$d, max: %5$d, user macro allowed)',
-					$item['name'], $item['key_'], $item['lifetime'], self::MIN_LIFETIME, self::MAX_LIFETIME)
+				_s('Incorrect value for field "%1$s": %2$s.', 'lifetime', $error)
 			);
 		}
 
@@ -1064,9 +1071,9 @@ class CDiscoveryRule extends CItemGeneral {
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
-				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-				'privatekey', 'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'preservekeys' => true
@@ -1162,9 +1169,9 @@ class CDiscoveryRule extends CItemGeneral {
 		$prototypes = API::ItemPrototype()->get([
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
 				'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname', 'snmpv3_securitylevel',
-				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'valuemapid', 'delay_flex', 'params',
-				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port',
-				'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor',
+				'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description',
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
@@ -1383,14 +1390,10 @@ class CDiscoveryRule extends CItemGeneral {
 		return $rs;
 	}
 
-	private function validateLifetime($lifetime) {
-		return (validateNumber($lifetime, self::MIN_LIFETIME, self::MAX_LIFETIME) || validateUserMacro($lifetime));
-	}
-
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			// add filter fields
 			if ($this->outputIsRequested('formula', $options['selectFilter'])
 					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])

@@ -127,28 +127,28 @@ static int	DBpatch_2050007(void)
 {
 	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("hosts", &field);
+	return DBmodify_field_type("hosts", &field, NULL);
 }
 
 static int	DBpatch_2050008(void)
 {
 	const ZBX_FIELD	field = {"ipmi_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("hosts", &field);
+	return DBmodify_field_type("hosts", &field, NULL);
 }
 
 static int	DBpatch_2050009(void)
 {
 	const ZBX_FIELD	field = {"snmp_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("hosts", &field);
+	return DBmodify_field_type("hosts", &field, NULL);
 }
 
 static int	DBpatch_2050010(void)
 {
 	const ZBX_FIELD	field = {"jmx_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("hosts", &field);
+	return DBmodify_field_type("hosts", &field, NULL);
 }
 
 static int	DBpatch_2050011(void)
@@ -250,7 +250,7 @@ static int	DBpatch_2050013(void)
 	return DBdrop_table("user_history");
 }
 
-static int      DBpatch_2050014(void)
+static int	DBpatch_2050014(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 		"update config"
@@ -265,7 +265,7 @@ static int      DBpatch_2050014(void)
 	return FAIL;
 }
 
-static int      DBpatch_2050015(void)
+static int	DBpatch_2050015(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 		"update users"
@@ -461,7 +461,7 @@ static int	DBpatch_2050051(void)
 {
 	const ZBX_FIELD	field = {"iprange", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("drules", &field);
+	return DBmodify_field_type("drules", &field, NULL);
 }
 
 static int	DBpatch_2050052(void)
@@ -636,14 +636,14 @@ static int	DBpatch_2050070(void)
 {
 	const ZBX_FIELD	field = {"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("globalmacro", &field);
+	return DBmodify_field_type("globalmacro", &field, NULL);
 }
 
 static int	DBpatch_2050071(void)
 {
 	const ZBX_FIELD	field = {"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("hostmacro", &field);
+	return DBmodify_field_type("hostmacro", &field, NULL);
 }
 
 static int	DBpatch_2050072(void)

@@ -59,7 +59,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestHrefClickWait('?form=update&slideshowid='.$slideshow['slideshowid']);
 		$this->zbxTestCheckHeader('Slide shows');
 		$this->zbxTestTextPresent(['Slide','Sharing']);
-		$this->zbxTestTextPresent(['Owner', 'Name', 'Default delay (in seconds)', 'Slides']);
+		$this->zbxTestTextPresent(['Owner', 'Name', 'Default delay', 'Slides']);
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
@@ -78,7 +78,7 @@ class testPageSlideShows extends CWebTest {
 
 		$this->zbxTestCheckHeader('Slide shows');
 		$this->zbxTestTextPresent(['Slide','Sharing']);
-		$this->zbxTestTextPresent(['Owner', 'Name', 'Default delay (in seconds)', 'Slides']);
+		$this->zbxTestTextPresent(['Owner', 'Name', 'Default delay', 'Slides']);
 		$this->zbxTestTextPresent(['Screen', 'Delay', 'Action']);
 		$this->zbxTestClickWait('cancel');
 		$this->zbxTestTextPresent('Slide shows');

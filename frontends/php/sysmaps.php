@@ -206,21 +206,26 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 	else {
 		if (getRequest('form') === 'full_clone') {
-			$clone_maps = API::Map()->get([
+			$maps = API::Map()->get([
 				'output' => [],
 				'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 					'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
 					'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
 				],
-				'selectShapes' => API_OUTPUT_EXTEND,
+				'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
+					'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
+					'zindex'
+				],
+				'selectLines' => ['x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color', 'zindex'],
 				'selectLinks' => ['selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
 				'sysmapids' => $sysmap['sysmapid']
 			]);
 
-			if ($clone_maps) {
-				$map['selements'] = $clone_maps[0]['selements'];
-				$map['shapes'] = $clone_maps[0]['shapes'];
-				$map['links'] = $clone_maps[0]['links'];
+			if ($maps) {
+				$map['selements'] = $maps[0]['selements'];
+				$map['shapes'] = $maps[0]['shapes'];
+				$map['lines'] = $maps[0]['lines'];
+				$map['links'] = $maps[0]['links'];
 			}
 		}
 
@@ -430,7 +435,7 @@ else {
 	]);
 
 	$user_type = CWebUser::getType();
-	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+	if ($user_type != USER_TYPE_SUPER_ADMIN) {
 		$editable_maps = API::Map()->get([
 			'output' => [],
 			'sysmapids' => array_keys($data['maps']),

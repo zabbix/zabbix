@@ -30,65 +30,145 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 	* @dataProvider WorkingTime
 	*/
 	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
-
-		$this->zbxTestLogin('adm.workingtime.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
+		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->zbxTestAssertElementPresentId('work_period');
+
 		$this->zbxTestAssertAttribute("//input[@id='work_period']", "maxlength", 255);
 		$this->zbxTestAssertAttribute("//input[@id='work_period']", "size", 20);
 		$this->zbxTestAssertAttribute("//input[@id='work_period']", "value", $WorkingTime['work_period']);
-
 	}
 
-	public function testFormAdministrationGeneralWorkperiod_SavingWorkperiod() {
+	public function testFormAdministrationGeneralWorkperiod_SimpleUpdate() {
+		$sqlHash = 'SELECT * FROM config ORDER BY configid';
+		$oldHash = DBhash($sqlHash);
 
 		$this->zbxTestLogin('adm.workingtime.php');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownAssertSelected('configDropDown', 'Working time');
-
-		$sqlHash = 'SELECT configid,refresh_unsupported,alert_usrgrpid,'.
-				'event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,'.
-				'ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,'.
-				'ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,'.
-				'max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,'.
-				'severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,'.
-				'severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,'.
-				'blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,'.
-				'problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging'.
-				' FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
-
-		$this->zbxTestInputType('work_period', '1-7,09:00-20:00');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
 
-		$result = DBselect('SELECT work_period FROM config');
-		if ($row = DBfetch($result)) {
-			$this->assertEquals('1-7,09:00-20:00', $row['work_period'], 'Incorrect value in the DB field "work_period"');
-		};
+		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals($oldHash, DBhash($sqlHash));
+	}
 
-		$newHash=DBhash($sqlHash);
-		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
+	public static function data() {
+		return [
+			[
+				'work_period' => 'test',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-7 09:00-24:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '0-7,09:00-24:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-5,09:00-18:00,6-7,10:00-16:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-8,09:00-24:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-7,09:00-25:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-7,24:00-00:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-7,14:00-13:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-7,25:00-26:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-7,13:60-14:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '1-7',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '09:00-24:00',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '{WORKING_HOURS}',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
+				'work_period' => '{$WORKING_HOURS}',
+				'success_expected' => TEST_GOOD,
+				'error-msg' => null
+			],
+			[
+				'work_period' => '1-5,09:00-18:00',
+				'success_expected' => TEST_GOOD,
+				'error-msg' => null
+			],
+			[
+				'work_period' => '1-5,09:00-18:00;5-7,12:00-16:00',
+				'success_expected' => TEST_GOOD,
+				'error-msg' => null
+			]
+		];
+	}
 
-		// checking also for the following error: Configuration was not updated | Incorrect working time: "1-8,09:00-25:00".
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
+	/**
+	 * @dataProvider data
+	 */
+	public function testFormAdministrationGeneralWorkperiod_SavingWorkperiod($work_period, $expected, $msg) {
+		$this->zbxTestLogin('adm.workingtime.php');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->zbxTestInputType('work_period', '1-8,09:00-25:00');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Field "Working time" is not correct: Incorrect time period "1-8,09:00-25:00".']);
 
-		// trying to save empty work period
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
-		$this->zbxTestCheckTitle('Configuration of working time');
-		$this->zbxTestCheckHeader('Working time');
-		$this->zbxTestInputType('work_period', '');
+		$this->zbxTestInputType('work_period', $work_period);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Page received incorrect data', 'ield "Working time" is not correct: Empty time period.']);
+
+		switch ($expected) {
+			case TEST_GOOD:
+				$this->zbxTestTextNotPresent('Page received incorrect data');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
+				$this->zbxTestCheckFatalErrors();
+				$result = DBfetch(DBselect('SELECT work_period FROM config'));
+				$this->assertEquals($work_period, $result['work_period']);
+				break;
+			case TEST_BAD:
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+				$this->zbxTestTextPresent($msg);
+				break;
+		}
 	}
 }

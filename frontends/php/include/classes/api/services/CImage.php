@@ -63,15 +63,15 @@ class CImage extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'select_image'				=> null,
 			'editable'					=> null,
-			'countOutput'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -150,7 +150,7 @@ class CImage extends CApiService {
 			}
 		}
 
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 		return $result;
@@ -561,7 +561,7 @@ class CImage extends CApiService {
 	 * @return array				The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			if ($options['output'] == API_OUTPUT_EXTEND) {
 				$options['output'] = ['imageid', 'imagetype', 'name'];
 			}

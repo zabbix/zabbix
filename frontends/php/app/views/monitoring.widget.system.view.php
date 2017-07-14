@@ -22,7 +22,7 @@
 $table = make_system_status($data['filter'], 'zabbix.php?action=dashboard.view');
 
 $output = [
-	'header' => _('System status'),
+	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];

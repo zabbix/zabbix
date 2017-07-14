@@ -73,6 +73,7 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertItems(array $items) {
 		foreach ($items as &$item) {
+			// Item preprocessing.
 			$item['preprocessing'] = [];
 
 			if ($item['data_type'] != ITEM_DATA_TYPE_DECIMAL) {
@@ -107,6 +108,25 @@ class C32ImportConverter extends CConverter {
 			if (!$item['preprocessing']) {
 				unset($item['preprocessing']);
 			}
+
+			// Merge delay_flex into delay separated by a semicolon.
+			$item['delay'] = (string) $item['delay'];
+			if ($item['delay_flex'] !== '') {
+				$item['delay'] .= ';'.$item['delay_flex'];
+			}
+			unset($item['delay_flex']);
+
+			// Convert to days.
+			$item['history'] = (string) $item['history'];
+			if ($item['history'] != 0) {
+				$item['history'] .= 'd';
+			}
+			$item['trends'] = (string) $item['trends'];
+			if ($item['trends'] != 0) {
+				$item['trends'] .= 'd';
+			}
+
+			$item['jmx_endpoint'] = ($item['type'] == ITEM_TYPE_JMX) ? ZBX_DEFAULT_JMX_ENDPOINT : '';
 		}
 		unset($item);
 
@@ -122,8 +142,22 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertDiscoveryRules(array $discovery_rules) {
 		foreach ($discovery_rules as &$discovery_rule) {
-			$discovery_rule['item_prototypes'] =
-				$this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['jmx_endpoint'] = ($discovery_rule['type'] == ITEM_TYPE_JMX)
+				? ZBX_DEFAULT_JMX_ENDPOINT
+				: '';
+
+			// Merge delay_flex into delay separated by a semicolon.
+			$discovery_rule['delay'] = (string) $discovery_rule['delay'];
+			if ($discovery_rule['delay_flex'] !== '') {
+				$discovery_rule['delay'] .= ';'.$discovery_rule['delay_flex'];
+			}
+			unset($discovery_rule['delay_flex']);
+
+			// Convert to days.
+			if (ctype_digit($discovery_rule['lifetime']) && $discovery_rule['lifetime'] != 0) {
+				$discovery_rule['lifetime'] .= 'd';
+			}
 		}
 		unset($discovery_rule);
 
@@ -138,9 +172,28 @@ class C32ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertMaps(array $maps) {
+		$default_shape = [
+			'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
+			'x' => DB::getDefault('sysmap_shape', 'x'),
+			'y' => DB::getDefault('sysmap_shape', 'y'),
+			'height' => 15,
+			'text' => '{MAP.NAME}',
+			'font' => DB::getDefault('sysmap_shape', 'font'),
+			'font_size' => DB::getDefault('sysmap_shape', 'font_size'),
+			'font_color' => DB::getDefault('sysmap_shape', 'font_color'),
+			'text_halign' => DB::getDefault('sysmap_shape', 'text_halign'),
+			'text_valign' => DB::getDefault('sysmap_shape', 'text_valign'),
+			'border_type' => DB::getDefault('sysmap_shape', 'border_type'),
+			'border_width' => DB::getDefault('sysmap_shape', 'border_width'),
+			'border_color' => DB::getDefault('sysmap_shape', 'border_color'),
+			'background_color' => DB::getDefault('sysmap_shape', 'background_color'),
+			'zindex' => DB::getDefault('sysmap_shape', 'zindex')
+		];
+
 		foreach ($maps as &$map) {
 			$map['selements'] = $this->convertMapElements($map['selements']);
-			$map['shapes'] = [];
+			$map['shapes'] = [['width' => $map['width']] + $default_shape];
+			$map['lines'] = [];
 		}
 		unset($map);
 
@@ -156,7 +209,18 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertMapElements(array $selements) {
 		foreach ($selements as &$selement) {
-			$selement['elements'] = [$selement['element']];
+			if (zbx_is_int($selement['elementtype'])) {
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_HOST:
+					case SYSMAP_ELEMENT_TYPE_MAP:
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$selement['elements'] = [$selement['element']];
+						break;
+				}
+			}
+
+			unset($selement['element']);
 		}
 		unset($selement);
 

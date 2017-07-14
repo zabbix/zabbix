@@ -66,26 +66,30 @@ $itemFormList->addRow(_('Key'), [
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
-	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
+	$interfacesComboBox = new CComboBox('interfaceid', $data['interfaceid']);
 
-	// set up interface groups
-	$interfaceGroups = [];
-	foreach (zbx_objectValues($this->data['interfaces'], 'type') as $interfaceType) {
-		$interfaceGroups[$interfaceType] = new COptGroup(interfaceType2str($interfaceType));
+	// Set up interface groups sorted by priority.
+	$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
+	$interface_groups = [];
+	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
+		if (in_array($interface_type, $interface_types)) {
+			$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
+		}
 	}
 
 	// add interfaces to groups
 	foreach ($this->data['interfaces'] as $interface) {
-		$option = new CComboItem(
-			$interface['interfaceid'],
-			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
-			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
+		$option = new CComboItem($interface['interfaceid'],
+			$interface['useip']
+				? $interface['ip'].' : '.$interface['port']
+				: $interface['dns'].' : '.$interface['port'],
+			($interface['interfaceid'] == $data['interfaceid'])
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
-		$interfaceGroups[$interface['type']]->addItem($option);
+		$interface_groups[$interface['type']]->addItem($option);
 	}
-	foreach ($interfaceGroups as $interfaceGroup) {
-		$interfacesComboBox->addItem($interfaceGroup);
+	foreach ($interface_groups as $interface_group) {
+		$interfacesComboBox->addItem($interface_group);
 	}
 
 	$span = (new CSpan(_('No interface found')))
@@ -94,7 +98,7 @@ if (!empty($this->data['interfaces'])) {
 		->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], 'interface_row');
-	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
+	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
 	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $this->data['limited'], 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
@@ -160,6 +164,10 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
+$itemFormList->addRow(_('JMX endpoint'),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'row_jmx_endpoint'
+);
 $itemFormList->addRow(_('User name'),
 	(new CTextBox('username', $this->data['username'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_username'
@@ -185,8 +193,8 @@ $itemFormList->addRow(_('SQL query'),
 	'label_params'
 );
 
-$itemFormList->addRow(_('Update interval (in sec)'),
-	(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+$itemFormList->addRow(_('Update interval'),
+	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_delay'
 );
 
@@ -198,28 +206,28 @@ $delayFlexTable = (new CTable())
 
 foreach ($data['delay_flex'] as $i => $delay_flex) {
 	$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
-		->addValue(_('Flexible'), ITEM_DELAY_FLEX_TYPE_FLEXIBLE)
-		->addValue(_('Scheduling'), ITEM_DELAY_FLEX_TYPE_SCHEDULING)
+		->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+		->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 		->setModern(true);
 
-	if ($delay_flex['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
-		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', $delay_flex['delay'], 5, false, true, false))
-			->setAttribute('placeholder', 50);
-		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], false, 255))
+	if ($delay_flex['type'] == ITEM_DELAY_FLEXIBLE) {
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay']))
+			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT);
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period']))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
-		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', false, 255))
-			->setAttribute('placeholder', 'wd1-5h9-18')
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', ''))
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
 			->setAttribute('style', 'display: none;');
 	}
 	else {
-		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', '', 5, false, true, false))
-			->setAttribute('placeholder', 50)
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', ''))
+			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
 			->setAttribute('style', 'display: none;');
-		$period_input = (new CTextBox('delay_flex['.$i.'][period]', '', false, 255))
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', ''))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
 			->setAttribute('style', 'display: none;');
-		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule'], false, 255))
-			->setAttribute('placeholder', 'wd1-5h9-18');
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule']))
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
 	}
 
 	$button = (new CButton('delay_flex['.$i.'][remove]', _('Remove')))
@@ -239,8 +247,8 @@ $itemFormList->addRow(_('Custom intervals'),
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 		'row_flex_intervals'
 	)
-	->addRow(_('Keep lost resources period (in days)'),
-		(new CTextBox('lifetime', $this->data['lifetime'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	->addRow(_('Keep lost resources period'),
+		(new CTextBox('lifetime', $data['lifetime']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Allowed hosts'),
 		(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

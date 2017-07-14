@@ -52,12 +52,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'source' => 'name',
 			'method' => 'resolveGraph'
 		],
-		'screenElementURL' => [
+		'widgetURL' => [
 			'types' => ['host', 'hostId', 'interfaceWithoutPort', 'user'],
 			'source' => 'url',
 			'method' => 'resolveTexts'
 		],
-		'screenElementURLUser' => [
+		'widgetURLUser' => [
 			'types' => ['user'],
 			'source' => 'url',
 			'method' => 'resolveTexts'
@@ -1517,6 +1517,65 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Resolve item delay macros, item history and item trend macros.
+	 *
+	 * @param array  $data
+	 * @param string $data[n]['hostid']
+	 * @param string $data[n][<sources>]  see options['source']
+	 * @param array  $options
+	 * @param array  $options['sources']  an array of the field names
+	 *
+	 * @return array
+	 */
+	public function resolveTimeUnitMacros(array $data, array $options) {
+		$usermacros = [];
+		$macro_values = [];
+
+		$types = [
+			'usermacros' => true
+		];
+
+		// Find macros.
+		foreach ($data as $key => $value) {
+			$texts = [];
+			foreach ($options['sources'] as $source) {
+				$texts[] = $value[$source];
+			}
+
+			$matched_macros = $this->extractMacros($texts, $types);
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$key] = [
+					'hostids' => array_key_exists('hostid', $value) ? [$value['hostid']] : [],
+					'macros' => $matched_macros['usermacros']
+				];
+			}
+		}
+
+		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
+			$macro_values[$key] = array_key_exists($key, $macro_values)
+				? array_merge($macro_values[$key], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		$types = $this->transformToPositionTypes($types);
+
+		// Replace macros to value.
+		foreach (array_keys($macro_values) as $key) {
+			foreach ($options['sources'] as $source) {
+				$matched_macros = $this->getMacroPositions($data[$key][$source], $types);
+
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$data[$key][$source] =
+						substr_replace($data[$key][$source], $macro_values[$key][$macro], $pos, strlen($macro));
+				}
+			}
+		}
+
+		return $data;
 	}
 
 	/**

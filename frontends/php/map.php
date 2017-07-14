@@ -28,17 +28,23 @@ $page['type'] = PAGE_TYPE_JSON;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$map_data = CMapHelper::get(getRequest('sysmapid'), getRequest('severity_min'));
+$map_data = CMapHelper::get(getRequest('sysmapid'), ['severity_min' => getRequest('severity_min')]);
 
-/* no need to get all data */
+// No need to get all data.
 $options = [
 	'canvas' => $map_data['canvas'],
 	'background' => $map_data['background'],
 	'elements' => $map_data['elements'],
 	'links' => $map_data['links'],
 	'shapes' => $map_data['shapes'],
+	'label_location' => $map_data['label_location'],
 	'timestamp' => $map_data['timestamp']
 ];
+
+if ($map_data['id'] == -1) {
+	$options['timestamp'] = null;
+	$options['homepage'] = null;
+}
 
 echo CJs::encodeJson($options);
 

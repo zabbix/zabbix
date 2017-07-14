@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
+
 class CControllerProblemView extends CController {
 
 	protected function init() {
@@ -180,11 +182,7 @@ class CControllerProblemView extends CController {
 		$groups = [];
 
 		if ($filter_groupids) {
-			$groups = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter_groupids,
-				'preservekeys' => true
-			]), ['groupid' => 'id']);
+			$filter_groupids = getSubGroups($filter_groupids, $groups);
 		}
 
 		$filter_triggers = $filter_triggerids

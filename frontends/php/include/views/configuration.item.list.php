@@ -77,15 +77,23 @@ $this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($
 	'sources' => ['expression', 'recovery_expression']
 ]);
 
+$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
 	if (!empty($item['template_host'])) {
-		$description[] = (new CLink(CHtml::encode($item['template_host']['name']),
-			'?hostid='.$item['template_host']['hostid'].'&filter_set=1'
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
+		if (array_key_exists($item['template_host']['hostid'], $data['writable_templates'])) {
+			$description[] = (new CLink(CHtml::encode($item['template_host']['name']),
+				'?hostid='.$item['template_host']['hostid'].'&filter_set=1'
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$description[] = (new CSpan(CHtml::encode($item['template_host']['name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
 		$description[] = NAME_DELIMITER;
 	}
 
@@ -138,27 +146,40 @@ foreach ($this->data['items'] as $item) {
 
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
-		$triggerDescription = [];
+		$trigger_description = [];
+
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$triggerDescription[] = (new CSpan('HOST'))->addClass(ZBX_STYLE_GREY);
-				$triggerDescription[] = ':';
+				$trigger_description[] = (new CSpan('HOST'))->addClass(ZBX_STYLE_GREY);
+				$trigger_description[] = ':';
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = (new CLink(
-					CHtml::encode($realHost['name']),
-					'triggers.php?hostid='.$realHost['hostid']))
-					->addClass(ZBX_STYLE_GREY);
-				$triggerDescription[] = ':';
+
+				if (array_key_exists($realHost['hostid'], $data['writable_templates'])) {
+					$trigger_description[] = (new CLink(CHtml::encode($realHost['name']),
+						'triggers.php?hostid='.$realHost['hostid']
+					))->addClass(ZBX_STYLE_GREY);
+				}
+				else {
+					$trigger_description[] = (new CSpan(CHtml::encode($realHost['name'])))->addClass(ZBX_STYLE_GREY);
+				}
+
+				$trigger_description[] = ':';
 			}
 		}
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		$triggerDescription[] = new CLink(CHtml::encode($trigger['description']),
-			'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
-		);
+		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
+		}
+		else {
+			$trigger_description[] = new CLink(
+				CHtml::encode($trigger['description']),
+				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
+			);
+		}
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -178,7 +199,7 @@ foreach ($this->data['items'] as $item) {
 
 		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $this->data['config']),
-			$triggerDescription,
+			$trigger_description,
 			$expression,
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
@@ -232,6 +253,18 @@ foreach ($this->data['items'] as $item) {
 		$menuIcon = '';
 	}
 
+	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+		$item['trends'] = '';
+	}
+
+	// hide zeroes for trapper and SNMP trap items
+	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+		$item['delay'] = '';
+	}
+	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+		$item['delay'] = $update_interval_parser->getDelay();
+	}
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$menuIcon,
@@ -239,9 +272,9 @@ foreach ($this->data['items'] as $item) {
 		$description,
 		$triggerInfo,
 		CHtml::encode($item['key_']),
-		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
-		$item['history']._x('d', 'day short'),
-		($item['trends'] !== '') ? $item['trends']._x('d', 'day short') : '',
+		$item['delay'],
+		$item['history'],
+		$item['trends'],
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,

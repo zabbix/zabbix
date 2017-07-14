@@ -76,3 +76,38 @@ dist-hook:
 	cp $(srcdir)/modules/dummy/*.c $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/Makefile $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/README $(distdir)/modules/dummy/
+
+## CUnit test support
+TEST_COMMENT = "embedded unit tests - remove before commit"
+TEST_LIBDIR = libs/zbxcunit
+TEST_SUITESFILE = $(TEST_LIBDIR)/cu_modules.h
+TEST_SRCFILES = `grep $(TEST_COMMENT) * -rl | grep "\.c$$"`
+TEST_TESTFILES = `find -name *_test.c`
+TEST_DECLARE = "ZBX_CU_DECLARE" 
+
+$(TEST_SUITESFILE):
+	echo 'const char *cu_modules[]={' > $(TEST_SUITESFILE)
+	for file in $(TEST_TESTFILES); do								\
+		if [ -f "$${file%_test.c}.c" ]; then							\
+			echo "#include \"$${file##*/}\" //$(TEST_COMMENT)" >> "$${file%_test.c}.c"	;\
+			grep $(TEST_DECLARE) $${file} | while read line; do				\
+				funcname=$${line##*(}							;\
+				echo "\"$${funcname%%)*}\"," >> $(TEST_SUITESFILE)			;\
+			done										;\
+		fi											;\
+	done
+	echo 'NULL};' >> $(TEST_SUITESFILE)
+
+test: $(TEST_SUITESFILE) 
+	$(MAKE) $(AM_MAKEFLAGS) CFLAGS="$(CFLAGS) -rdynamic -DZBX_CUNIT" CUNIT_LDADD="-lcunit"
+
+clean-test:
+	rm -rf $(TEST_SUITESFILE)
+	for file in $(TEST_SRCFILES); do		\
+		sed -i /$(TEST_COMMENT)/d $$file;	\
+	done
+ 
+clean-local: clean-test
+
+.PHONY: test clean-test
+

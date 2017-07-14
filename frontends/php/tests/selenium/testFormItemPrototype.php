@@ -763,7 +763,8 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		if ($type == 'JMX agent' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'jmx[<object name>,<attribute name>]');
+			$this->zbxTestAssertElementValue('key', '');
+			$this->zbxTestAssertElementNotPresentXpath("//button[@id='keyButton'][@disabled]");
 		}
 
 		if ($type == 'SNMPv3 agent') {
@@ -1046,16 +1047,16 @@ class testFormItemPrototype extends CWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 			case 'Calculated':
-				$this->zbxTestTextPresent('Update interval (in sec)');
+				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 5);
+				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($itemid)) {
-					$this->zbxTestAssertElementValue('delay', 30);
+					$this->zbxTestAssertElementValue('delay', '30s');
 				}
 				break;
 			default:
-				$this->zbxTestTextNotVisibleOnPage('Update interval (in sec)');
+				$this->zbxTestTextNotVisibleOnPage('Update interval');
 				$this->zbxTestAssertNotVisibleId('delay');
 		}
 
@@ -1120,11 +1121,11 @@ class testFormItemPrototype extends CWebTest {
 				$this->zbxTestTextPresent(['Custom intervals', 'Interval',  'Period', 'Action']);
 				$this->zbxTestAssertVisibleId('delayFlexTable');
 
-				$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval (in sec)']);
+				$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval']);
 				$this->zbxTestAssertVisibleId('delay_flex_0_delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 5);
+				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 255);
 				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', 50);
+				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', '50s');
 
 				$this->zbxTestAssertVisibleId('delay_flex_0_period');
 				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'maxlength', 255);
@@ -1142,26 +1143,26 @@ class testFormItemPrototype extends CWebTest {
 				$this->zbxTestAssertNotVisibleId('interval_add');
 		}
 
-		$this->zbxTestTextPresent('History storage period (in days)');
+		$this->zbxTestTextPresent('History storage period');
 		$this->zbxTestAssertVisibleId('history');
-		$this->zbxTestAssertAttribute("//input[@id='history']", 'maxlength', 8);
+		$this->zbxTestAssertAttribute("//input[@id='history']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='history']", 'size', 20);
-		$this->zbxTestAssertElementValue('history', 90);
+		$this->zbxTestAssertElementValue('history', '90d');
 		if (!isset($itemid)) {
-			$this->zbxTestAssertElementValue('history', 90);
+			$this->zbxTestAssertElementValue('history', '90d');
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->zbxTestTextPresent('Trend storage period (in days)');
+			$this->zbxTestTextPresent('Trend storage period');
 			$this->zbxTestAssertVisibleId('trends');
-			$this->zbxTestAssertAttribute("//input[@id='trends']", 'maxlength', 8);
+			$this->zbxTestAssertAttribute("//input[@id='trends']", 'maxlength', 255);
 			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('trends', 365);
+				$this->zbxTestAssertElementValue('trends', '365d');
 			}
 			$this->zbxTestAssertAttribute("//input[@id='trends']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Trend storage period (in days)');
+			$this->zbxTestTextNotVisibleOnPage('Trend storage period');
 			$this->zbxTestAssertNotVisibleId('trends');
 		}
 
@@ -1368,7 +1369,7 @@ class testFormItemPrototype extends CWebTest {
 					'delay' => '-30',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
+						'Field "Update interval" is not correct: a time unit is expected'
 					]
 				]
 			],
@@ -1379,9 +1380,9 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => 86401,
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1396,7 +1397,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid interval "50/": unexpected end of interval.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1411,7 +1412,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid interval "50/1-11,00:00-24:00": incorrect syntax near "1,00:00-24:00".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1426,7 +1427,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect time period "1-7,00:00-25:00".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1441,7 +1442,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1757,10 +1758,14 @@ class testFormItemPrototype extends CWebTest {
 			// History
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-empty',
-					'history' => ''
+					'history' => ' ',
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+							'Incorrect value for field "history": a time unit is expected.'
+					]
 				]
 			],
 			// History
@@ -1769,10 +1774,23 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
-					'history' => 65536,
-					'error_msg' => 'Page received incorrect data',
+					'history' => 3599,
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value "65536" for "History storage period" field: must be between 0 and 65535.'
+						'Incorrect value for field "history": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// History
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item history',
+					'key' => 'item-history-test',
+					'history' => 788400001,
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+						'Incorrect value for field "history": must be between "3600" and "788400000".'
 					]
 				]
 			],
@@ -1783,21 +1801,23 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => '-1',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value "-1" for "History storage period" field: must be between 0 and 65535.'
+							'Incorrect value for field "history": a time unit is expected.'
 					]
 				]
 			],
 			// Trends
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-empty',
-					'trends' => '',
-					'dbCheck' => true,
-					'formCheck' => true
+					'trends' => ' ',
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+							'Incorrect value for field "trends": a time unit is expected.'
+					]
 				]
 			],
 			// Trends
@@ -1807,9 +1827,9 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => '-1',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value "-1" for "Trend storage period" field: must be between 0 and 65535.'
+							'Incorrect value for field "trends": a time unit is expected.'
 					]
 				]
 			],
@@ -1819,10 +1839,23 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
-					'trends' => 65536,
-					'error_msg' => 'Page received incorrect data',
+					'trends' => 3599,
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value "65536" for "Trend storage period" field: must be between 0 and 65535.'
+							'Incorrect value for field "trends": must be between "86400" and "788400000".'
+					]
+				]
+			],
+			// Trends
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item trends',
+					'key' => 'item-trends-test',
+					'trends' => 788400001,
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+							'Incorrect value for field "trends": must be between "86400" and "788400000".'
 					]
 				]
 			],
@@ -2195,9 +2228,9 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
-					'error_msg' => 'Cannot add item prototype',
+					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+							'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			]
@@ -2487,7 +2520,7 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item prototype left trim',
 					'key' => 'item-prototype-empty-left-trim',
 					'preprocessing' => [
-						['type' => 'Left trim ', 'params' => ''],
+						['type' => 'Left trim', 'params' => ''],
 					],
 					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -2499,6 +2532,29 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'item-prototype-empty-trim',
 					'preprocessing' => [
 						['type' => 'Trim', 'params' => ''],
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
+			// Structured data
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item XML XPath',
+					'key' => 'item-empty-xpath',
+					'preprocessing' => [
+						['type' => 'XML XPath', 'params' => ''],
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item JSON Path',
+					'key' => 'item-empty-jsonpath',
+					'preprocessing' => [
+						['type' => 'JSON Path', 'params' => ''],
 					],
 					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -2544,10 +2600,10 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item prototype two delta',
 					'key' => 'item-prototype-two-delta',
 					'preprocessing' => [
-						['type' => 'Delta'],
-						['type' => 'Delta']
+						['type' => 'Simple change'],
+						['type' => 'Simple change']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -2556,10 +2612,10 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item prototype two delta per second',
 					'key' => 'item-prototype-two-delta-per-second',
 					'preprocessing' => [
-						['type' => 'Delta per second'],
-						['type' => 'Delta per second']
+						['type' => 'Change per second'],
+						['type' => 'Change per second']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -2568,10 +2624,10 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item prototype two different delta',
 					'key' => 'item-prototype-two-different-delta',
 					'preprocessing' => [
-						['type' => 'Delta'],
-						['type' => 'Delta per second']
+						['type' => 'Simple change'],
+						['type' => 'Change per second']
 					],
-					'error' => 'Only one "Delta" step is allowed.'
+					'error' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -2581,14 +2637,14 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'item.prototype.preprocessing',
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'params' => '123'],
 						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
 						['type' => 'Boolean to decimal'],
 						['type' => 'Octal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Delta']
+						['type' => 'Simple change']
 					]
 				]
 			],
@@ -2599,8 +2655,10 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'item.prototype.symbols.preprocessing',
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => '1a!@#$%^&*()-='],
-						['type' => 'Left trim ', 'params' => '2b!@#$%^&*()-='],
+						['type' => 'Left trim', 'params' => '2b!@#$%^&*()-='],
 						['type' => 'Trim', 'params' => '3c!@#$%^&*()-='],
+						['type' => 'XML XPath', 'params' => '3c!@#$%^&*()-='],
+						['type' => 'JSON Path', 'params' => '3c!@#$%^&*()-='],
 						['type' => 'Custom multiplier', 'params' => '4e+10'],
 						['type' => 'Regular expression', 'params' => '5d!@#$%^&*()-=', 'output' => '6e!@#$%^&*()-=']
 					]
@@ -2614,10 +2672,14 @@ class testFormItemPrototype extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => 'abc'],
 						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Left trim ', 'params' => 'def'],
-						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
+						['type' => 'XML XPath', 'params' => '1a2b3c'],
+						['type' => 'XML XPath', 'params' => '1a2b3c'],
+						['type' => 'JSON Path', 'params' => '1a2b3c'],
+						['type' => 'JSON Path', 'params' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'params' => '123'],
 						['type' => 'Custom multiplier', 'params' => '123'],
 						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
@@ -2628,7 +2690,7 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Octal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Delta per second']
+						['type' => 'Change per second']
 					]
 				]
 			]
@@ -2690,6 +2752,8 @@ class testFormItemPrototype extends CWebTest {
 						case 'Right trim':
 						case 'Left trim ':
 						case 'Trim':
+						case 'XML XPath':
+						case 'JSON Path':
 							$this->assertEquals($options['params'], $dbParams[$key]);
 							break;
 						case 'Regular expression':

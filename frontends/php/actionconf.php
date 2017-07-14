@@ -47,10 +47,8 @@ $fields = [
 											]),
 											'isset({add}) || isset({update})'
 										],
-	'formula' =>						[T_ZBX_STR, O_OPT, null,   null,		'isset({add}) || isset({update})'],
-	'esc_period' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null,
-											_('Default operation step duration')
-										],
+	'formula' =>						[T_ZBX_STR, O_OPT, null,	null,	'isset({add}) || isset({update})'],
+	'esc_period' =>						[T_ZBX_STR, O_OPT, null,	null,	null, _('Default operation step duration')],
 	'status' =>							[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 											null
 										],
@@ -149,7 +147,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$action = [
 		'name' => getRequest('name'),
 		'status' => getRequest('status', ACTION_STATUS_DISABLED),
-		'esc_period' => getRequest('esc_period', 0),
+		'esc_period' => getRequest('esc_period', DB::getDefault('actions', 'esc_period')),
 		'def_shortdata' => getRequest('def_shortdata', ''),
 		'def_longdata' => getRequest('def_longdata', ''),
 		'r_shortdata' => getRequest('r_shortdata', ''),
@@ -615,7 +613,7 @@ if (hasRequest('form')) {
 	}
 	else {
 		$data['action']['name'] = getRequest('name');
-		$data['action']['esc_period'] = getRequest('esc_period', SEC_PER_HOUR);
+		$data['action']['esc_period'] = getRequest('esc_period', DB::getDefault('actions', 'esc_period'));
 		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['operations'] = getRequest('operations', []);
 		$data['action']['recovery_operations'] = getRequest('recovery_operations', []);
@@ -701,7 +699,7 @@ if (hasRequest('form')) {
 	if ($data['new_operation'] && !is_array($data['new_operation'])) {
 		$data['new_operation'] = [
 			'operationtype' => OPERATION_TYPE_MESSAGE,
-			'esc_period' => 0,
+			'esc_period' => '0',
 			'esc_step_from' => 1,
 			'esc_step_to' => 1,
 			'evaltype' => 0

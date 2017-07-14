@@ -28,24 +28,25 @@ class CScreenMap extends CScreenBase {
 	 */
 	public function get() {
 		$severity = null;
+
 		if (array_key_exists('severity_min', $this->screenitem)) {
 			$severity = $this->screenitem['severity_min'];
 		}
 
-		$mapData = CMapHelper::get($this->screenitem['resourceid'], $severity);
-		$mapData['container'] = "#map_{$this->screenitem['screenitemid']}";
-		$this->insertFlickerfreeJs($mapData);
+		$map_data = CMapHelper::get($this->screenitem['resourceid'], ['severity_min' => $severity]);
+		$map_data['container'] = '#map_'.$this->screenitem['screenitemid'];
+		$this->insertFlickerfreeJs($map_data);
 
 		$output = [
 			(new CDiv())
 				->setId('map_'.$this->screenitem['screenitemid'])
-				->addStyle('width:'.$mapData['canvas']['width'].'px;')
-				->addStyle('height:'.$mapData['canvas']['height'].'px;')
-				->addStyle('overflow:hidden;')
+				->addStyle('width: '.$map_data['canvas']['width'].'px;')
+				->addStyle('height: '.$map_data['canvas']['height'].'px;')
+				->addStyle('overflow: hidden;')
 		];
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$output += [BR(), new CLink(_('Change'), $this->action)];
+			$output += [BR(), new CLink(_x('Change', 'verb'), $this->action)];
 		}
 
 		$div = (new CDiv($output))

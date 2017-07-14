@@ -35,7 +35,7 @@ static int	DBmodify_proxy_table_id_field(const char *table_name)
 #ifdef HAVE_POSTGRESQL
 	const ZBX_FIELD	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type(table_name, &field);
+	return DBmodify_field_type(table_name, &field, NULL);
 #else
 	ZBX_UNUSED(table_name);
 	return SUCCEED;
@@ -172,7 +172,7 @@ static int	DBpatch_2010008(void)
 {
 	const ZBX_FIELD	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("triggers", &field);
+	return DBmodify_field_type("triggers", &field, NULL);
 }
 
 static int	DBpatch_2010009(void)
@@ -1310,7 +1310,8 @@ static int	DBpatch_2010158(void)
 					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
@@ -1359,7 +1360,8 @@ static int	DBpatch_2010164(void)
 					{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"parent_interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
@@ -1391,7 +1393,8 @@ static int	DBpatch_2010167(void)
 					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
@@ -1434,7 +1437,8 @@ static int	DBpatch_2010172(void)
 					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
@@ -1550,21 +1554,21 @@ static int	DBpatch_2010181(void)
 {
 	const ZBX_FIELD	field = {"ip", "127.0.0.1", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("interface", &field);
+	return DBmodify_field_type("interface", &field, NULL);
 }
 
 static int	DBpatch_2010182(void)
 {
 	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("sysmaps_elements", &field);
+	return DBmodify_field_type("sysmaps_elements", &field, NULL);
 }
 
 static int	DBpatch_2010183(void)
 {
 	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("sysmaps_links", &field);
+	return DBmodify_field_type("sysmaps_links", &field, NULL);
 }
 
 static int	DBpatch_2010184(void)
