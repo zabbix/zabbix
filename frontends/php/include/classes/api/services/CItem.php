@@ -591,14 +591,14 @@ class CItem extends CItemGeneral {
 		$dependent_items = [];
 		$db_dependent_items = $delItems;
 
-		do {
+		while ($db_dependent_items) {
 			$db_dependent_items = $this->get([
 				'output'		=> ['itemid', 'master_itemid'],
-				'filter'		=> ['master_itemid' => array_keys($db_dependent_items)],
+				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
 				'preservekeys'	=> true
 			]);
 			$dependent_items = $dependent_items + $db_dependent_items;
-		} while ($db_dependent_items);
+		};
 
 		foreach ($dependent_items as $dependent_item) {
 			if (!array_key_exists($dependent_item['itemid'], $delItems)) {
