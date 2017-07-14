@@ -2196,6 +2196,29 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_current_event_value                                          *
+ *                                                                            *
+ * Purpose: request current event value by macro                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_current_event_value(const char *macro, const DB_EVENT *event, char **replace_to)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
+	{
+		if (0 == strcmp(macro, MVAR_EVENT_STATUS))
+		{
+			*replace_to = zbx_strdup(*replace_to,
+					zbx_event_value_string(event->source, event->object, event->value));
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
+		{
+			*replace_to = zbx_dsprintf(*replace_to, "%d", event->value);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_event_value                                                  *
  *                                                                            *
  * Purpose: request event value by macro                                      *
@@ -2219,31 +2242,19 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	{
 		*replace_to = zbx_strdup(*replace_to, zbx_time2str(event->clock));
 	}
-	else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
+	else if (EVENT_SOURCE_TRIGGERS == event->source)
 	{
-		if (0 == strcmp(macro, MVAR_EVENT_STATUS))
+		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY))
 		{
-			*replace_to = zbx_strdup(*replace_to,
-					zbx_event_value_string(event->source, event->object, event->value));
+			get_event_ack_history(event, replace_to);
 		}
-		else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
+		else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
 		{
-			*replace_to = zbx_dsprintf(*replace_to, "%d", event->value);
+			*replace_to = zbx_strdup(*replace_to, event->acknowledged ? "Yes" : "No");
 		}
-		else if (EVENT_SOURCE_TRIGGERS == event->source)
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
 		{
-			if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY))
-			{
-				get_event_ack_history(event, replace_to);
-			}
-			else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
-			{
-				*replace_to = zbx_strdup(*replace_to, event->acknowledged ? "Yes" : "No");
-			}
-			else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
-			{
-				get_event_tags(event, replace_to);
-			}
+			get_event_tags(event, replace_to);
 		}
 	}
 }
@@ -2675,6 +2686,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
+				{
+					get_current_event_value(m, c_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
