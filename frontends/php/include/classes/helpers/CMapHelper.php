@@ -92,6 +92,10 @@ class CMapHelper {
 				$options['severity_min'] = $map['severity_min'];
 			}
 
+			if (!ctype_digit($options['severity_min'])) {
+				$options['severity_min'] = null;
+			}
+
 			self::resolveMapState($map, $options, $theme);
 		}
 
