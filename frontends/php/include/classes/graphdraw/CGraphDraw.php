@@ -137,6 +137,14 @@ abstract class CGraphDraw {
 		$this->sizeY = $value;
 	}
 
+	public function getWidth() {
+		return $this->sizeX;
+	}
+
+	public function getHeight() {
+		return $this->sizeY;
+	}
+
 	public function getLastValue($num) {
 		$data = &$this->data[$this->items[$num]['itemid']][$this->items[$num]['calc_type']];
 
