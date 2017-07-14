@@ -137,7 +137,9 @@ $dashboard_data = [
 	'dynamic'	=> $data['dynamic']
 ];
 $dashboard_options = [
-	'fullscreen' => $data['fullscreen']
+	'fullscreen' => $data['fullscreen'],
+	'columns' => DASHBOARD_COLUMNS,
+	'max-rows' => DASHBOARD_MAX_ROWS
 ];
 if ($data['dashboard']['dashboardid'] != 0) {
 	$dashboard_data['id'] = $data['dashboard']['dashboardid'];

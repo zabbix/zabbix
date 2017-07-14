@@ -237,6 +237,11 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$grid_widgets = [];
 
 		foreach ($widgets as $widget) {
+			// TODO: better solution would be to create this widget in it's place and size with warning about error
+			if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
+				continue;
+			}
+
 			$widgetid = $widget['widgetid'];
 			$default_rf_rate = CWidgetConfig::getDefaultRfRate($widget['type']);
 
