@@ -135,7 +135,7 @@ class testFormUserProfile extends CWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => ' ',
-				'error_msg' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+				'error_msg' => 'Invalid parameter "/1/refresh": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -232,7 +232,7 @@ class testFormUserProfile extends CWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => ' ',
-				'error_msg' => 'Invalid parameter "/1/autologout": a time unit is expected.'
+				'error_msg' => 'Invalid parameter "/1/autologout": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,
