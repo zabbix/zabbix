@@ -25,13 +25,14 @@ require_once dirname(__FILE__).'/maps.inc.php';
 require_once dirname(__FILE__).'/users.inc.php';
 
 /**
- * @param array  $filter['groupids']          (optional)
- * @param array  $filter['exclude_groupids']  (optional)
- * @param array  $filter['hostids']           (optional)
- * @param string $filter['problem']           (optional)
- * @param array  $filter['severities']        (optional)
- * @param array  $filter['maintenance']       (optional)
- * @param int    $filter['ext_ack']           (optional)
+ * @param array  $filter['groupids']           (optional)
+ * @param array  $filter['exclude_groupids']   (optional)
+ * @param array  $filter['hostids']            (optional)
+ * @param string $filter['problem']            (optional)
+ * @param array  $filter['severities']         (optional)
+ * @param int    $filter['maintenance']        (optional)
+ * @param int    $filter['hide_empty_groups']  (optional)
+ * @param int    $filter['ext_ack']            (optional)
  * @param string $backurl
  * @param int    $fullscreen
  *
@@ -47,6 +48,7 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 		? $filter['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 	$filter_maintenance = array_key_exists('maintenance', $filter) ? $filter['maintenance'] : 1;
+	$filter_hide_empty_groups = array_key_exists('hide_empty_groups', $filter) ? $filter['hide_empty_groups'] : 0;
 	$filter_ext_ack = array_key_exists('ext_ack', $filter) ? $filter['ext_ack'] : EXTACK_OPTION_ALL;
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
@@ -105,6 +107,7 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 
 	foreach ($groups as &$group) {
 		$group['tab_priority'] = $def_tab_priority;
+		$group['has_problems'] = false;
 	}
 	unset($group);
 
@@ -189,6 +192,8 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
 			}
+
+			$groups[$group['groupid']]['has_problems'] = true;
 		}
 	}
 	unset($triggers);
@@ -206,6 +211,10 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 	}
 
 	foreach ($groups as $group) {
+		if ($filter_hide_empty_groups && !$group['has_problems']) {
+			continue;
+		}
+
 		$groupRow = new CRow();
 
 		$url_group->setArgument('filter_groupids', [$group['groupid']]);

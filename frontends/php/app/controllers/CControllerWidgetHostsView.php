@@ -42,13 +42,14 @@ class CControllerWidgetHostsView extends CController {
 		if ($ret) {
 			/*
 			 * @var array        $fields
-			 * @var array|string $fields['groupids']          (optional)
-			 * @var array|string $fields['exclude_groupids']  (optional)
-			 * @var array|string $fields['hostids']           (optional)
-			 * @var string       $fields['problem']           (optional)
-			 * @var array        $fields['severities']        (optional)
-			 * @var int          $fields['maintenance']       (optional)
-			 * @var int          $fields['ext_ack']           (optional)
+			 * @var array|string $fields['groupids']           (optional)
+			 * @var array|string $fields['exclude_groupids']   (optional)
+			 * @var array|string $fields['hostids']            (optional)
+			 * @var string       $fields['problem']            (optional)
+			 * @var array        $fields['severities']         (optional)
+			 * @var int          $fields['maintenance']        (optional)
+			 * @var int          $fields['hide_empty_groups']  (optional)
+			 * @var int          $fields['ext_ack']            (optional)
 			 */
 			$this->form = CWidgetConfig::getForm(WIDGET_HOST_STATUS, $this->getInput('fields', []));
 
@@ -319,6 +320,7 @@ class CControllerWidgetHostsView extends CController {
 				'problem' => $fields['problem'],
 				'severities' => $filter_severities,
 				'maintenance' => $fields['maintenance'],
+				'hide_empty_groups' => $fields['hide_empty_groups'],
 				'ext_ack' => $fields['ext_ack']
 			],
 			'config' => [

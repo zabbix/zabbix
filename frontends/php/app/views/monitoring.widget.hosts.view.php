@@ -53,6 +53,10 @@ foreach ($data['groups'] as $group) {
 		continue;
 	}
 
+	if ($data['filter']['hide_empty_groups'] && $data['hosts_data'][$group['groupid']]['problematic'] == 0) {
+		continue;
+	}
+
 	$group_row = new CRow();
 
 	$url_group->setArgument('filter_groupids', [$group['groupid']]);

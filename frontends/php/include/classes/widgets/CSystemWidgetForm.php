@@ -76,6 +76,14 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_maintenance;
 
+		// Hide groups without problems
+		$field_hide_empty_groups = new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems'));
+
+		if (array_key_exists('hide_empty_groups', $data)) {
+			$field_hide_empty_groups->setValue($data['hide_empty_groups']);
+		}
+		$this->fields[] = $field_hide_empty_groups;
+
 		// Problem display
 		$field_ext_ack = (new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [
 			EXTACK_OPTION_ALL => _('All'),
