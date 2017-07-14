@@ -45,7 +45,8 @@ class CWidgetConfig {
 			WIDGET_URL					=> _('URL'),
 			WIDGET_ACTION_LOG			=> _('Action log'),
 			WIDGET_DATA_OVERVIEW		=> _('Data overview'),
-			WIDGET_TRIG_OVERVIEW		=> _('Trigger overview')
+			WIDGET_TRIG_OVERVIEW		=> _('Trigger overview'),
+			WIDGET_PLAIN_TEXT			=> _('Plain text')
 		];
 	}
 
@@ -75,7 +76,8 @@ class CWidgetConfig {
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
 			WIDGET_ACTION_LOG			=> ['width' => 6, 'height' => 5],
 			WIDGET_DATA_OVERVIEW		=> ['width' => 6, 'height' => 5],
-			WIDGET_TRIG_OVERVIEW		=> ['width' => 6, 'height' => 5]
+			WIDGET_TRIG_OVERVIEW		=> ['width' => 6, 'height' => 5],
+			WIDGET_PLAIN_TEXT			=> ['width' => 6, 'height' => 4]
 		];
 	}
 
@@ -120,6 +122,7 @@ class CWidgetConfig {
 			case WIDGET_ACTION_LOG:
 			case WIDGET_DATA_OVERVIEW:
 			case WIDGET_TRIG_OVERVIEW:
+			case WIDGET_PLAIN_TEXT:
 				return SEC_PER_MIN;
 
 			case WIDGET_ZABBIX_STATUS:
@@ -172,6 +175,9 @@ class CWidgetConfig {
 
 			case WIDGET_PROBLEMS:
 				return new CProblemsWidgetForm($data);
+
+			case WIDGET_PLAIN_TEXT:
+				return new CPlainTextWidgetForm($data);
 
 			default:
 				// TODO VM: delete this case after all widget forms will be created
