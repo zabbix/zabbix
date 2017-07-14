@@ -34,6 +34,33 @@ $script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJs
 	. 'timeControl.processObjects();'
 	. 'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
 
+if ($data['widget']['initial_load'] === 1) {
+	$script .=
+		'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
+			'function zbx_graph_widget_resize_end(img_id) {'.
+				'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
+					'new_width = content.width(),'.
+					'new_height = content.height();'.
+				'var src = jQuery("#"+img_id).attr("src");'.
+				'if (src.search("&outer=") == -1) {'.
+					'src = src + "&outer=1";'.
+				'}'.
+				'else {'.
+					'src = src.replace(/&outer=\d+/,"&outer=1");'.
+				'}'.
+				'src = src.replace(/width=\d+/,"width="+new_width);'.
+				'src = src.replace(/height=\d+/,"height="+new_height);'.
+				'jQuery("#"+img_id).attr("src", src);'.
+			'}'.
+		'}'.
+		'zbx_graph_widget_resize_end("'.$data['graph']['dataid'].'");'. // resizes graph first time
+		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd", '.
+			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
+				'parameters: ["'.$data['graph']['dataid'].'"],'.
+			'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
+		'});';
+}
+
 $output = [
 	'header' => $data['name'],
 	'body' => $flickerfree_item->toString(),

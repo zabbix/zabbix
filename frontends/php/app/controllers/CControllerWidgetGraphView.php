@@ -29,6 +29,7 @@ class CControllerWidgetGraphView extends CController {
 		$fields = [
 			'name' =>				'string',
 			'uniqueid' =>			'required|string',
+			'initial_load' =>		'in 0,1',
 			'dashboardid' =>		'required|db dashboard.dashboardid',
 			'fields' =>				'required|array',
 			'dynamic_groupid' =>	'db groups.groupid', // TODO VM: probably not needed
@@ -254,19 +255,23 @@ class CControllerWidgetGraphView extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_GRAPH]),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
 			'graph' => [
 				'graphid' => $data['graphid'],
 				'dataid' => $dataid,
 				'containerid' => $containerid,
 				'timestamp' => time()
 			],
+			'widget' => [
+				'uniqueid' => $data['uniqueid'],
+				'initial_load' => (int) $this->getInput('initial_load', 1),
+			],
 			'timeline' => $timeline,
 			'time_control_data' => $time_control_data,
 			'is_default' => $is_default,
-			'fs_data' => $fs_data
+			'fs_data' => $fs_data,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		]));
 	}
 }

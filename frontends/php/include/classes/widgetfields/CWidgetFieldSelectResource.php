@@ -88,7 +88,8 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				break;
 
 			case WIDGET_FIELD_SELECT_RES_GRAPH:
-				$url .= '&real_hosts=1&with_graphs=1';
+				$url->setArgument('real_hosts', '1');
+				$url->setArgument('with_graphs', '1');
 				break;
 		}
 
