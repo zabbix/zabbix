@@ -2522,13 +2522,16 @@ class CConfigurationImport {
 					if (array_key_exists($host_key, $resolved_masters_cache)
 							&& array_key_exists($master_key, $resolved_masters_cache[$host_key])) {
 						$entity = $resolved_masters_cache[$host_key][$master_key];
-						$traversal_path[] = $master_key;
-						if ($entity['type'] == ITEM_TYPE_DEPENDENT && $entity[$master_key_identifier]
-								&& $master_key == $entity[$master_key_identifier]['key']) {
+
+						if (in_array($master_key, $traversal_path) || ($entity['type'] == ITEM_TYPE_DEPENDENT
+								&& $entity[$master_key_identifier]
+								&& $master_key == $entity[$master_key_identifier]['key'])) {
 							throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 								_('dependent item recursion')
 							));
 						}
+
+						$traversal_path[] = $master_key;
 						$level++;
 					}
 					else {
