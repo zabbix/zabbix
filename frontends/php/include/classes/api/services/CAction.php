@@ -2030,16 +2030,15 @@ class CAction extends CApiService {
 				'preservekeys' => true
 			]);
 
+			foreach ($result as &$action) {
+				$action['acknowledgeOperations'] = [];
+			}
+
 			$ack_operations = $this->getAcknowledgeOperations($ack_operations, $options['selectAcknowledgeOperations']);
 
 			foreach ($ack_operations as $ack_operation) {
 				$actionid = $ack_operation['actionid'];
 				unset($ack_operation['actionid']);
-
-				if (!array_key_exists('acknowledgeOperations', $result[$actionid])) {
-					$result[$actionid]['acknowledgeOperations'] = [];
-				}
-
 				$result[$actionid]['acknowledgeOperations'][] = $ack_operation;
 			}
 		}
