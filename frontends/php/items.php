@@ -1156,6 +1156,8 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
  * Display
  */
 if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'), 'update', 'clone'])) {
+	$master_item_options = [];
+
 	if (hasRequest('itemid')) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
@@ -1180,29 +1182,37 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		unset($step);
 
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-			$master_items = API::Item()->get([
+			$master_item_options = [
 				'itemids'	=> $item['master_itemid'],
 				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
-			]);
-			$item['master_item'] = reset($master_items);
+			];
 		}
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output' => ['status'],
-			'hostids' => getRequest('hostid'),
-			'templated_hosts' => true
+			'output'			=> ['status'],
+			'hostids'			=> getRequest('hostid'),
+			'templated_hosts'	=> true
 		]);
 		$item = [];
 		$host = $hosts[0];
 
 		if ($host && getRequest('master_itemid')) {
-			$master_items = API::Item()->get([
+			$master_item_options = [
 				'itemids'	=> getRequest('master_itemid'),
 				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_'],
 				'filter'	=> ['hostid' => $host['hostid']]
-			]);
+			];
+		}
+	}
+
+	if ($master_item_options) {
+		$master_items = API::Item()->get($master_item_options);
+		if ($master_items) {
 			$item['master_item'] = reset($master_items);
+		}
+		else {
+			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
 		}
 	}
 

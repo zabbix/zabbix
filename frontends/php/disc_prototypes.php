@@ -517,6 +517,8 @@ elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelet
  */
 if (isset($_REQUEST['form'])) {
 	$itemPrototype = [];
+	$master_prototype_options = [];
+
 	if (hasRequest('itemid')) {
 		$itemPrototype = API::ItemPrototype()->get([
 			'itemids' => getRequest('itemid'),
@@ -535,27 +537,38 @@ if (isset($_REQUEST['form'])) {
 			$step['params'] = explode("\n", $step['params']);
 		}
 		unset($step);
+
 		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
-			$master_prototypes = API::ItemPrototype()->get([
+			$master_prototype_options = [
 				'itemids'	=> $itemPrototype['master_itemid'],
 				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
-			]);
-			$itemPrototype['master_item'] = reset($master_prototypes);
+			];
 		}
 	}
 	elseif (getRequest('master_itemid') && getRequest('parent_discoveryid')) {
 		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['hostid'],
-			'itemids' => getRequest('parent_discoveryid'),
-			'editable' => true
+			'output'	=> ['hostid'],
+			'itemids'	=> getRequest('parent_discoveryid'),
+			'editable'	=> true
 		]);
+
 		if ($discovery_rule) {
-			$master_prototypes = API::ItemPrototype()->get([
-				'itemids' => getRequest('master_itemid'),
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'filter' => ['hostid' => $discovery_rule[0]['hostid']]
-			]);
+			$master_prototype_options = [
+				'itemids'	=> getRequest('master_itemid'),
+				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'filter'	=> ['hostid' => $discovery_rule[0]['hostid']]
+			];
+		}
+	}
+
+	if ($master_prototype_options) {
+		$master_prototypes = API::ItemPrototype()->get($master_prototype_options);
+
+		if ($master_prototypes) {
 			$itemPrototype['master_item'] = reset($master_prototypes);
+		}
+		else {
+			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
