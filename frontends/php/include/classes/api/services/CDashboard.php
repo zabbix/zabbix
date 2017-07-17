@@ -780,6 +780,20 @@ class CDashboard extends CApiService {
 			])
 			: [];
 
+		$userids = [];
+
+		foreach ($db_dashboard_users as $db_dashboard_user) {
+			$userids[$db_dashboard_user['userid']] = true;
+		}
+
+		// get list of accessible users
+		$db_users = $userids
+			? API::User()->get([
+				'output' => [],
+				'preservekeys' => true
+			])
+			: [];
+
 		$ins_dashboard_users = [];
 		$upd_dashboard_users = [];
 		$del_dashboard_userids = [];
@@ -798,7 +812,7 @@ class CDashboard extends CApiService {
 
 				unset($dashboards_users[$dashboardid][$userid]);
 			}
-			else {
+			elseif (array_key_exists($userid, $db_users)) {
 				$del_dashboard_userids[] = $db_dashboard_user['dashboard_userid'];
 			}
 		}
@@ -858,6 +872,20 @@ class CDashboard extends CApiService {
 			])
 			: [];
 
+		$usrgrpids = [];
+
+		foreach ($db_dashboard_usrgrps as $db_dashboard_usrgrp) {
+			$usrgrpids[$db_dashboard_usrgrp['usrgrpid']] = true;
+		}
+
+		// get list of accessible user groups
+		$db_usrgrps = $usrgrpids
+			? API::UserGroup()->get([
+				'output' => [],
+				'preservekeys' => true
+			])
+			: [];
+
 		$ins_dashboard_usrgrps = [];
 		$upd_dashboard_usrgrps = [];
 		$del_dashboard_usrgrpids = [];
@@ -876,7 +904,7 @@ class CDashboard extends CApiService {
 
 				unset($dashboards_usrgrps[$dashboardid][$usrgrpid]);
 			}
-			else {
+			elseif (array_key_exists($usrgrpid, $db_usrgrps)) {
 				$del_dashboard_usrgrpids[] = $db_dashboard_usrgrp['dashboard_usrgrpid'];
 			}
 		}
