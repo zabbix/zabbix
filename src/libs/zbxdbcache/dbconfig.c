@@ -4281,7 +4281,7 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_init(&func_sync, mode);
 	zbx_dbsync_init(&expr_sync, mode);
 	zbx_dbsync_init(&action_sync, mode);
-	zbx_dbsync_init(&action_op_sync, mode); //TODO: check it
+	zbx_dbsync_init(&action_op_sync, mode);
 	zbx_dbsync_init(&action_condition_sync, mode);
 	zbx_dbsync_init(&trigger_tag_sync, mode);
 	zbx_dbsync_init(&correlation_sync, mode);
@@ -4607,7 +4607,6 @@ void	DCsync_configuration(unsigned char mode)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
 				__function_name, action_sec, action_sec2, action_sync.add_num, action_sync.update_num,
 				action_sync.remove_num);
-		//TODO: refactoring name
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() operations : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
 				__function_name, action_op_sec, action_op_sec2, action_op_sync.add_num,
 				action_op_sync.update_num, action_op_sync.remove_num);
