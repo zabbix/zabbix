@@ -3,6 +3,7 @@ Changes for 3.4.0alpha2
 New features:
 
 Bug fixes:
+........S. [ZBX-12357] fixed missing user macro substitution in expression of newly added triggers (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.0alpha1
