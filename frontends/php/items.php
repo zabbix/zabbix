@@ -1741,7 +1741,7 @@ else {
 
 	foreach ($data['items'] as $item) {
 		if (array_key_exists('template_host', $item)) {
-			$hostids = array_merge($hostids, zbx_objectValues($item['template_host'], 'itemid'));
+			$hostids = array_merge($hostids, zbx_objectValues($item['template_host'], 'hostid'));
 		}
 	}
 
