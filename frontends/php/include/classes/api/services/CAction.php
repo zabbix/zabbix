@@ -3033,11 +3033,14 @@ class CAction extends CApiService {
 							|| array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
 						$ack_operation['eventsource'] = $db_action['eventsource'];
-						if (array_key_exists('operationid', $ack_operation) &&
-								array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
+
+						if (array_key_exists('operationid', $ack_operation)
+								&& array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 							$db_ack_operation = $db_ack_operations[$ack_operation['operationid']];
-							// As documentation defines field 'operationtype' is required.
+
+							// Field 'operationtype' is required.
 							unset($db_ack_operation['operationtype']);
+
 							$ack_operation += $db_ack_operation;
 						}
 
