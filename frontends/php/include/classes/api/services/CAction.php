@@ -543,13 +543,13 @@ class CAction extends CApiService {
 						));
 					}
 
-					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
-							$operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+							|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
 						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
 							? $operation['opmessage']
 							: [];
 
-						if (array_key_exists('default_msg', $message) && (string)$message['default_msg'] == '1') {
+						if (array_key_exists('default_msg', $message) && $message['default_msg'] == 1) {
 							$message['subject'] = $action['r_shortdata'];
 							$message['message'] = $action['r_longdata'];
 						}
@@ -574,13 +574,13 @@ class CAction extends CApiService {
 						));
 					}
 
-					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
-							$operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
 						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
 							? $operation['opmessage']
 							: [];
 
-						if (array_key_exists('default_msg', $message) && (string)$message['default_msg'] == '1') {
+						if (array_key_exists('default_msg', $message) && $message['default_msg'] == 1) {
 							$message['subject'] = $action['ack_shortdata'];
 							$message['message'] = $action['ack_longdata'];
 						}
@@ -824,8 +824,8 @@ class CAction extends CApiService {
 					$ack_operation['actionid'] = $action['actionid'];
 
 					if (!array_key_exists('operationid', $ack_operation)) {
-						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
-								$ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
+								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
 							$opmessage += [
 								'default_msg'	=> 0,
 								'mediatypeid'	=> 0,
@@ -833,7 +833,7 @@ class CAction extends CApiService {
 								'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
 							];
 
-							if ((string)$opmessage['default_msg'] == '1') {
+							if ($opmessage['default_msg'] == 1) {
 								$opmessage['subject'] = array_key_exists('ack_shortdata', $action)
 									? $action['ack_shortdata']
 									: $db_action['ack_shortdata'];
@@ -848,14 +848,14 @@ class CAction extends CApiService {
 						$operations_to_create[] = $ack_operation;
 					}
 					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
-						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE ||
-								$ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
+								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
 							$db_opmessage = $db_ack_operations[$ack_operation['operationid']]['opmessage'];
 							$default_msg = array_key_exists('default_msg', $opmessage)
-								? (string)$opmessage['default_msg']
+								? $opmessage['default_msg']
 								: $db_opmessage['default_msg'];
 
-							if ($default_msg == '1') {
+							if ($default_msg == 1) {
 								$opmessage['subject'] = array_key_exists('ack_shortdata', $action)
 									? $action['ack_shortdata']
 									: $db_action['ack_shortdata'];
@@ -868,7 +868,8 @@ class CAction extends CApiService {
 
 						$operations_to_update[] = $ack_operation;
 						unset($db_ack_operations[$ack_operation['operationid']]);
-					} else {
+					}
+					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
 							$ack_operation['operationid'], 'operationid'
 						));
@@ -1601,6 +1602,10 @@ class CAction extends CApiService {
 
 		$required_fields = ['eventsource', 'recovery', 'operationtype'];
 
+		$default_msg_validator = new CLimitedSetValidator([
+			'values' => [0, 1]
+		]);
+
 		foreach ($operations as $operation) {
 			foreach ($required_fields as $field) {
 				if (!array_key_exists($field, $operation)) {
@@ -1672,8 +1677,8 @@ class CAction extends CApiService {
 						$all_mediatypeids[$message['mediatypeid']] = true;
 					}
 
-					if (array_key_exists('default_msg', $message) &&
-							(string)$message['default_msg'] !== '0' && (string)$message['default_msg'] !== '1') {
+					if (array_key_exists('default_msg', $message)
+							&& (!$default_msg_validator->validate($message['default_msg']))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
 							$message['default_msg'], 'default_msg', 0, 1
@@ -1713,9 +1718,9 @@ class CAction extends CApiService {
 								);
 							}
 
-							if (!array_key_exists('username', $operation['opcommand']) ||
-									!is_string($operation['opcommand']['username']) ||
-									$operation['opcommand']['username'] == '') {
+							if (!array_key_exists('username', $operation['opcommand'])
+									|| !is_string($operation['opcommand']['username'])
+									|| $operation['opcommand']['username'] == '') {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication user name specified for action operation command "%s".',
 										$operation['opcommand']['command']
@@ -1748,9 +1753,9 @@ class CAction extends CApiService {
 							}
 							break;
 						case ZBX_SCRIPT_TYPE_TELNET:
-							if (!array_key_exists('username', $operation['opcommand']) ||
-									!is_string($operation['opcommand']['username']) ||
-									$operation['opcommand']['username'] == '') {
+							if (!array_key_exists('username', $operation['opcommand'])
+									|| !is_string($operation['opcommand']['username'])
+									|| $operation['opcommand']['username'] == '') {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication user name specified for action operation command "%s".',
 										$operation['opcommand']['command']
