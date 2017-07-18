@@ -1331,16 +1331,20 @@ abstract class CItemGeneral extends CApiService {
 							$item['master_itemid'] != $db_items[$item['itemid']]['master_itemid']) {
 						$itemid = $item['itemid'];
 						$old_master_itemid = $db_items[$itemid]['master_itemid'];
+						--$dependency_level;
 
 						if (!array_key_exists($master_itemid, $items_added)) {
-							$items_added[$master_itemid] = [];
+							$items_added[$master_itemid] = [$dependency_level => []];
 						}
-						$items_added[$master_itemid][$itemid] = true;
+						elseif (!array_key_exits($dependency_level, $items_added[$master_itemid])) {
+							$items_added[$master_itemid][$dependency_level] = [];
+						}
+						$items_added[$master_itemid][$dependency_level][$itemid] = $itemid;
 
 						if (!array_key_exists($old_master_itemid, $items_moved)) {
 							$items_moved[$old_master_itemid] = [];
 						}
-						$items_moved[$old_master_itemid][$itemid] = true;
+						$items_moved[$old_master_itemid][$itemid] = $itemid;
 					}
 					elseif (!array_key_exists('itemid', $item)) {
 						$items_created[$master_itemid] = array_key_exists($master_itemid, $items_created)
@@ -1354,35 +1358,34 @@ abstract class CItemGeneral extends CApiService {
 		// Validate every root mater items childrens count.
 		foreach (array_keys($root_items) as $root_itemid) {
 			$dependency_level = 0;
+			$find_itemids = [$root_itemid => $dependency_level];
 			$items_count = array_key_exists($root_itemid, $items_created)
 				? $items_created[$root_itemid]
 				: 0;
 
-			$find_itemids = [$root_itemid => true];
-			if (array_key_exists($root_itemid, $items_added)) {
-				$find_itemids += $items_added[$root_itemid];
-			}
-
-			do {
-				if ($find_itemids) {
-					$find_itemids = $data_provider->get([
-						'output' => ['itemid'],
-						'filter' => ['master_itemid' => array_keys($find_itemids)],
-						'preservekeys' => true
-					]);
-					$items_count = $items_count + count($find_itemids);
-					// If item was moved to another master item, do not count moved item (and its dependent items)
-					// in old master dependent items count calculation.
-					$ignoreids = array_intersect_key($find_itemids, $items_moved);
-					$find_itemids = array_diff_key($find_itemids, $ignoreids);
-					++$dependency_level;
+			while ($find_itemids && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+				if (array_key_exists($root_itemid, $items_added)
+						&& array_key_exists($dependency_level, $items_added[$root_itemid])) {
+					$find_itemids += $items_added[$root_itemid][$dependency_level];
 				}
+				$find_itemids = $data_provider->get([
+					'output'		=> ['itemid'],
+					'filter' 		=> ['master_itemid' => array_keys($find_itemids)],
+					'preservekeys'	=> true
+				]);
+				$items_count = $items_count + count($find_itemids);
+				// If item was moved to another master item, do not count moved item (and its dependent items)
+				// in old master dependent items count calculation.
+				$ignoreids = array_intersect_key($find_itemids, $items_moved);
+				$find_itemids = array_diff_key($find_itemids, $ignoreids);
+				++$dependency_level;
+
 				if ($items_count > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _('maximum dependent items count reached')
 					));
 				}
-			} while ($find_itemids);
+			};
 
 			if ($find_itemids && $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
