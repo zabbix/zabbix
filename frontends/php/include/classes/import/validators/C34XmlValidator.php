@@ -148,7 +148,7 @@ class C34XmlValidator {
 							]],
 							'interface_ref' =>			['type' => XML_STRING],
 							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
-							'master_item' =>			['type' => XML_ARRAY, 'prefix' => 'master_item', 'rules' => [
+							'master_item' =>			['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
 								'key' =>					['type' => XML_STRING]
 							]]
 						]]
@@ -246,7 +246,7 @@ class C34XmlValidator {
 									]],
 									'interface_ref' =>			['type' => XML_STRING],
 									'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
-									'master_item_prototype' =>	['type' => XML_ARRAY, 'prefix' => 'master_item_prototype', 'rules' => [
+									'master_item_prototype' =>	['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
 										'key' =>					['type' => XML_STRING]
 									]]
 								]]
@@ -554,7 +554,7 @@ class C34XmlValidator {
 							]],
 							'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
 							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
-							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
+							'master_item' =>			['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
 								'key' =>					['type' => XML_STRING]
 							]]
 						]]
@@ -650,7 +650,7 @@ class C34XmlValidator {
 									]],
 									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
 									'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
-									'master_item_prototype' =>	['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item_prototype', 'rules' => [
+									'master_item_prototype' =>	['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item_prototype', 'rules' => [
 										'key' =>					['type' => XML_STRING]
 									]]
 								]]
@@ -1345,7 +1345,7 @@ class C34XmlValidator {
 	 */
 	public function validateMasterItem($data, array $parent_data = null, $path) {
 		$prefix = substr(strrchr($path, '/'), 1);
-		$rules = ['type' => XML_ARRAY, 'prefix' => $prefix, 'rules' => ['key' => ['type' => XML_STRING]]];
+		$rules = ['type' => XML_ARRAY | XML_REQUIRED, 'prefix' => $prefix, 'rules' => ['key' => ['type' => XML_STRING]]];
 
 		if ($parent_data['type'] == ITEM_TYPE_DEPENDENT) {
 			$rules['rules']['key']['type'] |= XML_REQUIRED;
