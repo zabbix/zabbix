@@ -405,6 +405,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
+	else if (0 == strcmp(param, "disk"))
+		zbx_proc_stat = ZBX_PROC_STAT_IOWAIT;
+	else if (0 == strcmp(param, "trace"))
+		zbx_proc_stat = ZBX_PROC_STAT_TRACE;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -476,6 +480,14 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				break;
 			case ZBX_PROC_STAT_ZOMB:
 				if (proc[i].ZBX_PROC_STAT == SZOMB)
+					stat_ok = 1;
+				break;
+			case ZBX_PROC_STAT_IOWAIT
+				if (SSLEEP == proc[i].ZBX_PROC_STAT && !(proc[i].ZBX_PROC_FLAG & TDF_SINTR))
+					stat_ok = 1;
+				break;
+			case ZBX_PROC_STAT_TRACE:
+				if (SSTOP == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			}
