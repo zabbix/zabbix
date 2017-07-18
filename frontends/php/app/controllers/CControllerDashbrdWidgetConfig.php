@@ -84,26 +84,37 @@ class CControllerDashbrdWidgetConfig extends CController {
 	 * @return array
 	 */
 	private function getCaptions($form) {
-		// TODO VM: (?) currently it will have both, numeric and textual keys. Also, ones will come from defines, others will not.
-		//				(maybe it is good to add 'groups' to defines as well? Or maybe it can be improved, not to mix different key types.
-		$captions = [];
+		$captions = ['simple' => [], 'ms' => []];
 
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldSelectResource) {
-				if (!array_key_exists($field->getResourceType(), $captions)) {
-					$captions[$field->getResourceType()] = [];
+				$resource_type = $field->getResourceType();
+				$id = $field->getValue();
+
+				if (!array_key_exists($resource_type, $captions['simple'])) {
+					$captions['simple'][$resource_type] = [];
 				}
-				if ($field->getValue() != 0) {
-					$captions[$field->getResourceType()][$field->getValue()] = true;
+
+				if ($id != 0) {
+					switch ($resource_type) {
+						case WIDGET_FIELD_SELECT_RES_ITEM:
+							$captions['simple'][$resource_type][$id] = _('Inaccessible item');
+							break;
+
+						case WIDGET_FIELD_SELECT_RES_SYSMAP:
+							$captions['simple'][$resource_type][$id] = _('Inaccessible map');
+							break;
+					}
 				}
 			}
 		}
 
-		foreach ($captions as $resource => $list) {
+		foreach ($captions['simple'] as $resource_type => &$list) {
 			if (!$list) {
 				continue;
 			}
-			switch ($resource) {
+
+			switch ($resource_type) {
 				case WIDGET_FIELD_SELECT_RES_ITEM:
 					$items = API::Item()->get([
 						'output' => ['itemid', 'hostid', 'key_', 'name'],
@@ -116,7 +127,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 						$items = CMacrosResolverHelper::resolveItemNames($items);
 
 						foreach ($items as $key => $item) {
-							$captions[$resource][$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+							$list[$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
 						}
 					}
 					break;
@@ -129,31 +140,42 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 					if ($maps) {
 						foreach ($maps as $key => $map) {
-							$captions[$resource][$map['sysmapid']] = $map['name'];
+							$list[$map['sysmapid']] = $map['name'];
 						}
 					}
 					break;
 			}
 		}
+		unset($list);
 
-		// Prepare data for CMultiselect controls.
+		// Prepare data for CMultiSelect controls.
 		$groupids = [];
 		$hostids = [];
 
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldGroup) {
 				$field_name = $field->getName();
-				$captions['groups'][$field_name] = [];
+				$captions['ms']['groups'][$field_name] = [];
 
 				foreach ($field->getValue() as $groupid) {
+					$captions['ms']['groups'][$field_name][$groupid] = [
+						'id' => $groupid,
+						'name' => _('Inaccessible group'),
+						'inaccessible' => true
+					];
 					$groupids[$groupid][] = $field_name;
 				}
 			}
 			elseif ($field instanceof CWidgetFieldHost) {
 				$field_name = $field->getName();
-				$captions['hosts'][$field_name] = [];
+				$captions['ms']['hosts'][$field_name] = [];
 
 				foreach ($field->getValue() as $hostid) {
+					$captions['ms']['hosts'][$field_name][$hostid] = [
+						'id' => $hostid,
+						'name' => _('Inaccessible host'),
+						'inaccessible' => true
+					];
 					$hostids[$hostid][] = $field_name;
 				}
 			}
@@ -168,10 +190,8 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 			foreach ($groups as $groupid => $group) {
 				foreach ($groupids[$groupid] as $field_name) {
-					$captions['groups'][$field_name][] = [
-						'id' => $groupid,
-						'name' => $group['name']
-					];
+					$captions['ms']['groups'][$field_name][$groupid]['name'] = $group['name'];
+					unset($captions['ms']['groups'][$field_name][$groupid]['inaccessible']);
 				}
 			}
 		}
@@ -185,10 +205,8 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 			foreach ($hosts as $hostid => $host) {
 				foreach ($hostids[$hostid] as $field_name) {
-					$captions['hosts'][$field_name][] = [
-						'id' => $hostid,
-						'name' => $host['name']
-					];
+					$captions['ms']['hosts'][$field_name][$hostid]['name'] = $host['name'];
+					unset($captions['ms']['hosts'][$field_name][$hostid]['inaccessible']);
 				}
 			}
 		}
