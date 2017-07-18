@@ -88,8 +88,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
-
-	if (0 == strcmp(section, "kthr"))
+	else if (0 == strcmp(section, "kthr"))
 	{
 		if (0 == strcmp(type, "r"))
 			SET_DBL_RESULT(result, collector->vmstat.kthr_r);
