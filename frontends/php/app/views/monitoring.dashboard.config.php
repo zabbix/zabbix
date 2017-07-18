@@ -110,31 +110,12 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$form->addVar($field->getName(), $field->getValue());
 	}
 	elseif ($field instanceof CWidgetFieldSelectResource) {
-		$resource_type = $field->getResourceType();
-		$id = $field->getValue();
-
-		if (array_key_exists($id, $data['captions']['simple'][$resource_type])) {
-			if ($data['captions']['simple'][$resource_type][$id] !== null) {
-				$caption = $data['captions']['simple'][$resource_type][$id];
-			}
-			else {
-				switch ($resource_type) {
-					case WIDGET_FIELD_SELECT_RES_ITEM:
-						$caption = _('Inaccessible item');
-						break;
-
-					case WIDGET_FIELD_SELECT_RES_SYSMAP:
-						$caption = _('Inaccessible map');
-						break;
-				}
-			}
-		}
-		else {
-			$caption = '';
-		}
+		$caption = ($field->getValue() != 0)
+			? $data['captions']['simple'][$field->getResourceType()][$field->getValue()]
+			: '';
 
 		// needed for popup script
-		$form->addVar($field->getName(), $id);
+		$form->addVar($field->getName(), $field->getValue());
 		$form_list->addRow($field->getLabel(), [
 			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
