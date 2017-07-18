@@ -1196,6 +1196,10 @@ abstract class CItemGeneral extends CApiService {
 			]);
 
 			foreach ($db_items as $db_itemid => $db_item) {
+				if (array_key_exists('type', $items_cache[$db_itemid])
+						&& $items_cache[$db_itemid]['type'] != $db_item['type']) {
+					unset($db_item['master_itemid']);
+				}
 				$items_cache[$db_itemid] = $items_cache[$db_itemid] + $db_item;
 			}
 		}
