@@ -38,7 +38,7 @@
 
 #ifdef KERN_PROC2
 #	define ZBX_P_COMM	p_comm
-#	define ZBX_P_FLAG		p_flag
+#	define ZBX_P_FLAG	p_flag
 #	define ZBX_P_PID	p_pid
 #	define ZBX_P_STAT	p_stat
 #	define ZBX_P_VM_TSIZE	p_vm_tsize
@@ -46,7 +46,7 @@
 #	define ZBX_P_VM_SSIZE	p_vm_ssize
 #else
 #	define ZBX_P_COMM	kp_proc.p_comm
-#	define ZBX_P_FLAG		kp_proc.p_flag
+#	define ZBX_P_FLAG	kp_proc.p_flag
 #	define ZBX_P_PID	kp_proc.p_pid
 #	define ZBX_P_STAT	kp_proc.p_stat
 #	define ZBX_P_VM_TSIZE	kp_eproc.e_vm.vm_tsize
