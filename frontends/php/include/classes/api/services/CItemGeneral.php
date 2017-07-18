@@ -1204,6 +1204,18 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		foreach ($items as $item) {
+			if (array_key_exists('itemid', $item)) {
+				$item = $items_cache[$item['itemid']];
+			}
+
+			if ($item['type'] != ITEM_TYPE_DEPENDENT && array_key_exists('master_itemid', $item)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'master_itemid', _('field can not be set for not dependent items')
+				));
+			}
+		}
+
 		do {
 			if ($has_unresolved_masters) {
 				$db_masters = $data_provider->get([
