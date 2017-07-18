@@ -2203,17 +2203,14 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
  ******************************************************************************/
 static void	get_current_event_value(const char *macro, const DB_EVENT *event, char **replace_to)
 {
-	if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
+	if (0 == strcmp(macro, MVAR_EVENT_STATUS))
 	{
-		if (0 == strcmp(macro, MVAR_EVENT_STATUS))
-		{
-			*replace_to = zbx_strdup(*replace_to,
-					zbx_event_value_string(event->source, event->object, event->value));
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
-		{
-			*replace_to = zbx_dsprintf(*replace_to, "%d", event->value);
-		}
+		*replace_to = zbx_strdup(*replace_to,
+				zbx_event_value_string(event->source, event->object, event->value));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", event->value);
 	}
 }
 
