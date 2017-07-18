@@ -175,6 +175,18 @@ abstract class CItemGeneral extends CApiService {
 						_('No permissions to referred object or it does not exist!'));
 				}
 
+				if (array_key_exists('hostid', $item) && $dbItems[$item['itemid']]['hostid'] != $item['hostid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'hostid',
+						'can not be changed'
+					));
+				}
+
+				if (array_key_exists('ruleid', $item) && $dbItems[$item['itemid']]['ruleid'] != $item['ruleid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'ruleid',
+						'can not be changed'
+					));
+				}
+
 				$dbItem = $dbItems[$item['itemid']];
 
 				$itemName = isset($item['name']) ? $item['name'] : $dbItem['name'];
