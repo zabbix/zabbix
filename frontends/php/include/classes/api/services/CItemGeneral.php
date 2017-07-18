@@ -1389,4 +1389,39 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 	}
+
+	/**
+	 * Ensures that no dependent items will be left without master item after delete operation.
+	 *
+	 * @param array                $items_todelete          Array of items to be deleted, where key is itemid.
+	 * @param string               $items_todelete['name']	Item name, is used in exception message.
+	 * @param CItem|CItemPrototype $data_provider           Service used to get dependent items.
+	 *
+	 * @throws APIException if there are dependent items not marked for delete.
+	 */
+	protected function validateDeleteDependentItems($items_todelete, $data_provider) {
+		$dependent_items = [];
+		$db_dependent_items = $items_todelete;
+
+		while ($db_dependent_items) {
+			$db_dependent_items = $data_provider->get([
+				'output'		=> ['itemid', 'master_itemid', 'templateid'],
+				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+				'preservekeys'	=> true
+			]);
+			$dependent_items = $dependent_items + $db_dependent_items;
+		};
+
+		foreach ($dependent_items as $dependent_item) {
+			if (!array_key_exists($dependent_item['itemid'], $items_todelete)) {
+				$master_item = array_key_exists($dependent_item['master_itemid'], $items_todelete)
+					? $items_todelete[$dependent_item['master_itemid']]
+					: $items_todelete[$dependent_item['templateid']];
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" have dependent item and can not be removed.',
+					$master_item['name']
+				));
+			}
+		}
+	}
 }

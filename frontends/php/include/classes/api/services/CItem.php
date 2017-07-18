@@ -588,25 +588,6 @@ class CItem extends CItemGeneral {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-		$dependent_items = [];
-		$db_dependent_items = $delItems;
-
-		while ($db_dependent_items) {
-			$db_dependent_items = $this->get([
-				'output'		=> ['itemid', 'master_itemid'],
-				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
-				'preservekeys'	=> true
-			]);
-			$dependent_items = $dependent_items + $db_dependent_items;
-		};
-
-		foreach ($dependent_items as $dependent_item) {
-			if (!array_key_exists($dependent_item['itemid'], $delItems)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" have dependent item and can not be removed.',
-					$delItems[$dependent_item['master_itemid']]['name']
-				));
-			}
-		}
 
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
@@ -623,15 +604,21 @@ class CItem extends CItemGeneral {
 		}
 
 		// first delete child items
+		$dependent_items = $delItems;
 		$parentItemIds = $itemIds;
 		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemIds));
+			$dbItems = DBselect('SELECT i.itemid, i.name FROM items i WHERE '.dbConditionInt('i.templateid',
+				$parentItemIds
+			));
 			$parentItemIds = [];
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemIds[] = $dbItem['itemid'];
 				$itemIds[$dbItem['itemid']] = $dbItem['itemid'];
+				$dependent_items[$dbItem['itemid']] = ['name' => $dbItem['name']];
 			}
 		} while ($parentItemIds);
+
+		$this->validateDeleteDependentItems($dependent_items, $this);
 
 		// delete graphs, leave if graph still have item
 		$delGraphs = [];

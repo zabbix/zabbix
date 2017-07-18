@@ -759,14 +759,18 @@ class CItemPrototype extends CItemGeneral {
 		// first delete child items
 		$parentItemids = $prototypeids;
 		$childPrototypeids = [];
+		$dependent_itemprototypes = $delItemPrototypes;
 		do {
-			$dbItems = DBselect('SELECT itemid FROM items WHERE '.dbConditionInt('templateid', $parentItemids));
+			$dbItems = DBselect('SELECT itemid, name FROM items WHERE '.dbConditionInt('templateid', $parentItemids));
 			$parentItemids = [];
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
 				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
+				$dependent_itemprototypes[$dbItem['itemid']] = ['name' => $dbItem['name']];
 			}
 		} while ($parentItemids);
+
+		$this->validateDeleteDependentItems($dependent_itemprototypes, $this);
 
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
