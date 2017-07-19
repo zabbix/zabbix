@@ -66,14 +66,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (0 == (nparams = get_rparams_num(&request)))
-	{
-		error = zbx_strdup(error, "Invalid number of parameters.");
-		goto out;
-	}
-
-	/* NULL check to silence static analyzer warning */
-	if (NULL == (tmp = get_rparam(&request, 0)))
+	if (0 == (nparams = get_rparams_num(&request)) || NULL == (tmp = get_rparam(&request, 0)))
 	{
 		error = zbx_strdup(error, "Invalid number of parameters.");
 		goto out;
