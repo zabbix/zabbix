@@ -1336,7 +1336,7 @@ abstract class CItemGeneral extends CApiService {
 						if (!array_key_exists($master_itemid, $items_added)) {
 							$items_added[$master_itemid] = [$dependency_level => []];
 						}
-						elseif (!array_key_exits($dependency_level, $items_added[$master_itemid])) {
+						elseif (!array_key_exists($dependency_level, $items_added[$master_itemid])) {
 							$items_added[$master_itemid][$dependency_level] = [];
 						}
 						$items_added[$master_itemid][$dependency_level][$itemid] = $itemid;
