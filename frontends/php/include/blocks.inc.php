@@ -223,7 +223,7 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 		$groupRow->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
-			if ($data['count'] == 0) {
+			if ($data['count'] == 0 && $data['count_unack'] == 0) {
 				$groupRow->addItem('');
 				continue;
 			}
