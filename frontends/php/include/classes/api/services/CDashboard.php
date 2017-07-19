@@ -228,7 +228,6 @@ class CDashboard extends CApiService {
 			]]
 		]];
 
-
 		if (!CApiInputValidator::validate($api_input_rules, $dashboards, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
