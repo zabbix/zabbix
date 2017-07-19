@@ -138,7 +138,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 static int	zbx_popen(pid_t *pid, const char *command)
 {
 	const char	*__function_name = "zbx_popen";
-	int		fd[2];
+	int		fd[2], stdout_orig, stderr_orig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __function_name, command);
 
@@ -162,10 +162,8 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	}
 
 	/* child process */
+
 	close(fd[0]);
-	dup2(fd[1], STDOUT_FILENO);
-	dup2(fd[1], STDERR_FILENO);
-	close(fd[1]);
 
 	/* set the child as the process group leader, otherwise orphans may be left after timeout */
 	if (-1 == setpgid(0, 0))
@@ -177,10 +175,32 @@ static int	zbx_popen(pid_t *pid, const char *command)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __function_name);
 
+	/* preserve stdout and stderr to restore them in case execl() fails */
+
+	stdout_orig = dup(STDOUT_FILENO);
+	stderr_orig = dup(STDERR_FILENO);
+	fcntl(stdout_orig, F_SETFD, FD_CLOEXEC);
+	fcntl(stderr_orig, F_SETFD, FD_CLOEXEC);
+
+	/* redirect output right before script execution after all logging is done */
+
+	dup2(fd[1], STDOUT_FILENO);
+	dup2(fd[1], STDERR_FILENO);
+	close(fd[1]);
+
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
-	/* execl() returns only when an error occurs */
+	/* restore original stdout and stderr, because we don't want our output to be confused with script's output */
+
+	dup2(stdout_orig, STDOUT_FILENO);
+	dup2(stderr_orig, STDERR_FILENO);
+	close(stdout_orig);
+	close(stderr_orig);
+
+	/* this message may end up in stdout or stderr, that's why we needed to save and restore them */
 	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
+
+	/* execl() returns only when an error occurs, let parent process know about it */
 	exit(EXIT_FAILURE);
 }
 
