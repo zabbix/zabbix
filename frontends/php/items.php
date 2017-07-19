@@ -970,11 +970,16 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 		}
 
 		if ($items_to_update) {
-			foreach ($items_to_update as $index => $update_item) {
-				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_JMX) {
-					unset($items_to_update[$index]['jmx_endpoint']);
+			foreach ($items_to_update as &$update_item) {
+				$type = array_key_exists('type', $update_item)
+					? $update_item['type']
+					: $items[$update_item['itemid']]['type'];
+
+				if ($type != ITEM_TYPE_JMX) {
+					unset($update_item['jmx_endpoint']);
 				}
 			}
+			unset($update_item);
 
 			$result = API::Item()->update($items_to_update);
 		}
