@@ -2484,7 +2484,7 @@ class CConfigurationImport {
 
 			if ($find_ids) {
 				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-					_('maximum dependent items dependency level reached')
+					_('maximum number of dependency levels reached')
 				));
 			}
 
@@ -2543,7 +2543,7 @@ class CConfigurationImport {
 					if ($level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 						$traversal = '"'. implode('" => "', $traversal_path) . '"';
 						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-							_('maximum dependent items dependency level reached')
+							_('maximum number of dependency levels reached')
 						));
 					}
 				}
