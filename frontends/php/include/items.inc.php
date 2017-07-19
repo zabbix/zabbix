@@ -429,7 +429,7 @@ function findMasterWithMissingDependentItem($items, $data_provider) {
  * @return bool|string
  */
 function findDependentWithMissingMasterItem($items, $data_provider) {
-	$master_itemname = false;
+	$dependent_itemname = false;
 	$not_selected = [];
 	$db_master_items = $items;
 
@@ -458,12 +458,12 @@ function findDependentWithMissingMasterItem($items, $data_provider) {
 		if ($not_selected) {
 			$master_item = reset($not_selected);
 			$dependent_itemid = array_search(key($not_selected), $db_master_itemids);
-			$master_itemname = $items[$dependent_itemid]['name'];
+			$dependent_itemname = $items[$dependent_itemid]['name'];
 			break;
 		}
 	} while ($db_master_items);
 
-	return $master_itemname;
+	return $dependent_itemname;
 }
 
 /**
@@ -494,6 +494,22 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		return false;
 	}
 
+	$create_order = [];
+	$src_itemid_to_key = [];
+	foreach ($items as $itemid => $item) {
+		$dependency_level = 0;
+		$master_item = $item;
+		$src_itemid_to_key[$itemid] = $item['key_'];
+
+		while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_item = $items[$master_item['master_itemid']];
+			++$dependency_level;
+		}
+
+		$create_order[$itemid] = $dependency_level;
+	}
+	asort($create_order);
+
 	$dstHosts = API::Host()->get([
 		'output' => ['hostid', 'host', 'status'],
 		'selectInterfaces' => ['interfaceid', 'type', 'main'],
@@ -510,7 +526,25 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 				$interfaceids[$interface['type']] = $interface['interfaceid'];
 			}
 		}
-		foreach ($items as &$item) {
+
+		$itemkey_to_id = [];
+		$create_items = [];
+		$current_dependency = reset($create_order);
+
+		foreach ($create_order as $itemid => $dependency_level) {
+			if ($current_dependency != $dependency_level) {
+				$created_itemids = API::Item()->create($create_items);
+				$created_itemids = $created_itemids['itemids'];
+
+				foreach ($create_items as $index => $created_item) {
+					$itemkey_to_id[$created_item['key_']] = $created_itemids[$index];
+				}
+
+				$create_items = [];
+			}
+
+			$item = $items[$itemid];
+
 			if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 				$type = itemTypeInterface($item['type']);
 
@@ -538,11 +572,19 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 				zbx_objectValues($item['applications'], 'applicationid'),
 				$dstHost['hostid']
 			);
-		}
-		unset($item);
 
-		if (!API::Item()->create($items)) {
-			return false;
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$src_item_key = $src_itemid_to_key[$item['master_itemid']];
+				$item['master_itemid'] = $itemkey_to_id[$src_item_key];
+			}
+			else {
+				unset($item['master_itemid']);
+			}
+			$create_items[] = $item;
+		}
+
+		if ($create_items) {
+			API::Item()->create($create_items);
 		}
 	}
 
