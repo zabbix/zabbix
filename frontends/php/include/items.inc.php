@@ -536,8 +536,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 				$current_dependency = $dependency_level;
 				$created_itemids = API::Item()->create($create_items);
 
-				if (!array_key_exists('itemids', $created_itemids)) {
-					error(_s('Cannot create items on "%1$s".', $dstHost['host']));
+				if (!$created_itemids) {
 					return false;
 				}
 				$created_itemids = $created_itemids['itemids'];
@@ -590,7 +589,6 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		}
 
 		if ($create_items && !API::Item()->create($create_items)) {
-			error(_s('Cannot create items on "%1$s".', $dstHost['host']));
 			return false;
 		}
 	}
@@ -604,12 +602,12 @@ function copyItems($srcHostId, $dstHostId) {
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
 			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint', 'master_itemid'
+			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint', 'master_itemid',
+			'templateid'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
 		'hostids' => $srcHostId,
-		'inherited' => false,
 		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 		'preservekeys' => true
 	]);
@@ -648,8 +646,7 @@ function copyItems($srcHostId, $dstHostId) {
 			$current_dependency = $dependency_level;
 			$created_itemids = API::Item()->create($create_items);
 
-			if (!array_key_exists('itemids', $created_itemids)) {
-				error(_s('Cannot create items on "%1$s".', $dstHost['host']));
+			if (!$created_itemids) {
 				return false;
 			}
 			$created_itemids = $created_itemids['itemids'];
@@ -662,6 +659,16 @@ function copyItems($srcHostId, $dstHostId) {
 		}
 
 		$srcItem = $srcItems[$itemid];
+
+		if ($srcItem['templateid']) {
+			$srcItem = get_same_item_for_host($srcItem, $dstHost['hostid']);
+
+			if (!$srcItem) {
+				return false;
+			}
+			$itemkey_to_id[$srcItem['key_']] = $srcItem['itemid'];
+			continue;
+		}
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
@@ -694,7 +701,6 @@ function copyItems($srcHostId, $dstHostId) {
 	}
 
 	if ($create_items && !API::Item()->create($create_items)) {
-		error(_s('Cannot create items on "%1$s".', $dstHost['host']));
 		return false;
 	}
 
