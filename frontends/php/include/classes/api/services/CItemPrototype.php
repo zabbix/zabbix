@@ -714,6 +714,23 @@ class CItemPrototype extends CItemGeneral {
 		$items = zbx_toArray($items);
 		$this->checkInput($items, true);
 		$this->validateDependentItems($items, API::ItemPrototype());
+
+		$dbItems = $this->get([
+			'output' => ['type', 'master_itemid'],
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($items as &$item) {
+			$item_type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
+
+			if ($item_type != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
+				$item['master_itemid'] = null;
+			}
+		}
+		unset($item);
+
 		$this->updateReal($items);
 		$this->inherit($items);
 
