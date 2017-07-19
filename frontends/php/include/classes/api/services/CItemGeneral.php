@@ -177,13 +177,13 @@ abstract class CItemGeneral extends CApiService {
 
 				if (array_key_exists('hostid', $item) && $dbItems[$item['itemid']]['hostid'] != $item['hostid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'hostid',
-						_('can not be changed')
+						_('cannot be changed')
 					));
 				}
 
 				if (array_key_exists('ruleid', $item) && $dbItems[$item['itemid']]['ruleid'] != $item['ruleid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'ruleid',
-						_('can not be changed')
+						_('cannot be changed')
 					));
 				}
 
