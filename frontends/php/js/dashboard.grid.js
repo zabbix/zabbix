@@ -497,6 +497,7 @@
 				if (widget['update_attempts'] == 1) {
 					widget['update_attempts'] = 0;
 					startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+					doAction('onContentUpdated', $obj, data, null);
 				}
 				else {
 					widget['update_attempts'] = 0;

@@ -18,30 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$item = ($data['is_default'])
-	? (new CLink(null, 'charts.php?graphid='.$data['graph']['graphid'].'&period='.$data['timeline']['period'].
-		'&stime='.$data['timeline']['stimeNow']))
-	: (new CDiv());
-$item->setId($data['graph']['containerid']);
+$item = (new CDiv())->setId($data['graph']['containerid']);
 
 $flickerfree_item = (new CDiv($item))
 	->addClass('flickerfreescreen')
 	->setAttribute('data-timestamp', $data['graph']['timestamp'])
 	->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
-$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJson($data['timeline']).', '
-		.CJs::encodeJson($data['time_control_data']).');'
-	. 'timeControl.processObjects();'
-	. 'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
+$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJson($data['timeline']).', '.
+	CJs::encodeJson($data['time_control_data']).');'.
+	'timeControl.processObjects();'.
+	'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
 
-if ($data['widget']['initial_load'] === 1) {
+if ($data['widget']['initial_load'] == 1) {
 	$script .=
 		'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
 			'function zbx_graph_widget_resize_end(img_id) {'.
 				'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
 					'new_width = content.width(),'.
-					'new_height = content.height();'.
-				'var src = jQuery("#"+img_id).attr("src");'.
+					'new_height = content.height() - 10,'.
+					'src = jQuery("#"+img_id).attr("src");'.
+
+				'if (typeof src === "undefined") return;'.
 				'if (src.search("&outer=") == -1) {'.
 					'src = src + "&outer=1";'.
 				'}'.
@@ -51,15 +49,34 @@ if ($data['widget']['initial_load'] === 1) {
 				'src = src.replace(/width=\d+/,"width="+new_width);'.
 				'src = src.replace(/height=\d+/,"height="+new_height);'.
 				'jQuery("#"+img_id).attr("src", src);'.
+
+				// TODO miks: do not forget to delete unneeded code.
+				//'var object_changes = {graphHeight: new_height + '.$data['time_control_data']['objDims']['shiftYtop'].', width: new_width};'.
+				//'timeControl.editObjectDims("'.$data['graph']['dataid'].'", object_changes);'.
 			'}'.
 		'}'.
+
 		'zbx_graph_widget_resize_end("'.$data['graph']['dataid'].'");'. // resizes graph first time
+
+		// TODO miks: do not forget to delete unneeded code.
+		//'jQuery("#'.$data['graph']['containerid'].'").bind("DOMSubtreeModified",function() {
+		//	zbx_graph_widget_resize_end("'.$data['graph']['dataid'].'");
+		//});'.
+
 		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd", '.
 			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 				'parameters: ["'.$data['graph']['dataid'].'"],'.
-			'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
-		'});';
+				'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
+			'});';
 }
+
+$script .=
+	'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onContentUpdated", '.
+		'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
+			'parameters: ["'.$data['graph']['dataid'].'"],'.
+			'trigger_name: "graph_widget_content_update_end_'.$data['widget']['uniqueid'].'"'.
+		'});';
+
 
 $output = [
 	'header' => $data['name'],

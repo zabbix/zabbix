@@ -24,12 +24,36 @@ class CGraphWidgetForm extends CWidgetForm {
 	{
 		parent::__construct($data);
 
-		// Select graph field
-		$field_graph = (new CWidgetFieldSelectResource('graphid', _('Graph'), WIDGET_FIELD_SELECT_RES_GRAPH));
-		if (array_key_exists('graphid', $data)) {
-			$field_graph->setValue($data['graphid']);
+		// select graph type field
+		$source_types = [
+			ZBX_WIDGET_FIELD_RESOURCE_GRAPH => _('Graph'),
+			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
+		];
+		$field_source = (new CWidgetFieldRadioButtonList('source_type', _('Source'), $source_types))
+			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
+			->setAction('updateWidgetConfigDialogue()')
+			->setModern(true);
+		if (array_key_exists('source_type', $data)) {
+			$field_source->setValue($data['source_type']);
 		}
-		$this->fields[] = $field_graph;
+		$this->fields[] = $field_source;
+
+		if (array_key_exists('source_type', $data) && $data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			// Item field
+			$field_item = new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM);
+			if (array_key_exists('itemid', $data)) {
+				$field_item->setValue($data['itemid']);
+			}
+			$this->fields[] = $field_item;
+		}
+		else {
+			// Select graph field
+			$field_graph = (new CWidgetFieldSelectResource('graphid', _('Graph'), WIDGET_FIELD_SELECT_RES_GRAPH));
+			if (array_key_exists('graphid', $data)) {
+				$field_graph->setValue($data['graphid']);
+			}
+			$this->fields[] = $field_graph;
+		}
 
 		// Dynamic item
 		$field_dynamic = (new CWidgetFieldCheckbox('dynamic', _('Dynamic item')));

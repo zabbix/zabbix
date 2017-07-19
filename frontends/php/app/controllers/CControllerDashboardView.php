@@ -38,7 +38,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
 			'period' =>				'int32',
-			'stime' =>				'time'
+			'stime' =>				'time',
+			'favobj' =>				'in timelinefixedperiod',
+			'favid' =>				'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -65,6 +67,12 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
+			return;
+		}
+		// TODO miks: this solution is not a pretty one. Think about it once again before commit.
+		elseif ($this->dashboard && $this->hasInput('favobj') && $this->getInput('favobj')) {
+			CProfile::update('web.dashb.timelinefixed', $this->getInput('favid', 0), PROFILE_TYPE_INT,
+				$this->dashboard['dashboardid']);
 			return;
 		}
 
@@ -96,7 +104,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'loadScroll' => 1,
 			'mainObject' => 1,
 			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1, $options['profileIdx2']),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
+			'periodFixed' => CProfile::get('web.dashb.timelinefixed', 1, $dashboard['dashboardid'])
 		];
 
 		if (self::hasDynamicWidgets($data['grid_widgets'])) {

@@ -683,7 +683,7 @@ define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
 define('SCREEN_MIN_SIZE', 1);
 define('SCREEN_MAX_SIZE', 100);
 
-// default, minimum and macimum number of lines for dashboard widgets
+// default, minimum and maximum number of lines for dashboard widgets
 define('ZBX_DEFAULT_WIDGET_LINES', 25);
 define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
@@ -1203,6 +1203,12 @@ define('ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE',	5);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
+
+define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',				0);
+define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',		1);
+
+define('UPDATE_PROFILE_OFF',	0);
+define('UPDATE_PROFILE_ON',		1);
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");

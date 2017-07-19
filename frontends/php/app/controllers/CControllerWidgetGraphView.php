@@ -30,9 +30,9 @@ class CControllerWidgetGraphView extends CController {
 			'name' =>				'string',
 			'uniqueid' =>			'required|string',
 			'initial_load' =>		'in 0,1',
-			'dashboardid' =>		'required|db dashboard.dashboardid',
+			'edit_mode' =>			'in 0,1',
+			'dashboardid' =>		'db dashboard.dashboardid',
 			'fields' =>				'required|array',
-			'dynamic_groupid' =>	'db groups.groupid', // TODO VM: probably not needed
 			'dynamic_hostid' =>		'db hosts.hostid'
 		];
 
@@ -41,7 +41,9 @@ class CControllerWidgetGraphView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
-			 * @var id     $fields['graphid']
+			 * @var int    $fields['source_type']		  in ZBX_WIDGET_FIELD_RESOURCE_GRAPH, ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
+			 * @var id     $fields['itemid']			  required if $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
+			 * @var id     $fields['graphid']			  required if $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH
 			 * @var int    $fields['dynamic']             (optional)
 			 */
 			// TODO VM: if fields are present, check that fields have enough data
@@ -60,20 +62,27 @@ class CControllerWidgetGraphView extends CController {
 	}
 
 	protected function doAction() {
-
 		// Default values
 		$default = [
-			'graphid' => null,
 			'uniqueid' => $this->getInput('uniqueid'),
-			'dynamic' => WIDGET_SIMPLE_ITEM,
-			'dynamic_hostid' => '0'
+			'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
+			'dynamic' => WIDGET_SIMPLE_ITEM
 		];
 
 		$data = $this->getInput('fields');
+		$edit_mode = $this->getInput('edit_mode', 0);
 
 		// TODO VM: for testing
 		$data['width'] = '500';
-		$data['height'] = '100';
+		$data['height'] = '150';
+
+		if (array_key_exists('source_type', $data) && $data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			$default['itemid'] = null;
+		}
+		else {
+			$data['source_type'] = ZBX_WIDGET_FIELD_RESOURCE_GRAPH;
+			$default['graphid'] = null;
+		}
 
 		// Apply defualt value for data
 		foreach ($default as $key => $value) {
@@ -90,19 +99,37 @@ class CControllerWidgetGraphView extends CController {
 		//			each time, we are adding new one. (together with using uniqueid())
 		$dataid = 'graph_'.$data['uniqueid'];
 		$containerid = 'graph_container_'.$data['uniqueid'];
+		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
+		$dashboardid = $this->getInput('dashboardid', 0);
+		$resourceid = null;
 		$profileIdx = 'web.dashbrd';
-		$profileIdx2 = $this->getInput('dashboardid');
-		$updateProfile = '1'; // TODO VM: there should be constant
-		$graphDims = getGraphDims($data['graphid']);
-		$graphDims['graphHeight'] = $data['height'];
-		$graphDims['width'] = $data['width'];
-		$graph = getGraphByGraphId($data['graphid']);
-		$url = '';
+		$profileIdx2 = $dashboardid;
+		$update_profile = $dashboardid ? UPDATE_PROFILE_ON : UPDATE_PROFILE_OFF;
+
+		if ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $data['graphid']) {
+			$resource_type = SCREEN_RESOURCE_GRAPH;
+			$resourceid = $data['graphid'];
+			$graph_dims = getGraphDims($resourceid);
+			$graph_dims['graphHeight'] = $data['height'];
+			$graph_dims['width'] = $data['width'];
+			$graph = getGraphByGraphId($resourceid);
+		}
+		elseif ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH && $data['itemid']) {
+			$resource_type = SCREEN_RESOURCE_SIMPLE_GRAPH;
+			$resourceid = $data['itemid'];
+			$graph_dims = getGraphDims();
+			$graph_dims['graphHeight'] = $data['height'];
+			$graph_dims['width'] = $data['width'];
+		}
+		else {
+			$resource_type = null;
+			$graph_dims = getGraphDims();
+		}
 
 		$timeline = calculateTime([
 			'profileIdx' => $profileIdx,
 			'profileIdx2' => $profileIdx2,
-			'updateProfile' => $updateProfile,
+			'updateProfile' => $update_profile,
 			'period' => null,
 			'stime' => null
 		]);
@@ -110,7 +137,7 @@ class CControllerWidgetGraphView extends CController {
 		$time_control_data = [
 			'id' => $dataid,
 			'containerid' => $containerid,
-			'objDims' => $graphDims,
+			'objDims' => $graph_dims,
 			'loadSBox' => 0,
 			'loadImage' => 1,
 			'periodFixed' => CProfile::get($profileIdx.'.timelinefixed', 1),
@@ -123,152 +150,174 @@ class CControllerWidgetGraphView extends CController {
 			'id' => $dataid,
 			'interval' => CWebUser::getRefresh(),
 			'timeline' => $timeline,
-			'resourcetype' => SCREEN_RESOURCE_GRAPH, // TODO VM: (?) flickerscreen works with screen resource types
+			'resourcetype' => $resource_type,
 			'profileIdx' => $profileIdx,
 			'profileIdx2' => $profileIdx2,
-			'updateProfile' => $updateProfile,
+			'updateProfile' => $update_profile,
 		];
 
-		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $data['dynamic_hostid']) {
-			// get host
-			$hosts = API::Host()->get([
-				'hostids' => $data['dynamic_hostid'],
-				'output' => ['hostid', 'name']
-			]);
-			$host = reset($hosts);
+		// Replace graph item by particular host item if dynamic items are used.
+		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+			// Find same simple-graph item in selected $dynamic_hostid host.
+			if ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+				$new_itemid = get_same_item_for_host($resourceid, $dynamic_hostid);
+				$resourceid = !empty($new_itemid) ? $new_itemid : null;
+			}
+			// Find requested host and change graph details.
+			elseif ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+				// get host
+				$hosts = API::Host()->get([
+					'hostids' => $dynamic_hostid,
+					'output' => ['hostid', 'name']
+				]);
+				$host = reset($hosts);
 
-			// get graph
-			$graph = API::Graph()->get([
-				'graphids' => $data['graphid'],
-				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => ['hostid'],
-				'selectGraphItems' => API_OUTPUT_EXTEND
-			]);
-			$graph = reset($graph);
+				// get graph
+				$graph = API::Graph()->get([
+					'graphids' => $resourceid,
+					'output' => API_OUTPUT_EXTEND,
+					'selectHosts' => ['hostid'],
+					'selectGraphItems' => API_OUTPUT_EXTEND
+				]);
+				$graph = reset($graph);
 
-			// if items from one host we change them, or set calculated if not exist on that host
-			if (count($graph['hosts']) == 1) {
-				if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
-					$newDynamic = getSameGraphItemsForHost(
-						[['itemid' => $graph['ymax_itemid']]],
-						$data['dynamic_hostid'],
-						false
-					);
-					$newDynamic = reset($newDynamic);
+				// if all items are from one host we change them, or set calculated if not exist on that host
+				if ($graph && count($graph['hosts']) == 1) {
+					if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
+						$new_dynamic = getSameGraphItemsForHost(
+							[['itemid' => $graph['ymax_itemid']]],
+							$dynamic_hostid,
+							false
+						);
+						$new_dynamic = reset($new_dynamic);
 
-					if (isset($newDynamic['itemid']) && $newDynamic['itemid'] > 0) {
-						$graph['ymax_itemid'] = $newDynamic['itemid'];
+						if ($new_dynamic && array_key_exists('itemid', $new_dynamic) && $new_dynamic['itemid'] > 0) {
+							$graph['ymax_itemid'] = $new_dynamic['itemid'];
+						}
+						else {
+							$graph['ymax_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
+						}
 					}
-					else {
-						$graph['ymax_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
-					}
-				}
 
-				if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
-					$newDynamic = getSameGraphItemsForHost(
-						[['itemid' => $graph['ymin_itemid']]],
-						$data['dynamic_hostid'],
-						false
-					);
-					$newDynamic = reset($newDynamic);
+					if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
+						$new_dynamic = getSameGraphItemsForHost(
+							[['itemid' => $graph['ymin_itemid']]],
+							$dynamic_hostid,
+							false
+						);
+						$new_dynamic = reset($new_dynamic);
 
-					if (isset($newDynamic['itemid']) && $newDynamic['itemid'] > 0) {
-						$graph['ymin_itemid'] = $newDynamic['itemid'];
-					}
-					else {
-						$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
+						if ($new_dynamic && array_key_exists('itemid', $new_dynamic) && $new_dynamic['itemid'] > 0) {
+							$graph['ymin_itemid'] = $new_dynamic['itemid'];
+						}
+						else {
+							$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
+						}
 					}
 				}
 			}
-
-			// get url
-			$url = (in_array($graph['graphtype'], [GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED]))
-				? 'chart7.php'
-				: 'chart3.php';
-			$url = new CUrl($url);
-
-			foreach ($graph as $name => $value) {
-				if ($name == 'width' || $name == 'height') {
-					continue;
-				}
-				$url->setArgument($name, $value);
-			}
-
-			$newGraphItems = getSameGraphItemsForHost($graph['gitems'], $data['dynamic_hostid'], false);
-			foreach ($newGraphItems as $newGraphItem) {
-				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
-
-				foreach ($newGraphItem as $name => $value) {
-					$url->setArgument('items['.$newGraphItem['itemid'].']['.$name.']', $value);
-				}
-			}
-
-			$url->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
-			$url = $url->getUrl();
 		}
 
-		$is_default = false; // TODO VM: (?) what it logicaly means?
-		if (in_array($graphDims['graphtype'], [GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED])) {
-			// $url may be empty, if it is dynamic graph, but no host is selected
-			if ($data['dynamic'] == SCREEN_SIMPLE_ITEM || $url === '') { // TODO VM: WIDGET_SIMPLE_ITEM
-				$url = 'chart6.php?graphid='.$data['graphid']/*.'&screenid='.$this->screenitem['screenid']*/;
-				$is_default = true;
-			}
-
-			$timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_graphid($data['graphid']));
-
-			$time_control_data['src'] = $url.'&width='.$data['width']
-				.'&height='.$data['height'].'&legend='.$graph['show_legend']
-				.'&graph3d='.$graph['show_3d'].'&updateProfile='.$updateProfile // TODO VM: $updateProfile must be int at this point
-				.'&profileIdx='.$profileIdx.'&profileIdx2='.$profileIdx2;
-//			$time_control_data['src'] .= ($this->mode == SCREEN_MODE_EDIT) // TODO VM (?): Implement as onEdit trigger.. or not.
-//				? '&period=3600&stime='.date(TIMESTAMP_FORMAT, time())
-//				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
-			// TODO VM: (?) was ..&stime='.$timeline['stimeNow'] - it means, graph will ALWAYS be "till now", not taking into account scrollbar
-			$time_control_data['src'] .= '&period='.$timeline['period'].'&stime='.$timeline['stime'];
-		}
-		else {
-			// $url may be empty, if it is dynamic graph, but no host is selected
-			if ($data['dynamic'] == WIDGET_SIMPLE_ITEM || $url === '') {
-				$url = 'chart2.php?graphid='.$data['graphid']/*.'&screenid='.$this->screenitem['screenid']*/;
-				$is_default = true;
-			}
-
-//			if ($this->mode != SCREEN_MODE_EDIT && $graphId) { // TODO VM: implement edit part as trigger - or just hide the SBox in edit
-//				if ($this->mode == SCREEN_MODE_PREVIEW) {
-//					$time_control_data['loadSBox'] = 1;
-//				}
-//			}
-			if ($data['graphid']) {
+		// Build graph action and data source links.
+		if ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			if (!$edit_mode) {
 				$time_control_data['loadSBox'] = 1;
 			}
 
-			$time_control_data['src'] = $url.'&width='.$data['width']
-				.'&height='.$data['height'].'&legend='.$graph['show_legend'].'&updateProfile='.$updateProfile // TODO VM: $updateProfile must be int at this point
-				.'&profileIdx='.$profileIdx.'&profileIdx2='.$profileIdx2;
-//			$time_control_data['src'] .= ($this->mode == SCREEN_MODE_EDIT) // TODO VM (?): Implement as onEdit trigger.. or not.
-//				? '&period=3600&stime='.date(TIMESTAMP_FORMAT, time())
-//				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
-			// TODO VM: (?) was ..&stime='.$timeline['stimeNow'] - it means, graph will ALWAYS be "till now", not taking into account scrollbar
-			$time_control_data['src'] .= '&period='.$timeline['period'].'&stime='.$timeline['stime'];
+			if ($resourceid) {
+				$graph_src = new CUrl('chart.php');
+				$graph_src->setArgument('itemids[]', $resourceid);
+				$graph_src->setArgument('width', $data['width']);
+				$graph_src->setArgument('height', $data['height']);
+			}
+			else {
+				$graph_src = new CUrl('chart3.php');
+			}
+
+			$graph_src->setArgument('period', $timeline['period']);
+			$graph_src->setArgument('stime', $timeline['stimeNow']);
 		}
+		elseif ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+			$graph_src = '';
+
+			if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+				// TODO miks: why chart7 and chart3 are allowed only if dynamic is set?
+				$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
+					? 'chart7.php'
+					: 'chart3.php';
+
+				$graph_src = new CUrl($chart_file);
+
+				foreach ($graph as $name => $value) {
+					if ($name === 'width' || $name === 'height') {
+						continue;
+					}
+					$graph_src->setArgument($name, $value);
+				}
+
+				$new_graph_items = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
+				foreach ($new_graph_items as $new_graph_item) {
+					unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
+
+					foreach ($new_graph_item as $name => $value) {
+						$graph_src->setArgument('items['.$new_graph_item['itemid'].']['.$name.']', $value);
+					}
+				}
+
+				$graph_src->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
+			}
+
+			if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				if ($data['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+					$graph_src = new CUrl('chart6.php');
+					$graph_src->setArgument('graphid', $resourceid);
+				}
+
+				$timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_graphid($resourceid));
+			}
+			else {
+				if ($data['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+					$graph_src = new CUrl('chart2.php');
+					$graph_src->setArgument('graphid', $resourceid);
+				}
+
+				if (!$edit_mode) {
+					$time_control_data['loadSBox'] = 1;
+				}
+			}
+
+			$graph_src->setArgument('width', $data['width']);
+			$graph_src->setArgument('height', $data['height']);
+			$graph_src->setArgument('legend', $graph['show_legend']);
+			$graph_src->setArgument('period', $timeline['period']);
+			$graph_src->setArgument('stime', $timeline['stimeNow']);
+
+			if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				$graph_src->setArgument('graph3d', $graph['show_3d']);
+			}
+		}
+
+		$graph_src->setArgument('updateProfile', $update_profile);
+		$graph_src->setArgument('profileIdx', $profileIdx);
+		$graph_src->setArgument('profileIdx2', $profileIdx2);
+
+		$time_control_data['src'] = $graph_src->getUrl();
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_GRAPH]),
 			'graph' => [
-				'graphid' => $data['graphid'],
 				'dataid' => $dataid,
 				'containerid' => $containerid,
 				'timestamp' => time()
 			],
 			'widget' => [
 				'uniqueid' => $data['uniqueid'],
-				'initial_load' => (int) $this->getInput('initial_load', 1),
+				'initial_load' => (int) $this->getInput('initial_load', 0),
 			],
-			'timeline' => $timeline,
 			'time_control_data' => $time_control_data,
-			'is_default' => $is_default,
+			'timeline' => $timeline,
 			'fs_data' => $fs_data,
+			'dashboardid' => $dashboardid,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

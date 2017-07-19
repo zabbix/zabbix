@@ -49,6 +49,7 @@ $fields = [
 	'yaxismax' =>		[T_ZBX_DBL, O_OPT, null,		null,				null],
 	'percent_left' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
+	'outer' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
 	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null]
 ];
 if (!check_fields($fields)) {
@@ -157,6 +158,7 @@ $graph->setYMinItemId(getRequest('ymin_itemid', 0));
 $graph->setYMaxItemId(getRequest('ymax_itemid', 0));
 $graph->setLeftPercentage(getRequest('percent_left', 0));
 $graph->setRightPercentage(getRequest('percent_right', 0));
+$graph->setOuter(getRequest('outer', 0));
 
 foreach ($items as $item) {
 	$graph->addItem(
