@@ -535,6 +535,11 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			if ($current_dependency != $dependency_level) {
 				$current_dependency = $dependency_level;
 				$created_itemids = API::Item()->create($create_items);
+
+				if (!array_key_exists('itemids', $created_itemids)) {
+					error(_s('Cannot create items on "%1$s".', $dstHost['host']));
+					return false;
+				}
 				$created_itemids = $created_itemids['itemids'];
 
 				foreach ($create_items as $index => $created_item) {
@@ -584,8 +589,9 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			$create_items[] = $item;
 		}
 
-		if ($create_items) {
-			API::Item()->create($create_items);
+		if ($create_items && !API::Item()->create($create_items)) {
+			error(_s('Cannot create items on "%1$s".', $dstHost['host']));
+			return false;
 		}
 	}
 
@@ -598,13 +604,14 @@ function copyItems($srcHostId, $dstHostId) {
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
 			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint'
+			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint', 'master_itemid'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
 		'hostids' => $srcHostId,
 		'inherited' => false,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+		'preservekeys' => true
 	]);
 	$dstHosts = API::Host()->get([
 		'output' => ['hostid', 'host', 'status'],
@@ -616,7 +623,46 @@ function copyItems($srcHostId, $dstHostId) {
 	]);
 	$dstHost = reset($dstHosts);
 
-	foreach ($srcItems as &$srcItem) {
+	$create_order = [];
+	$src_itemid_to_key = [];
+	foreach ($srcItems as $itemid => $item) {
+		$dependency_level = 0;
+		$master_item = $item;
+		$src_itemid_to_key[$itemid] = $item['key_'];
+
+		while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_item = $srcItems[$master_item['master_itemid']];
+			++$dependency_level;
+		}
+
+		$create_order[$itemid] = $dependency_level;
+	}
+	asort($create_order);
+
+	$itemkey_to_id = [];
+	$create_items = [];
+	$current_dependency = reset($create_order);
+
+	foreach ($create_order as $itemid => $dependency_level) {
+		if ($current_dependency != $dependency_level) {
+			$current_dependency = $dependency_level;
+			$created_itemids = API::Item()->create($create_items);
+
+			if (!array_key_exists('itemids', $created_itemids)) {
+				error(_s('Cannot create items on "%1$s".', $dstHost['host']));
+				return false;
+			}
+			$created_itemids = $created_itemids['itemids'];
+
+			foreach ($create_items as $index => $created_item) {
+				$itemkey_to_id[$created_item['key_']] = $created_itemids[$index];
+			}
+
+			$create_items = [];
+		}
+
+		$srcItem = $srcItems[$itemid];
+
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
 			$interface = CItem::findInterfaceForItem($srcItem, $dstHost['interfaces']);
@@ -636,10 +682,23 @@ function copyItems($srcHostId, $dstHostId) {
 		if (!$srcItem['preprocessing']) {
 			unset($srcItem['preprocessing']);
 		}
-	}
-	unset($srcItem);
 
-	return API::Item()->create($srcItems);
+		if ($srcItem['type'] == ITEM_TYPE_DEPENDENT) {
+			$src_item_key = $src_itemid_to_key[$srcItem['master_itemid']];
+			$srcItem['master_itemid'] = $itemkey_to_id[$src_item_key];
+		}
+		else {
+			unset($srcItem['master_itemid']);
+		}
+		$create_items[] = $srcItem;
+	}
+
+	if ($create_items && !API::Item()->create($create_items)) {
+		error(_s('Cannot create items on "%1$s".', $dstHost['host']));
+		return false;
+	}
+
+	return true;
 }
 
 /**
