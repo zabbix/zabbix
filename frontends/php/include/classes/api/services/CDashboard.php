@@ -236,8 +236,8 @@ class CDashboard extends CApiService {
 		$this->checkDuplicates(zbx_objectValues($dashboards, 'name'));
 		$this->checkUsers($dashboards);
 		$this->checkUserGroups($dashboards);
-		$this->checkWidgets($dashboards, __FUNCTION__);
-		$this->checkWidgetFields($dashboards);
+		$this->checkWidgets($dashboards);
+		$this->checkWidgetFields($dashboards, __FUNCTION__);
 	}
 
 	/**
@@ -407,10 +407,10 @@ class CDashboard extends CApiService {
 		if ($names) {
 			$this->checkDuplicates($names);
 		}
-		$this->checkUsers($dashboards);
+		$this->checkUsers($dashboards, $db_dashboards);
 		$this->checkUserGroups($dashboards);
-		$this->checkWidgets($dashboards, __FUNCTION__);
-		$this->checkWidgetFields($dashboards);
+		$this->checkWidgets($dashboards);
+		$this->checkWidgetFields($dashboards, __FUNCTION__);
 	}
 
 	/**
@@ -441,14 +441,19 @@ class CDashboard extends CApiService {
 	 * @param string $dashboards[]['userid']             (optional)
 	 * @param array  $dashboards[]['users']              (optional)
 	 * @param string $dashboards[]['users'][]['userid']
+	 * @param array  $db_dashboards
+	 * @param string $db_dashboards[]['userid']
 	 *
 	 * @throws APIException  if user is not valid.
 	 */
-	private function checkUsers(array $dashboards) {
+	private function checkUsers(array $dashboards, array $db_dashboards = null) {
 		$userids = [];
 
 		foreach ($dashboards as $dashboard) {
-			if (array_key_exists('userid', $dashboard)) {
+			$db_dashboard = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']] : null;
+
+			if (array_key_exists('userid', $dashboard)
+					&& ($db_dashboard === null || bccomp($dashboard['userid'], $db_dashboard['userid']) != 0)) {
 				if (bccomp($dashboard['userid'], self::$userData['userid']) != 0
 						&& !in_array(self::$userData['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set dashboard owner.'));
@@ -595,13 +600,54 @@ class CDashboard extends CApiService {
 	 * @param array  $dashboards
 	 * @param string $dashboards[]['name']
 	 * @param array  $dashboards[]['widgets']
+	 * @param string $dashboards[]['widgets'][]['widgetid']  (optional)
 	 * @param array  $dashboards[]['widgets'][]['fields']
 	 * @param int    $dashboards[]['widgets'][]['type']
 	 * @param mixed  $dashboards[]['widgets'][]['value']
+	 * @param string $method
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	private function checkWidgetFields(array $dashboards) {
+	private function checkWidgetFields(array $dashboards, $method) {
+		$widget_fields = [];
+
+		if ($method === 'validateUpdate') {
+			foreach ($dashboards as $dashboard) {
+				if (array_key_exists('widgets', $dashboard)) {
+					foreach ($dashboard['widgets'] as $widget) {
+						if (array_key_exists('widgetid', $widget)) {
+							$widgetids[] = $widget['widgetid'];
+						}
+					}
+				}
+			}
+
+			if ($widgetids) {
+				$db_widget_fields = DB::select('widget_field', [
+					'output' => ['widgetid', 'type', 'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid',
+						'value_sysmapid'
+					],
+					'filter' => [
+						'widgetid' => $widgetids,
+						'type' => [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
+							ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH,
+							ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_MAP
+						]
+					]
+				]);
+
+				$field_names_by_type = self::getFieldNamesByType();
+
+				foreach ($db_widget_fields as $db_widget_field) {
+					$widgetid = $db_widget_field['widgetid'];
+					$type = $db_widget_field['type'];
+					$value = $db_widget_field[$field_names_by_type[$db_widget_field['type']]];
+
+					$widget_fields[$widgetid][$type][$value] = true;
+				}
+			}
+		}
+
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
 			ZBX_WIDGET_FIELD_TYPE_HOST => [],
@@ -615,9 +661,15 @@ class CDashboard extends CApiService {
 		foreach ($dashboards as $dashboard) {
 			if (array_key_exists('widgets', $dashboard)) {
 				foreach ($dashboard['widgets'] as $widget) {
+					$widgetid = array_key_exists('widgetid', $widget) ? $widget['widgetid'] : 0;
+
 					if (array_key_exists('fields', $widget)) {
 						foreach ($widget['fields'] as $field) {
-							$ids[$field['type']][$field['value']] = true;
+							if ($widgetid == 0 || !array_key_exists($widgetid, $widget_fields)
+									|| !array_key_exists($field['type'], $widget_fields[$widgetid])
+									|| !array_key_exists($field['value'], $widget_fields[$widgetid][$field['type']])) {
+								$ids[$field['type']][$field['value']] = true;
+							}
 						}
 					}
 				}
@@ -775,6 +827,20 @@ class CDashboard extends CApiService {
 			])
 			: [];
 
+		$userids = [];
+
+		foreach ($db_dashboard_users as $db_dashboard_user) {
+			$userids[$db_dashboard_user['userid']] = true;
+		}
+
+		// get list of accessible users
+		$db_users = $userids
+			? API::User()->get([
+				'output' => [],
+				'preservekeys' => true
+			])
+			: [];
+
 		$ins_dashboard_users = [];
 		$upd_dashboard_users = [];
 		$del_dashboard_userids = [];
@@ -793,7 +859,7 @@ class CDashboard extends CApiService {
 
 				unset($dashboards_users[$dashboardid][$userid]);
 			}
-			else {
+			elseif (array_key_exists($userid, $db_users)) {
 				$del_dashboard_userids[] = $db_dashboard_user['dashboard_userid'];
 			}
 		}
@@ -853,6 +919,20 @@ class CDashboard extends CApiService {
 			])
 			: [];
 
+		$usrgrpids = [];
+
+		foreach ($db_dashboard_usrgrps as $db_dashboard_usrgrp) {
+			$usrgrpids[$db_dashboard_usrgrp['usrgrpid']] = true;
+		}
+
+		// get list of accessible user groups
+		$db_usrgrps = $usrgrpids
+			? API::UserGroup()->get([
+				'output' => [],
+				'preservekeys' => true
+			])
+			: [];
+
 		$ins_dashboard_usrgrps = [];
 		$upd_dashboard_usrgrps = [];
 		$del_dashboard_usrgrpids = [];
@@ -871,7 +951,7 @@ class CDashboard extends CApiService {
 
 				unset($dashboards_usrgrps[$dashboardid][$usrgrpid]);
 			}
-			else {
+			elseif (array_key_exists($usrgrpid, $db_usrgrps)) {
 				$del_dashboard_usrgrpids[] = $db_dashboard_usrgrp['dashboard_usrgrpid'];
 			}
 		}

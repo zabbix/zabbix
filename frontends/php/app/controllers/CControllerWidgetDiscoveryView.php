@@ -47,8 +47,40 @@ class CControllerWidgetDiscoveryView extends CController {
 	}
 
 	protected function doAction() {
+		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
+			$drules = API::DRule()->get([
+				'output' => ['druleid', 'name'],
+				'selectDHosts' => ['status'],
+				'filter' => ['status' => DHOST_STATUS_ACTIVE]
+			]);
+			CArrayHelper::sort($drules, ['name']);
+
+			foreach ($drules as &$drule) {
+				$drule['up'] = 0;
+				$drule['down'] = 0;
+
+				foreach ($drule['dhosts'] as $dhost){
+					if (DRULE_STATUS_DISABLED == $dhost['status']) {
+						$drule['down']++;
+					}
+					else {
+						$drule['up']++;
+					}
+				}
+			}
+			unset($drule);
+
+			$error = null;
+		}
+		else {
+			$drules = [];
+			$error = _('No permissions to referred object or it does not exist!');
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_DISCOVERY_STATUS]),
+			'drules' => $drules,
+			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
