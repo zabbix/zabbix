@@ -323,6 +323,7 @@ function getMenuPopupMap(options) {
 				var url = new Curl('zabbix.php');
 				url.setArgument('action', 'problem.view');
 				url.setArgument('filter_triggerids[]', options.gotos.events.triggerids);
+				url.setArgument('filter_severity', options.gotos.events.severity_min);
 				url.setArgument('filter_set', '1');
 				url.unsetArgument('sid');
 
