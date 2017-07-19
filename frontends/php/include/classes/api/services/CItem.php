@@ -539,7 +539,7 @@ class CItem extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$dbItems = $this->get([
-			'output' => ['itemid', 'flags', 'type'],
+			'output' => ['itemid', 'flags', 'type', 'master_itemid'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -551,6 +551,11 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as &$item) {
 			$item['flags'] = $dbItems[$item['itemid']]['flags'];
+			$item_type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
+
+			if ($item_type != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
+				$item['master_itemid'] = null;
+			}
 		}
 		unset($item);
 		$this->updateReal($items);
