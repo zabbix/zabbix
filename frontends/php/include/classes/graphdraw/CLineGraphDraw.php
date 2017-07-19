@@ -195,7 +195,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$config = select_config();
 
 		for ($i = 0; $i < $this->num; $i++) {
-			$item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = $this->items[$i];
 
 			if ($this->itemsHost === null) {
 				$this->itemsHost = $item['hostid'];
@@ -204,14 +204,14 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->itemsHost = false;
 			}
 
-			if (!isset($this->axis_valuetype[$this->items[$i]['axisside']])) {
-				$this->axis_valuetype[$this->items[$i]['axisside']] = $item['value_type'];
+			if (!isset($this->axis_valuetype[$items['axisside']])) {
+				$this->axis_valuetype[$item['axisside']] = $item['value_type'];
 			}
-			elseif ($this->axis_valuetype[$this->items[$i]['axisside']] != $item['value_type']) {
-				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
+			elseif ($this->axis_valuetype[$item['axisside']] != $item['value_type']) {
+				$this->axis_valuetype[$item['axisside']] = ITEM_VALUE_TYPE_FLOAT;
 			}
 
-			$type = $this->items[$i]['calc_type'];
+			$type = $item['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 			$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)'; // required for 'group by' support of Oracle
@@ -270,23 +270,23 @@ class CLineGraphDraw extends CGraphDraw {
 			else {
 				$this->dataFrom = 'trends';
 
-				if (!$this->items[$i]['has_scheduling_intervals'] || $this->items[$i]['delay'] != 0) {
-					$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
+				if (!$item['has_scheduling_intervals'] || $item['delay'] != 0) {
+					$item['delay'] = max($item['delay'], SEC_PER_HOUR);
 				}
 
 				$sql_select = 'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 			}
 
-			if (!isset($this->data[$this->items[$i]['itemid']])) {
-				$this->data[$this->items[$i]['itemid']] = [];
+			if (!isset($this->data[$item['itemid']])) {
+				$this->data[$item['itemid']] = [];
 			}
 
-			if (!isset($this->data[$this->items[$i]['itemid']][$type])) {
-				$this->data[$this->items[$i]['itemid']][$type] = [];
+			if (!isset($this->data[$item['itemid']][$type])) {
+				$this->data[$item['itemid']][$type] = [];
 			}
 
-			$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
+			$curr_data = &$this->data[$item['itemid']][$type];
 
 			$curr_data['count'] = null;
 			$curr_data['min'] = null;
@@ -297,7 +297,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$result = DBselect(
 				'SELECT itemid,'.$calc_field.' AS i,'.$sql_select.',MAX(clock) AS clock'.
 				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
 					' AND clock>='.zbx_dbstr($from_time).
 					' AND clock<='.zbx_dbstr($to_time).
 				' GROUP BY itemid,'.$calc_field
@@ -326,7 +326,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			$loc_min = is_array($curr_data['min']) ? min($curr_data['min']) : null;
-			$this->setGraphOrientation($loc_min, $this->items[$i]['axisside']);
+			$this->setGraphOrientation($loc_min, $item['axisside']);
 			unset($row);
 
 			$curr_data['avg_orig'] = is_array($curr_data['avg']) ? zbx_avg($curr_data['avg']) : null;
@@ -401,18 +401,18 @@ class CLineGraphDraw extends CGraphDraw {
 		// calculate shift for stacked graphs
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			for ($i = 1; $i < $this->num; $i++) {
-				$curr_data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
+				$curr_data = &$this->data[$item['itemid']][$item['calc_type']];
 
 				if (!isset($curr_data)) {
 					continue;
 				}
 
 				for ($j = $i - 1; $j >= 0; $j--) {
-					if ($this->items[$j]['axisside'] != $this->items[$i]['axisside']) {
+					if ($item['axisside'] != $item['axisside']) {
 						continue;
 					}
 
-					$prev_data = &$this->data[$this->items[$j]['itemid']][$this->items[$j]['calc_type']];
+					$prev_data = &$this->data[$item['itemid']][$item['calc_type']];
 
 					if (!isset($prev_data)) {
 						continue;
