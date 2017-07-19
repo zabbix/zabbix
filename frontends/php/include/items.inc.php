@@ -380,6 +380,93 @@ function itemTypeInterface($type = null) {
 }
 
 /**
+ * Finds master item in input array which dependent items not present in input array. If master is found it name
+ * will be returned or false otherwise.
+ *
+ * @param array                $items            Associative array of item arrays to search, where itemid is array key.
+ * @param string               $items[]['name']
+ * @param string               $items[]['master_itemid']
+ * @param CItem|CItemPrototype $data_provider    Service, is used to get dependent items.
+ *
+ * @return bool|string
+ */
+function findMasterWithMissingDependentItem($items, $data_provider) {
+	$master_itemname = false;
+	$not_selected = [];
+	$db_dependent_items = $items;
+
+	while ($db_dependent_items) {
+		$db_dependent_items = $data_provider->get([
+			'output'		=> ['master_itemid', 'templateid'],
+			'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+			'preservekeys'	=> true
+		]);
+		$not_selected = array_diff_key($db_dependent_items, $items);
+
+		if ($not_selected) {
+			$dependent_item = reset($not_selected);
+			$master_item = array_key_exists($dependent_item['master_itemid'], $items)
+				? $items[$dependent_item['master_itemid']]
+				: $items[$dependent_item['templateid']];
+			$master_itemname = $master_item['name'];
+			break;
+		}
+	};
+
+	return $master_itemname;
+}
+
+/**
+ * Finds dependent item in input array which master item not present in input array. If dependent is found it name
+ * will be returned or false otherwise.
+ *
+ * @param array                $items            Associative array of item arrays to search, where itemid is array key.
+ * @param string               $items[]['name']
+ * @param string               $items[]['master_itemid']
+ * @param string               $items[]['type']
+ * @param CItem|CItemPrototype $data_provider    Service, is used to get dependent items.
+ *
+ * @return bool|string
+ */
+function findDependentWithMissingMasterItem($items, $data_provider) {
+	$master_itemname = false;
+	$not_selected = [];
+	$db_master_items = $items;
+
+	do {
+		$db_master_itemids = [];
+
+		foreach ($db_master_items as $dm_master_itemid => $db_master_item) {
+			if ($db_master_item['type'] == ITEM_TYPE_DEPENDENT) {
+				$db_master_itemids[$dm_master_itemid] = $db_master_item['master_itemid'];
+			}
+		}
+
+		if ($db_master_itemids) {
+			$db_master_items = $data_provider->get([
+				'output'		=> ['master_itemid', 'templateid', 'type'],
+				'itemids'		=> array_keys(array_flip($db_master_itemids)),
+				'preservekeys'	=> true
+			]);
+		}
+		else {
+			$db_master_items = [];
+		}
+
+		$not_selected = array_diff_key($db_master_items, $items);
+
+		if ($not_selected) {
+			$master_item = reset($not_selected);
+			$dependent_itemid = array_search(key($not_selected), $db_master_itemids);
+			$master_itemname = $items[$dependent_itemid]['name'];
+			break;
+		}
+	} while ($db_master_items);
+
+	return $master_itemname;
+}
+
+/**
  * Copies the given items to the given hosts or templates.
  *
  * @param array $src_itemids		Items which will be copied to $dst_hostids
@@ -393,12 +480,19 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
 			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint'
+			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint', 'master_itemid'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
-		'itemids' => $src_itemids
+		'itemids' => $src_itemids,
+		'preservekeys' => true
 	]);
+
+	$master_name = findDependentWithMissingMasterItem($items, API::Item());
+	if ($master_name !== false) {
+		error(_s('Item "%1$s" have master item and can not be copied.', $master_name));
+		return false;
+	}
 
 	$dstHosts = API::Host()->get([
 		'output' => ['hostid', 'host', 'status'],
