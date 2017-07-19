@@ -1364,15 +1364,15 @@ abstract class CItemGeneral extends CApiService {
 				: 0;
 
 			while ($find_itemids && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-				if (array_key_exists($root_itemid, $items_added)
-						&& array_key_exists($dependency_level, $items_added[$root_itemid])) {
-					$find_itemids += $items_added[$root_itemid][$dependency_level];
-				}
 				$find_itemids = $data_provider->get([
 					'output'		=> ['itemid'],
 					'filter' 		=> ['master_itemid' => array_keys($find_itemids)],
 					'preservekeys'	=> true
 				]);
+				if (array_key_exists($root_itemid, $items_added)
+						&& array_key_exists($dependency_level, $items_added[$root_itemid])) {
+					$find_itemids += $items_added[$root_itemid][$dependency_level];
+				}
 				$items_count = $items_count + count($find_itemids);
 				// If item was moved to another master item, do not count moved item (and its dependent items)
 				// in old master dependent items count calculation.
