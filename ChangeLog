@@ -3,6 +3,7 @@ Changes for 3.4.0alpha2
 New features:
 
 Bug fixes:
+........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
@@ -109,6 +110,7 @@ New features:
 A.F....... [ZBX-1357] updated Catalan, Chinese (China), English (United States), Japanese, Korean, Polish, Portuguese (Brazil), Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
 ..F....... [ZBX-12252] fixed history page to display values in chronological order (Sasha)
 
 --------------------------------------------------------------------------------
