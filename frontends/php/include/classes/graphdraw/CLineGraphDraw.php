@@ -401,18 +401,22 @@ class CLineGraphDraw extends CGraphDraw {
 		// calculate shift for stacked graphs
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			for ($i = 1; $i < $this->num; $i++) {
-				$curr_data = &$this->data[$item['itemid']][$item['calc_type']];
+				$item1 = $this->items[$i];
+
+				$curr_data = &$this->data[$item1['itemid']][$item1['calc_type']];
 
 				if (!isset($curr_data)) {
 					continue;
 				}
 
 				for ($j = $i - 1; $j >= 0; $j--) {
-					if ($item['axisside'] != $item['axisside']) {
+					$item2 = $this->items[$j];
+
+					if ($item2['axisside'] != $item1['axisside']) {
 						continue;
 					}
 
-					$prev_data = &$this->data[$item['itemid']][$item['calc_type']];
+					$prev_data = &$this->data[$item2['itemid']][$item2['calc_type']];
 
 					if (!isset($prev_data)) {
 						continue;
