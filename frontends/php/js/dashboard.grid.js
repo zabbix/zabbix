@@ -430,7 +430,9 @@
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
-			'storage': widget['storage']
+			'storage': widget['storage'],
+			'content_width': widget['content_body'].width(),
+			'content_height': widget['content_body'].height()
 		}
 		widget['initial_load'] = false;
 

@@ -131,6 +131,11 @@
 
 		// Update buttons on existing widgets to edit mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
+
+		// Hide filter with timeline
+		jQuery('.filter-btn-container').hide();
+		jQuery('#filter-space').hide();
+		timeControl.removeAllSBox();
 	};
 
 	// this method related to forms: "sharing", "dashboard properties"

@@ -40,23 +40,16 @@ if ($data['widget']['initial_load'] == 1) {
 					'src = jQuery("#"+img_id).attr("src");'.
 
 				'if (typeof src === "undefined") return;'.
-				'if (src.search("&outer=") == -1) {'.
-					'src = src + "&outer=1";'.
-				'}'.
-				'else {'.
-					'src = src.replace(/&outer=\d+/,"&outer=1");'.
-				'}'.
-				'src = src.replace(/width=\d+/,"width="+new_width);'.
-				'src = src.replace(/height=\d+/,"height="+new_height);'.
-				'jQuery("#"+img_id).attr("src", src);'.
+				'var img_url = new Curl(src);'.
+				'img_url.setArgument("width", new_width);'.
+				'img_url.setArgument("height", new_height);'.
+				'jQuery("#"+img_id).attr("src", img_url.getUrl());'.
 
 				// TODO miks: do not forget to delete unneeded code.
 				//'var object_changes = {graphHeight: new_height + '.$data['time_control_data']['objDims']['shiftYtop'].', width: new_width};'.
 				//'timeControl.editObjectDims("'.$data['graph']['dataid'].'", object_changes);'.
 			'}'.
 		'}'.
-
-		'zbx_graph_widget_resize_end("'.$data['graph']['dataid'].'");'. // resizes graph first time
 
 		// TODO miks: do not forget to delete unneeded code.
 		//'jQuery("#'.$data['graph']['containerid'].'").bind("DOMSubtreeModified",function() {

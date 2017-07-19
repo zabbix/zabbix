@@ -317,6 +317,21 @@ var timeControl = {
 	addSBox: function(e, id) {
 		var sbox = sbox_init(id);
 		sbox.onchange = this.objectUpdate.bind(this);
+	},
+
+	// Remove sbox from all objects in objectList
+	removeAllSBox: function() {
+		for (var id in this.objectList) {
+			if (!empty(this.objectList[id]) && this.objectList[id]['loadSBox'] === 1) {
+				var obj = this.objectList[id],
+					img = $(id);
+				obj['loadSBox'] = 0;
+				removeListener(img, 'load', obj.sbox_listener);
+				removeListener(img, 'load', sboxGlobalMove);
+				delete obj.sbox_listener;
+				jQuery(".box_on").remove();
+			}
+		}
 	}
 };
 

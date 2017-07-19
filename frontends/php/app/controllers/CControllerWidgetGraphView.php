@@ -35,7 +35,9 @@ class CControllerWidgetGraphView extends CController {
 			'edit_mode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'fields' =>				'required|array',
-			'dynamic_hostid' =>		'db hosts.hostid'
+			'dynamic_hostid' =>		'db hosts.hostid',
+			'content_width' =>		'int32',
+			'content_height' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -280,6 +282,10 @@ class CControllerWidgetGraphView extends CController {
 		$graph_src->setArgument('updateProfile', $update_profile);
 		$graph_src->setArgument('profileIdx', $profileIdx);
 		$graph_src->setArgument('profileIdx2', $profileIdx2);
+
+		if ($graph_dims['graphtype'] != GRAPH_TYPE_PIE && $graph_dims['graphtype'] != GRAPH_TYPE_EXPLODED) {
+			$graph_src->setArgument('outer', '1');
+		}
 
 		$time_control_data['src'] = $graph_src->getUrl();
 
