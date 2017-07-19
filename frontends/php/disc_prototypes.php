@@ -517,6 +517,7 @@ elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelet
  */
 if (isset($_REQUEST['form'])) {
 	$itemPrototype = [];
+	$has_errors = false;
 	$master_prototype_options = [];
 
 	if (hasRequest('itemid')) {
@@ -569,6 +570,7 @@ if (isset($_REQUEST['form'])) {
 		}
 		else {
 			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
+			$has_errors = true;
 		}
 	}
 
@@ -582,9 +584,11 @@ if (isset($_REQUEST['form'])) {
 	]);
 
 	// render view
-	$itemView = new CView('configuration.item.prototype.edit', $data);
-	$itemView->render();
-	$itemView->show();
+	if (!$has_errors) {
+		$itemView = new CView('configuration.item.prototype.edit', $data);
+		$itemView->render();
+		$itemView->show();
+	}
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));

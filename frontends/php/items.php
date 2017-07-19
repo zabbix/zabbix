@@ -1157,6 +1157,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
  */
 if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'), 'update', 'clone'])) {
 	$master_item_options = [];
+	$has_errors = false;
 
 	if (hasRequest('itemid')) {
 		$items = API::Item()->get([
@@ -1213,6 +1214,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		}
 		else {
 			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
+			$has_errors = true;
 		}
 	}
 
@@ -1232,9 +1234,11 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	}
 
 	// render view
-	$itemView = new CView('configuration.item.edit', $data);
-	$itemView->render();
-	$itemView->show();
+	if (!$has_errors) {
+		$itemView = new CView('configuration.item.edit', $data);
+		$itemView->render();
+		$itemView->show();
+	}
 }
 elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform') || hasRequest('massupdate'))
 		&& hasRequest('group_itemid')) {
