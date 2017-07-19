@@ -21,6 +21,8 @@
 
 class CControllerWidgetGraphView extends CController {
 
+	private $form;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -41,12 +43,16 @@ class CControllerWidgetGraphView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
-			 * @var int    $fields['source_type']		  in ZBX_WIDGET_FIELD_RESOURCE_GRAPH, ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
-			 * @var id     $fields['itemid']			  required if $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
-			 * @var id     $fields['graphid']			  required if $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH
-			 * @var int    $fields['dynamic']             (optional)
+			 * @var int    $fields['source_type']		in ZBX_WIDGET_FIELD_RESOURCE_GRAPH, ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
+			 * @var id     $fields['itemid']			required if $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
+			 * @var id     $fields['graphid']			required if $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH
+			 * @var int    $fields['dynamic']
 			 */
-			// TODO VM: if fields are present, check that fields have enough data
+			$this->form = CWidgetConfig::getForm(WIDGET_GRAPH, $this->getInput('fields', []));
+
+			if ($errors = $this->form->validate()) {
+				$ret = false;
+			}
 		}
 
 		if (!$ret) {
@@ -62,43 +68,17 @@ class CControllerWidgetGraphView extends CController {
 	}
 
 	protected function doAction() {
-		// Default values
-		$default = [
-			'uniqueid' => $this->getInput('uniqueid'),
-			'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
-			'dynamic' => WIDGET_SIMPLE_ITEM
-		];
+		$fields = $this->form->getFieldsData();
 
-		$data = $this->getInput('fields');
-		$edit_mode = $this->getInput('edit_mode', 0);
+		$uniqueid = $this->getInput('uniqueid');
+		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
 		// TODO VM: for testing
-		$data['width'] = '500';
-		$data['height'] = '150';
+		$width = $this->getInput('content_width', '100');
+		$height = $this->getInput('content_height', '100');
 
-		if (array_key_exists('source_type', $data) && $data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-			$default['itemid'] = null;
-		}
-		else {
-			$data['source_type'] = ZBX_WIDGET_FIELD_RESOURCE_GRAPH;
-			$default['graphid'] = null;
-		}
-
-		// Apply defualt value for data
-		foreach ($default as $key => $value) {
-			if (!array_key_exists($key, $data)) {
-				$data[$key] = $value;
-			}
-		}
-
-		// TODO VM: (?) By using uniqid() we are adding new graph after each reload. As a result, we will have A LOT of
-		//			nonexisting graphs in timeControl.objectList array in gtlc.js
-		// TODO VM: (?) By not using uniqueid(), we need to find a way to distinguish cases, when same graph is added
-		//			in two widgets. We can't use widgetid, becasue for new widgets, widgetid is empty string => it can be same
-		// TODO VM: (?) Other option is to update gtlc.js script, to delete nonexisting entries from timeControl.objectList,
-		//			each time, we are adding new one. (together with using uniqueid())
-		$dataid = 'graph_'.$data['uniqueid'];
-		$containerid = 'graph_container_'.$data['uniqueid'];
+		$dataid = 'graph_'.$uniqueid;
+		$containerid = 'graph_container_'.$uniqueid;
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 		$dashboardid = $this->getInput('dashboardid', 0);
 		$resourceid = null;
@@ -106,20 +86,20 @@ class CControllerWidgetGraphView extends CController {
 		$profileIdx2 = $dashboardid;
 		$update_profile = $dashboardid ? UPDATE_PROFILE_ON : UPDATE_PROFILE_OFF;
 
-		if ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $data['graphid']) {
+		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $fields['graphid']) {
 			$resource_type = SCREEN_RESOURCE_GRAPH;
-			$resourceid = $data['graphid'];
+			$resourceid = $fields['graphid'];
 			$graph_dims = getGraphDims($resourceid);
-			$graph_dims['graphHeight'] = $data['height'];
-			$graph_dims['width'] = $data['width'];
+			$graph_dims['graphHeight'] = $height;
+			$graph_dims['width'] = $width;
 			$graph = getGraphByGraphId($resourceid);
 		}
-		elseif ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH && $data['itemid']) {
+		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH && $fields['itemid']) {
 			$resource_type = SCREEN_RESOURCE_SIMPLE_GRAPH;
-			$resourceid = $data['itemid'];
+			$resourceid = $fields['itemid'];
 			$graph_dims = getGraphDims();
-			$graph_dims['graphHeight'] = $data['height'];
-			$graph_dims['width'] = $data['width'];
+			$graph_dims['graphHeight'] = $height;
+			$graph_dims['width'] = $width;
 		}
 		else {
 			$resource_type = null;
@@ -157,14 +137,14 @@ class CControllerWidgetGraphView extends CController {
 		];
 
 		// Replace graph item by particular host item if dynamic items are used.
-		if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.
-			if ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$new_itemid = get_same_item_for_host($resourceid, $dynamic_hostid);
 				$resourceid = !empty($new_itemid) ? $new_itemid : null;
 			}
 			// Find requested host and change graph details.
-			elseif ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get host
 				$hosts = API::Host()->get([
 					'hostids' => $dynamic_hostid,
@@ -219,7 +199,7 @@ class CControllerWidgetGraphView extends CController {
 		}
 
 		// Build graph action and data source links.
-		if ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 			if (!$edit_mode) {
 				$time_control_data['loadSBox'] = 1;
 			}
@@ -227,8 +207,8 @@ class CControllerWidgetGraphView extends CController {
 			if ($resourceid) {
 				$graph_src = new CUrl('chart.php');
 				$graph_src->setArgument('itemids[]', $resourceid);
-				$graph_src->setArgument('width', $data['width']);
-				$graph_src->setArgument('height', $data['height']);
+				$graph_src->setArgument('width', $width);
+				$graph_src->setArgument('height', $height);
 			}
 			else {
 				$graph_src = new CUrl('chart3.php');
@@ -237,10 +217,10 @@ class CControllerWidgetGraphView extends CController {
 			$graph_src->setArgument('period', $timeline['period']);
 			$graph_src->setArgument('stime', $timeline['stimeNow']);
 		}
-		elseif ($data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 			$graph_src = '';
 
-			if ($data['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+			if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
 				// TODO miks: why chart7 and chart3 are allowed only if dynamic is set?
 				$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
 					? 'chart7.php'
@@ -268,7 +248,7 @@ class CControllerWidgetGraphView extends CController {
 			}
 
 			if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				if ($data['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+				if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
 					$graph_src = new CUrl('chart6.php');
 					$graph_src->setArgument('graphid', $resourceid);
 				}
@@ -276,7 +256,7 @@ class CControllerWidgetGraphView extends CController {
 				$timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_graphid($resourceid));
 			}
 			else {
-				if ($data['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+				if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
 					$graph_src = new CUrl('chart2.php');
 					$graph_src->setArgument('graphid', $resourceid);
 				}
@@ -286,8 +266,8 @@ class CControllerWidgetGraphView extends CController {
 				}
 			}
 
-			$graph_src->setArgument('width', $data['width']);
-			$graph_src->setArgument('height', $data['height']);
+			$graph_src->setArgument('width', $width);
+			$graph_src->setArgument('height', $height);
 			$graph_src->setArgument('legend', $graph['show_legend']);
 			$graph_src->setArgument('period', $timeline['period']);
 			$graph_src->setArgument('stime', $timeline['stimeNow']);
@@ -311,7 +291,7 @@ class CControllerWidgetGraphView extends CController {
 				'timestamp' => time()
 			],
 			'widget' => [
-				'uniqueid' => $data['uniqueid'],
+				'uniqueid' => $uniqueid,
 				'initial_load' => (int) $this->getInput('initial_load', 0),
 			],
 			'time_control_data' => $time_control_data,
