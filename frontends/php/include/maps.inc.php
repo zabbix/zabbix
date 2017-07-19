@@ -1042,6 +1042,34 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'ack' => true
 		];
 
+		// If user has no rights to see the details of particular selement, add only info that is needed to render map
+		// icons.
+		if (PERM_READ > $selement['permission']) {
+			switch ($selement['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$info[$selementId] = getMapsInfo(['iconid_off' => $selement['iconid_off']], $i, null);
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$info[$selementId] = getHostGroupsInfo(['iconid_off' => $selement['iconid_off']], $i, null);
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$info[$selementId] = getHostsInfo(['iconid_off' => $selement['iconid_off']], $i, null);
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					$info[$selementId] = getTriggersInfo(['iconid_off' => $selement['iconid_off']], $i, null);
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_IMAGE:
+					$info[$selementId] = getImagesInfo(['iconid_off' => $selement['iconid_off']]);
+					break;
+			}
+
+			continue;
+		}
+
 		foreach ($selement['hosts'] as $hostId) {
 			$host = $allHosts[$hostId];
 			$last_hostid = $hostId;
