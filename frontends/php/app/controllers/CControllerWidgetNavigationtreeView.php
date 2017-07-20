@@ -44,6 +44,8 @@ class CControllerWidgetNavigationtreeView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
+			 * @var string $fields['reference']
+			 * @var string $fields['map_widget_reference']
 			 * @var string $fields['map.name.#']
 			 * @var int    $fields['map.parent.#']
 			 * @var int    $fields['map.order.#']

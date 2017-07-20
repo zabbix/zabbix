@@ -43,6 +43,7 @@ class CControllerWidgetSysmapView extends CController {
 		if ($ret) {
 			/*
 			 * @var array  $fields
+			 * @var string $fields['reference']                (optional)
 			 * @var int    $fields['source_type']              (optional)
 			 * @var string $fields['filter_widget_reference']  (optional)
 			 * @var string $fields['sysmapid']                 (optional)
