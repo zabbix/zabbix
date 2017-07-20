@@ -112,7 +112,6 @@ class CControllerWidgetHostsView extends CController {
 				'preservekeys' => true
 			]));
 
-			$filter_groupids = null;
 			$filter_hostids = array_diff($filter_hostids, $exclude_hostids);
 		}
 
