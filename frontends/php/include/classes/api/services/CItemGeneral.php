@@ -420,6 +420,25 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			// Dependent item.
+			if ((array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_DEPENDENT)
+					|| $fullItem['type'] == ITEM_TYPE_DEPENDENT) {
+				if (!array_key_exists('master_itemid', $item) || !$item['master_itemid']) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Field "%1$s" is mandatory.', 'master_itemid'));
+				}
+				if (!is_int($item['master_itemid'])
+						&& !(is_string($item['master_itemid']) && ctype_digit($item['master_itemid']))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+						$item['master_itemid'], 'master_itemid'
+					));
+				}
+			}
+			elseif (array_key_exists('master_itemid', $item) && $item['master_itemid']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+					_('should be empty')
+				));
+			}
+
 			// ssh, telnet
 			if ($fullItem['type'] == ITEM_TYPE_SSH || $fullItem['type'] == ITEM_TYPE_TELNET) {
 				if (zbx_empty($fullItem['username'])) {
@@ -1207,28 +1226,6 @@ abstract class CItemGeneral extends CApiService {
 					unset($db_item['master_itemid']);
 				}
 				$items_cache[$db_itemid] = $items_cache[$db_itemid] + $db_item;
-			}
-		}
-
-		// Validation. Field 'type' is validated globally and should be present in data when item is created.
-		foreach ($items as $item) {
-			$item_type = array_key_exists('type', $item) ? $item['type'] : $items_cache[$item['itemid']]['type'];
-
-			if ($item_type == ITEM_TYPE_DEPENDENT) {
-				if (!array_key_exists('master_itemid', $item) || !$item['master_itemid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Field "%1$s" is mandatory.', 'master_itemid'));
-				}
-				if (!is_int($item['master_itemid'])
-						&& !(is_string($item['master_itemid']) && ctype_digit($item['master_itemid']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-						$item['master_itemid'], 'master_itemid'
-					));
-				}
-			}
-			elseif (array_key_exists('master_itemid', $item) && $item['master_itemid']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-					_('should be empty')
-				));
 			}
 		}
 
