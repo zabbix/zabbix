@@ -1253,6 +1253,9 @@ jQuery(function($) {
 
 											if (prev_maps && !data[0]['moving_upward']) {
 												prev_map_selector = '.tree-item.selected[data-mapid='+prev_maps+'] ';
+												if (!$('.tree-item.selected[data-mapid='+prev_maps+']', $this).length) {
+													prev_map_selector = '.tree-item[data-mapid='+prev_maps+'] ';
+												}
 											}
 											else if (prev_maps) {
 												prev_map_selector = '.tree-item[data-mapid='+prev_maps+'] ';
