@@ -54,21 +54,18 @@ class CControllerDashbrdWidgetConfig extends CController {
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', []));
 
 		$config = select_config();
+		$global_config = [];
+		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
+			$global_config['severity_name_'.$severity] = getSeverityName($severity, $config);
+		}
 
 		$this->setResponse(new CControllerResponseData([
-			'config' => [
-				'severity_name_0' => $config['severity_name_0'],
-				'severity_name_1' => $config['severity_name_1'],
-				'severity_name_2' => $config['severity_name_2'],
-				'severity_name_3' => $config['severity_name_3'],
-				'severity_name_4' => $config['severity_name_4'],
-				'severity_name_5' => $config['severity_name_5']
-			],
+			'config' => $global_config,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
 			'dialogue' => [
-				'type' => $this->getInput('type', WIDGET_CLOCK),
+				'type' => $type,
 				'name' => $this->getInput('name', ''),
 				'form' => $form,
 			],
