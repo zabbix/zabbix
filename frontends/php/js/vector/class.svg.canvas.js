@@ -492,6 +492,20 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 		return null;
 	}
 
+	if (Array.isArray(content)) {
+		var i;
+
+		for (i = 0; i < content.length; i++) {
+			if (content[i].content.trim() !== '') {
+				break;
+			}
+		}
+
+		if (i === content.length) {
+			return null;
+		}
+	}
+
 	['x', 'y', 'anchor', 'background', 'clip'].forEach(function (key) {
 		this[key] = attributes[key];
 	}, this);
