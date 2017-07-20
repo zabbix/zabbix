@@ -772,18 +772,28 @@ class CItemPrototype extends CItemGeneral {
 		// first delete child items
 		$parentItemids = $prototypeids;
 		$childPrototypeids = [];
-		$dependent_itemprototypes = $delItemPrototypes;
 		do {
-			$dbItems = DBselect('SELECT itemid, name FROM items WHERE '.dbConditionInt('templateid', $parentItemids));
+			$dbItems = DBselect('SELECT itemid FROM items WHERE '.dbConditionInt('templateid', $parentItemids));
 			$parentItemids = [];
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
 				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
-				$dependent_itemprototypes[$dbItem['itemid']] = ['name' => $dbItem['name']];
 			}
 		} while ($parentItemids);
 
-		$this->validateDeleteDependentItems($dependent_itemprototypes, $this);
+		$db_dependent_items = $delItemPrototypes + $childPrototypeids;
+		$dependent_itemprototypes = [];
+		// Master item deletion will remove dependent items on database level.
+		while ($db_dependent_items) {
+			$db_dependent_items = $this->get([
+				'output'		=> ['itemid', 'name'],
+				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+				'selectHosts'	=> ['name'],
+				'preservekeys'	=> true
+			]);
+			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_itemprototypes);
+			$dependent_itemprototypes += $db_dependent_items;
+		};
 
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
@@ -865,6 +875,7 @@ class CItemPrototype extends CItemGeneral {
 
 
 // TODO: remove info from API
+		$delItemPrototypes = zbx_toHash($delItemPrototypes, 'itemid') + $dependent_itemprototypes;
 		foreach ($delItemPrototypes as $item) {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
@@ -1042,6 +1053,9 @@ class CItemPrototype extends CItemGeneral {
 		if ($updateItems) {
 			$this->updateReal($updateItems);
 		}
+
+		// Update master_itemid for inserted or updated inherited dependent items.
+		$this->inheritDependentItems(array_merge($updateItems, $insertItems));
 
 		// propagate the inheritance to the children
 		$this->inherit(array_merge($insertItems, $updateItems));

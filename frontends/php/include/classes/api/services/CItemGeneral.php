@@ -1391,36 +1391,54 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Ensures that no dependent items will be left without master item after delete operation.
+	 * Updates inherited dependent items dependency to inherited master items.
 	 *
-	 * @param array                $items_todelete          Array of items to be deleted, where key is itemid.
-	 * @param string               $items_todelete['name']	Item name, is used in exception message.
-	 * @param CItem|CItemPrototype $data_provider           Service used to get dependent items.
-	 *
-	 * @throws APIException if there are dependent items not marked for delete.
+	 * @param array $items  Array of inherited items.
 	 */
-	protected function validateDeleteDependentItems($items_todelete, $data_provider) {
-		$dependent_items = [];
-		$db_dependent_items = $items_todelete;
+	protected function inheritDependentItems($items) {
+		$master_itemids = [];
 
-		while ($db_dependent_items) {
-			$db_dependent_items = $data_provider->get([
-				'output'		=> ['itemid', 'master_itemid', 'templateid'],
-				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
-				'preservekeys'	=> true
+		foreach ($items as $item) {
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_itemids[$item['master_itemid']] = true;
+			}
+		}
+
+		if ($master_itemids) {
+			$master_items = DB::select('items', [
+				'output' => ['key_', 'hostid'],
+				'filter' => ['itemid' => array_keys($master_itemids)],
+				'preservekeys' => true
 			]);
-			$dependent_items = $dependent_items + $db_dependent_items;
-		};
+			$data = [];
+			$host_master_items = [];
 
-		foreach ($dependent_items as $dependent_item) {
-			if (!array_key_exists($dependent_item['itemid'], $items_todelete)) {
-				$master_item = array_key_exists($dependent_item['master_itemid'], $items_todelete)
-					? $items_todelete[$dependent_item['master_itemid']]
-					: $items_todelete[$dependent_item['templateid']];
+			foreach ($items as $item) {
+				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+					continue;
+				}
+				$master_item = $master_items[$item['master_itemid']];
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" have dependent item and can not be removed.',
-					$master_item['name']
-				));
+				if (!array_key_exists($item['hostid'], $host_master_items)) {
+					$host_master_items[$item['hostid']] = [];
+				}
+				if ($master_item['hostid'] != $item['hostid']) {
+					if (!array_key_exists($master_item['key_'], $host_master_items[$item['hostid']])) {
+						$inherited_master_items = DB::select('items', [
+							'output' => ['itemid'],
+							'filter' => ['hostid' => $item['hostid'], 'key_' => $master_item['key_']]
+						]);
+						$host_master_items[$item['hostid']][$master_item['key_']] = reset($inherited_master_items);
+					}
+					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
+					$data[] = [
+						'values'	=> ['master_itemid' => $inherited_master_item['itemid']],
+						'where'		=> ['itemid' => $item['itemid']]
+					];
+				}
+			}
+			if ($data) {
+				DB::update('items', $data);
 			}
 		}
 	}

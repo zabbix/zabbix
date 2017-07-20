@@ -609,21 +609,32 @@ class CItem extends CItemGeneral {
 		}
 
 		// first delete child items
-		$dependent_items = $delItems;
 		$parentItemIds = $itemIds;
+		$db_dependent_items = $delItems;
 		do {
-			$dbItems = DBselect('SELECT i.itemid, i.name FROM items i WHERE '.dbConditionInt('i.templateid',
+			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid',
 				$parentItemIds
 			));
 			$parentItemIds = [];
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemIds[] = $dbItem['itemid'];
 				$itemIds[$dbItem['itemid']] = $dbItem['itemid'];
-				$dependent_items[$dbItem['itemid']] = ['name' => $dbItem['name']];
+				$db_dependent_items[$dbItem['itemid']] = $dbItem['itemid'];
 			}
 		} while ($parentItemIds);
 
-		$this->validateDeleteDependentItems($dependent_items, $this);
+		$dependent_items = [];
+
+		while ($db_dependent_items) {
+			$db_dependent_items = $this->get([
+				'output'		=> ['itemid', 'name'],
+				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+				'selectHosts'	=> ['name'],
+				'preservekeys'	=> true
+			]);
+			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_items);
+			$dependent_items += $db_dependent_items;
+		};
 
 		// delete graphs, leave if graph still have item
 		$delGraphs = [];
@@ -701,6 +712,7 @@ class CItem extends CItemGeneral {
 		DB::insertBatch('housekeeper', $insert);
 
 		// TODO: remove info from API
+		$delItems += $dependent_items;
 		foreach ($delItems as $item) {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
@@ -802,54 +814,8 @@ class CItem extends CItemGeneral {
 			$this->updateReal($updateItems);
 		}
 
-		// Fix master_itemid for inserted or updated inherited items.
-		$items = array_merge($updateItems, $insertItems);
-		$master_itemids = [];
-
-		foreach ($items as $item) {
-			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				$master_itemids[$item['master_itemid']] = true;
-			}
-		}
-
-		if ($master_itemids) {
-			$master_items = DB::select('items', [
-				'output' => ['key_', 'hostid'],
-				'filter' => ['itemid' => array_keys($master_itemids)],
-				'preservekeys' => true
-			]);
-			$data = [];
-			$host_master_items = [];
-
-			foreach ($items as $item) {
-				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-					continue;
-				}
-				$master_item = $master_items[$item['master_itemid']];
-
-				if (!array_key_exists($item['hostid'], $host_master_items)) {
-					$host_master_items[$item['hostid']] = [];
-				}
-				if ($master_item['hostid'] != $item['hostid']) {
-					if (!array_key_exists($master_item['key_'], $host_master_items[$item['hostid']])) {
-						$inherited_master_items = DB::select('items', [
-							'output' => ['itemid'],
-							'filter' => ['hostid' => $item['hostid'], 'key_' => $master_item['key_']]
-						]);
-						$host_master_items[$item['hostid']][$master_item['key_']] = reset($inherited_master_items);
-					}
-					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
-					$data[] = [
-						'values'	=> ['master_itemid' => $inherited_master_item['itemid']],
-						'where'		=> ['itemid' => $item['itemid']]
-					];
-				}
-			}
-			if ($data) {
-				DB::update('items', $data);
-			}
-		}
-		unset($items);
+		// Update master_itemid for inserted or updated inherited dependent items.
+		$this->inheritDependentItems(array_merge($updateItems, $insertItems));
 
 		// propagate the inheritance to the children
 		return $this->inherit(array_merge($updateItems, $insertItems));
