@@ -4,17 +4,17 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates</name>
+         <name>Templates/Network Devices</name>
       </group>
    </groups>
    <templates>
       <template>
          <template>Template Mikrotik SNMPv1</template>
          <name>Template Mikrotik SNMPv1</name>
-         <description>Template Mikrotik version: 0.7</description>
+         <description>Template Mikrotik version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Network Devices</name>
             </group>
          </groups>
          <applications>
@@ -62,8 +62,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>HOST-RESOURCES-MIB The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: HOST-RESOURCES-MIB
+The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -106,8 +108,9 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>HOST-RESOURCES-MIB The size of the storage represented by this entry, in
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: HOST-RESOURCES-MIB
+The size of the storage represented by this entry, in
 	      units of hrStorageAllocationUnits. This object is
 	      writable to allow remote configuration of the size of
 	      the storage area in those cases where such an
@@ -116,7 +119,8 @@
 	      memory allocated to a buffer pool might be modified or
 	      the amount of disk space allocated to virtual memory
 	      might be modified.
-	      </description>
+	      
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -159,8 +163,9 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>Memory utilization in %</description>
+               <port>{$SNMP_PORT}</port>
+               <description>Memory utilization in %
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -198,8 +203,11 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>MIKROTIK-MIB http://wiki.mikrotik.com/wiki/Manual:SNMP (mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: MIKROTIK-MIB
+(mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)
+Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -242,8 +250,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>MIKROTIK-MIB Software version</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: MIKROTIK-MIB
+Software version
+</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -281,8 +291,9 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description/>
+               <port>{$SNMP_PORT}</port>
+               <description>
+</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -320,8 +331,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>MIKROTIK-MIB RouterBOARD serial number</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: MIKROTIK-MIB
+RouterBOARD serial number
+</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -359,8 +372,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>MIKROTIK-MIB Current firmware version</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: MIKROTIK-MIB
+Current firmware version
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -396,7 +411,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -432,8 +447,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>HOST-RESOURCES-MIB The average, over the last minute, of the percentage of time that this processor was not idle.Implementations may approximate this one minute smoothing period if necessary.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: HOST-RESOURCES-MIB
+The average, over the last minute, of the percentage of time that this processor was not idle.Implementations may approximate this one minute smoothing period if necessary.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -457,14 +474,48 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>[{#SNMPINDEX}] CPU utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Mikrotik SNMPv1</host>
+                              <key>system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
 		          <discovery_rule>
@@ -490,7 +541,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -526,8 +577,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>MIKROTIK-MIB (mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: MIKROTIK-MIB
+(mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -556,7 +609,8 @@
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
@@ -578,7 +632,8 @@
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -594,7 +649,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -628,7 +684,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                         <evaltype>2</evaltype>
                         <formula/>
@@ -677,8 +733,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>HOST-RESOURCES-MIB The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: HOST-RESOURCES-MIB
+The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -722,8 +780,9 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>HOST-RESOURCES-MIB The size of the storage represented by this entry, in
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: HOST-RESOURCES-MIB
+The size of the storage represented by this entry, in
 	      units of hrStorageAllocationUnits. This object is
 	      writable to allow remote configuration of the size of
 	      the storage area in those cases where such an
@@ -732,7 +791,8 @@
 	      memory allocated to a buffer pool might be modified or
 	      the amount of disk space allocated to virtual memory
 	      might be modified.
-	      </description>
+	      
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -776,8 +836,9 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>Storage utilization in % for Disk-{#SNMPINDEX}</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>Storage utilization in % for Disk-{#SNMPINDEX}
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -801,7 +862,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -817,7 +879,8 @@
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
@@ -873,8 +936,15 @@
                <macro>{$STORAGE_UTIL_WARN}</macro>
                <value>80</value>
             </macro>
+            <macro>
+               <macro>{$SNMP_PORT}</macro>
+               <value>161</value>
+            </macro>
          </macros>
          <templates>
+            <template>
+               <name>Template SNMP Interfaces SNMPv1</name>
+            </template>
             <template>
                <name>Template SNMP Generic SNMPv1</name>
             </template>
@@ -882,7 +952,40 @@
          <screens/>
       </template>
    </templates>
-   <graphs/>
+   <graphs>
+      <graph>
+         <name>Memory utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+                     <graph_item>
+                        <sortorder>0</sortorder>
+                        <drawtype>5</drawtype>
+                        <color>1A7C11</color>
+                        <yaxisside>0</yaxisside>
+                        <calc_fnc>2</calc_fnc>
+                        <type>0</type>
+                        <item>
+                           <host>Template Mikrotik SNMPv1</host>
+                           <key>vm.memory.pused[memoryUsedPercentage.Memory]</key>
+                        </item>
+                     </graph_item>
+                  </graph_items>
+      </graph>
+   </graphs>
    <triggers>
       <trigger>
          <expression>{Template Mikrotik SNMPv1:vm.memory.pused[memoryUsedPercentage.Memory].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
@@ -894,7 +997,8 @@
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -910,7 +1014,8 @@
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies>
@@ -932,7 +1037,8 @@
          <url/>
          <status>0</status>
          <priority>4</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -948,7 +1054,8 @@
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -964,7 +1071,8 @@
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Device serial number has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>
@@ -980,7 +1088,8 @@
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Firmware version has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>

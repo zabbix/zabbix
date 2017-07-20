@@ -4,17 +4,17 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates</name>
+         <name>Templates/Dependencies</name>
       </group>
    </groups>
    <templates>
       <template>
          <template>Template SNMP Generic SNMPv1</template>
          <name>Template SNMP Generic SNMPv1</name>
-         <description>Template SNMP Generic version: 0.7</description>
+         <description>Template SNMP Generic version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Dependencies</name>
             </group>
          </groups>
          <applications>
@@ -50,8 +50,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -94,8 +96,9 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>Item is used to collect all SNMP traps unmatched by other snmptrap items</description>
+               <port>{$SNMP_PORT}</port>
+               <description>Item is used to collect all SNMP traps unmatched by other snmptrap items
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -133,8 +136,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB  The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+ The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+</description>
                <inventory_link>24</inventory_link>
                <applications>
                   <application>
@@ -172,8 +177,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+</description>
                <inventory_link>23</inventory_link>
                <applications>
                   <application>
@@ -211,8 +218,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB  The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+ The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -250,8 +259,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+</description>
                <inventory_link>3</inventory_link>
                <applications>
                   <application>
@@ -289,10 +300,12 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB A textual description of the entity.  This value should
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+A textual description of the entity.  This value should
 include the full name and version identification of thesystem's hardware type, software operating-system, and
-networking software.</description>
+networking software.
+</description>
                <inventory_link>14</inventory_link>
                <applications>
                   <application>
@@ -330,8 +343,9 @@ networking software.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description/>
+               <port>{$SNMP_PORT}</port>
+               <description>
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -352,6 +366,10 @@ networking software.</description>
                <macro>{$SNMP_TIMEOUT}</macro>
                <value>3m</value>
             </macro>
+            <macro>
+               <macro>{$SNMP_PORT}</macro>
+               <value>161</value>
+            </macro>
          </macros>
          <templates>
             <template>
@@ -363,10 +381,10 @@ networking software.</description>
       <template>
          <template>Template ICMP Ping</template>
          <name>Template ICMP Ping</name>
-         <description>Template ICMP Ping version: 0.7</description>
+         <description>Template ICMP Ping version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Dependencies</name>
             </group>
          </groups>
          <applications>
@@ -402,8 +420,9 @@ networking software.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description/>
+               <port>{$SNMP_PORT}</port>
+               <description>
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -443,8 +462,9 @@ networking software.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description/>
+               <port>{$SNMP_PORT}</port>
+               <description>
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -482,8 +502,9 @@ networking software.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description/>
+               <port>{$SNMP_PORT}</port>
+               <description>
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -525,7 +546,8 @@ networking software.</description>
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.The device uptime is less then 10 minutes or SNMP trap(coldStart) received</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+The device uptime is less then 10 minutes or SNMP trap(coldStart) received</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies>
@@ -547,7 +569,8 @@ networking software.</description>
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.SNMP is not available for polling. Please check device connectivity and SNMP settings.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+SNMP is not available for polling. Please check device connectivity and SNMP settings.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies>
@@ -569,7 +592,8 @@ networking software.</description>
          <url/>
          <status>0</status>
          <priority>4</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Last three attempts returned timeout.  Please check device connectivity.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Last three attempts returned timeout.  Please check device connectivity.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>

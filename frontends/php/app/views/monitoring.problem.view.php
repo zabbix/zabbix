@@ -262,6 +262,7 @@ if ($data['action'] == 'problem.view') {
 						->addItem(new CRedirectButton(_('Export to CSV'),
 							(new CUrl('zabbix.php'))
 								->setArgument('action', 'problem.view.csv')
+								->setArgument('page',  $data['page'])
 						))
 						->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 				)

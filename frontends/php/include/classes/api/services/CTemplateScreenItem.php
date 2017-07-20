@@ -42,8 +42,8 @@ class CTemplateScreenItem extends CApiService {
 			'editable'		=> null,
 			'sortfield'		=> '',
 			'sortorder'		=> '',
-			'preservekeys'	=> null,
-			'countOutput'	=> null
+			'preservekeys'	=> false,
+			'countOutput'	=> false
 		]);
 	}
 
@@ -70,12 +70,12 @@ class CTemplateScreenItem extends CApiService {
 		$result = [];
 		while ($row = DBfetch($res)) {
 			// count query, return a single result
-			if ($options['countOutput'] !== null) {
+			if ($options['countOutput']) {
 				$result = $row['rowscount'];
 			}
 			// normal select query
 			else {
-				if ($options['preservekeys'] !== null) {
+				if ($options['preservekeys']) {
 					$result[$row['screenitemid']] = $row;
 				}
 				else {

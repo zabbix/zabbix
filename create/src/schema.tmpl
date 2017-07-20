@@ -333,6 +333,7 @@ FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -373,6 +374,9 @@ FIELD		|smtp_verify_peer|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_host|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_authentication|t_integer	|'0'	|NOT NULL	|0
 FIELD		|exec_params	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|maxsessions	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|maxattempts	|t_integer	|'3'	|NOT NULL	|0
+FIELD		|attempt_interval|t_varchar(32)	|'10s'	|NOT NULL	|0
 UNIQUE		|1		|description
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
@@ -961,7 +965,7 @@ FIELD		|p_eventid	|t_id		|	|NULL		|0			|5|events	|eventid
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|eventid
-INDEX		|4		|status,retries
+INDEX		|4		|status
 INDEX		|5		|mediatypeid
 INDEX		|6		|userid
 INDEX		|7		|p_eventid
@@ -1505,7 +1509,7 @@ UNIQUE		|1			|selementid,triggerid
 
 TABLE|httptest_field|httptest_fieldid|ZBX_DATA
 FIELD		|httptest_fieldid	|t_id		|	|NOT NULL	|0
-FIELD		|httptestid		|t_id		|	|NOT NULL	|ZBX_PROXY			|1|httptest
+FIELD		|httptestid		|t_id		|	|NOT NULL	|ZBX_PROXY	|1|httptest
 FIELD		|type			|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value			|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
@@ -1513,13 +1517,63 @@ INDEX		|1			|httptestid
 
 TABLE|httpstep_field|httpstep_fieldid|ZBX_DATA
 FIELD		|httpstep_fieldid	|t_id		|	|NOT NULL	|0
-FIELD		|httpstepid		|t_id		|	|NOT NULL	|ZBX_PROXY			|1|httpstep
+FIELD		|httpstepid		|t_id		|	|NOT NULL	|ZBX_PROXY	|1|httpstep
 FIELD		|type			|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value			|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1			|httpstepid
 
+TABLE|dashboard|dashboardid|ZBX_DATA
+FIELD		|dashboardid	|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users	|		|RESTRICT
+FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
+
+TABLE|dashboard_user|dashboard_userid|ZBX_DATA
+FIELD		|dashboard_userid|t_id		|	|NOT NULL	|0
+FIELD		|dashboardid	|t_id		|	|NOT NULL	|0			|1|dashboard
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|2|users
+FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
+UNIQUE		|1		|dashboardid,userid
+
+TABLE|dashboard_usrgrp|dashboard_usrgrpid|ZBX_DATA
+FIELD		|dashboard_usrgrpid|t_id	|	|NOT NULL	|0
+FIELD		|dashboardid	|t_id		|	|NOT NULL	|0			|1|dashboard
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0			|2|usrgrp
+FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
+UNIQUE		|1		|dashboardid,usrgrpid
+
+TABLE|widget|widgetid|ZBX_DATA
+FIELD		|widgetid	|t_id		|	|NOT NULL	|0
+FIELD		|dashboardid	|t_id		|	|NOT NULL	|0			|1|dashboard
+FIELD		|type		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|row		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|col		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|height		|t_integer	|'1'	|NOT NULL	|0
+FIELD		|width		|t_integer	|'1'	|NOT NULL	|0
+INDEX		|1		|dashboardid
+
+TABLE|widget_field|widget_fieldid|ZBX_DATA
+FIELD		|widget_fieldid	|t_id		|	|NOT NULL	|0
+FIELD		|widgetid	|t_id		|	|NOT NULL	|0			|1|widget
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value_groupid	|t_id		|	|NULL		|0			|2|groups	|groupid
+FIELD		|value_hostid	|t_id		|	|NULL		|0			|3|hosts	|hostid
+FIELD		|value_itemid	|t_id		|	|NULL		|0			|4|items	|itemid
+FIELD		|value_graphid	|t_id		|	|NULL		|0			|5|graphs	|graphid
+FIELD		|value_sysmapid	|t_id		|	|NULL		|0			|6|sysmaps	|sysmapid
+INDEX		|1		|widgetid
+INDEX		|2		|value_groupid
+INDEX		|3		|value_hostid
+INDEX		|4		|value_itemid
+INDEX		|5		|value_graphid
+INDEX		|6		|value_sysmapid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030140	|3030140
+ROW		|3030175	|3030175

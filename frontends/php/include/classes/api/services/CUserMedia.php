@@ -69,15 +69,15 @@ class CUserMedia extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'editable'					=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -116,7 +116,7 @@ class CUserMedia extends CApiService {
 			$sqlParts['where'][] = dbConditionInt('u.userid', $options['userids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 
-			if ($options['groupCount'] !== null) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['userid'] = 'm.userid';
 			}
 		}
@@ -129,7 +129,7 @@ class CUserMedia extends CApiService {
 			$sqlParts['where'][] = dbConditionInt('ug.usrgrpid', $options['usrgrpids']);
 			$sqlParts['where']['mug'] = 'm.userid=ug.userid';
 
-			if ($options['groupCount'] !== null) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['usrgrpid'] = 'ug.usrgrpid';
 			}
 		}
@@ -140,7 +140,7 @@ class CUserMedia extends CApiService {
 
 			$sqlParts['where'][] = dbConditionInt('m.mediatypeid', $options['mediatypeids']);
 
-			if ($options['groupCount'] !== null) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['mediatypeid'] = 'm.mediatypeid';
 			}
 		}
@@ -165,8 +165,8 @@ class CUserMedia extends CApiService {
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		while ($media = DBfetch($res)) {
-			if ($options['countOutput'] !== null) {
-				if ($options['groupCount'] !== null) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $media;
 				}
 				else {
@@ -178,12 +178,12 @@ class CUserMedia extends CApiService {
 			}
 		}
 
-		if ($options['countOutput'] !== null) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
 		// removing keys
-		if ($options['preservekeys'] === null) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 

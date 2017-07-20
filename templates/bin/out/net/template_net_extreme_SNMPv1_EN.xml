@@ -4,17 +4,17 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates</name>
+         <name>Templates/Network Devices</name>
       </group>
    </groups>
    <templates>
       <template>
          <template>Template Extreme EXOS SNMPv1</template>
          <name>Template Extreme EXOS SNMPv1</name>
-         <description>Template Extreme EXOS version: 0.7</description>
+         <description>Template Extreme EXOS version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Network Devices</name>
             </group>
          </groups>
          <applications>
@@ -65,8 +65,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>EXTREME-SOFTWARE-MONITOR-MIB Total CPU utlization (percentage) as of last sampling.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
+Total CPU utlization (percentage) as of last sampling.
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -104,8 +106,11 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>EXTREME-SYSTEM-MIB https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack Temperature readings of testpoint: Device</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: EXTREME-SYSTEM-MIB
+Temperature readings of testpoint: Device
+Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -143,8 +148,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>EXTREME-SYSTEM-MIB Temperature status of testpoint: Device</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: EXTREME-SYSTEM-MIB
+Temperature status of testpoint: Device
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -184,8 +191,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -223,8 +232,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -262,8 +273,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -301,8 +314,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -340,11 +355,13 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>EXTREME-SYSTEM-MIB The software revision of the primary image stored in this device.
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: EXTREME-SYSTEM-MIB
+The software revision of the primary image stored in this device.
 		    This string will have a zero length if the revision is unknown, invalid or not present.
 		    This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.
-		    </description>
+		    
+</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -380,7 +397,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -416,8 +433,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>EXTREME-SOFTWARE-MONITOR-MIB Total amount of free memory in Kbytes in the system.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
+Total amount of free memory in Kbytes in the system.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -461,8 +480,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>EXTREME-SOFTWARE-MONITOR-MIB Total amount of DRAM in Kbytes in the system.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
+Total amount of DRAM in Kbytes in the system.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -506,8 +527,9 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>Memory utilization in %</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>Memory utilization in %
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -531,14 +553,48 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>[{#SNMPVALUE}] Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Extreme EXOS SNMPv1</host>
+                              <key>vm.memory.pused[{#SNMPVALUE}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
 
@@ -565,7 +621,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -601,8 +657,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>EXTREME-SYSTEM-MIB Status of the power supply {#SNMPVALUE}</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: EXTREME-SYSTEM-MIB
+Status of the power supply {#SNMPVALUE}
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -628,7 +686,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the power supply unit for errors</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -662,7 +721,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -698,8 +757,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>EXTREME-SYSTEM-MIB Operational status of a cooling fan.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: EXTREME-SYSTEM-MIB
+Operational status of a cooling fan.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -740,8 +801,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>EXTREME-SYSTEM-MIB The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: EXTREME-SYSTEM-MIB
+The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -765,7 +828,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the fan unit</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -827,8 +891,18 @@
                <macro>{$STORAGE_UTIL_WARN}</macro>
                <value>80</value>
             </macro>
+            <macro>
+               <macro>{$SNMP_PORT}</macro>
+               <value>161</value>
+            </macro>
          </macros>
          <templates>
+            <template>
+               <name>Template SNMP Interfaces SNMPv1</name>
+            </template>
+            <template>
+               <name>Template SNMP EtherLike-MIB SNMPv1</name>
+            </template>
             <template>
                <name>Template SNMP Generic SNMPv1</name>
             </template>
@@ -836,7 +910,40 @@
          <screens/>
       </template>
    </templates>
-   <graphs/>
+   <graphs>
+      <graph>
+         <name>CPU utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+                     <graph_item>
+                        <sortorder>0</sortorder>
+                        <drawtype>5</drawtype>
+                        <color>1A7C11</color>
+                        <yaxisside>0</yaxisside>
+                        <calc_fnc>2</calc_fnc>
+                        <type>0</type>
+                        <item>
+                           <host>Template Extreme EXOS SNMPv1</host>
+                           <key>system.cpu.util[extremeCpuMonitorTotalUtilization.0]</key>
+                        </item>
+                     </graph_item>
+                  </graph_items>
+      </graph>
+   </graphs>
    <triggers>
       <trigger>
          <expression>{Template Extreme EXOS SNMPv1:system.cpu.util[extremeCpuMonitorTotalUtilization.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
@@ -848,7 +955,8 @@
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -864,7 +972,8 @@
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies>
@@ -892,7 +1001,8 @@
          <url/>
          <status>0</status>
          <priority>4</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -908,7 +1018,8 @@
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -924,7 +1035,8 @@
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Device serial number has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>
@@ -940,7 +1052,8 @@
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Firmware version has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>

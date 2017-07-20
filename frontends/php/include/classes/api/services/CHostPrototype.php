@@ -64,13 +64,13 @@ class CHostPrototype extends CHostBase {
 		$result = [];
 		while ($row = DBfetch($res)) {
 			// a count query, return a single result
-			if ($options['countOutput'] !== null) {
-			if ($options['groupCount'] !== null) {
-				$result[] = $row;
-			}
-			else {
-				$result = $row['rowscount'];
-			}
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
+					$result[] = $row;
+				}
+				else {
+					$result = $row['rowscount'];
+				}
 			}
 			// a normal select query
 			else {
@@ -78,7 +78,7 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		if ($options['countOutput'] !== null) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -87,7 +87,7 @@ class CHostPrototype extends CHostBase {
 			$result = $this->unsetExtraFields($result, ['triggerid'], $options['output']);
 		}
 
-		if ($options['preservekeys'] === null) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -1235,7 +1235,7 @@ class CHostPrototype extends CHostBase {
 		if ($options['discoveryids'] !== null) {
 			$sqlParts['where'][] = dbConditionInt('hd.parent_itemid', (array) $options['discoveryids']);
 
-			if ($options['groupCount'] !== null) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['hd'] = 'hd.parent_itemid';
 			}
 		}

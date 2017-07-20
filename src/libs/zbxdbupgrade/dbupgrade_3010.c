@@ -1589,14 +1589,14 @@ static int	DBpatch_3010077(void)
 {
 	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("groups", &field);
+	return DBmodify_field_type("groups", &field, NULL);
 }
 
 static int	DBpatch_3010078(void)
 {
 	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("group_prototype", &field);
+	return DBmodify_field_type("group_prototype", &field, NULL);
 }
 
 static int	DBpatch_3010079(void)

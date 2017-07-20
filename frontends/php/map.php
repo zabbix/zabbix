@@ -28,7 +28,7 @@ $page['type'] = PAGE_TYPE_JSON;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$map_data = CMapHelper::get(getRequest('sysmapid'), getRequest('severity_min'));
+$map_data = CMapHelper::get(getRequest('sysmapid'), ['severity_min' => getRequest('severity_min')]);
 
 // No need to get all data.
 $options = [

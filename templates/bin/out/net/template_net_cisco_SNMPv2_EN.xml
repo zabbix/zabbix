@@ -4,17 +4,17 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates</name>
+         <name>Templates/Network Devices</name>
       </group>
    </groups>
    <templates>
       <template>
          <template>Template Cisco IOS Software releases 12.2_3.5_ or later SNMPv2</template>
          <name>Template Cisco IOS Software releases 12.2_3.5_ or later SNMPv2</name>
-         <description>Cisco IOS Software releases 12.2(3.5) or later version: 0.7</description>
+         <description>Cisco IOS Software releases 12.2(3.5) or later version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Network Devices</name>
             </group>
          </groups>
          <applications>
@@ -65,8 +65,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -104,8 +106,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -143,8 +147,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+
+</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -189,7 +195,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                         <evaltype>1</evaltype>
                         <formula/>
@@ -239,8 +245,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>ENTITY-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: ENTITY-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -264,7 +272,8 @@
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.{#ENT_NAME} serial number has changed. Ack to close</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+{#ENT_NAME} serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
                      <dependencies/>
@@ -301,7 +310,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -341,8 +350,11 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-PROCESS-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html The cpmCPUTotal5minRev MIB object provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev . These MIB objects are not accurate because they look at CPU at one minute and five second intervals, respectively. These MIBs enable you to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500s, can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-PROCESS-MIB
+The cpmCPUTotal5minRev MIB object provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev . These MIB objects are not accurate because they look at CPU at one minute and five second intervals, respectively. These MIBs enable you to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500s, can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -366,14 +378,48 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>[{#SNMPINDEX}] CPU utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Cisco IOS Software releases 12.2_3.5_ or later SNMPv2</host>
+                              <key>system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}.]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
 	  	        <discovery_rule>
@@ -399,7 +445,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -437,8 +483,11 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-MEMORY-POOL-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-MEMORY-POOL-MIB
+Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -477,8 +526,11 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-MEMORY-POOL-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html Indicates the number of bytes from the memory pool that are currently unused on the managed device.Note that the sum of ciscoMemoryPoolUsed andciscoMemoryPoolFree is the total amount of memory in the pool</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-MEMORY-POOL-MIB
+Indicates the number of bytes from the memory pool that are currently unused on the managed device.Note that the sum of ciscoMemoryPoolUsed andciscoMemoryPoolFree is the total amount of memory in the pool
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -517,8 +569,9 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>Memory utilization in %</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>Memory utilization in %
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -542,14 +595,48 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>[{#SNMPVALUE}] Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Cisco IOS Software releases 12.2_3.5_ or later SNMPv2</host>
+                              <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
 	  	        <discovery_rule>
@@ -575,7 +662,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -613,8 +700,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-ENVMON-MIB The current measurement of the testpoint being instrumented.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-ENVMON-MIB
+The current measurement of the testpoint being instrumented.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -653,8 +742,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-ENVMON-MIB The current state of the testpoint being instrumented.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-ENVMON-MIB
+The current state of the testpoint being instrumented.
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -683,7 +774,8 @@
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
@@ -717,7 +809,8 @@
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -733,7 +826,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -767,7 +861,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -803,8 +897,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-ENVMON-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-ENVMON-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -830,7 +926,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the power supply unit for errors</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -864,7 +961,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -900,8 +997,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-ENVMON-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-ENVMON-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -927,7 +1026,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the fan unit</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -950,10 +1050,6 @@
             <macro>
                <macro>{$TEMP_WARN:"CPU"}</macro>
                <value>70</value>
-            </macro>
-            <macro>
-               <macro>{$HEALTH_CRIT_STATUS}</macro>
-               <value>4</value>
             </macro>
             <macro>
                <macro>{$TEMP_WARN_STATUS}</macro>
@@ -1011,8 +1107,18 @@
                <macro>{$STORAGE_UTIL_WARN}</macro>
                <value>80</value>
             </macro>
+            <macro>
+               <macro>{$SNMP_PORT}</macro>
+               <value>161</value>
+            </macro>
          </macros>
          <templates>
+            <template>
+               <name>Template SNMP Interfaces SNMPv2</name>
+            </template>
+            <template>
+               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+            </template>
             <template>
                <name>Template SNMP Generic SNMPv2</name>
             </template>
@@ -1022,10 +1128,10 @@
       <template>
          <template>Template Cisco IOS Software releases later to 12.0_3_T and prior to 12.2_3.5_ SNMPv2</template>
          <name>Template Cisco IOS Software releases later to 12.0_3_T and prior to 12.2_3.5_ SNMPv2</name>
-         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.7</description>
+         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Network Devices</name>
             </group>
          </groups>
          <applications>
@@ -1076,8 +1182,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -1115,8 +1223,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -1154,8 +1264,10 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+
+</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -1197,7 +1309,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                         <evaltype>1</evaltype>
                         <formula/>
@@ -1247,8 +1359,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>ENTITY-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: ENTITY-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1272,7 +1386,8 @@
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.{#ENT_NAME} serial number has changed. Ack to close</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+{#ENT_NAME} serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
                      <dependencies/>
@@ -1306,7 +1421,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -1342,8 +1457,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-ENVMON-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-ENVMON-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1369,7 +1486,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the power supply unit for errors</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -1403,7 +1521,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -1439,8 +1557,10 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-ENVMON-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-ENVMON-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1466,7 +1586,8 @@
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the fan unit</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -1501,7 +1622,7 @@
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -1541,12 +1662,15 @@
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-PROCESS-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html The overall CPU busy percentage in the last 5 minute
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-PROCESS-MIB
+The overall CPU busy percentage in the last 5 minute
 period. This object deprecates the avgBusy5 object from 
 the OLD-CISCO-SYSTEM-MIB. This object is deprecated
 by cpmCPUTotal5minRev which has the changed range 
-of value (0..100)</description>
+of value (0..100)
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1570,14 +1694,48 @@ of value (0..100)</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>[{#SNMPVALUE}] CPU utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Cisco IOS Software releases later to 12.0_3_T and prior to 12.2_3.5_ SNMPv2</host>
+                              <key>system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
 	  	        <discovery_rule>
@@ -1603,7 +1761,7 @@ of value (0..100)</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -1640,8 +1798,11 @@ of value (0..100)</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-MEMORY-POOL-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-MEMORY-POOL-MIB
+Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1680,8 +1841,11 @@ of value (0..100)</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-MEMORY-POOL-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed andciscoMemoryPoolFree is the total amount of memoryin the pool</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-MEMORY-POOL-MIB
+Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed andciscoMemoryPoolFree is the total amount of memoryin the pool
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1720,8 +1884,9 @@ of value (0..100)</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>Memory utilization in %</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>Memory utilization in %
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1745,14 +1910,48 @@ of value (0..100)</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>[{#SNMPVALUE}] Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Cisco IOS Software releases later to 12.0_3_T and prior to 12.2_3.5_ SNMPv2</host>
+                              <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
 	        </discovery_rules>
@@ -1765,10 +1964,6 @@ of value (0..100)</description>
             <macro>
                <macro>{$TEMP_WARN:"CPU"}</macro>
                <value>70</value>
-            </macro>
-            <macro>
-               <macro>{$HEALTH_CRIT_STATUS}</macro>
-               <value>4</value>
             </macro>
             <macro>
                <macro>{$TEMP_WARN_STATUS}</macro>
@@ -1829,6 +2024,9 @@ of value (0..100)</description>
          </macros>
          <templates>
             <template>
+               <name>Template SNMP Interfaces SNMPv2</name>
+            </template>
+            <template>
                <name>Template SNMP Generic SNMPv2</name>
             </template>
          </templates>
@@ -1837,10 +2035,10 @@ of value (0..100)</description>
       <template>
          <template>Template Cisco IOS Software releases prior to 12.0_3_T SNMPv2</template>
          <name>Template Cisco IOS Software releases prior to 12.0_3_T SNMPv2</name>
-         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.7</description>
+         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.8</description>
          <groups>
             <group>
-               <name>Templates</name>
+               <name>Templates/Network Devices</name>
             </group>
          </groups>
          <applications>
@@ -1891,9 +2089,12 @@ of value (0..100)</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>OLD-CISCO-CPU-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html 5 minute exponentially-decayed moving 
-average of the CPU busy percentage.</description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: OLD-CISCO-CPU-MIB
+5 minute exponentially-decayed moving 
+average of the CPU busy percentage.
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -1931,8 +2132,10 @@ average of the CPU busy percentage.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -1970,8 +2173,10 @@ average of the CPU busy percentage.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>ENTITY-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: ENTITY-MIB
+
+</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -2009,8 +2214,10 @@ average of the CPU busy percentage.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
-               <description>SNMPv2-MIB </description>
+               <port>{$SNMP_PORT}</port>
+               <description>MIB: SNMPv2-MIB
+
+</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -2053,7 +2260,7 @@ average of the CPU busy percentage.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                         <evaltype>1</evaltype>
                         <formula/>
@@ -2103,8 +2310,10 @@ average of the CPU busy percentage.</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>ENTITY-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: ENTITY-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -2128,7 +2337,8 @@ average of the CPU busy percentage.</description>
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.{#ENT_NAME} serial number has changed. Ack to close</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+{#ENT_NAME} serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
                      <dependencies/>
@@ -2162,7 +2372,7 @@ average of the CPU busy percentage.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -2198,8 +2408,10 @@ average of the CPU busy percentage.</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-ENVMON-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-ENVMON-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -2225,7 +2437,8 @@ average of the CPU busy percentage.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the power supply unit for errors</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -2259,7 +2472,7 @@ average of the CPU busy percentage.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -2295,8 +2508,10 @@ average of the CPU busy percentage.</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-ENVMON-MIB </description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-ENVMON-MIB
+
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -2322,7 +2537,8 @@ average of the CPU busy percentage.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.Please check the fan unit</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -2355,7 +2571,7 @@ average of the CPU busy percentage.</description>
                <password/>
                <publickey/>
                <privatekey/>
-               <port>161</port>
+               <port>{$SNMP_PORT}</port>
                <filter>
                   <evaltype>0</evaltype>
                   <formula/>
@@ -2392,8 +2608,11 @@ average of the CPU busy percentage.</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-MEMORY-POOL-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-MEMORY-POOL-MIB
+Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -2432,8 +2651,11 @@ average of the CPU busy percentage.</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>CISCO-MEMORY-POOL-MIB http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>MIB: CISCO-MEMORY-POOL-MIB
+Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -2472,8 +2694,9 @@ average of the CPU busy percentage.</description>
                      <password/>
                      <publickey/>
                      <privatekey/>
-                     <port>161</port>
-                     <description>Memory utilization in %</description>
+                     <port>{$SNMP_PORT}</port>
+                     <description>Memory utilization in %
+</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -2497,14 +2720,48 @@ average of the CPU busy percentage.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
-               <graph_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>[{#SNMPVALUE}] Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Cisco IOS Software releases prior to 12.0_3_T SNMPv2</host>
+                              <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <host_prototypes/>
             </discovery_rule>
   	      </discovery_rules>
@@ -2517,10 +2774,6 @@ average of the CPU busy percentage.</description>
             <macro>
                <macro>{$TEMP_WARN:"CPU"}</macro>
                <value>70</value>
-            </macro>
-            <macro>
-               <macro>{$HEALTH_CRIT_STATUS}</macro>
-               <value>4</value>
             </macro>
             <macro>
                <macro>{$TEMP_WARN_STATUS}</macro>
@@ -2587,7 +2840,40 @@ average of the CPU busy percentage.</description>
          <screens/>
       </template>
    </templates>
-   <graphs/>
+   <graphs>
+      <graph>
+         <name>CPU utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+                     <graph_item>
+                        <sortorder>0</sortorder>
+                        <drawtype>5</drawtype>
+                        <color>1A7C11</color>
+                        <yaxisside>0</yaxisside>
+                        <calc_fnc>2</calc_fnc>
+                        <type>0</type>
+                        <item>
+                           <host>Template Cisco IOS Software releases prior to 12.0_3_T SNMPv2</host>
+                           <key>system.cpu.util[avgBusy5]</key>
+                        </item>
+                     </graph_item>
+                  </graph_items>
+      </graph>
+   </graphs>
    <triggers>
       <trigger>
          <expression>{Template Cisco IOS Software releases 12.2_3.5_ or later SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Cisco IOS Software releases 12.2_3.5_ or later SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
@@ -2599,7 +2885,8 @@ average of the CPU busy percentage.</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Device serial number has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>
@@ -2615,7 +2902,8 @@ average of the CPU busy percentage.</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Device serial number has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>
@@ -2631,7 +2919,8 @@ average of the CPU busy percentage.</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -2647,7 +2936,8 @@ average of the CPU busy percentage.</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.Device serial number has changed. Ack to close</description>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
          <dependencies/>

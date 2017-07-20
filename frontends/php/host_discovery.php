@@ -103,6 +103,9 @@ $fields = [
 	'evaltype' =>	 		[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' => 			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'conditions' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'jmx_endpoint' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
+	],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),
@@ -253,6 +256,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'lifetime' => getRequest('lifetime')
 		];
 
+		if ($newItem['type'] == ITEM_TYPE_JMX) {
+			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+		}
+
 		// add macros; ignore empty new macros
 		$filter = [
 			'evaltype' => getRequest('evaltype'),
@@ -394,6 +401,11 @@ if (isset($_REQUEST['form'])) {
 		unset($data['itemid']);
 		$data['form'] = 'clone';
 	}
+
+	// Sort interfaces to be listed starting with one selected as 'main'.
+	CArrayHelper::sort($data['interfaces'], [
+		['field' => 'main', 'order' => ZBX_SORT_DOWN]
+	]);
 
 	// render view
 	$itemView = new CView('configuration.host.discovery.edit', $data);

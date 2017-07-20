@@ -18,9 +18,43 @@
 **/
 
 #include "common.h"
+
+/* LIBXML2 is used */
+#ifdef HAVE_LIBXML2
+#	include <libxml/parser.h>
+#	include <libxml/tree.h>
+#	include <libxml/xpath.h>
+#endif
+
+#include "log.h"
 #include "zbxregexp.h"
+#include "zbxjson.h"
 
 #include "item_preproc.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_numeric_type_hint                                   *
+ *                                                                            *
+ * Purpose: returns numeric type hint based on item value type                *
+ *                                                                            *
+ * Parameters: value_type - [IN] the item value type                          *
+ *                                                                            *
+ * Return value: variant numeric type or none                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_numeric_type_hint(unsigned char value_type)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			return ZBX_VARIANT_DBL;
+		case ITEM_VALUE_TYPE_UINT64:
+			return ZBX_VARIANT_UI64;
+		default:
+			return ZBX_VARIANT_NONE;
+	}
+}
 
 /******************************************************************************
  *                                                                            *
@@ -55,6 +89,7 @@ static int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, 
  *                                                                            *
  * Parameters: value_num - [OUT] the converted value                          *
  *             value     - [IN] the value to convert                          *
+ *             type_hint - [IN] the expected type (DBL/UI64) ir NONE          *
  *             errmsg    - [OUT] error message                                *
  *                                                                            *
  * Return value: SUCCEED - the value was converted successfully               *
@@ -62,7 +97,7 @@ static int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, 
  *                                                                            *
  ******************************************************************************/
 static int	item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
-		char **errmsg)
+		unsigned char type_hint, char **errmsg)
 {
 	int	ret = FAIL;
 
@@ -86,6 +121,9 @@ static int	item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const
 		return FAIL;
 	}
 
+	if (ZBX_VARIANT_NONE != type_hint)
+		zbx_variant_convert(value_num, type_hint);
+
 	return SUCCEED;
 }
 
@@ -96,21 +134,26 @@ static int	item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const
  * Purpose: execute custom multiplier preprocessing operation on variant      *
  *          value type                                                        *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the value to process                  *
- *             params        - [IN] the operation parameters                  *
- *             errmsg        - [OUT] error message                            *
+ * Parameters: item   - [IN] the item                                         *
+ *             value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
  *                                                                            *
  * Return value: SUCCEED - the preprocessing step finished successfully       *
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_multiplier_variant(const DC_ITEM *item, zbx_variant_t *value, const char *params,
+		char **errmsg)
 {
 	zbx_uint64_t	multiplier_ui64, value_ui64;
 	double		value_dbl;
 	zbx_variant_t	value_num;
+	int		type_hint;
 
-	if (FAIL == item_preproc_convert_value_to_numeric(&value_num, value, errmsg))
+
+	type_hint = item_preproc_numeric_type_hint(item->value_type);
+	if (FAIL == item_preproc_convert_value_to_numeric(&value_num, value, type_hint, errmsg))
 		return FAIL;
 
 	switch (value_num.type)
@@ -147,22 +190,23 @@ static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *par
  *                                                                            *
  * Purpose: execute custom multiplier preprocessing operation                 *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the value to process                  *
- *             params        - [IN] the operation parameters                  *
- *             errmsg        - [OUT] error message                            *
+ * Parameters: item   - [IN] the item                                         *
+ *             value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
  *                                                                            *
  * Return value: SUCCEED - the preprocessing step finished successfully       *
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_multiplier(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_multiplier(const DC_ITEM *item, zbx_variant_t *value, const char *params, char **errmsg)
 {
 	char	*err = NULL;
 
-	if (SUCCEED == item_preproc_multiplier_variant(value, params, &err))
+	if (SUCCEED == item_preproc_multiplier_variant(item, value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
 			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 	zbx_free(err);
 
@@ -268,11 +312,12 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
 static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const zbx_timespec_t *ts,
 		unsigned char op_type, zbx_hashset_t *delta_history, char **errmsg)
 {
-	int				ret = FAIL;
+	int				ret = FAIL, type_hint;
 	zbx_item_history_value_t	*deltaitem;
 	zbx_variant_t			value_num;
 
-	if (FAIL == item_preproc_convert_value_to_numeric(&value_num, value, errmsg))
+	type_hint = item_preproc_numeric_type_hint(item->value_type);
+	if (FAIL == item_preproc_convert_value_to_numeric(&value_num, value, type_hint, errmsg))
 		return FAIL;
 
 	if (NULL == (deltaitem = zbx_hashset_search(delta_history, &item->itemid)))
@@ -341,7 +386,7 @@ static int	item_preproc_delta_value(const DC_ITEM *item, zbx_variant_t *value, c
 	if (SUCCEED == item_preproc_delta(item, value, ts, ZBX_PREPROC_DELTA_VALUE, delta_history, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot calculate delta (simple change) for value \"%s\" of type"
+	*errmsg = zbx_dsprintf(*errmsg, "cannot calculate delta (simple change) for value \"%s\" of type"
 				" \"%s\": %s", zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -374,7 +419,7 @@ static int	item_preproc_delta_speed(const DC_ITEM *item, zbx_variant_t *value, c
 	if (SUCCEED == item_preproc_delta(item, value, ts, ZBX_PREPROC_DELTA_SPEED, delta_history, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot calculate delta (speed per second) for value \"%s\" of type"
+	*errmsg = zbx_dsprintf(*errmsg, "cannot calculate delta (speed per second) for value \"%s\" of type"
 				" \"%s\": %s", zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -475,7 +520,7 @@ static int item_preproc_rtrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_RTRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot perform right trim of \"%s\" for value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform right trim of \"%s\" for value \"%s\" of type \"%s\": %s",
 			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -504,7 +549,7 @@ static int item_preproc_ltrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_LTRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot perform left trim of \"%s\" for value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform left trim of \"%s\" for value \"%s\" of type \"%s\": %s",
 			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -533,7 +578,7 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_TRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot perform trim of \"%s\" for value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform trim of \"%s\" for value \"%s\" of type \"%s\": %s",
 			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -621,7 +666,7 @@ static int	item_preproc_bool2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_BOOL2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot convert value \"%s\" of type \"%s\" from boolean format: %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from boolean format: %s",
 			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -649,7 +694,7 @@ static int	item_preproc_oct2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_OCT2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot convert value \"%s\" of type \"%s\" from octal format: %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from octal format: %s",
 			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -677,7 +722,7 @@ static int	item_preproc_hex2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_HEX2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot convert value \"%s\" of type \"%s\" from hexadecimal format: %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from hexadecimal format: %s",
 			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
@@ -751,9 +796,211 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_regsub_op(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "Cannot perform regular expression match on value \"%s\" of type \"%s\": %s",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match on value \"%s\" of type \"%s\": %s",
 			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
 
+	zbx_free(err);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_jsonpath_op                                         *
+ *                                                                            *
+ * Purpose: execute jsonpath query                                            *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	struct	zbx_json_parse	jp, jp_out;
+	char	*data = NULL;
+	size_t	data_alloc = 0;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_json_path_open(&jp, params, &jp_out))
+	{
+		*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
+		return FAIL;
+	}
+
+	zbx_json_value_dyn(&jp_out, &data, &data_alloc);
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, data);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_jsonpath                                            *
+ *                                                                            *
+ * Purpose: execute jsonpath query                                            *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	*err = NULL;
+
+	if (SUCCEED == item_preproc_jsonpath_op(value, params, &err))
+		return SUCCEED;
+
+	*errmsg = zbx_dsprintf(*errmsg, "cannot extract value from json by path \"%s\": %s", params, err);
+	zbx_free(err);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_xpath_op                                             *
+ *                                                                            *
+ * Purpose: execute xpath query                                               *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char **errmsg)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(params);
+	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+	return FAIL;
+#else
+	xmlDoc		*doc = NULL;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlErrorPtr	pErr;
+	xmlBufferPtr	xmlBuf;
+	int		ret = FAIL, i;
+	char		buffer[32], *ptr;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
+		else
+			*errmsg = zbx_strdup(*errmsg, "cannot parse xml value");
+		return FAIL;
+	}
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
+	{
+		pErr = xmlGetLastError();
+		*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
+		goto out;
+	}
+
+	switch (xpathObj->type)
+	{
+		case XPATH_NODESET:
+			xmlBuf = xmlBufferCreate();
+
+			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+			{
+				nodeset = xpathObj->nodesetval;
+				for (i = 0; i < nodeset->nodeNr; i++)
+					xmlNodeDump(xmlBuf, doc, nodeset->nodeTab[i], 0, 0);
+			}
+
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBuf->content));
+
+			xmlBufferFree(xmlBuf);
+			ret = SUCCEED;
+			break;
+		case XPATH_STRING:
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xpathObj->stringval));
+			ret = SUCCEED;
+			break;
+		case XPATH_BOOLEAN:
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_dsprintf(NULL, "%d", xpathObj->boolval));
+			ret = SUCCEED;
+			break;
+		case XPATH_NUMBER:
+			zbx_variant_clear(value);
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
+
+			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90    */
+			/* so simply check the if the result starts with digit (accounting for -inf) */
+			if (*(ptr = buffer) == '-')
+				ptr++;
+			if (0 != isdigit(*ptr))
+			{
+				del_zeroes(buffer);
+				zbx_variant_set_str(value, zbx_strdup(NULL, buffer));
+				ret = SUCCEED;
+			}
+			else
+				*errmsg = zbx_dsprintf(*errmsg, "Invalid numeric value");
+			break;
+		default:
+			*errmsg = zbx_dsprintf(*errmsg, "Unknown result");
+			break;
+	}
+out:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+
+	return ret;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_xpath_op                                             *
+ *                                                                            *
+ * Purpose: execute xpath query                                               *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	*err = NULL;
+
+	if (SUCCEED == item_preproc_xpath_op(value, params, &err))
+		return SUCCEED;
+
+	*errmsg = zbx_dsprintf(*errmsg, "cannot extract XML value with xpath \"%s\": %s", params, err);
 	zbx_free(err);
 
 	return FAIL;
@@ -784,7 +1031,7 @@ int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timesp
 	switch (op->type)
 	{
 		case ZBX_PREPROC_MULTIPLIER:
-			return item_preproc_multiplier(value, op->params, errmsg);
+			return item_preproc_multiplier(item, value, op->params, errmsg);
 		case ZBX_PREPROC_RTRIM:
 			return item_preproc_rtrim(value, op->params, errmsg);
 		case ZBX_PREPROC_LTRIM:
@@ -803,9 +1050,13 @@ int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timesp
 			return item_preproc_delta_value(item, value, ts, delta_history, errmsg);
 		case ZBX_PREPROC_DELTA_SPEED:
 			return item_preproc_delta_speed(item, value, ts, delta_history, errmsg);
+		case ZBX_PREPROC_XPATH:
+			return item_preproc_xpath(value, op->params, errmsg);
+		case ZBX_PREPROC_JSONPATH:
+			return item_preproc_jsonpath(value, op->params, errmsg);
 	}
 
-	*errmsg = zbx_dsprintf(*errmsg, "Unknown preprocessing operation.");
+	*errmsg = zbx_dsprintf(*errmsg, "unknown preprocessing operation");
 
 	return FAIL;
 }
