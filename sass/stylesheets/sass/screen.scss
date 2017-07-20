@@ -2279,6 +2279,12 @@ $icon-widget-btn: (
 	}
 }
 
+.inaccessible {
+	.subfilter-enabled {
+		color: darken($font-selected-color, 25%);
+	}
+}
+
 %btn-search-hover-focus {
 	background-color: $transparent;
 	@include opacity(1);

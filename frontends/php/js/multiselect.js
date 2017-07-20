@@ -746,6 +746,10 @@ jQuery(function($) {
 					.append(close_btn)
 			);
 
+			if (typeof(item.inaccessible) !== 'undefined' && item.inaccessible) {
+				li.addClass('inaccessible');
+			}
+
 			$('.selected ul', obj).append(li);
 
 			resizeSelectedText(li, obj);

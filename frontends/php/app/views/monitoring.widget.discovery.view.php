@@ -19,41 +19,24 @@
 **/
 
 
-$drules = API::DRule()->get([
-	'output' => ['druleid', 'name'],
-	'selectDHosts' => ['status'],
-	'filter' => ['status' => DHOST_STATUS_ACTIVE]
-]);
-CArrayHelper::sort($drules, ['name']);
-
-foreach ($drules as &$drule) {
-	$drule['up'] = 0;
-	$drule['down'] = 0;
-
-	foreach ($drule['dhosts'] as $dhost){
-		if (DRULE_STATUS_DISABLED == $dhost['status']) {
-			$drule['down']++;
-		}
-		else {
-			$drule['up']++;
-		}
-	}
+if ($data['error'] !== null) {
+	$table = (new CTableInfo())->setNoDataMessage($data['error']);
 }
-unset($drule);
+else {
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Discovery rule'),
+			_x('Up', 'discovery results in dashboard'),
+			_x('Down', 'discovery results in dashboard')
+		]);
 
-$table = (new CTableInfo())
-	->setHeader([
-		_('Discovery rule'),
-		_x('Up', 'discovery results in dashboard'),
-		_x('Down', 'discovery results in dashboard')
-	]);
-
-foreach ($drules as $drule) {
-	$table->addRow([
-		new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
-		($drule['up'] != 0) ? (new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN) : '',
-		($drule['down'] != 0) ? (new CSpan($drule['down']))->addClass(ZBX_STYLE_RED) : ''
-	]);
+	foreach ($data['drules'] as $drule) {
+		$table->addRow([
+			new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
+			($drule['up'] != 0) ? (new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN) : '',
+			($drule['down'] != 0) ? (new CSpan($drule['down']))->addClass(ZBX_STYLE_RED) : ''
+		]);
+	}
 }
 
 $output = [

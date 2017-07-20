@@ -25,9 +25,9 @@ class CWidgetFieldComboBox extends CWidgetField {
 	/**
 	 * Combo box widget field. Can use both, string and integer type keys.
 	 *
-	 * @param string $name    field name in form
-	 * @param string $label   label for the field in form
-	 * @param array  $values  key/value pairs of combo box values. Key - saved in DB. Value - visible to user.
+	 * @param string $name    Field name in form
+	 * @param string $label   Label for the field in form
+	 * @param array  $values  Key/value pairs of combo box values. Key - saved in DB. Value - visible to user.
 	 */
 	public function __construct($name, $label, $values) {
 		parent::__construct($name, $label);

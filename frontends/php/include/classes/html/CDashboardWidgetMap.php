@@ -44,6 +44,15 @@ class CDashboardWidgetMap extends CDiv {
 	public function getScriptRun() {
 		$script_run = '';
 
+		if ($this->initial_load) {
+			$script_run .=
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
+					'"zbx_sysmap_widget_timer_refresh", "'.$this->uniqueid.'", {'.
+						'grid: {widget: 1},'.
+					'trigger_name: "map_widget_timer_refresh_'.$this->uniqueid.'"'.
+				'});';
+		}
+
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
 			&& $this->initial_load
 		) {
@@ -71,10 +80,9 @@ class CDashboardWidgetMap extends CDiv {
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("callWidgetDataShare", false);'.
 
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart", '.
-					'"zbx_sysmap_widget_trigger", {'.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
 						'parameters: ["onEditStart"],'.
-						'grid: {widget: "'.$this->uniqueid.'"'.
-					'},'.
+						'grid: {widget: 1},'.
 					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
 				'});';
 		}
@@ -119,7 +127,6 @@ class CDashboardWidgetMap extends CDiv {
 		}
 		else {
 			$this->addItem((new CTableInfo())->setNoDataMessage($this->error));
-			$this->addClass(ZBX_STYLE_DISABLED);
 		}
 	}
 
