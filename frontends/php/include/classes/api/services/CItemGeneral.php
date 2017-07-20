@@ -1391,7 +1391,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates inherited dependent items dependency to inherited master items.
+	 * Synchronize dependent item to master item relation for inherited items.
 	 *
 	 * @param array $items  Array of inherited items.
 	 */
@@ -1441,5 +1441,86 @@ abstract class CItemGeneral extends CApiService {
 				DB::update('items', $data);
 			}
 		}
+	}
+
+	/**
+	 * Creates array of item dependency level for input array. Returns array where key is host id and value is
+	 * associative array of item key and item dependency level.
+	 *
+	 * @param array  $items             Array of items.
+	 * @param string $items[]['hostid'] Item host id.
+	 * @param string $items[]['itemid'] Item item id.
+	 * @param string $items[]['type']   Item type.
+	 * @param string $items[]['key_']   Item key.
+	 */
+	protected function getDependentItemsDependencyLevel($items) {
+		$items = zbx_toHash($items, 'itemid');
+		$host_items = [];
+
+		foreach ($items as $item) {
+			$master_item = $item;
+			$dependency_level = 0;
+
+			while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_item = $items[$master_item['master_itemid']];
+				++$dependency_level;
+			}
+
+			if (array_key_exists($item['hostid'], $host_items)) {
+				$host_items[$item['hostid']][$item['key_']] = $dependency_level;
+			}
+			else {
+				$host_items[$item['hostid']] = [$item['key_'] => $dependency_level];
+			}
+		}
+
+		return $host_items;
+	}
+
+	/**
+	 * Creates array of master item maximum dependency level.
+	 *
+	 * @param array  $items             Array of items.
+	 * @param string $items[]['hostid'] Item host id.
+	 * @param string $items[]['itemid'] Item item id.
+	 * @param string $items[]['type']   Item type.
+	 * @param string $items[]['key_']   Item key.
+	 */
+	protected function getMasterItemsDependencyLevels($items) {
+		$items = zbx_toHash($items, 'itemid');
+		$host_items = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists($item['hostid'], $host_items)) {
+				$host_items[$item['hostid']][$item['key_']] = 0;
+			}
+			else {
+				$host_items[$item['hostid']] = [$item['key_'] => 0];
+			}
+		}
+
+		foreach ($items as $item) {
+			$master_item = $item;
+			$dependency_level = 0;
+
+			while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
+				$host_items[$master_item['hostid']][$master_item['key_']] = max([
+					$dependency_level,
+					$host_items[$master_item['hostid']][$master_item['key_']]
+				]);
+
+				$master_item = array_key_exists($master_item['master_itemid'], $items)
+					? $items[$master_item['master_itemid']]
+					: null;
+				++$dependency_level;
+			};
+
+			$host_items[$master_item['hostid']][$master_item['key_']] = max([
+				$dependency_level,
+				$host_items[$master_item['hostid']][$master_item['key_']]
+			]);
+		}
+
+		return $host_items;
 	}
 }
