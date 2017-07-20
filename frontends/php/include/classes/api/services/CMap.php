@@ -206,10 +206,18 @@ class CMap extends CMapElement {
 		}
 
 		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-				$hostgroupids_to_check = [];
-				$triggerids_to_check = [];
-				$sysmapids_to_check = [];
-				$hostids_to_check = [];
+			$hostgroupids_to_check = [];
+			$triggerids_to_check = [];
+			$sysmapids_to_check = [];
+			$hostids_to_check = [];
+			$db_hostgrps_r = [];
+			$db_hostgrps_rw = [];
+			$db_hosts_r = [];
+			$db_hosts_rw = [];
+			$db_triggers_r = [];
+			$db_triggers_rw = [];
+			$db_sysmaps_r = [];
+			$db_sysmaps_rw = [];
 
 			foreach ($result as $sysmapid => &$sysmap) {
 				if ($sysmap['selements']) {
