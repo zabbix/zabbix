@@ -34,7 +34,7 @@ $url_group = (new CUrl('zabbix.php'))
 	->setArgument('filter_groupids', null)
 	->setArgument('filter_hostids', $data['filter']['hostids'])
 	->setArgument('filter_problem', $data['filter']['problem'])
-	->setArgument('filter_maintenance', $data['filter']['maintenance'] == 1 ? 1 : null);
+	->setArgument('filter_maintenance', ($data['filter']['maintenance']) == 1 ? 1 : null);
 $url_host = (new CUrl('zabbix.php'))
 	->setArgument('action', 'problem.view')
 	->setArgument('filter_set', 1)
@@ -42,7 +42,8 @@ $url_host = (new CUrl('zabbix.php'))
 	->setArgument('filter_groupids', null)
 	->setArgument('filter_hostids', null)
 	->setArgument('filter_problem', $data['filter']['problem'])
-	->setArgument('filter_maintenance', $data['filter']['maintenance'] == 1 ? 1 : null);
+	->setArgument('filter_maintenance', ($data['filter']['maintenance']) == 1 ? 1 : null);
+
 if ($data['fullscreen'] == 1) {
 	$url_group->setArgument('fullscreen', '1');
 	$url_host->setArgument('fullscreen', '1');
@@ -64,7 +65,7 @@ foreach ($data['groups'] as $group) {
 	$name = new CLink($group['name'], $url_group->getUrl());
 	$group_row->addItem($name);
 	$group_row->addItem(
-		$data['hosts_data'][$group['groupid']]['ok'] != 0
+		($data['hosts_data'][$group['groupid']]['ok'] != 0)
 			? $data['hosts_data'][$group['groupid']]['ok']
 			: ''
 	);

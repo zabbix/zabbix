@@ -41,8 +41,8 @@ require_once dirname(__FILE__).'/users.inc.php';
 function make_system_status($filter, $backurl, $fullscreen = 0) {
 	$config = select_config();
 
-	$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
-	$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
+	$filter_groupids = (array_key_exists('groupids', $filter) && $filter['groupids']) ? $filter['groupids'] : null;
+	$filter_hostids = (array_key_exists('hostids', $filter) && $filter['hostids']) ? $filter['hostids'] : null;
 	$filter_problem = array_key_exists('problem', $filter) ? $filter['problem'] : '';
 	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
 		? $filter['severities']
@@ -53,7 +53,7 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 		if ($filter_hostids === null) {
-			// get all groups if no selected groups defined
+			// Get all groups if no selected groups defined.
 			if ($filter_groupids === null) {
 				$filter_groupids = array_keys(API::HostGroup()->get([
 					'output' => [],
@@ -63,7 +63,7 @@ function make_system_status($filter, $backurl, $fullscreen = 0) {
 
 			$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
 
-			// get available hosts
+			// Get available hosts.
 			$filter_hostids = array_keys(API::Host()->get([
 				'output' => [],
 				'groupids' => $filter_groupids,

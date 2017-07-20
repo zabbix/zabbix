@@ -21,6 +21,7 @@
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view');
+
 if ($data['fullscreen'] == 1) {
 	$backurl->setArgument('fullscreen', '1');
 }

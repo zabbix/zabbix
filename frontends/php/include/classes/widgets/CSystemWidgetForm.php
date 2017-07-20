@@ -20,14 +20,14 @@
 
 
 /**
- * System widget form
+ * System widget form.
  */
 class CSystemWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data);
 
-		// Host groups
+		// host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $data)) {
@@ -35,7 +35,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_groups;
 
-		// Exclude host groups
+		// Exclude host groups.
 		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'));
 
 		if (array_key_exists('exclude_groupids', $data)) {
@@ -43,7 +43,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_exclude_groups;
 
-		// Hosts
+		// hosts
 		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
 
 		if (array_key_exists('hostids', $data)) {
@@ -51,7 +51,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_hosts;
 
-		// Problem
+		// problem
 		$field_problem = new CWidgetFieldTextBox('problem', _('Problem'));
 
 		if (array_key_exists('problem', $data)) {
@@ -59,7 +59,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_problem;
 
-		// Severity
+		// severity
 		$field_severities = new CWidgetFieldSeverities('severities', _('Severity'));
 
 		if (array_key_exists('severities', $data)) {
@@ -67,16 +67,15 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_severities;
 
-		// Show hosts in maintenance
-		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
-			->setDefault(1);
+		// Show hosts in maintenance.
+		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))->setDefault(1);
 
 		if (array_key_exists('maintenance', $data)) {
 			$field_maintenance->setValue($data['maintenance']);
 		}
 		$this->fields[] = $field_maintenance;
 
-		// Hide groups without problems
+		// Hide groups without problems.
 		$field_hide_empty_groups = new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems'));
 
 		if (array_key_exists('hide_empty_groups', $data)) {
@@ -84,7 +83,7 @@ class CSystemWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_hide_empty_groups;
 
-		// Problem display
+		// problem display
 		$field_ext_ack = (new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [
 			EXTACK_OPTION_ALL => _('All'),
 			EXTACK_OPTION_BOTH => _('Separated'),

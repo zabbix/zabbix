@@ -76,7 +76,7 @@ class CControllerWidgetWebView extends CController {
 			$exclude_groupids = getSubGroups($fields['exclude_groupids']);
 
 			if ($filter_hostids === null) {
-				// get all groups if no selected groups defined
+				// Get all groups if no selected groups defined.
 				if ($filter_groupids === null) {
 					$filter_groupids = array_keys(API::HostGroup()->get([
 						'output' => [],
@@ -86,7 +86,7 @@ class CControllerWidgetWebView extends CController {
 
 				$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
 
-				// get available hosts
+				// Get available hosts.
 				$filter_hostids = array_keys(API::Host()->get([
 					'output' => [],
 					'groupids' => $filter_groupids,
@@ -130,7 +130,7 @@ class CControllerWidgetWebView extends CController {
 		}
 		unset($group);
 
-		// fetch links between HTTP tests and host groups
+		// Fetch links between HTTP tests and host groups.
 		$result = DbFetchArray(DBselect(
 			'SELECT DISTINCT ht.httptestid,hg.groupid'.
 			' FROM httptest ht,hosts_groups hg'.
@@ -140,7 +140,7 @@ class CControllerWidgetWebView extends CController {
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE
 		));
 
-		// fetch HTTP test execution data
+		// Fetch HTTP test execution data.
 		$httptest_data = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
 
 		foreach ($result as $row) {
@@ -148,7 +148,7 @@ class CControllerWidgetWebView extends CController {
 
 			if (array_key_exists($row['httptestid'], $httptest_data)
 					&& $httptest_data[$row['httptestid']]['lastfailedstep'] !== null) {
-				$group[$httptest_data[$row['httptestid']]['lastfailedstep'] != 0 ? 'failed' : 'ok']++;
+				$group[($httptest_data[$row['httptestid']]['lastfailedstep'] != 0) ? 'failed' : 'ok']++;
 			}
 			else {
 				$group['unknown']++;

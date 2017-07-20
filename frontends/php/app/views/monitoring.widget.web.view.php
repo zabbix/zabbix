@@ -25,6 +25,7 @@ $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'web.view')
 	->setArgument('groupid', '')
 	->setArgument('hostid', '0');
+
 if ($data['fullscreen'] == 1) {
 	$url->setArgument('fullscreen', '1');
 }
