@@ -99,7 +99,7 @@ class CControllerWidgetActionLogView extends CController {
 	{
 		// TODO AV: remove direct SQL requests
 		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
-			'a.userid,a.actionid,a.mediatypeid,mt.description'.
+			'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
 			' FROM events e,alerts a'.
 			' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 			' WHERE e.eventid=a.eventid'.
