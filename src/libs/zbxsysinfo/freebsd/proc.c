@@ -482,7 +482,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (proc[i].ZBX_PROC_STAT == SZOMB)
 					stat_ok = 1;
 				break;
-			case ZBX_PROC_STAT_IOWAIT
+			case ZBX_PROC_STAT_IOWAIT:
 				if (SSLEEP == proc[i].ZBX_PROC_STAT && !(proc[i].ZBX_PROC_FLAG & TDF_SINTR))
 					stat_ok = 1;
 				break;
