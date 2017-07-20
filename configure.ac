@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[3.4.0alpha1])
+AC_INIT([Zabbix],[3.4.0alpha2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1359,6 +1359,10 @@ if test "x$have_ipmi" = "xyes"; then
 	have_ipcservice="yes"
 fi
 
+if test "x$server" = "xyes"; then
+	have_ipcservice="yes"
+fi
+
 dnl Check for libevent, used by Zabbix IPC services
 if test "x$have_ipcservice" = "xyes"; then
 	AC_DEFINE([HAVE_IPCSERVICE], 1, [Define to 1 if Zabbix IPC services are used])
@@ -1632,7 +1636,6 @@ AC_OUTPUT([
 	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/timer/Makefile
 	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/watchdog/Makefile
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/selfmon/Makefile

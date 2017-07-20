@@ -118,6 +118,9 @@ $fields = [
 	'applications' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_applications' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_history' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
+	],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
@@ -488,6 +491,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
+				case ZBX_PREPROC_XPATH:
+				case ZBX_PREPROC_JSONPATH:
 					$step['params'] = $step['params'][0];
 					break;
 
@@ -539,6 +544,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'status' => getRequest('status', ITEM_STATUS_DISABLED)
 			];
 
+			if ($item['type'] == ITEM_TYPE_JMX) {
+				$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+			}
+
 			if ($preprocessing) {
 				$item['preprocessing'] = $preprocessing;
 			}
@@ -552,7 +561,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
 					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'history',
 					'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description', 'status',
-					'templateid', 'flags'
+					'templateid', 'flags', 'jmx_endpoint'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params'],
@@ -659,6 +668,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
+				}
+				if ($db_item['jmx_endpoint'] !== getRequest('jmx_endpoint', '')) {
+					$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
 				}
 				$db_applications = zbx_objectValues($db_item['applications'], 'applicationid');
 				natsort($db_applications);
@@ -865,7 +877,7 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 		}
 
 		$items = API::Item()->get([
-			'output' => ['itemid', 'flags'],
+			'output' => ['itemid', 'flags', 'type'],
 			'itemids' => $itemids,
 			'preservekeys' => true
 		]);
@@ -895,6 +907,7 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'logtimefmt' => getRequest('logtimefmt'),
 				'valuemapid' => getRequest('valuemapid'),
 				'authtype' => getRequest('authtype'),
+				'jmx_endpoint' => getRequest('jmx_endpoint'),
 				'username' => getRequest('username'),
 				'password' => getRequest('password'),
 				'publickey' => getRequest('publickey'),
@@ -912,6 +925,8 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 						case ZBX_PREPROC_RTRIM:
 						case ZBX_PREPROC_LTRIM:
 						case ZBX_PREPROC_TRIM:
+						case ZBX_PREPROC_XPATH:
+						case ZBX_PREPROC_JSONPATH:
 							$step['params'] = $step['params'][0];
 							break;
 
@@ -955,6 +970,17 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 		}
 
 		if ($items_to_update) {
+			foreach ($items_to_update as &$update_item) {
+				$type = array_key_exists('type', $update_item)
+					? $update_item['type']
+					: $items[$update_item['itemid']]['type'];
+
+				if ($type != ITEM_TYPE_JMX) {
+					unset($update_item['jmx_endpoint']);
+				}
+			}
+			unset($update_item);
+
 			$result = API::Item()->update($items_to_update);
 		}
 	}
@@ -1120,7 +1146,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname'
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
@@ -1152,6 +1178,11 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
+	// Sort interfaces to be listed starting with one selected as 'main'.
+	CArrayHelper::sort($data['interfaces'], [
+		['field' => 'main', 'order' => ZBX_SORT_DOWN]
+	]);
+
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
 	}
@@ -1181,6 +1212,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
 		'units' => getRequest('units', ''),
 		'authtype' => getRequest('authtype', ''),
+		'jmx_endpoint' => getRequest('jmx_endpoint', ''),
 		'username' => getRequest('username', ''),
 		'password' => getRequest('password', ''),
 		'publickey' => getRequest('publickey', ''),
@@ -1243,6 +1275,11 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 		if ($hostCount == 1 && $data['displayInterfaces']) {
 			$data['hosts'] = reset($data['hosts']);
+
+			// Sort interfaces to be listed starting with one selected as 'main'.
+			CArrayHelper::sort($data['hosts']['interfaces'], [
+				['field' => 'main', 'order' => ZBX_SORT_DOWN]
+			]);
 
 			// if selected from filter without 'hostid'
 			if (!$data['hostid']) {

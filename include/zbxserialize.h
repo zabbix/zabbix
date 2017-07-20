@@ -22,6 +22,13 @@
 
 #include "common.h"
 
+#define zbx_serialize_prepare_str(len, str)			\
+	str##_len = (NULL != str ? strlen(str) + 1 : 0);	\
+	len += str##_len + sizeof(zbx_uint32_t)
+
+#define zbx_serialize_prepare_value(len, value)			\
+	len += sizeof(value)
+
 #define zbx_serialize_uint64(buffer, value) (memcpy(buffer, &value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
 
 #define zbx_serialize_int(buffer, value) (memcpy(buffer, (int *)&value, sizeof(int)), sizeof(int))
@@ -30,7 +37,7 @@
 
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 
-#define zbx_serialize_str_null(buffer)	 			\
+#define zbx_serialize_str_null(buffer)				\
 	(							\
 		memset(buffer, 0, sizeof(zbx_uint32_t)),	\
 		sizeof(zbx_uint32_t)				\
@@ -45,6 +52,10 @@
 			len + sizeof(zbx_uint32_t)					\
 		)									\
 	)
+	
+#define zbx_serialize_value(buffer, value) (memcpy(buffer, &value, sizeof(value)), sizeof(value))
+
+/* deserialization of primitive types */
 
 #define zbx_deserialize_uint64(buffer, value) \
 	(memcpy(value, buffer, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
@@ -58,18 +69,18 @@
 #define zbx_deserialize_char(buffer, value) \
 	(*value = *buffer, sizeof(char))
 
-#define zbx_deserialize_str(buffer, value, value_len) 					\
+#define zbx_deserialize_str(buffer, value, value_len)					\
 	(										\
 			memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
 			0 < value_len ? (						\
-			*value = zbx_malloc(NULL, value_len + 1), 			\
+			*value = zbx_malloc(NULL, value_len + 1),			\
 			memcpy(*(value), buffer + sizeof(zbx_uint32_t), value_len),	\
 			(*value)[value_len] = '\0'					\
 			) : (*value = NULL, 0),						\
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 
-#define zbx_deserialize_str_s(buffer, value, value_len) 			\
+#define zbx_deserialize_str_s(buffer, value, value_len)				\
 	(									\
 		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
 		memcpy(value, buffer + sizeof(zbx_uint32_t), value_len),	\
@@ -77,5 +88,7 @@
 		value_len + sizeof(zbx_uint32_t)				\
 	)
 
+#define zbx_deserialize_value(buffer, value) \
+	(memcpy(value, buffer, sizeof(*value)), sizeof(*value))
 
 #endif /* ZABBIX_SERIALIZE_H */

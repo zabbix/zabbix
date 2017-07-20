@@ -1344,9 +1344,11 @@ function getActionMessages(array $alerts, array $r_alerts) {
 					$retries = '';
 					break;
 
+				case ALERT_STATUS_NEW:
+					// falls through
 				case ALERT_STATUS_NOT_SENT:
 					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
-					$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
+					$retries = (new CSpan($mediaType['maxattempts'] - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
 					break;
 
 				default:
@@ -1361,7 +1363,8 @@ function getActionMessages(array $alerts, array $r_alerts) {
 				: $alert['sendto'];
 
 			$info_icons = [];
-			if ($alert['error'] !== '') {
+			if ($alert['error'] !== ''
+					&& !($alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT)) {
 				$info_icons[] = makeErrorIcon($alert['error']);
 			}
 
@@ -1434,11 +1437,11 @@ function getActionCommands(array $alerts, array $r_alerts) {
 				case ALERT_STATUS_SENT:
 					$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 					break;
-
+				case ALERT_STATUS_NEW:
+					// falls through
 				case ALERT_STATUS_NOT_SENT:
 					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 					break;
-
 				default:
 					$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 					break;
@@ -1456,12 +1459,18 @@ function getActionCommands(array $alerts, array $r_alerts) {
 				$show_header = false;
 			}
 
+			$error_span = '';
+			if ($alert['error']
+					&& !($alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT)) {
+				$error_span = (new CSpan($alert['error']))->addClass(ZBX_STYLE_RED);
+			}
+
 			$table->addRow([
 				$alert['esc_step'],
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 				$status,
 				zbx_nl2br($alert['message']),
-				$alert['error'] ? (new CSpan($alert['error']))->addClass(ZBX_STYLE_RED) : ''
+				$error_span
 			]);
 		}
 
@@ -1483,16 +1492,16 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 		foreach ($alerts_data as $alert) {
 			switch ($alert['status']) {
 				case ALERT_STATUS_SENT:
-					$status_str = (new CSpan($alert['alerttype'] == ALERT_TYPE_COMMAND ? _('Executed') : _('Sent')))
+					$status = (new CSpan(($alert['alerttype'] == ALERT_TYPE_COMMAND) ? _('Executed') : _('Sent')))
 						->addClass(ZBX_STYLE_GREEN);
 					break;
-
+				case ALERT_STATUS_NEW:
+					// falls through
 				case ALERT_STATUS_NOT_SENT:
-					$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 					break;
-
 				default:
-					$status_str = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
+					$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 			}
 
 			switch ($alert['alerttype']) {
@@ -1505,17 +1514,20 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 						? $mediatypes[$alert['mediatypeid']]['description']
 						: '';
 					break;
+
 				case ALERT_TYPE_COMMAND:
 					$user = '';
 					$message = _('Remote command');
 					break;
+
 				default:
 					$user = '';
 					$message = '';
 			}
 
 			$info_icons = [];
-			if ($alert['error'] !== '') {
+			if ($alert['error'] !== ''
+					&& !($alert['status'] == ALERT_STATUS_NEW || $alert['status'] == ALERT_STATUS_NOT_SENT)) {
 				$info_icons[] = makeErrorIcon($alert['error']);
 			}
 
@@ -1535,7 +1547,7 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 				$user,
 				$message,
-				$status_str,
+				$status,
 				makeInformationList($info_icons)
 			]);
 
@@ -1654,7 +1666,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 			$status = ALERT_STATUS_SENT;
 			foreach ([$event_alerts, $r_event_alerts] as $alerts_data) {
 				foreach ($alerts_data as $alert) {
-					if ($alert['status'] == ALERT_STATUS_NOT_SENT) {
+					if ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
 						$status = ALERT_STATUS_NOT_SENT;
 					}
 					elseif ($alert['status'] == ALERT_STATUS_FAILED && $status != ALERT_STATUS_NOT_SENT) {

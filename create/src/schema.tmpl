@@ -333,6 +333,7 @@ FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -373,6 +374,9 @@ FIELD		|smtp_verify_peer|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_host|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_authentication|t_integer	|'0'	|NOT NULL	|0
 FIELD		|exec_params	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|maxsessions	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|maxattempts	|t_integer	|'3'	|NOT NULL	|0
+FIELD		|attempt_interval|t_varchar(32)	|'10s'	|NOT NULL	|0
 UNIQUE		|1		|description
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
@@ -961,7 +965,7 @@ FIELD		|p_eventid	|t_id		|	|NULL		|0			|5|events	|eventid
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|eventid
-INDEX		|4		|status,retries
+INDEX		|4		|status
 INDEX		|5		|mediatypeid
 INDEX		|6		|userid
 INDEX		|7		|p_eventid
@@ -1572,4 +1576,4 @@ INDEX		|6		|value_sysmapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030168	|3030168
+ROW		|3030175	|3030175

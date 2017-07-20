@@ -32,7 +32,7 @@ class CWidgetConfig {
 		return [
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix'),
-			WIDGET_LAST_ISSUES			=> _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
+			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_WEB_OVERVIEW			=> _('Web monitoring'),
 			WIDGET_DISCOVERY_STATUS		=> _('Discovery status'),
 			WIDGET_HOST_STATUS			=> _('Host status'),
@@ -62,7 +62,7 @@ class CWidgetConfig {
 		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
-			WIDGET_LAST_ISSUES			=> ['width' => 6, 'height' => 6],
+			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
 			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
 			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
 			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 4],
@@ -113,7 +113,7 @@ class CWidgetConfig {
 	public static function getDefaultRfRate($type) {
 		switch ($type) {
 			case WIDGET_SYSTEM_STATUS:
-			case WIDGET_LAST_ISSUES:
+			case WIDGET_PROBLEMS:
 			case WIDGET_WEB_OVERVIEW:
 			case WIDGET_DISCOVERY_STATUS:
 			case WIDGET_HOST_STATUS:
@@ -169,6 +169,9 @@ class CWidgetConfig {
 
 			case WIDGET_TRIG_OVERVIEW:
 				return new CTrigOverviewWidgetForm($data);
+
+			case WIDGET_PROBLEMS:
+				return new CProblemsWidgetForm($data);
 
 			default:
 				// TODO VM: delete this case after all widget forms will be created

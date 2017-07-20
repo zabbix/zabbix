@@ -22,7 +22,7 @@
 			<property name="with.mysql" value="true"/>
 		</default>
 	</switch>
-	
+
 	<!-- Zabbix various configuration parameters -->
 	<target name="init-conf-options">
 		<property name="conf1" value="--enable-agent"/>
@@ -51,7 +51,7 @@
 			<arg line="."/>
 		</exec>
 	</target>
-	
+
 	<!-- Clang Static Analyzer target with various configuration parameters -->
 	<target name="clang-static-analyzer" depends="init,init-conf-options">
 		<delete dir="clang-scan-build-reports"/>
@@ -78,7 +78,7 @@
 			</sequential>
 		</for>
 	</target>
-	
+
 	<!-- Static analysis container target -->
 	<target name="static-analysis" depends="cppcheck-static-analysis,clang-static-analyzer"/>
 
@@ -243,18 +243,18 @@
 
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
-	
+
 	<target name="unit-test" depends="init">
 		<!-- Build Zabbix with C unit tests -->
 		<sequential>
-			<make args="--enable-server --with-mysql" target="test"/>
+			<make args="--enable-server --with-mysql --with-libxml2" target="test"/>
 			<exec executable="src/zabbix_server/zabbix_server" failonerror="on">
 				<arg line="-t"/>
 				<arg line="-obackend"/>
 			</exec>
 		</sequential>
 	</target>
-	
+
 	<target name="make-dist" depends="init">
 		<!-- Create & build Zabbix distribution -->
 		<sequential>

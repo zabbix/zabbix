@@ -968,7 +968,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		}
 		else if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
-			status = ALERT_STATUS_NOT_SENT;
+			status = ALERT_STATUS_NEW;
 			perror = "";
 		}
 		else

@@ -111,7 +111,7 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  *
  * @return CCol
  */
-function getSeverityCell($severity, $config, $text = null, $forceNormal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $forceNormal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
@@ -1899,6 +1899,18 @@ function get_item_function_info($expr) {
  * @return bool     the calculated value of the expression
  */
 function evalExpressionData($expression, $replaceFunctionMacros) {
+	// Sort by longest array key which in this case contains macros.
+	uksort($replaceFunctionMacros, function ($key1, $key2) {
+		$s1 = strlen($key1);
+		$s2 = strlen($key2);
+
+		if ($s1 == $s2) {
+			return 0;
+		}
+
+		return ($s1 > $s2) ? -1 : 1;
+	});
+
 	// replace function macros with their values
 	$expression = str_replace(array_keys($replaceFunctionMacros), array_values($replaceFunctionMacros), $expression);
 

@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
+
 class CControllerWidgetTrigOverView extends CController {
 
 	private $form;
@@ -73,7 +75,7 @@ class CControllerWidgetTrigOverView extends CController {
 		];
 
 		list($data['hosts'], $data['triggers']) =
-			getTriggersOverviewData($fields['groupids'], $fields['application'], $fields['style']);
+			getTriggersOverviewData(getSubGroups($fields['groupids']), $fields['application'], $fields['style']);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

@@ -392,7 +392,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
 			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port', 'description', 'inventory_link'
+			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
@@ -460,7 +460,7 @@ function copyItems($srcHostId, $dstHostId) {
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
 			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port',	'description', 'inventory_link'
+			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
@@ -1433,6 +1433,8 @@ function getParamFieldLabelByType($itemType) {
  *                                               [4] => Trim
  *                                               [2] => Right trim
  *                                               [3] => Left trim
+ *                                               [11] => XML XPath
+ *                                               [12] => JSON Path
  *                                               [1] => Custom multiplier
  *                                               [9] => Simple change
  *                                               [10] => Speed per second
@@ -1454,6 +1456,13 @@ function get_preprocessing_types($type = null, $grouped = true) {
 				ZBX_PREPROC_TRIM => _('Trim'),
 				ZBX_PREPROC_RTRIM => _('Right trim'),
 				ZBX_PREPROC_LTRIM => _('Left trim')
+			]
+		],
+		[
+			'label' => _('Structured data'),
+			'types' => [
+				ZBX_PREPROC_XPATH => _('XML XPath'),
+				ZBX_PREPROC_JSONPATH => _('JSON Path')
 			]
 		],
 		[

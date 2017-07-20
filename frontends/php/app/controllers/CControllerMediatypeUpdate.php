@@ -42,10 +42,15 @@ class CControllerMediatypeUpdate extends CController {
 			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
+			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'maxsessions' =>			'db media_type.maxsessions',
+			'maxattempts' =>			'db media_type.maxattempts',
+			'attempt_interval' =>		'db media_type.attempt_interval',
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
+		$error = $this->GetValidationError();
 
 		if ($ret && $this->hasInput('exec_params')) {
 			foreach ($this->getInput('exec_params') as $exec_param) {
@@ -58,7 +63,7 @@ class CControllerMediatypeUpdate extends CController {
 		}
 
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
+			switch ($error) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
 					$response->setFormData($this->getInputAll());
@@ -90,7 +95,7 @@ class CControllerMediatypeUpdate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['mediatypeid', 'type', 'description']);
+		$this->getInputs($mediatype, ['mediatypeid', 'type', 'description', 'maxsessions', 'maxattempts', 'attempt_interval']);
 		$mediatype['status'] = $this->getInput('status', MEDIA_TYPE_STATUS_DISABLED);
 
 		switch ($mediatype['type']) {
@@ -124,6 +129,7 @@ class CControllerMediatypeUpdate extends CController {
 
 			case MEDIA_TYPE_SMS:
 				$this->getInputs($mediatype, ['gsm_modem']);
+				$mediatype['maxsessions'] = 1;
 				break;
 
 			case MEDIA_TYPE_JABBER:

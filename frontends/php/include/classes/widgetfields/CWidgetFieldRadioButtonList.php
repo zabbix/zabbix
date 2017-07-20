@@ -38,6 +38,10 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
 	}
 
+	public function setValue($value) {
+		return parent::setValue((int) $value);
+	}
+
 	public function setModern($modern) {
 		$this->modern = $modern;
 
