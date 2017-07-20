@@ -158,11 +158,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 				$captions['ms']['groups'][$field_name] = [];
 
 				foreach ($field->getValue() as $groupid) {
-					$captions['ms']['groups'][$field_name][$groupid] = [
-						'id' => $groupid,
-						'name' => _('Inaccessible group'),
-						'inaccessible' => true
-					];
+					$captions['ms']['groups'][$field_name][$groupid] = ['id' => $groupid];
 					$groupids[$groupid][] = $field_name;
 				}
 			}
@@ -171,11 +167,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 				$captions['ms']['hosts'][$field_name] = [];
 
 				foreach ($field->getValue() as $hostid) {
-					$captions['ms']['hosts'][$field_name][$hostid] = [
-						'id' => $hostid,
-						'name' => _('Inaccessible host'),
-						'inaccessible' => true
-					];
+					$captions['ms']['hosts'][$field_name][$hostid] = ['id' => $hostid];
 					$hostids[$hostid][] = $field_name;
 				}
 			}
@@ -206,10 +198,31 @@ class CControllerDashbrdWidgetConfig extends CController {
 			foreach ($hosts as $hostid => $host) {
 				foreach ($hostids[$hostid] as $field_name) {
 					$captions['ms']['hosts'][$field_name][$hostid]['name'] = $host['name'];
-					unset($captions['ms']['hosts'][$field_name][$hostid]['inaccessible']);
 				}
 			}
 		}
+
+		$inaccessible_resources = [
+			'groups' => _('Inaccessible group'),
+			'hosts' => _('Inaccessible host')
+		];
+
+		foreach ($captions['ms'] as $resource_type => &$fields_captions) {
+			foreach ($fields_captions as &$field_captions) {
+				$n = 0;
+
+				foreach ($field_captions as &$caption) {
+					if (!array_key_exists('name', $caption)) {
+						$postfix = (++$n > 1) ? ' ('.$n.')' : '';
+						$caption['name'] = $inaccessible_resources[$resource_type].$postfix;
+						$caption['inaccessible'] = true;
+					}
+				}
+				unset($caption);
+			}
+			unset($field_captions);
+		}
+		unset($fields_captions);
 
 		return $captions;
 	}
