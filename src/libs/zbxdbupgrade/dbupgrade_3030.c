@@ -1767,7 +1767,7 @@ static int	DBpatch_3030144(void)
 
 static int	DBpatch_3030145(void)
 {
-	const ZBX_FIELD	field = {"master_itemid", NULL, "items", "itemid", 0, 0, 0, 0};
+	const ZBX_FIELD	field = {"master_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("items", 5, &field);
 }
