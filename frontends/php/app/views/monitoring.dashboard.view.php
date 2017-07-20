@@ -43,22 +43,18 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 
 $url_create = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('new', '1');
+	->setArgument('new', '1')
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 $url_clone = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('source_dashboardid', $data['dashboard']['dashboardid']);
+	->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 if ($data['dashboard']['editable']) {
 	$url_delete = (new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.delete')
 		->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
+		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 		->setArgumentSID();
-}
-if ($data['fullscreen']) {
-	$url_create->setArgument('fullscreen', '1');
-	$url_clone->setArgument('fullscreen', '1');
-	if ($data['dashboard']['editable']) {
-		$url_delete->setArgument('fullscreen', '1');
-	}
 }
 
 (new CWidget())
@@ -132,7 +128,9 @@ $dashboard_data = [
 	'dynamic' => $data['dynamic']
 ];
 $dashboard_options = [
-	'fullscreen' => $data['fullscreen']
+	'fullscreen' => $data['fullscreen'],
+	'columns' => DASHBOARD_COLUMNS,
+	'max-rows' => DASHBOARD_MAX_ROWS
 ];
 if ($data['dashboard']['dashboardid'] != 0) {
 	$dashboard_data['id'] = $data['dashboard']['dashboardid'];

@@ -122,7 +122,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$dashboard = $this->getNewDashboard();
 		}
 		elseif ($this->hasInput('source_dashboardid')) {
-			// clone dashboard and show as new
+			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name'],
 				// TODO AV: remove widgetid from 'selectWidgets'; related CControllerDashbrdWidgetUpdate:155
@@ -133,11 +133,11 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			if ($dashboards) {
 				$dashboard = $this->getNewDashboard();
 				$dashboard['name'] = $dashboards[0]['name'];
-				$dashboard['widgets'] = $dashboards[0]['widgets'];
+				$dashboard['widgets'] = $this->unsetInaccessibleFields($dashboards[0]['widgets']);
 			}
 		}
 		else {
-			// getting existing dashboard
+			// Getting existing dashboard.
 			$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
 
 			if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
@@ -163,6 +163,140 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		}
 
 		return $dashboard;
+	}
+
+	/**
+	 * Returns array of widgets without inaccessible fields.
+	 *
+	 * @param array $widgets
+	 * @param array $widgets[]['fields']
+	 * @param array $widgets[]['fields'][]['type']
+	 * @param array $widgets[]['fields'][]['value']
+	 *
+	 * @return array
+	 */
+	private function unsetInaccessibleFields($widgets) {
+		$ids = [
+			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
+			ZBX_WIDGET_FIELD_TYPE_HOST => [],
+			ZBX_WIDGET_FIELD_TYPE_ITEM => [],
+			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
+			ZBX_WIDGET_FIELD_TYPE_GRAPH => [],
+			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => [],
+			ZBX_WIDGET_FIELD_TYPE_MAP => []
+		];
+
+		foreach ($widgets as $w_index => $widget) {
+			foreach ($widget['fields'] as $f_index => $field) {
+				$ids[$field['type']][$field['value']][] = ['w' => $w_index, 'f' => $f_index];
+			}
+		}
+
+		$inaccessible_indexes = [];
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]) {
+			$db_groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]),
+				'preservekeys' => true
+			]);
+
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_GROUP] as $groupid => $indexes) {
+				if (!array_key_exists($groupid, $db_groups)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_HOST]) {
+			$db_hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_HOST]),
+				'preservekeys' => true
+			]);
+
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_HOST] as $hostid => $indexes) {
+				if (!array_key_exists($hostid, $db_hosts)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]) {
+			$db_items = API::Item()->get([
+				'output' => [],
+				'itemids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]),
+				'preservekeys' => true
+			]);
+
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM] as $itemid => $indexes) {
+				if (!array_key_exists($itemid, $db_items)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE]) {
+			$db_item_prototypes = API::ItemPrototype()->get([
+				'output' => [],
+				'itemids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE]),
+				'preservekeys' => true
+			]);
+
+			foreach ($item_prototypeids as $item_prototypeid => $indexes) {
+				if (!array_key_exists($item_prototypeid, $db_item_prototypes)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH]) {
+			$db_graphs = API::Graph()->get([
+				'output' => [],
+				'graphids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH]),
+				'preservekeys' => true
+			]);
+
+			foreach ($graphids as $graphid => $indexes) {
+				if (!array_key_exists($graphid, $db_graphs)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE]) {
+			$db_graph_prototypes = API::GraphPrototype()->get([
+				'output' => [],
+				'graphids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE]),
+				'preservekeys' => true
+			]);
+
+			foreach ($graph_prototypeids as $graph_prototypeid => $indexes) {
+				if (!array_key_exists($graph_prototypeid, $db_graph_prototypes)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_MAP]) {
+			$db_sysmaps = API::Map()->get([
+				'output' => [],
+				'sysmapids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_MAP]),
+				'preservekeys' => true
+			]);
+
+			foreach ($sysmapids as $sysmapid => $indexes) {
+				if (!array_key_exists($sysmapid, $db_sysmaps)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		foreach ($inaccessible_indexes as $index) {
+			unset($widgets[$index['w']]['fields'][$index['f']]);
+		}
+
+		return $widgets;
 	}
 
 	/**
@@ -214,6 +348,11 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$grid_widgets = [];
 
 		foreach ($widgets as $widget) {
+			// TODO: better solution would be to create this widget in it's place and size with warning about error
+			if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
+				continue;
+			}
+
 			$widgetid = $widget['widgetid'];
 			$default_rf_rate = CWidgetConfig::getDefaultRfRate($widget['type']);
 

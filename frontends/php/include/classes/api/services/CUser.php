@@ -901,6 +901,21 @@ class CUser extends CApiService {
 				)
 			);
 		}
+
+		// Check if deleted users have dashboards.
+		$db_dashboards = API::Dashboard()->get([
+			'output' => ['name', 'userid'],
+			'filter' => ['userid' => $userids],
+			'limit' => 1
+		]);
+
+		if ($db_dashboards) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User "%1$s" is dashboard "%2$s" owner.', $db_users[$db_dashboards[0]['userid']]['alias'],
+					$db_dashboards[0]['name']
+				)
+			);
+		}
 	}
 
 	/**

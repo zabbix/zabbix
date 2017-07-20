@@ -24,18 +24,13 @@ $sort_div = (new CSpan())
 	->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
 $backurl = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view');
-if ($data['fullscreen'] == 1) {
-	$backurl->setArgument('fullscreen', $data['fullscreen']);
-}
-$backurl = $backurl->getUrl();
+	->setArgument('action', 'dashboard.view')
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
-	->setArgument('eventid', '');
-if ($data['fullscreen'] == 1) {
-	$url_details->setArgument('fullscreen', $data['fullscreen']);
-}
+	->setArgument('eventid', '')
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $show_timeline = ($data['sortfield'] === 'clock');
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
@@ -76,7 +71,7 @@ if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
 }
 if ($data['config']['event_ack_enable']) {
-	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl);
+	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
 }
 $actions = makeEventsActions($data['data']['problems'], true);
 
@@ -159,7 +154,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		(new CSpan(CMacrosResolverHelper::resolveEventDescription(
 			$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
 		)))
-			->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $data['config'], $data['fullscreen']),
+			->setHint(make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']),
 				'', true, 'max-width: 500px'
 			)
 			->addClass(ZBX_STYLE_LINK_ACTION)

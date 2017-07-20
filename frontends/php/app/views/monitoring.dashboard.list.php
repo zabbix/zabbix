@@ -27,6 +27,7 @@ $create_button = new CRedirectButton(_('Create dashboard'),
 	(new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.view')
 		->setArgument('new', '1')
+		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 		->getUrl()
 );
 
@@ -53,10 +54,8 @@ $table = (new CTableInfo())
 
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('dashboardid', '');
-if ($data['fullscreen']) {
-	$url->setArgument('fullscreen', '1');
-}
+	->setArgument('dashboardid', '')
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 foreach ($data['dashboards'] as $dashboard) {
 	$table->addRow([

@@ -104,10 +104,11 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 /**
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
- * @param int	 $severity			trigger severity
- * @param array  $config			array of configuration parameters to get trigger severity name
- * @param string $text				trigger severity name
- * @param bool	 $forceNormal		true to return 'normal' class, false to return corresponding severity class
+ * @param int         $severity     trigger severity
+ * @param array|null  $config       array of configuration parameters to get trigger severity name; can be omitted
+ *                                  if $text is not null
+ * @param string|null $text         trigger severity name
+ * @param bool        $forceNormal  true to return 'normal' class, false to return corresponding severity class
  *
  * @return CCol
  */
