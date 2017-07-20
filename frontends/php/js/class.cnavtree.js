@@ -1286,6 +1286,8 @@ jQuery(function($) {
 												step_in_path = $(step_in_path).parent().closest('.tree-item');
 											}
 											openBranch($this, $(item).data('id'));
+											updateUserProfile('web.dashbrd.navtree.item.selected', $(item).data('id'),
+												[widget['widgetid']]);
 										}
 									}
 								});
