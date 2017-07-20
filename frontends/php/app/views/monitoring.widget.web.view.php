@@ -24,11 +24,8 @@ $table = (new CTableInfo())->setHeader([_('Host group'), _('Ok'), _('Failed'), _
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'web.view')
 	->setArgument('groupid', '')
-	->setArgument('hostid', '0');
-
-if ($data['fullscreen'] == 1) {
-	$url->setArgument('fullscreen', '1');
-}
+	->setArgument('hostid', '0')
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 foreach ($data['groups'] as $group) {
 	$url->setArgument('groupid', $group['groupid']);
