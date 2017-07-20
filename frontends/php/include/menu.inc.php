@@ -44,7 +44,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'action' => 'dashboard.view',
 					'active_if' => ['dashboard.list', 'dashboard.view'],
 					'label' => _('Dashboard'),
-					'sub_pages' => ['dashconf.php']
 				],
 				[
 					'url' => 'zabbix.php',

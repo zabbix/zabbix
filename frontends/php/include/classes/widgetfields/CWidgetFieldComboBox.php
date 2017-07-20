@@ -37,6 +37,10 @@ class CWidgetFieldComboBox extends CWidgetField {
 		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
 	}
 
+	public function setValue($value) {
+		return parent::setValue((int) $value);
+	}
+
 	public function getValues() {
 		return $this->values;
 	}
