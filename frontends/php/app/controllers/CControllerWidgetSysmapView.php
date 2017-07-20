@@ -20,15 +20,13 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetSysmapView extends CController {
-	private $form;
+class CControllerWidgetSysmapView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_SYSMAP);
+		$this->setValidationRules([
 			'name' =>			'string',
 			'uniqueid' =>		'required|string',
 			'edit_mode' =>		'in 0,1',
@@ -36,40 +34,11 @@ class CControllerWidgetSysmapView extends CController {
 			'fullscreen' =>		'in 0,1',
 			'fields' =>			'array',
 			'storage' =>		'array'
-		];
+		]);
+	}
 
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array  $fields
-			 * @var int    $fields['source_type']              (optional)
-			 * @var string $fields['filter_widget_reference']  (optional)
-			 * @var string $fields['sysmapid']                 (optional)
-			 * @var array  $storage
-			 * @var string $storage['current_sysmapid']
-			 * @var string $storage['previous_maps']
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-
-			// TODO VM: implement validation for previous_maps and current_sysmapid in storage
-		}
-
-		if (!$ret) {
-			$output = [];
-
-			if (($messages = getMessages()) !== null) {
-				$output['errors'][] = $messages->toString();
-			}
-
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
-		}
-
-		return $ret;
+	protected function init() {
+		$this->disableSIDValidation();
 	}
 
 	protected function checkPermissions() {
@@ -77,7 +46,7 @@ class CControllerWidgetSysmapView extends CController {
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 		$storage = $this->getInput('storage', []);
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = $this->getInput('edit_mode', 0);
@@ -135,7 +104,7 @@ class CControllerWidgetSysmapView extends CController {
 
 		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'sysmap_data' => $sysmap_data,
 			'widget_settings' => [
 				'current_sysmapid' => $sysmapid,

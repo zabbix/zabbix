@@ -19,41 +19,20 @@
 **/
 
 
-class CControllerWidgetClockView extends CController {
+class CControllerWidgetClockView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
+
+		$this->setType(WIDGET_CLOCK);
+		$this->setValidationRules([
+			'name' =>	'string',
+			'fields' =>	'array'
+		]);
+	}
 
 	protected function init() {
 		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
-			'name' =>	'string',
-			'fields' =>	'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array  $fields
-			 * @var int    $fields['time_type']
-			 * @var string $fields['itemid']
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_CLOCK, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -61,10 +40,10 @@ class CControllerWidgetClockView extends CController {
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		$time = null;
-		$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_CLOCK];
+		$name = $this->getDefaultHeader();
 		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;

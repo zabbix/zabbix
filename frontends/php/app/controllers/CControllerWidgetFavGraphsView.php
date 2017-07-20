@@ -21,25 +21,19 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetFavGraphsView extends CController {
+class CControllerWidgetFavGraphsView extends CControllerWidget {
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->setType(WIDGET_FAVOURITE_GRAPHS);
+		$this->setValidationRules([
+			'name' =>	'string'
+		]);
+	}
 
 	protected function init() {
 		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
-			'name' =>	'string'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -93,7 +87,7 @@ class CControllerWidgetFavGraphsView extends CController {
 		CArrayHelper::sort($graphs, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_GRAPHS]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'graphs' => $graphs,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

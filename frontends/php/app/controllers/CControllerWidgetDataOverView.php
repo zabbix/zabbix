@@ -21,42 +21,20 @@
 
 require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetDataOverView extends CController {
+class CControllerWidgetDataOverView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
+
+		$this->setType(WIDGET_DATA_OVERVIEW);
+		$this->setValidationRules([
+			'name' =>	'string',
+			'fields' =>	'array'
+		]);
+	}
 
 	protected function init() {
 		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
-			'name' =>	'string',
-			'fields' =>	'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array  $fields
-			 * @var array  $fields['groupids']     (optional)
-			 * @var string $fields['application']  (optional)
-			 * @var int    $fields['style']        (optional) in (STYLE_LEFT,STYLE_TOP)
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_DATA_OVERVIEW, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -64,10 +42,10 @@ class CControllerWidgetDataOverView extends CController {
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_DATA_OVERVIEW]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'groupids' => getSubGroups($fields['groupids']),
 			'application' => $fields['application'],
 			'style' => $fields['style'],

@@ -21,25 +21,19 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetWebView extends CController {
+class CControllerWidgetWebView extends CControllerWidget {
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->setType(WIDGET_WEB_OVERVIEW);
+		$this->setValidationRules([
+			'name' =>	'string'
+		]);
+	}
 
 	protected function init() {
 		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
-			'name' =>	'string'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -100,7 +94,7 @@ class CControllerWidgetWebView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_WEB_OVERVIEW]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

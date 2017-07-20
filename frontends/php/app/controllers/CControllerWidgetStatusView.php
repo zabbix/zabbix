@@ -21,25 +21,19 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetStatusView extends CController {
+class CControllerWidgetStatusView extends CControllerWidget {
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->setType(WIDGET_ZABBIX_STATUS);
+		$this->setValidationRules([
+			'name' =>	'string'
+		]);
+	}
 
 	protected function init() {
 		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
-			'name' =>	'string'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -48,7 +42,7 @@ class CControllerWidgetStatusView extends CController {
 
 	protected function doAction() {
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_ZABBIX_STATUS]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

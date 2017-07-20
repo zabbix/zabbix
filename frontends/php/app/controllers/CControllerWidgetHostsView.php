@@ -21,25 +21,19 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetHostsView extends CController {
+class CControllerWidgetHostsView extends CControllerWidget {
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->setType(WIDGET_HOST_STATUS);
+		$this->setValidationRules([
+			'name' =>	'string'
+		]);
+	}
 
 	protected function init() {
 		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
-			'name' =>	'string'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -349,7 +343,7 @@ class CControllerWidgetHostsView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_HOST_STATUS]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'filter' => $filter,
 			'config' => [
 				'severity_name_0' => $config['severity_name_0'],

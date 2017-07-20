@@ -24,6 +24,7 @@ class CControllerResponseData extends CControllerResponse {
 	private $data;
 	private $title = null;
 	private $file_name = null;
+	private $view_enabled = true;
 
 	public function __construct($data) {
 		$this->data = $data;
@@ -47,5 +48,15 @@ class CControllerResponseData extends CControllerResponse {
 
 	public function getFileName() {
 		return $this->file_name;
+	}
+
+	public function disableView() {
+		$this->view_enabled = false;
+
+		return $this;
+	}
+
+	public function isViewEnabled() {
+		return $this->view_enabled;
 	}
 }

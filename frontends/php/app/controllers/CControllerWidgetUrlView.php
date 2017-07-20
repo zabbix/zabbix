@@ -19,42 +19,21 @@
 **/
 
 
-class CControllerWidgetUrlView extends CController {
+class CControllerWidgetUrlView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_URL);
+		$this->setValidationRules([
 			'name' =>			'string',
 			'fields' =>			'array',
 			'dynamic_hostid' =>	'db hosts.hostid'
-		];
+		]);
+	}
 
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array  $fields
-			 * @var string $fields['url']      (optional)
-			 * @var int    $fields['dynamic']  (optional)
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_URL, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
+	protected function init() {
+		$this->disableSIDValidation();
 	}
 
 	protected function checkPermissions() {
@@ -62,7 +41,7 @@ class CControllerWidgetUrlView extends CController {
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 		$error = null;
 		$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
 		$isTemplatedDashboard = false; // TODO VM: will dashboards be templated?
@@ -83,7 +62,7 @@ class CControllerWidgetUrlView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_URL]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'url' => [
 				'url' => $fields['url'],
 				'error' => $error
