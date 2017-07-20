@@ -1210,18 +1210,25 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		// Validation. Field 'type' is validated globally and should be present in data when item is created.
 		foreach ($items as $item) {
-			if (array_key_exists('type', $item) || array_key_exists('itemid', $item)) {
-				$item_type = array_key_exists('type', $item)
-					? $item['type']
-					: $items_cache[$item['itemid']]['type'];
+			$item_type = array_key_exists('type', $item) ? $item['type'] : $items_cache[$item['itemid']]['type'];
 
-				if ($item_type != ITEM_TYPE_DEPENDENT && array_key_exists('master_itemid', $item)
-						&& $item['master_itemid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('should be empty')
+			if ($item_type == ITEM_TYPE_DEPENDENT) {
+				if (!array_key_exists('master_itemid', $item) || !$item['master_itemid']) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Field "%1$s" is mandatory.', 'master_itemid'));
+				}
+				if (!is_int($item['master_itemid']) &&
+						!(is_string($item['master_itemid']) && ctype_digit($item['master_itemid']))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+						$item['master_itemid'], 'master_itemid'
 					));
 				}
+			}
+			elseif (array_key_exists('master_itemid', $item) && $item['master_itemid']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+					_('should be empty')
+				));
 			}
 		}
 
@@ -1260,11 +1267,7 @@ abstract class CItemGeneral extends CApiService {
 				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
 					continue;
 				}
-				else if (!array_key_exists('master_itemid', $item) || !$item['master_itemid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('cannot be empty')
-					));
-				}
+
 				$dependency_level = 0;
 				$item_masters = [];
 				$master_item = $item;
