@@ -461,10 +461,6 @@ class CItemPrototype extends CItemGeneral {
 
 		$data = [];
 		foreach ($items as $inum => $item) {
-			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-				$item['master_itemid'] = null;
-			}
-
 			$data[] = ['values' => $item, 'where'=> ['itemid' => $item['itemid']]];
 		}
 
