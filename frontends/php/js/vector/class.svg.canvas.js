@@ -542,7 +542,7 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	// Workaround for IE/EDGE for proper text height calculation.
 	if ((IE || ED) && this.lines.length > 0
 			&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
-		this.width = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
+		this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
 	}
 
 	this.alignToAnchor();
