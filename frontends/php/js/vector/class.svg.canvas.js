@@ -536,9 +536,8 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.text = this.element.add('text', attributes, this.lines);
 
 	size = this.text.element.getBBox();
-	this.delta = size.y;
 	this.width = Math.ceil(size.width);
-	this.height = Math.ceil(size.height);
+	this.height = Math.ceil(size.height + size.y);
 
 	// Workaround for IE/EDGE for proper text height calculation.
 	if ((IE || ED) && this.lines.length > 0
@@ -551,8 +550,7 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	if (this.background !== null) {
 		this.background.update({
 			width: this.width + (this.canvas.textPadding * 2),
-			height: this.height + (this.canvas.textPadding * 2),
-			transform: 'translate(0 ' + this.delta + ')'
+			height: this.height + (this.canvas.textPadding * 2)
 		});
 	}
 
