@@ -992,10 +992,6 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				if ($items[$update_item['itemid']]['type'] != ITEM_TYPE_JMX) {
 					unset($items_to_update[$index]['jmx_endpoint']);
 				}
-
-				if ($type != ITEM_TYPE_DEPENDENT) {
-					unset($items_to_update[$index]['master_itemid']);
-				}
 			}
 
 			$result = API::Item()->update($items_to_update);

@@ -90,7 +90,8 @@ abstract class CItemGeneral extends CApiService {
 			'inventory_link'		=> [],
 			'lifetime'				=> [],
 			'preprocessing'			=> ['template' => 1],
-			'jmx_endpoint'			=> []
+			'jmx_endpoint'			=> [],
+			'master_itemid'			=> []
 		];
 
 		$this->errorMessages = array_merge($this->errorMessages, [
@@ -421,10 +422,12 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// Dependent item.
-			if ((array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_DEPENDENT)
-					|| $fullItem['type'] == ITEM_TYPE_DEPENDENT) {
-				if (!$update && (!array_key_exists('master_itemid', $item) || !$item['master_itemid'])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Field "%1$s" is mandatory.', 'master_itemid'));
+			if ($fullItem['type'] == ITEM_TYPE_DEPENDENT) {
+				if ((!$update || $fullItem['type'] != $dbItems[$item['itemid']]['type'])
+						&& (!array_key_exists('master_itemid', $item) || !$item['master_itemid'])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _('cannot be empty')
+					));
 				}
 				if (array_key_exists('master_itemid', $item) && !is_int($item['master_itemid'])
 						&& !(is_string($item['master_itemid']) && ctype_digit($item['master_itemid']))) {
@@ -1221,10 +1224,6 @@ abstract class CItemGeneral extends CApiService {
 			]);
 
 			foreach ($db_items as $db_itemid => $db_item) {
-				if (array_key_exists('type', $items_cache[$db_itemid])
-						&& $items_cache[$db_itemid]['type'] != $db_item['type']) {
-					unset($db_item['master_itemid']);
-				}
 				$items_cache[$db_itemid] = $items_cache[$db_itemid] + $db_item;
 			}
 		}
