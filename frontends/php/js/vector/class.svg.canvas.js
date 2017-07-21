@@ -407,14 +407,13 @@ SVGTextArea.prototype.alignToAnchor = function() {
 	}
 
 	this.x -= this.getHorizontalOffset();
-
 	switch (this.anchor.vertical) {
-		case 'middle':
-			this.y -= Math.floor(this.height/2);
+		case 'top':
+			this.y -= this.height + this.canvas.textPadding;
 			break;
 
-		case 'bottom':
-			this.y -= this.height;
+		case 'middle':
+			this.y -= Math.floor(this.height / 2);
 			break;
 	}
 };
