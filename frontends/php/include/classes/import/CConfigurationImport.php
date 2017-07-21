@@ -948,7 +948,8 @@ class CConfigurationImport {
 				$itemId = $this->referencer->resolveItem($hostId, $item_key);
 
 				// prototypes
-				foreach ($host_order_tree[$item_key] as $index => $level) {
+				$item_prototypes = $item['item_prototypes'] ? $host_order_tree[$item_key] : [];
+				foreach ($item_prototypes as $index => $level) {
 					$prototype = $item['item_prototypes'][$index];
 					$prototype['hostid'] = $hostId;
 					$applicationsIds = [];
@@ -2364,10 +2365,11 @@ class CConfigurationImport {
 
 		foreach ($discovery_rules as $host_key => $items) {
 			foreach ($items as $item) {
-				$entities = [$host_key => $item['item_prototypes']];
-				$entities_order[$host_key][$item['key_']] = $this->getEntitiesOrder($master_key_identifier, $entities,
-					$data_povider
-				)[$host_key];
+				if ($item['item_prototypes']) {
+					$item_prototypes = [$host_key => $item['item_prototypes']];
+					$item_prototypes = $this->getEntitiesOrder($master_key_identifier, $item_prototypes, $data_povider);
+					$entities_order[$host_key][$item['key_']] = $item_prototypes[$host_key];
+				}
 			}
 		}
 
@@ -2409,13 +2411,17 @@ class CConfigurationImport {
 				$resolved_masters_cache[$host_key] = [];
 			}
 
+			// Cache input array entities.
 			foreach ($entities as $entity_key => $entity) {
-				$resolved_masters_cache[$host_key][$entity_key] = [
+				$resolved_masters_cache[$host_key][$entity['key_']] = [
 					'type'					=> $entity['type'],
 					$master_key_identifier	=> $entity[$master_key_identifier]
 				];
+			}
 
-				if ($entity['type'] = ITEM_TYPE_DEPENDENT
+			// Search master entities not in input array. Will be requested from database.
+			foreach ($entities as $entity_key => $entity) {
+				if ($entity['type'] == ITEM_TYPE_DEPENDENT
 						&& array_key_exists('key', $entity[$master_key_identifier])) {
 					$find_hosts[$hostkey_to_hostid[$host_key]] = true;
 					$find_keys[$entity[$master_key_identifier]['key']] = true;
