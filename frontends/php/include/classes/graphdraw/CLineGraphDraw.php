@@ -204,7 +204,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->itemsHost = false;
 			}
 
-			if (!isset($this->axis_valuetype[$items['axisside']])) {
+			if (!isset($this->axis_valuetype[$item['axisside']])) {
 				$this->axis_valuetype[$item['axisside']] = $item['value_type'];
 			}
 			elseif ($this->axis_valuetype[$item['axisside']] != $item['value_type']) {
