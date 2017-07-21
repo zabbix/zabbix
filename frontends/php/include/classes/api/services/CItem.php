@@ -747,22 +747,19 @@ class CItem extends CItemGeneral {
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
-		$template_items_level = $this->getDependentItemsDependencyLevel($items);
-		$host_masters_level = $this->getMasterItemsDependencyLevels($host_items);
-		$host_items_level = $this->getDependentItemsDependencyLevel($host_items);
+		$template_items_level = $this->getDependentItemsMastersCount($items);
+		$host_masters_level = $this->getDependentItemsDependentLevels($host_items);
 		unset($host_items);
 
 		foreach ($data['hostids'] as $hostid) {
-			$items_level = $host_items_level[$hostid];
 			$masters_level = $host_masters_level[$hostid];
 
 			foreach ($data['templateids'] as $templateid) {
-				$items_intersection = array_intersect_key($template_items_level[$templateid], $items_level);
+				$items_intersection = array_intersect_key($template_items_level[$templateid], $masters_level);
 
 				foreach ($items_intersection as $item_key => $dependency_level) {
-					$summary_level = $masters_level[$item_key] + $items_level[$item_key] + $dependency_level;
 
-					if ($summary_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+					if ($masters_level[$item_key] + $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'master_itemid', _('maximum number of dependency levels reached')
 						));

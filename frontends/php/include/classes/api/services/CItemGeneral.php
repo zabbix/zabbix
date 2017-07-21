@@ -1444,8 +1444,8 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Creates array of item dependency level for input array. Returns array where key is host id and value is
-	 * associative array of item key and item dependency level.
+	 * Array of arrays for host dependent items. Host dependent items array is associative array of master items count
+	 * for every dependent items.
 	 *
 	 * @param array  $items             Array of items.
 	 * @param string $items[]['hostid'] Item host id.
@@ -1453,7 +1453,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param string $items[]['type']   Item type.
 	 * @param string $items[]['key_']   Item key.
 	 */
-	protected function getDependentItemsDependencyLevel($items) {
+	protected function getDependentItemsMastersCount($items) {
 		$items = zbx_toHash($items, 'itemid');
 		$host_items = [];
 
@@ -1478,7 +1478,8 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Creates array of master item maximum dependency level.
+	 * Array of arrays for host dependent items. Host dependent items array is associative array of dependent levels
+	 * count.
 	 *
 	 * @param array  $items             Array of items.
 	 * @param string $items[]['hostid'] Item host id.
@@ -1486,7 +1487,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param string $items[]['type']   Item type.
 	 * @param string $items[]['key_']   Item key.
 	 */
-	protected function getMasterItemsDependencyLevels($items) {
+	protected function getDependentItemsDependentLevels($items) {
 		$items = zbx_toHash($items, 'itemid');
 		$host_items = [];
 
