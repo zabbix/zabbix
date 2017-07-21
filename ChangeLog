@@ -3,6 +3,7 @@ Changes for 3.4.0alpha2
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-2031] fixed multiple bugs in maps (vjaceslavs)
 A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form and item.update API (vjaceslavs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
