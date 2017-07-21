@@ -1312,8 +1312,6 @@ jQuery(function($) {
 									$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare',
 										widget_data, 'selected_mapid', {mapid: $(selected_item).data('mapid')});
 								}
-
-								openBranch($this, options.navtree_item_selected);
 							}
 						}
 
