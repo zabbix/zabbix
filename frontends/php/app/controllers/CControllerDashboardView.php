@@ -60,7 +60,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 	protected function doAction() {
 		if ($this->dashboard === null) {
-			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null);
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;

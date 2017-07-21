@@ -1078,18 +1078,25 @@
 		cancelEditDashboard: function() {
 			return this.each(function() {
 				var	$this = $(this),
-					data = $this.data('dashboardGrid');
+					data = $this.data('dashboardGrid'),
+					url = new Curl('zabbix.php');
 
 				doAction('onEditStop', $this, data, null);
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;
 
+				url.unsetArgument('sid');
+				url.setArgument('action', 'dashboard.view');
+				if (data['options']['fullscreen'] == 1) {
+					url.setArgument('fullscreen', '1');
+				}
+
 				// Redirect to last active dashboard.
 				// (1) In case of New Dashboard from list, it will open list
 				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
 				// (3) In case of simple editing of current dashboard, it will reload same dashboard
-				location.replace('zabbix.php?action=dashboard.view&fullscreen=' + data['options']['fullscreen']);
+				location.replace(url.getUrl());
 			});
 		},
 

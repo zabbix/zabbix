@@ -59,8 +59,10 @@ if ($data['dashboard']['editable']) {
 
 (new CWidget())
 	->setTitle($data['dashboard']['name'])
-	->setControls((new CForm('post', 'zabbix.php?action=dashboard.view'))
+	->setControls((new CForm('get'))
 		->cleanItems()
+		->addVar('action', 'dashboard.view')
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem((new CList())
 			// $item_groupid and $item_hostid will be hidden, when 'Edit Dashboard' will be clicked.
 			->addItem($item_groupid)
