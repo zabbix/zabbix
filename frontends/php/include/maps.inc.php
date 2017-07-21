@@ -1042,8 +1042,10 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'ack' => true
 		];
 
-		// If user has no rights to see the details of particular selement, add only info that is needed to render map
-		// icons.
+		/*
+		 * If user has no rights to see the details of particular selement, add only info that is needed to render map
+		 * icons.
+		 */
 		if (PERM_READ > $selement['permission']) {
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_MAP:
