@@ -923,6 +923,10 @@ class CHost extends CHostGeneral {
 			$hostTemplateids = array_keys($hostTemplates);
 			$newTemplateids = zbx_objectValues($updateTemplates, 'templateid');
 
+			if ($newTemplateids) {
+				$this->validateDependentItemsLinkage($hostids, $newTemplateids);
+			}
+
 			$templatesToDel = array_diff($hostTemplateids, $newTemplateids);
 			$templatesToDel = array_diff($templatesToDel, $templateIdsClear);
 

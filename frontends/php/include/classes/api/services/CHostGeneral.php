@@ -961,4 +961,89 @@ abstract class CHostGeneral extends CHostBase {
 
 		return $result;
 	}
+
+	/**
+	 * Validates dependent items trees intersection between host items and template items.
+	 *
+	 * @param array $hostids        Array of hosts to validate.
+	 * @param array $templateids    Array of added templates.
+	 *
+	 * @throws API APIException if intersection of template items and host items creates dependent items tree with
+	 *                          dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
+	 */
+	protected function validateDependentItemsLinkage($hostids, $templateids) {
+		// Validate items.
+		$host_items = API::Item()->get([
+			'output' => ['itemid', 'type', 'key_', 'master_itemid'],
+			'hostids' => $hostids,
+			'preservekeys' => true,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
+
+		$template_items = API::Item()->get([
+			'output' => ['itemid', 'type', 'key_', 'master_itemid'],
+			'hostids' => $templateids,
+			'preservekeys' => true,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
+
+		if ($host_items && $temlpate_items) {
+			$template_items_level = getDependentItemsMastersCount($template_items);
+			$host_masters_level = getDependentItemsDependentLevels($host_items);
+
+			foreach ($hostids as $hostid) {
+				$masters_level = $host_masters_level[$hostid];
+
+				foreach ($templateids as $templateid) {
+					$items_intersection = array_intersect_key($template_items_level[$templateid], $masters_level);
+
+					foreach ($items_intersection as $item_key => $dependency_level) {
+
+						if ($masters_level[$item_key] + $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'master_itemid', _('maximum number of dependency levels reached')
+							));
+						}
+					}
+				}
+			}
+		}
+
+		// Validate item prototypes.
+		$host_itemprototypes = API::ItemPrototype()->get([
+			'output' => ['itemid', 'type', 'key_', 'master_itemid'],
+			'hostids' => $hostids,
+			'preservekeys' => true,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
+
+		$template_itemprototypes = API::ItemPrototype()->get([
+			'output' => ['itemid', 'type', 'key_', 'master_itemid'],
+			'hostids' => $templateids,
+			'preservekeys' => true,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
+
+		if ($host_itemprototypes && $template_itemprototypes) {
+			$template_items_level = getDependentItemsMastersCount($template_itemprototypes);
+			$host_masters_level = getDependentItemsDependentLevels($host_itemprototypes);
+
+			foreach ($hostids as $hostid) {
+				$masters_level = $host_masters_level[$hostid];
+
+				foreach ($templateids as $templateid) {
+					$items_intersection = array_intersect_key($template_items_level[$templateid], $masters_level);
+
+					foreach ($items_intersection as $item_key => $dependency_level) {
+
+						if ($masters_level[$item_key] + $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'master_itemid', _('maximum number of dependency levels reached')
+							));
+						}
+					}
+				}
+			}
+		}
+	}
 }

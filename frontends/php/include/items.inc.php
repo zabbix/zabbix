@@ -467,6 +467,88 @@ function findDependentWithMissingMasterItem($items, $data_provider) {
 }
 
 /**
+ * Array of arrays for host dependent items. Host dependent items array is associative array of master items count
+ * for every dependent item.
+ *
+ * @param array  $items             Array of items.
+ * @param string $items[]['hostid'] Item host id.
+ * @param string $items[]['itemid'] Item item id.
+ * @param string $items[]['type']   Item type.
+ * @param string $items[]['key_']   Item key.
+ */
+function getDependentItemsMastersCount($items) {
+	$items = zbx_toHash($items, 'itemid');
+	$host_items = [];
+
+	foreach ($items as $item) {
+		$master_item = $item;
+		$dependency_level = 0;
+
+		while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_item = $items[$master_item['master_itemid']];
+			++$dependency_level;
+		}
+
+		if (array_key_exists($item['hostid'], $host_items)) {
+			$host_items[$item['hostid']][$item['key_']] = $dependency_level;
+		}
+		else {
+			$host_items[$item['hostid']] = [$item['key_'] => $dependency_level];
+		}
+	}
+
+	return $host_items;
+}
+
+/**
+ * Array of arrays for host dependent items. Host dependent items array is associative array of dependent levels
+ * count.
+ *
+ * @param array  $items             Array of items.
+ * @param string $items[]['hostid'] Item host id.
+ * @param string $items[]['itemid'] Item item id.
+ * @param string $items[]['type']   Item type.
+ * @param string $items[]['key_']   Item key.
+ */
+function getDependentItemsDependentLevels($items) {
+	$items = zbx_toHash($items, 'itemid');
+	$host_items = [];
+
+	foreach ($items as $item) {
+		if (array_key_exists($item['hostid'], $host_items)) {
+			$host_items[$item['hostid']][$item['key_']] = 0;
+		}
+		else {
+			$host_items[$item['hostid']] = [$item['key_'] => 0];
+		}
+	}
+
+	foreach ($items as $item) {
+		$master_item = $item;
+		$dependency_level = 0;
+
+		while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
+			$host_items[$master_item['hostid']][$master_item['key_']] = max([
+				$dependency_level,
+				$host_items[$master_item['hostid']][$master_item['key_']]
+			]);
+
+			$master_item = array_key_exists($master_item['master_itemid'], $items)
+				? $items[$master_item['master_itemid']]
+				: null;
+			++$dependency_level;
+		};
+
+		$host_items[$master_item['hostid']][$master_item['key_']] = max([
+			$dependency_level,
+			$host_items[$master_item['hostid']][$master_item['key_']]
+		]);
+	}
+
+	return $host_items;
+}
+
+/**
  * Copies the given items to the given hosts or templates.
  *
  * @param array $src_itemids		Items which will be copied to $dst_hostids
