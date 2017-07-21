@@ -1862,7 +1862,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	if (FAIL == zbx_ipc_service_start(&alerter_service, ZBX_IPC_SERVICE_ALERTER, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start alerter service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start alert manager service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
