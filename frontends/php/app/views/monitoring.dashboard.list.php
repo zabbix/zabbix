@@ -41,7 +41,9 @@ $widget = (new CWidget())
 		)
 	);
 
-$form = (new CForm())->setName('dashboardForm');
+$form = (new CForm())
+	->setName('dashboardForm')
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $table = (new CTableInfo())
 	->setHeader([
