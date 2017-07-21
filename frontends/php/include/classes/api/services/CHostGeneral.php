@@ -976,14 +976,12 @@ abstract class CHostGeneral extends CHostBase {
 		$host_items = API::Item()->get([
 			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
 			'hostids' => $hostids,
-			'preservekeys' => true,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
 		$template_items = API::Item()->get([
 			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
 			'hostids' => $templateids,
-			'preservekeys' => true,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
@@ -1011,17 +1009,13 @@ abstract class CHostGeneral extends CHostBase {
 
 		// Validate item prototypes.
 		$host_itemprototypes = API::ItemPrototype()->get([
-			'output' => ['itemid', 'type', 'key_', 'master_itemid'],
+			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
 			'hostids' => $hostids,
-			'preservekeys' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
 		$template_itemprototypes = API::ItemPrototype()->get([
-			'output' => ['itemid', 'type', 'key_', 'master_itemid'],
+			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
 			'hostids' => $templateids,
-			'preservekeys' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
 		if ($host_itemprototypes && $template_itemprototypes) {
