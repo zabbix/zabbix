@@ -717,6 +717,7 @@ class CDashboard extends CApiService {
 			$db_items = API::Item()->get([
 				'output' => [],
 				'itemids' => $itemids,
+				'webitems' => true,
 				'preservekeys' => true
 			]);
 

@@ -226,6 +226,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$db_items = API::Item()->get([
 				'output' => [],
 				'itemids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]),
+				'webitems' => true,
 				'preservekeys' => true
 			]);
 
