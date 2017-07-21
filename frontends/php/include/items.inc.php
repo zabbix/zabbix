@@ -724,7 +724,7 @@ function copyItems($srcHostId, $dstHostId) {
 	$current_dependency = reset($create_order);
 
 	foreach ($create_order as $itemid => $dependency_level) {
-		if ($current_dependency != $dependency_level) {
+		if ($current_dependency != $dependency_level && $create_items) {
 			$current_dependency = $dependency_level;
 			$created_itemids = API::Item()->create($create_items);
 
