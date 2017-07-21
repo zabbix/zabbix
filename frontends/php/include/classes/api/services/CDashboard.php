@@ -611,6 +611,8 @@ class CDashboard extends CApiService {
 		$widget_fields = [];
 
 		if ($method === 'validateUpdate') {
+			$widgetids = [];
+
 			foreach ($dashboards as $dashboard) {
 				if (array_key_exists('widgets', $dashboard)) {
 					foreach ($dashboard['widgets'] as $widget) {
