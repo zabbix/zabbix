@@ -1204,7 +1204,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException for invalid data.
 	 */
-	public function validateDependentItems($items, $data_provider) {
+	protected function validateDependentItems($items, $data_provider) {
 		$items_cache = zbx_toHash($items, 'itemid');
 		$root_items = [];
 		$items_added = [];
