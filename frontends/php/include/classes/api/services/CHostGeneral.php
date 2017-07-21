@@ -974,20 +974,20 @@ abstract class CHostGeneral extends CHostBase {
 	protected function validateDependentItemsLinkage($hostids, $templateids) {
 		// Validate items.
 		$host_items = API::Item()->get([
-			'output' => ['itemid', 'type', 'key_', 'master_itemid'],
+			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
 			'hostids' => $hostids,
 			'preservekeys' => true,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
 		$template_items = API::Item()->get([
-			'output' => ['itemid', 'type', 'key_', 'master_itemid'],
+			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
 			'hostids' => $templateids,
 			'preservekeys' => true,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
-		if ($host_items && $temlpate_items) {
+		if ($host_items && $template_items) {
 			$template_items_level = getDependentItemsMastersCount($template_items);
 			$host_masters_level = getDependentItemsDependentLevels($host_items);
 
