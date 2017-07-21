@@ -1356,22 +1356,28 @@ abstract class CItemGeneral extends CApiService {
 			$items_count = array_key_exists($root_itemid, $items_created)
 				? $items_created[$root_itemid]
 				: 0;
+			$counted_masters = [];
 
 			while ($find_itemids && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+				// If item was moved to another master item, do not count moved item (and its dependent items)
+				// in old master dependent items count calculation.
+				if (array_key_exists($root_itemid, $items_moved)) {
+					$ignoreids = array_intersect_key($find_itemids, $items_moved[$root_itemid]);
+					$find_itemids = array_diff_key($find_itemids, $ignoreids);
+				}
+				if (array_key_exists($root_itemid, $items_added)
+						&& array_key_exists($dependency_level, $items_added[$root_itemid])) {
+					$find_itemids += $items_added[$root_itemid][$dependency_level];
+				}
 				$find_itemids = $data_provider->get([
 					'output'		=> ['itemid'],
 					'filter' 		=> ['master_itemid' => array_keys($find_itemids)],
 					'preservekeys'	=> true
 				]);
-				if (array_key_exists($root_itemid, $items_added)
-						&& array_key_exists($dependency_level, $items_added[$root_itemid])) {
-					$find_itemids += $items_added[$root_itemid][$dependency_level];
-				}
+
+				$find_itemids = array_diff_key($find_itemids, $counted_masters);
 				$items_count = $items_count + count($find_itemids);
-				// If item was moved to another master item, do not count moved item (and its dependent items)
-				// in old master dependent items count calculation.
-				$ignoreids = array_intersect_key($find_itemids, $items_moved);
-				$find_itemids = array_diff_key($find_itemids, $ignoreids);
+				$counted_masters += $find_itemids;
 				++$dependency_level;
 
 				if ($items_count > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
