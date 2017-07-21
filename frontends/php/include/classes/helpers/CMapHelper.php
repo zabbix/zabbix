@@ -224,9 +224,6 @@ class CMapHelper {
 				$link['color'] = $color;
 				$link['drawtype'] = $drawtype;
 			}
-			else {
-				$link['label'] = '';
-			}
 		}
 		unset($link);
 	}
