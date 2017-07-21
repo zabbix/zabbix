@@ -452,12 +452,36 @@ class CMap extends CMapElement {
 			elseif ($options['selectSelements'] === API_OUTPUT_COUNT) {
 				$result[$sysmap_key]['selements'] = count($result[$sysmap_key]['selements']);
 			}
+			elseif (is_array($options['selectSelements'])) {
+				$selements_data_to_return = [];
+				foreach ($result[$sysmap_key]['selements'] as $selement_key => $selement) {
+					foreach ($options['selectSelements'] as $requested_attr) {
+						if (array_key_exists($requested_attr, $selement)) {
+							$selements_data_to_return[$selement_key][$requested_attr] = $selement[$requested_attr];
+						}
+					}
+				}
+
+				$result[$sysmap_key]['selements'] = $selements_data_to_return;
+			}
 
 			if ($options['selectLinks'] === null) {
 				unset($result[$sysmap_key]['links']);
 			}
 			elseif ($options['selectLinks'] === API_OUTPUT_COUNT) {
 				$result[$sysmap_key]['links'] = count($result[$sysmap_key]['links']);
+			}
+			elseif (is_array($options['selectLinks'])) {
+				$links_data_to_return = [];
+				foreach ($result[$sysmap_key]['links'] as $link_key => $link) {
+					foreach ($options['selectLinks'] as $requested_attr) {
+						if (array_key_exists($requested_attr, $link)) {
+							$links_data_to_return[$link_key][$requested_attr] = $link[$requested_attr];
+						}
+					}
+				}
+
+				$result[$sysmap_key]['links'] = $links_data_to_return;
 			}
 
 			/*
