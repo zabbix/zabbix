@@ -3,6 +3,7 @@ Changes for 3.4.0alpha2
 New features:
 
 Bug fixes:
+........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 ..F....... [ZBXNEXT-2031] fixed multiple bugs in maps (vjaceslavs)
 A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form and item.update API (vjaceslavs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
@@ -95,6 +96,7 @@ Changes for 3.2.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)

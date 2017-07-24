@@ -23,7 +23,12 @@
 #include "common.h"
 #include "db.h"
 
+#define ZBX_ACTION_RECOVERY_NONE	0
+#define ZBX_ACTION_RECOVERY_OPERATIONS	1
+
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition);
 void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint64_pair_t *closed_events);
+void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actions);
+void	free_db_action(DB_ACTION *action);
 
 #endif
