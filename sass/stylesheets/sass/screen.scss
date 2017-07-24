@@ -2279,6 +2279,12 @@ $icon-widget-btn: (
 	}
 }
 
+.inaccessible {
+	.subfilter-enabled {
+		color: darken($font-selected-color, 25%);
+	}
+}
+
 %btn-search-hover-focus {
 	background-color: $transparent;
 	@include opacity(1);
@@ -3911,17 +3917,6 @@ td.inactive-bg {
 
 %found-bg {
 	background-color: $lighter-yellow;
-}
-
-.active-indic {
-	width: 8px;
-	height: 8px;
-	position: absolute;
-	top: -6px;
-	right: -6px;
-	border: 2px solid $body-bg-color;
-	background-color: darken(desaturate($alt-green, 10%), 16%);
-	@include border-radius(4px);
 }
 
 .msg-good {

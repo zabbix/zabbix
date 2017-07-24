@@ -66,7 +66,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$field_groupids = (new CMultiSelect([
 			'name' => $field->getName().'[]',
 			'objectName' => 'hostGroup',
-			'data' => $data['captions']['groups'][$field->getName()],
+			'data' => $data['captions']['ms']['groups'][$field->getName()],
 			'popup' => [
 				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
 					'&srcfld1=groupid&multiselect=1'
@@ -85,7 +85,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$field_hostids = (new CMultiSelect([
 			'name' => $field->getName().'[]',
 			'objectName' => 'hosts',
-			'data' => $data['captions']['hosts'][$field->getName()],
+			'data' => $data['captions']['ms']['hosts'][$field->getName()],
 			'popup' => [
 				'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
 					'&srcfld1=hostid&multiselect=1'
@@ -110,9 +110,10 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$form->addVar($field->getName(), $field->getValue());
 	}
 	elseif ($field instanceof CWidgetFieldSelectResource) {
-		$caption = array_key_exists($field->getValue(), $data['captions'][$field->getResourceType()])
-			? $data['captions'][$field->getResourceType()][$field->getValue()]
+		$caption = ($field->getValue() != 0)
+			? $data['captions']['simple'][$field->getResourceType()][$field->getValue()]
 			: '';
+
 		// needed for popup script
 		$form->addVar($field->getName(), $field->getValue());
 		$form_list->addRow($field->getLabel(), [

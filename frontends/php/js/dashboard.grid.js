@@ -520,8 +520,6 @@
 
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
-			ajax_widgets = [],
-			ajax_widget = {},
 			fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'];
@@ -529,24 +527,16 @@
 		delete fields['type'];
 		delete fields['name'];
 
-		url.setArgument('action', 'dashbrd.widget.update');
-
-		if (widget !== null) {
-			ajax_widget.widgetid = widget['widgetid'];
-		}
-		ajax_widget.type = type;
-		ajax_widget.name = name;
-		ajax_widget.fields = fields;
-		ajax_widgets.push(ajax_widget);
+		url.setArgument('action', 'dashbrd.widget.check');
 
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboardid: data['dashboard']['id'],
-				widgets: ajax_widgets,
-				save: 0 // WIDGET_CONFIG_DONT_SAVE - only check
+				type: type,
+				name: name,
+				fields: fields
 			},
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
@@ -748,8 +738,7 @@
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
-			widgets: ajax_widgets,
-			save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
+			widgets: ajax_widgets
 		};
 
 		$.ajax({
@@ -1089,18 +1078,25 @@
 		cancelEditDashboard: function() {
 			return this.each(function() {
 				var	$this = $(this),
-					data = $this.data('dashboardGrid');
+					data = $this.data('dashboardGrid'),
+					url = new Curl('zabbix.php');
 
 				doAction('onEditStop', $this, data, null);
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;
 
+				url.unsetArgument('sid');
+				url.setArgument('action', 'dashboard.view');
+				if (data['options']['fullscreen'] == 1) {
+					url.setArgument('fullscreen', '1');
+				}
+
 				// Redirect to last active dashboard.
 				// (1) In case of New Dashboard from list, it will open list
 				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
 				// (3) In case of simple editing of current dashboard, it will reload same dashboard
-				location.replace('zabbix.php?action=dashboard.view&fullscreen=' + data['options']['fullscreen']);
+				location.replace(url.getUrl());
 			});
 		},
 
