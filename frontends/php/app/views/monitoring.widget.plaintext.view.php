@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 $widget_div = (new CDiv())
 	->addClass(ZBX_STYLE_SYSMAP)
 	->setId(uniqid());
 
 if ($data['error'] === null) {
-	$table = (new CTableInfo())
-		->setHeader([_('Timestamp'), _('Value')]);
+	$table = (new CTableInfo())->setHeader([_('Timestamp'), _('Value')]);
 
 	foreach ($data['table_rows'] as $table_row) {
 		$table->addRow($table_row);

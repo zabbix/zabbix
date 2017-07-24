@@ -18,12 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CPlainTextWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data);
 
-		// Item field
+		// item field
 		$field_item = new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM);
 
 		if (array_key_exists('itemid', $data)) {
@@ -32,7 +33,7 @@ class CPlainTextWidgetForm extends CWidgetForm {
 
 		$this->fields[] = $field_item;
 
-		// Number of records to display
+		// Number of records to display.
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
 		))->setDefault(25);
@@ -43,7 +44,7 @@ class CPlainTextWidgetForm extends CWidgetForm {
 
 		$this->fields[] = $field_lines;
 
-		// Show text as HTML
+		// Show text as HTML.
 		$field_text_as_html = (new CWidgetFieldCheckBox('style', _('Show text as HTML')))->setDefault(0);
 
 		if (array_key_exists('style', $data)) {
@@ -52,7 +53,7 @@ class CPlainTextWidgetForm extends CWidgetForm {
 
 		$this->fields[] = $field_text_as_html;
 
-		// Dynamic item
+		// dynamic item
 		$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(0);
 
 		if (array_key_exists('dynamic', $data)) {

@@ -19,7 +19,12 @@
 **/
 
 
+/**
+ * Class for Dashboard Plain-text widget view.
+ */
 class CControllerWidgetPlainTextView extends CController {
+
+	// Widget's configuration form.
 	private $form;
 
 	protected function init() {
@@ -28,9 +33,9 @@ class CControllerWidgetPlainTextView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'				=>	'string',
-			'fields'			=>	'array',
-			'dynamic_hostid'	=>	'db hosts.hostid'
+			'name' => 'string',
+			'fields' => 'array',
+			'dynamic_hostid' => 'db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,7 +51,7 @@ class CControllerWidgetPlainTextView extends CController {
 
 			$this->form = CWidgetConfig::getForm(WIDGET_PLAIN_TEXT, $this->getInput('fields', []));
 
-			if ($errors = $this->form->validate()) {
+			if ($this->form->validate()) {
 				$ret = false;
 			}
 		}
