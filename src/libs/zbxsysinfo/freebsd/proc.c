@@ -476,7 +476,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_SLEEP:
-				if (SSLEEP == proc[i].ZBX_PROC_STAT)
+				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 != (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_ZOMB:
