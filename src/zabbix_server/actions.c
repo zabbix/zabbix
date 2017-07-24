@@ -2148,7 +2148,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 			actionids->values_num);
 
 	result = DBselect("select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
-				"r_longdata,maintenance_mode"
+				"r_longdata,maintenance_mode,ack_longdata,ack_shortdata"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -2161,7 +2161,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		ZBX_STR2UCHAR(action->status, row[2]);
 		ZBX_STR2UCHAR(action->eventsource, row[3]);
 
-		tmp = zbx_strdup(tmp, row[4]);
+		tmp = zbx_strdup(NULL, row[4]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON,
 				NULL, 0);
 		if (SUCCEED != is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
@@ -2179,6 +2179,8 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		ZBX_STR2UCHAR(action->maintenance_mode, row[9]);
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
+		action->ack_shortdata = zbx_strdup(NULL, row[10]);
+		action->ack_longdata = zbx_strdup(NULL, row[11]);
 
 		zbx_vector_ptr_append(actions, action);
 	}
@@ -2206,14 +2208,13 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 
 void	free_db_action(DB_ACTION *action)
 {
-	if (0 != action->actionid)
-	{
-		zbx_free(action->shortdata);
-		zbx_free(action->longdata);
-		zbx_free(action->r_shortdata);
-		zbx_free(action->r_longdata);
-		zbx_free(action->ack_shortdata);
-		zbx_free(action->ack_longdata);
-		zbx_free(action->name);
-	}
+	zbx_free(action->shortdata);
+	zbx_free(action->longdata);
+	zbx_free(action->r_shortdata);
+	zbx_free(action->r_longdata);
+	zbx_free(action->ack_shortdata);
+	zbx_free(action->ack_longdata);
+	zbx_free(action->name);
+
+	zbx_free(action);
 }

@@ -1788,8 +1788,9 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	ret = ZBX_ESCALATION_PROCESS;
 out:
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error: '%s'", __function_name, check_escalation_result_string(ret),
-			ZBX_NULL2STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, check_escalation_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error));
+
 
 	return ret;
 }
@@ -2325,7 +2326,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	}
 
 	result = DBselect("select escalationid,actionid,triggerid,eventid,r_eventid,nextcheck,esc_step,status,itemid,"
-					" itemid,acknowledgeid"
+					"acknowledgeid"
 				" from escalations"
 				" where %s"
 				" order by actionid,triggerid,itemid,escalationid", filter);
