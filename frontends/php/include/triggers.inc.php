@@ -915,13 +915,17 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			->addClass(ZBX_STYLE_CURSOR_POINTER);
 	}
 
-	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
-	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
-		$column->addClass('blink');
-		$column->setAttribute('data-toggle-class', $css);
-	}
-
 	if ($trigger) {
+		// blinking
+		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+		$duration = time() - $trigger['lastchange'];
+
+		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
+			$column->addClass('blink');
+			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
+			$column->setAttribute('data-toggle-class', $css);
+		}
+
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
 	}
 

@@ -110,7 +110,8 @@ class CControllerWidgetProblemsView extends CController {
 				'show' => $fields['show']
 			],
 			'config' => [
-				'event_ack_enable' => $config['event_ack_enable']
+				'event_ack_enable' => $config['event_ack_enable'],
+				'blink_period' => timeUnitToSeconds($config['blink_period'])
 			],
 			'data' => $data,
 			'info' => $info,
