@@ -434,7 +434,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 						stat_ok = 1;
 					break;
 				case ZBX_PROC_STAT_SLEEP:
-					if (SSLEEP == proc[i].ZBX_P_STAT)
+					if (SSLEEP == proc[i].ZBX_P_STAT && 0 != (proc[i].ZBX_P_FLAG & P_SINTR))
 						stat_ok = 1;
 					break;
 				case ZBX_PROC_STAT_ZOMB:
@@ -442,7 +442,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 						stat_ok = 1;
 					break;
 				case ZBX_PROC_STAT_DISK:
-					if (SSLEEP == proc[i].ZBX_P_STAT && !(proc[i].ZBX_P_FLAG & P_SINTR))
+					if (SSLEEP == proc[i].ZBX_P_STAT && 0 == (proc[i].ZBX_P_FLAG & P_SINTR))
 						stat_ok = 1;
 					break;
 				case ZBX_PROC_STAT_TRACE:
