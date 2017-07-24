@@ -4281,7 +4281,12 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_init(&func_sync, mode);
 	zbx_dbsync_init(&expr_sync, mode);
 	zbx_dbsync_init(&action_sync, mode);
-	zbx_dbsync_init(&action_op_sync, mode);
+
+	/* Action operation sync produces virtual rows with two columns - actionid, opflags. */
+	/* Because of this it cannot return the original database select and must always be  */
+	/* initialized in update mode.                                                       */
+	zbx_dbsync_init(&action_op_sync, ZBX_DBSYNC_UPDATE);
+
 	zbx_dbsync_init(&action_condition_sync, mode);
 	zbx_dbsync_init(&trigger_tag_sync, mode);
 	zbx_dbsync_init(&correlation_sync, mode);

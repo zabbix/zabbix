@@ -2177,38 +2177,6 @@ static int	dbsync_compare_action(const zbx_dc_action_t *action, const DB_ROW dbr
 
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_compare_action_op                                         *
- *                                                                            *
- * Purpose: compares action opereation class and flushes update row if        *
- *          necessary                                                         *
- *                                                                            *
- * Parameter: sync     - [OUT] the changeset                                  *
- *            actionid - [IN] the action identifier                           *
- *            opflags  - [IN] the action operation class flags                *
- *                                                                            *
- ******************************************************************************/
-static void	dbsync_compare_action_op(zbx_dbsync_t *sync, zbx_uint64_t actionid, unsigned char opflags)
-{
-	zbx_dc_action_t	*action;
-
-	if (0 == actionid)
-		return;
-
-	if (NULL == (action = (zbx_dc_action_t *)zbx_hashset_search(&dbsync_env.cache->actions, &actionid)) ||
-			opflags != action->opflags)
-	{
-		char	actionid_s[MAX_ID_LEN], opflags_s[MAX_ID_LEN];
-		char	*row[] = {actionid_s, opflags_s};
-
-		zbx_snprintf(actionid_s, sizeof(actionid_s), ZBX_FS_UI64, actionid);
-		zbx_snprintf(opflags_s, sizeof(opflags_s), "%d", opflags);
-
-		dbsync_add_row(sync, actionid, ZBX_DBSYNC_ROW_UPDATE, (DB_ROW)row);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dbsync_compare_actions                                       *
  *                                                                            *
  * Purpose: compares actions table with cached configuration data             *
@@ -2280,6 +2248,38 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dbsync_compare_action_op                                         *
+ *                                                                            *
+ * Purpose: compares action opereation class and flushes update row if        *
+ *          necessary                                                         *
+ *                                                                            *
+ * Parameter: sync     - [OUT] the changeset                                  *
+ *            actionid - [IN] the action identifier                           *
+ *            opflags  - [IN] the action operation class flags                *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbsync_compare_action_op(zbx_dbsync_t *sync, zbx_uint64_t actionid, unsigned char opflags)
+{
+	zbx_dc_action_t	*action;
+
+	if (0 == actionid)
+		return;
+
+	if (NULL == (action = (zbx_dc_action_t *)zbx_hashset_search(&dbsync_env.cache->actions, &actionid)) ||
+			opflags != action->opflags)
+	{
+		char	actionid_s[MAX_ID_LEN], opflags_s[MAX_ID_LEN];
+		char	*row[] = {actionid_s, opflags_s};
+
+		zbx_snprintf(actionid_s, sizeof(actionid_s), ZBX_FS_UI64, actionid);
+		zbx_snprintf(opflags_s, sizeof(opflags_s), "%d", opflags);
+
+		dbsync_add_row(sync, actionid, ZBX_DBSYNC_ROW_UPDATE, (DB_ROW)row);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dbsync_compare_action_ops                                    *
  *                                                                            *
  * Purpose: compares actions by operation class                               *
@@ -2312,12 +2312,6 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 	}
 
 	dbsync_prepare(sync, 2, NULL);
-
-	if (ZBX_DBSYNC_INIT == sync->mode)
-	{
-		sync->dbresult = result;
-		return SUCCEED;
-	}
 
 	while (NULL != (dbrow = DBfetch(result)))
 	{
