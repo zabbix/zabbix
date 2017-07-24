@@ -21,11 +21,19 @@
 (function($) {
 	"use strict"
 
+	function getWidgetDefaults(data, type) {
+		if (type in data['widget_defaults']) {
+			return data['widget_defaults'][type];
+		}
+
+		return data['widget_defaults']['__unknown'];
+	}
+
 	function makeWidgetDiv(data, widget) {
 		widget['content_header'] = $('<div>')
 			.addClass('dashbrd-grid-widget-head')
 			.append($('<h4>').text(
-				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
+				(widget['header'] !== '') ? widget['header'] : getWidgetDefaults(data, widget['type'])['header']
 			));
 		widget['content_body'] = $('<div>')
 			.addClass('dashbrd-grid-widget-content');
@@ -557,7 +565,7 @@
 							'type': type,
 							'header': name,
 							'pos': pos,
-							'rf_rate': data['widget_defaults'][type]['rf_rate'],
+							'rf_rate': getWidgetDefaults(data, type)['rf_rate'],
 							'fields': fields
 						}
 						updateWidgetDynamic($obj, data, widget_data);
@@ -593,8 +601,8 @@
 		var pos = {
 			'row': 0,
 			'col': 0,
-			'height': data['widget_defaults'][type]['size']['height'],
-			'width': data['widget_defaults'][type]['size']['width']
+			'height': getWidgetDefaults(data, type)['size']['height'],
+			'width': getWidgetDefaults(data, type)['size']['width']
 		}
 
 		// go row by row and try to position widget in each space
