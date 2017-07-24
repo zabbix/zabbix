@@ -33,7 +33,7 @@ class CProblemsWidgetForm extends CWidgetForm {
 			TRIGGERS_OPTION_IN_PROBLEM => _('Problems'),
 			TRIGGERS_OPTION_ALL => _('History')
 		]))
-			->setDefault(TRIGGERS_OPTION_IN_PROBLEM)
+			->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
 			->setModern(true);
 
 		if (array_key_exists('show', $data)) {
