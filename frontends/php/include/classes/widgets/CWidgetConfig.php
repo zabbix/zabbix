@@ -98,12 +98,6 @@ class CWidgetConfig {
 			];
 		}
 
-		$ret['__unknown'] = [
-			'header' => _('Unknown'),
-			'rf_rate' => SEC_PER_MIN,
-			'size' => ['width' => 2, 'height' => 3]
-		];
-
 		return $ret;
 	}
 
