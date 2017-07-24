@@ -4194,6 +4194,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			/* some data reside in stack but it will be available at the time when a PSK client callback */
 			/* function copies the data into buffers provided by OpenSSL within the callback */
 			psk_identity_for_cb = tls_arg1;			/* string is on stack */
+			/* NULL check to silence analyzer warning */
 			psk_identity_len_for_cb = (NULL == tls_arg1 ? 0 : strlen(tls_arg1));
 			psk_for_cb = psk_buf;				/* buffer is on stack */
 			psk_len_for_cb = (size_t)psk_len;
