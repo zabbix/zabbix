@@ -366,6 +366,10 @@ class CMap extends CMapElement {
 								elseif (array_intersect($sel['elmids'], $db_triggers_r) && !$options['editable']) {
 									$permission = PERM_READ;
 								}
+								elseif ($options['editable']
+									&& !array_diff($sel['elmids'], array_intersect($db_triggers_r, $sel['elmids']))) {
+									$permission = PERM_READ;
+								}
 								break;
 							case SYSMAP_ELEMENT_TYPE_MAP:
 								if (!array_diff($sel['elmids'], array_intersect($db_sysmaps_rw, $sel['elmids']))) {
@@ -404,6 +408,10 @@ class CMap extends CMapElement {
 							$permission = PERM_READ_WRITE;
 						}
 						elseif (array_intersect($lnk['triggerids'], $db_triggers_r) && !$options['editable']) {
+							$permission = PERM_READ;
+						}
+						elseif ($options['editable']
+							&& !array_diff($lnk['triggerids'], array_intersect($db_triggers_r, $lnk['triggerids']))) {
 							$permission = PERM_READ;
 						}
 
@@ -485,8 +493,8 @@ class CMap extends CMapElement {
 			}
 
 			/*
-			 * At this point editable means that all elemenets must be at least visible (user has permissions to
-			 * read or read-write). This does not cancel previous conditions.
+			 * At this point editable means that all elemenets must be at least readable. This does not cancel
+			 * previous conditions.
 			 */
 			if ($options['editable'] && PERM_READ > $sysmap['permission']) {
 				unset($result[$sysmap_key]);
