@@ -24,4 +24,6 @@
 
 ZBX_THREAD_ENTRY(escalator_thread, args);
 
+
+
 #endif
