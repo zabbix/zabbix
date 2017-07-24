@@ -41,7 +41,7 @@ class CControllerWidgetPlainTextView extends CController {
 			 * @var int    $fields['itemid']
 			 * @var int	   $fields['show_lines']
 			 * @var int    $fields['style']        (optional) in (0,1)
-			 * @var int    $fields['dynamic']      (optional) in (0,1)
+			 * @var int    $fields['dynamic']      (optional) in (WIDGET_SIMPLE_ITEM,WIDGET_DYNAMIC_ITEM)
 			 */
 
 			$this->form = CWidgetConfig::getForm(WIDGET_PLAIN_TEXT, $this->getInput('fields', []));
@@ -70,7 +70,7 @@ class CControllerWidgetPlainTextView extends CController {
 		$error = null;
 
 		$default_values = [
-			'dynamic' => 0,
+			'dynamic' => WIDGET_SIMPLE_ITEM,
 			'style' => 0
 		];
 
