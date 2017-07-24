@@ -51,7 +51,8 @@
 #	define ZBX_PROC_FLAG 	ki_sflag
 #	define ZBX_PROC_MASK	PS_INMEM
 #else
-#	define ZBX_PROC_FLAG 	ki_flag
+#	define ZBX_PROC_TDFLAG	ki_tdflags
+#	define ZBX_PROC_FLAG	ki_flag
 #	define ZBX_PROC_MASK	P_INMEM
 #endif
 
@@ -471,19 +472,19 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			switch (zbx_proc_stat) {
 			case ZBX_PROC_STAT_RUN:
-				if (proc[i].ZBX_PROC_STAT == SRUN)
+				if (SRUN == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_SLEEP:
-				if (proc[i].ZBX_PROC_STAT == SSLEEP)
+				if (SSLEEP == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_ZOMB:
-				if (proc[i].ZBX_PROC_STAT == SZOMB)
+				if (SZOMB == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_IOWAIT:
-				if (SSLEEP == proc[i].ZBX_PROC_STAT && !(proc[i].ZBX_PROC_FLAG & TDF_SINTR))
+				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 == (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_TRACE:
