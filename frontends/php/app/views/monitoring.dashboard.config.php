@@ -99,6 +99,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$js_scripts[] = $field_hostids->getPostJS();
 	}
 	elseif ($field instanceof CWidgetFieldReference) {
+		// TODO AV: very strange code
 		$form->addVar($field->getName(), $field->getValue() ?: '');
 
 		if (!$field->getValue()) {
@@ -151,7 +152,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 				(new CCheckBox('severities[]', $severity))
 					->setLabel(getSeverityName($severity, $data['config']))
 					->setId('severities_'.$severity)
-					->setChecked(in_array($severity, $field->getValue(true)))
+					->setChecked(in_array($severity, $field->getValue()))
 			);
 		}
 
