@@ -24,20 +24,41 @@
  */
 abstract class CControllerWidget extends CController {
 
+	/**
+	 * @var int $type  Widget type WIDGET_*.
+	 */
 	private $type;
+
+	/**
+	 * @var array $validation_rules  Validation rules for input parameters.
+	 */
 	private $validation_rules = [];
+
+	/**
+	 * @var object $form  CWidgetForm object.
+	 */
 	private $form;
 
+	/**
+	 * Initialization function.
+	 */
 	protected function init() {
 		$this->disableSIDValidation();
 	}
 
+	/**
+	 * Check user permissions.
+	 *
+	 * @return bool
+	 */
 	protected function checkPermissions() {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	/**
 	 * Set widget type.
+	 *
+	 * @param int $type  Widget type WIDGET_*.
 	 *
 	 * @return object
 	 */
@@ -49,6 +70,8 @@ abstract class CControllerWidget extends CController {
 
 	/**
 	 * Set validation rules for input parameters.
+	 *
+	 * @param array $validation_rules  Validation rules for input parameters.
 	 *
 	 * @return object
 	 */
