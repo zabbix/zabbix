@@ -99,7 +99,6 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		$js_scripts[] = $field_hostids->getPostJS();
 	}
 	elseif ($field instanceof CWidgetFieldReference) {
-		// TODO AV: very strange code
 		$form->addVar($field->getName(), $field->getValue() ?: '');
 
 		if (!$field->getValue()) {
