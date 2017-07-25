@@ -467,85 +467,65 @@ function findDependentWithMissingMasterItem($items, $data_provider) {
 }
 
 /**
- * Array of arrays for host dependent items. Host dependent items array is associative array of master items count
- * for every dependent item.
+ * Validate merge of template dependent items and every host dependent items, host dependent item will be overwritten
+ * by template dependent items.
+ * Return false if intersection of host dependent items and template dependent items create dependent items
+ * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
  *
- * @param array  $items             Array of items.
- * @param string $items[]['hostid'] Item host id.
- * @param string $items[]['itemid'] Item item id.
- * @param string $items[]['type']   Item type.
- * @param string $items[]['key_']   Item key.
- */
-function getDependentItemsMastersCount($items) {
-	$items = zbx_toHash($items, 'itemid');
-	$host_items = [];
-
-	foreach ($items as $item) {
-		$master_item = $item;
-		$dependency_level = 0;
-
-		while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
-			$master_item = $items[$master_item['master_itemid']];
-			++$dependency_level;
-		}
-
-		if (array_key_exists($item['hostid'], $host_items)) {
-			$host_items[$item['hostid']][$item['key_']] = $dependency_level;
-		}
-		else {
-			$host_items[$item['hostid']] = [$item['key_'] => $dependency_level];
-		}
-	}
-
-	return $host_items;
-}
-
-/**
- * Array of arrays for host dependent items. Host dependent items array is associative array of dependent levels
- * count.
+ * @param array $items
+ * @param array $hostids
  *
- * @param array  $items             Array of items.
- * @param string $items[]['hostid'] Item host id.
- * @param string $items[]['itemid'] Item item id.
- * @param string $items[]['type']   Item type.
- * @param string $items[]['key_']   Item key.
+ * @return bool
  */
-function getDependentItemsDependentLevels($items) {
-	$items = zbx_toHash($items, 'itemid');
-	$host_items = [];
+function validateDependentItemsIntersection($db_items, $hostids) {
+	$hosts_items = [];
+	$tmpl_items = [];
 
-	foreach ($items as $item) {
-		if (array_key_exists($item['hostid'], $host_items)) {
-			$host_items[$item['hostid']][$item['key_']] = 0;
+	foreach ($db_items as $db_item) {
+		$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT)
+			? $db_items[$db_item['master_itemid']]['key_']
+			: '';
+
+		if (in_array($db_item['hostid'], $hostids)) {
+			$hosts_items[$db_item['hostid']][$db_item['key_']] = $master_key;
 		}
-		else {
-			$host_items[$item['hostid']] = [$item['key_'] => 0];
+		elseif (!array_key_exists($db_item['key_'], $tmpl_items) || !$tmpl_items[$db_item['key_']]) {
+			$tmpl_items[$db_item['key_']] = $master_key;
 		}
 	}
 
-	foreach ($items as $item) {
-		$master_item = $item;
-		$dependency_level = 0;
+	foreach ($hosts_items as $hostid => $items) {
+		$linked_items = $items;
 
-		while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
-			$host_items[$master_item['hostid']][$master_item['key_']] = max([
-				$dependency_level,
-				$host_items[$master_item['hostid']][$master_item['key_']]
-			]);
+		// Merge host items dependency tree with template items dependency tree
+		foreach ($tmpl_items as $tmpl_item_key => $tmpl_master_key) {
+			if (array_key_exists($tmpl_item_key, $linked_items)) {
+				$linked_items[$tmpl_item_key] = ($linked_items[$tmpl_item_key])
+					? $linked_items[$tmpl_item_key]
+					: $tmpl_master_key;
+			}
+			else {
+				$linked_items[$tmpl_item_key] = $tmpl_master_key;
+			}
+		}
 
-			$master_item = array_key_exists($master_item['master_itemid'], $items)
-				? $items[$master_item['master_itemid']]
-				: null;
-			++$dependency_level;
-		};
+		// Check dependency level for every dependent item.
+		foreach ($linked_items as $linked_item => $linked_master_key) {
+			$master_key = $linked_master_key;
+			$dependency_level = 0;
 
-		$host_items[$master_item['hostid']][$master_item['key_']] = max([
-			$dependency_level,
-			$host_items[$master_item['hostid']][$master_item['key_']]
-		]);
+			while ($master_key) {
+				$master_key = $linked_items[$master_key];
+				++$dependency_level;
+			}
+
+			if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+				return false;
+			}
+		}
 	}
 
-	return $host_items;
+	return true;
 }
 
 /**
