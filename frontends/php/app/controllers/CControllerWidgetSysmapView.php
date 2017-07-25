@@ -43,10 +43,12 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$initial_load = $this->getInput('initial_load', 1);
+		$sysmap_data = null;
+		$previous_map = null;
+		$sysmapid = null;
 		$error = null;
 
 		// Get previous map.
-		$previous_map = null;
 		if (array_key_exists('previous_maps', $storage)) {
 			$previous_map = array_filter(explode(',', $storage['previous_maps']), 'is_numeric');
 
@@ -65,7 +67,8 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 			'fullscreen' => $this->getInput('fullscreen', 0)
 		];
 
-		$sysmapid = array_key_exists('current_sysmapid', $storage) ? $storage['current_sysmapid']
+		$sysmapid = array_key_exists('current_sysmapid', $storage)
+			? $storage['current_sysmapid']
 			: (array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null);
 		$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
 
@@ -73,13 +76,13 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 			$error = _('No map selected.');
 		}
 		elseif ($sysmap_data['id'] < 0) {
-			$error = _('No permissions to referred object or it does not exist!');
+			$error = _('No permissions to selected map or it does not exist.');
 		}
 
 		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
 		foreach ($sysmap_data['elements'] as &$element) {
 			if ($edit_mode) {
-				$element['actions'] = json_encode([]);
+				$element['actions'] = json_encode(null);
 			}
 			else {
 				$actions = json_decode($element['actions'], true);
@@ -97,7 +100,7 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'sysmap_data' => $sysmap_data,
+			'sysmap_data' => $sysmap_data ?: [],
 			'widget_settings' => [
 				'current_sysmapid' => $sysmapid,
 				'filter_widget_reference' => array_key_exists('filter_widget_reference', $fields)
