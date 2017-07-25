@@ -176,6 +176,15 @@ class CWidgetConfig {
 			case WIDGET_PROBLEMS:
 				return new CProblemsWidgetForm($data);
 
+			case WIDGET_WEB_OVERVIEW:
+				return new CWebWidgetForm($data);
+
+			case WIDGET_SYSTEM_STATUS:
+				return new CSystemWidgetForm($data);
+
+			case WIDGET_HOST_STATUS:
+				return new CHostsWidgetForm($data);
+
 			case WIDGET_PLAIN_TEXT:
 				return new CPlainTextWidgetForm($data);
 
