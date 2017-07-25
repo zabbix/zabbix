@@ -42,7 +42,7 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 		$storage = $this->getInput('storage', []);
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = $this->getInput('edit_mode', 0);
-		$initial_load = $this->getInput('initial_load', 1);
+		$initial_load = $this->getInput('initial_load', 1)	;
 		$sysmap_data = null;
 		$previous_map = null;
 		$sysmapid = null;

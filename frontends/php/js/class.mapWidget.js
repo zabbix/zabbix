@@ -93,13 +93,19 @@ jQuery(function($) {
 							url.setArgument('curtime', new CDate().getTime());
 							url.setArgument('add_widget_footer', 1);
 
-							$.ajax( {
+							$.ajax({
 								'url': url.getUrl()
 							})
 							.done(function(data) {
 								widget_data['is_refreshing'] = false;
-								widget_data['map_instance'].update(data);
-								widget['content_footer'].html(data.map_widget_footer);
+								if (+data.mapid > 0) {
+									widget_data['map_instance'].update(data);
+									widget['content_footer'].html(data.map_widget_footer);
+								}
+								else {
+									jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget',
+										widget_data['uniqueid']);
+								}
 							});
 						}
 					});
