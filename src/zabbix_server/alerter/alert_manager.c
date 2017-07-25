@@ -855,7 +855,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 		alerter = (zbx_am_alerter_t *)manager->alerters.values[manager->next_alerter_index++];
 		alerter->client = client;
 
-		zbx_hashset_insert(&manager->alerters_client, &alerter, sizeof(alerter));
+		zbx_hashset_insert(&manager->alerters_client, &alerter, sizeof(zbx_am_alerter_t *));
 		zbx_queue_ptr_push(&manager->free_alerters, alerter);
 	}
 
