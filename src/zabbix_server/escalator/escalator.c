@@ -1447,13 +1447,13 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 
 /******************************************************************************
  *                                                                            *
-<<<<<<< .working
  * Function: escalation_execute_acknowledge_operations                        *
  *                                                                            *
  * Purpose: execute escalation acknowledge operations                         *
  *                                                                            *
- * Parameters: event      - [IN] the event                                    *
- *             action     - [IN] the action                                   *
+ * Parameters: event  - [IN] the event                                        *
+ *             action - [IN] the action                                       *
+ *             ack    - [IN] the acknowledge                                  *
  *                                                                            *
  * Comments: Action acknowledge operations have a single escalation step, so  *
  *           alerts created by escalation acknowledge operations must have    *

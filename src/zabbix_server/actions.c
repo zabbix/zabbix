@@ -2006,7 +2006,6 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&ack_escalations);
-	zbx_vector_ptr_create(&events);
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
@@ -2027,6 +2026,8 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 
 	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_ptr_create(&events);
 
 	get_db_events_info(&eventids, &events);
 
@@ -2148,7 +2149,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 			actionids->values_num);
 
 	result = DBselect("select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
-				"r_longdata,maintenance_mode,ack_longdata,ack_shortdata"
+				"r_longdata,maintenance_mode,ack_shortdata,ack_longdata"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -2177,10 +2178,10 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		action->r_shortdata = zbx_strdup(NULL, row[7]);
 		action->r_longdata = zbx_strdup(NULL, row[8]);
 		ZBX_STR2UCHAR(action->maintenance_mode, row[9]);
-		action->name = zbx_strdup(NULL, row[1]);
-		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 		action->ack_shortdata = zbx_strdup(NULL, row[10]);
 		action->ack_longdata = zbx_strdup(NULL, row[11]);
+		action->name = zbx_strdup(NULL, row[1]);
+		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 
 		zbx_vector_ptr_append(actions, action);
 	}
