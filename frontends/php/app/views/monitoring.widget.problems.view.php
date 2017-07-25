@@ -150,7 +150,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	$description = [
+	$description_style = getSeverityStyle($trigger['priority'], $value == TRIGGER_VALUE_TRUE);
+	$description = (new CCol([
 		(new CSpan(CMacrosResolverHelper::resolveEventDescription(
 			$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
 		)))
@@ -158,7 +159,19 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				'', true, 'max-width: 500px'
 			)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-	];
+	]))
+		->addClass($description_style);
+
+	if (!$show_recovery_data) {
+		// blinking
+		$duration = time() - $problem['clock'];
+
+		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
+			$description->addClass('blink');
+			$description->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration);
+			$description->setAttribute('data-toggle-class', $description_style);
+		}
+	}
 
 	if ($show_timeline) {
 		if ($last_clock != 0) {
@@ -187,7 +200,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$show_recovery_data ? $cell_status : null,
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
-		getSeverityCell($trigger['priority'], null, $description, $value == TRIGGER_VALUE_FALSE),
+		$description,
 		(new CCol(
 			($problem['r_eventid'] != 0)
 				? zbx_date2age($problem['clock'], $problem['r_clock'])

@@ -29,7 +29,7 @@ class CControllerWidgetDiscoveryView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>	'string'
+			'name' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,7 +60,7 @@ class CControllerWidgetDiscoveryView extends CController {
 				$drule['down'] = 0;
 
 				foreach ($drule['dhosts'] as $dhost){
-					if (DRULE_STATUS_DISABLED == $dhost['status']) {
+					if ($dhost['status'] == DRULE_STATUS_DISABLED) {
 						$drule['down']++;
 					}
 					else {

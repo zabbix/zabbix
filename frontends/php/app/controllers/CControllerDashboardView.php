@@ -60,7 +60,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 	protected function doAction() {
 		if ($this->dashboard === null) {
-			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null);
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;
@@ -226,6 +228,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$db_items = API::Item()->get([
 				'output' => [],
 				'itemids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]),
+				'webitems' => true,
 				'preservekeys' => true
 			]);
 
@@ -243,7 +246,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'preservekeys' => true
 			]);
 
-			foreach ($item_prototypeids as $item_prototypeid => $indexes) {
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE] as $item_prototypeid => $indexes) {
 				if (!array_key_exists($item_prototypeid, $db_item_prototypes)) {
 					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
 				}
@@ -257,7 +260,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'preservekeys' => true
 			]);
 
-			foreach ($graphids as $graphid => $indexes) {
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH] as $graphid => $indexes) {
 				if (!array_key_exists($graphid, $db_graphs)) {
 					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
 				}
@@ -271,7 +274,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'preservekeys' => true
 			]);
 
-			foreach ($graph_prototypeids as $graph_prototypeid => $indexes) {
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE] as $graph_prototypeid => $indexes) {
 				if (!array_key_exists($graph_prototypeid, $db_graph_prototypes)) {
 					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
 				}
@@ -285,7 +288,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'preservekeys' => true
 			]);
 
-			foreach ($sysmapids as $sysmapid => $indexes) {
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_MAP] as $sysmapid => $indexes) {
 				if (!array_key_exists($sysmapid, $db_sysmaps)) {
 					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
 				}

@@ -92,14 +92,13 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 					'selectSelements' => ['elements', 'elementtype', 'permission']
 				]);
 
-				foreach ($submaps as $submap) {
-					$maps_resolved[] = $submap['sysmapid'];
+				$maps_resolved = array_merge($maps_resolved, $diff);
 
+				foreach ($submaps as $submap) {
 					foreach ($submap['selements'] as $selement) {
 						if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
 								&& $selement['permission'] >= PERM_READ) {
-							$element = reset($selement['elements']);
-							if ($element) {
+							if (($element = reset($selement['elements'])) !== false) {
 								$maps_relations[$submap['sysmapid']][] = $element['sysmapid'];
 								$maps_found[] = $element['sysmapid'];
 							}
@@ -115,9 +114,6 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 				'preservekeys' => true,
 			]);
 
-			foreach ($submaps as &$submap) {
-				unset($submap['selements']);
-			}
 			unset($submap);
 		}
 
