@@ -2016,7 +2016,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char	*tmp;
+		char	*tmp = NULL;
 
 		action = (DB_ACTION *)zbx_malloc(NULL, sizeof(DB_ACTION));
 		ZBX_STR2UINT64(action->actionid, row[0]);
