@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha2
 
 New features:
+........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
 ..F....... [ZBXNEXT-2031] fixed multiple bugs in maps (vjaceslavs)
@@ -93,6 +94,7 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.8rc1
 
 New features:
+........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)

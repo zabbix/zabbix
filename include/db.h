@@ -276,8 +276,8 @@ DB_TRIGGER;
 
 typedef struct
 {
-	DB_TRIGGER		trigger;
 	zbx_uint64_t		eventid;
+	DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
 	int			source;
 	int			object;
@@ -401,6 +401,22 @@ typedef struct
 	zbx_escalation_status_t	status;
 }
 DB_ESCALATION;
+
+typedef struct
+{
+	zbx_uint64_t	actionid;
+	char		*name;
+	char		*shortdata;
+	char		*longdata;
+	char		*r_shortdata;
+	char		*r_longdata;
+	int		esc_period;
+	unsigned char	eventsource;
+	unsigned char	maintenance_mode;
+	unsigned char	recovery;
+	unsigned char	status;
+}
+DB_ACTION;
 
 int	DBinit(char **error);
 void	DBdeinit(void);
