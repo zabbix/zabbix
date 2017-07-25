@@ -127,7 +127,7 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		events[events_num].trigger.correlation_mode = trigger_correlation_mode;
 		events[events_num].trigger.correlation_tag = zbx_strdup(NULL, trigger_correlation_tag);
 
-		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&events[events_num].trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
 		zbx_vector_ptr_create(&events[events_num].tags);
@@ -144,10 +144,10 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 				tag->value = zbx_strdup(NULL, trigger_tag->value);
 
 				substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-						&tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+						NULL, &tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
 				substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-						&tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+						NULL, &tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
 				if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
 					tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
@@ -2039,7 +2039,7 @@ int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object
 
 /******************************************************************************
  *                                                                            *
- * Function: get_events_info                                                  *
+ * Function: get_db_events_info                                               *
  *                                                                            *
  * Purpose: get events and flags that indicate what was filled in DB_EVENT    *
  *          structure                                                         *

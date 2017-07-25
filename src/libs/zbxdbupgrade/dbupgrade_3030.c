@@ -2049,6 +2049,78 @@ static int	DBpatch_3030175(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3030176(void)
+{
+	const ZBX_TABLE table =
+			{"task_acknowledge", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030177(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_acknowledge", 1, &field);
+}
+
+static int	DBpatch_3030178(void)
+{
+	const ZBX_FIELD	field = {"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+
+static int	DBpatch_3030179(void)
+{
+	const ZBX_FIELD	field = {"ack_shortdata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_3030180(void)
+{
+	const ZBX_FIELD	field = {"ack_longdata", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_3030181(void)
+{
+	const ZBX_FIELD	field = {"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("alerts", &field);
+}
+
+static int	DBpatch_3030182(void)
+{
+	const ZBX_FIELD	field = {"acknowledgeid", NULL, "acknowledges", "acknowledgeid", 0, ZBX_TYPE_ID, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("alerts", 6, &field);
+}
+
+static int	DBpatch_3030183(void)
+{
+	if (ZBX_DB_OK > DBexecute("update actions set "
+			"ack_shortdata='Acknowledged: {TRIGGER.NAME}', "
+			"ack_longdata="
+				"'{USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME} "
+				"with the following message:\r\n"
+				"{ACK.MESSAGE}\r\n\r\n"
+				"Current problem status is {EVENT.STATUS}' "
+			"where eventsource=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(3030)
@@ -2230,5 +2302,13 @@ DBPATCH_ADD(3030172, 0, 1)
 DBPATCH_ADD(3030173, 0, 1)
 DBPATCH_ADD(3030174, 0, 1)
 DBPATCH_ADD(3030175, 0, 1)
+DBPATCH_ADD(3030176, 0, 1)
+DBPATCH_ADD(3030177, 0, 1)
+DBPATCH_ADD(3030178, 0, 1)
+DBPATCH_ADD(3030179, 0, 1)
+DBPATCH_ADD(3030180, 0, 1)
+DBPATCH_ADD(3030181, 0, 1)
+DBPATCH_ADD(3030182, 0, 1)
+DBPATCH_ADD(3030183, 0, 1)
 
 DBPATCH_END()
