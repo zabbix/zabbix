@@ -97,7 +97,7 @@
 
 	function getDivPosition($obj, data, $div) {
 		var	target_pos = $div.position(),
-			widget_width_px = Math.floor($obj.width() / data['options']['columns']),
+			widget_width_px = Math.floor($obj.width() / data['options']['max-columns']),
 			target_top = target_pos.top + 25,
 			target_left = target_pos.left + 25,
 			target_height = $div.height() + 25,
@@ -115,8 +115,8 @@
 			row = data['options']['max-rows'] - height;
 		}
 
-		if (col > data['options']['columns'] - width) {
-			col = data['options']['columns'] - width;
+		if (col > data['options']['max-columns'] - width) {
+			col = data['options']['max-columns'] - width;
 		}
 
 		if (col < 0) {
@@ -130,8 +130,8 @@
 		if (width < 1) {
 			width = 1;
 		}
-		else if (width > data['options']['columns']) {
-			width = data['options']['columns'];
+		else if (width > data['options']['max-columns']) {
+			width = data['options']['max-columns'];
 		}
 
 		return {'row': row, 'col': col, 'height': height, 'width': width};
@@ -598,7 +598,7 @@
 		}
 
 		// go row by row and try to position widget in each space
-		var	max_col = data['options']['columns'] - pos['width'],
+		var	max_col = data['options']['max-columns'] - pos['width'],
 			found = false,
 			col, row;
 
@@ -895,13 +895,13 @@
 			var default_options = {
 				'fullscreen': 0,
 				'widget-height': 70,
-				'columns': 12,
 				'max-rows': 64,
+				'max-columns': 12,
 				'rows': 0,
 				'updated': false
 			};
 			options = $.extend(default_options, options);
-			options['widget-width'] = 100 / options['columns'];
+			options['widget-width'] = 100 / options['max-columns'];
 			options['edit_mode'] = false;
 
 			return this.each(function() {

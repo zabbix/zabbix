@@ -690,8 +690,8 @@ define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
 define('DASHBOARD_DEFAULT_ID', 1);
-define('DASHBOARD_COLUMNS', 12);
 define('DASHBOARD_MAX_ROWS', 64);
+define('DASHBOARD_MAX_COLUMNS', 12);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
