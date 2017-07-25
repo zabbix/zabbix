@@ -38,14 +38,6 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 		]);
 	}
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
-	}
-
 	protected function getNumberOfProblemsBySysmap(array $navtree_items = []) {
 		$response = [];
 		$sysmapids = array_keys(array_flip(zbx_objectValues($navtree_items, 'mapid')));

@@ -28,6 +28,14 @@ abstract class CControllerWidget extends CController {
 	private $validation_rules = [];
 	private $form;
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
+	protected function checkPermissions() {
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+	}
+
 	/**
 	 * Set widget type.
 	 *

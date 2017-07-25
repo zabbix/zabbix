@@ -32,14 +32,6 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 		]);
 	}
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
-	}
-
 	protected function doAction() {
 		$graphs = [];
 		$ids = ['graphid' => [], 'itemid' => []];
