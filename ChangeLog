@@ -16,6 +16,7 @@ A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form 
 Changes for 3.4.0alpha1
 
 New features:
+...G...... [ZBXNEXT-3910] added support to the agent for monitoring processes in trace or uninterruptible state on Linux, FreeBSD, OpenBSD and NetBSD (abs)
 A.F.I..... [ZBXNEXT-2102] added support of multiple dashboards; implemented API for dashboards (pavels, maximt, miks, Sasha, vmurzins)
 ..F..J.... [ZBXNEXT-1223] implemented jmx discovery item (vjaceslavs)
 A.F.....S. [ZBXNEXT-2442] implemented parallel alert processing (gcalenko, wiper)
