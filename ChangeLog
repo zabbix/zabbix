@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha2
 
 New features:
+A.F.....S. [ZBXNEXT-18] implemented sending alerts on acknowledges (Sergejs)
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
