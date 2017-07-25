@@ -74,7 +74,7 @@ if (!$triggers) {
 $trigger = reset($triggers);
 
 $alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error', 'esc_step',
-	'clock', 'subject', 'message', 'p_eventid'
+	'clock', 'subject', 'message', 'p_eventid', 'acknowledgeid'
 ];
 $options = [
 	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value'],
@@ -132,6 +132,15 @@ if ($event['r_eventid'] != 0) {
 	}
 }
 
+// Filter out acknowledgment notification messages.
+foreach ([&$alerts, &$r_alerts] as &$alerts_data) {
+	foreach ($alerts_data as $index => $alert) {
+		if ($alert['acknowledgeid'] > 0) {
+			unset($alerts_data[$index]);
+		}
+	}
+}
+unset($alerts_data);
 /*
  * Display
  */

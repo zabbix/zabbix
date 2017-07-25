@@ -1922,6 +1922,17 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
+			'ack_shortdata' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'ack_longdata' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
 		],
 	],
 	'operations' => [
@@ -4364,6 +4375,13 @@ return [
 				'ref_table' => 'events',
 				'ref_field' => 'eventid',
 			],
+			'acknowledgeid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid',
+			],
 		],
 	],
 	'history' => [
@@ -5239,6 +5257,13 @@ return [
 				'length' => 20,
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
+			],
+			'acknowledgeid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid',
 			],
 		],
 	],
@@ -6740,6 +6765,25 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
+			],
+		],
+	],
+	'task_acknowledge' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'acknowledgeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid',
 			],
 		],
 	],

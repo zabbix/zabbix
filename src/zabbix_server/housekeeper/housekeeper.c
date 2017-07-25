@@ -396,7 +396,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (ZBX_HK_OPTION_DISABLED == *rule->poption_global)
 			{
 				tmp = zbx_strdup(tmp, row[2]);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, &tmp,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
 						MACRO_TYPE_COMMON, NULL, 0);
 
 				if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
@@ -423,7 +423,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (ZBX_HK_OPTION_DISABLED == *rule->poption_global)
 			{
 				tmp = zbx_strdup(tmp, row[3]);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, &tmp,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
 						MACRO_TYPE_COMMON, NULL, 0);
 
 				if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
