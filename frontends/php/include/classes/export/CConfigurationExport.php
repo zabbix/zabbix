@@ -432,24 +432,12 @@ class CConfigurationExport {
 					$item['master_item'] = ['key_' => $items[$item['master_itemid']]['key_']];
 				}
 				else {
-					$template_itemids[$itemid] = $item['master_itemid'];
+					// Do not export dependent items with master item from template.
+					unset($items[$itemid]);
 				}
 			}
 		}
 		unset($item);
-
-		// Find template master item key to be set for host dependent item.
-		if ($template_itemids) {
-			$db_template_items = API::Item()->get([
-				'output'		=> ['key_'],
-				'itemids'		=> array_keys(array_flip($template_itemids)),
-				'preservekeys'	=> true
-			]);
-
-			foreach ($template_itemids as $itemid => $master_itemid) {
-				$items[$itemid]['master_item'] = ['key_' => $db_template_items[$master_itemid]['key_']];
-			}
-		}
 
 		$items = $this->prepareItems($items);
 
