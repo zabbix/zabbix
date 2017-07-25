@@ -21,52 +21,21 @@
 
 require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetWebView extends CController {
+class CControllerWidgetWebView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_WEB_OVERVIEW);
+		$this->setValidationRules([
 			'name' =>		'string',
 			'fullscreen' =>	'in 0,1',
 			'fields' =>		'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array        $fields
-			 * @var array|string $fields['groupids']          (optional)
-			 * @var array|string $fields['exclude_groupids']  (optional)
-			 * @var array|string $fields['hostids']           (optional)
-			 * @var int          $fields['maintenance']       (optional)
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_WEB_OVERVIEW, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$filter_hostids = $fields['hostids'] ? $fields['hostids'] : null;
@@ -157,7 +126,7 @@ class CControllerWidgetWebView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_WEB_OVERVIEW]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'groups' => $groups,
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [

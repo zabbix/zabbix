@@ -20,16 +20,13 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetSysmapView extends CController {
-	private $form;
-	private $error;
+class CControllerWidgetSysmapView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_SYSMAP);
+		$this->setValidationRules([
 			'name' =>			'string',
 			'uniqueid' =>		'required|string',
 			'edit_mode' =>		'in 0,1',
@@ -37,36 +34,11 @@ class CControllerWidgetSysmapView extends CController {
 			'fullscreen' =>		'in 0,1',
 			'fields' =>			'array',
 			'storage' =>		'array'
-		];
-
-		$ret = $this->validateInput($fields);
-		if ($ret) {
-			/*
-			 * @var array  $fields
-			 * @var string $fields['reference']                (optional)
-			 * @var int    $fields['source_type']              (optional)
-			 * @var string $fields['filter_widget_reference']  (optional)
-			 * @var string $fields['sysmapid']                 (optional)
-			 * @var array  $storage
-			 * @var string $storage['current_sysmapid']
-			 * @var string $storage['previous_maps']
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_SYSMAP, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$this->error = _('Widget is incorrectly configured or requested map does not exist.');
-			}
-		}
-
-		return true;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 		$storage = $this->getInput('storage', []);
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = $this->getInput('edit_mode', 0);
@@ -74,60 +46,60 @@ class CControllerWidgetSysmapView extends CController {
 		$sysmap_data = null;
 		$previous_map = null;
 		$sysmapid = null;
+		$error = null;
 
-		if (!$this->error) {
-			// Get previous map.
-			if (array_key_exists('previous_maps', $storage)) {
-				$previous_map = array_filter(explode(',', $storage['previous_maps']), 'is_numeric');
+		// Get previous map.
+		if (array_key_exists('previous_maps', $storage)) {
+			$previous_map = array_filter(explode(',', $storage['previous_maps']), 'is_numeric');
 
-				if ($previous_map) {
-					$previous_map = API::Map()->get([
-						'sysmapids' => [array_pop($previous_map)],
-						'output' => ['sysmapid', 'name']
-					]);
+			if ($previous_map) {
+				$previous_map = API::Map()->get([
+					'sysmapids' => [array_pop($previous_map)],
+					'output' => ['sysmapid', 'name']
+				]);
 
-					$previous_map = reset($previous_map);
-				}
+				$previous_map = reset($previous_map);
 			}
-
-			// Get requested map.
-			$options = [
-				'fullscreen' => $this->getInput('fullscreen', 0)
-			];
-
-			$sysmapid = array_key_exists('current_sysmapid', $storage) ? $storage['current_sysmapid']
-				: (array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null);
-			$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
-
-			if ($sysmapid === null) {
-				$this->error = _('No map selected.');
-			}
-			elseif ($sysmap_data['id'] < 0) {
-				$this->error = _('No permissions to selected map or it does not exist.');
-			}
-
-			// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
-			foreach ($sysmap_data['elements'] as &$element) {
-				if ($edit_mode) {
-					$element['actions'] = json_encode(null);
-				}
-				else {
-					$actions = json_decode($element['actions'], true);
-					if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
-						$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
-						$actions['navigatetos']['submap']['widget_uniqueid'] = $uniqueid;
-						unset($actions['gotos']['submap']);
-					}
-
-					$element['actions'] = json_encode($actions);
-				}
-			}
-			unset($element);
 		}
+
+		// Get requested map.
+		$options = [
+			'fullscreen' => $this->getInput('fullscreen', 0)
+		];
+
+		$sysmapid = array_key_exists('current_sysmapid', $storage)
+			? $storage['current_sysmapid']
+			: (array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null);
+		$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
+
+		if ($sysmapid === null) {
+			$error = _('No map selected.');
+		}
+		elseif ($sysmap_data['id'] < 0) {
+			$error = _('No permissions to selected map or it does not exist.');
+		}
+
+		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
+		foreach ($sysmap_data['elements'] as &$element) {
+			if ($edit_mode) {
+				$element['actions'] = json_encode(null);
+			}
+			else {
+				$actions = json_decode($element['actions'], true);
+				if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
+					$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
+					$actions['navigatetos']['submap']['widget_uniqueid'] = $uniqueid;
+					unset($actions['gotos']['submap']);
+				}
+
+				$element['actions'] = json_encode($actions);
+			}
+		}
+		unset($element);
 
 		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_SYSMAP]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'sysmap_data' => $sysmap_data ?: [],
 			'widget_settings' => [
 				'current_sysmapid' => $sysmapid,
@@ -138,7 +110,7 @@ class CControllerWidgetSysmapView extends CController {
 				'previous_map' => $previous_map,
 				'initial_load' => $initial_load,
 				'uniqueid' => $uniqueid,
-				'error' => $this->error
+				'error' => $error
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
