@@ -90,13 +90,15 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             trigger_tags                - [IN] trigger tags                *
  *             trigger_correlation_mode    - [IN] trigger correlation mode    *
  *             trigger_correlation_tag     - [IN] trigger correlation tag     *
+ *             trigger_value               - [IN] trigger value               *
  *                                                                            *
  ******************************************************************************/
 int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
-		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag)
+		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
+		unsigned char trigger_value)
 {
 	int	i;
 
@@ -126,6 +128,7 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		events[events_num].trigger.type = trigger_type;
 		events[events_num].trigger.correlation_mode = trigger_correlation_mode;
 		events[events_num].trigger.correlation_tag = zbx_strdup(NULL, trigger_correlation_tag);
+		events[events_num].trigger.value = (int)trigger_value;
 
 		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
 				&events[events_num].trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
@@ -1251,7 +1254,8 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
 						event->objectid, &ts, 0, correlation->correlationid, event->eventid,
 						event->trigger.description, event->trigger.expression,
 						event->trigger.recovery_expression, event->trigger.priority,
-						event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
+						event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "",
+						event->trigger.value);
 
 				event->flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
 				events[index].flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
@@ -1565,7 +1569,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 						queue->objectid, &queue->ts, 0, queue->correlationid,
 						queue->c_eventid, trigger->description, trigger->expression_orig,
 						trigger->recovery_expression_orig, trigger->priority, trigger->type,
-						NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
+						NULL, ZBX_TRIGGER_CORRELATION_NONE, "", trigger->value);
 
 				closed_num++;
 			}
@@ -2007,6 +2011,7 @@ out:
  *             trigger_tags                - [IN] trigger tags                *
  *             trigger_correlation_mode    - [IN] trigger correlation mode    *
  *             trigger_correlation_tag     - [IN] trigger correlation tag     *
+ *             trigger_value               - [IN] trigger value               *
  *                                                                            *
  ******************************************************************************/
 int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
@@ -2014,14 +2019,14 @@ int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object
 		const char *trigger_description, const char *trigger_expression,
 		const char *trigger_recovery_expression, unsigned char trigger_priority, unsigned char trigger_type,
 		const zbx_vector_ptr_t *trigger_tags, unsigned char trigger_correlation_mode,
-		const char *trigger_correlation_tag)
+		const char *trigger_correlation_tag, unsigned char trigger_value)
 {
 	int			index;
 	zbx_event_recovery_t	recovery_local;
 
 	index = add_event(source, object, objectid, ts, TRIGGER_VALUE_OK, trigger_description, trigger_expression,
 			trigger_recovery_expression, trigger_priority, trigger_type, trigger_tags,
-			trigger_correlation_mode, trigger_correlation_tag);
+			trigger_correlation_mode, trigger_correlation_tag, trigger_value);
 
 	recovery_local.eventid = eventid;
 	recovery_local.objectid = objectid;
