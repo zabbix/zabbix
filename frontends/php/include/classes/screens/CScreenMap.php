@@ -40,8 +40,6 @@ class CScreenMap extends CScreenBase {
 		$output = [
 			(new CDiv())
 				->setId('map_'.$this->screenitem['screenitemid'])
-				->addStyle('width: '.$map_data['canvas']['width'].'px;')
-				->addStyle('height: '.$map_data['canvas']['height'].'px;')
 				->addStyle('overflow: hidden;')
 		];
 

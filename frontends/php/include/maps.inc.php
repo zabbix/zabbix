@@ -198,6 +198,10 @@ function getActionsBySysmap($sysmap, array $options = []) {
 						}
 
 						$gotos['events']['triggerids'][] = $element['triggerid'];
+
+						if (array_key_exists('severity_min', $options) && zbx_ctype_digit($options['severity_min'])) {
+							$gotos['events']['severity_min'] = $options['severity_min'];
+						}
 					}
 				}
 				break;
