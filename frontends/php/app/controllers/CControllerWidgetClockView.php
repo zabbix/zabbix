@@ -46,7 +46,8 @@ class CControllerWidgetClockView extends CControllerWidget {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'value_type'],
 					'selectHosts' => ['name'],
-					'itemids' => $fields['itemid']
+					'itemids' => $fields['itemid'],
+					'webitems' => true
 				]);
 
 				if ($items) {

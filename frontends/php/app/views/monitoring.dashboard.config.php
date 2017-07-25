@@ -151,7 +151,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 				(new CCheckBox('severities[]', $severity))
 					->setLabel(getSeverityName($severity, $data['config']))
 					->setId('severities_'.$severity)
-					->setChecked(in_array($severity, $field->getValue(true)))
+					->setChecked(in_array($severity, $field->getValue()))
 			);
 		}
 

@@ -97,7 +97,7 @@
 
 	function getDivPosition($obj, data, $div) {
 		var	target_pos = $div.position(),
-			widget_width_px = Math.floor($obj.width() / data['options']['columns']),
+			widget_width_px = Math.floor($obj.width() / data['options']['max-columns']),
 			target_top = target_pos.top + 25,
 			target_left = target_pos.left + 25,
 			target_height = $div.height() + 25,
@@ -115,8 +115,8 @@
 			row = data['options']['max-rows'] - height;
 		}
 
-		if (col > data['options']['columns'] - width) {
-			col = data['options']['columns'] - width;
+		if (col > data['options']['max-columns'] - width) {
+			col = data['options']['max-columns'] - width;
 		}
 
 		if (col < 0) {
@@ -130,8 +130,8 @@
 		if (width < 1) {
 			width = 1;
 		}
-		else if (width > data['options']['columns']) {
-			width = data['options']['columns'];
+		else if (width > data['options']['max-columns']) {
+			width = data['options']['max-columns'];
 		}
 
 		return {'row': row, 'col': col, 'height': height, 'width': width};
@@ -598,7 +598,7 @@
 		}
 
 		// go row by row and try to position widget in each space
-		var	max_col = data['options']['columns'] - pos['width'],
+		var	max_col = data['options']['max-columns'] - pos['width'],
 			found = false,
 			col, row;
 
@@ -895,13 +895,13 @@
 			var default_options = {
 				'fullscreen': 0,
 				'widget-height': 70,
-				'columns': 12,
 				'max-rows': 64,
+				'max-columns': 12,
 				'rows': 0,
 				'updated': false
 			};
 			options = $.extend(default_options, options);
-			options['widget-width'] = 100 / options['columns'];
+			options['widget-width'] = 100 / options['max-columns'];
 			options['edit_mode'] = false;
 
 			return this.each(function() {
@@ -1078,18 +1078,25 @@
 		cancelEditDashboard: function() {
 			return this.each(function() {
 				var	$this = $(this),
-					data = $this.data('dashboardGrid');
+					data = $this.data('dashboardGrid'),
+					url = new Curl('zabbix.php');
 
 				doAction('onEditStop', $this, data, null);
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;
 
+				url.unsetArgument('sid');
+				url.setArgument('action', 'dashboard.view');
+				if (data['options']['fullscreen'] == 1) {
+					url.setArgument('fullscreen', '1');
+				}
+
 				// Redirect to last active dashboard.
 				// (1) In case of New Dashboard from list, it will open list
 				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
 				// (3) In case of simple editing of current dashboard, it will reload same dashboard
-				location.replace('zabbix.php?action=dashboard.view&fullscreen=' + data['options']['fullscreen']);
+				location.replace(url.getUrl());
 			});
 		},
 

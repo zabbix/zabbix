@@ -28,6 +28,21 @@ class CTrigOverviewWidgetForm extends CWidgetForm {
 	{
 		parent::__construct($data);
 
+		// show
+		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [
+			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problems'),
+			TRIGGERS_OPTION_IN_PROBLEM => _('Problems'),
+			TRIGGERS_OPTION_ALL => _('Any')
+		]))
+			->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
+			->setModern(true);
+
+		if (array_key_exists('show', $data)) {
+			$field_show->setValue($data['show']);
+		}
+		$this->fields[] = $field_show;
+
+		// host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $data)) {
@@ -35,6 +50,7 @@ class CTrigOverviewWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_groups;
 
+		// application
 		$field_application = new CWidgetFieldTextBox('application', _('Application'));
 
 		if (array_key_exists('application', $data)) {
@@ -42,12 +58,11 @@ class CTrigOverviewWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_application;
 
-		$styles = [
+		// hosts location
+		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
 			STYLE_LEFT => _('Left'),
 			STYLE_TOP => _('Top')
-		];
-
-		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), $styles))
+		]))
 			->setDefault(STYLE_LEFT)
 			->setModern(true);
 

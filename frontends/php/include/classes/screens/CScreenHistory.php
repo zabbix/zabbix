@@ -128,6 +128,7 @@ class CScreenHistory extends CScreenBase {
 				'history' => $firstItem['value_type'],
 				'itemids' => $this->itemids,
 				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => ['itemid', 'clock'],
 				'sortorder' => ZBX_SORT_DOWN
 			];
 			if ($this->action == HISTORY_LATEST) {
@@ -176,8 +177,8 @@ class CScreenHistory extends CScreenBase {
 
 				$historyData = API::History()->get($options);
 				CArrayHelper::sort($historyData, [
-					['field' => 'clock', 'order' => SORT_DESC],
-					['field' => 'ns', 'order' => SORT_DESC]
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 				]);
 
 				foreach ($historyData as $data) {
@@ -273,8 +274,8 @@ class CScreenHistory extends CScreenBase {
 
 				$historyData = API::History()->get($options);
 				CArrayHelper::sort($historyData, [
-					['field' => 'clock', 'order' => SORT_DESC],
-					['field' => 'ns', 'order' => SORT_DESC]
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 				]);
 
 				foreach ($historyData as $data) {

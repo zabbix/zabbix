@@ -301,7 +301,7 @@ var AudioControl = {
  * @author Konstantin Buravcov
  */
 var jqBlink = {
-	shown: false, // are objects currently shown or hidden?
+	shown: true, // are objects currently shown or hidden?
 	blinkInterval: 1000, // how fast will they blink (ms)
 	secondsSinceInit: 0,
 
@@ -346,11 +346,7 @@ var jqBlink = {
 			if (typeof obj.data('timeToBlink') !== 'undefined') {
 				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
 
-				// if object stops blinking, it should be left visible
-				if (!shouldBlink && !that.shown) {
-					obj.css('visibility', 'visible');
-				}
-				return shouldBlink;
+				return shouldBlink || !that.shown;
 			}
 			else {
 				// no time-to-blink attribute, should blink forever

@@ -24,8 +24,8 @@
  */
 class CDashboard extends CApiService {
 
-	const MAX_ROW = 63;
-	const MAX_COL = 11;
+	const MAX_ROW = DASHBOARD_MAX_ROWS - 1;
+	const MAX_COL = DASHBOARD_MAX_COLUMNS - 1;
 
 	protected $tableName = 'dashboard';
 	protected $tableAlias = 'd';
@@ -611,6 +611,8 @@ class CDashboard extends CApiService {
 		$widget_fields = [];
 
 		if ($method === 'validateUpdate') {
+			$widgetids = [];
+
 			foreach ($dashboards as $dashboard) {
 				if (array_key_exists('widgets', $dashboard)) {
 					foreach ($dashboard['widgets'] as $widget) {
@@ -715,6 +717,7 @@ class CDashboard extends CApiService {
 			$db_items = API::Item()->get([
 				'output' => [],
 				'itemids' => $itemids,
+				'webitems' => true,
 				'preservekeys' => true
 			]);
 

@@ -46,8 +46,8 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 			'sysmapids' => $sysmapids,
 			'preservekeys' => true,
 			'output' => ['sysmapid', 'severity_min'],
-			'selectLinks' => ['linktriggers'],
-			'selectSelements' => ['elements', 'elementtype']
+			'selectLinks' => ['linktriggers', 'permission'],
+			'selectSelements' => ['elements', 'elementtype', 'permission']
 		]);
 
 		if ($sysmaps) {
@@ -78,8 +78,8 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 					'sysmapids' => $diff,
 					'preservekeys' => true,
 					'output' => ['sysmapid', 'severity_min'],
-					'selectLinks' => ['linktriggers'],
-					'selectSelements' => ['elements', 'elementtype']
+					'selectLinks' => ['linktriggers', 'permission'],
+					'selectSelements' => ['elements', 'elementtype', 'permission']
 				]);
 
 				$sysmaps_resolved = array_merge($sysmaps_resolved, $diff);

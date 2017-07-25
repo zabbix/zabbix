@@ -24,18 +24,13 @@ $sort_div = (new CSpan())
 	->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
 $backurl = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view');
-if ($data['fullscreen'] == 1) {
-	$backurl->setArgument('fullscreen', $data['fullscreen']);
-}
-$backurl = $backurl->getUrl();
+	->setArgument('action', 'dashboard.view')
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
-	->setArgument('eventid', '');
-if ($data['fullscreen'] == 1) {
-	$url_details->setArgument('fullscreen', $data['fullscreen']);
-}
+	->setArgument('eventid', '')
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $show_timeline = ($data['sortfield'] === 'clock');
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
@@ -76,7 +71,7 @@ if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
 }
 if ($data['config']['event_ack_enable']) {
-	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl);
+	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
 }
 $actions = makeEventsActions($data['data']['problems'], true);
 
@@ -155,15 +150,28 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	$description = [
+	$description_style = getSeverityStyle($trigger['priority'], $value == TRIGGER_VALUE_TRUE);
+	$description = (new CCol([
 		(new CSpan(CMacrosResolverHelper::resolveEventDescription(
 			$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
 		)))
-			->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $data['config'], $data['fullscreen']),
+			->setHint(make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']),
 				'', true, 'max-width: 500px'
 			)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-	];
+	]))
+		->addClass($description_style);
+
+	if (!$show_recovery_data) {
+		// blinking
+		$duration = time() - $problem['clock'];
+
+		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
+			$description->addClass('blink');
+			$description->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration);
+			$description->setAttribute('data-toggle-class', $description_style);
+		}
+	}
 
 	if ($show_timeline) {
 		if ($last_clock != 0) {
@@ -192,7 +200,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$show_recovery_data ? $cell_status : null,
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
-		getSeverityCell($trigger['priority'], null, $description, $value == TRIGGER_VALUE_FALSE),
+		$description,
 		(new CCol(
 			($problem['r_eventid'] != 0)
 				? zbx_date2age($problem['clock'], $problem['r_clock'])

@@ -28,7 +28,7 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 
 		$this->setType(WIDGET_DISCOVERY_STATUS);
 		$this->setValidationRules([
-			'name' =>	'string'
+			'name' => 'string'
 		]);
 	}
 
@@ -46,7 +46,7 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 				$drule['down'] = 0;
 
 				foreach ($drule['dhosts'] as $dhost){
-					if (DRULE_STATUS_DISABLED == $dhost['status']) {
+					if ($dhost['status'] == DRULE_STATUS_DISABLED) {
 						$drule['down']++;
 					}
 					else {

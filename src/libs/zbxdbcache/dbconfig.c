@@ -7889,7 +7889,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])))
 			continue;
 
-		if (HOST_STATUS_MONITORED != dc_host->status)
+		if (HOST_STATUS_MONITORED != dc_host->status && HOST_STATUS_NOT_MONITORED != dc_host->status)
 			continue;
 
 		if (dc_host->maintenance_status != maintenance_status)

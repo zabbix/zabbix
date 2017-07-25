@@ -186,20 +186,13 @@ if ($type == SHOW_TRIGGERS) {
 	$trigger_options = [
 		'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
 		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+		'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null],
 		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
 		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
 		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
 		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null,
 		'maintenance' => !$filter['showMaintenance'] ? false : null,
 	];
-
-	// trigger status filter
-	if ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) {
-		$trigger_options['only_true'] = true;
-	}
-	elseif ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) {
-		$trigger_options['filter']['value'] = TRIGGER_VALUE_TRUE;
-	}
 
 	$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
 	list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
