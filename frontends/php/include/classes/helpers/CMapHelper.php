@@ -48,9 +48,10 @@ class CMapHelper {
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
+				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls', 'permission'
 			],
-			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
+			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
+				'permission'],
 			'selectUrls' => ['sysmapurlid', 'name', 'url'],
 			'sysmapids' => $sysmapids,
 			'expandUrls' => true,
@@ -228,9 +229,6 @@ class CMapHelper {
 
 				$link['color'] = $color;
 				$link['drawtype'] = $drawtype;
-			}
-			else {
-				$link['label'] = '';
 			}
 		}
 		unset($link);

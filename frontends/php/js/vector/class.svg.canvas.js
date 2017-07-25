@@ -494,6 +494,20 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 		return null;
 	}
 
+	if (Array.isArray(content)) {
+		var i;
+
+		for (i = 0; i < content.length; i++) {
+			if (content[i].content.trim() !== '') {
+				break;
+			}
+		}
+
+		if (i === content.length) {
+			return null;
+		}
+	}
+
 	['x', 'y', 'anchor', 'background', 'clip'].forEach(function (key) {
 		this[key] = attributes[key];
 	}, this);
@@ -524,13 +538,14 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.text = this.element.add('text', attributes, this.lines);
 
 	size = this.text.element.getBBox();
+	this.delta = size.y;
 	this.width = Math.ceil(size.width);
 	this.height = Math.ceil(size.height);
 
 	// Workaround for IE/EDGE for proper text height calculation.
 	if ((IE || ED) && this.lines.length > 0
 			&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
-		this.width = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
+		this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
 	}
 
 	this.alignToAnchor();
@@ -538,7 +553,8 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	if (this.background !== null) {
 		this.background.update({
 			width: this.width + (this.canvas.textPadding * 2),
-			height: this.height + (this.canvas.textPadding * 2)
+			height: this.height + (this.canvas.textPadding * 2),
+			transform: 'translate(0 ' + this.delta + ')'
 		});
 	}
 

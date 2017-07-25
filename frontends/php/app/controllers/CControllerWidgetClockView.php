@@ -68,13 +68,15 @@ class CControllerWidgetClockView extends CController {
 		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;
+		$critical_error = null;
 
 		switch ($fields['time_type']) {
 			case TIME_TYPE_HOST:
 				$items = API::Item()->get([
 					'output' => ['itemid', 'value_type'],
 					'selectHosts' => ['name'],
-					'itemids' => $fields['itemid']
+					'itemids' => $fields['itemid'],
+					'webitems' => true
 				]);
 
 				if ($items) {
@@ -96,15 +98,15 @@ class CControllerWidgetClockView extends CController {
 							$time = time() - ($last_value['clock'] - $now->getTimestamp());
 						}
 						catch (Exception $e) {
-							$error = _('No data');
+							$error = _('Incorrect data.');
 						}
 					}
 					else {
-						$error = _('No data');
+						$error = _('No data.');
 					}
 				}
 				else {
-					$error = _('No data');
+					$critical_error = _('No permissions to referred object or it does not exist!');
 				}
 				break;
 
@@ -128,7 +130,8 @@ class CControllerWidgetClockView extends CController {
 				'time' => $time,
 				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
-				'error' => $error
+				'error' => $error,
+				'critical_error' => $critical_error
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

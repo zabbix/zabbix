@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.4.0alpha1');
+define('ZABBIX_VERSION',		'3.4.0alpha2');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
 define('ZABBIX_DB_VERSION',		3030175);
@@ -690,8 +690,8 @@ define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
 define('DASHBOARD_DEFAULT_ID', 1);
-define('DASHBOARD_COLUMNS', 12);
 define('DASHBOARD_MAX_ROWS', 64);
+define('DASHBOARD_MAX_COLUMNS', 12);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
@@ -1187,9 +1187,6 @@ define('WIDGET_SLIDESHOW',				'hat_slides');
 // Dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
-// Dashboard widget dynamic state
-define('WIDGET_CONFIG_DONT_SAVE',	0);
-define('WIDGET_CONFIG_DO_SAVE',		1);
 
 // widget field types
 define('ZBX_WIDGET_FIELD_TYPE_INT32',			0);
@@ -1254,7 +1251,6 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
-define('ZBX_STYLE_ACTIVE_INDIC', 'active-indic');
 define('ZBX_STYLE_ACTIVE_BG', 'active-bg');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ARTICLE', 'article');

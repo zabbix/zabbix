@@ -29,12 +29,13 @@ $filterForm = (new CFilter($filter['filterid']))
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);
 
+// show
 $column1 = (new CFormList())
-	->addRow(_('Trigger status'),
+	->addRow(_('Show'),
 		(new CRadioButtonList('show_triggers', (int) $filter['showTriggers']))
-			->addValue(_('Any'), TRIGGERS_OPTION_ALL)
 			->addValue(_('Recent problems'), TRIGGERS_OPTION_RECENT_PROBLEM)
 			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM)
+			->addValue(_('Any'), TRIGGERS_OPTION_ALL)
 			->setModern(true)
 	);
 

@@ -1822,7 +1822,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&dbsync_env.cache->triggers, &rowid)))
 		{
-			dbsync_add_row(sync, rowid, ZBX_DBSYNC_ROW_ADD, dbrow);
+			dbsync_add_row(sync, rowid, ZBX_DBSYNC_ROW_ADD, row);
 		}
 		else
 		{
