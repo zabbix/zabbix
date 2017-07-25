@@ -222,6 +222,10 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 				return ('S' == *p) ? SUCCEED : FAIL;
 			case ZBX_PROC_STAT_ZOMB:
 				return ('Z' == *p) ? SUCCEED : FAIL;
+			case ZBX_PROC_STAT_DISK:
+				return ('D' == *p) ? SUCCEED : FAIL;
+			case ZBX_PROC_STAT_TRACE:
+				return ('T' == *p) ? SUCCEED : FAIL;
 			default:
 				return FAIL;
 		}
@@ -758,6 +762,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
+	else if (0 == strcmp(param, "disk"))
+		zbx_proc_stat = ZBX_PROC_STAT_DISK;
+	else if (0 == strcmp(param, "trace"))
+		zbx_proc_stat = ZBX_PROC_STAT_TRACE;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
