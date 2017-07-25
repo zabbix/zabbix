@@ -1042,8 +1042,10 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'ack' => true
 		];
 
-		// If user has no rights to see the details of particular selement, add only info that is needed to render map
-		// icons.
+		/*
+		 * If user has no rights to see the details of particular selement, add only info that is needed to render map
+		 * icons.
+		 */
 		if (PERM_READ > $selement['permission']) {
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_MAP:
@@ -2049,7 +2051,7 @@ function getMapHighligts($map, $map_info) {
 }
 
 /**
- * Get trigger data for all linktriggers
+ * Get trigger data for all linktriggers.
  *
  * @param array $sysmap
  * @param array $options                  Options used to retrieve actions.
@@ -2065,8 +2067,8 @@ function getMapLinktriggerInfo($sysmap, $options) {
 
 	$triggerids = [];
 
-	foreach($sysmap['links'] as $link) {
-		foreach($link['linktriggers'] as $linktrigger) {
+	foreach ($sysmap['links'] as $link) {
+		foreach ($link['linktriggers'] as $linktrigger) {
 			$triggerids[$linktrigger['triggerid']] = $linktrigger['triggerid'];
 		}
 	}
@@ -2075,6 +2077,6 @@ function getMapLinktriggerInfo($sysmap, $options) {
 		'output' => ['status', 'value', 'priority'],
 		'min_severity' => $options['severity_min'],
 		'preservekeys' => true,
-		'triggerids' => $triggerids,
+		'triggerids' => $triggerids
 	]);
 }
