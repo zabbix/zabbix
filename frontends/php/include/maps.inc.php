@@ -2051,7 +2051,7 @@ function getMapHighligts($map, $map_info) {
 }
 
 /**
- * Get trigger data for all linktriggers
+ * Get trigger data for all linktriggers.
  *
  * @param array $sysmap
  * @param array $options                  Options used to retrieve actions.
@@ -2067,8 +2067,8 @@ function getMapLinktriggerInfo($sysmap, $options) {
 
 	$triggerids = [];
 
-	foreach($sysmap['links'] as $link) {
-		foreach($link['linktriggers'] as $linktrigger) {
+	foreach ($sysmap['links'] as $link) {
+		foreach ($link['linktriggers'] as $linktrigger) {
 			$triggerids[$linktrigger['triggerid']] = $linktrigger['triggerid'];
 		}
 	}
@@ -2077,6 +2077,6 @@ function getMapLinktriggerInfo($sysmap, $options) {
 		'output' => ['status', 'value', 'priority'],
 		'min_severity' => $options['severity_min'],
 		'preservekeys' => true,
-		'triggerids' => $triggerids,
+		'triggerids' => $triggerids
 	]);
 }
