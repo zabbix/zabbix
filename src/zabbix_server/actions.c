@@ -1982,3 +1982,95 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_actions_info                                                 *
+ *                                                                            *
+ * Purpose: reads actions from database                                       *
+ *                                                                            *
+ * Parameters: actionids - [IN] requested action ids                          *
+ *             actions   - [OUT] the array of actions                         *
+ *                                                                            *
+ * Comments: use 'free_db_action' function to release allocated memory        *
+ *                                                                            *
+ ******************************************************************************/
+void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actions)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*filter = NULL;
+	size_t		filter_alloc = 0, filter_offset = 0;
+	DB_ACTION	*action;
+
+	zbx_vector_uint64_sort(actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "actionid", actionids->values,
+			actionids->values_num);
+
+	result = DBselect("select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
+				"r_longdata,maintenance_mode"
+				" from actions"
+				" where%s order by actionid", filter);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char	*tmp = NULL;
+
+		action = (DB_ACTION *)zbx_malloc(NULL, sizeof(DB_ACTION));
+		ZBX_STR2UINT64(action->actionid, row[0]);
+		ZBX_STR2UCHAR(action->status, row[2]);
+		ZBX_STR2UCHAR(action->eventsource, row[3]);
+
+		tmp = zbx_strdup(tmp, row[4]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+		if (SUCCEED != is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid default operation step duration \"%s\" for action"
+					" \"%s\", using default value of 1 hour", tmp, row[1]);
+			action->esc_period = SEC_PER_HOUR;
+		}
+		zbx_free(tmp);
+
+		action->shortdata = zbx_strdup(NULL, row[5]);
+		action->longdata = zbx_strdup(NULL, row[6]);
+		action->r_shortdata = zbx_strdup(NULL, row[7]);
+		action->r_longdata = zbx_strdup(NULL, row[8]);
+		ZBX_STR2UCHAR(action->maintenance_mode, row[9]);
+		action->name = zbx_strdup(NULL, row[1]);
+		action->recovery = ZBX_ACTION_RECOVERY_NONE;
+
+		zbx_vector_ptr_append(actions, action);
+	}
+	DBfree_result(result);
+
+	result = DBselect("select actionid from operations where recovery=%d and%s",
+			ZBX_OPERATION_MODE_RECOVERY, filter);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	actionid;
+		int		index;
+
+		ZBX_STR2UINT64(actionid, row[0]);
+		if (FAIL != (index = zbx_vector_ptr_bsearch(actions, &actionid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			action = (DB_ACTION *)actions->values[index];
+			action->recovery = ZBX_ACTION_RECOVERY_OPERATIONS;
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(filter);
+}
+
+void	free_db_action(DB_ACTION *action)
+{
+	zbx_free(action->shortdata);
+	zbx_free(action->longdata);
+	zbx_free(action->r_shortdata);
+	zbx_free(action->r_longdata);
+	zbx_free(action->name);
+	zbx_free(action);
+}

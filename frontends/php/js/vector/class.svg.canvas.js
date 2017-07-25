@@ -407,14 +407,13 @@ SVGTextArea.prototype.alignToAnchor = function() {
 	}
 
 	this.x -= this.getHorizontalOffset();
-
 	switch (this.anchor.vertical) {
-		case 'middle':
-			this.y -= Math.floor(this.height/2);
+		case 'top':
+			this.y -= this.height + this.canvas.textPadding;
 			break;
 
-		case 'bottom':
-			this.y -= this.height;
+		case 'middle':
+			this.y -= Math.floor(this.height / 2);
 			break;
 	}
 };
@@ -492,6 +491,20 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 		return null;
 	}
 
+	if (Array.isArray(content)) {
+		var i;
+
+		for (i = 0; i < content.length; i++) {
+			if (content[i].content.trim() !== '') {
+				break;
+			}
+		}
+
+		if (i === content.length) {
+			return null;
+		}
+	}
+
 	['x', 'y', 'anchor', 'background', 'clip'].forEach(function (key) {
 		this[key] = attributes[key];
 	}, this);
@@ -523,12 +536,12 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 
 	size = this.text.element.getBBox();
 	this.width = Math.ceil(size.width);
-	this.height = Math.ceil(size.height);
+	this.height = Math.ceil(size.height + size.y);
 
 	// Workaround for IE/EDGE for proper text height calculation.
 	if ((IE || ED) && this.lines.length > 0
 			&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
-		this.width = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
+		this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
 	}
 
 	this.alignToAnchor();
