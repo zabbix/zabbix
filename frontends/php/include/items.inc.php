@@ -572,7 +572,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 
 	$master_name = findDependentWithMissingMasterItem($items, API::Item());
 	if ($master_name !== false) {
-		error(_s('Item "%1$s" have master item and can not be copied.', $master_name));
+		error(_s('Item "%1$s" have master item and cannot be copied.', $master_name));
 		return false;
 	}
 

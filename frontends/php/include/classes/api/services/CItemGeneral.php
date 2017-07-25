@@ -1243,7 +1243,7 @@ abstract class CItemGeneral extends CApiService {
 				if ($unresolved_master_itemids) {
 					reset($unresolved_master_itemids);
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _s('Item "%1$s" does not exist or you have no access to this item.',
+						'master_itemid', _s('Item "%1$s" does not exist or you have no access to this item',
 							key($unresolved_master_itemids)
 					)));
 				}
