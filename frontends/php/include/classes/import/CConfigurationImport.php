@@ -935,7 +935,6 @@ class CConfigurationImport {
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
-			$host_order_tree = $order_tree[$host];
 
 			foreach ($discoveryRules as $item) {
 				// if rule was not processed we should not create/update any of its prototypes
@@ -948,7 +947,7 @@ class CConfigurationImport {
 				$itemId = $this->referencer->resolveItem($hostId, $item_key);
 
 				// prototypes
-				$item_prototypes = $item['item_prototypes'] ? $host_order_tree[$item_key] : [];
+				$item_prototypes = $item['item_prototypes'] ? $order_tree[$host][$item_key] : [];
 				foreach ($item_prototypes as $index => $level) {
 					$prototype = $item['item_prototypes'][$index];
 					$prototype['hostid'] = $hostId;
