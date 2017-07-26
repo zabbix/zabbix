@@ -3,6 +3,8 @@ Changes for 3.4.0alhpa3
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-18] fixed php5.4 incompatibility in events page and acknowledge operation form (gcalenko)
+..F....... [ZBXNEXT-18] fixed script name select button for new acknowledge operation form and recovery operation form (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.0alpha2
