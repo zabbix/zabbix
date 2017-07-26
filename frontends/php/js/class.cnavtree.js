@@ -753,7 +753,8 @@ jQuery(function($) {
 								.append($('<input/>', {
 										'type': 'button',
 										'data-id': item.id,
-										'class': 'add-child-btn'
+										'class': 'add-child-btn',
+										'title': t('Add child element')
 									})
 									.click(function() {
 										var parentId = $(this).data('id'),
@@ -773,7 +774,8 @@ jQuery(function($) {
 								.append($('<input/>', {
 										'class': 'import-items-btn',
 										'data-id': item.id,
-										'type': 'button'
+										'type': 'button',
+										'title': t('Add multiple maps')
 									})
 									.click(function() {
 										var url = new Curl('popup.php'),
@@ -821,7 +823,8 @@ jQuery(function($) {
 								.append(editable ? $('<input/>', {
 										'class': 'edit-item-btn',
 										'type': 'button',
-										'data-id': item.id
+										'data-id': item.id,
+										'title': t('Edit')
 									})
 									.click(function() {
 										var id = $(this).data('id'),
@@ -834,7 +837,8 @@ jQuery(function($) {
 								.append(editable ? $('<button/>', {
 										'type': 'button',
 										'data-id': item.id,
-										'class': 'remove-btn'
+										'class': 'remove-btn',
+										'title': t('Remove')
 									})
 									.click(function(){
 										removeItem($obj, [$(this).data('id')]);
