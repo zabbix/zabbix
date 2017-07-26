@@ -146,9 +146,27 @@ class CMapHelper {
 		add_elementNames($sysmap['selements']);
 
 		foreach ($sysmap['selements'] as $id => $element) {
-			$map_info[$id]['name'] = ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
-				? _('Image')
-				: $element['elements'][0]['elementName'];
+			switch ($element['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_IMAGE:
+					$map_info[$id]['name'] = _('Image');
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					// Skip inaccessible elements.
+					$selements_accessible = array_filter($element['elements'], function($elmn) {
+						return array_key_exists('elementName', $elmn);
+					});
+					if (($selements_accessible = reset($selements_accessible)) !== false) {
+						$map_info[$id]['name'] = $selements_accessible['elementName'];
+					} else {
+						$map_info[$id]['name'] = '';
+					}
+					break;
+
+				default:
+					$map_info[$id]['name'] = $element['elements'][0]['elementName'];
+					break;
+			}
 		}
 
 		$labels = getMapLabels($sysmap, $map_info, true);
