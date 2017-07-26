@@ -36,16 +36,6 @@ class testUrlUserPermissions extends CWebTest {
 				]
 			]],
 			[[
-				'url' => 'dashconf.php',
-				'title' =>	'Dashboard configuration',
-				'header' =>	'Dashboard',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'zabbix.php?action=problem.view',
 				'title' =>	'Problems',
 				'header' =>	'Problems',

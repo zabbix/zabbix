@@ -185,27 +185,39 @@ class CMap extends CMapElement {
 			$result[$sysmap['sysmapid']]['accessible_elements'] = 0;
 		}
 
-		// If Selements are not required, request only details needed to validate map permissions:
-		$remove_selements = false;
-		if ($options['selectSelements'] === null) {
-			$options['selectSelements'] = ['selementid', 'elements', 'elementtype'];
-			$remove_selements = true;
-		}
-		$remove_links = false;
-		if ($options['selectLinks'] === null) {
-			$options['selectLinks'] = ['sysmapid', 'linkid', 'linktriggers'];
-			$remove_links = true;
-		}
-
 		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
+			// If Selements are not required, request only details needed to validate map permissions:
+			$rewritten_options['selectSelements'] = [];
+			$rewritten_options['selectLinks'] = [];
+
+			if ($options['selectSelements'] !== null && $options['selectSelements'] !== API_OUTPUT_COUNT) {
+				$rewritten_options['selectSelements'] = $options['selectSelements'];
+			}
+			if ($options['selectLinks'] !== null && $options['selectLinks'] !== API_OUTPUT_COUNT) {
+				$rewritten_options['selectLinks'] = $options['selectLinks'];
+			}
+
+			$rewritten_options['selectSelements'] = $this->outputExtend($rewritten_options['selectSelements'],
+				['selementid', 'elements', 'elementtype']);
+			$rewritten_options['selectLinks'] = $this->outputExtend($rewritten_options['selectLinks'],
+				['linkid', 'linktriggers']);
+
+			$result = $this->addRelatedObjects(zbx_array_merge($options, $rewritten_options), $result);
 		}
 
 		if ($result && $user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-				$hostgroupids_to_check = [];
-				$triggerids_to_check = [];
-				$sysmapids_to_check = [];
-				$hostids_to_check = [];
+			$hostgroupids_to_check = [];
+			$triggerids_to_check = [];
+			$sysmapids_to_check = [];
+			$hostids_to_check = [];
+			$db_hostgrps_r = [];
+			$db_hostgrps_rw = [];
+			$db_hosts_r = [];
+			$db_hosts_rw = [];
+			$db_triggers_r = [];
+			$db_triggers_rw = [];
+			$db_sysmaps_r = [];
+			$db_sysmaps_rw = [];
 
 			foreach ($result as $sysmapid => &$sysmap) {
 				if ($sysmap['selements']) {
@@ -351,7 +363,11 @@ class CMap extends CMapElement {
 								if (!array_diff($sel['elmids'], array_intersect($db_triggers_rw, $sel['elmids']))) {
 									$permission = PERM_READ_WRITE;
 								}
-								elseif (!array_diff($sel['elmids'], array_intersect($db_triggers_r, $sel['elmids']))) {
+								elseif (array_intersect($sel['elmids'], $db_triggers_r) && !$options['editable']) {
+									$permission = PERM_READ;
+								}
+								elseif ($options['editable']
+									&& !array_diff($sel['elmids'], array_intersect($db_triggers_r, $sel['elmids']))) {
 									$permission = PERM_READ;
 								}
 								break;
@@ -391,7 +407,11 @@ class CMap extends CMapElement {
 						if (!array_diff($lnk['triggerids'], array_intersect($db_triggers_rw, $lnk['triggerids']))) {
 							$permission = PERM_READ_WRITE;
 						}
-						elseif (!array_diff($lnk['triggerids'], array_intersect($db_triggers_r, $lnk['triggerids']))) {
+						elseif (array_intersect($lnk['triggerids'], $db_triggers_r) && !$options['editable']) {
+							$permission = PERM_READ;
+						}
+						elseif ($options['editable']
+							&& !array_diff($lnk['triggerids'], array_intersect($db_triggers_r, $lnk['triggerids']))) {
 							$permission = PERM_READ;
 						}
 
@@ -433,17 +453,48 @@ class CMap extends CMapElement {
 				continue;
 			}
 
-			if ($remove_selements) {
+			// Convert selected elements and links in the form they was originaly requested.
+			if ($options['selectSelements'] === null) {
 				unset($result[$sysmap_key]['selements']);
 			}
+			elseif ($options['selectSelements'] === API_OUTPUT_COUNT) {
+				$result[$sysmap_key]['selements'] = count($result[$sysmap_key]['selements']);
+			}
+			elseif (is_array($options['selectSelements'])) {
+				$selements_data_to_return = [];
+				foreach ($result[$sysmap_key]['selements'] as $selement_key => $selement) {
+					foreach ($options['selectSelements'] as $requested_attr) {
+						if (array_key_exists($requested_attr, $selement)) {
+							$selements_data_to_return[$selement_key][$requested_attr] = $selement[$requested_attr];
+						}
+					}
+				}
 
-			if ($remove_links) {
+				$result[$sysmap_key]['selements'] = $selements_data_to_return;
+			}
+
+			if ($options['selectLinks'] === null) {
 				unset($result[$sysmap_key]['links']);
+			}
+			elseif ($options['selectLinks'] === API_OUTPUT_COUNT) {
+				$result[$sysmap_key]['links'] = count($result[$sysmap_key]['links']);
+			}
+			elseif (is_array($options['selectLinks'])) {
+				$links_data_to_return = [];
+				foreach ($result[$sysmap_key]['links'] as $link_key => $link) {
+					foreach ($options['selectLinks'] as $requested_attr) {
+						if (array_key_exists($requested_attr, $link)) {
+							$links_data_to_return[$link_key][$requested_attr] = $link[$requested_attr];
+						}
+					}
+				}
+
+				$result[$sysmap_key]['links'] = $links_data_to_return;
 			}
 
 			/*
-			 * At this point editable means that all elemenets must be at least visible (user has permissions to
-			 * read or read-write). This does not cancel previous conditions.
+			 * At this point editable means that all elemenets must be at least readable. This does not cancel
+			 * previous conditions.
 			 */
 			if ($options['editable'] && PERM_READ > $sysmap['permission']) {
 				unset($result[$sysmap_key]);

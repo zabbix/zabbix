@@ -19,49 +19,20 @@
 **/
 
 
-class CControllerWidgetActionLogView extends CController {
+class CControllerWidgetActionLogView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_ACTION_LOG);
+		$this->setValidationRules([
 			'name' =>	'string',
 			'fields' =>	'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array $fields
-			 * @var int   $fields['sort_triggers']  (optional)
-			 * @var int   $fields['show_lines']     (optional)
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_ACTION_LOG, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$alerts = $this->getAlerts($sortfield, $sortorder, $fields['show_lines']);
@@ -74,7 +45,7 @@ class CControllerWidgetActionLogView extends CController {
 		]);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_ACTION_LOG]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'actions' => $actions,
 			'alerts'  => $alerts,
 			'db_users' => $db_users,
@@ -99,7 +70,7 @@ class CControllerWidgetActionLogView extends CController {
 	{
 		// TODO AV: remove direct SQL requests
 		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
-			'a.userid,a.actionid,a.mediatypeid,mt.description'.
+			'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
 			' FROM events e,alerts a'.
 			' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 			' WHERE e.eventid=a.eventid'.
