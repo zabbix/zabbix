@@ -25,6 +25,7 @@
 #include "dbcache.h"
 #include "zbxtasks.h"
 #include "../events.h"
+#include "../actions.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -58,8 +59,6 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64, __function_name,
 			taskid, eventid);
-
-	DBbegin();
 
 	result = DBselect("select null from problem where eventid=" ZBX_FS_UI64 " and r_eventid is null", eventid);
 
@@ -122,7 +121,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 
 	DB_ROW			row;
 	DB_RESULT		result;
-	int			ret = FAIL;
+	int			ret = FAIL, remove_task = 0;
 	zbx_uint64_t		userid, triggerid, eventid;
 	zbx_vector_uint64_t	triggerids, locked_triggerids;
 
@@ -131,33 +130,50 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_create(&locked_triggerids);
 
-	result = DBselect("select a.userid,a.eventid,e.objectid"
-				" from task_close_problem tcp,acknowledges a"
+	result = DBselect("select a.userid,e.eventid,e.objectid"
+				" from task_close_problem tcp"
+				" left join acknowledges a"
+					" on a.acknowledgeid=tcp.acknowledgeid"
 				" left join events e"
 					" on a.eventid=e.eventid"
-				" where tcp.taskid=" ZBX_FS_UI64
-					" and tcp.acknowledgeid=a.acknowledgeid",
+				" where tcp.taskid=" ZBX_FS_UI64,
 			taskid);
+
+	DBbegin();
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[2]);
-		zbx_vector_uint64_append(&triggerids, triggerid);
-		DCconfig_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
-
-		/* only close the problem if source trigger was successfully locked */
-		if (0 != locked_triggerids.values_num)
+		if (SUCCEED != DBis_null(row[1]))
 		{
-			ZBX_STR2UINT64(userid, row[0]);
-			ZBX_STR2UINT64(eventid, row[1]);
-			tm_execute_task_close_problem(taskid, triggerid, eventid, userid, &locked_triggerids);
+			ZBX_STR2UINT64(triggerid, row[2]);
+			zbx_vector_uint64_append(&triggerids, triggerid);
+			DCconfig_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
 
-			DCconfig_unlock_triggers(&locked_triggerids);
+			/* only close the problem if source trigger was successfully locked */
+			if (0 != locked_triggerids.values_num)
+			{
+				ZBX_STR2UINT64(userid, row[0]);
+				ZBX_STR2UINT64(eventid, row[1]);
 
-			ret = SUCCEED;
+				tm_execute_task_close_problem(taskid, triggerid, eventid, userid, &locked_triggerids);
+				remove_task = 1;
+
+				ret = SUCCEED;
+			}
 		}
+		else
+			remove_task = 1;
 	}
 	DBfree_result(result);
+
+	/* remove the task if it was executed or related event was deleted before task was processed */
+	if (1 == remove_task)
+		DBexecute("delete from task where taskid=" ZBX_FS_UI64, taskid);
+
+	DBcommit();
+
+	if (0 != locked_triggerids.values_num)
+		DCconfig_unlock_triggers(&locked_triggerids);
 
 	zbx_vector_uint64_destroy(&locked_triggerids);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -167,6 +183,13 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_expire_remote_command                                         *
+ *                                                                            *
+ * Purpose: process expired remote command task                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	tm_expire_remote_command(zbx_uint64_t taskid)
 {
 	DB_ROW		row;
@@ -198,6 +221,16 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 	DBcommit();
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_process_remote_command_result                                 *
+ *                                                                            *
+ * Purpose: process remote command result task                                *
+ *                                                                            *
+ * Return value: SUCCEED - the task was processed successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 {
 	DB_ROW		row;
@@ -255,6 +288,78 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_process_acknowledgments                                       *
+ *                                                                            *
+ * Purpose: process acknowledgments for alerts sending                        *
+ *                                                                            *
+ * Return value: The number of successfully processed tasks                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			processed_num = 0;
+	char			*filter = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_ptr_t	ack_tasks;
+	zbx_ack_task_t		*ack_task;
+
+	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_ptr_create(&ack_tasks);
+
+	DBadd_condition_alloc(&filter, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values,
+			ack_taskids->values_num);
+
+	result = DBselect(
+			"select a.eventid,ta.acknowledgeid,ta.taskid"
+			" from task_acknowledge ta"
+			" left join acknowledges a"
+				" on ta.acknowledgeid=a.acknowledgeid"
+			" left join events e"
+				" on a.eventid=e.eventid"
+			" left join task t"
+				" on ta.taskid=t.taskid"
+			" where t.status=%d and%s",
+			ZBX_TM_STATUS_NEW, filter);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (SUCCEED == DBis_null(row[0]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process acknowledge tasks because related event"
+					" was removed");
+			continue;
+		}
+
+		ack_task = (zbx_ack_task_t *)zbx_malloc(NULL, sizeof(zbx_ack_task_t));
+
+		ZBX_STR2UINT64(ack_task->eventid, row[0]);
+		ZBX_STR2UINT64(ack_task->acknowledgeid, row[1]);
+		ZBX_STR2UINT64(ack_task->taskid, row[2]);
+		zbx_vector_ptr_append(&ack_tasks, ack_task);
+	}
+	DBfree_result(result);
+
+	if (0 < ack_tasks.values_num)
+	{
+		zbx_vector_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		processed_num = process_actions_by_acknowledgments(&ack_tasks);
+	}
+
+	DBexecute("update task t set t.status=%d where %s", ZBX_TM_STATUS_DONE, filter);
+
+	zbx_free(filter);
+
+	zbx_vector_ptr_clear_ext(&ack_tasks, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&ack_tasks);
+
+	return processed_num;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_process_tasks                                                 *
  *                                                                            *
  * Purpose: process task manager tasks depending on task type                 *
@@ -264,10 +369,13 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
  ******************************************************************************/
 static int	tm_process_tasks(int now)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
-	int		type, ret, processed_num = 0, clock, ttl;
-	zbx_uint64_t	taskid;
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			type, processed_num = 0, clock, ttl;
+	zbx_uint64_t		taskid;
+	zbx_vector_uint64_t	ack_taskids;
+
+	zbx_vector_uint64_create(&ack_taskids);
 
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
@@ -286,28 +394,35 @@ static int	tm_process_tasks(int now)
 		{
 			case ZBX_TM_TASK_CLOSE_PROBLEM:
 				/* close problem tasks will never have 'in progress' status */
-				ret = tm_try_task_close_problem(taskid);
+				if (SUCCEED == tm_try_task_close_problem(taskid))
+					processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND:
 				/* both - 'new' and 'in progress' remote tasks should expire */
 				if (0 != ttl && clock + ttl < now)
 					tm_expire_remote_command(taskid);
-				ret = SUCCEED;
+				processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				/* close problem tasks will never have 'in progress' status */
-				ret = tm_process_remote_command_result(taskid);
+				if (SUCCEED == tm_process_remote_command_result(taskid))
+					processed_num++;
+				break;
+			case ZBX_TM_TASK_ACKNOWLEDGE:
+				zbx_vector_uint64_append(&ack_taskids, taskid);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				ret = FAIL;
 				break;
 		}
 
-		if (FAIL != ret)
-			processed_num++;
 	}
 	DBfree_result(result);
+
+	if (0 < ack_taskids.values_num)
+		processed_num += tm_process_acknowledgments(&ack_taskids);
+
+	zbx_vector_uint64_destroy(&ack_taskids);
 
 	return processed_num;
 }

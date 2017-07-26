@@ -38,7 +38,7 @@ $form_list->addRow(_('Type'),
 $form_list->addRow(_('Name'),
 	(new CTextBox('name', $data['dialogue']['name']))
 		->setAttribute('placeholder', _('default'))
-		->setAttribute('tabindex', 1)
+		->setAttribute('class', 'auto-focus')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
@@ -125,7 +125,10 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {
-		$form_list->addRow($field->getLabel(), new CComboBox($field->getName(), [], $field->getAction(), []));
+		$form_list->addRow($field->getLabel(),
+			(new CComboBox($field->getName(), [], $field->getAction(), []))
+				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+		);
 
 		$form->addItem(new CJsScript(get_js($field->getJavascript(), true))); // TODO VM: rewrite to use js_scripts
 	}
@@ -151,7 +154,7 @@ foreach ($data['dialogue']['form']->getFields() as $field) {
 				(new CCheckBox('severities[]', $severity))
 					->setLabel(getSeverityName($severity, $data['config']))
 					->setId('severities_'.$severity)
-					->setChecked(in_array($severity, $field->getValue(true)))
+					->setChecked(in_array($severity, $field->getValue()))
 			);
 		}
 

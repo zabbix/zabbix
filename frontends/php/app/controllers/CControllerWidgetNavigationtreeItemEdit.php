@@ -89,7 +89,7 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 					'sysmapids' => $diff,
 					'preservekeys' => true,
 					'output' => ['sysmapid'],
-					'selectSelements' => ['elements', 'elementtype']
+					'selectSelements' => ['elements', 'elementtype', 'permission']
 				]);
 
 				$maps_resolved = array_merge($maps_resolved, $diff);

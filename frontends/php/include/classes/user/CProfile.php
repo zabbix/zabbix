@@ -89,76 +89,28 @@ class CProfile {
 	}
 
 	/**
-	 * Returns the values stored under the given idx and idx2 as an array.
+	 * Returns the array of numbers matched by regex of attribute $idx where idx2 matches the number passed by $idx2.
 	 *
-	 * @param string    $idx				Values searched in idx field. Supports SQL % syntax.
-	 * @param string    $idx2				Values searched in idx2 field. Supports SQL % syntax.
-	 * @param string    $key				Database field used as key in array. Options allowed: idx or idx2.
-	 * @param boolean   $extract_key_num	Extracts the number found in the place of % and uses it as a key of
-	 *										returned array. Skips the row if the number is not found.
+	 * @param string    $idx				Required. Regular expression pattern that is used to search rows by idx.
+	 *										Only the first match is used.
+	 * @param number    $idx2				Required. Numerical value searched in idx2 field.
 	 *
 	 * @return array
 	 */
-	public static function findByIDXs($idx = null, $idx2 = null, $key = 'idx', $extract_key_num = false) {
+	public static function findByIDXs($idx = null, $idx2 = null) {
 		// no user data available, just return the null
 		if (!CWebUser::$data) {
 			return null;
 		}
 
-		if (!self::$userDetails) {
-			self::$userDetails = CWebUser::$data;
+		if (is_null(self::$profiles)) {
+			self::init();
 		}
 
 		$results = [];
-
-		if ($key !== 'idx' && $key !== 'idx2') {
-			$key = 'idx';
-		}
-
-		$sql_filter = '';
-		if ($idx !== null && strstr($idx, '%')) {
-			$sql_filter .= ' AND p.idx LIKE '.zbx_dbstr($idx);
-		}
-		elseif ($idx !== null) {
-			$sql_filter .= ' AND p.idx = '.zbx_dbstr($idx);
-		}
-
-		if ($idx2 !== null && strstr($idx2, '%')) {
-			$sql_filter .= ' AND p.idx2 LIKE '.$idx2;
-		}
-		elseif ($idx2 !== null) {
-			$sql_filter .= ' AND p.idx2 = '.zbx_dbstr($idx2);
-		}
-
-		$db_profiles = DBselect(
-			'SELECT p.'.$key.', p.value_id, p.value_int, p.value_str, p.type'.
-			' FROM profiles p'.
-			' WHERE p.userid='.self::$userDetails['userid'].$sql_filter
-		);
-
-		while ($profile = DBfetch($db_profiles)) {
-			$value_type = self::getFieldByType($profile['type']);
-			$row_key = $profile[$key];
-
-			if ($extract_key_num) {
-				$regex = str_replace('%', '(?<number_found>\d+)', preg_quote($$key, '/'));
-				preg_match('/'.$regex.'/', $row_key, $re_result);
-				if (array_key_exists('number_found', $re_result)) {
-					$row_key = $re_result['number_found'];
-				}
-				else {
-					continue;
-				}
-			}
-
-			if (array_key_exists($row_key, $results)) {
-				$results[$row_key] = [
-					$results[$row_key],
-					$profile[$value_type]
-				];
-			}
-			else {
-				$results[$row_key] = $profile[$value_type];
+		foreach (self::$profiles as $k => $v) {
+			if (preg_match($idx, $k, $match) && array_key_exists($idx2, $v)) {
+				$results[] = $match[1];
 			}
 		}
 

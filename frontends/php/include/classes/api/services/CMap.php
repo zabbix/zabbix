@@ -366,6 +366,10 @@ class CMap extends CMapElement {
 								elseif (array_intersect($sel['elmids'], $db_triggers_r) && !$options['editable']) {
 									$permission = PERM_READ;
 								}
+								elseif ($options['editable']
+									&& !array_diff($sel['elmids'], array_intersect($db_triggers_r, $sel['elmids']))) {
+									$permission = PERM_READ;
+								}
 								break;
 							case SYSMAP_ELEMENT_TYPE_MAP:
 								if (!array_diff($sel['elmids'], array_intersect($db_sysmaps_rw, $sel['elmids']))) {
@@ -404,6 +408,10 @@ class CMap extends CMapElement {
 							$permission = PERM_READ_WRITE;
 						}
 						elseif (array_intersect($lnk['triggerids'], $db_triggers_r) && !$options['editable']) {
+							$permission = PERM_READ;
+						}
+						elseif ($options['editable']
+							&& !array_diff($lnk['triggerids'], array_intersect($db_triggers_r, $lnk['triggerids']))) {
 							$permission = PERM_READ;
 						}
 
@@ -452,6 +460,18 @@ class CMap extends CMapElement {
 			elseif ($options['selectSelements'] === API_OUTPUT_COUNT) {
 				$result[$sysmap_key]['selements'] = count($result[$sysmap_key]['selements']);
 			}
+			elseif (is_array($options['selectSelements'])) {
+				$selements_data_to_return = [];
+				foreach ($result[$sysmap_key]['selements'] as $selement_key => $selement) {
+					foreach ($options['selectSelements'] as $requested_attr) {
+						if (array_key_exists($requested_attr, $selement)) {
+							$selements_data_to_return[$selement_key][$requested_attr] = $selement[$requested_attr];
+						}
+					}
+				}
+
+				$result[$sysmap_key]['selements'] = $selements_data_to_return;
+			}
 
 			if ($options['selectLinks'] === null) {
 				unset($result[$sysmap_key]['links']);
@@ -459,10 +479,22 @@ class CMap extends CMapElement {
 			elseif ($options['selectLinks'] === API_OUTPUT_COUNT) {
 				$result[$sysmap_key]['links'] = count($result[$sysmap_key]['links']);
 			}
+			elseif (is_array($options['selectLinks'])) {
+				$links_data_to_return = [];
+				foreach ($result[$sysmap_key]['links'] as $link_key => $link) {
+					foreach ($options['selectLinks'] as $requested_attr) {
+						if (array_key_exists($requested_attr, $link)) {
+							$links_data_to_return[$link_key][$requested_attr] = $link[$requested_attr];
+						}
+					}
+				}
+
+				$result[$sysmap_key]['links'] = $links_data_to_return;
+			}
 
 			/*
-			 * At this point editable means that all elemenets must be at least visible (user has permissions to
-			 * read or read-write). This does not cancel previous conditions.
+			 * At this point editable means that all elemenets must be at least readable. This does not cancel
+			 * previous conditions.
 			 */
 			if ($options['editable'] && PERM_READ > $sysmap['permission']) {
 				unset($result[$sysmap_key]);

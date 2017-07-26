@@ -22,56 +22,21 @@
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetHostsView extends CController {
+class CControllerWidgetHostsView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_HOST_STATUS);
+		$this->setValidationRules([
 			'name' =>		'string',
 			'fullscreen' =>	'in 0,1',
 			'fields' =>		'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array        $fields
-			 * @var array|string $fields['groupids']           (optional)
-			 * @var array|string $fields['exclude_groupids']   (optional)
-			 * @var array|string $fields['hostids']            (optional)
-			 * @var string       $fields['problem']            (optional)
-			 * @var array        $fields['severities']         (optional)
-			 * @var int          $fields['maintenance']        (optional)
-			 * @var int          $fields['hide_empty_groups']  (optional)
-			 * @var int          $fields['ext_ack']            (optional)
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_HOST_STATUS, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		$config = select_config();
 
@@ -311,7 +276,7 @@ class CControllerWidgetHostsView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_HOST_STATUS]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'filter' => [
 				'hostids' => $fields['hostids'],
 				'problem' => $fields['problem'],

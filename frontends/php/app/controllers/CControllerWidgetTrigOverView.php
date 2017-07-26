@@ -21,53 +21,23 @@
 
 require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetTrigOverView extends CController {
+class CControllerWidgetTrigOverView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_TRIG_OVERVIEW);
+		$this->setValidationRules([
 			'name' =>	'string',
 			'fields' =>	'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array  $fields
-			 * @var array  $fields['groupids']     (optional)
-			 * @var string $fields['application']  (optional)
-			 * @var int    $fields['style']        (optional) in (STYLE_LEFT,STYLE_TOP)
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_TRIG_OVERVIEW, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		$data = [
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_TRIG_OVERVIEW]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'style' => $fields['style'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

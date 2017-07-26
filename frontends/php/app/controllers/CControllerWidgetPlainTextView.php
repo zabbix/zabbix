@@ -139,7 +139,7 @@ class CControllerWidgetPlainTextView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $name),
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT]),
 			'table_rows' => $table_rows,
 			'error' => $error,
 			'user' => [

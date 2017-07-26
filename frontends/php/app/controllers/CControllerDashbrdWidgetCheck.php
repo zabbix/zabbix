@@ -27,18 +27,31 @@ class CControllerDashbrdWidgetCheck extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' =>			'string|required',
-			'name' =>			'string',
-			'fields' =>			'array',
+			'type' =>	'string|required',
+			'name' =>	'string',
+			'fields' =>	'array',
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', []));
+
+			if ($errors = $form->validate()) {
+				foreach ($errors as $msg) {
+					error($msg);
+				}
+
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			$output = [];
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
 			}
+
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
 		}
 
@@ -50,21 +63,6 @@ class CControllerDashbrdWidgetCheck extends CController {
 	}
 
 	protected function doAction() {
-		$type = $this->getInput('type');
-		$fields = $this->getInput('fields', []);
-		$form = CWidgetConfig::getForm($type, $fields);
-		unset($fields);
-
-		if (($errors = $form->validate()) !== []) {
-			foreach($errors as $msg) {
-				error($msg);
-			}
-		}
-
-		$output = [];
-		if (($messages = getMessages()) !== null) {
-			$output['errors'] = $messages->toString();
-		}
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([])]));
 	}
 }

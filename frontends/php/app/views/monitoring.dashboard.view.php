@@ -131,8 +131,8 @@ $dashboard_data = [
 ];
 $dashboard_options = [
 	'fullscreen' => $data['fullscreen'],
-	'columns' => DASHBOARD_COLUMNS,
-	'max-rows' => DASHBOARD_MAX_ROWS
+	'max-rows' => DASHBOARD_MAX_ROWS,
+	'max-columns' => DASHBOARD_MAX_COLUMNS
 ];
 if ($data['dashboard']['dashboardid'] != 0) {
 	$dashboard_data['id'] = $data['dashboard']['dashboardid'];

@@ -685,6 +685,10 @@ jQuery(function($) {
 					item_clases += ' root-item';
 				}
 
+				if (isEditMode() && item.mapid == 0) {
+					item_clases += ' no-map';
+				}
+
 				if (typeof item.children !== 'undefined' && widget_data.max_depth > depth) {
 					if (item.children.length) {
 						item_clases += ' is-parent';
@@ -749,7 +753,8 @@ jQuery(function($) {
 								.append($('<input/>', {
 										'type': 'button',
 										'data-id': item.id,
-										'class': 'add-child-btn'
+										'class': 'add-child-btn',
+										'title': t('Add child element')
 									})
 									.click(function() {
 										var parentId = $(this).data('id'),
@@ -769,7 +774,8 @@ jQuery(function($) {
 								.append($('<input/>', {
 										'class': 'import-items-btn',
 										'data-id': item.id,
-										'type': 'button'
+										'type': 'button',
+										'title': t('Add multiple maps')
 									})
 									.click(function() {
 										var url = new Curl('popup.php'),
@@ -817,7 +823,8 @@ jQuery(function($) {
 								.append(editable ? $('<input/>', {
 										'class': 'edit-item-btn',
 										'type': 'button',
-										'data-id': item.id
+										'data-id': item.id,
+										'title': t('Edit')
 									})
 									.click(function() {
 										var id = $(this).data('id'),
@@ -830,7 +837,8 @@ jQuery(function($) {
 								.append(editable ? $('<button/>', {
 										'type': 'button',
 										'data-id': item.id,
-										'class': 'remove-btn'
+										'class': 'remove-btn',
+										'title': t('Remove')
 									})
 									.click(function(){
 										removeItem($obj, [$(this).data('id')]);
@@ -1249,6 +1257,9 @@ jQuery(function($) {
 
 											if (prev_maps && !data[0]['moving_upward']) {
 												prev_map_selector = '.tree-item.selected[data-mapid='+prev_maps+'] ';
+												if (!$('.tree-item.selected[data-mapid='+prev_maps+']', $this).length) {
+													prev_map_selector = '.tree-item[data-mapid='+prev_maps+'] ';
+												}
 											}
 											else if (prev_maps) {
 												prev_map_selector = '.tree-item[data-mapid='+prev_maps+'] ';
@@ -1279,6 +1290,8 @@ jQuery(function($) {
 												step_in_path = $(step_in_path).parent().closest('.tree-item');
 											}
 											openBranch($this, $(item).data('id'));
+											updateUserProfile('web.dashbrd.navtree.item.selected', $(item).data('id'),
+												[widget['widgetid']]);
 										}
 									}
 								});
@@ -1287,7 +1300,8 @@ jQuery(function($) {
 							switchToNavigationMode($this);
 
 							if (!options.navtree_item_selected) {
-								options.navtree_item_selected = $('.tree-item', $this).first().data('id');
+								options.navtree_item_selected = $('.tree-item', $this).not('[data-mapid="0"]').first()
+									.data('id');
 							}
 							if (options.navtree_item_selected) {
 								var selected_item = $('.tree-item[data-id='+options.navtree_item_selected+']'),
@@ -1302,8 +1316,6 @@ jQuery(function($) {
 									$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare',
 										widget_data, 'selected_mapid', {mapid: $(selected_item).data('mapid')});
 								}
-
-								openBranch($this, options.navtree_item_selected);
 							}
 						}
 

@@ -1,8 +1,22 @@
 Changes for 3.4.0alpha2
 
 New features:
+..F....... [ZBXNEXT-2102] added blinking for recent problems in Problems widget (Sasha)
+..F....... [ZBXNEXT-2102] implemented additional filters for dashboard widgets (Sasha)
+A.F....... [ZBXNEXT-1076] implemented new permission schema to allow view map when no permissions to all map elements (miks)
+A.F.....S. [ZBXNEXT-18] implemented sending alerts on acknowledges (Sergejs)
+...G...... [ZBXNEXT-3910] added support to the agent for monitoring processes in trace or uninterruptible state on Linux, FreeBSD, OpenBSD and NetBSD (abs)
+........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+A......... [ZBXNEXT-2102] fixed multiple issues in Map widget (miks)
+A......... [ZBXNEXT-2102] fixed Undefined variable: widgetids in dashboard sharing form (Sasha)
+..F....... [ZBXNEXT-2102] fixed Undefined constant: ALERT_MAX_RETRIES in Action log widget (Sasha)
+A......... [ZBXNEXT-2102] added check for dashboard owners in user.delete() method (Sasha)
+..F....... [ZBXNEXT-2102] fixed updating of dashboard with inaccessible elements (Sasha)
+....I..... [ZBXNEXT-2102] fixed possible sql errors in upgrade patch (Sasha)
+..F....... [ZBXNEXT-2102] fixed removing of favourites from dashboard widgets (vmurzins)
+........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 ..F....... [ZBXNEXT-2031] fixed multiple bugs in maps (vjaceslavs)
 A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form and item.update API (vjaceslavs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
@@ -93,8 +107,10 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.8rc1
 
 New features:
+........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)

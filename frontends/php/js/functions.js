@@ -680,24 +680,12 @@ function overlayDialogue(params) {
 function overlayDialogueOnLoad(focus) {
 	// Focus element with lowest tabindex attribute.
 	if (focus) {
-		var focusable = jQuery(':focusable', jQuery('#overlay_dialogue')),
-			min_tabindex = null;
-
-		focusable.attr('tabindex', function(a, b) {
-			if (typeof b !== 'undefined') {
-				min_tabindex = (typeof min_tabindex === 'number') ? Math.min(min_tabindex, +b) : +b;
-			}
-		});
-
-		if (min_tabindex !== null) {
-			focusable.filter(function() {
-				return jQuery(this).attr('tabindex') == min_tabindex;
-			}).first().focus();
-		}
+		jQuery('.auto-focus:focusable', jQuery('#overlay_dialogue')).first().focus();
 	}
 
 	// Trigger click on the first button if user press enter in textbox.
-	var writable_fields = jQuery('input[type=text], textarea', jQuery('#widget_dialogue_form'));
+	var selector = 'input[type=text], textarea, input[type=radio], input[type=checkbox], select';
+	var writable_fields = jQuery(selector, jQuery('#widget_dialogue_form'));
 	if (writable_fields.length) {
 		writable_fields.on('keydown', function(e) {
 			if (e.keyCode == 13) {
