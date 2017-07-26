@@ -56,8 +56,7 @@ class CWidgetConfig {
 	 *
 	 * @return array
 	 */
-	private static function getDefaultDimensions()
-	{
+	private static function getDefaultDimensions() {
 		// TODO AV: review and accept default dimentions
 		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
@@ -142,8 +141,7 @@ class CWidgetConfig {
 	 * @static
 	 *
 	 * @param string $type          widget type - 'WIDGET_' constant
-	 * @param array  $data          array with all widget's fields
-	 * @param string $data[<name>]  (optional)
+	 * @param string $data          JSON string with widget fields.
 	 *
 	 * @return CWidgetForm
 	 */

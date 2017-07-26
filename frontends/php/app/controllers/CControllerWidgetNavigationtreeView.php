@@ -34,7 +34,7 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 			'uniqueid' =>		'required|string',
 			'widgetid'	=>		'db widget.widgetid',
 			'initial_load' =>	'in 0,1',
-			'fields' =>			'array'
+			'fields' =>			'string'
 		]);
 	}
 

@@ -177,7 +177,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return array
 	 */
-	private function unsetInaccessibleFields($widgets) {
+	private function unsetInaccessibleFields(array $widgets) {
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
 			ZBX_WIDGET_FIELD_TYPE_HOST => [],

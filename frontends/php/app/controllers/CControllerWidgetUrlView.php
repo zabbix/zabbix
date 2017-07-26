@@ -26,9 +26,9 @@ class CControllerWidgetUrlView extends CControllerWidget {
 
 		$this->setType(WIDGET_URL);
 		$this->setValidationRules([
-			'name' =>			'string',
-			'fields' =>			'array',
-			'dynamic_hostid' =>	'db hosts.hostid'
+			'name' => 'string',
+			'fields' => 'string',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 

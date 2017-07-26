@@ -28,9 +28,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$this->setType(WIDGET_PROBLEMS);
 		$this->setValidationRules([
-			'name' =>		'string',
-			'fullscreen' =>	'in 0,1',
-			'fields' =>		'array'
+			'name' => 'string',
+			'fullscreen' => 'in 0,1',
+			'fields' => 'string'
 		]);
 	}
 

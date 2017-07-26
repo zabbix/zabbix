@@ -441,7 +441,7 @@
 		}
 		// display widget with yet unsaved changes
 		if (typeof widget['fields'] !== 'undefined') {
-			ajax_data['fields'] = widget['fields'];
+			ajax_data['fields'] = JSON.stringify(widget['fields']);
 		}
 		if (typeof(widget['dynamic']) !== 'undefined') {
 			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
@@ -536,17 +536,16 @@
 			data: {
 				type: type,
 				name: name,
-				fields: fields
+				fields: JSON.stringify(fields)
 			},
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
-					// Error returned
-					// Remove previous errors
+					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
 				}
 				else {
-					// No errors, proceed with update
+					// No errors, proceed with update.
 					overlayDialogueDestroy();
 
 					if (widget === null) {
@@ -715,7 +714,7 @@
 		var	url = new Curl('zabbix.php'),
 			ajax_widgets = [];
 
-		// Remove previous messages
+		// Remove previous messages.
 		dashboardRemoveMessages();
 
 		url.setArgument('action', 'dashbrd.widget.update');
@@ -729,7 +728,7 @@
 			ajax_widget['pos'] = widget['pos'];
 			ajax_widget['type'] = widget['type'];
 			ajax_widget['name'] = widget['header'];
-			ajax_widget['fields'] = widget['fields'];
+			ajax_widget['fields'] = JSON.stringify(widget['fields']);
 
 			ajax_widgets.push(ajax_widget);
 		});
@@ -747,16 +746,18 @@
 			dataType: 'json',
 			data: ajax_data,
 			success: function(resp) {
-				// we can have redirect with errors
+				// We can have redirect with errors.
 				if ('redirect' in resp) {
-					// There are no more unsaved changes
+					// There are no more unsaved changes.
 					data['options']['updated'] = false;
-					// Replace add possibility to remove previous url (as ..&new=1) from the document history
-					// it allows to use back browser button more user-friendly
+					/*
+					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
+					 * It allows to use back browser button more user-friendly.
+					 */
 					window.location.replace(resp.redirect);
 				}
 				else if ('errors' in resp) {
-					// Error returned
+					// Error returned.
 					dashbaordAddMessages(resp.errors);
 				}
 			},
@@ -1120,8 +1121,10 @@
 			});
 		},
 
-		// Add or update form on widget configuration dialogue
-		// (when opened, as well as when requested by 'onchange' attributes in form itself)
+		/*
+		 * Add or update form on widget configuration dialogue (when opened, as well as when requested by 'onchange'
+		 * attributes in form itself).
+		 */
 		updateWidgetConfigDialogue: function() {
 			return this.each(function() {
 				var	$this = $(this),
@@ -1133,7 +1136,7 @@
 					url = new Curl('zabbix.php'),
 					ajax_data = {};
 
-				// disable saving, while form is beeing updated
+				// Disable saving, while form is beeing updated.
 				$('.dialogue-widget-save', footer).prop('disabled', true);
 
 				url.setArgument('action', 'dashbrd.widget.config');
@@ -1144,22 +1147,23 @@
 				}
 
 				if (form.length) {
-					// Take values from form
+					// Take values from form.
 					ajax_data.fields = form.serializeJSON();
 					ajax_data.type = ajax_data['fields']['type'];
 					ajax_data.name = ajax_data['fields']['name'];
 					delete ajax_data['fields']['type'];
 					delete ajax_data['fields']['name'];
+					ajax_data.fields = JSON.stringify(ajax_data.fields);
 				}
 				else if (widget !== null) {
-					// Open form with current config
+					// Open form with current config.
 					ajax_data.type = widget['type'];
 					ajax_data.name = widget['header'];
-					ajax_data.fields = widget['fields'];
+					ajax_data.fields = JSON.stringify(widget['fields']);
 				}
 				else {
-					// Get default config for new widget
-					ajax_data.fields = [];
+					// Get default config for new widget.
+					ajax_data.fields = JSON.stringify({});
 				}
 
 				jQuery.ajax({
@@ -1177,19 +1181,19 @@
 							body.append(resp.messages);
 						}
 
-						// Change submit function for returned form
+						// Change submit function for returned form.
 						$('#widget_dialogue_form', body).on('submit', function(e) {
 							e.preventDefault();
 							updateWidgetConfig($this, data, widget);
 						});
 
-						// position dialogue in middle of screen
+						// Position dialogue in middle of screen.
 						data.dialogue['div'].css({
 							'margin-top': '-' + (data.dialogue['div'].outerHeight() / 2) + 'px',
 							'margin-left': '-' + (data.dialogue['div'].outerWidth() / 2) + 'px'
 						});
 
-						// Enable save button after sucessfull form update
+						// Enable save button after sucessfull form update.
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {

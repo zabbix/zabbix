@@ -29,9 +29,9 @@ class CControllerWidgetSystemView extends CControllerWidget {
 
 		$this->setType(WIDGET_SYSTEM_STATUS);
 		$this->setValidationRules([
-			'name' =>		'string',
-			'fullscreen' =>	'in 0,1',
-			'fields' =>		'array'
+			'name' => 'string',
+			'fullscreen' => 'in 0,1',
+			'fields' => 'string'
 		]);
 	}
 

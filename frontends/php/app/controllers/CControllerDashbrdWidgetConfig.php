@@ -23,10 +23,10 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'	=> 'db widget.widgetid',
-			'type'		=> 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
-			'name'		=> 'string',
-			'fields'	=> 'array'
+			'widgetid' => 'db widget.widgetid',
+			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'name' => 'string',
+			'fields' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,7 +51,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function doAction() {
 		$type = $this->getInput('type', WIDGET_CLOCK);
-		$form = CWidgetConfig::getForm($type, $this->getInput('fields', []));
+		$form = CWidgetConfig::getForm($type, $this->getInput('fields', ''));
 
 		$config = select_config();
 		$global_config = [];
@@ -74,7 +74,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 	}
 
 	/**
-	 * Prepares mapped list of names for all required resources
+	 * Prepares mapped list of names for all required resources.
 	 *
 	 * @param CWidgetForm $form
 	 *
