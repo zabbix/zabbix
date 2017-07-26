@@ -189,7 +189,7 @@ static int	DBpatch_2050012(void)
 		param = get_rparam(&request, 0);
 
 		/* NULL check to silence static analyzer warning */
-		if (NULL == param || 0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param))
+		if (NULL == param || (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param)))
 		{
 			free_request(&request);
 			continue;
