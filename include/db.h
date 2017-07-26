@@ -267,7 +267,7 @@ typedef struct
 	char		*url;
 	char		*comments;
 	char		*correlation_tag;
-	int		value;
+	unsigned char	value;
 	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	recovery_mode;
