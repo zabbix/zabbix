@@ -1129,8 +1129,8 @@ function getItemFormData(array $item = [], array $options = []) {
 				if ($data['delay'][0] !== '{') {
 					$delay = timeUnitToSeconds($data['delay']);
 
-					if (($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
-							|| $data['type'] == ITEM_TYPE_DEPENDENT ) && $delay == 0) {
+					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
+							|| $data['type'] == ITEM_TYPE_DEPENDENT)) {
 						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 					}
 				}
