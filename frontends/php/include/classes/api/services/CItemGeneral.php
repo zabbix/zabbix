@@ -1358,7 +1358,9 @@ abstract class CItemGeneral extends CApiService {
 				: 0;
 			$counted_masters = [];
 
-			while ($find_itemids && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+			while (($find_itemids || (array_key_exists($root_itemid, $items_added)
+						&& array_key_exists($dependency_level, $items_added[$root_itemid])))
+						&& $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				// If item was moved to another master item, do not count moved item (and its dependent items)
 				// in old master dependent items count calculation.
 				if (array_key_exists($root_itemid, $items_moved)) {
@@ -1387,7 +1389,9 @@ abstract class CItemGeneral extends CApiService {
 				}
 			};
 
-			if ($find_itemids && $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+			if (($find_itemids || (array_key_exists($root_itemid, $items_added)
+					&& array_key_exists($dependency_level, $items_added[$root_itemid])))
+					&& $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 					'master_itemid', _('maximum number of dependency levels reached')
 				));
