@@ -51,7 +51,8 @@
 #	define ZBX_PROC_FLAG 	ki_sflag
 #	define ZBX_PROC_MASK	PS_INMEM
 #else
-#	define ZBX_PROC_FLAG 	ki_flag
+#	define ZBX_PROC_TDFLAG	ki_tdflags
+#	define ZBX_PROC_FLAG	ki_flag
 #	define ZBX_PROC_MASK	P_INMEM
 #endif
 
@@ -405,6 +406,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
+	else if (0 == strcmp(param, "disk"))
+		zbx_proc_stat = ZBX_PROC_STAT_DISK;
+	else if (0 == strcmp(param, "trace"))
+		zbx_proc_stat = ZBX_PROC_STAT_TRACE;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -467,15 +472,23 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			switch (zbx_proc_stat) {
 			case ZBX_PROC_STAT_RUN:
-				if (proc[i].ZBX_PROC_STAT == SRUN)
+				if (SRUN == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_SLEEP:
-				if (proc[i].ZBX_PROC_STAT == SSLEEP)
+				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 != (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_ZOMB:
-				if (proc[i].ZBX_PROC_STAT == SZOMB)
+				if (SZOMB == proc[i].ZBX_PROC_STAT)
+					stat_ok = 1;
+				break;
+			case ZBX_PROC_STAT_DISK:
+				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 == (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
+					stat_ok = 1;
+				break;
+			case ZBX_PROC_STAT_TRACE:
+				if (SSTOP == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			}
