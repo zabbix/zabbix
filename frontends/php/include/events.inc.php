@@ -564,7 +564,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			$cell_status = new CSpan($value_str);
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($cell_status, $value, $problem['clock'],
+			addTriggerValueStyle($cell_status, $value, $value_clock,
 				$config['event_ack_enable'] && (bool) $problem['acknowledges']
 			);
 

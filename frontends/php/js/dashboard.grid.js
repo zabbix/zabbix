@@ -97,7 +97,7 @@
 
 	function getDivPosition($obj, data, $div) {
 		var	target_pos = $div.position(),
-			widget_width_px = Math.floor($obj.width() / data['options']['columns']),
+			widget_width_px = Math.floor($obj.width() / data['options']['max-columns']),
 			target_top = target_pos.top + 25,
 			target_left = target_pos.left + 25,
 			target_height = $div.height() + 25,
@@ -111,8 +111,12 @@
 			row = 0;
 		}
 
-		if (col > data['options']['columns'] - width) {
-			col = data['options']['columns'] - width;
+		if (row > data['options']['max-rows'] - height) {
+			row = data['options']['max-rows'] - height;
+		}
+
+		if (col > data['options']['max-columns'] - width) {
+			col = data['options']['max-columns'] - width;
 		}
 
 		if (col < 0) {
@@ -126,8 +130,8 @@
 		if (width < 1) {
 			width = 1;
 		}
-		else if (width > data['options']['columns']) {
-			width = data['options']['columns'];
+		else if (width > data['options']['max-columns']) {
+			width = data['options']['max-columns'];
 		}
 
 		return {'row': row, 'col': col, 'height': height, 'width': width};
@@ -331,7 +335,7 @@
 			},
 			stop: function(event, ui) {
 				stopWidgetPositioning($obj, $(event.target), data);
-				doAction($obj, data, 'onResizeEnd');
+				doAction('onResizeEnd', $obj, data, widget);
 			}
 		});
 	}
@@ -384,7 +388,16 @@
 
 	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
 		if (rf_rate != 0) {
-			widget['rf_timeoutid'] = setTimeout(function () { updateWidgetContent($obj, data, widget); }, rf_rate * 1000);
+			widget['rf_timeoutid'] = setTimeout(function () {
+				if (doAction('timer_refresh', $obj, data, widget) == 0) {
+					// widget was not updated, update it's content
+					updateWidgetContent($obj, data, widget);
+				}
+				else {
+					// widget was updated, start next timeout.
+					startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+				}
+			}, rf_rate * 1000);
 		}
 	}
 
@@ -507,8 +520,6 @@
 
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
-			ajax_widgets = [],
-			ajax_widget = {},
 			fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'];
@@ -516,24 +527,16 @@
 		delete fields['type'];
 		delete fields['name'];
 
-		url.setArgument('action', 'dashbrd.widget.update');
-
-		if (widget !== null) {
-			ajax_widget.widgetid = widget['widgetid'];
-		}
-		ajax_widget.type = type;
-		ajax_widget.name = name;
-		ajax_widget.fields = fields;
-		ajax_widgets.push(ajax_widget);
+		url.setArgument('action', 'dashbrd.widget.check');
 
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
 			data: {
-				dashboardid: data['dashboard']['id'],
-				widgets: ajax_widgets,
-				save: 0 // WIDGET_CONFIG_DONT_SAVE - only check
+				type: type,
+				name: name,
+				fields: fields
 			},
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
@@ -557,6 +560,7 @@
 							'rf_rate': data['widget_defaults'][type]['rf_rate'],
 							'fields': fields
 						}
+						updateWidgetDynamic($obj, data, widget_data);
 						methods.addWidget.call($obj, widget_data);
 						// new widget is last element in data['widgets'] array
 						widget = data['widgets'].slice(-1)[0];
@@ -570,10 +574,10 @@
 						}
 						widget['header'] = name;
 						widget['fields'] = fields;
-					}
 
-					updateWidgetDynamic($obj, data, widget);
-					refreshWidget($obj, data, widget);
+						updateWidgetDynamic($obj, data, widget);
+						refreshWidget($obj, data, widget);
+					}
 
 					// mark dashboard as updated
 					data['options']['updated'] = true;
@@ -594,7 +598,7 @@
 		}
 
 		// go row by row and try to position widget in each space
-		var	max_col = data['options']['columns'] - pos['width'],
+		var	max_col = data['options']['max-columns'] - pos['width'],
 			found = false,
 			col, row;
 
@@ -666,7 +670,7 @@
 			.addClass('btn-widget-edit')
 			.attr('title', t('Edit'))
 			.click(function() {
-				doAction($obj, data, 'beforeConfigLoad');
+				doAction('beforeConfigLoad', $obj, data, widget);
 				methods.editWidget.call($obj, widget);
 			});
 
@@ -685,6 +689,7 @@
 			.append($('<li>').append(btn_delete))
 		);
 
+		stopWidgetRefreshTimer(widget);
 		makeDraggable($obj, data, widget);
 		makeResizable($obj, data, widget);
 	}
@@ -733,8 +738,7 @@
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
-			widgets: ajax_widgets,
-			save: 1 // WIDGET_CONFIG_DO_SAVE - check and save
+			widgets: ajax_widgets
 		};
 
 		$.ajax({
@@ -769,6 +773,7 @@
 	}
 
 	function updateWidgetDynamic($obj, data, widget) {
+		// this function may be called for widget that is not in data['widgets'] array yet.
 		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] === '1') {
 			if (data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
@@ -802,12 +807,32 @@
 		return ref;
 	}
 
-	function doAction($obj, data, hook_name) {
+	/**
+	 * Performs action added by addAction function
+	 *
+	 * @param string hook_name  name of trigger that is currently beeing called
+	 * @param object $obj  dashboard grid object
+	 * @param object data  data from dashboard grid
+	 * @param object widget  current widget object (can be null for generic actions)
+	 *
+	 * @returns int  number of triggers, that were called
+	 */
+	function doAction(hook_name, $obj, data, widget) {
 		if (typeof(data['triggers'][hook_name]) === 'undefined') {
-			return;
+			return 0;
 		}
-		var triggers = data['triggers'][hook_name];
+		var triggers = [];
 
+		if (widget === null) {
+			triggers = data['triggers'][hook_name];
+		}
+		else {
+			$.each(data['triggers'][hook_name], function(index, trigger) {
+				if (widget['uniqueid'] === trigger['uniqueid']) {
+					triggers.push(trigger);
+				}
+			});
+		}
 		triggers.sort(function(a,b) {
 			var priority_a = (typeof(a['options']['priority']) !== 'undefined') ? a['options']['priority'] : 10;
 			var priority_b = (typeof(b['options']['priority']) !== 'undefined') ? b['options']['priority'] : 10;
@@ -832,11 +857,18 @@
 			}
 			if (typeof(trigger['options']['grid']) !== 'undefined') {
 				var grid = {};
-				if (typeof(trigger['options']['grid']['widget']) !== 'undefined') {
-					var widgets = methods.getWidgetsBy.call($obj, 'uniqueid', trigger['options']['grid']['widget']);
-					// will return only first element
-					if (widgets.length > 0) {
-						grid['widget'] = widgets[0];
+				if (typeof(trigger['options']['grid']['widget']) !== 'undefined'
+						&& trigger['options']['grid']['widget']
+				) {
+					if (widget === null) {
+						var widgets = methods.getWidgetsBy.call($obj, 'uniqueid', trigger['uniqueid']);
+						// will return only first element
+						if (widgets.length > 0) {
+							grid['widget'] = widgets[0];
+						}
+					}
+					else {
+						grid['widget'] = widget;
 					}
 				}
 				if (typeof(trigger['options']['grid']['data']) !== 'undefined' && trigger['options']['grid']['data']) {
@@ -854,6 +886,8 @@
 			}
 			catch(e) {}
 		});
+
+		return triggers.length;
 	}
 
 	var	methods = {
@@ -861,12 +895,13 @@
 			var default_options = {
 				'fullscreen': 0,
 				'widget-height': 70,
-				'columns': 12,
+				'max-rows': 64,
+				'max-columns': 12,
 				'rows': 0,
 				'updated': false
 			};
 			options = $.extend(default_options, options);
-			options['widget-width'] = 100 / options['columns'];
+			options['widget-width'] = 100 / options['max-columns'];
 			options['edit_mode'] = false;
 
 			return this.each(function() {
@@ -1020,7 +1055,7 @@
 					data = $this.data('dashboardGrid');
 
 				data['options']['edit_mode'] = true;
-				doAction($this, data, 'onEditStart');
+				doAction('onEditStart', $this, data, null);
 				dashboardRemoveMessages();
 				setModeEditDashboard($this, data);
 			});
@@ -1032,10 +1067,10 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				doAction($this, data, 'beforeDashboardSave');
+				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
 				data['options']['edit_mode'] = false;
-				doAction($this, data, 'afterDashboardSave');
+				doAction('afterDashboardSave', $this, data, null);
 			});
 		},
 
@@ -1043,18 +1078,25 @@
 		cancelEditDashboard: function() {
 			return this.each(function() {
 				var	$this = $(this),
-					data = $this.data('dashboardGrid');
+					data = $this.data('dashboardGrid'),
+					url = new Curl('zabbix.php');
 
-				doAction($this, data, 'onEditStop');
+				doAction('onEditStop', $this, data, null);
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;
+
+				url.unsetArgument('sid');
+				url.setArgument('action', 'dashboard.view');
+				if (data['options']['fullscreen'] == 1) {
+					url.setArgument('fullscreen', '1');
+				}
 
 				// Redirect to last active dashboard.
 				// (1) In case of New Dashboard from list, it will open list
 				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
 				// (3) In case of simple editing of current dashboard, it will reload same dashboard
-				location.replace('zabbix.php?action=dashboard.view&fullscreen=' + data['options']['fullscreen']);
+				location.replace(url.getUrl());
 			});
 		},
 
@@ -1066,11 +1108,6 @@
 
 				openConfigDialogue($this, data, widget);
 			});
-		},
-
-		// Call stopWidgetRefreshTimer on some speciffic widget.
-		stopWidgetRefreshTimer: function(widget) {
-			stopWidgetRefreshTimer(widget);
 		},
 
 		// After pressing "delete" button on widget
@@ -1322,17 +1359,18 @@
 		 *
 		 * @param string hook_name  name of trigger, when $function_to_call should be called
 		 * @param string function_to_call  name of function in global scope that will be called
+		 * @param string uniqueid  identifier of widget, that added this action
 		 * @param array options  any key in options is optional
 		 * @param array options['parameters']  array of parameters with which the function will be called
 		 * @param array options['grid']  mark, what data from grid should be passed to $function_to_call.
 		 *								If is empty, parameter 'grid' will not be added to function_to_call params.
-		 * @param string options['grid']['widget']  should contain uniqueid of widget. Will add widget object.
+		 * @param string options['grid']['widget']  should contain 1. Will add widget object.
 		 * @param string options['grid']['data']  should contain '1'. Will add dashboard grid data object.
 		 * @param string options['grid']['obj']  should contain '1'. Will add dashboard grid object ($this).
 		 * @param int options['priority']  order, when it should be called, compared to others. Default = 10
 		 * @param int options['trigger_name']  unique name. There can be only one trigger with this name for each hook.
 		 */
-		addAction: function(hook_name, function_to_call, options) {
+		addAction: function(hook_name, function_to_call, uniqueid, options) {
 			this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
@@ -1347,7 +1385,9 @@
 				if (typeof(options['trigger_name']) !== 'undefined') {
 					trigger_name = options['trigger_name'];
 					$.each(data['triggers'][hook_name], function(index, trigger) {
-						if (trigger['trigger_name'] === trigger_name) {
+						if (typeof(trigger['options']['trigger_name']) !== 'undefined'
+							&& trigger['options']['trigger_name'] === trigger_name)
+						{
 							found = true;
 						}
 					});
@@ -1355,8 +1395,8 @@
 
 				if (!found) {
 					data['triggers'][hook_name].push({
-						'trigger_name': trigger_name,
 						'function': function_to_call,
+						'uniqueid': uniqueid,
 						'options': options
 					});
 				}

@@ -104,10 +104,11 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 /**
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
- * @param int	 $severity			trigger severity
- * @param array  $config			array of configuration parameters to get trigger severity name
- * @param string $text				trigger severity name
- * @param bool	 $forceNormal		true to return 'normal' class, false to return corresponding severity class
+ * @param int         $severity     trigger severity
+ * @param array|null  $config       array of configuration parameters to get trigger severity name; can be omitted
+ *                                  if $text is not null
+ * @param string|null $text         trigger severity name
+ * @param bool        $forceNormal  true to return 'normal' class, false to return corresponding severity class
  *
  * @return CCol
  */
@@ -914,13 +915,17 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			->addClass(ZBX_STYLE_CURSOR_POINTER);
 	}
 
-	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
-	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
-		$column->addClass('blink');
-		$column->setAttribute('data-toggle-class', $css);
-	}
-
 	if ($trigger) {
+		// blinking
+		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+		$duration = time() - $trigger['lastchange'];
+
+		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
+			$column->addClass('blink');
+			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
+			$column->setAttribute('data-toggle-class', $css);
+		}
+
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
 	}
 

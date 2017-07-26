@@ -21,29 +21,15 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetFavMapsView extends CController {
+class CControllerWidgetFavMapsView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_FAVOURITE_MAPS);
+		$this->setValidationRules([
 			'name' =>	'string'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {

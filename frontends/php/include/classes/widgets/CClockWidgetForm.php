@@ -33,7 +33,7 @@ class CClockWidgetForm extends CWidgetForm {
 			->setDefault(TIME_TYPE_LOCAL)
 			->setAction('updateWidgetConfigDialogue()');
 		if (array_key_exists('time_type', $data)) {
-			$field_time_type->setValue((int)$data['time_type']);
+			$field_time_type->setValue($data['time_type']);
 		}
 		$this->fields[] = $field_time_type;
 

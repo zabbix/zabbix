@@ -767,7 +767,6 @@ SVGMapElement.prototype.updateLabel = function() {
 			'anchor': anchor,
 			background: {
 				fill: '#' + this.map.options.theme.backgroundcolor,
-				'shape-rendering':'crispEdges',
 				opacity: 0.5
 			}
 		}, this.options.label);
@@ -947,7 +946,6 @@ SVGMapLink.prototype.update = function(options) {
 				vertical: 'middle'
 			},
 			background: {
-				'shape-rendering':'crispEdges'
 			}
 		}, options.label
 	);
@@ -1089,10 +1087,6 @@ SVGMapShape.prototype.update = function(options) {
 				width: this.width,
 				height: this.height
 			};
-
-			if (typeof attributes['stroke-linecap'] === 'undefined') {
-				attributes['shape-rendering'] = 'crispEdges';
-			}
 			break;
 
 		case SVGMapShape.TYPE_ELLIPSE:

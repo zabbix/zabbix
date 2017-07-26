@@ -28,10 +28,15 @@ $page['type'] = PAGE_TYPE_JSON;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$map_data = CMapHelper::get(getRequest('sysmapid'), ['severity_min' => getRequest('severity_min')]);
+$severity_min = getRequest('severity_min');
+if (!zbx_ctype_digit($severity_min)) {
+	$severity_min = null;
+}
+$map_data = CMapHelper::get(getRequest('sysmapid'), ['severity_min' => $severity_min]);
 
 // No need to get all data.
 $options = [
+	'mapid' => $map_data['id'],
 	'canvas' => $map_data['canvas'],
 	'background' => $map_data['background'],
 	'elements' => $map_data['elements'],
@@ -40,6 +45,10 @@ $options = [
 	'label_location' => $map_data['label_location'],
 	'timestamp' => $map_data['timestamp']
 ];
+
+if (getRequest('add_widget_footer', 0)) {
+	$options['map_widget_footer'] = (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString();
+}
 
 if ($map_data['id'] == -1) {
 	$options['timestamp'] = null;

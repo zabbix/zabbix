@@ -25,8 +25,9 @@ $this->addJsFile('flickerfreescreen.js');
 (new CWidget())
 	->setTitle(_('Web monitoring'))
 	->setControls((new CForm('get'))
-		->addVar('fullscreen', $data['fullscreen'])
+		->cleanItems()
 		->addVar('action', 'web.view')
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem((new CList())
 			->addItem([
 				new CLabel(_('Group'), 'groupid'),

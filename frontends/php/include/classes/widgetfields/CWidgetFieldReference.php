@@ -42,4 +42,12 @@ class CWidgetFieldReference extends CWidgetField {
 				'reference_field.val(reference);'.
 			'}';
 	}
+
+	public function setValue($value) {
+		if ($value === '' || ctype_alnum($value)) {
+			$this->value = $value;
+		}
+
+		return $this;
+	}
 }
