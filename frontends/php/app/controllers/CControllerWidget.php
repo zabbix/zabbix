@@ -99,7 +99,7 @@ abstract class CControllerWidget extends CController {
 		$ret = $this->validateInput($this->validation_rules);
 
 		if ($ret) {
-			$this->form = CWidgetConfig::getForm($this->type, $this->getInput('fields', []));
+			$this->form = CWidgetConfig::getForm($this->type, $this->getInput('fields', ''));
 
 			if ($errors = $this->form->validate()) {
 				foreach ($errors as $error) {
