@@ -30,7 +30,7 @@ class CWidgetForm {
 	/**
 	 * Return fields for this form.
 	 *
-	 * @return array  an array of CWidgetField
+	 * @return array  An array of CWidgetField.
 	 */
 	public function getFields() {
 		return $this->fields;
@@ -39,7 +39,7 @@ class CWidgetForm {
 	/**
 	 * Returns widget fields data as array.
 	 *
-	 * @return array  key/value pairs where key is field name and value is it's data
+	 * @return array  Key/value pairs where key is field name and value is it's data.
 	 */
 	public function getFieldsData() {
 		$data = [];
@@ -63,9 +63,9 @@ class CWidgetForm {
 	}
 
 	/**
-	 * Prepares array, ready to be passed to CDashboard API functions
+	 * Prepares array, ready to be passed to CDashboard API functions.
 	 *
-	 * @return array  Array of widget fields ready for saving in API
+	 * @return array  Array of widget fields ready for saving in API.
 	 */
 	public function fieldsToApi() {
 		$api_fields = [];

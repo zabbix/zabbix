@@ -1613,7 +1613,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, pstart, pend - pstart);
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &db_alert, &param,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &db_alert, NULL, &param,
 					MACRO_TYPE_ALERT, NULL, 0);
 
 			param_esc = zbx_dyn_escape_shell_single_quote(param);
@@ -1865,7 +1865,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	if (FAIL == zbx_ipc_service_start(&alerter_service, ZBX_IPC_SERVICE_ALERTER, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start alerter service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start alert manager service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}

@@ -19,66 +19,31 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetProblemsView extends CController {
+class CControllerWidgetProblemsView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		$fields = [
-			'name'			=> 'string',
-			'fullscreen'	=> 'in 0,1',
-			'fields'		=> 'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array        $fields
-			 * @var array|string $fields['groupids']          (optional)
-			 * @var array|string $fields['exclude_groupids']  (optional)
-			 * @var array|string $fields['hostids']           (optional)
-			 * @var string       $fields['problem']           (optional)
-			 * @var array        $fields['severities']        (optional)
-			 * @var int          $fields['maintenance']       (optional)
-			 * @var int          $fields['unacknowledged']    (optional)
-			 * @var int          $fields['sort_triggers']     (optional)
-			 * @var int          $fields['show_lines']        (optional) BETWEEN 1,100
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_PROBLEMS, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		$this->setType(WIDGET_PROBLEMS);
+		$this->setValidationRules([
+			'name' =>		'string',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array'
+		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		$config = select_config();
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
-			'groupids' => getSubGroups((array) $fields['groupids']),
-			'exclude_groupids' => getSubGroups((array) $fields['exclude_groupids']),
-			'hostids' => (array) $fields['hostids'],
+			'groupids' => getSubGroups($fields['groupids']),
+			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
+			'hostids' => $fields['hostids'],
 			'problem' => $fields['problem'],
 			'severities' => $fields['severities'],
 			'maintenance' => $fields['maintenance'],
@@ -104,12 +69,13 @@ class CControllerWidgetProblemsView extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PROBLEMS]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'fields' => [
 				'show' => $fields['show']
 			],
 			'config' => [
-				'event_ack_enable' => $config['event_ack_enable']
+				'event_ack_enable' => $config['event_ack_enable'],
+				'blink_period' => timeUnitToSeconds($config['blink_period'])
 			],
 			'data' => $data,
 			'info' => $info,

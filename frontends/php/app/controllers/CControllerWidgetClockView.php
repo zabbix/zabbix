@@ -19,62 +19,35 @@
 **/
 
 
-class CControllerWidgetClockView extends CController {
+class CControllerWidgetClockView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_CLOCK);
+		$this->setValidationRules([
 			'name' =>	'string',
 			'fields' =>	'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array  $fields
-			 * @var int    $fields['time_type']
-			 * @var string $fields['itemid']
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_CLOCK, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		$time = null;
-		$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_CLOCK];
+		$name = $this->getDefaultHeader();
 		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;
+		$critical_error = null;
 
 		switch ($fields['time_type']) {
 			case TIME_TYPE_HOST:
 				$items = API::Item()->get([
 					'output' => ['itemid', 'value_type'],
 					'selectHosts' => ['name'],
-					'itemids' => $fields['itemid']
+					'itemids' => $fields['itemid'],
+					'webitems' => true
 				]);
 
 				if ($items) {
@@ -96,15 +69,15 @@ class CControllerWidgetClockView extends CController {
 							$time = time() - ($last_value['clock'] - $now->getTimestamp());
 						}
 						catch (Exception $e) {
-							$error = _('No data');
+							$error = _('Incorrect data.');
 						}
 					}
 					else {
-						$error = _('No data');
+						$error = _('No data.');
 					}
 				}
 				else {
-					$error = _('No data');
+					$critical_error = _('No permissions to referred object or it does not exist!');
 				}
 				break;
 
@@ -128,7 +101,8 @@ class CControllerWidgetClockView extends CController {
 				'time' => $time,
 				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
-				'error' => $error
+				'error' => $error,
+				'critical_error' => $critical_error
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

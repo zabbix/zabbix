@@ -44,15 +44,25 @@ class CDashboardWidgetMap extends CDiv {
 	public function getScriptRun() {
 		$script_run = '';
 
+		if ($this->current_sysmapid !== null && $this->initial_load) {
+			// this should be before other scripts
+			$script_run .= 'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
+				'\'setWidgetStorageValue\', "'.$this->uniqueid.'", \'current_sysmapid\', '.$this->current_sysmapid.');';
+		}
+
+		if ($this->initial_load) {
+			$script_run .=
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
+						'parameters: ["onWidgetRefresh"],'.
+						'grid: {widget: 1},'.
+					'trigger_name: "map_widget_timer_refresh_'.$this->uniqueid.'"'.
+				'});';
+		}
+
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
 			&& $this->initial_load
 		) {
-			$script_run = '';
-			if ($this->current_sysmapid !== null) {
-				// this should be before other scripts
-				$script_run .= 'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-					'\'setWidgetStorageValue\', widget.uniqueid, \'current_sysmapid\', '.$this->current_sysmapid.');';
-			}
 			$script_run .=
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.
@@ -71,10 +81,9 @@ class CDashboardWidgetMap extends CDiv {
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("callWidgetDataShare", false);'.
 
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart", '.
-					'"zbx_sysmap_widget_trigger", {'.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
 						'parameters: ["onEditStart"],'.
-						'grid: {widget: "'.$this->uniqueid.'"'.
-					'},'.
+						'grid: {widget: 1},'.
 					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
 				'});';
 		}
@@ -82,9 +91,11 @@ class CDashboardWidgetMap extends CDiv {
 		if ($this->sysmap_data && $this->error === null) {
 			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
 
-			$script_run .= 'jQuery(document).ready(function(){'.
-				'new SVGMap('.zbx_jsvalue($this->sysmap_data).')'.
-			'});';
+			$script_run .= ''.
+				'jQuery("#'.$this->getId().'").zbx_mapwidget({'.
+					'uniqueid: "'.$this->uniqueid.'",'.
+					'map_options: '.zbx_jsvalue($this->sysmap_data).
+				'});';
 		}
 
 		return $script_run;
@@ -110,16 +121,13 @@ class CDashboardWidgetMap extends CDiv {
 
 			$map_div = (new CDiv())
 				->setId('map_'.$this->uniqueid)
-				->addStyle('width:'.$this->sysmap_data['canvas']['width'].'px;')
-				->addStyle('height:'.$this->sysmap_data['canvas']['height'].'px;')
-				->addStyle('overflow:hidden;');
+				->addClass('sysmap-widget-container');
 
 			$this->addStyle('position:relative;');
 			$this->addItem($map_div);
 		}
 		else {
 			$this->addItem((new CTableInfo())->setNoDataMessage($this->error));
-			$this->addClass(ZBX_STYLE_DISABLED);
 		}
 	}
 

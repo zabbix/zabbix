@@ -82,7 +82,9 @@ class CWidget {
 		}
 
 		if ($this->controls !== null) {
-			$divs[] = (new CDiv($this->controls))->addClass(ZBX_STYLE_CELL);
+			$divs[] = (new CDiv($this->controls))
+				->addClass(ZBX_STYLE_CELL)
+				->addClass(ZBX_STYLE_NOWRAP);
 		}
 
 		return (new CDiv($divs))
