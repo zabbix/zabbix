@@ -1590,6 +1590,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .disabled .subfilter-disable-btn:active {
       color: black; }
 
+.inaccessible .subfilter-enabled {
+  color: #b2b2b2; }
+
 .btn-search:hover, .btn-search:active, .btn-search:focus {
   background-color: transparent;
   opacity: 1;
@@ -2649,18 +2652,6 @@ td.active-bg {
 .list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .calendar .tree-item.selected:hover > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
   background-color: #2f280a; }
 
-.active-indic {
-  width: 8px;
-  height: 8px;
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  border: 2px solid #0e1012;
-  background-color: #34af67;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px; }
-
 .msg-good {
   color: #2f9f5e;
   border: 1px solid #344e3f;
@@ -3037,8 +3028,11 @@ tr.cursor-move td * {
 .clock-lines {
   fill: #4f4f4f; }
 
-.navtree {
-  height: 100%; }
+.sysmap-widget-container {
+  overflow: hidden;
+  padding-left: 5px;
+  padding-right: 5px; }
+
 @keyframes fadein {
   from {
     opacity: 0; }
@@ -3064,168 +3058,169 @@ tr.cursor-move td * {
     opacity: 0; }
   to {
     opacity: 1; } }
-  .navtree .tree {
+.navtree .tree {
+  width: 100%;
+  height: 100%; }
+  .navtree .tree .tree-list {
+    list-style: none; }
+  .navtree .tree .tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 15px; }
+  .navtree .tree .tree-list[data-depth="0"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 10px; }
+  .navtree .tree .tree-list[data-depth="1"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 25px; }
+  .navtree .tree .tree-list[data-depth="2"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 40px; }
+  .navtree .tree .tree-list[data-depth="3"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 55px; }
+  .navtree .tree .tree-list[data-depth="4"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 70px; }
+  .navtree .tree .tree-list[data-depth="5"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 85px; }
+  .navtree .tree .tree-list[data-depth="6"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 100px; }
+  .navtree .tree .tree-list[data-depth="7"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 115px; }
+  .navtree .tree .tree-list[data-depth="8"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 130px; }
+  .navtree .tree .tree-list[data-depth="9"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 145px; }
+  .navtree .tree .tree-list[data-depth="10"] > .tree-item > .tree-row > .content > .margin-lvl {
+    flex: 0 0 160px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper > .tree-row > .content > .margin-lvl {
+    flex: 0 0 15px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 30px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 45px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 60px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 75px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 90px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 105px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 120px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 135px; }
+  .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
+    flex: 0 0 150px; }
+  .navtree .tree .tree-item > .tree-row {
     width: 100%;
-    height: 100%; }
-    .navtree .tree .tree-list {
-      list-style: none; }
-    .navtree .tree .tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 15px; }
-    .navtree .tree .tree-list[data-depth="0"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 10px; }
-    .navtree .tree .tree-list[data-depth="1"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 25px; }
-    .navtree .tree .tree-list[data-depth="2"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 40px; }
-    .navtree .tree .tree-list[data-depth="3"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 55px; }
-    .navtree .tree .tree-list[data-depth="4"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 70px; }
-    .navtree .tree .tree-list[data-depth="5"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 85px; }
-    .navtree .tree .tree-list[data-depth="6"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 100px; }
-    .navtree .tree .tree-list[data-depth="7"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 115px; }
-    .navtree .tree .tree-list[data-depth="8"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 130px; }
-    .navtree .tree .tree-list[data-depth="9"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 145px; }
-    .navtree .tree .tree-list[data-depth="10"] > .tree-item > .tree-row > .content > .margin-lvl {
-      flex: 0 0 160px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper > .tree-row > .content > .margin-lvl {
-      flex: 0 0 15px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 30px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 45px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 60px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 75px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 90px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 105px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 120px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 135px; }
-    .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-      flex: 0 0 150px; }
-    .navtree .tree .tree-item > .tree-row {
-      width: 100%;
-      min-width: 320px;
-      border-bottom: 1px solid #303030;
-      padding: 8px 0; }
-      .navtree .tree .tree-item > .tree-row:hover {
-        background-color: #383838; }
-      .navtree .tree .tree-item > .tree-row > .problems {
-        float: right;
+    min-width: 320px;
+    border-bottom: 1px solid #303030;
+    padding: 8px 0; }
+    .navtree .tree .tree-item > .tree-row:hover {
+      background-color: #383838; }
+    .navtree .tree .tree-item > .tree-row > .problems {
+      float: right;
+      position: relative;
+      padding-left: 10px;
+      margin-right: 10px;
+      background: inherit;
+      display: flex; }
+      .navtree .tree .tree-item > .tree-row > .problems .problems-per-item {
+        flex: 0 0 7px;
+        background: gray;
+        color: #fff;
+        padding: 3px 4px 2px;
+        font-size: 12px;
+        line-height: 1;
+        border-radius: 3px;
+        margin: 0px 5px 0px 0px; }
+    .navtree .tree .tree-item > .tree-row > .tools {
+      float: right;
+      position: relative;
+      padding-left: 10px;
+      margin-right: 10px;
+      display: flex;
+      width: 85px; }
+      .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn,
+      .navtree .tree .tree-item > .tree-row > .tools .remove-item-btn,
+      .navtree .tree .tree-item > .tree-row > .tools .import-items-btn,
+      .navtree .tree .tree-item > .tree-row > .tools .add-child-btn {
+        margin-left: 5px;
+        cursor: pointer;
+        border: 0px none;
+        opacity: 0.5;
+        float: left; }
+      .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn:hover,
+      .navtree .tree .tree-item > .tree-row > .tools .remove-item-btn:hover,
+      .navtree .tree .tree-item > .tree-row > .tools .import-items-btn:hover,
+      .navtree .tree .tree-item > .tree-row > .tools .add-child-btn:hover {
+        opacity: 1; }
+      .navtree .tree .tree-item > .tree-row > .tools .add-child-btn {
+        background: url(../img/icon-sprite.svg) no-repeat -47px -551px;
+        background-color: transparent !important;
+        height: 15px;
+        width: 14px; }
+      .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn {
+        background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+        background-color: transparent !important;
+        height: 15px;
+        width: 14px; }
+      .navtree .tree .tree-item > .tree-row > .tools .import-items-btn {
+        background: url(../img/icon-sprite.svg) no-repeat -47px -515px;
+        background-color: transparent !important;
+        height: 15px;
+        width: 14px; }
+      .navtree .tree .tree-item > .tree-row > .tools .remove-btn {
         position: relative;
-        padding-left: 10px;
-        margin-right: 10px;
-        background: inherit;
-        display: flex; }
-        .navtree .tree .tree-item > .tree-row > .problems .problems-per-item {
-          flex: 0 0 7px;
-          background: gray;
-          color: #fff;
-          padding: 3px 4px 2px;
-          font-size: 12px;
-          line-height: 1;
-          border-radius: 3px;
-          margin: 0px 5px 0px 0px; }
-      .navtree .tree .tree-item > .tree-row > .tools {
-        float: right;
-        position: relative;
-        padding-left: 10px;
-        margin-right: 10px;
-        display: flex;
-        width: 85px; }
-        .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn,
-        .navtree .tree .tree-item > .tree-row > .tools .remove-item-btn,
-        .navtree .tree .tree-item > .tree-row > .tools .import-items-btn,
-        .navtree .tree .tree-item > .tree-row > .tools .add-child-btn {
-          margin-left: 5px;
-          float: left;
-          filter: invert(40%); }
-        .navtree .tree .tree-item > .tree-row > .tools .add-child-btn {
-          background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjguMyAoMjk4MDIpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjIweDIwL1BsdXM8L3RpdGxlPgogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+CiAgICA8ZGVmcz48L2RlZnM+CiAgICA8ZyBpZD0iMjB4MjAiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICAgICAgPGcgaWQ9IjIweDIwL1BsdXMiIHN0cm9rZT0iIzM2NDM0RCI+CiAgICAgICAgICAgIDxnIGlkPSJQbHVzIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyLjAwMDAwMCwgMi4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMCw4IEwxNiw4IiBpZD0iTGluZS00Ij48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTgsMCBMOCwxNiIgaWQ9IkxpbmUtMyI+PC9wYXRoPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=") no-repeat left center;
-          background-size: cover;
-          border: 0px none;
-          cursor: pointer;
-          height: 15px;
-          width: 14px; }
-        .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn {
-          background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjguMyAoMjk4MDIpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjIweDIwL0VkaXQ8L3RpdGxlPgogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+CiAgICA8ZGVmcz4KICAgICAgICA8cGF0aCBkPSJNMTIuODk0ODI2LDEuNTY5NjQwMDUgQzEzLjY3MjcwNTIsMC43OTE3NjA4OSAxNC45MzUzODM1LDAuNzkzMjQ3ODQ0IDE1LjcyMDk2NjIsMS41Nzg4MzA1NCBMMTYuNDIxMTY5NSwyLjI3OTAzMzg0IEMxNy4yMDQxMjQ0LDMuMDYxOTg4NzYgMTcuMjA3MTA3NSw0LjMyODQyNjQ1IDE2LjQzMDM1OTksNS4xMDUxNzM5NiBMNy4yMzIyMzMwNSwxNC4zMDMzMDA5IEwyLjg3NzA1NjEsMTUuNzU1MDI2NSBDMi4zNTM0MjE3MiwxNS45Mjk1NzEzIDIuMDY3NjQ1OSwxNS42NTQ5MjY3IDIuMjQ0OTczNDksMTUuMTIyOTQzOSBMMy42OTY2OTkxNCwxMC43Njc3NjcgTDEyLjg5NDgyNiwxLjU2OTY0MDA1IEwxMi44OTQ4MjYsMS41Njk2NDAwNSBaIiBpZD0icGF0aC0xIj48L3BhdGg+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNC44MTgzMTY4IiBoZWlnaHQ9IjE0LjgxOTQ2NyIgZmlsbD0id2hpdGUiPgogICAgICAgICAgICA8dXNlIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgIDwvbWFzaz4KICAgIDwvZGVmcz4KICAgIDxnIGlkPSIyMHgyMCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9IjIweDIwL0VkaXQiPgogICAgICAgICAgICA8ZyBpZD0iRWRpdCI+CiAgICAgICAgICAgICAgICA8ZyBpZD0iSWNvbiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMi4wMDAwMDAsIDAuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTAsMTguNSBMMTYsMTguNSIgaWQ9IkxpbmUtNDIiIHN0cm9rZT0iIzM2NDM0RCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0iTGluZS00MSIgc3Ryb2tlPSIjMzU0MjRDIiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTExLjg4OTA4NzMsNS4xMTA5MTI3IEwxMy44ODkwODczLDUuMTEwOTEyNyIgaWQ9IkxpbmUtNDAiIHN0cm9rZT0iIzM1NDI0QyIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTIuODg5MDg3LCA1LjExMDkxMykgcm90YXRlKC0zMTUuMDAwMDAwKSB0cmFuc2xhdGUoLTEyLjg4OTA4NywgLTUuMTEwOTEzKSAiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNC44MTgwMTk0OCwxMi4xODE5ODA1IEw2LjgxODAxOTQ4LDEyLjE4MTk4MDUiIGlkPSJMaW5lLTM5IiBzdHJva2U9IiMzNTQyNEMiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDUuODE4MDE5LCAxMi4xODE5ODEpIHJvdGF0ZSgtMzE1LjAwMDAwMCkgdHJhbnNsYXRlKC01LjgxODAxOSwgLTEyLjE4MTk4MSkgIj48L3BhdGg+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==");
-          background-size: cover;
-          border: 0px none;
-          cursor: pointer;
-          height: 15px;
-          width: 14px; }
-        .navtree .tree .tree-item > .tree-row > .tools .import-items-btn {
-          background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjguMyAoMjk4MDIpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjIweDIwL1VwbG9hZDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSIyMHgyMCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgICAgICA8ZyBpZD0iMjB4MjAvVXBsb2FkIiBzdHJva2U9IiMzNTQyNEMiPgogICAgICAgICAgICA8ZyBpZD0iVXBsb2FkIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgMS4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8ZyBpZD0idXBsb2FkIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjUwMDAwMCwgMC41MDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTExLjkxODYyNTYsMTQuNSBMMTMuNSwxNC41IEMxMy41LDE0LjUgMTguOTYxNDcxLDE0Ljg3MDI3MzEgMTksOS41IEMxOC45NjE0NzIxLDQuMDQzOTc4MTEgMTMuNSw0IDEzLjUsNCBDMTIuMjQwNDk2NCwxLjU1MTExMzYzIDkuODYwMjM1MDMsMCA3LDAgQzMuMTg2Njk5MTEsMCAwLDMuMTg2Njk5MTEgMCw3IEMwLDExLjA0ODY4NDIgMywxNC41IDcsMTQuNSIgaWQ9IkxpbmUtNTEiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9InVwbG9hZCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNy4wMDAwMDAsIDYuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSJQYXRoLTIxNjQtKy1MaW5lIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwb2x5bGluZSBpZD0iTGluZS01MCIgcG9pbnRzPSI2LjA0NTczOTE2IDMuNTA1ODM2NTEgMy4wMzQwNjYxNCAwLjQ5NDE2MzQ4OCAwLjA1NzgxOTE4NTIgMy40NzA0MTA0NCI+PC9wb2x5bGluZT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0zLDEuNSBMMywxMS41NDE1OTQ1IiBpZD0iTGluZS00OSI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=");
-          background-size: cover;
-          cursor: pointer;
-          border: 0px none;
-          height: 15px;
-          width: 14px; }
-        .navtree .tree .tree-item > .tree-row > .tools .remove-btn {
-          position: relative;
-          margin-left: 10px;
-          top: 0px; }
-      .navtree .tree .tree-item > .tree-row > .content {
-        display: flex;
-        height: 20px; }
-        .navtree .tree .tree-item > .tree-row > .content > .arrow {
-          flex: 0 0 15px;
-          text-align: center;
-          margin: 2px 2px 0px -5px; }
-          .navtree .tree .tree-item > .tree-row > .content > .arrow > .treeview {
-            display: none; }
-        .navtree .tree .tree-item > .tree-row > .content > .drag-icon {
-          min-width: 24px;
-          cursor: move; }
-        .navtree .tree .tree-item > .tree-row > .content > .item-name {
-          flex: 0 1 auto;
-          white-space: nowrap;
-          overflow: hidden;
-          margin-right: 5px;
-          text-overflow: ellipsis;
-          line-height: 1.5; }
-    .navtree .tree .tree-item.is-parent > .tree-row > .content > .arrow > .treeview {
-      display: block; }
-    .navtree .tree .tree-item.inaccessible > .tree-row > .content > .item-name {
-      color: #4f4f4f; }
-    .navtree .tree .tree-item.ui-sortable-helper {
-      background: #f7f7f7;
-      border-color: #d7dadc;
-      border-width: 1px;
-      border-style: solid; }
-      .navtree .tree .tree-item.ui-sortable-helper .tools {
-        display: none; }
-    .navtree .tree .tree-item.sortable-error {
-      border-color: transparent;
-      background: #fbe3e4; }
-    .navtree .tree .tree-item.opened > ul {
-      display: block; }
-    .navtree .tree .tree-item.closed > ul {
+        margin-left: 10px;
+        top: 0px; }
+    .navtree .tree .tree-item > .tree-row > .content {
+      display: flex;
+      height: 20px; }
+      .navtree .tree .tree-item > .tree-row > .content > .arrow {
+        flex: 0 0 15px;
+        text-align: center;
+        margin: 2px 2px 0px -5px; }
+        .navtree .tree .tree-item > .tree-row > .content > .arrow > .treeview {
+          display: none; }
+      .navtree .tree .tree-item > .tree-row > .content > .drag-icon {
+        min-width: 24px;
+        cursor: move; }
+      .navtree .tree .tree-item > .tree-row > .content > .item-name {
+        flex: 0 1 auto;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-right: 5px;
+        text-overflow: ellipsis;
+        line-height: 1.5; }
+  .navtree .tree .tree-item.is-parent > .tree-row > .content > .arrow > .treeview {
+    display: block; }
+  .navtree .tree .tree-item.no-map > .tree-row > .content > .item-name, .navtree .tree .tree-item.inaccessible > .tree-row > .content > .item-name {
+    color: #4f4f4f; }
+  .navtree .tree .tree-item.ui-sortable-helper {
+    background: #f7f7f7;
+    border-color: #d7dadc;
+    border-width: 1px;
+    border-style: solid; }
+    .navtree .tree .tree-item.ui-sortable-helper .tools {
       display: none; }
-    .navtree .tree .highliglted-parent > .tree-row {
-      background: #f9f9f9; }
-    .navtree .tree .sortable-item-placeholder {
-      background: #f5f5f5;
-      height: 33px; }
-    .navtree .tree .placeholder {
-      background-color: #ebeef0;
-      -webkit-animation: fadein .5s;
-      -moz-animation: fadein .5s;
-      -ms-animation: fadein .5s;
-      -o-animation: fadein .5s;
-      animation: fadein .5s; }
-    .navtree .tree .drop-hover > .row {
-      background: #faebd7; }
+  .navtree .tree .tree-item.sortable-error {
+    border-color: transparent;
+    background: #fbe3e4; }
+  .navtree .tree .tree-item.opened > ul {
+    display: block; }
+  .navtree .tree .tree-item.closed > ul {
+    display: none; }
+  .navtree .tree .highliglted-parent > .tree-row {
+    background: #f9f9f9; }
+  .navtree .tree .sortable-item-placeholder {
+    background: #f5f5f5;
+    height: 33px; }
+  .navtree .tree .placeholder {
+    background-color: #ebeef0;
+    -webkit-animation: fadein .5s;
+    -moz-animation: fadein .5s;
+    -ms-animation: fadein .5s;
+    -o-animation: fadein .5s;
+    animation: fadein .5s; }
+  .navtree .tree .drop-hover > .row {
+    background: #faebd7; }
 
 /*doc
 ---
