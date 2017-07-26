@@ -101,6 +101,10 @@ class CControllerDashbrdWidgetConfig extends CController {
 						case WIDGET_FIELD_SELECT_RES_SYSMAP:
 							$captions['simple'][$resource_type][$id] = _('Inaccessible map');
 							break;
+
+						case WIDGET_FIELD_SELECT_RES_GRAPH:
+							$captions['simple'][$resource_type][$id] = _('Inaccessible graph');
+							break;
 					}
 				}
 			}
@@ -153,7 +157,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 						foreach ($graphs as $key => $graph) {
 							order_result($graph['hosts'], 'name');
 							$graph['host'] = reset($graph['hosts']);
-							$captions[$resource][$graph['graphid']] = $graph['host']['name'].NAME_DELIMITER.$graph['name'];
+							$list[$graph['graphid']] = $graph['host']['name'].NAME_DELIMITER.$graph['name'];
 						}
 					}
 					break;
