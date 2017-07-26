@@ -22,56 +22,24 @@
 /**
  * Class for Dashboard Plain-text widget view.
  */
-class CControllerWidgetPlainTextView extends CController {
+class CControllerWidgetPlainTextView extends CControllerWidget {
 
 	// Widget's configuration form.
 	private $form;
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_PLAIN_TEXT);
+		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'array',
 			'dynamic_hostid' => 'db hosts.hostid'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			/*
-			 * @var array  $fields
-			 * @var int    $fields['itemid']
-			 * @var int	   $fields['show_lines']
-			 * @var int    $fields['style']        (optional) in (0,1)
-			 * @var int    $fields['dynamic']      (optional) in (WIDGET_SIMPLE_ITEM,WIDGET_DYNAMIC_ITEM)
-			 */
-
-			$this->form = CWidgetConfig::getForm(WIDGET_PLAIN_TEXT, $this->getInput('fields', []));
-
-			if ($this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->form->getFieldsData();
-
-		$name = CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT];
+		$fields = $this->getForm()->getFieldsData();
 		$error = null;
 
 		$default_values = [
@@ -98,7 +66,12 @@ class CControllerWidgetPlainTextView extends CController {
 		}
 
 		// Resolve item name.
-		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($fields['itemid'])]);
+		if ($fields['itemid']) {
+			$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($fields['itemid'])]);
+		}
+		else {
+			$items = [];
+		}
 
 		// Select item history data.
 		if (($item = reset($items)) !== false) {
