@@ -19,31 +19,50 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
-
-class CControllerWidgetDataOverView extends CControllerWidget {
+class CControllerDashbrdWidgetCheck extends CController {
 
 	public function __construct() {
 		parent::__construct();
+	}
 
-		$this->setType(WIDGET_DATA_OVERVIEW);
-		$this->setValidationRules([
+	protected function checkInput() {
+		$fields = [
+			'type' =>	'string|required',
 			'name' =>	'string',
-			'fields' =>	'array'
-		]);
+			'fields' =>	'array',
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', []));
+
+			if ($errors = $form->validate()) {
+				foreach ($errors as $msg) {
+					error($msg);
+				}
+
+				$ret = false;
+			}
+		}
+
+		if (!$ret) {
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions() {
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
-
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'groupids' => getSubGroups($fields['groupids']),
-			'application' => $fields['application'],
-			'style' => $fields['style'],
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		]));
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([])]));
 	}
 }

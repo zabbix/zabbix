@@ -69,7 +69,8 @@ class CNavigationWidgetForm extends CWidgetForm {
 				// TODO VM: make defualt value 0
 				if (array_key_exists('mapid.'.$item_id, $data) && $data['mapid.'.$item_id]) {
 					$field_mapid = (new CWidgetFieldHidden('mapid.'.$item_id, ZBX_WIDGET_FIELD_TYPE_MAP))
-						->setValue($data['mapid.'.$item_id]);
+						->setValue($data['mapid.'.$item_id])
+						->setDefault(0);
 					$this->fields[] = $field_mapid;
 				}
 			}

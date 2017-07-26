@@ -450,7 +450,11 @@ function getActionOperationDescriptions(array $actions, $type) {
 			}
 		}
 		else {
-			foreach ($action['recovery_operations'] as $j => $operation) {
+			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
+				? 'recovery_operations'
+				: 'ack_operations';
+
+			foreach ($action[$operations_key] as $j => $operation) {
 				$result[$i][$j] = [];
 
 				switch ($operation['operationtype']) {
@@ -716,7 +720,11 @@ function getActionOperationDescriptions(array $actions, $type) {
 			}
 		}
 		else {
-			foreach ($action['recovery_operations'] as $j => $operation) {
+			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
+				? 'recovery_operations'
+				: 'ack_operations';
+
+			foreach ($action[$operations_key] as $j => $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$media_type = _('all media');
@@ -807,6 +815,10 @@ function getActionOperationDescriptions(array $actions, $type) {
 						$result[$i][$j][] = bold(
 							_('Notify all who received any messages regarding the problem before')
 						);
+						break;
+
+					case OPERATION_TYPE_ACK_MESSAGE:
+						$result[$i][$j][] = bold(_('Notify all who left acknowledgement and comments'));
 						break;
 				}
 			}
@@ -930,6 +942,27 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 							italic(zbx_nl2br($operation['opcommand']['command']))
 						];
 				}
+				break;
+
+			case OPERATION_TYPE_ACK_MESSAGE:
+				$opmessage = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
+
+				if (array_key_exists('default_msg', $opmessage) && $opmessage['default_msg']) {
+					$subject = $defaultMessage['subject'];
+					$message = $defaultMessage['message'];
+				}
+				else {
+					$opmessage += [
+						'subject'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+						'message'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+					];
+
+					$subject = $opmessage['subject'];
+					$message = $opmessage['message'];
+				}
+
+				$result[$key][] = [bold($subject), BR(), BR(), zbx_nl2br($message)];
+				break;
 		}
 	}
 
@@ -1018,6 +1051,11 @@ function getAllowedOperations($eventsource) {
 				OPERATION_TYPE_MESSAGE,
 				OPERATION_TYPE_COMMAND,
 				OPERATION_TYPE_RECOVERY_MESSAGE
+			],
+			ACTION_ACKNOWLEDGE_OPERATION => [
+				OPERATION_TYPE_MESSAGE,
+				OPERATION_TYPE_COMMAND,
+				OPERATION_TYPE_ACK_MESSAGE
 			]
 		];
 	}
@@ -1076,7 +1114,8 @@ function operation_type2str($type = null) {
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
-		OPERATION_TYPE_RECOVERY_MESSAGE => _('Send recovery message')
+		OPERATION_TYPE_RECOVERY_MESSAGE => _('Send recovery message'),
+		OPERATION_TYPE_ACK_MESSAGE => _('Notify all who left acknowledgement and comments')
 	];
 
 	if (is_null($type)) {
@@ -1602,6 +1641,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 		' FROM alerts a'.
 		' WHERE '.dbConditionInt('a.eventid', array_keys($eventids)).
 			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+			' AND a.acknowledgeid IS NULL'.
 		' ORDER BY a.alertid DESC'
 	);
 

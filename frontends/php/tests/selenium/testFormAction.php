@@ -32,7 +32,11 @@ class testFormAction extends CWebTest {
 	public static function layout() {
 		return [
 			[
-				['eventsource' => 'Triggers']
+				[
+					'eventsource' => 'Triggers',
+					'recovery_msg' => true,
+					'acknowledge_msg' => true
+				]
 			],
 			[
 				[
@@ -438,7 +442,6 @@ class testFormAction extends CWebTest {
 			]
 		];
 	}
-
 
 	/**
 	 * @dataProvider layout
@@ -1541,9 +1544,10 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'cancel_new_operation')]");
 		}
 
-		if (isset($data['recovery_msg'])) {
+		if (array_key_exists('recovery_msg', $data)) {
 			$this->zbxTestTabSwitch('Recovery operations');
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('r_shortdata'));
+			$recovery_msg = $data['recovery_msg'];
 		}
 		else {
 			$recovery_msg = false;
@@ -1599,6 +1603,48 @@ class testFormAction extends CWebTest {
 		else {
 			$this->zbxTestAssertElementNotPresentId('r_shortdata');
 			$this->zbxTestAssertElementNotPresentId('r_longdata');
+		}
+
+		if (array_key_exists('acknowledge_msg', $data)) {
+			$this->zbxTestTabSwitch('Acknowledgement operations');
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('ack_shortdata'));
+			$acknowledge_msg = $data['acknowledge_msg'];
+		}
+		else {
+			$acknowledge_msg = false;
+		}
+
+		if ($eventsource == 'Triggers') {
+			$this->zbxTestAssertElementPresentId('tab_acknowledgeTab');
+		}
+		else {
+			$this->zbxTestTextNotPresent('Acknowledgement operations');
+			$this->zbxTestAssertElementNotPresentId('tab_acknowledgeTab');
+		}
+
+		if ($acknowledge_msg == true) {
+			$this->zbxTestTextPresent('Default subject');
+			$this->zbxTestAssertVisibleId('ack_shortdata');
+			$this->zbxTestAssertAttribute("//input[@id='ack_shortdata']", 'maxlength', 255);
+			$this->zbxTestAssertAttribute("//input[@id='ack_shortdata']", 'size', 20);
+			$this->zbxTestAssertElementValue('ack_shortdata', 'Acknowledged: {TRIGGER.NAME}');
+
+			$this->zbxTestTextPresent('Default message');
+			$this->zbxTestAssertVisibleId('ack_longdata');
+			$this->zbxTestAssertAttribute("//textarea[@id='ack_longdata']", 'rows', 7);
+			$ack_longdata_val = '{USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME}'.
+						' with the following message:'.
+						' {ACK.MESSAGE}'.
+						' Current problem status is {EVENT.STATUS}';
+			$this->zbxTestAssertElementText('//textarea[@id="ack_longdata"]', $ack_longdata_val);
+		}
+		elseif ($eventsource == 'Triggers') {
+			$this->zbxTestAssertNotVisibleId('ack_shortdata');
+			$this->zbxTestAssertNotVisibleId('ack_longdata');
+		}
+		else {
+			$this->zbxTestAssertElementNotPresentId('ack_shortdata');
+			$this->zbxTestAssertElementNotPresentId('ack_longdata');
 		}
 
 		$this->zbxTestAssertVisibleId('add');

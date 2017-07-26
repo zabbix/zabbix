@@ -297,7 +297,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	if (FAIL == zbx_ipc_socket_open(&alerter_socket, ZBX_IPC_SERVICE_ALERTER, 10, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to alerter service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to alert manager service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -336,7 +336,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read alerter service request");
+			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
 			exit(EXIT_FAILURE);
 		}
 

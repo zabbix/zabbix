@@ -403,13 +403,13 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 			else {
-				if (!array_key_exists('jmx_endpoint', $fullItem) && $update) {
-					$item['jmx_endpoint'] = '';
-				}
-				if (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] !== '') {
+				if (array_key_exists('jmx_endpoint', $item) && $item['jmx_endpoint'] !== '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('should be empty'))
 					);
+				}
+				elseif (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] !== '') {
+					$item['jmx_endpoint'] = '';
 				}
 			}
 

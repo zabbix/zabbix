@@ -325,6 +325,9 @@ function getMenuPopupMap(options) {
 				url.setArgument('filter_triggerids[]', options.gotos.events.triggerids);
 				url.setArgument('filter_set', '1');
 				url.unsetArgument('sid');
+				if (typeof options.gotos.events.severity_min !== 'undefined') {
+					url.setArgument('filter_severity', options.gotos.events.severity_min);
+				}
 
 				events.url = url.getUrl();
 			}

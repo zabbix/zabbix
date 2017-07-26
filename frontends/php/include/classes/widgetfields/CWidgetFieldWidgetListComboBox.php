@@ -64,4 +64,12 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 				'});'.
 			'}';
 	}
+
+	public function setValue($value) {
+		if ($value === '' || ctype_alnum($value)) {
+			$this->value = $value;
+		}
+
+		return $this;
+	}
 }

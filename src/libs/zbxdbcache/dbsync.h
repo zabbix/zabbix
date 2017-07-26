@@ -125,6 +125,7 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync);

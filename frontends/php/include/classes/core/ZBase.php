@@ -383,7 +383,7 @@ class ZBase {
 		// Controller returned data
 		if ($response instanceof CControllerResponseData) {
 			// if no view defined we pass data directly to layout
-			if ($router->getView() === null) {
+			if ($router->getView() === null || !$response->isViewEnabled()) {
 				$layout = new CView($router->getLayout(), $response->getData());
 				echo $layout->getOutput();
 			}

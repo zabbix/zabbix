@@ -22,20 +22,18 @@
 /**
  * Latest problems widget form
  */
-class CProblemsWidgetForm extends CWidgetForm
-{
-	public function __construct($data)
-	{
+class CProblemsWidgetForm extends CWidgetForm {
+
+	public function __construct($data) {
 		parent::__construct($data);
 
-		$shows = [
+		// Show
+		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [
 			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problems'),
 			TRIGGERS_OPTION_IN_PROBLEM => _('Problems'),
 			TRIGGERS_OPTION_ALL => _('History')
-		];
-
-		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), $shows))
-			->setDefault(TRIGGERS_OPTION_IN_PROBLEM)
+		]))
+			->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
 			->setModern(true);
 
 		if (array_key_exists('show', $data)) {
@@ -43,6 +41,7 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_show;
 
+		// Host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $data)) {
@@ -50,6 +49,7 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_groups;
 
+		// Exclude host groups
 		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'));
 
 		if (array_key_exists('exclude_groupids', $data)) {
@@ -57,6 +57,7 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_exclude_groups;
 
+		// Hosts
 		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
 
 		if (array_key_exists('hostids', $data)) {
@@ -64,6 +65,7 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_hosts;
 
+		// Problem
 		$field_problem = new CWidgetFieldTextBox('problem', _('Problem'));
 
 		if (array_key_exists('problem', $data)) {
@@ -71,6 +73,7 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_problem;
 
+		// Severity
 		$field_severities = new CWidgetFieldSeverities('severities', _('Severity'));
 
 		if (array_key_exists('severities', $data)) {
@@ -78,6 +81,7 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_severities;
 
+		// Show hosts in maintenance
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
 			->setDefault(1);
 
@@ -86,6 +90,7 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_maintenance;
 
+		// Show unacknowledged only
 		$field_unacknowledged = new CWidgetFieldCheckBox('unacknowledged', _('Show unacknowledged only'));
 
 		if (array_key_exists('unacknowledged', $data)) {
@@ -93,7 +98,8 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_unacknowledged;
 
-		$sort_types = [
+		// Sort entries by
+		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity').' ('._('descending').')',
@@ -102,9 +108,7 @@ class CProblemsWidgetForm extends CWidgetForm
 			SCREEN_SORT_TRIGGERS_NAME_ASC => _('Problem').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_DESC => _('Host').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host').' ('._('ascending').')'
-		];
-
-		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types))
+		]))
 			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
 		if (array_key_exists('sort_triggers', $data)) {
@@ -112,6 +116,7 @@ class CProblemsWidgetForm extends CWidgetForm
 		}
 		$this->fields[] = $field_sort;
 
+		// Show lines
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
 		))->setDefault(ZBX_DEFAULT_WIDGET_LINES);

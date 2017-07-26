@@ -48,9 +48,10 @@ class CMapHelper {
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
+				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls', 'permission'
 			],
-			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
+			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
+				'permission'],
 			'selectUrls' => ['sysmapurlid', 'name', 'url'],
 			'sysmapids' => $sysmapids,
 			'expandUrls' => true,
@@ -85,7 +86,12 @@ class CMapHelper {
 			];
 		}
 		else {
-			$map['severity_min'] = array_key_exists('severity_min', $options) ? $options['severity_min'] : null;
+			if (array_key_exists('severity_min', $options)) {
+				$map['severity_min'] = $options['severity_min'];
+			}
+			else {
+				$options['severity_min'] = $map['severity_min'];
+			}
 
 			self::resolveMapState($map, $options, $theme);
 		}
@@ -140,9 +146,27 @@ class CMapHelper {
 		add_elementNames($sysmap['selements']);
 
 		foreach ($sysmap['selements'] as $id => $element) {
-			$map_info[$id]['name'] = ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
-				? _('Image')
-				: $element['elements'][0]['elementName'];
+			switch ($element['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_IMAGE:
+					$map_info[$id]['name'] = _('Image');
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					// Skip inaccessible elements.
+					$selements_accessible = array_filter($element['elements'], function($elmn) {
+						return array_key_exists('elementName', $elmn);
+					});
+					if (($selements_accessible = reset($selements_accessible)) !== false) {
+						$map_info[$id]['name'] = $selements_accessible['elementName'];
+					} else {
+						$map_info[$id]['name'] = '';
+					}
+					break;
+
+				default:
+					$map_info[$id]['name'] = $element['elements'][0]['elementName'];
+					break;
+			}
 		}
 
 		$labels = getMapLabels($sysmap, $map_info, true);
@@ -223,9 +247,6 @@ class CMapHelper {
 
 				$link['color'] = $color;
 				$link['drawtype'] = $drawtype;
-			}
-			else {
-				$link['label'] = '';
 			}
 		}
 		unset($link);

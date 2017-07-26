@@ -44,6 +44,22 @@
 ?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="edit_dashboard_control">
+<?= (new CSpan([
+	new CList([
+		(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
+		(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
+			->addClass(ZBX_STYLE_BTN_ALT),
+		(new CButton('dashbrd-save', _('Save changes'))),
+		(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
+		''
+	])
+]))
+	->addClass(ZBX_STYLE_DASHBRD_EDIT)
+	->toString()
+?>
+</script>
+
 <script type="text/javascript">
 	// Change dashboard settings
 	function dashbrd_config() {
@@ -75,59 +91,15 @@
 	};
 
 	var showEditMode = function showEditMode() {
-		var edit_button = jQuery('#dashbrd-edit');
-		var btn_conf = jQuery('<button>')
-			.addClass('<?= ZBX_STYLE_BTN_DASHBRD_CONF ?>')
-			.attr('id', 'dashbrd-config')
-			.attr('type', 'button')
-			.click(dashbrd_config);
+		jQuery('#dashbrd-edit').closest('ul')
+			.hide()
+			.before(jQuery('#edit_dashboard_control').html())
 
-		var btn_add = jQuery('<button>')
-			.addClass('<?= ZBX_STYLE_BTN_ALT ?>')
-			.attr('id', 'dashbrd-add-widget')
-			.attr('type', 'button')
-			.append(
-				jQuery('<span>').addClass('<?= ZBX_STYLE_PLUS_ICON ?>'),
-				'<?= _('Add widget') ?>'
-			)
-			.click(dashbrd_add_widget);
-
-		var btn_save = jQuery('<button>')
-			.attr('id', 'dashbrd-save')
-			.attr('type', 'button')
-			.append('<?= _('Save changes') ?>')
-			.click(dashbrd_save_changes);
-
-		var btn_cancel = jQuery('<a>')
-			.attr('href', '#') // needed for button to be styled like link
-			.append('<?= _('Cancel') ?>')
-			.click(dashbrd_cancel);
-
-		var btn_edit_disabled = jQuery('<button>')
-			.attr('disabled', 'disabled')
-			.attr('type', 'button')
-			.append('<?= _('Edit dashboard') ?>');
-
-		edit_button.closest('li').hide();
-		jQuery('#groupid', edit_button.closest('ul')).closest('li').hide();
-		jQuery('#hostid', edit_button.closest('ul')).closest('li').hide();
-		jQuery('#dashbrd-actions').closest('li').hide();
-		// hidding fulscreen button in all states
-		jQuery('.btn-max').closest('li').hide();
-		jQuery('.btn-min').closest('li').hide();
-
-		edit_button.closest('ul').before(
-			jQuery('<span>')
-				.addClass('<?= ZBX_STYLE_DASHBRD_EDIT ?>')
-				.append(jQuery('<ul>')
-					.append(jQuery('<li>').append(btn_conf))
-					.append(jQuery('<li>').append(btn_add))
-					.append(jQuery('<li>').append(btn_save))
-					.append(jQuery('<li>').append(btn_cancel))
-					.append(jQuery('<li>'))
-					.append(jQuery('<li>').append(btn_edit_disabled))
-				)
-		);
+		var ul = jQuery('#dashbrd-config').closest('ul');
+		jQuery('#dashbrd-config', ul).click(dashbrd_config),
+		jQuery('#dashbrd-add-widget', ul).click(dashbrd_add_widget),
+		jQuery('#dashbrd-save', ul).click(dashbrd_save_changes),
+		jQuery('#dashbrd-cancel', ul).click(dashbrd_cancel),
 
 		// Update buttons on existing widgets to edit mode
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');

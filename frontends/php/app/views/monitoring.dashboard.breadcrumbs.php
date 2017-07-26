@@ -20,11 +20,8 @@
 
 
 $url_list = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.list');
-
-if ($data['fullscreen']) {
-	$url_list->setArgument('fullscreen', '1');
-}
+	->setArgument('action', 'dashboard.list')
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $breadcrumbs = [
 	(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
@@ -33,10 +30,9 @@ $breadcrumbs = [
 if ($data['dashboard']['dashboardid'] != 0) {
 	$url_view = (new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.view')
-		->setArgument('dashboardid', $data['dashboard']['dashboardid']);
-	if ($data['fullscreen']) {
-		$url_view->setArgument('fullscreen', '1');
-	}
+		->setArgument('dashboardid', $data['dashboard']['dashboardid'])
+		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+
 	$breadcrumbs[] = '/';
 	$breadcrumbs[] = (new CSpan())
 		->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl()))
