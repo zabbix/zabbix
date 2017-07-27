@@ -1755,21 +1755,33 @@ static int	DBpatch_3030142(void)
 
 static int	DBpatch_3030143(void)
 {
-	const ZBX_FIELD	field = {"master_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+	const ZBX_FIELD field = {"maxsessions", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	return DBadd_field("items", &field);
+	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_3030144(void)
 {
-	return DBcreate_index("items", "items_7", "master_itemid", 0);
+	const ZBX_FIELD field = {"maxattempts", "3", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_3030145(void)
 {
-	const ZBX_FIELD	field = {"master_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD field = {"attempt_interval", "10s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_foreign_key("items", 5, &field);
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_3030146(void)
+{
+	return DBdrop_index("alerts", "alerts_4");
+}
+
+static int	DBpatch_3030147(void)
+{
+	return DBcreate_index("alerts", "alerts_4", "status", 0);
 }
 
 static int	DBpatch_3030148(void)
@@ -2105,6 +2117,25 @@ static int	DBpatch_3030183(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_3030184(void)
+{
+	const ZBX_FIELD	field = {"master_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3030185(void)
+{
+	return DBcreate_index("items", "items_7", "master_itemid", 0);
+}
+
+static int	DBpatch_3030186(void)
+{
+	const ZBX_FIELD	field = {"master_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("items", 5, &field);
+}
 #endif
 
 DBPATCH_START(3030)
@@ -2256,6 +2287,8 @@ DBPATCH_ADD(3030142, 0, 1)
 DBPATCH_ADD(3030143, 0, 1)
 DBPATCH_ADD(3030144, 0, 1)
 DBPATCH_ADD(3030145, 0, 1)
+DBPATCH_ADD(3030146, 0, 1)
+DBPATCH_ADD(3030147, 0, 1)
 DBPATCH_ADD(3030148, 0, 1)
 DBPATCH_ADD(3030149, 0, 1)
 DBPATCH_ADD(3030150, 0, 1)
@@ -2292,5 +2325,8 @@ DBPATCH_ADD(3030180, 0, 1)
 DBPATCH_ADD(3030181, 0, 1)
 DBPATCH_ADD(3030182, 0, 1)
 DBPATCH_ADD(3030183, 0, 1)
+DBPATCH_ADD(3030184, 0, 1)
+DBPATCH_ADD(3030185, 0, 1)
+DBPATCH_ADD(3030186, 0, 1)
 
 DBPATCH_END()
