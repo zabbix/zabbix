@@ -50,7 +50,11 @@ var timeControl = {
 				loadImage: 0,
 				loadScroll: 0,
 				mainObject: 0, // object on changing will reflect on all others
-				sliderMaximumTimePeriod: null // max period in seconds
+				sliderMaximumTimePeriod: null, // max period in seconds
+				profile: { // if values are not null, will save fixedperiod state here, on change
+					idx: null,
+					idx2: null
+				}
 			};
 
 			for (var key in this.objectList[id]) {
@@ -115,7 +119,7 @@ var timeControl = {
 					width = 600;
 				}
 
-				this.scrollbar = new CScrollBar(width, obj.periodFixed, obj.sliderMaximumTimePeriod);
+				this.scrollbar = new CScrollBar(width, obj.periodFixed, obj.sliderMaximumTimePeriod, obj.profile);
 				this.scrollbar.onchange = this.objectUpdate.bind(this);
 			}
 		}
@@ -451,6 +455,7 @@ var CTimeLine = Class.create({
 var CScrollBar = Class.create({
 
 	ghostBox:		null, // ghost box object
+	profile:		null, // if values are not null, will save fixedperiod state here, on change
 	clndrLeft:		null, // calendar object left
 	clndrRight:		null, // calendar object right
 	px2sec:			null, // seconds in pixel
@@ -506,10 +511,11 @@ var CScrollBar = Class.create({
 	disabled:		1,		// activates/disables scrollbars
 	maxperiod:		null,	// max period in seconds
 
-	initialize: function(width, fixedperiod, maximalPeriod) {
+	initialize: function(width, fixedperiod, maximalPeriod, profile) {
 		try {
 			this.fixedperiod = (fixedperiod == 1) ? 1 : 0;
 			this.maxperiod = maximalPeriod;
+			this.profile = profile;
 
 			// create scrollbar
 			this.scrollCreate(width);
@@ -979,12 +985,30 @@ var CScrollBar = Class.create({
 
 		this.fixedperiod = (this.fixedperiod == 1) ? 0 : 1;
 
-		// sending fixed/dynamic setting to server to save in a profile
-		sendAjaxData(location.href, {
-			data: {
+		var url = location.href,
+			ajax_data = {
 				favobj: 'timelinefixedperiod',
 				favid: this.fixedperiod
+			};
+
+		// If we know profile entry, that should be updated, update it directly
+		if (isset('idx', this.profile) && !is_null(this.profile.idx)) {
+			var url = new Curl('zabbix.php');
+			url.setArgument('action', 'profile.update');
+			url = url.getUrl();
+
+			ajax_data = {
+				idx: this.profile.idx + '.timelinefixed',
+				value_int: this.fixedperiod
+			};
+			if (isset('idx2', this.profile) && !is_null(this.profile.idx2)) {
+				ajax_data.idx2 = [this.profile.idx2];
 			}
+		}
+
+		// sending fixed/dynamic setting to server to save in a profile
+		sendAjaxData(url, {
+			data: ajax_data
 		});
 
 		this.dom.period_state.innerHTML = this.fixedperiod ? locale['S_FIXED_SMALL'] : locale['S_DYNAMIC_SMALL'];

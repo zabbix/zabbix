@@ -216,7 +216,7 @@ class CControllerWidgetGraphView extends CController {
 			}
 
 			$graph_src->setArgument('period', $timeline['period']);
-			$graph_src->setArgument('stime', $timeline['stimeNow']);
+			$graph_src->setArgument('stime', $timeline['stime']);
 		}
 		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 			$graph_src = '';
@@ -272,7 +272,6 @@ class CControllerWidgetGraphView extends CController {
 			$graph_src->setArgument('legend', $graph['show_legend']);
 			$graph_src->setArgument('period', $timeline['period']);
 			$graph_src->setArgument('stime', $timeline['stime']);
-//			$graph_src->setArgument('stime', ($timeline['isNow'] ? $timeline['stimeNow'] : $timeline['stime']));
 
 			if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 				$graph_src->setArgument('graph3d', $graph['show_3d']);

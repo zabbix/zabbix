@@ -71,6 +71,7 @@ class CControllerProfileUpdate extends CController {
 
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
+				case 'web.dashbrd.timelinefixed':
 				case 'web.dashbrd.navtree.item.selected':
 				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 					$ret = $this->hasInput('idx2');
@@ -100,6 +101,7 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			case 'web.latest.toggle':
 			case 'web.latest.toggle_other':
+			case 'web.dashbrd.timelinefixed':
 			case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));
