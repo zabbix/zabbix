@@ -53,13 +53,13 @@ class testPageDashboard extends CWebTest {
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No data found.');
+					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 				case 'guest';
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No data found.');
+					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 			}
 			if ($user != 'super-admin'){
