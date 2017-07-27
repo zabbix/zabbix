@@ -64,9 +64,10 @@ class CDashboardWidgetMap extends CDiv {
 			&& $this->initial_load
 		) {
 			$script_run .=
-				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerDataExchange\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.
-					'source_widget_reference: "'.$this->filter_widget_reference.'",'.
+					'linkedto: "'.$this->filter_widget_reference.'",'.
+					'data_name: "selected_mapid",'.
 					'callback: function(widget, data) {'.
 						'if(data[0].mapid !== +data[0].mapid) return;'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.

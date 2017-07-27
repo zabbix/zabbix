@@ -31,7 +31,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'initial_load' =>		'in 0,1',
 			'edit_mode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
-			'fields' =>				'array',
+			'fields' =>				'json',
 			'dynamic_hostid' =>		'db hosts.hostid',
 			'content_width' =>		'int32',
 			'content_height' =>		'int32',

@@ -33,32 +33,34 @@ class CGraphWidgetForm extends CWidgetForm {
 			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
 			->setAction('updateWidgetConfigDialogue()')
 			->setModern(true);
-		if (array_key_exists('source_type', $data)) {
-			$field_source->setValue($data['source_type']);
+		if (array_key_exists('source_type', $this->data)) {
+			$field_source->setValue($this->data['source_type']);
 		}
 		$this->fields[] = $field_source;
 
-		if (array_key_exists('source_type', $data) && $data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+		if (array_key_exists('source_type', $this->data)
+				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH)
+		{
 			// Item field
 			$field_item = new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM);
-			if (array_key_exists('itemid', $data)) {
-				$field_item->setValue($data['itemid']);
+			if (array_key_exists('itemid', $this->data)) {
+				$field_item->setValue($this->data['itemid']);
 			}
 			$this->fields[] = $field_item;
 		}
 		else {
 			// Select graph field
 			$field_graph = (new CWidgetFieldSelectResource('graphid', _('Graph'), WIDGET_FIELD_SELECT_RES_GRAPH));
-			if (array_key_exists('graphid', $data)) {
-				$field_graph->setValue($data['graphid']);
+			if (array_key_exists('graphid', $this->data)) {
+				$field_graph->setValue($this->data['graphid']);
 			}
 			$this->fields[] = $field_graph;
 		}
 
 		// Dynamic item
 		$field_dynamic = (new CWidgetFieldCheckbox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
-		if (array_key_exists('dynamic', $data)) {
-			$field_dynamic->setValue($data['dynamic']);
+		if (array_key_exists('dynamic', $this->data)) {
+			$field_dynamic->setValue($this->data['dynamic']);
 		}
 		else {
 			$field_dynamic->setValue(false);

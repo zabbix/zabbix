@@ -299,6 +299,20 @@ if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $
 	exit;
 }
 
+if (in_array('prototype.js', $files)) {
+	// This takes care of the Array toJSON incompatibility with JSON.stringify.
+	$js .=
+		'var _json_stringify = JSON.stringify;'.
+		'JSON.stringify = function(value) {'.
+			'var _array_tojson = Array.prototype.toJSON,'.
+				'ret;'.
+			'delete Array.prototype.toJSON;'.
+			'ret = _json_stringify(value);'.
+			'Array.prototype.toJSON = _array_tojson;'.
+			'return ret;'.
+		'};';
+}
+
 header('Content-type: text/javascript; charset=UTF-8');
 // breaks if "zlib.output_compression = On"
 // header('Content-length: '.$jsLength);

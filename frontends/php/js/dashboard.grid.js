@@ -445,8 +445,8 @@
 			ajax_data['name'] = widget['header'];
 		}
 		// display widget with yet unsaved changes
-		if (typeof widget['fields'] !== 'undefined') {
-			ajax_data['fields'] = widget['fields'];
+		if (typeof widget['fields'] !== 'undefined' && Object.keys(widget['fields']).length != 0) {
+			ajax_data['fields'] = JSON.stringify(widget['fields']);
 		}
 		if (typeof(widget['dynamic']) !== 'undefined') {
 			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
@@ -507,6 +507,9 @@
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
 				}
+
+				widget['ready'] = true;
+				methods.registerDataExchangeCommit.call($obj);
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
@@ -528,31 +531,34 @@
 		var	url = new Curl('zabbix.php'),
 			fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
-			name = fields['name'];
+			name = fields['name'],
+			ajax_data = {
+				type: type,
+				name: name
+			};
 
 		delete fields['type'];
 		delete fields['name'];
 
 		url.setArgument('action', 'dashbrd.widget.check');
 
+		if (Object.keys(fields).length != 0) {
+			ajax_data['fields'] = JSON.stringify(fields);
+		}
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
-			data: {
-				type: type,
-				name: name,
-				fields: fields
-			},
+			data: ajax_data,
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
-					// Error returned
-					// Remove previous errors
+					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
 				}
 				else {
-					// No errors, proceed with update
+					// No errors, proceed with update.
 					overlayDialogueDestroy();
 
 					if (widget === null) {
@@ -721,7 +727,7 @@
 		var	url = new Curl('zabbix.php'),
 			ajax_widgets = [];
 
-		// Remove previous messages
+		// Remove previous messages.
 		dashboardRemoveMessages();
 
 		url.setArgument('action', 'dashbrd.widget.update');
@@ -730,12 +736,14 @@
 			var	ajax_widget = {};
 
 			if (widget['widgetid'] !== '') {
-				ajax_widget.widgetid = widget['widgetid'];
+				ajax_widget['widgetid'] = widget['widgetid'];
 			}
 			ajax_widget['pos'] = widget['pos'];
 			ajax_widget['type'] = widget['type'];
 			ajax_widget['name'] = widget['header'];
-			ajax_widget['fields'] = widget['fields'];
+			if (Object.keys(widget['fields']).length != 0) {
+				ajax_widget['fields'] = JSON.stringify(widget['fields']);
+			}
 
 			ajax_widgets.push(ajax_widget);
 		});
@@ -753,16 +761,18 @@
 			dataType: 'json',
 			data: ajax_data,
 			success: function(resp) {
-				// we can have redirect with errors
+				// We can have redirect with errors.
 				if ('redirect' in resp) {
-					// There are no more unsaved changes
+					// There are no more unsaved changes.
 					data['options']['updated'] = false;
-					// Replace add possibility to remove previous url (as ..&new=1) from the document history
-					// it allows to use back browser button more user-friendly
+					/*
+					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
+					 * It allows to use back browser button more user-friendly.
+					 */
 					window.location.replace(resp.redirect);
 				}
 				else if ('errors' in resp) {
-					// Error returned
+					// Error returned.
 					dashbaordAddMessages(resp.errors);
 				}
 			},
@@ -921,6 +931,12 @@
 					widget_defaults: {},
 					triggers: {},
 					placeholder: $placeholder,
+					widget_relation_submissions: [],
+					widget_relations: {
+						relations: [],
+						tasks: {}
+					},
+					tmp_data_buffer: [],
 					data_buffer: []
 				});
 
@@ -979,6 +995,7 @@
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
 				'initial_load': true,
+				'ready': false,
 				'fields': {},
 				'storage': {}
 			}, widget);
@@ -1126,8 +1143,10 @@
 			});
 		},
 
-		// Add or update form on widget configuration dialogue
-		// (when opened, as well as when requested by 'onchange' attributes in form itself)
+		/*
+		 * Add or update form on widget configuration dialogue (when opened, as well as when requested by 'onchange'
+		 * attributes in form itself).
+		 */
 		updateWidgetConfigDialogue: function() {
 			return this.each(function() {
 				var	$this = $(this),
@@ -1137,35 +1156,39 @@
 					form = $('form', body),
 					widget = data.dialogue['widget'], // widget currently beeing edited
 					url = new Curl('zabbix.php'),
-					ajax_data = {};
+					ajax_data = {},
+					fields;
 
-				// disable saving, while form is beeing updated
+				// Disable saving, while form is beeing updated.
 				$('.dialogue-widget-save', footer).prop('disabled', true);
 
 				url.setArgument('action', 'dashbrd.widget.config');
 
 				// Don't send on "Add widget" or on "Edit widget", if widget was not saved yet
 				if (widget !== null && widget['widgetid'] !== '') {
-					ajax_data.widgetid = widget['widgetid'];
+					ajax_data['widgetid'] = widget['widgetid'];
 				}
 
 				if (form.length) {
-					// Take values from form
-					ajax_data.fields = form.serializeJSON();
-					ajax_data.type = ajax_data['fields']['type'];
-					ajax_data.name = ajax_data['fields']['name'];
-					delete ajax_data['fields']['type'];
-					delete ajax_data['fields']['name'];
+					// Take values from form.
+					fields = form.serializeJSON();
+					ajax_data['type'] = fields['type'];
+					ajax_data['name'] = fields['name'];
+					delete fields['type'];
+					delete fields['name'];
 				}
 				else if (widget !== null) {
-					// Open form with current config
-					ajax_data.type = widget['type'];
-					ajax_data.name = widget['header'];
-					ajax_data.fields = widget['fields'];
+					// Open form with current config.
+					ajax_data['type'] = widget['type'];
+					ajax_data['name'] = widget['header'];
+					fields = widget['fields'];
 				}
 				else {
-					// Get default config for new widget
-					ajax_data.fields = [];
+					// Get default config for new widget.
+					fields = {};
+				}
+				if (Object.keys(fields).length != 0) {
+					ajax_data['fields'] = JSON.stringify(fields);
 				}
 
 				jQuery.ajax({
@@ -1183,19 +1206,19 @@
 							body.append(resp.messages);
 						}
 
-						// Change submit function for returned form
+						// Change submit function for returned form.
 						$('#widget_dialogue_form', body).on('submit', function(e) {
 							e.preventDefault();
 							updateWidgetConfig($this, data, widget);
 						});
 
-						// position dialogue in middle of screen
+						// Position dialogue in middle of screen.
 						data.dialogue['div'].css({
 							'margin-top': '-' + (data.dialogue['div'].outerHeight() / 2) + 'px',
 							'margin-left': '-' + (data.dialogue['div'].outerWidth() / 2) + 'px'
 						});
 
-						// Enable save button after sucessfull form update
+						// Enable save button after sucessfull form update.
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
@@ -1226,65 +1249,149 @@
 		},
 
 		// Register widget as data receiver shared by other widget
-		registerAsSharedDataReceiver: function(obj) {
+		registerDataExchange: function(obj) {
 			return this.each(function() {
 				var $this = $(this),
 					data = $this.data('dashboardGrid');
+				data['widget_relation_submissions'].push(obj);
+			});
+		},
 
-				for (var i = 0, l = data['widgets'].length; l > i; i++) {
-					if (data['widgets'][i]['uniqueid'] == obj.uniqueid) {
-						if (typeof data['widgets'][i]['listen_for'] === 'undefined') {
-							data['widgets'][i]['listen_for'] = [];
+		registerDataExchangeCommit: function() {
+			return this.each(function() {
+				var $this = $(this),
+					used_indexes = [],
+					data = $this.data('dashboardGrid'),
+					erase;
+
+				if (data['widget_relation_submissions'].length
+						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length
+					) {
+					$.each(data['widget_relation_submissions'], function(rel_index, relation) {
+						erase = false;
+						$.each(data['widgets'], function(index, widget) {
+							// No linked widget reference given. Just register as data receiver.
+							if (typeof relation.linkedto === 'undefined') {
+								if (typeof data['widget_relations']['tasks'][relation.uniqueid] === 'undefined') {
+									data['widget_relations']['tasks'][relation.uniqueid] = [];
+								}
+
+								data['widget_relations']['tasks'][relation.uniqueid].push({
+									data_name: relation.data_name,
+									callback: relation.callback
+								});
+								erase = true;
+							}
+							/*
+							 * Linked widget reference is given. Register two direction relationship as well as
+							 * register data receiver.
+							 */
+							else if (typeof widget['fields']['reference'] !== 'undefined'
+									&& widget['fields']['reference'] === relation.linkedto) {
+
+								if (typeof data['widget_relations']['relations'][widget.uniqueid] === 'undefined') {
+									data['widget_relations']['relations'][widget.uniqueid] = [];
+								}
+								if (typeof data['widget_relations']['relations'][relation.uniqueid] === 'undefined') {
+									data['widget_relations']['relations'][relation.uniqueid] = [];
+								}
+								if (typeof data['widget_relations']['tasks'][relation.uniqueid] === 'undefined') {
+									data['widget_relations']['tasks'][relation.uniqueid] = [];
+								}
+
+								data['widget_relations']['relations'][widget.uniqueid].push(relation.uniqueid);
+								data['widget_relations']['relations'][relation.uniqueid].push(widget.uniqueid);
+								data['widget_relations']['tasks'][relation.uniqueid].push({
+									data_name: relation.data_name,
+									callback: relation.callback
+								});
+								erase = true;
+							}
+						});
+
+						if (erase) {
+							used_indexes.push(rel_index);
 						}
-						data['widgets'][i]['listen_for'].push(obj);
+					});
+
+					for (var i = used_indexes.length - 1; i >= 0; i--) {
+						data['widget_relation_submissions'].splice(used_indexes[i], 1);
 					}
+
+					if (data['tmp_data_buffer'].length) {
+						$.each(data['tmp_data_buffer'], function(index, shared_data) {
+							methods.widgetDataShare.apply($this, shared_data);
+						});
+
+						data['tmp_data_buffer'] = [];
+					}
+
+					methods.callWidgetDataShare.call($this, false);
 				}
 			});
 		},
 
-		widgetDataShare: function(widget, data_key) {
-			var args = Array.prototype.slice.call(arguments, 2);
+		widgetDataShare: function(widget, data_name) {
+			var args = Array.prototype.slice.call(arguments, 2),
+				uniqueid = widget['uniqueid'];
 
 			if (!args.length) {
 				return false;
 			}
 
-			if (typeof widget['fields'] === 'object' && typeof widget['fields']['reference'] !== 'undefined') {
-				var reference = widget['fields']['reference'];
+			return this.each(function() {
+				var $this = $(this),
+					data = $this.data('dashboardGrid'),
+					indx = -1;
 
-				return this.each(function() {
-					var $this = $(this),
-						data = $this.data('dashboardGrid'),
-						indx = -1;
-
-					if (typeof data['data_buffer'][reference] === 'undefined') {
-						data['data_buffer'][reference] = [];
+				if (data['widgets'].filter(function(widget) {return !widget['ready']}).length) {
+					var tmp_buffer_record = [];
+					tmp_buffer_record.push(widget);
+					tmp_buffer_record.push(data_name);
+					for (var i in args) {
+						tmp_buffer_record.push(args[i]);
 					}
-					else if (typeof data['data_buffer'][reference] !== 'undefined') {
-						$.each(data['data_buffer'][reference], function(i, arr) {
-							if (arr['data_key'] === data_key) {
-								indx = i;
+					data['tmp_data_buffer'].push(tmp_buffer_record);
+				}
+				else {
+					if (typeof data['widget_relations']['relations'][uniqueid] !== 'undefined') {
+						$.each(data['widget_relations']['relations'][uniqueid], function(index, linked_uniqueid) {
+							if (typeof data['widget_relations']['tasks'][linked_uniqueid] !== 'undefined') {
+								$.each(data['widget_relations']['tasks'][linked_uniqueid], function(index, task) {
+									if (task.data_name === data_name) {
+										if (typeof data['data_buffer'][linked_uniqueid] === 'undefined') {
+											data['data_buffer'][linked_uniqueid] = [];
+										}
+										else if (typeof data['data_buffer'][linked_uniqueid] !== 'undefined') {
+											$.each(data['data_buffer'][linked_uniqueid], function(i, arr) {
+												if (arr['data_key'] === data_name) {
+													indx = i;
+												}
+											});
+										}
+
+										if (indx === -1) {
+											data['data_buffer'][linked_uniqueid].push({
+												data_name: data_name,
+												args: args,
+												old: false
+											});
+										}
+										else {
+											if (data['data_buffer'][linked_uniqueid][indx]['args'] !== args) {
+												data['data_buffer'][linked_uniqueid][indx]['args'] = args;
+												data['data_buffer'][linked_uniqueid][indx]['old'] = false;
+											}
+										}
+									}
+								});
 							}
 						});
 					}
 
-					if (indx === -1) {
-						data['data_buffer'][reference].push({
-							data_key: data_key,
-							args: args,
-							old: false
-						});
-					}
-					else {
-						if (data['data_buffer'][reference][indx]['args'] !== args) {
-							data['data_buffer'][reference][indx]['args'] = args;
-							data['data_buffer'][reference][indx]['old'] = false;
-						}
-					}
-
-					methods.callWidgetDataShare.call($(this), true);
-				});
-			}
+					methods.callWidgetDataShare.call($this, true);
+				}
+			});
 		},
 
 		callWidgetDataShare: function($obj) {
@@ -1294,27 +1401,23 @@
 				var $this = $(this),
 					data = $this.data('dashboardGrid');
 
-				for (var reference in data['data_buffer']) {
-					if (typeof data['data_buffer'][reference] === 'object') {
-						$.each(data['data_buffer'][reference], function(i, shared_data) {
+				for (var uniqueid in data['data_buffer']) {
+					if (typeof data['data_buffer'][uniqueid] === 'object') {
+						$.each(data['data_buffer'][uniqueid], function(i, shared_data) {
 							if (!shared_data['old'] || !ignore_old_data) {
-								for (var i = 0, l = data['widgets'].length; l > i; i++) {
-									if (typeof(data['widgets'][i]['listen_for']) != 'undefined') {
-										for (var t = 0, j = data['widgets'][i]['listen_for'].length; j > t; t++) {
-											var wr = data['widgets'][i]['listen_for'][t]['source_widget_reference'];
-											if (wr === reference) {
-												data['widgets'][i]['listen_for'][t].callback.apply($obj,
-													[data['widgets'][i], shared_data['args']]
-												);
-											}
+								var widget = methods.getWidgetsBy.call($this, 'uniqueid', uniqueid);
+								if (widget.length) {
+									$.each(data['widget_relations']['tasks'][uniqueid], function(index, task) {
+										if (task['data_name'] === shared_data['data_name']) {
+											task.callback.apply($obj, [widget[0], shared_data['args']]);
 										}
-									}
+									});
 								}
 							}
 							shared_data['old'] = true;
 						});
 					}
-				}
+				};
 			});
 		},
 
