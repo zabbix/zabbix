@@ -530,6 +530,55 @@ abstract class CItemGeneral extends CApiService {
 		unset($item);
 
 		$this->checkExistingItems($items);
+
+		// Validate inherited items linkage.
+		$templateids = [];
+
+		foreach ($dbHosts as $db_host) {
+			if ($db_host['status'] == HOST_STATUS_TEMPLATE) {
+				$templateids[] = $db_host['hostid'];
+			}
+		}
+
+		$templateids = array_keys(array_flip($templateids));
+		$templates = $template = API::Template()->get([
+			'output'		=> ['templateid'],
+			'templateids'	=> $templateids,
+			'selectHosts'	=> ['hostid']
+		]);
+
+		foreach ($templates as $template) {
+			if (!$template['hosts']) {
+				continue;
+			}
+
+			$hostids = zbx_objectValues($template['hosts'], 'hostid');
+			$hostids = array_keys(array_flip($hostids));
+			$all_hostids = array_merge($hostids, [$template['templateid']]);
+
+			$host_items = $this->get([
+				'output'	=> ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
+				'filter'	=> ['hostid' => $all_hostids],
+				'preservekeys'	=> true
+			]);
+
+			foreach ($items as $item) {
+				if ($update) {
+					$item += $dbItems[$item['itemid']];
+				}
+
+				if ($item['hostid'] == $template['templateid']) {
+					$item_index = array_key_exists('itemid', $item) ? $item['itemid'] : $item['key_'];
+					$host_items[$item_index] = $item;
+				}
+			}
+
+			if (validateDependentItemsIntersection($host_items, $hostids) === false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'master_itemid', _('maximum number of dependency levels reached')
+				));
+			}
+		}
 	}
 
 	/**
