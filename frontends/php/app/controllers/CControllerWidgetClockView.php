@@ -27,7 +27,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 		$this->setType(WIDGET_CLOCK);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' =>	'string'
+			'fields' => 'string'
 		]);
 	}
 

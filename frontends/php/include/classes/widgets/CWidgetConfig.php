@@ -140,8 +140,8 @@ class CWidgetConfig {
 	 *
 	 * @static
 	 *
-	 * @param string $type          widget type - 'WIDGET_' constant
-	 * @param string $data          JSON string with widget fields.
+	 * @param string $type  Widget type - 'WIDGET_' constant.
+	 * @param string $data  JSON string with widget fields.
 	 *
 	 * @return CWidgetForm
 	 */

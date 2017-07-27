@@ -20,7 +20,7 @@
 
 
 /**
- * Latest problems widget form
+ * Problems widget form
  */
 class CProblemsWidgetForm extends CWidgetForm {
 

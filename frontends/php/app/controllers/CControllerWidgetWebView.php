@@ -29,7 +29,7 @@ class CControllerWidgetWebView extends CControllerWidget {
 		$this->setType(WIDGET_WEB_OVERVIEW);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fullscreen' =>	'in 0,1',
+			'fullscreen' => 'in 0,1',
 			'fields' => 'string'
 		]);
 	}
