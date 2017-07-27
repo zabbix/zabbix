@@ -19,16 +19,13 @@
 **/
 
 
-class CControllerWidgetGraphView extends CController {
+class CControllerWidgetGraphView extends CControllerWidget {
 
-	private $form;
+	public function __construct() {
+		parent::__construct();
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
+		$this->setType(WIDGET_GRAPH);
+		$this->setValidationRules([
 			'name' =>				'string',
 			'uniqueid' =>			'required|string',
 			'initial_load' =>		'in 0,1',
@@ -39,35 +36,7 @@ class CControllerWidgetGraphView extends CController {
 			'content_width' =>		'int32',
 			'content_height' =>		'int32',
 			'only_footer' =>		'in 1'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret && !$this->getInput('only_footer', 0)) {
-			/*
-			 * @var array  $fields
-			 * @var int    $fields['source_type']		in ZBX_WIDGET_FIELD_RESOURCE_GRAPH, ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
-			 * @var id     $fields['itemid']			required if $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
-			 * @var id     $fields['graphid']			required if $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH
-			 * @var int    $fields['dynamic']
-			 */
-			$this->form = CWidgetConfig::getForm(WIDGET_GRAPH, $this->getInput('fields', []));
-
-			if ($errors = $this->form->validate()) {
-				$ret = false;
-			}
-		}
-
-		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		]);
 	}
 
 	protected function doAction() {
@@ -81,7 +50,7 @@ class CControllerWidgetGraphView extends CController {
 			return;
 		}
 
-		$fields = $this->form->getFieldsData();
+		$fields = $this->getForm()->getFieldsData();
 
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
@@ -300,7 +269,7 @@ class CControllerWidgetGraphView extends CController {
 		$time_control_data['src'] = $graph_src->getUrl();
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_GRAPH]),
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'graph' => [
 				'dataid' => $dataid,
 				'containerid' => $containerid,

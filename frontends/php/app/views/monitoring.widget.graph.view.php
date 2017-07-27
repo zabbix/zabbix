@@ -22,7 +22,8 @@ if ($data['only_footer']) {
 	$output = [
 		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 	];
-} else {
+}
+else {
 	$item = (new CDiv())->setId($data['graph']['containerid']);
 
 	$flickerfree_item = (new CDiv($item))
