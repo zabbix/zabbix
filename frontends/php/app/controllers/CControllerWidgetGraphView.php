@@ -34,15 +34,16 @@ class CControllerWidgetGraphView extends CController {
 			'initial_load' =>		'in 0,1',
 			'edit_mode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
-			'fields' =>				'required|array',
+			'fields' =>				'array',
 			'dynamic_hostid' =>		'db hosts.hostid',
 			'content_width' =>		'int32',
-			'content_height' =>		'int32'
+			'content_height' =>		'int32',
+			'only_footer' =>		'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
+		if ($ret && !$this->getInput('only_footer', 0)) {
 			/*
 			 * @var array  $fields
 			 * @var int    $fields['source_type']		in ZBX_WIDGET_FIELD_RESOURCE_GRAPH, ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
@@ -70,6 +71,16 @@ class CControllerWidgetGraphView extends CController {
 	}
 
 	protected function doAction() {
+		if ($this->getInput('only_footer', 0)) {
+			$this->setResponse(new CControllerResponseData([
+				'only_footer' => true,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
+			]));
+			return;
+		}
+
 		$fields = $this->form->getFieldsData();
 
 		$uniqueid = $this->getInput('uniqueid');
@@ -303,6 +314,7 @@ class CControllerWidgetGraphView extends CController {
 			'timeline' => $timeline,
 			'fs_data' => $fs_data,
 			'dashboardid' => $dashboardid,
+			'only_footer' => false,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

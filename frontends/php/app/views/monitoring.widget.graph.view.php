@@ -18,77 +18,100 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$item = (new CDiv())->setId($data['graph']['containerid']);
+if ($data['only_footer']) {
+	$output = [
+		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	];
+} else {
+	$item = (new CDiv())->setId($data['graph']['containerid']);
 
-$flickerfree_item = (new CDiv($item))
-	->addClass('flickerfreescreen')
-	->setAttribute('data-timestamp', $data['graph']['timestamp'])
-	->setId('flickerfreescreen_'.$data['graph']['dataid']);
+	$flickerfree_item = (new CDiv($item))
+		->addClass('flickerfreescreen')
+		->setAttribute('data-timestamp', $data['graph']['timestamp'])
+		->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
-$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJson($data['timeline']).', '.
-	CJs::encodeJson($data['time_control_data']).');'.
-	'timeControl.processObjects();'.
-	'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
+	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJson($data['timeline']).', '.
+		CJs::encodeJson($data['time_control_data']).');'.
+		'timeControl.processObjects();'.
+		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
 
-if ($data['widget']['initial_load'] == 1) {
+	if ($data['widget']['initial_load'] == 1) {
+		$script .=
+			'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
+				'function zbx_graph_widget_resize_end(img_id) {'.
+					'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
+						'new_width = content.width(),'.
+						'new_height = content.height() - 10,'.
+						'src = jQuery("#"+img_id).attr("src");'.
+
+					'if (typeof src === "undefined") return;'.
+					'var img_url = new Curl(src);'.
+					'img_url.setArgument("width", new_width);'.
+					'img_url.setArgument("height", new_height);'.
+					'jQuery("#"+img_id).attr("src", img_url.getUrl());'.
+
+					// TODO miks: do not forget to delete unneeded code.
+					//'var object_changes = {graphHeight: new_height + '.$data['time_control_data']['objDims']['shiftYtop'].', width: new_width};'.
+					//'timeControl.editObjectDims("'.$data['graph']['dataid'].'", object_changes);'.
+				'}'.
+			'}'.
+
+			'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
+				'function zbx_graph_widget_timer_refresh(img_id, grid) {'.
+					'timeControl.refreshObject(img_id);'.
+
+					'var url = new Curl("zabbix.php"),'.
+						'widget = grid["widget"];'.
+					'url.setArgument("action", "widget.'.WIDGET_GRAPH.'.view");'.
+					'jQuery.ajax({'.
+						'url: url.getUrl(),'.
+						'method: "POST",'.
+						'data: {'.
+							'uniqueid: widget["uniqueid"],'.
+							'only_footer: 1'.
+						'},'.
+						'dataType: "json",'.
+						'success: function(resp) {'.
+							'widget["content_footer"].html(resp.footer);'.
+						'}'.
+					'});'.
+				'}'.
+			'}'.
+
+			// TODO miks: do not forget to delete unneeded code.
+			//'jQuery("#'.$data['graph']['containerid'].'").bind("DOMSubtreeModified",function() {
+			//	zbx_graph_widget_resize_end("'.$data['graph']['dataid'].'");
+			//});'.
+
+			'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd", '.
+				'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
+					'parameters: ["'.$data['graph']['dataid'].'"],'.
+					'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
+				'});'.
+
+			'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
+				'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
+					'parameters: ["'.$data['graph']['dataid'].'"],'.
+					'grid: {widget: 1},'.
+					'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
+				'});';
+	}
+
 	$script .=
-		'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
-			'function zbx_graph_widget_resize_end(img_id) {'.
-				'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
-					'new_width = content.width(),'.
-					'new_height = content.height() - 10,'.
-					'src = jQuery("#"+img_id).attr("src");'.
-
-				'if (typeof src === "undefined") return;'.
-				'var img_url = new Curl(src);'.
-				'img_url.setArgument("width", new_width);'.
-				'img_url.setArgument("height", new_height);'.
-				'jQuery("#"+img_id).attr("src", img_url.getUrl());'.
-
-				// TODO miks: do not forget to delete unneeded code.
-				//'var object_changes = {graphHeight: new_height + '.$data['time_control_data']['objDims']['shiftYtop'].', width: new_width};'.
-				//'timeControl.editObjectDims("'.$data['graph']['dataid'].'", object_changes);'.
-			'}'.
-		'}'.
-
-		'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
-			'function zbx_graph_widget_timer_refresh(img_id) {'.
-				'timeControl.refreshObject(img_id);'.
-			'}'.
-		'}'.
-
-		// TODO miks: do not forget to delete unneeded code.
-		//'jQuery("#'.$data['graph']['containerid'].'").bind("DOMSubtreeModified",function() {
-		//	zbx_graph_widget_resize_end("'.$data['graph']['dataid'].'");
-		//});'.
-
-		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd", '.
+		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onContentUpdated", '.
 			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 				'parameters: ["'.$data['graph']['dataid'].'"],'.
-				'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
-			'});'.
-
-		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
-			'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
-				'parameters: ["'.$data['graph']['dataid'].'"],'.
-				'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
+				'trigger_name: "graph_widget_content_update_end_'.$data['widget']['uniqueid'].'"'.
 			'});';
+
+
+	$output = [
+		'header' => $data['name'],
+		'body' => $flickerfree_item->toString(),
+		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
+		'script_inline' => $script
+	];
 }
-
-$script .=
-	'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onContentUpdated", '.
-		'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
-			'parameters: ["'.$data['graph']['dataid'].'"],'.
-			'trigger_name: "graph_widget_content_update_end_'.$data['widget']['uniqueid'].'"'.
-		'});';
-
-
-$output = [
-	'header' => $data['name'],
-	'body' => $flickerfree_item->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
-	'script_inline' => $script
-];
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

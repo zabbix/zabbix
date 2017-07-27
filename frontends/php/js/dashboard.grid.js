@@ -33,7 +33,7 @@
 			.addClass('dashbrd-grid-widget-foot');
 		// We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
 		// This size will later be passed to widget controller in updateWidgetContent() function.
-		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').text('&nbsp;')));
+		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').html('&nbsp;')));
 
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
