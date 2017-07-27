@@ -31,7 +31,9 @@
 			.addClass('dashbrd-grid-widget-content');
 		widget['content_footer'] = $('<div>')
 			.addClass('dashbrd-grid-widget-foot');
-		widget['content_script'] = $('<div>');
+		// We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
+		// This size will later be passed to widget controller in updateWidgetContent() function.
+		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').text('&nbsp;')));
 
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
@@ -432,7 +434,7 @@
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
 			'content_width': widget['content_body'].width(),
-			'content_height': widget['content_body'].height()
+			'content_height': widget['content_body'].height() - 10 // -10 is added to avoid scrollbar
 		}
 		widget['initial_load'] = false;
 

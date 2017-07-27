@@ -155,6 +155,10 @@ $this->addPostJS(
 );
 
 if ($data['show_timeline']) {
-	$this->addPostJS('timeControl.addObject("scrollbar", '.zbx_jsvalue($data['timeline']).', '
-		.zbx_jsvalue($data['timeControlData']).'); timeControl.processObjects();');
+	$this->addPostJS(
+		'timeControl.useTimeRefresh('.CWebUser::getRefresh().');'.
+		'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.
+			CJs::encodeJson($data['timeControlData']).');'.
+		'timeControl.processObjects();'
+	);
 }

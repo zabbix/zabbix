@@ -75,7 +75,6 @@ class CControllerWidgetGraphView extends CController {
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
-		// TODO VM: for testing
 		$width = $this->getInput('content_width', '100');
 		$height = $this->getInput('content_height', '100');
 
@@ -272,7 +271,8 @@ class CControllerWidgetGraphView extends CController {
 			$graph_src->setArgument('height', $height);
 			$graph_src->setArgument('legend', $graph['show_legend']);
 			$graph_src->setArgument('period', $timeline['period']);
-			$graph_src->setArgument('stime', $timeline['stimeNow']);
+			$graph_src->setArgument('stime', $timeline['stime']);
+//			$graph_src->setArgument('stime', ($timeline['isNow'] ? $timeline['stimeNow'] : $timeline['stime']));
 
 			if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 				$graph_src->setArgument('graph3d', $graph['show_3d']);

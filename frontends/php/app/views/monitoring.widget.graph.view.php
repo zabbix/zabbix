@@ -51,6 +51,12 @@ if ($data['widget']['initial_load'] == 1) {
 			'}'.
 		'}'.
 
+		'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
+			'function zbx_graph_widget_timer_refresh(img_id) {'.
+				'timeControl.refreshObject(img_id);'.
+			'}'.
+		'}'.
+
 		// TODO miks: do not forget to delete unneeded code.
 		//'jQuery("#'.$data['graph']['containerid'].'").bind("DOMSubtreeModified",function() {
 		//	zbx_graph_widget_resize_end("'.$data['graph']['dataid'].'");
@@ -60,6 +66,12 @@ if ($data['widget']['initial_load'] == 1) {
 			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 				'parameters: ["'.$data['graph']['dataid'].'"],'.
 				'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
+			'});'.
+
+		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
+			'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
+				'parameters: ["'.$data['graph']['dataid'].'"],'.
+				'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
 			'});';
 }
 
