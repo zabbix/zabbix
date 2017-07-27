@@ -423,8 +423,20 @@ abstract class CItemGeneral extends CApiService {
 
 			// Dependent item.
 			if ($fullItem['type'] == ITEM_TYPE_DEPENDENT) {
-				if ((!$update || $fullItem['type'] != $dbItems[$item['itemid']]['type'])
-						&& (!array_key_exists('master_itemid', $item) || !$item['master_itemid'])) {
+				if ($update) {
+					if (array_key_exists('master_itemid', $item) && !$item['master_itemid']) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('cannot be empty')
+						));
+					}
+					if ($dbItems[$fullItem['itemid']]['type'] != ITEM_TYPE_DEPENDENT
+							&& !array_key_exists('master_itemid', $item)) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('cannot be empty')
+						));
+					}
+				}
+				elseif (!array_key_exists('master_itemid', $item) || !$item['master_itemid']) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _('cannot be empty')
 					));
