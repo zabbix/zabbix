@@ -31,7 +31,7 @@ class CControllerWidgetSystemView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fullscreen' => 'in 0,1',
-			'fields' => 'string'
+			'fields' => 'json'
 		]);
 	}
 

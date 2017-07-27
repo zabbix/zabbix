@@ -27,7 +27,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 		$this->setType(WIDGET_ACTION_LOG);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'string'
+			'fields' => 'json'
 		]);
 	}
 

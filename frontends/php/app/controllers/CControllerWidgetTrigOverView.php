@@ -29,7 +29,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		$this->setType(WIDGET_TRIG_OVERVIEW);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'string'
+			'fields' => 'json'
 		]);
 	}
 

@@ -32,7 +32,7 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 			'edit_mode' => 'in 0,1',
 			'initial_load' => 'in 0,1',
 			'fullscreen' => 'in 0,1',
-			'fields' => 'string',
+			'fields' => 'json',
 			'storage' => 'array'
 		]);
 	}

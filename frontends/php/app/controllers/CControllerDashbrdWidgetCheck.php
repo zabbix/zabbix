@@ -29,7 +29,7 @@ class CControllerDashbrdWidgetCheck extends CController {
 		$fields = [
 			'type' => 'string|required',
 			'name' => 'string',
-			'fields' => 'string',
+			'fields' => 'json',
 		];
 
 		$ret = $this->validateInput($fields);

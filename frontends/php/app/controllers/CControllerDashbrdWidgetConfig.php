@@ -26,7 +26,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 			'widgetid' => 'db widget.widgetid',
 			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
 			'name' => 'string',
-			'fields' => 'string'
+			'fields' => 'json'
 		];
 
 		$ret = $this->validateInput($fields);
