@@ -226,12 +226,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$templatesClear = zbx_toObject($templatesClear, 'templateid');
 
 		// discovered hosts
-		$dbHosts = API::Host()->get([
-			'output' => ['hostid'],
-			'hostids' => getRequest('hosts', []),
-			'templated_hosts' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		$db_hosts = API::Host()->get([
+			'output'			=> ['hostid', 'status'],
+			'hostids'			=> getRequest('hosts', []),
+			'templated_hosts'	=> true,
+			'filter'			=> ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
+
+		foreach ($db_hosts as $i => $db_host) {
+			if ($db_host['status'] == HOST_STATUS_TEMPLATE) {
+				$templates[] = ['templateid' => $db_host['hostid']];
+				unset($db_hosts[$i]);
+			}
+		}
 
 		$templateName = getRequest('template_name', '');
 
@@ -241,7 +248,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => getRequest('visiblename', ''),
 			'groups' => $groups,
 			'templates' => $templates,
-			'hosts' => $dbHosts,
+			'hosts' => $db_hosts,
 			'macros' => getRequest('macros', []),
 			'description' => getRequest('description', '')
 		];
