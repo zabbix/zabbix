@@ -501,6 +501,9 @@
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
 				}
+
+				widget['ready'] = true;
+				methods.registerDataExchangeCommit.call($obj);
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
@@ -922,6 +925,12 @@
 					widget_defaults: {},
 					triggers: {},
 					placeholder: $placeholder,
+					widget_relation_submissions: [],
+					widget_relations: {
+						relations: [],
+						tasks: {}
+					},
+					tmp_data_buffer: [],
 					data_buffer: []
 				});
 
@@ -980,6 +989,7 @@
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
 				'initial_load': true,
+				'ready': false,
 				'fields': {},
 				'storage': {}
 			}, widget);
@@ -1233,65 +1243,150 @@
 		},
 
 		// Register widget as data receiver shared by other widget
-		registerAsSharedDataReceiver: function(obj) {
+		registerDataExchange: function(obj) {
 			return this.each(function() {
 				var $this = $(this),
 					data = $this.data('dashboardGrid');
+				data['widget_relation_submissions'].push(obj);
+			});
+		},
 
-				for (var i = 0, l = data['widgets'].length; l > i; i++) {
-					if (data['widgets'][i]['uniqueid'] == obj.uniqueid) {
-						if (typeof data['widgets'][i]['listen_for'] === 'undefined') {
-							data['widgets'][i]['listen_for'] = [];
+		registerDataExchangeCommit: function() {
+			return this.each(function() {
+				var $this = $(this),
+					used_indexes = [],
+					data = $this.data('dashboardGrid'),
+					erase;
+
+				if (data['widget_relation_submissions'].length
+						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length
+					) {
+
+					$.each(data['widget_relation_submissions'], function(rel_index, relation) {
+						erase = false;
+						$.each(data['widgets'], function(index, widget) {
+							// No linked widget reference given. Just register as data receiver.
+							if (typeof relation.linkedto === 'undefined') {
+								if (typeof data['widget_relations']['tasks'][relation.uniqueid]) {
+									data['widget_relations']['tasks'][relation.uniqueid] = [];
+								}
+
+								data['widget_relations']['tasks'][relation.uniqueid].push({
+									data_name: relation.data_name,
+									callback: relation.callback
+								});
+								erase = true;
+							}
+							/*
+							 * Linked widget reference is given. Register two direction relationship as well as
+							 * register data receiver.
+							 */
+							else if (typeof widget['fields']['reference'] !== 'undefined'
+									&& widget['fields']['reference'] === relation.linkedto) {
+
+								if (typeof data['widget_relations']['relations'][widget.uniqueid]) {
+									data['widget_relations']['relations'][widget.uniqueid] = [];
+								}
+								if (typeof data['widget_relations']['relations'][relation.uniqueid]) {
+									data['widget_relations']['relations'][relation.uniqueid] = [];
+								}
+								if (typeof data['widget_relations']['tasks'][relation.uniqueid]) {
+									data['widget_relations']['tasks'][relation.uniqueid] = [];
+								}
+
+								data['widget_relations']['relations'][widget.uniqueid].push(relation.uniqueid);
+								data['widget_relations']['relations'][relation.uniqueid].push(widget.uniqueid);
+								data['widget_relations']['tasks'][relation.uniqueid].push({
+									data_name: relation.data_name,
+									callback: relation.callback
+								});
+								erase = true;
+							}
+						});
+
+						if (erase) {
+							used_indexes.push(rel_index);
 						}
-						data['widgets'][i]['listen_for'].push(obj);
+					});
+
+					for (var i = used_indexes.length - 1; i >= 0; i--) {
+						data['widget_relation_submissions'].splice(used_indexes[i], 1);
 					}
+
+					if (data['tmp_data_buffer'].length) {
+						$.each(data['tmp_data_buffer'], function(index, shared_data) {
+							methods.widgetDataShare.apply($this, shared_data);
+						});
+
+						data['tmp_data_buffer'] = [];
+					}
+
+					methods.callWidgetDataShare.call($this, false);
 				}
 			});
 		},
 
-		widgetDataShare: function(widget, data_key) {
-			var args = Array.prototype.slice.call(arguments, 2);
+		widgetDataShare: function(widget, data_name) {
+			var args = Array.prototype.slice.call(arguments, 2),
+				uniqueid = widget['uniqueid'];
 
 			if (!args.length) {
 				return false;
 			}
 
-			if (typeof widget['fields'] === 'object' && typeof widget['fields']['reference'] !== 'undefined') {
-				var reference = widget['fields']['reference'];
+			return this.each(function() {
+				var $this = $(this),
+					data = $this.data('dashboardGrid'),
+					indx = -1;
 
-				return this.each(function() {
-					var $this = $(this),
-						data = $this.data('dashboardGrid'),
-						indx = -1;
-
-					if (typeof data['data_buffer'][reference] === 'undefined') {
-						data['data_buffer'][reference] = [];
+				if (data['widgets'].filter(function(widget) {return !widget['ready']}).length) {
+					var tmp_buffer_record = [];
+					tmp_buffer_record.push(widget);
+					tmp_buffer_record.push(data_name);
+					for (var i in args) {
+						tmp_buffer_record.push(args[i]);
 					}
-					else if (typeof data['data_buffer'][reference] !== 'undefined') {
-						$.each(data['data_buffer'][reference], function(i, arr) {
-							if (arr['data_key'] === data_key) {
-								indx = i;
+					data['tmp_data_buffer'].push(tmp_buffer_record);
+				}
+				else {
+					if (typeof data['widget_relations']['relations'][uniqueid] !== 'undefined') {
+						$.each(data['widget_relations']['relations'][uniqueid], function(index, linked_uniqueid) {
+							if (typeof data['widget_relations']['tasks'][linked_uniqueid] !== 'undefined') {
+								$.each(data['widget_relations']['tasks'][linked_uniqueid], function(index, task) {
+									if (task.data_name === data_name) {
+										if (typeof data['data_buffer'][linked_uniqueid] === 'undefined') {
+											data['data_buffer'][linked_uniqueid] = [];
+										}
+										else if (typeof data['data_buffer'][linked_uniqueid] !== 'undefined') {
+											$.each(data['data_buffer'][linked_uniqueid], function(i, arr) {
+												if (arr['data_key'] === data_name) {
+													indx = i;
+												}
+											});
+										}
+
+										if (indx === -1) {
+											data['data_buffer'][linked_uniqueid].push({
+												data_name: data_name,
+												args: args,
+												old: false
+											});
+										}
+										else {
+											if (data['data_buffer'][linked_uniqueid][indx]['args'] !== args) {
+												data['data_buffer'][linked_uniqueid][indx]['args'] = args;
+												data['data_buffer'][linked_uniqueid][indx]['old'] = false;
+											}
+										}
+									}
+								});
 							}
 						});
 					}
 
-					if (indx === -1) {
-						data['data_buffer'][reference].push({
-							data_key: data_key,
-							args: args,
-							old: false
-						});
-					}
-					else {
-						if (data['data_buffer'][reference][indx]['args'] !== args) {
-							data['data_buffer'][reference][indx]['args'] = args;
-							data['data_buffer'][reference][indx]['old'] = false;
-						}
-					}
-
-					methods.callWidgetDataShare.call($(this), true);
-				});
-			}
+					methods.callWidgetDataShare.call($this, true);
+				}
+			});
 		},
 
 		callWidgetDataShare: function($obj) {
@@ -1301,27 +1396,23 @@
 				var $this = $(this),
 					data = $this.data('dashboardGrid');
 
-				for (var reference in data['data_buffer']) {
-					if (typeof data['data_buffer'][reference] === 'object') {
-						$.each(data['data_buffer'][reference], function(i, shared_data) {
+				for (var uniqueid in data['data_buffer']) {
+					if (typeof data['data_buffer'][uniqueid] === 'object') {
+						$.each(data['data_buffer'][uniqueid], function(i, shared_data) {
 							if (!shared_data['old'] || !ignore_old_data) {
-								for (var i = 0, l = data['widgets'].length; l > i; i++) {
-									if (typeof(data['widgets'][i]['listen_for']) != 'undefined') {
-										for (var t = 0, j = data['widgets'][i]['listen_for'].length; j > t; t++) {
-											var wr = data['widgets'][i]['listen_for'][t]['source_widget_reference'];
-											if (wr === reference) {
-												data['widgets'][i]['listen_for'][t].callback.apply($obj,
-													[data['widgets'][i], shared_data['args']]
-												);
-											}
+								var widget = methods.getWidgetsBy.call($this, 'uniqueid', uniqueid);
+								if (widget.length) {
+									$.each(data['widget_relations']['tasks'][uniqueid], function(index, task) {
+										if (task['data_name'] === shared_data['data_name']) {
+											task.callback.apply($obj, [widget[0], shared_data['args']]);
 										}
-									}
+									});
 								}
 							}
 							shared_data['old'] = true;
 						});
 					}
-				}
+				};
 			});
 		},
 
