@@ -61,11 +61,19 @@ class CWidgetForm {
 		return $data;
 	}
 
-	public function validate() {
+	/**
+	 * Validate form fields.
+	 *
+	 * @param bool $strict  Enables more strict validation of the form fields.
+	 *                      Must be enabled for validation of input parameters in the widget configuration form.
+	 *
+	 * @return bool
+	 */
+	public function validate($strict = false) {
 		$errors = [];
 
 		foreach ($this->fields as $field) {
-			$errors = array_merge($errors, $field->validate());
+			$errors = array_merge($errors, $field->validate($strict));
 		}
 
 		return $errors;
