@@ -35,7 +35,7 @@ class CControllerDashbrdWidgetCheck extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', ''));
+			$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'));
 
 			if ($errors = $form->validate()) {
 				foreach ($errors as $msg) {

@@ -51,7 +51,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function doAction() {
 		$type = $this->getInput('type', WIDGET_CLOCK);
-		$form = CWidgetConfig::getForm($type, $this->getInput('fields', ''));
+		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
 
 		$config = select_config();
 		$global_config = [];
