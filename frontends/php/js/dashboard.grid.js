@@ -723,7 +723,7 @@
 			var	ajax_widget = {};
 
 			if (widget['widgetid'] !== '') {
-				ajax_widget.widgetid = widget['widgetid'];
+				ajax_widget['widgetid'] = widget['widgetid'];
 			}
 			ajax_widget['pos'] = widget['pos'];
 			ajax_widget['type'] = widget['type'];
@@ -1143,27 +1143,27 @@
 
 				// Don't send on "Add widget" or on "Edit widget", if widget was not saved yet
 				if (widget !== null && widget['widgetid'] !== '') {
-					ajax_data.widgetid = widget['widgetid'];
+					ajax_data['widgetid'] = widget['widgetid'];
 				}
 
 				if (form.length) {
 					// Take values from form.
-					ajax_data.fields = form.serializeJSON();
-					ajax_data.type = ajax_data['fields']['type'];
-					ajax_data.name = ajax_data['fields']['name'];
+					ajax_data['fields'] = form.serializeJSON();
+					ajax_data['type'] = ajax_data['fields']['type'];
+					ajax_data['name'] = ajax_data['fields']['name'];
 					delete ajax_data['fields']['type'];
 					delete ajax_data['fields']['name'];
-					ajax_data.fields = JSON.stringify(ajax_data.fields);
+					ajax_data['fields'] = JSON.stringify(ajax_data['fields']);
 				}
 				else if (widget !== null) {
 					// Open form with current config.
-					ajax_data.type = widget['type'];
-					ajax_data.name = widget['header'];
-					ajax_data.fields = JSON.stringify(widget['fields']);
+					ajax_data['type'] = widget['type'];
+					ajax_data['name'] = widget['header'];
+					ajax_data['fields'] = JSON.stringify(widget['fields']);
 				}
 				else {
 					// Get default config for new widget.
-					ajax_data.fields = JSON.stringify({});
+					ajax_data['fields'] = JSON.stringify({});
 				}
 
 				jQuery.ajax({
