@@ -31,20 +31,6 @@ class CWidgetForm {
 	protected $data;
 
 	public function __construct($data) {
-		/*
-		 * Before converting JSON to array, data incoming is quoted and escaped. So it must be converted.
-		 * From a string like this: {"groupids":"[\"273\"]"}
-		 * to this: {"groupids":["273"]}
-		 * and this: {"problem":"","severities":"[\"3\", \"5\"]","maintenance":"1"}
-		 * to this: {"problem":"","severities":["3", "5"],"maintenance":"1"}
-		 */
-		$replace = [
-			'/"\[\\\/' => '[',
-			'/\\\"\]"/' => '"]',
-			'/\\\", \\\"/' => '", "'
-		];
-		$data = preg_replace(array_keys($replace), $replace, $data);
-
 		$this->data = (new CJson)->decode($data, true);
 
 		$this->fields = [];
