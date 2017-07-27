@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Action log widget form
+ */
 class CActionLogWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
