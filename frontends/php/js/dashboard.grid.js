@@ -431,7 +431,6 @@
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage']
 		}
-		widget['initial_load'] = false;
 
 		if (widget['widgetid'] !== '') {
 			ajax_data['widgetid'] = widget['widgetid'];
@@ -502,8 +501,11 @@
 					updateWidgetContent($obj, data, widget);
 				}
 
+				if (!widget['ready']) {
+					widget['ready'] = true; // leave it before registerDataExchangeCommit.
+					methods.registerDataExchangeCommit.call($obj);
+				}
 				widget['ready'] = true;
-				methods.registerDataExchangeCommit.call($obj);
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
@@ -511,6 +513,8 @@
 				startWidgetRefreshTimer($obj, data, widget, 3);
 			}
 		});
+
+		widget['initial_load'] = false;
 	}
 
 	function refreshWidget($obj, data, widget) {
@@ -930,7 +934,6 @@
 						relations: [],
 						tasks: {}
 					},
-					tmp_data_buffer: [],
 					data_buffer: []
 				});
 
@@ -1247,6 +1250,7 @@
 			return this.each(function() {
 				var $this = $(this),
 					data = $this.data('dashboardGrid');
+
 				data['widget_relation_submissions'].push(obj);
 			});
 		},
@@ -1261,47 +1265,49 @@
 				if (data['widget_relation_submissions'].length
 						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length
 					) {
-					$.each(data['widget_relation_submissions'], function(rel_index, relation) {
+					$.each(data['widget_relation_submissions'], function(rel_index, rel) {
 						erase = false;
-						$.each(data['widgets'], function(index, widget) {
-							// No linked widget reference given. Just register as data receiver.
-							if (typeof relation.linkedto === 'undefined') {
-								if (typeof data['widget_relations']['tasks'][relation.uniqueid] === 'undefined') {
-									data['widget_relations']['tasks'][relation.uniqueid] = [];
-								}
 
-								data['widget_relations']['tasks'][relation.uniqueid].push({
-									data_name: relation.data_name,
-									callback: relation.callback
-								});
-								erase = true;
+						// No linked widget reference given. Just register as data receiver.
+						if (typeof rel.linkedto === 'undefined') {
+							if (typeof data['widget_relations']['tasks'][rel.uniqueid] === 'undefined') {
+								data['widget_relations']['tasks'][rel.uniqueid] = [];
 							}
-							/*
-							 * Linked widget reference is given. Register two direction relationship as well as
-							 * register data receiver.
-							 */
-							else if (typeof widget['fields']['reference'] !== 'undefined'
-									&& widget['fields']['reference'] === relation.linkedto) {
 
-								if (typeof data['widget_relations']['relations'][widget.uniqueid] === 'undefined') {
-									data['widget_relations']['relations'][widget.uniqueid] = [];
-								}
-								if (typeof data['widget_relations']['relations'][relation.uniqueid] === 'undefined') {
-									data['widget_relations']['relations'][relation.uniqueid] = [];
-								}
-								if (typeof data['widget_relations']['tasks'][relation.uniqueid] === 'undefined') {
-									data['widget_relations']['tasks'][relation.uniqueid] = [];
-								}
+							data['widget_relations']['tasks'][rel.uniqueid].push({
+								data_name: rel.data_name,
+								callback: rel.callback
+							});
+							erase = true;
+						}
+						/*
+						 * Linked widget reference is given. Register two direction relationship as well as
+						 * register data receiver.
+						 */
+						else {
+							$.each(data['widgets'], function(index, widget) {
+								if (typeof widget['fields']['reference'] !== 'undefined'
+										&& widget['fields']['reference'] === rel.linkedto) {
+									if (typeof data['widget_relations']['relations'][widget.uniqueid] === 'undefined') {
+										data['widget_relations']['relations'][widget.uniqueid] = [];
+									}
+									if (typeof data['widget_relations']['relations'][rel.uniqueid] === 'undefined') {
+										data['widget_relations']['relations'][rel.uniqueid] = [];
+									}
+									if (typeof data['widget_relations']['tasks'][rel.uniqueid] === 'undefined') {
+										data['widget_relations']['tasks'][rel.uniqueid] = [];
+									}
 
-								data['widget_relations']['relations'][widget.uniqueid].push(relation.uniqueid);
-								data['widget_relations']['relations'][relation.uniqueid].push(widget.uniqueid);
-								data['widget_relations']['tasks'][relation.uniqueid].push({
-									data_name: relation.data_name,
-									callback: relation.callback
-								});
-								erase = true;
-							}
-						});
+									data['widget_relations']['relations'][widget.uniqueid].push(rel.uniqueid);
+									data['widget_relations']['relations'][rel.uniqueid].push(widget.uniqueid);
+									data['widget_relations']['tasks'][rel.uniqueid].push({
+										data_name: rel.data_name,
+										callback: rel.callback
+									});
+									erase = true;
+								}
+							});
+						}
 
 						if (erase) {
 							used_indexes.push(rel_index);
@@ -1312,15 +1318,7 @@
 						data['widget_relation_submissions'].splice(used_indexes[i], 1);
 					}
 
-					if (data['tmp_data_buffer'].length) {
-						$.each(data['tmp_data_buffer'], function(index, shared_data) {
-							methods.widgetDataShare.apply($this, shared_data);
-						});
-
-						data['tmp_data_buffer'] = [];
-					}
-
-					methods.callWidgetDataShare.call($this, false);
+					methods.callWidgetDataShare.call($this);
 				}
 			});
 		},
@@ -1338,43 +1336,57 @@
 					data = $this.data('dashboardGrid'),
 					indx = -1;
 
-				if (data['widgets'].filter(function(widget) {return !widget['ready']}).length) {
-					var tmp_buffer_record = [];
-					tmp_buffer_record.push(widget);
-					tmp_buffer_record.push(data_name);
-					for (var i in args) {
-						tmp_buffer_record.push(args[i]);
-					}
-					data['tmp_data_buffer'].push(tmp_buffer_record);
+				if (typeof data['data_buffer'][uniqueid] === 'undefined') {
+					data['data_buffer'][uniqueid] = [];
+				}
+				else if (typeof data['data_buffer'][uniqueid] !== 'undefined') {
+					$.each(data['data_buffer'][uniqueid], function(i, arr) {
+						if (arr['data_key'] === data_name) {
+							indx = i;
+						}
+					});
+				}
+
+				if (indx === -1) {
+					data['data_buffer'][uniqueid].push({
+						data_name: data_name,
+						args: args,
+						old: []
+					});
 				}
 				else {
-					if (typeof data['widget_relations']['relations'][uniqueid] !== 'undefined') {
-						$.each(data['widget_relations']['relations'][uniqueid], function(index, linked_uniqueid) {
-							if (typeof data['widget_relations']['tasks'][linked_uniqueid] !== 'undefined') {
-								$.each(data['widget_relations']['tasks'][linked_uniqueid], function(index, task) {
-									if (task.data_name === data_name) {
-										if (typeof data['data_buffer'][linked_uniqueid] === 'undefined') {
-											data['data_buffer'][linked_uniqueid] = [];
-										}
-										else if (typeof data['data_buffer'][linked_uniqueid] !== 'undefined') {
-											$.each(data['data_buffer'][linked_uniqueid], function(i, arr) {
-												if (arr['data_key'] === data_name) {
-													indx = i;
-												}
-											});
-										}
+					if (data['data_buffer'][uniqueid][indx]['args'] !== args) {
+						data['data_buffer'][uniqueid][indx]['args'] = args;
+						data['data_buffer'][uniqueid][indx]['old'] = [];
+					}
+				}
 
-										if (indx === -1) {
-											data['data_buffer'][linked_uniqueid].push({
-												data_name: data_name,
-												args: args,
-												old: false
-											});
-										}
-										else {
-											if (data['data_buffer'][linked_uniqueid][indx]['args'] !== args) {
-												data['data_buffer'][linked_uniqueid][indx]['args'] = args;
-												data['data_buffer'][linked_uniqueid][indx]['old'] = false;
+				methods.callWidgetDataShare.call($this);
+			});
+		},
+
+		callWidgetDataShare: function($obj) {
+			return this.each(function() {
+				var $this = $(this),
+					data = $this.data('dashboardGrid');
+
+				for (var src_uniqueid in data['data_buffer']) {
+					if (typeof data['data_buffer'][src_uniqueid] === 'object') {
+						$.each(data['data_buffer'][src_uniqueid], function(index, buffer_data) {
+							if (typeof data['widget_relations']['relations'][src_uniqueid] !== 'undefined') {
+								$.each(data['widget_relations']['relations'][src_uniqueid], function(index,
+										dest_uniqueid) {
+									if (buffer_data['old'].indexOf(dest_uniqueid) == -1) {
+										if (typeof data['widget_relations']['tasks'][dest_uniqueid] !== 'undefined') {
+											var widget = methods.getWidgetsBy.call($this, 'uniqueid', dest_uniqueid);
+											if (widget.length) {
+												$.each(data['widget_relations']['tasks'][dest_uniqueid], function(index, task) {
+													if (task['data_name'] === buffer_data['data_name']) {
+														task.callback.apply($obj, [widget[0], buffer_data['args']]);
+													}
+												});
+
+												buffer_data['old'].push(dest_uniqueid);
 											}
 										}
 									}
@@ -1382,36 +1394,7 @@
 							}
 						});
 					}
-
-					methods.callWidgetDataShare.call($this, true);
 				}
-			});
-		},
-
-		callWidgetDataShare: function($obj) {
-			var ignore_old_data = arguments[0];
-
-			return this.each(function() {
-				var $this = $(this),
-					data = $this.data('dashboardGrid');
-
-				for (var uniqueid in data['data_buffer']) {
-					if (typeof data['data_buffer'][uniqueid] === 'object') {
-						$.each(data['data_buffer'][uniqueid], function(i, shared_data) {
-							if (!shared_data['old'] || !ignore_old_data) {
-								var widget = methods.getWidgetsBy.call($this, 'uniqueid', uniqueid);
-								if (widget.length) {
-									$.each(data['widget_relations']['tasks'][uniqueid], function(index, task) {
-										if (task['data_name'] === shared_data['data_name']) {
-											task.callback.apply($obj, [widget[0], shared_data['args']]);
-										}
-									});
-								}
-							}
-							shared_data['old'] = true;
-						});
-					}
-				};
 			});
 		},
 
