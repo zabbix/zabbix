@@ -22,7 +22,15 @@
 class CMultiSelect extends CTag {
 
 	/**
-	 * @param array $options['objectOptions'] 	an array of parameters to be added to the request URL
+	 * Javascript event name that will be triggered after multiselect initialization
+	 *
+	 * @var string
+	 */
+	private $js_event_name = '';
+
+	/**
+	 * @param array $options['objectOptions']  an array of parameters to be added to the request URL
+	 * @param bool  $options['add_post_js']
 	 *
 	 * @see jQuery.multiSelect()
 	 */
@@ -30,7 +38,7 @@ class CMultiSelect extends CTag {
 		parent::__construct('div', true);
 		$this->addClass('multiselect');
 		$this->setId(zbx_formatDomId($options['name']));
-
+		$this->js_event_name = sprintf('multiselect_%s_init', $this->getId());
 		// url
 		$url = new CUrl('jsrpc.php');
 		$url->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
@@ -70,12 +78,32 @@ class CMultiSelect extends CTag {
 				$params['popup']['parameters'] = $options['popup']['parameters'];
 			}
 		}
+		if (array_key_exists('callPostEvent', $options) && $options['callPostEvent']) {
+			$params['postInitEvent'] = $this->getJsEventName();
+		}
 
-		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).');');
+		$this->params = $params;
+
+		if (!array_key_exists('add_post_js', $options) || $options['add_post_js']) {
+			zbx_add_post_js($this->getPostJS());
+		}
 	}
 
 	public function setWidth($value) {
 		$this->addStyle('width: '.$value.'px;');
 		return $this;
+	}
+
+	/**
+	 * Get js event name
+	 *
+	 * @return string
+	 */
+	public function getJsEventName() {
+		return $this->js_event_name;
+	}
+
+	public function getPostJS() {
+		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($this->params).');';
 	}
 }

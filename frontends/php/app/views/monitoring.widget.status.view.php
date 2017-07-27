@@ -20,7 +20,7 @@
 
 
 $output = [
-	'header' => _('Status of Zabbix'),
+	'header' => $data['name'],
 	'body' => make_status_of_zbx()->toString(),
 	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];

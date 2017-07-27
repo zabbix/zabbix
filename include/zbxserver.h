@@ -43,6 +43,7 @@
 #define MACRO_TYPE_ALERT		0x00010000
 #define MACRO_TYPE_TRIGGER_TAG		0x00020000
 #define MACRO_TYPE_JMX_ENDPOINT		0x00040000
+#define MACRO_TYPE_MESSAGE_ACK		0x00080000
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
@@ -54,7 +55,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, DC_ITEM *dc_item,
-		DB_ALERT *alert, char **data, int macro_type, char *error, int maxerrlen);
+		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 

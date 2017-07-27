@@ -52,7 +52,8 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
 	int	ret = SUCCEED;
 
 	tmp = zbx_strdup(NULL, port_orig);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+			&tmp, MACRO_TYPE_COMMON, NULL, 0);
 
 	if (FAIL == is_ushort(tmp, port) || 0 == *port)
 	{

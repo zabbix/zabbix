@@ -292,6 +292,7 @@ function getFontComboBox($name) {
 					->addRow(_('Text'),
 						(new CDiv([
 							(new CTextArea('text'))
+								->addStyle('margin-bottom: 4px;')
 								->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 								->setRows(3),
 							BR(),

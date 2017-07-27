@@ -20,88 +20,37 @@
 
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetSystemView extends CController {
+class CControllerWidgetSystemView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		return true;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		$this->setType(WIDGET_SYSTEM_STATUS);
+		$this->setValidationRules([
+			'name' =>		'string',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array'
+		]);
 	}
 
 	protected function doAction() {
-		$filter = [
-			'groupids' => null,
-			'maintenance' => null,
-			'severity' => null,
-			'trigger_name' => '',
-			'extAck' => 0
-		];
-
-		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
-			// groups
-			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 0) {
-				// null mean all groups
-				$filter['groupids'] = null;
-			}
-			else {
-				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
-
-				if ($hide_groupids) {
-					// get all groups if no selected groups defined
-					if (!$filter['groupids']) {
-						$dbHostGroups = API::HostGroup()->get([
-							'output' => ['groupid']
-						]);
-						$filter['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
-					}
-
-					$filter['groupids'] = array_diff($filter['groupids'], $hide_groupids);
-
-					// get available hosts
-					$dbAvailableHosts = API::Host()->get([
-						'groupids' => $filter['groupids'],
-						'output' => ['hostid']
-					]);
-					$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
-
-					$dbDisabledHosts = API::Host()->get([
-						'groupids' => $hide_groupids,
-						'output' => ['hostid']
-					]);
-					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
-
-					$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
-				}
-				elseif (!$filter['groupids']) {
-					// null mean all groups
-					$filter['groupids'] = null;
-				}
-			}
-
-			// hosts
-			$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
-			$filter['maintenance'] = ($maintenance == 0) ? 0 : null;
-
-			// triggers
-			$severity = CProfile::get('web.dashconf.triggers.severity', null);
-			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
-			$filter['severity'] = zbx_toHash($filter['severity']);
-			$filter['trigger_name'] = CProfile::get('web.dashconf.triggers.name', '');
-
-			$config = select_config();
-			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
-		}
+		$fields = $this->getForm()->getFieldsData();
 
 		$this->setResponse(new CControllerResponseData([
-			'filter' => $filter,
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'filter' => [
+				'groupids' => getSubGroups($fields['groupids']),
+				'hostids' => $fields['hostids'],
+				'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
+				'problem' => $fields['problem'],
+				'severities' => $fields['severities'],
+				'maintenance' => $fields['maintenance'],
+				'hide_empty_groups' => $fields['hide_empty_groups'],
+				'ext_ack' => $fields['ext_ack']
+			],
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

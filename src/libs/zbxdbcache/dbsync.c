@@ -1836,7 +1836,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&dbsync_env.cache->triggers, &rowid)))
 		{
-			dbsync_add_row(sync, rowid, ZBX_DBSYNC_ROW_ADD, dbrow);
+			dbsync_add_row(sync, rowid, ZBX_DBSYNC_ROW_ADD, row);
 		}
 		else
 		{
@@ -2259,6 +2259,107 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbsync_compare_action_op                                         *
+ *                                                                            *
+ * Purpose: compares action opereation class and flushes update row if        *
+ *          necessary                                                         *
+ *                                                                            *
+ * Parameter: sync     - [OUT] the changeset                                  *
+ *            actionid - [IN] the action identifier                           *
+ *            opflags  - [IN] the action operation class flags                *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbsync_compare_action_op(zbx_dbsync_t *sync, zbx_uint64_t actionid, unsigned char opflags)
+{
+	zbx_dc_action_t	*action;
+
+	if (0 == actionid)
+		return;
+
+	if (NULL == (action = (zbx_dc_action_t *)zbx_hashset_search(&dbsync_env.cache->actions, &actionid)) ||
+			opflags != action->opflags)
+	{
+		char	actionid_s[MAX_ID_LEN], opflags_s[MAX_ID_LEN];
+		char	*row[] = {actionid_s, opflags_s};
+
+		zbx_snprintf(actionid_s, sizeof(actionid_s), ZBX_FS_UI64, actionid);
+		zbx_snprintf(opflags_s, sizeof(opflags_s), "%d", opflags);
+
+		dbsync_add_row(sync, actionid, ZBX_DBSYNC_ROW_UPDATE, (DB_ROW)row);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbsync_compare_action_ops                                    *
+ *                                                                            *
+ * Purpose: compares actions by operation class                               *
+ *                                                                            *
+ * Parameter: cache - [IN] the configuration cache                            *
+ *            sync  - [OUT] the changeset                                     *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
+{
+	DB_ROW			dbrow;
+	DB_RESULT		result;
+	zbx_uint64_t		rowid, actionid = 0;
+	unsigned char		opclass, opflags = ZBX_ACTION_OPCLASS_NONE;
+
+	if (NULL == (result = DBselect(
+			"select a.actionid,o.recovery"
+			" from actions a"
+			" left join operations o"
+				" on a.actionid=o.actionid"
+			" where a.status=%d"
+			" group by a.actionid,o.recovery"
+			" order by a.actionid",
+			ACTION_STATUS_ACTIVE)))
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, 2, NULL);
+
+	while (NULL != (dbrow = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(rowid, dbrow[0]);
+		opclass = atoi(dbrow[1]);
+
+		if (actionid != rowid)
+		{
+			dbsync_compare_action_op(sync, actionid, opflags);
+			actionid = rowid;
+			opflags = ZBX_ACTION_OPCLASS_NONE;
+		}
+
+		switch (opclass)
+		{
+			case 0:
+				opflags |= ZBX_ACTION_OPCLASS_NORMAL;
+				break;
+			case 1:
+				opflags |= ZBX_ACTION_OPCLASS_RECOVERY;
+				break;
+			case 2:
+				opflags |= ZBX_ACTION_OPCLASS_ACKNOWLEDGE;
+				break;
+		}
+	}
+
+	dbsync_compare_action_op(sync, actionid, opflags);
+
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
 
 /******************************************************************************
  *                                                                            *

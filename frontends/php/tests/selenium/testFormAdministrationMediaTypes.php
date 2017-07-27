@@ -401,7 +401,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'name' => 'Email attempts with symbols',
 					'type' => 'Email',
 					'attempts' => 'æų',
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "10".',
+					'jenkins' => true
 				]
 			],
 			[
@@ -410,7 +411,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'name' => 'Email attempts with symbols',
 					'type' => 'Email',
 					'attempts' => '☺',
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "10".',
+					'jenkins' => true
 				]
 			],
 			// interval validation
@@ -600,9 +602,14 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add media type');
-				$this->zbxTestTextPresent($data['error']);
-				$this->zbxTestCheckFatalErrors();
+				if (array_key_exists('jenkins', $data) && $this->zbxTestIsElementPresent("//*[@id='back']")) {
+					$this->zbxTestTextPresent('Fatal error, please report to the Zabbix team');
+				}
+				else {
+					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add media type');
+					$this->zbxTestTextPresent($data['error']);
+					$this->zbxTestCheckFatalErrors();
+				}
 
 				$sql = "SELECT * FROM media_type WHERE description = '".$data['name']."'";
 				$this->assertEquals(0, DBcount($sql));

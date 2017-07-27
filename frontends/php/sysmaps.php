@@ -435,7 +435,7 @@ else {
 	]);
 
 	$user_type = CWebUser::getType();
-	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+	if ($user_type != USER_TYPE_SUPER_ADMIN) {
 		$editable_maps = API::Map()->get([
 			'output' => [],
 			'sysmapids' => array_keys($data['maps']),

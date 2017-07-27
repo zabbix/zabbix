@@ -19,77 +19,116 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetWebView extends CController {
+class CControllerWidgetWebView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		return true;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		$this->setType(WIDGET_WEB_OVERVIEW);
+		$this->setValidationRules([
+			'name' =>		'string',
+			'fullscreen' =>	'in 0,1',
+			'fields' =>		'array'
+		]);
 	}
 
 	protected function doAction() {
-		$filter = [
-			'groupids' => null,
-			'maintenance' => null
-		];
+		$fields = $this->getForm()->getFieldsData();
 
-		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
-			// groups
-			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 0) {
-				// null mean all groups
-				$filter['groupids'] = null;
+		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
+		$filter_hostids = $fields['hostids'] ? $fields['hostids'] : null;
+		$filter_maintenance = ($fields['maintenance'] == 0) ? 0 : null;
+
+		if ($fields['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($fields['exclude_groupids']);
+
+			if ($filter_hostids === null) {
+				// Get all groups if no selected groups defined.
+				if ($filter_groupids === null) {
+					$filter_groupids = array_keys(API::HostGroup()->get([
+						'output' => [],
+						'preservekeys' => true
+					]));
+				}
+
+				$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
+
+				// Get available hosts.
+				$filter_hostids = array_keys(API::Host()->get([
+					'output' => [],
+					'groupids' => $filter_groupids,
+					'preservekeys' => true
+				]));
+			}
+
+			$exclude_hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => $exclude_groupids,
+				'preservekeys' => true
+			]));
+
+			$filter_hostids = array_diff($filter_hostids, $exclude_hostids);
+		}
+
+		$groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter_groupids,
+			'hostids' => $filter_hostids,
+			'monitored_hosts' => true,
+			'with_monitored_httptests' => true,
+			'preservekeys' => true
+		]);
+
+		CArrayHelper::sort($groups, ['name']);
+
+		$groupids = array_keys($groups);
+
+		$hosts = API::Host()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'hostids' => $filter_hostids,
+			'filter' => ['maintenance_status' => $filter_maintenance],
+			'monitored_hosts' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($groups as &$group) {
+			$group += ['ok' => 0, 'failed' => 0, 'unknown' => 0];
+		}
+		unset($group);
+
+		// Fetch links between HTTP tests and host groups.
+		$result = DbFetchArray(DBselect(
+			'SELECT DISTINCT ht.httptestid,hg.groupid'.
+			' FROM httptest ht,hosts_groups hg'.
+			' WHERE ht.hostid=hg.hostid'.
+				' AND '.dbConditionInt('hg.hostid', array_keys($hosts)).
+				' AND '.dbConditionInt('hg.groupid', $groupids).
+				' AND ht.status='.HTTPTEST_STATUS_ACTIVE
+		));
+
+		// Fetch HTTP test execution data.
+		$httptest_data = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
+
+		foreach ($result as $row) {
+			$group = &$groups[$row['groupid']];
+
+			if (array_key_exists($row['httptestid'], $httptest_data)
+					&& $httptest_data[$row['httptestid']]['lastfailedstep'] !== null) {
+				$group[($httptest_data[$row['httptestid']]['lastfailedstep'] != 0) ? 'failed' : 'ok']++;
 			}
 			else {
-				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
-
-				if ($hide_groupids) {
-					// get all groups if no selected groups defined
-					if (!$filter['groupids']) {
-						$dbHostGroups = API::HostGroup()->get([
-							'output' => ['groupid']
-						]);
-						$filter['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
-					}
-
-					$filter['groupids'] = array_diff($filter['groupids'], $hide_groupids);
-
-					// get available hosts
-					$dbAvailableHosts = API::Host()->get([
-						'groupids' => $filter['groupids'],
-						'output' => ['hostid']
-					]);
-					$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
-
-					$dbDisabledHosts = API::Host()->get([
-						'groupids' => $hide_groupids,
-						'output' => ['hostid']
-					]);
-					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
-
-					$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
-				}
-				elseif (!$filter['groupids']) {
-					// null mean all groups
-					$filter['groupids'] = null;
-				}
+				$group['unknown']++;
 			}
-
-			// hosts
-			$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
-			$filter['maintenance'] = ($maintenance == 0) ? 0 : null;
+			unset($group);
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'filter' => $filter,
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'groups' => $groups,
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

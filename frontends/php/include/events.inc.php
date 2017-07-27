@@ -400,14 +400,17 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $trigger['triggerid']				Trigger ID to select events.
  * @param string $trigger['description']			Trigger description.
  * @param string $trigger['url']					Trigger URL.
- * @param string $trigger['lastEvent']['eventid']	Last event ID
+ * @param string $eventid_till
  * @param string $backurl							URL to return to.
+ * @param array  $config
+ * @param int    $config['event_ack_enable']
+ * @param int    $fullscreen
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $backurl) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, $fullscreen = 0) {
 	// Show trigger description and URL.
-	$div = (new CDiv());
+	$div = new CDiv();
 
 	if ($trigger['comments'] !== '') {
 		$div->addItem(
@@ -425,50 +428,179 @@ function make_popup_eventlist($trigger, $backurl) {
 		);
 	}
 
-	// Select and show events.
-	$config = select_config();
+	$show_timeline = true;
 
-	$table = new CTableInfo();
+	// indicator of sort field
+	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);
 
-	// If acknowledges are turned on, we show 'ack' column.
-	if ($config['event_ack_enable']) {
-		$table->setHeader([_('Time'), _('Status'), _('Duration'), _('Age'), _('Ack')]);
+	if ($show_timeline) {
+		$header = [
+			(new CColHeader([_('Time'), $sort_div]))->addClass(ZBX_STYLE_RIGHT),
+			(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH),
+			(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH)
+		];
 	}
 	else {
-		$table->setHeader([_('Time'), _('Status'), _('Duration'), _('Age')]);
+		$header = [[_('Time'), $sort_div]];
 	}
 
-	if (array_key_exists('lastEvent', $trigger)) {
-		$events = API::Event()->get([
+	// Select and show events.
+	$table = (new CTableInfo())
+		->setHeader(array_merge($header, [
+			_('Recovery time'),
+			_('Status'),
+			_('Duration'),
+			$config['event_ack_enable'] ? _('Ack') : null
+		]));
+
+	if ($eventid_till != 0) {
+		$options = [
+			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid'],
+			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'output' => API_OUTPUT_EXTEND,
-			'objectids' => [$trigger['triggerid']],
-			'eventid_till' => $trigger['lastEvent']['eventid'],
-			'select_acknowledges' => API_OUTPUT_COUNT,
-			'sortfield' => ['clock', 'eventid'],
+			'eventid_till' => $eventid_till,
+			'objectids' => $trigger['triggerid'],
+			'value' => TRIGGER_VALUE_TRUE,
+			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => ZBX_WIDGET_ROWS
+		];
+		if ($config['event_ack_enable']) {
+			$options['select_acknowledges'] = ['userid', 'clock', 'message', 'action'];
+		}
+
+		$problems = API::Event()->get($options);
+
+		CArrayHelper::sort($problems, [
+			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+			['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 		]);
 
-		$lclock = time();
+		$r_eventids = [];
 
-		foreach ($events as $event) {
-			$duration = zbx_date2age($lclock, $event['clock']);
-			$lclock = $event['clock'];
+		foreach ($problems as $problem) {
+			$r_eventids[$problem['r_eventid']] = true;
+		}
+		unset($r_eventids[0]);
 
-			$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+		$r_events = $r_eventids
+			? API::Event()->get([
+				'output' => ['clock', 'correlationid', 'userid'],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'eventids' => array_keys($r_eventids),
+				'preservekeys' => true
+			])
+			: [];
+
+		$today = strtotime('today');
+		$last_clock = 0;
+		if ($config['event_ack_enable']) {
+			$acknowledges = makeEventsAcknowledges($problems, $backurl);
+		}
+
+		$url_details = (new CUrl('tr_events.php'))
+			->setArgument('triggerid', '')
+			->setArgument('eventid', '');
+		if ($fullscreen == 1) {
+			$url_details->setArgument('fullscreen', $fullscreen);
+		}
+
+		foreach ($problems as $problem) {
+			if (array_key_exists($problem['r_eventid'], $r_events)) {
+				$problem['r_clock'] = $r_events[$problem['r_eventid']]['clock'];
+				$problem['correlationid'] = $r_events[$problem['r_eventid']]['correlationid'];
+				$problem['userid'] = $r_events[$problem['r_eventid']]['userid'];
+			}
+			else {
+				$problem['r_clock'] = 0;
+				$problem['correlationid'] = 0;
+				$problem['userid'] = 0;
+			}
+
+			if ($problem['r_eventid'] != 0) {
+				$value = TRIGGER_VALUE_FALSE;
+				$value_str = _('RESOLVED');
+				$value_clock = $problem['r_clock'];
+			}
+			else {
+				$in_closing = false;
+
+				if ($config['event_ack_enable']) {
+					foreach ($problem['acknowledges'] as $acknowledge) {
+						if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+							$in_closing = true;
+							break;
+						}
+					}
+				}
+
+				$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+				$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+				$value_clock = $in_closing ? time() : $problem['clock'];
+			}
+
+			$url_details
+				->setArgument('triggerid', $problem['objectid'])
+				->setArgument('eventid', $problem['eventid']);
+
+			$cell_clock = ($problem['clock'] >= $today)
+				? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
+				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
+			$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+			if ($problem['r_eventid'] != 0) {
+				$cell_r_clock = ($problem['r_clock'] >= $today)
+					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
+					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
+				$cell_r_clock = (new CCol(new CLink($cell_r_clock, $url_details)))
+					->addClass(ZBX_STYLE_NOWRAP)
+					->addClass(ZBX_STYLE_RIGHT);
+			}
+			else {
+				$cell_r_clock = '';
+			}
+
+			$cell_status = new CSpan($value_str);
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
+			addTriggerValueStyle($cell_status, $value, $value_clock,
+				$config['event_ack_enable'] && (bool) $problem['acknowledges']
+			);
 
-			$table->addRow([
-				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-				$eventStatusSpan,
-				$duration,
-				zbx_date2age($event['clock']),
-				$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null
-			]);
+			if ($show_timeline) {
+				if ($last_clock != 0) {
+					CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
+				}
+				$last_clock = $problem['clock'];
+
+				$row = [
+					$cell_clock->addClass(ZBX_STYLE_TIMELINE_DATE),
+					(new CCol())
+						->addClass(ZBX_STYLE_TIMELINE_AXIS)
+						->addClass(ZBX_STYLE_TIMELINE_DOT),
+					(new CCol())->addClass(ZBX_STYLE_TIMELINE_TD)
+				];
+			}
+			else {
+				$row = [
+					$cell_clock
+						->addClass(ZBX_STYLE_NOWRAP)
+						->addClass(ZBX_STYLE_RIGHT)
+				];
+			}
+
+			$table->addRow(array_merge($row, [
+				$cell_r_clock,
+				$cell_status,
+				(new CCol(
+					($problem['r_eventid'] != 0)
+						? zbx_date2age($problem['clock'], $problem['r_clock'])
+						: zbx_date2age($problem['clock'])
+				))
+					->addClass(ZBX_STYLE_NOWRAP),
+				$config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
+			]));
 		}
 	}
 

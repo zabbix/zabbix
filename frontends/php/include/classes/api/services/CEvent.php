@@ -105,8 +105,8 @@ class CEvent extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
@@ -115,9 +115,9 @@ class CEvent extends CApiService {
 			'select_alerts'				=> null,
 			'select_acknowledges'		=> null,
 			'selectTags'				=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -213,7 +213,7 @@ class CEvent extends CApiService {
 			zbx_value2array($options['objectids']);
 			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['objectid'] = 'e.objectid';
 			}
 		}
@@ -367,8 +367,8 @@ class CEvent extends CApiService {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount'])) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $event;
 				}
 				else {
@@ -380,7 +380,7 @@ class CEvent extends CApiService {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -390,7 +390,7 @@ class CEvent extends CApiService {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -465,11 +465,12 @@ class CEvent extends CApiService {
 
 		$acknowledgeids = DB::insert('acknowledges', $acknowledges);
 
+		$ack_count = count($acknowledgeids);
+
 		if ($action == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
 			// Close the problem manually.
 
 			$tasks = [];
-			$ack_count = count($acknowledgeids);
 
 			for ($i = 0; $i < $ack_count; $i++) {
 				$tasks[] = [
@@ -492,6 +493,29 @@ class CEvent extends CApiService {
 
 			DB::insert('task_close_problem', $task_close, false);
 		}
+
+		$tasks = [];
+
+		for ($i = 0; $i < $ack_count; $i++) {
+			$tasks[] = [
+				'type' => ZBX_TM_TASK_ACKNOWLEDGE,
+				'status' => ZBX_TM_STATUS_NEW,
+				'clock' => $time
+			];
+		}
+
+		$taskids = DB::insert('task', $tasks);
+
+		$tasks_ack = [];
+
+		for ($i = 0; $i < $ack_count; $i++) {
+			$tasks_ack[] = [
+				'taskid' => $taskids[$i],
+				'acknowledgeid' => $acknowledgeids[$i]
+			];
+		}
+
+		DB::insert('task_acknowledge', $tasks_ack, false);
 
 		return ['eventids' => array_values($eventids)];
 	}
@@ -535,7 +559,7 @@ class CEvent extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			if ($this->outputIsRequested('r_eventid', $options['output'])) {
 				// Select fields from event_recovery table using LEFT JOIN.
 

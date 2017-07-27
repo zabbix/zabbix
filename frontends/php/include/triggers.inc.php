@@ -104,14 +104,15 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 /**
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
- * @param int	 $severity			trigger severity
- * @param array  $config			array of configuration parameters to get trigger severity name
- * @param string $text				trigger severity name
- * @param bool	 $forceNormal		true to return 'normal' class, false to return corresponding severity class
+ * @param int         $severity     trigger severity
+ * @param array|null  $config       array of configuration parameters to get trigger severity name; can be omitted
+ *                                  if $text is not null
+ * @param string|null $text         trigger severity name
+ * @param bool        $forceNormal  true to return 'normal' class, false to return corresponding severity class
  *
  * @return CCol
  */
-function getSeverityCell($severity, $config, $text = null, $forceNormal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $forceNormal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
@@ -635,6 +636,48 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
+function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
+		array $trigger_options = []) {
+	// fetch hosts
+	$hosts = API::Host()->get([
+		'output' => ['hostid', 'status'],
+		'selectGraphs' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'selectScreens' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'groupids' => $groupids ? $groupids : null,
+		'preservekeys' => true
+	] + $host_options);
+
+	$hostids = array_keys($hosts);
+
+	$options = [
+		'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'],
+		'selectHosts' => ['hostid', 'name', 'status'],
+		'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+		'hostids' => $hostids,
+		'monitored' => true,
+		'skipDependent' => true,
+		'sortfield' => 'description',
+		'preservekeys' => true
+	] + $trigger_options;
+
+	// application filter
+	if ($application !== '') {
+		$applications = API::Application()->get([
+			'output' => [],
+			'hostids' => $hostids,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]);
+		$options['applicationids'] = array_keys($applications);
+	}
+
+	$triggers = API::Trigger()->get($options);
+
+	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
+
+	return [$hosts, $triggers];
+}
+
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *
@@ -872,13 +915,17 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			->addClass(ZBX_STYLE_CURSOR_POINTER);
 	}
 
-	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
-	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
-		$column->addClass('blink');
-		$column->setAttribute('data-toggle-class', $css);
-	}
-
 	if ($trigger) {
+		// blinking
+		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+		$duration = time() - $trigger['lastchange'];
+
+		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
+			$column->addClass('blink');
+			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
+			$column->setAttribute('data-toggle-class', $css);
+		}
+
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
 	}
 
@@ -1857,6 +1904,18 @@ function get_item_function_info($expr) {
  * @return bool     the calculated value of the expression
  */
 function evalExpressionData($expression, $replaceFunctionMacros) {
+	// Sort by longest array key which in this case contains macros.
+	uksort($replaceFunctionMacros, function ($key1, $key2) {
+		$s1 = strlen($key1);
+		$s2 = strlen($key2);
+
+		if ($s1 == $s2) {
+			return 0;
+		}
+
+		return ($s1 > $s2) ? -1 : 1;
+	});
+
 	// replace function macros with their values
 	$expression = str_replace(array_keys($replaceFunctionMacros), array_values($replaceFunctionMacros), $expression);
 

@@ -21,18 +21,15 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetFavMapsView extends CController {
+class CControllerWidgetFavMapsView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		return true;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		$this->setType(WIDGET_FAVOURITE_MAPS);
+		$this->setValidationRules([
+			'name' =>	'string'
+		]);
 	}
 
 	protected function doAction() {
@@ -60,6 +57,7 @@ class CControllerWidgetFavMapsView extends CController {
 		CArrayHelper::sort($maps, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_MAPS]),
 			'maps' => $maps,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

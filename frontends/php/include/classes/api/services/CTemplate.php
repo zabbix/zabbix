@@ -77,8 +77,8 @@ class CTemplate extends CHostGeneral {
 			'filter'					=> null,
 			'search'					=> '',
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
@@ -94,9 +94,9 @@ class CTemplate extends CHostGeneral {
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'selectHttpTests'			=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
@@ -131,7 +131,7 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
 			}
 		}
@@ -151,7 +151,7 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['parentTemplateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['templateid'] = 'ht.templateid';
 			}
 		}
@@ -164,7 +164,7 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('ht.hostid', $options['hostids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.templateid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['ht'] = 'ht.hostid';
 			}
 		}
@@ -258,11 +258,13 @@ class CTemplate extends CHostGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($template = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount']))
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $template;
-				else
+				}
+				else {
 					$result = $template['rowscount'];
+				}
 			}
 			else{
 				$template['templateid'] = $template['hostid'];
@@ -273,7 +275,7 @@ class CTemplate extends CHostGeneral {
 
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -282,7 +284,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -651,7 +653,7 @@ class CTemplate extends CHostGeneral {
 			'templateids' => $templateids,
 			'output' => ['httptestid'],
 			'nopermissions' => 1,
-			'preservekeys' => 1
+			'preservekeys' => true
 		]);
 		if (!empty($delHttpTests)) {
 			API::HttpTest()->delete(array_keys($delHttpTests), true);
@@ -662,7 +664,7 @@ class CTemplate extends CHostGeneral {
 			'templateids' => $templateids,
 			'output' => ['applicationid'],
 			'nopermissions' => 1,
-			'preservekeys' => 1
+			'preservekeys' => true
 		]);
 		if (!empty($delApplications)) {
 			API::Application()->delete(array_keys($delApplications), true);

@@ -97,6 +97,103 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/name": value must be one of xml, json.'
 			],
 			[
+				['type' => API_STRINGS_UTF8],
+				['hostid', 'name'],
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				['a' => 'hostid', 'b' => 'name'],
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				[],
+				'/output',
+				[]
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'flags' => API_NOT_EMPTY],
+				[],
+				'/output',
+				'Invalid parameter "/output": cannot be empty.'
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				'',
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE],
+				'',
+				'/output',
+				['']
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				true,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				123,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				123.5,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				null,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL],
+				null,
+				'/output',
+				null
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				['hostid', []],
+				'/output',
+				'Invalid parameter "/output/2": a character string is expected.'
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				// broken UTF-8 byte sequence
+				['abc'."\xd1".'e'],
+				'/output',
+				'Invalid parameter "/output/1": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => 'hostid,name'],
+				['hostid', 'name'],
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => 'hostid,name'],
+				['hostid', 'host'],
+				'/output',
+				'Invalid parameter "/output/2": value must be one of hostid, name.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => 'hostid,name', 'uniq' => true],
+				['hostid', 'name', 'name'],
+				'/output',
+				'Invalid parameter "/output/3": value (name) already exists.'
+			],
+			[
 				['type' => API_INT32],
 				0,
 				'/1/int',
@@ -277,6 +374,102 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
 			],
 			[
+				['type' => API_INTS32],
+				[0, 1],
+				'/output',
+				[0, 1]
+			],
+			[
+				['type' => API_INTS32],
+				['0', '1'],
+				'/output',
+				[0, 1]
+			],
+			[
+				['type' => API_INTS32],
+				['a' => 0, 'b' => 1],
+				'/output',
+				[0, 1]
+			],
+			[
+				['type' => API_INTS32],
+				[],
+				'/output',
+				[]
+			],
+			[
+				['type' => API_INTS32, 'flags' => API_NOT_EMPTY],
+				[],
+				'/output',
+				'Invalid parameter "/output": cannot be empty.'
+			],
+			[
+				['type' => API_INTS32],
+				'',
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_INTS32],
+				true,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_INTS32],
+				123,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_INTS32, 'flags' => API_NORMALIZE],
+				123,
+				'/output',
+				[123]
+			],
+			[
+				['type' => API_INTS32],
+				123.5,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_INTS32],
+				null,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_INTS32, 'flags' => API_ALLOW_NULL],
+				null,
+				'/output',
+				null
+			],
+			[
+				['type' => API_INTS32],
+				[0, []],
+				'/output',
+				'Invalid parameter "/output/2": a number is expected.'
+			],
+			[
+				['type' => API_INTS32, 'in' => '1:100'],
+				[55, 67],
+				'/output',
+				[55, 67]
+			],
+			[
+				['type' => API_INTS32, 'in' => '1:100'],
+				[55, 55, 101],
+				'/output',
+				'Invalid parameter "/output/3": value must be one of 1-100.'
+			],
+			[
+				['type' => API_INTS32, 'uniq' => true],
+				[55, 55, 101],
+				'/output',
+				'Invalid parameter "/output/2": value (55) already exists.'
+			],
+			[
 				['type' => API_ID],
 				0,
 				'/1/id',
@@ -437,6 +630,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				null,
 				'/',
 				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => []],
+				null,
+				'/',
+				null
 			],
 			[
 				['type' => API_OBJECT, 'fields' => []],
@@ -654,6 +853,24 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
+					'name' => ['type' => API_STRING_UTF8],
+					'col' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => '0'],
+					'row' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => '1'],
+					'width' => ['type' => API_INT32],
+					'height' => ['type' => API_INT32]
+				]],
+				[
+					['name' => 'Zabbix server 1'],
+					['name' => 'Zabbix server 2', 'col' => 5, 'row' => 10, 'width' => 1, 'height' => 1]
+				],
+				'/',
+				[
+					['name' => 'Zabbix server 1', 'col' => 0, 'row' => 1],
+					['name' => 'Zabbix server 2', 'col' => 5, 'row' => 10, 'width' => 1, 'height' => 1]
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
 					'host' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 					'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 				]],
@@ -808,6 +1025,59 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						]
 					]
 				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32],
+						['if' => ['field' => 'type', 'in' => '3,4'], 'type' => API_STRING_UTF8],
+						['if' => ['field' => 'type', 'in' => '5:9'], 'type' => API_ID]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125'],
+					['type' => '3', 'value' => 'text'],
+					['type' => '4', 'value' => 'text3'],
+					['type' => '7', 'value' => '123456789012345']
+				],
+				'/',
+				[
+					['type' => 1, 'value' => -5],
+					['type' => 2, 'value' => 125],
+					['type' => 3, 'value' => 'text'],
+					['type' => 4, 'value' => 'text3'],
+					['type' => 7, 'value' => '123456789012345']
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => 'a125']
+				],
+				'/',
+				'Invalid parameter "/2/value": a number is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,3'], 'type' => API_INT32]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125']
+				],
+				'/',
+				'Incorrect validation rules.'
 			],
 			[
 				['type' => API_HG_NAME, 'length' => 16],
@@ -1415,6 +1685,115 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'{$MACRO}',
 				'/1/time_unit',
 				'Invalid parameter "/1/time_unit": a time unit is expected.'
+			],
+			[
+				['type' => API_OUTPUT],
+				['hostid', 'name'],
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_OUTPUT],
+				['a' => 'hostid', 'b' => 'name'],
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_OUTPUT],
+				[],
+				'/output',
+				[]
+			],
+			[
+				['type' => API_OUTPUT],
+				'extend',
+				'/output',
+				'extend'
+			],
+			[
+				['type' => API_OUTPUT],
+				'count',
+				'/output',
+				'Invalid parameter "/output": value must be one of extend.'
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT],
+				'count',
+				'/output',
+				'count'
+			],
+			[
+				['type' => API_OUTPUT],
+				'',
+				'/output',
+				'Invalid parameter "/output": value must be one of extend.'
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT],
+				'',
+				'/output',
+				'Invalid parameter "/output": value must be one of extend, count.'
+			],
+			[
+				['type' => API_OUTPUT],
+				true,
+				'/output',
+				'Invalid parameter "/output": an array or a character string is expected.'
+			],
+			[
+				['type' => API_OUTPUT],
+				123,
+				'/output',
+				'Invalid parameter "/output": an array or a character string is expected.'
+			],
+			[
+				['type' => API_OUTPUT],
+				123.5,
+				'/output',
+				'Invalid parameter "/output": an array or a character string is expected.'
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL],
+				null,
+				'/output',
+				null
+			],
+			[
+				['type' => API_OUTPUT],
+				null,
+				'/output',
+				'Invalid parameter "/output": an array or a character string is expected.'
+			],
+			[
+				['type' => API_OUTPUT],
+				['hostid', []],
+				'/output',
+				'Invalid parameter "/output/2": a character string is expected.'
+			],
+			[
+				['type' => API_OUTPUT],
+				// broken UTF-8 byte sequence
+				['abc'."\xd1".'e'],
+				'/output',
+				'Invalid parameter "/output/1": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_OUTPUT, 'in' => 'hostid,name'],
+				['hostid', 'name'],
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_OUTPUT, 'in' => 'hostid,name'],
+				['hostid', 'host'],
+				'/output',
+				'Invalid parameter "/output/2": value must be one of hostid, name.'
+			],
+			[
+				['type' => API_OUTPUT, 'in' => 'hostid,name'],
+				['hostid', 'name', 'name'],
+				'/output',
+				'Invalid parameter "/output/3": value (name) already exists.'
 			]
 		];
 	}
@@ -1454,11 +1833,39 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				''
 			],
 			[
+				['type' => API_IDS],
+				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, '3'],
+				'/',
+				true,
+				''
+			],
+			[
 				['type' => API_IDS, 'uniq' => true],
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, '3'],
 				'/',
 				false,
 				'Invalid parameter "/10": value (3) already exists.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'uniq' => true],
+				['dashboardid', 'name', 'userid', 'private'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_STRINGS_UTF8],
+				['dashboardid', 'name', 'userid', 'private', 'dashboardid'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'uniq' => true],
+				['dashboardid', 'name', 'userid', 'private', 'dashboardid'],
+				'/',
+				false,
+				'Invalid parameter "/5": value (dashboardid) already exists.'
 			],
 			[
 				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']]],

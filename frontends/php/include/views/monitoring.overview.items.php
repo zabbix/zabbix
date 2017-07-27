@@ -92,14 +92,13 @@ $widget->addItem($filter);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
-	$dataTable = getItemsDataOverview(array_keys($this->data['pageFilter']->hosts), $this->data['applicationIds'],
-		$this->data['view_style']
-	);
+	$groupids = ($this->data['pageFilter']->groupids !== null) ? $this->data['pageFilter']->groupids : [];
+	$table = getItemsDataOverview($groupids, $this->data['filter']['application'], $this->data['view_style']);
 }
 else {
-	$dataTable = new CTableInfo();
+	$table = new CTableInfo();
 }
 
-$widget->addItem($dataTable);
+$widget->addItem($table);
 
 return $widget;

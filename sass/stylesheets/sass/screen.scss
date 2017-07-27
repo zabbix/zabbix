@@ -516,16 +516,49 @@ ul.top-nav-icons {
 	}
 
 	form {
-		display: inline-block;
+		display: flex;
+		justify-content: flex-end;
 	}
 
 	ul {
-
 		li {
 			display: inline-block;
 			vertical-align: top;
 			position: relative;
 			padding: 0 0 0 10px;
+		}
+	}
+
+	.dashbrd-edit {
+		position: relative;
+		display: inline-block;
+		background-color: $ui-bg-color;
+		@include box-shadow(0 0 0 4px $ui-bg-color);
+
+		&::after {
+			content: "";
+			position: absolute;
+			min-height: 24px;
+			z-index: -1;
+			top: -5px;
+			right: -5px;
+			bottom: -5px;
+			left: -5px;
+			border: 1px solid $ui-border-color;
+		}
+
+		ul {
+			li {
+				vertical-align: middle;
+
+				&:first-child {
+					padding: 0;
+				}
+
+				.btn-dashbrd-conf {
+					vertical-align: middle;
+				}
+			}
 		}
 	}
 }
@@ -1964,16 +1997,49 @@ button {
 	color: $btn-alt-font-color;
 	background-color: $btn-alt-bg-color;
 
+	.plus-icon {
+		background-color: $btn-alt-font-color;
+		margin-right: 8px;
+
+		&::after {
+			background-color: $btn-alt-font-color;
+		}
+	}
+
 	&:hover {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
 	}
 
 	&:focus {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
 	}
 
 	&:active {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
 	}
 }
 
@@ -2109,9 +2175,11 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
+	widget-action: url(../img/icon-sprite.svg) no-repeat -4px -616px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -39px -617px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -39px -580px,
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
@@ -2125,10 +2193,25 @@ $icon-widget-btn: (
 	}
 }
 
+.btn-dashbrd-conf {
+	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
+	@extend %btn-dashbrd;
+}
+
 %btn-widget {
-	border: none;
 	width: 30px;
 	height: 28px;
+	@extend %btn-widget-defaults;
+}
+
+%btn-dashbrd {
+	width: 24px;
+	height: 24px;
+	@extend %btn-widget-defaults;
+}
+
+%btn-widget-defaults {
+	border: none;
 	min-height: 0;
 	padding: 0;
 	-webkit-transform-style: preserve-3d;
@@ -2193,6 +2276,12 @@ $icon-widget-btn: (
 		&:active {
 			color: darken($ui-bg-selected-color, 35%);
 		}
+	}
+}
+
+.inaccessible {
+	.subfilter-enabled {
+		color: darken($font-selected-color, 25%);
 	}
 }
 
@@ -2567,6 +2656,15 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
+.dashbrd-grid-widget-mask {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	z-index: 80;
+	display: none;
+}
+
 .dashbrd-grid-widget-draggable {
 	border-color: $action-border-color !important;
 	border-bottom-color: darken($action-border-color, 1%) !important;
@@ -2626,7 +2724,7 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-head {
 	position: relative;
-	padding: 8px 40px 8px 10px;
+	padding: 8px 65px 8px 10px;
 	min-height: 17px;
 
 	h4 {
@@ -2638,7 +2736,7 @@ $form-icon-btn: (
 	ul {
 		position: absolute;
 		top: 0;
-		right: 3px;
+		right: 0;
 
 		li {
 			display: block;
@@ -3113,7 +3211,7 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue-body {
-	margin: 0 0 50px 0;
+	white-space: nowrap;
 }
 
 .overlay-dialogue-footer {
@@ -3441,19 +3539,19 @@ $form-icon-btn: (
 
 %scroll-vert-shadow {
 	background:
-	// Shadow covers
-	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
-	linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
-	// Shadows
-	radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
-	radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
+		// Shadow covers
+		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
+		linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
+		// Shadows
+		radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
+		radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background:
-	// Shadow covers
-	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
-	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
-	// Shadows
-	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
-	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
+		// Shadow covers
+		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
+		linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
+		// Shadows
+		radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
+		radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background-repeat: no-repeat;
 	background-color: $ui-bg-color;
 	background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -3829,17 +3927,6 @@ td.inactive-bg {
 	background-color: $lighter-yellow;
 }
 
-.active-indic {
-	width: 8px;
-	height: 8px;
-	position: absolute;
-	top: -6px;
-	right: -6px;
-	border: 2px solid $body-bg-color;
-	background-color: darken(desaturate($alt-green, 10%), 16%);
-	@include border-radius(4px);
-}
-
 .msg-good {
 	color: darken(desaturate($green, 10%), 20%);
 	border: 1px solid $light-green;
@@ -3971,6 +4058,28 @@ td.inactive-bg {
 	margin-right: auto;
 	margin-top: 5%;
 	max-width: 25%;
+}
+
+// Plus/Add icon
+
+.plus-icon {
+	display: inline-block;
+	@extend %plus-icon;
+}
+
+%plus-icon {
+	width: 2px;
+	height: 8px;
+	position: relative;
+
+	&::after {
+		content: "";
+		width: 8px;
+		height: 2px;
+		top: 3px;
+		left: -3px;
+		position: absolute;
+	}
 }
 
 // Close/Remove icon
@@ -4282,8 +4391,14 @@ tr.cursor-move {
 
 // Analog Clock
 .clock {
-	text-align: center;
-	display: inline-block;
+	padding: 0 5px;
+	height: 100%;
+}
+
+.clock-svg {
+	max-height: 100%;
+	display: block;
+	margin: 0 auto;
 }
 
 .time-zone {
@@ -4310,6 +4425,263 @@ tr.cursor-move {
 
 .clock-lines {
 	fill: $clock-lines-color;
+}
+
+.sysmap-widget-container {
+	overflow: hidden;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.navtree {
+	$max_depth: 10;
+
+	@keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+	@-moz-keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+	@-webkit-keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+	@-ms-keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+	@-o-keyframes fadein {
+		from {opacity: 0;}
+		to   {opacity: 1;}
+	}
+
+	.tree {
+		width: 100%;
+		height: 100%;
+
+		.tree-list {
+			list-style: none;
+		}
+
+		.tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
+			flex: 0 0 15px;
+		}
+		@for $i from 0 through $max_depth {
+			.tree-list[data-depth="#{$i}"] > .tree-item > .tree-row > .content > .margin-lvl {
+				flex: 0 0 ($i * 15px + 10px);
+			}
+		}
+
+		.tree-list[data-depth] .ui-sortable-helper {
+			> .tree-row > .content > .margin-lvl {
+				flex: 0 0 15px;
+			}
+
+			@for $i from 1 through $max_depth - 1 {
+				$class_tree_list: '.tree-list';
+				@for $j from 1 through $i {
+					@if $j != 1 {
+						$class_tree_list: $class_tree_list + ' .tree-list';
+					}
+				}
+				#{$class_tree_list} > li > .tree-row > .content > .margin-lvl {
+					flex: 0 0 ($i * 15px + 15px);
+				}
+			}
+		}
+
+		.tree-item {
+			> .tree-row {
+				width: 100%;
+				min-width: 320px;
+				border-bottom: 1px solid $ui-border-color;
+				padding: 8px 0;
+
+				&:hover {
+					background-color: $ui-hover-color;
+				}
+
+				> .problems {
+					float: right;
+					position: relative;
+					padding-left:10px;
+					margin-right: 10px;
+					background: inherit;
+					display: flex;
+
+					.problems-per-item {
+						flex: 0 0 7px;
+						background: gray;
+						color: $white;
+						padding: 3px 4px 2px;
+						font-size: 12px;
+						line-height: 1;
+						border-radius: 3px;
+						margin: 0px 5px 0px 0px;
+					}
+				}
+
+				> .tools {
+					float: right;
+					position: relative;
+					padding-left:10px;
+					margin-right: 10px;
+					display: flex;
+					width: 85px;
+
+					.edit-item-btn,
+					.remove-item-btn,
+					.import-items-btn,
+					.add-child-btn {
+						margin-left: 5px;
+						cursor: pointer;
+						border: 0px none;
+						opacity: 0.5;
+						float: left;
+					}
+					.edit-item-btn:hover,
+					.remove-item-btn:hover,
+					.import-items-btn:hover,
+					.add-child-btn:hover {
+						opacity: 1;
+					}
+					.add-child-btn {
+						background: url(../img/icon-sprite.svg) no-repeat -47px -551px;
+						background-color: $transparent !important;
+						height: 15px;
+						width: 14px;
+					}
+					.edit-item-btn {
+						background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+						background-color: $transparent !important;
+						height: 15px;
+						width: 14px;
+					}
+					.import-items-btn {
+						background: url(../img/icon-sprite.svg) no-repeat -47px -515px;
+						background-color: $transparent !important;
+						height: 15px;
+						width: 14px;
+					}
+					.remove-btn {
+						position: relative;
+						margin-left: 10px;
+						top: 0px;
+					}
+				}
+
+				> .content {
+					display: flex;
+					height: 20px;
+
+					> .arrow {
+						flex: 0 0 15px;
+						text-align:center;
+						margin: 2px 2px 0px -5px;
+
+						> .treeview {
+							display: none;
+						}
+					}
+
+					> .drag-icon {
+						min-width: 24px;
+						cursor: move;
+					}
+
+					> .item-name {
+						flex: 0 1 auto;
+						white-space: nowrap;
+						overflow: hidden;
+						margin-right: 5px;
+						text-overflow: ellipsis;
+						line-height: 1.5;
+					}
+				}
+			}
+
+			&.is-parent {
+				> .tree-row{
+					> .content {
+						> .arrow {
+							> .treeview {
+								display: block;
+							}
+						}
+					}
+				}
+			}
+
+			&.selected {
+				> .tree-row {
+					@extend %found-bg;
+
+					&:hover {
+						@extend %found-bg;
+					}
+				}
+			}
+
+			&.no-map,
+			&.inaccessible {
+				> .tree-row {
+					> .content {
+						> .item-name {
+							color: $form-border-color;
+						}
+					}
+				}
+			}
+
+			&.ui-sortable-helper {
+				background: #f7f7f7;
+				border-color: #d7dadc;
+				border-width: 1px;
+				border-style: solid;
+
+				.tools {
+					display: none;
+				}
+			}
+
+			&.sortable-error {
+				border-color: transparent;
+				background: #fbe3e4;
+			}
+
+			&.opened > ul {
+				display: block;
+			}
+
+			&.closed > ul {
+				display: none;
+			}
+		}
+
+		.highliglted-parent > .tree-row {
+			background: #f9f9f9;
+		}
+
+		.sortable-item-placeholder {
+			background: #f5f5f5;
+			height: 33px;
+		}
+
+		.placeholder {
+			background-color: #ebeef0;
+			-webkit-animation: fadein .5s;
+			-moz-animation: fadein .5s;
+			-ms-animation: fadein .5s;
+			-o-animation: fadein .5s;
+			animation: fadein .5s;
+		}
+
+		.drop-hover > .row {
+			background: #faebd7;
+		}
+	}
 }
 
 /*doc

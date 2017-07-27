@@ -21,18 +21,15 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetFavScreensView extends CController {
+class CControllerWidgetFavScreensView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		return true;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		$this->setType(WIDGET_FAVOURITE_SCREENS);
+		$this->setValidationRules([
+			'name' =>	'string'
+		]);
 	}
 
 	protected function doAction() {
@@ -77,6 +74,7 @@ class CControllerWidgetFavScreensView extends CController {
 		CArrayHelper::sort($screens, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_SCREENS]),
 			'screens' => $screens,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

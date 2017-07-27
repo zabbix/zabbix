@@ -97,23 +97,38 @@ class CScreenClock extends CScreenBase {
 			$this->screenitem['width'] = $this->screenitem['height'];
 		}
 
-		$item = (new CClock())
+		$clock = (new CClock())
 			->setWidth($this->screenitem['width'])
 			->setHeight($this->screenitem['height'])
-			->setTimeZoneString($time_zone_string)
-			->setFooter($title);
+			->setTimeZoneString($time_zone_string);
 
 		if ($error !== null) {
-			$item->setError($error);
+			$clock->setError($error);
 		}
 
 		if ($time !== null) {
-			$item->setTime($time);
+			$clock->setTime($time);
 		}
 
 		if ($time_zone_offset !== null) {
-			$item->setTimeZoneOffset($time_zone_offset);
+			$clock->setTimeZoneOffset($time_zone_offset);
 		}
+
+		if ($error === null) {
+			if (!defined('ZBX_CLOCK')) {
+				define('ZBX_CLOCK', 1);
+				insert_js(file_get_contents($clock->getScriptFile()));
+			}
+			zbx_add_post_js($clock->getScriptRun());
+		}
+
+		$item = [];
+		$item[] = $clock->getTimeDiv()
+			->addClass(ZBX_STYLE_TIME_ZONE);
+		$item[] = $clock;
+		$item[] = (new CDiv($title))
+			->addClass(ZBX_STYLE_LOCAL_CLOCK)
+			->addClass(ZBX_STYLE_GREY);
 
 		return $this->getOutput($item);
 	}

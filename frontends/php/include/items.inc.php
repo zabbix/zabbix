@@ -911,50 +911,82 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param array  		$hostIds
- * @param array|null	$applicationIds		IDs of applications to filter items by
- * @param int    		$viewMode
+ * @param array|null $groupids
+ * @param string     $application  IDs of applications to filter items by
+ * @param int        $viewMode
  *
  * @return CTableInfo
  */
-function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode) {
-	$sqlFrom = '';
-	$sqlWhere = '';
-
-	if ($applicationIds !== null) {
-		$sqlFrom = 'items_applications ia,';
-		$sqlWhere = ' AND i.itemid=ia.itemid AND '.dbConditionInt('ia.applicationid', $applicationIds);
+function getItemsDataOverview(array $groupids, $application, $viewMode) {
+	// application filter
+	if ($application !== '') {
+		$applicationids = array_keys(API::Application()->get([
+			'output' => [],
+			'groupids' => $groupids ? $groupids : null,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]));
+		$groupids = [];
+	}
+	else {
+		$applicationids = null;
 	}
 
-	$dbItems = DBfetchArray(DBselect(
-		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.units,'.
-			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
-		' FROM hosts h,'.$sqlFrom.'items i'.
-			' LEFT JOIN functions f ON f.itemid=i.itemid'.
-			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-		' WHERE '.dbConditionInt('h.hostid', $hostIds).
-			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND h.hostid=i.hostid'.
-			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
-				$sqlWhere
-	));
+	$db_items = API::Item()->get([
+		'output' => ['itemid', 'hostid', 'key_', 'name', 'value_type', 'units', 'valuemapid'],
+		'selectHosts' => ['name'],
+		'groupids' => $groupids ? $groupids : null,
+		'applicationids' => $applicationids,
+		'monitored' => true,
+		'webitems' => true,
+		'preservekeys' => true
+	]);
 
-	$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
+	$db_triggers = API::Trigger()->get([
+		'output' => ['triggerid', 'priority', 'value'],
+		'selectItems' => ['itemid'],
+		'groupids' => $groupids ? $groupids : null,
+		'applicationids' => $applicationids,
+		'monitored' => true
+	]);
 
-	CArrayHelper::sort($dbItems, [
+	foreach ($db_triggers as $db_trigger) {
+		foreach ($db_trigger['items'] as $item) {
+			if (array_key_exists($item['itemid'], $db_items)) {
+				$db_item = &$db_items[$item['itemid']];
+
+				// a little tricky check for attempt to overwrite active trigger (value=1) with
+				// inactive or active trigger with lower priority.
+				if (!array_key_exists('triggerid', $db_item)
+						|| ($db_item['value'] == TRIGGER_VALUE_FALSE && $db_trigger['value'] == TRIGGER_VALUE_TRUE)
+						|| (($db_item['value'] == TRIGGER_VALUE_FALSE || $db_trigger['value'] == TRIGGER_VALUE_TRUE)
+							&& $db_item['priority'] < $db_trigger['priority'])) {
+					$db_item['triggerid'] = $db_trigger['triggerid'];
+					$db_item['priority'] = $db_trigger['priority'];
+					$db_item['value'] = $db_trigger['value'];
+				}
+
+				unset($db_item);
+			}
+		}
+	}
+
+	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
+
+	CArrayHelper::sort($db_items, [
 		['field' => 'name_expanded', 'order' => ZBX_SORT_UP],
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
 	// fetch latest values
-	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'), 1, ZBX_HISTORY_PERIOD);
+	$history = Manager::History()->getLast(zbx_toHash($db_items, 'itemid'), 1, ZBX_HISTORY_PERIOD);
 
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get([
 		'output' => ['name', 'hostid', 'status'],
 		'monitored_hosts' => true,
-		'hostids' => $hostIds,
+		'groupids' => $groupids ? $groupids : null,
+		'applicationids' => $applicationids,
 		'with_monitored_items' => true,
 		'preservekeys' => true,
 		'selectGraphs' => API_OUTPUT_COUNT,
@@ -964,10 +996,10 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	$items = [];
 	$item_counter = [];
 	$host_items = [];
-	foreach ($dbItems as $dbItem) {
-		$item_name = $dbItem['name_expanded'];
-		$host_name = $dbItem['hostname'];
-		$hostNames[$dbItem['hostid']] = $host_name;
+	foreach ($db_items as $db_item) {
+		$item_name = $db_item['name_expanded'];
+		$host_name = $db_item['hosts'][0]['name'];
+		$hostNames[$db_item['hostid']] = $host_name;
 
 		if (!array_key_exists($host_name, $item_counter)) {
 			$item_counter[$host_name] = [];
@@ -981,34 +1013,42 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 			$host_items[$item_name][$host_name] = [];
 		}
 
-		// a little tricky check for attempt to overwrite active trigger (value=1) with
-		// inactive or active trigger with lower priority.
-		if (!array_key_exists($dbItem['itemid'], $host_items[$item_name][$host_name])
-			|| (($host_items[$item_name][$host_name][$dbItem['itemid']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-				|| (($host_items[$item_name][$host_name][$dbItem['itemid']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-					&& $dbItem['priority'] > $host_items[$item_name][$host_name][$dbItem['itemid']]['severity']))) {
-
-			if (array_key_exists($dbItem['itemid'], $host_items[$item_name][$host_name])) {
-				$item_place = $host_items[$item_name][$host_name][$dbItem['itemid']]['item_place'];
+		if (!array_key_exists($db_item['itemid'], $host_items[$item_name][$host_name])) {
+			if (array_key_exists($db_item['itemid'], $host_items[$item_name][$host_name])) {
+				$item_place = $host_items[$item_name][$host_name][$db_item['itemid']]['item_place'];
 			}
 			else {
 				$item_place = $item_counter[$host_name][$item_name];
 				$item_counter[$host_name][$item_name]++;
 			}
 
-			$items[$item_name][$item_place][$host_name] = [
-				'itemid' => $dbItem['itemid'],
-				'value_type' => $dbItem['value_type'],
-				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
-				'units' => $dbItem['units'],
-				'valuemapid' => $dbItem['valuemapid'],
-				'severity' => $dbItem['priority'],
-				'tr_value' => $dbItem['tr_value'],
-				'triggerid' => $dbItem['triggerid'],
+			$item = [
+				'itemid' => $db_item['itemid'],
+				'value_type' => $db_item['value_type'],
+				'value' => isset($history[$db_item['itemid']]) ? $history[$db_item['itemid']][0]['value'] : null,
+				'units' => $db_item['units'],
+				'valuemapid' => $db_item['valuemapid'],
 				'item_place' => $item_place
 			];
 
-			$host_items[$item_name][$host_name][$dbItem['itemid']] = $items[$item_name][$item_place][$host_name];
+			if (array_key_exists('triggerid', $db_item)) {
+				$item += [
+					'triggerid' => $db_item['triggerid'],
+					'severity' => $db_item['priority'],
+					'tr_value' => $db_item['value']
+				];
+			}
+			else {
+				$item += [
+					'triggerid' => null,
+					'severity' => null,
+					'tr_value' => null
+				];
+			}
+
+			$items[$item_name][$item_place][$host_name] = $item;
+
+			$host_items[$item_name][$host_name][$db_item['itemid']] = $items[$item_name][$item_place][$host_name];
 		}
 	}
 

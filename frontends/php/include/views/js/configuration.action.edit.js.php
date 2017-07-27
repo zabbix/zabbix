@@ -105,26 +105,76 @@
 			value,
 			tpl,
 			container,
-			inlineContainers;
+			field_variables = {
+				userid: {
+					opmsgUserListFooter: {
+						field: 'new_operation',
+						row: 'opmsgUserRow_'
+					},
+					recOpmsgUserListFooter: {
+						field: 'new_recovery_operation',
+						row: 'recOpmsgUserRow_'
+					},
+					ackOpmsgUserListFooter: {
+						field: 'new_ack_operation',
+						row: 'ackOpmsgUserRow_'
+					}
+				},
+				usrgrpid: {
+					opmsgUsrgrpListFooter: {
+						field: 'new_operation',
+						row: 'opmsgUsrgrpRow_'
+					},
+					recOpmsgUsrgrpListFooter: {
+						field: 'new_recovery_operation',
+						row: 'recOpmsgUsrgrpRow_'
+					},
+					ackOpmsgUsrgrpListFooter: {
+						field: 'new_ack_operation',
+						row: 'ackOpmsgUsrgrpRow_'
+					},
+				},
+				groupid: {
+					opCmdListFooter: {
+						field: 'new_operation',
+						row: 'opCmdGroupRow_'
+					},
+					recOpCmdListFooter: {
+						field: 'new_recovery_operation',
+						row: 'recOpCmdGroupRow_'
+					},
+					ackOpCmdListFooter: {
+						field: 'new_ack_operation',
+						row: 'ackOpCmdGroupRow_'
+					}
+				},
+				hostid: {
+					opCmdListFooter: {
+						field: 'new_operation',
+						row: 'opCmdHostRow_'
+					},
+					recOpCmdListFooter: {
+						field: 'new_recovery_operation',
+						row: 'recOpCmdHostRow_'
+					},
+					ackOpCmdListFooter: {
+						field: 'new_ack_operation',
+						row: 'ackOpCmdHostRow_'
+					}
+				}
+			};
 
 		for (i = 0; i < list.values.length; i++) {
 			if (empty(list.values[i])) {
 				continue;
 			}
 
-			value = list.values[i];
+			value = list.object in field_variables
+				? jQuery.extend(list.values[i], field_variables[list.object][list.parentId])
+				: null;
 
 			switch (list.object) {
 				case 'userid':
-					if (list.parentId == 'opmsgUserListFooter') {
-						value.field = 'new_operation';
-						value.row = 'opmsgUserRow_';
-					}
-					else {
-						value.field = 'new_recovery_operation';
-						value.row = 'recOpmsgUserRow_';
-					}
-
 					if (jQuery('#' + value.row + value.id).length) {
 						continue;
 					}
@@ -135,15 +185,6 @@
 					break;
 
 				case 'usrgrpid':
-					if (list.parentId == 'opmsgUsrgrpListFooter') {
-						value.field = 'new_operation';
-						value.row = 'opmsgUsrgrpRow_';
-					}
-					else {
-						value.field = 'new_recovery_operation';
-						value.row = 'recOpmsgUsrgrpRow_';
-					}
-
 					if (jQuery('#' + value.row + value.id).length) {
 						continue;
 					}
@@ -154,15 +195,6 @@
 					break;
 
 				case 'groupid':
-					if (list.parentId == 'opCmdListFooter') {
-						value.field = 'new_operation';
-						value.row = 'opCmdGroupRow_';
-					}
-					else {
-						value.field = 'new_recovery_operation';
-						value.row = 'recOpCmdGroupRow_';
-					}
-
 					tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
 					value.objectCaption = <?= CJs::encodeJson(_('Host group').NAME_DELIMITER) ?>;
@@ -174,15 +206,6 @@
 					break;
 
 				case 'hostid':
-					if (list.parentId == 'opCmdListFooter') {
-						value.field = 'new_operation';
-						value.row = 'opCmdHostRow_';
-					}
-					else {
-						value.field = 'new_recovery_operation';
-						value.row = 'recOpCmdHostRow_';
-					}
-
 					tpl = new Template(jQuery('#opCmdHostRowTPL').html());
 
 					if (value.hostid.toString() != '0') {
@@ -212,8 +235,11 @@
 		if (type == <?= ACTION_OPERATION ?>) {
 			var row = jQuery('#operations_' + index);
 		}
-		else {
+		else if (type == <?= ACTION_RECOVERY_OPERATION ?>) {
 			var row = jQuery('#recovery_operations_' + index);
+		}
+		else {
+			var row = jQuery('#ack_operations_' + index);
 		}
 
 		var rowParent = row.parent();
@@ -251,8 +277,11 @@
 		if (type == <?= ACTION_OPERATION ?>) {
 			parentId = 'opCmdList';
 		}
-		else {
+		else if (type == <?= ACTION_RECOVERY_OPERATION ?>) {
 			parentId = 'recOpCmdList';
+		}
+		else {
+			parentId = 'ackOpCmdList';
 		}
 
 		tpl = new Template(jQuery('#opcmdEditFormTPL').html());
@@ -279,8 +308,11 @@
 		if (type == <?= ACTION_OPERATION ?>) {
 			parentId = 'opCmdListFooter';
 		}
-		else {
+		else if (type == <?= ACTION_RECOVERY_OPERATION ?>) {
 			parentId = 'recOpCmdListFooter';
+		}
+		else {
+			parentId = 'ackOpCmdListFooter';
 		}
 
 		// host group
@@ -418,7 +450,7 @@
 				opcommand_authtype = '#new_operation_opcommand_authtype',
 				opcommand_username = '#new_operation_opcommand_username';
 		}
-		else {
+		else if (type == <?= ACTION_RECOVERY_OPERATION ?>) {
 			var opcommand_type = jQuery('#new_recovery_operation_opcommand_type'),
 				opcommand_script = '#new_recovery_operation_opcommand_script',
 				opcommand_execute_on = '#new_recovery_operation_opcommand_execute_on',
@@ -427,6 +459,16 @@
 				opcommand_command_ipmi = '#new_recovery_operation_opcommand_command_ipmi',
 				opcommand_authtype = '#new_recovery_operation_opcommand_authtype',
 				opcommand_username = '#new_recovery_operation_opcommand_username';
+		}
+		else {
+			var opcommand_type = jQuery('#new_ack_operation_opcommand_type'),
+				opcommand_script = '#new_ack_operation_opcommand_script',
+				opcommand_execute_on = '#new_ack_operation_opcommand_execute_on',
+				opcommand_port = '#new_ack_operation_opcommand_port',
+				opcommand_command = '#new_ack_operation_opcommand_command',
+				opcommand_command_ipmi = '#new_ack_operation_opcommand_command_ipmi',
+				opcommand_authtype = '#new_ack_operation_opcommand_authtype',
+				opcommand_username = '#new_ack_operation_opcommand_username';
 		}
 
 		if (opcommand_type.length == 0) {
@@ -474,13 +516,21 @@
 				opcommand_privatekey = 'new_operation_opcommand_privatekey',
 				opcommand_passphrase = 'new_operation_opcommand_passphrase';
 		}
-		else {
+		else if (type == <?= ACTION_RECOVERY_OPERATION ?>) {
 			var current_op_type = parseInt(jQuery('#new_recovery_operation_opcommand_type').val(), 10),
 				opcommand_authtype = 'new_recovery_operation_opcommand_authtype',
 				opcommand_password = 'new_recovery_operation_opcommand_password',
 				opcommand_publickey = 'new_recovery_operation_opcommand_publickey',
 				opcommand_privatekey = 'new_recovery_operation_opcommand_privatekey',
 				opcommand_passphrase = 'new_recovery_operation_opcommand_passphrase';
+		}
+		else {
+			var current_op_type = parseInt(jQuery('#new_ack_operation_opcommand_type').val(), 10),
+				opcommand_authtype = 'new_ack_operation_opcommand_authtype',
+				opcommand_password = 'new_ack_operation_opcommand_password',
+				opcommand_publickey = 'new_ack_operation_opcommand_publickey',
+				opcommand_privatekey = 'new_ack_operation_opcommand_privatekey',
+				opcommand_passphrase = 'new_ack_operation_opcommand_passphrase';
 		}
 
 		if (current_op_type === <?= ZBX_SCRIPT_TYPE_SSH ?>) {
@@ -567,7 +617,17 @@
 				.toggle(!default_message);
 		});
 
-		jQuery('#new_operation_opmessage_default_msg, #new_recovery_operation_opmessage_default_msg').trigger('change');
+		jQuery('#new_ack_operation_opmessage_default_msg').on('change', function() {
+			var default_message = jQuery(this).is(':checked');
+
+			jQuery('#new_ack_operation_opmessage_subject, #new_ack_operation_opmessage_message')
+				.closest('li')
+				.toggle(!default_message);
+		});
+
+		jQuery('#new_operation_opmessage_default_msg, #new_recovery_operation_opmessage_default_msg, '+
+				'#new_ack_operation_opmessage_default_msg'
+		).trigger('change');
 
 		// clone button
 		jQuery('#clone').click(function() {
@@ -594,6 +654,15 @@
 				}
 			});
 
+			// Remove acknowledgment operations IDs
+			var ack_operationid_RegExp = /ack_operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=ack_operations]').each(function() {
+				// Intentional usage of JS Prototype.
+				if ($(this).getAttribute('name').match(ack_operationid_RegExp)) {
+					$(this).remove();
+				}
+			});
+
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
 		});
@@ -605,6 +674,7 @@
 		// new operation form command type
 		showOpTypeForm(<?= ACTION_OPERATION ?>);
 		showOpTypeForm(<?= ACTION_RECOVERY_OPERATION ?>);
+		showOpTypeForm(<?= ACTION_ACKNOWLEDGE_OPERATION ?>);
 
 		jQuery('#select_operation_opcommand_script').click(function() {
 			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
@@ -615,6 +685,12 @@
 		jQuery('#select_recovery_operation_opcommand_script').click(function() {
 			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
 				+ '&dstfld1=new_recovery_operation_opcommand_scriptid&dstfld2=new_recovery_operation_opcommand_script'
+			);
+		});
+
+		jQuery('#select_ack_operation_opcommand_script').click(function() {
+			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
+				+ '&dstfld1=new_ack_operation_opcommand_scriptid&dstfld2=new_ack_operation_opcommand_script'
 			);
 		});
 

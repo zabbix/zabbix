@@ -31,11 +31,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL 	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'css' =>		[T_ZBX_INT, O_OPT, P_SYS, null,				null],
-	'imageid' =>	[T_ZBX_STR, O_OPT, P_SYS, null,				null],
-	'iconid' =>		[T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null],
-	'width' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
-	'height' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
+	'css' =>			[T_ZBX_INT, O_OPT, P_SYS, null,				null],
+	'imageid' =>		[T_ZBX_STR, O_OPT, P_SYS, null,				null],
+	'iconid' =>			[T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null],
+	'width' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
+	'unavailable' =>	[T_ZBX_INT, O_OPT, null, IN([0, 1]),		null],
 ];
 check_fields($fields);
 
@@ -76,6 +77,7 @@ if (isset($_REQUEST['css'])) {
 }
 elseif (isset($_REQUEST['iconid'])) {
 	$iconid = getRequest('iconid', 0);
+	$unavailable = getRequest('unavailable', 0);
 
 	if ($iconid > 0) {
 		$image = get_image_by_imageid($iconid);
@@ -88,6 +90,11 @@ elseif (isset($_REQUEST['iconid'])) {
 
 	if ($resize) {
 		$source = imageThumb($source, $width, $height);
+	}
+
+	if ($unavailable == 1) {
+		imagefilter($source, IMG_FILTER_GRAYSCALE);
+		imagefilter($source, IMG_FILTER_BRIGHTNESS, 75);
 	}
 
 	imageOut($source);

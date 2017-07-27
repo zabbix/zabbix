@@ -21,18 +21,15 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetFavGraphsView extends CController {
+class CControllerWidgetFavGraphsView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		return true;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		$this->setType(WIDGET_FAVOURITE_GRAPHS);
+		$this->setValidationRules([
+			'name' =>	'string'
+		]);
 	}
 
 	protected function doAction() {
@@ -82,6 +79,7 @@ class CControllerWidgetFavGraphsView extends CController {
 		CArrayHelper::sort($graphs, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'graphs' => $graphs,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

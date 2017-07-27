@@ -88,6 +88,10 @@ jQuery(function($) {
 			case 'dependent_items':
 				data = getMenuPopupDependentItems(data);
 				break;
+
+			case 'dashboard':
+				data = getMenuPopupDashboard(data);
+				break;
 		}
 
 		obj.menuPopup(data, event);
