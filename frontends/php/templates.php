@@ -228,7 +228,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		// discovered hosts
 		$db_hosts = API::Host()->get([
 			'output'			=> ['hostid', 'status'],
-			'hostids'			=> getRequest('hosts', []),
+			'hostids'			=> array_diff(getRequest('hosts', []), $linkedTemplates),
 			'templated_hosts'	=> true,
 			'filter'			=> ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
