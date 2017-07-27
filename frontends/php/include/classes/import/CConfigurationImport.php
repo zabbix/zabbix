@@ -1210,8 +1210,6 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				$httptest['hostid'] = $hostid;
-
 				if (array_key_exists('name', $httptest['application'])) {
 					$applicationid = $this->referencer->resolveApplication($hostid, $httptest['application']['name']);
 
@@ -1244,6 +1242,7 @@ class CConfigurationImport {
 					$httptests_to_update[] = $httptest;
 				}
 				else {
+					$httptest['hostid'] = $hostid;
 					$httptests_to_create[] = $httptest;
 				}
 			}
