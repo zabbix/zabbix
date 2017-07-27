@@ -531,7 +531,7 @@ abstract class CItemGeneral extends CApiService {
 
 		$this->checkExistingItems($items);
 
-		// Validate inherited items linkage.
+		// Validate inherited dependent items linkage.
 		$templateids = [];
 
 		foreach ($dbHosts as $db_host) {
@@ -541,7 +541,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		$templateids = array_keys(array_flip($templateids));
-		$templates = $template = API::Template()->get([
+		$templates = API::Template()->get([
 			'output'		=> ['templateid'],
 			'templateids'	=> $templateids,
 			'selectHosts'	=> ['hostid']

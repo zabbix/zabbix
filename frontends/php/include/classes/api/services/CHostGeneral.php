@@ -981,7 +981,7 @@ abstract class CHostGeneral extends CHostBase {
 			'preservekeys' => true
 		]);
 
-		if (validateDependentItemsIntersection($db_items, $hostids, $templateids) === false) {
+		if (validateDependentItemsIntersection($db_items, $hostids) === false) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 				'master_itemid', _('maximum number of dependency levels reached')
 			));
@@ -993,7 +993,7 @@ abstract class CHostGeneral extends CHostBase {
 			'preservekeys' => true
 		]);
 
-		if (validateDependentItemsIntersection($db_itemprototypes, $hostids, $templateids) === false) {
+		if (validateDependentItemsIntersection($db_itemprototypes, $hostids) === false) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 				'master_itemid', _('maximum number of dependency levels reached')
 			));
