@@ -1261,13 +1261,12 @@
 				if (data['widget_relation_submissions'].length
 						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length
 					) {
-
 					$.each(data['widget_relation_submissions'], function(rel_index, relation) {
 						erase = false;
 						$.each(data['widgets'], function(index, widget) {
 							// No linked widget reference given. Just register as data receiver.
 							if (typeof relation.linkedto === 'undefined') {
-								if (typeof data['widget_relations']['tasks'][relation.uniqueid]) {
+								if (typeof data['widget_relations']['tasks'][relation.uniqueid] === 'undefined') {
 									data['widget_relations']['tasks'][relation.uniqueid] = [];
 								}
 
@@ -1284,13 +1283,13 @@
 							else if (typeof widget['fields']['reference'] !== 'undefined'
 									&& widget['fields']['reference'] === relation.linkedto) {
 
-								if (typeof data['widget_relations']['relations'][widget.uniqueid]) {
+								if (typeof data['widget_relations']['relations'][widget.uniqueid] === 'undefined') {
 									data['widget_relations']['relations'][widget.uniqueid] = [];
 								}
-								if (typeof data['widget_relations']['relations'][relation.uniqueid]) {
+								if (typeof data['widget_relations']['relations'][relation.uniqueid] === 'undefined') {
 									data['widget_relations']['relations'][relation.uniqueid] = [];
 								}
-								if (typeof data['widget_relations']['tasks'][relation.uniqueid]) {
+								if (typeof data['widget_relations']['tasks'][relation.uniqueid] === 'undefined') {
 									data['widget_relations']['tasks'][relation.uniqueid] = [];
 								}
 
