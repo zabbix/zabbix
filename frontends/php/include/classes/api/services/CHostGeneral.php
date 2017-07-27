@@ -990,6 +990,7 @@ abstract class CHostGeneral extends CHostBase {
 		$db_itemprototypes = API::ItemPrototype()->get([
 			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
 			'hostids' => array_merge($hostids, $templateids),
+			'preservekeys' => true
 		]);
 
 		if (validateDependentItemsIntersection($db_itemprototypes, $hostids, $templateids) === false) {
