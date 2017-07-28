@@ -1161,11 +1161,6 @@
 
 				url.setArgument('action', 'dashbrd.widget.config');
 
-				// Don't send on "Add widget" or on "Edit widget", if widget was not saved yet
-				if (widget !== null && widget['widgetid'] !== '') {
-					ajax_data['widgetid'] = widget['widgetid'];
-				}
-
 				if (form.length) {
 					// Take values from form.
 					fields = form.serializeJSON();
