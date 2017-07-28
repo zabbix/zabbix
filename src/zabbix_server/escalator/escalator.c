@@ -1759,7 +1759,8 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
 			ACTION_MAINTENANCE_MODE_PAUSE == action->maintenance_mode &&
-			HOST_MAINTENANCE_STATUS_ON == maintenance)
+			HOST_MAINTENANCE_STATUS_ON == maintenance &&
+			escalation->acknowledgeid == 0)
 	{
 		/* remove paused escalations that were created and recovered */
 		/* during maintenance period                                 */
