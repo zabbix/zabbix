@@ -36,11 +36,12 @@ else {
 		'timeControl.processObjects();'.
 		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
 
-	if ($data['widget']['initial_load'] == 1) {
-		$script .=
+if ($data['widget']['initial_load'] == 1) {
+	$script .=
 			'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
 				'function zbx_graph_widget_resize_end(img_id) {'.
 					'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
+						'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
 						'new_width = content.width(),'.
 						'new_height = content.height() - 10,'.
 						'src = jQuery("#"+img_id).attr("src");'.
@@ -50,10 +51,7 @@ else {
 					'img_url.setArgument("width", new_width);'.
 					'img_url.setArgument("height", new_height);'.
 					'jQuery("#"+img_id).attr("src", img_url.getUrl());'.
-
-					// TODO miks: do not forget to delete unneeded code.
-					//'var object_changes = {graphHeight: new_height + '.$data['time_control_data']['objDims']['shiftYtop'].', width: new_width};'.
-					//'timeControl.editObjectDims("'.$data['graph']['dataid'].'", object_changes);'.
+					'timeControl.changeSBoxHeight(img_id, new_height-property_zone_height);'.
 				'}'.
 			'}'.
 
@@ -78,11 +76,6 @@ else {
 					'});'.
 				'}'.
 			'}'.
-
-			// TODO miks: do not forget to delete unneeded code.
-			//'jQuery("#'.$data['graph']['containerid'].'").bind("DOMSubtreeModified",function() {
-			//	zbx_graph_widget_resize_end("'.$data['graph']['dataid'].'");
-			//});'.
 
 			'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd", '.
 				'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.

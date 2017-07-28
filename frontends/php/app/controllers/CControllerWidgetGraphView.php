@@ -87,6 +87,33 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$graph_dims = getGraphDims();
 		}
 
+		// Get graph SBox height
+		$graph = null;
+		if ($resource_type == SCREEN_RESOURCE_GRAPH) {
+			$graph = API::Graph()->get([
+				'output' => API_OUTPUT_EXTEND,
+				'selectGraphItems' => API_OUTPUT_EXTEND,
+				'graphids' => $resourceid,
+				'selectItems' => ['itemid'],
+				'selectHosts' => ['name']
+			]);
+
+			if (($graph = reset($graph)) !== false) {
+				$graphs_items = $graph['items'];
+			}
+			else {
+				$graphs_items = [];
+			}
+		}
+		else {
+			$graphs_items = [
+				['itemid' => $resourceid]
+			];
+		}
+
+		$graph_dims['graphPropertyZoneHeight'] = (new CLineGraphDraw())->calcGraphPropertyZoneHeight($graphs_items, $graph);
+
+		// Prepare timeline details
 		$timeline = calculateTime([
 			'profileIdx' => $profileIdx,
 			'profileIdx2' => $profileIdx2,

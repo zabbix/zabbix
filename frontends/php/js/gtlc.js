@@ -70,6 +70,23 @@ var timeControl = {
 		}
 	},
 
+	changeSBoxHeight: function(id, height) {
+		if (typeof ZBX_SBOX[id] !== 'undefined') {
+			delete ZBX_SBOX[id];
+		}
+
+		var obj = this.objectList[id],
+			img = $(id);
+
+		obj['objDims']['graphHeight'] = height;
+
+		if (obj.loadSBox) {
+			obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
+			addListener(img, 'load', obj.sbox_listener);
+			addListener(img, 'load', sboxGlobalMove);
+		}
+	},
+
 	processObjects: function() {
 		// create timeline and scrollbar
 		for (var id in this.objectList) {
