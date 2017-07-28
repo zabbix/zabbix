@@ -556,6 +556,9 @@ class CItem extends CItemGeneral {
 			if ($item_type != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
 				$item['master_itemid'] = null;
 			}
+			elseif (!array_key_exists('master_itemid', $item)) {
+				$item['master_itemid'] = $dbItems[$item['itemid']]['master_itemid'];
+			}
 		}
 		unset($item);
 		$this->updateReal($items);
