@@ -27,12 +27,9 @@ $js_scripts = [];
 
 $form_list = new CFormList();
 
-$known_widget_types = CWidgetConfig::getKnownWidgetTypes();
-natsort($known_widget_types);
-
 // Common fields
 $form_list->addRow(_('Type'),
-	new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $known_widget_types)
+	new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $data['known_widget_types'])
 );
 
 $form_list->addRow(_('Name'),

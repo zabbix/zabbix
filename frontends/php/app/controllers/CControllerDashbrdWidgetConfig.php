@@ -49,7 +49,10 @@ class CControllerDashbrdWidgetConfig extends CController {
 	}
 
 	protected function doAction() {
-		$type = $this->getInput('type', WIDGET_CLOCK);
+		$known_widget_types = CWidgetConfig::getKnownWidgetTypes();
+		natsort($known_widget_types);
+
+		$type = $this->getInput('type', array_keys($known_widget_types)[0]);
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
 
 		$config = select_config();
@@ -68,6 +71,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 				'name' => $this->getInput('name', ''),
 				'fields' => $form->getFields(),
 			],
+			'known_widget_types' => $known_widget_types,
 			'captions' => $this->getCaptions($form)
 		]));
 	}
