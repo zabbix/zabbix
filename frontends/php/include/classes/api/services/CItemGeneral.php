@@ -579,7 +579,9 @@ abstract class CItemGeneral extends CApiService {
 					$item += $dbItems[$item['itemid']];
 				}
 
-				if ($item['hostid'] == $template['templateid']) {
+				if ($item['hostid'] == $template['templateid']
+						|| ($item['type'] == ITEM_TYPE_DEPENDENT
+						&& array_key_exists($item['master_itemid'], $host_items))) {
 					$item_index = array_key_exists('itemid', $item) ? $item['itemid'] : $item['key_'];
 					$host_items[$item_index] = $item;
 				}
