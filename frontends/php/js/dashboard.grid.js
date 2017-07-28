@@ -748,6 +748,9 @@
 			userid: data['dashboard']['userid'],
 			widgets: ajax_widgets
 		};
+		if (isset('sharing', data['dashboard'])) {
+			ajax_data['sharing'] = data['dashboard']['sharing'];
+		}
 
 		$.ajax({
 			url: url.getUrl(),
