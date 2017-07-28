@@ -24,16 +24,13 @@
  */
 class CControllerWidgetPlainTextView extends CControllerWidget {
 
-	// Widget's configuration form.
-	private $form;
-
 	public function __construct() {
 		parent::__construct();
 
 		$this->setType(WIDGET_PLAIN_TEXT);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'array',
+			'fields' => 'json',
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
