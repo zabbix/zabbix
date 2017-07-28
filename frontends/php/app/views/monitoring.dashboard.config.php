@@ -41,6 +41,11 @@ $form_list->addRow(_('Name'),
 
 // Widget specific fields
 foreach ($data['dialogue']['fields'] as $field) {
+	if (!$data['config']['event_ack_enable'] && ($field->getFlags() & CWidgetField::FLAG_ACKNOWLEDGES)) {
+		$form->addVar($field->getName(), $field->getValue());
+		continue;
+	}
+
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow($field->getLabel(),
 			new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues())

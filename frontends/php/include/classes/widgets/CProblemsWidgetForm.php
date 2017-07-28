@@ -91,7 +91,8 @@ class CProblemsWidgetForm extends CWidgetForm {
 		$this->fields[] = $field_maintenance;
 
 		// Show unacknowledged only
-		$field_unacknowledged = new CWidgetFieldCheckBox('unacknowledged', _('Show unacknowledged only'));
+		$field_unacknowledged = (new CWidgetFieldCheckBox('unacknowledged', _('Show unacknowledged only')))
+			->setFlags(CWidgetField::FLAG_ACKNOWLEDGES);
 
 		if (array_key_exists('unacknowledged', $this->data)) {
 			$field_unacknowledged->setValue($this->data['unacknowledged']);
