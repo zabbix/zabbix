@@ -698,6 +698,16 @@ class CTemplate extends CHostGeneral {
 				'editable' => true
 			]);
 
+			if ($count == count($hostids)) {
+				return;
+			}
+
+			$count += $this->get([
+				'countOutput' => true,
+				'templateids' => $hostids,
+				'editable' => true
+			]);
+
 			if ($count != count($hostids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
