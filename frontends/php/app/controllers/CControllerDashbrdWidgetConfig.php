@@ -66,7 +66,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 			'dialogue' => [
 				'type' => $type,
 				'name' => $this->getInput('name', ''),
-				'form' => $form,
+				'fields' => $form->getFields(),
 			],
 			'captions' => $this->getCaptions($form)
 		]));

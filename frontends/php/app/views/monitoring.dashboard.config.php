@@ -43,7 +43,7 @@ $form_list->addRow(_('Name'),
 );
 
 // Widget specific fields
-foreach ($data['dialogue']['form']->getFields() as $field) {
+foreach ($data['dialogue']['fields'] as $field) {
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow($field->getLabel(),
 			new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues())
