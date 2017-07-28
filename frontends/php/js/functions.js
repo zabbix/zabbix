@@ -574,10 +574,6 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
-	var css_body = {"margin-bottom": '50px'};
-	if (typeof params.css_body !== 'undefined') {
-		css_body = params.css_body;
-	}
 	overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
 		class: 'overlay-dialogue',
@@ -605,7 +601,6 @@ function overlayDialogue(params) {
 		.append(
 			jQuery('<div>', {
 				class: 'overlay-dialogue-body',
-				css: css_body
 			}).append(params.content)
 		)
 		.append(overlay_dialogue_footer)
