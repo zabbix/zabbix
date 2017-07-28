@@ -130,7 +130,14 @@ class CWidgetField {
 		return $this->save_type;
 	}
 
-	public function validate() {
+	/**
+	 * Validate field.
+	 *
+	 * @param bool $strict  Enables more strict validation of the field.
+	 *
+	 * @return bool
+	 */
+	public function validate($strict = false) {
 		$errors = [];
 
 		$validation_rules = $this->validation_rules + $this->ex_validation_rules;

@@ -20,7 +20,7 @@
 
 
 /**
- * Latest problems widget form
+ * Problems widget form
  */
 class CProblemsWidgetForm extends CWidgetForm {
 
@@ -36,48 +36,48 @@ class CProblemsWidgetForm extends CWidgetForm {
 			->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
 			->setModern(true);
 
-		if (array_key_exists('show', $data)) {
-			$field_show->setValue($data['show']);
+		if (array_key_exists('show', $this->data)) {
+			$field_show->setValue($this->data['show']);
 		}
 		$this->fields[] = $field_show;
 
 		// Host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
-		if (array_key_exists('groupids', $data)) {
-			$field_groups->setValue($data['groupids']);
+		if (array_key_exists('groupids', $this->data)) {
+			$field_groups->setValue($this->data['groupids']);
 		}
 		$this->fields[] = $field_groups;
 
 		// Exclude host groups
 		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'));
 
-		if (array_key_exists('exclude_groupids', $data)) {
-			$field_exclude_groups->setValue($data['exclude_groupids']);
+		if (array_key_exists('exclude_groupids', $this->data)) {
+			$field_exclude_groups->setValue($this->data['exclude_groupids']);
 		}
 		$this->fields[] = $field_exclude_groups;
 
 		// Hosts
 		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
 
-		if (array_key_exists('hostids', $data)) {
-			$field_hosts->setValue($data['hostids']);
+		if (array_key_exists('hostids', $this->data)) {
+			$field_hosts->setValue($this->data['hostids']);
 		}
 		$this->fields[] = $field_hosts;
 
 		// Problem
 		$field_problem = new CWidgetFieldTextBox('problem', _('Problem'));
 
-		if (array_key_exists('problem', $data)) {
-			$field_problem->setValue($data['problem']);
+		if (array_key_exists('problem', $this->data)) {
+			$field_problem->setValue($this->data['problem']);
 		}
 		$this->fields[] = $field_problem;
 
 		// Severity
 		$field_severities = new CWidgetFieldSeverities('severities', _('Severity'));
 
-		if (array_key_exists('severities', $data)) {
-			$field_severities->setValue($data['severities']);
+		if (array_key_exists('severities', $this->data)) {
+			$field_severities->setValue($this->data['severities']);
 		}
 		$this->fields[] = $field_severities;
 
@@ -85,16 +85,16 @@ class CProblemsWidgetForm extends CWidgetForm {
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
 			->setDefault(1);
 
-		if (array_key_exists('maintenance', $data)) {
-			$field_maintenance->setValue($data['maintenance']);
+		if (array_key_exists('maintenance', $this->data)) {
+			$field_maintenance->setValue($this->data['maintenance']);
 		}
 		$this->fields[] = $field_maintenance;
 
 		// Show unacknowledged only
 		$field_unacknowledged = new CWidgetFieldCheckBox('unacknowledged', _('Show unacknowledged only'));
 
-		if (array_key_exists('unacknowledged', $data)) {
-			$field_unacknowledged->setValue($data['unacknowledged']);
+		if (array_key_exists('unacknowledged', $this->data)) {
+			$field_unacknowledged->setValue($this->data['unacknowledged']);
 		}
 		$this->fields[] = $field_unacknowledged;
 
@@ -111,8 +111,8 @@ class CProblemsWidgetForm extends CWidgetForm {
 		]))
 			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
-		if (array_key_exists('sort_triggers', $data)) {
-			$field_sort->setValue($data['sort_triggers']);
+		if (array_key_exists('sort_triggers', $this->data)) {
+			$field_sort->setValue($this->data['sort_triggers']);
 		}
 		$this->fields[] = $field_sort;
 
@@ -121,8 +121,8 @@ class CProblemsWidgetForm extends CWidgetForm {
 			ZBX_MAX_WIDGET_LINES
 		))->setDefault(ZBX_DEFAULT_WIDGET_LINES);
 
-		if (array_key_exists('show_lines', $data)) {
-			$field_lines->setValue($data['show_lines']);
+		if (array_key_exists('show_lines', $this->data)) {
+			$field_lines->setValue($this->data['show_lines']);
 		}
 		$this->fields[] = $field_lines;
 	}

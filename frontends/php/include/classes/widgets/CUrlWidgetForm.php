@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * URL widget form.
+ */
 class CUrlWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
@@ -25,15 +29,15 @@ class CUrlWidgetForm extends CWidgetForm {
 
 		// URL field
 		$field_url = new CWidgetFieldTextBox('url', _('URL'));
-		if (array_key_exists('url', $data)) {
-			$field_url->setValue($data['url']);
+		if (array_key_exists('url', $this->data)) {
+			$field_url->setValue($this->data['url']);
 		}
 		$this->fields[] = $field_url;
 
 		// Dynamic item
 		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
-		if (array_key_exists('dynamic', $data)) {
-			$field_dynamic->setValue($data['dynamic']);
+		if (array_key_exists('dynamic', $this->data)) {
+			$field_dynamic->setValue($this->data['dynamic']);
 		}
 		$this->fields[] = $field_dynamic;
 	}

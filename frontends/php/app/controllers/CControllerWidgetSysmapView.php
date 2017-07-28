@@ -27,13 +27,13 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 
 		$this->setType(WIDGET_SYSMAP);
 		$this->setValidationRules([
-			'name' =>			'string',
-			'uniqueid' =>		'required|string',
-			'edit_mode' =>		'in 0,1',
-			'initial_load' =>	'in 0,1',
-			'fullscreen' =>		'in 0,1',
-			'fields' =>			'array',
-			'storage' =>		'array'
+			'name' => 'string',
+			'uniqueid' => 'required|string',
+			'edit_mode' => 'in 0,1',
+			'initial_load' => 'in 0,1',
+			'fullscreen' => 'in 0,1',
+			'fields' => 'json',
+			'storage' => 'array'
 		]);
 	}
 

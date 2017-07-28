@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CSysmapWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
@@ -25,8 +26,8 @@ class CSysmapWidgetForm extends CWidgetForm {
 
 		// widget reference field
 		$field_reference = (new CWidgetFieldReference());
-		if (array_key_exists($field_reference->getName(), $data)) {
-			$field_reference->setValue($data[$field_reference->getName()]);
+		if (array_key_exists($field_reference->getName(), $this->data)) {
+			$field_reference->setValue($this->data[$field_reference->getName()]);
 		}
 		$this->fields[] = $field_reference;
 
@@ -39,8 +40,8 @@ class CSysmapWidgetForm extends CWidgetForm {
 			->setDefault(WIDGET_SYSMAP_SOURCETYPE_MAP)
 			->setAction('updateWidgetConfigDialogue()')
 			->setModern(true);
-		if (array_key_exists('source_type', $data)) {
-			$field_source_type->setValue($data['source_type']);
+		if (array_key_exists('source_type', $this->data)) {
+			$field_source_type->setValue($this->data['source_type']);
 		}
 		$this->fields[] = $field_source_type;
 
@@ -50,8 +51,8 @@ class CSysmapWidgetForm extends CWidgetForm {
 				'type', 'navigationtree'
 			))->setDefault('');
 
-			if (array_key_exists('filter_widget_reference', $data)) {
-				$field_filter_widget->setValue($data['filter_widget_reference']);
+			if (array_key_exists('filter_widget_reference', $this->data)) {
+				$field_filter_widget->setValue($this->data['filter_widget_reference']);
 			}
 
 			$this->fields[] = $field_filter_widget;
@@ -60,8 +61,8 @@ class CSysmapWidgetForm extends CWidgetForm {
 			// select sysmap field
 			$field_map = new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP);
 
-			if (array_key_exists('sysmapid', $data)) {
-				$field_map->setValue($data['sysmapid']);
+			if (array_key_exists('sysmapid', $this->data)) {
+				$field_map->setValue($this->data['sysmapid']);
 			}
 			$this->fields[] = $field_map;
 		}

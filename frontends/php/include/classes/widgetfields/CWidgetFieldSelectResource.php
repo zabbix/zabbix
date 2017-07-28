@@ -82,10 +82,10 @@ class CWidgetFieldSelectResource extends CWidgetField {
 		return $url->getUrl();
 	}
 
-	public function validate() {
-		$errors = parent::validate();
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
 
-		if (!$errors && $this->getValue() == 0) {
+		if (!$errors && $strict && $this->getValue() == 0) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
 		}
 

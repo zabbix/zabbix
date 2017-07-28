@@ -24,8 +24,8 @@
  */
 class CDashboard extends CApiService {
 
-	const MAX_ROW = DASHBOARD_MAX_ROWS - 1;
-	const MAX_COL = DASHBOARD_MAX_COLUMNS - 1;
+	const MAX_ROW = 63; // DASHBOARD_MAX_ROWS - 1
+	const MAX_COL = 11; // DASHBOARD_MAX_COLUMNS - 1
 
 	protected $tableName = 'dashboard';
 	protected $tableAlias = 'd';
