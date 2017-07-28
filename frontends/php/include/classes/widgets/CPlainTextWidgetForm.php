@@ -27,8 +27,8 @@ class CPlainTextWidgetForm extends CWidgetForm {
 		// item field
 		$field_item = new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM);
 
-		if (array_key_exists('itemid', $data)) {
-			$field_item->setValue($data['itemid']);
+		if (array_key_exists('itemid', $this->data)) {
+			$field_item->setValue($this->data['itemid']);
 		}
 
 		$this->fields[] = $field_item;
@@ -38,8 +38,8 @@ class CPlainTextWidgetForm extends CWidgetForm {
 			ZBX_MAX_WIDGET_LINES
 		))->setDefault(25);
 
-		if (array_key_exists('show_lines', $data)) {
-			$field_lines->setValue($data['show_lines']);
+		if (array_key_exists('show_lines', $this->data)) {
+			$field_lines->setValue($this->data['show_lines']);
 		}
 
 		$this->fields[] = $field_lines;
@@ -47,8 +47,8 @@ class CPlainTextWidgetForm extends CWidgetForm {
 		// Show text as HTML.
 		$field_text_as_html = (new CWidgetFieldCheckBox('style', _('Show text as HTML')))->setDefault(0);
 
-		if (array_key_exists('style', $data)) {
-			$field_text_as_html->setValue($data['style']);
+		if (array_key_exists('style', $this->data)) {
+			$field_text_as_html->setValue($this->data['style']);
 		}
 
 		$this->fields[] = $field_text_as_html;
@@ -56,8 +56,8 @@ class CPlainTextWidgetForm extends CWidgetForm {
 		// dynamic item
 		$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(0);
 
-		if (array_key_exists('dynamic', $data)) {
-			$dynamic_item->setValue($data['dynamic']);
+		if (array_key_exists('dynamic', $this->data)) {
+			$dynamic_item->setValue($this->data['dynamic']);
 		}
 
 		$this->fields[] = $dynamic_item;
