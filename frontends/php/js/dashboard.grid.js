@@ -340,10 +340,6 @@
 		});
 	}
 
-	function stopResizable($obj, data, widget) {
-		widget['div'].resizable("destroy");
-	}
-
 	function showPreloader(widget) {
 		if (typeof(widget['preloader_div']) == 'undefined') {
 			widget['preloader_div'] = $('<div>')
@@ -430,7 +426,7 @@
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage']
-		}
+		};
 
 		if (widget['widgetid'] !== '') {
 			ajax_data['widgetid'] = widget['widgetid'];
@@ -470,7 +466,7 @@
 
 				widget['content_footer'].html(resp.footer);
 
-				// Creates new script elements and removes previous ones to force their reexecution
+				// Creates new script elements and removes previous ones to force their re-execution.
 				widget['content_script'].empty();
 				if (typeof(resp.script_file) !== 'undefined' && resp.script_file.length) {
 					// NOTE: it is done this way to make sure, this script is executed before script_run function below.
@@ -486,7 +482,7 @@
 					}
 				}
 				if (typeof(resp.script_inline) !== 'undefined') {
-					// NOTE: to execute scrpt with current widget context, add unique ID for required div, and use it in script
+					// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
 					var new_script = $('<script>')
 						.text(resp.script_inline);
 					widget['content_script'].append(new_script);
