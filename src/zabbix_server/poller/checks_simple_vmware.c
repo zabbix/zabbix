@@ -1656,7 +1656,7 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			i, ret = SYSINFO_RET_FAIL, mode;
-	zbx_vmware_datastore_t	*datastore;
+	zbx_vmware_datastore_t	*datastore = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

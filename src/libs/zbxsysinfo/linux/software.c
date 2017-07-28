@@ -259,7 +259,7 @@ next:
 
 	if (0 == show_pm)
 	{
-		offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
+		print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
 
 		zbx_vector_str_clear_ext(&packages, zbx_ptr_free);
 	}
