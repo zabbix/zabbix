@@ -1203,12 +1203,6 @@
 							updateWidgetConfig($this, data, widget);
 						});
 
-						// Position dialogue in middle of screen.
-						data.dialogue['div'].css({
-							'margin-top': '-' + (data.dialogue['div'].outerHeight() / 2) + 'px',
-							'margin-left': '-' + (data.dialogue['div'].outerWidth() / 2) + 'px'
-						});
-
 						// Enable save button after sucessfull form update.
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
