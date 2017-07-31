@@ -1252,7 +1252,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_HOST		*host;
-	unsigned char		value_type, type;
+	unsigned char		value_type, type, history;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
@@ -1280,15 +1280,12 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		return FAIL;
 
 	if (ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
-	{
-		if (item->history != dbsync_env.cache->config->hk.history)
-			return FAIL;
-	}
+		history = (0 != dbsync_env.cache->config->hk.history);
 	else
-	{
-		if (FAIL == dbsync_compare_bool_time(dbrow[31], item->history))
-			return FAIL;
-	}
+		history = zbx_time2bool(dbrow[31]);
+
+	if (item->history != history)
+		return FAIL;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[33], item->inventory_link))
 		return FAIL;
