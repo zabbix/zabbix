@@ -943,7 +943,7 @@
 				$(window).bind('beforeunload', function() {
 					var	res = confirmExit($this, data);
 
-					// return value only if we need confirmation window, return nothing othervise
+					// Return value only if we need confirmation window, return nothing otherwise.
 					if (typeof res !== 'undefined') {
 						return res;
 					}
