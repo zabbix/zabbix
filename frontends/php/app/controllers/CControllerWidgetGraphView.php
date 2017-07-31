@@ -181,6 +181,18 @@ class CControllerWidgetGraphView extends CControllerWidget {
 						}
 					}
 				}
+
+				if ($graph) {
+					// Search if there are any items available for this dynamic host
+					$new_dynamic = getSameGraphItemsForHost(
+						$graph['gitems'],
+						$dynamic_hostid,
+						false
+					);
+					if (!$new_dynamic) {
+						$critical_error = _('No permissions to referred object or it does not exist!');
+					}
+				}
 				else {
 					$critical_error = _('No permissions to referred object or it does not exist!');
 				}
