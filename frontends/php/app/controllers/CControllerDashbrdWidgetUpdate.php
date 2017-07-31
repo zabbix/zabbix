@@ -36,12 +36,65 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			'dashboardid' =>	'db dashboard.dashboardid',
 			'userid' =>			'db dashboard.userid',
 			'name' =>			'db dashboard.name|not_empty',
-			'widgets' =>		'array'
+			'widgets' =>		'array',
+			'sharing' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			/*
+			 * @var array  $sharing
+			 * @var int    $sharing['private']
+			 * @var array  $sharing['users']
+			 * @var array  $sharing['users'][]['userid']
+			 * @var array  $sharing['users'][]['permission']
+			 * @var array  $sharing['userGroups']
+			 * @var array  $sharing['userGroups'][]['usrgrpid']
+			 * @var array  $sharing['userGroups'][]['permission']
+			 */
+			$sharing = $this->getInput('sharing', []);
+			if ($sharing) {
+				if (!array_key_exists('private', $sharing)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'sharing',
+						_s('the parameter "%1$s" is missing', 'private')
+					));
+					$ret = false;
+				}
+				if (array_key_exists('users', $sharing) && $sharing['users']) {
+					foreach ($sharing['users'] as $index => $user) {
+						if (!array_key_exists('userid', $user)) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[users]['.$index.']',
+								_s('the parameter "%1$s" is missing', 'userid')
+							));
+							$ret = false;
+						}
+						if (!array_key_exists('permission', $user)) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[users]['.$index.']',
+								_s('the parameter "%1$s" is missing', 'permission')
+							));
+							$ret = false;
+						}
+					}
+				}
+				if (array_key_exists('userGroups', $sharing) && $sharing['userGroups']) {
+					foreach ($sharing['userGroups'] as $index => $usergrp) {
+						if (!array_key_exists('usrgrpid', $usergrp)) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[userGroups]['.$index.']',
+								_s('the parameter "%1$s" is missing', 'usrgrpid')
+							));
+							$ret = false;
+						}
+						if (!array_key_exists('permission', $usergrp)) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[userGroups]['.$index.']',
+								_s('the parameter "%1$s" is missing', 'permission')
+							));
+							$ret = false;
+						}
+					}
+				}
+			}
+
 			/*
 			 * @var array  $widgets
 			 * @var string $widget[]['widgetid']        (optional)
@@ -138,6 +191,19 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		];
 		if ($this->hasInput('dashboardid')) {
 			$dashboard['dashboardid'] = $this->getInput('dashboardid');
+		}
+
+		$sharing = $this->getInput('sharing', []);
+		if ($sharing) {
+			if (array_key_exists('private', $sharing)) {
+				$dashboard['private'] = $sharing['private'];
+			}
+			if (array_key_exists('users', $sharing)) {
+				$dashboard['users'] = $sharing['users'];
+			}
+			if (array_key_exists('userGroups', $sharing)) {
+				$dashboard['userGroups'] = $sharing['userGroups'];
+			}
 		}
 
 		foreach ($this->widgets as $widget) {

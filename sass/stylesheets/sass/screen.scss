@@ -3158,13 +3158,19 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue {
-	position: absolute;
+	position: fixed;
 	z-index: 1000;
+	top: 50%;
+	left: 50%;
+	max-height: 90%;
+	max-width: 75%;
+	overflow: auto;
 	padding: 15px 10px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+	@include transform(translate(-50%, -50%));
 
 	.list-table {
 		border: none;
@@ -3211,6 +3217,7 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue-body {
+	margin: 0 0 25px 0;
 	white-space: nowrap;
 }
 

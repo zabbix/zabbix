@@ -20,6 +20,9 @@
 
 class CWidgetField {
 
+	const FLAG_ACKNOWLEDGES = 0x01;
+	const FLAG_NOT_EMPTY = 0x02;
+
 	protected	$name;
 	protected	$label;
 	protected	$value;
@@ -28,6 +31,7 @@ class CWidgetField {
 	protected	$action;
 	private		$validation_rules = [];
 	private		$ex_validation_rules = [];
+	private		$flags;
 
 	/**
 	 * Create widget field (general)
@@ -40,6 +44,7 @@ class CWidgetField {
 		$this->label = $label;
 		$this->value = null;
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->flags = 0x00;
 	}
 
 	public function setValue($value) {
@@ -128,6 +133,28 @@ class CWidgetField {
 
 	public function getSaveType() {
 		return $this->save_type;
+	}
+
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 *
+	 * @param int $flags
+	 *
+	 * @return $this
+	 */
+	public function setFlags($flags) {
+		$this->flags = $flags;
+
+		return $this;
+	}
+
+	/**
+	 * Get additional flags, which can be used in configuration form.
+	 *
+	 * @return int
+	 */
+	public function getFlags() {
+		return $this->flags;
 	}
 
 	/**

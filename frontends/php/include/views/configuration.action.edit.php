@@ -1595,7 +1595,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				];
 
 				$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-				$new_operation_formlist->addRow(_('Script name'), $userScript);
+				$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP));
 
 				// script
 				$new_operation_formlist->addRow(_('Execute on'),
@@ -2008,7 +2008,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
 					])
 				)
-				->addRow(_('Script name'), [
+				->addRow(_('Script name'), (new CDiv([
 						new CVar('new_ack_operation[opcommand][scriptid]',
 							$data['new_ack_operation']['opcommand']['scriptid']
 						),
@@ -2018,7 +2018,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton('select_ack_operation_opcommand_script', _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-					]
+					]))->addClass(ZBX_STYLE_NOWRAP)
 				)
 				->addRow(_('Execute on'),
 					(new CRadioButtonList('new_ack_operation[opcommand][execute_on]',

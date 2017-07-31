@@ -126,9 +126,11 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		elseif ($this->hasInput('source_dashboardid')) {
 			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
-				'output' => ['name'],
+				'output' => ['name', 'private'],
 				// TODO AV: remove widgetid from 'selectWidgets'; related CControllerDashbrdWidgetUpdate:155
 				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
+				'selectUsers' => ['userid', 'permission'],
+				'selectUserGroups' => ['usrgrpid', 'permission'],
 				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
 
@@ -136,6 +138,11 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				$dashboard = $this->getNewDashboard();
 				$dashboard['name'] = $dashboards[0]['name'];
 				$dashboard['widgets'] = $this->unsetInaccessibleFields($dashboards[0]['widgets']);
+				$dashboard['sharing'] = [
+					'private' => $dashboards[0]['private'],
+					'users' => $dashboards[0]['users'],
+					'userGroups' => $dashboards[0]['userGroups']
+				];
 			}
 		}
 		else {

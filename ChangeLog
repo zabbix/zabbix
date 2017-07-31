@@ -1,3 +1,12 @@
+Changes for 3.4.0alpha3
+
+New features:
+
+Bug fixes:
+..F....... [ZBXNEXT-18] fixed php5.4 incompatibility in events page and acknowledge operation form (gcalenko)
+..F....... [ZBXNEXT-18] fixed script name select button for new acknowledge operation form and recovery operation form (gcalenko)
+
+--------------------------------------------------------------------------------
 Changes for 3.4.0alpha2
 
 New features:
@@ -15,7 +24,6 @@ A......... [ZBXNEXT-2102] added check for dashboard owners in user.delete() meth
 ..F....... [ZBXNEXT-2102] fixed updating of dashboard with inaccessible elements (Sasha)
 ....I..... [ZBXNEXT-2102] fixed possible sql errors in upgrade patch (Sasha)
 ..F....... [ZBXNEXT-2102] fixed removing of favourites from dashboard widgets (vmurzins)
-........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 ..F....... [ZBXNEXT-2031] fixed multiple bugs in maps (vjaceslavs)
 A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form and item.update API (vjaceslavs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)

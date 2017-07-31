@@ -748,6 +748,9 @@
 			userid: data['dashboard']['userid'],
 			widgets: ajax_widgets
 		};
+		if (isset('sharing', data['dashboard'])) {
+			ajax_data['sharing'] = data['dashboard']['sharing'];
+		}
 
 		$.ajax({
 			url: url.getUrl(),
@@ -1198,12 +1201,6 @@
 						$('#widget_dialogue_form', body).on('submit', function(e) {
 							e.preventDefault();
 							updateWidgetConfig($this, data, widget);
-						});
-
-						// Position dialogue in middle of screen.
-						data.dialogue['div'].css({
-							'margin-top': '-' + (data.dialogue['div'].outerHeight() / 2) + 'px',
-							'margin-left': '-' + (data.dialogue['div'].outerWidth() / 2) + 'px'
 						});
 
 						// Enable save button after sucessfull form update.

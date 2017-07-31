@@ -133,7 +133,9 @@ if ($event['r_eventid'] != 0) {
 }
 
 // Filter out acknowledgment notification messages.
-foreach ([&$alerts, &$r_alerts] as &$alerts_data) {
+$all_alerts = [&$alerts, &$r_alerts];
+
+foreach ($all_alerts as &$alerts_data) {
 	foreach ($alerts_data as $index => $alert) {
 		if ($alert['acknowledgeid'] > 0) {
 			unset($alerts_data[$index]);

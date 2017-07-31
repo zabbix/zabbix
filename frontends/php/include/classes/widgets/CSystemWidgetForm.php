@@ -90,6 +90,7 @@ class CSystemWidgetForm extends CWidgetForm {
 			EXTACK_OPTION_UNACK => _('Unacknowledged only')
 		]))
 			->setDefault(EXTACK_OPTION_ALL)
+			->setFlags(CWidgetField::FLAG_ACKNOWLEDGES)
 			->setModern(true);
 
 		if (array_key_exists('ext_ack', $this->data)) {
