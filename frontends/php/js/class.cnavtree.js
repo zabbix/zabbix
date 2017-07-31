@@ -1030,7 +1030,7 @@ jQuery(function($) {
 				var ret = -1;
 
 				for (var i in arr) {
-					if (arr[i]['id'] == val) {
+					if (arr[i]['id'] === val) {
 						ret = i;
 						break;
 					}
@@ -1057,13 +1057,13 @@ jQuery(function($) {
 						}
 
 						if (item['parent'] == parent_id) {
-							var children = buildTree($obj, rows, +item['id']);
+							var children = buildTree($obj, rows, item['id']);
 
 							if (children.length) {
 								item['children'] = children;
 							}
 
-							var indx = getTreeItemIndex(tree, item['id']);
+							var indx = getTreeItemIndex(tree, +item['id']);
 
 							if (indx > -1) {
 								tree[indx] = item;
