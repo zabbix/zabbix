@@ -199,7 +199,10 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			}
 		}
 		else {
-			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			if (!$resourceid) {
+				$critical_error = _('No permissions to referred object or it does not exist!');
+			}
+			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$item = API::Item()->get([
 					'itemids' => $resourceid,
 					'output' => null
@@ -210,7 +213,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-				// get graph
+				// get graph, used below
 				$graph = API::Graph()->get([
 					'graphids' => $resourceid,
 					'output' => API_OUTPUT_EXTEND
