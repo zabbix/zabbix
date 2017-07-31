@@ -132,4 +132,6 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 
 $graph->draw();
 
+header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+
 require_once dirname(__FILE__).'/include/page_footer.php';

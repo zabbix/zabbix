@@ -27,12 +27,9 @@ $js_scripts = [];
 
 $form_list = new CFormList();
 
-$known_widget_types = CWidgetConfig::getKnownWidgetTypes();
-natsort($known_widget_types);
-
 // Common fields
 $form_list->addRow(_('Type'),
-	new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $known_widget_types)
+	new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $data['known_widget_types'])
 );
 
 $form_list->addRow(_('Name'),
@@ -43,7 +40,7 @@ $form_list->addRow(_('Name'),
 );
 
 // Widget specific fields
-foreach ($data['dialogue']['form']->getFields() as $field) {
+foreach ($data['dialogue']['fields'] as $field) {
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow($field->getLabel(),
 			new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues())

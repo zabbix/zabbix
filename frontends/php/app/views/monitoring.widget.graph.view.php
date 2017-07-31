@@ -50,8 +50,11 @@ if ($data['widget']['initial_load'] == 1) {
 					'var img_url = new Curl(src);'.
 					'img_url.setArgument("width", new_width);'.
 					'img_url.setArgument("height", new_height);'.
-					'jQuery("#"+img_id).attr("src", img_url.getUrl());'.
-					'timeControl.changeSBoxHeight(img_id, new_height-property_zone_height);'.
+					'jQuery("#"+img_id)'.
+						'.attr("src", img_url.getUrl())'.
+						'.load(img_url.getUrl(), function(response, status, xhr) {'.
+							'timeControl.changeSBoxHeight(img_id, +xhr.getResponseHeader("X-ZBX-SBOX-HEIGHT"));'.
+						'});'.
 				'}'.
 			'}'.
 

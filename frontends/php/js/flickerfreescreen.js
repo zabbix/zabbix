@@ -55,6 +55,27 @@
 			}
 		},
 
+		changeSBoxHeight: function(id, height) {
+			if (typeof height !== 'number') {
+				return;
+			}
+
+			if (typeof ZBX_SBOX[id] !== 'undefined') {
+				delete ZBX_SBOX[id];
+			}
+
+			var obj = this.objectList[id],
+				img = $(id);
+
+			obj['objDims']['graphHeight'] = height;
+
+			if (obj.loadSBox) {
+				obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
+				addListener(img, 'load', obj.sbox_listener);
+				addListener(img, 'load', sboxGlobalMove);
+			}
+		},
+
 		refresh: function(id, isSelfRefresh) {
 			var screen = this.screens[id], ajaxParams;
 
@@ -375,7 +396,7 @@
 						screen.error++;
 						window.flickerfreeScreen.calculateReRefresh(id);
 					})
-					.load(function() {
+					.load(url.getUrl(), function(response, status, xhr) {
 						if (screen.error > 0) {
 							return;
 						}
@@ -407,6 +428,8 @@
 							// rebuild timeControl sbox listeners
 							if (!empty(ZBX_SBOX[id])) {
 								ZBX_SBOX[id].addListeners();
+								timeControl.changeSBoxHeight(domImg.attr('id'),
+									+xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
 							}
 
 							window.flickerfreeScreenShadow.end(id);

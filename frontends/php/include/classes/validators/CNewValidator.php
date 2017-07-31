@@ -95,8 +95,7 @@ class CNewValidator {
 					if (array_key_exists($field, $this->input)) {
 						if (!is_string($this->input[$field]) || CJs::decodeJson($this->input[$field]) === null) {
 							$this->addError($fatal,
-								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-								// TODO: stringify($this->input[$field]) ???
+								_s('Incorrect value for field "%1$s": %2$s.', $field, _('the JSON is expected'))
 							);
 							return false;
 						}
