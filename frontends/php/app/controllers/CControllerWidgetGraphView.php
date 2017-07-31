@@ -66,6 +66,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$profileIdx = 'web.dashbrd';
 		$profileIdx2 = $dashboardid;
 		$update_profile = $dashboardid ? UPDATE_PROFILE_ON : UPDATE_PROFILE_OFF;
+		$critical_error = null;
 
 		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $fields['graphid']) {
 			$resource_type = SCREEN_RESOURCE_GRAPH;
@@ -73,7 +74,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$graph_dims = getGraphDims($resourceid);
 			$graph_dims['graphHeight'] = $height;
 			$graph_dims['width'] = $width;
-			$graph = getGraphByGraphId($resourceid);
 		}
 		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH && $fields['itemid']) {
 			$resource_type = SCREEN_RESOURCE_SIMPLE_GRAPH;
@@ -124,6 +124,10 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$new_itemid = get_same_item_for_host($resourceid, $dynamic_hostid);
 				$resourceid = !empty($new_itemid) ? $new_itemid : null;
+
+				if ($resourceid === null) {
+					$critical_error = _('No permissions to referred object or it does not exist!');
+				}
 			}
 			// Find requested host and change graph details.
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
@@ -177,104 +181,134 @@ class CControllerWidgetGraphView extends CControllerWidget {
 						}
 					}
 				}
+				else {
+					$critical_error = _('No permissions to referred object or it does not exist!');
+				}
+			}
+		}
+		else {
+			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+				$item = API::Item()->get([
+					'itemids' => $resourceid,
+					'output' => null
+				]);
+				$item = reset($item);
+				if (!$item) {
+					$critical_error = _('No permissions to referred object or it does not exist!');
+				}
+			}
+			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+				// get graph
+				$graph = API::Graph()->get([
+					'graphids' => $resourceid,
+					'output' => API_OUTPUT_EXTEND
+				]);
+				$graph = reset($graph);
+
+				if (!$graph) {
+					$critical_error = _('No permissions to referred object or it does not exist!');
+				}
 			}
 		}
 
-		// Build graph action and data source links.
-		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-			if (!$edit_mode) {
-				$time_control_data['loadSBox'] = 1;
-			}
-
-			if ($resourceid) {
-				$graph_src = new CUrl('chart.php');
-				$graph_src->setArgument('itemids[]', $resourceid);
-				$graph_src->setArgument('width', $width);
-				$graph_src->setArgument('height', $height);
-			}
-			else {
-				$graph_src = new CUrl('chart3.php');
-			}
-
-			$graph_src->setArgument('period', $timeline['period']);
-			$graph_src->setArgument('stime', $timeline['stime']);
-		}
-		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-			$graph_src = '';
-
-			if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
-				// TODO miks: why chart7 and chart3 are allowed only if dynamic is set?
-				$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
-					? 'chart7.php'
-					: 'chart3.php';
-
-				$graph_src = new CUrl($chart_file);
-
-				foreach ($graph as $name => $value) {
-					if ($name === 'width' || $name === 'height') {
-						continue;
-					}
-					$graph_src->setArgument($name, $value);
-				}
-
-				$new_graph_items = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
-				foreach ($new_graph_items as $new_graph_item) {
-					unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
-
-					foreach ($new_graph_item as $name => $value) {
-						$graph_src->setArgument('items['.$new_graph_item['itemid'].']['.$name.']', $value);
-					}
-				}
-
-				$graph_src->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
-			}
-
-			if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
-					$graph_src = new CUrl('chart6.php');
-					$graph_src->setArgument('graphid', $resourceid);
-				}
-
-				$timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_graphid($resourceid));
-			}
-			else {
-				if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
-					$graph_src = new CUrl('chart2.php');
-					$graph_src->setArgument('graphid', $resourceid);
-				}
-
+		if (!$critical_error) {
+			// Build graph action and data source links.
+			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				if (!$edit_mode) {
 					$time_control_data['loadSBox'] = 1;
 				}
+
+				if ($resourceid) {
+					$graph_src = new CUrl('chart.php');
+					$graph_src->setArgument('itemids[]', $resourceid);
+					$graph_src->setArgument('width', $width);
+					$graph_src->setArgument('height', $height);
+				}
+				else {
+					$graph_src = new CUrl('chart3.php');
+				}
+
+				$graph_src->setArgument('period', $timeline['period']);
+				$graph_src->setArgument('stime', $timeline['stime']);
+			}
+			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+				$graph_src = '';
+
+				if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+					// TODO miks: why chart7 and chart3 are allowed only if dynamic is set?
+					$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
+						? 'chart7.php'
+						: 'chart3.php';
+
+					$graph_src = new CUrl($chart_file);
+
+					foreach ($graph as $name => $value) {
+						if ($name === 'width' || $name === 'height') {
+							continue;
+						}
+						$graph_src->setArgument($name, $value);
+					}
+
+					$new_graph_items = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
+					foreach ($new_graph_items as $new_graph_item) {
+						unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
+
+						foreach ($new_graph_item as $name => $value) {
+							$graph_src->setArgument('items['.$new_graph_item['itemid'].']['.$name.']', $value);
+						}
+					}
+
+					$graph_src->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
+				}
+
+				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
+					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+						$graph_src = new CUrl('chart6.php');
+						$graph_src->setArgument('graphid', $resourceid);
+					}
+
+					$timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_graphid($resourceid));
+				}
+				else {
+					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+						$graph_src = new CUrl('chart2.php');
+						$graph_src->setArgument('graphid', $resourceid);
+					}
+
+					if (!$edit_mode) {
+						$time_control_data['loadSBox'] = 1;
+					}
+				}
+
+				$graph_src->setArgument('width', $width);
+				$graph_src->setArgument('height', $height);
+				$graph_src->setArgument('legend', $graph['show_legend']);
+				$graph_src->setArgument('period', $timeline['period']);
+				$graph_src->setArgument('stime', $timeline['stime']);
+
+				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
+					$graph_src->setArgument('graph3d', $graph['show_3d']);
+				}
 			}
 
-			$graph_src->setArgument('width', $width);
-			$graph_src->setArgument('height', $height);
-			$graph_src->setArgument('legend', $graph['show_legend']);
-			$graph_src->setArgument('period', $timeline['period']);
-			$graph_src->setArgument('stime', $timeline['stime']);
+			$graph_src->setArgument('updateProfile', $update_profile);
+			$graph_src->setArgument('profileIdx', $profileIdx);
+			$graph_src->setArgument('profileIdx2', $profileIdx2);
 
-			if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				$graph_src->setArgument('graph3d', $graph['show_3d']);
+			if ($graph_dims['graphtype'] != GRAPH_TYPE_PIE && $graph_dims['graphtype'] != GRAPH_TYPE_EXPLODED) {
+				$graph_src->setArgument('outer', '1');
 			}
+
+			$time_control_data['src'] = $graph_src->getUrl();
 		}
-
-		$graph_src->setArgument('updateProfile', $update_profile);
-		$graph_src->setArgument('profileIdx', $profileIdx);
-		$graph_src->setArgument('profileIdx2', $profileIdx2);
-
-		if ($graph_dims['graphtype'] != GRAPH_TYPE_PIE && $graph_dims['graphtype'] != GRAPH_TYPE_EXPLODED) {
-			$graph_src->setArgument('outer', '1');
-		}
-
-		$time_control_data['src'] = $graph_src->getUrl();
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'graph' => [
 				'dataid' => $dataid,
 				'containerid' => $containerid,
-				'timestamp' => time()
+				'timestamp' => time(),
+				'critical_error' => $critical_error
 			],
 			'widget' => [
 				'uniqueid' => $uniqueid,

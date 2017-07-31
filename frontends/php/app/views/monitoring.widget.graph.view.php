@@ -23,6 +23,15 @@ if ($data['only_footer']) {
 		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 	];
 }
+elseif ($data['graph']['critical_error'] !== null) {
+	$item = (new CTableInfo())->setNoDataMessage($data['graph']['critical_error']);
+
+	$output = [
+		'header' => $data['name'],
+		'body' => $item->toString(),
+		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	];
+}
 else {
 	$item = (new CDiv())->setId($data['graph']['containerid']);
 
