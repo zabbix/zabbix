@@ -108,6 +108,10 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			}
 		}
 
+		if (!count($table_rows)) {
+			$error = 'No permissions to selected item or it does not exist.';
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT]),
 			'table_rows' => $table_rows,

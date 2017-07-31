@@ -33,7 +33,7 @@ if ($data['error'] === null) {
 	$widget_div->addItem($table);
 }
 else {
-	$widget_div->addItem((new CTableInfo())->setNoDataMessage($data['error']));
+	$table = (new CTableInfo())->setNoDataMessage($data['error']);
 }
 
 $output = [
