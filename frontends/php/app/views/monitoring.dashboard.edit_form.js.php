@@ -34,7 +34,7 @@
 			dashboard.dashboardGrid(
 				"setDashboardData", {"name": formData['name'], "userid": formData['userid'] || 0}
 			);
-			jQuery('div.article h1').text(form.data('data').name);
+			jQuery('div.article .header-title .cell:first h1').text(form.data('data').name);
 			jQuery('#dashboard-direct-link').text(form.data('data').name);
 		});
 	});

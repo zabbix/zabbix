@@ -2656,6 +2656,23 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
+.dashbrd-grid-empty-placeholder {
+	width: 16%;
+	height: 200px;
+	background-color: #fff;
+	border-style: dashed;
+	border-width: 2px;
+	border-color: #bdbdbd;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin: .25rem;
+
+	h1 {
+		text-align: center;
+	}
+}
+
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	width: 100%;
