@@ -23,37 +23,102 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashbrdWidgetUpdate extends CController {
 
+	private $widgets;
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->widgets = [];
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'widgets' =>	'required|array'
+			'dashboardid' =>	'db dashboard.dashboardid',
+			'userid' =>			'db dashboard.userid',
+			'name' =>			'db dashboard.name|not_empty',
+			'widgets' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$widgetids = [
-				WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES, WIDGET_WEB_OVERVIEW,
-				WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS, WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS,
-				WIDGET_FAVOURITE_SCREENS
-			];
-
 			/*
 			 * @var array  $widgets
-			 * @var string $widget[]['widgetid']
-			 * @var int    $widget[]['rf_rate']        (optional)
-			 * @var array  $widget[]['pos']            (optional)
+			 * @var string $widget[]['widgetid']        (optional)
+			 * @var array  $widget[]['pos']             (optional)
 			 * @var int    $widget[]['pos']['row']
 			 * @var int    $widget[]['pos']['col']
 			 * @var int    $widget[]['pos']['height']
 			 * @var int    $widget[]['pos']['width']
+			 * @var string $widget[]['type']
+			 * @var string $widget[]['name']
+			 * @var array  $widget[]['fields']
+			 * @var string $widget[]['fields'][<name>]  (optional)
 			 */
-			foreach ($this->getInput('widgets') as $widget) {
-				// TODO: validation
+			foreach ($this->getInput('widgets', []) as $index => $widget) {
+				// TODO VM: check widgetid - if present in $widget, must be existing widget id
+
+				if (!array_key_exists('pos', $widget)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+						_s('the parameter "%1$s" is missing', 'pos')
+					));
+					$ret = false;
+				}
+				else {
+					foreach (['row', 'col', 'height', 'width'] as $field) {
+						if (!array_key_exists($field, $widget['pos'])) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][pos]',
+								_s('the parameter "%1$s" is missing', $field)
+							));
+							$ret = false;
+						}
+					}
+				}
+
+				if (!array_key_exists('type', $widget)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+						_s('the parameter "%1$s" is missing', 'type')
+					));
+					$ret = false;
+					break;
+				}
+
+				if (!array_key_exists('name', $widget)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+						_s('the parameter "%1$s" is missing', 'name')
+					));
+					$ret = false;
+				}
+
+				// AJAX is not sending empty elements,
+				// absence of 'fields' element means, there are no fields for this widget
+				if (!array_key_exists('fields', $widget)) {
+					$widget['fields'] = [];
+				}
+				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget['fields']);
+				unset($widget['fields']);
+
+				if (($errors = $widget['form']->validate()) !== []) {
+					$widget_name = (array_key_exists('name', $widget) && $widget['name'] === '')
+						? CWidgetConfig::getKnownWidgetTypes()[$widget['type']]
+						: $widget['name'];
+
+					error_group(['header' => _s('Cannot save widget "%1$s".', $widget_name), 'msgs' => $errors]);
+
+					$ret = false;
+				}
+
+				$this->widgets[] = $widget;
 			}
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				// TODO AV: "errors" => "messages"
+				$output['errors'] = $messages->toString();
+			}
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
 		}
 
 		return $ret;
@@ -64,21 +129,70 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	}
 
 	protected function doAction() {
-		foreach ($this->getInput('widgets') as $widget) {
-			$widgetid = $widget['widgetid'];
+		$data = [];
 
-			if (array_key_exists('rf_rate', $widget)) {
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT);
+		$dashboard = [
+			'name' => $this->getInput('name'),
+			'userid' => $this->getInput('userid', 0),
+			'widgets' => []
+		];
+		if ($this->hasInput('dashboardid')) {
+			$dashboard['dashboardid'] = $this->getInput('dashboardid');
+		}
+
+		foreach ($this->widgets as $widget) {
+			$upd_widget = [];
+			if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
+					&& array_key_exists('dashboardid', $dashboard)) { // TODO AV: remove check for dashboardid; related CControllerDashboardView:118
+				$upd_widget['widgetid'] = $widget['widgetid'];
 			}
 
-			if (array_key_exists('pos', $widget)) {
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row'], PROFILE_TYPE_INT);
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col'], PROFILE_TYPE_INT);
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height'], PROFILE_TYPE_INT);
-				CProfile::update('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'], PROFILE_TYPE_INT);
+			$upd_widget += [
+				'row' => $widget['pos']['row'],
+				'col' => $widget['pos']['col'],
+				'height' => $widget['pos']['height'],
+				'width' => $widget['pos']['width'],
+				'type' => $widget['type'],
+				'name' => $widget['name'],
+				'fields' => $widget['form']->fieldsToApi(),
+			];
+
+			$dashboard['widgets'][] = $upd_widget;
+		}
+
+		if (array_key_exists('dashboardid', $dashboard)) {
+			$result = API::Dashboard()->update([$dashboard]);
+			$message = _('Dashboard updated');
+			$error_msg =  _('Failed to update dashboard');
+		}
+		else {
+			$result = API::Dashboard()->create([$dashboard]);
+			$message = _('Dashboard created');
+			$error_msg = _('Failed to create dashboard');
+		}
+
+		if ($result) {
+			// TODO VM: (?) we need to find a way to display message next time, page is loaded.
+			// TODO VM: ideas: processRequest in ZBase (CSession::setValue())
+			$data['redirect'] = (new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.view')
+				->setArgument('dashboardid', $result['dashboardids'][0])
+				->getUrl();
+			// @TODO should be moved from here to base logic by ZBXNEXT-3892
+			CSession::setValue('messageOk', $message);
+		}
+		else {
+			// TODO AV: improve error messages
+			if (!hasErrorMesssages()) {
+				error($error_msg);
 			}
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		if (($messages = getMessages()) !== null) {
+			// TODO AV: "errors" => "messages"
+			$data['errors'] = $messages->toString();
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($data)]));
 	}
 }

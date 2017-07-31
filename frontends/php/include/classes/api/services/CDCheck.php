@@ -51,15 +51,15 @@ class CDCheck extends CApiService {
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'				=> false,
+			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectDRules'				=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
+			'countOutput'				=> false,
+			'groupCount'				=> false,
+			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
@@ -88,7 +88,7 @@ class CDCheck extends CApiService {
 
 			$sqlParts['where'][] = dbConditionInt('dc.druleid', $options['druleids']);
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['druleid'] = 'dc.druleid';
 			}
 		}
@@ -104,7 +104,7 @@ class CDCheck extends CApiService {
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
-			if (!is_null($options['groupCount'])) {
+			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
 			}
 		}
@@ -129,18 +129,20 @@ class CDCheck extends CApiService {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dcheck = DBfetch($res)) {
-			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount']))
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $dcheck;
-				else
+				}
+				else {
 					$result = $dcheck['rowscount'];
+				}
 			}
 			else {
 				$result[$dcheck['dcheckid']] = $dcheck;
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
@@ -150,7 +152,7 @@ class CDCheck extends CApiService {
 		}
 
 // removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -160,7 +162,7 @@ class CDCheck extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			if ($options['selectDRules'] !== null) {
 				$sqlParts = $this->addQuerySelect('dc.druleid', $sqlParts);
 			}

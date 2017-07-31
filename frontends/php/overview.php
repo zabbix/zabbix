@@ -173,62 +173,31 @@ if ($type == SHOW_TRIGGERS) {
 		];
 	}
 
-	// fetch hosts
-	$inventoryFilter = [];
-	foreach ($filter['inventory'] as $field) {
-		$inventoryFilter[$field['field']][] = $field['value'];
-	}
-	$hosts = API::Host()->get([
-		'output' => ['hostid', 'status'],
-		'selectGraphs' => ($viewStyle == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
-		'selectScreens' => ($viewStyle == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
-		'groupids' => $data['pageFilter']->groupids,
-		'searchInventory' => ($inventoryFilter) ? $inventoryFilter : null,
-		'preservekeys' => true
-	]);
-	$hostIds = array_keys($hosts);
+	$host_options = [];
 
-	$options = [
-		'output' => [
-			'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
-		],
-		'selectHosts' => ['hostid', 'name', 'status'],
-		'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
-		'hostids' => $hostIds,
+	// fetch hosts
+	if ($filter['inventory']) {
+		$host_options['searchInventory'] = [];
+		foreach ($filter['inventory'] as $field) {
+			$host_options['searchInventory'][$field['field']][] = $field['value'];
+		}
+	}
+
+	$trigger_options = [
 		'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
 		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+		'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null],
 		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
 		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
 		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
 		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null,
 		'maintenance' => !$filter['showMaintenance'] ? false : null,
-		'monitored' => true,
-		'skipDependent' => true,
-		'sortfield' => 'description',
-		'preservekeys' => true
 	];
 
-	// trigger status filter
-	if ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) {
-		$options['only_true'] = true;
-	}
-	elseif ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) {
-		$options['filter']['value'] = TRIGGER_VALUE_TRUE;
-	}
-
-	// application filter
-	if ($filter['application'] !== '') {
-		$applications = API::Application()->get([
-			'output' => ['applicationid'],
-			'hostids' => $hostIds,
-			'search' => ['name' => $filter['application']]
-		]);
-		$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
-	}
-
-	$triggers = API::Trigger()->get($options);
-
-	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
+	$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
+	list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
+		$host_options, $trigger_options
+	);
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;
@@ -238,24 +207,9 @@ if ($type == SHOW_TRIGGERS) {
 }
 // fetch item data
 else {
-	// filter data
-	$filter = [
+	$data['filter'] = [
 		'application' => CProfile::get('web.overview.filter.application', '')
 	];
-
-	// application filter
-	$applicationIds = null;
-	if ($filter['application'] !== '') {
-		$applications = API::Application()->get([
-			'output' => ['applicationid'],
-			'groupids' => $data['pageFilter']->groupids,
-			'search' => ['name' => $filter['application']]
-		]);
-		$applicationIds = zbx_objectValues($applications, 'applicationid');
-	}
-
-	$data['filter'] = $filter;
-	$data['applicationIds'] = $applicationIds;
 
 	$overviewView = new CView('monitoring.overview.items', $data);
 }

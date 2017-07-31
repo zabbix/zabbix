@@ -333,7 +333,7 @@ function insert_js_function($fnct_name) {
 							jQuery(frmStorage).html(values[key]);
 						}
 						else {
-							frmStorage.value = values[key];
+							jQuery(frmStorage).val(values[key]).change();
 						}
 					}
 					if (!is_null(frmStorage) && submitParent) {

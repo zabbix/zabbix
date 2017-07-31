@@ -108,3 +108,46 @@ function inheritPermissions($groupid, $name) {
 		API::UserGroup()->update($upd_usrgrps);
 	}
 }
+
+/**
+ * Get sub-groups of elected host groups.
+ *
+ * @param array $groupids
+ * @param array $ms_groups  [OUT] the list of groups for multiselect
+ *
+ * @return array
+ */
+function getSubGroups(array $groupids, array &$ms_groups = null) {
+	$db_groups = $groupids
+		? API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		])
+		: [];
+
+	if ($ms_groups !== null) {
+		$ms_groups = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
+	}
+
+	$db_groups_names = [];
+
+	foreach ($db_groups as $db_group) {
+		$db_groups_names[] = $db_group['name'].'/';
+	}
+
+	if ($db_groups_names) {
+		$child_groups = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'search' => ['name' => $db_groups_names],
+			'searchByAny' => true,
+			'startSearch' => true
+		]);
+
+		foreach ($child_groups as $child_group) {
+			$groupids[] = $child_group['groupid'];
+		}
+	}
+
+	return $groupids;
+}

@@ -162,47 +162,50 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	}
 	DBfree_result(result);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
-
-	for (i = 0; i < num; i++)
+	if (0 < num)
 	{
-		if (SUCCEED != errcodes[i])
-			continue;
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
-		if (ITEM_STATUS_ACTIVE != items[i].status)
-			continue;
-
-		if (HOST_STATUS_MONITORED != items[i].host.status)
-			continue;
-
-		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+		for (i = 0; i < num; i++)
 		{
-			continue;
+			if (SUCCEED != errcodes[i])
+				continue;
+
+			if (ITEM_STATUS_ACTIVE != items[i].status)
+				continue;
+
+			if (HOST_STATUS_MONITORED != items[i].host.status)
+				continue;
+
+			if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
+					MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+			{
+				continue;
+			}
+
+			init_result(&value);
+
+			switch (types[i])
+			{
+				case ZBX_HTTPITEM_TYPE_SPEED:
+					SET_UI64_RESULT(&value, speed_download);
+					break;
+				case ZBX_HTTPITEM_TYPE_LASTSTEP:
+					SET_UI64_RESULT(&value, lastfailedstep);
+					break;
+				case ZBX_HTTPITEM_TYPE_LASTERROR:
+					SET_STR_RESULT(&value, zbx_strdup(NULL, err_str));
+					break;
+			}
+
+			items[i].state = ITEM_STATE_NORMAL;
+			dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+
+			free_result(&value);
 		}
 
-		init_result(&value);
-
-		switch (types[i])
-		{
-			case ZBX_HTTPITEM_TYPE_SPEED:
-				SET_UI64_RESULT(&value, speed_download);
-				break;
-			case ZBX_HTTPITEM_TYPE_LASTSTEP:
-				SET_UI64_RESULT(&value, lastfailedstep);
-				break;
-			case ZBX_HTTPITEM_TYPE_LASTERROR:
-				SET_STR_RESULT(&value, zbx_strdup(NULL, err_str));
-				break;
-		}
-
-		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
-
-		free_result(&value);
+		DCconfig_clean_items(items, errcodes, num);
 	}
-
-	DCconfig_clean_items(items, errcodes, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -303,47 +306,50 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	}
 	DBfree_result(result);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
-
-	for (i = 0; i < num; i++)
+	if (0 < num)
 	{
-		if (SUCCEED != errcodes[i])
-			continue;
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
-		if (ITEM_STATUS_ACTIVE != items[i].status)
-			continue;
-
-		if (HOST_STATUS_MONITORED != items[i].host.status)
-			continue;
-
-		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+		for (i = 0; i < num; i++)
 		{
-			continue;
+			if (SUCCEED != errcodes[i])
+				continue;
+
+			if (ITEM_STATUS_ACTIVE != items[i].status)
+				continue;
+
+			if (HOST_STATUS_MONITORED != items[i].host.status)
+				continue;
+
+			if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
+					MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+			{
+				continue;
+			}
+
+			init_result(&value);
+
+			switch (types[i])
+			{
+				case ZBX_HTTPITEM_TYPE_RSPCODE:
+					SET_UI64_RESULT(&value, stat->rspcode);
+					break;
+				case ZBX_HTTPITEM_TYPE_TIME:
+					SET_DBL_RESULT(&value, stat->total_time);
+					break;
+				case ZBX_HTTPITEM_TYPE_SPEED:
+					SET_DBL_RESULT(&value, stat->speed_download);
+					break;
+			}
+
+			items[i].state = ITEM_STATE_NORMAL;
+			dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+
+			free_result(&value);
 		}
 
-		init_result(&value);
-
-		switch (types[i])
-		{
-			case ZBX_HTTPITEM_TYPE_RSPCODE:
-				SET_UI64_RESULT(&value, stat->rspcode);
-				break;
-			case ZBX_HTTPITEM_TYPE_TIME:
-				SET_DBL_RESULT(&value, stat->total_time);
-				break;
-			case ZBX_HTTPITEM_TYPE_SPEED:
-				SET_DBL_RESULT(&value, stat->speed_download);
-				break;
-		}
-
-		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
-
-		free_result(&value);
+		DCconfig_clean_items(items, errcodes, num);
 	}
-
-	DCconfig_clean_items(items, errcodes, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -430,7 +436,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 		value = zbx_strdup(NULL, row[1]);
 
 		/* from now on variable values can contain macros so proper URL encoding can be performed */
-		if (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+		if (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 				&value, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
 		{
 			zbx_free(value);
@@ -442,7 +448,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
 		/* another variables */
 		if (ZBX_HTTPFIELD_VARIABLE != type && (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL,
-				NULL, NULL, host, NULL, NULL, &key, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)) ||
+				NULL, NULL, host, NULL, NULL, NULL, &key, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)) ||
 				SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &key)) ||
 				SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &value))))
 		{
@@ -629,7 +635,7 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 		value = zbx_strdup(NULL, row[1]);
 
 		/* from now on variable values can contain macros so proper URL encoding can be performed */
-		if (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+		if (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 				&value, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
 		{
 			zbx_free(value);
@@ -641,7 +647,7 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
 		/* another variables */
 		if (ZBX_HTTPFIELD_VARIABLE != type && SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL,
-				NULL, NULL, host, NULL, NULL, &key, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
+				NULL, NULL, host, NULL, NULL, NULL, &key, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
 		{
 			httppairs_free(&httptest->variables);
 			zbx_free(key);
@@ -727,8 +733,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			httptest->httptest.httptestid);
 
 	buffer = zbx_strdup(buffer, httptest->httptest.delay);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &buffer, MACRO_TYPE_COMMON,
-			NULL, 0);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, &buffer,
+			MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED != is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
 	{
@@ -841,7 +847,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		db_httpstep.name = row[2];
 
 		db_httpstep.url = zbx_strdup(NULL, row[3]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 				&db_httpstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 		http_substitute_variables(httptest, &db_httpstep.url);
 
@@ -850,7 +856,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		if (ZBX_POSTTYPE_RAW == db_httpstep.post_type)
 		{
 			db_httpstep.posts = zbx_strdup(NULL, row[5]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 					&db_httpstep.posts, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 			http_substitute_variables(httptest, &db_httpstep.posts);
 		}
@@ -864,7 +870,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		}
 
 		buffer = zbx_strdup(buffer, row[4]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &buffer,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, &buffer,
 				MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != is_time_suffix(buffer, &db_httpstep.timeout, ZBX_LENGTH_UNLIMITED))
@@ -879,11 +885,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		}
 
 		db_httpstep.required = zbx_strdup(NULL, row[6]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 				&db_httpstep.required, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		db_httpstep.status_codes = zbx_strdup(NULL, row[7]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 				&db_httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
 		db_httpstep.follow_redirects = atoi(row[9]);
@@ -1244,24 +1250,24 @@ int	process_httptests(int httppoller_num, int now)
 		}
 
 		httptest.httptest.agent = zbx_strdup(NULL, row[5]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
 				&httptest.httptest.agent, MACRO_TYPE_COMMON, NULL, 0);
 
 		if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[6])))
 		{
 			httptest.httptest.http_user = zbx_strdup(NULL, row[7]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
 					&httptest.httptest.http_user, MACRO_TYPE_COMMON, NULL, 0);
 
 			httptest.httptest.http_password = zbx_strdup(NULL, row[8]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
 					&httptest.httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
 		if ('\0' != *row[9])
 		{
 			httptest.httptest.http_proxy = zbx_strdup(NULL, row[9]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
 					&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 		}
 		else
@@ -1270,15 +1276,15 @@ int	process_httptests(int httppoller_num, int now)
 		httptest.httptest.retries = atoi(row[10]);
 
 		httptest.httptest.ssl_cert_file = zbx_strdup(NULL, row[11]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 				&httptest.httptest.ssl_cert_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httptest.httptest.ssl_key_file = zbx_strdup(NULL, row[12]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 				&httptest.httptest.ssl_key_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[13]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
 				&httptest.httptest.ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
 
 		httptest.httptest.verify_peer = atoi(row[14]);

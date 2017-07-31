@@ -696,13 +696,17 @@ SVGMapElement.prototype.updateImage = function() {
 			height: this.height
 		};
 
-	if (this.options.actions !== null) {
+	if (this.options.actions !== null && this.options.actions !== 'null') {
 		options['data-menu-popup'] = this.options.actions;
 		options['style'] = 'cursor: pointer';
 	}
 
 	if (typeof this.options.icon !== 'undefined') {
 		var href = this.map.getImageUrl(this.options.icon);
+		// 2 - PERM_READ
+		if (2 > this.options.permission) {
+			href += '&unavailable=1';
+		}
 
 		if (this.image === null || this.image.attributes['xlink:href'] !== href) {
 			options['xlink:href'] = href;
@@ -728,7 +732,7 @@ SVGMapElement.prototype.updateLabel = function() {
 		y = this.center.y,
 		anchor = {
 			horizontal: 'left',
-			vertical: 'top'
+			vertical: 'bottom'
 		};
 
 	switch (this.options.label_location) {
@@ -751,7 +755,7 @@ SVGMapElement.prototype.updateLabel = function() {
 		case SVGMapElement.LABEL_POSITION_TOP:
 			y = this.y - this.map.canvas.textPadding;
 			anchor.horizontal = 'center';
-			anchor.vertical = 'bottom';
+			anchor.vertical = 'top';
 			break;
 	}
 
@@ -763,7 +767,6 @@ SVGMapElement.prototype.updateLabel = function() {
 			'anchor': anchor,
 			background: {
 				fill: '#' + this.map.options.theme.backgroundcolor,
-				'shape-rendering':'crispEdges',
 				opacity: 0.5
 			}
 		}, this.options.label);
@@ -943,7 +946,6 @@ SVGMapLink.prototype.update = function(options) {
 				vertical: 'middle'
 			},
 			background: {
-				'shape-rendering':'crispEdges'
 			}
 		}, options.label
 	);
@@ -1085,10 +1087,6 @@ SVGMapShape.prototype.update = function(options) {
 				width: this.width,
 				height: this.height
 			};
-
-			if (typeof attributes['stroke-linecap'] === 'undefined') {
-				attributes['shape-rendering'] = 'crispEdges';
-			}
 			break;
 
 		case SVGMapShape.TYPE_ELLIPSE:

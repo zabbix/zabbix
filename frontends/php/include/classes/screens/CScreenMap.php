@@ -33,15 +33,13 @@ class CScreenMap extends CScreenBase {
 			$severity = $this->screenitem['severity_min'];
 		}
 
-		$map_data = CMapHelper::get($this->screenitem['resourceid'], $severity);
+		$map_data = CMapHelper::get($this->screenitem['resourceid'], ['severity_min' => $severity]);
 		$map_data['container'] = '#map_'.$this->screenitem['screenitemid'];
 		$this->insertFlickerfreeJs($map_data);
 
 		$output = [
 			(new CDiv())
 				->setId('map_'.$this->screenitem['screenitemid'])
-				->addStyle('width: '.$map_data['canvas']['width'].'px;')
-				->addStyle('height: '.$map_data['canvas']['height'].'px;')
 				->addStyle('overflow: hidden;')
 		];
 

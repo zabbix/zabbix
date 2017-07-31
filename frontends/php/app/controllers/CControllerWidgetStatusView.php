@@ -21,22 +21,20 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetStatusView extends CController {
+class CControllerWidgetStatusView extends CControllerWidget {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	public function __construct() {
+		parent::__construct();
 
-	protected function checkInput() {
-		return true;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		$this->setType(WIDGET_ZABBIX_STATUS);
+		$this->setValidationRules([
+			'name' =>	'string'
+		]);
 	}
 
 	protected function doAction() {
 		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

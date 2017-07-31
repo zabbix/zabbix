@@ -560,22 +560,22 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve macros in screen element URL.
+	 * Resolve macros in dashboard widget URL.
 	 *
 	 * @static
 	 *
-	 * @param array $screenElement
+	 * @param array $widget
 	 *
 	 * @return string
 	 */
-	public static function resolveScreenElementURL(array $screenElement) {
+	public static function resolveWidgetURL(array $widget) {
 		self::init();
 
 		$macros = self::$macrosResolver->resolve([
-			'config' => $screenElement['config'],
+			'config' => $widget['config'],
 			'data' => [
-				$screenElement['hostid'] => [
-					'url' => $screenElement['url']
+				$widget['hostid'] => [
+					'url' => $widget['url']
 				]
 			]
 		]);

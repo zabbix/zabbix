@@ -235,7 +235,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 					item.snmp_community = strdup(dcheck->snmp_community);
 					item.snmp_oid = strdup(dcheck->key_);
 
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 							&item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL,
 							MACRO_TYPE_SNMP_OID, NULL, 0);
@@ -254,16 +254,16 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
 
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_securityname, MACRO_TYPE_COMMON,
+								NULL, &item.snmpv3_securityname, MACRO_TYPE_COMMON,
 								NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_authpassphrase, MACRO_TYPE_COMMON,
+								NULL, &item.snmpv3_authpassphrase, MACRO_TYPE_COMMON,
 								NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_privpassphrase, MACRO_TYPE_COMMON,
+								NULL, &item.snmpv3_privpassphrase, MACRO_TYPE_COMMON,
 								NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_contextname, MACRO_TYPE_COMMON,
+								NULL, &item.snmpv3_contextname, MACRO_TYPE_COMMON,
 								NULL, 0);
 					}
 
@@ -431,7 +431,7 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 				unique ? "=" : "<>", drule->unique_dcheckid);
 	}
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by dcheckid");
+	zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by dcheckid");
 
 	result = DBselect("%s", sql);
 
@@ -713,8 +713,8 @@ static int	process_discovery(int now)
 		ZBX_STR2UINT64(druleid, row[0]);
 
 		delay_str = zbx_strdup(delay_str, row[5]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str, MACRO_TYPE_COMMON,
-				NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str,
+				MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 		{

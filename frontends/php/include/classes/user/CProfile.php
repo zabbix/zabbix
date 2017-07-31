@@ -88,6 +88,35 @@ class CProfile {
 		self::$update = [];
 	}
 
+	/**
+	 * Returns the array of numbers matched by regex of attribute $idx where idx2 matches the number passed by $idx2.
+	 *
+	 * @param string    $idx				Required. Regular expression pattern that is used to search rows by idx.
+	 *										Only the first match is used.
+	 * @param number    $idx2				Required. Numerical value searched in idx2 field.
+	 *
+	 * @return array
+	 */
+	public static function findByIDXs($idx = null, $idx2 = null) {
+		// no user data available, just return the null
+		if (!CWebUser::$data) {
+			return null;
+		}
+
+		if (is_null(self::$profiles)) {
+			self::init();
+		}
+
+		$results = [];
+		foreach (self::$profiles as $k => $v) {
+			if (preg_match($idx, $k, $match) && array_key_exists($idx2, $v)) {
+				$results[] = $match[1];
+			}
+		}
+
+		return $results;
+	}
+
 	public static function get($idx, $default_value = null, $idx2 = 0) {
 		// no user data available, just return the default value
 		if (!CWebUser::$data) {

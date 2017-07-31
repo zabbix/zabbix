@@ -186,7 +186,7 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 	char		replace_char, *substitute;
 	size_t		left, right, len, offset;
 	int		index, ret = SUCCEED;
-	zbx_ptr_pair_t	pair;
+	zbx_ptr_pair_t	pair = {NULL, NULL};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 

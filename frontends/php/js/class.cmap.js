@@ -2258,6 +2258,23 @@ ZABBIX.apps.map = (function($) {
 						})
 						.removeClass('map-element-area-bg');
 				}
+			},
+
+			getName: function () {
+				var name;
+
+				if (typeof this.data.elementName === 'undefined') {
+					name = this.data.elements[0].elementName;
+
+					if (Object.keys(this.data.elements).length > 1) {
+						name += '...';
+					}
+				}
+				else {
+					name = this.data.elementName;
+				}
+
+				return name;
 			}
 		};
 
@@ -2950,19 +2967,9 @@ ZABBIX.apps.map = (function($) {
 						case '4': elementTypeText = locale['S_IMAGE']; break;
 					}
 
-					if (typeof element.data.elementName === 'undefined') {
-						name = element.data.elements[0].elementName.escapeHTML();
-						if (Object.keys(element.data.elements).length > 1) {
-							name += '...';
-						}
-					}
-					else {
-						name = element.data.elementName.escapeHTML();
-					}
-
 					list.push({
 						elementType: elementTypeText,
-						elementName: name
+						elementName: element.getName().escapeHTML()
 					});
 				}
 
@@ -3343,7 +3350,7 @@ ZABBIX.apps.map = (function($) {
 
 					for (i = 0, ln = optgroups[optgroupType].length; i < ln; i++) {
 						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">'
-							+ optgroups[optgroupType][i].data.elementName + '</option>'
+							+ optgroups[optgroupType][i].getName().escapeHTML() + '</option>'
 						);
 					}
 
@@ -3478,27 +3485,8 @@ ZABBIX.apps.map = (function($) {
 							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
 						}
 
-						if (typeof this.sysmap.selements[link.selementid1].data.elementName === 'undefined') {
-							fromElementName = this.sysmap.selements[link.selementid1].data.elements[0].elementName;
-
-							if (Object.keys(this.sysmap.selements[link.selementid1].data.elements).length > 1) {
-								fromElementName += '...';
-							}
-						}
-						else {
-							fromElementName = this.sysmap.selements[link.selementid1].data.elementName;
-						}
-
-						if (typeof this.sysmap.selements[link.selementid2].data.elementName === 'undefined') {
-							toElementName = this.sysmap.selements[link.selementid2].data.elements[0].elementName;
-
-							if (Object.keys(this.sysmap.selements[link.selementid2].data.elements).length > 1) {
-								toElementName += '...';
-							}
-						}
-						else {
-							toElementName = this.sysmap.selements[link.selementid2].data.elementName;
-						}
+						fromElementName = this.sysmap.selements[link.selementid1].getName();
+						toElementName = this.sysmap.selements[link.selementid2].getName();
 
 						list.push({
 							fromElementName: fromElementName,

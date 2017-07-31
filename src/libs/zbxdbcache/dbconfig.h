@@ -470,6 +470,7 @@ typedef struct
 	const char		*formula;
 	unsigned char		eventsource;
 	unsigned char		evaltype;
+	unsigned char		opflags;
 	zbx_vector_ptr_t	conditions;
 }
 zbx_dc_action_t;

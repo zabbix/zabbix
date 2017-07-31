@@ -36,7 +36,7 @@ class CTrend extends CApiService {
 			'time_till'		=> null,
 			// output
 			'output'		=> API_OUTPUT_EXTEND,
-			'countOutput'	=> null,
+			'countOutput'	=> false,
 			'limit'			=> null
 		];
 
@@ -69,7 +69,7 @@ class CTrend extends CApiService {
 			$sql_where['clock_till'] = 't.clock<='.zbx_dbstr($options['time_till']);
 		}
 
-		if ($options['countOutput'] === null) {
+		if (!$options['countOutput']) {
 			$sql_limit = ($options['limit'] && zbx_ctype_digit($options['limit'])) ? $options['limit'] : null;
 
 			$sql_fields = [];
