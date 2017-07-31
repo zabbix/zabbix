@@ -19,7 +19,6 @@ A.F.....S. [ZBXNEXT-18] implemented sending alerts on acknowledges (Sergejs)
 ...G...... [ZBXNEXT-3910] added support to the agent for monitoring processes in trace or uninterruptible state on Linux, FreeBSD, OpenBSD and NetBSD (abs)
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
-
 Bug fixes:
 ..F....... [ZBXNEXT-2102] fixed multiple issues in Map widget (miks)
 ..F....... [ZBXNEXT-2102] fixed Undefined constant: ALERT_MAX_RETRIES in Action log widget (Sasha)
