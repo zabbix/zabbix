@@ -81,6 +81,10 @@
 		}
 
 		$obj.css({'height': '' + (data['options']['widget-height'] * data['options']['rows']) + 'px'});
+
+		if (data['options']['rows'] == 0) {
+			data['empty_placeholder'].show();
+		}
 	}
 
 	function getWidgetByTarget(widgets, $div) {
@@ -342,10 +346,6 @@
 		});
 	}
 
-	function stopResizable($obj, data, widget) {
-		widget['div'].resizable("destroy");
-	}
-
 	function showPreloader(widget) {
 		if (typeof(widget['preloader_div']) == 'undefined') {
 			widget['preloader_div'] = $('<div>')
@@ -435,7 +435,7 @@
 			'storage': widget['storage'],
 			'content_width': widget['content_body'].width(),
 			'content_height': widget['content_body'].height() - 10 // -10 is added to avoid scrollbar
-		}
+		};
 
 		if (widget['widgetid'] !== '') {
 			ajax_data['widgetid'] = widget['widgetid'];
@@ -475,7 +475,7 @@
 
 				widget['content_footer'].html(resp.footer);
 
-				// Creates new script elements and removes previous ones to force their reexecution
+				// Creates new script elements and removes previous ones to force their re-execution.
 				widget['content_script'].empty();
 				if (typeof(resp.script_file) !== 'undefined' && resp.script_file.length) {
 					// NOTE: it is done this way to make sure, this script is executed before script_run function below.
@@ -491,7 +491,7 @@
 					}
 				}
 				if (typeof(resp.script_inline) !== 'undefined') {
-					// NOTE: to execute scrpt with current widget context, add unique ID for required div, and use it in script
+					// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
 					var new_script = $('<script>')
 						.text(resp.script_inline);
 					widget['content_script'].append(new_script);
@@ -758,6 +758,9 @@
 			userid: data['dashboard']['userid'],
 			widgets: ajax_widgets
 		};
+		if (isset('sharing', data['dashboard'])) {
+			ajax_data['sharing'] = data['dashboard']['sharing'];
+		}
 
 		$.ajax({
 			url: url.getUrl(),
@@ -825,6 +828,30 @@
 		}
 
 		return ref;
+	}
+
+	function addWidgetDiv($obj, options) {
+		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'});
+
+		var $text = $('<h1>')
+		if (options['editable']) {
+			$text.append(
+				$('<a>', {'href':'#'})
+				.text(t('Add a new widget'))
+				.click(function(e){
+					e.preventDefault(); // To prevent going by href link
+					if (!methods.isEditMode.call($obj)) {
+						showEditMode();
+					}
+					methods.addNewWidget.call($obj);
+				})
+			)
+		}
+		else {
+			$text.addClass('disabled').text(t('Add a new widget'));
+		}
+
+		return $div.append($text);
 	}
 
 	/**
@@ -918,7 +945,8 @@
 				'max-rows': 64,
 				'max-columns': 12,
 				'rows': 0,
-				'updated': false
+				'updated': false,
+				'editable': true
 			};
 			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['max-columns'];
@@ -926,7 +954,8 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'});
+					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}),
+					$empty_placeholder = addWidgetDiv($this, options);
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -935,6 +964,7 @@
 					widget_defaults: {},
 					triggers: {},
 					placeholder: $placeholder,
+					empty_placeholder: $empty_placeholder,
 					widget_relation_submissions: [],
 					widget_relations: {
 						relations: [],
@@ -946,11 +976,12 @@
 				var	data = $this.data('dashboardGrid');
 
 				$this.append($placeholder.hide());
+				$this.append($empty_placeholder);
 
 				$(window).bind('beforeunload', function() {
 					var	res = confirmExit($this, data);
 
-					// return value only if we need confirmation window, return nothing othervise
+					// Return value only if we need confirmation window, return nothing otherwise.
 					if (typeof res !== 'undefined') {
 						return res;
 					}
@@ -1010,6 +1041,7 @@
 				widget['uniqueid'] = generateUniqueId($this, data);
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
 				updateWidgetDynamic($this, data, widget);
+				data['empty_placeholder'].hide();
 
 				data['widgets'].push(widget);
 				$this.append(widget['div']);
@@ -1208,12 +1240,6 @@
 						$('#widget_dialogue_form', body).on('submit', function(e) {
 							e.preventDefault();
 							updateWidgetConfig($this, data, widget);
-						});
-
-						// Position dialogue in middle of screen.
-						data.dialogue['div'].css({
-							'margin-top': '-' + (data.dialogue['div'].outerHeight() / 2) + 'px',
-							'margin-left': '-' + (data.dialogue['div'].outerWidth() / 2) + 'px'
 						});
 
 						// Enable save button after sucessfull form update.

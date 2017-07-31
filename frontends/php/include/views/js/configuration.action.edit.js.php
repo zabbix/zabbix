@@ -688,6 +688,12 @@
 			);
 		});
 
+		jQuery('#select_ack_operation_opcommand_script').click(function() {
+			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
+				+ '&dstfld1=new_ack_operation_opcommand_scriptid&dstfld2=new_ack_operation_opcommand_script'
+			);
+		});
+
 		processTypeOfCalculation();
 		processOperationTypeOfCalculation();
 	});

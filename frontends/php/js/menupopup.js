@@ -544,9 +544,6 @@ function showDialogForm(form, options, formData) {
 	overlayDialogue({
 		'title': options.title,
 		'content': form,
-		'css_body': {
-			"margin-bottom": '10px'
-		},
 		'buttons': [
 			{
 				'title': options.action_title,

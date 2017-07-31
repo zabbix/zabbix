@@ -528,13 +528,11 @@ function overlayDialogueDestroy() {
  * @param object buttons[]['click']
  */
 function overlayDialogue(params) {
-	var overlay_bg = jQuery('<div>', {
+	jQuery('<div>', {
 		id: 'overlay_bg',
-		class: 'overlay-bg',
-		css: {
-			'display': 'none'
-		}
-	});
+		class: 'overlay-bg'
+	})
+		.appendTo('body');
 
 	var overlay_dialogue_footer = jQuery('<div>', {
 		class: 'overlay-dialogue-footer'
@@ -574,16 +572,9 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
-	var css_body = {"margin-bottom": '50px'};
-	if (typeof params.css_body !== 'undefined') {
-		css_body = params.css_body;
-	}
-	overlay_dialogue = jQuery('<div>', {
+	var	overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
-		class: 'overlay-dialogue',
-		css: {
-			'display': 'none'
-		}
+		class: 'overlay-dialogue'
 	})
 		.append(
 			jQuery('<button>', {
@@ -605,7 +596,6 @@ function overlayDialogue(params) {
 		.append(
 			jQuery('<div>', {
 				class: 'overlay-dialogue-body',
-				css: css_body
 			}).append(params.content)
 		)
 		.append(overlay_dialogue_footer)
@@ -617,28 +607,8 @@ function overlayDialogue(params) {
 				overlayDialogueDestroy();
 				return false;
 			}
-		});
-
-	overlay_bg
-		.appendTo('body')
-		.show();
-	overlay_dialogue
+		})
 		.appendTo('body');
-
-	// position of window should be centred on 40% of top offset line and 30px max
-	var	top = Math.max(jQuery(window).innerHeight() * 0.4 - overlay_dialogue.outerHeight() / 2, 30),
-		left = Math.max((jQuery(window).innerWidth() - overlay_dialogue.outerWidth()) / 2, 0),
-		css = {
-			'position': 'fixed',
-			'top': top + 'px',
-			'left': left + 'px',
-			'max-height': (jQuery(window).innerHeight() - top) * 0.95 + 'px',
-			'overflow': 'auto'
-		};
-
-	overlay_dialogue
-		.css(css)
-		.show();
 
 	var focusable = jQuery(':focusable', overlay_dialogue);
 
