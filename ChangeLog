@@ -1,6 +1,7 @@
 Changes for 3.4.0alpha3
 
 New features:
+....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta)
 
 Bug fixes:
 ........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchornization (wiper)
@@ -17,7 +18,6 @@ A.F....... [ZBXNEXT-1076] implemented new permission schema to allow view map wh
 A.F.....S. [ZBXNEXT-18] implemented sending alerts on acknowledges (Sergejs)
 ...G...... [ZBXNEXT-3910] added support to the agent for monitoring processes in trace or uninterruptible state on Linux, FreeBSD, OpenBSD and NetBSD (abs)
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
-....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta) (vzhuravlev)
 
 
 Bug fixes:
