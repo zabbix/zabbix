@@ -407,7 +407,8 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 			" where actionid=" ZBX_FS_UI64
 				" and %s"
 				" and mediatypeid is not null"
-				" and alerttype=%d",
+				" and alerttype=%d"
+				" and acknowledgeid is null",
 				actionid, event_filter, ALERT_TYPE_MESSAGE);
 
 	while (NULL != (row = DBfetch(result)))
