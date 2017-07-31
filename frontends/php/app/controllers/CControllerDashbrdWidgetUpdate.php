@@ -105,8 +105,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			 * @var int    $widget[]['pos']['width']
 			 * @var string $widget[]['type']
 			 * @var string $widget[]['name']
-			 * @var array  $widget[]['fields']
-			 * @var string $widget[]['fields'][<name>]  (optional)
+			 * @var string $widget[]['fields']          (optional) JSON object
 			 */
 			foreach ($this->getInput('widgets', []) as $index => $widget) {
 				// TODO VM: check widgetid - if present in $widget, must be existing widget id
@@ -143,11 +142,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					$ret = false;
 				}
 
-				// AJAX is not sending empty elements,
-				// absence of 'fields' element means, there are no fields for this widget
-				if (!array_key_exists('fields', $widget)) {
-					$widget['fields'] = [];
-				}
+				$widget['fields'] = array_key_exists('fields', $widget) ? $widget['fields'] : '{}';
 				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget['fields']);
 				unset($widget['fields']);
 

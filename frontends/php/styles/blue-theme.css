@@ -2188,15 +2188,24 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       background-color: #e8f5ff; }
 
 .overlay-dialogue {
-  position: absolute;
+  position: fixed;
   z-index: 1000;
+  top: 50%;
+  left: 50%;
+  max-height: 90%;
+  max-width: 75%;
+  overflow: auto;
   padding: 15px 10px 10px 10px;
   background-color: #fff;
   border: 1px solid #ccd5d9;
   border-bottom-color: #c9d3d7;
   -webkit-box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5);
   -moz-box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5);
-  box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5); }
+  box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); }
   .overlay-dialogue .list-table {
     border: none; }
   .overlay-dialogue .table-paging {
@@ -2216,6 +2225,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin-left: -10px; }
 
 .overlay-dialogue-body {
+  margin: 0 0 25px 0;
   white-space: nowrap; }
 
 .overlay-dialogue-footer {
