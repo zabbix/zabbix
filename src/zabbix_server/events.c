@@ -2156,7 +2156,7 @@ void	get_db_events_info(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events)
 
 		result = DBselect(
 				"select triggerid,description,expression,priority,comments,url,recovery_expression,"
-					"recovery_mode"
+					"recovery_mode,value"
 				" from triggers"
 				" where%s",
 				filter);
@@ -2184,6 +2184,7 @@ void	get_db_events_info(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events)
 					event->trigger.url = zbx_strdup(NULL, row[5]);
 					event->trigger.recovery_expression = zbx_strdup(NULL, row[6]);
 					ZBX_STR2UCHAR(event->trigger.recovery_mode, row[7]);
+					ZBX_STR2UCHAR(event->trigger.value, row[8]);
 				}
 			}
 		}
