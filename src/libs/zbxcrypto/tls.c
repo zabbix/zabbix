@@ -1524,7 +1524,7 @@ static void	zbx_read_psk_file(void)
 {
 	FILE		*f;
 	size_t		len;
-	int		len_bin;
+	int		len_bin, ret = FAIL;
 	char		buf[HOST_TLS_PSK_LEN_MAX + 2];	/* up to 512 bytes of hex-digits, maybe 1-2 bytes for '\n', */
 							/* 1 byte for terminating '\0' */
 	char		buf_bin[HOST_TLS_PSK_LEN / 2];	/* up to 256 bytes of binary PSK */
@@ -1538,12 +1538,6 @@ static void	zbx_read_psk_file(void)
 	if (NULL == fgets(buf, (int)sizeof(buf), f))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\" or file empty", CONFIG_TLS_PSK_FILE);
-		goto out;
-	}
-
-	if (0 != fclose(f))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot close file \"%s\": %s", CONFIG_TLS_PSK_FILE, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -1579,8 +1573,17 @@ static void	zbx_read_psk_file(void)
 	my_psk = zbx_malloc(my_psk, my_psk_len);
 	memcpy(my_psk, buf_bin, my_psk_len);
 
-	return;
+	ret = SUCCEED;
 out:
+	if (NULL != f && 0 != fclose(f))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot close file \"%s\": %s", CONFIG_TLS_PSK_FILE, zbx_strerror(errno));
+		ret = FAIL;
+	}
+
+	if (SUCCEED == ret)
+		return;
+
 	zbx_tls_free();
 	exit(EXIT_FAILURE);
 }
@@ -4191,7 +4194,8 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			/* some data reside in stack but it will be available at the time when a PSK client callback */
 			/* function copies the data into buffers provided by OpenSSL within the callback */
 			psk_identity_for_cb = tls_arg1;			/* string is on stack */
-			psk_identity_len_for_cb = strlen(tls_arg1);
+			/* NULL check to silence analyzer warning */
+			psk_identity_len_for_cb = (NULL == tls_arg1 ? 0 : strlen(tls_arg1));
 			psk_for_cb = psk_buf;				/* buffer is on stack */
 			psk_len_for_cb = (size_t)psk_len;
 		}

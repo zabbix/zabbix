@@ -577,7 +577,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "%s:%hu", smtp_server, smtp_port);
 
 	if ('\0' != *smtp_helo)
-		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", smtp_helo);
+		zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", smtp_helo);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 		goto error;
