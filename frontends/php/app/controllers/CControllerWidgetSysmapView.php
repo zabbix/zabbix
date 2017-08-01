@@ -72,10 +72,7 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 			: (array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null);
 		$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
 
-		if ($sysmapid === null) {
-			$error = _('No map selected.');
-		}
-		elseif ($sysmap_data['id'] < 0) {
+		if ($sysmapid === null || $sysmap_data['id'] < 0) {
 			$error = _('No permissions to selected map or it does not exist.');
 		}
 
