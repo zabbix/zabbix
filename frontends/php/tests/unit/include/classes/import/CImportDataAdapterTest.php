@@ -348,7 +348,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'interface_ref' => 'if1',
 					'key_' => 'item',
 					'trapper_hosts' => '',
-					'jmx_endpoint' => ''
+					'jmx_endpoint' => '',
+					'master_item' => []
 				],
 				'item-jmx' => [
 					'name' => 'item-jmx',
@@ -384,7 +385,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'interface_ref' => 'if3',
 					'key_' => 'item-jmx',
 					'trapper_hosts' => '',
-					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+					'master_item' => []
 				],
 				'item2' => [
 					'name' => 'item2',
@@ -424,7 +426,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'interface_ref' => 'if1',
 					'key_' => 'item2',
 					'trapper_hosts' => '',
-					'jmx_endpoint' => ''
+					'jmx_endpoint' => '',
+					'master_item' => []
 				]
 			],
 			'export-template' => [
@@ -461,7 +464,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'logtimefmt' => '',
 					'key_' => 'item',
 					'trapper_hosts' => '',
-					'jmx_endpoint' => ''
+					'jmx_endpoint' => '',
+					'master_item' => []
 				],
 				'item-jmx' => [
 					'name' => 'item-jmx',
@@ -496,7 +500,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'logtimefmt' => '',
 					'key_' => 'item-jmx',
 					'trapper_hosts' => '',
-					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+					'master_item' => []
 				],
 				'item2' => [
 					'name' => 'item2',
@@ -535,7 +540,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'logtimefmt' => '',
 					'key_' => 'item2',
 					'trapper_hosts' => '',
-					'jmx_endpoint' => ''
+					'jmx_endpoint' => '',
+					'master_item' => []
 				]
 			]
 		]);
@@ -853,7 +859,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'interface_ref' => 'if1',
 							'key_' => 'lld-item',
 							'trapper_hosts' => '',
-							'jmx_endpoint' => ''
+							'jmx_endpoint' => '',
+							'master_item_prototype' => []
 						],
 						[
 							'name' => 'lld-item-jmx',
@@ -889,7 +896,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'interface_ref' => 'if3',
 							'key_' => 'lld-item-jmx',
 							'trapper_hosts' => '',
-							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+							'master_item_prototype' => []
 						],
 						[
 							'name' => 'lld-item2',
@@ -929,7 +937,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'interface_ref' => 'if1',
 							'key_' => 'lld-item2',
 							'trapper_hosts' => '',
-							'jmx_endpoint' => ''
+							'jmx_endpoint' => '',
+							'master_item_prototype' => []
 						]
 					],
 					'trigger_prototypes' => [
@@ -1160,7 +1169,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'logtimefmt' => '',
 							'key_' => 'lld-item',
 							'trapper_hosts' => '',
-							'jmx_endpoint' => ''
+							'jmx_endpoint' => '',
+							'master_item_prototype' => []
 						],
 						[
 							'name' => 'lld-item-jmx',
@@ -1195,7 +1205,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'logtimefmt' => '',
 							'key_' => 'lld-item-jmx',
 							'trapper_hosts' => '',
-							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+							'master_item_prototype' => []
 						],
 						[
 							'name' => 'lld-item2',
@@ -1234,7 +1245,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'logtimefmt' => '',
 							'key_' => 'lld-item2',
 							'trapper_hosts' => '',
-							'jmx_endpoint' => ''
+							'jmx_endpoint' => '',
+							'master_item_prototype' => []
 						]
 					],
 					'trigger_prototypes' => [
@@ -1761,7 +1773,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						],
 						'name' => 'Free disk space on $1 in %',
 						'key_' => 'vfs.fs.size[/,pfree]',
-						'jmx_endpoint' => ''
+						'jmx_endpoint' => '',
+						'master_item' => []
 					]
 				],
 				'Template_Simple' => [
@@ -1797,7 +1810,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						],
 						'name' => 'FTP check',
 						'key_' => 'net.tcp.service[ftp,,21]',
-						'jmx_endpoint' => ''
+						'jmx_endpoint' => '',
+						'master_item' => []
 					],
 					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
 						'type' => '3',
@@ -1831,7 +1845,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						],
 						'name' => 'FTP check with macro',
 						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]',
-						'jmx_endpoint' => ''
+						'jmx_endpoint' => '',
+						'master_item' => []
 					]
 				]
 			],
