@@ -120,7 +120,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		// needed for popup script
 		$form->addVar($field->getName(), $field->getValue());
 		$form_list->addRow($field->getLabel(), [
-			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
