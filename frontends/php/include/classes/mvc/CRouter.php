@@ -114,7 +114,8 @@ class CRouter {
 		'widget.actlog.view'	=> ['CControllerWidgetActionLogView',	'layout.widget',		'monitoring.widget.actionlog.view'],
 		'widget.dataover.view'	=> ['CControllerWidgetDataOverView',	'layout.widget',		'monitoring.widget.dataover.view'],
 		'widget.trigover.view'	=> ['CControllerWidgetTrigOverView',	'layout.widget',		'monitoring.widget.trigover.view'],
-		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view']
+		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view'],
+		'widget.plaintext.view'	=> ['CControllerWidgetPlainTextView',	'layout.widget',		'monitoring.widget.plaintext.view'],
 	];
 
 	public function __construct($action) {

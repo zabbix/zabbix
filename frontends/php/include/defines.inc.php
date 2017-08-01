@@ -1164,6 +1164,7 @@ define('WIDGET_GRAPH',					'graph');
 define('WIDGET_CLOCK',					'clock');
 define('WIDGET_SYSMAP',					'sysmap');
 define('WIDGET_NAVIGATION_TREE',		'navigationtree');
+define('WIDGET_PLAIN_TEXT',				'plaintext');
 define('WIDGET_URL',					'url');
 define('WIDGET_ACTION_LOG',				'actlog');
 define('WIDGET_DATA_OVERVIEW',			'dataover');
