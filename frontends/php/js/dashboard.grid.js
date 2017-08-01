@@ -573,7 +573,7 @@
 							'type': type,
 							'header': name,
 							'pos': pos,
-							'rf_rate': data['widget_defaults'][type]['rf_rate'],
+							'rf_rate': 0,
 							'fields': fields
 						}
 						updateWidgetDynamic($obj, data, widget_data);
