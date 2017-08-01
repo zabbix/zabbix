@@ -71,7 +71,7 @@ class CWidgetConfig {
 			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
-			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
+			WIDGET_CLOCK				=> ['width' => 2, 'height' => 3],
 			WIDGET_SYSMAP				=> ['width' => 9, 'height' => 5],
 			WIDGET_NAVIGATION_TREE		=> ['width' => 3, 'height' => 5],
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
