@@ -28,10 +28,10 @@ class CControllerDashboardUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>	'required|db dashboard.dashboardid',
-			'private' =>		'db dashboard.private|in 0,1',
-			'users' =>			'array',
-			'userGroups' =>		'array'
+			'dashboardid' => 'required|db dashboard.dashboardid',
+			'private' => 'db dashboard.private|in 0,1',
+			'users' => 'array',
+			'userGroups' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);

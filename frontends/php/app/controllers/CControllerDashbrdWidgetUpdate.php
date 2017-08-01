@@ -33,15 +33,69 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>	'db dashboard.dashboardid',
-			'userid' =>			'db dashboard.userid',
-			'name' =>			'db dashboard.name|not_empty',
-			'widgets' =>		'array'
+			'fullscreen' =>	'in 0,1',
+			'dashboardid' => 'db dashboard.dashboardid',
+			'userid' => 'db dashboard.userid',
+			'name' => 'db dashboard.name|not_empty',
+			'widgets' => 'array',
+			'sharing' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			/*
+			 * @var array  $sharing
+			 * @var int    $sharing['private']
+			 * @var array  $sharing['users']
+			 * @var array  $sharing['users'][]['userid']
+			 * @var array  $sharing['users'][]['permission']
+			 * @var array  $sharing['userGroups']
+			 * @var array  $sharing['userGroups'][]['usrgrpid']
+			 * @var array  $sharing['userGroups'][]['permission']
+			 */
+			$sharing = $this->getInput('sharing', []);
+			if ($sharing) {
+				if (!array_key_exists('private', $sharing)) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'sharing',
+						_s('the parameter "%1$s" is missing', 'private')
+					));
+					$ret = false;
+				}
+				if (array_key_exists('users', $sharing) && $sharing['users']) {
+					foreach ($sharing['users'] as $index => $user) {
+						if (!array_key_exists('userid', $user)) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[users]['.$index.']',
+								_s('the parameter "%1$s" is missing', 'userid')
+							));
+							$ret = false;
+						}
+						if (!array_key_exists('permission', $user)) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[users]['.$index.']',
+								_s('the parameter "%1$s" is missing', 'permission')
+							));
+							$ret = false;
+						}
+					}
+				}
+				if (array_key_exists('userGroups', $sharing) && $sharing['userGroups']) {
+					foreach ($sharing['userGroups'] as $index => $usergrp) {
+						if (!array_key_exists('usrgrpid', $usergrp)) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[userGroups]['.$index.']',
+								_s('the parameter "%1$s" is missing', 'usrgrpid')
+							));
+							$ret = false;
+						}
+						if (!array_key_exists('permission', $usergrp)) {
+							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[userGroups]['.$index.']',
+								_s('the parameter "%1$s" is missing', 'permission')
+							));
+							$ret = false;
+						}
+					}
+				}
+			}
+
 			/*
 			 * @var array  $widgets
 			 * @var string $widget[]['widgetid']        (optional)
@@ -52,8 +106,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			 * @var int    $widget[]['pos']['width']
 			 * @var string $widget[]['type']
 			 * @var string $widget[]['name']
-			 * @var array  $widget[]['fields']
-			 * @var string $widget[]['fields'][<name>]  (optional)
+			 * @var string $widget[]['fields']          (optional) JSON object
 			 */
 			foreach ($this->getInput('widgets', []) as $index => $widget) {
 				// TODO VM: check widgetid - if present in $widget, must be existing widget id
@@ -90,11 +143,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					$ret = false;
 				}
 
-				// AJAX is not sending empty elements,
-				// absence of 'fields' element means, there are no fields for this widget
-				if (!array_key_exists('fields', $widget)) {
-					$widget['fields'] = [];
-				}
+				$widget['fields'] = array_key_exists('fields', $widget) ? $widget['fields'] : '{}';
 				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget['fields']);
 				unset($widget['fields']);
 
@@ -140,6 +189,19 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			$dashboard['dashboardid'] = $this->getInput('dashboardid');
 		}
 
+		$sharing = $this->getInput('sharing', []);
+		if ($sharing) {
+			if (array_key_exists('private', $sharing)) {
+				$dashboard['private'] = $sharing['private'];
+			}
+			if (array_key_exists('users', $sharing)) {
+				$dashboard['users'] = $sharing['users'];
+			}
+			if (array_key_exists('userGroups', $sharing)) {
+				$dashboard['userGroups'] = $sharing['userGroups'];
+			}
+		}
+
 		foreach ($this->widgets as $widget) {
 			$upd_widget = [];
 			if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
@@ -177,6 +239,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			$data['redirect'] = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.view')
 				->setArgument('dashboardid', $result['dashboardids'][0])
+				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null)
 				->getUrl();
 			// @TODO should be moved from here to base logic by ZBXNEXT-3892
 			CSession::setValue('messageOk', $message);

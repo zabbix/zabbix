@@ -113,7 +113,8 @@ $tranStrings = [
 		'Cancel' => _('Cancel'),
 		'Delete' => _('Delete'),
 		'You have unsaved changes.' => _('You have unsaved changes.'),
-		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?')
+		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
+		'Add a new widget' => _('Add a new widget')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -297,6 +298,20 @@ if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $
 	header('HTTP/1.1 304 Not Modified');
 	header('ETag: '.$etag);
 	exit;
+}
+
+if (in_array('prototype.js', $files)) {
+	// This takes care of the Array toJSON incompatibility with JSON.stringify.
+	$js .=
+		'var _json_stringify = JSON.stringify;'.
+		'JSON.stringify = function(value) {'.
+			'var _array_tojson = Array.prototype.toJSON,'.
+				'ret;'.
+			'delete Array.prototype.toJSON;'.
+			'ret = _json_stringify(value);'.
+			'Array.prototype.toJSON = _array_tojson;'.
+			'return ret;'.
+		'};';
 }
 
 header('Content-type: text/javascript; charset=UTF-8');

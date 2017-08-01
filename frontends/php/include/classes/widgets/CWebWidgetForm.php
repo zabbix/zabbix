@@ -30,24 +30,24 @@ class CWebWidgetForm extends CWidgetForm {
 		// host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
-		if (array_key_exists('groupids', $data)) {
-			$field_groups->setValue($data['groupids']);
+		if (array_key_exists('groupids', $this->data)) {
+			$field_groups->setValue($this->data['groupids']);
 		}
 		$this->fields[] = $field_groups;
 
 		// Exclude host groups.
 		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'));
 
-		if (array_key_exists('exclude_groupids', $data)) {
-			$field_exclude_groups->setValue($data['exclude_groupids']);
+		if (array_key_exists('exclude_groupids', $this->data)) {
+			$field_exclude_groups->setValue($this->data['exclude_groupids']);
 		}
 		$this->fields[] = $field_exclude_groups;
 
 		// hosts
 		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
 
-		if (array_key_exists('hostids', $data)) {
-			$field_hosts->setValue($data['hostids']);
+		if (array_key_exists('hostids', $this->data)) {
+			$field_hosts->setValue($this->data['hostids']);
 		}
 		$this->fields[] = $field_hosts;
 
@@ -55,8 +55,8 @@ class CWebWidgetForm extends CWidgetForm {
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
 			->setDefault(1);
 
-		if (array_key_exists('maintenance', $data)) {
-			$field_maintenance->setValue($data['maintenance']);
+		if (array_key_exists('maintenance', $this->data)) {
+			$field_maintenance->setValue($this->data['maintenance']);
 		}
 		$this->fields[] = $field_maintenance;
 	}

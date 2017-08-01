@@ -29,14 +29,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'graphid' =>		[T_ZBX_INT, O_MAND, P_SYS,		DB_ID,		null],
+	'graphid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
 	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
-	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,		null],
-	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,		null,		null],
-	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
-	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
-	'width' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(20, 65535),		null],
-	'height' =>			[T_ZBX_INT, O_OPT, P_NZERO,	'{} > 0',		null]
+	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
+	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
+	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -139,6 +140,21 @@ $graph->setYMinItemId($dbGraph['ymin_itemid']);
 $graph->setYMaxItemId($dbGraph['ymax_itemid']);
 $graph->setLeftPercentage($dbGraph['percent_left']);
 $graph->setRightPercentage($dbGraph['percent_right']);
+
+if (hasRequest('outer')) {
+	$graph->setOuter(getRequest('outer'));
+}
+
+$min_dimentions = $graph->getMinDimensions();
+if ($min_dimentions['width'] > $graph->getWidth()) {
+	$graph->setWidth($min_dimentions['width']);
+}
+if ($min_dimentions['height'] > $graph->getHeight()) {
+	$graph->setHeight($min_dimentions['height']);
+}
+
 $graph->draw();
+
+header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
 
 require_once dirname(__FILE__).'/include/page_footer.php';

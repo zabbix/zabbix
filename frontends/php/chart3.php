@@ -35,8 +35,8 @@ $fields = [
 	'httptestid' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
 	'http_item_type' =>	[T_ZBX_INT, O_OPT, null,		null,				null],
 	'name' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
-	'width' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	null],
-	'height' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
 	'ymin_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
 	'ymax_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
 	'ymin_itemid' =>	[T_ZBX_INT, O_OPT, null,		DB_ID,				null],
@@ -49,6 +49,7 @@ $fields = [
 	'yaxismax' =>		[T_ZBX_DBL, O_OPT, null,		null,				null],
 	'percent_left' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
+	'outer' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
 	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null]
 ];
 if (!check_fields($fields)) {
@@ -160,11 +161,14 @@ $graph->setYMinItemId(getRequest('ymin_itemid', 0));
 $graph->setYMaxItemId(getRequest('ymax_itemid', 0));
 $graph->setLeftPercentage(getRequest('percent_left', 0));
 $graph->setRightPercentage(getRequest('percent_right', 0));
+$graph->setOuter(getRequest('outer', 0));
 
 foreach ($graph_items as $graph_item) {
 	$graph->addItem($graph_item);
 }
 
 $graph->draw();
+
+header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
 
 require_once dirname(__FILE__).'/include/page_footer.php';
