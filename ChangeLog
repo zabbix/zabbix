@@ -4,6 +4,8 @@ New features:
 ....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta)
 
 Bug fixes:
+........S. [ZBXNEXT-18] fixed unnecessary notification sending a recovery message (Sergejs)
+........S. [ZBXNEXT-18] fixed acknowledge notification sending in maintenance period (Sergejs)
 ........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchornization (wiper)
 ..F....... [ZBXNEXT-18] fixed php5.4 incompatibility in events page and acknowledge operation form (gcalenko)
 ..F....... [ZBXNEXT-18] fixed script name select button for new acknowledge operation form and recovery operation form (gcalenko)
