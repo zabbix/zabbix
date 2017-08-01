@@ -1,4 +1,4 @@
-Changes for 3.4.0alpha3
+Changes for 3.4.0beta1
 
 New features:
 A.FG...PS. [ZBXNEXT-3006] implemented support of bulk metric collection for dependent items data population (gcalenko, vjaceslavs, wiper)
