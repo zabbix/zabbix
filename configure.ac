@@ -1357,10 +1357,13 @@ dnl Check if Zabbix internal IPC services are used
 have_ipcservice="no"
 if test "x$have_ipmi" = "xyes"; then
 	have_ipcservice="yes"
+	proxy_libevent="yes"
+	server_libevent="yes"
 fi
 
 if test "x$server" = "xyes"; then
 	have_ipcservice="yes"
+	server_libevent="yes"
 fi
 
 dnl Check for libevent, used by Zabbix IPC services
@@ -1371,11 +1374,16 @@ if test "x$have_ipcservice" = "xyes"; then
 	if test "x$found_libevent" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
 	fi
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
+	
+	if test "x$server_libevent" = "xyes"; then
+		SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
+		SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
+	fi
 
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
+	if test "x$proxy_libevent" = "xyes"; then
+		PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
+		PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
+	fi
 
 	AC_SUBST(LIBEVENET_CFLAGS)
 fi
