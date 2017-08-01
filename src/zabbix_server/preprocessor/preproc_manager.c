@@ -928,7 +928,6 @@ static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, z
 static void	preprocessor_free_worker(zbx_preprocessing_worker_t *worker)
 {
 	zbx_ipc_client_close(worker->client);
-	zbx_free(worker);
 }
 
 /******************************************************************************

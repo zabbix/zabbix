@@ -1162,9 +1162,7 @@ void	zbx_on_exit(void)
 
 	zbx_sleep(2);	/* wait for all child processes to exit */
 
-#ifdef HAVE_IPCSERVICE
 	zbx_ipc_service_free_env();
-#endif
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
