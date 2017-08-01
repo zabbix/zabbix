@@ -306,6 +306,7 @@ sass/img_source/icons.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text
+src/libs/zbxalgo/queue_test.c -text
 src/libs/zbxcommon/variant.c -text
 src/libs/zbxcunit/zbxcunit.c -text
 src/libs/zbxcunit/zbxcunit.h -text

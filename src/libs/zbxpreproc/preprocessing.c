@@ -28,6 +28,8 @@
 
 extern unsigned char	program_type;
 
+#ifdef HAVE_IPCSERVICE
+
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
 #define MAX_VALUES_LOCAL	256
@@ -631,6 +633,8 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
 	}
 }
 
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_preprocess_item_value                                        *
@@ -650,13 +654,14 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
 		zbx_timespec_t *ts, unsigned char state, char *error)
 {
 	const char			*__function_name = "zbx_preprocess_item_value";
-	zbx_preproc_item_value_t	value;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* only server performs preprocessing */
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
+#ifdef HAVE_IPCSERVICE
+		zbx_preproc_item_value_t	value;
+
 		if (0 != (item_flags & ZBX_FLAG_DISCOVERY_RULE))
 		{
 			if (NULL != result && NULL != GET_TEXT_RESULT(result))
@@ -664,7 +669,6 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
 
 			goto out;
 		}
-
 		value.itemid = itemid;
 		value.result = result;
 		value.error = error;
@@ -677,6 +681,10 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
 
 		if (MAX_VALUES_LOCAL < values_num)
 			zbx_preprocessor_flush();
+#else
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+#endif
 	}
 	else
 		dc_add_history(itemid, item_flags, result, ts, state, error);
@@ -696,6 +704,7 @@ void	zbx_preprocessor_flush()
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
+#ifdef HAVE_IPCSERVICE
 		if (0 < message.size)
 		{
 			preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, message.data, message.size, NULL);
@@ -704,6 +713,9 @@ void	zbx_preprocessor_flush()
 			zbx_ipc_message_init(&message);
 			values_num = 0;
 		}
+#else
+		THIS_SHOULD_NEVER_HAPPEN;
+#endif
 	}
 	else
 		dc_flush_history();
@@ -720,6 +732,7 @@ void	zbx_preprocessor_flush()
  ******************************************************************************/
 zbx_uint64_t	zbx_preprocessor_get_queue_size()
 {
+#ifdef HAVE_IPCSERVICE
 	zbx_uint64_t		size;
 	zbx_ipc_message_t	message;
 
@@ -729,4 +742,8 @@ zbx_uint64_t	zbx_preprocessor_get_queue_size()
 	zbx_ipc_message_clean(&message);
 
 	return size;
+#else
+	THIS_SHOULD_NEVER_HAPPEN;
+	return 0;
+#endif
 }

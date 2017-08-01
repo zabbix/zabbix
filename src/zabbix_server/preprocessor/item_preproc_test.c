@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../zbxcunit/zbxcunit.h"
+#include "../../libs/zbxcunit/zbxcunit.h"
 
 static void	cu_xml_error_func(void *ctx, const char *msg, ...)
 {
