@@ -61,13 +61,13 @@ class CWidgetConfig {
 	private static function getDefaultDimensions() {
 		// TODO AV: review and accept default dimentions
 		return [
-			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
+			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
 			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
 			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
-			WIDGET_GRAPH				=> ['width' => 5, 'height' => 5],
-			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 4],
+			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
+			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 5],
 			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
@@ -78,7 +78,7 @@ class CWidgetConfig {
 			WIDGET_ACTION_LOG			=> ['width' => 6, 'height' => 5],
 			WIDGET_DATA_OVERVIEW		=> ['width' => 6, 'height' => 5],
 			WIDGET_TRIG_OVERVIEW		=> ['width' => 6, 'height' => 5],
-			WIDGET_PLAIN_TEXT			=> ['width' => 6, 'height' => 4]
+			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3]
 		];
 	}
 
