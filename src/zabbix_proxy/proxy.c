@@ -832,13 +832,14 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
+#ifdef HAVE_IPCSERVICE
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
 		zbx_error("Cannot initialize IPC services: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
+#endif
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
