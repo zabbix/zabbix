@@ -183,7 +183,8 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	}
 
 	foreach ($this->data['types'] as $type => $label) {
-		if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_ZABBIX_ACTIVE || $type == ITEM_TYPE_SNMPTRAP) {
+		if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_ZABBIX_ACTIVE || $type == ITEM_TYPE_SNMPTRAP
+				|| $type == ITEM_TYPE_DEPENDENT) {
 			continue;
 		}
 		zbx_subarray_push($this->data['typeVisibility'], $type, 'delay_flex['.$i.'][delay]');
@@ -279,6 +280,7 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_CALCULATED, 'params_c
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_CALCULATED, 'row_params');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'trapper_hosts');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DEPENDENT, 'row_master_item');
 foreach ($this->data['types'] as $type => $label) {
 	switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
@@ -304,7 +306,8 @@ foreach ($this->data['types'] as $type => $label) {
 	}
 }
 foreach ($this->data['types'] as $type => $label) {
-	if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_ZABBIX_ACTIVE || $type == ITEM_TYPE_SNMPTRAP) {
+	if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_ZABBIX_ACTIVE || $type == ITEM_TYPE_SNMPTRAP
+			|| $type == ITEM_TYPE_DEPENDENT) {
 		continue;
 	}
 	zbx_subarray_push($this->data['typeVisibility'], $type, 'row_flex_intervals');
@@ -314,7 +317,7 @@ foreach ($this->data['types'] as $type => $label) {
 	zbx_subarray_push($this->data['typeVisibility'], $type, 'add_delay_flex');
 }
 foreach ($this->data['types'] as $type => $label) {
-	if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_SNMPTRAP) {
+	if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_SNMPTRAP || $type == ITEM_TYPE_DEPENDENT) {
 		continue;
 	}
 	zbx_subarray_push($this->data['typeVisibility'], $type, 'delay');

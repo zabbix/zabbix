@@ -39,6 +39,7 @@ $itemTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Wizard'),
 		make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
@@ -62,6 +63,15 @@ foreach ($this->data['items'] as $item) {
 			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
+	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
+			'?form=update&parent_discoveryid='.$data['parent_discoveryid'].'&itemid='.$item['master_item']['itemid']
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_TEAL);
+		$description[] = NAME_DELIMITER;
+	}
+
 	$description[] = new CLink(
 		$item['name_expanded'],
 		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
@@ -97,16 +107,28 @@ foreach ($this->data['items'] as $item) {
 		$item['trends'] = '';
 	}
 
-	// hide zeroes for trapper and SNMP trap items
-	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+	// Hide zeroes for trapper, SNMP trap and dependent items.
+	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
+			|| $item['type'] == ITEM_TYPE_DEPENDENT) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
+	$item_menu = CMenuPopupHelper::getDependentItemPrototype($item['itemid'], $data['parent_discoveryid'],
+		$item['name']
+	);
+
+	$wizard = (new CSpan(
+		(new CButton(null))
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+			->setMenuPopup($item_menu)
+	))->addClass(ZBX_STYLE_REL_CONTAINER);
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
+		$wizard,
 		$description,
 		$item['key_'],
 		$item['delay'],

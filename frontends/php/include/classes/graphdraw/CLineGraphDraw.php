@@ -95,57 +95,56 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->m_showTriggers = ($value == 1) ? 1 : 0;
 	}
 
-	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null, $drawtype = null, $type = null) {
+	/**
+	 * Add single item object to graph. If invalid 'delay' interval passed method will interrupt current request with
+	 * error message.
+	 *
+	 * @param array  $item                  Array of graph item properties.
+	 * @param string $item['itemid']        Item id.
+	 * @param string $item['type']          Item type.
+	 * @param string $item['name']          Item host display name.
+	 * @param string $item['hostname']      Item hostname.
+	 * @param string $item['key_']          Item key_ field value.
+	 * @param string $item['value_type']    Item value type.
+	 * @param string $item['history']       Item history field value.
+	 * @param string $item['trends']        Item trends field value.
+	 * @param string $item['delay']         Item delay.
+	 * @param string $item['master_itemid'] Master item id for item of type ITEM_TYPE_DEPENDENT.
+	 * @param string $item['units']         Item units value.
+	 * @param string $item['hostid']        Item host id.
+	 * @param string $item['hostname']      Item host name.
+	 * @param string $item['color']         Item presentation color.
+	 * @param int    $item['drawtype']      Item presentation draw type, could be one of GRAPH_ITEM_DRAWTYPE_* constants.
+	 * @param int    $item['axisside']      Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
+	 * @param int    $item['calc_fnc']      Item calculation function, could be one of CALC_FNC_* constants.
+	 * @param int    $item['calc_type']     Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or GRAPH_ITEM_SUM.
+	 *
+	 */
+	public function addItem(array $graph_item) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
-			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
+			$options['drawtype'] = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
-
-		// TODO: graphs shouldn't retrieve items and resolve macros themselves
-		// all of the data must be passed as parameters
-		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($itemid)]);
-		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay']);
-		$item = reset($items);
-
-		$item['name'] = $item['name_expanded'];
-
-		$this->items[$this->num] = $item;
-
 		$update_interval_parser = new CUpdateIntervalParser();
 
-		if ($update_interval_parser->parse($item['delay']) != CParser::PARSE_SUCCESS) {
+		if ($update_interval_parser->parse($graph_item['delay']) != CParser::PARSE_SUCCESS) {
 			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('invalid delay')));
 			exit;
 		}
 
-		// getItemDelay will internally convert delay and flexible delay to seconds.
-		$this->items[$this->num]['delay'] = getItemDelay($update_interval_parser->getDelay(),
-			$update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE)
-		);
-		$this->items[$this->num]['has_scheduling_intervals']
-			= (bool) $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING);
+		// Set graph item safe default values.
+		$graph_item += [
+			'color'			=> 'Dark Green',
+			'drawtype'		=> GRAPH_ITEM_DRAWTYPE_LINE,
+			'axisside'		=> GRAPH_YAXIS_SIDE_DEFAULT,
+			'calc_fnc'		=> CALC_FNC_AVG,
+			'calc_type'		=> GRAPH_ITEM_SIMPLE
+		];
+		$this->items[$this->num] = $graph_item;
 
-		if (strpos($item['units'], ',') === false) {
-			$this->items[$this->num]['unitsLong'] = '';
-		}
-		else {
-			list($this->items[$this->num]['units'], $this->items[$this->num]['unitsLong']) = explode(',', $item['units']);
-		}
-
-		$host = get_host_by_hostid($item['hostid']);
-
-		$this->items[$this->num]['host'] = $host['host'];
-		$this->items[$this->num]['hostname'] = $host['name'];
-		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
-		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
-		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_DEFAULT : $axis;
-		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
-		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
-
-		if ($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+		if ($graph_item['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
 			$this->yaxisleft = 1;
 		}
-
-		if ($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
+		else if ($graph_item['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
 			$this->yaxisright = 1;
 		}
 
@@ -215,7 +214,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$config = select_config();
 
 		for ($i = 0; $i < $this->num; $i++) {
-			$item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = $this->items[$i];
 
 			if ($this->itemsHost === null) {
 				$this->itemsHost = $item['hostid'];
@@ -2509,11 +2508,71 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
+	/**
+	 * Expands graph item objects data: macros in item name, time units, dependent item
+	 *
+	 */
+	private function expandItems() {
+		$items_cache = zbx_toHash($this->items, 'itemid');
+		$items = $this->items;
+
+		do {
+			$master_itemids = [];
+
+			foreach ($items as $item) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && !array_key_exists($item['master_itemid'], $items_cache)) {
+					$master_itemids[$item['master_itemid']] = true;
+				}
+				$items_cache[$item['itemid']] = $item;
+			}
+			$master_itemids = array_keys($master_itemids);
+
+			$items = API::Item()->get([
+				'output'		=> ['itemid', 'type', 'master_itemid', 'delay'],
+				'itemids'		=> $master_itemids
+			]);
+		} while ($items);
+		$update_interval_parser = new CUpdateIntervalParser();
+
+		foreach ($this->items as &$graph_item) {
+			if ($graph_item['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_item = $graph_item;
+
+				while ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT) {
+					$master_item = $items_cache[$master_item['master_itemid']];
+				}
+				$graph_item['type'] = $master_item['type'];
+				$graph_item['delay'] = $master_item['delay'];
+			}
+
+			$graph_items = CMacrosResolverHelper::resolveItemNames([$graph_item]);
+			$graph_items = CMacrosResolverHelper::resolveTimeUnitMacros($graph_items, ['delay']);
+			$graph_item = reset($graph_items);
+			$graph_item['name'] = $graph_item['name_expanded'];
+			// getItemDelay will internally convert delay and flexible delay to seconds.
+			$update_interval_parser->parse($graph_item['delay']);
+			$graph_item['delay'] = getItemDelay($update_interval_parser->getDelay(),
+				$update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE)
+			);
+			$graph_item['has_scheduling_intervals']
+				= (bool) $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING);
+
+			if (strpos($graph_item['units'], ',') === false) {
+				$graph_item['unitsLong'] = '';
+			}
+			else {
+				list($graph_item['units'], $graph_item['unitsLong']) = explode(',', $graph_item['units']);
+			}
+		}
+		unset($graph_item);
+	}
+
 	public function draw() {
 		$start_time = microtime(true);
 
 		set_image_header();
 
+		$this->expandItems();
 		$this->selectData();
 
 		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])) {

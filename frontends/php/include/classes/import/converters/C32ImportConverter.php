@@ -53,7 +53,9 @@ class C32ImportConverter extends CConverter {
 				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules']);
 			}
 			if (array_key_exists('items', $host)) {
-				$host['items'] = $this->convertItems($host['items']);
+				$host['items'] = $this->convertItems($host['items'], [
+					'master_item'	=> []
+				]);
 			}
 			if (array_key_exists('httptests', $host)) {
 				$host['httptests'] = $this->convertHttpTests($host['httptests']);
@@ -68,10 +70,11 @@ class C32ImportConverter extends CConverter {
 	 * Convert item elements.
 	 *
 	 * @param array $items
+	 * @param array $default_fields     Default values to add to every item.
 	 *
 	 * @return array
 	 */
-	protected function convertItems(array $items) {
+	protected function convertItems(array $items,array $default_fields) {
 		foreach ($items as &$item) {
 			// Item preprocessing.
 			$item['preprocessing'] = [];
@@ -127,6 +130,8 @@ class C32ImportConverter extends CConverter {
 			}
 
 			$item['jmx_endpoint'] = ($item['type'] == ITEM_TYPE_JMX) ? ZBX_DEFAULT_JMX_ENDPOINT : '';
+
+			$item = $item + $default_fields;
 		}
 		unset($item);
 
@@ -142,7 +147,9 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertDiscoveryRules(array $discovery_rules) {
 		foreach ($discovery_rules as &$discovery_rule) {
-			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes'], [
+				'master_item_prototype'	=> []
+			]);
 			$discovery_rule['jmx_endpoint'] = ($discovery_rule['type'] == ITEM_TYPE_JMX)
 				? ZBX_DEFAULT_JMX_ENDPOINT
 				: '';

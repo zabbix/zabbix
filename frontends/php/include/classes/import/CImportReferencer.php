@@ -65,6 +65,15 @@ class CImportReferencer {
 	protected $httpstepsRefs;
 
 	/**
+	 * Initializes references for items.
+	 */
+	public function initItemsReferences() {
+		if ($this->itemsRefs === null) {
+			$this->selectItems();
+		}
+	}
+
+	/**
 	 * Get group id by name.
 	 *
 	 * @param string $name
