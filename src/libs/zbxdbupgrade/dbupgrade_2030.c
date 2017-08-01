@@ -1188,7 +1188,8 @@ static int	DBpatch_2030095(void)
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\":"
 					" resulting expression is too long", row[1]);
 		}
-		else if (0 != strcmp(row[1], params))
+		/* NULL check to silence analyzer warning */
+		else if (NULL != params && 0 != strcmp(row[1], params))
 		{
 			params_esc = DBdyn_escape_string(params);
 

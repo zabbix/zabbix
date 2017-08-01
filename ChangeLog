@@ -1,8 +1,10 @@
 Changes for 3.4.0alpha3
 
 New features:
+....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta)
 
 Bug fixes:
+........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchornization (wiper)
 ..F....... [ZBXNEXT-18] fixed php5.4 incompatibility in events page and acknowledge operation form (gcalenko)
 ..F....... [ZBXNEXT-18] fixed script name select button for new acknowledge operation form and recovery operation form (gcalenko)
 

@@ -1026,6 +1026,19 @@ jQuery(function($) {
 				return tree_items;
 			};
 
+			function getTreeItemIndex(arr, val) {
+				var ret = -1;
+
+				for (var i in arr) {
+					if (arr[i]['id'] === val) {
+						ret = i;
+						break;
+					}
+				}
+
+				return ret;
+			};
+
 			// Create multi-level array that represents real child-parent dependencies in tree.
 			var buildTree = function($obj, rows, parent_id) {
 				var parent_id = (typeof parent_id === 'number') ? parent_id : 0,
@@ -1050,9 +1063,7 @@ jQuery(function($) {
 								item['children'] = children;
 							}
 
-							var indx = tree.findIndex(function(el) {
-								return el['id'] === item['id'];
-							});
+							var indx = getTreeItemIndex(tree, +item['id']);
 
 							if (indx > -1) {
 								tree[indx] = item;

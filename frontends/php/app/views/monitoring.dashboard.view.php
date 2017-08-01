@@ -135,7 +135,8 @@ if (array_key_exists('sharing', $data['dashboard'])) {
 $dashboard_options = [
 	'fullscreen' => $data['fullscreen'],
 	'max-rows' => DASHBOARD_MAX_ROWS,
-	'max-columns' => DASHBOARD_MAX_COLUMNS
+	'max-columns' => DASHBOARD_MAX_COLUMNS,
+	'editable' => $data['dashboard']['editable']
 ];
 if ($data['dashboard']['dashboardid'] != 0) {
 	$dashboard_data['id'] = $data['dashboard']['dashboardid'];

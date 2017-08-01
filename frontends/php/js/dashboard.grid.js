@@ -79,6 +79,10 @@
 		}
 
 		$obj.css({'height': '' + (data['options']['widget-height'] * data['options']['rows']) + 'px'});
+
+		if (data['options']['rows'] == 0) {
+			data['empty_placeholder'].show();
+		}
 	}
 
 	function getWidgetByTarget(widgets, $div) {
@@ -820,6 +824,30 @@
 		return ref;
 	}
 
+	function addWidgetDiv($obj, options) {
+		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'});
+
+		var $text = $('<h1>')
+		if (options['editable']) {
+			$text.append(
+				$('<a>', {'href':'#'})
+				.text(t('Add a new widget'))
+				.click(function(e){
+					e.preventDefault(); // To prevent going by href link
+					if (!methods.isEditMode.call($obj)) {
+						showEditMode();
+					}
+					methods.addNewWidget.call($obj);
+				})
+			)
+		}
+		else {
+			$text.addClass('disabled').text(t('Add a new widget'));
+		}
+
+		return $div.append($text);
+	}
+
 	/**
 	 * Performs action added by addAction function
 	 *
@@ -911,7 +939,8 @@
 				'max-rows': 64,
 				'max-columns': 12,
 				'rows': 0,
-				'updated': false
+				'updated': false,
+				'editable': true
 			};
 			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['max-columns'];
@@ -919,7 +948,8 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'});
+					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}),
+					$empty_placeholder = addWidgetDiv($this, options);
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -928,6 +958,7 @@
 					widget_defaults: {},
 					triggers: {},
 					placeholder: $placeholder,
+					empty_placeholder: $empty_placeholder,
 					widget_relation_submissions: [],
 					widget_relations: {
 						relations: [],
@@ -939,11 +970,12 @@
 				var	data = $this.data('dashboardGrid');
 
 				$this.append($placeholder.hide());
+				$this.append($empty_placeholder);
 
 				$(window).bind('beforeunload', function() {
 					var	res = confirmExit($this, data);
 
-					// return value only if we need confirmation window, return nothing othervise
+					// Return value only if we need confirmation window, return nothing otherwise.
 					if (typeof res !== 'undefined') {
 						return res;
 					}
@@ -1003,6 +1035,7 @@
 				widget['uniqueid'] = generateUniqueId($this, data);
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
 				updateWidgetDynamic($this, data, widget);
+				data['empty_placeholder'].hide();
 
 				data['widgets'].push(widget);
 				$this.append(widget['div']);
