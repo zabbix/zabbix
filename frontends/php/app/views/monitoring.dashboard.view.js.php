@@ -61,7 +61,7 @@
 </script>
 
 <script type="text/javascript">
-	// Change dashboard settings
+	// Change dashboard settings.
 	function dashbrd_config() {
 		var form = jQuery('form[name="dashboard_form"]');
 		showDialogForm(
@@ -71,21 +71,22 @@
 		);
 	};
 
-	// Save changes and cancel editing dashboard
+	// Save changes and cancel editing dashboard.
 	function dashbrd_save_changes() {
-		// Update buttons on existing widgets to view mode
+		// Update buttons on existing widgets to view mode.
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
 	};
 
-	// Cancel editing dashboard
+	// Cancel editing dashboard.
 	function dashbrd_cancel(e) {
-		e.preventDefault(); // To prevent going by href link
+		// To prevent going by href link.
+		e.preventDefault();
 
-		// Update buttons on existing widgets to view mode
+		// Update buttons on existing widgets to view mode.
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
 	};
 
-	// Add new widget
+	// Add new widget.
 	function dashbrd_add_widget() {
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
 	};
@@ -101,11 +102,16 @@
 		jQuery('#dashbrd-save', ul).click(dashbrd_save_changes),
 		jQuery('#dashbrd-cancel', ul).click(dashbrd_cancel),
 
-		// Update buttons on existing widgets to edit mode
+		// Update buttons on existing widgets to edit mode.
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
+
+		// Hide filter with timeline.
+		jQuery('.filter-btn-container').hide();
+		jQuery('#filter-space').hide();
+		timeControl.removeAllSBox();
 	};
 
-	// this method related to forms: "sharing", "dashboard properties"
+	// This method related to forms: "sharing", "dashboard properties".
 	jQuery.fn.fillForm = function(data) {
 		if (typeof data.name) {
 			this.find('#name').val(data.name);
@@ -133,7 +139,7 @@
 	};
 
 	jQuery(document).ready(function($) {
-		// Turn on edit dashboard
+		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
 	});
 
@@ -148,7 +154,7 @@
 		jQuery('.msg-good').remove();
 	}
 
-	// Function is in global scope, because it should be accessable by html onchange() attribute
+	// Function is in global scope, because it should be accessable by html onchange() attribute.
 	function updateWidgetConfigDialogue() {
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('updateWidgetConfigDialogue');
 	}

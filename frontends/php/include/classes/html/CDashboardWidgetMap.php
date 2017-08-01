@@ -47,7 +47,8 @@ class CDashboardWidgetMap extends CDiv {
 		if ($this->current_sysmapid !== null && $this->initial_load) {
 			// this should be before other scripts
 			$script_run .= 'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-				'\'setWidgetStorageValue\', "'.$this->uniqueid.'", \'current_sysmapid\', '.$this->current_sysmapid.');';
+				'\'setWidgetStorageValue\', "'.$this->uniqueid.'", \'current_sysmapid\', '.$this->current_sysmapid.
+			');';
 		}
 
 		if ($this->initial_load) {
@@ -56,29 +57,34 @@ class CDashboardWidgetMap extends CDiv {
 					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
 						'parameters: ["onWidgetRefresh"],'.
 						'grid: {widget: 1},'.
-					'trigger_name: "map_widget_timer_refresh_'.$this->uniqueid.'"'.
-				'});';
+						'trigger_name: "map_widget_timer_refresh_'.$this->uniqueid.'"'.
+					'}'.
+				');';
 		}
 
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
-			&& $this->initial_load
-		) {
+				&& $this->initial_load) {
 			$script_run .=
-				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerAsSharedDataReceiver\', {'.
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'registerDataExchange\', {'.
 					'uniqueid: "'.$this->uniqueid.'",'.
-					'source_widget_reference: "'.$this->filter_widget_reference.'",'.
+					'linkedto: "'.$this->filter_widget_reference.'",'.
+					'data_name: "selected_mapid",'.
 					'callback: function(widget, data) {'.
-						'if(data[0].mapid !== +data[0].mapid) return;'.
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-							'\'setWidgetStorageValue\', widget.uniqueid, \'current_sysmapid\', data[0].mapid);'.
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-							'\'setWidgetStorageValue\', widget.uniqueid, \'previous_maps\', "");'.
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('.
-							'\'refreshWidget\', widget.widgetid);'.
+						'if (data[0].mapid !== +data[0].mapid) {'.
+							'return;'.
+						'}'.
+
+						'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'setWidgetStorageValue\', '.
+							'widget.uniqueid, \'current_sysmapid\', data[0].mapid'.
+						');'.
+						'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'setWidgetStorageValue\', '.
+							'widget.uniqueid, \'previous_maps\', ""'.
+						');'.
+						'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'refreshWidget\', widget.widgetid);'.
 					'}'.
 				'});'.
 
-				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("callWidgetDataShare", false);'.
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("callWidgetDataShare");'.
 
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart", '.
 					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
@@ -91,11 +97,12 @@ class CDashboardWidgetMap extends CDiv {
 		if ($this->sysmap_data && $this->error === null) {
 			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
 
-			$script_run .= ''.
-				'jQuery("#'.$this->getId().'").zbx_mapwidget({'.
+			$script_run .= 'jQuery(function($) {'.
+				'$("#'.$this->getId().'").zbx_mapwidget({'.
 					'uniqueid: "'.$this->uniqueid.'",'.
 					'map_options: '.zbx_jsvalue($this->sysmap_data).
-				'});';
+				'})'.
+			'});';
 		}
 
 		return $script_run;
@@ -110,10 +117,11 @@ class CDashboardWidgetMap extends CDiv {
 
 			if ($this->previous_map) {
 				$go_back_div = (new CDiv())
-					->setAttribute('style', 'padding:5px 10px; border-bottom: 1px solid #ebeef0;')
+					->setAttribute('style', 'padding: 5px 10px; border-bottom: 1px solid #ebeef0;')
 					->addItem(
 						(new CLink(_s('Go back to %1$s', $this->previous_map['name']), 'javascript: navigateToSubmap('.
-							$this->previous_map['sysmapid'].', "'.$this->uniqueid.'", true);'))
+							$this->previous_map['sysmapid'].', "'.$this->uniqueid.'", true);'
+						))
 					);
 
 				$this->addItem($go_back_div);
