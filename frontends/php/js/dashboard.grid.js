@@ -31,7 +31,9 @@
 			.addClass('dashbrd-grid-widget-content');
 		widget['content_footer'] = $('<div>')
 			.addClass('dashbrd-grid-widget-foot');
-		widget['content_script'] = $('<div>');
+		// We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
+		// This size will later be passed to widget controller in updateWidgetContent() function.
+		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').html('&nbsp;')));
 
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
@@ -426,10 +428,13 @@
 
 		ajax_data = {
 			'fullscreen': data['options']['fullscreen'],
+			'dashboardid': data['dashboard']['id'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
-			'storage': widget['storage']
+			'storage': widget['storage'],
+			'content_width': widget['content_body'].width(),
+			'content_height': widget['content_body'].height() - 10 // -10 is added to avoid scrollbar
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -495,6 +500,7 @@
 				if (widget['update_attempts'] == 1) {
 					widget['update_attempts'] = 0;
 					startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+					doAction('onContentUpdated', $obj, data, null);
 				}
 				else {
 					widget['update_attempts'] = 0;

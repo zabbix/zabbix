@@ -36,7 +36,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'source_dashboardid' =>	'db dashboard.dashboardid',
 			'groupid' =>			'db groups.groupid',
 			'hostid' =>				'db hosts.hostid',
-			'new' =>				'in 1'
+			'new' =>				'in 1',
+			'period' =>				'int32',
+			'stime' =>				'time'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -75,7 +77,32 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'dashboard' => $dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
-			'widget_defaults' => CWidgetConfig::getDefaults()
+			'widget_defaults' => CWidgetConfig::getDefaults(),
+			'show_timeline' => self::showTimeline($this->dashboard['widgets']),
+		];
+
+		$options = [
+			'profileIdx' => 'web.dashbrd',
+			'profileIdx2' => $this->dashboard['dashboardid']
+		];
+
+		$data['timeline'] = calculateTime([
+			'profileIdx' => $options['profileIdx'],
+			'profileIdx2' => $options['profileIdx2'],
+			'updateProfile' => 1,
+			'period' => $this->hasInput('period') ? $this->getInput('period') : null,
+			'stime' => $this->hasInput('stime') ? $this->getInput('stime') : null
+		]);
+
+		$data['timeControlData'] = [
+			'loadScroll' => 1,
+			'mainObject' => 1,
+			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1, $options['profileIdx2']),
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
+			'profile' => [
+				'idx' => $options['profileIdx'],
+				'idx2' => $options['profileIdx2']
+			]
 		];
 
 		if (self::hasDynamicWidgets($data['grid_widgets'])) {
@@ -425,6 +452,24 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			}
 		}
 
+		return false;
+	}
+
+	/**
+	 * Checks, if any of widgets needs timeline.
+	 *
+	 * @param array $widgets
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
+	private static function showTimeline($widgets) {
+		foreach ($widgets as $widget) {
+			if (CWidgetConfig::usesTimeline($widget['type'])) {
+				return true;
+			}
+		}
 		return false;
 	}
 }
