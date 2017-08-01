@@ -28,6 +28,7 @@
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "zbxpreproc.h"
 
 #include "ipmi_manager.h"
 #include "ipmi_protocol.h"
@@ -761,7 +762,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 				init_result(&result);
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
-				dc_add_history(itemid, 0, &result, &ts, state, NULL);
+				zbx_preprocess_item_value(itemid, 0, &result, &ts, state, NULL);
 				free_result(&result);
 			}
 			break;
@@ -770,14 +771,13 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case AGENT_ERROR:
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
-			dc_add_history(itemid, 0, NULL, &ts, state, value);
+			zbx_preprocess_item_value(itemid, 0, NULL, &ts, state, value);
 			break;
 		default:
 			/* don't change item's state when network related error occurs */
 			state = poller->request->item_state;
 	}
 
-	dc_flush_history();
 	zbx_free(value);
 
 	/* put back the item in configuration cache IPMI poller queue */
@@ -865,7 +865,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			int		errcode = CONFIG_ERROR;
 
 			zbx_timespec(&ts);
-			dc_add_history(items[i].itemid, 0, NULL, &ts, state, error);
+			zbx_preprocess_item_value(items[i].itemid, 0, NULL, &ts, state, error);
 			DCrequeue_items(&items[i].itemid, &state, &ts.sec, NULL, NULL, &errcode, 1);
 			zbx_free(error);
 			continue;
@@ -878,7 +878,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 		ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
 	}
 
-	dc_flush_history();
+	zbx_preprocessor_flush();
 	DCconfig_clean_items(items, NULL, num);
 
 	return num;

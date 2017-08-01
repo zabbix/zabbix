@@ -83,7 +83,7 @@ class CConfigurationExport {
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
 				'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint'
+				'logtimefmt', 'jmx_endpoint', 'master_itemid'
 			],
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
@@ -97,7 +97,7 @@ class CConfigurationExport {
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
 				'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint'
+				'logtimefmt', 'jmx_endpoint', 'master_itemid'
 			]
 		];
 	}
@@ -424,6 +424,21 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
+		$template_itemids = [];
+
+		foreach ($items as $itemid => &$item) {
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				if (array_key_exists($item['master_itemid'], $items)) {
+					$item['master_item'] = ['key_' => $items[$item['master_itemid']]['key_']];
+				}
+				else {
+					// Do not export dependent items with master item from template.
+					unset($items[$itemid]);
+				}
+			}
+		}
+		unset($item);
+
 		$items = $this->prepareItems($items);
 
 		foreach ($items as $item) {
@@ -553,9 +568,13 @@ class CConfigurationExport {
 
 		$valuemapids = [];
 
-		foreach ($prototypes as $prototype) {
+		foreach ($prototypes as &$prototype) {
 			$valuemapids[$prototype['valuemapid']] = true;
+			if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
+				$prototype['master_item'] = ['key_' => $prototypes[$prototype['master_itemid']]['key_']];
+			}
 		}
+		unset($prototype);
 
 		// Value map IDs that are zeroes, should be skipped.
 		unset($valuemapids[0]);

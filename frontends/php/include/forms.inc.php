@@ -753,8 +753,8 @@ function getItemFilterForm(&$items) {
 		}
 
 		// interval
-		if ($filter_delay === '' && $filter_type != ITEM_TYPE_TRAPPER
-				&& $item['type'] != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_SNMPTRAP) {
+		if ($filter_delay === '' && $filter_type != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_TRAPPER
+				&& $item['type'] != ITEM_TYPE_SNMPTRAP && $item['type'] != ITEM_TYPE_DEPENDENT) {
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 			$value = $delay;
@@ -876,6 +876,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'name' => getRequest('name', ''),
 		'description' => getRequest('description', ''),
 		'key' => getRequest('key', ''),
+		'master_itemid' => getRequest('master_itemid', 0),
+		'master_itemname' => getRequest('master_itemname', ''),
 		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
@@ -915,6 +917,17 @@ function getItemFormData(array $item = [], array $options = []) {
 		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT)
 	];
 
+	// Dependent item initialization by master_itemid.
+	if (!hasRequest('form_refresh') && array_key_exists('master_item', $item)) {
+		$expanded = CMacrosResolverHelper::resolveItemNames([$item['master_item']]);
+		$master_item = reset($expanded);
+		$data['type'] = ITEM_TYPE_DEPENDENT;
+		$data['master_itemid'] = $master_item['itemid'];
+		$data['master_itemname'] = $master_item['name_expanded'].NAME_DELIMITER.$master_item['key_'];
+		// Do not initialize item data if only master_item array was passed.
+		unset($item['master_item']);
+	}
+
 	// hostid
 	if (!empty($data['parent_discoveryid'])) {
 		$discoveryRule = API::DiscoveryRule()->get([
@@ -942,12 +955,13 @@ function getItemFormData(array $item = [], array $options = []) {
 	if (!empty($options['is_discovery_rule'])) {
 		unset($data['types'][ITEM_TYPE_AGGREGATE],
 			$data['types'][ITEM_TYPE_CALCULATED],
-			$data['types'][ITEM_TYPE_SNMPTRAP]
+			$data['types'][ITEM_TYPE_SNMPTRAP],
+			$data['types'][ITEM_TYPE_DEPENDENT]
 		);
 	}
 
 	// item
-	if ($item) {
+	if (array_key_exists('itemid', $item)) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
@@ -1115,7 +1129,8 @@ function getItemFormData(array $item = [], array $options = []) {
 				if ($data['delay'][0] !== '{') {
 					$delay = timeUnitToSeconds($data['delay']);
 
-					if (($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP) && $delay == 0) {
+					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
+							|| $data['type'] == ITEM_TYPE_DEPENDENT)) {
 						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 					}
 				}
@@ -1205,7 +1220,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if ($data['limited'] || ($item && $data['parent_discoveryid'] === null
+	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] === null
 			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
 		if ($data['valuemapid'] != 0) {
 			$valuemaps = API::ValueMap()->get([
@@ -1255,6 +1270,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['authtype'] = ITEM_AUTHTYPE_PASSWORD;
 		$data['publickey'] = '';
 		$data['privatekey'] = '';
+	}
+
+	if ($data['type'] != ITEM_TYPE_DEPENDENT) {
+		$data['master_itemid'] = 0;
 	}
 
 	return $data;

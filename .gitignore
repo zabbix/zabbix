@@ -180,6 +180,9 @@ src/libs/zbxmodules/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
+src/libs/zbxpreproc/.deps
+src/libs/zbxpreproc/Makefile
+src/libs/zbxpreproc/Makefile.in
 src/libs/zbxregexp/.deps
 src/libs/zbxregexp/Makefile
 src/libs/zbxregexp/Makefile.in
@@ -317,6 +320,9 @@ src/zabbix_server/pinger/Makefile.in
 src/zabbix_server/poller/.deps
 src/zabbix_server/poller/Makefile
 src/zabbix_server/poller/Makefile.in
+src/zabbix_server/preprocessor/.deps
+src/zabbix_server/preprocessor/Makefile
+src/zabbix_server/preprocessor/Makefile.in
 src/zabbix_server/proxypoller/.deps
 src/zabbix_server/proxypoller/Makefile
 src/zabbix_server/proxypoller/Makefile.in

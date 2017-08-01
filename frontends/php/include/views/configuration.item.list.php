@@ -106,6 +106,15 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 
+	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
+			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_TEAL);
+		$description[] = NAME_DELIMITER;
+	}
+
 	$description[] = new CLink(CHtml::encode($item['name_expanded']),
 		'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
 	);
@@ -222,7 +231,8 @@ foreach ($this->data['items'] as $item) {
 		$triggerInfo = SPACE;
 	}
 
-	// if item type is 'Log' we must show log menu
+	$item_menu = CMenuPopupHelper::getDependentItem($item['itemid'], $item['hostid'], $item['name']);
+
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
 		$triggers = [];
 
@@ -243,31 +253,33 @@ foreach ($this->data['items'] as $item) {
 			];
 		}
 
-		$menuIcon = (new CSpan(
-			(new CButton(null))
-				->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-				->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers))
-		))->addClass(ZBX_STYLE_REL_CONTAINER);
-	}
-	else {
-		$menuIcon = '';
+		$trigger_menu = CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers);
+		$trigger_menu['dependent_items'] = $item_menu;
+		$item_menu = $trigger_menu;
 	}
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
 	}
 
-	// hide zeroes for trapper and SNMP trap items
-	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+	// Hide zeroes for trapper, SNMP trap and dependent items.
+	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
+			|| $item['type'] == ITEM_TYPE_DEPENDENT) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
+	$wizard = (new CSpan(
+		(new CButton(null))
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+			->setMenuPopup($item_menu)
+	))->addClass(ZBX_STYLE_REL_CONTAINER);
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
-		$menuIcon,
+		$wizard,
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
