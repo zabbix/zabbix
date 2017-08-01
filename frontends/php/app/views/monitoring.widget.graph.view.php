@@ -108,18 +108,15 @@ if ($data['widget']['initial_load'] == 1) {
 					'parameters: ["'.$data['graph']['dataid'].'"],'.
 					'grid: {widget: 1},'.
 					'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
-				'});'.
-			'';
+				'});';
 	}
 
-	/*
 	$script .=
 		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onContentUpdated", '.
 			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 				'parameters: ["'.$data['graph']['dataid'].'"],'.
 				'trigger_name: "graph_widget_content_update_end_'.$data['widget']['uniqueid'].'"'.
 			'});';
-	*/
 
 	$output = [
 		'header' => $data['name'],
