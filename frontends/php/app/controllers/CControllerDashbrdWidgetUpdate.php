@@ -33,11 +33,12 @@ class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>	'db dashboard.dashboardid',
-			'userid' =>			'db dashboard.userid',
-			'name' =>			'db dashboard.name|not_empty',
-			'widgets' =>		'array',
-			'sharing' =>		'array'
+			'fullscreen' =>	'in 0,1',
+			'dashboardid' => 'db dashboard.dashboardid',
+			'userid' => 'db dashboard.userid',
+			'name' => 'db dashboard.name|not_empty',
+			'widgets' => 'array',
+			'sharing' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -238,6 +239,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			$data['redirect'] = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.view')
 				->setArgument('dashboardid', $result['dashboardids'][0])
+				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null)
 				->getUrl();
 			// @TODO should be moved from here to base logic by ZBXNEXT-3892
 			CSession::setValue('messageOk', $message);

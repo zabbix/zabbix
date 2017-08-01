@@ -753,6 +753,7 @@
 		});
 
 		var ajax_data = {
+			fullscreen: data['options']['fullscreen'],
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
