@@ -572,7 +572,7 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
-	var	overlay_dialogue = jQuery('<div>', {
+	var overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
 		class: 'overlay-dialogue modal'
 	})
