@@ -87,9 +87,12 @@ $hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
 $items = zbx_toHash($dbGraph['items'], 'itemid');
 
 foreach ($dbGraph['gitems'] as $graph_item) {
-	$graph->addItem($items[$graph_item['itemid']] + [
-		'host' => $hosts[$graph_item['hostid']]['host'],
-		'hostname' => $hosts[$graph_item['hostid']]['name'],
+	$item = $items[$graph_item['itemid']];
+	$host = $hosts[$item['hostid']];
+
+	$graph->addItem($item + [
+		'host' => $host['host'],
+		'hostname' => $host['name'],
 		'color' => $graph_item['color'],
 		'drawtype' => $graph_item['drawtype'],
 		'axisside' => $graph_item['yaxisside'],
