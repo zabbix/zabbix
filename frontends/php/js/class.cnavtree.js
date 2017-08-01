@@ -690,29 +690,29 @@ jQuery(function($) {
 				}
 
 				if (typeof item.children !== 'undefined' && widget_data.max_depth > depth) {
-					if (item.children.length) {
-						item_clases += ' is-parent';
-					}
-
+					var child_items_visible = 0;
 					$.each(item.children, function(i, item) {
 						if (typeof item === 'object') {
 							ul.append(createTreeItem($obj, item, depth+1));
 							if (item.id > widget_data.lastId) {
 								widget_data.lastId = item.id;
 							}
+							if (item.item_visible === true) {
+								child_items_visible++;
+							}
 						}
 					});
-				}
 
-				var map_accessible = false;
-				if (item.mapid) {
-					map_accessible = (widget_data['maps_accessible'].indexOf(item.mapid) !== -1);
-					if (!map_accessible && !isEditMode()) {
-						item_clases += ' inaccessible';
+					if (item.children.length && child_items_visible > 0) {
+						item_clases += ' is-parent';
 					}
 				}
 
-				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0 && map_accessible) {
+				if (item.item_active === false && !isEditMode()) {
+					item_clases += ' inaccessible';
+				}
+
+				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0 && item.item_active === true) {
 					link = $('<a/>', {
 							'data-mapid': item.mapid,
 							'href': '#'
@@ -745,6 +745,7 @@ jQuery(function($) {
 						'data-mapid': item.mapid,
 						'data-id': item.id
 					})
+					.css(item.item_visible === false ? {display: 'none'} : {})
 					.append(
 						$('<div/>', {'class': 'tree-row'})
 							.append(!isEditMode() ? $('<div/>', {'class': 'problems'}) : null)
@@ -925,7 +926,7 @@ jQuery(function($) {
 
 				// Add .is-parent class for branches with sub-items.
 				$('.tree-list', $obj).not('.ui-sortable, .root').each(function() {
-					if ($('>li', this).length) {
+					if ($('>li', this).not('.inaccessible').length) {
 						$(this).closest('.tree-item').addClass('is-parent');
 					}
 					else {
@@ -1057,12 +1058,35 @@ jQuery(function($) {
 						}
 
 						if (item['parent'] == parent_id) {
-							var children = buildTree($obj, rows, item['id']);
+							var children = buildTree($obj, rows, item['id']),
+								item_visible = true,
+								item_active = true,
+								children_maps;
 
 							if (children.length) {
 								item['children'] = children;
 							}
 
+							if (widget_data.show_unavailable && item.mapid
+									&& widget_data['maps_accessible'].indexOf(item.mapid) === -1) {
+								item_active = false;
+							}
+							else {
+								if (item.mapid) {
+									item_active = widget_data['maps_accessible'].indexOf(item.mapid) !== -1;
+									if (!widget_data.show_unavailable && !item_active) {
+										item_visible = false;
+									}
+								}
+								else {
+									item_active = false;
+								}
+							}
+
+							item['item_visible'] = item_visible;
+							item['item_active'] = item_active;
+
+							// TODO miks: is this still needed?
 							var indx = getTreeItemIndex(tree, +item['id']);
 
 							if (indx > -1) {
@@ -1223,6 +1247,7 @@ jQuery(function($) {
 							severity_levels: options.severity_levels || [],
 							navtree_items_opened: options.navtree_items_opened.toString().split(',') || [],
 							maps_accessible: options.maps_accessible || [],
+							show_unavailable: options.show_unavailable == 1 || false,
 							problems: options.problems || [],
 							max_depth: options.max_depth || 10,
 							lastId: 0
