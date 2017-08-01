@@ -76,7 +76,6 @@ if ($data['widget']['initial_load'] == 1) {
 
 			'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
 				'function zbx_graph_widget_timer_refresh(img_id, grid) {'.
-					'console.log("stopped on refresh..."); return;'.
 					'timeControl.refreshObject(img_id);'.
 
 					'var url = new Curl("zabbix.php"),'.

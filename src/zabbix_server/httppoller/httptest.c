@@ -162,47 +162,50 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	}
 	DBfree_result(result);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
-
-	for (i = 0; i < num; i++)
+	if (0 < num)
 	{
-		if (SUCCEED != errcodes[i])
-			continue;
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
-		if (ITEM_STATUS_ACTIVE != items[i].status)
-			continue;
-
-		if (HOST_STATUS_MONITORED != items[i].host.status)
-			continue;
-
-		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+		for (i = 0; i < num; i++)
 		{
-			continue;
+			if (SUCCEED != errcodes[i])
+				continue;
+
+			if (ITEM_STATUS_ACTIVE != items[i].status)
+				continue;
+
+			if (HOST_STATUS_MONITORED != items[i].host.status)
+				continue;
+
+			if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
+					MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+			{
+				continue;
+			}
+
+			init_result(&value);
+
+			switch (types[i])
+			{
+				case ZBX_HTTPITEM_TYPE_SPEED:
+					SET_UI64_RESULT(&value, speed_download);
+					break;
+				case ZBX_HTTPITEM_TYPE_LASTSTEP:
+					SET_UI64_RESULT(&value, lastfailedstep);
+					break;
+				case ZBX_HTTPITEM_TYPE_LASTERROR:
+					SET_STR_RESULT(&value, zbx_strdup(NULL, err_str));
+					break;
+			}
+
+			items[i].state = ITEM_STATE_NORMAL;
+			dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+
+			free_result(&value);
 		}
 
-		init_result(&value);
-
-		switch (types[i])
-		{
-			case ZBX_HTTPITEM_TYPE_SPEED:
-				SET_UI64_RESULT(&value, speed_download);
-				break;
-			case ZBX_HTTPITEM_TYPE_LASTSTEP:
-				SET_UI64_RESULT(&value, lastfailedstep);
-				break;
-			case ZBX_HTTPITEM_TYPE_LASTERROR:
-				SET_STR_RESULT(&value, zbx_strdup(NULL, err_str));
-				break;
-		}
-
-		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
-
-		free_result(&value);
+		DCconfig_clean_items(items, errcodes, num);
 	}
-
-	DCconfig_clean_items(items, errcodes, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -303,47 +306,50 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	}
 	DBfree_result(result);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
-
-	for (i = 0; i < num; i++)
+	if (0 < num)
 	{
-		if (SUCCEED != errcodes[i])
-			continue;
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
-		if (ITEM_STATUS_ACTIVE != items[i].status)
-			continue;
-
-		if (HOST_STATUS_MONITORED != items[i].host.status)
-			continue;
-
-		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+		for (i = 0; i < num; i++)
 		{
-			continue;
+			if (SUCCEED != errcodes[i])
+				continue;
+
+			if (ITEM_STATUS_ACTIVE != items[i].status)
+				continue;
+
+			if (HOST_STATUS_MONITORED != items[i].host.status)
+				continue;
+
+			if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
+					MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+			{
+				continue;
+			}
+
+			init_result(&value);
+
+			switch (types[i])
+			{
+				case ZBX_HTTPITEM_TYPE_RSPCODE:
+					SET_UI64_RESULT(&value, stat->rspcode);
+					break;
+				case ZBX_HTTPITEM_TYPE_TIME:
+					SET_DBL_RESULT(&value, stat->total_time);
+					break;
+				case ZBX_HTTPITEM_TYPE_SPEED:
+					SET_DBL_RESULT(&value, stat->speed_download);
+					break;
+			}
+
+			items[i].state = ITEM_STATE_NORMAL;
+			dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+
+			free_result(&value);
 		}
 
-		init_result(&value);
-
-		switch (types[i])
-		{
-			case ZBX_HTTPITEM_TYPE_RSPCODE:
-				SET_UI64_RESULT(&value, stat->rspcode);
-				break;
-			case ZBX_HTTPITEM_TYPE_TIME:
-				SET_DBL_RESULT(&value, stat->total_time);
-				break;
-			case ZBX_HTTPITEM_TYPE_SPEED:
-				SET_DBL_RESULT(&value, stat->speed_download);
-				break;
-		}
-
-		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
-
-		free_result(&value);
+		DCconfig_clean_items(items, errcodes, num);
 	}
-
-	DCconfig_clean_items(items, errcodes, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

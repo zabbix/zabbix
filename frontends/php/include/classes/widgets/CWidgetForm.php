@@ -37,6 +37,39 @@ class CWidgetForm {
 	}
 
 	/**
+	 * Convert all dot-delimited keys to arrays of objets.
+	 * Example:
+	 *   source: [
+	 *               'tags.tag.1' => 'tag1',
+	 *               'tags.value.1' => 'value1',
+	 *               'tags.tag.2' => 'tag2',
+	 *               'tags.value.2' => 'value2'
+	 *           ]
+	 *   result: [
+	 *               'tags' => [
+	 *                   ['tag' => 'tag1', 'value' => 'value1'],
+	 *                   ['tag' => 'tag2', 'value' => 'value2']
+	 *               ]
+	 *           ]
+	 *
+	 * @static
+	 *
+	 * @param array $data  An array of key => value pairs.
+	 *
+	 * @return array
+	 */
+	protected static function convertDottedKeys(array $data) {
+		foreach ($data as $key => $value) {
+			if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
+				unset($data[$key]);
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Return fields for this form.
 	 *
 	 * @return array  An array of CWidgetField.

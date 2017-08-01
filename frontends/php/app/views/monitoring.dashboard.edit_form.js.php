@@ -24,7 +24,7 @@
 
 			form.trimValues(['#name']);
 
-			var	formData = JSON.parse(form.formToJSON());
+			var	form_data = form.serializeJSON();
 
 			// cancel original event to prevent form submitting
 			event.preventDefault();
@@ -32,7 +32,7 @@
 			save_previous_form_state(form);
 
 			dashboard.dashboardGrid(
-				"setDashboardData", {"name": formData['name'], "userid": formData['userid'] || 0}
+				"setDashboardData", {"name": form_data['name'], "userid": form_data['userid'] || 0}
 			);
 			jQuery('div.article .header-title .cell:first h1').text(form.data('data').name);
 			jQuery('#dashboard-direct-link').text(form.data('data').name);

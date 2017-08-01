@@ -574,7 +574,7 @@ function overlayDialogue(params) {
 
 	var	overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
-		class: 'overlay-dialogue'
+		class: 'overlay-dialogue modal'
 	})
 		.append(
 			jQuery('<button>', {
@@ -715,16 +715,42 @@ function executeScript(hostid, scriptid, confirmation) {
 		var json = {};
 
 		jQuery.map($(this).serializeArray(), function(n) {
-			var	pos = n['name'].indexOf('[]');
+			var	l = n['name'].indexOf('['),
+				r = n['name'].indexOf(']'),
+				curr_json = json;
 
-			if (pos != -1 && n['name'].length == pos + 2) {
-				n['name'] = n['name'].substr(0, pos);
+			if (l != -1 && r != -1 && r > l) {
+				var	key = n['name'].substr(0, l);
 
-				if (typeof json[n['name']] === 'undefined') {
-					json[n['name']] = [];
+				if (l + 1 == r) {
+					if (typeof curr_json[key] === 'undefined') {
+						curr_json[key] = [];
+					}
+
+					curr_json[key].push(n['value']);
 				}
+				else {
+					if (typeof curr_json[key] === 'undefined') {
+						curr_json[key] = {};
+					}
+					curr_json = curr_json[key];
 
-				json[n['name']].push(n['value']);
+					do {
+						key = n['name'].substr(l + 1, r - l - 1);
+						l = n['name'].indexOf('[', r + 1);
+						r = n['name'].indexOf(']', r + 1);
+
+						if (l == -1 || r == -1 || r <= l) {
+							curr_json[key] = n['value']
+							break;
+						}
+
+						if (typeof curr_json[key] === 'undefined') {
+							curr_json[key] = {};
+						}
+						curr_json = curr_json[key];
+					} while (l != -1 && r != -1 && r > l);
+				}
 			}
 			else {
 				json[n['name']] = n['value'];
@@ -732,55 +758,6 @@ function executeScript(hostid, scriptid, confirmation) {
 		});
 
 		return json;
-	};
-
-	$.fn.formToJSON = function() {
-		var $form = $(this),
-			$elements = {};
-
-		$form.find('input, select, textarea').each(function() {
-			var name = $(this).attr('name'),
-				type = $(this).attr('type');
-
-			if (name) {
-				var $value;
-
-				if (type == 'radio') {
-					$value = $('input[name=' + name + ']:checked', $form).val();
-				}
-				else if (type == 'checkbox') {
-					$value = $(this).is(':checked');
-				}
-				else {
-					$value = $(this).val();
-				}
-
-				$elements[$(this).attr('name')] = $value;
-			}
-		});
-
-		return JSON.stringify($elements)
-	};
-
-	// TODO AV: this function is unused
-	$.fn.formFromJSON = function(json_string) {
-		var $form = $(this),
-			data = JSON.parse(json_string);
-
-		$.each(data, function(key, value) {
-			var $elem = $('[name="' + key + '"]', $form),
-				type = $elem.first().attr('type');
-
-			if (type === 'radio') {
-				$('[name="' + key + '"][value="' + value + '"]').prop('checked', true);
-			}
-			else if (type === 'checkbox' && (value === true || value === 'true')) {
-				$('[name="' + key + '"]').prop('checked', true);
-			}
-			else {
-				$elem.val(value);
-			}
-		})
 	};
 })(jQuery);
 
