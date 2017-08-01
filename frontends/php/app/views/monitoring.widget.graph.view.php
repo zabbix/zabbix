@@ -60,15 +60,23 @@ if ($data['widget']['initial_load'] == 1) {
 					'img_url.setArgument("width", new_width);'.
 					'img_url.setArgument("height", new_height);'.
 					'jQuery("#"+img_id)'.
-						'.attr("src", img_url.getUrl())'.
+						'.load(img_url.getUrl(), function(response, status, xhr) {'.
+							'timeControl.changeSBoxHeight(img_id, +xhr.getResponseHeader("X-ZBX-SBOX-HEIGHT"));'.
+						'})'.
+						'.attr("src", img_url.getUrl());'.
+
+					'var tmpImg = jQuery("#"+img_id)'.
 						'.load(img_url.getUrl(), function(response, status, xhr) {'.
 							'timeControl.changeSBoxHeight(img_id, +xhr.getResponseHeader("X-ZBX-SBOX-HEIGHT"));'.
 						'});'.
+
+					'$("#"+img_id).replaceWith(tmpImg);'.
 				'}'.
 			'}'.
 
 			'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
 				'function zbx_graph_widget_timer_refresh(img_id, grid) {'.
+					'console.log("stopped on refresh..."); return;'.
 					'timeControl.refreshObject(img_id);'.
 
 					'var url = new Curl("zabbix.php"),'.
@@ -100,16 +108,18 @@ if ($data['widget']['initial_load'] == 1) {
 					'parameters: ["'.$data['graph']['dataid'].'"],'.
 					'grid: {widget: 1},'.
 					'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
-				'});';
+				'});'.
+			'';
 	}
 
+	/*
 	$script .=
 		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onContentUpdated", '.
 			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 				'parameters: ["'.$data['graph']['dataid'].'"],'.
 				'trigger_name: "graph_widget_content_update_end_'.$data['widget']['uniqueid'].'"'.
 			'});';
-
+	*/
 
 	$output = [
 		'header' => $data['name'],

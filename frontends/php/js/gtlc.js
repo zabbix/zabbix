@@ -191,10 +191,12 @@ var timeControl = {
 			img = $(id);
 
 		if (empty(img)) {
-			img = document.createElement('img');
-			img.setAttribute('id', id);
-			img.setAttribute('src', obj.src);
-			$(obj.containerid).appendChild(img);
+			img = jQuery('<img />')
+				.load(obj.src, function(response, status, xhr) {
+					timeControl.changeSBoxHeight(id, +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+				})
+				.appendTo(jQuery('#'+obj.containerid))
+				.attr({'src': obj.src, 'id': id});
 		}
 
 		// apply sbox events to image
