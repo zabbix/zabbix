@@ -171,6 +171,9 @@ void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue)
 
 		if (queue->tail_pos == queue->alloc_num)
 			queue->tail_pos = 0;
+
+		if (queue->head_pos == queue->alloc_num)
+			queue->head_pos = 0;
 	}
 	else
 		value = NULL;
@@ -222,9 +225,10 @@ void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value)
 			for (; i > queue->tail_pos; i--)
 				queue->values[i] = queue->values[i - 1];
 
-			queue->tail_pos++;
+			if (++queue->tail_pos == queue->alloc_num)
+				queue->tail_pos = 0;
+
 			return;
 		}
 	}
 }
-
