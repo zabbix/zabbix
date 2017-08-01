@@ -2117,6 +2117,25 @@ static int	DBpatch_3030183(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_3030184(void)
+{
+	const ZBX_FIELD	field = {"master_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3030185(void)
+{
+	return DBcreate_index("items", "items_7", "master_itemid", 0);
+}
+
+static int	DBpatch_3030186(void)
+{
+	const ZBX_FIELD	field = {"master_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("items", 5, &field);
+}
 #endif
 
 DBPATCH_START(3030)
@@ -2306,5 +2325,8 @@ DBPATCH_ADD(3030180, 0, 1)
 DBPATCH_ADD(3030181, 0, 1)
 DBPATCH_ADD(3030182, 0, 1)
 DBPATCH_ADD(3030183, 0, 1)
+DBPATCH_ADD(3030184, 0, 1)
+DBPATCH_ADD(3030185, 0, 1)
+DBPATCH_ADD(3030186, 0, 1)
 
 DBPATCH_END()

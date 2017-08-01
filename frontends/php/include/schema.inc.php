@@ -1541,6 +1541,13 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'master_itemid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
 		],
 	],
 	'httpstepitem' => [

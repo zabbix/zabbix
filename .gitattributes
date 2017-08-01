@@ -313,9 +313,6 @@ src/libs/zbxdbcache/dbconfig.h -text
 src/libs/zbxdbcache/dbconfig_dump.c -text
 src/libs/zbxdbcache/dbsync.c -text
 src/libs/zbxdbcache/dbsync.h -text
-src/libs/zbxdbcache/item_preproc.c -text
-src/libs/zbxdbcache/item_preproc.h -text
-src/libs/zbxdbcache/item_preproc_test.c -text
 src/libs/zbxdbhigh/trigger.c -text
 src/libs/zbxjson/json_test.c -text
 src/libs/zbxnix/ipcservice.c -text
@@ -342,6 +339,7 @@ src/zabbix_server/ipmi/ipmi_poller.c -text
 src/zabbix_server/ipmi/ipmi_poller.h -text
 src/zabbix_server/ipmi/ipmi_protocol.c -text
 src/zabbix_server/ipmi/ipmi_protocol.h -text
+src/zabbix_server/preprocessor/item_preproc_test.c -text
 src/zabbix_server/scripts/Makefile.am -text
 src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/proxy_tasks.c -text

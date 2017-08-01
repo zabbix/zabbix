@@ -2459,6 +2459,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .blue, a.blue {
   color: #1e87e3; }
 
+.teal, a.teal {
+  color: #0f998b; }
+
 .progress-bar-container {
   display: inline-block;
   white-space: nowrap;

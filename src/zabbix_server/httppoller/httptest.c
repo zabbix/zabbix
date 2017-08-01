@@ -26,6 +26,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
+#include "zbxpreproc.h"
 
 #include "httptest.h"
 #include "httpmacro.h"
@@ -204,6 +205,11 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 			free_result(&value);
 		}
 
+		items[i].state = ITEM_STATE_NORMAL;
+		zbx_preprocess_item_value(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+
+		free_result(&value);
+
 		DCconfig_clean_items(items, errcodes, num);
 	}
 
@@ -348,6 +354,10 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 			free_result(&value);
 		}
 
+		items[i].state = ITEM_STATE_NORMAL;
+		zbx_preprocess_item_value(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+
+		free_result(&value);
 		DCconfig_clean_items(items, errcodes, num);
 	}
 
@@ -1178,8 +1188,7 @@ httptest_error:
 
 	zbx_free(buffer);
 	zbx_free(err_str);
-
-	dc_flush_history();
+	zbx_preprocessor_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

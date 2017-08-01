@@ -1353,33 +1353,18 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AC_SUBST(OPENIPMI_CFLAGS)
 fi
 
-dnl Check if Zabbix internal IPC services are used
-have_ipcservice="no"
-if test "x$have_ipmi" = "xyes"; then
-	have_ipcservice="yes"
-fi
-
-if test "x$server" = "xyes"; then
-	have_ipcservice="yes"
-fi
-
 dnl Check for libevent, used by Zabbix IPC services
-if test "x$have_ipcservice" = "xyes"; then
-	AC_DEFINE([HAVE_IPCSERVICE], 1, [Define to 1 if Zabbix IPC services are used])
-
-	LIBEVENT_CHECK_CONFIG([no])
-	if test "x$found_libevent" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
-	fi
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
-
-	AC_SUBST(LIBEVENET_CFLAGS)
-
+LIBEVENT_CHECK_CONFIG([no])
+if test "x$found_libevent" != "xyes"; then
+        AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
 fi
+SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
+
+AC_SUBST(LIBEVENET_CFLAGS)
 
 dnl Check for libpcre, used by Zabbix for regular expressions
 LIBPCRE_CHECK_CONFIG([no])
@@ -1614,6 +1599,7 @@ AC_OUTPUT([
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxhttp/Makefile
+	src/libs/zbxpreproc/Makefile
 	src/libs/zbxserver/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxexec/Makefile
@@ -1643,6 +1629,7 @@ AC_OUTPUT([
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/ipmi/Makefile
 	src/zabbix_server/scripts/Makefile
+	src/zabbix_server/preprocessor/Makefile
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile

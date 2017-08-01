@@ -95,6 +95,8 @@ abstract class CHostGeneral extends CHostBase {
 		if (!empty($data['templates_link'])) {
 			$this->checkHostPermissions($allHostIds);
 
+			$this->validateDependentItemsLinkage($allHostIds, zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'));
+
 			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
 		}
 
@@ -960,5 +962,41 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validates dependent items trees intersection between host items and template items.
+	 *
+	 * @param array $hostids        Array of hosts to validate.
+	 * @param array $templateids    Array of added templates.
+	 *
+	 * @throws APIException if intersection of template items and host items creates dependent items tree with
+	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
+	 */
+	protected function validateDependentItemsLinkage($hostids, $templateids) {
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
+			'hostids' => array_merge($hostids, $templateids),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+			'preservekeys' => true
+		]);
+
+		if (validateDependentItemsIntersection($db_items, $hostids) === false) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+				'master_itemid', _('maximum number of dependency levels reached')
+			));
+		}
+
+		$db_itemprototypes = API::ItemPrototype()->get([
+			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
+			'hostids' => array_merge($hostids, $templateids),
+			'preservekeys' => true
+		]);
+
+		if (validateDependentItemsIntersection($db_itemprototypes, $hostids) === false) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+				'master_itemid', _('maximum number of dependency levels reached')
+			));
+		}
 	}
 }

@@ -3618,6 +3618,14 @@ a.blue {
 	@extend .blue;
 }
 
+.teal {
+	color: $teal;
+}
+
+a.teal {
+	@extend .teal;
+}
+
 .progress-bar-container {
 	display: inline-block;
 	white-space: nowrap;

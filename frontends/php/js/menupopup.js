@@ -701,7 +701,8 @@ function getMenuPopupTrigger(options) {
  * @return array
  */
 function getMenuPopupTriggerLog(options) {
-	var items = [];
+	var items = [],
+		dependent_items = getMenuPopupDependentItems(options.dependent_items);
 
 	// create
 	items[items.length] = {
@@ -752,9 +753,31 @@ function getMenuPopupTriggerLog(options) {
 
 	items[items.length] = edit_trigger;
 
+	dependent_items = dependent_items.pop();
+	items[items.length] = dependent_items.items.pop();
+
 	return [{
 		label: sprintf(t('Item "%1$s"'), options.itemName),
 		items: items
+	}];
+}
+
+/**
+ * Get menu structure for dependent items.
+ *
+ * @param array options['item_name']    Menu label.
+ * @param array options['add_label']    Add dependent item menu element label
+ * @param array options['add_url']      Add dependent item menu element url
+ *
+ * @return array
+ */
+function getMenuPopupDependentItems(options) {
+	return [{
+		label: sprintf(t('Item "%1$s"'), options.item_name),
+		items: [{
+			label: options.add_label,
+			url: options.add_url
+		}]
 	}];
 }
 
