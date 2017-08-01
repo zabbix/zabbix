@@ -22,7 +22,6 @@
 class CNavigationTree extends CDiv {
 		private $error;
 		private $script_file;
-		private $script_run;
 		private $data;
 
 		public function __construct(array $data = []) {
@@ -31,7 +30,6 @@ class CNavigationTree extends CDiv {
 			$this->data = $data;
 			$this->error = null;
 			$this->script_file = 'js/class.cnavtree.js';
-			$this->script_run = '';
 
 			$this->setId(uniqid());
 			$this->addClass(ZBX_STYLE_NAVIGATIONTREE);
@@ -47,21 +45,20 @@ class CNavigationTree extends CDiv {
 		}
 
 		public function getScriptRun() {
-			if ($this->error === null) {
-				$this->script_run .= ''.
-					'jQuery("#'.$this->getId().'").zbx_navtree({'.
-						'problems: '.json_encode($this->data['problems']).','.
-						'severity_levels: '.json_encode($this->data['severity_config']).','.
+			return ($this->error === null)
+				? 'jQuery(function($) {'.
+					'$("#'.$this->getId().'").zbx_navtree({'.
+						'problems: '.CJs::encodeJson($this->data['problems']).','.
+						'severity_levels: '.CJs::encodeJson($this->data['severity_config']).','.
 						'navtree_items_opened: "'.implode(',', $this->data['navtree_items_opened']).'",'.
 						'navtree_item_selected: '.intval($this->data['navtree_item_selected']).','.
-						'maps_accessible: '.json_encode($this->data['maps_accessible']).','.
+						'maps_accessible: '.CJs::encodeJson($this->data['maps_accessible']).','.
 						'initial_load: '.$this->data['initial_load'].','.
 						'uniqueid: "'.$this->data['uniqueid'].'",'.
 						'max_depth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
-					'});';
-			}
-
-			return $this->script_run;
+					'});'.
+				'});'
+				: '';
 		}
 
 		private function build() {

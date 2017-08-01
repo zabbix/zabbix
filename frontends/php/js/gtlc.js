@@ -32,7 +32,10 @@ var timeControl = {
 	timeRefreshTimeoutHandler: null,
 
 	addObject: function(id, time, objData) {
-		if (typeof this.objectList[id] === 'undefined') {
+		if (typeof this.objectList[id] === 'undefined'
+			// TODO VM: (?) by this I am modifying current logic. It may have consequences unknown to me.
+			|| (typeof(objData['reloadOnAdd']) !== 'undefined' && objData['reloadOnAdd'] === 1)
+		) {
 			this.objectList[id] = {
 				id: id,
 				containerid: null,
@@ -47,7 +50,11 @@ var timeControl = {
 				loadImage: 0,
 				loadScroll: 0,
 				mainObject: 0, // object on changing will reflect on all others
-				sliderMaximumTimePeriod: null // max period in seconds
+				sliderMaximumTimePeriod: null, // max period in seconds
+				profile: { // if values are not null, will save fixedperiod state here, on change
+					idx: null,
+					idx2: null
+				}
 			};
 
 			for (var key in this.objectList[id]) {
@@ -56,7 +63,27 @@ var timeControl = {
 				}
 			}
 
+			if (isset('isNow', time) && time.isNow === '0') {
+				time.isNow = false;
+			}
 			this.objectList[id].time = time;
+		}
+	},
+
+	changeSBoxHeight: function(id, height) {
+		if (typeof ZBX_SBOX[id] !== 'undefined') {
+			delete ZBX_SBOX[id];
+		}
+
+		var obj = this.objectList[id],
+			img = $(id);
+
+		obj['objDims']['graphHeight'] = height;
+
+		if (obj.loadSBox) {
+			obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
+			addListener(img, 'load', obj.sbox_listener);
+			addListener(img, 'load', sboxGlobalMove);
 		}
 	},
 
@@ -109,7 +136,7 @@ var timeControl = {
 					width = 600;
 				}
 
-				this.scrollbar = new CScrollBar(width, obj.periodFixed, obj.sliderMaximumTimePeriod);
+				this.scrollbar = new CScrollBar(width, obj.periodFixed, obj.sliderMaximumTimePeriod, obj.profile);
 				this.scrollbar.onchange = this.objectUpdate.bind(this);
 			}
 		}
@@ -164,10 +191,12 @@ var timeControl = {
 			img = $(id);
 
 		if (empty(img)) {
-			img = document.createElement('img');
-			img.setAttribute('id', id);
-			img.setAttribute('src', obj.src);
-			$(obj.containerid).appendChild(img);
+			img = jQuery('<img />')
+				.load(obj.src, function(response, status, xhr) {
+					timeControl.changeSBoxHeight(id, +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+				})
+				.appendTo(jQuery('#'+obj.containerid))
+				.attr({'src': obj.src, 'id': id});
 		}
 
 		// apply sbox events to image
@@ -314,6 +343,21 @@ var timeControl = {
 	addSBox: function(e, id) {
 		var sbox = sbox_init(id);
 		sbox.onchange = this.objectUpdate.bind(this);
+	},
+
+	// Remove sbox from all objects in objectList
+	removeAllSBox: function() {
+		for (var id in this.objectList) {
+			if (!empty(this.objectList[id]) && this.objectList[id]['loadSBox'] === 1) {
+				var obj = this.objectList[id],
+					img = $(id);
+				obj['loadSBox'] = 0;
+				removeListener(img, 'load', obj.sbox_listener);
+				removeListener(img, 'load', sboxGlobalMove);
+				delete obj.sbox_listener;
+				jQuery(".box_on").remove();
+			}
+		}
 	}
 };
 
@@ -430,6 +474,7 @@ var CTimeLine = Class.create({
 var CScrollBar = Class.create({
 
 	ghostBox:		null, // ghost box object
+	profile:		null, // if values are not null, will save fixedperiod state here, on change
 	clndrLeft:		null, // calendar object left
 	clndrRight:		null, // calendar object right
 	px2sec:			null, // seconds in pixel
@@ -485,10 +530,11 @@ var CScrollBar = Class.create({
 	disabled:		1,		// activates/disables scrollbars
 	maxperiod:		null,	// max period in seconds
 
-	initialize: function(width, fixedperiod, maximalPeriod) {
+	initialize: function(width, fixedperiod, maximalPeriod, profile) {
 		try {
 			this.fixedperiod = (fixedperiod == 1) ? 1 : 0;
 			this.maxperiod = maximalPeriod;
+			this.profile = profile;
 
 			// create scrollbar
 			this.scrollCreate(width);
@@ -958,12 +1004,30 @@ var CScrollBar = Class.create({
 
 		this.fixedperiod = (this.fixedperiod == 1) ? 0 : 1;
 
-		// sending fixed/dynamic setting to server to save in a profile
-		sendAjaxData(location.href, {
-			data: {
+		var url = location.href,
+			ajax_data = {
 				favobj: 'timelinefixedperiod',
 				favid: this.fixedperiod
+			};
+
+		// If we know profile entry, that should be updated, update it directly
+		if (isset('idx', this.profile) && !is_null(this.profile.idx)) {
+			var url = new Curl('zabbix.php');
+			url.setArgument('action', 'profile.update');
+			url = url.getUrl();
+
+			ajax_data = {
+				idx: this.profile.idx + '.timelinefixed',
+				value_int: this.fixedperiod
+			};
+			if (isset('idx2', this.profile) && !is_null(this.profile.idx2)) {
+				ajax_data.idx2 = [this.profile.idx2];
 			}
+		}
+
+		// sending fixed/dynamic setting to server to save in a profile
+		sendAjaxData(url, {
+			data: ajax_data
 		});
 
 		this.dom.period_state.innerHTML = this.fixedperiod ? locale['S_FIXED_SMALL'] : locale['S_DYNAMIC_SMALL'];
@@ -1680,11 +1744,11 @@ var sbox = Class.create({
 
 			var dims = getDimensions(this.dom_obj);
 
-			this.shifts.left = dims.left;
+			this.shifts.left = dims.offsetleft;
 			this.shifts.top = dims.top;
 
 			this.box.top = 0; // we use only x axis
-			this.box.left = this.mouse_event.left - dims.left;
+			this.box.left = this.mouse_event.left - dims.offsetleft;
 			this.box.height = this.areaHeight;
 
 			this.dom_box.setAttribute('id', 'selection_box');
@@ -1752,7 +1816,7 @@ var sbox = Class.create({
 	},
 
 	moveSBoxByObj: function() {
-		var posxy = jQuery('#' + jQuery(this.grphobj).attr('id')).position();
+		var posxy = jQuery(this.grphobj).position();
 		var dims = getDimensions(this.grphobj);
 
 		this.dom_obj.style.top = (posxy.top + this.shiftT) + 'px';
@@ -1761,7 +1825,7 @@ var sbox = Class.create({
 			this.dom_obj.style.width = dims.width + 'px';
 		}
 
-		this.additionShiftL = posxy.left + this.shiftL;
+		this.additionShiftL = dims.offsetleft + this.shiftL;
 	},
 
 	optimizeEvent: function(e) {

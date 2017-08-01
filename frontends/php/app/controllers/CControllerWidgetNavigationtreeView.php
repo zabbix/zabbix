@@ -30,11 +30,11 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 
 		$this->setType(WIDGET_NAVIGATION_TREE);
 		$this->setValidationRules([
-			'name' =>			'string',
-			'uniqueid' =>		'required|string',
-			'widgetid'	=>		'db widget.widgetid',
-			'initial_load' =>	'in 0,1',
-			'fields' =>			'array'
+			'name' => 'string',
+			'uniqueid' => 'required|string',
+			'widgetid' => 'db widget.widgetid',
+			'initial_load' => 'in 0,1',
+			'fields' => 'json'
 		]);
 	}
 

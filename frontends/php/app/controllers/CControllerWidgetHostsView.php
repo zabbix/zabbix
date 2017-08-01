@@ -29,9 +29,9 @@ class CControllerWidgetHostsView extends CControllerWidget {
 
 		$this->setType(WIDGET_HOST_STATUS);
 		$this->setValidationRules([
-			'name' =>		'string',
-			'fullscreen' =>	'in 0,1',
-			'fields' =>		'array'
+			'name' => 'string',
+			'fullscreen' => 'in 0,1',
+			'fields' => 'json'
 		]);
 	}
 
@@ -42,7 +42,7 @@ class CControllerWidgetHostsView extends CControllerWidget {
 
 		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$filter_hostids = $fields['hostids'] ? $fields['hostids'] : null;
-		$filter_problem = $fields['problem'] != '' ? $fields['problem'] : null;
+		$filter_problem = ($fields['problem'] !== '') ? $fields['problem'] : null;
 		$filter_severities = $fields['severities']
 			? $fields['severities']
 			: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);

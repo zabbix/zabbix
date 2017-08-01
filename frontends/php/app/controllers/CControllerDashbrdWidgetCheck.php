@@ -27,17 +27,17 @@ class CControllerDashbrdWidgetCheck extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' =>	'string|required',
-			'name' =>	'string',
-			'fields' =>	'array',
+			'type' => 'string|required',
+			'name' => 'string',
+			'fields' => 'json',
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', []));
+			$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'));
 
-			if ($errors = $form->validate()) {
+			if ($errors = $form->validate(true)) {
 				foreach ($errors as $msg) {
 					error($msg);
 				}
