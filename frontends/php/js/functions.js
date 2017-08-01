@@ -574,7 +574,7 @@ function overlayDialogue(params) {
 
 	var	overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
-		class: 'overlay-dialogue'
+		class: 'overlay-dialogue modal'
 	})
 		.append(
 			jQuery('<button>', {
