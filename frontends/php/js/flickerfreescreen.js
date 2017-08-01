@@ -18,7 +18,8 @@
  **/
 
 
-jQuery(function($) {
+// TODO VM: (?) it was jQuery(function($){}) before. This way it loads in correct order. Is it ok to change it? I think - yes.
+(function($) {
 
 	window.flickerfreeScreen = {
 
@@ -51,6 +52,27 @@ jQuery(function($) {
 					},
 					this.screens[screen.id].interval
 				);
+			}
+		},
+
+		changeSBoxHeight: function(id, height) {
+			if (typeof height !== 'number') {
+				return;
+			}
+
+			if (typeof ZBX_SBOX[id] !== 'undefined') {
+				delete ZBX_SBOX[id];
+			}
+
+			var obj = this.objectList[id],
+				img = $(id);
+
+			obj['objDims']['graphHeight'] = height;
+
+			if (obj.loadSBox) {
+				obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
+				addListener(img, 'load', obj.sbox_listener);
+				addListener(img, 'load', sboxGlobalMove);
 			}
 		},
 
@@ -374,7 +396,7 @@ jQuery(function($) {
 						screen.error++;
 						window.flickerfreeScreen.calculateReRefresh(id);
 					})
-					.load(function() {
+					.load(url.getUrl(), function(response, status, xhr) {
 						if (screen.error > 0) {
 							return;
 						}
@@ -406,6 +428,8 @@ jQuery(function($) {
 							// rebuild timeControl sbox listeners
 							if (!empty(ZBX_SBOX[id])) {
 								ZBX_SBOX[id].addListeners();
+								timeControl.changeSBoxHeight(domImg.attr('id'),
+									+xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
 							}
 
 							window.flickerfreeScreenShadow.end(id);
@@ -777,4 +801,4 @@ jQuery(function($) {
 	$(window).resize(function() {
 		window.flickerfreeScreenShadow.moveShadows();
 	});
-});
+}(jQuery));

@@ -646,7 +646,7 @@ class CScreenBuilder {
 	 * @param string $options['profileIdx']
 	 */
 	public static function insertScreenScrollJs(array $options = []) {
-		$options['timeline'] = empty($options['timeline']) ? '' : $options['timeline'];
+		$options['timeline'] = empty($options['timeline']) ? '' : $options['timeline']; // TODO VM: (?) usage of '' will result in error
 		$options['profileIdx'] = empty($options['profileIdx']) ? '' : $options['profileIdx'];
 
 		$timeControlData = [

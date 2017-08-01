@@ -691,7 +691,7 @@ define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
 define('SCREEN_MIN_SIZE', 1);
 define('SCREEN_MAX_SIZE', 100);
 
-// default, minimum and macimum number of lines for dashboard widgets
+// default, minimum and maximum number of lines for dashboard widgets
 define('ZBX_DEFAULT_WIDGET_LINES', 25);
 define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
@@ -1160,6 +1160,7 @@ define('WIDGET_PROBLEMS',				'problems');
 define('WIDGET_SYSTEM_STATUS',			'syssum');
 define('WIDGET_WEB_OVERVIEW',			'webovr');
 define('WIDGET_ZABBIX_STATUS',			'stszbx');
+define('WIDGET_GRAPH',					'graph');
 define('WIDGET_CLOCK',					'clock');
 define('WIDGET_SYSMAP',					'sysmap');
 define('WIDGET_NAVIGATION_TREE',		'navigationtree');
@@ -1176,6 +1177,7 @@ define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
 // widget select resource field types
 define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
 define('WIDGET_FIELD_SELECT_RES_ITEM',		2);
+define('WIDGET_FIELD_SELECT_RES_GRAPH',		3);
 
 // max depth of navigation tree
 define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
@@ -1208,6 +1210,12 @@ define('ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE',	5);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
+
+define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',				0);
+define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',		1);
+
+define('UPDATE_PROFILE_OFF',	0);
+define('UPDATE_PROFILE_ON',		1);
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");

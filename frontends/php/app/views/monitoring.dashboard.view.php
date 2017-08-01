@@ -19,7 +19,11 @@
 **/
 
 
+$this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('gtlc.js');
 $this->addJsFile('dashboard.grid.js');
+$this->addJsFile('class.calendar.js');
+
 $this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
 $sharing_form = include 'monitoring.dashboard.sharing_form.php';
@@ -112,6 +116,7 @@ if ($data['dashboard']['editable']) {
 		->addItem($breadcrumbs)
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 	)
+	->addItem(($data['show_timeline']) ? (new CFilter('web.dashboard.filter.state'))->addNavigator() : null)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->addItem($edit_form)
 	->addItem($sharing_form)
@@ -125,9 +130,9 @@ $this->addPostJS('jqBlink.blink();');
 
 $dashboard_data = [
 	// name is required for new dashboard creation
-	'name'   => $data['dashboard']['name'],
-	'userid' => $data['dashboard']['owner']['id'],
-	'dynamic' => $data['dynamic']
+	'name'		=> $data['dashboard']['name'],
+	'userid'	=> $data['dashboard']['owner']['id'],
+	'dynamic'	=> $data['dynamic']
 ];
 if (array_key_exists('sharing', $data['dashboard'])) {
 	$dashboard_data['sharing'] = $data['dashboard']['sharing'];
@@ -152,3 +157,12 @@ $this->addPostJS(
 		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
 );
+
+if ($data['show_timeline']) {
+	$this->addPostJS(
+		'timeControl.useTimeRefresh('.CWebUser::getRefresh().');'.
+		'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.
+			CJs::encodeJson($data['timeControlData']).');'.
+		'timeControl.processObjects();'
+	);
+}

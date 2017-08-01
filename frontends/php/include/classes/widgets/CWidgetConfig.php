@@ -35,6 +35,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_WEB_OVERVIEW			=> _('Web monitoring'),
 			WIDGET_DISCOVERY_STATUS		=> _('Discovery status'),
+			WIDGET_GRAPH				=> _('Graph'),
 			WIDGET_HOST_STATUS			=> _('Host status'),
 			WIDGET_FAVOURITE_GRAPHS		=> _('Favourite graphs'),
 			WIDGET_FAVOURITE_MAPS		=> _('Favourite maps'),
@@ -65,6 +66,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
 			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
 			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
+			WIDGET_GRAPH				=> ['width' => 5, 'height' => 5],
 			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 4],
 			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
@@ -117,6 +119,7 @@ class CWidgetConfig {
 			case WIDGET_PROBLEMS:
 			case WIDGET_WEB_OVERVIEW:
 			case WIDGET_DISCOVERY_STATUS:
+			case WIDGET_GRAPH:
 			case WIDGET_HOST_STATUS:
 			case WIDGET_ACTION_LOG:
 			case WIDGET_DATA_OVERVIEW:
@@ -135,6 +138,22 @@ class CWidgetConfig {
 
 			case WIDGET_URL:
 				return 0;
+		}
+	}
+
+	/**
+	 * Does this widget type use timeline
+	 *
+	 * @param type $type  WIDGET_ constant
+	 *
+	 * @return boolean
+	 */
+	public static function usesTimeline($type) {
+		switch ($type) {
+			case WIDGET_GRAPH:
+				return true;
+			default:
+				return false;
 		}
 	}
 
@@ -170,6 +189,9 @@ class CWidgetConfig {
 
 			case WIDGET_TRIG_OVERVIEW:
 				return new CTrigOverviewWidgetForm($data);
+
+			case WIDGET_GRAPH:
+				return new CGraphWidgetForm($data);
 
 			case WIDGET_PROBLEMS:
 				return new CProblemsWidgetForm($data);
