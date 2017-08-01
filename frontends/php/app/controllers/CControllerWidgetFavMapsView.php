@@ -28,7 +28,7 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 
 		$this->setType(WIDGET_FAVOURITE_MAPS);
 		$this->setValidationRules([
-			'name' =>	'string'
+			'name' => 'string'
 		]);
 	}
 

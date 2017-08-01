@@ -2656,6 +2656,24 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
+.dashbrd-grid-empty-placeholder {
+	width: 16%;
+	height: 200px;
+	background-color: #fff;
+	border-style: dashed;
+	border-width: 2px;
+	border-color: #bdbdbd;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin: .25rem;
+	padding: 10px;
+
+	h1 {
+		text-align: center;
+	}
+}
+
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	width: 100%;
@@ -3166,6 +3184,16 @@ $form-icon-btn: (
 	border-bottom-color: darken($action-border-color, 1%);
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
+	&.modal {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		max-height: 90%;
+		max-width: 75%;
+		overflow: auto;
+		@include transform(translate(-50%, -50%));
+	}
+
 	.list-table {
 		border: none;
 
@@ -3211,6 +3239,7 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue-body {
+	margin: 0 0 25px 0;
 	white-space: nowrap;
 }
 
@@ -4578,7 +4607,7 @@ tr.cursor-move {
 
 					> .arrow {
 						flex: 0 0 15px;
-						text-align:center;
+						text-align: center;
 						margin: 2px 2px 0px -5px;
 
 						> .treeview {

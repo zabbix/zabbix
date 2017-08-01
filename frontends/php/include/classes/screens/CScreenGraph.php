@@ -188,6 +188,8 @@ class CScreenGraph extends CScreenBase {
 				$item = new CLink(null, 'charts.php?graphid='.$resourceId.'&period='.$this->timeline['period'].
 						'&stime='.$this->timeline['stimeNow']);
 			}
+			// TODO VM: (?) becuase there is no 'else' it is possible, that $item will be undefined here.
+			//			But, probably, Zabbix doesn't have such case.
 			$item->setId($containerId);
 
 			return $this->getOutput($item);

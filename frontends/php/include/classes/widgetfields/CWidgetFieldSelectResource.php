@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CWidgetFieldSelectResource extends CWidgetField {
 
 	protected $srctbl;
@@ -54,6 +55,14 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				$this->srcfld1 = 'itemid';
 				$this->srcfld2 = 'name';
 				break;
+
+			case WIDGET_FIELD_SELECT_RES_GRAPH:
+				$this->srctbl = 'graphs';
+				$this->srcfld1 = 'graphid';
+				$this->srcfld2 = 'name';
+
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
+				break;
 		}
 
 		$this->dstfld1 = $name;
@@ -77,19 +86,23 @@ class CWidgetFieldSelectResource extends CWidgetField {
 			case WIDGET_FIELD_SELECT_RES_ITEM:
 				$url->setArgument('real_hosts', '1');
 				break;
+
+			case WIDGET_FIELD_SELECT_RES_GRAPH:
+				$url->setArgument('real_hosts', '1');
+				$url->setArgument('with_graphs', '1');
+				break;
 		}
 
 		return $url->getUrl();
 	}
 
-	public function validate() {
-		$errors = parent::validate();
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
 
-		if (!$errors && $this->getValue() == 0) {
+		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && $this->getValue() == 0) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
 		}
 
 		return $errors;
 	}
-
 }

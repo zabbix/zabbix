@@ -61,7 +61,8 @@ $table = (new CTableInfo())
 		],
 		_('Duration'),
 		$data['config']['event_ack_enable'] ? _('Ack') : null,
-		_('Actions')
+		_('Actions'),
+		$data['fields']['show_tags'] ? _('Tags') : null
 	]));
 
 $today = strtotime('today');
@@ -210,7 +211,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$data['config']['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
 		array_key_exists($eventid, $actions)
 			? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
-			: ''
+			: '',
+		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }
 

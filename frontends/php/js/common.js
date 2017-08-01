@@ -235,30 +235,26 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 	return false;
 }
 
-function getDimensions(obj, trueSide) {
+function getDimensions(obj) {
 	obj = $(obj);
 
-	if (typeof(trueSide) == 'undefined') {
-		trueSide = false;
-	}
-
 	var dim = {
-		left:	0,
-		top:	0,
-		right:	0,
-		bottom:	0,
-		width:	0,
-		height:	0
+		left:		0,
+		top:		0,
+		right:		0,
+		bottom:		0,
+		width:		0,
+		height:		0,
+		offsetleft:	0
 	};
 
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
 		var dim = {
 			left:	parseInt(obj.style.left, 10),
 			top:	parseInt(obj.style.top, 10),
-			right:	parseInt(obj.style.right, 10),
-			bottom:	parseInt(obj.style.bottom, 10),
 			width:	parseInt(obj.style.width, 10),
-			height:	parseInt(obj.style.height, 10)
+			height:	parseInt(obj.style.height, 10),
+			offsetleft: parseInt(jQuery(obj).offset().left, 10)
 		};
 
 		if (!is_number(dim.top)) {
@@ -274,10 +270,8 @@ function getDimensions(obj, trueSide) {
 			dim.height = parseInt(obj.offsetHeight, 10);
 		}
 
-		if (!trueSide) {
-			dim.right = dim.left + dim.width;
-			dim.bottom = dim.top + dim.height;
-		}
+		dim.right = dim.left + dim.width;
+		dim.bottom = dim.top + dim.height;
 	}
 
 	return dim;
