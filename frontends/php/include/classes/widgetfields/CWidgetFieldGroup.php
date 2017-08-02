@@ -39,5 +39,4 @@ class CWidgetFieldGroup extends CWidgetField {
 
 		return $this;
 	}
-
 }

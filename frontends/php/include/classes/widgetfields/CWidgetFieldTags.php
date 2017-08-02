@@ -51,7 +51,7 @@ class CWidgetFieldTags extends CWidgetField {
 	}
 
 	/**
-	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
+	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
 	 *
 	 * @return array  An array of widget fields ready for saving in API.
 	 */

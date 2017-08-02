@@ -841,12 +841,12 @@
 	}
 
 	/**
-	 * Creates div for empty dashboard
+	 * Creates div for empty dashboard.
 	 *
-	 * @param object $obj  dashboard grid object
-	 * @param object options  dashboard options (will be put in data['options'] in dashboard grid)
+	 * @param {object} $obj     Dashboard grid object.
+	 * @param {object} options  Dashboard options (will be put in data['options'] in dashboard grid).
 	 *
-	 * @returns object  jQuery <div> object for placeholder
+	 * @return {object}         jQuery <div> object for placeholder.
 	 */
 	function emptyPlaceholderDiv($obj, options) {
 		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'}),
@@ -866,7 +866,7 @@
 
 					methods.addNewWidget.call($obj);
 				})
-			)
+			);
 		}
 		else {
 			$text.addClass('disabled').text(t('Add a new widget'));
@@ -876,14 +876,14 @@
 	}
 
 	/**
-	 * Performs action added by addAction function
+	 * Performs action added by addAction function.
 	 *
-	 * @param string hook_name  name of trigger that is currently beeing called
-	 * @param object $obj  dashboard grid object
-	 * @param object data  data from dashboard grid
-	 * @param object widget  current widget object (can be null for generic actions)
+	 * @param {string} hook_name  Name of trigger that is currently being called.
+	 * @param {object} $obj       Dashboard grid object.
+	 * @param {object} data       Data from dashboard grid.
+	 * @param {object} widget     Current widget object (can be null for generic actions).
 	 *
-	 * @returns int  number of triggers, that were called
+	 * @return int               Number of triggers, that were called.
 	 */
 	function doAction(hook_name, $obj, data, widget) {
 		if (typeof(data['triggers'][hook_name]) === 'undefined') {
