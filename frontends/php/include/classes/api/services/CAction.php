@@ -3041,9 +3041,21 @@ class CAction extends CApiService {
 						if (array_key_exists('operationid', $ack_operation)
 								&& array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 							$db_ack_operation = $db_ack_operations[$ack_operation['operationid']];
+							$operation_type = array_key_exists('operationtype', $ack_operation)
+								? $ack_operation['operationtype']
+								: $db_ack_operation['operationtype'];
 
 							// Field 'operationtype' is required.
 							unset($db_ack_operation['operationtype']);
+
+							if ($operation_type == OPERATION_TYPE_MESSAGE) {
+								unset($db_ack_operation['opmessage_grp']);
+								unset($db_ack_operation['opmessage_usr']);
+							}
+							elseif ($operation_type == OPERATION_TYPE_COMMAND) {
+								unset($db_ack_operation['opcommand_grp']);
+								unset($db_ack_operation['opcommand_hst']);
+							}
 
 							$ack_operation += $db_ack_operation;
 						}
