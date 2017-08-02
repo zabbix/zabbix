@@ -66,10 +66,6 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a 
 	
-if PROXY_IPCSERVICE
-zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a
-endif	
-
 zabbix_proxy_LDADD += @PROXY_LIBS@
 
 zabbix_proxy_LDFLAGS = @PROXY_LDFLAGS@
