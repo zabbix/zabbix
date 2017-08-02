@@ -15,7 +15,7 @@ A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, v
 ..F....... [ZBXNEXT-2102] fixed copying sharing properties when cloning dashboard (vmurzins)
 ........S. [ZBXNEXT-18] fixed unnecessary notification sending a recovery message (Sergejs)
 ........S. [ZBXNEXT-18] fixed acknowledge notification sending in maintenance period (Sergejs)
-........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchornization (wiper)
+........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchronization (wiper)
 ..F....... [ZBXNEXT-18] fixed php5.4 incompatibility in events page and acknowledge operation form (gcalenko)
 ..F....... [ZBXNEXT-18] fixed script name select button for new acknowledge operation form and recovery operation form (gcalenko)
 
