@@ -35,9 +35,11 @@
 
 #define zbx_serialize_short(buffer, value) (memcpy(buffer, (short *)&value, sizeof(short)), sizeof(short))
 
+#define zbx_serialize_double(buffer, value) (memcpy(buffer, (double *)&value, sizeof(double)), sizeof(double))
+
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 
-#define zbx_serialize_str_null(buffer)				\
+#define zbx_serialize_str_null(buffer)	 			\
 	(							\
 		memset(buffer, 0, sizeof(zbx_uint32_t)),	\
 		sizeof(zbx_uint32_t)				\
@@ -69,6 +71,9 @@
 #define zbx_deserialize_char(buffer, value) \
 	(*value = *buffer, sizeof(char))
 
+#define zbx_deserialize_double(buffer, value) \
+	(memcpy(value, buffer, sizeof(double)), sizeof(double))
+
 #define zbx_deserialize_str(buffer, value, value_len)					\
 	(										\
 			memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
@@ -80,12 +85,19 @@
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 
-#define zbx_deserialize_str_s(buffer, value, value_len)				\
+#define zbx_deserialize_str_s(buffer, value, value_len) 		\
 	(									\
 		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
 		memcpy(value, buffer + sizeof(zbx_uint32_t), value_len),	\
 		value[value_len] = '\0',					\
 		value_len + sizeof(zbx_uint32_t)				\
+	)
+
+#define zbx_deserialize_str_ptr(buffer, value, value_len)				\
+	(										\
+		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
+		0 < value_len ? (value = (char *)(buffer + sizeof(zbx_uint32_t))) :	\
+		(value = NULL), value_len + sizeof(zbx_uint32_t)			\
 	)
 
 #define zbx_deserialize_value(buffer, value) \

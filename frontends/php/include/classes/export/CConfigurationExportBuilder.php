@@ -699,8 +699,14 @@ class CConfigurationExportBuilder {
 				'jmx_endpoint' => $item['jmx_endpoint']
 			];
 
+			$master_item = ($item['type'] == ITEM_TYPE_DEPENDENT) ? ['key' => $item['master_item']['key_']] : [];
+
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
+				$data['master_item_prototype'] = $master_item;
+			}
+			else {
+				$data['master_item'] = $master_item;
 			}
 
 			if (isset($item['interface_ref'])) {

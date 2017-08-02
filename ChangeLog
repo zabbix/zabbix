@@ -1,9 +1,19 @@
-Changes for 3.4.0alpha3
+Changes for 3.4.0beta1
 
 New features:
+..F....... [ZBXNEXT-2102] added support of new dashboard widgets "Plain text" and "Graph" (miks, vmurzins)
+..F....... [ZBXNEXT-2102] implemented two-direction widget linkage for data sharing; improved active element selection in map navigation tree widget when map is changed from map widget (miks)
+..F....... [ZBXNEXT-2102] implemented validation for empty fields in widget configuration forms (Sasha)
+..F....... [ZBXNEXT-2102] added placeholder on empty dashboard (vmurzins)
+A.FG...PS. [ZBXNEXT-3006] implemented support of bulk metric collection for dependent items data population (gcalenko, vjaceslavs, wiper)
 ....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta)
 
 Bug fixes:
+........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
+A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
+..F....... [ZBXNEXT-2102] fixed copying sharing properties when cloning dashboard (vmurzins)
+........S. [ZBXNEXT-18] fixed unnecessary notification sending a recovery message (Sergejs)
+........S. [ZBXNEXT-18] fixed acknowledge notification sending in maintenance period (Sergejs)
 ........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchornization (wiper)
 ..F....... [ZBXNEXT-18] fixed php5.4 incompatibility in events page and acknowledge operation form (gcalenko)
 ..F....... [ZBXNEXT-18] fixed script name select button for new acknowledge operation form and recovery operation form (gcalenko)
@@ -119,6 +129,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
@@ -576,6 +587,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
@@ -2290,6 +2302,7 @@ Changes for 2.2.20rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
 
 --------------------------------------------------------------------------------

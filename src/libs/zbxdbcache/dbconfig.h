@@ -99,6 +99,7 @@ typedef struct
 	unsigned char		update_triggers;
 
 	zbx_vector_ptr_t	preproc_ops;
+	zbx_vector_uint64_t	dep_itemids;
 }
 ZBX_DC_ITEM;
 
@@ -147,6 +148,14 @@ typedef struct
 	const char	*trapper_hosts;
 }
 ZBX_DC_TRAPITEM;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	master_itemid;
+	zbx_uint64_t	last_master_itemid;
+}
+ZBX_DC_DEPENDENTITEM;
 
 typedef struct
 {
@@ -586,6 +595,7 @@ typedef struct
 	zbx_hashset_t		snmpitems;
 	zbx_hashset_t		ipmiitems;
 	zbx_hashset_t		trapitems;
+	zbx_hashset_t		dependentitems;
 	zbx_hashset_t		logitems;
 	zbx_hashset_t		dbitems;
 	zbx_hashset_t		sshitems;

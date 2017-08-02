@@ -898,6 +898,12 @@ class CDiscoveryRule extends CItemGeneral {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 
+			if (array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_DEPENDENT) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+					ITEM_TYPE_DEPENDENT, 'type'
+				));
+			}
+
 			// unset fields that are updated using the 'filter' parameter
 			unset($item['evaltype']);
 			unset($item['formula']);
@@ -1171,7 +1177,8 @@ class CDiscoveryRule extends CItemGeneral {
 				'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname', 'snmpv3_securitylevel',
 				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor',
 				'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid',
+				'templateid', 'type'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
@@ -1182,7 +1189,55 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$rs = [];
 		if ($prototypes) {
-			foreach ($prototypes as $key => $prototype) {
+			$create_order = [];
+			$src_itemid_to_key = [];
+			foreach ($prototypes as $itemid => $item) {
+				$dependency_level = 0;
+				$master_item = $item;
+				$src_itemid_to_key[$itemid] = $item['key_'];
+
+				while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
+					$master_item = $prototypes[$master_item['master_itemid']];
+					++$dependency_level;
+				}
+
+				$create_order[$itemid] = $dependency_level;
+			}
+			asort($create_order);
+
+			$itemkey_to_id = [];
+			$create_items = [];
+			$current_dependency = reset($create_order);
+
+			foreach ($create_order as $key => $dependency_level) {
+				if ($current_dependency != $dependency_level && $create_items) {
+					$current_dependency = $dependency_level;
+					$created_itemids = API::ItemPrototype()->create($create_items);
+
+					if (!$created_itemids) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
+					}
+					$created_itemids = $created_itemids['itemids'];
+
+					foreach ($create_items as $index => $created_item) {
+						$itemkey_to_id[$created_item['key_']] = $created_itemids[$index];
+					}
+
+					$create_items = [];
+				}
+
+				$prototype = $prototypes[$key];
+
+				if ($prototype['templateid']) {
+					$prototype = get_same_item_for_host($prototype, $dstHost['hostid']);
+
+					if (!$prototype) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
+					}
+					$itemkey_to_id[$srcItem['key_']] = $prototype['itemid'];
+					continue;
+				}
+
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
 
@@ -1213,16 +1268,24 @@ class CDiscoveryRule extends CItemGeneral {
 					unset($prototype['preprocessing']);
 				}
 
-				$prototypes[$key] = $prototype;
+				if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
+					$src_item_key = $src_itemid_to_key[$prototype['master_itemid']];
+					$prototype['master_itemid'] = $itemkey_to_id[$src_item_key];
+				}
+				else {
+					unset($prototype['master_itemid']);
+				}
+
+				unset($prototype['templateid']);
+				$create_items[] = $prototype;
 			}
 
-			$rs = API::ItemPrototype()->create($prototypes);
-			if (!$rs) {
+			if ($create_items && !API::ItemPrototype()->create($create_items)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
 			}
 		}
 
-		return $rs;
+		return true;
 	}
 
 	/**

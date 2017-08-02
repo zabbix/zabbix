@@ -20,7 +20,7 @@
 
 
 /**
- * Problems widget form
+ * Problems widget form.
  */
 class CProblemsWidgetForm extends CWidgetForm {
 
@@ -92,8 +92,7 @@ class CProblemsWidgetForm extends CWidgetForm {
 		$this->fields[] = $field_tags;
 
 		// show hosts in maintenance
-		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
-			->setDefault(1);
+		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))->setDefault(1);
 
 		if (array_key_exists('maintenance', $this->data)) {
 			$field_maintenance->setValue($this->data['maintenance']);
@@ -119,8 +118,7 @@ class CProblemsWidgetForm extends CWidgetForm {
 			SCREEN_SORT_TRIGGERS_NAME_ASC => _('Problem').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_DESC => _('Host').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host').' ('._('ascending').')'
-		]))
-			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
+		]))->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
 		if (array_key_exists('sort_triggers', $this->data)) {
 			$field_sort->setValue($this->data['sort_triggers']);

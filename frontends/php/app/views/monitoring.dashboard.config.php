@@ -28,7 +28,7 @@ $js_scripts = [];
 
 $form_list = new CFormList();
 
-// Common fields
+// common fields
 $form_list->addRow(_('Type'),
 	new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $data['known_widget_types'])
 );
@@ -40,7 +40,7 @@ $form_list->addRow(_('Name'),
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
-// Widget specific fields
+// widget specific fields
 foreach ($data['dialogue']['fields'] as $field) {
 	if (!$data['config']['event_ack_enable'] && ($field->getFlags() & CWidgetField::FLAG_ACKNOWLEDGES)) {
 		$form->addVar($field->getName(), $field->getValue());
@@ -64,7 +64,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldGroup) {
-		// multiselect.js must be preloaded in parent view`
+		// multiselect.js must be preloaded in parent view.
 
 		$field_groupids = (new CMultiSelect([
 			'name' => $field->getName().'[]',
@@ -75,15 +75,14 @@ foreach ($data['dialogue']['fields'] as $field) {
 					'&srcfld1=groupid&multiselect=1'
 			],
 			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 		$form_list->addRow($field->getLabel(), $field_groupids);
 
 		$js_scripts[] = $field_groupids->getPostJS();
 	}
 	elseif ($field instanceof CWidgetFieldHost) {
-		// multiselect.js must be preloaded in parent view`
+		// multiselect.js must be preloaded in parent view.
 
 		$field_hostids = (new CMultiSelect([
 			'name' => $field->getName().'[]',
@@ -102,7 +101,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$js_scripts[] = $field_hostids->getPostJS();
 	}
 	elseif ($field instanceof CWidgetFieldReference) {
-		$form->addVar($field->getName(), $field->getValue() ?: '');
+		$form->addVar($field->getName(), $field->getValue() ? $field->getValue() : '');
 
 		if (!$field->getValue()) {
 			$javascript = $field->getJavascript('#'.$form->getAttribute('id'));
@@ -117,10 +116,10 @@ foreach ($data['dialogue']['fields'] as $field) {
 			? $data['captions']['simple'][$field->getResourceType()][$field->getValue()]
 			: '';
 
-		// needed for popup script
+		// Needed for popup script.
 		$form->addVar($field->getName(), $field->getValue());
 		$form_list->addRow($field->getLabel(), [
-			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -165,12 +164,14 @@ foreach ($data['dialogue']['fields'] as $field) {
 	}
 	elseif ($field instanceof CWidgetFieldTags) {
 		$tags = $field->getValue();
+
 		if (!$tags) {
 			$tags = [['tag' => '', 'value' => '']];
 		}
 
 		$tags_table = (new CTable())->setId('tags_table');
 		$i = 0;
+
 		foreach ($tags as $tag) {
 			$tags_table->addRow([
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
@@ -188,6 +189,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 			$i++;
 		}
+
 		$tags_table->addRow(
 			(new CCol(
 				(new CButton('tags_add', _('Add')))

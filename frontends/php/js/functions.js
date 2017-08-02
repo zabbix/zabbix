@@ -572,7 +572,7 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
-	var	overlay_dialogue = jQuery('<div>', {
+	var overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
 		class: 'overlay-dialogue modal'
 	})
@@ -599,12 +599,23 @@ function overlayDialogue(params) {
 			}).append(params.content)
 		)
 		.append(overlay_dialogue_footer)
-		.on('keypress keydown', function(e) {
+		.on('keydown', function(e) {
 			if (e.which == 27) { // ESC
 				if (cancel_action !== null) {
 					cancel_action();
 				}
 				overlayDialogueDestroy();
+				return false;
+			}
+			else if (e.which == 13) { // ENTER
+				// Trigger click on the first button.
+				if (e.target.tagName === 'BUTTON') {
+					return true;
+				}
+				else {
+					jQuery('button:focusable', jQuery('#overlay_dialogue > .overlay-dialogue-footer')).first()
+						.trigger('click');
+				}
 				return false;
 			}
 		})
@@ -617,14 +628,14 @@ function overlayDialogue(params) {
 			last_focusable = focusable.filter(':last');
 
 		first_focusable.on('keydown', function(e) {
-			if (e.keyCode == 9 && e.shiftKey) {
+			if (e.keyCode == 9 && e.shiftKey) { // TAB && SHIFT
 				last_focusable.focus();
 				return false;
 			}
 		});
 
 		last_focusable.on('keydown', function(e) {
-			if (e.keyCode == 9 && !e.shiftKey) {
+			if (e.keyCode == 9 && !e.shiftKey) { // TAB && !SHIFT
 				first_focusable.focus();
 				return false;
 			}
@@ -637,33 +648,19 @@ function overlayDialogue(params) {
 		button_focused.focus();
 	}
 
+	// Don't focus element in overlay, if button is already focused
 	overlayDialogueOnLoad(!button_focused);
 }
 
 /**
- * Makes overlay dialogues more useble by:
- *  - focusing :focusable input element with lowest tabindex value
- *  - triggering onclick event on pressing an enter in focused element
+ * Actions to perform, when dialogue is created,
+ * as well as, when data in dialogue changed, and this is forced from outside
  *
- * @param boolean focus			focus element with lowest tabindex
+ * @param boolean focus  focus first focusable element in overalay
  */
 function overlayDialogueOnLoad(focus) {
-	// Focus element with lowest tabindex attribute.
 	if (focus) {
 		jQuery('.auto-focus:focusable', jQuery('#overlay_dialogue')).first().focus();
-	}
-
-	// Trigger click on the first button if user press enter in textbox.
-	var selector = 'input[type=text], textarea, input[type=radio], input[type=checkbox], select';
-	var writable_fields = jQuery(selector, jQuery('#widget_dialogue_form'));
-	if (writable_fields.length) {
-		writable_fields.on('keydown', function(e) {
-			if (e.keyCode == 13) {
-				jQuery('button:focusable', jQuery('#overlay_dialogue > .overlay-dialogue-footer')).first()
-					.trigger('click');
-				return false;
-			}
-		});
 	}
 }
 

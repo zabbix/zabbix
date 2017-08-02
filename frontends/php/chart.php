@@ -51,8 +51,10 @@ $itemIds = getRequest('itemids');
  * Permissions
  */
 $items = API::Item()->get([
-	'output' => ['itemid', 'name'],
-	'selectHosts' => ['name'],
+	'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
+		'value_type', 'key_'
+	],
+	'selectHosts' => ['name', 'host'],
 	'itemids' => $itemIds,
 	'webitems' => true,
 	'preservekeys' => true
@@ -66,6 +68,7 @@ foreach ($itemIds as $itemId) {
 $hostNames = [];
 foreach ($items as &$item) {
 	$item['hostname'] = $item['hosts'][0]['name'];
+	$item['host'] = $item['hosts'][0]['host'];
 	if (!in_array($item['hostname'], $hostNames)) {
 		$hostNames[] = $item['hostname'];
 	}
@@ -117,9 +120,11 @@ if (hasRequest('outer')) {
 }
 
 foreach ($items as $item) {
-	$graph->addItem($item['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL,
-		rgb2hex(get_next_color(1))
-	);
+	$graph->addItem($item + [
+		'color'		=> rgb2hex(get_next_color(1)),
+		'axisside'	=> GRAPH_YAXIS_SIDE_DEFAULT,
+		'calc_fnc'	=> (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
+	]);
 }
 
 $min_dimentions = $graph->getMinDimensions();

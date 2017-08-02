@@ -2667,6 +2667,7 @@ $form-icon-btn: (
 	flex-direction: column;
 	justify-content: center;
 	margin: .25rem;
+	padding: 10px;
 
 	h1 {
 		text-align: center;
@@ -3646,6 +3647,14 @@ a.blue {
 	@extend .blue;
 }
 
+.teal {
+	color: $teal;
+}
+
+a.teal {
+	@extend .teal;
+}
+
 .progress-bar-container {
 	display: inline-block;
 	white-space: nowrap;
@@ -4446,11 +4455,16 @@ tr.cursor-move {
 .clock-lines {
 	fill: $clock-lines-color;
 }
-
+.sysmap {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+}
 .sysmap-widget-container {
 	overflow: hidden;
 	padding-left: 5px;
 	padding-right: 5px;
+	height: 100%;
 }
 
 .navtree {

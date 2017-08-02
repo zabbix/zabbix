@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.4.0alpha3');
+define('ZABBIX_VERSION',		'3.4.0beta1');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030183);
+define('ZABBIX_DB_VERSION',		3030186);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -412,6 +412,10 @@ define('ITEM_TYPE_TELNET',			14);
 define('ITEM_TYPE_CALCULATED',		15);
 define('ITEM_TYPE_JMX',				16);
 define('ITEM_TYPE_SNMPTRAP',		17);
+define('ITEM_TYPE_DEPENDENT',		18);
+
+define('ZBX_DEPENDENT_ITEM_MAX_LEVELS',	3);
+define('ZBX_DEPENDENT_ITEM_MAX_COUNT',	999);
 
 define('ITEM_VALUE_TYPE_FLOAT',		0);
 define('ITEM_VALUE_TYPE_STR',		1); // aka Character
@@ -1164,6 +1168,7 @@ define('WIDGET_GRAPH',					'graph');
 define('WIDGET_CLOCK',					'clock');
 define('WIDGET_SYSMAP',					'sysmap');
 define('WIDGET_NAVIGATION_TREE',		'navigationtree');
+define('WIDGET_PLAIN_TEXT',				'plaintext');
 define('WIDGET_URL',					'url');
 define('WIDGET_ACTION_LOG',				'actlog');
 define('WIDGET_DATA_OVERVIEW',			'dataover');
@@ -1341,6 +1346,7 @@ define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
+define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_LOGO', 'header-logo');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HIDDEN', 'hidden');

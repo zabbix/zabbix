@@ -28,7 +28,7 @@ if (typeof addPopupValues === 'undefined') {
 }
 
 if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
-	function zbx_widget_navtree_trigger(action, grid){
+	function zbx_widget_navtree_trigger(action, grid) {
 		var $navtree = jQuery('.navtree', grid['widget']['content_body']);
 		$navtree.zbx_navtree(action);
 	}
@@ -690,29 +690,29 @@ jQuery(function($) {
 				}
 
 				if (typeof item.children !== 'undefined' && widget_data.max_depth > depth) {
-					if (item.children.length) {
-						item_clases += ' is-parent';
-					}
-
+					var child_items_visible = 0;
 					$.each(item.children, function(i, item) {
 						if (typeof item === 'object') {
 							ul.append(createTreeItem($obj, item, depth+1));
 							if (item.id > widget_data.lastId) {
 								widget_data.lastId = item.id;
 							}
+							if (item.item_visible === true) {
+								child_items_visible++;
+							}
 						}
 					});
-				}
 
-				var map_accessible = false;
-				if (item.mapid) {
-					map_accessible = (widget_data['maps_accessible'].indexOf(item.mapid) !== -1);
-					if (!map_accessible && !isEditMode()) {
-						item_clases += ' inaccessible';
+					if (item.children.length && child_items_visible > 0) {
+						item_clases += ' is-parent';
 					}
 				}
 
-				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0 && map_accessible) {
+				if (item.item_active === false && !isEditMode()) {
+					item_clases += ' inaccessible';
+				}
+
+				if (!isEditMode() && typeof item.mapid === 'number' && item.mapid > 0 && item.item_active === true) {
 					link = $('<a/>', {
 							'data-mapid': item.mapid,
 							'href': '#'
@@ -723,17 +723,18 @@ jQuery(function($) {
 								step_in_path = $(this).closest('.tree-item'),
 								widget = getWidgetData($obj);
 
-							$('.selected', $obj).removeClass('selected');
-							while ($(step_in_path).length) {
-								$(step_in_path).addClass('selected');
-								step_in_path = $(step_in_path).parent().closest('.tree-item');
+							if ($('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+									'selected_mapid', data_to_share))  {
+								$('.selected', $obj).removeClass('selected');
+								while ($(step_in_path).length) {
+									$(step_in_path).addClass('selected');
+									step_in_path = $(step_in_path).parent().closest('.tree-item');
+								}
+								$(this).closest('.tree-item').addClass('selected');
 							}
-							$(this).closest('.tree-item').addClass('selected');
 
 							e.preventDefault();
 							updateUserProfile('web.dashbrd.navtree.item.selected', itemid, [widget['widgetid']]);
-							$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
-								'selected_mapid', data_to_share);
 						});
 				}
 				else {
@@ -745,6 +746,7 @@ jQuery(function($) {
 						'data-mapid': item.mapid,
 						'data-id': item.id
 					})
+					.css(item.item_visible === false ? {display: 'none'} : {})
 					.append(
 						$('<div/>', {'class': 'tree-row'})
 							.append(!isEditMode() ? $('<div/>', {'class': 'problems'}) : null)
@@ -925,7 +927,7 @@ jQuery(function($) {
 
 				// Add .is-parent class for branches with sub-items.
 				$('.tree-list', $obj).not('.ui-sortable, .root').each(function() {
-					if ($('>li', this).length) {
+					if ($('>li', this).not('.inaccessible').length) {
 						$(this).closest('.tree-item').addClass('is-parent');
 					}
 					else {
@@ -1057,12 +1059,35 @@ jQuery(function($) {
 						}
 
 						if (item['parent'] == parent_id) {
-							var children = buildTree($obj, rows, item['id']);
+							var children = buildTree($obj, rows, item['id']),
+								item_visible = true,
+								item_active = true,
+								children_maps;
 
 							if (children.length) {
 								item['children'] = children;
 							}
 
+							if (widget_data.show_unavailable && item.mapid
+									&& widget_data['maps_accessible'].indexOf(item.mapid) === -1) {
+								item_active = false;
+							}
+							else {
+								if (item.mapid) {
+									item_active = widget_data['maps_accessible'].indexOf(item.mapid) !== -1;
+									if (!widget_data.show_unavailable && !item_active) {
+										item_visible = false;
+									}
+								}
+								else {
+									item_active = false;
+								}
+							}
+
+							item['item_visible'] = item_visible;
+							item['item_active'] = item_active;
+
+							// TODO miks: is this still needed?
 							var indx = getTreeItemIndex(tree, +item['id']);
 
 							if (indx > -1) {
@@ -1211,6 +1236,40 @@ jQuery(function($) {
 					});
 				},
 
+				// onDashboardReady trigger method
+				onDashboardReady: function() {
+					var $this = $(this);
+
+					return this.each(function() {
+						var widget = getWidgetData($this),
+							widget_data = $this.data('widgetData');
+
+						if (!widget_data.navtree_item_selected
+								|| !$('.tree-item[data-id='+widget_data.navtree_item_selected+']').is(':visible')
+							) {
+							widget_data.navtree_item_selected = $('.tree-item:visible', $this).not('[data-mapid="0"]')
+								.first().data('id');
+						}
+
+						var selected_item = $('.tree-item[data-id='+widget_data.navtree_item_selected+']'),
+							step_in_path = selected_item;
+
+						if (widget_data.navtree_item_selected
+								&& $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+								'selected_mapid', {mapid: $(selected_item).data('mapid')})
+							) {
+
+							$('.selected', $this).removeClass('selected');
+							while ($(step_in_path).length) {
+								$(step_in_path).addClass('selected');
+								step_in_path = $(step_in_path).parent().closest('.tree-item');
+							}
+						}
+
+						delete widget_data.navtree_item_selected;
+					});
+				},
+
 				// initialization of widget
 				init: function(options) {
 					options = $.extend({}, options);
@@ -1222,7 +1281,9 @@ jQuery(function($) {
 							uniqueid: options.uniqueid,
 							severity_levels: options.severity_levels || [],
 							navtree_items_opened: options.navtree_items_opened.toString().split(',') || [],
+							navtree_item_selected: +options.navtree_item_selected || null,
 							maps_accessible: options.maps_accessible || [],
+							show_unavailable: options.show_unavailable == 1 || false,
 							problems: options.problems || [],
 							max_depth: options.max_depth || 10,
 							lastId: 0
@@ -1230,7 +1291,7 @@ jQuery(function($) {
 
 						var widget_data = getWidgetData($this),
 							triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
-							'beforeConfigLoad'];
+							'beforeConfigLoad', 'onDashboardReady'];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-widget-container").dashboardGrid("addAction", trigger,
@@ -1315,27 +1376,7 @@ jQuery(function($) {
 							});
 
 							switchToNavigationMode($this);
-
-							if (!options.navtree_item_selected) {
-								options.navtree_item_selected = $('.tree-item', $this).not('[data-mapid="0"]').first()
-									.data('id');
-							}
-							if (options.navtree_item_selected) {
-								var selected_item = $('.tree-item[data-id='+options.navtree_item_selected+']'),
-									step_in_path = selected_item;
-
-								while ($(step_in_path).length) {
-									$(step_in_path).addClass('selected');
-									step_in_path = $(step_in_path).parent().closest('.tree-item');
-								}
-
-								if (options['initial_load']) {
-									$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget_data,
-										'selected_mapid', {mapid: $(selected_item).data('mapid')});
-								}
-							}
 						}
-
 					});
 				}
 			};
