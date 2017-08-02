@@ -857,7 +857,7 @@
 				$('<a>', {'href':'#'})
 				.text(t('Add a new widget'))
 				.click(function(e){
-					// To prevent going by href link
+					// To prevent going by href link.
 					e.preventDefault();
 
 					if (!methods.isEditMode.call($obj)) {
