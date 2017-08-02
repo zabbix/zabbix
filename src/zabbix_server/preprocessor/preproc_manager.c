@@ -653,6 +653,10 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 {
 	int		type, ret = FAIL;
 
+	/* reset the old result - it will be converted from the received variant value */
+	free_result(request->value.result);
+	init_result(request->value.result);
+
 	if (NULL != error)
 	{
 		/* on error item state is set to ITEM_STATE_NOTSUPPORTED */
@@ -713,7 +717,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 				}
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				SET_DBL_RESULT(request->value.result, value->data.ui64);
+				SET_UI64_RESULT(request->value.result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
 				UNSET_TEXT_RESULT(request->value.result);
@@ -918,20 +922,6 @@ static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, z
 
 /******************************************************************************
  *                                                                            *
- * Function: preprocessor_free_worker                                         *
- *                                                                            *
- * Purpose: free preprocessing worker                                         *
- *                                                                            *
- * Parameters: worker - [IN] the preprocessing worker                         *
- *                                                                            *
- ******************************************************************************/
-static void	preprocessor_free_worker(zbx_preprocessing_worker_t *worker)
-{
-	zbx_ipc_client_close(worker->client);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: preprocessor_destroy_manager                                     *
  *                                                                            *
  * Purpose: destroy preprocessing manager                                     *
@@ -941,13 +931,9 @@ static void	preprocessor_free_worker(zbx_preprocessing_worker_t *worker)
  ******************************************************************************/
 static void	preprocessor_destroy_manager(zbx_preprocessing_manager_t *manager)
 {
-	int				i;
 	zbx_hashset_iter_t		iter;
 	DC_ITEM				*item;
 	zbx_preprocessing_request_t	*request;
-
-	for (i = 0; i < manager->worker_count; i++)
-		preprocessor_free_worker(&manager->workers[i]);
 
 	zbx_free(manager->workers);
 

@@ -315,8 +315,8 @@ src/libs/zbxdbcache/dbconfig_dump.c -text
 src/libs/zbxdbcache/dbsync.c -text
 src/libs/zbxdbcache/dbsync.h -text
 src/libs/zbxdbhigh/trigger.c -text
+src/libs/zbxipcservice/ipcservice.c -text
 src/libs/zbxjson/json_test.c -text
-src/libs/zbxnix/ipcservice.c -text
 src/libs/zbxserver/macrofunc.c -text
 src/libs/zbxserver/macrofunc.h -text
 src/zabbix_java/lib/android-json-4.3_r3.1.jar -text svneol=unset#application/java-archive
@@ -324,6 +324,7 @@ src/zabbix_java/lib/logback-classic-0.9.27.jar -text svneol=unset#application/ja
 src/zabbix_java/lib/logback-core-0.9.27.jar -text svneol=unset#application/java-archive
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text svneol=unset#application/java-archive
 src/zabbix_java/tests/junit-4.8.2.jar -text svneol=unset#application/java-archive
+src/zabbix_proxy/preprocessing.c -text
 src/zabbix_proxy/taskmanager/server_tasks.c -text
 src/zabbix_server/alerter/alert_manager.c -text
 src/zabbix_server/alerter/alert_manager.h -text
@@ -341,6 +342,7 @@ src/zabbix_server/ipmi/ipmi_poller.h -text
 src/zabbix_server/ipmi/ipmi_protocol.c -text
 src/zabbix_server/ipmi/ipmi_protocol.h -text
 src/zabbix_server/preprocessor/item_preproc_test.c -text
+src/zabbix_server/preprocessor/preprocessing.c -text
 src/zabbix_server/scripts/Makefile.am -text
 src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/proxy_tasks.c -text

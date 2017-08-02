@@ -5,8 +5,6 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "log.h"
-
-#include <event.h>
 #include "zbxipcservice.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
