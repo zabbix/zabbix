@@ -840,19 +840,30 @@
 		return ref;
 	}
 
-	function addWidgetDiv($obj, options) {
-		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'});
+	/**
+	 * Creates div for empty dashboard
+	 *
+	 * @param object $obj  dashboard grid object
+	 * @param object options  dashboard options (will be put in data['options'] in dashboard grid)
+	 *
+	 * @returns object  jQuery <div> object for placeholder
+	 */
+	function emptyPlaceholderDiv($obj, options) {
+		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'}),
+			$text = $('<h1>');
 
-		var $text = $('<h1>')
 		if (options['editable']) {
 			$text.append(
 				$('<a>', {'href':'#'})
 				.text(t('Add a new widget'))
 				.click(function(e){
-					e.preventDefault(); // To prevent going by href link
+					// To prevent going by href link
+					e.preventDefault();
+
 					if (!methods.isEditMode.call($obj)) {
 						showEditMode();
 					}
+
 					methods.addNewWidget.call($obj);
 				})
 			)
@@ -965,7 +976,7 @@
 			return this.each(function() {
 				var	$this = $(this),
 					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}),
-					$empty_placeholder = addWidgetDiv($this, options);
+					$empty_placeholder = emptyPlaceholderDiv($this, options);
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
