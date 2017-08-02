@@ -9,6 +9,7 @@ A.FG...PS. [ZBXNEXT-3006] implemented support of bulk metric collection for depe
 ....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta)
 
 Bug fixes:
+....I..... [ZBXNEXT-3006] fixed libevent build depenedencies (wiper)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
 ..F....... [ZBXNEXT-2102] fixed copying sharing properties when cloning dashboard (vmurzins)
