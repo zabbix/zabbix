@@ -918,20 +918,6 @@ static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, z
 
 /******************************************************************************
  *                                                                            *
- * Function: preprocessor_free_worker                                         *
- *                                                                            *
- * Purpose: free preprocessing worker                                         *
- *                                                                            *
- * Parameters: worker - [IN] the preprocessing worker                         *
- *                                                                            *
- ******************************************************************************/
-static void	preprocessor_free_worker(zbx_preprocessing_worker_t *worker)
-{
-	zbx_ipc_client_close(worker->client);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: preprocessor_destroy_manager                                     *
  *                                                                            *
  * Purpose: destroy preprocessing manager                                     *
@@ -941,13 +927,9 @@ static void	preprocessor_free_worker(zbx_preprocessing_worker_t *worker)
  ******************************************************************************/
 static void	preprocessor_destroy_manager(zbx_preprocessing_manager_t *manager)
 {
-	int				i;
 	zbx_hashset_iter_t		iter;
 	DC_ITEM				*item;
 	zbx_preprocessing_request_t	*request;
-
-	for (i = 0; i < manager->worker_count; i++)
-		preprocessor_free_worker(&manager->workers[i]);
 
 	zbx_free(manager->workers);
 
