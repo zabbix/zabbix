@@ -1765,8 +1765,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				'mediatypeid'	=> 0
 			];
 
+			$details = new CSpan($operation_descriptions[0][$operationid]);
+
+			if (array_key_exists($operationid, $operation_hints) && $operation_hints[$operationid]) {
+				$details->setHint($operation_hints[$operationid]);
+			}
+
 			$operations_table->addRow([
-				(new CSpan($operation_descriptions[0][$operationid]))->setHint($operation_hints[$operationid]),
+				$details,
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))

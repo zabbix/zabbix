@@ -961,7 +961,19 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 					$message = $opmessage['message'];
 				}
 
-				$result[$key][] = [bold($subject), BR(), BR(), zbx_nl2br($message)];
+				$result_hint = [];
+
+				if (trim($subject)) {
+					$result_hint = [bold($subject), BR(), BR()];
+				}
+
+				if (trim($message)) {
+					$result_hint[] = zbx_nl2br($message);
+				}
+
+				if ($result_hint) {
+					$result[$key][] = $result_hint;
+				}
 				break;
 		}
 	}
