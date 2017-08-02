@@ -28,7 +28,7 @@ if (typeof addPopupValues === 'undefined') {
 }
 
 if (typeof(zbx_widget_navtree_trigger) !== typeof(Function)) {
-	function zbx_widget_navtree_trigger(action, grid){
+	function zbx_widget_navtree_trigger(action, grid) {
 		var $navtree = jQuery('.navtree', grid['widget']['content_body']);
 		$navtree.zbx_navtree(action);
 	}
@@ -723,17 +723,18 @@ jQuery(function($) {
 								step_in_path = $(this).closest('.tree-item'),
 								widget = getWidgetData($obj);
 
-							$('.selected', $obj).removeClass('selected');
-							while ($(step_in_path).length) {
-								$(step_in_path).addClass('selected');
-								step_in_path = $(step_in_path).parent().closest('.tree-item');
+							if ($('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+									'selected_mapid', data_to_share))  {
+								$('.selected', $obj).removeClass('selected');
+								while ($(step_in_path).length) {
+									$(step_in_path).addClass('selected');
+									step_in_path = $(step_in_path).parent().closest('.tree-item');
+								}
+								$(this).closest('.tree-item').addClass('selected');
 							}
-							$(this).closest('.tree-item').addClass('selected');
 
 							e.preventDefault();
 							updateUserProfile('web.dashbrd.navtree.item.selected', itemid, [widget['widgetid']]);
-							$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
-								'selected_mapid', data_to_share);
 						});
 				}
 				else {
@@ -1235,6 +1236,40 @@ jQuery(function($) {
 					});
 				},
 
+				// onDashboardReady trigger method
+				onDashboardReady: function() {
+					var $this = $(this);
+
+					return this.each(function() {
+						var widget = getWidgetData($this),
+							widget_data = $this.data('widgetData');
+
+						if (!widget_data.navtree_item_selected
+								|| !$('.tree-item[data-id='+widget_data.navtree_item_selected+']').is(':visible')
+							) {
+							widget_data.navtree_item_selected = $('.tree-item:visible', $this).not('[data-mapid="0"]')
+								.first().data('id');
+						}
+
+						var selected_item = $('.tree-item[data-id='+widget_data.navtree_item_selected+']'),
+							step_in_path = selected_item;
+
+						if (widget_data.navtree_item_selected
+								&& $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+								'selected_mapid', {mapid: $(selected_item).data('mapid')})
+							) {
+
+							$('.selected', $this).removeClass('selected');
+							while ($(step_in_path).length) {
+								$(step_in_path).addClass('selected');
+								step_in_path = $(step_in_path).parent().closest('.tree-item');
+							}
+						}
+
+						delete widget_data.navtree_item_selected;
+					});
+				},
+
 				// initialization of widget
 				init: function(options) {
 					options = $.extend({}, options);
@@ -1246,6 +1281,7 @@ jQuery(function($) {
 							uniqueid: options.uniqueid,
 							severity_levels: options.severity_levels || [],
 							navtree_items_opened: options.navtree_items_opened.toString().split(',') || [],
+							navtree_item_selected: +options.navtree_item_selected || null,
 							maps_accessible: options.maps_accessible || [],
 							show_unavailable: options.show_unavailable == 1 || false,
 							problems: options.problems || [],
@@ -1255,7 +1291,7 @@ jQuery(function($) {
 
 						var widget_data = getWidgetData($this),
 							triggers = ['onEditStart', 'onEditStop', 'beforeDashboardSave', 'afterDashboardSave',
-							'beforeConfigLoad'];
+							'beforeConfigLoad', 'onDashboardReady'];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-widget-container").dashboardGrid("addAction", trigger,
@@ -1340,27 +1376,7 @@ jQuery(function($) {
 							});
 
 							switchToNavigationMode($this);
-
-							if (!options.navtree_item_selected) {
-								options.navtree_item_selected = $('.tree-item', $this).not('[data-mapid="0"]').first()
-									.data('id');
-							}
-							if (options.navtree_item_selected) {
-								var selected_item = $('.tree-item[data-id='+options.navtree_item_selected+']'),
-									step_in_path = selected_item;
-
-								while ($(step_in_path).length) {
-									$(step_in_path).addClass('selected');
-									step_in_path = $(step_in_path).parent().closest('.tree-item');
-								}
-
-								if (options['initial_load']) {
-									$('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget_data,
-										'selected_mapid', {mapid: $(selected_item).data('mapid')});
-								}
-							}
 						}
-
 					});
 				}
 			};

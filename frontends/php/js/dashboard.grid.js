@@ -507,11 +507,20 @@
 					updateWidgetContent($obj, data, widget);
 				}
 
+				var callOnDashboardReadyTrigger = false;
 				if (!widget['ready']) {
 					widget['ready'] = true; // leave it before registerDataExchangeCommit.
 					methods.registerDataExchangeCommit.call($obj);
+
+					// If this is the last trigger loaded, then set callOnDashboardReadyTrigger to be true.
+					callOnDashboardReadyTrigger
+						= (data['widgets'].filter(function(widget) {return !widget['ready']}).length == 0);
 				}
 				widget['ready'] = true;
+
+				if (callOnDashboardReadyTrigger) {
+					doAction('onDashboardReady', $obj, data, null);
+				}
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
@@ -1351,25 +1360,39 @@
 			});
 		},
 
+		/**
+		 * Pushes received data in data buffer and calls sharing method.
+		 *
+		 * @param object widget  data origin widget
+		 * @param string data_name  string to identify data shared
+		 *
+		 * @returns boolean		indicates either there was linked widget that was related to data origin widget
+		 */
 		widgetDataShare: function(widget, data_name) {
 			var args = Array.prototype.slice.call(arguments, 2),
-				uniqueid = widget['uniqueid'];
+				uniqueid = widget['uniqueid'],
+				ret = true;
 
 			if (!args.length) {
 				return false;
 			}
 
-			return this.each(function() {
+			this.each(function() {
 				var $this = $(this),
 					data = $this.data('dashboardGrid'),
 					indx = -1;
+
+				if (typeof data['widget_relations']['relations'][widget['uniqueid']] === 'undefined'
+						|| data['widget_relations']['relations'][widget['uniqueid']].length == 0) {
+					ret = false;
+				}
 
 				if (typeof data['data_buffer'][uniqueid] === 'undefined') {
 					data['data_buffer'][uniqueid] = [];
 				}
 				else if (typeof data['data_buffer'][uniqueid] !== 'undefined') {
 					$.each(data['data_buffer'][uniqueid], function(i, arr) {
-						if (arr['data_key'] === data_name) {
+						if (arr['data_name'] === data_name) {
 							indx = i;
 						}
 					});
@@ -1391,6 +1414,8 @@
 
 				methods.callWidgetDataShare.call($this);
 			});
+
+			return ret;
 		},
 
 		callWidgetDataShare: function($obj) {
