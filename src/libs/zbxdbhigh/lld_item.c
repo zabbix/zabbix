@@ -1830,8 +1830,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				value_esc = DBdyn_escape_string(item->jmx_endpoint);
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 						"%sjmx_endpoint='%s'", d, value_esc);
-				d = ",";
 				zbx_free(value_esc);
+				d = ",";
 			}
 			if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM))
 			{
