@@ -70,8 +70,11 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			$items = [];
 		}
 
+		if (!$items) {
+			$error = _('No item selected.');
+		}
 		// Select item history data.
-		if (($item = reset($items)) !== false) {
+		else if (($item = reset($items)) !== false) {
 			$histories = API::History()->get([
 				'history' => $item['value_type'],
 				'itemids' => $item['itemid'],
@@ -108,8 +111,8 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			}
 		}
 
-		if (!count($table_rows)) {
-			$error = 'No permissions to selected item or it does not exist.';
+		if (!$error && !$table_rows) {
+			$error = _('No permissions to selected item or it does not exist.');
 		}
 
 		$this->setResponse(new CControllerResponseData([
