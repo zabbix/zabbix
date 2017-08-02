@@ -713,7 +713,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 				}
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				SET_DBL_RESULT(request->value.result, value->data.ui64);
+				SET_UI64_RESULT(request->value.result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
 				UNSET_TEXT_RESULT(request->value.result);
