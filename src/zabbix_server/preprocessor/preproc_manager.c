@@ -28,7 +28,7 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 
-#include "zbxpreproc.h"
+#include "preprocessing.h"
 #include "preproc_manager.h"
 #include "linked_list.h"
 

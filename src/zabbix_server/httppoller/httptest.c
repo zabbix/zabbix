@@ -26,7 +26,6 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
-#include "zbxpreproc.h"
 
 #include "httptest.h"
 #include "httpmacro.h"
