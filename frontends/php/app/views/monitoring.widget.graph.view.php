@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 if ($data['only_footer']) {
 	$output = [
 		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
@@ -43,7 +44,8 @@ else {
 	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJson($data['timeline']).', '.
 		CJs::encodeJson($data['time_control_data']).');'.
 		'timeControl.processObjects();'.
-		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
+		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).
+	');';
 
 if ($data['widget']['initial_load'] == 1) {
 	$script .=
@@ -55,8 +57,12 @@ if ($data['widget']['initial_load'] == 1) {
 						'new_height = content.height() - 10,'.
 						'src = jQuery("#"+img_id).attr("src");'.
 
-					'if (typeof src === "undefined") return;'.
+					'if (typeof src === "undefined") {'.
+						'return;'.
+					'}'.
+
 					'var img_url = new Curl(src);'.
+
 					'img_url.setArgument("width", new_width);'.
 					'img_url.setArgument("height", new_height);'.
 					'jQuery("#"+img_id)'.
@@ -80,6 +86,7 @@ if ($data['widget']['initial_load'] == 1) {
 
 					'var url = new Curl("zabbix.php"),'.
 						'widget = grid["widget"];'.
+
 					'url.setArgument("action", "widget.'.WIDGET_GRAPH.'.view");'.
 					'jQuery.ajax({'.
 						'url: url.getUrl(),'.
