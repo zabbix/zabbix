@@ -103,6 +103,9 @@ do									\
 }									\
 while (0)
 
+#define DETACH_LOG_RESULT(res)						\
+	(0 == ((res)->type & AR_LOG) ? NULL : ((res)->type &= ~AR_LOG, (res)->log))
+
 #define UNSET_RESULT_EXCLUDING(res, exc_type) 					\
 										\
 do										\

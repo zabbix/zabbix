@@ -652,10 +652,7 @@ static void	preprocessor_add_request(zbx_preprocessing_manager_t *manager, zbx_i
 static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request, zbx_variant_t *value, char *error)
 {
 	int		type, ret = FAIL;
-
-	/* reset the old result - it will be converted from the received variant value */
-	free_result(request->value.result);
-	init_result(request->value.result);
+	zbx_log_t	*log;
 
 	if (NULL != error)
 	{
@@ -694,33 +691,38 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		switch (request->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
+				free_result(request->value.result);
+				init_result(request->value.result);
 				SET_DBL_RESULT(request->value.result, value->data.dbl);
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				UNSET_STR_RESULT(request->value.result);
+				free_result(request->value.result);
+				init_result(request->value.result);
 				SET_STR_RESULT(request->value.result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				if (ISSET_LOG(request->value.result))
+				if (NULL == (log = DETACH_LOG_RESULT(request->value.result)))
 				{
-					zbx_free(request->value.result->log->value);
-					request->value.result->log->value = value->data.str;
-				}
-				else
-				{
-					zbx_log_t	*log;
-
 					log = zbx_malloc(NULL, sizeof(zbx_log_t));
 					memset(log, 0, sizeof(zbx_log_t));
-					log->value = value->data.str;
-					SET_LOG_RESULT(request->value.result, log);
 				}
+				else
+					zbx_free(log->value);
+
+				log->value = value->data.str;
+
+				free_result(request->value.result);
+				init_result(request->value.result);
+				SET_LOG_RESULT(request->value.result, log);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
+				free_result(request->value.result);
+				init_result(request->value.result);
 				SET_UI64_RESULT(request->value.result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				UNSET_TEXT_RESULT(request->value.result);
+				free_result(request->value.result);
+				init_result(request->value.result);
 				SET_TEXT_RESULT(request->value.result, value->data.str);
 				break;
 		}
