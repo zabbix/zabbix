@@ -498,23 +498,14 @@ function validateDependentItemsIntersection($db_items, $hostids) {
 		$linked_items = $items;
 
 		// Merge host items dependency tree with template items dependency tree
-		foreach ($tmpl_items as $tmpl_item_key => $tmpl_master_key) {
-			if (array_key_exists($tmpl_item_key, $linked_items)) {
-				$linked_items[$tmpl_item_key] = ($linked_items[$tmpl_item_key])
-					? $linked_items[$tmpl_item_key]
-					: $tmpl_master_key;
-			}
-			else {
-				$linked_items[$tmpl_item_key] = $tmpl_master_key;
-			}
-		}
+		$linked_items = array_merge($linked_items, $tmpl_items);
 
 		// Check dependency level for every dependent item.
 		foreach ($linked_items as $linked_item => $linked_master_key) {
 			$master_key = $linked_master_key;
 			$dependency_level = 0;
 
-			while ($master_key) {
+			while ($master_key && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				$master_key = $linked_items[$master_key];
 				++$dependency_level;
 			}
