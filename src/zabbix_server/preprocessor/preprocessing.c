@@ -24,7 +24,7 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 
-#include "zbxpreproc.h"
+#include "preprocessing.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
