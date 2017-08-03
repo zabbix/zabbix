@@ -696,7 +696,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				UNSET_RESULT_EXCLUDING(request->value.result, AR_STRING);
-				UNSET_TEXT_RESULT(request->value.result);
+				UNSET_STR_RESULT(request->value.result);
 				SET_STR_RESULT(request->value.result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
