@@ -1276,7 +1276,9 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'preprocessing' => getRequest('preprocessing', []),
 		'initial_item_type' => null,
 		'multiple_interface_types' => false,
-		'visible' => getRequest('visible', [])
+		'visible' => getRequest('visible', []),
+		'master_itemname' => getRequest('master_itemname', ''),
+		'master_itemid' => getRequest('master_itemid', 0)
 	];
 
 	$data['displayApplications'] = true;
