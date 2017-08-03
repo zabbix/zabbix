@@ -28,6 +28,8 @@
 
 #ifndef HAVE_SQLITE3
 
+extern unsigned char program_type;
+
 static int	DBpatch_3030000(void)
 {
 	const ZBX_FIELD	field = {"ipmi_authtype", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -2011,11 +2013,14 @@ static int	DBpatch_3030173(void)
 
 static int	DBpatch_3030174(void)
 {
-	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
-	if (ZBX_DB_OK > DBexecute(
-			"insert into dashboard (dashboardid,name,userid,private)"
-			" values (1,'Dashboard',(select min(userid) from users where type=3),0)"))
-		return FAIL;
+	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	{
+		/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
+		if (ZBX_DB_OK > DBexecute(
+				"insert into dashboard (dashboardid,name,userid,private)"
+				" values (1,'Dashboard',(select min(userid) from users where type=3),0)"))
+			return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -2037,9 +2042,12 @@ static int	DBpatch_3030175(void)
 		NULL
 	};
 
-	for (i = 0; NULL != values[i]; i++) {
-		if (ZBX_DB_OK > DBexecute("insert into widget (%s) values (%s)", columns, values[i]))
-			return FAIL;
+	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	{
+		for (i = 0; NULL != values[i]; i++) {
+			if (ZBX_DB_OK > DBexecute("insert into widget (%s) values (%s)", columns, values[i]))
+				return FAIL;
+		}
 	}
 
 	return SUCCEED;
