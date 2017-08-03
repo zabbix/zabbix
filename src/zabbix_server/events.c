@@ -2044,6 +2044,50 @@ int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_db_eventid_r_eventid_pairs                                   *
+ *                                                                            *
+ * Purpose: get recovery event IDs by event IDs then map them together also   *
+ *          additional create a separate array of recovery event IDs          *
+ *                                                                            *
+ * Parameters: eventids    - [IN] requested event IDs                         *
+ *             event_pairs - [OUT] the array of event ID and recovery event   *
+ *                                 pairs                                      *
+ *             r_eventids  - [OUT] array of recovery event IDs                *
+ *                                                                            *
+ ******************************************************************************/
+void	get_db_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
+		zbx_vector_uint64_t *r_eventids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*filter = NULL;
+	size_t		filter_alloc = 0, filter_offset = 0;
+
+	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "eventid", eventids->values,
+			eventids->values_num);
+
+	result = DBselect("select eventid,r_eventid"
+			" from event_recovery"
+			" where%s order by eventid",
+			filter);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_pair_t	r_event;
+
+		ZBX_STR2UINT64(r_event.first, row[0]);
+		ZBX_STR2UINT64(r_event.second, row[1]);
+
+		zbx_vector_uint64_pair_append(event_pairs, r_event);
+		zbx_vector_uint64_append(r_eventids, r_event.second);
+	}
+	DBfree_result(result);
+
+	zbx_free(filter);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_db_events_info                                               *
  *                                                                            *
  * Purpose: get events and flags that indicate what was filled in DB_EVENT    *
