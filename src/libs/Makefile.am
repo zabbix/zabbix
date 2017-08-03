@@ -25,7 +25,8 @@ DIST_SUBDIRS = \
 	zbxmodules \
 	zbxregexp \
 	zbxtasks \
-	zbxhttp
+	zbxhttp \
+	zbxipcservice
 
 if SERVER
 SERVER_SUBDIRS = \

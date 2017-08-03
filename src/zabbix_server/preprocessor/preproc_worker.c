@@ -23,7 +23,7 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
-#include "zbxpreproc.h"
+#include "preprocessing.h"
 
 #include "sysinfo.h"
 #include "preproc_worker.h"
