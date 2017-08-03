@@ -199,15 +199,10 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 			}
 
 			items[i].state = ITEM_STATE_NORMAL;
-			dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
+			zbx_preprocess_item_value(items[i].itemid, 0, &value, ts, items[i].state, NULL);
 
 			free_result(&value);
 		}
-
-		items[i].state = ITEM_STATE_NORMAL;
-		zbx_preprocess_item_value(items[i].itemid, 0, &value, ts, items[i].state, NULL);
-
-		free_result(&value);
 
 		DCconfig_clean_items(items, errcodes, num);
 	}
