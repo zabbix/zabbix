@@ -116,11 +116,11 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Set graph item safe default values.
 		$graph_item += [
-			'color'			=> 'Dark Green',
-			'drawtype'		=> GRAPH_ITEM_DRAWTYPE_LINE,
-			'axisside'		=> GRAPH_YAXIS_SIDE_DEFAULT,
-			'calc_fnc'		=> CALC_FNC_AVG,
-			'calc_type'		=> GRAPH_ITEM_SIMPLE
+			'color' => 'Dark Green',
+			'drawtype' => GRAPH_ITEM_DRAWTYPE_LINE,
+			'axisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+			'calc_fnc' => CALC_FNC_AVG,
+			'calc_type' => GRAPH_ITEM_SIMPLE
 		];
 		$this->items[$this->num] = $graph_item;
 

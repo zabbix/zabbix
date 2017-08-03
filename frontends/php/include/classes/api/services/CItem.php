@@ -630,10 +630,10 @@ class CItem extends CItemGeneral {
 
 		while ($db_dependent_items) {
 			$db_dependent_items = $this->get([
-				'output'		=> ['itemid', 'name'],
-				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
-				'selectHosts'	=> ['name'],
-				'preservekeys'	=> true
+				'output' => ['itemid', 'name'],
+				'filter' => ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+				'selectHosts' => ['name'],
+				'preservekeys' => true
 			]);
 			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_items);
 			$dependent_items += $db_dependent_items;

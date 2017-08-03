@@ -1197,9 +1197,9 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 
 		if ($host && getRequest('master_itemid')) {
 			$master_item_options = [
-				'itemids'	=> getRequest('master_itemid'),
-				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'filter'	=> ['hostid' => $host['hostid']]
+				'itemids' => getRequest('master_itemid'),
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'filter' => ['hostid' => $host['hostid']]
 			];
 		}
 	}

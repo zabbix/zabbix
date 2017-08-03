@@ -554,9 +554,9 @@ abstract class CItemGeneral extends CApiService {
 
 		$templateids = array_keys(array_flip($templateids));
 		$templates = API::Template()->get([
-			'output'		=> ['templateid'],
-			'templateids'	=> $templateids,
-			'selectHosts'	=> ['hostid']
+			'output' => ['templateid'],
+			'templateids' => $templateids,
+			'selectHosts' => ['hostid']
 		]);
 
 		foreach ($templates as $template) {
@@ -569,9 +569,9 @@ abstract class CItemGeneral extends CApiService {
 			$all_hostids = array_merge($hostids, [$template['templateid']]);
 
 			$host_items = $this->get([
-				'output'	=> ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
-				'filter'	=> ['hostid' => $all_hostids],
-				'preservekeys'	=> true
+				'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
+				'filter' => ['hostid' => $all_hostids],
+				'preservekeys' => true
 			]);
 
 			foreach ($items as $item) {
@@ -1281,9 +1281,9 @@ abstract class CItemGeneral extends CApiService {
 
 		if ($items_cache) {
 			$db_items = $data_provider->get([
-				'output' 		=> ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
-				'itemids' 		=> array_keys($items_cache),
-				'preservekeys'	=> true
+				'output' => ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
+				'itemids' => array_keys($items_cache),
+				'preservekeys' => true
 			]);
 
 			foreach ($db_items as $db_itemid => $db_item) {
@@ -1435,9 +1435,9 @@ abstract class CItemGeneral extends CApiService {
 					$find_itemids += $items_added[$root_itemid][$dependency_level];
 				}
 				$find_itemids = $data_provider->get([
-					'output'		=> ['itemid'],
-					'filter' 		=> ['master_itemid' => array_keys($find_itemids)],
-					'preservekeys'	=> true
+					'output' => ['itemid'],
+					'filter' => ['master_itemid' => array_keys($find_itemids)],
+					'preservekeys' => true
 				]);
 
 				$find_itemids = array_diff_key($find_itemids, $counted_masters);
@@ -1504,8 +1504,8 @@ abstract class CItemGeneral extends CApiService {
 					}
 					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
 					$data[] = [
-						'values'	=> ['master_itemid' => $inherited_master_item['itemid']],
-						'where'		=> ['itemid' => $item['itemid']]
+						'values' => ['master_itemid' => $inherited_master_item['itemid']],
+						'where' => ['itemid' => $item['itemid']]
 					];
 				}
 			}
