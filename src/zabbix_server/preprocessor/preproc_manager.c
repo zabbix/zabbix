@@ -691,38 +691,36 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		switch (request->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				free_result(request->value.result);
-				init_result(request->value.result);
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_DOUBLE);
 				SET_DBL_RESULT(request->value.result, value->data.dbl);
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				free_result(request->value.result);
-				init_result(request->value.result);
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_STRING);
+				UNSET_TEXT_RESULT(request->value.result);
 				SET_STR_RESULT(request->value.result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				if (NULL == (log = DETACH_LOG_RESULT(request->value.result)))
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_LOG);
+				if (ISSET_LOG(request->value.result))
+				{
+					log = GET_LOG_RESULT(request->value.result);
+					zbx_free(log->value);
+				}
+				else
 				{
 					log = zbx_malloc(NULL, sizeof(zbx_log_t));
 					memset(log, 0, sizeof(zbx_log_t));
+					SET_LOG_RESULT(request->value.result, log);
 				}
-				else
-					zbx_free(log->value);
-
 				log->value = value->data.str;
-
-				free_result(request->value.result);
-				init_result(request->value.result);
-				SET_LOG_RESULT(request->value.result, log);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				free_result(request->value.result);
-				init_result(request->value.result);
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_UINT64);
 				SET_UI64_RESULT(request->value.result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				free_result(request->value.result);
-				init_result(request->value.result);
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_TEXT);
+				UNSET_TEXT_RESULT(request->value.result);
 				SET_TEXT_RESULT(request->value.result, value->data.str);
 				break;
 		}
