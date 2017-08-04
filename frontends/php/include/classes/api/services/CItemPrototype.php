@@ -797,6 +797,8 @@ class CItemPrototype extends CItemGeneral {
 			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_itemprototypes);
 			$dependent_itemprototypes += $db_dependent_items;
 		};
+		$dependent_itemprototypeids = array_keys($dependent_itemprototypes);
+		$childPrototypeids += array_combine($dependent_itemprototypeids, $dependent_itemprototypeids);
 
 		$options = [
 			'output' => API_OUTPUT_EXTEND,

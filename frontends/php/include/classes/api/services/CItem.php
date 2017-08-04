@@ -638,6 +638,8 @@ class CItem extends CItemGeneral {
 			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_items);
 			$dependent_items += $db_dependent_items;
 		};
+		$dependent_itemids = array_keys($dependent_items);
+		$itemIds += array_combine($dependent_itemids, $dependent_itemids);
 
 		// delete graphs, leave if graph still have item
 		$delGraphs = [];
