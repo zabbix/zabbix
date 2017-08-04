@@ -3,6 +3,7 @@ if [ -z "$1" ] || [ -z "$2" ]; then
 	The script generates data file out of existing MySQL database." && exit 1
 fi
 
+dblogin="-uroot -p<password>"
 dbname=$1
 dbflag=$2
 basedir=`dirname "$0"`
@@ -29,7 +30,7 @@ echo "--
 "
 
 for table in `grep TABLE "$schema" | grep $dbflag | awk -F'|' '{print $2}'`; do
-	if [ "0" == `echo "select count(*) from $table" | mysql -uroot $dbname | tail -1` ]; then
+	if [ "0" == `echo "select count(*) from $table" | mysql $dblogin $dbname | tail -1` ]; then
 		continue
 	fi
 	echo "TABLE |$table"
@@ -66,6 +67,6 @@ for table in `grep TABLE "$schema" | grep $dbflag | awk -F'|' '{print $2}'`; do
 
 	# remove first comma
 	fields=`echo $fields | cut -c2-`
-	echo "select $fields from $table $sortorder" | mysql -t -uroot $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g'
+	echo "select $fields from $table $sortorder" | mysql -t $dblogin $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g'
 	echo ""
 done
