@@ -1513,7 +1513,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 				}
 
 				add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
-						message, event, NULL, ack, MACRO_TYPE_MESSAGE_ACK);
+						message, event, r_event, ack, MACRO_TYPE_MESSAGE_ACK);
 				break;
 			case OPERATION_TYPE_ACK_MESSAGE:
 				if (SUCCEED == DBis_null(row[2]))
@@ -1537,7 +1537,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 						subject, message);
 				break;
 			case OPERATION_TYPE_COMMAND:
-				execute_commands(event, NULL, ack, action->actionid, operationid, 1,
+				execute_commands(event, r_event, ack, action->actionid, operationid, 1,
 						MACRO_TYPE_MESSAGE_ACK);
 				break;
 		}
@@ -2159,26 +2159,20 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			zbx_uint64_t		r_eventid = 0;
 			zbx_uint64_pair_t	event_pair;
 
+			r_event = NULL;
 			event_pair.first = event->eventid;
 
-			if (FAIL == (index = zbx_vector_uint64_pair_bsearch(&event_pairs, event_pair,
+			if (FAIL != (index = zbx_vector_uint64_pair_bsearch(&event_pairs, event_pair,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				r_event = NULL;
-			}
-			else
 				r_eventid = event_pairs.values[index].second;
 
-			if (0 != r_eventid)
-			{
-
-				if (FAIL == (index = zbx_vector_ptr_bsearch(&events, &r_eventid,
+				if (FAIL != (index = zbx_vector_ptr_bsearch(&events, &r_eventid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 				{
-					r_event = NULL;
-				}
-				else
 					r_event = (DB_EVENT *)events.values[index];
+				}
+
 			}
 
 			escalation_acknowledge(escalation, action, event, r_event);
