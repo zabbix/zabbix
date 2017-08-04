@@ -26,7 +26,6 @@
 #include "snmptrapper.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
-#include "zbxpreproc.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;

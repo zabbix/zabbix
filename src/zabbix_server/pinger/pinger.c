@@ -25,7 +25,6 @@
 #include "zbxicmpping.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "zbxpreproc.h"
 
 #include "pinger.h"
 

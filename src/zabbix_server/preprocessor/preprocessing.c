@@ -24,9 +24,7 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 
-#include "zbxpreproc.h"
-
-extern unsigned char	program_type;
+#include "preprocessing.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -654,33 +652,24 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* only server performs preprocessing */
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (item_flags & ZBX_FLAG_DISCOVERY_RULE))
 	{
-		if (0 != (item_flags & ZBX_FLAG_DISCOVERY_RULE))
-		{
-			if (NULL != result && NULL != GET_TEXT_RESULT(result))
-				lld_process_discovery_rule(itemid, result->text, ts);
-
-			goto out;
-		}
-
-		value.itemid = itemid;
-		value.result = result;
-		value.error = error;
-		value.item_flags = item_flags;
-		value.state = state;
-		value.ts = ts;
-
-		preprocessor_pack_value(&message, &value);
-		values_num++;
-
-		if (MAX_VALUES_LOCAL < values_num)
-			zbx_preprocessor_flush();
+		if (NULL != result && NULL != GET_TEXT_RESULT(result))
+			lld_process_discovery_rule(itemid, result->text, ts);
+		goto out;
 	}
-	else
-		dc_add_history(itemid, item_flags, result, ts, state, error);
+	value.itemid = itemid;
+	value.result = result;
+	value.error = error;
+	value.item_flags = item_flags;
+	value.state = state;
+	value.ts = ts;
 
+	preprocessor_pack_value(&message, &value);
+	values_num++;
+
+	if (MAX_VALUES_LOCAL < values_num)
+		zbx_preprocessor_flush();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -694,19 +683,14 @@ out:
  ******************************************************************************/
 void	zbx_preprocessor_flush()
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 < message.size)
 	{
-		if (0 < message.size)
-		{
-			preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, message.data, message.size, NULL);
+		preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, message.data, message.size, NULL);
 
-			zbx_ipc_message_clean(&message);
-			zbx_ipc_message_init(&message);
-			values_num = 0;
-		}
+		zbx_ipc_message_clean(&message);
+		zbx_ipc_message_init(&message);
+		values_num = 0;
 	}
-	else
-		dc_flush_history();
 }
 
 /******************************************************************************
