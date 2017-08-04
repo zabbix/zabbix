@@ -50,6 +50,7 @@ A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form 
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
+..F....... [ZBX-12277] fixed trigger expression test form incorrectly replacing macros (Ivo)
 ........S. [ZBX-12357] fixed missing user macro substitution in expression of newly added triggers (vso)
 
 --------------------------------------------------------------------------------
