@@ -1343,13 +1343,13 @@ abstract class CItemGeneral extends CApiService {
 
 					if (array_key_exists('itemid', $master_item) && $master_itemid == $master_item['itemid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('dependent item recursion')
+							'master_itemid', _('circular item dependency is not allowed')
 						));
 					}
 
 					if ($item_masters && array_key_exists($master_itemid, $item_masters)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('dependent item recursion')
+							'master_itemid', _('circular item dependency is not allowed')
 						));
 					}
 

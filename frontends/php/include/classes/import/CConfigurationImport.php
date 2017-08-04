@@ -2532,7 +2532,7 @@ class CConfigurationImport {
 								&& $entity[$master_key_identifier]
 								&& $master_key == $entity[$master_key_identifier]['key'])) {
 							throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-								_('dependent item recursion')
+								_('circular item dependency is not allowed')
 							));
 						}
 
