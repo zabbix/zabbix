@@ -1,8 +1,8 @@
 Changes for 3.4.0beta2
 
-New features:
-
 Bug fixes:
+....I..... [ZBX-12462] fixed database upgrade patch for proxy (dimir)
+....I..PS. [ZBXNEXT-3006] fixed distribution archive creation (make dist) and log, web scenario item preprocessing (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.0beta1
