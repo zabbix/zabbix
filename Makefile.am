@@ -37,6 +37,7 @@ dist-hook:
 
 dbschema_ibm_db2:
 	create/bin/gen_data.pl ibm_db2 "/../src/data.tmpl" > database/ibm_db2/data.sql
+	create/bin/gen_data.pl ibm_db2 "/../src/templates.tmpl" > database/ibm_db2/templates.sql
 	create/bin/gen_schema.pl ibm_db2 > database/ibm_db2/schema.sql
 
 dbschema_mysql:
@@ -46,14 +47,17 @@ dbschema_mysql:
 
 dbschema_oracle:
 	create/bin/gen_data.pl oracle "/../src/data.tmpl" > database/oracle/data.sql
+	create/bin/gen_data.pl oracle "/../src/templates.tmpl" > database/oracle/templates.sql
 	create/bin/gen_schema.pl oracle > database/oracle/schema.sql
 
 dbschema_postgresql:
 	create/bin/gen_data.pl postgresql "/../src/data.tmpl" > database/postgresql/data.sql
+	create/bin/gen_data.pl postgresql "/../src/templates.tmpl" > database/postgresql/templates.sql
 	create/bin/gen_schema.pl postgresql > database/postgresql/schema.sql
 
 dbschema_sqlite3:
 	create/bin/gen_data.pl sqlite3 "/../src/data.tmpl" > database/sqlite3/data.sql
+	create/bin/gen_data.pl sqlite3 "/../src/templates.tmpl" > database/sqlite3/templates.sql
 	create/bin/gen_schema.pl sqlite3 > database/sqlite3/schema.sql
 
 dbschema_c:
