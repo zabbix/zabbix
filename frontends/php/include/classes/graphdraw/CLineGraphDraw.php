@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,53 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if(!function_exists('stats_standard_deviation')){
+function stats_standard_deviation(array $a, $sample = false) {
+$n = count($a);
+if ($n === 0) {
+trigger_error("The array has zero elements", E_USER_WARNING);
+return false;
+}
+if ($sample && $n === 1) {
+trigger_error("The array has only 1 element", E_USER_WARNING);
+return false;
+}
+$mean = array_sum($a) / $n;
+$carry = 0.0;
+foreach ($a as $val) {
+$d = ((double) $val) - $mean;
+$carry += $d * $d;
+};
+if ($sample) {
+--$n;
+}
+return sqrt($carry / $n);
+}
+}
+
+function mypercentile($percentile, $data){ 
+if( 0 < $percentile && $percentile < 1 ) { 
+$p = $percentile; 
+}else if( 1 < $percentile && $percentile <= 100 ) { 
+$p = $percentile * .01; 
+}else { 
+return ""; 
+} 
+$count = count($data); 
+$allindex = ($count-1)*$p; 
+$intvalindex = intval($allindex); 
+$floatval = $allindex - $intvalindex; 
+sort($data); 
+if(!is_float($floatval)){ 
+$result = $data[$intvalindex]; 
+}else { 
+if($count > $intvalindex+1) 
+$result = $floatval*($data[$intvalindex+1] - $data[$intvalindex]) + $data[$intvalindex]; 
+else 
+$result = $data[$intvalindex]; 
+} 
+return $result; 
+} 
 
 class CLineGraphDraw extends CGraphDraw {
 
@@ -2006,7 +2053,13 @@ class CLineGraphDraw extends CGraphDraw {
 			['text' => _('last'), 'align' => 1, 'fontsize' => 9],
 			['text' => _('min'), 'align' => 1, 'fontsize' => 9],
 			['text' => _('avg'), 'align' => 1, 'fontsize' => 9],
-			['text' => _('max'), 'align' => 1, 'fontsize' => 9]
+			['text' => _('max'), 'align' => 1, 'fontsize' => 9],
+			['text' => _('stdev'), 'align' => 1, 'fontsize' => 9],
+                        ['text' => _('q1'), 'align' => 1, 'fontsize' => 9],
+	                ['text' => _('med'), 'align' => 1, 'fontsize' => 9],
+			['text' => _('q3'), 'align' => 1, 'fontsize' => 9],
+			['text' => _('95th'), 'align' => 1, 'fontsize' => 9],
+			['text' => _('99.95th'), 'align' => 1, 'fontsize' => 9],
 		];
 
 		$legend->addRow($row);
@@ -2093,6 +2146,54 @@ class CLineGraphDraw extends CGraphDraw {
 					]),
 					'align' => 2
 				]);
+                                $legend->addCell($rowNum, [
+                                        'text' => convert_units([
+                                                'value' => stats_standard_deviation($data['max']),
+                                                'units' => $this->items[$i]['units'],
+                                                'convert' => ITEM_CONVERT_NO_UNITS
+                                        ]),
+                                        'align' => 2
+                                ]);
+                                $legend->addCell($rowNum, [
+                                        'text' => convert_units([
+                                                'value' => mypercentile(0.25,$data['max']),
+                                                'units' => $this->items[$i]['units'],
+                                                'convert' => ITEM_CONVERT_NO_UNITS
+                                        ]),
+                                        'align' => 2
+                                ]);
+                                $legend->addCell($rowNum, [
+                                        'text' => convert_units([
+                                                'value' => mypercentile(0.5,$data['max']),
+                                                'units' => $this->items[$i]['units'],
+                                                'convert' => ITEM_CONVERT_NO_UNITS
+                                        ]),
+                                        'align' => 2
+                                ]);
+                                $legend->addCell($rowNum, [
+                                        'text' => convert_units([
+                                                'value' => mypercentile(0.75,$data['max']),
+                                                'units' => $this->items[$i]['units'],
+                                                'convert' => ITEM_CONVERT_NO_UNITS
+                                        ]),
+                                        'align' => 2
+                                ]);
+                                $legend->addCell($rowNum, [
+                                        'text' => convert_units([
+                                                'value' => mypercentile('0.95',$data['max']),
+                                                'units' => $this->items[$i]['units'],
+                                                'convert' => ITEM_CONVERT_NO_UNITS
+                                        ]),
+                                        'align' => 2
+                                ]);
+                                $legend->addCell($rowNum, [
+                                        'text' => convert_units([
+                                                'value' => mypercentile('0.995',$data['max']),
+                                                'units' => $this->items[$i]['units'],
+                                                'convert' => ITEM_CONVERT_NO_UNITS
+                                        ]),
+                                        'align' => 2
+                                ]);
 			}
 			// draw legend of an item without data
 			else {
