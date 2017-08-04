@@ -1,7 +1,10 @@
-[ -z "$1" ] && echo "Usage: ./export_data.sh <DB name>
-The script generates data file out of existing MySQL database." && exit 1
+if [ -z "$1" ] || [ -z "$2" ]; then
+	echo "Usage: ./export_data.sh <DB name> ZBX_DATA or ./export_data.sh <DB name> ZBX_TEMPLATE
+	The script generates data file out of existing MySQL database." && exit 1
+fi
 
 dbname=$1
+dbflag=$2
 basedir=`dirname "$0"`
 schema=$basedir/../src/schema.tmpl
 
@@ -25,7 +28,7 @@ echo "--
 --
 "
 
-for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
+for table in `grep TABLE "$schema" | grep $dbflag | awk -F'|' '{print $2}'`; do
 	if [ "0" == `echo "select count(*) from $table" | mysql -uroot $dbname | tail -1` ]; then
 		continue
 	fi
