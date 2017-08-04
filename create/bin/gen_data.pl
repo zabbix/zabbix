@@ -189,15 +189,18 @@ sub usage
 
 sub main
 {
-	if ($#ARGV != 1)
+	if ($#ARGV != 0)
 	{
 		usage();
 	}
 
-	my $file = dirname($0)."$ARGV[1]";	# name the file
-	open(INFO, $file);			# open the file
-	my @lines = <INFO>;			# read it into an array
-	close(INFO);				# close the file
+	open(INFO, dirname($0)."/../src/data.tmpl");
+	my @lines = <INFO>;
+	close(INFO);
+
+	open(INFO, dirname($0)."/../src/templates.tmpl");
+	push(@lines, <INFO>);
+	close(INFO);
 
 	if ($ARGV[0] eq 'ibm_db2')		{ %output = %ibm_db2; }
 	elsif ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
