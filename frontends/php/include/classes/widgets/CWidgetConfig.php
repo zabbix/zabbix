@@ -42,7 +42,7 @@ class CWidgetConfig {
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_SYSMAP				=> _('Map'),
-			WIDGET_NAVIGATION_TREE		=> _('Map Navigation Tree'),
+			WIDGET_NAVIGATION_TREE		=> _('Map navigation tree'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_ACTION_LOG			=> _('Action log'),
 			WIDGET_DATA_OVERVIEW		=> _('Data overview'),

@@ -245,6 +245,17 @@ $tranStrings = [
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found')
+	],
+	'class.cnavtree.js' => [
+		'edit' => _('edit'),
+		'remove' => _('Remove'),
+		'root' => _('root'),
+		'Edit tree element' => _('Edit tree element'),
+		'Update' => _('Update'),
+		'Add' => _('Add'),
+		'Cancel' => _('Cancel'),
+		'Add child element' => _('Add child element'),
+		'Add multiple maps' => _('Add multiple maps')
 	]
 ];
 
