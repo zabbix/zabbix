@@ -80,6 +80,9 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 				$sysmap_caption = $map['name'];
 				$sysmap_id = $map['sysmapid'];
 			}
+			else {
+				$sysmap_caption = _('Inaccessible map');
+			}
 		}
 
 		$formList->addVar('linked_map_id', $sysmap_id);

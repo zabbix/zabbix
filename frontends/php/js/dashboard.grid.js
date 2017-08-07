@@ -507,11 +507,20 @@
 					updateWidgetContent($obj, data, widget);
 				}
 
+				var callOnDashboardReadyTrigger = false;
 				if (!widget['ready']) {
 					widget['ready'] = true; // leave it before registerDataExchangeCommit.
 					methods.registerDataExchangeCommit.call($obj);
+
+					// If this is the last trigger loaded, then set callOnDashboardReadyTrigger to be true.
+					callOnDashboardReadyTrigger
+						= (data['widgets'].filter(function(widget) {return !widget['ready']}).length == 0);
 				}
 				widget['ready'] = true;
+
+				if (callOnDashboardReadyTrigger) {
+					doAction('onDashboardReady', $obj, data, null);
+				}
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
@@ -573,7 +582,7 @@
 							'type': type,
 							'header': name,
 							'pos': pos,
-							'rf_rate': data['widget_defaults'][type]['rf_rate'],
+							'rf_rate': 0,
 							'fields': fields
 						}
 						updateWidgetDynamic($obj, data, widget_data);
@@ -831,22 +840,33 @@
 		return ref;
 	}
 
-	function addWidgetDiv($obj, options) {
-		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'});
+	/**
+	 * Creates div for empty dashboard.
+	 *
+	 * @param {object} $obj     Dashboard grid object.
+	 * @param {object} options  Dashboard options (will be put in data['options'] in dashboard grid).
+	 *
+	 * @return {object}         jQuery <div> object for placeholder.
+	 */
+	function emptyPlaceholderDiv($obj, options) {
+		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'}),
+			$text = $('<h1>');
 
-		var $text = $('<h1>')
 		if (options['editable']) {
 			$text.append(
 				$('<a>', {'href':'#'})
 				.text(t('Add a new widget'))
 				.click(function(e){
-					e.preventDefault(); // To prevent going by href link
+					// To prevent going by href link.
+					e.preventDefault();
+
 					if (!methods.isEditMode.call($obj)) {
 						showEditMode();
 					}
+
 					methods.addNewWidget.call($obj);
 				})
-			)
+			);
 		}
 		else {
 			$text.addClass('disabled').text(t('Add a new widget'));
@@ -856,14 +876,14 @@
 	}
 
 	/**
-	 * Performs action added by addAction function
+	 * Performs action added by addAction function.
 	 *
-	 * @param string hook_name  name of trigger that is currently beeing called
-	 * @param object $obj  dashboard grid object
-	 * @param object data  data from dashboard grid
-	 * @param object widget  current widget object (can be null for generic actions)
+	 * @param {string} hook_name  Name of trigger that is currently being called.
+	 * @param {object} $obj       Dashboard grid object.
+	 * @param {object} data       Data from dashboard grid.
+	 * @param {object} widget     Current widget object (can be null for generic actions).
 	 *
-	 * @returns int  number of triggers, that were called
+	 * @return int               Number of triggers, that were called.
 	 */
 	function doAction(hook_name, $obj, data, widget) {
 		if (typeof(data['triggers'][hook_name]) === 'undefined') {
@@ -956,7 +976,7 @@
 			return this.each(function() {
 				var	$this = $(this),
 					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}),
-					$empty_placeholder = addWidgetDiv($this, options);
+					$empty_placeholder = emptyPlaceholderDiv($this, options);
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -1129,7 +1149,6 @@
 				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
 				data['options']['edit_mode'] = false;
-				doAction('afterDashboardSave', $this, data, null);
 			});
 		},
 
@@ -1139,8 +1158,6 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					url = new Curl('zabbix.php');
-
-				doAction('onEditStop', $this, data, null);
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;
@@ -1351,25 +1368,39 @@
 			});
 		},
 
+		/**
+		 * Pushes received data in data buffer and calls sharing method.
+		 *
+		 * @param object widget  data origin widget
+		 * @param string data_name  string to identify data shared
+		 *
+		 * @returns boolean		indicates either there was linked widget that was related to data origin widget
+		 */
 		widgetDataShare: function(widget, data_name) {
 			var args = Array.prototype.slice.call(arguments, 2),
-				uniqueid = widget['uniqueid'];
+				uniqueid = widget['uniqueid'],
+				ret = true;
 
 			if (!args.length) {
 				return false;
 			}
 
-			return this.each(function() {
+			this.each(function() {
 				var $this = $(this),
 					data = $this.data('dashboardGrid'),
 					indx = -1;
+
+				if (typeof data['widget_relations']['relations'][widget['uniqueid']] === 'undefined'
+						|| data['widget_relations']['relations'][widget['uniqueid']].length == 0) {
+					ret = false;
+				}
 
 				if (typeof data['data_buffer'][uniqueid] === 'undefined') {
 					data['data_buffer'][uniqueid] = [];
 				}
 				else if (typeof data['data_buffer'][uniqueid] !== 'undefined') {
 					$.each(data['data_buffer'][uniqueid], function(i, arr) {
-						if (arr['data_key'] === data_name) {
+						if (arr['data_name'] === data_name) {
 							indx = i;
 						}
 					});
@@ -1391,6 +1422,8 @@
 
 				methods.callWidgetDataShare.call($this);
 			});
+
+			return ret;
 		},
 
 		callWidgetDataShare: function($obj) {
