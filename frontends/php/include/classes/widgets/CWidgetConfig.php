@@ -96,7 +96,6 @@ class CWidgetConfig {
 		foreach (self::getKnownWidgetTypes() as $type => $name) {
 			$ret[$type] = [
 				'header' => $name,
-				'rf_rate' => self::getDefaultRfRate($type),
 				'size' => $dimensions[$type]
 			];
 		}
