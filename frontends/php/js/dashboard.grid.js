@@ -1149,7 +1149,6 @@
 				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
 				data['options']['edit_mode'] = false;
-				doAction('afterDashboardSave', $this, data, null);
 			});
 		},
 
@@ -1159,8 +1158,6 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					url = new Curl('zabbix.php');
-
-				doAction('onEditStop', $this, data, null);
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;

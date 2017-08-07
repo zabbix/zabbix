@@ -263,6 +263,14 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 			}
 		}
 
+		foreach ($response as &$row) {
+			// Reduce the amount of data transferred over Ajax.
+			if ($row === $this->problems_per_severity_tpl) {
+				$row = 0;
+			}
+		}
+		unset($row);
+
 		return $response;
 	}
 
