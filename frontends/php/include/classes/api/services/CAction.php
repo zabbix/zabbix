@@ -528,8 +528,8 @@ class CAction extends CApiService {
 				$action['evaltype'] = $action['filter']['evaltype'];
 			}
 			$action += [
-				'r_shortdata'	=> ACTION_DEFAULT_SUBJ_TRIGGER,
-				'r_longdata'	=> ACTION_DEFAULT_MSG_TRIGGER,
+				'r_shortdata'	=> ACTION_DEFAULT_SUBJ_RECOVERY,
+				'r_longdata'	=> ACTION_DEFAULT_MSG_RECOVERY,
 				'ack_shortdata'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
 				'ack_longdata'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
 			];
@@ -557,8 +557,8 @@ class CAction extends CApiService {
 						$operation['opmessage'] = $message + [
 							'default_msg'	=> 0,
 							'mediatypeid'	=> 0,
-							'subject'		=> ACTION_DEFAULT_SUBJ_TRIGGER,
-							'message'		=> ACTION_DEFAULT_MSG_TRIGGER
+							'subject'		=> ACTION_DEFAULT_SUBJ_RECOVERY,
+							'message'		=> ACTION_DEFAULT_MSG_RECOVERY
 						];
 					}
 				}
