@@ -222,6 +222,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 $form->addItem($form_list);
 
+// Submit button is needed to enable submit event on Enter on inputs
+$form->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;'));
+
 $output = [
 	'body' => $form->toString()
 ];
