@@ -558,7 +558,7 @@ jQuery(function($) {
 						var id = ajax_data['map_id'];
 
 						overlayDialogue({
-							'title': t('Edit Tree Widget item'),
+							'title': t('Edit tree element'),
 							'content': resp.body,
 							'buttons': [
 								{

@@ -612,19 +612,6 @@ function overlayDialogue(params) {
 
 				return false;
 			}
-			// ENTER
-			else if (e.which == 13) {
-				// Trigger click on the first button.
-				if (e.target.tagName === 'BUTTON') {
-					return true;
-				}
-				else {
-					jQuery('button:focusable', jQuery('#overlay_dialogue > .overlay-dialogue-footer')).first()
-						.trigger('click');
-				}
-
-				return false;
-			}
 		})
 		.appendTo('body');
 
