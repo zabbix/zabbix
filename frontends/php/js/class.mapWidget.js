@@ -18,7 +18,7 @@
 **/
 
 if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
-	function zbx_sysmap_widget_trigger(hook_name, grid) {
+	function zbx_sysmap_widget_trigger(hook_name, data, grid) {
 		switch(hook_name) {
 			case 'onWidgetRefresh':
 				var div_id = jQuery('[data-uniqueid="'+grid['widget']['uniqueid']+'"]').attr('id');
@@ -27,6 +27,11 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 			case 'afterUpdateWidgetConfig':
 				jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue',
 					grid['widget']['uniqueid'], 'current_sysmapid', grid['widget']['fields']['sysmapid']);
+				break;
+			case 'onDashboardReady':
+				if (typeof grid['widget']['storage']['current_sysmapid'] === 'undefined') {
+					grid['widget']['content_body'].html(data['html']);
+				}
 				break;
 			case 'onEditStart':
 				jQuery(".dashbrd-grid-widget-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);

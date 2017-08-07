@@ -113,6 +113,17 @@ class CDashboardWidgetMap extends CDiv {
 				'})'.
 			'});';
 		}
+		elseif ($this->error !== null && $this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+			$error_msg_html = (new CTableInfo())->setNoDataMessage($this->error);
+			$script_run .=
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onDashboardReady", '.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
+						'parameters: ["onDashboardReady", {html: "'. addslashes($error_msg_html).'"}],'.
+						'grid: {widget: 1},'.
+						'trigger_name: "on_dashboard_ready_'.$this->uniqueid.'"'.
+					'}'.
+				');';
+		}
 
 		return $script_run;
 	}
@@ -143,7 +154,7 @@ class CDashboardWidgetMap extends CDiv {
 			$this->addStyle('position:relative;');
 			$this->addItem($map_div);
 		}
-		else {
+		elseif ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_MAP) {
 			$this->addItem((new CTableInfo())->setNoDataMessage($this->error));
 		}
 	}
