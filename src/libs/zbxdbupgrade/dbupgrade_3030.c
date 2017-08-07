@@ -831,20 +831,11 @@ static int	DBpatch_3030060_migrate_pairs(const char *table, const char *field, i
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	parentid;
 	char		*target, *target_id, *source_id;
-	int		len, ret;
+	int		ret;
 
-	len = strlen(table) + 1;
-	target = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("_field"));
-	zbx_strlcpy(target, table, len);
-	zbx_strlcat(target, "_field", ZBX_CONST_STRLEN("_field"));
-
-	target_id = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("_fieldid"));
-	zbx_strlcpy(target_id, table, len);
-	zbx_strlcat(target_id, "_fieldid", ZBX_CONST_STRLEN("_field"));
-
-	source_id = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("id"));
-	zbx_strlcpy(source_id, table, len);
-	zbx_strlcat(source_id, "id", ZBX_CONST_STRLEN("id"));
+	target = zbx_dsprintf(NULL, "%s%s", table, "_field");
+	target_id = zbx_dsprintf(NULL, "%s%s", table, "_fieldid");
+	source_id = zbx_dsprintf(NULL, "%s%s", table, "id");
 
 	zbx_db_insert_prepare(&db_insert, target, target_id, source_id, "type", "name", "value", NULL);
 
