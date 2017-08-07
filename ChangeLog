@@ -1,3 +1,14 @@
+Changes for 3.4.0beta3
+
+New features:
+..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
+..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
+
+Bug fixes:
+..F....... [ZBXNEXT-2102] fixed low performance of navigation tree widget and improved dashboard performance (miks)
+.......PS. [ZBX-12458] fixed incorrect use of zbx_strlcat() in DBpatch_3030060_migrate_pairs(); thanks to MATSUDA Daiki for patch (Andris)
+
+--------------------------------------------------------------------------------
 Changes for 3.4.0beta2
 
 Bug fixes:
