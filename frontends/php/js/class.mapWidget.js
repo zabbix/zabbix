@@ -24,6 +24,10 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 				var div_id = jQuery('[data-uniqueid="'+grid['widget']['uniqueid']+'"]').attr('id');
 				jQuery('#'+div_id).zbx_mapwidget('update', grid['widget']);
 				break;
+			case 'afterUpdateWidgetConfig':
+				jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue',
+					grid['widget']['uniqueid'], 'current_sysmapid', grid['widget']['fields']['sysmapid']);
+				break;
 			case 'onEditStart':
 				jQuery(".dashbrd-grid-widget-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
 				break;

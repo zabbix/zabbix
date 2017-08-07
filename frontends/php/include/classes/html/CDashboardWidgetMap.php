@@ -60,6 +60,15 @@ class CDashboardWidgetMap extends CDiv {
 						'trigger_name: "map_widget_timer_refresh_'.$this->uniqueid.'"'.
 					'}'.
 				');';
+
+			$script_run .=
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "afterUpdateWidgetConfig", '.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
+						'parameters: ["afterUpdateWidgetConfig"],'.
+						'grid: {widget: 1},'.
+						'trigger_name: "after_map_widget_config_update_'.$this->uniqueid.'"'.
+					'}'.
+				');';
 		}
 
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference

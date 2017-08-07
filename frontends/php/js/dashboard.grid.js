@@ -600,6 +600,8 @@
 						widget['header'] = name;
 						widget['fields'] = fields;
 
+						doAction('afterUpdateWidgetConfig', $obj, data, null);
+
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					}
