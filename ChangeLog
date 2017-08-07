@@ -1,3 +1,10 @@
+Changes for 3.4.0beta2
+
+Bug fixes:
+....I..... [ZBX-12462] fixed database upgrade patch for proxy (dimir)
+....I..PS. [ZBXNEXT-3006] fixed distribution archive creation (make dist) and log, web scenario item preprocessing (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 3.4.0beta1
 
 New features:
@@ -9,12 +16,13 @@ A.FG...PS. [ZBXNEXT-3006] implemented support of bulk metric collection for depe
 ....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta)
 
 Bug fixes:
+....I..... [ZBXNEXT-3006] fixed libevent build depenedencies (wiper)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
 ..F....... [ZBXNEXT-2102] fixed copying sharing properties when cloning dashboard (vmurzins)
 ........S. [ZBXNEXT-18] fixed unnecessary notification sending a recovery message (Sergejs)
 ........S. [ZBXNEXT-18] fixed acknowledge notification sending in maintenance period (Sergejs)
-........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchornization (wiper)
+........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchronization (wiper)
 ..F....... [ZBXNEXT-18] fixed php5.4 incompatibility in events page and acknowledge operation form (gcalenko)
 ..F....... [ZBXNEXT-18] fixed script name select button for new acknowledge operation form and recovery operation form (gcalenko)
 
@@ -42,6 +50,7 @@ A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form 
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
+..F....... [ZBX-12277] fixed trigger expression test form incorrectly replacing macros (Ivo)
 ........S. [ZBX-12357] fixed missing user macro substitution in expression of newly added triggers (vso)
 
 --------------------------------------------------------------------------------
@@ -131,6 +140,7 @@ New features:
 Bug fixes:
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
+........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
@@ -148,7 +158,6 @@ New features:
 A.F....... [ZBX-1357] updated Catalan, Chinese (China), English (United States), Japanese, Korean, Polish, Portuguese (Brazil), Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
 ..F....... [ZBX-12252] fixed history page to display values in chronological order (Sasha)
 
 --------------------------------------------------------------------------------

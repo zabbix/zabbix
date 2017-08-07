@@ -85,18 +85,20 @@ CArrayHelper::sort($dbGraph['gitems'], [
 ]);
 
 $hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
-$graph_item = reset($dbGraph['gitems']);
+$items = zbx_toHash($dbGraph['items'], 'itemid');
 
-foreach ($dbGraph['items'] as $item) {
+foreach ($dbGraph['gitems'] as $graph_item) {
+	$item = $items[$graph_item['itemid']];
+	$host = $hosts[$item['hostid']];
+
 	$graph->addItem($item + [
-		'host'		=> $hosts[$item['hostid']]['host'],
-		'hostname'	=> $hosts[$item['hostid']]['name'],
-		'color'		=> $graph_item['color'],
-		'drawtype'	=> $graph_item['drawtype'],
-		'axisside'	=> $graph_item['yaxisside'],
-		'calc_fnc'	=> $graph_item['calc_fnc']
+		'host' => $host['host'],
+		'hostname' => $host['name'],
+		'color' => $graph_item['color'],
+		'drawtype' => $graph_item['drawtype'],
+		'axisside' => $graph_item['yaxisside'],
+		'calc_fnc' => $graph_item['calc_fnc']
 	]);
-	$graph_item = next($dbGraph['gitems']);
 }
 
 $hostName = '';

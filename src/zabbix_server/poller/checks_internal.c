@@ -24,7 +24,6 @@
 #include "zbxself.h"
 #include "valuecache.h"
 #include "proxy.h"
-#include "zbxpreproc.h"
 
 #include "../vmware/vmware.h"
 
