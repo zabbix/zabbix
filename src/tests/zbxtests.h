@@ -17,13 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ESCALATOR_H
-#define ZABBIX_ESCALATOR_H
+#include "../../include/common.h"
+#include "../../include/zbxalgo.h"
+#include "../../include/log.h"
+#include "../../include/zbxserver.h"
 
-#include "threads.h"
+/* Mandatory headers needed by CMocka */                                                                                                                                                         
+#include <stdbool.h>
+#include <stdarg.h>
+#include <setjmp.h>
+#include <cmocka.h>
 
-ZBX_THREAD_ENTRY(escalator_thread, args);
+#ifndef ZABBIX_TESTS_H
+#define ZABBIX_TESTS_H
 
-int	process_escalations(int now, int *nextcheck, unsigned int escalation_source);
+void test_successful_process_escalations();
 
 #endif
+

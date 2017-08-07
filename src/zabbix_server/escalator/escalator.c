@@ -2262,7 +2262,7 @@ out:
  *           in process_actions().                                            *
  *                                                                            *
  ******************************************************************************/
-static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source)
+int	process_escalations(int now, int *nextcheck, unsigned int escalation_source)
 {
 	const char		*__function_name = "process_escalations";
 
