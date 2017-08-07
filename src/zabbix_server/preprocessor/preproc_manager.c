@@ -28,7 +28,7 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 
-#include "zbxpreproc.h"
+#include "preprocessing.h"
 #include "preproc_manager.h"
 #include "linked_list.h"
 
@@ -652,6 +652,7 @@ static void	preprocessor_add_request(zbx_preprocessing_manager_t *manager, zbx_i
 static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request, zbx_variant_t *value, char *error)
 {
 	int		type, ret = FAIL;
+	zbx_log_t	*log;
 
 	if (NULL != error)
 	{
@@ -690,32 +691,35 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		switch (request->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_DOUBLE);
 				SET_DBL_RESULT(request->value.result, value->data.dbl);
 				break;
 			case ITEM_VALUE_TYPE_STR:
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_STRING);
 				UNSET_STR_RESULT(request->value.result);
 				SET_STR_RESULT(request->value.result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_LOG);
 				if (ISSET_LOG(request->value.result))
 				{
-					zbx_free(request->value.result->log->value);
-					request->value.result->log->value = value->data.str;
+					log = GET_LOG_RESULT(request->value.result);
+					zbx_free(log->value);
 				}
 				else
 				{
-					zbx_log_t	*log;
-
 					log = zbx_malloc(NULL, sizeof(zbx_log_t));
 					memset(log, 0, sizeof(zbx_log_t));
-					log->value = value->data.str;
 					SET_LOG_RESULT(request->value.result, log);
 				}
+				log->value = value->data.str;
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				SET_DBL_RESULT(request->value.result, value->data.ui64);
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_UINT64);
+				SET_UI64_RESULT(request->value.result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
+				UNSET_RESULT_EXCLUDING(request->value.result, AR_TEXT);
 				UNSET_TEXT_RESULT(request->value.result);
 				SET_TEXT_RESULT(request->value.result, value->data.str);
 				break;
@@ -918,21 +922,6 @@ static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, z
 
 /******************************************************************************
  *                                                                            *
- * Function: preprocessor_free_worker                                         *
- *                                                                            *
- * Purpose: free preprocessing worker                                         *
- *                                                                            *
- * Parameters: worker - [IN] the preprocessing worker                         *
- *                                                                            *
- ******************************************************************************/
-static void	preprocessor_free_worker(zbx_preprocessing_worker_t *worker)
-{
-	zbx_ipc_client_close(worker->client);
-	zbx_free(worker);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: preprocessor_destroy_manager                                     *
  *                                                                            *
  * Purpose: destroy preprocessing manager                                     *
@@ -942,13 +931,9 @@ static void	preprocessor_free_worker(zbx_preprocessing_worker_t *worker)
  ******************************************************************************/
 static void	preprocessor_destroy_manager(zbx_preprocessing_manager_t *manager)
 {
-	int				i;
 	zbx_hashset_iter_t		iter;
 	DC_ITEM				*item;
 	zbx_preprocessing_request_t	*request;
-
-	for (i = 0; i < manager->worker_count; i++)
-		preprocessor_free_worker(&manager->workers[i]);
 
 	zbx_free(manager->workers);
 

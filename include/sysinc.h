@@ -421,4 +421,8 @@
 #	include <utmpx.h>
 #endif
 
+#ifdef HAVE_LIBEVENT
+#	include <event.h>
+#endif
+
 #endif

@@ -4455,16 +4455,11 @@ tr.cursor-move {
 .clock-lines {
 	fill: $clock-lines-color;
 }
-.sysmap {
-	height: 100%;
-	display: flex;
-	justify-content: center;
-}
+
 .sysmap-widget-container {
 	overflow: hidden;
 	padding-left: 5px;
 	padding-right: 5px;
-	height: 100%;
 }
 
 .navtree {

@@ -105,7 +105,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 */
 	public function addItem(array $graph_item) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
-			$options['drawtype'] = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
+			$graph_item['drawtype'] = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
 		$update_interval_parser = new CUpdateIntervalParser();
 

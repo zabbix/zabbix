@@ -52,12 +52,13 @@ class CWidgetFieldTags extends CWidgetField {
 
 	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
+	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
+	 * fields it causes significant performance decrease.
 	 *
-	 * @return array  An array of widget fields ready for saving in API.
+	 * @param array $widget_fields   reference to Array of widget fields.
 	 */
-	public function toApi() {
+	public function toApi(array &$widget_fields = []) {
 		$value = $this->getValue();
-		$widget_fields = [];
 
 		foreach ($value as $index => $val) {
 			$widget_fields[] = [
@@ -71,7 +72,5 @@ class CWidgetFieldTags extends CWidgetField {
 				'value' => $val['value']
 			];
 		}
-
-		return $widget_fields;
 	}
 }

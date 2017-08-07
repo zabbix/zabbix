@@ -162,6 +162,9 @@ src/libs/zbxhttp/Makefile.in
 src/libs/zbxicmpping/.deps
 src/libs/zbxicmpping/Makefile
 src/libs/zbxicmpping/Makefile.in
+src/libs/zbxipcservice/.deps
+src/libs/zbxipcservice/Makefile
+src/libs/zbxipcservice/Makefile.in
 src/libs/zbxjson/.deps
 src/libs/zbxjson/Makefile
 src/libs/zbxjson/Makefile.in
@@ -180,9 +183,6 @@ src/libs/zbxmodules/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
-src/libs/zbxpreproc/.deps
-src/libs/zbxpreproc/Makefile
-src/libs/zbxpreproc/Makefile.in
 src/libs/zbxregexp/.deps
 src/libs/zbxregexp/Makefile
 src/libs/zbxregexp/Makefile.in

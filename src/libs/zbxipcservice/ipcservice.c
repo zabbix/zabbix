@@ -1,9 +1,10 @@
 #include "common.h"
+
+#ifdef HAVE_IPCSERVICE
+
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "log.h"
-
-#include <event.h>
 #include "zbxipcservice.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
@@ -1268,7 +1269,6 @@ void	zbx_ipc_message_init(zbx_ipc_message_t *message)
 	memset(message, 0, sizeof(zbx_ipc_message_t));
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_ipc_message_format                                           *
@@ -1703,3 +1703,4 @@ int	zbx_ipc_client_connected(zbx_ipc_client_t *client)
 	return (NULL == client->rx_event ? FAIL : SUCCEED);
 }
 
+#endif

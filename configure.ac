@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[3.4.0beta1])
+AC_INIT([Zabbix],[3.4.0beta3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1353,18 +1353,35 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AC_SUBST(OPENIPMI_CFLAGS)
 fi
 
-dnl Check for libevent, used by Zabbix IPC services
-LIBEVENT_CHECK_CONFIG([no])
-if test "x$found_libevent" != "xyes"; then
-        AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
+dnl Check if Zabbix internal IPC services are used
+have_ipcservice="no"
+if test "x$have_ipmi" = "xyes"; then
+	have_ipcservice="yes"
 fi
-SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
-SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
 
-PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
-PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
+if test "x$server" = "xyes"; then
+	have_ipcservice="yes"
+fi
 
-AC_SUBST(LIBEVENET_CFLAGS)
+AM_CONDITIONAL(PROXY_IPCSERVICE, [test "x$have_ipmi" = "xyes"])
+
+dnl Check for libevent, used by Zabbix IPC services
+if test "x$have_ipcservice" = "xyes"; then
+	AC_DEFINE([HAVE_IPCSERVICE], 1, [Define to 1 if Zabbix IPC services are used])
+
+	LIBEVENT_CHECK_CONFIG([no])
+	if test "x$found_libevent" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
+	fi
+	
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
+
+	if test "x$have_ipmi" = "xyes"; then
+		PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
+		PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
+	fi
+fi
 
 dnl Check for libpcre, used by Zabbix for regular expressions
 LIBPCRE_CHECK_CONFIG([no])
@@ -1599,7 +1616,6 @@ AC_OUTPUT([
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxhttp/Makefile
-	src/libs/zbxpreproc/Makefile
 	src/libs/zbxserver/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxexec/Makefile
@@ -1607,6 +1623,7 @@ AC_OUTPUT([
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxtasks/Makefile
+	src/libs/zbxipcservice/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
