@@ -27,12 +27,12 @@
 			.append($('<h4>').text(
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
 			));
-		widget['content_body'] = $('<div>')
-			.addClass('dashbrd-grid-widget-content');
-		widget['content_footer'] = $('<div>')
-			.addClass('dashbrd-grid-widget-foot');
-		// We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
-		// This size will later be passed to widget controller in updateWidgetContent() function.
+		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
+		widget['content_footer'] = $('<div>').addClass('dashbrd-grid-widget-foot');
+		/*
+		 * We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
+		 * This size will later be passed to widget controller in updateWidgetContent() function.
+		 */
 		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').html('&nbsp;')));
 
 		widget['content_header'].append($('<ul>')
