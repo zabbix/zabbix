@@ -178,13 +178,14 @@ function getSystemStatusData(array $filter, array $config) {
 			}
 		}
 
-		// get acknowledges
-		$event_acknowledges = ($config['event_ack_enable']
+		// get acknowledges and tags
+		$problems_data = ($config['event_ack_enable']
 				&& in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))
 			? API::Problem()->get([
-				'output' => ['eventid'],
+				'output' => [],
 				'eventids' => array_keys($problems),
 				'selectAcknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
+				'selectTags' => ['tag', 'value'],
 				'preservekeys' => true
 			])
 			: [];
@@ -194,9 +195,14 @@ function getSystemStatusData(array $filter, array $config) {
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
-			$problem['acknowledges'] = array_key_exists($eventid, $event_acknowledges)
-				? $event_acknowledges[$eventid]['acknowledges']
-				: [];
+			if (array_key_exists($eventid, $problems_data)) {
+				$problem['acknowledges'] = $problems_data[$eventid]['acknowledges'];
+				$problem['tags'] = $problems_data[$eventid]['tags'];
+			}
+			else {
+				$problem['acknowledges'] = [];
+				$problem['tags'] = [];
+			}
 
 			// groups
 			foreach ($trigger['groups'] as $trigger_group) {
@@ -263,6 +269,9 @@ function getSystemStatusData(array $filter, array $config) {
  * @param string $data['groups'][]['stats']['problems'][]['acknowledges'][]['alias']
  * @param string $data['groups'][]['stats']['problems'][]['acknowledges'][]['name']
  * @param string $data['groups'][]['stats']['problems'][]['acknowledges'][]['surname']
+ * @param array  $data['groups'][]['stats']['problems'][]['tags']
+ * @param string $data['groups'][]['stats']['problems'][]['tags'][]['tag']
+ * @param string $data['groups'][]['stats']['problems'][]['tags'][]['value']
  * @param int    $data['groups'][]['stats']['count_unack']
  * @param array  $data['groups'][]['stats']['problems_unack']
  * @param array  $data['triggers']
@@ -288,8 +297,11 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 		? $filter['ext_ack']
 		: EXTACK_OPTION_ALL;
 
+	// indicator of sort field
+	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
+
 	// Set trigger severities as table header starting from highest severity.
-	$header = [_('Host group')];
+	$header = [[_('Host group'), $sort_div]];
 
 	for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
 		if (in_array($severity, $filter_severities)) {
@@ -720,13 +732,16 @@ function make_latest_issues(array $filter = [], $backurl) {
  * @param string $problems[]['objectid']
  * @param int    $problems[]['clock']
  * @param int    $problems[]['ns']
- * @param int    $problems[]['acknowledges']
+ * @param array  $problems[]['acknowledges']
  * @param int    $problems[]['acknowledges'][]['clock']
  * @param string $problems[]['acknowledges'][]['message']
  * @param int    $problems[]['acknowledges'][]['action']
  * @param string $problems[]['acknowledges'][]['alias']
  * @param string $problems[]['acknowledges'][]['name']
  * @param string $problems[]['acknowledges'][]['surname']
+ * @param array  $problems[]['tags']
+ * @param string $problems[]['tags'][]['tag']
+ * @param string $problems[]['tags'][]['value']
  * @param array  $triggers
  * @param string $triggers[<triggerid>]['expression']
  * @param string $triggers[<triggerid>]['description']
@@ -741,13 +756,18 @@ function make_latest_issues(array $filter = [], $backurl) {
  * @return CTableInfo
  */
 function makeProblemsPopup(array $problems, array $triggers, $backurl, array $actions, array $config) {
+	if ($problems) {
+		$tags = makeEventsTags($problems);
+	}
+
 	$table = (new CTableInfo())
 		->setHeader([
 			_('Host'),
 			_('Problem'),
 			_('Duration'),
 			$config['event_ack_enable'] ? _('Ack') : null,
-			_('Actions')
+			_('Actions'),
+			_('Tags')
 		]);
 
 	foreach ($problems as $problem) {
@@ -775,7 +795,8 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			$ack,
 			array_key_exists($problem['eventid'], $actions)
 				? (new CCol($actions[$problem['eventid']]))->addClass(ZBX_STYLE_NOWRAP)
-				: ''
+				: '',
+			$tags[$problem['eventid']]
 		]);
 	}
 
