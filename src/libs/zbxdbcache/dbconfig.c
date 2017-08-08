@@ -2139,7 +2139,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
-	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
 	unsigned char		status, type, value_type;
@@ -2256,13 +2255,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
-
-			/* remove deltaitem history if item value type has been changed */
-			if (item->value_type != value_type)
-			{
-				if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &itemid)))
-					zbx_hashset_remove_direct(&config->deltaitems, deltaitem);
-			}
 
 			if (ITEM_STATUS_ACTIVE == item->status)
 				dc_host_update_agent_stats(host, item->type, -1);
@@ -4771,8 +4763,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->jmxitems.num_data, config->jmxitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
 				config->calcitems.num_data, config->calcitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() deltaitems : %d (%d slots)", __function_name,
-				config->deltaitems.num_data, config->deltaitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
