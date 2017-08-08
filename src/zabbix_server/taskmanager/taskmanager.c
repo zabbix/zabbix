@@ -285,8 +285,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			processed_num = 0;
-	char			*filter = NULL;
-	size_t			filter_alloc = 0, filter_offset = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	ack_tasks;
 	zbx_ack_task_t		*ack_task;
 
@@ -294,10 +294,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 
 	zbx_vector_ptr_create(&ack_tasks);
 
-	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "t.taskid", ack_taskids->values,
-			ack_taskids->values_num);
-
-	result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select a.eventid,ta.acknowledgeid,ta.taskid"
 			" from task_acknowledge ta"
 			" left join acknowledges a"
@@ -306,8 +303,10 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 				" on a.eventid=e.eventid"
 			" left join task t"
 				" on ta.taskid=t.taskid"
-			" where t.status=%d and%s",
-			ZBX_TM_STATUS_NEW, filter);
+			" where t.status=%d and",
+			ZBX_TM_STATUS_NEW);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values, ack_taskids->values_num);
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -327,20 +326,18 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	}
 	DBfree_result(result);
 
-	filter_offset = 0;
-
 	if (0 < ack_tasks.values_num)
 	{
 		zbx_vector_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		processed_num = process_actions_by_acknowledgments(&ack_tasks);
 	}
 
-	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "taskid", ack_taskids->values,
-			ack_taskids->values_num);
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , "update task set status=%d where", ZBX_TM_STATUS_NEW);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", ack_taskids->values, ack_taskids->values_num);
+	DBexecute("%s", sql);
 
-	DBexecute("update task set status=%d where%s", ZBX_TM_STATUS_DONE, filter);
-
-	zbx_free(filter);
+	zbx_free(sql);
 
 	zbx_vector_ptr_clear_ext(&ack_tasks, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&ack_tasks);
