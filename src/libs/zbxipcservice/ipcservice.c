@@ -45,16 +45,11 @@ struct zbx_ipc_client
 /*
  * Private API
  */
-#define ZBX_IPC_CLIENT_STATE_PENDING	0
-#define ZBX_IPC_CLIENT_STATE_QUEUED	1
 
 #define ZBX_IPC_HEADER_SIZE	(int)(sizeof(zbx_uint32_t) * 2)
 
 #define ZBX_IPC_MESSAGE_CODE	0
 #define ZBX_IPC_MESSAGE_SIZE	1
-
-#define ZBX_IPC_TX_DONE		0
-#define ZBX_IPC_TX_MORE		1
 
 #if !defined(_EVENT_NUMERIC_VERSION) || _EVENT_NUMERIC_VERSION < 0x2000000
 typedef int evutil_socket_t;
