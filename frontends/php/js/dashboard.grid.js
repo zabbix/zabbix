@@ -795,6 +795,10 @@
 					dashbaordAddMessages(resp.errors);
 				}
 			},
+			complete: function() {
+				var ul = $('#dashbrd-config').closest('ul');
+				$('#dashbrd-save', ul).prop('disabled', false);
+			},
 			error: function() {
 				// TODO VM: add error message box
 			}
@@ -1146,8 +1150,10 @@
 		saveDashboardChanges: function() {
 			return this.each(function() {
 				var	$this = $(this),
+					ul = $('#dashbrd-config').closest('ul'),
 					data = $this.data('dashboardGrid');
 
+				$('#dashbrd-save', ul).prop('disabled', true);
 				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
 				data['options']['edit_mode'] = false;
