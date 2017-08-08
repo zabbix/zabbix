@@ -51,7 +51,7 @@
 		);
 
 		return $('<div>', {
-			'class': 'dashbrd-grid-widget',
+			'class': 'dashbrd-grid-widget' + (!widget['widgetid'].length ? ' new-widget' : ''),
 			'css': {
 				'min-height': '' + data['options']['widget-height'] + 'px',
 				'min-width': '' + data['options']['widget-width'] + '%'
@@ -578,18 +578,34 @@
 						// In case of ADD widget
 						// create widget with required selected fields and add it to dashboard
 						var pos = findEmptyPosition($obj, data, type),
+							scroll_by = (pos['row'] * data['options']['widget-height'])
+								- $('.dashbrd-grid-widget-container').scrollTop(),
 							widget_data = {
-							'type': type,
-							'header': name,
-							'pos': pos,
-							'rf_rate': 0,
-							'fields': fields
+								'type': type,
+								'header': name,
+								'pos': pos,
+								'rf_rate': 0,
+								'fields': fields
+							},
+							add_new_widget = function() {
+								updateWidgetDynamic($obj, data, widget_data);
+								methods.addWidget.call($obj, widget_data);
+								// new widget is last element in data['widgets'] array
+								widget = data['widgets'].slice(-1)[0];
+								setWidgetModeEdit($obj, data, widget);
+							};
+
+						if (scroll_by > 0) {
+							var new_height = (pos['row'] + pos['height']) * data['options']['widget-height'];
+							if (new_height > $('.dashbrd-grid-widget-container').height()) {
+								$('.dashbrd-grid-widget-container').height(new_height);
+							}
+
+							$('body').animate({scrollTop: '+='+scroll_by+'px'}, 800, add_new_widget);
 						}
-						updateWidgetDynamic($obj, data, widget_data);
-						methods.addWidget.call($obj, widget_data);
-						// new widget is last element in data['widgets'] array
-						widget = data['widgets'].slice(-1)[0];
-						setWidgetModeEdit($obj, data, widget);
+						else {
+							add_new_widget();
+						}
 					}
 					else {
 						// In case of EDIT widget
