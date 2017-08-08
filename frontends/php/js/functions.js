@@ -517,15 +517,16 @@ function overlayDialogueDestroy() {
 /**
  * Display modal window
  *
- * @param string title					modal window title
- * @param object content				window content
- * @param array  buttons				window buttons
- * @param string buttons[]['title']
- * @param string buttons[]['class']
- * @param bool	 buttons[]['cancel']	(optional) it means what this button has cancel action
- * @param bool	 buttons[]['focused']
- * @param bool   buttons[]['enabled']
- * @param object buttons[]['click']
+ * @param {string}	title					Modal window title.
+ * @param {object}	content					Window content.
+ * @param {array}	buttons					Window buttons.
+ * @param {string}	buttons[]['title']		Text on the button.
+ * @param {object}	buttons[]['action']		Function object that will be called on click.
+ * @param {string}	buttons[]['class']		(optional) Button class.
+ * @param {bool}	buttons[]['cancel']		(optional) It means what this button has cancel action.
+ * @param {bool}	buttons[]['focused']	(optional) Focus this button.
+ * @param {bool}	buttons[]['enabled']	(optional) Should the button be enabled? Default: true.
+ * @param {bool}	buttons[]['keepOpen']	(optional) Prevent dialogue closing, if button action returned false.
  */
 function overlayDialogue(params) {
 	jQuery('<div>', {
@@ -534,12 +535,11 @@ function overlayDialogue(params) {
 	})
 		.appendTo('body');
 
-	var overlay_dialogue_footer = jQuery('<div>', {
-		class: 'overlay-dialogue-footer'
-	});
-
 	var button_focused = null,
-		cancel_action = null;
+		cancel_action = null,
+		overlay_dialogue_footer = jQuery('<div>', {
+			class: 'overlay-dialogue-footer'
+		});
 
 	jQuery.each(params.buttons, function(index, obj) {
 		var button = jQuery('<button>', {
@@ -547,9 +547,11 @@ function overlayDialogue(params) {
 			text: obj.title
 		}).click(function() {
 			var res = obj.action();
+
 			if (res !== false && (!('keepOpen' in obj) || obj.keepOpen === false)) {
 				overlayDialogueDestroy();
 			}
+
 			return false;
 		});
 
@@ -585,6 +587,7 @@ function overlayDialogue(params) {
 						cancel_action();
 					}
 					overlayDialogueDestroy();
+
 					return false;
 				})
 		)
@@ -599,12 +602,14 @@ function overlayDialogue(params) {
 			}).append(params.content)
 		)
 		.append(overlay_dialogue_footer)
-		.on('keypress keydown', function(e) {
-			if (e.which == 27) { // ESC
+		.on('keydown', function(e) {
+			// ESC
+			if (e.which == 27) {
 				if (cancel_action !== null) {
 					cancel_action();
 				}
 				overlayDialogueDestroy();
+
 				return false;
 			}
 		})
@@ -617,15 +622,19 @@ function overlayDialogue(params) {
 			last_focusable = focusable.filter(':last');
 
 		first_focusable.on('keydown', function(e) {
+			// TAB && SHIFT
 			if (e.keyCode == 9 && e.shiftKey) {
 				last_focusable.focus();
+
 				return false;
 			}
 		});
 
 		last_focusable.on('keydown', function(e) {
+			// TAB && !SHIFT
 			if (e.keyCode == 9 && !e.shiftKey) {
 				first_focusable.focus();
+
 				return false;
 			}
 		});
@@ -637,33 +646,19 @@ function overlayDialogue(params) {
 		button_focused.focus();
 	}
 
+	// Don't focus element in overlay, if button is already focused.
 	overlayDialogueOnLoad(!button_focused);
 }
 
 /**
- * Makes overlay dialogues more useble by:
- *  - focusing :focusable input element with lowest tabindex value
- *  - triggering onclick event on pressing an enter in focused element
+ * Actions to perform, when dialogue is created,
+ * as well as, when data in dialogue changed, and this is forced from outside.
  *
- * @param boolean focus			focus element with lowest tabindex
+ * @param {boolean} focus  Focus first focusable element in overalay.
  */
 function overlayDialogueOnLoad(focus) {
-	// Focus element with lowest tabindex attribute.
 	if (focus) {
 		jQuery('.auto-focus:focusable', jQuery('#overlay_dialogue')).first().focus();
-	}
-
-	// Trigger click on the first button if user press enter in textbox.
-	var selector = 'input[type=text], textarea, input[type=radio], input[type=checkbox], select';
-	var writable_fields = jQuery(selector, jQuery('#widget_dialogue_form'));
-	if (writable_fields.length) {
-		writable_fields.on('keydown', function(e) {
-			if (e.keyCode == 13) {
-				jQuery('button:focusable', jQuery('#overlay_dialogue > .overlay-dialogue-footer')).first()
-					.trigger('click');
-				return false;
-			}
-		});
 	}
 }
 

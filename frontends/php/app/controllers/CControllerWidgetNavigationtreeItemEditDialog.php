@@ -80,6 +80,9 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 				$sysmap_caption = $map['name'];
 				$sysmap_id = $map['sysmapid'];
 			}
+			else {
+				$sysmap_caption = _('Inaccessible map');
+			}
 		}
 
 		$formList->addVar('linked_map_id', $sysmap_id);
@@ -98,7 +101,7 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 		]);
 
 		if ($depth >= WIDGET_NAVIGATION_TREE_MAX_DEPTH) {
-			$formList->addRow(null, _('Can not add submaps. Max depth reached.'));
+			$formList->addRow(null, _('Cannot add submaps. Max depth reached.'));
 		}
 		else {
 			$formList->addRow(null, [
