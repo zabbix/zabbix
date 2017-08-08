@@ -138,10 +138,18 @@ class CDashboardWidgetMap extends CDiv {
 
 			if ($this->previous_map) {
 				$go_back_div = (new CDiv())
-					->setAttribute('style', 'padding: 5px 10px; border-bottom: 1px solid #ebeef0;')
+					->addClass('btn-back-map-container')
 					->addItem(
-						(new CLink(_s('Go back to %1$s', $this->previous_map['name']), 'javascript: navigateToSubmap('.
-							$this->previous_map['sysmapid'].', "'.$this->uniqueid.'", true);'
+						(new CLink(
+							(new CSpan())
+								->addClass('btn-back-map')
+								->addItem((new CDiv())->addClass('btn-back-map-icon'))
+								->addItem((new CDiv())
+									->addClass('btn-back-map-content')
+									->addItem(_s('Go back to %1$s', $this->previous_map['name']))
+								),
+							'javascript: navigateToSubmap('
+								.$this->previous_map['sysmapid'].', "'.$this->uniqueid.'", true);'
 						))
 					);
 

@@ -3238,6 +3238,52 @@ $form-icon-btn: (
 	}
 }
 
+// Map widget back to parent button.
+.btn-back-map-container {
+
+	text-align: left;
+	position: absolute;
+	left: -1px;
+
+	.btn-back-map {
+		margin-top: 10px;
+		border-radius: 0px 2px 2px 0px;
+		background-color: $btn-back-map-background-color;
+		padding: 0px 0px 0px 0px;
+		display: inline-block;
+		height: 24px;
+		line-height: 24px;
+		vertical-align: middle;
+		border: $ui-border-color solid 1px;
+		color: $btn-back-text-color;
+		text-decoration: none;
+
+		.btn-back-map-content {
+			display: none;
+		}
+
+		.btn-back-map-icon {
+			margin-left: 5px;
+			display: inline-block;
+			width: 28px;
+			height: 24px;
+			vertical-align: middle;
+			background: url(../img/icon-sprite.svg) no-repeat -85px -691px;
+		}
+
+		&:hover {
+			background-color: $btn-back-background-hover;
+			border: $btn-border-color solid 1px;
+
+			.btn-back-map-content {
+				display: inline-block;
+				line-height: 24px;
+				padding: 0px 6px 0px 0px;
+			}
+		}
+	}
+}
+
 .overlay-dialogue-body {
 	margin: 0 0 25px 0;
 	white-space: nowrap;
@@ -4420,12 +4466,14 @@ tr.cursor-move {
 
 // Analog Clock
 .clock {
-	padding: 0 5px;
-	height: 100%;
+	padding: 0 10px;
+	height: 99%;
+	width: auto;
 }
 
 .clock-svg {
 	max-height: 100%;
+	max-width: 100%;
 	display: block;
 	margin: 0 auto;
 }
@@ -4456,10 +4504,19 @@ tr.cursor-move {
 	fill: $clock-lines-color;
 }
 
+.sysmap {
+	height: 100%;
+	width: auto;
+	padding: 0 10px;
+	text-align: center;
+}
+
 .sysmap-widget-container {
 	overflow: hidden;
-	padding-left: 5px;
-	padding-right: 5px;
+	height: 100%;
+	width: 100%;
+	max-height: 100%;
+	max-width: 100%;
 }
 
 .navtree {
