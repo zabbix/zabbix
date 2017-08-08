@@ -37,19 +37,31 @@ class CControllerWidgetSystemView extends CControllerWidget {
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
+		$config = select_config();
+		$filter = [
+			'groupids' => getSubGroups($fields['groupids']),
+			'hostids' => $fields['hostids'],
+			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
+			'problem' => $fields['problem'],
+			'severities' => $fields['severities'],
+			'maintenance' => $fields['maintenance'],
+			'hide_empty_groups' => $fields['hide_empty_groups'],
+			'ext_ack' => $fields['ext_ack']
+		];
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'filter' => [
-				'groupids' => getSubGroups($fields['groupids']),
-				'hostids' => $fields['hostids'],
-				'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
-				'problem' => $fields['problem'],
-				'severities' => $fields['severities'],
-				'maintenance' => $fields['maintenance'],
-				'hide_empty_groups' => $fields['hide_empty_groups'],
-				'ext_ack' => $fields['ext_ack']
+			'data' => getSystemStatusData($filter, ['event_ack_enable' => $config['event_ack_enable']]),
+			'config' => [
+				'event_ack_enable' => $config['event_ack_enable'],
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
 			],
+			'filter' => $filter,
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

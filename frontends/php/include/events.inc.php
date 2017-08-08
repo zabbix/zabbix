@@ -613,12 +613,11 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
  * Create element with event acknowledges info.
  * If $event has subarray 'acknowledges', returned link will have hint with acknowledges.
  *
- * @param array			$event   event data
- * @param int			$event['acknowledged']
- * @param int			$event['eventid']
- * @param int			$event['objectid']
- * @param mixed			$event['acknowledges']
- * @param string		$backurl  add url param to link with current page file name
+ * @param array  $event                  Event data.
+ * @param int    $event['acknowledged']
+ * @param int    $event['eventid']
+ * @param mixed  $event['acknowledges']
+ * @param string $backurl                Add url param to link with current page file name.
  *
  * @deprecated use makeEventsAcknowledges instead
  *
