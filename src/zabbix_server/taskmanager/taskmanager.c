@@ -177,10 +177,14 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
  ******************************************************************************/
 static void	tm_expire_remote_command(zbx_uint64_t taskid)
 {
+	const char	*__function_name = "tm_expire_remote_command";
+
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	alertid;
 	char		*error;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __function_name, taskid);
 
 	DBbegin();
 
@@ -204,6 +208,8 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_EXPIRED, taskid);
 
 	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -218,12 +224,16 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
  ******************************************************************************/
 static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 {
+	const char	*__function_name = "tm_process_remote_command_result";
+
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	alertid, parent_taskid = 0;
 	int		status, ret = FAIL;
 	char		*error, *sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __function_name, taskid);
 
 	DBbegin();
 
@@ -268,6 +278,8 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 	DBcommit();
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -282,6 +294,8 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
  ******************************************************************************/
 static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 {
+	const char		*__function_name = "tm_process_acknowledgments";
+
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			processed_num = 0;
@@ -289,6 +303,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	ack_tasks;
 	zbx_ack_task_t		*ack_task;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:" ZBX_FS_UI64, __function_name, ack_taskids->values_num);
 
 	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -341,6 +357,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 
 	zbx_vector_ptr_clear_ext(&ack_tasks, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&ack_tasks);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
 
 	return processed_num;
 }
