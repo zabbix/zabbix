@@ -601,7 +601,10 @@
 								$('.dashbrd-grid-widget-container').height(new_height);
 							}
 
-							$('body').animate({scrollTop: '+='+scroll_by+'px'}, 800, add_new_widget);
+							$('html, body')
+								.animate({scrollTop: '+='+scroll_by+'px'}, 800)
+								.promise()
+								.then(add_new_widget);
 						}
 						else {
 							add_new_widget();
