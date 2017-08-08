@@ -285,8 +285,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			processed_num = 0;
-	char			*sql_select = NULL, *sql_upd = NULL;
-	size_t			sql_select_alloc = 0, sql_select_offset = 0, sql_upd_alloc = 0, sql_upd_offset = 0;
+	char			*filter = NULL;
+	size_t			filter_alloc = 0, filter_offset = 0;
 	zbx_vector_ptr_t	ack_tasks;
 	zbx_ack_task_t		*ack_task;
 
@@ -294,7 +294,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 
 	zbx_vector_ptr_create(&ack_tasks);
 
-	DBadd_condition_alloc(&sql_select, &sql_select_alloc, &sql_select_offset, "t.taskid", ack_taskids->values,
+	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "t.taskid", ack_taskids->values,
 			ack_taskids->values_num);
 
 	result = DBselect(
@@ -307,7 +307,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 			" left join task t"
 				" on ta.taskid=t.taskid"
 			" where t.status=%d and%s",
-			ZBX_TM_STATUS_NEW, sql_select);
+			ZBX_TM_STATUS_NEW, filter);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -326,7 +326,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 		zbx_vector_ptr_append(&ack_tasks, ack_task);
 	}
 	DBfree_result(result);
-	zbx_free(sql_select);
+
+	filter_offset = 0;
 
 	if (0 < ack_tasks.values_num)
 	{
@@ -334,12 +335,12 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 		processed_num = process_actions_by_acknowledgments(&ack_tasks);
 	}
 
-	DBadd_condition_alloc(&sql_upd, &sql_upd_alloc, &sql_upd_offset, "taskid", ack_taskids->values,
+	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "taskid", ack_taskids->values,
 			ack_taskids->values_num);
 
-	DBexecute("update task set status=%d where%s", ZBX_TM_STATUS_DONE, sql_upd);
+	DBexecute("update task set status=%d where%s", ZBX_TM_STATUS_DONE, filter);
 
-	zbx_free(sql_upd);
+	zbx_free(filter);
 
 	zbx_vector_ptr_clear_ext(&ack_tasks, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&ack_tasks);
