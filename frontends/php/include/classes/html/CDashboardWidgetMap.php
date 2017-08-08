@@ -120,6 +120,7 @@ class CDashboardWidgetMap extends CDiv {
 					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
 						'parameters: ["onDashboardReady", {html: "'. addslashes($error_msg_html).'"}],'.
 						'grid: {widget: 1},'.
+						'priority: 10,'.
 						'trigger_name: "on_dashboard_ready_'.$this->uniqueid.'"'.
 					'}'.
 				');';

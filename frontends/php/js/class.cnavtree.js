@@ -1310,6 +1310,7 @@ jQuery(function($) {
 								{
 									'parameters': [trigger],
 									'grid': {'widget': 1},
+									'priority': 5,
 									'trigger_name': 'maptree_' + options.uniqueid
 								}
 							);
