@@ -476,7 +476,7 @@ jQuery(function($) {
 				if (isEditMode) {
 					var edit_mode_tree = createTreeItem($obj, {name: t('root'), id: 0}, 0, false, true);
 
-					root.append(edit_mode_tree);
+					root.appendChild(edit_mode_tree);
 
 					if (tree.length) {
 						var new_class = edit_mode_tree.getAttribute('class').replace('closed', 'opened');
@@ -488,7 +488,7 @@ jQuery(function($) {
 
 				$.each(tree, function(i, item) {
 					if (typeof item === 'object') {
-						root.append(createTreeItem($obj, item, 1, true, isEditMode));
+						root.appendChild(createTreeItem($obj, item, 1, true, isEditMode));
 					}
 				});
 
