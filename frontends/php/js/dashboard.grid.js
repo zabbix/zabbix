@@ -51,7 +51,7 @@
 		);
 
 		return $('<div>', {
-			'class': 'dashbrd-grid-widget',
+			'class': 'dashbrd-grid-widget' + (!widget['widgetid'].length ? ' new-widget' : ''),
 			'css': {
 				'min-height': '' + data['options']['widget-height'] + 'px',
 				'min-width': '' + data['options']['widget-width'] + '%'
@@ -578,18 +578,37 @@
 						// In case of ADD widget
 						// create widget with required selected fields and add it to dashboard
 						var pos = findEmptyPosition($obj, data, type),
+							scroll_by = (pos['row'] * data['options']['widget-height'])
+								- $('.dashbrd-grid-widget-container').scrollTop(),
 							widget_data = {
-							'type': type,
-							'header': name,
-							'pos': pos,
-							'rf_rate': 0,
-							'fields': fields
+								'type': type,
+								'header': name,
+								'pos': pos,
+								'rf_rate': 0,
+								'fields': fields
+							},
+							add_new_widget = function() {
+								updateWidgetDynamic($obj, data, widget_data);
+								methods.addWidget.call($obj, widget_data);
+								// new widget is last element in data['widgets'] array
+								widget = data['widgets'].slice(-1)[0];
+								setWidgetModeEdit($obj, data, widget);
+							};
+
+						if (scroll_by > 0) {
+							var new_height = (pos['row'] + pos['height']) * data['options']['widget-height'];
+							if (new_height > $('.dashbrd-grid-widget-container').height()) {
+								$('.dashbrd-grid-widget-container').height(new_height);
+							}
+
+							$('html, body')
+								.animate({scrollTop: '+='+scroll_by+'px'}, 800)
+								.promise()
+								.then(add_new_widget);
 						}
-						updateWidgetDynamic($obj, data, widget_data);
-						methods.addWidget.call($obj, widget_data);
-						// new widget is last element in data['widgets'] array
-						widget = data['widgets'].slice(-1)[0];
-						setWidgetModeEdit($obj, data, widget);
+						else {
+							add_new_widget();
+						}
 					}
 					else {
 						// In case of EDIT widget
@@ -599,6 +618,8 @@
 						}
 						widget['header'] = name;
 						widget['fields'] = fields;
+
+						doAction('afterUpdateWidgetConfig', $obj, data, null);
 
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
@@ -792,6 +813,10 @@
 					// Error returned.
 					dashbaordAddMessages(resp.errors);
 				}
+			},
+			complete: function() {
+				var ul = $('#dashbrd-config').closest('ul');
+				$('#dashbrd-save', ul).prop('disabled', false);
 			},
 			error: function() {
 				// TODO VM: add error message box
@@ -1144,8 +1169,10 @@
 		saveDashboardChanges: function() {
 			return this.each(function() {
 				var	$this = $(this),
+					ul = $('#dashbrd-config').closest('ul'),
 					data = $this.data('dashboardGrid');
 
+				$('#dashbrd-save', ul).prop('disabled', true);
 				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
 				data['options']['edit_mode'] = false;
@@ -1244,6 +1271,20 @@
 					method: 'POST',
 					data: ajax_data,
 					dataType: 'json',
+					beforeSend: function() {
+						body.empty()
+							.append($('<div>')
+								// The smallest possible size of configuration dialog.
+								.css({
+									'width': '544px',
+									'height': '68px',
+									'max-width': '100%'
+								})
+								.append($('<div>')
+									.addClass('preloader-container')
+									.append($('<div>').addClass('preloader'))
+								));
+					},
 					success: function(resp) {
 						body.empty();
 						body.append(resp.body);
