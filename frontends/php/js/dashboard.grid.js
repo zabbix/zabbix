@@ -575,8 +575,7 @@
 					overlayDialogueDestroy();
 
 					if (widget === null) {
-						// In case of ADD widget
-						// create widget with required selected fields and add it to dashboard
+						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
 						var pos = findEmptyPosition($obj, data, type),
 							scroll_by = (pos['row'] * data['options']['widget-height'])
 								- $('.dashbrd-grid-widget-container').scrollTop(),
@@ -590,19 +589,20 @@
 							add_new_widget = function() {
 								updateWidgetDynamic($obj, data, widget_data);
 								methods.addWidget.call($obj, widget_data);
-								// new widget is last element in data['widgets'] array
+								// New widget is last element in data['widgets'] array.
 								widget = data['widgets'].slice(-1)[0];
 								setWidgetModeEdit($obj, data, widget);
 							};
 
 						if (scroll_by > 0) {
 							var new_height = (pos['row'] + pos['height']) * data['options']['widget-height'];
+
 							if (new_height > $('.dashbrd-grid-widget-container').height()) {
 								$('.dashbrd-grid-widget-container').height(new_height);
 							}
 
 							$('html, body')
-								.animate({scrollTop: '+='+scroll_by+'px'}, 800)
+								.animate({scrollTop: '+=' + scroll_by + 'px'}, 800)
 								.promise()
 								.then(add_new_widget);
 						}
@@ -611,21 +611,20 @@
 						}
 					}
 					else {
-						// In case of EDIT widget
+						// In case of EDIT widget.
 						if (widget['type'] !== type) {
 							widget['type'] = type;
 							widget['initial_load'] = true;
 						}
+
 						widget['header'] = name;
 						widget['fields'] = fields;
-
 						doAction('afterUpdateWidgetConfig', $obj, data, null);
-
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					}
 
-					// mark dashboard as updated
+					// Mark dashboard as updated.
 					data['options']['updated'] = true;
 				}
 			},
