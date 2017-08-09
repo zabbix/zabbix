@@ -75,7 +75,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			$error = _('No permissions to selected item or it does not exist.');
 		}
 		// Select host name and item history data.
-		else if (($item = reset($items)) !== false) {
+		elseif (($item = reset($items)) !== false) {
 			$host = API::Host()->get([
 				'output' => ['name'],
 				'hostids' => $item['hostid']
@@ -121,7 +121,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			}
 		}
 
-		if (!$error && !$table_rows) {
+		if ($error === null && !$table_rows) {
 			$error = _('No data found.');
 		}
 
