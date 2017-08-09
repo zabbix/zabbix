@@ -64,7 +64,7 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 			_('Name'),
 			(new CTextBox('map.name.'.$map_id, $map_item_name))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAttribute('class', 'auto-focus')
+				->setAttribute('autofocus', 'autofocus')
 		);
 
 		$sysmap_id = 0;

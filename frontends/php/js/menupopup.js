@@ -585,6 +585,7 @@ function showDialogForm(form, options, formData) {
 	});
 
 	form.css('visibility', 'visible');
+	overlayDialogueOnLoad(true);
 }
 
 /**
