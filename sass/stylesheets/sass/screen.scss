@@ -511,8 +511,15 @@ ul.top-nav-icons {
 	text-align: right;
 	border-bottom: 1px solid $ui-border-color;
 
+	.cell:first-child {
+		max-width: calc(100vw - 370px);
+	}
+
 	h1 {
 		text-align: left;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
 	}
 
 	form {
