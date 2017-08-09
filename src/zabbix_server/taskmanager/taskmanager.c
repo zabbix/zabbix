@@ -304,7 +304,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_t	ack_tasks;
 	zbx_ack_task_t		*ack_task;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:" ZBX_FS_UI64, __function_name, ack_taskids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, ack_taskids->values_num);
 
 	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
