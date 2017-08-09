@@ -839,7 +839,7 @@ static int	DBpatch_3030060_migrate_pairs(const char *table, const char *field, i
 
 	zbx_db_insert_prepare(&db_insert, target, target_id, source_id, "type", "name", "value", NULL);
 
-	result = DBselect("select %s, %s from %s", source_id, field, table);
+	result = DBselect("select %s,%s from %s", source_id, field, table);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -857,9 +857,9 @@ static int	DBpatch_3030060_migrate_pairs(const char *table, const char *field, i
 	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	zbx_free(target);
-	zbx_free(target_id);
 	zbx_free(source_id);
+	zbx_free(target_id);
+	zbx_free(target);
 
 	return ret;
 }
