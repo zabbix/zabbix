@@ -745,7 +745,7 @@ jQuery(function($) {
 					}
 				}
 
-				if (item.item_active === false && !isEditMode) {
+				if (item.item_active === false && !isEditMode && item.mapid > 0) {
 					item_clases += ' inaccessible';
 				}
 
