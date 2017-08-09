@@ -349,7 +349,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	}
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , "update task set status=%d where", ZBX_TM_STATUS_NEW);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , "update task set status=%d where", ZBX_TM_STATUS_DONE);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", ack_taskids->values, ack_taskids->values_num);
 	DBexecute("%s", sql);
 
