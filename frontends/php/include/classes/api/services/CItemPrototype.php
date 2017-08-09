@@ -731,6 +731,13 @@ class CItemPrototype extends CItemGeneral {
 		unset($item);
 
 		$this->updateReal($items);
+
+		foreach ($items as &$item) {
+			if (!array_key_exists('type', $item)) {
+				$item['type'] = $dbItems[$item['itemid']]['type'];
+			}
+		}
+		unset($item);
 		$this->inherit($items);
 
 		return ['itemids' => zbx_objectValues($items, 'itemid')];
