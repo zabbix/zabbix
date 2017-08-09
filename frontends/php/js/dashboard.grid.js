@@ -682,7 +682,7 @@
 			'content': '',
 			'buttons': [
 				{
-					'title': (edit_mode ? t('Update') : t('Add')),
+					'title': (edit_mode ? t('Apply') : t('Add')),
 					'class': 'dialogue-widget-save',
 					'keepOpen': true,
 					'action': function() {
