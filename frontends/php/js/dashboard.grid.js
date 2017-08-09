@@ -1040,6 +1040,12 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				if (!$.isEmptyObject(data['dashboard']) && (data['dashboard']['name'] !== dashboard['name']
+					|| data['dashboard']['userid'] !== dashboard['userid'])
+				) {
+					data['options']['updated'] = true;
+				}
+
 				dashboard = $.extend({}, data['dashboard'], dashboard);
 				data['dashboard'] = dashboard;
 			});
