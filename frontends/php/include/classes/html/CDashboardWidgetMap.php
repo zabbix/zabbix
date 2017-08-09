@@ -60,6 +60,15 @@ class CDashboardWidgetMap extends CDiv {
 						'trigger_name: "map_widget_timer_refresh_'.$this->uniqueid.'"'.
 					'}'.
 				');';
+
+			$script_run .=
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "afterUpdateWidgetConfig", '.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
+						'parameters: ["afterUpdateWidgetConfig"],'.
+						'grid: {widget: 1},'.
+						'trigger_name: "after_map_widget_config_update_'.$this->uniqueid.'"'.
+					'}'.
+				');';
 		}
 
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
@@ -104,6 +113,18 @@ class CDashboardWidgetMap extends CDiv {
 				'})'.
 			'});';
 		}
+		elseif ($this->error !== null && $this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+			$error_msg_html = (new CTableInfo())->setNoDataMessage($this->error);
+			$script_run .=
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onDashboardReady", '.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
+						'parameters: ["onDashboardReady", {html: "'. addslashes($error_msg_html).'"}],'.
+						'grid: {widget: 1},'.
+						'priority: 10,'.
+						'trigger_name: "on_dashboard_ready_'.$this->uniqueid.'"'.
+					'}'.
+				');';
+		}
 
 		return $script_run;
 	}
@@ -117,10 +138,18 @@ class CDashboardWidgetMap extends CDiv {
 
 			if ($this->previous_map) {
 				$go_back_div = (new CDiv())
-					->setAttribute('style', 'padding: 5px 10px; border-bottom: 1px solid #ebeef0;')
+					->addClass('btn-back-map-container')
 					->addItem(
-						(new CLink(_s('Go back to %1$s', $this->previous_map['name']), 'javascript: navigateToSubmap('.
-							$this->previous_map['sysmapid'].', "'.$this->uniqueid.'", true);'
+						(new CLink(
+							(new CSpan())
+								->addClass('btn-back-map')
+								->addItem((new CDiv())->addClass('btn-back-map-icon'))
+								->addItem((new CDiv())
+									->addClass('btn-back-map-content')
+									->addItem(_s('Go back to %1$s', $this->previous_map['name']))
+								),
+							'javascript: navigateToSubmap('
+								.$this->previous_map['sysmapid'].', "'.$this->uniqueid.'", true);'
 						))
 					);
 
@@ -134,7 +163,7 @@ class CDashboardWidgetMap extends CDiv {
 			$this->addStyle('position:relative;');
 			$this->addItem($map_div);
 		}
-		else {
+		elseif ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_MAP) {
 			$this->addItem((new CTableInfo())->setNoDataMessage($this->error));
 		}
 	}
