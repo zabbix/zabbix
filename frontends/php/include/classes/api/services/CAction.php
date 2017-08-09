@@ -3049,12 +3049,10 @@ class CAction extends CApiService {
 							unset($db_ack_operation['operationtype']);
 
 							if ($operation_type == OPERATION_TYPE_MESSAGE) {
-								unset($db_ack_operation['opmessage_grp']);
-								unset($db_ack_operation['opmessage_usr']);
+								unset($db_ack_operation['opmessage_grp'], $db_ack_operation['opmessage_usr']);
 							}
 							elseif ($operation_type == OPERATION_TYPE_COMMAND) {
-								unset($db_ack_operation['opcommand_grp']);
-								unset($db_ack_operation['opcommand_hst']);
+								unset($db_ack_operation['opcommand_grp'], $db_ack_operation['opcommand_hst']);
 							}
 
 							$ack_operation += $db_ack_operation;
