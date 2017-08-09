@@ -54,6 +54,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$show_lines = $fields['show_lines'];
 		$dynamic = $fields['dynamic'];
 		$style = $fields['style'];
+		$dynamic_widget_name = null;
 		$table_rows = [];
 
 		// Select dynamically selected host.
@@ -71,52 +72,63 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		}
 
 		if (!$items) {
-			$error = _('No item selected.');
+			$error = _('No permissions to selected item or it does not exist.');
 		}
-		// Select item history data.
+		// Select host name and item history data.
 		else if (($item = reset($items)) !== false) {
-			$histories = API::History()->get([
-				'history' => $item['value_type'],
-				'itemids' => $item['itemid'],
-				'output' => API_OUTPUT_EXTEND,
-				'sortorder' => ZBX_SORT_DOWN,
-				'sortfield' => ['itemid', 'clock'],
-				'limit' => $show_lines
+			$host = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => $item['hostid']
 			]);
 
-			foreach ($histories as $history) {
-				switch ($item['value_type']) {
-					case ITEM_VALUE_TYPE_FLOAT:
-						sscanf($history['value'], '%f', $value);
-						break;
-					case ITEM_VALUE_TYPE_TEXT:
-					case ITEM_VALUE_TYPE_STR:
-					case ITEM_VALUE_TYPE_LOG:
-						$value = $style ? new CJsScript($history['value']) : $history['value'];
-						break;
-					default:
-						$value = $history['value'];
-						break;
-				}
+			if (($host = reset($host)) !== false) {
+				$dynamic_widget_name = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 
-				if ($item['valuemapid'] > 0) {
-					$value = applyValueMap($value, $item['valuemapid']);
-				}
+				$histories = API::History()->get([
+					'history' => $item['value_type'],
+					'itemids' => $item['itemid'],
+					'output' => API_OUTPUT_EXTEND,
+					'sortorder' => ZBX_SORT_DOWN,
+					'sortfield' => ['itemid', 'clock'],
+					'limit' => $show_lines
+				]);
 
-				if ($style == 0) {
-					$value = new CPre($value);
-				}
+				foreach ($histories as $history) {
+					switch ($item['value_type']) {
+						case ITEM_VALUE_TYPE_FLOAT:
+							sscanf($history['value'], '%f', $value);
+							break;
+						case ITEM_VALUE_TYPE_TEXT:
+						case ITEM_VALUE_TYPE_STR:
+						case ITEM_VALUE_TYPE_LOG:
+							$value = $style ? new CJsScript($history['value']) : $history['value'];
+							break;
+						default:
+							$value = $history['value'];
+							break;
+					}
 
-				$table_rows[] = [zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), $value];
+					if ($item['valuemapid'] > 0) {
+						$value = applyValueMap($value, $item['valuemapid']);
+					}
+
+					if ($style == 0) {
+						$value = new CPre($value);
+					}
+
+					$table_rows[] = [zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), $value];
+				}
 			}
 		}
 
 		if (!$error && !$table_rows) {
-			$error = _('No permissions to selected item or it does not exist.');
+			$error = _('No data found.');
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT]),
+			'name' => $dynamic_widget_name
+				? $dynamic_widget_name
+				: $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT]),
 			'table_rows' => $table_rows,
 			'error' => $error,
 			'user' => [

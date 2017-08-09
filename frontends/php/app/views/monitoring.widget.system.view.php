@@ -23,7 +23,7 @@ $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
-$table = make_system_status($data['filter'], $backurl->getUrl(), $data['fullscreen']);
+$table = makeSystemStatus($data['filter'], $data['data'], $data['config'], $backurl->getUrl(), $data['fullscreen']);
 
 $output = [
 	'header' => $data['name'],
