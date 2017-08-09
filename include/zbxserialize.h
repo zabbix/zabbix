@@ -39,7 +39,7 @@
 
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 
-#define zbx_serialize_str_null(buffer)	 			\
+#define zbx_serialize_str_null(buffer)				\
 	(							\
 		memset(buffer, 0, sizeof(zbx_uint32_t)),	\
 		sizeof(zbx_uint32_t)				\
@@ -85,7 +85,7 @@
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 
-#define zbx_deserialize_str_s(buffer, value, value_len) 		\
+#define zbx_deserialize_str_s(buffer, value, value_len)				\
 	(									\
 		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
 		memcpy(value, buffer + sizeof(zbx_uint32_t), value_len),	\

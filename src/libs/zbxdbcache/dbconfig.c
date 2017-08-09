@@ -1768,7 +1768,6 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->ip);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-
 			DCstrpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
 		}
@@ -3149,7 +3148,7 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 	ZBX_DC_EXPRESSION	*expression;
 	ZBX_DC_REGEXP		*regexp, regexp_local;
 	zbx_uint64_t		expressionid;
-	int 			found, ret;
+	int			found, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3478,7 +3477,7 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		correlationid;
+	zbx_uint64_t		correlationid;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret;
 
@@ -3690,7 +3689,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		conditionid, correlationid;
+	zbx_uint64_t		conditionid, correlationid;
 	zbx_dc_corr_condition_t	*condition;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret, i, index;
@@ -3794,7 +3793,7 @@ static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		operationid, correlationid;
+	zbx_uint64_t		operationid, correlationid;
 	zbx_dc_corr_operation_t	*operation;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret, index;
@@ -3878,7 +3877,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		groupid;
+	zbx_uint64_t		groupid;
 	zbx_dc_hostgroup_t	*group;
 	int			found, ret, index;
 
@@ -4050,7 +4049,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		item_preprocid, itemid, lastitemid = 0;
+	zbx_uint64_t		item_preprocid, itemid, lastitemid = 0;
 	int			found, ret, i, index;
 	ZBX_DC_ITEM		*item = NULL;
 	zbx_dc_item_preproc_t	*preproc;
@@ -4749,6 +4748,8 @@ void	DCsync_configuration(unsigned char mode)
 				config->ipmiitems.num_data, config->ipmiitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __function_name,
 				config->trapitems.num_data, config->trapitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() dependentitems  : %d (%d slots)", __function_name,
+				config->dependentitems.num_data, config->dependentitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __function_name,
 				config->logitems.num_data, config->logitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __function_name,
