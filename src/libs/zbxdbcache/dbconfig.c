@@ -237,6 +237,7 @@ static int	is_counted_in_item_queue(unsigned char type, const char *key)
 			}
 			break;
 		case ITEM_TYPE_TRAPPER:
+		case ITEM_TYPE_DEPENDENT:
 		case ITEM_TYPE_HTTPTEST:
 		case ITEM_TYPE_SNMPTRAP:
 			return FAIL;
