@@ -3223,8 +3223,19 @@ $form-icon-btn: (
 		left: 50%;
 		max-height: 90%;
 		max-width: 75%;
-		overflow: auto;
+		overflow: hidden;
 		@include transform(translate(-50%, -50%));
+
+		.overlay-dialogue-body {
+			overflow: auto;
+			max-height: calc(100vh - 145px);
+		}
+		.overlay-close-btn {
+			position: relative;
+			float: right;
+			top: -12px;
+			right: -8px;
+		}
 	}
 
 	.list-table {
