@@ -45,7 +45,7 @@
 		sizeof(zbx_uint32_t)				\
 	)
 
-#define zbx_serialize_str(buffer, value, len) 						\
+#define zbx_serialize_str(buffer, value, len)						\
 	(										\
 		0 == len ? zbx_serialize_str_null(buffer) :				\
 		(									\
