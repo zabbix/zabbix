@@ -178,17 +178,18 @@ function getSystemStatusData(array $filter, array $config) {
 			}
 		}
 
-		// get acknowledges and tags
-		$problems_data = ($config['event_ack_enable']
-				&& in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))
-			? API::Problem()->get([
-				'output' => [],
-				'eventids' => array_keys($problems),
-				'selectAcknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
-				'selectTags' => ['tag', 'value'],
-				'preservekeys' => true
-			])
-			: [];
+		// Get acknowledges and tags.
+		$options = [
+			'output' => [],
+			'eventids' => array_keys($problems),
+			'selectTags' => ['tag', 'value'],
+			'preservekeys' => true
+		];
+		if ($config['event_ack_enable'] && in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
+			$options['selectAcknowledges'] = ['clock', 'message', 'action', 'alias', 'name', 'surname'];
+		}
+
+		$problems_data = API::Problem()->get($options);
 
 		$visible_problems = [];
 
@@ -196,7 +197,9 @@ function getSystemStatusData(array $filter, array $config) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
 			if (array_key_exists($eventid, $problems_data)) {
-				$problem['acknowledges'] = $problems_data[$eventid]['acknowledges'];
+				$problem['acknowledges'] = array_key_exists('acknowledges', $problems_data[$eventid])
+					? $problems_data[$eventid]['acknowledges']
+					: [];
 				$problem['tags'] = $problems_data[$eventid]['tags'];
 			}
 			else {
