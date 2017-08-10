@@ -88,6 +88,23 @@ if (!$readonly) {
 
 $itemFormList->addRow(_('Key'), $key_controls);
 
+// Append master item select.
+$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
+];
+
+if (!$readonly) {
+	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$master_item[] = (new CButton('button', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.php?srctbl=items&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
+			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&only_hostid='.$data['hostid'].
+			'&with_webitems=0&excludeids[]='.$data['itemid'].'");'
+		);
+}
+
+$itemFormList->addRow(_('Master item'), $master_item, 'row_master_item');
+
 // Append interface(s) to form list.
 if ($data['interfaces']) {
 	if ($discovered_item) {

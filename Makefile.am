@@ -8,7 +8,7 @@ SUBDIRS = \
 	man \
 	misc \
 	upgrades
-
+	
 EXTRA_DIST = \
 	bin \
 	build \

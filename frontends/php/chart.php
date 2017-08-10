@@ -28,17 +28,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'type' =>           [T_ZBX_INT, O_OPT, null,   IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
+	'type' =>           [T_ZBX_INT, O_OPT, null,	IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
 	'itemids' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
-	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
+	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
 	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'from' =>			[T_ZBX_INT, O_OPT, null,	'{} >= 0',	null],
-	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(20, 65535),	null],
-	'height' =>			[T_ZBX_INT, O_OPT, null,	'{} > 0',	null],
-	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
+	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -50,8 +51,10 @@ $itemIds = getRequest('itemids');
  * Permissions
  */
 $items = API::Item()->get([
-	'output' => ['itemid', 'name'],
-	'selectHosts' => ['name'],
+	'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
+		'value_type', 'key_'
+	],
+	'selectHosts' => ['name', 'host'],
 	'itemids' => $itemIds,
 	'webitems' => true,
 	'preservekeys' => true
@@ -65,6 +68,7 @@ foreach ($itemIds as $itemId) {
 $hostNames = [];
 foreach ($items as &$item) {
 	$item['hostname'] = $item['hosts'][0]['name'];
+	$item['host'] = $item['hosts'][0]['host'];
 	if (!in_array($item['hostname'], $hostNames)) {
 		$hostNames[] = $item['hostname'];
 	}
@@ -102,22 +106,37 @@ if (getRequest('batch')) {
 	$graph->showTriggers(false);
 }
 
-if (isset($_REQUEST['from'])) {
-	$graph->setFrom($_REQUEST['from']);
+if (hasRequest('from')) {
+	$graph->setFrom(getRequest('from'));
 }
-if (isset($_REQUEST['width'])) {
-	$graph->setWidth($_REQUEST['width']);
+if (hasRequest('width')) {
+	$graph->setWidth(getRequest('width'));
 }
-if (isset($_REQUEST['height'])) {
-	$graph->setHeight($_REQUEST['height']);
+if (hasRequest('height')) {
+	$graph->setHeight(getRequest('height'));
+}
+if (hasRequest('outer')) {
+	$graph->setOuter(getRequest('outer'));
 }
 
 foreach ($items as $item) {
-	$graph->addItem($item['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL,
-		rgb2hex(get_next_color(1))
-	);
+	$graph->addItem($item + [
+		'color'		=> rgb2hex(get_next_color(1)),
+		'axisside'	=> GRAPH_YAXIS_SIDE_DEFAULT,
+		'calc_fnc'	=> (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
+	]);
+}
+
+$min_dimentions = $graph->getMinDimensions();
+if ($min_dimentions['width'] > $graph->getWidth()) {
+	$graph->setWidth($min_dimentions['width']);
+}
+if ($min_dimentions['height'] > $graph->getHeight()) {
+	$graph->setHeight($min_dimentions['height']);
 }
 
 $graph->draw();
+
+header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
 
 require_once dirname(__FILE__).'/include/page_footer.php';

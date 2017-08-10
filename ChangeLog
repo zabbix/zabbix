@@ -1,8 +1,43 @@
-Changes for 3.4.0alpha3
+Changes for 3.4.0beta3
 
 New features:
+..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
+..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
 Bug fixes:
+...G...... [ZBX-12397] fixed system.cpu.num count for 64-bit Windows with more than 64 logical cpus (abs)
+.......PS. [ZBX-12483] fixed compilation with libevent 2.1.8 and IPC service initialization in proxy (Andris)
+........S. [ZBX-12485] fixed PostgreSQL query errors during sending notifications on acknowledgement (Sergejs)
+.......PS. [ZBXNEXT-3006] fixed web scenario item preprocessing (wiper)
+..F....... [ZBXNEXT-2102] fixed low performance of navigation tree widget and improved dashboard performance (miks)
+.......PS. [ZBX-12458] fixed incorrect use of zbx_strlcat() in DBpatch_3030060_migrate_pairs(); thanks to MATSUDA Daiki for patch (Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0beta2
+
+Bug fixes:
+....I..... [ZBX-12462] fixed database upgrade patch for proxy (dimir)
+....I..PS. [ZBXNEXT-3006] fixed distribution archive creation (make dist) and log, web scenario item preprocessing (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0beta1
+
+New features:
+..F....... [ZBXNEXT-2102] added support of new dashboard widgets "Plain text" and "Graph" (miks, vmurzins)
+..F....... [ZBXNEXT-2102] implemented two-direction widget linkage for data sharing; improved active element selection in map navigation tree widget when map is changed from map widget (miks)
+..F....... [ZBXNEXT-2102] implemented validation for empty fields in widget configuration forms (Sasha)
+..F....... [ZBXNEXT-2102] added placeholder on empty dashboard (vmurzins)
+A.FG...PS. [ZBXNEXT-3006] implemented support of bulk metric collection for dependent items data population (gcalenko, vjaceslavs, wiper)
+....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta)
+
+Bug fixes:
+....I..... [ZBXNEXT-3006] fixed libevent build depenedencies (wiper)
+........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
+A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
+..F....... [ZBXNEXT-2102] fixed copying sharing properties when cloning dashboard (vmurzins)
+........S. [ZBXNEXT-18] fixed unnecessary notification sending a recovery message (Sergejs)
+........S. [ZBXNEXT-18] fixed acknowledge notification sending in maintenance period (Sergejs)
+........S. [ZBX-12339] fixed item history and trends flags update during configuration cache synchronization (wiper)
 ..F....... [ZBXNEXT-18] fixed php5.4 incompatibility in events page and acknowledge operation form (gcalenko)
 ..F....... [ZBXNEXT-18] fixed script name select button for new acknowledge operation form and recovery operation form (gcalenko)
 
@@ -30,6 +65,7 @@ A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form 
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
+..F....... [ZBX-12277] fixed trigger expression test form incorrectly replacing macros (Ivo)
 ........S. [ZBX-12357] fixed missing user macro substitution in expression of newly added triggers (vso)
 
 --------------------------------------------------------------------------------
@@ -54,7 +90,7 @@ A.F.I..PS. [ZBXNEXT-1675] added support for user macros and time unit suffixes i
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)
-A.FG...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite3 support for frontend and server (abs)
+A.FG...PS. [ZBXNEXT-3687] made shared memory and semaphores private to the zabbix processes. Dropped SQLite3 support for frontend and server (abs)
 A.F.I..... [ZBXNEXT-2694] implemented multiple triggers support for map elements (Oleg)
 ....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors (abs)
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)
@@ -117,7 +153,9 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
+........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
@@ -135,7 +173,6 @@ New features:
 A.F....... [ZBX-1357] updated Catalan, Chinese (China), English (United States), Japanese, Korean, Polish, Portuguese (Brazil), Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
 ..F....... [ZBX-12252] fixed history page to display values in chronological order (Sasha)
 
 --------------------------------------------------------------------------------
@@ -574,6 +611,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
@@ -2288,6 +2326,7 @@ Changes for 2.2.20rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
 
 --------------------------------------------------------------------------------

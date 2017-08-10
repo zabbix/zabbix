@@ -12,7 +12,13 @@ sbin_PROGRAMS = zabbix_proxy
 zabbix_proxy_SOURCES = \
 	servercomms.c servercomms.h \
 	events.c \
-	proxy.c
+	preprocessing.c \
+	proxy.c 
+	
+	
+if PROXY_IPCSERVICE
+LIBIPCSERVICE = $(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a
+endif
 	
 zabbix_proxy_LDADD = \
 	heart/libzbxheart.a \
@@ -42,6 +48,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	${LIBIPCSERVICE} \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
@@ -57,9 +64,8 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a
+	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a 
 	
-
 zabbix_proxy_LDADD += @PROXY_LIBS@
 
 zabbix_proxy_LDFLAGS = @PROXY_LDFLAGS@

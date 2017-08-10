@@ -43,8 +43,12 @@ $fields = [
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'key' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Key')],
+	'master_itemid' =>			[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({type}) && {type}=='.ITEM_TYPE_DEPENDENT, _('Master item')],
+	'master_itemname' =>		[T_ZBX_STR, O_OPT, null,	null,			null],
 	'delay' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type}!='.ITEM_TYPE_TRAPPER.' && {type}!='.ITEM_TYPE_SNMPTRAP,
+		'(isset({add}) || isset({update})) && isset({type}) && {type}!='.ITEM_TYPE_TRAPPER.
+			' && {type}!='.ITEM_TYPE_SNMPTRAP.' && {type}!='.ITEM_TYPE_DEPENDENT,
 		_('Update interval')
 	],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -55,7 +59,7 @@ $fields = [
 	'type' =>					[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP]), 'isset({add}) || isset({update})'],
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT]), 'isset({add}) || isset({update})'],
 	'trends' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type}) && '.
 			IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
@@ -147,7 +151,8 @@ $fields = [
 	'filter_type' =>			[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 		ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-		ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP]), null],
+		ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
+		ITEM_TYPE_DEPENDENT]), null],
 	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_snmp_community' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_snmpv3_securityname' => [T_ZBX_STR, O_OPT, null, null,		null],
@@ -552,6 +557,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['preprocessing'] = $preprocessing;
 			}
 
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = getRequest('master_itemid');
+			}
+
 			$result = (bool) API::Item()->create($item);
 		}
 		else {
@@ -561,7 +570,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
 					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'history',
 					'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description', 'status',
-					'templateid', 'flags', 'jmx_endpoint'
+					'templateid', 'flags', 'jmx_endpoint', 'master_itemid'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params'],
@@ -692,6 +701,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($db_item['preprocessing'] !== $preprocessing) {
 				$item['preprocessing'] = $preprocessing;
+			}
+
+			if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
 			if ($item) {
@@ -914,7 +927,8 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'privatekey' => getRequest('privatekey'),
 				'ipmi_sensor' => getRequest('ipmi_sensor'),
 				'applications' => $applications,
-				'status' => getRequest('status')
+				'status' => getRequest('status'),
+				'master_itemid' => getRequest('master_itemid')
 			];
 			if (hasRequest('preprocessing')) {
 				$preprocessing = getRequest('preprocessing');
@@ -1139,6 +1153,9 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
  * Display
  */
 if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'), 'update', 'clone'])) {
+	$master_item_options = [];
+	$has_errors = false;
+
 	if (hasRequest('itemid')) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
@@ -1146,7 +1163,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
@@ -1161,15 +1178,41 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 			$step['params'] = explode("\n", $step['params']);
 		}
 		unset($step);
+
+		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_item_options = [
+				'itemids'	=> $item['master_itemid'],
+				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
+			];
+		}
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output' => ['status'],
-			'hostids' => getRequest('hostid'),
-			'templated_hosts' => true
+			'output'			=> ['status'],
+			'hostids'			=> getRequest('hostid'),
+			'templated_hosts'	=> true
 		]);
 		$item = [];
 		$host = $hosts[0];
+
+		if ($host && getRequest('master_itemid')) {
+			$master_item_options = [
+				'itemids'	=> getRequest('master_itemid'),
+				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'filter'	=> ['hostid' => $host['hostid']]
+			];
+		}
+	}
+
+	if ($master_item_options) {
+		$master_items = API::Item()->get($master_item_options);
+		if ($master_items) {
+			$item['master_item'] = reset($master_items);
+		}
+		else {
+			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
+			$has_errors = true;
+		}
 	}
 
 	$data = getItemFormData($item);
@@ -1188,9 +1231,11 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	}
 
 	// render view
-	$itemView = new CView('configuration.item.edit', $data);
-	$itemView->render();
-	$itemView->show();
+	if (!$has_errors) {
+		$itemView = new CView('configuration.item.edit', $data);
+		$itemView->render();
+		$itemView->show();
+	}
 }
 elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform') || hasRequest('massupdate'))
 		&& hasRequest('group_itemid')) {
@@ -1355,7 +1400,7 @@ else {
 		'search' => [],
 		'output' => [
 			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
-			'templateid', 'flags', 'state'
+			'templateid', 'flags', 'state', 'master_itemid'
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
@@ -1451,7 +1496,8 @@ else {
 
 				$options['filter']['delay'] = $filter_delay;
 			}
-			elseif ($filter_type == ITEM_TYPE_TRAPPER || $filter_type == ITEM_TYPE_SNMPTRAP) {
+			elseif ($filter_type == ITEM_TYPE_TRAPPER || $filter_type == ITEM_TYPE_SNMPTRAP
+					|| $filter_type == ITEM_TYPE_DEPENDENT) {
 				$options['filter']['delay'] = -1;
 			}
 			else {
@@ -1525,7 +1571,7 @@ else {
 		}
 
 		// resolve name macros
-		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+		$data['items'] = expandItemNamesWithMasterItems($data['items'], API::Item());
 
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
@@ -1540,7 +1586,8 @@ else {
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 
-			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
+					|| $item['type'] == ITEM_TYPE_DEPENDENT) {
 				$delay = '';
 			}
 			else {
@@ -1695,7 +1742,7 @@ else {
 
 	foreach ($data['items'] as $item) {
 		if (array_key_exists('template_host', $item)) {
-			$hostids = array_merge($hostids, zbx_objectValues($item['template_host'], 'itemid'));
+			$hostids = array_merge($hostids, zbx_objectValues($item['template_host'], 'hostid'));
 		}
 	}
 

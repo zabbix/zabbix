@@ -1849,6 +1849,21 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: absolute;
   z-index: 999; }
 
+.dashbrd-grid-empty-placeholder {
+  width: 16%;
+  height: 200px;
+  background-color: #fff;
+  border-style: dashed;
+  border-width: 2px;
+  border-color: #bdbdbd;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: .25rem;
+  padding: 10px; }
+  .dashbrd-grid-empty-placeholder h1 {
+    text-align: center; }
+
 .dashbrd-grid-widget-mask {
   position: absolute;
   width: 100%;
@@ -2220,6 +2235,17 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .overlay-dialogue.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    max-height: 90%;
+    max-width: 75%;
+    overflow: auto;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); }
   .overlay-dialogue .list-table {
     border: none; }
   .overlay-dialogue .table-paging {
@@ -2239,6 +2265,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin-left: -10px; }
 
 .overlay-dialogue-body {
+  margin: 0 0 25px 0;
   white-space: nowrap; }
 
 .overlay-dialogue-footer {
@@ -2481,6 +2508,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .blue, a.blue {
   color: #429ae3; }
+
+.teal, a.teal {
+  color: #0f998b; }
 
 .progress-bar-container {
   display: inline-block;

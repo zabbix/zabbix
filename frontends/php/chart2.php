@@ -29,14 +29,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'graphid' =>		[T_ZBX_INT, O_MAND, P_SYS,		DB_ID,		null],
+	'graphid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
 	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
-	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,		null],
-	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,		null,		null],
-	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
-	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
-	'width' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(20, 65535),		null],
-	'height' =>			[T_ZBX_INT, O_OPT, P_NZERO,	'{} > 0',		null]
+	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
+	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
+	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -48,7 +49,10 @@ if (!check_fields($fields)) {
 $dbGraph = API::Graph()->get([
 	'output' => API_OUTPUT_EXTEND,
 	'selectGraphItems' => API_OUTPUT_EXTEND,
-	'selectHosts' => ['name'],
+	'selectHosts' => ['hostid', 'name', 'host'],
+	'selectItems' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
+		'value_type', 'key_'
+	],
 	'graphids' => $_REQUEST['graphid']
 ]);
 
@@ -80,15 +84,21 @@ CArrayHelper::sort($dbGraph['gitems'], [
 	['field' => 'itemid', 'order' => ZBX_SORT_DOWN]
 ]);
 
-// get graph items
-foreach ($dbGraph['gitems'] as $gItem) {
-	$graph->addItem(
-		$gItem['itemid'],
-		$gItem['yaxisside'],
-		$gItem['calc_fnc'],
-		$gItem['color'],
-		$gItem['drawtype']
-	);
+$hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
+$items = zbx_toHash($dbGraph['items'], 'itemid');
+
+foreach ($dbGraph['gitems'] as $graph_item) {
+	$item = $items[$graph_item['itemid']];
+	$host = $hosts[$item['hostid']];
+
+	$graph->addItem($item + [
+		'host' => $host['host'],
+		'hostname' => $host['name'],
+		'color' => $graph_item['color'],
+		'drawtype' => $graph_item['drawtype'],
+		'axisside' => $graph_item['yaxisside'],
+		'calc_fnc' => $graph_item['calc_fnc']
+	]);
 }
 
 $hostName = '';
@@ -130,6 +140,21 @@ $graph->setYMinItemId($dbGraph['ymin_itemid']);
 $graph->setYMaxItemId($dbGraph['ymax_itemid']);
 $graph->setLeftPercentage($dbGraph['percent_left']);
 $graph->setRightPercentage($dbGraph['percent_right']);
+
+if (hasRequest('outer')) {
+	$graph->setOuter(getRequest('outer'));
+}
+
+$min_dimentions = $graph->getMinDimensions();
+if ($min_dimentions['width'] > $graph->getWidth()) {
+	$graph->setWidth($min_dimentions['width']);
+}
+if ($min_dimentions['height'] > $graph->getHeight()) {
+	$graph->setHeight($min_dimentions['height']);
+}
+
 $graph->draw();
+
+header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -20,6 +20,9 @@
 
 class CWidgetField {
 
+	const FLAG_ACKNOWLEDGES = 0x01;
+	const FLAG_NOT_EMPTY = 0x02;
+
 	protected	$name;
 	protected	$label;
 	protected	$value;
@@ -28,6 +31,7 @@ class CWidgetField {
 	protected	$action;
 	private		$validation_rules = [];
 	private		$ex_validation_rules = [];
+	private		$flags;
 
 	/**
 	 * Create widget field (general)
@@ -40,6 +44,7 @@ class CWidgetField {
 		$this->label = $label;
 		$this->value = null;
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->flags = 0x00;
 	}
 
 	public function setValue($value) {
@@ -85,6 +90,7 @@ class CWidgetField {
 
 			case ZBX_WIDGET_FIELD_TYPE_ITEM:
 			case ZBX_WIDGET_FIELD_TYPE_MAP:
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 				$this->validation_rules = ['type' => API_ID];
 				break;
 
@@ -130,7 +136,36 @@ class CWidgetField {
 		return $this->save_type;
 	}
 
-	public function validate() {
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 *
+	 * @param int $flags
+	 *
+	 * @return $this
+	 */
+	public function setFlags($flags) {
+		$this->flags = $flags;
+
+		return $this;
+	}
+
+	/**
+	 * Get additional flags, which can be used in configuration form.
+	 *
+	 * @return int
+	 */
+	public function getFlags() {
+		return $this->flags;
+	}
+
+	/**
+	 * Validate field.
+	 *
+	 * @param bool $strict  Enables more strict validation of the field.
+	 *
+	 * @return bool
+	 */
+	public function validate($strict = false) {
 		$errors = [];
 
 		$validation_rules = $this->validation_rules + $this->ex_validation_rules;
@@ -145,13 +180,14 @@ class CWidgetField {
 	}
 
 	/**
-	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
+	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
+	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
+	 * fields it causes significant performance decrease.
 	 *
-	 * @return array  An array of widget fields ready for saving in API.
+	 * @param array $widget_fields   reference to Array of widget fields.
 	 */
-	public function toApi() {
+	public function toApi(array &$widget_fields = []) {
 		$value = $this->getValue();
-		$widget_fields = [];
 
 		if ($value !== null && $value !== $this->default) {
 			$widget_field = [
@@ -170,7 +206,5 @@ class CWidgetField {
 				$widget_fields[] = $widget_field;
 			}
 		}
-
-		return $widget_fields;
 	}
 }

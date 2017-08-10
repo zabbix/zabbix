@@ -131,18 +131,6 @@ static int	dbsync_compare_int(const char *value_raw, int value)
 
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_compare_bool_time                                         *
- *                                                                            *
- * Purpose: compares history/trends storing flag with a raw database value    *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_bool_time(const char *value_raw, unsigned char value)
-{
-	return (zbx_time2bool(value_raw) == value ? SUCCEED : FAIL);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dbsync_compare_uchar                                             *
  *                                                                            *
  * Purpose: compares unsigned character with a raw database value             *
@@ -1251,8 +1239,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_CALCITEM		*calcitem;
+	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
-	unsigned char		value_type, type;
+	unsigned char		value_type, type, history, trends;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
@@ -1280,15 +1269,12 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		return FAIL;
 
 	if (ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
-	{
-		if (item->history != dbsync_env.cache->config->hk.history)
-			return FAIL;
-	}
+		history = (0 != dbsync_env.cache->config->hk.history);
 	else
-	{
-		if (FAIL == dbsync_compare_bool_time(dbrow[31], item->history))
-			return FAIL;
-	}
+		history = zbx_time2bool(dbrow[31]);
+
+	if (item->history != history)
+		return FAIL;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[33], item->inventory_link))
 		return FAIL;
@@ -1313,15 +1299,12 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 
 		if (ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.trends_global)
-		{
-			if (numitem->trends != dbsync_env.cache->config->hk.trends)
-				return FAIL;
-		}
+			trends = (0 != dbsync_env.cache->config->hk.trends);
 		else
-		{
-			if (FAIL == dbsync_compare_bool_time(dbrow[32], numitem->trends))
-				return FAIL;
-		}
+			trends = zbx_time2bool(dbrow[32]);
+
+		if (trends != numitem->trends)
+			return FAIL;
 
 		if (FAIL == dbsync_compare_str(dbrow[35], numitem->units))
 			return FAIL;
@@ -1511,6 +1494,18 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	else if (NULL != calcitem)
 		return FAIL;
 
+	depitem = (ZBX_DC_DEPENDENTITEM *)zbx_hashset_search(&dbsync_env.cache->dependentitems, &item->itemid);
+	if (ITEM_TYPE_DEPENDENT == item->type)
+	{
+		if (NULL == depitem)
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uint64(dbrow[38], depitem->master_itemid))
+			return FAIL;
+	}
+	else if (NULL != depitem)
+		return FAIL;
+
 	return SUCCEED;
 }
 
@@ -1602,7 +1597,8 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.trapper_hosts,i.logtimefmt,i.params,i.state,i.authtype,i.username,i.password,"
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
 				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,"
-				"i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error,i.jmx_endpoint"
+				"i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error,i.jmx_endpoint,"
+				"i.master_itemid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
@@ -1613,7 +1609,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 38, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 39, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

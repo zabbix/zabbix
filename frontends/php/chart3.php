@@ -35,8 +35,8 @@ $fields = [
 	'httptestid' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
 	'http_item_type' =>	[T_ZBX_INT, O_OPT, null,		null,				null],
 	'name' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
-	'width' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	null],
-	'height' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
 	'ymin_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
 	'ymax_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
 	'ymin_itemid' =>	[T_ZBX_INT, O_OPT, null,		DB_ID,				null],
@@ -49,42 +49,34 @@ $fields = [
 	'yaxismax' =>		[T_ZBX_DBL, O_OPT, null,		null,				null],
 	'percent_left' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
+	'outer' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
 	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null]
 ];
 if (!check_fields($fields)) {
 	exit();
 }
+$graph_items = [];
 
 if ($httptestid = getRequest('httptestid', false)) {
 	$httptests = API::HttpTest()->get([
 		'output' => [],
-		'httptestids' => $httptestid
+		'httptestids' => $httptestid,
+		'selectHosts' => ['hostid', 'name', 'host']
 	]);
 
 	if (!$httptests) {
 		access_deny();
 	}
 
-	$color = [
-		'current' => 0,
-		0 => ['next' => '1'],
-		1 => ['color' => 'Red', 'next' => '2'],
-		2 => ['color' => 'Dark Green', 'next' => '3'],
-		3 => ['color' => 'Blue', 'next' => '4'],
-		4 => ['color' => 'Dark Yellow', 'next' => '5'],
-		5 => ['color' => 'Cyan', 'next' => '6'],
-		6 => ['color' => 'Gray', 'next' => '7'],
-		7 => ['color' => 'Dark Red', 'next' => '8'],
-		8 => ['color' => 'Green', 'next' => '9'],
-		9 => ['color' => 'Dark Blue', 'next' => '10'],
-		10 => ['color' => 'Yellow', 'next' => '11'],
-		11 => ['color' => 'Black', 'next' => '1']
+	$colors = ['Red', 'Dark Green', 'Blue', 'Dark Yellow', 'Cyan', 'Gray', 'Dark Red', 'Green', 'Dark Blue', 'Yellow',
+		'Black'
 	];
-
+	$color = false;
 	$items = [];
+	$hosts = zbx_toHash($httptests[0]['hosts'], 'hostid');
 
 	$dbItems = DBselect(
-		'SELECT i.itemid'.
+		'SELECT i.itemid, i.type, i.name, i.delay, i.units, i.hostid, i.history, i.trends, i.value_type, i.key_'.
 		' FROM httpstepitem hi,items i,httpstep hs'.
 		' WHERE i.itemid=hi.itemid'.
 			' AND hs.httptestid='.zbx_dbstr($httptestid).
@@ -93,9 +85,12 @@ if ($httptestid = getRequest('httptestid', false)) {
 		' ORDER BY hs.no DESC'
 	);
 	while ($item = DBfetch($dbItems)) {
-		$itemColor = $color[$color['current'] = $color[$color['current']]['next']]['color'];
-
-		$items[] = ['itemid' => $item['itemid'], 'color' => $itemColor];
+		$graph_items[] = $item + [
+			'color' 	=> ($color === false) ? reset($colors) : $color,
+			'host'		=> $hosts[$item['hostid']]['host'],
+			'hostname'	=> $hosts[$item['hostid']]['name']
+		];
+		$color = next($colors);
 	}
 
 	$name = getRequest('name', '');
@@ -105,7 +100,10 @@ elseif ($items = getRequest('items', [])) {
 
 	$dbItems = API::Item()->get([
 		'itemids' => zbx_objectValues($items, 'itemid'),
-		'output' => ['itemid'],
+		'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
+			'value_type', 'key_'
+		],
+		'selectHosts' => ['hostid', 'name', 'host'],
 		'filter' => [
 			'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 		],
@@ -114,9 +112,15 @@ elseif ($items = getRequest('items', [])) {
 	]);
 
 	foreach ($items as $item) {
-		if (!isset($dbItems[$item['itemid']])) {
+		if (!array_key_exists($item['itemid'], $dbItems)) {
 			access_deny();
 		}
+		$host = reset($dbItems[$item['itemid']]['hosts']);
+		unset($dbItems[$item['itemid']]['hosts']);
+		$graph_items[] = $dbItems[$item['itemid']] + $item + [
+			'host'		=> $host['host'],
+			'hostname'	=> $host['name']
+		];
 	}
 	$name = getRequest('name', '');
 }
@@ -157,17 +161,14 @@ $graph->setYMinItemId(getRequest('ymin_itemid', 0));
 $graph->setYMaxItemId(getRequest('ymax_itemid', 0));
 $graph->setLeftPercentage(getRequest('percent_left', 0));
 $graph->setRightPercentage(getRequest('percent_right', 0));
+$graph->setOuter(getRequest('outer', 0));
 
-foreach ($items as $item) {
-	$graph->addItem(
-		$item['itemid'],
-		isset($item['yaxisside']) ? $item['yaxisside'] : null,
-		isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
-		isset($item['color']) ? $item['color'] : null,
-		isset($item['drawtype']) ? $item['drawtype'] : null
-	);
+foreach ($graph_items as $graph_item) {
+	$graph->addItem($graph_item);
 }
 
 $graph->draw();
+
+header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
 
 require_once dirname(__FILE__).'/include/page_footer.php';

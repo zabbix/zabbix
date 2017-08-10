@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * Clock widget form.
+ */
 class CClockWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
@@ -32,16 +36,19 @@ class CClockWidgetForm extends CWidgetForm {
 		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), $time_types))
 			->setDefault(TIME_TYPE_LOCAL)
 			->setAction('updateWidgetConfigDialogue()');
-		if (array_key_exists('time_type', $data)) {
-			$field_time_type->setValue($data['time_type']);
+
+		if (array_key_exists('time_type', $this->data)) {
+			$field_time_type->setValue($this->data['time_type']);
 		}
 		$this->fields[] = $field_time_type;
 
 		// Item field
 		if ($field_time_type->getValue() === TIME_TYPE_HOST) {
-			$field_item = new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM);
-			if (array_key_exists('itemid', $data)) {
-				$field_item->setValue($data['itemid']);
+			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+
+			if (array_key_exists('itemid', $this->data)) {
+				$field_item->setValue($this->data['itemid']);
 			}
 			$this->fields[] = $field_item;
 		}

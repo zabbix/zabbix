@@ -100,6 +100,7 @@ class CRouter {
 		'widget.favmap.view'	=> ['CControllerWidgetFavMapsView',		'layout.widget',		'monitoring.widget.favmaps.view'],
 		'widget.favscr.view'	=> ['CControllerWidgetFavScreensView',	'layout.widget',		'monitoring.widget.favscreens.view'],
 		'widget.dscvry.view'	=> ['CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'],
+		'widget.graph.view'		=> ['CControllerWidgetGraphView',		'layout.widget',		'monitoring.widget.graph.view'],
 		'widget.hoststat.view'	=> ['CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'],
 		'widget.problems.view'	=> ['CControllerWidgetProblemsView',	'layout.widget',		'monitoring.widget.problems.view'],
 		'widget.stszbx.view'	=> ['CControllerWidgetStatusView',		'layout.widget',		'monitoring.widget.status.view'],
@@ -113,7 +114,8 @@ class CRouter {
 		'widget.actlog.view'	=> ['CControllerWidgetActionLogView',	'layout.widget',		'monitoring.widget.actionlog.view'],
 		'widget.dataover.view'	=> ['CControllerWidgetDataOverView',	'layout.widget',		'monitoring.widget.dataover.view'],
 		'widget.trigover.view'	=> ['CControllerWidgetTrigOverView',	'layout.widget',		'monitoring.widget.trigover.view'],
-		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view']
+		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view'],
+		'widget.plaintext.view'	=> ['CControllerWidgetPlainTextView',	'layout.widget',		'monitoring.widget.plaintext.view'],
 	];
 
 	public function __construct($action) {

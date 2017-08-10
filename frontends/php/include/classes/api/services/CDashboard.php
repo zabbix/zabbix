@@ -350,6 +350,8 @@ class CDashboard extends CApiService {
 			'preservekeys' => true
 		]);
 
+		$dashboards = $this->extendObjectsByKey($dashboards, $db_dashboards, 'dashboardid', ['name']);
+
 		$names = [];
 
 		$widget_defaults = [
@@ -370,7 +372,7 @@ class CDashboard extends CApiService {
 
 			$db_dashboard = $db_dashboards[$dashboard['dashboardid']];
 
-			if (array_key_exists('name', $dashboard) && $dashboard['name'] !== $db_dashboard['name']) {
+			if ($dashboard['name'] !== $db_dashboard['name']) {
 				$names[] = $dashboard['name'];
 			}
 
@@ -533,7 +535,7 @@ class CDashboard extends CApiService {
 	 *
 	 * @param array  $dashboards
 	 * @param string $dashboards[]['name']
-	 * @param array  $dashboards[]['widgets']
+	 * @param array  $dashboards[]['widgets']              (optional)
 	 * @param int    $dashboards[]['widgets'][]['row']
 	 * @param int    $dashboards[]['widgets'][]['col']
 	 * @param int    $dashboards[]['widgets'][]['height']
@@ -565,7 +567,7 @@ class CDashboard extends CApiService {
 							|| $widget['col'] + $widget['width'] - 1 > self::MAX_COL) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Dashboard "%1$s" widget in cell X - %2$s Y - %3$s is ouf of bounds.',
-								$dashboards[$dashboardid]['name'], $widget['col'], $widget['row']
+								$dashboard['name'], $widget['col'], $widget['row']
 							)
 						);
 					}

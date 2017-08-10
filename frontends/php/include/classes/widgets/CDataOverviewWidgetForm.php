@@ -20,25 +20,24 @@
 
 
 /**
- * Action log widget form
+ * Data overview widget form.
  */
 class CDataOverviewWidgetForm extends CWidgetForm {
 
-	public function __construct($data)
-	{
+	public function __construct($data) {
 		parent::__construct($data);
 
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
-		if (array_key_exists('groupids', $data)) {
-			$field_groups->setValue($data['groupids']);
+		if (array_key_exists('groupids', $this->data)) {
+			$field_groups->setValue($this->data['groupids']);
 		}
 		$this->fields[] = $field_groups;
 
 		$field_application = new CWidgetFieldTextBox('application', _('Application'));
 
-		if (array_key_exists('application', $data)) {
-			$field_application->setValue($data['application']);
+		if (array_key_exists('application', $this->data)) {
+			$field_application->setValue($this->data['application']);
 		}
 		$this->fields[] = $field_application;
 
@@ -51,8 +50,8 @@ class CDataOverviewWidgetForm extends CWidgetForm {
 			->setDefault(STYLE_LEFT)
 			->setModern(true);
 
-		if (array_key_exists('style', $data)) {
-			$field_style->setValue($data['style']);
+		if (array_key_exists('style', $this->data)) {
+			$field_style->setValue($this->data['style']);
 		}
 		$this->fields[] = $field_style;
 	}

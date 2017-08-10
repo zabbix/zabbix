@@ -28,8 +28,8 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 
 		$this->setType(WIDGET_DATA_OVERVIEW);
 		$this->setValidationRules([
-			'name' =>	'string',
-			'fields' =>	'array'
+			'name' => 'string',
+			'fields' => 'json'
 		]);
 	}
 

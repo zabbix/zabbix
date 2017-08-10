@@ -27,6 +27,7 @@ $alt-blue-grey: #97aab3;
 $white: #fff !default;
 $transparent: transparent;
 
+$teal: #0f998b;
 
 // MAIN
 $main-nav-bg-color: #fff !default;
@@ -86,6 +87,9 @@ $btn-disabled-font-color: #acbbc2 !default;
 $btn-disabled-bg-color: #ebebeb !default;
 $btn-disabled-border-color: #ccd5d9 !default;
 
+$btn-back-map-background-color: rgba(255, 255, 255, 0.8) !default;
+$btn-back-text-color: #0275b8 !default;
+$btn-back-background-hover: $form-bg-color !default;
 
 // LINKS
 $link-color: #0275b8 !default;

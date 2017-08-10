@@ -86,21 +86,32 @@ void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num)
  ******************************************************************************/
 void	zbx_queue_ptr_compact(zbx_queue_ptr_t *queue)
 {
-	int values_num, resize_num;
+	int values_num, alloc_num;
 
-	values_num = zbx_queue_ptr_values_num(queue) + 1;
+	values_num = zbx_queue_ptr_values_num(queue);
+	alloc_num = values_num + 1;
 
-	resize_num = queue->alloc_num - values_num;
-	queue->alloc_num = values_num;
+	if (alloc_num == queue->alloc_num)
+		return;
 
-	if (queue->tail_pos > queue->head_pos)
+	if (0 != queue->tail_pos)
 	{
-		memmove(queue->values + queue->head_pos + 1, queue->values + queue->tail_pos,
-				resize_num * sizeof(*queue->values));
-		queue->tail_pos = queue->head_pos + 1;
+		if (queue->tail_pos > queue->head_pos)
+		{
+			memmove(queue->values + queue->head_pos + 1, queue->values + queue->tail_pos,
+					(queue->alloc_num - queue->tail_pos) * sizeof(*queue->values));
+			queue->tail_pos = queue->head_pos + 1;
+		}
+		else
+		{
+			memmove(queue->values, queue->values + queue->tail_pos, values_num * sizeof(*queue->values));
+			queue->tail_pos = 0;
+			queue->head_pos = values_num;
+		}
 	}
 
-	queue->values = zbx_realloc(queue->values, queue->alloc_num * sizeof(*queue->values));
+	queue->values = zbx_realloc(queue->values, alloc_num * sizeof(*queue->values));
+	queue->alloc_num = alloc_num;
 }
 
 /******************************************************************************
@@ -171,6 +182,9 @@ void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue)
 
 		if (queue->tail_pos == queue->alloc_num)
 			queue->tail_pos = 0;
+
+		if (queue->head_pos == queue->alloc_num)
+			queue->head_pos = 0;
 	}
 	else
 		value = NULL;
@@ -222,9 +236,10 @@ void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value)
 			for (; i > queue->tail_pos; i--)
 				queue->values[i] = queue->values[i - 1];
 
-			queue->tail_pos++;
+			if (++queue->tail_pos == queue->alloc_num)
+				queue->tail_pos = 0;
+
 			return;
 		}
 	}
 }
-

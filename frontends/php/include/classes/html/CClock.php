@@ -28,7 +28,6 @@ class CClock extends CDiv {
 	private $time_zone_offset;
 	private $error;
 	private $script_file;
-	private $script_run;
 
 	public function __construct() {
 		parent::__construct();
@@ -43,7 +42,6 @@ class CClock extends CDiv {
 		$this->time_zone_offset = null;
 		$this->error = null;
 		$this->script_file = 'js/class.cclock.js';
-		$this->script_run = '';
 	}
 
 	public function setWidth($value) {
@@ -93,17 +91,18 @@ class CClock extends CDiv {
 	}
 
 	public function getScriptRun() {
-		if ($this->error === null) {
-			$js_options = [
-				'time' => $this->time,
-				'time_zone_string' => $this->time_zone_string,
-				'time_zone_offset' => $this->time_zone_offset,
-				'clock_id' => $this->getId()
-			];
-			$this->script_run = 'jQuery("#'.$this->getId().'").zbx_clock('.CJs::encodeJson($js_options).');';
-		}
-
-		return $this->script_run;
+		return ($this->error === null)
+			? 'jQuery(function($) {'.
+				'$("#'.$this->getId().'").zbx_clock('.
+					CJs::encodeJson([
+						'time' => $this->time,
+						'time_zone_string' => $this->time_zone_string,
+						'time_zone_offset' => $this->time_zone_offset,
+						'clock_id' => $this->getId()
+					]).
+				');'.
+			'});'
+			: '';
 	}
 
 	private function makeClockLine($width, $height, $x, $y, $deg) {
