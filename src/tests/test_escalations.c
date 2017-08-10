@@ -107,7 +107,7 @@ void test_successful_process_escalations()
 	dbrow_esc[3] = "1";		/* eventid */
 	dbrow_esc[4] = "0";		/* r_eventid */
 	dbrow_esc[5] = "1501594532";	/* nextcheck */
-	dbrow_esc[6] = "0";		/* esc_step
+	dbrow_esc[6] = "0";		/* esc_step */
 	dbrow_esc[7] = "0";		/* status (0 - ESCALATION_STATUS_ACTIVE) */
 	dbrow_esc[8] = "1";		/* itemid */
 	dbrow_esc[9] = "0";		/* acknowledgeid */
@@ -223,22 +223,22 @@ void test_successful_process_escalations()
 
 	/* checking user permissions to access system (check_perm2system) */
 	dbrow_prm = zbx_calloc(NULL, MAX_DBROWS, sizeof(char *));
-	dbrow_prm[0] = "1";		/* count(*)
+	dbrow_prm[0] = "1";		/* count(*) */
 	will_return(__wrap_zbx_db_fetch, dbrow_prm);
 
-	/* check user permissions for access to trigger (get_trigger_permission) */
-	dbrow_pr2 = zbx_calloc(NULL, MAX_DBROWS, sizeof(char *));
-	dbrow_pr2[0] = "1";		/* hostid
-	will_return(__wrap_zbx_db_fetch, dbrow_pr2);
+		/* check user permissions for access to trigger (get_trigger_permission) */
+		dbrow_pr2 = zbx_calloc(NULL, MAX_DBROWS, sizeof(char *));
+		dbrow_pr2[0] = "1";		/* hostid */
+		will_return(__wrap_zbx_db_fetch, dbrow_pr2);
 
-	/* check user permissions for access to the host (get_host_permission) */
-	dbrow_pr3 = zbx_calloc(NULL, MAX_DBROWS, sizeof(char *));
-	dbrow_pr3[0] = "3";		/* type (3 - USER_TYPE_SUPER_ADMIN)
-	will_return(__wrap_zbx_db_fetch, dbrow_pr3);
+			/* check user permissions for access to the host (get_host_permission) */
+			dbrow_pr3 = zbx_calloc(NULL, MAX_DBROWS, sizeof(char *));
+			dbrow_pr3[0] = "3";		/* type (3 - USER_TYPE_SUPER_ADMIN) */
+			will_return(__wrap_zbx_db_fetch, dbrow_pr3);
+			will_return(__wrap_zbx_db_fetch, NULL); /* END check user permissions for access to trigger */
 
-	will_return(__wrap_zbx_db_fetch, NULL); /* END check user permissions for access to trigger */
+		will_return(__wrap_zbx_db_fetch, NULL); /* END get userid from db */
 
-	will_return(__wrap_zbx_db_fetch, NULL); /* END get userid from db */
 	will_return(__wrap_zbx_db_fetch, NULL); /* END get operations from db */
 
 	/** get media from db */

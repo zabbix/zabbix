@@ -948,7 +948,7 @@ skip:
 
 #undef ZBX_IPMI_FIELDS_NUM
 
-static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
+int	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		zbx_uint64_t ackid)
 {
@@ -959,6 +959,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	int		now, severity, medias_num = 0, status, res;
 	char		error[MAX_STRING_LEN], *perror, *period = NULL;
 	zbx_db_insert_t	db_insert;
+	int 		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1023,7 +1024,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		else
 		{
 			status = ALERT_STATUS_FAILED;
-			perror = "Media type disabled";
+			perror = "Media type disabled";static
 		}
 
 		if (0 == medias_num++)
@@ -1084,6 +1085,8 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
