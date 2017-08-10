@@ -57,72 +57,75 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$dynamic_widget_name = null;
 		$table_rows = [];
 
+		$items = ($fields['itemid'] != 0)
+			? API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+				'selectHosts' => ['name'],
+				'itemids' => $fields['itemid'],
+				'webitems' => true
+			])
+			: [];
+
 		// Select dynamically selected host.
-		if ($dynamic && $dynamic_hostid) {
-			$new_itemid = get_same_item_for_host($fields['itemid'], $dynamic_hostid);
-			$fields['itemid'] = $new_itemid ?: 0;
+		if ($items && $dynamic && $dynamic_hostid) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+				'selectHosts' => ['name'],
+				'filter' => [
+					'hostid' => $dynamic_hostid,
+					'key_' => $items[0]['key_']
+				],
+				'webitems' => true
+			]);
 		}
 
 		// Resolve item name.
-		if ($fields['itemid']) {
-			$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($fields['itemid'])]);
-		}
-		else {
-			$items = [];
-		}
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		if (!$items) {
 			$error = _('No permissions to selected item or it does not exist.');
 		}
 		// Select host name and item history data.
-		elseif (($item = reset($items)) !== false) {
-			$host = API::Host()->get([
-				'output' => ['name'],
-				'hostids' => $item['hostid']
+		else {
+			$item = $items[0];
+			$host = $item['hosts'][0];
+
+			$dynamic_widget_name = $host['name'].NAME_DELIMITER.$item['name_expanded'];
+
+			$histories = API::History()->get([
+				'output' => API_OUTPUT_EXTEND,
+				'history' => $item['value_type'],
+				'itemids' => $item['itemid'],
+				'sortorder' => ZBX_SORT_DOWN,
+				'sortfield' => ['itemid', 'clock'],
+				'limit' => $show_lines
 			]);
 
-			if (($host = reset($host)) !== false) {
-				$dynamic_widget_name = $host['name'].NAME_DELIMITER.$item['name_expanded'];
-
-				$histories = API::History()->get([
-					'history' => $item['value_type'],
-					'itemids' => $item['itemid'],
-					'output' => API_OUTPUT_EXTEND,
-					'sortorder' => ZBX_SORT_DOWN,
-					'sortfield' => ['itemid', 'clock'],
-					'limit' => $show_lines
-				]);
-
-				foreach ($histories as $history) {
-					switch ($item['value_type']) {
-						case ITEM_VALUE_TYPE_FLOAT:
-							sscanf($history['value'], '%f', $value);
-							break;
-						case ITEM_VALUE_TYPE_TEXT:
-						case ITEM_VALUE_TYPE_STR:
-						case ITEM_VALUE_TYPE_LOG:
-							$value = $style ? new CJsScript($history['value']) : $history['value'];
-							break;
-						default:
-							$value = $history['value'];
-							break;
-					}
-
-					if ($item['valuemapid'] > 0) {
-						$value = applyValueMap($value, $item['valuemapid']);
-					}
-
-					if ($style == 0) {
-						$value = new CPre($value);
-					}
-
-					$table_rows[] = [zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), $value];
+			foreach ($histories as $history) {
+				switch ($item['value_type']) {
+					case ITEM_VALUE_TYPE_FLOAT:
+						sscanf($history['value'], '%f', $value);
+						break;
+					case ITEM_VALUE_TYPE_TEXT:
+					case ITEM_VALUE_TYPE_STR:
+					case ITEM_VALUE_TYPE_LOG:
+						$value = $style ? new CJsScript($history['value']) : $history['value'];
+						break;
+					default:
+						$value = $history['value'];
+						break;
 				}
-			}
-		}
 
-		if ($error === null && !$table_rows) {
-			$error = _('No data found.');
+				if ($item['valuemapid'] != 0) {
+					$value = applyValueMap($value, $item['valuemapid']);
+				}
+
+				if ($style == 0) {
+					$value = new CPre($value);
+				}
+
+				$table_rows[] = [zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), $value];
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData([
