@@ -722,8 +722,9 @@ class CItem extends CItemGeneral {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
+		$itemids = array_map('strval', array_values($itemIds));
 
-		return ['itemids' => $itemIds];
+		return ['itemids' => $itemids];
 	}
 
 	public function syncTemplates($data) {

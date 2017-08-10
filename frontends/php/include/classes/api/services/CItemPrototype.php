@@ -885,6 +885,7 @@ class CItemPrototype extends CItemGeneral {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
+		$prototypeids = array_map('strval', $prototypeids);
 
 		return ['prototypeids' => $prototypeids];
 	}
