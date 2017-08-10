@@ -2666,10 +2666,10 @@ $form-icon-btn: (
 .dashbrd-grid-empty-placeholder {
 	width: 16%;
 	height: 200px;
-	background-color: #fff;
+	background-color: $ui-bg-color;
 	border-style: dashed;
 	border-width: 2px;
-	border-color: #bdbdbd;
+	border-color: $ui-border-color;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -3349,7 +3349,7 @@ $form-icon-btn: (
 }
 
 .overlay-bg {
-	background-color: $white;
+	background-color: $overlay-bg-color;
 	width: 100%;
 	height: 100%;
 	position: fixed;
