@@ -1029,25 +1029,25 @@ jQuery(function($) {
 				});
 
 				// Set [data-depth] for list and each sublist.
-				$('.tree-list').not('.root').each(function() {
+				$('.tree-list', $obj).not('.root').each(function() {
 					tree_list_depth = $(this).parents('.tree-list').not('.root').size() + 1;
 					$(this).attr('data-depth', tree_list_depth);
-				});
+				}).promise().done(function() {
+					// Show/hide 'add new items' buttons.
+					$('.tree-list', $obj).filter(function() {
+						return +$(this).attr('data-depth') >= widget_data.max_depth;
+					}).each(function() {
+						$('.import-items-btn', $(this)).css('visibility', 'hidden');
+						$('.add-child-btn', $(this)).css('visibility', 'hidden');
+					});
 
-				// Show/hide 'add new items' buttons.
-				$('.tree-list').filter(function() {
-					return +$(this).data('depth') >= widget_data.max_depth;
-				}).each(function() {
-					$('.import-items-btn', $(this)).css('visibility', 'hidden');
-					$('.add-child-btn', $(this)).css('visibility', 'hidden');
-				});
-
-				// Show/hide buttons in deepest levels.
-				$('.tree-list').filter(function() {
-					return widget_data.max_depth > +$(this).data('depth');
-				}).each(function() {
-					$('>.tree-item>.tree-row>.tools>.import-items-btn', $(this)).css('visibility', 'visible');
-					$('>.tree-item>.tree-row>.tools>.add-child-btn', $(this)).css('visibility', 'visible');
+					// Show/hide buttons in deepest levels.
+					$('.tree-list', $obj).filter(function() {
+						return widget_data.max_depth > +$(this).attr('data-depth');
+					}).each(function() {
+						$('>.tree-item>.tree-row>.tools>.import-items-btn', $(this)).css('visibility', 'visible');
+						$('>.tree-item>.tree-row>.tools>.add-child-btn', $(this)).css('visibility', 'visible');
+					});
 				});
 
 				// Change arrow style.
