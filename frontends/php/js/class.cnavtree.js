@@ -199,7 +199,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 			}
 
 			var parent_item = $(this.placeholder.parent()).closest('.tree-item'),
-				level = $(this.placeholder.parent()).data('depth'),
+				level = +$(this.placeholder.parent()).attr('data-depth'),
 				prev_item = this.placeholder[0].previousSibling ? $(this.placeholder[0].previousSibling) : null,
 				next_item = this.placeholder[0].nextSibling ? $(this.placeholder[0].nextSibling) : null,
 				child_levels = this._levelsUnder(this.currentItem[0]),
@@ -399,7 +399,8 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 
 		_isAllowed: function(parentItem, level, levels) {
 			if (this.options.max_depth != 0 && (this.options.max_depth < levels
-					|| +this.placeholder.closest('[data-depth]').data('depth') > this.options.max_depth)) {
+					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth)
+			) {
 				this.placeholder.addClass('sortable-error');
 				this.beyondMaxLevels = levels - this.options.max_depth;
 			}
@@ -838,15 +839,15 @@ jQuery(function($) {
 					btn1.addEventListener('click', function(event) {
 						var parentId = $(this).data('id'),
 							widget_data = $obj.data('widgetData'),
-							depth = $(this).closest('.tree-list').data('depth'),
+							depth = $(this).closest('.tree-list').attr('data-depth'),
 							branch = $('.tree-item[data-id='+parentId+']>ul', $obj);
 
 						if (typeof depth === 'undefined') {
 							depth = 0;
 						}
 
-						if (widget_data.max_depth > depth) {
-							itemEditDialog($obj, 0, parentId, depth);
+						if (widget_data.max_depth > +depth) {
+							itemEditDialog($obj, 0, parentId, +depth);
 						}
 					});
 					tools.appendChild(btn1);
@@ -912,7 +913,7 @@ jQuery(function($) {
 						btn3.addEventListener('click', function() {
 							var id = $(this).data('id'),
 								parent = +$('input[name="map.parent.'+id+'"]', $obj).val(),
-								depth = +$(this).closest('[data-depth]').data('depth');
+								depth = +$(this).closest('[data-depth]').attr('data-depth');
 
 							itemEditDialog($obj, id, parent, depth);
 						});
