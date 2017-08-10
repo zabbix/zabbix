@@ -467,6 +467,8 @@ jQuery(function($) {
 
 			var drawTree = function($obj, isEditMode) {
 				var root = createTreeBranch($obj, 'root', null),
+					widget_data = $obj.data('widgetData'),
+					prefix = widget_data['uniqueid']+'_',
 					tree_items = getTreeWidgetItems($obj),
 					tree = buildTree($obj, tree_items, 0);
 
@@ -483,7 +485,7 @@ jQuery(function($) {
 						edit_mode_tree.setAttribute('class', new_class);
 					}
 
-					root = document.getElementById('children-of-0');
+					root = document.getElementById(prefix+'children-of-0');
 				}
 
 				$.each(tree, function(i, item) {
@@ -534,10 +536,12 @@ jQuery(function($) {
 
 			var createTreeBranch = function($obj, className, parentId) {
 				var className = className || '',
+					widget_data = $obj.data('widgetData'),
+					prefix = widget_data['uniqueid']+'_',
 					ul = document.createElement('UL');
 
 				if (parentId !== null) {
-					ul.setAttribute('id', 'children-of-'+parentId);
+					ul.setAttribute('id', prefix+'children-of-'+parentId);
 				}
 
 				className += ' tree-list';
@@ -705,6 +709,7 @@ jQuery(function($) {
 			 */
 			var createTreeItem = function($obj, item, depth, editable, isEditMode) {
 				var widget_data = $obj.data('widgetData'),
+					prefix = widget_data['uniqueid']+'_',
 					ul = createTreeBranch($obj, null, item.id),
 					item_clases = 'tree-item';
 
@@ -761,7 +766,8 @@ jQuery(function($) {
 							widget = getWidgetData($obj);
 
 						if ($('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
-								'selected_mapid', data_to_share))  {
+								'selected_mapid', data_to_share)
+						) {
 							$('.selected', $obj).removeClass('selected');
 							while ($(step_in_path).length) {
 								$(step_in_path).addClass('selected');
@@ -786,7 +792,7 @@ jQuery(function($) {
 
 				li_item.setAttribute('class', item_clases);
 				li_item.setAttribute('data-id', item.id);
-				li_item.setAttribute('id', 'tree-item-'+item.id);
+				li_item.setAttribute('id', prefix+'tree-item-'+item.id);
 
 				if (item.mapid) {
 					li_item.setAttribute('data-mapid', item.mapid);
@@ -961,7 +967,7 @@ jQuery(function($) {
 
 							branch.removeClass('opened').addClass('closed');
 						}
-						else {
+						else {prefix
 							$('span', button)
 								.addClass('arrow-down')
 								.removeClass('arrow-right');
@@ -984,26 +990,23 @@ jQuery(function($) {
 
 				if (isEditMode && editable) {
 					var name_fld = document.createElement('INPUT');
-
 					name_fld.setAttribute('type', 'hidden');
 					name_fld.setAttribute('name', 'map.name.'+item.id);
-					name_fld.setAttribute('id', 'map.name.'+item.id);
+					name_fld.setAttribute('id', prefix+'map.name.'+item.id);
 					name_fld.value = item.name;
 					li_item.appendChild(name_fld);
 
 					var parent_fld = document.createElement('INPUT');
-
 					parent_fld.setAttribute('type', 'hidden');
 					parent_fld.setAttribute('name', 'map.parent.'+item.id);
-					parent_fld.setAttribute('id', 'map.parent.'+item.id);
+					parent_fld.setAttribute('id', prefix+'map.parent.'+item.id);
 					parent_fld.value = item.parent || 0;
 					li_item.appendChild(parent_fld);
 
 					var mapid_fld = document.createElement('INPUT');
-
 					mapid_fld.setAttribute('type', 'hidden');
 					mapid_fld.setAttribute('name', 'mapid.'+item.id);
-					mapid_fld.setAttribute('id', 'mapid.'+item.id);
+					mapid_fld.setAttribute('id', prefix+'mapid.'+item.id);
 					mapid_fld.value = typeof item.mapid === 'number' ? item.mapid : 0;
 					li_item.appendChild(mapid_fld);
 				}
@@ -1188,10 +1191,12 @@ jQuery(function($) {
 			// Remove item from tree.
 			var removeItem = function($obj, id) {
 				var item = $('[data-id='+id+']', $obj),
-					parent = $('#map.parent.'+id, item).val();
+					widget_data = $obj.data('widgetData'),
+					prefix = widget_data['uniqueid']+'_',
+					parent = $('#'+prefix+'map.parent.'+id, item).val();
 
-				if ($('#children-of-'+parent+'>.tree-item', $obj).length == 1) {
-					$('#tree-item-'+parent).removeClass('is-parent');
+				if ($('#'+prefix+'children-of-'+parent+'>.tree-item', $obj).length == 1) {
+					$('#'+prefix+'tree-item-'+parent).removeClass('is-parent');
 				}
 
 				$(item).remove();
@@ -1201,6 +1206,7 @@ jQuery(function($) {
 			// Records data from DOM to dashboard widget[fields] array.
 			var updateWidgetFields = function($obj) {
 				var dashboard_widget = getWidgetData($obj),
+					prefix = dashboard_widget['uniqueid']+'_',
 					widget_fields = {};
 
 				if (!dashboard_widget || !isEditMode()) {
@@ -1217,9 +1223,9 @@ jQuery(function($) {
 					var id = +field.getAttribute('name').substr(9);
 
 					if (id) {
-						var parent = document.getElementById('map.parent.'+id).value,
-							mapid = document.getElementById('mapid.'+id).value,
-							sibl = document.getElementById('children-of-'+parent).childNodes,
+						var parent = document.getElementById(prefix+'map.parent.'+id).value,
+							mapid = document.getElementById(prefix+'mapid.'+id).value,
+							sibl = document.getElementById(prefix+'children-of-'+parent).childNodes,
 							order = 0;
 
 						while (typeof sibl[order] !== 'undefined' && +sibl[order].getAttribute('data-id') !== id) {

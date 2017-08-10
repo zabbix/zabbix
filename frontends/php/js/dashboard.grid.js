@@ -1179,7 +1179,6 @@
 				$('#dashbrd-save', ul).prop('disabled', true);
 				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
-				data['options']['edit_mode'] = false;
 			});
 		},
 
