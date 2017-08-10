@@ -5,6 +5,8 @@ New features:
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
 Bug fixes:
+........S. [ZBX-12485] fixed PostgreSQL query errors during sending notifications on acknowledgement (Sergejs)
+.......PS. [ZBXNEXT-3006] fixed web scenario item preprocessing (wiper)
 ..F....... [ZBXNEXT-2102] fixed low performance of navigation tree widget and improved dashboard performance (miks)
 .......PS. [ZBX-12458] fixed incorrect use of zbx_strlcat() in DBpatch_3030060_migrate_pairs(); thanks to MATSUDA Daiki for patch (Andris)
 
@@ -86,7 +88,7 @@ A.F.I..PS. [ZBXNEXT-1675] added support for user macros and time unit suffixes i
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)
-A.FG...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite3 support for frontend and server (abs)
+A.FG...PS. [ZBXNEXT-3687] made shared memory and semaphores private to the zabbix processes. Dropped SQLite3 support for frontend and server (abs)
 A.F.I..... [ZBXNEXT-2694] implemented multiple triggers support for map elements (Oleg)
 ....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors (abs)
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)

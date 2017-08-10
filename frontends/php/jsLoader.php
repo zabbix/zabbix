@@ -108,6 +108,7 @@ $tranStrings = [
 		'Edit widget' => _('Edit widget'),
 		'Add widget' => _('Add widget'),
 		'Update' => _('Update'),
+		'Apply' => _('Apply'),
 		'Add' => _('Add'),
 		'Edit' => _('Edit'),
 		'Cancel' => _('Cancel'),

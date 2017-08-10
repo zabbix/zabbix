@@ -5282,17 +5282,11 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	int			i;
-	zbx_vector_uint64_t	profileids, screen_itemids, selementids;
+	zbx_vector_uint64_t	screen_itemids, selementids;
 	zbx_uint64_t		resource_types_delete[] = {SCREEN_RESOURCE_DATA_OVERVIEW,
 						SCREEN_RESOURCE_TRIGGER_OVERVIEW};
 	zbx_uint64_t		resource_types_update[] = {SCREEN_RESOURCE_HOST_INFO, SCREEN_RESOURCE_TRIGGER_INFO,
 						SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS};
-	const char		*profile_idxs[] = {
-						"web.dashconf.groups.groupids",
-						"web.dashconf.groups.subgroupids",
-						"web.dashconf.groups.hide.groupids",
-						"web.dashconf.groups.hide.subgroupids"
-					};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, groupids->values_num);
 
@@ -5306,7 +5300,6 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_vector_uint64_create(&profileids);
 	zbx_vector_uint64_create(&screen_itemids);
 	zbx_vector_uint64_create(&selementids);
 
@@ -5346,15 +5339,6 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	DBget_profiles_by_source_idxs_values(&profileids, NULL, profile_idxs, ARRSIZE(profile_idxs), groupids);
-	if (0 != profileids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from profiles where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "profileid", profileids.values,
-				profileids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
 	/* groups */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from groups where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
@@ -5366,7 +5350,6 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 
 	zbx_vector_uint64_destroy(&selementids);
 	zbx_vector_uint64_destroy(&screen_itemids);
-	zbx_vector_uint64_destroy(&profileids);
 
 	zbx_free(sql);
 out:

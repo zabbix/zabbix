@@ -345,7 +345,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	{
 		return [
 			'dashboardid' => 0,
-			'name' => '',
+			'name' => _('New dashboard'),
 			'editable' => true,
 			'widgets' => [],
 			'owner' => $this->getOwnerData(CWebUser::$data['userid'])

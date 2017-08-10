@@ -36,7 +36,7 @@ $form_list->addRow(_('Type'),
 $form_list->addRow(_('Name'),
 	(new CTextBox('name', $data['dialogue']['name']))
 		->setAttribute('placeholder', _('default'))
-		->setAttribute('class', 'auto-focus')
+		->setAttribute('autofocus', 'autofocus')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
@@ -222,7 +222,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 $form->addItem($form_list);
 
-// Submit button is needed to enable submit event on Enter on inputs
+// Submit button is needed to enable submit event on Enter on inputs.
 $form->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;'));
 
 $output = [
