@@ -22,7 +22,7 @@
 #include "../../include/log.h"
 #include "../../include/zbxserver.h"
 
-/* Mandatory headers needed by CMocka */                                                                                                                                                         
+/* Mandatory headers needed by cmocka */
 #include <stdbool.h>
 #include <stdarg.h>
 #include <setjmp.h>
@@ -31,7 +31,11 @@
 #ifndef ZABBIX_TESTS_H
 #define ZABBIX_TESTS_H
 
-void test_successful_process_escalations();
+void	test_successful_evaluate_function();
+void	test_exception();
+void	test_successful_process_escalations();
+
+DB_ROW	get_db_data(const char *case_name, const char *data_suite);
 
 #endif
 

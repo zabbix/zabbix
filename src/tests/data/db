@@ -1,0 +1,64 @@
+--
+-- Zabbix
+-- Copyright (C) 2001-2017 Zabbix SIA
+--
+-- This program is free software; you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation; either version 2 of the License, or
+-- (at your option) any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+--
+
+CASE_NAME |test_successful_process_escalations
+
+DATA_SUITE|escalations
+FIELDS    |escalationid|actionid|triggerid|eventid|r_eventid|nextcheck |esc_step|status|itemid|acknowledgeid|
+ROW       |1           |1       |1        |1      |0        |1501594532|0       |0     |1     |0            |
+
+DATA_SUITE|actions
+FIELDS    |actionid|name       |status|eventsource|esc_period|def_shortdata|def_longdata|r_shortdata|r_longdata|maintenance_mode|ack_shortdata|ack_longdata|
+ROW       |1       |action name|0     |0          |60s       |msg subject  |msg body    |rec subject|rec body  |0               |ack subject  |ack body    |
+
+DATA_SUITE|events
+FIELDS    |eventid|source|object|objectid|clock     |value|acknowledged|Nanoseconds|
+ROW       |1      |0     |0     |1       |1501594532|1    |0           |100        |
+
+DATA_SUITE|triggers
+FIELDS    |triggerid|description|expression|priority|clock     |url|recovery_expression|recovery_mode|
+ROW       |1        |           |{1}=0     |2       |1501594532|   |                   |0            |
+
+DATA_SUITE|operations_opmessage
+FIELDS    |operations.operationid|operationtype|esc_period|evaltype|opmessage.operationid|default_msg|subject|message|mediatypeid|
+ROW       |1                     |0            |0         |0       |1                    |0          |       |       |           |
+
+DATA_SUITE|opmessage_usr
+FIELDS    |conditiontype|operator|value|
+ROW       |0            |0       |0    |
+
+DATA_SUITE|media
+FIELDS    |mediatypeid|sendto     |severity|period         |status|
+ROW       |1          |zbx@zbx.com|2       |1-7,00:00-23:59|0     |
+
+DATA_SUITE|userid
+FIELDS    |userid|
+ROW       |1     |
+
+DATA_SUITE|user_permissions_access_system
+FIELDS    |count|
+ROW       |1    |
+
+DATA_SUITE|user_permissions_access_trigger
+FIELDS    |hostid|
+ROW       |1     |
+
+DATA_SUITE|user_permissions_access_host
+FIELDS    |type|
+ROW       |3   |

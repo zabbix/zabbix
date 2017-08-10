@@ -61,6 +61,8 @@ LIBS=../zabbix_server/escalator/libzbxescalator.a \
 INC=-I../../include -I../libs/zbxdbcache -I../zabbix_server/scripts -I../zabbix_server/escalator -I../zabbix_server -I/usr/include/mysql/
 
 C=	unresolved.c \
+	main.c \
+	data.c \
 	test_example.c \
 	test_escalations.c \
 	../zabbix_server/actions.c \
