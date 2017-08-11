@@ -25,7 +25,8 @@ $item = new CNavigationTree([
 	'uniqueid' => $data['uniqueid'],
 	'maps_accessible' => $data['maps_accessible'],
 	'navtree_item_selected' => $data['navtree_item_selected'],
-	'navtree_items_opened' => $data['navtree_items_opened']
+	'navtree_items_opened' => $data['navtree_items_opened'],
+	'show_unavailable' => $data['show_unavailable']
 ]);
 
 if ($data['error'] !== null) {

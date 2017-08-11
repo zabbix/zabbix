@@ -34,6 +34,23 @@ if (!zbx_ctype_digit($severity_min)) {
 }
 $map_data = CMapHelper::get(getRequest('sysmapid'), ['severity_min' => $severity_min]);
 
+if (getRequest('used_in_widget', 0) && hasRequest('uniqueid')) {
+	$uniqueid = getRequest('uniqueid');
+
+	// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
+	foreach ($map_data['elements'] as &$element) {
+		$actions = json_decode($element['actions'], true);
+		if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
+			$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
+			$actions['navigatetos']['submap']['widget_uniqueid'] = $uniqueid;
+			unset($actions['gotos']['submap']);
+		}
+
+		$element['actions'] = json_encode($actions);
+	}
+	unset($element);
+}
+
 // No need to get all data.
 $options = [
 	'mapid' => $map_data['id'],
@@ -46,7 +63,7 @@ $options = [
 	'timestamp' => $map_data['timestamp']
 ];
 
-if (getRequest('add_widget_footer', 0)) {
+if (getRequest('used_in_widget', 0)) {
 	$options['map_widget_footer'] = (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString();
 }
 

@@ -1831,8 +1831,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 						"%sjmx_endpoint='%s'", d, value_esc);
 				zbx_free(value_esc);
+				d = ",";
 			}
-
 			if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM))
 			{
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%smaster_itemid=%s",
@@ -1937,7 +1937,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				"snmpv3_securitylevel", "snmpv3_authprotocol", "snmpv3_authpassphrase",
 				"snmpv3_privprotocol", "snmpv3_privpassphrase", "authtype", "username", "password",
 				"publickey", "privatekey", "description", "interfaceid", "flags", "snmpv3_contextname",
-				"jmx_endpoint, master_itemid", NULL);
+				"jmx_endpoint", "master_itemid", NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", NULL);
