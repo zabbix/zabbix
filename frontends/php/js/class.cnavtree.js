@@ -1116,6 +1116,10 @@ jQuery(function($) {
 							item.order = + widget_data['fields']['map.order.' + item.id];
 						}
 
+						if (item.parent === item.id) {
+							item.parent = 0;
+						}
+
 						tree_items.push(item);
 					}
 				});
