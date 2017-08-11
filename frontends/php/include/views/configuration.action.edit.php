@@ -428,12 +428,8 @@ if ($data['action']['operations']) {
 
 		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
 
-		if (array_key_exists($operationid, $action_operation_hints)) {
-			$action_operation_hints[$operationid] = array_filter($action_operation_hints[$operationid]);
-
-			if ($action_operation_hints[$operationid]) {
-				$details->setHint($action_operation_hints[$operationid]);
-			}
+		if (array_key_exists($operationid, $action_operation_hints) && $action_operation_hints[$operationid]) {
+			$details->setHint($action_operation_hints[$operationid]);
 		}
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
@@ -1212,12 +1208,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
 
-			if (array_key_exists($operationid, $action_operation_hints)) {
-				$action_operation_hints[$operationid] = array_filter($action_operation_hints[$operationid]);
-
-				if ($action_operation_hints[$operationid]) {
-					$details->setHint($action_operation_hints[$operationid]);
-				}
+			if (array_key_exists($operationid, $action_operation_hints) && $action_operation_hints[$operationid]) {
+				$details->setHint($action_operation_hints[$operationid]);
 			}
 
 			$operationRow = [
