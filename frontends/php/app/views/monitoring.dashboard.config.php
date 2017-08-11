@@ -112,7 +112,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$form->addVar($field->getName(), $field->getValue());
 	}
 	elseif ($field instanceof CWidgetFieldSelectResource) {
-		$caption = ($field->getValue() != 0)
+		$resourceid = $field->getValue();
+		$caption = (is_numeric($resourceid) && $resourceid != 0)
 			? $data['captions']['simple'][$field->getResourceType()][$field->getValue()]
 			: '';
 

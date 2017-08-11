@@ -47,7 +47,7 @@ class CClockWidgetForm extends CWidgetForm {
 			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
-			if (array_key_exists('itemid', $this->data)) {
+			if (array_key_exists('itemid', $this->data) && is_numeric($this->data['itemid'])) {
 				$field_item->setValue($this->data['itemid']);
 			}
 			$this->fields[] = $field_item;
