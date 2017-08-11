@@ -1282,6 +1282,24 @@ jQuery(function($) {
 				makeSortable($obj);
 			};
 
+			var markTreeItemSelected = function($obj, item_id) {
+				var widget = getWidgetData($obj),
+					prefix = widget['uniqueid']+'_',
+					selected_item = $('#'+prefix+'tree-item-'+item_id),
+					step_in_path = selected_item;
+
+				if (item_id && $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+						'selected_mapid', {mapid: $(selected_item).data('mapid')})
+				) {
+					$('.selected', $obj).removeClass('selected');
+
+					while ($(step_in_path).length) {
+						$(step_in_path).addClass('selected');
+						step_in_path = $(step_in_path).parent().closest('.tree-item');
+					}
+				}
+			};
+
 			var methods = {
 				// beforeConfigLoad trigger method
 				beforeConfigLoad: function() {
@@ -1323,21 +1341,7 @@ jQuery(function($) {
 								.data('id');
 						}
 
-						var selected_item = $('.tree-item[data-id='+widget_data.navtree_item_selected+']'),
-							step_in_path = selected_item;
-
-						if (widget_data.navtree_item_selected
-								&& $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
-									'selected_mapid', {mapid: $(selected_item).data('mapid')})) {
-							$('.selected', $this).removeClass('selected');
-
-							while ($(step_in_path).length) {
-								$(step_in_path).addClass('selected');
-								step_in_path = $(step_in_path).parent().closest('.tree-item');
-							}
-						}
-
-						delete widget_data.navtree_item_selected;
+						markTreeItemSelected($this, widget_data.navtree_item_selected);
 					});
 				},
 
@@ -1389,7 +1393,7 @@ jQuery(function($) {
 
 									mapid_selector = '.tree-item[data-mapid='+data[0]['submapid']+']';
 
-									if (data[0]['previous_maps']) {
+									if (data[0]['previous_maps'].length) {
 										var prev_maps = data[0]['previous_maps'].split(','),
 											prev_maps = prev_maps.length
 												? prev_maps[prev_maps.length-1]
@@ -1449,6 +1453,10 @@ jQuery(function($) {
 							});
 
 							switchToNavigationMode($this);
+
+							if (!options['initial_load']) {
+								markTreeItemSelected($this, options.navtree_item_selected);
+							}
 						}
 					});
 				}
