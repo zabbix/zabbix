@@ -79,14 +79,14 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			]);
 		}
 
-		// Resolve item name.
-		$items = CMacrosResolverHelper::resolveItemNames($items);
-
 		if (!$items) {
 			$error = _('No permissions to selected item or it does not exist.');
 		}
 		// Select host name and item history data.
 		else {
+			// Resolve item name.
+			$items = CMacrosResolverHelper::resolveItemNames($items);
+
 			$item = $items[0];
 			$host = $item['hosts'][0];
 
