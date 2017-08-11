@@ -4605,9 +4605,23 @@ tr.cursor-move {
 		.tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
 			flex: 0 0 15px;
 		}
+
+		.tree-list > .tree-item.ui-sortable-helper .content {
+			padding-left: 5px;
+		}
+
 		@for $i from 0 through $max_depth {
-			.tree-list[data-depth="#{$i}"] > .tree-item > .tree-row > .content > .margin-lvl {
-				flex: 0 0 ($i * 15px + 10px);
+			.tree-list[data-depth="#{$i}"] > .tree-item {
+				&> .tree-row > .content > .margin-lvl {
+					flex: 0 0 ($i * 15px + 10px);
+				}
+				&.ui-sortable-helper {
+					margin-left: ($i * 15px + 10px);
+
+					& > .tree-row > .content > .margin-lvl {
+						display: none;
+					}
+				}
 			}
 		}
 

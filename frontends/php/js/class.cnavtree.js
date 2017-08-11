@@ -47,7 +47,6 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 			forceHelperSize: true,
 			tolerance: 'intersect',
 			handle: '.drag-icon',
-			cursorAt: {left: 15},
 			items: '.tree-item',
 			helper:	'clone',
 			revert:	10,
