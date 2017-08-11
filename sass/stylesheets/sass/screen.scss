@@ -3235,7 +3235,8 @@ $form-icon-btn: (
 
 		.overlay-dialogue-body {
 			overflow: auto;
-			max-height: calc(100vh - 145px);
+			max-height: calc(100vh - 190px);
+			margin: 0 0 10px 0;
 		}
 		.overlay-close-btn {
 			position: relative;
