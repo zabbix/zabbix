@@ -114,11 +114,11 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldSelectResource) {
 		$resourceid = $field->getValue();
 		$caption = (is_numeric($resourceid) && $resourceid != 0)
-			? $data['captions']['simple'][$field->getResourceType()][$field->getValue()]
+			? $data['captions']['simple'][$field->getResourceType()][$resourceid]
 			: '';
 
 		// Needed for popup script.
-		$form->addVar($field->getName(), $field->getValue());
+		$form->addVar($field->getName(), $resourceid);
 		$form_list->addRow($field->getLabel(), [
 			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
