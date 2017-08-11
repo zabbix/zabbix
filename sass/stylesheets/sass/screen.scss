@@ -3238,7 +3238,7 @@ $form-icon-btn: (
 			max-height: calc(100vh - 190px);
 			margin: 0 0 10px 0;
 		}
-		.overlay-close-btn {
+		& > .overlay-close-btn {
 			position: relative;
 			float: right;
 			top: -12px;
