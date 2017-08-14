@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
 Bug fixes:
+..F....... [ZBXNEXT-18] fixed empty acknowledge operation message tooltip visibility (gcalenko)
 ..F....... [ZBX-12468] fixed vertical text alignment for map shapes (vjaceslavs)
 ..F....... [ZBX-12418] fixed draggable rectangle calculation for map shape lines (vjaceslavs)
 ...G...... [ZBX-12397] fixed system.cpu.num count for 64-bit Windows with more than 64 logical cpus (abs)
