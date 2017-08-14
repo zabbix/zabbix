@@ -166,11 +166,10 @@ Memory utilization in %
                <port/>
                <description>MIB: SW-MIB
 The current operational status of the switch.The states are as follow:
-		       online(1) means the switch is accessible by an external  Fibre Channel port;
-		       offline(2) means the switch is not accessible;
-		       testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port;
-		       faulty(4) means the switch is not operational.
-		      
+online(1) means the switch is accessible by an external  Fibre Channel port
+offline(2) means the switch is not accessible
+testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port
+faulty(4) means the switch is not operational.
 </description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -788,7 +787,7 @@ Please check the power supply unit for errors</description>
 
 		      The current value (reading) of the sensor.
 		      The value, -2147483648, represents an unknown quantity.
-			  The fan value will be in RPM(revolution per minute);
+			  The fan value will be in RPM(revolution per minute)
 		      
 </description>
                      <inventory_link>0</inventory_link>

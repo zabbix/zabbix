@@ -105,9 +105,8 @@ The statistics collection of 1 minute CPU utilization.
                <port/>
                <description>MIB: FOUNDRY-SN-AGENT-MIB
 The system dynamic memory utilization, in unit of percentage.
-                    Deprecated: Refer to snAgSystemDRAMUtil.
-                    For NI platforms, refer to snAgentBrdMemoryUtil100thPercent
-                
+Deprecated: Refer to snAgSystemDRAMUtil.
+For NI platforms, refer to snAgentBrdMemoryUtil100thPercent
 </description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -133,12 +132,11 @@ The system dynamic memory utilization, in unit of percentage.
          <name>Template Net Brocade_Foundry Nonstackable SNMPv2</name>
          <description>Template Net Brocade_Foundry Nonstackable version: 0.11
 Overview: For devices(old Foundry devices, MLXe and so on) that doesn't support Stackable SNMP Tables: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table -
-                FOUNDRY-SN-AGENT-MIB::snChasFanTable, snChasPwrSupplyTable,snAgentTempTable are used instead.
-                For example:
-                The objects in table snChasPwrSupply2Table is not supported on the NetIron and the FastIron SX devices.
-                snChasFan2Table is not supported on  on the NetIron devices.
-                snAgentTemp2Table is not supported on old versions of MLXe
-            
+FOUNDRY-SN-AGENT-MIB::snChasFanTable, snChasPwrSupplyTable,snAgentTempTable are used instead.
+For example:
+The objects in table snChasPwrSupply2Table is not supported on the NetIron and the FastIron SX devices.
+snChasFan2Table is not supported on  on the NetIron devices.
+snAgentTemp2Table is not supported on old versions of MLXe
 
 MIBs used:
 FOUNDRY-SN-AGENT-MIB
@@ -699,8 +697,8 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <port/>
                      <description>MIB: FOUNDRY-SN-AGENT-MIB
 Temperature of the chassis. Each unit is 0.5 degrees Celcius.
-                    Only management module built with temperature sensor hardware is applicable.
-                    For those non-applicable management module, it returns no-such-name.
+Only management module built with temperature sensor hardware is applicable.
+For those non-applicable management module, it returns no-such-name.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>

@@ -377,9 +377,8 @@ Temperature status of testpoint: Device
                <port/>
                <description>MIB: EXTREME-SYSTEM-MIB
 The software revision of the primary image stored in this device.
-		    This string will have a zero length if the revision is unknown, invalid or not present.
-		    This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.
-		    
+This string will have a zero length if the revision is unknown, invalid or not present.
+This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.
 </description>
                <inventory_link>5</inventory_link>
                <applications>

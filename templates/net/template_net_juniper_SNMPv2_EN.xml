@@ -75,17 +75,15 @@ SNMPv2-MIB
                <privatekey/>
                <port/>
                <description>MIB: JUNIPER-ALARM-MIB
-The red alarm indication on the craft interface 
-		panel.
+The red alarm indication on the craft interface panel.
+The red alarm is on when there is some system
+failure or power supply failure or the system
+is experiencing a hardware malfunction or some
+threshold is being exceeded.
 
-		The red alarm is on when there is some system 
-		failure or power supply failure or the system 
-		is experiencing a hardware malfunction or some 
-		threshold is being exceeded.
-
-		This red alarm state could be turned off by the
-		ACO/LT (Alarm Cut Off / Lamp Test) button on the
-		front panel module.
+This red alarm state could be turned off by the
+ACO/LT (Alarm Cut Off / Lamp Test) button on the
+front panel module.
 </description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -277,7 +275,7 @@ The name, model, or detailed description of the box,indicating which product the
                </filter>
                <lifetime>30d</lifetime>
                <description>Scanning JUNIPER-MIB::jnxOperatingTable for CPU and Memory 
-                    http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
+http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPVALUE}: CPU utilization</name>
@@ -513,7 +511,7 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                </filter>
                <lifetime>30d</lifetime>
                <description>Scanning JUNIPER-MIB::jnxOperatingTable for Temperature 
-                    http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
+http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SENSOR_INFO}: Temperature</name>

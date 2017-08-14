@@ -118,8 +118,8 @@ CPU utilization in %
                <port/>
                <description>MIB: SNMPv2-MIB
 A textual description of the entity.  This value should
-				include the full name and version identification of thesystem's hardware type, software operating-system, and
-				networking software.
+include the full name and version identification of the system's hardware type, software operating-system, and
+networking software.
 </description>
                <inventory_link>29</inventory_link>
                <applications>

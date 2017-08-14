@@ -128,8 +128,8 @@ device : HP 1910-48
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 The CPU usage for this entity. Generally, the CPU usage
-	      will calculate the overall CPU usage on the entity, and it
-	      is not sensible with the number of CPU on the entity
+will calculate the overall CPU usage on the entity, and it
+is not sensible with the number of CPU on the entity
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -526,7 +526,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 Indicate the error state of this entity object.
-		      fanError(41) means that the fan stops working.
+fanError(41) means that the fan stops working.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -636,9 +636,8 @@ Please check the fan unit</description>
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 Indicate the error state of this entity object.
-		      psuError(51) means that the Power Supply Unit is in the state of fault.
-		      rpsError(61) means the Redundant Power Supply is in the state of fault.
-		      
+psuError(51) means that the Power Supply Unit is in the state of fault.
+rpsError(61) means the Redundant Power Supply is in the state of fault.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>

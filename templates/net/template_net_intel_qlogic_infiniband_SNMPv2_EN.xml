@@ -504,16 +504,15 @@ Device serial number has changed. Ack to close</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-
-		      Actual status of the power supply:
-		      (1) unknown: status not known.
-		      (2) disabled: power supply is disabled.
-		      (3) failed - power supply is unable to supply power due to failure.
-		      (4) warning - power supply is supplying power, but an output or sensor is bad or warning.
-		      (5) standby - power supply believed usable,but not supplying power.
-		      (6) engaged - power supply is supplying power.
-		      (7) redundant - power supply is supplying power, but not needed.
-		      (8) notPresent - power supply is supplying power is not present.
+Actual status of the power supply:
+(1) unknown: status not known.
+(2) disabled: power supply is disabled.
+(3) failed - power supply is unable to supply power due to failure.
+(4) warning - power supply is supplying power, but an output or sensor is bad or warning.
+(5) standby - power supply believed usable,but not supplying power.
+(6) engaged - power supply is supplying power.
+(7) redundant - power supply is supplying power, but not needed.
+(8) notPresent - power supply is supplying power is not present.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>

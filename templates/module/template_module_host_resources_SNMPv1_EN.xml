@@ -610,8 +610,8 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB
 The size, in bytes, of the data objects allocated from this pool.
-	  		 If this entry is monitoring sectors, blocks, buffers, or packets, for example,
-	  		 this number will commonly be greater than one.  Otherwise this number will typically be one.
+If this entry is monitoring sectors, blocks, buffers, or packets, for example,
+this number will commonly be greater than one.  Otherwise this number will typically be one.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>

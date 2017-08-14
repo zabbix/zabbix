@@ -125,15 +125,14 @@ The amount of the storage represented by this entry that is allocated, in units 
                <port/>
                <description>MIB: HOST-RESOURCES-MIB
 The size of the storage represented by this entry, in
-	      units of hrStorageAllocationUnits. This object is
-	      writable to allow remote configuration of the size of
-	      the storage area in those cases where such an
-	      operation makes sense and is possible on the
-	      underlying system. For example, the amount of main
-	      memory allocated to a buffer pool might be modified or
-	      the amount of disk space allocated to virtual memory
-	      might be modified.
-	      
+units of hrStorageAllocationUnits. This object is
+writable to allow remote configuration of the size of
+the storage area in those cases where such an
+operation makes sense and is possible on the
+underlying system. For example, the amount of main
+memory allocated to a buffer pool might be modified or
+the amount of disk space allocated to virtual memory
+might be modified.
 </description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -818,15 +817,14 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB
 The size of the storage represented by this entry, in
-	      units of hrStorageAllocationUnits. This object is
-	      writable to allow remote configuration of the size of
-	      the storage area in those cases where such an
-	      operation makes sense and is possible on the
-	      underlying system. For example, the amount of main
-	      memory allocated to a buffer pool might be modified or
-	      the amount of disk space allocated to virtual memory
-	      might be modified.
-	      
+units of hrStorageAllocationUnits. This object is
+writable to allow remote configuration of the size of
+the storage area in those cases where such an
+operation makes sense and is possible on the
+underlying system. For example, the amount of main
+memory allocated to a buffer pool might be modified or
+the amount of disk space allocated to virtual memory
+might be modified.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>

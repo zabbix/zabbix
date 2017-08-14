@@ -103,7 +103,13 @@ IF-MIB
                      <privatekey/>
                      <port/>
                      <description>MIB: IF-MIB
-The current operational state of the interface. The testing(3) state indicates that no operational packet scan be passed.  If ifAdminStatus is down(2) then ifOperStatus should be down(2).  If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic; it should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection); it should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state; it should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
+The current operational state of the interface.
+- The testing(3) state indicates that no operational packet scan be passed
+- If ifAdminStatus is down(2) then ifOperStatus should be down(2)
+- If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic
+- It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
+- It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
+- It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -354,10 +360,10 @@ For packet-oriented interfaces, the number of outbound packets that contained er
                      <port/>
                      <description>MIB: IF-MIB
 The number of outbound packets which were chosen to be discarded
-    		 even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
-    		   One possible reason for discarding such a packet could be to free up buffer space.
-    		   Discontinuities in the value of this counter can occur at re-initialization of the management system,
-    		    and at other times as indicated by the value ofifCounterDiscontinuityTime.
+even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+One possible reason for discarding such a packet could be to free up buffer space.
+Discontinuities in the value of this counter can occur at re-initialization of the management system,
+and at other times as indicated by the value of ifCounterDiscontinuityTime.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -407,10 +413,10 @@ The number of outbound packets which were chosen to be discarded
                      <port/>
                      <description>MIB: IF-MIB
 The number of inbound packets which were chosen to be discarded
-    		 even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
-    		   One possible reason for discarding such a packet could be to free up buffer space.
-    		   Discontinuities in the value of this counter can occur at re-initialization of the management system,
-    		    and at other times as indicated by the value ofifCounterDiscontinuityTime.
+even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+One possible reason for discarding such a packet could be to free up buffer space.
+Discontinuities in the value of this counter can occur at re-initialization of the management system,
+and at other times as indicated by the value of ifCounterDiscontinuityTime.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -460,8 +466,8 @@ The number of inbound packets which were chosen to be discarded
                      <port/>
                      <description>MIB: IF-MIB
 The type of interface.  
-    		Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
-    		through updating the syntax of the IANAifType textual convention.
+Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+through updating the syntax of the IANAifType textual convention.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -508,12 +514,11 @@ The type of interface.
                      <port/>
                      <description>MIB: IF-MIB
  An estimate of the interface's current bandwidth in bits per second.
-    		 For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,
-    		 this object should contain the nominal bandwidth.
-    		 If the bandwidth of the interface is greater than the maximum value reportable by this object then
-    		 this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interace's speed.
-    		 For a sub-layer which has no concept of bandwidth, this object should be zero. 
-			
+For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,
+this object should contain the nominal bandwidth.
+If the bandwidth of the interface is greater than the maximum value reportable by this object then
+this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interace's speed.
+For a sub-layer which has no concept of bandwidth, this object should be zero.
 </description>
                      <inventory_link>0</inventory_link>
                      <applications>
