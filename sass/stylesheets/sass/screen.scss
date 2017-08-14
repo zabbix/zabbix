@@ -3216,6 +3216,7 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue {
+	display: table;
 	position: absolute;
 	z-index: 1000;
 	padding: 15px 10px 10px 10px;
