@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template HOST-RESOURCES-MIB SNMPv1</template>
-         <name>Template HOST-RESOURCES-MIB SNMPv1</name>
-         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.10
+         <template>Template Module HOST-RESOURCES-MIB SNMPv1</template>
+         <name>Template Module HOST-RESOURCES-MIB SNMPv1</name>
+         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.11
 MIBs used:
 HOST-RESOURCES-MIB
 </description>
@@ -36,7 +36,7 @@ HOST-RESOURCES-MIB
          </applications>
          <items/>
          <discovery_rules>
-		          <discovery_rule>
+            <discovery_rule>
                <name>CPU Discovery</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -110,11 +110,12 @@ The average, over the last minute, of the percentage of time that this processor
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HOST-RESOURCES-MIB SNMPv1:system.cpu.util[hrProcessorLoad.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <expression>{Template Module HOST-RESOURCES-MIB SNMPv1:system.cpu.util[hrProcessorLoad.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPINDEX}: High CPU utilization</name>
@@ -158,7 +159,7 @@ The average, over the last minute, of the percentage of time that this processor
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template HOST-RESOURCES-MIB SNMPv1</host>
+                              <host>Template Module HOST-RESOURCES-MIB SNMPv1</host>
                               <key>system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -168,8 +169,7 @@ The average, over the last minute, of the percentage of time that this processor
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>Memory Discovery</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -194,23 +194,23 @@ The average, over the last minute, of the percentage of time that this processor
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>2</evaltype>
-                        <formula/>
-                        <conditions>
-                            <condition>
-                                <macro>{#STORAGE_TYPE}</macro>
-                                <value>.+2$</value>
-                                <operator>8</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                            <condition>
-                                <macro>{#STORAGE_TYPE}</macro>
-                                <value>.+hrStorageRam</value>
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                  <evaltype>2</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#STORAGE_TYPE}</macro>
+                        <value>.+2$</value>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#STORAGE_TYPE}</macro>
+                        <value>.+hrStorageRam</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>HOST-RESOURCES-MIB::hrStorage discovery with memory filter</description>
                <item_prototypes>
@@ -221,7 +221,7 @@ The average, over the last minute, of the percentage of time that this processor
                      <snmp_oid>.1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units[hrStorageAllocationUnits.{#SNMPINDEX}]</key>
                      <delay>180</delay>
-                     <history>7d</history>
+                     <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -258,6 +258,7 @@ The size, in bytes, of the data objects allocated from this pool.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Used memory in units</name>
@@ -266,7 +267,7 @@ The size, in bytes, of the data objects allocated from this pool.
                      <snmp_oid>.1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units.used[hrStorageUsed.{#SNMPINDEX}]</key>
                      <delay>180</delay>
-                     <history>7d</history>
+                     <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -301,6 +302,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Total memory in units</name>
@@ -309,7 +311,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <snmp_oid>.1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units.total[hrStorageSize.{#SNMPINDEX}]</key>
                      <delay>180</delay>
-                     <history>7d</history>
+                     <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -344,6 +346,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Used memory</name>
@@ -386,6 +389,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Total memory</name>
@@ -428,6 +432,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Memory utilization</name>
@@ -470,11 +475,12 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HOST-RESOURCES-MIB SNMPv1:vm.memory.pused[memoryUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Module HOST-RESOURCES-MIB SNMPv1:vm.memory.pused[memoryUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: High memory utilization</name>
@@ -518,7 +524,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template HOST-RESOURCES-MIB SNMPv1</host>
+                              <host>Template Module HOST-RESOURCES-MIB SNMPv1</host>
                               <key>vm.memory.pused[memoryUsedPercentage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -528,8 +534,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  	
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>Storage Discovery</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -554,24 +559,24 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>2</evaltype>
-                        <formula/>
-                        <conditions>
-                            <condition>
-                                <macro>{#STORAGE_TYPE}</macro>
-                                <value>.+4$</value> 
+                  <evaltype>2</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#STORAGE_TYPE}</macro>
+                        <value>.+4$</value>
                         <!-- OID: .1.3.6.1.2.1.25.2.1.4 -->
-                                <operator>8</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                            <condition>
-                                <macro>{#STORAGE_TYPE}</macro>
-                                <value>.+hrStorageFixedDisk</value>
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#STORAGE_TYPE}</macro>
+                        <value>.+hrStorageFixedDisk</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>HOST-RESOURCES-MIB::hrStorage discovery with storage filter</description>
                <item_prototypes>
@@ -582,7 +587,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <snmp_oid>.1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units[hrStorageAllocationUnits.{#SNMPINDEX}]</key>
                      <delay>300</delay>
-                     <history>7d</history>
+                     <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -619,6 +624,7 @@ The size, in bytes, of the data objects allocated from this pool.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Used storage in units</name>
@@ -627,7 +633,7 @@ The size, in bytes, of the data objects allocated from this pool.
                      <snmp_oid>.1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units.used[hrStorageUsed.{#SNMPINDEX}]</key>
                      <delay>300</delay>
-                     <history>7d</history>
+                     <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -662,6 +668,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Total space in units</name>
@@ -670,7 +677,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <snmp_oid>.1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units.total[hrStorageSize.{#SNMPINDEX}]</key>
                      <delay>300</delay>
-                     <history>7d</history>
+                     <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -705,6 +712,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Used space</name>
@@ -747,6 +755,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Total space</name>
@@ -789,6 +798,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Storage utilization</name>
@@ -831,14 +841,15 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HOST-RESOURCES-MIB SNMPv1:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
+                     <expression>{Template Module HOST-RESOURCES-MIB SNMPv1:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
-                     <name>{#SNMPVALUE}: Free disk space is low</name>
+                     <name>{#SNMPVALUE}: Disk space is critically low</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -852,10 +863,10 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template HOST-RESOURCES-MIB SNMPv1:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_WARN}</expression>
+                     <expression>{Template Module HOST-RESOURCES-MIB SNMPv1:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_WARN}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
-                     <name>{#SNMPVALUE}: Free disk space is low</name>
+                     <name>{#SNMPVALUE}: Disk space is low</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -867,8 +878,8 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <manual_close>0</manual_close>
                      <dependencies>
                         <dependency>
-                           <name>{#SNMPVALUE}: Free disk space is low</name>
-                           <expression>{Template HOST-RESOURCES-MIB SNMPv1:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
+                           <name>{#SNMPVALUE}: Disk space is critically low</name>
+                           <expression>{Template Module HOST-RESOURCES-MIB SNMPv1:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
                            <recovery_expression/>
                         </dependency>
                      </dependencies>
@@ -879,7 +890,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>

@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template HP Enterprise Switch SNMPv2</template>
-         <name>Template HP Enterprise Switch SNMPv2</name>
-         <description>Template HP Enterprise Switch version: 0.10
+         <template>Template Net HP Enterprise Switch SNMPv2</template>
+         <name>Template Net HP Enterprise Switch SNMPv2</name>
+         <description>Template Net HP Enterprise Switch version: 0.11
 MIBs used:
 STATISTICS-MIB
 NETSWITCH-MIB
@@ -87,6 +87,7 @@ Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c0259
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware serial number</name>
@@ -129,6 +130,7 @@ Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c0259
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Firmware version</name>
@@ -175,10 +177,11 @@ Contains the operating code version number (also known as software or firmware).
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
          <discovery_rules>
-		          <discovery_rule>
+            <discovery_rule>
                <name>Memory Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -252,6 +255,7 @@ The number of currently allocated bytes.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Available memory</name>
@@ -295,6 +299,7 @@ The number of available (unallocated) bytes.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Memory utilization</name>
@@ -337,11 +342,12 @@ The number of available (unallocated) bytes.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HP Enterprise Switch SNMPv2:vm.memory.pused[vm.memory.pused.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:vm.memory.pused[vm.memory.pused.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: High memory utilization</name>
@@ -385,7 +391,7 @@ The number of available (unallocated) bytes.
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template HP Enterprise Switch SNMPv2</host>
+                              <host>Template Net HP Enterprise Switch SNMPv2</host>
                               <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -395,9 +401,7 @@ The number of available (unallocated) bytes.
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-
-
-		          <discovery_rule>
+            <discovery_rule>
                <name>FAN Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -422,24 +426,24 @@ The number of available (unallocated) bytes.
                <privatekey/>
                <port/>
                <filter>
-				              <evaltype>1</evaltype>
-				              <formula/>
-				              <conditions>
-					                <condition>
-						                  <macro>{#ENT_CLASS}</macro>
-						                  <value>.+8.3.2$</value>
-						                  <operator>8</operator>
-						                  <formulaid>A</formulaid>
-					                </condition>
-					                <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
-					                <condition>
-						                  <macro>{#ENT_STATUS}</macro>
-						                  <value>(1|2|3|4)</value>
-						                  <operator>8</operator>
-						                  <formulaid>A</formulaid>
-					                </condition>
-				              </conditions>
-			            </filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>.+8.3.2$</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
+                     <condition>
+                        <macro>{#ENT_STATUS}</macro>
+                        <value>(1|2|3|4)</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.2 - fans and are present</description>
                <item_prototypes>
@@ -487,11 +491,12 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"bad"}</expression>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"bad"}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_DESCR}: Fan is in critical state</name>
@@ -512,8 +517,7 @@ Please check the fan unit</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-
-		          <discovery_rule>
+            <discovery_rule>
                <name>PSU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -538,24 +542,24 @@ Please check the fan unit</description>
                <privatekey/>
                <port/>
                <filter>
-				              <evaltype>1</evaltype>
-				              <formula/>
-				              <conditions>
-					                <condition>
-						                  <macro>{#ENT_CLASS}</macro>
-						                  <value>.+8.3.1$</value>
-						                  <operator>8</operator>
-						                  <formulaid>A</formulaid>
-					                </condition>
-					                <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
-					                <condition>
-						                  <macro>{#ENT_STATUS}</macro>
-						                  <value>(1|2|3|4)</value>
-						                  <operator>8</operator>
-						                  <formulaid>A</formulaid>
-					                </condition>
-				              </conditions>
-			            </filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>.+8.3.1$</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
+                     <condition>
+                        <macro>{#ENT_STATUS}</macro>
+                        <value>(1|2|3|4)</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.1 - power supplies and are present</description>
                <item_prototypes>
@@ -603,11 +607,12 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"bad"}</expression>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"bad"}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_DESCR}: Power supply is in critical state</name>
@@ -628,8 +633,7 @@ Please check the power supply unit for errors</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-
-		          <discovery_rule>
+            <discovery_rule>
                <name>Temp Status Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -654,24 +658,24 @@ Please check the power supply unit for errors</description>
                <privatekey/>
                <port/>
                <filter>
-				              <evaltype>1</evaltype>
-				              <formula/>
-				              <conditions>
-					                <condition>
-						                  <macro>{#ENT_CLASS}</macro>
-						                  <value>.+8.3.3$</value>
-						                  <operator>8</operator>
-						                  <formulaid>A</formulaid>
-					                </condition>
-					                <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
-					                <condition>
-						                  <macro>{#ENT_STATUS}</macro>
-						                  <value>(1|2|3|4)</value>
-						                  <operator>8</operator>
-						                  <formulaid>A</formulaid>
-					                </condition>
-				              </conditions>
-			            </filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>.+8.3.3$</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
+                     <condition>
+                        <macro>{#ENT_STATUS}</macro>
+                        <value>(1|2|3|4)</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.3 - over temp status and are present</description>
                <item_prototypes>
@@ -719,6 +723,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes/>
@@ -726,8 +731,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  	
-  	         <discovery_rule>
+            <discovery_rule>
                <name>Entity Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -752,18 +756,18 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#ENT_CLASS}</macro>
-                             <value>3</value> 
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>3</value>
                         <!-- 3 - chassis  -->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -809,6 +813,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Hardware version(revision)</name>
@@ -852,6 +857,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes/>
@@ -859,10 +865,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-  	
-
-	  		  		  	
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -912,16 +915,16 @@ Actual status indicated by the sensor: {#ENT_DESCR}
          </macros>
          <templates>
             <template>
-			            <name>Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2</name>
-		          </template>
-            <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -946,24 +949,24 @@ Actual status indicated by the sensor: {#ENT_DESCR}
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template HP Enterprise Switch SNMPv2</host>
-                           <key>system.cpu.util[hpSwitchCpuStat.0]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net HP Enterprise Switch SNMPv2</host>
+                  <key>system.cpu.util[hpSwitchCpuStat.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template HP Enterprise Switch SNMPv2:system.cpu.util[hpSwitchCpuStat.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Net HP Enterprise Switch SNMPv2:system.cpu.util[hpSwitchCpuStat.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization</name>
@@ -980,10 +983,10 @@ Actual status indicated by the sensor: {#ENT_DESCR}
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template HP Enterprise Switch SNMPv2:system.hw.serialnumber.diff()}=1 and {Template HP Enterprise Switch SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Net HP Enterprise Switch SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net HP Enterprise Switch SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
-         <name>Device might have been replaced (new serial number received)</name>
+         <name>Device has been replaced (new serial number received)</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>
@@ -997,7 +1000,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template HP Enterprise Switch SNMPv2:system.hw.firmware.diff()}=1 and {Template HP Enterprise Switch SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net HP Enterprise Switch SNMPv2:system.hw.firmware.diff()}=1 and {Template Net HP Enterprise Switch SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>
@@ -1016,33 +1019,29 @@ Firmware version has changed. Ack to close</description>
    </triggers>
    <value_maps>
       <value_map>
-			      <name>HP-ICF-CHASSIS::hpicfSensorStatus</name>
-			      <mappings>
-				        <mapping>
-					          <value>1</value>
-					          <newvalue>unknown</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>2</value>
-					          <newvalue>bad</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>3</value>
-					          <newvalue>warning</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>4</value>
-					          <newvalue>good</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>5</value>
-					          <newvalue>notPresent</newvalue>
-				        </mapping>
-			      </mappings>
-		    </value_map>
+         <name>HP-ICF-CHASSIS::hpicfSensorStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>bad</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>warning</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>good</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>notPresent</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>

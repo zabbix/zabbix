@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Mellanox SNMPv2</template>
-         <name>Template Mellanox SNMPv2</name>
-         <description>Template Mellanox version: 0.10
+         <template>Template Net Mellanox SNMPv2</template>
+         <name>Template Net Mellanox SNMPv2</name>
+         <description>Template Net Mellanox version: 0.11
 MIBs used:
 ENTITY-STATE-MIB
 ENTITY-MIB
@@ -31,7 +31,7 @@ ENTITY-MIB
          </applications>
          <items/>
          <discovery_rules>
-  	  	      <discovery_rule>
+            <discovery_rule>
                <name>Entity Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -56,18 +56,18 @@ ENTITY-MIB
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#ENT_CLASS}</macro>
-                             <value>3</value>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>3</value>
                         <!-- 3 - chassis-->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -113,6 +113,7 @@ ENTITY-MIB
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Hardware serial number</name>
@@ -156,14 +157,15 @@ ENTITY-MIB
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Mellanox SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Mellanox SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Net Mellanox SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Net Mellanox SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
-                     <name>{#ENT_NAME}: Device might have been replaced (new serial number received)</name>
+                     <name>{#ENT_NAME}: Device has been replaced (new serial number received)</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -181,7 +183,7 @@ Device serial number has changed. Ack to close</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		          <discovery_rule>
+            <discovery_rule>
                <name>PSU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -206,18 +208,18 @@ Device serial number has changed. Ack to close</description>
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#ENT_CLASS}</macro>
-                             <value>6</value>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>6</value>
                         <!-- 3 - chassis-->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -265,11 +267,12 @@ Device serial number has changed. Ack to close</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Mellanox SNMPv2:sensor.psu.status[entStateOper.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Mellanox SNMPv2:sensor.psu.status[entStateOper.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: Power supply is in critical state</name>
@@ -290,7 +293,7 @@ Please check the power supply unit for errors</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -327,17 +330,17 @@ Please check the power supply unit for errors</description>
             </macro>
          </macros>
          <templates>
-            <template> 
-	  		          <name>Template HOST-RESOURCES-MIB SNMPv2</name>
-	  	        </template>
-            <template> 
-	  		          <name>Template ENTITY-SENSORS-MIB SNMPv2</name>
-	  	        </template>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module HOST-RESOURCES-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module ENTITY-SENSORS-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Interfaces SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -346,8 +349,7 @@ Please check the power supply unit for errors</description>
    <graphs/>
    <triggers/>
    <value_maps>
-      <value_map>
-  	<!-- Name:  EntityOperState 
+      <value_map><!-- Name:  EntityOperState 
 Type:  TEXTUAL-CONVENTION 
 Module:  ENTITY-STATE-MIB 
      
@@ -363,25 +365,25 @@ Status:  current
 Description:   Represents the possible values of operational states. A value of 'disabled' means the resource is totally inoperable.  A value of 'enabled' means the resourceis partially or fully operable.  A value of 'testing'means the resource is currently being testedand cannot therefore report whether it is operationalor not.  A value of 'unknown' means that this resource is unable to report operational state.
  
   	 -->
-  		     <name>ENTITY-STATE-MIB::EntityOperState</name>
-  		     <mappings>
-  			       <mapping>
-  				         <value>1</value>
-  				         <newvalue>unknown</newvalue>
- 			        </mapping>
- 			        <mapping>
-  				         <value>2</value>
-  				         <newvalue>disabled</newvalue>
- 			        </mapping>
- 			        <mapping>
-  				         <value>3</value>
-  				         <newvalue>enabled</newvalue>
- 			        </mapping>
- 			        <mapping>
-  				         <value>4</value>
-  				         <newvalue>testing</newvalue>
- 			        </mapping>
-  		     </mappings>
-  	   </value_map>
+         <name>ENTITY-STATE-MIB::EntityOperState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>disabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>enabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>testing</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>

@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template ENTITY-SENSORS-MIB SNMPv2</template>
-         <name>Template ENTITY-SENSORS-MIB SNMPv2</name>
-         <description>ENTITY-SENSORS-MIB: Temperature, Fans version: 0.10
+         <template>Template Module ENTITY-SENSORS-MIB SNMPv2</template>
+         <name>Template Module ENTITY-SENSORS-MIB SNMPv2</name>
+         <description>ENTITY-SENSORS-MIB: Temperature, Fans version: 0.11
 MIBs used:
 ENTITY-SENSORS-MIB
 </description>
@@ -30,8 +30,7 @@ ENTITY-SENSORS-MIB
          </applications>
          <items/>
          <discovery_rules>
-
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -56,25 +55,25 @@ ENTITY-SENSORS-MIB
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>1</evaltype>
-                        <formula/>
-                        <conditions>
-                            <condition>
-                                <macro>{#SNMPVALUE}</macro>
-                                <value>8</value>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>8</value>
                         <!-- celsius -->
-                                <operator>8</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                             <condition>
-                                <macro>{#SENSOR_PRECISION}</macro>
-                                <value>1</value>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SENSOR_PRECISION}</macro>
+                        <value>1</value>
                         <!-- limit only to precision 1 (like 10.1) -->
-                                <operator>8</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter</description>
                <item_prototypes>
@@ -127,6 +126,7 @@ The most recent measurement obtained by the agent for this sensor.
                      </preprocessing>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SENSOR_INFO}: Temperature status</name>
@@ -172,15 +172,16 @@ The operational status of the sensor {#SENSOR_INFO}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
+                     <expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
 or
-{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -194,16 +195,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -218,9 +219,9 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -239,8 +240,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  	
-		          <discovery_rule>
+            <discovery_rule>
                <name>Fan Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -265,18 +265,18 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>2</evaltype>
-                        <formula/>
-                        <conditions>
-                            <condition>
-                                <macro>{#SNMPVALUE}</macro>
-                                <value>10</value>
+                  <evaltype>2</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>10</value>
                         <!-- rpm -->
-                                <operator>8</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter</description>
                <item_prototypes>
@@ -324,6 +324,7 @@ The most recent measurement obtained by the agent for this sensor.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SENSOR_INFO}: Fan status</name>
@@ -369,11 +370,12 @@ The operational status of the sensor {#SENSOR_INFO}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template ENTITY-SENSORS-MIB SNMPv2:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Module ENTITY-SENSORS-MIB SNMPv2:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SENSOR_INFO}: Fan is in critical state</name>
@@ -394,8 +396,7 @@ Please check the fan unit</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  	
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -431,9 +432,9 @@ Please check the fan unit</description>
          <screens/>
       </template>
       <template>
-         <template>Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2</template>
-         <name>Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2</name>
-         <description>Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 version: 0.10
+         <template>Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2</template>
+         <name>Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2</name>
+         <description>Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 version: 0.11
 MIBs used:
 ENTITY-SENSORS-MIB
 </description>
@@ -449,8 +450,7 @@ ENTITY-SENSORS-MIB
          </applications>
          <items/>
          <discovery_rules>
-
-			         <discovery_rule>
+            <discovery_rule>
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -475,25 +475,25 @@ ENTITY-SENSORS-MIB
                <privatekey/>
                <port/>
                <filter>
-					             <evaltype>1</evaltype>
-					             <formula/>
-					             <conditions>
-						               <condition>
-							                 <macro>{#SNMPVALUE}</macro>
-							                 <value>8</value>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>8</value>
                         <!-- celsius -->
-							                 <operator>8</operator>
-							                 <formulaid>B</formulaid>
-						               </condition>
-						               <condition>
-							                 <macro>{#SENSOR_PRECISION}</macro>
-							                 <value>0</value>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SENSOR_PRECISION}</macro>
+                        <value>0</value>
                         <!-- limit only to precision 0 (like 10) -->
-							                 <operator>8</operator>
-							                 <formulaid>B</formulaid>
-						               </condition>
-					             </conditions>
-				           </filter>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter</description>
                <item_prototypes>
@@ -541,6 +541,7 @@ The most recent measurement obtained by the agent for this sensor.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SENSOR_INFO}: Temperature status</name>
@@ -586,15 +587,16 @@ The operational status of the sensor {#SENSOR_INFO}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
+                     <expression>{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
 or
-{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -608,16 +610,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -632,9 +634,9 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Module ENTITY-SENSORS-MIB Temperature Sensor precision 0 SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -653,7 +655,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		       </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -689,21 +691,21 @@ This trigger uses temperature sensor values as well as temperature sensor status
    <triggers/>
    <value_maps>
       <value_map>
-  		     <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
-  		     <mappings>
-  			       <mapping>
-  				         <value>1</value>
-  				         <newvalue>ok</newvalue>
- 			        </mapping>
- 			        <mapping>
-  				         <value>2</value>
-  				         <newvalue>unavailable</newvalue>
- 			        </mapping>
- 			        <mapping>
-  				         <value>3</value>
-  				         <newvalue>nonoperational</newvalue>
- 			        </mapping>
-  		     </mappings>
-	     </value_map>
+         <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unavailable</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>nonoperational</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>
