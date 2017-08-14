@@ -134,9 +134,11 @@ $dashboard_data = [
 	'userid'	=> $data['dashboard']['owner']['id'],
 	'dynamic'	=> $data['dynamic']
 ];
+
 if (array_key_exists('sharing', $data['dashboard'])) {
 	$dashboard_data['sharing'] = $data['dashboard']['sharing'];
 }
+
 $dashboard_options = [
 	'fullscreen' => $data['fullscreen'],
 	'max-rows' => DASHBOARD_MAX_ROWS,
