@@ -2667,8 +2667,8 @@ $form-icon-btn: (
 	width: 16%;
 	height: 200px;
 	background-color: $ui-bg-color;
-	border-style: dashed;
-	border-width: 2px;
+	border-style: solid;
+	border-width: 1px;
 	border-color: $ui-border-color;
 	display: flex;
 	flex-direction: column;
@@ -3216,6 +3216,7 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue {
+	display: table;
 	position: absolute;
 	z-index: 1000;
 	padding: 15px 10px 10px 10px;
@@ -3235,9 +3236,10 @@ $form-icon-btn: (
 
 		.overlay-dialogue-body {
 			overflow: auto;
-			max-height: calc(100vh - 145px);
+			max-height: calc(100vh - 190px);
+			margin: 0 0 10px 0;
 		}
-		.overlay-close-btn {
+		& > .overlay-close-btn {
 			position: relative;
 			float: right;
 			top: -12px;
@@ -4605,9 +4607,23 @@ tr.cursor-move {
 		.tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
 			flex: 0 0 15px;
 		}
+
+		.tree-list > .tree-item.ui-sortable-helper .content {
+			padding-left: 5px;
+		}
+
 		@for $i from 0 through $max_depth {
-			.tree-list[data-depth="#{$i}"] > .tree-item > .tree-row > .content > .margin-lvl {
-				flex: 0 0 ($i * 15px + 10px);
+			.tree-list[data-depth="#{$i}"] > .tree-item {
+				&> .tree-row > .content > .margin-lvl {
+					flex: 0 0 ($i * 15px + 10px);
+				}
+				&.ui-sortable-helper {
+					margin-left: ($i * 15px + 10px);
+
+					& > .tree-row > .content > .margin-lvl {
+						display: none;
+					}
+				}
 			}
 		}
 

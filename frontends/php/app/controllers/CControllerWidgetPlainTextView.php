@@ -79,14 +79,14 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			]);
 		}
 
-		// Resolve item name.
-		$items = CMacrosResolverHelper::resolveItemNames($items);
-
 		if (!$items) {
-			$error = _('No permissions to selected item or it does not exist.');
+			$error = _('No permissions to referred object or it does not exist!');
 		}
 		// Select host name and item history data.
 		else {
+			// Resolve item name.
+			$items = CMacrosResolverHelper::resolveItemNames($items);
+
 			$item = $items[0];
 			$host = $item['hosts'][0];
 
@@ -128,10 +128,12 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			}
 		}
 
+		$name = $dynamic_widget_name
+			? $dynamic_widget_name
+			: CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT];
+
 		$this->setResponse(new CControllerResponseData([
-			'name' => $dynamic_widget_name
-				? $dynamic_widget_name
-				: $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT]),
+			'name' => $this->getInput('name', $name),
 			'table_rows' => $table_rows,
 			'error' => $error,
 			'user' => [

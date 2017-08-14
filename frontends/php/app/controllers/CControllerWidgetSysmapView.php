@@ -29,7 +29,6 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'uniqueid' => 'required|string',
-			'edit_mode' => 'in 0,1',
 			'initial_load' => 'in 0,1',
 			'fullscreen' => 'in 0,1',
 			'fields' => 'json',
@@ -41,7 +40,6 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$storage = $this->getInput('storage', []);
 		$uniqueid = $this->getInput('uniqueid');
-		$edit_mode = $this->getInput('edit_mode', 0);
 		$initial_load = $this->getInput('initial_load', 1);
 		$sysmap_data = null;
 		$previous_map = null;
@@ -78,19 +76,14 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 
 		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
 		foreach ($sysmap_data['elements'] as &$element) {
-			if ($edit_mode) {
-				$element['actions'] = json_encode(null);
+			$actions = json_decode($element['actions'], true);
+			if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
+				$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
+				$actions['navigatetos']['submap']['widget_uniqueid'] = $uniqueid;
+				unset($actions['gotos']['submap']);
 			}
-			else {
-				$actions = json_decode($element['actions'], true);
-				if ($actions && array_key_exists('gotos', $actions) && array_key_exists('submap', $actions['gotos'])) {
-					$actions['navigatetos']['submap'] = $actions['gotos']['submap'];
-					$actions['navigatetos']['submap']['widget_uniqueid'] = $uniqueid;
-					unset($actions['gotos']['submap']);
-				}
 
-				$element['actions'] = json_encode($actions);
-			}
+			$element['actions'] = json_encode($actions);
 		}
 		unset($element);
 

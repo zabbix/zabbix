@@ -422,7 +422,11 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 		}
 
 		// Propagate item mapids to all its parent items.
-		foreach ($navtree_items as $field_details) {
+		foreach ($navtree_items as $fieldid => $field_details) {
+			if ($field_details['parent'] == $fieldid) {
+				$navtree_items[$fieldid]['parent'] = 0;
+			}
+
 			$parentid = $field_details['parent'];
 			if ($field_details['parent'] != 0 && array_key_exists($parentid, $navtree_items)) {
 				while (array_key_exists($parentid, $navtree_items)) {

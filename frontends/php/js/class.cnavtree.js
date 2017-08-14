@@ -47,7 +47,6 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 			forceHelperSize: true,
 			tolerance: 'intersect',
 			handle: '.drag-icon',
-			cursorAt: {left: 15},
 			items: '.tree-item',
 			helper:	'clone',
 			revert:	10,
@@ -267,7 +266,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				var drop_to = prev_item,
 					uiObj = this;
 
-				this._isAllowed(prev_item, level, level+child_levels);
+				this._isAllowed(prev_item, level, level + child_levels);
 
 				this.changing_parent = setTimeout(function() {
 					$(drop_to)
@@ -314,11 +313,11 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 					uiObj.refreshPositions();
 				}, o.parent_change_delay);
 
-				this._isAllowed(prev_item, level, level+child_levels);
+				this._isAllowed(prev_item, level, level + child_levels);
 			}
 			else {
 				$(this.placeholder.parent().closest('.tree-item')).addClass('highliglted-parent');
-				this._isAllowed(prev_item, level, level+child_levels);
+				this._isAllowed(prev_item, level, level + child_levels);
 			}
 
 			// Post events to containers.
@@ -371,7 +370,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 					var parent_id = this.placeholder.parent().closest('.tree-item').data('id'),
 						item_id = $(this.currentItem[0]).data('id');
 
-					$('[name="map.parent.'+item_id+'"]').val(parent_id);
+					$('[name="map.parent.' + item_id + '"]').val(parent_id);
 				}
 
 				if (this.options.revert) {
@@ -446,7 +445,7 @@ jQuery(function($) {
 
 				widget_data.lastId++;
 
-				while ($('[name="map.name.'+widget_data.lastId+'"]').length) {
+				while ($('[name="map.name.' + widget_data.lastId + '"]').length) {
 					widget_data.lastId++;
 				}
 
@@ -469,7 +468,7 @@ jQuery(function($) {
 			var drawTree = function($obj, isEditMode) {
 				var root = createTreeBranch($obj, 'root', null),
 					widget_data = $obj.data('widgetData'),
-					prefix = widget_data['uniqueid']+'_',
+					prefix = widget_data['uniqueid'] + '_',
 					tree_items = getTreeWidgetItems($obj),
 					tree = buildTree($obj, tree_items, 0);
 
@@ -486,7 +485,7 @@ jQuery(function($) {
 						edit_mode_tree.setAttribute('class', new_class);
 					}
 
-					root = document.getElementById(prefix+'children-of-0');
+					root = document.getElementById(prefix + 'children-of-0');
 				}
 
 				$.each(tree, function(i, item) {
@@ -515,21 +514,21 @@ jQuery(function($) {
 
 					$.each(problems, function(sev, numb) {
 						if (numb) {
-							$('.tree-item[data-id='+itemid+']').attr('data-problems'+sev, numb);
+							$('.tree-item[data-id=' + itemid + ']').attr('data-problems' + sev, numb);
 						}
 					});
 				});
 
 				$.each(widget_data.severity_levels, function(sev, conf) {
-					$('[data-problems'+sev+']', $obj).each(function() {
+					$('[data-problems' + sev + ']', $obj).each(function() {
 						var obj = $(this);
 
 						$('>.tree-row>.problems', this).append($('<span/>', {
-								'style': 'background: #'+conf['color'],
+								'style': 'background: #' + conf['color'],
 								'class': 'problems-per-item',
 								'title': conf['name']
 							})
-							.html(obj.attr('data-problems'+sev))
+							.html(obj.attr('data-problems' + sev))
 						);
 					});
 				});
@@ -538,11 +537,11 @@ jQuery(function($) {
 			var createTreeBranch = function($obj, className, parentId) {
 				var className = className || '',
 					widget_data = $obj.data('widgetData'),
-					prefix = widget_data['uniqueid']+'_',
+					prefix = widget_data['uniqueid'] + '_',
 					ul = document.createElement('UL');
 
 				if (parentId !== null) {
-					ul.setAttribute('id', prefix+'children-of-'+parentId);
+					ul.setAttribute('id', prefix + 'children-of-' + parentId);
 				}
 
 				className += ' tree-list';
@@ -569,8 +568,8 @@ jQuery(function($) {
 					};
 
 				if (id) {
-					ajax_data['map_name'] = $('[name="map.name.'+id+'"]', $obj).val();
-					ajax_data['map_mapid'] = $('[name="mapid.'+id+'"]', $obj).val();
+					ajax_data['map_name'] = $('[name="map.name.' + id + '"]', $obj).val();
+					ajax_data['map_mapid'] = $('[name="mapid.' + id + '"]', $obj).val();
 				}
 				else {
 					ajax_data['map_id'] = getNextId($obj);
@@ -591,14 +590,14 @@ jQuery(function($) {
 							'content': resp.body,
 							'buttons': [
 								{
-									'title': item_edit ? t('Update') : t('Add'),
+									'title': item_edit ? t('Apply') : t('Add'),
 									'class': 'dialogue-widget-save',
 									'action': function() {
 										var form = $('#widget_dialogue_form'),
 											url = new Curl('zabbix.php'),
 											ajax_data = {
 												add_submaps: $('[name="add_submaps"]', form).is(':checked') ? 1 : 0,
-												map_name: $('[name="map.name.'+id+'"]', form).val(),
+												map_name: $('[name="map.name.' + id + '"]', form).val(),
 												map_mapid: +$('[name="linked_map_id"]', form).val(),
 												mapid: id
 											};
@@ -621,16 +620,20 @@ jQuery(function($) {
 													return false;
 												}
 												else {
-													if ($('[name="map.name.'+id+'"]', $obj).length) {
-														$('[name="map.name.'+id+'"]', $obj).val(resp['map_name']);
-														$('[name="mapid.'+id+'"]', $obj).val(resp['map_mapid']);
-														$('[data-id='+id+'] > .tree-row > .content > .item-name', $obj)
+													if ($('[name="map.name.' + id + '"]', $obj).length) {
+														$('[name="map.name.' + id + '"]', $obj).val(resp['map_name']);
+														$('[name="mapid.' + id + '"]', $obj).val(resp['map_mapid']);
+														$('[data-id=' + id + '] > .tree-row > .content > .item-name',
+																$obj
+															)
 															.empty()
 															.attr('title', resp['map_name'])
 															.append($('<span/>').text(resp['map_name']));
 													}
 													else {
-														root = $('.tree-item[data-id='+parent+']>ul.tree-list', $obj),
+														root = $('.tree-item[data-id=' + parent + ']>ul.tree-list',
+																$obj
+															),
 														id = +resp['map_id'];
 														new_item = {
 															name: resp['map_name'],
@@ -649,8 +652,8 @@ jQuery(function($) {
 													if (typeof resp.hierarchy !== 'undefined') {
 														var add_child_levels = function($obj, mapid, itemid) {
 															if (typeof resp.hierarchy[mapid] !== 'undefined') {
-																var sel = '.tree-item[data-id='+itemid+']>ul.tree-list',
-																	root = $(sel, $obj);
+																var root = $('.tree-item[data-id=' + itemid +
+																		']>ul.tree-list', $obj);
 
 																$.each(resp.hierarchy[mapid], function(i, submapid) {
 																	if (typeof resp.submaps[submapid] !== 'undefined') {
@@ -663,8 +666,12 @@ jQuery(function($) {
 																				parent: +itemid
 																			};
 
-																		root.append(createTreeItem($obj, new_item, 1, true, true));
-																		add_child_levels($obj, +submapid, submap_itemid);
+																		root.append(createTreeItem($obj, new_item, 1,
+																			true, true
+																		));
+																		add_child_levels($obj, +submapid,
+																			submap_itemid
+																		);
 																	}
 																});
 															}
@@ -710,7 +717,7 @@ jQuery(function($) {
 			 */
 			var createTreeItem = function($obj, item, depth, editable, isEditMode) {
 				var widget_data = $obj.data('widgetData'),
-					prefix = widget_data['uniqueid']+'_',
+					prefix = widget_data['uniqueid'] + '_',
 					ul = createTreeBranch($obj, null, item.id),
 					item_clases = 'tree-item';
 
@@ -793,7 +800,7 @@ jQuery(function($) {
 
 				li_item.setAttribute('class', item_clases);
 				li_item.setAttribute('data-id', item.id);
-				li_item.setAttribute('id', prefix+'tree-item-'+item.id);
+				li_item.setAttribute('id', prefix + 'tree-item-' + item.id);
 
 				if (item.mapid) {
 					li_item.setAttribute('data-mapid', item.mapid);
@@ -840,7 +847,7 @@ jQuery(function($) {
 						var parentId = $(this).data('id'),
 							widget_data = $obj.data('widgetData'),
 							depth = $(this).closest('.tree-list').attr('data-depth'),
-							branch = $('.tree-item[data-id='+parentId+']>ul', $obj);
+							branch = $('.tree-item[data-id=' + parentId + ']>ul', $obj);
 
 						if (typeof depth === 'undefined') {
 							depth = 0;
@@ -872,7 +879,7 @@ jQuery(function($) {
 						}
 
 						addPopupValues = function(data) {
-							var root = $('.tree-item[data-id='+id+']>ul.tree-list', $obj),
+							var root = $('.tree-item[data-id=' + id + ']>ul.tree-list', $obj),
 								new_item;
 
 							$.each(data.values, function() {
@@ -912,7 +919,7 @@ jQuery(function($) {
 						btn3.setAttribute('title', t('Edit'));
 						btn3.addEventListener('click', function() {
 							var id = $(this).data('id'),
-								parent = +$('input[name="map.parent.'+id+'"]', $obj).val(),
+								parent = +$('input[name="map.parent.' + id + '"]', $obj).val(),
 								depth = +$(this).closest('[data-depth]').attr('data-depth');
 
 							itemEditDialog($obj, id, parent, depth);
@@ -979,7 +986,7 @@ jQuery(function($) {
 
 						if (widget_data['widgetid'].length) {
 							updateUserProfile(
-								'web.dashbrd.navtree-'+branch.data('id')+'.toggle',
+								'web.dashbrd.navtree-' + branch.data('id') + '.toggle',
 								closed_state, [widget_data['widgetid']]
 							);
 						}
@@ -992,22 +999,22 @@ jQuery(function($) {
 				if (isEditMode && editable) {
 					var name_fld = document.createElement('INPUT');
 					name_fld.setAttribute('type', 'hidden');
-					name_fld.setAttribute('name', 'map.name.'+item.id);
-					name_fld.setAttribute('id', prefix+'map.name.'+item.id);
+					name_fld.setAttribute('name', 'map.name.' + item.id);
+					name_fld.setAttribute('id', prefix + 'map.name.' + item.id);
 					name_fld.value = item.name;
 					li_item.appendChild(name_fld);
 
 					var parent_fld = document.createElement('INPUT');
 					parent_fld.setAttribute('type', 'hidden');
-					parent_fld.setAttribute('name', 'map.parent.'+item.id);
-					parent_fld.setAttribute('id', prefix+'map.parent.'+item.id);
+					parent_fld.setAttribute('name', 'map.parent.' + item.id);
+					parent_fld.setAttribute('id', prefix + 'map.parent.' + item.id);
 					parent_fld.value = item.parent || 0;
 					li_item.appendChild(parent_fld);
 
 					var mapid_fld = document.createElement('INPUT');
 					mapid_fld.setAttribute('type', 'hidden');
-					mapid_fld.setAttribute('name', 'mapid.'+item.id);
-					mapid_fld.setAttribute('id', prefix+'mapid.'+item.id);
+					mapid_fld.setAttribute('name', 'mapid.' + item.id);
+					mapid_fld.setAttribute('id', prefix + 'mapid.' + item.id);
 					mapid_fld.value = typeof item.mapid === 'number' ? item.mapid : 0;
 					li_item.appendChild(mapid_fld);
 				}
@@ -1104,17 +1111,21 @@ jQuery(function($) {
 							parent: 0,
 							order: 1,
 							mapid: 0,
-							id: + det[1]
+							id: +det[1]
 						};
 
 						if (typeof widget_data['fields']['map.parent.' + item.id] !== 'undefined') {
-							item.parent = + widget_data['fields']['map.parent.' + item.id];
+							item.parent = +widget_data['fields']['map.parent.' + item.id];
 						}
 						if (typeof widget_data['fields']['mapid.' + item.id] !== 'undefined') {
-							item.mapid = + widget_data['fields']['mapid.' + item.id];
+							item.mapid = +widget_data['fields']['mapid.' + item.id];
 						}
 						if (typeof widget_data['fields']['map.order.' + item.id] !== 'undefined') {
-							item.order = + widget_data['fields']['map.order.' + item.id];
+							item.order = +widget_data['fields']['map.order.' + item.id];
+						}
+
+						if (item.parent === item.id) {
+							item.parent = 0;
 						}
 
 						tree_items.push(item);
@@ -1191,13 +1202,13 @@ jQuery(function($) {
 
 			// Remove item from tree.
 			var removeItem = function($obj, id) {
-				var item = $('[data-id='+id+']', $obj),
+				var item = $('[data-id=' + id + ']', $obj),
 					widget_data = $obj.data('widgetData'),
-					prefix = widget_data['uniqueid']+'_',
-					parent = $('#'+prefix+'map.parent.'+id, item).val();
+					prefix = widget_data['uniqueid'] + '_',
+					parent = $('#' + prefix + 'map.parent.' + id, item).val();
 
-				if ($('#'+prefix+'children-of-'+parent+'>.tree-item', $obj).length == 1) {
-					$('#'+prefix+'tree-item-'+parent).removeClass('is-parent');
+				if ($('#' + prefix + 'children-of-' + parent + '>.tree-item', $obj).length == 1) {
+					$('#' + prefix + 'tree-item-' + parent).removeClass('is-parent');
 				}
 
 				$(item).remove();
@@ -1207,7 +1218,7 @@ jQuery(function($) {
 			// Records data from DOM to dashboard widget[fields] array.
 			var updateWidgetFields = function($obj) {
 				var dashboard_widget = getWidgetData($obj),
-					prefix = dashboard_widget['uniqueid']+'_',
+					prefix = dashboard_widget['uniqueid'] + '_',
 					widget_fields = {};
 
 				if (!dashboard_widget || !isEditMode()) {
@@ -1224,21 +1235,21 @@ jQuery(function($) {
 					var id = +field.getAttribute('name').substr(9);
 
 					if (id) {
-						var parent = document.getElementById(prefix+'map.parent.'+id).value,
-							mapid = document.getElementById(prefix+'mapid.'+id).value,
-							sibl = document.getElementById(prefix+'children-of-'+parent).childNodes,
+						var parent = document.getElementById(prefix + 'map.parent.' + id).value,
+							mapid = document.getElementById(prefix + 'mapid.' + id).value,
+							sibl = document.getElementById(prefix + 'children-of-' + parent).childNodes,
 							order = 0;
 
 						while (typeof sibl[order] !== 'undefined' && +sibl[order].getAttribute('data-id') !== id) {
 							order++;
 						}
 
-						widget_fields['map.name.'+id] = field.value;
-						widget_fields['map.parent.'+id] = parent || 0;
-						widget_fields['map.order.'+id] = order + 1;
+						widget_fields['map.name.' + id] = field.value;
+						widget_fields['map.parent.' + id] = parent || 0;
+						widget_fields['map.order.' + id] = order + 1;
 
 						if (mapid) {
-							widget_fields['mapid.'+id] = +mapid;
+							widget_fields['mapid.' + id] = +mapid;
 						}
 					}
 				});
@@ -1247,9 +1258,9 @@ jQuery(function($) {
 			};
 
 			var openBranch = function($obj, id) {
-				if (!$('.tree-item[data-id='+id+']').is(':visible')) {
+				if (!$('.tree-item[data-id=' + id + ']').is(':visible')) {
 					var selector = '> .tree-row > .content > .arrow > .treeview > span',
-						branch_to_open = $('.tree-item[data-id='+id+']').closest('.tree-list').not('.root');
+						branch_to_open = $('.tree-item[data-id=' + id + ']').closest('.tree-list').not('.root');
 
 					while (branch_to_open.length) {
 						branch_to_open.closest('.tree-item.is-parent')
@@ -1280,6 +1291,24 @@ jQuery(function($) {
 
 				drawTree($obj, isEditMode());
 				makeSortable($obj);
+			};
+
+			var markTreeItemSelected = function($obj, item_id) {
+				var widget = getWidgetData($obj),
+					prefix = widget['uniqueid'] + '_',
+					selected_item = $('#' + prefix + 'tree-item-' + item_id),
+					step_in_path = selected_item;
+
+				if (item_id && $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+						'selected_mapid', {mapid: $(selected_item).data('mapid')})
+				) {
+					$('.selected', $obj).removeClass('selected');
+
+					while ($(step_in_path).length) {
+						$(step_in_path).addClass('selected');
+						step_in_path = $(step_in_path).parent().closest('.tree-item');
+					}
+				}
 			};
 
 			var methods = {
@@ -1316,28 +1345,14 @@ jQuery(function($) {
 							widget_data = $this.data('widgetData');
 
 						if (!widget_data.navtree_item_selected
-								|| !$('.tree-item[data-id='+widget_data.navtree_item_selected+']').is(':visible')) {
+								|| !$('.tree-item[data-id=' + widget_data.navtree_item_selected + ']').is(':visible')) {
 							widget_data.navtree_item_selected = $('.tree-item:visible', $this)
 								.not('[data-mapid="0"]')
 								.first()
 								.data('id');
 						}
 
-						var selected_item = $('.tree-item[data-id='+widget_data.navtree_item_selected+']'),
-							step_in_path = selected_item;
-
-						if (widget_data.navtree_item_selected
-								&& $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
-									'selected_mapid', {mapid: $(selected_item).data('mapid')})) {
-							$('.selected', $this).removeClass('selected');
-
-							while ($(step_in_path).length) {
-								$(step_in_path).addClass('selected');
-								step_in_path = $(step_in_path).parent().closest('.tree-item');
-							}
-						}
-
-						delete widget_data.navtree_item_selected;
+						markTreeItemSelected($this, widget_data.navtree_item_selected);
 					});
 				},
 
@@ -1387,29 +1402,31 @@ jQuery(function($) {
 										mapid_selector = '',
 										prev_map_selector = '';
 
-									mapid_selector = '.tree-item[data-mapid='+data[0]['submapid']+']';
+									mapid_selector = '.tree-item[data-mapid=' + data[0]['submapid'] + ']';
 
-									if (data[0]['previous_maps']) {
+									if (data[0]['previous_maps'].length) {
 										var prev_maps = data[0]['previous_maps'].split(','),
 											prev_maps = prev_maps.length
 												? prev_maps[prev_maps.length-1]
 												: null;
 
 										if (prev_maps) {
-											var prev_map_selectors = [
-												'.selected .selected .selected .selected .tree-item.selected[data-mapid='+prev_maps+']',
-												'.selected .selected .selected .tree-item.selected[data-mapid='+prev_maps+']',
-												'.selected .selected .tree-item.selected[data-mapid='+prev_maps+']',
-												'.selected .tree-item.selected[data-mapid='+prev_maps+']',
-												'.tree-item.selected[data-mapid='+prev_maps+']',
-												'.tree-item[data-mapid='+prev_maps+']'
-											],
-											indx = 0;
+											var sc = '.selected',
+												mapid = '[data-mapid=' + prev_maps + ']',
+												prev_map_selectors = [
+													Array(4).join(sc + ' ') + '.tree-item' + sc + mapid,
+													Array(3).join(sc + ' ') + '.tree-item' + sc + mapid,
+													Array(2).join(sc + ' ') + '.tree-item' + sc + mapid,
+													sc + ' .tree-item' + sc + mapid,
+													'.tree-item' + sc + mapid,
+													'.tree-item' + mapid
+												],
+												indx = 0;
 
 											while (!prev_map_selector.length
 													&& typeof prev_map_selectors[indx] !== 'undefined') {
 												if ($(prev_map_selectors[indx], $this).length) {
-													prev_map_selector = prev_map_selectors[indx]+' ';
+													prev_map_selector = prev_map_selectors[indx] + ' ';
 												}
 												indx++;
 											}
@@ -1449,6 +1466,10 @@ jQuery(function($) {
 							});
 
 							switchToNavigationMode($this);
+
+							if (!options['initial_load']) {
+								markTreeItemSelected($this, options.navtree_item_selected);
+							}
 						}
 					});
 				}

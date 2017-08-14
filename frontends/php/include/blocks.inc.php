@@ -179,33 +179,24 @@ function getSystemStatusData(array $filter, array $config) {
 		}
 
 		// Get acknowledges and tags.
-		$options = [
-			'output' => [],
-			'eventids' => array_keys($problems),
-			'selectTags' => ['tag', 'value'],
-			'preservekeys' => true
-		];
-		if ($config['event_ack_enable'] && in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-			$options['selectAcknowledges'] = ['clock', 'message', 'action', 'alias', 'name', 'surname'];
-		}
-
-		$problems_data = API::Problem()->get($options);
+		$problems_data = ($config['event_ack_enable']
+				&& in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))
+			? API::Problem()->get([
+				'output' => [],
+				'selectAcknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
+				'eventids' => array_keys($problems),
+				'preservekeys' => true
+			])
+			: [];
 
 		$visible_problems = [];
 
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
-			if (array_key_exists($eventid, $problems_data)) {
-				$problem['acknowledges'] = array_key_exists('acknowledges', $problems_data[$eventid])
-					? $problems_data[$eventid]['acknowledges']
-					: [];
-				$problem['tags'] = $problems_data[$eventid]['tags'];
-			}
-			else {
-				$problem['acknowledges'] = [];
-				$problem['tags'] = [];
-			}
+			$problem['acknowledges'] = array_key_exists($eventid, $problems_data)
+				? $problems_data[$eventid]['acknowledges']
+				: [];
 
 			// groups
 			foreach ($trigger['groups'] as $trigger_group) {
@@ -240,6 +231,29 @@ function getSystemStatusData(array $filter, array $config) {
 
 		// actions
 		$data['actions'] = makeEventsActions($visible_problems);
+
+		// tags
+		$problems_data = API::Problem()->get([
+			'output' => [],
+			'eventids' => array_keys($visible_problems),
+			'selectTags' => ['tag', 'value'],
+			'preservekeys' => true
+		]);
+
+		foreach ($data['groups'] as &$group) {
+			foreach ($group['stats'] as &$stat) {
+				foreach (['problems', 'problems_unack'] as $key) {
+					foreach ($stat[$key] as &$problem) {
+						$problem['tags'] = array_key_exists($problem['eventid'], $problems_data)
+							? $problems_data[$problem['eventid']]['tags']
+							: [];
+					}
+					unset($problem);
+				}
+			}
+			unset($stat);
+		}
+		unset($group);
 	}
 
 	return $data;
