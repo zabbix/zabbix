@@ -1353,7 +1353,7 @@
 
 				if (data['widget_relation_submissions'].length
 						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length
-					) {
+				) {
 					$.each(data['widget_relation_submissions'], function(rel_index, rel) {
 						erase = false;
 
@@ -1480,18 +1480,18 @@
 						$.each(data['data_buffer'][src_uniqueid], function(index, buffer_data) {
 							if (typeof data['widget_relations']['relations'][src_uniqueid] !== 'undefined') {
 								$.each(data['widget_relations']['relations'][src_uniqueid], function(index,
-										dest_uniqueid) {
-									if (buffer_data['old'].indexOf(dest_uniqueid) == -1) {
-										if (typeof data['widget_relations']['tasks'][dest_uniqueid] !== 'undefined') {
-											var widget = methods.getWidgetsBy.call($this, 'uniqueid', dest_uniqueid);
+										dest_uid) {
+									if (buffer_data['old'].indexOf(dest_uid) == -1) {
+										if (typeof data['widget_relations']['tasks'][dest_uid] !== 'undefined') {
+											var widget = methods.getWidgetsBy.call($this, 'uniqueid', dest_uid);
 											if (widget.length) {
-												$.each(data['widget_relations']['tasks'][dest_uniqueid], function(index, task) {
+												$.each(data['widget_relations']['tasks'][dest_uid], function(i, task) {
 													if (task['data_name'] === buffer_data['data_name']) {
 														task.callback.apply($obj, [widget[0], buffer_data['args']]);
 													}
 												});
 
-												buffer_data['old'].push(dest_uniqueid);
+												buffer_data['old'].push(dest_uid);
 											}
 										}
 									}
