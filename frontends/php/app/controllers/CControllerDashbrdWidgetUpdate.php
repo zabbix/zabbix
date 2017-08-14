@@ -105,10 +105,10 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			 * @var array  $widgets
 			 * @var string $widget[]['widgetid']        (optional)
 			 * @var array  $widget[]['pos']             (optional)
-			 * @var int    $widget[]['pos']['row']
-			 * @var int    $widget[]['pos']['col']
-			 * @var int    $widget[]['pos']['height']
+			 * @var int    $widget[]['pos']['x']
+			 * @var int    $widget[]['pos']['y']
 			 * @var int    $widget[]['pos']['width']
+			 * @var int    $widget[]['pos']['height']
 			 * @var string $widget[]['type']
 			 * @var string $widget[]['name']
 			 * @var string $widget[]['fields']          (optional) JSON object
@@ -123,7 +123,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 					$ret = false;
 				}
 				else {
-					foreach (['row', 'col', 'height', 'width'] as $field) {
+					foreach (['x', 'y', 'width', 'height'] as $field) {
 						if (!array_key_exists($field, $widget['pos'])) {
 							error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][pos]',
 								_s('the parameter "%1$s" is missing', $field)
@@ -219,10 +219,10 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			}
 
 			$upd_widget += [
-				'row' => $widget['pos']['row'],
-				'col' => $widget['pos']['col'],
-				'height' => $widget['pos']['height'],
+				'x' => $widget['pos']['x'],
+				'y' => $widget['pos']['y'],
 				'width' => $widget['pos']['width'],
+				'height' => $widget['pos']['height'],
 				'type' => $widget['type'],
 				'name' => $widget['name'],
 				'fields' => $widget['form']->fieldsToApi(),

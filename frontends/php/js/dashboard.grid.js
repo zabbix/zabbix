@@ -71,8 +71,8 @@
 		data['options']['rows'] = 0;
 
 		$.each(data['widgets'], function() {
-			if (this['pos']['row'] + this['pos']['height'] > data['options']['rows']) {
-				data['options']['rows'] = this['pos']['row'] + this['pos']['height'];
+			if (this['pos']['y'] + this['pos']['height'] > data['options']['rows']) {
+				data['options']['rows'] = this['pos']['y'] + this['pos']['height'];
 			}
 		});
 
@@ -108,29 +108,26 @@
 			target_left = target_pos.left + 25,
 			target_height = $div.height() + 25,
 			target_width = $div.width() + 25,
-			row = (target_top - (target_top % data['options']['widget-height'])) / data['options']['widget-height'],
-			col = (target_left - (target_left % widget_width_px)) / widget_width_px,
-			height = (target_height - (target_height % data['options']['widget-height'])) / data['options']['widget-height'],
-			width = (target_width - (target_width % widget_width_px)) / widget_width_px;
+			x = (target_left - (target_left % widget_width_px)) / widget_width_px,
+			y = (target_top - (target_top % data['options']['widget-height'])) / data['options']['widget-height'],
+			width = (target_width - (target_width % widget_width_px)) / widget_width_px,
+			height = (target_height - (target_height % data['options']['widget-height'])) /
+				data['options']['widget-height'];
 
-		if (row < 0) {
-			row = 0;
+		if (x > data['options']['max-columns'] - width) {
+			x = data['options']['max-columns'] - width;
 		}
 
-		if (row > data['options']['max-rows'] - height) {
-			row = data['options']['max-rows'] - height;
+		if (x < 0) {
+			x = 0;
 		}
 
-		if (col > data['options']['max-columns'] - width) {
-			col = data['options']['max-columns'] - width;
+		if (y < 0) {
+			y = 0;
 		}
 
-		if (col < 0) {
-			col = 0;
-		}
-
-		if (height < 1) {
-			height = 1;
+		if (y > data['options']['max-rows'] - height) {
+			y = data['options']['max-rows'] - height;
 		}
 
 		if (width < 1) {
@@ -140,15 +137,19 @@
 			width = data['options']['max-columns'];
 		}
 
-		return {'row': row, 'col': col, 'height': height, 'width': width};
+		if (height < 1) {
+			height = 1;
+		}
+
+		return {'x': x, 'y': y, 'width': width, 'height': height};
 	}
 
 	function setDivPosition($div, data, pos) {
 		$div.css({
-			'top': '' + (data['options']['widget-height'] * pos['row']) + 'px',
-			'left': '' + (data['options']['widget-width'] * pos['col']) + '%',
-			'height': '' + (data['options']['widget-height'] * pos['height']) + 'px',
-			'width': '' + (data['options']['widget-width'] * pos['width']) + '%'
+			'left': '' + (data['options']['widget-width'] * pos['x']) + '%',
+			'top': '' + (data['options']['widget-height'] * pos['y']) + 'px',
+			'width': '' + (data['options']['widget-width'] * pos['width']) + '%',
+			'height': '' + (data['options']['widget-height'] * pos['height']) + 'px'
 		});
 	}
 
@@ -170,7 +171,7 @@
 	function posEquals(pos1, pos2) {
 		var ret = true;
 
-		$.each(['row', 'col', 'height', 'width'], function(index, key) {
+		$.each(['x', 'y', 'width', 'height'], function(index, key) {
 			if (pos1[key] !== pos2[key]) {
 				ret = false;
 				return false;
@@ -181,14 +182,14 @@
 	}
 
 	function rectOverlap(pos1, pos2) {
-		return ((pos1['row'] >= pos2['row'] && pos2['row'] + pos2['height'] - 1 >= pos1['row']) ||
-			(pos2['row'] >= pos1['row'] && pos1['row'] + pos1['height'] - 1 >= pos2['row'])) &&
-			((pos1['col'] >= pos2['col'] && pos2['col'] + pos2['width'] - 1 >= pos1['col']) ||
-			(pos2['col'] >= pos1['col'] && pos1['col'] + pos1['width'] - 1 >= pos2['col']));
+		return ((pos1['x'] >= pos2['x'] && pos2['x'] + pos2['width'] - 1 >= pos1['x'])
+			|| (pos2['x'] >= pos1['x'] && pos1['x'] + pos1['width'] - 1 >= pos2['x'])) &&
+			((pos1['y'] >= pos2['y'] && pos2['y'] + pos2['height'] - 1 >= pos1['y'])
+			|| (pos2['y'] >= pos1['y'] && pos1['y'] + pos1['height'] - 1 >= pos2['y']));
 	}
 
 	function realignWidget($obj, data, widget) {
-		var to_row = widget['current_pos']['row'] + widget['current_pos']['height'],
+		var to_row = widget['current_pos']['y'] + widget['current_pos']['height'],
 			overlapped_widgets = [];
 
 		$.each(data['widgets'], function() {
@@ -198,11 +199,11 @@
 		});
 
 		overlapped_widgets.sort(function (widget1, widget2) {
-			return widget2['current_pos']['row'] - widget1['current_pos']['row'];
+			return widget2['current_pos']['y'] - widget1['current_pos']['y'];
 		});
 
 		for (var i = 0; i < overlapped_widgets.length; i++) {
-			overlapped_widgets[i]['current_pos']['row'] = to_row;
+			overlapped_widgets[i]['current_pos']['y'] = to_row;
 
 			realignWidget($obj, data, overlapped_widgets[i]);
 		}
@@ -244,7 +245,7 @@
 		var min_rows = 0;
 
 		$.each(data['widgets'], function() {
-			var rows = this['current_pos']['row'] + this['current_pos']['height'];
+			var rows = this['current_pos']['y'] + this['current_pos']['height'];
 
 			if (min_rows < rows) {
 				min_rows = rows;
@@ -270,7 +271,7 @@
 				old_pos = this['pos'],
 				changed = false;
 
-			$.each(['row', 'col', 'height', 'width'], function(index, value) {
+			$.each(['x', 'y', 'width', 'height'], function(index, value) {
 				if (new_pos[value] !== old_pos[value]) {
 					changed = true;
 				}
@@ -577,7 +578,7 @@
 					if (widget === null) {
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
 						var pos = findEmptyPosition($obj, data, type),
-							scroll_by = (pos['row'] * data['options']['widget-height'])
+							scroll_by = (pos['y'] * data['options']['widget-height'])
 								- $('.dashbrd-grid-widget-container').scrollTop(),
 							widget_data = {
 								'type': type,
@@ -595,7 +596,7 @@
 							};
 
 						if (scroll_by > 0) {
-							var new_height = (pos['row'] + pos['height']) * data['options']['widget-height'];
+							var new_height = (pos['y'] + pos['height']) * data['options']['widget-height'];
 
 							if (new_height > $('.dashbrd-grid-widget-container').height()) {
 								$('.dashbrd-grid-widget-container').height(new_height);
@@ -636,21 +637,21 @@
 
 	function findEmptyPosition($obj, data, type) {
 		var pos = {
-			'row': 0,
-			'col': 0,
-			'height': data['widget_defaults'][type]['size']['height'],
-			'width': data['widget_defaults'][type]['size']['width']
+			'x': 0,
+			'y': 0,
+			'width': data['widget_defaults'][type]['size']['width'],
+			'height': data['widget_defaults'][type]['size']['height']
 		}
 
-		// go row by row and try to position widget in each space
+		// go y by row and try to position widget in each space
 		var	max_col = data['options']['max-columns'] - pos['width'],
 			found = false,
-			col, row;
+			x, y;
 
-		for (row = 0; !found; row++) {
-			for (col = 0; col <= max_col && !found; col++) {
-				pos['row'] = row;
-				pos['col'] = col;
+		for (y = 0; !found; y++) {
+			for (x = 0; x <= max_col && !found; x++) {
+				pos['x'] = x;
+				pos['y'] = y;
 				found = isPosFree($obj, data, pos);
 			}
 		}
@@ -1070,10 +1071,10 @@
 				'type': '',
 				'header': '',
 				'pos': {
-					'row': 0,
-					'col': 0,
-					'height': 1,
-					'width': 1
+					'x': 0,
+					'y': 0,
+					'width': 1,
+					'height': 1
 				},
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
