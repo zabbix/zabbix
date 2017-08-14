@@ -590,7 +590,7 @@ jQuery(function($) {
 							'content': resp.body,
 							'buttons': [
 								{
-									'title': item_edit ? t('Update') : t('Add'),
+									'title': item_edit ? t('Apply') : t('Add'),
 									'class': 'dialogue-widget-save',
 									'action': function() {
 										var form = $('#widget_dialogue_form'),
