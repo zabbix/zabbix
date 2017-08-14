@@ -80,7 +80,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		}
 
 		if (!$items) {
-			$error = _('No permissions to selected item or it does not exist.');
+			$error = _('No permissions to referred object or it does not exist!');
 		}
 		// Select host name and item history data.
 		else {
