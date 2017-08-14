@@ -128,17 +128,12 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			}
 		}
 
-		if ($this->getInput('name', null)) {
-			$widget_name = $this->getInput('name');
-		}
-		else {
-			$widget_name = $dynamic_widget_name
-				? $dynamic_widget_name
-				: CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT];
-		}
+		$name = $dynamic_widget_name
+			? $dynamic_widget_name
+			: CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT];
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $widget_name,
+			'name' => $this->getInput('name', $name),
 			'table_rows' => $table_rows,
 			'error' => $error,
 			'user' => [
