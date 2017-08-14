@@ -105,7 +105,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'loadImage' => 1,
 			'periodFixed' => CProfile::get($profileIdx.'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
-			'reloadOnAdd' => 1
+			'reloadOnAdd' => 1,
+			'onDashboard' => 1
 		];
 
 		// data for flickerscreen

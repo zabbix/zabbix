@@ -587,10 +587,10 @@
 								'fields': fields
 							},
 							add_new_widget = function() {
-								updateWidgetDynamic($obj, data, widget_data);
 								methods.addWidget.call($obj, widget_data);
 								// New widget is last element in data['widgets'] array.
 								widget = data['widgets'].slice(-1)[0];
+								updateWidgetContent($obj, data, widget);
 								setWidgetModeEdit($obj, data, widget);
 							};
 
@@ -1102,7 +1102,6 @@
 				resizeDashboardGrid($this, data);
 
 				showPreloader(widget);
-				updateWidgetContent($this, data, widget);
 			});
 		},
 
@@ -1148,10 +1147,15 @@
 
 		addWidgets: function(widgets) {
 			return this.each(function() {
-				var	$this = $(this);
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
 
 				$.each(widgets, function(index, value) {
 					methods.addWidget.apply($this, Array.prototype.slice.call(arguments, 1));
+				});
+
+				$.each(data['widgets'], function(index, value) {
+					updateWidgetContent($this, data, value);
 				});
 			});
 		},

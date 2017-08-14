@@ -154,16 +154,7 @@ else {
 	$dashboard_options['updated'] = true;
 }
 
-// Initialize dashboard grid.
-$this->addPostJS(
-	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
-		'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
-		'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
-		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
-		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).
-	');'
-);
-
+// must be done before adding widgets, because it causes dashboard to resize.
 if ($data['show_timeline']) {
 	$this->addPostJS(
 		'timeControl.useTimeRefresh('.CWebUser::getRefresh().');'.
@@ -173,3 +164,13 @@ if ($data['show_timeline']) {
 		'timeControl.processObjects();'
 	);
 }
+
+// Initialize dashboard grid.
+$this->addPostJS(
+	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
+		'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
+		'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
+		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
+		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).
+	');'
+);

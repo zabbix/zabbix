@@ -97,6 +97,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$data['timeControlData'] = [
 			'loadScroll' => 1,
 			'mainObject' => 1,
+			'onDashboard' => 1,
 			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1, $options['profileIdx2']),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
 			'profile' => [
