@@ -16,13 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+
 use strict;
 use File::Basename;
-
-my $file = dirname($0)."/../src/data.tmpl";	# name the file
-open(INFO, $file);				# open the file
-my @lines = <INFO>;				# read it into an array
-close(INFO);					# close the file
 
 my (%output, $insert_into, $fields);
 
@@ -197,6 +193,14 @@ sub main
 	{
 		usage();
 	}
+
+	open(INFO, dirname($0)."/../src/data.tmpl");
+	my @lines = <INFO>;
+	close(INFO);
+
+	open(INFO, dirname($0)."/../src/templates.tmpl");
+	push(@lines, <INFO>);
+	close(INFO);
 
 	if ($ARGV[0] eq 'ibm_db2')		{ %output = %ibm_db2; }
 	elsif ($ARGV[0] eq 'mysql')		{ %output = %mysql; }

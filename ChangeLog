@@ -1,6 +1,7 @@
 Changes for 3.4.0beta3
 
 New features:
+....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vzhuravlev, vso)
 ..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
