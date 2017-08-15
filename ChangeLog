@@ -1,4 +1,4 @@
-Changes for 3.4.0beta3
+Changes for 3.4.0rc1
 
 New features:
 A......... [ZBXNEXT-2102] improved performance of event.get() and problem.get() methods with "selectTags" option (Sasha)
