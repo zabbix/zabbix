@@ -20,11 +20,11 @@
 
 
 class CGraphWidgetForm extends CWidgetForm {
-	public function __construct($data)
-	{
+
+	public function __construct($data) {
 		parent::__construct($data);
 
-		// select graph type field
+		// Select graph type field.
 		$source_types = [
 			ZBX_WIDGET_FIELD_RESOURCE_GRAPH => _('Graph'),
 			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
@@ -33,40 +33,42 @@ class CGraphWidgetForm extends CWidgetForm {
 			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
 			->setAction('updateWidgetConfigDialogue()')
 			->setModern(true);
+
 		if (array_key_exists('source_type', $this->data)) {
 			$field_source->setValue($this->data['source_type']);
 		}
+
 		$this->fields[] = $field_source;
 
 		if (array_key_exists('source_type', $this->data)
-				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH)
-		{
-			// Item field
+				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			// item field
 			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);
 			}
+
 			$this->fields[] = $field_item;
 		}
 		else {
-			// Select graph field
+			// Select graph field.
 			$field_graph = (new CWidgetFieldSelectResource('graphid', _('Graph'), WIDGET_FIELD_SELECT_RES_GRAPH))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+
 			if (array_key_exists('graphid', $this->data)) {
 				$field_graph->setValue($this->data['graphid']);
 			}
+
 			$this->fields[] = $field_graph;
 		}
 
-		// Dynamic item
+		// dynamic item
 		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
-		if (array_key_exists('dynamic', $this->data)) {
-			$field_dynamic->setValue($this->data['dynamic']);
-		}
-		else {
-			$field_dynamic->setValue(false);
-		}
+
+		$field_dynamic->setValue(array_key_exists('dynamic', $this->data) ? $this->data['dynamic'] : false);
+
 		$this->fields[] = $field_dynamic;
 	}
 }

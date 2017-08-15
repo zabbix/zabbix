@@ -379,8 +379,13 @@ ul.top-nav-icons {
   margin: 0 0 10px 0;
   text-align: right;
   border-bottom: 1px solid #303030; }
+  .header-title .cell:first-child {
+    max-width: calc(100vw - 370px); }
   .header-title h1 {
-    text-align: left; }
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden; }
   .header-title form {
     display: flex;
     justify-content: flex-end; }
@@ -1855,10 +1860,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-empty-placeholder {
   width: 16%;
   height: 200px;
-  background-color: #fff;
-  border-style: dashed;
-  border-width: 2px;
-  border-color: #bdbdbd;
+  background-color: #2b2b2b;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #303030;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -2271,6 +2276,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       background-color: #454545; }
 
 .overlay-dialogue {
+  display: table;
   position: absolute;
   z-index: 1000;
   padding: 15px 10px 10px 10px;
@@ -2293,8 +2299,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transform: translate(-50%, -50%); }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
-      max-height: calc(100vh - 145px); }
-    .overlay-dialogue.modal .overlay-close-btn {
+      max-height: calc(100vh - 190px);
+      margin: 0 0 10px 0; }
+    .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
       top: -12px;
@@ -2360,7 +2367,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin: 0 0 0 10px; }
 
 .overlay-bg {
-  background-color: #fff;
+  background-color: #000;
   width: 100%;
   height: 100%;
   position: fixed;
@@ -3191,28 +3198,74 @@ tr.cursor-move td * {
     list-style: none; }
   .navtree .tree .tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 15px; }
+  .navtree .tree .tree-list > .tree-item.ui-sortable-helper .content {
+    padding-left: 5px; }
   .navtree .tree .tree-list[data-depth="0"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 10px; }
+  .navtree .tree .tree-list[data-depth="0"] > .tree-item.ui-sortable-helper {
+    margin-left: 10px; }
+    .navtree .tree .tree-list[data-depth="0"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="1"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 25px; }
+  .navtree .tree .tree-list[data-depth="1"] > .tree-item.ui-sortable-helper {
+    margin-left: 25px; }
+    .navtree .tree .tree-list[data-depth="1"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="2"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 40px; }
+  .navtree .tree .tree-list[data-depth="2"] > .tree-item.ui-sortable-helper {
+    margin-left: 40px; }
+    .navtree .tree .tree-list[data-depth="2"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="3"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 55px; }
+  .navtree .tree .tree-list[data-depth="3"] > .tree-item.ui-sortable-helper {
+    margin-left: 55px; }
+    .navtree .tree .tree-list[data-depth="3"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="4"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 70px; }
+  .navtree .tree .tree-list[data-depth="4"] > .tree-item.ui-sortable-helper {
+    margin-left: 70px; }
+    .navtree .tree .tree-list[data-depth="4"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="5"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 85px; }
+  .navtree .tree .tree-list[data-depth="5"] > .tree-item.ui-sortable-helper {
+    margin-left: 85px; }
+    .navtree .tree .tree-list[data-depth="5"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="6"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 100px; }
+  .navtree .tree .tree-list[data-depth="6"] > .tree-item.ui-sortable-helper {
+    margin-left: 100px; }
+    .navtree .tree .tree-list[data-depth="6"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="7"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 115px; }
+  .navtree .tree .tree-list[data-depth="7"] > .tree-item.ui-sortable-helper {
+    margin-left: 115px; }
+    .navtree .tree .tree-list[data-depth="7"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="8"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 130px; }
+  .navtree .tree .tree-list[data-depth="8"] > .tree-item.ui-sortable-helper {
+    margin-left: 130px; }
+    .navtree .tree .tree-list[data-depth="8"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="9"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 145px; }
+  .navtree .tree .tree-list[data-depth="9"] > .tree-item.ui-sortable-helper {
+    margin-left: 145px; }
+    .navtree .tree .tree-list[data-depth="9"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth="10"] > .tree-item > .tree-row > .content > .margin-lvl {
     flex: 0 0 160px; }
+  .navtree .tree .tree-list[data-depth="10"] > .tree-item.ui-sortable-helper {
+    margin-left: 160px; }
+    .navtree .tree .tree-list[data-depth="10"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
+      display: none; }
   .navtree .tree .tree-list[data-depth] .ui-sortable-helper > .tree-row > .content > .margin-lvl {
     flex: 0 0 15px; }
   .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list > li > .tree-row > .content > .margin-lvl {

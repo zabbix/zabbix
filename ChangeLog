@@ -1,11 +1,14 @@
 Changes for 3.4.0beta3
 
 New features:
+A......... [ZBXNEXT-2102] improved performance of event.get() and problem.get() methods with "selectTags" option (Sasha)
 ....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vzhuravlev, vso)
 ..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
 Bug fixes:
+A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
+....I..... [ZBX-12505] fixed Oracle database creation scripts (Sasha)
 ..F....... [ZBXNEXT-18] fixed empty acknowledge operation message tooltip visibility (gcalenko)
 ..F....... [ZBX-12468] fixed vertical text alignment for map shapes (vjaceslavs)
 ..F....... [ZBX-12418] fixed draggable rectangle calculation for map shape lines (vjaceslavs)

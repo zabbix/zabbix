@@ -27,12 +27,12 @@
 			.append($('<h4>').text(
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
 			));
-		widget['content_body'] = $('<div>')
-			.addClass('dashbrd-grid-widget-content');
-		widget['content_footer'] = $('<div>')
-			.addClass('dashbrd-grid-widget-foot');
-		// We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
-		// This size will later be passed to widget controller in updateWidgetContent() function.
+		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
+		widget['content_footer'] = $('<div>').addClass('dashbrd-grid-widget-foot');
+		/*
+		 * We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
+		 * This size will later be passed to widget controller in updateWidgetContent() function.
+		 */
 		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').html('&nbsp;')));
 
 		widget['content_header'].append($('<ul>')
@@ -71,8 +71,8 @@
 		data['options']['rows'] = 0;
 
 		$.each(data['widgets'], function() {
-			if (this['pos']['row'] + this['pos']['height'] > data['options']['rows']) {
-				data['options']['rows'] = this['pos']['row'] + this['pos']['height'];
+			if (this['pos']['y'] + this['pos']['height'] > data['options']['rows']) {
+				data['options']['rows'] = this['pos']['y'] + this['pos']['height'];
 			}
 		});
 
@@ -108,29 +108,26 @@
 			target_left = target_pos.left + 25,
 			target_height = $div.height() + 25,
 			target_width = $div.width() + 25,
-			row = (target_top - (target_top % data['options']['widget-height'])) / data['options']['widget-height'],
-			col = (target_left - (target_left % widget_width_px)) / widget_width_px,
-			height = (target_height - (target_height % data['options']['widget-height'])) / data['options']['widget-height'],
-			width = (target_width - (target_width % widget_width_px)) / widget_width_px;
+			x = (target_left - (target_left % widget_width_px)) / widget_width_px,
+			y = (target_top - (target_top % data['options']['widget-height'])) / data['options']['widget-height'],
+			width = (target_width - (target_width % widget_width_px)) / widget_width_px,
+			height = (target_height - (target_height % data['options']['widget-height'])) /
+				data['options']['widget-height'];
 
-		if (row < 0) {
-			row = 0;
+		if (x > data['options']['max-columns'] - width) {
+			x = data['options']['max-columns'] - width;
 		}
 
-		if (row > data['options']['max-rows'] - height) {
-			row = data['options']['max-rows'] - height;
+		if (x < 0) {
+			x = 0;
 		}
 
-		if (col > data['options']['max-columns'] - width) {
-			col = data['options']['max-columns'] - width;
+		if (y < 0) {
+			y = 0;
 		}
 
-		if (col < 0) {
-			col = 0;
-		}
-
-		if (height < 1) {
-			height = 1;
+		if (y > data['options']['max-rows'] - height) {
+			y = data['options']['max-rows'] - height;
 		}
 
 		if (width < 1) {
@@ -140,15 +137,19 @@
 			width = data['options']['max-columns'];
 		}
 
-		return {'row': row, 'col': col, 'height': height, 'width': width};
+		if (height < 1) {
+			height = 1;
+		}
+
+		return {'x': x, 'y': y, 'width': width, 'height': height};
 	}
 
 	function setDivPosition($div, data, pos) {
 		$div.css({
-			'top': '' + (data['options']['widget-height'] * pos['row']) + 'px',
-			'left': '' + (data['options']['widget-width'] * pos['col']) + '%',
-			'height': '' + (data['options']['widget-height'] * pos['height']) + 'px',
-			'width': '' + (data['options']['widget-width'] * pos['width']) + '%'
+			'left': '' + (data['options']['widget-width'] * pos['x']) + '%',
+			'top': '' + (data['options']['widget-height'] * pos['y']) + 'px',
+			'width': '' + (data['options']['widget-width'] * pos['width']) + '%',
+			'height': '' + (data['options']['widget-height'] * pos['height']) + 'px'
 		});
 	}
 
@@ -170,7 +171,7 @@
 	function posEquals(pos1, pos2) {
 		var ret = true;
 
-		$.each(['row', 'col', 'height', 'width'], function(index, key) {
+		$.each(['x', 'y', 'width', 'height'], function(index, key) {
 			if (pos1[key] !== pos2[key]) {
 				ret = false;
 				return false;
@@ -181,14 +182,14 @@
 	}
 
 	function rectOverlap(pos1, pos2) {
-		return ((pos1['row'] >= pos2['row'] && pos2['row'] + pos2['height'] - 1 >= pos1['row']) ||
-			(pos2['row'] >= pos1['row'] && pos1['row'] + pos1['height'] - 1 >= pos2['row'])) &&
-			((pos1['col'] >= pos2['col'] && pos2['col'] + pos2['width'] - 1 >= pos1['col']) ||
-			(pos2['col'] >= pos1['col'] && pos1['col'] + pos1['width'] - 1 >= pos2['col']));
+		return ((pos1['x'] >= pos2['x'] && pos2['x'] + pos2['width'] - 1 >= pos1['x'])
+			|| (pos2['x'] >= pos1['x'] && pos1['x'] + pos1['width'] - 1 >= pos2['x'])) &&
+			((pos1['y'] >= pos2['y'] && pos2['y'] + pos2['height'] - 1 >= pos1['y'])
+			|| (pos2['y'] >= pos1['y'] && pos1['y'] + pos1['height'] - 1 >= pos2['y']));
 	}
 
 	function realignWidget($obj, data, widget) {
-		var to_row = widget['current_pos']['row'] + widget['current_pos']['height'],
+		var to_row = widget['current_pos']['y'] + widget['current_pos']['height'],
 			overlapped_widgets = [];
 
 		$.each(data['widgets'], function() {
@@ -198,11 +199,11 @@
 		});
 
 		overlapped_widgets.sort(function (widget1, widget2) {
-			return widget2['current_pos']['row'] - widget1['current_pos']['row'];
+			return widget2['current_pos']['y'] - widget1['current_pos']['y'];
 		});
 
 		for (var i = 0; i < overlapped_widgets.length; i++) {
-			overlapped_widgets[i]['current_pos']['row'] = to_row;
+			overlapped_widgets[i]['current_pos']['y'] = to_row;
 
 			realignWidget($obj, data, overlapped_widgets[i]);
 		}
@@ -244,7 +245,7 @@
 		var min_rows = 0;
 
 		$.each(data['widgets'], function() {
-			var rows = this['current_pos']['row'] + this['current_pos']['height'];
+			var rows = this['current_pos']['y'] + this['current_pos']['height'];
 
 			if (min_rows < rows) {
 				min_rows = rows;
@@ -270,7 +271,7 @@
 				old_pos = this['pos'],
 				changed = false;
 
-			$.each(['row', 'col', 'height', 'width'], function(index, value) {
+			$.each(['x', 'y', 'width', 'height'], function(index, value) {
 				if (new_pos[value] !== old_pos[value]) {
 					changed = true;
 				}
@@ -575,10 +576,9 @@
 					overlayDialogueDestroy();
 
 					if (widget === null) {
-						// In case of ADD widget
-						// create widget with required selected fields and add it to dashboard
+						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
 						var pos = findEmptyPosition($obj, data, type),
-							scroll_by = (pos['row'] * data['options']['widget-height'])
+							scroll_by = (pos['y'] * data['options']['widget-height'])
 								- $('.dashbrd-grid-widget-container').scrollTop(),
 							widget_data = {
 								'type': type,
@@ -588,21 +588,22 @@
 								'fields': fields
 							},
 							add_new_widget = function() {
-								updateWidgetDynamic($obj, data, widget_data);
 								methods.addWidget.call($obj, widget_data);
-								// new widget is last element in data['widgets'] array
+								// New widget is last element in data['widgets'] array.
 								widget = data['widgets'].slice(-1)[0];
+								updateWidgetContent($obj, data, widget);
 								setWidgetModeEdit($obj, data, widget);
 							};
 
 						if (scroll_by > 0) {
-							var new_height = (pos['row'] + pos['height']) * data['options']['widget-height'];
+							var new_height = (pos['y'] + pos['height']) * data['options']['widget-height'];
+
 							if (new_height > $('.dashbrd-grid-widget-container').height()) {
 								$('.dashbrd-grid-widget-container').height(new_height);
 							}
 
 							$('html, body')
-								.animate({scrollTop: '+='+scroll_by+'px'}, 800)
+								.animate({scrollTop: '+=' + scroll_by + 'px'}, 800)
 								.promise()
 								.then(add_new_widget);
 						}
@@ -611,21 +612,20 @@
 						}
 					}
 					else {
-						// In case of EDIT widget
+						// In case of EDIT widget.
 						if (widget['type'] !== type) {
 							widget['type'] = type;
 							widget['initial_load'] = true;
 						}
+
 						widget['header'] = name;
 						widget['fields'] = fields;
-
 						doAction('afterUpdateWidgetConfig', $obj, data, null);
-
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					}
 
-					// mark dashboard as updated
+					// Mark dashboard as updated.
 					data['options']['updated'] = true;
 				}
 			},
@@ -637,21 +637,21 @@
 
 	function findEmptyPosition($obj, data, type) {
 		var pos = {
-			'row': 0,
-			'col': 0,
-			'height': data['widget_defaults'][type]['size']['height'],
-			'width': data['widget_defaults'][type]['size']['width']
+			'x': 0,
+			'y': 0,
+			'width': data['widget_defaults'][type]['size']['width'],
+			'height': data['widget_defaults'][type]['size']['height']
 		}
 
-		// go row by row and try to position widget in each space
+		// go y by row and try to position widget in each space
 		var	max_col = data['options']['max-columns'] - pos['width'],
 			found = false,
-			col, row;
+			x, y;
 
-		for (row = 0; !found; row++) {
-			for (col = 0; col <= max_col && !found; col++) {
-				pos['row'] = row;
-				pos['col'] = col;
+		for (y = 0; !found; y++) {
+			for (x = 0; x <= max_col && !found; x++) {
+				pos['x'] = x;
+				pos['y'] = y;
 				found = isPosFree($obj, data, pos);
 			}
 		}
@@ -682,7 +682,7 @@
 			'content': '',
 			'buttons': [
 				{
-					'title': (edit_mode ? t('Update') : t('Add')),
+					'title': (edit_mode ? t('Apply') : t('Add')),
 					'class': 'dialogue-widget-save',
 					'keepOpen': true,
 					'action': function() {
@@ -789,6 +789,7 @@
 			userid: data['dashboard']['userid'],
 			widgets: ajax_widgets
 		};
+
 		if (isset('sharing', data['dashboard'])) {
 			ajax_data['sharing'] = data['dashboard']['sharing'];
 		}
@@ -1040,6 +1041,11 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				if (!$.isEmptyObject(data['dashboard']) && (data['dashboard']['name'] !== dashboard['name']
+						|| data['dashboard']['userid'] !== dashboard['userid'])) {
+					data['options']['updated'] = true;
+				}
+
 				dashboard = $.extend({}, data['dashboard'], dashboard);
 				data['dashboard'] = dashboard;
 			});
@@ -1065,10 +1071,10 @@
 				'type': '',
 				'header': '',
 				'pos': {
-					'row': 0,
-					'col': 0,
-					'height': 1,
-					'width': 1
+					'x': 0,
+					'y': 0,
+					'width': 1,
+					'height': 1
 				},
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
@@ -1098,7 +1104,6 @@
 				resizeDashboardGrid($this, data);
 
 				showPreloader(widget);
-				updateWidgetContent($this, data, widget);
 			});
 		},
 
@@ -1144,10 +1149,15 @@
 
 		addWidgets: function(widgets) {
 			return this.each(function() {
-				var	$this = $(this);
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
 
 				$.each(widgets, function(index, value) {
 					methods.addWidget.apply($this, Array.prototype.slice.call(arguments, 1));
+				});
+
+				$.each(data['widgets'], function(index, value) {
+					updateWidgetContent($this, data, value);
 				});
 			});
 		},
@@ -1175,7 +1185,6 @@
 				$('#dashbrd-save', ul).prop('disabled', true);
 				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
-				data['options']['edit_mode'] = false;
 			});
 		},
 
@@ -1349,8 +1358,7 @@
 					erase;
 
 				if (data['widget_relation_submissions'].length
-						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length
-					) {
+						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length) {
 					$.each(data['widget_relation_submissions'], function(rel_index, rel) {
 						erase = false;
 
@@ -1477,18 +1485,18 @@
 						$.each(data['data_buffer'][src_uniqueid], function(index, buffer_data) {
 							if (typeof data['widget_relations']['relations'][src_uniqueid] !== 'undefined') {
 								$.each(data['widget_relations']['relations'][src_uniqueid], function(index,
-										dest_uniqueid) {
-									if (buffer_data['old'].indexOf(dest_uniqueid) == -1) {
-										if (typeof data['widget_relations']['tasks'][dest_uniqueid] !== 'undefined') {
-											var widget = methods.getWidgetsBy.call($this, 'uniqueid', dest_uniqueid);
+										dest_uid) {
+									if (buffer_data['old'].indexOf(dest_uid) == -1) {
+										if (typeof data['widget_relations']['tasks'][dest_uid] !== 'undefined') {
+											var widget = methods.getWidgetsBy.call($this, 'uniqueid', dest_uid);
 											if (widget.length) {
-												$.each(data['widget_relations']['tasks'][dest_uniqueid], function(index, task) {
+												$.each(data['widget_relations']['tasks'][dest_uid], function(i, task) {
 													if (task['data_name'] === buffer_data['data_name']) {
 														task.callback.apply($obj, [widget[0], buffer_data['args']]);
 													}
 												});
 
-												buffer_data['old'].push(dest_uniqueid);
+												buffer_data['old'].push(dest_uid);
 											}
 										}
 									}
