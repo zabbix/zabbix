@@ -653,7 +653,8 @@ jQuery(function($) {
 														var add_child_levels = function($obj, mapid, itemid) {
 															if (typeof resp.hierarchy[mapid] !== 'undefined') {
 																var root = $('.tree-item[data-id=' + itemid +
-																		']>ul.tree-list', $obj);
+																		']>ul.tree-list', $obj
+																	);
 
 																$.each(resp.hierarchy[mapid], function(i, submapid) {
 																	if (typeof resp.submaps[submapid] !== 'undefined') {

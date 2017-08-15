@@ -1358,8 +1358,7 @@
 					erase;
 
 				if (data['widget_relation_submissions'].length
-						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length
-				) {
+						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length) {
 					$.each(data['widget_relation_submissions'], function(rel_index, rel) {
 						erase = false;
 
