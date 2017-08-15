@@ -99,7 +99,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 					$captions['simple'][$resource_type] = [];
 				}
 
-				if (is_numeric($id) && $id != 0) {
+				if ($id != 0) {
 					switch ($resource_type) {
 						case WIDGET_FIELD_SELECT_RES_ITEM:
 							$captions['simple'][$resource_type][$id] = _('Inaccessible item');
