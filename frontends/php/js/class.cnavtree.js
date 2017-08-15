@@ -465,11 +465,50 @@ jQuery(function($) {
 					.disableSelection();
 			};
 
+			/*
+			 * Find and fix Circular Dependencies in parent - child (id) relations.
+			 * Once the circular dependency is found, an item parent is set to be 0.
+			 *
+			 * @param {array} tree_items - array of tree items.
+			 */
+			var fixCircularDependencies = function($obj, tree_items) {
+				var tree_items = tree_items || [],
+					item_to_test,
+					parents;
+
+				$.each(tree_items, function(i, item) {
+					if (item['parent'] != 0) {
+						item_to_test = item;
+
+						while (item_to_test['parent'] != 0) {
+							if (item_to_test['parent'] == item['id']) {
+								tree_items[i]['parent'] = 0;
+								break;
+							}
+
+							parents = tree_items.filter(function(item) {
+								return item['id'] == item_to_test['parent'];
+							});
+
+							if (parents.length) {
+								item_to_test = parents[0];
+							}
+							else {
+								break;
+							}
+						}
+					}
+				});
+
+				return tree_items;
+			};
+
 			var drawTree = function($obj, isEditMode) {
 				var root = createTreeBranch($obj, 'root', null),
 					widget_data = $obj.data('widgetData'),
 					prefix = widget_data['uniqueid'] + '_',
 					tree_items = getTreeWidgetItems($obj),
+					tree_items = fixCircularDependencies($obj, tree_items),
 					tree = buildTree($obj, tree_items, 0);
 
 				$('.root', $obj).remove();

@@ -421,12 +421,27 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 			}
 		}
 
-		// Propagate item mapids to all its parent items.
+		// Find and fix circular dependencies.
 		foreach ($navtree_items as $fieldid => $field_details) {
-			if ($field_details['parent'] == $fieldid) {
-				$navtree_items[$fieldid]['parent'] = 0;
+			if ($field_details['parent'] != 0) {
+				$parent = $navtree_items[$field_details['parent']];
+				while ($parent['parent'] != 0) {
+					if ($parent['parent'] == $fieldid) {
+						$navtree_items[$fieldid]['parent'] = 0;
+						break;
+					}
+					elseif (array_key_exists($parent['parent'], $navtree_items)) {
+						$parent = $navtree_items[$parent['parent']];
+					}
+					else {
+						break;
+					}
+				}
 			}
+		}
 
+		// Propagate item mapids to all its parent items.
+		foreach ($navtree_items as $field_details) {
 			$parentid = $field_details['parent'];
 			if ($field_details['parent'] != 0 && array_key_exists($parentid, $navtree_items)) {
 				while (array_key_exists($parentid, $navtree_items)) {
