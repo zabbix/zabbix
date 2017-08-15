@@ -1108,12 +1108,15 @@ static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_brackets_by_name                                        *
+ * Function: zbx_json_path_open                                               *
+ *                                                                            *
+ * Purpose: opens an object by json path                                      *
  *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
+ * Comments: Only direct path to single object in dot or bracket notation     *
+ *           is supported.                                                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)

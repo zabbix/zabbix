@@ -51,7 +51,7 @@ struct zbx_ipc_client
 #define ZBX_IPC_MESSAGE_CODE	0
 #define ZBX_IPC_MESSAGE_SIZE	1
 
-#if !defined(_EVENT_NUMERIC_VERSION) || _EVENT_NUMERIC_VERSION < 0x2000000
+#if !defined(LIBEVENT_VERSION_NUMBER) || LIBEVENT_VERSION_NUMBER < 0x2000000
 typedef int evutil_socket_t;
 
 static struct event	*event_new(struct event_base *ev, evutil_socket_t fd, short what,
