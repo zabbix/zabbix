@@ -661,7 +661,7 @@ function overlayDialogue(params) {
  */
 function overlayDialogueOnLoad(focus) {
 	if (focus) {
-		jQuery('.auto-focus:focusable', jQuery('#overlay_dialogue')).first().focus();
+		jQuery('[autofocus=autofocus]:focusable', jQuery('#overlay_dialogue')).first().focus();
 	}
 }
 

@@ -755,15 +755,24 @@ class CEvent extends CApiService {
 
 		// Adding event tags.
 		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			$tags = API::getApiService()->select('event_tag', [
+			$tags_options = [
 				'output' => $this->outputExtend($options['selectTags'], ['eventid']),
-				'filter' => ['eventid' => $eventIds],
-				'preservekeys' => true
-			]);
+				'filter' => ['eventid' => $eventIds]
+			];
+			$tags = DBselect(DB::makeSql('event_tag', $tags_options));
 
-			$relationMap = $this->createRelationMap($tags, 'eventid', 'eventtagid');
-			$tags = $this->unsetExtraFields($tags, ['eventtagid', 'eventid'], []);
-			$result = $relationMap->mapMany($result, $tags, 'tags');
+			foreach ($result as &$event) {
+				$event['tags'] = [];
+			}
+			unset($event);
+
+			while ($tag = DBfetch($tags)) {
+				$event = &$result[$tag['eventid']];
+
+				unset($tag['eventtagid'], $tag['eventid']);
+				$event['tags'][] = $tag;
+			}
+			unset($event);
 		}
 
 		return $result;
