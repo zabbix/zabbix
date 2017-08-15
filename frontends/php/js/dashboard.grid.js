@@ -706,6 +706,7 @@
 
 	function setModeEditDashboard($obj, data) {
 		$.each(data['widgets'], function(index, widget) {
+			widget['rf_rate'] = 0;
 			setWidgetModeEdit($obj, data, widget);
 		});
 	}
