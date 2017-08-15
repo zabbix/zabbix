@@ -202,6 +202,7 @@ $tranStrings = [
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
+		'Access denied' => _('Access denied'),
 		'Cancel' => _('Cancel'),
 		'Configuration' => _('Configuration'),
 		'Create trigger' => _('Create trigger'),
@@ -234,6 +235,7 @@ $tranStrings = [
 		'Update' => _('Update'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
+		'No refresh' => _('No refresh'),
 		'You need permission to perform this action!' => _('You need permission to perform this action!'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),

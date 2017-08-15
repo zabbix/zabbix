@@ -71,7 +71,7 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 		$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
 
 		if ($sysmapid === null || $sysmap_data['id'] < 0) {
-			$error = _('No permissions to selected map or it does not exist.');
+			$error = _('No permissions to referred object or it does not exist!');
 		}
 
 		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.

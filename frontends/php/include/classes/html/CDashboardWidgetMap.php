@@ -20,10 +20,7 @@
 
 
 /**
- * Class CDashboardWidgetMap
- *
- * Dashboard Map widget class.
- * Creates all widget specific javascript and html content for map widget's view.
+ * Dashboard Map widget class. Creates all widget specific JavaScript and HTML content for map widget's view.
  */
 class CDashboardWidgetMap extends CDiv {
 
@@ -185,11 +182,11 @@ class CDashboardWidgetMap extends CDiv {
 			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
 
 			$script_run .= 'jQuery(function($) {'.
-				'$("#'.$this->getId().'").zbx_mapwidget({'.
-					'uniqueid: "'.$this->uniqueid.'",'.
-					'map_options: '.zbx_jsvalue($this->sysmap_data).
-				'})'.
-			'});';
+					'$("#'.$this->getId().'").zbx_mapwidget({'.
+						'uniqueid: "'.$this->uniqueid.'",'.
+						'map_options: '.zbx_jsvalue($this->sysmap_data).
+					'})'.
+				'});';
 		}
 		elseif ($this->error !== null && $this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			$error_msg_html = (new CTableInfo())->setNoDataMessage($this->error);

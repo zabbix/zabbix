@@ -499,7 +499,7 @@ function getMenuPopupDashboard(options) {
 										response.data
 									);
 								}
-								else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+								else if (typeof response === 'string' && response.indexOf(t('Access denied')) !== -1) {
 									alert(t('You need permission to perform this action!'))
 								}
 								else {

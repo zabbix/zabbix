@@ -156,7 +156,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name', 'private'],
 				// TODO AV: remove widgetid from 'selectWidgets'; related CControllerDashbrdWidgetUpdate:155
-				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
+				'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
 				'dashboardids' => $this->getInput('source_dashboardid')
@@ -184,7 +184,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			if ($dashboardid != 0) {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid'],
-					'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
+					'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields'],
 					'dashboardids' => $dashboardid,
 					'preservekeys' => true
 				]);
@@ -399,10 +399,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'type' => $widget['type'],
 				'header' => $widget['name'],
 				'pos' => [
-					'row' => (int) $widget['row'],
-					'col' => (int) $widget['col'],
-					'height' => (int) $widget['height'],
-					'width' => (int) $widget['width']
+					'x' => (int) $widget['x'],
+					'y' => (int) $widget['y'],
+					'width' => (int) $widget['width'],
+					'height' => (int) $widget['height']
 				],
 				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
 				'fields' => self::convertWidgetFields($widget['fields'])
