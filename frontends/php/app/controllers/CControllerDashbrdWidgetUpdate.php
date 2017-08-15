@@ -152,7 +152,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget['fields']);
 				unset($widget['fields']);
 
-				if (($errors = $widget['form']->validate()) !== []) {
+				if ($errors = $widget['form']->validate()) {
 					$widget_name = (array_key_exists('name', $widget) && $widget['name'] === '')
 						? CWidgetConfig::getKnownWidgetTypes()[$widget['type']]
 						: $widget['name'];
