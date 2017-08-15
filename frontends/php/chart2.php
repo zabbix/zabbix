@@ -37,7 +37,8 @@ $fields = [
 	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
-	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -153,8 +154,12 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 	$graph->setHeight($min_dimentions['height']);
 }
 
-$graph->draw();
-
-header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+if (getRequest('onlyHeight', '0') === '1') {
+	$graph->drawDimentions();
+	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+}
+else {
+	$graph->draw();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';

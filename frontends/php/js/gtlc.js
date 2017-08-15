@@ -189,19 +189,34 @@ var timeControl = {
 
 	addImage: function(id, rebuildListeners) {
 		var obj = this.objectList[id],
-			img = $(id);
+			img = $(id),
+			heightUrl = new Curl(obj.src);
 
 		if (empty(img)) {
-			img = jQuery('<img />')
-				.load(obj.src, function(response, status, xhr) {
+			img = document.createElement('img');
+			img.setAttribute('id', id);
+			$(obj.containerid).appendChild(img);
+
+			if (['chart.php','chart2.php','chart3.php'].indexOf(heightUrl.getPath()) > -1
+					&& heightUrl.getArgument('outer') === '1'
+			) {
+				// Getting height of graph inside image. Only for line graphs on dashboard.
+				heightUrl.setArgument('onlyHeight', '1');
+				jQuery('<img />').load(heightUrl.getUrl(), function(response, status, xhr) {
 					timeControl.changeSBoxHeight(id, +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
-				})
-				.appendTo(jQuery('#'+obj.containerid))
-				.attr({'src': obj.src, 'id': id});
+					jQuery(this).remove();
+
+					// 'src' should be added only here to trigger load event after new height is received.
+					img.setAttribute('src', obj.src);
+				});
+			}
+			else {
+				img.setAttribute('src', obj.src);
+			}
 		}
 
-		// apply sbox events to image
-		if (obj.loadSBox && empty(obj.sbox_listener)) {
+		// Apply sbox events to image.
+		if (obj.loadSBox && empty(obj.sbox_listener) && img.hasAttribute('src')) {
 			obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
 			addListener(img, 'load', obj.sbox_listener);
 			addListener(img, 'load', sboxGlobalMove);

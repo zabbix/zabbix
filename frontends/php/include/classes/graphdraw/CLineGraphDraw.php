@@ -2681,6 +2681,27 @@ class CLineGraphDraw extends CGraphDraw {
 		unset($graph_item);
 	}
 
+	/**
+	 * Calculate graph dimensions and draw 1x1 pixel image placeholder.
+	 */
+	public function drawDimentions() {
+		set_image_header();
+
+		$this->selectTriggers();
+		$this->calcDimentions();
+
+		$this->initColors();
+
+		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
+			$this->im = imagecreatetruecolor(1, 1);
+		}
+		else {
+			$this->im = imagecreate(1, 1);
+		}
+
+		imageOut($this->im);
+	}
+
 	public function draw() {
 		$start_time = microtime(true);
 

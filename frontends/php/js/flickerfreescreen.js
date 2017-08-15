@@ -378,6 +378,9 @@
 					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					url.setArgument('curtime', new CDate().getTime());
 
+					var heightUrl = new Curl(url.getUrl());
+					heightUrl.setArgument('onlyHeight', '1');
+
 					// create temp image in buffer
 					$('<img>', {
 						'class': domImg.attr('class'),
@@ -397,7 +400,7 @@
 						screen.error++;
 						window.flickerfreeScreen.calculateReRefresh(id);
 					})
-					.load(url.getUrl(), function(response, status, xhr) {
+					.on('load', function() {
 						if (screen.error > 0) {
 							return;
 						}
@@ -429,8 +432,6 @@
 							// rebuild timeControl sbox listeners
 							if (!empty(ZBX_SBOX[id])) {
 								ZBX_SBOX[id].addListeners();
-								timeControl.changeSBoxHeight(domImg.attr('id'),
-									+xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
 							}
 
 							window.flickerfreeScreenShadow.end(id);
@@ -441,6 +442,9 @@
 							window.flickerfreeScreen.refresh(id, true);
 						}
 					});
+//					.load(heightUrl.getUrl(), function(response, status, xhr) {
+//						timeControl.changeSBoxHeight(domImg.attr('id'), +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+//					});
 
 					if (on_dashboard) {
 						timeControl.updateDashboardFooter(id);
