@@ -202,6 +202,7 @@ $tranStrings = [
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
+		'Access denied' => _('Access denied'),
 		'Cancel' => _('Cancel'),
 		'Configuration' => _('Configuration'),
 		'Create trigger' => _('Create trigger'),
