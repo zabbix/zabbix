@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Dell Force S-Series SNMPv2</template>
-         <name>Template Dell Force S-Series SNMPv2</name>
-         <description>Template Dell Force S-Series version: 0.10
+         <template>Template Net Dell Force S-Series SNMPv2</template>
+         <name>Template Net Dell Force S-Series SNMPv2</name>
+         <description>Template Dell Force S-Series version: 0.11
 MIBs used:
 F10-S-SERIES-CHASSIS-MIB
 </description>
@@ -42,7 +42,7 @@ F10-S-SERIES-CHASSIS-MIB
          </applications>
          <items/>
          <discovery_rules>
-  	  	      <discovery_rule>
+            <discovery_rule>
                <name>CPU and Memory and Flash Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -116,6 +116,7 @@ CPU utilization in percentage for last 1 minute.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPINDEX}: Memory utilization</name>
@@ -159,11 +160,12 @@ Total memory usage in percentage.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Dell Force S-Series SNMPv2:system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <expression>{Template Net Dell Force S-Series SNMPv2:system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPINDEX}: High CPU utilization</name>
@@ -180,7 +182,7 @@ Total memory usage in percentage.
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Dell Force S-Series SNMPv2:vm.memory.pused[chStackUnitMemUsageUtil.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Net Dell Force S-Series SNMPv2:vm.memory.pused[chStackUnitMemUsageUtil.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPINDEX}: High memory utilization</name>
@@ -224,7 +226,7 @@ Total memory usage in percentage.
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Dell Force S-Series SNMPv2</host>
+                              <host>Template Net Dell Force S-Series SNMPv2</host>
                               <key>system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -256,7 +258,7 @@ Total memory usage in percentage.
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Dell Force S-Series SNMPv2</host>
+                              <host>Template Net Dell Force S-Series SNMPv2</host>
                               <key>vm.memory.pused[chStackUnitMemUsageUtil.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -266,8 +268,7 @@ Total memory usage in percentage.
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	
-  	  	      <discovery_rule>
+            <discovery_rule>
                <name>PSU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -343,11 +344,12 @@ The status of the power supply {#SNMPVALUE}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Dell Force S-Series SNMPv2:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>PSU {#SNMPVALUE}: Power supply is in critical state</name>
@@ -367,10 +369,8 @@ Please check the power supply unit for errors</description>
                <graph_prototypes/>
                <host_prototypes/>
                <jmx_endpoint/>
-            </discovery_rule>		
-
-
-  	  	      <discovery_rule>
+            </discovery_rule>
+            <discovery_rule>
                <name>FAN Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -446,11 +446,12 @@ The status of the fan tray {#SNMPVALUE}.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Dell Force S-Series SNMPv2:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Fan {#SNMPVALUE}: Fan is in critical state</name>
@@ -471,8 +472,7 @@ Please check the fan unit</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		
-		          <discovery_rule>
+            <discovery_rule>
                <name>Stack Unit Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -546,6 +546,7 @@ The temperature of the unit.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Hardware model name</name>
@@ -589,6 +590,7 @@ The plugged-in model ID for this unit.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Hardware serial number</name>
@@ -632,6 +634,7 @@ The unit's serial number.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Hardware version(revision)</name>
@@ -675,6 +678,7 @@ The unit manufacturer's product revision
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Operating system</name>
@@ -718,13 +722,14 @@ Current code version of this unit.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>Device {#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -738,16 +743,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -762,9 +767,9 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>Device {#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -779,10 +784,10 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Dell Force S-Series SNMPv2:system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}].diff()}=1 and {Template Dell Force S-Series SNMPv2:system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Net Dell Force S-Series SNMPv2:system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}].diff()}=1 and {Template Net Dell Force S-Series SNMPv2:system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
-                     <name>#{#SNMPVALUE}: Device might have been replaced (new serial number received)</name>
+                     <name>#{#SNMPVALUE}: Device has been replaced (new serial number received)</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -800,10 +805,7 @@ Device serial number has changed. Ack to close</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
- 
-		
-		
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -853,13 +855,13 @@ Device serial number has changed. Ack to close</description>
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -869,51 +871,51 @@ Device serial number has changed. Ack to close</description>
    <triggers/>
    <value_maps>
       <value_map>
-        	<name>F10-S-SERIES-CHASSIS-MIB::extremeFanOperational</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>true - on</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>false - off</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>F10-S-SERIES-CHASSIS-MIB::extremeFanOperational</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>true - on</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>false - off</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-            <name>F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>up</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>down</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>absent</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>up</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>down</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>absent</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-            <name>F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>up</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>down</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>absent</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>up</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>down</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>absent</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>
