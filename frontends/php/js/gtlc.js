@@ -207,12 +207,15 @@ var timeControl = {
 			) {
 				// Getting height of graph inside image. Only for line graphs on dashboard.
 				heightUrl.setArgument('onlyHeight', '1');
-				jQuery('<img />').load(heightUrl.getUrl(), function(response, status, xhr) {
-					timeControl.changeSBoxHeight(id, +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
-					jQuery(this).remove();
 
-					// 'src' should be added only here to trigger load event after new height is received.
-					img.setAttribute('src', obj.src);
+				jQuery.ajax({
+					url: heightUrl.getUrl(),
+					success: function(response, status, xhr) {
+						timeControl.changeSBoxHeight(id, +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+
+						// 'src' should be added only here to trigger load event after new height is received.
+						img.setAttribute('src', obj.src);
+					}
 				});
 			}
 			else {
@@ -238,19 +241,20 @@ var timeControl = {
 		imgUrl.setArgument('period', period);
 		imgUrl.setArgument('stime', stime);
 
-		var img = jQuery('<img />', {id: id + '_tmp'}).load(function() {
-					var imgId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+		var img = jQuery('<img />', {id: id + '_tmp'})
+			.on('load', function() {
+				var imgId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 
-					jQuery(this).unbind('load');
-					timeControl.changeSBoxHeight(id, jQuery(this).data('height'));
-					jQuery('#' + imgId).replaceWith(jQuery(this));
-					jQuery(this).attr('id', imgId);
+				jQuery(this).unbind('load');
+				timeControl.changeSBoxHeight(id, jQuery(this).data('height'));
+				jQuery('#' + imgId).replaceWith(jQuery(this));
+				jQuery(this).attr('id', imgId);
 
-					// update dashboard widget footer
-					if (obj.onDashboard) {
-						timeControl.updateDashboardFooter(id);
-					}
-				});
+				// update dashboard widget footer
+				if (obj.onDashboard) {
+					timeControl.updateDashboardFooter(id);
+				}
+			});
 
 		if (['chart.php','chart2.php','chart3.php'].indexOf(imgUrl.getPath()) > -1
 				&& imgUrl.getArgument('outer') === '1'
@@ -258,12 +262,14 @@ var timeControl = {
 			// Getting height of graph inside image. Only for line graphs on dashboard.
 			var heightUrl = new Curl(imgUrl.getUrl());
 			heightUrl.setArgument('onlyHeight', '1');
-			jQuery('<img />').load(heightUrl.getUrl(), function(response, status, xhr) {
-				jQuery(this).remove();
 
-				// 'src' should be added only here to trigger load event after new height is received.
-				img.data('height', +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
-				img.attr('src', imgUrl.getUrl());
+			jQuery.ajax({
+				url: heightUrl.getUrl(),
+				success: function(response, status, xhr) {
+					// 'src' should be added only here to trigger load event after new height is received.
+					img.data('height', +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+					img.attr('src', imgUrl.getUrl());
+				}
 			});
 		}
 		else {

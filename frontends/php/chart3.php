@@ -169,7 +169,7 @@ foreach ($graph_items as $graph_item) {
 }
 
 if (getRequest('onlyHeight', '0') === '1') {
-	$graph->drawDimentions();
+	$graph->drawDimensions();
 	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
 }
 else {

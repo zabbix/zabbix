@@ -155,7 +155,7 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 }
 
 if (getRequest('onlyHeight', '0') === '1') {
-	$graph->drawDimentions();
+	$graph->drawDimensions();
 	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
 }
 else {

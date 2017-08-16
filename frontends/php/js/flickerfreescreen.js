@@ -431,12 +431,14 @@
 						// Getting height of graph inside image. Only for line graphs on dashboard.
 						var heightUrl = new Curl(url.getUrl());
 						heightUrl.setArgument('onlyHeight', '1');
-						$('<img />').load(heightUrl.getUrl(), function(response, status, xhr) {
-							$(this).remove();
 
-							// 'src' should be added only here to trigger load event after new height is received.
-							img.data('height', +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
-							img.attr('src', url.getUrl());
+						$.ajax({
+							url: heightUrl.getUrl(),
+							success: function(response, status, xhr) {
+								// 'src' should be added only here to trigger load event after new height is received.
+								img.data('height', +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+								img.attr('src', url.getUrl());
+							}
 						});
 					}
 					else {
