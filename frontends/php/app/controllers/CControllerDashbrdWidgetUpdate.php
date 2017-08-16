@@ -232,12 +232,12 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		}
 
 		if (array_key_exists('dashboardid', $dashboard)) {
-			$result = API::Dashboard()->update([$dashboard]);
+			$result = API::Dashboard()->update($dashboard);
 			$message = _('Dashboard updated');
 			$error_msg =  _('Failed to update dashboard');
 		}
 		else {
-			$result = API::Dashboard()->create([$dashboard]);
+			$result = API::Dashboard()->create($dashboard);
 			$message = _('Dashboard created');
 			$error_msg = _('Failed to create dashboard');
 		}
