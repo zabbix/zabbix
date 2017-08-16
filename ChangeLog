@@ -14,6 +14,7 @@ A......... [ZBXNEXT-2102] improved performance of event.get() and problem.get() 
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
 Bug fixes:
+A......... [ZBX-12487] fixed undefined index error in item prototype update (gcalenko, Sasha)
 A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
 ....I..... [ZBX-12505] fixed Oracle database creation scripts (Sasha)
 ..F....... [ZBXNEXT-18] fixed empty acknowledge operation message tooltip visibility (gcalenko)
