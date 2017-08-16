@@ -33,7 +33,6 @@ var timeControl = {
 
 	addObject: function(id, time, objData) {
 		if (typeof this.objectList[id] === 'undefined'
-			// TODO VM: (?) by this I am modifying current logic. It may have consequences unknown to me.
 			|| (typeof(objData['reloadOnAdd']) !== 'undefined' && objData['reloadOnAdd'] === 1)
 		) {
 			this.objectList[id] = {

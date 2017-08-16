@@ -18,7 +18,6 @@
  **/
 
 
-// TODO VM: (?) it was jQuery(function($){}) before. This way it loads in correct order. Is it ok to change it? I think - yes.
 (function($) {
 
 	window.flickerfreeScreen = {
