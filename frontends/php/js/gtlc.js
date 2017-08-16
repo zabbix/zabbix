@@ -71,17 +71,23 @@ var timeControl = {
 		}
 	},
 
+	/**
+	 * Changes height of sbox for given image
+	 *
+	 * @param {string} id       image HTML element id attribute
+	 * @param {int}    height   new height for sbox
+	 */
 	changeSBoxHeight: function(id, height) {
-		if (typeof ZBX_SBOX[id] !== 'undefined') {
-			delete ZBX_SBOX[id];
-		}
-
 		var obj = this.objectList[id],
 			img = $(id);
 
 		obj['objDims']['graphHeight'] = height;
 
-		if (obj.loadSBox) {
+		if (!empty(ZBX_SBOX[id])) {
+			ZBX_SBOX[id].updateHeightBoxContainer(height);
+		}
+
+		if (obj.loadSBox && empty(obj.sbox_listener)) {
 			obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
 			addListener(img, 'load', obj.sbox_listener);
 			addListener(img, 'load', sboxGlobalMove);
@@ -233,13 +239,37 @@ var timeControl = {
 		imgUrl.setArgument('period', period);
 		imgUrl.setArgument('stime', stime);
 
-		jQuery('<img />', {id: id + '_tmp', src: imgUrl.getUrl()}).load(function() {
-			var imgId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+		var img = jQuery('<img />', {id: id + '_tmp'}).load(function() {
+					var imgId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 
-			jQuery(this).unbind('load');
-			jQuery('#' + imgId).replaceWith(jQuery(this));
-			jQuery(this).attr('id', imgId);
-		});
+					jQuery(this).unbind('load');
+					timeControl.changeSBoxHeight(id, jQuery(this).data('height'));
+					jQuery('#' + imgId).replaceWith(jQuery(this));
+					jQuery(this).attr('id', imgId);
+
+					// update dashboard widget footer
+					if (obj.onDashboard) {
+						timeControl.updateDashboardFooter(id);
+					}
+				});
+
+		if (['chart.php','chart2.php','chart3.php'].indexOf(imgUrl.getPath()) > -1
+				&& imgUrl.getArgument('outer') === '1'
+		) {
+			// Getting height of graph inside image. Only for line graphs on dashboard.
+			var heightUrl = new Curl(imgUrl.getUrl());
+			heightUrl.setArgument('onlyHeight', '1');
+			jQuery('<img />').load(heightUrl.getUrl(), function(response, status, xhr) {
+				jQuery(this).remove();
+
+				// 'src' should be added only here to trigger load event after new height is received.
+				img.data('height', +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+				img.attr('src', imgUrl.getUrl());
+			});
+		}
+		else {
+			img.attr('src', imgUrl.getUrl());
+		}
 
 		// link
 		var graphUrl = new Curl(jQuery('#' + obj.containerid).attr('href'));
@@ -248,11 +278,6 @@ var timeControl = {
 		graphUrl.setArgument('stime', stime);
 
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
-
-		// update dashboard widget footer
-		if (obj.onDashboard) {
-			this.updateDashboardFooter(id);
-		}
 	},
 
 	/**
@@ -1785,6 +1810,11 @@ var sbox = Class.create({
 		this.dom_obj.style.height = this.areaHeight + 'px';
 
 		jQuery(this.grphobj).parent().append(this.dom_obj);
+	},
+
+	updateHeightBoxContainer: function(height) {
+		this.areaHeight = height;
+		this.dom_obj.style.height = this.areaHeight + 'px';
 	},
 
 	createBox: function() {
