@@ -511,8 +511,15 @@ ul.top-nav-icons {
 	text-align: right;
 	border-bottom: 1px solid $ui-border-color;
 
+	.cell:first-child {
+		max-width: calc(100vw - 370px);
+	}
+
 	h1 {
 		text-align: left;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
 	}
 
 	form {
@@ -2659,10 +2666,10 @@ $form-icon-btn: (
 .dashbrd-grid-empty-placeholder {
 	width: 16%;
 	height: 200px;
-	background-color: #fff;
-	border-style: dashed;
-	border-width: 2px;
-	border-color: #bdbdbd;
+	background-color: $ui-bg-color;
+	border-style: solid;
+	border-width: 1px;
+	border-color: $ui-border-color;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -2782,6 +2789,39 @@ $form-icon-btn: (
 			@extend %overflow-ellipsis;
 		}
 	}
+}
+
+@-webkit-keyframes zoom-in-out {
+	0% {transform: scale(1);}
+	50% {transform: scale(1.05);}
+	100% {transform: scale(1);}
+}
+@-moz-keyframes zoom-in-out {
+	0% {transform: scale(1);}
+	50% {transform: scale(1.05);}
+	100% {transform: scale(1);}
+}
+@-o-keyframes zoom-in-out{
+	0% {transform: scale(1);}
+	50% {transform: scale(1.05);}
+	100% {transform: scale(1);}
+}
+@keyframes zoom-in-out {
+	0% {transform: scale(1);}
+	50% {transform: scale(1.05);}
+	100% {transform: scale(1);}
+}
+@keyframes zoom-in-out {
+	0% {transform: scale(1);}
+	50% {transform: scale(1.05);}
+	100% {transform: scale(1);}
+}
+.new-widget {
+	-webkit-animation: zoom-in-out .2s linear;
+	-moz-animation: zoom-in-out .2s linear;
+	-ms-animation: zoom-in-out .2s linear;
+	-o-animation: zoom-in-out .2s linear;
+	animation: zoom-in-out .2s linear;
 }
 
 .ui-resize-dot {
@@ -3176,6 +3216,7 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue {
+	display: table;
 	position: absolute;
 	z-index: 1000;
 	padding: 15px 10px 10px 10px;
@@ -3190,8 +3231,20 @@ $form-icon-btn: (
 		left: 50%;
 		max-height: 90%;
 		max-width: 75%;
-		overflow: auto;
+		overflow: hidden;
 		@include transform(translate(-50%, -50%));
+
+		.overlay-dialogue-body {
+			overflow: auto;
+			max-height: calc(100vh - 190px);
+			margin: 0 0 10px 0;
+		}
+		& > .overlay-close-btn {
+			position: relative;
+			float: right;
+			top: -12px;
+			right: -8px;
+		}
 	}
 
 	.list-table {
@@ -3238,6 +3291,52 @@ $form-icon-btn: (
 	}
 }
 
+// Map widget back to parent button.
+.btn-back-map-container {
+
+	text-align: left;
+	position: absolute;
+	left: -1px;
+
+	.btn-back-map {
+		margin-top: 10px;
+		border-radius: 0px 2px 2px 0px;
+		background-color: $btn-back-map-background-color;
+		padding: 0px 0px 0px 0px;
+		display: inline-block;
+		height: 24px;
+		line-height: 24px;
+		vertical-align: middle;
+		border: $ui-border-color solid 1px;
+		color: $btn-back-text-color;
+		text-decoration: none;
+
+		.btn-back-map-content {
+			display: none;
+		}
+
+		.btn-back-map-icon {
+			margin-left: 5px;
+			display: inline-block;
+			width: 28px;
+			height: 24px;
+			vertical-align: middle;
+			background: url(../img/icon-sprite.svg) no-repeat -85px -691px;
+		}
+
+		&:hover {
+			background-color: $btn-back-background-hover;
+			border: $btn-border-color solid 1px;
+
+			.btn-back-map-content {
+				display: inline-block;
+				line-height: 24px;
+				padding: 0px 6px 0px 0px;
+			}
+		}
+	}
+}
+
 .overlay-dialogue-body {
 	margin: 0 0 25px 0;
 	white-space: nowrap;
@@ -3252,7 +3351,7 @@ $form-icon-btn: (
 }
 
 .overlay-bg {
-	background-color: $white;
+	background-color: $overlay-bg-color;
 	width: 100%;
 	height: 100%;
 	position: fixed;
@@ -4420,12 +4519,14 @@ tr.cursor-move {
 
 // Analog Clock
 .clock {
-	padding: 0 5px;
-	height: 100%;
+	padding: 0 10px;
+	height: 99%;
+	width: auto;
 }
 
 .clock-svg {
 	max-height: 100%;
+	max-width: 100%;
 	display: block;
 	margin: 0 auto;
 }
@@ -4456,10 +4557,19 @@ tr.cursor-move {
 	fill: $clock-lines-color;
 }
 
+.sysmap {
+	height: 100%;
+	width: auto;
+	padding: 0 10px;
+	text-align: center;
+}
+
 .sysmap-widget-container {
 	overflow: hidden;
-	padding-left: 5px;
-	padding-right: 5px;
+	height: 100%;
+	width: 100%;
+	max-height: 100%;
+	max-width: 100%;
 }
 
 .navtree {
@@ -4497,9 +4607,23 @@ tr.cursor-move {
 		.tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
 			flex: 0 0 15px;
 		}
+
+		.tree-list > .tree-item.ui-sortable-helper .content {
+			padding-left: 5px;
+		}
+
 		@for $i from 0 through $max_depth {
-			.tree-list[data-depth="#{$i}"] > .tree-item > .tree-row > .content > .margin-lvl {
-				flex: 0 0 ($i * 15px + 10px);
+			.tree-list[data-depth="#{$i}"] > .tree-item {
+				&> .tree-row > .content > .margin-lvl {
+					flex: 0 0 ($i * 15px + 10px);
+				}
+				&.ui-sortable-helper {
+					margin-left: ($i * 15px + 10px);
+
+					& > .tree-row > .content > .margin-lvl {
+						display: none;
+					}
+				}
 			}
 		}
 

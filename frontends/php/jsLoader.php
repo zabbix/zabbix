@@ -107,7 +107,7 @@ $tranStrings = [
 	'dashboard.grid.js' => [
 		'Edit widget' => _('Edit widget'),
 		'Add widget' => _('Add widget'),
-		'Update' => _('Update'),
+		'Apply' => _('Apply'),
 		'Add' => _('Add'),
 		'Edit' => _('Edit'),
 		'Cancel' => _('Cancel'),
@@ -202,6 +202,7 @@ $tranStrings = [
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
+		'Access denied' => _('Access denied'),
 		'Cancel' => _('Cancel'),
 		'Configuration' => _('Configuration'),
 		'Create trigger' => _('Create trigger'),
@@ -234,6 +235,7 @@ $tranStrings = [
 		'Update' => _('Update'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
+		'No refresh' => _('No refresh'),
 		'You need permission to perform this action!' => _('You need permission to perform this action!'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
@@ -245,6 +247,17 @@ $tranStrings = [
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found')
+	],
+	'class.cnavtree.js' => [
+		'Edit' => _('Edit'),
+		'Remove' => _('Remove'),
+		'root' => _('root'),
+		'Edit tree element' => _('Edit tree element'),
+		'Apply' => _('Apply'),
+		'Add' => _('Add'),
+		'Cancel' => _('Cancel'),
+		'Add child element' => _('Add child element'),
+		'Add multiple maps' => _('Add multiple maps')
 	]
 ];
 

@@ -1,3 +1,34 @@
+Changes for 3.4.0rc2
+
+New features:
+
+Bug fixes:
+........S. [ZBXNEXT-3926] fixed macros {EVENT.STATUS} and {EVENT.VALUE} to return correct value depending on the state of a problem (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0rc1
+
+New features:
+A......... [ZBXNEXT-2102] improved performance of event.get() and problem.get() methods with "selectTags" option (Sasha)
+....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vzhuravlev, vso)
+..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
+..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
+
+Bug fixes:
+A......... [ZBX-12487] fixed undefined index error in item prototype update (gcalenko, Sasha)
+A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
+....I..... [ZBX-12505] fixed Oracle database creation scripts (Sasha)
+..F....... [ZBXNEXT-18] fixed empty acknowledge operation message tooltip visibility (gcalenko)
+..F....... [ZBX-12468] fixed vertical text alignment for map shapes (vjaceslavs)
+..F....... [ZBX-12418] fixed draggable rectangle calculation for map shape lines (vjaceslavs)
+...G...... [ZBX-12397] fixed system.cpu.num count for 64-bit Windows with more than 64 logical cpus (abs)
+.......PS. [ZBX-12483] fixed compilation with libevent 2.1.8 and IPC service initialization in proxy (Andris)
+........S. [ZBX-12485] fixed PostgreSQL query errors during sending notifications on acknowledgement (Sergejs)
+.......PS. [ZBXNEXT-3006] fixed web scenario item preprocessing (wiper)
+..F....... [ZBXNEXT-2102] fixed low performance of navigation tree widget and improved dashboard performance (miks)
+.......PS. [ZBX-12458] fixed incorrect use of zbx_strlcat() in DBpatch_3030060_migrate_pairs(); thanks to MATSUDA Daiki for patch (Andris)
+
+--------------------------------------------------------------------------------
 Changes for 3.4.0beta2
 
 Bug fixes:
@@ -50,6 +81,7 @@ A.F....... [ZBX-12384] fixed JMX endpoint related bugs in item mass update form 
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
+..F....... [ZBX-12277] fixed trigger expression test form incorrectly replacing macros (Ivo)
 ........S. [ZBX-12357] fixed missing user macro substitution in expression of newly added triggers (vso)
 
 --------------------------------------------------------------------------------
@@ -74,7 +106,7 @@ A.F.I..PS. [ZBXNEXT-1675] added support for user macros and time unit suffixes i
 .......PS. [ZBXNEXT-3659] reduced cache locking time during configuration synchronization (wiper)
 ........S. [ZBXNEXT-3432] added support of {HOST.ID}, {HOST.HOST}, {HOST.NAME} macros in tags, improved to read those from cache; added support of interface macros in tags (vso)
 A.F.I..PS. [ZBXNEXT-2074] implemented URL encoding and punycode support in web monitoring (vjaceslavs)
-A.FG...PS. [ZBXNEXT-3687] make shared memory and semaphores private to the zabbix processes. Drop SQLite3 support for frontend and server (abs)
+A.FG...PS. [ZBXNEXT-3687] made shared memory and semaphores private to the zabbix processes. Dropped SQLite3 support for frontend and server (abs)
 A.F.I..... [ZBXNEXT-2694] implemented multiple triggers support for map elements (Oleg)
 ....I...S. [ZBXNEXT-2445] increase the length of alert and trigger errors (abs)
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)

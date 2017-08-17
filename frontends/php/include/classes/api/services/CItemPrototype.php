@@ -708,6 +708,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
+
 		$this->checkInput($items, true);
 		$this->validateDependentItems($items, API::ItemPrototype());
 
@@ -718,10 +719,10 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		foreach ($items as &$item) {
-			$item_type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $dbItems, ['type']);
 
-			if ($item_type != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
+		foreach ($items as &$item) {
+			if ($item['type'] != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
 				$item['master_itemid'] = null;
 			}
 			elseif (!array_key_exists('master_itemid', $item)) {

@@ -368,7 +368,8 @@
 
 				$('#flickerfreescreen_' + id + ' img').each(function() {
 					var domImg = $(this),
-						url = new Curl(domImg.attr('src'));
+						url = new Curl(domImg.attr('src')),
+						on_dashboard = timeControl.objectList[id].onDashboard;
 
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
 					url.setArgument('updateProfile', (typeof screen.updateProfile === 'undefined')
@@ -440,6 +441,10 @@
 							window.flickerfreeScreen.refresh(id, true);
 						}
 					});
+
+					if (on_dashboard) {
+						timeControl.updateDashboardFooter(id);
+					}
 				});
 			}
 		},

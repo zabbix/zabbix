@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Ubiquiti AirOS SNMPv1</template>
-         <name>Template Ubiquiti AirOS SNMPv1</name>
-         <description>Template Ubiquiti AirOS version: 0.10
+         <template>Template Net Ubiquiti AirOS SNMPv1</template>
+         <name>Template Net Ubiquiti AirOS SNMPv1</name>
+         <description>Template Net Ubiquiti AirOS version: 0.11
 MIBs used:
 FROGFOOT-RESOURCES-MIB
 IEEE802dot11-MIB
@@ -88,6 +88,7 @@ device : NanoStation, UAP-LR
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Available memory</name>
@@ -135,6 +136,7 @@ device : NanoStation, UAP-LR
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Total memory</name>
@@ -182,6 +184,7 @@ Total memory in Bytes
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Memory utilization</name>
@@ -223,6 +226,7 @@ Total memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware model name</name>
@@ -265,6 +269,7 @@ A printable string used to identify the manufacturer's product name of the resou
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Firmware version</name>
@@ -307,6 +312,7 @@ Printable string used to identify the manufacturer's product version of the reso
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
          <discovery_rules/>
@@ -323,10 +329,10 @@ Printable string used to identify the manufacturer's product version of the reso
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces Simple SNMPv1</name>
+               <name>Template Module Interfaces Simple SNMPv1</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv1</name>
+               <name>Template Module Generic SNMPv1</name>
             </template>
          </templates>
          <screens/>
@@ -351,19 +357,19 @@ Printable string used to identify the manufacturer's product version of the reso
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template Ubiquiti AirOS SNMPv1</host>
-                           <key>system.cpu.util[loadValue.2]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net Ubiquiti AirOS SNMPv1</host>
+                  <key>system.cpu.util[loadValue.2]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
       <graph>
          <name>Memory utilization</name>
@@ -383,24 +389,24 @@ Printable string used to identify the manufacturer's product version of the reso
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template Ubiquiti AirOS SNMPv1</host>
-                           <key>vm.memory.pused[memoryUsedPercentage]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net Ubiquiti AirOS SNMPv1</host>
+                  <key>vm.memory.pused[memoryUsedPercentage]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template Ubiquiti AirOS SNMPv1:system.cpu.util[loadValue.2].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Net Ubiquiti AirOS SNMPv1:system.cpu.util[loadValue.2].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization</name>
@@ -417,7 +423,7 @@ Printable string used to identify the manufacturer's product version of the reso
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Ubiquiti AirOS SNMPv1:vm.memory.pused[memoryUsedPercentage].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+         <expression>{Template Net Ubiquiti AirOS SNMPv1:vm.memory.pused[memoryUsedPercentage].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High memory utilization</name>
@@ -434,7 +440,7 @@ Printable string used to identify the manufacturer's product version of the reso
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Ubiquiti AirOS SNMPv1:system.hw.firmware.diff()}=1 and {Template Ubiquiti AirOS SNMPv1:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net Ubiquiti AirOS SNMPv1:system.hw.firmware.diff()}=1 and {Template Net Ubiquiti AirOS SNMPv1:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>
