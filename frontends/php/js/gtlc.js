@@ -1858,7 +1858,7 @@ var sbox = Class.create({
 		var posxy = jQuery(this.grphobj).position();
 		var dims = getDimensions(this.grphobj);
 
-		this.dom_obj.style.top = (posxy.top + this.shiftT) + 'px';
+		this.dom_obj.style.top = this.shiftT + 'px';
 		this.dom_obj.style.left = posxy.left + 'px';
 		if (dims.width > 0) {
 			this.dom_obj.style.width = dims.width + 'px';
