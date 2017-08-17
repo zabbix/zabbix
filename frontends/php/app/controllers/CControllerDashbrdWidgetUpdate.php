@@ -114,8 +114,6 @@ class CControllerDashbrdWidgetUpdate extends CController {
 			 * @var string $widget[]['fields']          (optional) JSON object
 			 */
 			foreach ($this->getInput('widgets', []) as $index => $widget) {
-				// TODO VM: check widgetid - if present in $widget, must be existing widget id
-
 				if (!array_key_exists('pos', $widget)) {
 					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
 						_s('the parameter "%1$s" is missing', 'pos')
@@ -169,7 +167,6 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		if (!$ret) {
 			$output = [];
 			if (($messages = getMessages()) !== null) {
-				// TODO AV: "errors" => "messages"
 				$output['errors'] = $messages->toString();
 			}
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
@@ -214,7 +211,7 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		foreach ($this->widgets as $widget) {
 			$upd_widget = [];
 			if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
-					&& array_key_exists('dashboardid', $dashboard)) { // TODO AV: remove check for dashboardid; related CControllerDashboardView:118
+					&& array_key_exists('dashboardid', $dashboard)) {
 				$upd_widget['widgetid'] = $widget['widgetid'];
 			}
 
@@ -243,25 +240,20 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		}
 
 		if ($result) {
-			// TODO VM: (?) we need to find a way to display message next time, page is loaded.
-			// TODO VM: ideas: processRequest in ZBase (CSession::setValue())
 			$data['redirect'] = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.view')
 				->setArgument('dashboardid', $result['dashboardids'][0])
 				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null)
 				->getUrl();
-			// @TODO should be moved from here to base logic by ZBXNEXT-3892
 			CSession::setValue('messageOk', $message);
 		}
 		else {
-			// TODO AV: improve error messages
 			if (!hasErrorMesssages()) {
 				error($error_msg);
 			}
 		}
 
 		if (($messages = getMessages()) !== null) {
-			// TODO AV: "errors" => "messages"
 			$data['errors'] = $messages->toString();
 		}
 
