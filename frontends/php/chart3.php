@@ -50,7 +50,8 @@ $fields = [
 	'percent_left' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'outer' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null]
+	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
+	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -167,8 +168,12 @@ foreach ($graph_items as $graph_item) {
 	$graph->addItem($graph_item);
 }
 
-$graph->draw();
-
-header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+if (getRequest('onlyHeight', '0') === '1') {
+	$graph->drawDimensions();
+	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+}
+else {
+	$graph->draw();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';
