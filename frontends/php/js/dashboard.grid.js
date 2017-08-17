@@ -628,9 +628,6 @@
 					// Mark dashboard as updated.
 					data['options']['updated'] = true;
 				}
-			},
-			error: function() {
-				// TODO VM: Add error message box in this case
 			}
 		});
 	}
@@ -819,9 +816,6 @@
 			complete: function() {
 				var ul = $('#dashbrd-config').closest('ul');
 				$('#dashbrd-save', ul).prop('disabled', false);
-			},
-			error: function() {
-				// TODO VM: add error message box
 			}
 		});
 	}
@@ -975,7 +969,6 @@
 				params.push(grid);
 			}
 
-			// TODO VM: (?) try-catch may be unnecessary, but it prevents from JS from braking, if this function is not working properly
 			try {
 				window[trigger['function']].apply(null, params);
 			}
@@ -1316,9 +1309,6 @@
 					},
 					complete: function() {
 						overlayDialogueOnLoad(true);
-					},
-					error: function() {
-						// TODO VM: add error message box
 					}
 				});
 			});

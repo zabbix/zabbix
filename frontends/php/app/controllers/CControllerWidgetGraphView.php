@@ -254,7 +254,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$graph_src = '';
 
 				if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
-					// TODO miks: why chart7 and chart3 are allowed only if dynamic is set?
 					$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
 						? 'chart7.php'
 						: 'chart3.php';
