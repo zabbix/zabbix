@@ -498,10 +498,10 @@ CISCO-PROCESS-MIB</description>
                      <port/>
                      <description>MIB: CISCO-PROCESS-MIB
 The overall CPU busy percentage in the last 5 minute
-		period. This object deprecates the avgBusy5 object from 
-		the OLD-CISCO-SYSTEM-MIB. This object is deprecated
-		by cpmCPUTotal5minRev which has the changed range 
-		of value (0..100)
+period. This object deprecates the avgBusy5 object from
+the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+by cpmCPUTotal5minRev which has the changed range
+of value (0..100)
 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -624,8 +624,7 @@ OLD-CISCO-CPU-MIB</description>
                <privatekey/>
                <port/>
                <description>MIB: OLD-CISCO-CPU-MIB
-5 minute exponentially-decayed moving 
-		average of the CPU busy percentage.
+5 minute exponentially-decayed moving average of the CPU busy percentage.
 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -968,8 +967,7 @@ CISCO-ENVMON-MIB</description>
                </filter>
                <lifetime>30d</lifetime>
                <description>Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status
-	                 maintained by the environmental monitor.
-					</description>
+maintained by the environmental monitor.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Temperature</name>
