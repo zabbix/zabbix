@@ -59,7 +59,6 @@ class CWidgetConfig {
 	 * @return array
 	 */
 	private static function getDefaultDimensions() {
-		// TODO AV: review and accept default dimentions
 		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
@@ -208,7 +207,6 @@ class CWidgetConfig {
 				return new CPlainTextWidgetForm($data);
 
 			default:
-				// TODO VM: delete this case after all widget forms will be created
 				return new CWidgetForm($data);
 		}
 	}
