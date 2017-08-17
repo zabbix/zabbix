@@ -2593,6 +2593,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
 			DCitem_poller_type_update(item, host, flags);
+
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
 				DCitem_nextcheck_update(item, host, flags, now);
 		}
