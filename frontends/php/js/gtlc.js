@@ -50,6 +50,7 @@ var timeControl = {
 				loadImage: 0,
 				loadScroll: 0,
 				mainObject: 0, // object on changing will reflect on all others
+				onDashboard: 0, // object is on dashboard
 				sliderMaximumTimePeriod: null, // max period in seconds
 				profile: { // if values are not null, will save fixedperiod state here, on change
 					idx: null,
@@ -220,6 +221,7 @@ var timeControl = {
 		jQuery('<img />', {id: id + '_tmp', src: imgUrl.getUrl()}).load(function() {
 			var imgId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 
+			jQuery(this).unbind('load');
 			jQuery('#' + imgId).replaceWith(jQuery(this));
 			jQuery(this).attr('id', imgId);
 		});
@@ -231,6 +233,42 @@ var timeControl = {
 		graphUrl.setArgument('stime', stime);
 
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
+
+		// update dashboard widget footer
+		if (obj.onDashboard) {
+			this.updateDashboardFooter(id);
+		}
+	},
+
+	/**
+	 * Updates dashboard widget footer for specified graph
+	 *
+	 * @param {string} id  Id of img tag with graph.
+	 */
+	updateDashboardFooter: function (id) {
+		var widgets = jQuery(".dashbrd-grid-widget-container")
+				.dashboardGrid("getWidgetsBy", "uniqueid", id.replace('graph_', ''));
+
+		if (widgets.length !== 1) {
+			return;
+		}
+
+		var widget = widgets[0],
+			url = new Curl('zabbix.php');
+
+		url.setArgument('action', 'widget.graph.view');
+		jQuery.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			data: {
+				uniqueid: widget['uniqueid'],
+				only_footer: 1
+			},
+			dataType: 'json',
+			success: function(resp) {
+				widget['content_footer'].html(resp.footer);
+			}
+		});
 	},
 
 	refreshObject: function(id) {
@@ -345,12 +383,13 @@ var timeControl = {
 		sbox.onchange = this.objectUpdate.bind(this);
 	},
 
-	// Remove sbox from all objects in objectList
+	// Remove SBox from all objects in objectList.
 	removeAllSBox: function() {
 		for (var id in this.objectList) {
-			if (!empty(this.objectList[id]) && this.objectList[id]['loadSBox'] === 1) {
+			if (!empty(this.objectList[id]) && this.objectList[id]['loadSBox'] == 1) {
 				var obj = this.objectList[id],
 					img = $(id);
+
 				obj['loadSBox'] = 0;
 				removeListener(img, 'load', obj.sbox_listener);
 				removeListener(img, 'load', sboxGlobalMove);

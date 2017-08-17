@@ -1,10 +1,26 @@
-Changes for 3.4.0beta3
+Changes for 3.4.0rc2
 
 New features:
+
+Bug fixes:
+........S. [ZBXNEXT-3926] fixed macros {EVENT.STATUS} and {EVENT.VALUE} to return correct value depending on the state of a problem (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0rc1
+
+New features:
+A......... [ZBXNEXT-2102] improved performance of event.get() and problem.get() methods with "selectTags" option (Sasha)
+....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vzhuravlev, vso)
 ..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
 Bug fixes:
+A......... [ZBX-12487] fixed undefined index error in item prototype update (gcalenko, Sasha)
+A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
+....I..... [ZBX-12505] fixed Oracle database creation scripts (Sasha)
+..F....... [ZBXNEXT-18] fixed empty acknowledge operation message tooltip visibility (gcalenko)
+..F....... [ZBX-12468] fixed vertical text alignment for map shapes (vjaceslavs)
+..F....... [ZBX-12418] fixed draggable rectangle calculation for map shape lines (vjaceslavs)
 ...G...... [ZBX-12397] fixed system.cpu.num count for 64-bit Windows with more than 64 logical cpus (abs)
 .......PS. [ZBX-12483] fixed compilation with libevent 2.1.8 and IPC service initialization in proxy (Andris)
 ........S. [ZBX-12485] fixed PostgreSQL query errors during sending notifications on acknowledgement (Sergejs)

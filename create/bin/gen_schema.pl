@@ -246,8 +246,9 @@ sub process_table
 
 		for ($flags)
 		{
-			# do not output ZBX_DATA, remove it
+			# do not output ZBX_DATA and ZBX_TEMPLATE, remove it
 			s/ZBX_DATA//;
+			s/ZBX_TEMPLATE//;
 			s/,+$//;
 			s/^,+//;
 			s/,+/ \| /g;

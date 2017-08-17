@@ -57,11 +57,10 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				break;
 
 			case WIDGET_FIELD_SELECT_RES_GRAPH:
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
 				$this->srctbl = 'graphs';
 				$this->srcfld1 = 'graphid';
 				$this->srcfld2 = 'name';
-
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
 				break;
 		}
 

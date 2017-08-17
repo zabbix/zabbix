@@ -95,7 +95,7 @@ class CWidgetField {
 				break;
 
 			default:
-				exit(_('Internal error'));
+				exit(_('Internal error.'));
 		}
 
 		$this->save_type = $save_type;

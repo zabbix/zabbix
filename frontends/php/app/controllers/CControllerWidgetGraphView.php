@@ -26,16 +26,16 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 		$this->setType(WIDGET_GRAPH);
 		$this->setValidationRules([
-			'name' =>				'string',
-			'uniqueid' =>			'required|string',
-			'initial_load' =>		'in 0,1',
-			'edit_mode' =>			'in 0,1',
-			'dashboardid' =>		'db dashboard.dashboardid',
-			'fields' =>				'json',
-			'dynamic_hostid' =>		'db hosts.hostid',
-			'content_width' =>		'int32',
-			'content_height' =>		'int32',
-			'only_footer' =>		'in 1'
+			'name' => 'string',
+			'uniqueid' => 'required|string',
+			'initial_load' => 'in 0,1',
+			'edit_mode' => 'in 0,1',
+			'dashboardid' => 'db dashboard.dashboardid',
+			'fields' => 'json',
+			'dynamic_hostid' => 'db hosts.hostid',
+			'content_width' => 'int32',
+			'content_height' => 'int32',
+			'only_footer' => 'in 1'
 		]);
 	}
 
@@ -47,6 +47,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					'debug_mode' => $this->getDebugMode()
 				]
 			]));
+
 			return;
 		}
 
@@ -104,7 +105,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'loadImage' => 1,
 			'periodFixed' => CProfile::get($profileIdx.'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
-			'reloadOnAdd' => 1
+			'reloadOnAdd' => 1,
+			'onDashboard' => 1
 		];
 
 		// data for flickerscreen
@@ -147,7 +149,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				]);
 				$graph = reset($graph);
 
-				// if all items are from one host we change them, or set calculated if not exist on that host
+				// If all items are from one host we change them, or set calculated if not exist on that host.
 				if ($graph && count($graph['hosts']) == 1) {
 					if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
 						$new_dynamic = getSameGraphItemsForHost(
@@ -183,12 +185,13 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 
 				if ($graph) {
-					// Search if there are any items available for this dynamic host
+					// Search if there are any items available for this dynamic host.
 					$new_dynamic = getSameGraphItemsForHost(
 						$graph['gitems'],
 						$dynamic_hostid,
 						false
 					);
+
 					if (!$new_dynamic) {
 						$critical_error = _('No permissions to referred object or it does not exist!');
 					}
@@ -208,6 +211,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					'output' => null
 				]);
 				$item = reset($item);
+
 				if (!$item) {
 					$critical_error = _('No permissions to referred object or it does not exist!');
 				}
@@ -265,6 +269,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					}
 
 					$new_graph_items = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
+
 					foreach ($new_graph_items as $new_graph_item) {
 						unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
 

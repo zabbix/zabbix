@@ -195,7 +195,9 @@ function getMenuPopupMap(options) {
 			var url = new Curl('hostinventories.php');
 
 			jQuery.each(options.gotos.inventory, function(name, value) {
-				url.setArgument(name, value);
+				if (value !== null) {
+					url.setArgument(name, value);
+				}
 			});
 
 			gotos[gotos.length] = {
@@ -209,7 +211,9 @@ function getMenuPopupMap(options) {
 			var url = new Curl('latest.php?filter_set=1');
 
 			jQuery.each(options.gotos.latestData, function(name, value) {
-				url.setArgument(name, value);
+				if (value !== null) {
+					url.setArgument(name, value);
+				}
 			});
 
 			gotos[gotos.length] = {
@@ -231,7 +235,9 @@ function getMenuPopupMap(options) {
 				var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
 
 				jQuery.each(options.gotos.triggerStatus, function(name, value) {
-					url.setArgument(name, value);
+					if (value !== null) {
+						url.setArgument(name, value);
+					}
 				});
 
 				triggers.url = url.getUrl();
@@ -253,7 +259,9 @@ function getMenuPopupMap(options) {
 				var url = new Curl('charts.php');
 
 				jQuery.each(options.gotos.graphs, function(name, value) {
-					url.setArgument(name, value);
+					if (value !== null) {
+						url.setArgument(name, value);
+					}
 				});
 
 				graphs.url = url.getUrl();
@@ -275,7 +283,9 @@ function getMenuPopupMap(options) {
 				var url = new Curl('host_screen.php');
 
 				jQuery.each(options.gotos.screens, function(name, value) {
-					url.setArgument(name, value);
+					if (value !== null) {
+						url.setArgument(name, value);
+					}
 				});
 
 				screens.url = url.getUrl();
@@ -289,7 +299,9 @@ function getMenuPopupMap(options) {
 			var url = new Curl('zabbix.php?action=map.view');
 
 			jQuery.each(options.gotos.submap, function(name, value) {
-				url.setArgument(name, value);
+				if (value !== null) {
+					url.setArgument(name, value);
+				}
 			});
 
 			gotos[gotos.length] = {
@@ -487,7 +499,7 @@ function getMenuPopupDashboard(options) {
 										response.data
 									);
 								}
-								else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+								else if (typeof response === 'string' && response.indexOf(t('Access denied')) !== -1) {
 									alert(t('You need permission to perform this action!'))
 								}
 								else {
@@ -585,6 +597,7 @@ function showDialogForm(form, options, formData) {
 	});
 
 	form.css('visibility', 'visible');
+	overlayDialogueOnLoad(true);
 }
 
 /**

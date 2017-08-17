@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.4.0beta3');
+define('ZABBIX_VERSION',		'3.4.0rc2');
 define('ZABBIX_API_VERSION',	'3.4.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3030186);
+define('ZABBIX_DB_VERSION',		3030198);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
