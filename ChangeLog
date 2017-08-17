@@ -3,6 +3,7 @@ Changes for 3.4.0rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12486] fixed item removal from poller queue during configuration cache synchronization (wiper)
 ..F....... [ZBXNEXT-3890] fixed extra graph loading (vmurzins)
 ........S. [ZBXNEXT-3926] fixed macros {EVENT.STATUS} and {EVENT.VALUE} to return correct value depending on the state of a problem (viktors)
 
