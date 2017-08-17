@@ -580,8 +580,8 @@ if ($this->data['displayApplications']) {
 
 // Append master item select.
 $master_item = (new CDiv([
-	(new CTextBox('master_itemname', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	(new CVar('master_itemid', 0, 'master_itemid')),
+	(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid')),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
