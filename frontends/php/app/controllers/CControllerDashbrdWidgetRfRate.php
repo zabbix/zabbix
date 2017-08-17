@@ -30,12 +30,7 @@ class CControllerDashbrdWidgetRfRate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
-			// TODO AV: validation of 'widgets'
-		}
-
 		if (!$ret) {
-			// TODO AV: improve error reporting
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 		}
 
@@ -43,7 +38,6 @@ class CControllerDashbrdWidgetRfRate extends CController {
 	}
 
 	protected function checkPermissions() {
-		// TODO AV: permissions needs to be added
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 

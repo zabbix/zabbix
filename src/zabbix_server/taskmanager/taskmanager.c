@@ -84,7 +84,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 			close_event(eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
 					&ts, userid, 0, 0, trigger.description, trigger.expression_orig,
 					trigger.recovery_expression_orig, trigger.priority, trigger.type, NULL,
-					ZBX_TRIGGER_CORRELATION_NONE, "");
+					ZBX_TRIGGER_CORRELATION_NONE, "", trigger.value);
 
 			process_trigger_events(&trigger_diff, locked_triggerids, ZBX_EVENTS_SKIP_CORRELATION);
 			DCconfig_triggers_apply_changes(&trigger_diff);
@@ -304,7 +304,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_t	ack_tasks;
 	zbx_ack_task_t		*ack_task;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:" ZBX_FS_UI64, __function_name, ack_taskids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, ack_taskids->values_num);
 
 	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -349,7 +349,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	}
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , "update task set status=%d where", ZBX_TM_STATUS_NEW);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , "update task set status=%d where", ZBX_TM_STATUS_DONE);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", ack_taskids->values, ack_taskids->values_num);
 	DBexecute("%s", sql);
 

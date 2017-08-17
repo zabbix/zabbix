@@ -2528,7 +2528,6 @@ function calculateTime(array $options = []) {
 	}
 	else {
 		if ($options['period'] < ZBX_MIN_PERIOD) {
-			// TODO VM: (?) do we need error message here? Maybe just remove it.
 			error(_n('Minimum time period to display is %1$s minute.',
 				'Minimum time period to display is %1$s minutes.',
 				(int) ZBX_MIN_PERIOD / SEC_PER_MIN
@@ -2536,7 +2535,6 @@ function calculateTime(array $options = []) {
 			$options['period'] = ZBX_MIN_PERIOD;
 		}
 		elseif ($options['period'] > ZBX_MAX_PERIOD) {
-			// TODO VM: (?) do we need error message here? Maybe just remove it.
 			error(_n('Maximum time period to display is %1$s day.',
 				'Maximum time period to display is %1$s days.',
 				(int) ZBX_MAX_PERIOD / SEC_PER_DAY

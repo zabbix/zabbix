@@ -54,31 +54,48 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$show_lines = $fields['show_lines'];
 		$dynamic = $fields['dynamic'];
 		$style = $fields['style'];
+		$dynamic_widget_name = null;
 		$table_rows = [];
 
-		// Select dynamically selected host.
-		if ($dynamic && $dynamic_hostid) {
-			$new_itemid = get_same_item_for_host($fields['itemid'], $dynamic_hostid);
-			$fields['itemid'] = $new_itemid ?: 0;
-		}
+		$items = ($fields['itemid'] != 0)
+			? API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+				'selectHosts' => ['name'],
+				'itemids' => $fields['itemid'],
+				'webitems' => true
+			])
+			: [];
 
-		// Resolve item name.
-		if ($fields['itemid']) {
-			$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($fields['itemid'])]);
-		}
-		else {
-			$items = [];
+		// Select dynamically selected host.
+		if ($items && $dynamic && $dynamic_hostid) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+				'selectHosts' => ['name'],
+				'filter' => [
+					'hostid' => $dynamic_hostid,
+					'key_' => $items[0]['key_']
+				],
+				'webitems' => true
+			]);
 		}
 
 		if (!$items) {
-			$error = _('No item selected.');
+			$error = _('No permissions to referred object or it does not exist!');
 		}
-		// Select item history data.
-		else if (($item = reset($items)) !== false) {
+		// Select host name and item history data.
+		else {
+			// Resolve item name.
+			$items = CMacrosResolverHelper::resolveItemNames($items);
+
+			$item = $items[0];
+			$host = $item['hosts'][0];
+
+			$dynamic_widget_name = $host['name'].NAME_DELIMITER.$item['name_expanded'];
+
 			$histories = API::History()->get([
+				'output' => API_OUTPUT_EXTEND,
 				'history' => $item['value_type'],
 				'itemids' => $item['itemid'],
-				'output' => API_OUTPUT_EXTEND,
 				'sortorder' => ZBX_SORT_DOWN,
 				'sortfield' => ['itemid', 'clock'],
 				'limit' => $show_lines
@@ -99,7 +116,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 						break;
 				}
 
-				if ($item['valuemapid'] > 0) {
+				if ($item['valuemapid'] != 0) {
 					$value = applyValueMap($value, $item['valuemapid']);
 				}
 
@@ -111,12 +128,12 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			}
 		}
 
-		if (!$error && !$table_rows) {
-			$error = _('No permissions to selected item or it does not exist.');
-		}
+		$name = $dynamic_widget_name
+			? $dynamic_widget_name
+			: CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT];
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_PLAIN_TEXT]),
+			'name' => $this->getInput('name', $name),
 			'table_rows' => $table_rows,
 			'error' => $error,
 			'user' => [

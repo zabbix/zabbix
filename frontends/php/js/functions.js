@@ -515,18 +515,21 @@ function overlayDialogueDestroy() {
 }
 
 /**
- * Display modal window
+ * Display modal window.
  *
- * @param {string}	title					Modal window title.
- * @param {object}	content					Window content.
- * @param {array}	buttons					Window buttons.
- * @param {string}	buttons[]['title']		Text on the button.
- * @param {object}	buttons[]['action']		Function object that will be called on click.
- * @param {string}	buttons[]['class']		(optional) Button class.
- * @param {bool}	buttons[]['cancel']		(optional) It means what this button has cancel action.
- * @param {bool}	buttons[]['focused']	(optional) Focus this button.
- * @param {bool}	buttons[]['enabled']	(optional) Should the button be enabled? Default: true.
- * @param {bool}	buttons[]['keepOpen']	(optional) Prevent dialogue closing, if button action returned false.
+ * @param {object} params                        Modal window params.
+ * @param {string} params.title                  Modal window title.
+ * @param {object} params.content                Window content.
+ * @param {array}  params.buttons                Window buttons.
+ * @param {string} params.buttons[]['title']     Text on the button.
+ * @param {object} params.buttons[]['action']    Function object that will be called on click.
+ * @param {string} params.buttons[]['class']     (optional) Button class.
+ * @param {bool}   params.buttons[]['cancel']    (optional) It means what this button has cancel action.
+ * @param {bool}   params.buttons[]['focused']   (optional) Focus this button.
+ * @param {bool}   params.buttons[]['enabled']   (optional) Should the button be enabled? Default: true.
+ * @param {bool}   params.buttons[]['keepOpen']  (optional) Prevent dialogue closing, if button action returned false.
+ *
+ * @return {bool}
  */
 function overlayDialogue(params) {
 	jQuery('<div>', {
@@ -622,7 +625,7 @@ function overlayDialogue(params) {
 			last_focusable = focusable.filter(':last');
 
 		first_focusable.on('keydown', function(e) {
-			// TAB && SHIFT
+			// TAB and SHIFT
 			if (e.keyCode == 9 && e.shiftKey) {
 				last_focusable.focus();
 
@@ -631,7 +634,7 @@ function overlayDialogue(params) {
 		});
 
 		last_focusable.on('keydown', function(e) {
-			// TAB && !SHIFT
+			// TAB and not SHIFT
 			if (e.keyCode == 9 && !e.shiftKey) {
 				first_focusable.focus();
 
@@ -646,19 +649,19 @@ function overlayDialogue(params) {
 		button_focused.focus();
 	}
 
-	// Don't focus element in overlay, if button is already focused.
+	// Don't focus element in overlay, if the button is already focused.
 	overlayDialogueOnLoad(!button_focused);
 }
 
 /**
- * Actions to perform, when dialogue is created,
- * as well as, when data in dialogue changed, and this is forced from outside.
+ * Actions to perform, when dialogue is created, as well as, when data in dialogue changed,
+ * and this is forced from outside.
  *
- * @param {boolean} focus  Focus first focusable element in overalay.
+ * @param {bool} focus  Focus first focusable element in overlay.
  */
 function overlayDialogueOnLoad(focus) {
 	if (focus) {
-		jQuery('.auto-focus:focusable', jQuery('#overlay_dialogue')).first().focus();
+		jQuery('[autofocus=autofocus]:focusable', jQuery('#overlay_dialogue')).first().focus();
 	}
 }
 
