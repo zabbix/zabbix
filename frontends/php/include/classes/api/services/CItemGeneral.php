@@ -1543,7 +1543,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($hosts_items as $hostid => $items) {
 			$linked_items = $items;
 
-			// Merge host items dependency tree with template items dependency tree
+			// Merge host items dependency tree with template items dependency tree.
 			$linked_items = array_merge($linked_items, $tmpl_items);
 
 			// Check dependency level for every dependent item.
