@@ -246,11 +246,13 @@ var timeControl = {
 				var imgId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 
 				jQuery(this).unbind('load');
-				timeControl.changeSBoxHeight(id, jQuery(this).data('height'));
+				if (!empty(jQuery(this).data('height'))) {
+					timeControl.changeSBoxHeight(id, jQuery(this).data('height'));
+				}
 				jQuery('#' + imgId).replaceWith(jQuery(this));
 				jQuery(this).attr('id', imgId);
 
-				// update dashboard widget footer
+				// Update dashboard widget footer.
 				if (obj.onDashboard) {
 					timeControl.updateDashboardFooter(id);
 				}

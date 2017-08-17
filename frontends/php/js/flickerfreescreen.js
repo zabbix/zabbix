@@ -356,7 +356,7 @@
 					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					url.setArgument('curtime', new CDate().getTime());
 
-					// create temp image in buffer
+					// Create temp image in buffer.
 					var img = $('<img>', {
 							'class': domImg.attr('class'),
 							'data-timestamp': new CDate().getTime(),
@@ -381,16 +381,16 @@
 
 							screen.isRefreshing = false;
 
-							// re-refresh image
+							// Re-refresh image.
 							var bufferImg = $(this);
 
 							if (bufferImg.data('timestamp') > screen.timestamp) {
 								screen.timestamp = bufferImg.data('timestamp');
 
-								// set id
+								// Set id.
 								bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
 
-								// set opacity state
+								// Set opacity state.
 								if (window.flickerfreeScreenShadow.isShadowed(id)) {
 									bufferImg.fadeTo(0, 0.6);
 								}
@@ -399,15 +399,15 @@
 									timeControl.changeSBoxHeight(id, bufferImg.data('height'));
 								}
 
-								// set loaded image from buffer to dom
+								// Set loaded image from buffer to dom.
 								domImg.replaceWith(bufferImg);
 
-								// callback function on success
+								// Callback function on success.
 								if (!empty(successAction)) {
 									successAction();
 								}
 
-								// rebuild timeControl sbox listeners
+								// Rebuild timeControl sbox listeners.
 								if (!empty(ZBX_SBOX[id])) {
 									ZBX_SBOX[id].addListeners();
 								}
