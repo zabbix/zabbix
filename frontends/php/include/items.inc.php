@@ -467,68 +467,6 @@ function findDependentWithMissingMasterItem($items, $data_provider) {
 }
 
 /**
- * Validate merge of template dependent items and every host dependent items, host dependent item will be overwritten
- * by template dependent items.
- * Return false if intersection of host dependent items and template dependent items create dependent items
- * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
- *
- * @param array $items
- * @param array $hostids
- *
- * @return bool
- */
-function validateDependentItemsIntersection($db_items, $hostids) {
-	$hosts_items = [];
-	$tmpl_items = [];
-
-	foreach ($db_items as $db_item) {
-		$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT)
-			? $db_items[$db_item['master_itemid']]['key_']
-			: '';
-
-		if (in_array($db_item['hostid'], $hostids)) {
-			$hosts_items[$db_item['hostid']][$db_item['key_']] = $master_key;
-		}
-		elseif (!array_key_exists($db_item['key_'], $tmpl_items) || !$tmpl_items[$db_item['key_']]) {
-			$tmpl_items[$db_item['key_']] = $master_key;
-		}
-	}
-
-	foreach ($hosts_items as $hostid => $items) {
-		$linked_items = $items;
-
-		// Merge host items dependency tree with template items dependency tree
-		foreach ($tmpl_items as $tmpl_item_key => $tmpl_master_key) {
-			if (array_key_exists($tmpl_item_key, $linked_items)) {
-				$linked_items[$tmpl_item_key] = ($linked_items[$tmpl_item_key])
-					? $linked_items[$tmpl_item_key]
-					: $tmpl_master_key;
-			}
-			else {
-				$linked_items[$tmpl_item_key] = $tmpl_master_key;
-			}
-		}
-
-		// Check dependency level for every dependent item.
-		foreach ($linked_items as $linked_item => $linked_master_key) {
-			$master_key = $linked_master_key;
-			$dependency_level = 0;
-
-			while ($master_key) {
-				$master_key = $linked_items[$master_key];
-				++$dependency_level;
-			}
-
-			if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-
-/**
  * Copies the given items to the given hosts or templates.
  *
  * @param array $src_itemids		Items which will be copied to $dst_hostids
