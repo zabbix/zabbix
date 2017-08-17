@@ -610,8 +610,8 @@ if (!empty($data['new_operation'])) {
 				$data['new_operation']['opmessage'] = ['default_msg' => 1, 'mediatypeid' => 0];
 
 				if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-					$data['new_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
-					$data['new_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+					$data['new_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_PROBLEM;
+					$data['new_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_PROBLEM;
 				}
 				elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
 					$data['new_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_DISCOVERY;
@@ -1306,8 +1306,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					$data['new_recovery_operation']['opmessage'] = ['default_msg' => 1, 'mediatypeid' => 0];
 
 					if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
-						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_RECOVERY;
+						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_RECOVERY;
 					}
 					else {
 						$data['new_recovery_operation']['opmessage']['subject'] = '';
@@ -1667,8 +1667,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					$data['new_recovery_operation']['opmessage'] = ['default_msg' => 1];
 
 					if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
-						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_RECOVERY;
+						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_RECOVERY;
 					}
 					else {
 						$data['new_recovery_operation']['opmessage']['subject'] = '';
