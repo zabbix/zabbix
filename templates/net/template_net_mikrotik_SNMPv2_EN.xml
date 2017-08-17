@@ -11,19 +11,16 @@
       <template>
          <template>Template Net Mikrotik SNMPv2</template>
          <name>Template Net Mikrotik SNMPv2</name>
-         <description>Template Net Mikrotik version: 0.11
+         <description>Template Net Mikrotik version: 0.12
 MIBs used:
 HOST-RESOURCES-MIB
 MIKROTIK-MIB
-
 Known Issues:
 description : Doesn't have ifHighSpeed filled. fixed in more recent versions
 version : RotuerOS 6.28 or lower
-device : 
-description : Doesn't have any temperature sensors
+device : description : Doesn't have any temperature sensors
 version : RotuerOS 6.38.5
-device : Mikrotik 941-2nD, Mikrotik 951G-2HnD
-</description>
+device : Mikrotik 941-2nD, Mikrotik 951G-2HnD</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -76,8 +73,7 @@ device : Mikrotik 941-2nD, Mikrotik 951G-2HnD
                <privatekey/>
                <port/>
                <description>MIB: HOST-RESOURCES-MIB
-The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-</description>
+The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -132,8 +128,7 @@ operation makes sense and is possible on the
 underlying system. For example, the amount of main
 memory allocated to a buffer pool might be modified or
 the amount of disk space allocated to virtual memory
-might be modified.
-</description>
+might be modified.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -179,8 +174,7 @@ might be modified.
                <publickey/>
                <privatekey/>
                <port/>
-               <description>Memory utilization in %
-</description>
+               <description>Memory utilization in %</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -223,8 +217,7 @@ might be modified.
                <port/>
                <description>MIB: MIKROTIK-MIB
 (mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)
-Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
-</description>
+Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -271,8 +264,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
                <privatekey/>
                <port/>
                <description>MIB: MIKROTIK-MIB
-Software version
-</description>
+Software version</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -355,8 +347,7 @@ Software version
                <privatekey/>
                <port/>
                <description>MIB: MIKROTIK-MIB
-RouterBOARD serial number
-</description>
+RouterBOARD serial number</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -398,8 +389,7 @@ RouterBOARD serial number
                <privatekey/>
                <port/>
                <description>MIB: MIKROTIK-MIB
-Current firmware version
-</description>
+Current firmware version</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -475,8 +465,7 @@ Current firmware version
                      <privatekey/>
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB
-The average, over the last minute, of the percentage of time that this processor was not idle.Implementations may approximate this one minute smoothing period if necessary.
-</description>
+The average, over the last minute, of the percentage of time that this processor was not idle.Implementations may approximate this one minute smoothing period if necessary.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -502,8 +491,7 @@ The average, over the last minute, of the percentage of time that this processor
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -609,8 +597,7 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                      <privatekey/>
                      <port/>
                      <description>MIB: MIKROTIK-MIB
-(mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)
-</description>
+(mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -681,8 +668,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -767,8 +753,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <privatekey/>
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB
-The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-</description>
+The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -824,8 +809,7 @@ operation makes sense and is possible on the
 underlying system. For example, the amount of main
 memory allocated to a buffer pool might be modified or
 the amount of disk space allocated to virtual memory
-might be modified.
-</description>
+might be modified.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -872,8 +856,7 @@ might be modified.
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>Storage utilization in % for Disk-{#SNMPINDEX}
-</description>
+                     <description>Storage utilization in % for Disk-{#SNMPINDEX}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -899,8 +882,7 @@ might be modified.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -916,8 +898,7 @@ might be modified.
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
@@ -1030,8 +1011,7 @@ might be modified.
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -1087,8 +1067,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
