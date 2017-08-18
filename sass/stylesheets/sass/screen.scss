@@ -3229,8 +3229,6 @@ $form-icon-btn: (
 		position: fixed;
 		top: 50%;
 		left: 50%;
-		max-height: 95vh;
-		max-width: 90vw;
 		overflow: hidden;
 		@include transform(translate(-50%, -50%));
 
