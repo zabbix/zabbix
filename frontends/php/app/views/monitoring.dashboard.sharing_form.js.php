@@ -24,7 +24,7 @@
 							errors = response.errors;
 						}
 					}
-					else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+					else if (typeof response === 'string' && response.indexOf('<?= _('Access denied') ?>') !== -1) {
 						errors.push('<?= _('You need permission to perform this action!') ?>');
 					}
 					saveErrors(errors);

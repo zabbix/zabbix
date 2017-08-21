@@ -732,7 +732,7 @@ SVGMapElement.prototype.updateLabel = function() {
 		y = this.center.y,
 		anchor = {
 			horizontal: 'left',
-			vertical: 'bottom'
+			vertical: 'top'
 		};
 
 	switch (this.options.label_location) {
@@ -755,7 +755,7 @@ SVGMapElement.prototype.updateLabel = function() {
 		case SVGMapElement.LABEL_POSITION_TOP:
 			y = this.y - this.map.canvas.textPadding;
 			anchor.horizontal = 'center';
-			anchor.vertical = 'top';
+			anchor.vertical = 'bottom';
 			break;
 	}
 

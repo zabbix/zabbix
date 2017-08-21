@@ -554,9 +554,9 @@ abstract class CItemGeneral extends CApiService {
 
 		$templateids = array_keys(array_flip($templateids));
 		$templates = API::Template()->get([
-			'output'		=> ['templateid'],
-			'templateids'	=> $templateids,
-			'selectHosts'	=> ['hostid']
+			'output' => ['templateid'],
+			'templateids' => $templateids,
+			'selectHosts' => ['hostid']
 		]);
 
 		foreach ($templates as $template) {
@@ -569,9 +569,9 @@ abstract class CItemGeneral extends CApiService {
 			$all_hostids = array_merge($hostids, [$template['templateid']]);
 
 			$host_items = $this->get([
-				'output'	=> ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
-				'filter'	=> ['hostid' => $all_hostids],
-				'preservekeys'	=> true
+				'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
+				'filter' => ['hostid' => $all_hostids],
+				'preservekeys' => true
 			]);
 
 			foreach ($items as $item) {
@@ -587,11 +587,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			if (validateDependentItemsIntersection($host_items, $hostids) === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _('maximum number of dependency levels reached')
-				));
-			}
+			$this->validateDependentItemsIntersection($host_items, $hostids);
 		}
 	}
 
@@ -1281,9 +1277,9 @@ abstract class CItemGeneral extends CApiService {
 
 		if ($items_cache) {
 			$db_items = $data_provider->get([
-				'output' 		=> ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
-				'itemids' 		=> array_keys($items_cache),
-				'preservekeys'	=> true
+				'output' => ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
+				'itemids' => array_keys($items_cache),
+				'preservekeys' => true
 			]);
 
 			foreach ($db_items as $db_itemid => $db_item) {
@@ -1343,13 +1339,13 @@ abstract class CItemGeneral extends CApiService {
 
 					if (array_key_exists('itemid', $master_item) && $master_itemid == $master_item['itemid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('dependent item recursion')
+							'master_itemid', _('circular item dependency is not allowed')
 						));
 					}
 
 					if ($item_masters && array_key_exists($master_itemid, $item_masters)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('dependent item recursion')
+							'master_itemid', _('circular item dependency is not allowed')
 						));
 					}
 
@@ -1435,9 +1431,9 @@ abstract class CItemGeneral extends CApiService {
 					$find_itemids += $items_added[$root_itemid][$dependency_level];
 				}
 				$find_itemids = $data_provider->get([
-					'output'		=> ['itemid'],
-					'filter' 		=> ['master_itemid' => array_keys($find_itemids)],
-					'preservekeys'	=> true
+					'output' => ['itemid'],
+					'filter' => ['master_itemid' => array_keys($find_itemids)],
+					'preservekeys' => true
 				]);
 
 				$find_itemids = array_diff_key($find_itemids, $counted_masters);
@@ -1504,13 +1500,75 @@ abstract class CItemGeneral extends CApiService {
 					}
 					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
 					$data[] = [
-						'values'	=> ['master_itemid' => $inherited_master_item['itemid']],
-						'where'		=> ['itemid' => $item['itemid']]
+						'values' => ['master_itemid' => $inherited_master_item['itemid']],
+						'where' => ['itemid' => $item['itemid']]
 					];
 				}
 			}
 			if ($data) {
 				DB::update('items', $data);
+			}
+		}
+	}
+
+	/**
+	 * Validate merge of template dependent items and every host dependent items, host dependent item will be overwritten
+	 * by template dependent items.
+	 * Return false if intersection of host dependent items and template dependent items create dependent items
+	 * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
+	 *
+	 * @param array $items
+	 * @param array $hostids
+	 *
+	 * @throws APIException if intersection of template items and host items creates dependent items tree with
+	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS or master item recursion.
+	 */
+	protected function validateDependentItemsIntersection($db_items, $hostids, $errorService = null) {
+		$hosts_items = [];
+		$tmpl_items = [];
+
+		foreach ($db_items as $db_item) {
+			$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT)
+				? $db_items[$db_item['master_itemid']]['key_']
+				: '';
+
+			if (in_array($db_item['hostid'], $hostids)) {
+				$hosts_items[$db_item['hostid']][$db_item['key_']] = $master_key;
+			}
+			elseif (!array_key_exists($db_item['key_'], $tmpl_items) || !$tmpl_items[$db_item['key_']]) {
+				$tmpl_items[$db_item['key_']] = $master_key;
+			}
+		}
+
+		foreach ($hosts_items as $hostid => $items) {
+			$linked_items = $items;
+
+			// Merge host items dependency tree with template items dependency tree.
+			$linked_items = array_merge($linked_items, $tmpl_items);
+
+			// Check dependency level for every dependent item.
+			foreach ($linked_items as $linked_item => $linked_master_key) {
+				$master_key = $linked_master_key;
+				$dependency_level = 0;
+				$traversing_path = [];
+
+				while ($master_key && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+					$traversing_path[] = $master_key;
+					$master_key = $linked_items[$master_key];
+					++$dependency_level;
+
+					if (in_array($master_key, $traversing_path)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('circular item dependency is not allowed')
+						));
+					}
+				}
+
+				if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _('maximum number of dependency levels reached')
+					));
+				}
 			}
 		}
 	}

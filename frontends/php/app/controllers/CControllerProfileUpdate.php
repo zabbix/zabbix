@@ -65,7 +65,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.sysmapconf.filter.state':
 				case 'web.user.filter.state':
 				case 'web.usergroup.filter.state':
-				case 'web.dashboard.filter.state':
+				case 'web.dashbrd.filter.state':
 					$ret = true;
 					break;
 

@@ -116,11 +116,11 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Set graph item safe default values.
 		$graph_item += [
-			'color'			=> 'Dark Green',
-			'drawtype'		=> GRAPH_ITEM_DRAWTYPE_LINE,
-			'axisside'		=> GRAPH_YAXIS_SIDE_DEFAULT,
-			'calc_fnc'		=> CALC_FNC_AVG,
-			'calc_type'		=> GRAPH_ITEM_SIMPLE
+			'color' => 'Dark Green',
+			'drawtype' => GRAPH_ITEM_DRAWTYPE_LINE,
+			'axisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+			'calc_fnc' => CALC_FNC_AVG,
+			'calc_type' => GRAPH_ITEM_SIMPLE
 		];
 		$this->items[$this->num] = $graph_item;
 
@@ -2679,6 +2679,29 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 		unset($graph_item);
+	}
+
+	/**
+	 * Calculate graph dimensions and draw 1x1 pixel image placeholder.
+	 */
+	public function drawDimensions() {
+		set_image_header();
+
+		$this->selectTriggers();
+		$this->calcDimentions();
+
+		$this->initColors();
+
+		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
+				&& @imagecreatetruecolor(1, 1)
+		) {
+			$this->im = imagecreatetruecolor(1, 1);
+		}
+		else {
+			$this->im = imagecreate(1, 1);
+		}
+
+		imageOut($this->im);
 	}
 
 	public function draw() {

@@ -192,6 +192,10 @@ typedef enum
 }
 zbx_item_authtype_t;
 
+/* event status */
+#define EVENT_STATUS_RESOLVED		0
+#define EVENT_STATUS_PROBLEM		1
+
 /* event sources */
 #define EVENT_SOURCE_TRIGGERS		0
 #define EVENT_SOURCE_DISCOVERY		1

@@ -428,12 +428,8 @@ if ($data['action']['operations']) {
 
 		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
 
-		if (array_key_exists($operationid, $action_operation_hints)) {
-			$action_operation_hints[$operationid] = array_filter($action_operation_hints[$operationid]);
-
-			if ($action_operation_hints[$operationid]) {
-				$details->setHint($action_operation_hints[$operationid]);
-			}
+		if (array_key_exists($operationid, $action_operation_hints) && $action_operation_hints[$operationid]) {
+			$details->setHint($action_operation_hints[$operationid]);
 		}
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
@@ -614,8 +610,8 @@ if (!empty($data['new_operation'])) {
 				$data['new_operation']['opmessage'] = ['default_msg' => 1, 'mediatypeid' => 0];
 
 				if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-					$data['new_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
-					$data['new_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+					$data['new_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_PROBLEM;
+					$data['new_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_PROBLEM;
 				}
 				elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
 					$data['new_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_DISCOVERY;
@@ -1212,12 +1208,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
 
-			if (array_key_exists($operationid, $action_operation_hints)) {
-				$action_operation_hints[$operationid] = array_filter($action_operation_hints[$operationid]);
-
-				if ($action_operation_hints[$operationid]) {
-					$details->setHint($action_operation_hints[$operationid]);
-				}
+			if (array_key_exists($operationid, $action_operation_hints) && $action_operation_hints[$operationid]) {
+				$details->setHint($action_operation_hints[$operationid]);
 			}
 
 			$operationRow = [
@@ -1314,8 +1306,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					$data['new_recovery_operation']['opmessage'] = ['default_msg' => 1, 'mediatypeid' => 0];
 
 					if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
-						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_RECOVERY;
+						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_RECOVERY;
 					}
 					else {
 						$data['new_recovery_operation']['opmessage']['subject'] = '';
@@ -1675,8 +1667,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					$data['new_recovery_operation']['opmessage'] = ['default_msg' => 1];
 
 					if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
-						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_RECOVERY;
+						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_RECOVERY;
 					}
 					else {
 						$data['new_recovery_operation']['opmessage']['subject'] = '';
@@ -1765,8 +1757,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				'mediatypeid'	=> 0
 			];
 
+			$details = new CSpan($operation_descriptions[0][$operationid]);
+
+			if (array_key_exists($operationid, $operation_hints) && $operation_hints[$operationid]) {
+				$details->setHint($operation_hints[$operationid]);
+			}
+
 			$operations_table->addRow([
-				(new CSpan($operation_descriptions[0][$operationid]))->setHint($operation_hints[$operationid]),
+				$details,
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
