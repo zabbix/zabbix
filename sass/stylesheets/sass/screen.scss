@@ -4517,8 +4517,9 @@ tr.cursor-move {
 	text-transform: $font-transform;
 }
 
+.flickerfreescreen,
 .flickerfreescreen > a,
-.flickerfreescreen > div {
+.flickerfreescreen > div:not(.box_on) {
 	position: relative;
 }
 
