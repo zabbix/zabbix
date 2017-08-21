@@ -4517,6 +4517,11 @@ tr.cursor-move {
 	text-transform: $font-transform;
 }
 
+.flickerfreescreen > a,
+.flickerfreescreen > div {
+	position: relative;
+}
+
 // Analog Clock
 .clock {
 	padding: 0 10px;

@@ -122,9 +122,9 @@ if (hasRequest('outer')) {
 
 foreach ($items as $item) {
 	$graph->addItem($item + [
-		'color'		=> rgb2hex(get_next_color(1)),
-		'axisside'	=> GRAPH_YAXIS_SIDE_DEFAULT,
-		'calc_fnc'	=> (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
+		'color' => rgb2hex(get_next_color(1)),
+		'axisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+		'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
 	]);
 }
 

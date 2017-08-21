@@ -289,11 +289,11 @@ class CMenuPopupHelper {
 					->getUrl();
 
 		return [
-			'type'		=> 'dependent_items',
-			'itemid' 	=> $itemid,
-			'item_name'	=> $name,
-			'add_label'	=> _('Create dependent item'),
-			'add_url'	=> $url
+			'type' => 'dependent_items',
+			'itemid' => $itemid,
+			'item_name' => $name,
+			'add_label' => _('Create dependent item'),
+			'add_url' => $url
 		];
 	}
 
@@ -311,11 +311,11 @@ class CMenuPopupHelper {
 					->getUrl();
 
 		return [
-			'type'		=> 'dependent_items',
-			'itemid' 	=> $itemid,
-			'item_name'	=> $name,
-			'add_label'	=> _('Create dependent item'),
-			'add_url'	=> $url
+			'type' => 'dependent_items',
+			'itemid' => $itemid,
+			'item_name' => $name,
+			'add_label' => _('Create dependent item'),
+			'add_url' => $url
 		];
 	}
 }

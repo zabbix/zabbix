@@ -87,9 +87,9 @@ if ($httptestid = getRequest('httptestid', false)) {
 	);
 	while ($item = DBfetch($dbItems)) {
 		$graph_items[] = $item + [
-			'color' 	=> ($color === false) ? reset($colors) : $color,
-			'host'		=> $hosts[$item['hostid']]['host'],
-			'hostname'	=> $hosts[$item['hostid']]['name']
+			'color' => ($color === false) ? reset($colors) : $color,
+			'host' => $hosts[$item['hostid']]['host'],
+			'hostname' => $hosts[$item['hostid']]['name']
 		];
 		$color = next($colors);
 	}
@@ -119,8 +119,8 @@ elseif ($items = getRequest('items', [])) {
 		$host = reset($dbItems[$item['itemid']]['hosts']);
 		unset($dbItems[$item['itemid']]['hosts']);
 		$graph_items[] = $dbItems[$item['itemid']] + $item + [
-			'host'		=> $host['host'],
-			'hostname'	=> $host['name']
+			'host' => $host['host'],
+			'hostname' => $host['name']
 		];
 	}
 	$name = getRequest('name', '');
