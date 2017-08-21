@@ -1,6 +1,9 @@
-Changes for 3.4.0rc2
+Changes for 3.4.0
 
-New features:
+3.4.0rc2 was released as 3.4.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0rc2
 
 Bug fixes:
 A.F....... [ZBXNEXT-3883] fixed dependent trigger with dependent item deletion; dependent item recursion message; dependent item massupdate form master item being reset on error (gcalenko)
