@@ -103,7 +103,7 @@ class CClock extends CDiv {
 				');'.
 				// Hack for Safari to manually accept parent container height in pixels when clock widget is loaded.
 				'if (SF) {'.
-					'$("#'.$this->getId().'").height($("#'.$this->getId().'").parent().height())'.
+					'$("#'.$this->getId().'").height($("#'.$this->getId().'").parent().height());'.
 				'}'.
 			'});'
 			: '';
