@@ -687,6 +687,8 @@ class CTemplate extends CHostGeneral {
 	 * @param array $hostids    an array of host or template IDs
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
+	 *
+	 * @return void
 	 */
 	protected function checkHostPermissions(array $hostids) {
 		if ($hostids) {
