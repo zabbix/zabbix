@@ -10,6 +10,7 @@ Changes for 3.4.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
 ..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
 .......PS. [ZBX-12524] fixed DB upgrade patch for map shapes on DB2 (vjaceslavs)
 .......PS. [ZBXNEXT-3006] fixed multiple issues with dependent items (vjaceslavs)
