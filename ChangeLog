@@ -8,6 +8,7 @@ Bug fixes:
 Changes for 3.4.1rc1
 
 New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 ..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
