@@ -194,6 +194,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
