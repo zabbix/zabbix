@@ -514,7 +514,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
 				"i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,"
 				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.description,i.interfaceid,i.snmpv3_contextname,i.jmx_endpoint,id.parent_itemid,i.master_itemid"
+				"i.description,i.interfaceid,i.snmpv3_contextname,i.jmx_endpoint,i.master_itemid,"
+				"id.parent_itemid"
 			" from item_discovery id"
 				" join items i"
 					" on id.itemid=i.itemid"
@@ -527,7 +528,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(itemid, row[36]);
+		ZBX_STR2UINT64(itemid, row[37]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &itemid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -643,7 +644,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->jmx_endpoint = zbx_strdup(NULL, row[35]);
 		item->jmx_endpoint_orig = NULL;
 
-		ZBX_DBROW2UINT64(item->master_itemid, row[37]);
+		ZBX_DBROW2UINT64(item->master_itemid, row[36]);
 
 		item->lld_row = NULL;
 
