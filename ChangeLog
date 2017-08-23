@@ -192,6 +192,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
