@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-23 19:17+0300\n"
-"PO-Revision-Date: 2017-07-06 22:59+0300\n"
+"PO-Revision-Date: 2017-08-23 12:41+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1499374772.000000\n"
+"X-POOTLE-MTIME: 1503484915.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -42,7 +42,7 @@ msgstr "\"host:key\" pair is expected"
 #: include/classes/api/services/CDRule.php:520
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d characters exceeds maximum length of %2$d characters"
 
 #: include/func.inc.php:453
 #, c-format
@@ -62,8 +62,8 @@ msgstr[1] "%1$d of %2$d issues are shown"
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d of %3$d%2$s problem is shown"
+msgstr[1] "%1$d of %3$d%2$s problems are shown"
 
 #: chart4.php:91 chart5.php:86
 #, c-format
@@ -146,7 +146,7 @@ msgstr "(0 - infinitely)"
 
 #: include/views/configuration.action.edit.php:570
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - use action default)"
 
 #: include/views/configuration.host.edit.php:94
 #: include/views/configuration.hostgroups.list.php:26
@@ -261,8 +261,8 @@ msgstr "Access denied!"
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Account is blocked for %1$s second."
+msgstr[1] "Account is blocked for %1$s seconds."
 
 #: app/views/monitoring.widget.problems.view.php:63
 #: include/actions.inc.php:153 include/actions.inc.php:337
@@ -299,7 +299,7 @@ msgstr "Acknowledged PROBLEM events"
 
 #: include/views/configuration.action.edit.php:2162
 msgid "Acknowledgement operations"
-msgstr ""
+msgstr "Acknowledgement operations"
 
 #: tr_events.php:166
 msgid "Acknowledgements"
@@ -596,7 +596,7 @@ msgstr "Add"
 
 #: jsLoader.php:117
 msgid "Add a new widget"
-msgstr ""
+msgstr "Add a new widget"
 
 #: include/services.inc.php:75 include/services.inc.php:114
 msgid "Add child"
@@ -604,7 +604,7 @@ msgstr "Add child"
 
 #: jsLoader.php:259
 msgid "Add child element"
-msgstr ""
+msgstr "Add child element"
 
 #: include/actions.inc.php:652 include/actions.inc.php:1125
 msgid "Add host"
@@ -612,7 +612,7 @@ msgstr "Add host"
 
 #: jsLoader.php:260
 msgid "Add multiple maps"
-msgstr ""
+msgstr " Add multiple maps"
 
 #: include/views/configuration.item.massupdate.php:575
 msgid "Add new or existing applications"
@@ -630,7 +630,7 @@ msgstr "Add prototype"
 
 #: app/controllers/CControllerWidgetNavigationtreeItemEditDialog.php:109
 msgid "Add submaps"
-msgstr ""
+msgstr "Add submaps"
 
 #: app/controllers/CControllerFavouriteDelete.php:72 include/html.inc.php:157
 msgid "Add to favourites"
@@ -646,7 +646,7 @@ msgstr "Add to host groups"
 
 #: app/views/monitoring.dashboard.view.js.php:51 jsLoader.php:109
 msgid "Add widget"
-msgstr ""
+msgstr "Add widget"
 
 #: auditlogs.php:121
 msgid "Added"
@@ -743,7 +743,7 @@ msgstr "All"
 
 #: app/views/monitoring.dashboard.breadcrumbs.php:27
 msgid "All dashboards"
-msgstr ""
+msgstr "All dashboards"
 
 #: include/views/administration.usergroups.edit.php:99
 #: include/views/administration.users.edit.php:401
@@ -893,7 +893,7 @@ msgstr "Application with ID \"%1$s\" is not available on \"%2$s\"."
 #: include/classes/api/services/CHttpTest.php:705
 #, c-format
 msgid "Application with applicationid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Application with applicationid \"%1$s\" does not exist."
 
 #: include/forms.inc.php:805 include/html.inc.php:365
 #: include/views/configuration.application.edit.php:23
@@ -927,7 +927,7 @@ msgstr "Apply"
 
 #: include/views/configuration.hostgroups.edit.php:67
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Apply permissions to all subgroups"
 
 #: include/views/configuration.maintenance.list.php:43
 #: include/views/configuration.maintenance.list.php:74
@@ -954,7 +954,7 @@ msgstr "Are you sure you want to delete"
 
 #: jsLoader.php:116
 msgid "Are you sure, you want to leave this page?"
-msgstr ""
+msgstr "Are you sure, you want to leave this page?"
 
 #: include/views/js/monitoring.sysmaps.js.php:92
 msgid "Area size"
@@ -966,7 +966,7 @@ msgstr "Area type"
 
 #: include/items.inc.php:1672
 msgid "Arithmetic"
-msgstr ""
+msgstr "Arithmetic"
 
 #: include/views/configuration.item.edit.php:455
 #: include/views/configuration.item.edit.php:461
@@ -1026,11 +1026,11 @@ msgstr "At least one maintenance period must be created."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
-msgstr ""
+msgstr "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
 
 #: app/views/administration.mediatype.edit.php:188
 msgid "Attempt interval"
-msgstr ""
+msgstr "Attempt interval"
 
 #: app/views/administration.mediatype.edit.php:184 httpconf.php:45
 #: include/views/configuration.httpconf.edit.php:80
@@ -1050,7 +1050,7 @@ msgstr "Audit data storage period"
 #: include/profiles.inc.php:235
 #, c-format
 msgid "Audit data storage period \"%1$s\"."
-msgstr ""
+msgstr "Audit data storage period \"%1$s\"."
 
 #: auditlogs.php:27 include/views/administration.auditlogs.list.php:21
 msgid "Audit log"
@@ -1125,15 +1125,15 @@ msgstr "Auto-login"
 
 #: include/classes/api/services/CUser.php:605
 msgid "Auto-login and auto-logout options cannot be enabled together."
-msgstr ""
+msgstr "Auto-login and auto-logout options cannot be enabled together."
 
 #: include/views/administration.users.edit.php:177 profile.php:49 users.php:60
 msgid "Auto-logout"
-msgstr ""
+msgstr "Auto-logout"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period"
-msgstr ""
+msgstr "Auto-registration data storage period"
 
 #: adm.housekeeper.php:41
 msgid "Auto-registration event and alert data storage period"
@@ -1142,7 +1142,7 @@ msgstr "Auto-registration event and alert data storage period"
 #: include/profiles.inc.php:227
 #, c-format
 msgid "Auto-registration event and alert data storage period \"%1$s\"."
-msgstr ""
+msgstr "Auto-registration event and alert data storage period \"%1$s\"."
 
 #: include/hosts.inc.php:1061
 #: include/views/administration.general.other.edit.php:52
@@ -1208,7 +1208,7 @@ msgstr "Background"
 
 #: include/views/js/monitoring.sysmaps.js.php:485
 msgid "Background colour"
-msgstr ""
+msgstr "Background color"
 
 #: include/views/monitoring.sysmap.edit.php:120
 msgid "Background image"
@@ -1261,23 +1261,23 @@ msgstr "Bold line"
 
 #: include/items.inc.php:1687
 msgid "Boolean to decimal"
-msgstr ""
+msgstr "Boolean to decimal"
 
 #: include/views/js/monitoring.sysmaps.js.php:336
 msgid "Border"
-msgstr ""
+msgstr "Border"
 
 #: include/views/js/monitoring.sysmaps.js.php:514
 msgid "Border colour"
-msgstr ""
+msgstr "Border color"
 
 #: include/views/js/monitoring.sysmaps.js.php:494
 msgid "Border type"
-msgstr ""
+msgstr "Border type"
 
 #: include/views/js/monitoring.sysmaps.js.php:504
 msgid "Border width"
-msgstr ""
+msgstr "Border width"
 
 #: include/views/js/monitoring.sysmaps.js.php:18
 #: include/views/js/monitoring.sysmaps.js.php:120
@@ -1289,11 +1289,11 @@ msgstr "Bottom"
 
 #: jsLoader.php:168
 msgid "Bring forward"
-msgstr ""
+msgstr "Bring forward"
 
 #: jsLoader.php:167
 msgid "Bring to front"
-msgstr ""
+msgstr "Bring to front"
 
 #: include/locales.inc.php:54
 msgid "Bulgarian (bg_BG)"
@@ -1558,7 +1558,7 @@ msgstr "Cannot add slide show"
 
 #: app/controllers/CControllerWidgetNavigationtreeItemEditDialog.php:104
 msgid "Cannot add submaps. Max depth reached."
-msgstr ""
+msgstr "Cannot add submaps. Max depth reached."
 
 #: templates.php:180
 msgid "Cannot add template"
@@ -1643,7 +1643,7 @@ msgstr "Cannot connect to the database."
 
 #: include/views/js/configuration.httpconf.popup.js.php:375
 msgid "Cannot convert POST data from raw data format to form field data format."
-msgstr ""
+msgstr "Cannot convert POST data from raw data format to form field data format."
 
 #: graphs.php:367
 msgid "Cannot copy graph"
@@ -1717,7 +1717,7 @@ msgstr "Cannot create the configuration file."
 #: include/classes/api/services/CDashboard.php:386
 #, c-format
 msgid "Cannot create widget: %1$s."
-msgstr ""
+msgstr "Cannot create widget: %1$s."
 
 #: include/classes/api/services/CUser.php:841
 #, c-format
@@ -1741,8 +1741,8 @@ msgstr "Cannot delete correlation"
 #: app/controllers/CControllerDashboardDelete.php:66
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cannot delete dashboard"
+msgstr[1] "Cannot delete dashboards"
 
 #: include/classes/api/services/CTrigger.php:912
 #: include/classes/api/services/CTriggerPrototype.php:629
@@ -2343,7 +2343,7 @@ msgstr "Cannot save discovery rule without checks."
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:158
 #, c-format
 msgid "Cannot save widget \"%1$s\"."
-msgstr ""
+msgstr "Cannot save widget \"%1$s\"."
 
 #: include/classes/server/CZabbixServer.php:299
 #, c-format
@@ -2546,7 +2546,7 @@ msgstr "Cannot update a discovered host group."
 #: include/classes/api/services/CHttpTest.php:468
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
-msgstr ""
+msgstr "Cannot update a templated web scenario \"%1$s\": %2$s."
 
 #: actionconf.php:225
 msgid "Cannot update action"
@@ -2704,7 +2704,7 @@ msgstr "Cannot update slide show"
 #: include/classes/api/services/CHttpTest.php:754
 #, c-format
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
-msgstr ""
+msgstr "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 
 #: templates.php:185
 msgid "Cannot update template"
@@ -2803,7 +2803,7 @@ msgstr "Certificate"
 #: include/items.inc.php:1678 latest.php:415 latest.php:431
 msgctxt "noun"
 msgid "Change"
-msgstr ""
+msgstr "Change"
 
 #: include/classes/screens/CScreenBase.php:405
 #: include/classes/screens/CScreenBuilder.php:515
@@ -2812,7 +2812,7 @@ msgstr ""
 #: include/views/hostmacros.php:100 include/views/js/hostmacros.js.php:37
 msgctxt "verb"
 msgid "Change"
-msgstr ""
+msgstr "Change"
 
 #: app/views/administration.mediatype.edit.php:122
 #: include/views/administration.authentication.edit.php:93
@@ -2822,7 +2822,7 @@ msgstr "Change password"
 
 #: include/items.inc.php:1681
 msgid "Change per second"
-msgstr ""
+msgstr "Change per second"
 
 #: include/forms.inc.php:355 include/items.inc.php:130
 #: include/triggers.inc.php:1772 include/views/configuration.item.edit.php:323
@@ -3123,7 +3123,7 @@ msgstr "Comparing several triggers with \"and\" is not allowed."
 
 #: app/views/administration.mediatype.edit.php:169
 msgid "Concurrent sessions"
-msgstr ""
+msgstr "Concurrent sessions"
 
 #: popup_trexpr.php:25
 msgid "Condition"
@@ -3291,7 +3291,7 @@ msgstr "Configuration of scripts"
 
 #: services.php:27
 msgid "Configuration of services"
-msgstr ""
+msgstr "Configuration of services"
 
 #: slideconf.php:25
 msgid "Configuration of slide shows"
@@ -3566,12 +3566,12 @@ msgstr "Create correlation"
 
 #: app/views/monitoring.dashboard.list.php:26
 msgid "Create dashboard"
-msgstr ""
+msgstr "Create dashboard"
 
 #: include/classes/helpers/CMenuPopupHelper.php:295
 #: include/classes/helpers/CMenuPopupHelper.php:317
 msgid "Create dependent item"
-msgstr ""
+msgstr "Create dependent item"
 
 #: include/views/configuration.host.prototype.list.php:158
 #: include/views/configuration.item.prototype.list.php:152
@@ -3790,7 +3790,7 @@ msgstr "Current year"
 
 #: app/views/administration.mediatype.edit.php:177
 msgid "Custom"
-msgstr ""
+msgstr "Custom"
 
 #: include/views/configuration.action.edit.php:110
 #: include/views/configuration.correlation.edit.php:92
@@ -3899,44 +3899,44 @@ msgstr "Dashboard"
 #: include/classes/api/services/CDashboard.php:433
 #, c-format
 msgid "Dashboard \"%1$s\" already exists."
-msgstr ""
+msgstr "Dashboard \"%1$s\" already exists."
 
 #: include/classes/api/services/CDashboard.php:556
 #, c-format
 msgid "Dashboard \"%1$s\" cell X - %2$s Y - %3$s is already taken."
-msgstr ""
+msgstr "Dashboard \"%1$s\" cell X - %2$s Y - %3$s is already taken."
 
 #: include/classes/api/services/CDashboard.php:569
 #, c-format
 msgid "Dashboard \"%1$s\" widget in cell X - %2$s Y - %3$s is ouf of bounds."
-msgstr ""
+msgstr "Dashboard \"%1$s\" widget in cell X - %2$s Y - %3$s is ouf of bounds."
 
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:238
 msgid "Dashboard created"
-msgstr ""
+msgstr "Dashboard created"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Dashboard deleted"
+msgstr[1] "Dashboards deleted"
 
 #: app/views/monitoring.dashboard.view.js.php:69
 msgid "Dashboard properties"
-msgstr ""
+msgstr "Dashboard properties"
 
 #: jsLoader.php:209
 msgid "Dashboard sharing"
-msgstr ""
+msgstr "Dashboard sharing"
 
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:233
 msgid "Dashboard updated"
-msgstr ""
+msgstr "Dashboard updated"
 
 #: app/controllers/CControllerDashboardList.php:94
 #: app/views/monitoring.dashboard.list.php:35
 msgid "Dashboards"
-msgstr ""
+msgstr "Dashboards"
 
 #: include/graphs.inc.php:63 include/views/js/monitoring.sysmaps.js.php:686
 #: include/views/js/monitoring.sysmaps.js.php:766
@@ -3960,7 +3960,7 @@ msgstr "Data from %1$s. Generated in %2$s sec."
 
 #: include/views/js/configuration.httpconf.popup.js.php:355
 msgid "Data is not properly encoded."
-msgstr ""
+msgstr "Data is not properly encoded."
 
 #: include/classes/screens/CScreenDataOverview.php:38
 #: include/classes/widgets/CWidgetConfig.php:48 include/screens.inc.php:29
@@ -3973,7 +3973,7 @@ msgstr "Data overview"
 #: include/views/administration.general.housekeeper.edit.php:108
 #: include/views/administration.general.housekeeper.edit.php:124
 msgid "Data storage period"
-msgstr ""
+msgstr "Data storage period"
 
 #: include/classes/setup/CSetupWizard.php:218
 msgid "Database host"
@@ -4126,7 +4126,7 @@ msgstr "Default authentication"
 
 #: include/views/monitoring.slideconf.edit.php:108 slideconf.php:37
 msgid "Default delay"
-msgstr ""
+msgstr "Default delay"
 
 #: adm.other.php:36 include/views/administration.general.other.edit.php:48
 msgid "Default host inventory mode"
@@ -4239,7 +4239,7 @@ msgstr "Delete current correlation?"
 
 #: app/views/monitoring.dashboard.view.php:106
 msgid "Delete dashboard?"
-msgstr ""
+msgstr "Delete dashboard?"
 
 #: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:363
@@ -4331,7 +4331,7 @@ msgstr "Delete selected correlations?"
 
 #: app/views/monitoring.dashboard.list.php:78
 msgid "Delete selected dashboards?"
-msgstr ""
+msgstr "Delete selected dashboards?"
 
 #: include/views/configuration.discovery.list.php:89
 #: include/views/configuration.host.discovery.list.php:164
@@ -4425,7 +4425,7 @@ msgstr "Delete selected scripts?"
 
 #: jsLoader.php:166
 msgid "Delete selected shapes?"
-msgstr ""
+msgstr "Delete selected shapes?"
 
 #: include/views/monitoring.slideconf.list.php:89
 msgid "Delete selected slide shows?"
@@ -4573,7 +4573,7 @@ msgstr "Dependent"
 
 #: include/items.inc.php:103
 msgid "Dependent item"
-msgstr ""
+msgstr "Dependent item"
 
 #: include/triggers.inc.php:876
 #: include/views/configuration.services.edit.php:125
@@ -4706,7 +4706,7 @@ msgstr "Dimension (cols x rows)"
 
 #: include/classes/items/CHelpItems.php:313
 msgid "Directory size (in bytes), dir - absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - mode used to get directory size (\"apparent\" or \"disk\"), <max_depth> - maximal traversal depth for directories. Returns integer."
-msgstr ""
+msgstr "Directory size (in bytes), dir - absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - mode used to get directory size (\"apparent\" or \"disk\"), <max_depth> - maximal traversal depth for directories. Returns integer."
 
 #: app/views/administration.mediatype.list.php:146
 #: include/views/administration.auditlogs.list.php:45
@@ -4986,7 +4986,7 @@ msgstr "Display graph"
 
 #: include/views/monitoring.sysmap.edit.php:140
 msgid "Display problems"
-msgstr ""
+msgstr "Display problems"
 
 #: latest.php:810
 msgid "Display stacked graph"
@@ -5200,7 +5200,7 @@ msgstr "Edit"
 
 #: app/views/monitoring.dashboard.view.php:80
 msgid "Edit dashboard"
-msgstr ""
+msgstr "Edit dashboard"
 
 #: app/views/monitoring.map.view.php:43
 msgid "Edit map"
@@ -5216,7 +5216,7 @@ msgstr "Edit slide show"
 
 #: jsLoader.php:255
 msgid "Edit tree element"
-msgstr ""
+msgstr "Edit tree element"
 
 #: jsLoader.php:212
 msgid "Edit trigger"
@@ -5224,7 +5224,7 @@ msgstr "Edit trigger"
 
 #: jsLoader.php:108
 msgid "Edit widget"
-msgstr ""
+msgstr "Edit widget"
 
 #: include/views/hostmacros.php:46
 msgid "Effective value"
@@ -5241,7 +5241,7 @@ msgstr "Element name"
 #: include/views/js/monitoring.sysmaps.js.php:287
 #: include/views/js/monitoring.sysmaps.js.php:437
 msgid "Ellipse"
-msgstr ""
+msgstr "Ellipse"
 
 #: app/views/administration.mediatype.edit.php:47 include/media.inc.php:24
 msgid "Email"
@@ -5680,7 +5680,7 @@ msgstr "Exclude"
 #: include/classes/widgets/CSystemWidgetForm.php:39
 #: include/classes/widgets/CWebWidgetForm.php:39
 msgid "Exclude host groups"
-msgstr ""
+msgstr "Exclude host groups"
 
 #: jsLoader.php:121
 msgid "Execute"
@@ -5844,15 +5844,15 @@ msgstr "Failed"
 
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:239
 msgid "Failed to create dashboard"
-msgstr ""
+msgstr "Failed to create dashboard"
 
 #: include/views/js/configuration.httpconf.popup.js.php:289
 msgid "Failed to parse URL."
-msgstr ""
+msgstr "Failed to parse URL."
 
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:234
 msgid "Failed to update dashboard"
-msgstr ""
+msgstr "Failed to update dashboard"
 
 #: include/classes/api/services/CTemplate.php:505
 msgid "Failed to update template."
@@ -6078,16 +6078,16 @@ msgstr "Follow redirects"
 #: include/views/js/monitoring.sysmaps.js.php:299
 #: include/views/js/monitoring.sysmaps.js.php:451
 msgid "Font"
-msgstr ""
+msgstr "Font"
 
 #: include/views/js/monitoring.sysmaps.js.php:463
 msgid "Font colour"
-msgstr ""
+msgstr "Font color"
 
 #: include/views/js/monitoring.sysmaps.js.php:303
 #: include/views/js/monitoring.sysmaps.js.php:457
 msgid "Font size"
-msgstr ""
+msgstr "Font size"
 
 #: profile.php:116
 msgid "For guest, password must be empty"
@@ -6111,7 +6111,7 @@ msgstr "Forecast for next t seconds based on period T is NOT N"
 
 #: include/views/configuration.httpconf.popup.php:113
 msgid "Form data"
-msgstr ""
+msgstr "Form data"
 
 #: include/items.inc.php:1620 include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.prototype.edit.php:227
@@ -6186,7 +6186,7 @@ msgstr "Function \"%1$s\" cannot be used with selected item \"%2$s\""
 #: include/classes/screens/CScreenClock.php:87
 #, c-format
 msgid "GMT%1$s"
-msgstr ""
+msgstr "GMT%1$s"
 
 #: app/views/administration.mediatype.edit.php:115
 #: app/views/administration.mediatype.list.php:79
@@ -6232,7 +6232,7 @@ msgstr "Given expression is not a macro"
 #: include/classes/api/services/CIconMap.php:348
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
-msgstr ""
+msgstr "Global regular expression \"%1$s\" does not exist."
 
 #: include/views/configuration.action.edit.php:860
 #: include/views/configuration.action.edit.php:1573
@@ -6251,7 +6251,7 @@ msgstr "Global value"
 #: include/classes/html/CDashboardWidgetMap.php:227
 #, c-format
 msgid "Go back to %1$s"
-msgstr ""
+msgstr "Go back to %1$s"
 
 #: jsLoader.php:217
 msgid "Go to"
@@ -6391,7 +6391,7 @@ msgstr "Graph prototype updated"
 #: include/classes/api/services/CDashboard.php:779
 #, c-format
 msgid "Graph prototype with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Graph prototype with ID \"%1$s\" is not available."
 
 #: include/html.inc.php:479 include/views/configuration.graph.edit.php:28
 #: include/views/configuration.graph.list.php:24
@@ -6422,7 +6422,7 @@ msgstr "Graph updated"
 #: include/classes/api/services/CDashboard.php:762
 #, c-format
 msgid "Graph with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Graph with ID \"%1$s\" is not available."
 
 #: include/classes/api/services/CGraphGeneral.php:743
 #, c-format
@@ -6652,7 +6652,7 @@ msgstr "Help"
 
 #: include/items.inc.php:1689
 msgid "Hexadecimal to decimal"
-msgstr ""
+msgstr "Hexadecimal to decimal"
 
 #: include/views/monitoring.sysmap.constructor.php:48 jsLoader.php:154
 msgid "Hidden"
@@ -6669,7 +6669,7 @@ msgstr "Hide debug"
 #: include/classes/widgets/CHostsWidgetForm.php:79
 #: include/classes/widgets/CSystemWidgetForm.php:79
 msgid "Hide groups without problems"
-msgstr ""
+msgstr "Hide groups without problems"
 
 #: include/views/monitoring.history.php:155
 msgid "Hide selected"
@@ -6708,7 +6708,7 @@ msgstr "History data storage period"
 #: include/profiles.inc.php:241
 #, c-format
 msgid "History data storage period \"%1$s\"."
-msgstr ""
+msgstr "History data storage period \"%1$s\"."
 
 #: include/classes/screens/CScreenEvents.php:162 include/screens.inc.php:32
 msgid "History of events"
@@ -6895,7 +6895,7 @@ msgstr "Host group label type"
 #: include/classes/api/services/CUserGroup.php:426
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Host group with ID \"%1$s\" is not available."
 
 #: app/views/monitoring.problem.view.php:86
 #: include/classes/widgets/CDataOverviewWidgetForm.php:30
@@ -7065,7 +7065,7 @@ msgstr "Host updated"
 #: include/classes/api/services/CDashboard.php:711
 #, c-format
 msgid "Host with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Host with ID \"%1$s\" is not available."
 
 #: include/classes/api/services/CTemplate.php:1037
 #, c-format
@@ -7199,7 +7199,7 @@ msgstr "IP range"
 #: include/classes/api/services/CDRule.php:368
 #, c-format
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit"
-msgstr ""
+msgstr "IP range \"%1$s\" exceeds \"%2$s\" address limit"
 
 #: app/views/administration.script.edit.php:42
 #: app/views/administration.script.list.php:65 include/hosts.inc.php:471
@@ -7237,7 +7237,7 @@ msgstr "IPMI privilege level"
 
 #: include/classes/api/services/CScript.php:355
 msgid "IPMI scripts can be executed only by server."
-msgstr ""
+msgstr "IPMI scripts can be executed only by server."
 
 #: disc_prototypes.php:136 host_discovery.php:100
 #: include/views/configuration.host.discovery.edit.php:155
@@ -7321,7 +7321,7 @@ msgstr "Icon mapping"
 #: include/classes/api/services/CIconMap.php:389
 #, c-format
 msgid "Icon with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Icon with ID \"%1$s\" is not available."
 
 #: include/views/js/monitoring.sysmaps.js.php:202
 msgid "Icons"
@@ -7451,24 +7451,24 @@ msgstr "In progress"
 
 #: app/controllers/CControllerDashbrdWidgetConfig.php:112
 msgid "Inaccessible graph"
-msgstr ""
+msgstr "Inaccessible graph"
 
 #: app/controllers/CControllerDashbrdWidgetConfig.php:229
 msgid "Inaccessible group"
-msgstr ""
+msgstr "Inaccessible group"
 
 #: app/controllers/CControllerDashbrdWidgetConfig.php:230
 msgid "Inaccessible host"
-msgstr ""
+msgstr "Inaccessible host"
 
 #: app/controllers/CControllerDashbrdWidgetConfig.php:104
 msgid "Inaccessible item"
-msgstr ""
+msgstr "Inaccessible item"
 
 #: app/controllers/CControllerDashbrdWidgetConfig.php:108
 #: app/controllers/CControllerWidgetNavigationtreeItemEditDialog.php:84
 msgid "Inaccessible map"
-msgstr ""
+msgstr "Inaccessible map"
 
 #: app/controllers/CControllerDashboardView.php:364
 #: app/views/monitoring.acknowledge.edit.php:42 include/acknow.inc.php:43
@@ -7582,7 +7582,7 @@ msgstr "Incorrect acceptable SLA for service \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:3064
 msgid "Incorrect acknowledgement action operationid."
-msgstr ""
+msgstr "Incorrect acknowledgement action operationid."
 
 #: include/classes/validators/CActionCondValidator.php:136
 msgid "Incorrect action condition discovery check."
@@ -7674,7 +7674,7 @@ msgstr "Incorrect action operation port \"%s\"."
 
 #: include/classes/api/services/CAction.php:1904
 msgid "Incorrect action operation template. Template does not exist or you have no access to this template."
-msgstr ""
+msgstr "Incorrect action operation template. Template does not exist or you have no access to this template."
 
 #: include/classes/api/services/CAction.php:1652
 #, c-format
@@ -7833,7 +7833,7 @@ msgstr "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 
 #: app/controllers/CControllerWidgetClockView.php:72
 msgid "Incorrect data."
-msgstr ""
+msgstr "Incorrect data."
 
 #: include/classes/api/services/CHostPrototype.php:109
 #, c-format
@@ -8646,7 +8646,7 @@ msgstr "Internal JSON-RPC error."
 
 #: include/views/administration.general.housekeeper.edit.php:44
 msgid "Internal data storage period"
-msgstr ""
+msgstr "Internal data storage period"
 
 #: include/classes/api/services/CGraphGeneral.php:495
 #: include/classes/api/services/CGraphGeneral.php:629
@@ -8671,7 +8671,7 @@ msgstr "Internal event and alert data storage period"
 #: include/profiles.inc.php:217
 #, c-format
 msgid "Internal event and alert data storage period \"%1$s\"."
-msgstr ""
+msgstr "Internal event and alert data storage period \"%1$s\"."
 
 #: include/httptest.inc.php:275
 msgid "Internet Explorer"
@@ -8698,7 +8698,7 @@ msgstr "Invalid IP address \"%1$s\"."
 #: include/profiles.inc.php:109
 #, c-format
 msgid "Invalid IT services data storage period: %1$s."
-msgstr ""
+msgstr "Invalid IT services data storage period: %1$s."
 
 #: include/classes/core/CJsonRpc.php:184
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -8711,22 +8711,22 @@ msgstr "Invalid Request."
 #: include/classes/validators/CActionCondValidator.php:127
 #, c-format
 msgid "Invalid action condition: %1$s."
-msgstr ""
+msgstr "Invalid action condition: %1$s."
 
 #: include/profiles.inc.php:115
 #, c-format
 msgid "Invalid audit data storage period: %1$s."
-msgstr ""
+msgstr "Invalid audit data storage period: %1$s."
 
 #: include/profiles.inc.php:103
 #, c-format
 msgid "Invalid auto-registration data storage period: %1$s."
-msgstr ""
+msgstr "Invalid auto-registration data storage period: %1$s."
 
 #: include/profiles.inc.php:145
 #, c-format
 msgid "Invalid blinking on trigger status change: %1$s."
-msgstr ""
+msgstr "Invalid blinking on trigger status change: %1$s."
 
 #: maintenance.php:146 maintenance.php:160 services.php:188 services.php:202
 #, c-format
@@ -8736,12 +8736,12 @@ msgstr "Invalid date \"%s\"."
 #: include/profiles.inc.php:139
 #, c-format
 msgid "Invalid displaying of OK triggers: %1$s."
-msgstr ""
+msgstr "Invalid displaying of OK triggers: %1$s."
 
 #: include/profiles.inc.php:79
 #, c-format
 msgid "Invalid event expiry time: %1$s."
-msgstr ""
+msgstr "Invalid event expiry time: %1$s."
 
 #: include/classes/validators/CFunctionValidator.php:315
 msgid "Invalid fifth parameter."
@@ -8758,7 +8758,7 @@ msgstr "Invalid fourth parameter."
 #: include/profiles.inc.php:127
 #, c-format
 msgid "Invalid history data storage period: %1$s."
-msgstr ""
+msgstr "Invalid history data storage period: %1$s."
 
 #: include/classes/api/services/CUserMacro.php:734
 #, c-format
@@ -8768,7 +8768,7 @@ msgstr "Invalid hostid for macro \"%1$s\"."
 #: include/profiles.inc.php:91
 #, c-format
 msgid "Invalid internal data storage period: %1$s."
-msgstr ""
+msgstr "Invalid internal data storage period: %1$s."
 
 #: disc_prototypes.php:276 disc_prototypes.php:281 disc_prototypes.php:294
 #: host_discovery.php:196 host_discovery.php:201 host_discovery.php:214
@@ -8824,7 +8824,7 @@ msgstr "Invalid method parameters."
 #: include/profiles.inc.php:97
 #, c-format
 msgid "Invalid network discovery data storage period: %1$s."
-msgstr ""
+msgstr "Invalid network discovery data storage period: %1$s."
 
 #: include/classes/validators/CFunctionValidator.php:306
 msgid "Invalid number of parameters."
@@ -8882,7 +8882,7 @@ msgstr "Invalid number of parameters."
 #: include/classes/widgetfields/CWidgetFieldTextBox.php:41
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
-msgstr ""
+msgstr "Invalid parameter \"%1$s\": %2$s."
 
 #: include/classes/core/CJsonRpc.php:198
 msgid "Invalid params."
@@ -8891,7 +8891,7 @@ msgstr "Invalid params."
 #: include/profiles.inc.php:151
 #, c-format
 msgid "Invalid refresh of unsupported items: %1$s"
-msgstr ""
+msgstr "Invalid refresh of unsupported items: %1$s"
 
 #: include/classes/api/services/CHttpTest.php:804
 #: include/classes/api/services/CHttpTest.php:810
@@ -8936,22 +8936,22 @@ msgstr "Invalid third parameter."
 #: include/classes/api/services/CUser.php:1192
 #: include/classes/validators/CActionCondValidator.php:117
 msgid "Invalid time period."
-msgstr ""
+msgstr "Invalid time period."
 
 #: include/profiles.inc.php:133
 #, c-format
 msgid "Invalid trends data storage period: %1$s."
-msgstr ""
+msgstr "Invalid trends data storage period: %1$s."
 
 #: include/profiles.inc.php:85
 #, c-format
 msgid "Invalid trigger data storage period: %1$s."
-msgstr ""
+msgstr "Invalid trigger data storage period: %1$s."
 
 #: include/profiles.inc.php:121
 #, c-format
 msgid "Invalid user sessions data storage period: %1$s."
-msgstr ""
+msgstr "Invalid user sessions data storage period: %1$s."
 
 #: include/classes/mvc/CView.php:80
 #, c-format
@@ -9048,12 +9048,12 @@ msgstr "Item \"%1$s\" does not exist on template \"%2$s\"."
 #: include/classes/api/services/CItemGeneral.php:1305
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
-msgstr ""
+msgstr "Item \"%1$s\" does not exist or you have no access to this item"
 
 #: include/items.inc.php:493
 #, c-format
 msgid "Item \"%1$s\" have master item and cannot be copied."
-msgstr ""
+msgstr "Item \"%1$s\" have master item and cannot be copied."
 
 #: include/classes/import/CConfigurationImport.php:699
 #, c-format
@@ -9106,11 +9106,11 @@ msgstr "Item not selected"
 #: include/classes/api/services/CItemGeneral.php:1006
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
-msgstr ""
+msgstr "Item pre-processing is missing parameters: %1$s"
 
 #: include/classes/api/services/CDiscoveryRule.php:1027
 msgid "Item pre-processing is not allowed for discovery rules."
-msgstr ""
+msgstr "Item pre-processing is not allowed for discovery rules."
 
 #: include/forms.inc.php:1058
 #: include/views/monitoring.screen.constructor.edit.php:282
@@ -9144,7 +9144,7 @@ msgstr[1] "Item prototypes updated"
 #: include/classes/api/services/CDashboard.php:745
 #, c-format
 msgid "Item prototype with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Item prototype with ID \"%1$s\" is not available."
 
 #: include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:121
@@ -9183,7 +9183,7 @@ msgstr "Item will not be refreshed. Please enter a correct update interval."
 #: include/classes/api/services/CDashboard.php:728
 #, c-format
 msgid "Item with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Item with ID \"%1$s\" is not available."
 
 #: include/classes/api/services/CItemGeneral.php:629
 #, c-format
@@ -9261,7 +9261,7 @@ msgstr "JMX agent"
 #: include/views/configuration.item.massupdate.php:95
 #: include/views/configuration.item.prototype.edit.php:198
 msgid "JMX endpoint"
-msgstr ""
+msgstr "JMX endpoint"
 
 #: include/views/configuration.host.edit.php:171
 #: include/views/configuration.host.edit.php:258
@@ -9272,11 +9272,11 @@ msgstr "JMX interfaces"
 
 #: include/items.inc.php:1668
 msgid "JSON Path"
-msgstr ""
+msgstr "JSON Path"
 
 #: include/classes/validators/CNewValidator.php:98
 msgid "JSON string is expected"
-msgstr ""
+msgstr "JSON string is expected"
 
 #: include/classes/core/CJsonRpc.php:156
 #, c-format
@@ -9337,7 +9337,7 @@ msgstr "June"
 
 #: include/views/configuration.host.discovery.edit.php:250
 msgid "Keep lost resources period"
-msgstr ""
+msgstr "Keep lost resources period"
 
 #: disc_prototypes.php:45 host_discovery.php:50 include/forms.inc.php:470
 #: include/views/configuration.host.discovery.edit.php:63
@@ -9539,7 +9539,7 @@ msgstr "Left"
 
 #: include/items.inc.php:1661
 msgid "Left trim"
-msgstr ""
+msgstr "Left trim"
 
 #: popup_trexpr.php:392
 msgid "Length of last (most recent) T value in characters is < N"
@@ -9570,15 +9570,15 @@ msgstr "Line"
 
 #: include/views/js/monitoring.sysmaps.js.php:515
 msgid "Line colour"
-msgstr ""
+msgstr "Line colour"
 
 #: include/views/js/monitoring.sysmaps.js.php:495
 msgid "Line type"
-msgstr ""
+msgstr "Line type"
 
 #: include/views/js/monitoring.sysmaps.js.php:505
 msgid "Line width"
-msgstr ""
+msgstr "Line width"
 
 #: include/views/monitoring.sysmap.constructor.php:40
 msgid "Link"
@@ -9622,7 +9622,7 @@ msgstr "Link to templates"
 
 #: app/controllers/CControllerWidgetNavigationtreeItemEditDialog.php:89
 msgid "Linked map"
-msgstr ""
+msgstr "Linked map"
 
 #: include/views/configuration.host.edit.php:602
 #: include/views/configuration.host.edit.php:647
@@ -9771,7 +9771,7 @@ msgstr "Login"
 
 #: include/classes/api/services/CUser.php:1444
 msgid "Login failed."
-msgstr ""
+msgstr "Login failed."
 
 #: include/classes/api/services/CUser.php:1414
 #, c-format
@@ -9994,7 +9994,7 @@ msgstr "Map element"
 #: include/classes/api/services/CMapElement.php:168
 #, c-format
 msgid "Map element is missing parameters: %1$s"
-msgstr ""
+msgstr "Map element is missing parameters: %1$s"
 
 #: sysmap.php:100
 msgid "Map is updated! Return?"
@@ -10011,7 +10011,7 @@ msgstr "Map name cannot be empty."
 #: include/classes/widgets/CSysmapWidgetForm.php:40
 #: include/classes/widgets/CWidgetConfig.php:45
 msgid "Map navigation tree"
-msgstr ""
+msgstr "Map navigation tree"
 
 #: include/classes/api/services/CMap.php:624
 #: include/classes/api/services/CMap.php:1041
@@ -10020,7 +10020,7 @@ msgstr "Map owner cannot be empty."
 
 #: include/views/js/monitoring.sysmaps.js.php:272
 msgid "Map shape"
-msgstr ""
+msgstr "Map shape"
 
 #: sysmap.php:103
 msgid "Map update failed."
@@ -10029,7 +10029,7 @@ msgstr "Map update failed."
 #: include/classes/api/services/CDashboard.php:796
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Map with ID \"%1$s\" is not available."
 
 #: include/views/administration.general.valuemapping.edit.php:46
 msgid "Mapped to"
@@ -10087,13 +10087,13 @@ msgstr "Mass update elements"
 
 #: include/views/js/monitoring.sysmaps.js.php:421
 msgid "Mass update shapes"
-msgstr ""
+msgstr "Mass update shapes"
 
 #: disc_prototypes.php:48 include/views/configuration.item.edit.php:106
 #: include/views/configuration.item.massupdate.php:596
 #: include/views/configuration.item.prototype.edit.php:96 items.php:47
 msgid "Master item"
-msgstr ""
+msgstr "Master item"
 
 #: include/views/monitoring.screen.constructor.edit.php:189
 #: include/views/monitoring.screen.constructor.edit.php:288 screenedit.php:72
@@ -10208,7 +10208,7 @@ msgstr "Media type updated"
 #: include/classes/api/services/CUser.php:541
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Media type with ID \"%1$s\" is not available."
 
 #: app/views/administration.mediatype.edit.php:24
 #: app/views/administration.mediatype.list.php:27 include/menu.inc.php:290
@@ -10428,7 +10428,7 @@ msgstr "Monitoring"
 
 #: include/views/js/monitoring.sysmaps.js.php:48
 msgid "Monospace"
-msgstr ""
+msgstr "Monospace"
 
 #: app/views/report.services.php:61 include/forms.inc.php:1921 report4.php:162
 msgid "Month"
@@ -10600,11 +10600,11 @@ msgstr "Name for group prototype \"%1$s\" must contain macros."
 
 #: include/views/js/configuration.httpconf.popup.js.php:363
 msgid "Name of the form field should not exceed 255 characters."
-msgstr ""
+msgstr "Name of the form field should not exceed 255 characters."
 
 #: include/views/administration.general.housekeeper.edit.php:50
 msgid "Network discovery data storage period"
-msgstr ""
+msgstr "Network discovery data storage period"
 
 #: adm.housekeeper.php:38
 msgid "Network discovery event and alert data storage period"
@@ -10613,7 +10613,7 @@ msgstr "Network discovery event and alert data storage period"
 #: include/profiles.inc.php:222
 #, c-format
 msgid "Network discovery event and alert data storage period \"%1$s\"."
-msgstr ""
+msgstr "Network discovery event and alert data storage period \"%1$s\"."
 
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:399
@@ -10672,7 +10672,7 @@ msgstr "New condition"
 
 #: app/controllers/CControllerDashboardView.php:348
 msgid "New dashboard"
-msgstr ""
+msgstr "New dashboard"
 
 #: jsLoader.php:172
 msgid "New element"
@@ -10714,7 +10714,7 @@ msgstr "New service time"
 
 #: include/views/js/monitoring.sysmaps.js.php:151
 msgid "New triggers"
-msgstr ""
+msgstr "New triggers"
 
 #: include/classes/setup/CSetupWizard.php:115
 #: include/classes/setup/CSetupWizard.php:261
@@ -10917,7 +10917,7 @@ msgstr "No data received during period of time T, then N NOT 1, 0 - otherwise"
 
 #: app/controllers/CControllerWidgetClockView.php:76
 msgid "No data."
-msgstr ""
+msgstr "No data."
 
 #: include/classes/api/services/CHostInterface.php:810
 #, c-format
@@ -11260,7 +11260,7 @@ msgstr "No recipients for action operation message."
 
 #: jsLoader.php:238
 msgid "No refresh"
-msgstr ""
+msgstr "No refresh"
 
 #: include/classes/api/services/CScreenItem.php:539
 msgid "No screen ID provided for screen element."
@@ -11297,7 +11297,7 @@ msgstr "No triggers defined."
 
 #: include/classes/validators/CApiInputValidator.php:551
 msgid "Non-boolean flags are deprecated."
-msgstr ""
+msgstr "Non-boolean flags are deprecated."
 
 #: app/views/administration.mediatype.edit.php:71
 #: app/views/administration.mediatype.edit.php:80
@@ -11402,7 +11402,7 @@ msgstr "Notifications"
 
 #: include/actions.inc.php:821 include/actions.inc.php:1135
 msgid "Notify all who left acknowledgement and comments"
-msgstr ""
+msgstr "Notify all who left acknowledgement and comments"
 
 #: include/actions.inc.php:816
 msgid "Notify all who received any messages regarding the problem before"
@@ -11461,11 +11461,11 @@ msgstr "Number of out-of-window collisions. Returns integer"
 
 #: include/views/monitoring.sysmap.edit.php:143
 msgid "Number of problems"
-msgstr ""
+msgstr "Number of problems"
 
 #: include/views/monitoring.sysmap.edit.php:144
 msgid "Number of problems and expand most critical one"
-msgstr ""
+msgstr "Number of problems and expand most critical one"
 
 #: include/classes/items/CHelpItems.php:715
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -11588,7 +11588,7 @@ msgstr "Number or percentage of inodes. Returns integer for number; float for pe
 
 #: include/items.inc.php:1685
 msgid "Numeral systems"
-msgstr ""
+msgstr "Numeral systems"
 
 #: include/forms.inc.php:354 include/items.inc.php:128
 #: include/triggers.inc.php:1771 include/views/configuration.item.edit.php:322
@@ -11669,7 +11669,7 @@ msgstr "Oct"
 
 #: include/items.inc.php:1688
 msgid "Octal to decimal"
-msgstr ""
+msgstr "Octal to decimal"
 
 #: include/forms.inc.php:1902 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:137
@@ -11715,7 +11715,7 @@ msgstr "Once"
 
 #: app/views/administration.mediatype.edit.php:175
 msgid "One"
-msgstr ""
+msgstr "One"
 
 #: include/classes/api/services/CHostGroup.php:1115
 msgid "One of the objects is left without a host group."
@@ -11740,7 +11740,7 @@ msgstr "Only Super Admins can create media types."
 
 #: include/classes/api/services/CUserGroup.php:204
 msgid "Only Super Admins can create user groups."
-msgstr ""
+msgstr "Only Super Admins can create user groups."
 
 #: include/classes/api/services/CMediatype.php:885
 msgid "Only Super Admins can delete media types."
@@ -11758,7 +11758,7 @@ msgstr "Only Super Admins can edit media types."
 
 #: include/classes/api/services/CUserGroup.php:284
 msgid "Only Super Admins can update user groups."
-msgstr ""
+msgstr "Only Super Admins can update user groups."
 
 #: include/classes/api/services/CUser.php:962
 msgid "Only Zabbix Admins can add user media."
@@ -11778,7 +11778,7 @@ msgstr "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 
 #: include/classes/api/services/CDashboard.php:460
 msgid "Only administrators can set dashboard owner."
-msgstr ""
+msgstr "Only administrators can set dashboard owner."
 
 #: include/classes/api/services/CMap.php:628
 #: include/classes/api/services/CMap.php:1045
@@ -11800,7 +11800,7 @@ msgstr "Only items assigned to enabled hosts are counted"
 
 #: include/classes/api/services/CItemGeneral.php:1121
 msgid "Only one change step is allowed."
-msgstr ""
+msgstr "Only one change step is allowed."
 
 #: include/classes/api/services/CDRule.php:583
 msgid "Only one check can be unique."
@@ -11915,7 +11915,7 @@ msgstr "Operator"
 
 #: app/views/administration.mediatype.edit.php:192
 msgid "Options"
-msgstr ""
+msgstr "Options"
 
 #: include/triggers.inc.php:1239
 #: include/views/configuration.action.edit.php:109
@@ -12280,7 +12280,7 @@ msgstr "Parameter"
 #: include/classes/validators/CApiInputValidator.php:606
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
-msgstr ""
+msgstr "Parameter \"%1$s\" is deprecated."
 
 #: include/classes/debug/CProfiler.php:156
 #: include/views/configuration.item.edit.php:550
@@ -12318,7 +12318,7 @@ msgstr "Parent web scenarios"
 
 #: include/views/configuration.httpconf.popup.php:95
 msgid "Parse"
-msgstr ""
+msgstr "Parse"
 
 #: include/classes/api/services/CImage.php:199
 #, c-format
@@ -12385,11 +12385,11 @@ msgstr "Password should not be empty"
 
 #: jsLoader.php:174
 msgid "Paste"
-msgstr ""
+msgstr "Paste"
 
 #: jsLoader.php:175
 msgid "Paste without external links"
-msgstr ""
+msgstr "Paste without external links"
 
 #: actionconf.php:93 include/views/configuration.action.edit.php:390
 msgid "Pause operations while in maintenance"
@@ -12520,11 +12520,11 @@ msgstr "Please select two elements"
 
 #: app/controllers/CControllerWidgetNavigationtreeItemEdit.php:41
 msgid "Please specify element name."
-msgstr ""
+msgstr "Please specify element name."
 
 #: include/views/js/monitoring.sysmaps.js.php:357
 msgid "Points"
-msgstr ""
+msgstr "Points"
 
 #: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
@@ -12576,11 +12576,11 @@ msgstr "Position"
 
 #: include/views/configuration.httpconf.popup.php:109
 msgid "Post fields"
-msgstr ""
+msgstr "Post fields"
 
 #: include/views/configuration.httpconf.popup.php:111
 msgid "Post type"
-msgstr ""
+msgstr "Post type"
 
 #: include/classes/setup/CSetupWizard.php:49
 #: include/classes/setup/CSetupWizard.php:322
@@ -12590,13 +12590,13 @@ msgstr "Pre-installation summary"
 #: include/views/configuration.item.edit.php:669
 #: include/views/configuration.item.prototype.edit.php:509
 msgid "Preprocessing"
-msgstr ""
+msgstr "Preprocessing"
 
 #: include/views/configuration.item.edit.php:664
 #: include/views/configuration.item.massupdate.php:356
 #: include/views/configuration.item.prototype.edit.php:504
 msgid "Preprocessing steps"
-msgstr ""
+msgstr "Preprocessing steps"
 
 #: include/views/administration.general.iconmap.edit.php:71
 #: include/views/administration.general.iconmap.edit.php:113
@@ -12851,7 +12851,7 @@ msgstr "Public key file"
 
 #: include/views/configuration.httpconf.popup.php:104
 msgid "Query fields"
-msgstr ""
+msgstr "Query fields"
 
 #: include/menu.inc.php:300 queue.php:25
 msgid "Queue"
@@ -12875,11 +12875,11 @@ msgstr "RMCP+"
 
 #: include/views/configuration.httpconf.popup.php:114
 msgid "Raw data"
-msgstr ""
+msgstr "Raw data"
 
 #: include/views/configuration.httpconf.popup.php:119
 msgid "Raw post"
-msgstr ""
+msgstr "Raw post"
 
 #: app/views/administration.script.edit.php:89
 #: app/views/administration.script.list.php:96 include/users.inc.php:366
@@ -12987,11 +12987,11 @@ msgstr "Recovery time"
 #: include/views/js/monitoring.sysmaps.js.php:286
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "Rectangle"
-msgstr ""
+msgstr "Rectangle"
 
 #: include/views/administration.users.edit.php:185 profile.php:52 users.php:63
 msgid "Refresh"
-msgstr ""
+msgstr "Refresh"
 
 #: include/html.inc.php:192 jsLoader.php:228
 msgid "Refresh time"
@@ -13003,12 +13003,12 @@ msgstr "Refresh time multiplier"
 
 #: adm.other.php:30 include/views/administration.general.other.edit.php:43
 msgid "Refresh unsupported items"
-msgstr ""
+msgstr "Refresh unsupported items"
 
 #: include/profiles.inc.php:274
 #, c-format
 msgid "Refresh unsupported items \"%1$s\"."
-msgstr ""
+msgstr "Refresh unsupported items \"%1$s\"."
 
 #: include/audit.inc.php:46 include/items.inc.php:1658
 #: include/views/configuration.host.discovery.edit.php:294
@@ -13357,7 +13357,7 @@ msgstr "Retry"
 
 #: include/classes/items/CHelpItems.php:1019
 msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
-msgstr ""
+msgstr "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
 
 #: include/classes/items/CHelpItems.php:1005
 msgid "Return first column of the first row of the SQL query result."
@@ -13365,7 +13365,7 @@ msgstr "Return first column of the first row of the SQL query result."
 
 #: include/classes/items/CHelpItems.php:1015
 msgid "Return value of an attribute of MBean object."
-msgstr ""
+msgstr "Return value of an attribute of MBean object."
 
 #: include/classes/items/CHelpItems.php:651
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -13373,7 +13373,7 @@ msgstr "Returns ICMP ping response time in seconds. Example: 0.02"
 
 #: include/classes/items/CHelpItems.php:923
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr ""
+msgstr "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
 
 #: include/classes/items/CHelpItems.php:927
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -13402,7 +13402,7 @@ msgstr "Right"
 
 #: include/items.inc.php:1660
 msgid "Right trim"
-msgstr ""
+msgstr "Right trim"
 
 #: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
@@ -13452,7 +13452,7 @@ msgstr "Run commands"
 #: include/actions.inc.php:929
 #, c-format
 msgid "Run custom commands on %1$s"
-msgstr ""
+msgstr "Run custom commands on %1$s"
 
 #: include/actions.inc.php:939
 msgid "Run global script"
@@ -13590,7 +13590,7 @@ msgstr "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 
 #: include/db.inc.php:188 include/func.inc.php:1871
 msgid "SQL error. Please contact Zabbix administrator."
-msgstr ""
+msgstr "SQL error. Please contact Zabbix administrator."
 
 #: include/items.inc.php:1618
 #: include/views/configuration.host.discovery.edit.php:191
@@ -13658,7 +13658,7 @@ msgstr "Safari"
 
 #: include/views/js/monitoring.sysmaps.js.php:37
 msgid "Sans-Serif"
-msgstr ""
+msgstr "Sans-Serif"
 
 #: include/func.inc.php:218
 msgid "Sat"
@@ -13671,7 +13671,7 @@ msgstr "Saturday"
 
 #: app/views/monitoring.dashboard.view.js.php:53
 msgid "Save changes"
-msgstr ""
+msgstr "Save changes"
 
 #: include/classes/setup/CSetupWizard.php:370
 #, c-format
@@ -13976,7 +13976,7 @@ msgstr "Select prototype"
 
 #: include/classes/widgetfields/CWidgetFieldWidgetListComboBox.php:55
 msgid "Select widget"
-msgstr ""
+msgstr "Select widget"
 
 #: app/views/administration.script.edit.php:75
 #: include/views/monitoring.history.php:169
@@ -14001,7 +14001,7 @@ msgstr "Selected elements"
 
 #: jsLoader.php:169
 msgid "Send backward"
-msgstr ""
+msgstr "Send backward"
 
 #: include/actions.inc.php:1123
 msgid "Send message"
@@ -14043,7 +14043,7 @@ msgstr "Send to Users"
 
 #: jsLoader.php:170
 msgid "Send to back"
-msgstr ""
+msgstr "Send to back"
 
 #: app/views/monitoring.widget.actionlog.view.php:40
 #: include/actions.inc.php:1399 include/actions.inc.php:1551
@@ -14077,7 +14077,7 @@ msgstr "Serial number B"
 
 #: include/views/js/monitoring.sysmaps.js.php:31
 msgid "Serif"
-msgstr ""
+msgstr "Serif"
 
 #: app/controllers/CControllerWidgetClockView.php:85
 #: app/views/administration.script.list.php:75
@@ -14087,7 +14087,7 @@ msgstr "Server"
 
 #: app/views/administration.script.list.php:78 popup.php:1820
 msgid "Server (proxy)"
-msgstr ""
+msgstr "Server (proxy)"
 
 #: include/classes/widgets/CClockWidgetForm.php:33
 #: include/views/monitoring.screen.constructor.edit.php:613
@@ -14125,7 +14125,7 @@ msgstr "Service \"%1$s\" is already hardlinked to a different service."
 #: app/controllers/CControllerReportServices.php:146
 #: app/views/report.services.php:21
 msgid "Service availability report"
-msgstr ""
+msgstr "Service availability report"
 
 #: include/classes/api/services/CService.php:953
 msgid "Service cannot be parent and child at the same time."
@@ -14137,12 +14137,12 @@ msgstr "Service created"
 
 #: adm.housekeeper.php:45
 msgid "Service data storage period"
-msgstr ""
+msgstr "Service data storage period"
 
 #: include/profiles.inc.php:232
 #, c-format
 msgid "Service data storage period \"%1$s\"."
-msgstr ""
+msgstr "Service data storage period \"%1$s\"."
 
 #: services.php:117
 msgid "Service deleted"
@@ -14150,11 +14150,11 @@ msgstr "Service deleted"
 
 #: include/views/configuration.services.child.list.php:24
 msgid "Service dependencies"
-msgstr ""
+msgstr "Service dependencies"
 
 #: include/views/configuration.services.parent.list.php:24
 msgid "Service parent"
-msgstr ""
+msgstr "Service parent"
 
 #: include/actions.inc.php:53
 msgid "Service port"
@@ -14231,7 +14231,7 @@ msgstr "Severity (descending)"
 #: include/views/js/monitoring.sysmaps.js.php:434
 #: include/views/monitoring.sysmap.constructor.php:34
 msgid "Shape"
-msgstr ""
+msgstr "Shape"
 
 #: app/views/monitoring.dashboard.view.php:90
 #: include/views/monitoring.screen.edit.php:208
@@ -14266,7 +14266,7 @@ msgstr "Show"
 #: include/views/common.filter.trigger.php:59
 #, c-format
 msgid "Show all (%1$s)"
-msgstr ""
+msgstr "Show all (%1$s)"
 
 #: app/views/monitoring.problem.view.php:239
 #: include/views/common.filter.trigger.php:155 latest.php:371
@@ -14280,12 +14280,12 @@ msgstr "Show events max \"%1$s\"."
 
 #: adm.gui.php:46 include/views/administration.general.gui.edit.php:52
 msgid "Show events not older than"
-msgstr ""
+msgstr "Show events not older than"
 
 #: include/profiles.inc.php:256
 #, c-format
 msgid "Show events not older than \"%1$s\"."
-msgstr ""
+msgstr "Show events not older than \"%1$s\"."
 
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/CHostsWidgetForm.php:71
@@ -14320,7 +14320,7 @@ msgstr "Show selected"
 
 #: include/classes/widgets/CProblemsWidgetForm.php:139
 msgid "Show tags"
-msgstr ""
+msgstr "Show tags"
 
 #: include/classes/widgets/CPlainTextWidgetForm.php:49
 #: include/views/monitoring.screen.constructor.edit.php:372
@@ -14334,7 +14334,7 @@ msgstr "Show triggers"
 #: include/views/common.filter.trigger.php:62
 #, c-format
 msgid "Show unacknowledged (%1$s)"
-msgstr ""
+msgstr "Show unacknowledged (%1$s)"
 
 #: app/views/monitoring.problem.view.php:233
 #: include/classes/widgets/CProblemsWidgetForm.php:103
@@ -14343,7 +14343,7 @@ msgstr "Show unacknowledged only"
 
 #: include/classes/widgets/CNavigationWidgetForm.php:74
 msgid "Show unavailable maps"
-msgstr ""
+msgstr "Show unavailable maps"
 
 #: include/views/configuration.item.edit.php:468
 #: include/views/configuration.item.massupdate.php:478
@@ -14377,7 +14377,7 @@ msgstr "Simple"
 
 #: include/items.inc.php:1680
 msgid "Simple change"
-msgstr ""
+msgstr "Simple change"
 
 #: include/items.inc.php:87
 msgid "Simple check"
@@ -14434,7 +14434,7 @@ msgstr "Site state / province"
 
 #: include/views/js/monitoring.sysmaps.js.php:376
 msgid "Size"
-msgstr ""
+msgstr "Size"
 
 #: include/classes/server/CZabbixServer.php:320
 #, c-format
@@ -14551,7 +14551,7 @@ msgstr "Software architecture information. Returns string"
 
 #: app/views/monitoring.dashboard.sharing_form.js.php:33 jsLoader.php:231
 msgid "Something went wrong. Please try again later!"
-msgstr ""
+msgstr "Something went wrong. Please try again later!"
 
 #: include/classes/widgets/CActionLogWidgetForm.php:41
 #: include/classes/widgets/CProblemsWidgetForm.php:112
@@ -14579,7 +14579,7 @@ msgstr "Source"
 
 #: include/classes/widgets/CSysmapWidgetForm.php:42
 msgid "Source type"
-msgstr ""
+msgstr "Source type"
 
 #: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
@@ -14744,7 +14744,7 @@ msgstr "Straight"
 
 #: include/items.inc.php:1665
 msgid "Structured data"
-msgstr ""
+msgstr "Structured data"
 
 #: include/views/monitoring.screen.constructor.edit.php:648
 msgid "Style"
@@ -15449,7 +15449,7 @@ msgstr "Trend data storage period"
 #: include/profiles.inc.php:244
 #, c-format
 msgid "Trend data storage period \"%1$s\"."
-msgstr ""
+msgstr "Trend data storage period \"%1$s\"."
 
 #: disc_prototypes.php:162 include/views/configuration.item.edit.php:444
 #: include/views/configuration.item.massupdate.php:442
@@ -15511,7 +15511,7 @@ msgstr[1] "Triggers copied"
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period"
-msgstr ""
+msgstr "Trigger data storage period"
 
 #: triggers.php:376
 msgid "Trigger deleted"
@@ -15546,7 +15546,7 @@ msgstr "Trigger event and alert data storage period"
 #: include/profiles.inc.php:214
 #, c-format
 msgid "Trigger event and alert data storage period \"%1$s\"."
-msgstr ""
+msgstr "Trigger event and alert data storage period \"%1$s\"."
 
 #: include/views/configuration.triggers.expression.php:124
 msgid "Trigger expression condition"
@@ -15718,7 +15718,7 @@ msgstr "Triggers top 100"
 
 #: include/items.inc.php:1659
 msgid "Trim"
-msgstr ""
+msgstr "Trim"
 
 #: include/classes/pagefilter/CPageFilter.php:189
 #, c-format
@@ -15872,7 +15872,7 @@ msgstr "URL C"
 
 #: include/views/js/configuration.httpconf.popup.js.php:289
 msgid "URL is not properly encoded."
-msgstr ""
+msgstr "URL is not properly encoded."
 
 #: include/classes/api/services/CMap.php:915
 #: include/classes/api/services/CMap.php:1353
@@ -16027,7 +16027,7 @@ msgstr "Unknown value type"
 
 #: app/views/administration.mediatype.edit.php:176
 msgid "Unlimited"
-msgstr ""
+msgstr "Unlimited"
 
 #: include/views/configuration.host.edit.php:583
 #: include/views/configuration.host.prototype.edit.php:279
@@ -16358,7 +16358,7 @@ msgstr "User \"%1$s\" cannot be without user group."
 #: include/classes/api/services/CUser.php:914
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
-msgstr ""
+msgstr "User \"%1$s\" is dashboard \"%2$s\" owner."
 
 #: include/classes/api/services/CUser.php:871
 #, c-format
@@ -16378,7 +16378,7 @@ msgstr "User \"%1$s\" is slide show \"%2$s\" owner."
 #: include/classes/api/services/CUser.php:857
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
-msgstr ""
+msgstr "User \"%1$s\" is used in \"%2$s\" action."
 
 #: app/views/monitoring.acknowledge.edit.php:35 include/acknow.inc.php:36
 #: include/events.inc.php:728
@@ -16409,7 +16409,7 @@ msgstr "User cannot change status of himself"
 
 #: include/classes/api/services/CUser.php:559
 msgid "User cannot change their user type."
-msgstr ""
+msgstr "User cannot change their user type."
 
 #: users.php:295 users.php:329
 msgid "User deleted"
@@ -16433,7 +16433,7 @@ msgstr "User group \"%1$s\" already exists."
 #: include/classes/api/services/CUserGroup.php:1073
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
-msgstr ""
+msgstr "User group \"%1$s\" is used in \"%2$s\" action."
 
 #: include/classes/api/services/CUserGroup.php:1096
 #, c-format
@@ -16488,7 +16488,7 @@ msgstr "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
 #: include/classes/api/services/CUser.php:502
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "User group with ID \"%1$s\" is not available."
 
 #: app/views/monitoring.dashboard.sharing_form.php:33 include/menu.inc.php:277
 #: include/views/administration.usergroups.edit.php:22
@@ -16542,7 +16542,7 @@ msgstr "User session data storage period"
 #: include/profiles.inc.php:238
 #, c-format
 msgid "User session data storage period \"%1$s\"."
-msgstr ""
+msgstr "User session data storage period \"%1$s\"."
 
 #: include/views/administration.general.housekeeper.edit.php:86
 msgid "User sessions"
@@ -16575,7 +16575,7 @@ msgstr "User updated"
 #: include/classes/api/services/CUserGroup.php:388
 #, c-format
 msgid "User with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "User with ID \"%1$s\" is not available."
 
 #: include/classes/api/services/CUser.php:464
 #, c-format
@@ -16925,7 +16925,7 @@ msgstr "Values"
 
 #: include/views/js/configuration.httpconf.popup.js.php:359
 msgid "Values without names are not allowed in form fields."
-msgstr ""
+msgstr "Values without names are not allowed in form fields."
 
 #: include/views/configuration.httpconf.edit.php:108
 #: include/views/configuration.httpconf.popup.php:127
@@ -17233,15 +17233,15 @@ msgstr "X"
 
 #: include/views/js/monitoring.sysmaps.js.php:362
 msgid "X1"
-msgstr ""
+msgstr "X1"
 
 #: include/views/js/monitoring.sysmaps.js.php:382
 msgid "X2"
-msgstr ""
+msgstr "X2"
 
 #: include/items.inc.php:1667
 msgid "XML XPath"
-msgstr ""
+msgstr "XML XPath"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
@@ -17283,11 +17283,11 @@ msgstr "m/d/Y h:i:s A"
 
 #: include/views/js/monitoring.sysmaps.js.php:369
 msgid "Y1"
-msgstr ""
+msgstr "Y1"
 
 #: include/views/js/monitoring.sysmaps.js.php:391
 msgid "Y2"
-msgstr ""
+msgstr "Y2"
 
 #: include/classes/import/validators/C20XmlValidator.php:833
 #: include/classes/import/validators/C30XmlValidator.php:896
@@ -17393,7 +17393,7 @@ msgstr "You have no permissions to access this page."
 
 #: jsLoader.php:115
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "You have unsaved changes."
 
 #: include/func.inc.php:1745
 msgid "You must login to view this page."
@@ -17401,7 +17401,7 @@ msgstr "You must login to view this page."
 
 #: app/views/monitoring.dashboard.sharing_form.js.php:28 jsLoader.php:239
 msgid "You need permission to perform this action!"
-msgstr ""
+msgstr "You need permission to perform this action!"
 
 #: index.php:25
 msgid "ZABBIX"
@@ -17480,7 +17480,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1598
 #: include/views/configuration.action.edit.php:2026
 msgid "Zabbix server (proxy)"
-msgstr ""
+msgstr "Zabbix server (proxy)"
 
 #: include/blocks.inc.php:414
 msgid "Zabbix server IP or port is not set!"
@@ -17532,7 +17532,7 @@ msgstr "[Wrong value for month: \"%s\" ]"
 
 #: include/classes/validators/CApiInputValidator.php:526
 msgid "a boolean is expected"
-msgstr ""
+msgstr "a boolean is expected"
 
 #: include/classes/api/services/CTriggerGeneral.php:241
 #: include/classes/api/services/CTriggerGeneral.php:257
@@ -17545,13 +17545,13 @@ msgstr "a character string is expected"
 #: include/classes/validators/CApiInputValidator.php:355
 #: include/classes/validators/CApiInputValidator.php:492
 msgid "a number is expected"
-msgstr ""
+msgstr "a number is expected"
 
 #: include/classes/validators/CApiInputValidator.php:360
 #: include/classes/validators/CApiInputValidator.php:497
 #: include/classes/validators/CApiInputValidator.php:962
 msgid "a number is too large"
-msgstr ""
+msgstr "a number is too large"
 
 #: include/classes/api/services/CDRule.php:320
 #: include/classes/api/services/CItemGeneral.php:1042
@@ -17566,16 +17566,16 @@ msgstr "a time is expected"
 #: include/classes/validators/CApiInputValidator.php:878
 #: include/validate.inc.php:216
 msgid "a time period is expected"
-msgstr ""
+msgstr "a time period is expected"
 
 #: include/classes/validators/CApiInputValidator.php:951
 #: include/validate.inc.php:227 include/validate.inc.php:507
 msgid "a time unit is expected"
-msgstr ""
+msgstr "a time unit is expected"
 
 #: include/classes/validators/CApiInputValidator.php:844
 msgid "a user macro is expected"
-msgstr ""
+msgstr "a user macro is expected"
 
 #: include/forms.inc.php:487
 msgid "affects only filtered data"
@@ -17621,7 +17621,7 @@ msgstr "an array is expected"
 
 #: include/classes/validators/CApiInputValidator.php:655
 msgid "an array or a character string is expected"
-msgstr ""
+msgstr "an array or a character string is expected"
 
 #: include/classes/import/validators/C10XmlValidator.php:397
 #: include/classes/import/validators/C10XmlValidator.php:419
@@ -17653,7 +17653,7 @@ msgstr "as Red"
 #: include/classes/widgets/CProblemsWidgetForm.php:118
 #: include/classes/widgets/CProblemsWidgetForm.php:120
 msgid "ascending"
-msgstr ""
+msgstr "ascending"
 
 #: include/events.inc.php:36
 msgid "auto registration"
@@ -17680,7 +17680,7 @@ msgstr "blinking"
 
 #: include/classes/api/services/CItemGeneral.php:181
 msgid "cannot be changed"
-msgstr ""
+msgstr "cannot be changed"
 
 #: correlation.php:227 correlation.php:237 correlation.php:243
 #: correlation.php:263 correlation.php:267 correlation.php:280
@@ -17748,7 +17748,7 @@ msgstr "check expression starting from \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1562
 #: include/classes/import/CConfigurationImport.php:2534
 msgid "circular item dependency is not allowed"
-msgstr ""
+msgstr "circular item dependency is not allowed"
 
 #: include/views/hostmacros.php:38
 msgid "configure"
@@ -17789,11 +17789,11 @@ msgstr "default"
 #: include/classes/widgets/CProblemsWidgetForm.php:117
 #: include/classes/widgets/CProblemsWidgetForm.php:119
 msgid "descending"
-msgstr ""
+msgstr "descending"
 
 #: include/classes/validators/CApiInputValidator.php:814
 msgid "directory or script name cannot be empty"
-msgstr ""
+msgstr "directory or script name cannot be empty"
 
 #: include/events.inc.php:64
 msgid "discovered host"
@@ -17830,7 +17830,7 @@ msgstr "expression is empty"
 
 #: include/classes/api/services/CItemGeneral.php:1080
 msgid "first parameter is expected"
-msgstr ""
+msgstr "first parameter is expected"
 
 #: jsLoader.php:97
 msgid "fixed"
@@ -17871,7 +17871,7 @@ msgstr "host group"
 
 #: include/classes/api/services/CItemGeneral.php:1365
 msgid "hostid of dependent item and master item should match"
-msgstr ""
+msgstr "hostid of dependent item and master item should match"
 
 #: include/classes/api/services/CMap.php:798
 #: include/classes/api/services/CMap.php:1228
@@ -17894,7 +17894,7 @@ msgstr "including subgroups"
 
 #: include/classes/api/services/CMapElement.php:183
 msgid "incorrect element count"
-msgstr ""
+msgstr "incorrect element count"
 
 #: include/classes/parsers/CItemKey.php:80
 #: include/classes/parsers/CUserMacroParser.php:59
@@ -17910,16 +17910,16 @@ msgstr "internal"
 #: include/classes/parsers/CIPRangeParser.php:114
 #, c-format
 msgid "invalid address range \"%1$s\""
-msgstr ""
+msgstr "invalid address range \"%1$s\""
 
 #: include/classes/validators/CApiInputValidator.php:205
 msgid "invalid byte sequence in UTF-8"
-msgstr ""
+msgstr "invalid byte sequence in UTF-8"
 
 #: include/classes/api/services/CItemGeneral.php:272
 #: include/classes/graphdraw/CLineGraphDraw.php:113
 msgid "invalid delay"
-msgstr ""
+msgstr "invalid delay"
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:47
 #, c-format
@@ -17929,20 +17929,20 @@ msgstr "invalid group name \"%1$s\""
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CPieGraphDraw.php:198
 msgid "invalid history storage period"
-msgstr ""
+msgstr "invalid history storage period"
 
 #: include/classes/validators/CApiInputValidator.php:914
 msgid "invalid regular expression"
-msgstr ""
+msgstr "invalid regular expression"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:256
 #: include/classes/graphdraw/CPieGraphDraw.php:208
 msgid "invalid trend storage period"
-msgstr ""
+msgstr "invalid trend storage period"
 
 #: include/classes/validators/CApiInputValidator.php:1142
 msgid "is not enclosed in {} or is malformed"
-msgstr ""
+msgstr "is not enclosed in {} or is malformed"
 
 #: include/events.inc.php:67
 msgid "item"
@@ -17960,7 +17960,7 @@ msgstr "last"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2150
 msgid "left"
-msgstr ""
+msgstr "left"
 
 #: include/actions.inc.php:26 include/correlation.inc.php:33
 #: include/views/inventory.host.list.php:52
@@ -17973,7 +17973,7 @@ msgstr "like"
 #: include/views/js/common.item.edit.js.php:140
 #: include/views/js/configuration.item.massupdate.js.php:154
 msgid "list of characters"
-msgstr ""
+msgstr "list of characters"
 
 #: include/events.inc.php:68
 msgid "low-level discovery rule"
@@ -18029,7 +18029,7 @@ msgstr "max"
 
 #: include/classes/api/services/CItemGeneral.php:1446
 msgid "maximum dependent items count reached"
-msgstr ""
+msgstr "maximum dependent items count reached"
 
 #: include/classes/api/services/CHostGeneral.php:1050
 #: include/classes/api/services/CItemGeneral.php:1371
@@ -18038,7 +18038,7 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:2491
 #: include/classes/import/CConfigurationImport.php:2550
 msgid "maximum number of dependency levels reached"
-msgstr ""
+msgstr "maximum number of dependency levels reached"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2014
 #: include/classes/graphdraw/CLineGraphDraw.php:2027
@@ -18089,7 +18089,7 @@ msgstr "must be between \"%1$s\" and \"%2$s\""
 #: include/views/js/configuration.httpconf.edit.js.php:13
 #: include/views/js/configuration.httpconf.popup.js.php:13
 msgid "name"
-msgstr ""
+msgstr "name"
 
 #: include/classes/html/CMultiSelect.php:61 jsLoader.php:200
 msgid "new"
@@ -18138,7 +18138,7 @@ msgstr "now"
 #: include/views/js/configuration.item.massupdate.js.php:45
 #: include/views/js/configuration.item.massupdate.js.php:145
 msgid "number"
-msgstr ""
+msgstr "number"
 
 #: app/views/monitoring.widget.hosts.view.php:225 include/blocks.inc.php:392
 msgid "of"
@@ -18201,7 +18201,7 @@ msgstr "other"
 #: include/views/js/common.item.edit.js.php:49
 #: include/views/js/configuration.item.massupdate.js.php:46
 msgid "output"
-msgstr ""
+msgstr "output"
 
 #: include/views/configuration.item.edit.php:597
 #: include/views/configuration.item.massupdate.php:303
@@ -18209,7 +18209,7 @@ msgstr ""
 #: include/views/js/common.item.edit.js.php:148
 #: include/views/js/configuration.item.massupdate.js.php:162
 msgid "path"
-msgstr ""
+msgstr "path"
 
 #: include/views/configuration.item.edit.php:602
 #: include/views/configuration.item.massupdate.php:308
@@ -18218,7 +18218,7 @@ msgstr ""
 #: include/views/js/common.item.edit.js.php:155
 #: include/views/js/configuration.item.massupdate.js.php:169
 msgid "pattern"
-msgstr ""
+msgstr "pattern"
 
 #: include/page_header.php:118 include/views/general.warning.php:21
 #, c-format
@@ -18236,7 +18236,7 @@ msgstr "remember selected"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2150
 msgid "right"
-msgstr ""
+msgstr "right"
 
 #: include/services.inc.php:72 include/services.inc.php:75
 #: include/services.inc.php:163
@@ -18253,7 +18253,7 @@ msgstr "s"
 
 #: include/classes/api/services/CItemGeneral.php:1086
 msgid "second parameter is expected"
-msgstr ""
+msgstr "second parameter is expected"
 
 #: include/classes/html/CActionButtonList.php:89
 msgid "selected"
@@ -18325,7 +18325,7 @@ msgstr "template ID \"%1$s\" is passed %2$s times"
 #: include/classes/validators/CApiInputValidator.php:611
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
-msgstr ""
+msgstr "the parameter \"%1$s\" is missing"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:106
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125
@@ -18368,7 +18368,7 @@ msgstr "unexpected end of macro"
 #: include/classes/validators/CApiInputValidator.php:587
 #, c-format
 msgid "unexpected parameter \"%1$s\""
-msgstr ""
+msgstr "unexpected parameter \"%1$s\""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:91
 #: include/classes/import/validators/CXmlValidatorGeneral.php:151
@@ -18436,13 +18436,13 @@ msgstr "value"
 #: include/classes/import/CConfigurationImport.php:2543
 #, c-format
 msgid "value \"%1$s\" not found"
-msgstr ""
+msgstr "value \"%1$s\" not found"
 
 #: include/classes/validators/CApiInputValidator.php:996
 #: include/classes/validators/CApiInputValidator.php:1050
 #, c-format
 msgid "value %1$s already exists"
-msgstr ""
+msgstr "value %1$s already exists"
 
 #: include/classes/validators/CApiInputValidator.php:276
 #: include/classes/validators/CApiInputValidator.php:773
@@ -18452,7 +18452,7 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:905
 #: include/classes/validators/CApiInputValidator.php:1137
 msgid "value is too long"
-msgstr ""
+msgstr "value is too long"
 
 #: include/classes/api/services/CMapElement.php:94
 #: include/classes/api/services/CMap.php:643
@@ -18461,7 +18461,7 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:414
 #, c-format
 msgid "value must be one of %1$s"
-msgstr ""
+msgstr "value must be one of %1$s"
 
 #: include/actions.inc.php:586 include/actions.inc.php:604
 #: include/actions.inc.php:749 include/actions.inc.php:767
