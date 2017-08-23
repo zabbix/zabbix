@@ -355,7 +355,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'delay' => '60;30/1-5,08:00-12:00',
 									'history' => '0',
 									'trends' => '0',
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '0',
@@ -368,7 +369,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'params' => '10'
 										]
 									],
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '0',
@@ -381,7 +383,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'params' => ''
 										]
 									],
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '0',
@@ -398,7 +401,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'params' => ''
 										]
 									],
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '0',
@@ -419,14 +423,16 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'params' => '100'
 										]
 									],
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '16',
 									'delay' => '60',
 									'history' => '90d',
 									'trends' => '365d',
-									'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+									'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+									'master_item' => []
 								]
 							],
 							'discovery_rules' => [
@@ -440,7 +446,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'delay' => '60;30/1-5,08:00-12:00',
 											'history' => '0',
 											'trends' => '0',
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '0',
@@ -453,7 +460,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => '10'
 												]
 											],
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '0',
@@ -466,7 +474,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => ''
 												]
 											],
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '0',
@@ -483,7 +492,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => ''
 												]
 											],
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '0',
@@ -504,14 +514,16 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => '100'
 												]
 											],
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '16',
 											'delay' => '60',
 											'history' => '90d',
 											'trends' => '365d',
-											'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+											'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+											'master_item_prototype' => []
 										]
 									],
 									'jmx_endpoint' => ''
@@ -572,7 +584,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'delay' => '60;30/1-5,08:00-12:00',
 									'history' => '0',
 									'trends' => '0',
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '0',
@@ -585,7 +598,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'params' => '10'
 										]
 									],
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '0',
@@ -598,7 +612,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'params' => ''
 										]
 									],
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '0',
@@ -615,7 +630,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'params' => ''
 										]
 									],
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '0',
@@ -636,14 +652,16 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'params' => '100'
 										]
 									],
-									'jmx_endpoint' => ''
+									'jmx_endpoint' => '',
+									'master_item' => []
 								],
 								[
 									'type' => '16',
 									'delay' => '60',
 									'history' => '90d',
 									'trends' => '365d',
-									'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+									'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+									'master_item' => []
 								]
 							],
 							'discovery_rules' => [
@@ -657,7 +675,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'delay' => '60',
 											'history' => '0',
 											'trends' => '0',
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '0',
@@ -670,7 +689,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => '10'
 												]
 											],
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '0',
@@ -683,7 +703,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => ''
 												]
 											],
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '0',
@@ -700,7 +721,8 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => ''
 												]
 											],
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '0',
@@ -721,14 +743,16 @@ class C32ImportConverterTest extends CImportConverterTest {
 													'params' => '100'
 												]
 											],
-											'jmx_endpoint' => ''
+											'jmx_endpoint' => '',
+											'master_item_prototype' => []
 										],
 										[
 											'type' => '16',
 											'delay' => '60',
 											'history' => '90d',
 											'trends' => '365d',
-											'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+											'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
+											'master_item_prototype' => []
 										]
 									],
 									'jmx_endpoint' => ''

@@ -443,7 +443,8 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $simple_interval_parser = new CSimpleIntervalParser();
 
 foreach ($items as &$item) {
-	if ($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER) {
+	if ($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER
+			|| $item['type'] == ITEM_TYPE_DEPENDENT) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {

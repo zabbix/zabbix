@@ -36,7 +36,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'source_dashboardid' =>	'db dashboard.dashboardid',
 			'groupid' =>			'db groups.groupid',
 			'hostid' =>				'db hosts.hostid',
-			'new' =>				'in 1'
+			'new' =>				'in 1',
+			'period' =>				'int32',
+			'stime' =>				'time'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -75,7 +77,33 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'dashboard' => $dashboard,
 			'fullscreen' => $this->getInput('fullscreen', '0'),
 			'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
-			'widget_defaults' => CWidgetConfig::getDefaults()
+			'widget_defaults' => CWidgetConfig::getDefaults(),
+			'show_timeline' => self::showTimeline($this->dashboard['widgets']),
+		];
+
+		$options = [
+			'profileIdx' => 'web.dashbrd',
+			'profileIdx2' => $this->dashboard['dashboardid']
+		];
+
+		$data['timeline'] = calculateTime([
+			'profileIdx' => $options['profileIdx'],
+			'profileIdx2' => $options['profileIdx2'],
+			'updateProfile' => 1,
+			'period' => $this->hasInput('period') ? $this->getInput('period') : null,
+			'stime' => $this->hasInput('stime') ? $this->getInput('stime') : null
+		]);
+
+		$data['timeControlData'] = [
+			'loadScroll' => 1,
+			'mainObject' => 1,
+			'onDashboard' => 1,
+			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1, $options['profileIdx2']),
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
+			'profile' => [
+				'idx' => $options['profileIdx'],
+				'idx2' => $options['profileIdx2']
+			]
 		];
 
 		if (self::hasDynamicWidgets($data['grid_widgets'])) {
@@ -126,9 +154,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		elseif ($this->hasInput('source_dashboardid')) {
 			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
-				'output' => ['name'],
-				// TODO AV: remove widgetid from 'selectWidgets'; related CControllerDashbrdWidgetUpdate:155
-				'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
+				'output' => ['name', 'private'],
+				'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields'],
+				'selectUsers' => ['userid', 'permission'],
+				'selectUserGroups' => ['usrgrpid', 'permission'],
 				'dashboardids' => $this->getInput('source_dashboardid')
 			]);
 
@@ -136,6 +165,11 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				$dashboard = $this->getNewDashboard();
 				$dashboard['name'] = $dashboards[0]['name'];
 				$dashboard['widgets'] = $this->unsetInaccessibleFields($dashboards[0]['widgets']);
+				$dashboard['sharing'] = [
+					'private' => $dashboards[0]['private'],
+					'users' => $dashboards[0]['users'],
+					'userGroups' => $dashboards[0]['userGroups']
+				];
 			}
 		}
 		else {
@@ -149,7 +183,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			if ($dashboardid != 0) {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid'],
-					'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields'],
+					'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields'],
 					'dashboardids' => $dashboardid,
 					'preservekeys' => true
 				]);
@@ -177,7 +211,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return array
 	 */
-	private function unsetInaccessibleFields($widgets) {
+	private function unsetInaccessibleFields(array $widgets) {
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
 			ZBX_WIDGET_FIELD_TYPE_HOST => [],
@@ -311,7 +345,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	{
 		return [
 			'dashboardid' => 0,
-			'name' => '',
+			'name' => _('New dashboard'),
 			'editable' => true,
 			'widgets' => [],
 			'owner' => $this->getOwnerData(CWebUser::$data['userid'])
@@ -351,7 +385,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$grid_widgets = [];
 
 		foreach ($widgets as $widget) {
-			// TODO: better solution would be to create this widget in it's place and size with warning about error
 			if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
 				continue;
 			}
@@ -364,10 +397,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'type' => $widget['type'],
 				'header' => $widget['name'],
 				'pos' => [
-					'row' => (int) $widget['row'],
-					'col' => (int) $widget['col'],
-					'height' => (int) $widget['height'],
-					'width' => (int) $widget['width']
+					'x' => (int) $widget['x'],
+					'y' => (int) $widget['y'],
+					'width' => (int) $widget['width'],
+					'height' => (int) $widget['height']
 				],
 				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
 				'fields' => self::convertWidgetFields($widget['fields'])
@@ -412,12 +445,29 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 */
 	private static function hasDynamicWidgets($grid_widgets) {
 		foreach ($grid_widgets as $widget) {
-			// TODO VM: document 'dynamic' as field with special interraction
 			if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {
 				return true;
 			}
 		}
 
+		return false;
+	}
+
+	/**
+	 * Checks, if any of widgets needs timeline.
+	 *
+	 * @param array $widgets
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
+	private static function showTimeline($widgets) {
+		foreach ($widgets as $widget) {
+			if (CWidgetConfig::usesTimeline($widget['type'])) {
+				return true;
+			}
+		}
 		return false;
 	}
 }

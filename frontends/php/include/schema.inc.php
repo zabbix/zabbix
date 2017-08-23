@@ -1541,6 +1541,13 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'master_itemid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
 		],
 	],
 	'httpstepitem' => [
@@ -7106,25 +7113,25 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'row' => [
+			'x' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
 			],
-			'col' => [
+			'y' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
 			],
-			'height' => [
+			'width' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1',
 			],
-			'width' => [
+			'height' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

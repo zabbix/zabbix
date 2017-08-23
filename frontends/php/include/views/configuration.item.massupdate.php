@@ -578,6 +578,26 @@ if ($this->data['displayApplications']) {
 	);
 }
 
+// Append master item select.
+$master_item = (new CDiv([
+	(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid')),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CButton('button', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.php?srctbl=items&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
+			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&only_hostid='.$data['hostid'].
+			'&with_webitems=0&'.http_build_query(['excludeids' => $data['itemids']]).'");'
+		)
+]))->setId('master_item');
+
+$itemFormList->addRow(
+	(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))
+		->setLabel(_('Master item'))
+		->setChecked(isset($data['visible']['master_itemid'])),
+	$master_item
+);
+
 // append description to form list
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))

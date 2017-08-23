@@ -195,7 +195,9 @@ function getMenuPopupMap(options) {
 			var url = new Curl('hostinventories.php');
 
 			jQuery.each(options.gotos.inventory, function(name, value) {
-				url.setArgument(name, value);
+				if (value !== null) {
+					url.setArgument(name, value);
+				}
 			});
 
 			gotos[gotos.length] = {
@@ -209,7 +211,9 @@ function getMenuPopupMap(options) {
 			var url = new Curl('latest.php?filter_set=1');
 
 			jQuery.each(options.gotos.latestData, function(name, value) {
-				url.setArgument(name, value);
+				if (value !== null) {
+					url.setArgument(name, value);
+				}
 			});
 
 			gotos[gotos.length] = {
@@ -231,7 +235,9 @@ function getMenuPopupMap(options) {
 				var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
 
 				jQuery.each(options.gotos.triggerStatus, function(name, value) {
-					url.setArgument(name, value);
+					if (value !== null) {
+						url.setArgument(name, value);
+					}
 				});
 
 				triggers.url = url.getUrl();
@@ -253,7 +259,9 @@ function getMenuPopupMap(options) {
 				var url = new Curl('charts.php');
 
 				jQuery.each(options.gotos.graphs, function(name, value) {
-					url.setArgument(name, value);
+					if (value !== null) {
+						url.setArgument(name, value);
+					}
 				});
 
 				graphs.url = url.getUrl();
@@ -275,7 +283,9 @@ function getMenuPopupMap(options) {
 				var url = new Curl('host_screen.php');
 
 				jQuery.each(options.gotos.screens, function(name, value) {
-					url.setArgument(name, value);
+					if (value !== null) {
+						url.setArgument(name, value);
+					}
 				});
 
 				screens.url = url.getUrl();
@@ -289,7 +299,9 @@ function getMenuPopupMap(options) {
 			var url = new Curl('zabbix.php?action=map.view');
 
 			jQuery.each(options.gotos.submap, function(name, value) {
-				url.setArgument(name, value);
+				if (value !== null) {
+					url.setArgument(name, value);
+				}
 			});
 
 			gotos[gotos.length] = {
@@ -487,7 +499,7 @@ function getMenuPopupDashboard(options) {
 										response.data
 									);
 								}
-								else if (typeof response === 'string' && response.indexOf('Access denied') !== -1) {
+								else if (typeof response === 'string' && response.indexOf(t('Access denied')) !== -1) {
 									alert(t('You need permission to perform this action!'))
 								}
 								else {
@@ -544,9 +556,6 @@ function showDialogForm(form, options, formData) {
 	overlayDialogue({
 		'title': options.title,
 		'content': form,
-		'css_body': {
-			"margin-bottom": '10px'
-		},
 		'buttons': [
 			{
 				'title': options.action_title,
@@ -588,6 +597,7 @@ function showDialogForm(form, options, formData) {
 	});
 
 	form.css('visibility', 'visible');
+	overlayDialogueOnLoad(true);
 }
 
 /**
@@ -701,7 +711,8 @@ function getMenuPopupTrigger(options) {
  * @return array
  */
 function getMenuPopupTriggerLog(options) {
-	var items = [];
+	var items = [],
+		dependent_items = getMenuPopupDependentItems(options.dependent_items);
 
 	// create
 	items[items.length] = {
@@ -752,9 +763,31 @@ function getMenuPopupTriggerLog(options) {
 
 	items[items.length] = edit_trigger;
 
+	dependent_items = dependent_items.pop();
+	items[items.length] = dependent_items.items.pop();
+
 	return [{
 		label: sprintf(t('Item "%1$s"'), options.itemName),
 		items: items
+	}];
+}
+
+/**
+ * Get menu structure for dependent items.
+ *
+ * @param array options['item_name']    Menu label.
+ * @param array options['add_label']    Add dependent item menu element label
+ * @param array options['add_url']      Add dependent item menu element url
+ *
+ * @return array
+ */
+function getMenuPopupDependentItems(options) {
+	return [{
+		label: sprintf(t('Item "%1$s"'), options.item_name),
+		items: [{
+			label: options.add_label,
+			url: options.add_url
+		}]
 	}];
 }
 

@@ -153,6 +153,8 @@ int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 1;
 int	CONFIG_IPMIMANAGER_FORKS	= 0;
 int	CONFIG_ALERTMANAGER_FORKS	= 0;
+int	CONFIG_PREPROCMAN_FORKS		= 0;
+int	CONFIG_PREPROCESSOR_FORKS	= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -830,9 +832,9 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
-#ifdef HAVE_IPCSERVICE
+#ifdef HAVE_OPENIPMI
 	{
-		char	*error = NULL;
+		char *error = NULL;
 
 		if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 		{
@@ -1148,7 +1150,7 @@ void	zbx_on_exit(void)
 
 	zbx_sleep(2);	/* wait for all child processes to exit */
 
-#ifdef HAVE_IPCSERVICE
+#ifdef HAVE_OPENIPMI
 	zbx_ipc_service_free_env();
 #endif
 

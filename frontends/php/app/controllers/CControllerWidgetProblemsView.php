@@ -28,9 +28,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$this->setType(WIDGET_PROBLEMS);
 		$this->setValidationRules([
-			'name' =>		'string',
-			'fullscreen' =>	'in 0,1',
-			'fields' =>		'array'
+			'name' => 'string',
+			'fullscreen' => 'in 0,1',
+			'fields' => 'json'
 		]);
 	}
 
@@ -46,6 +46,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'hostids' => $fields['hostids'],
 			'problem' => $fields['problem'],
 			'severities' => $fields['severities'],
+			'tags' => $fields['tags'],
 			'maintenance' => $fields['maintenance'],
 			'unacknowledged' => $fields['unacknowledged']
 		], $config, true);
@@ -64,6 +65,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'details' => 0
 		], $config, true);
 
+		if ($fields['show_tags']) {
+			$data['tags'] = makeEventsTags($data['problems']);
+		}
 		if ($data['problems']) {
 			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
 		}
@@ -71,7 +75,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'fields' => [
-				'show' => $fields['show']
+				'show' => $fields['show'],
+				'show_tags' => $fields['show_tags']
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable'],

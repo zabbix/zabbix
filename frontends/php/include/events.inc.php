@@ -417,6 +417,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			(new CDiv())
 				->addItem(zbx_str2links($trigger['comments']))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR)
+				->addStyle('max-width: 500px')
 		);
 	}
 
@@ -425,6 +426,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			(new CDiv())
 				->addItem(new CLink($trigger['url'], $trigger['url']))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
+				->addStyle('max-width: 500px')
 		);
 	}
 
@@ -450,7 +452,8 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			_('Recovery time'),
 			_('Status'),
 			_('Duration'),
-			$config['event_ack_enable'] ? _('Ack') : null
+			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Tags')
 		]));
 
 	if ($eventid_till != 0) {
@@ -498,6 +501,9 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 		$last_clock = 0;
 		if ($config['event_ack_enable']) {
 			$acknowledges = makeEventsAcknowledges($problems, $backurl);
+		}
+		if ($problems) {
+			$tags = makeEventsTags($problems);
 		}
 
 		$url_details = (new CUrl('tr_events.php'))
@@ -600,6 +606,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 				))
 					->addClass(ZBX_STYLE_NOWRAP),
 				$config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
+				$tags[$problem['eventid']]
 			]));
 		}
 	}
@@ -613,12 +620,11 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
  * Create element with event acknowledges info.
  * If $event has subarray 'acknowledges', returned link will have hint with acknowledges.
  *
- * @param array			$event   event data
- * @param int			$event['acknowledged']
- * @param int			$event['eventid']
- * @param int			$event['objectid']
- * @param mixed			$event['acknowledges']
- * @param string		$backurl  add url param to link with current page file name
+ * @param array  $event                  Event data.
+ * @param int    $event['acknowledged']
+ * @param int    $event['eventid']
+ * @param mixed  $event['acknowledges']
+ * @param string $backurl                Add url param to link with current page file name.
  *
  * @deprecated use makeEventsAcknowledges instead
  *

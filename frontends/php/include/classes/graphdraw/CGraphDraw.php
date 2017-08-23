@@ -51,7 +51,6 @@ abstract class CGraphDraw {
 		$this->num = 0;
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
-		$this->axis_valuetype = []; // overal items type (int/float)
 		$this->graphtheme = getUserGraphTheme();
 	}
 
@@ -136,6 +135,14 @@ abstract class CGraphDraw {
 			$value = 900;
 		}
 		$this->sizeY = $value;
+	}
+
+	public function getWidth() {
+		return $this->sizeX;
+	}
+
+	public function getHeight() {
+		return $this->sizeY;
 	}
 
 	public function getLastValue($num) {

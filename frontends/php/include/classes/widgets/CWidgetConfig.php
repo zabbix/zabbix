@@ -35,17 +35,19 @@ class CWidgetConfig {
 			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_WEB_OVERVIEW			=> _('Web monitoring'),
 			WIDGET_DISCOVERY_STATUS		=> _('Discovery status'),
+			WIDGET_GRAPH				=> _('Graph'),
 			WIDGET_HOST_STATUS			=> _('Host status'),
 			WIDGET_FAVOURITE_GRAPHS		=> _('Favourite graphs'),
 			WIDGET_FAVOURITE_MAPS		=> _('Favourite maps'),
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_SYSMAP				=> _('Map'),
-			WIDGET_NAVIGATION_TREE		=> _('Map Navigation Tree'),
+			WIDGET_NAVIGATION_TREE		=> _('Map navigation tree'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_ACTION_LOG			=> _('Action log'),
 			WIDGET_DATA_OVERVIEW		=> _('Data overview'),
-			WIDGET_TRIG_OVERVIEW		=> _('Trigger overview')
+			WIDGET_TRIG_OVERVIEW		=> _('Trigger overview'),
+			WIDGET_PLAIN_TEXT			=> _('Plain text')
 		];
 	}
 
@@ -56,26 +58,26 @@ class CWidgetConfig {
 	 *
 	 * @return array
 	 */
-	private static function getDefaultDimensions()
-	{
-		// TODO AV: review and accept default dimentions
+	private static function getDefaultDimensions() {
 		return [
-			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 4],
+			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
 			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
 			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
-			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 4],
+			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
+			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 5],
 			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
 			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
-			WIDGET_CLOCK				=> ['width' => 3, 'height' => 3],
+			WIDGET_CLOCK				=> ['width' => 2, 'height' => 3],
 			WIDGET_SYSMAP				=> ['width' => 9, 'height' => 5],
 			WIDGET_NAVIGATION_TREE		=> ['width' => 3, 'height' => 5],
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
 			WIDGET_ACTION_LOG			=> ['width' => 6, 'height' => 5],
 			WIDGET_DATA_OVERVIEW		=> ['width' => 6, 'height' => 5],
-			WIDGET_TRIG_OVERVIEW		=> ['width' => 6, 'height' => 5]
+			WIDGET_TRIG_OVERVIEW		=> ['width' => 6, 'height' => 5],
+			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3]
 		];
 	}
 
@@ -93,7 +95,6 @@ class CWidgetConfig {
 		foreach (self::getKnownWidgetTypes() as $type => $name) {
 			$ret[$type] = [
 				'header' => $name,
-				'rf_rate' => self::getDefaultRfRate($type),
 				'size' => $dimensions[$type]
 			];
 		}
@@ -116,10 +117,12 @@ class CWidgetConfig {
 			case WIDGET_PROBLEMS:
 			case WIDGET_WEB_OVERVIEW:
 			case WIDGET_DISCOVERY_STATUS:
+			case WIDGET_GRAPH:
 			case WIDGET_HOST_STATUS:
 			case WIDGET_ACTION_LOG:
 			case WIDGET_DATA_OVERVIEW:
 			case WIDGET_TRIG_OVERVIEW:
+			case WIDGET_PLAIN_TEXT:
 				return SEC_PER_MIN;
 
 			case WIDGET_ZABBIX_STATUS:
@@ -137,13 +140,28 @@ class CWidgetConfig {
 	}
 
 	/**
+	 * Does this widget type use timeline
+	 *
+	 * @param type $type  WIDGET_ constant
+	 *
+	 * @return boolean
+	 */
+	public static function usesTimeline($type) {
+		switch ($type) {
+			case WIDGET_GRAPH:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	/**
 	 * Return Form object for widget with provided data.
 	 *
 	 * @static
 	 *
-	 * @param string $type          widget type - 'WIDGET_' constant
-	 * @param array  $data          array with all widget's fields
-	 * @param string $data[<name>]  (optional)
+	 * @param string $type  Widget type - 'WIDGET_' constant.
+	 * @param string $data  JSON string with widget fields.
 	 *
 	 * @return CWidgetForm
 	 */
@@ -170,6 +188,9 @@ class CWidgetConfig {
 			case WIDGET_TRIG_OVERVIEW:
 				return new CTrigOverviewWidgetForm($data);
 
+			case WIDGET_GRAPH:
+				return new CGraphWidgetForm($data);
+
 			case WIDGET_PROBLEMS:
 				return new CProblemsWidgetForm($data);
 
@@ -182,8 +203,10 @@ class CWidgetConfig {
 			case WIDGET_HOST_STATUS:
 				return new CHostsWidgetForm($data);
 
+			case WIDGET_PLAIN_TEXT:
+				return new CPlainTextWidgetForm($data);
+
 			default:
-				// TODO VM: delete this case after all widget forms will be created
 				return new CWidgetForm($data);
 		}
 	}

@@ -26,9 +26,9 @@ class CControllerWidgetUrlView extends CControllerWidget {
 
 		$this->setType(WIDGET_URL);
 		$this->setValidationRules([
-			'name' =>			'string',
-			'fields' =>			'array',
-			'dynamic_hostid' =>	'db hosts.hostid'
+			'name' => 'string',
+			'fields' => 'json',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
@@ -36,13 +36,12 @@ class CControllerWidgetUrlView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$error = null;
 		$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
-		$isTemplatedDashboard = false; // TODO VM: will dashboards be templated?
 
 		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid == 0) {
 			$error = _('No host selected.');
 		}
 		else {
-			$resolveHostMacros = ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM || $isTemplatedDashboard);
+			$resolveHostMacros = ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 			$resolved_url = CMacrosResolverHelper::resolveWidgetURL([
 				'config' => $resolveHostMacros ? 'widgetURL' : 'widgetURLUser',

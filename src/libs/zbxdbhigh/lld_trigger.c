@@ -3129,8 +3129,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 				if (NULL != zbx_hashset_search(cache, &trigger_node_local))
 					continue;
 
-				trigger_node = lld_trigger_cache_append(cache, trigger_node_local.trigger_ref.triggerid,
-						NULL);
+				lld_trigger_cache_append(cache, trigger_node_local.trigger_ref.triggerid, NULL);
 
 				zbx_vector_uint64_append(&triggerids_up, trigger_node_local.trigger_ref.triggerid);
 				zbx_vector_uint64_append(&triggerids_down, trigger_node_local.trigger_ref.triggerid);
