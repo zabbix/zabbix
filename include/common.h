@@ -156,7 +156,8 @@ typedef enum
 	ITEM_TYPE_TELNET,
 	ITEM_TYPE_CALCULATED,
 	ITEM_TYPE_JMX,
-	ITEM_TYPE_SNMPTRAP	/* 17 */
+	ITEM_TYPE_SNMPTRAP,
+	ITEM_TYPE_DEPENDENT	/* 18 */
 }
 zbx_item_type_t;
 const char	*zbx_agent_type_string(zbx_item_type_t item_type);
@@ -190,6 +191,10 @@ typedef enum
 	ITEM_AUTHTYPE_PUBLICKEY
 }
 zbx_item_authtype_t;
+
+/* event status */
+#define EVENT_STATUS_RESOLVED		0
+#define EVENT_STATUS_PROBLEM		1
 
 /* event sources */
 #define EVENT_SOURCE_TRIGGERS		0

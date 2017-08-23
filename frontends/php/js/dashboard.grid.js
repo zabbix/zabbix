@@ -27,11 +27,13 @@
 			.append($('<h4>').text(
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
 			));
-		widget['content_body'] = $('<div>')
-			.addClass('dashbrd-grid-widget-content');
-		widget['content_footer'] = $('<div>')
-			.addClass('dashbrd-grid-widget-foot');
-		widget['content_script'] = $('<div>');
+		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
+		widget['content_footer'] = $('<div>').addClass('dashbrd-grid-widget-foot');
+		/*
+		 * We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
+		 * This size will later be passed to widget controller in updateWidgetContent() function.
+		 */
+		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').html('&nbsp;')));
 
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
@@ -49,7 +51,7 @@
 		);
 
 		return $('<div>', {
-			'class': 'dashbrd-grid-widget',
+			'class': 'dashbrd-grid-widget' + (!widget['widgetid'].length ? ' new-widget' : ''),
 			'css': {
 				'min-height': '' + data['options']['widget-height'] + 'px',
 				'min-width': '' + data['options']['widget-width'] + '%'
@@ -69,8 +71,8 @@
 		data['options']['rows'] = 0;
 
 		$.each(data['widgets'], function() {
-			if (this['pos']['row'] + this['pos']['height'] > data['options']['rows']) {
-				data['options']['rows'] = this['pos']['row'] + this['pos']['height'];
+			if (this['pos']['y'] + this['pos']['height'] > data['options']['rows']) {
+				data['options']['rows'] = this['pos']['y'] + this['pos']['height'];
 			}
 		});
 
@@ -79,6 +81,10 @@
 		}
 
 		$obj.css({'height': '' + (data['options']['widget-height'] * data['options']['rows']) + 'px'});
+
+		if (data['options']['rows'] == 0) {
+			data['empty_placeholder'].show();
+		}
 	}
 
 	function getWidgetByTarget(widgets, $div) {
@@ -102,29 +108,26 @@
 			target_left = target_pos.left + 25,
 			target_height = $div.height() + 25,
 			target_width = $div.width() + 25,
-			row = (target_top - (target_top % data['options']['widget-height'])) / data['options']['widget-height'],
-			col = (target_left - (target_left % widget_width_px)) / widget_width_px,
-			height = (target_height - (target_height % data['options']['widget-height'])) / data['options']['widget-height'],
-			width = (target_width - (target_width % widget_width_px)) / widget_width_px;
+			x = (target_left - (target_left % widget_width_px)) / widget_width_px,
+			y = (target_top - (target_top % data['options']['widget-height'])) / data['options']['widget-height'],
+			width = (target_width - (target_width % widget_width_px)) / widget_width_px,
+			height = (target_height - (target_height % data['options']['widget-height'])) /
+				data['options']['widget-height'];
 
-		if (row < 0) {
-			row = 0;
+		if (x > data['options']['max-columns'] - width) {
+			x = data['options']['max-columns'] - width;
 		}
 
-		if (row > data['options']['max-rows'] - height) {
-			row = data['options']['max-rows'] - height;
+		if (x < 0) {
+			x = 0;
 		}
 
-		if (col > data['options']['max-columns'] - width) {
-			col = data['options']['max-columns'] - width;
+		if (y < 0) {
+			y = 0;
 		}
 
-		if (col < 0) {
-			col = 0;
-		}
-
-		if (height < 1) {
-			height = 1;
+		if (y > data['options']['max-rows'] - height) {
+			y = data['options']['max-rows'] - height;
 		}
 
 		if (width < 1) {
@@ -134,15 +137,19 @@
 			width = data['options']['max-columns'];
 		}
 
-		return {'row': row, 'col': col, 'height': height, 'width': width};
+		if (height < 1) {
+			height = 1;
+		}
+
+		return {'x': x, 'y': y, 'width': width, 'height': height};
 	}
 
 	function setDivPosition($div, data, pos) {
 		$div.css({
-			'top': '' + (data['options']['widget-height'] * pos['row']) + 'px',
-			'left': '' + (data['options']['widget-width'] * pos['col']) + '%',
-			'height': '' + (data['options']['widget-height'] * pos['height']) + 'px',
-			'width': '' + (data['options']['widget-width'] * pos['width']) + '%'
+			'left': '' + (data['options']['widget-width'] * pos['x']) + '%',
+			'top': '' + (data['options']['widget-height'] * pos['y']) + 'px',
+			'width': '' + (data['options']['widget-width'] * pos['width']) + '%',
+			'height': '' + (data['options']['widget-height'] * pos['height']) + 'px'
 		});
 	}
 
@@ -164,7 +171,7 @@
 	function posEquals(pos1, pos2) {
 		var ret = true;
 
-		$.each(['row', 'col', 'height', 'width'], function(index, key) {
+		$.each(['x', 'y', 'width', 'height'], function(index, key) {
 			if (pos1[key] !== pos2[key]) {
 				ret = false;
 				return false;
@@ -175,14 +182,14 @@
 	}
 
 	function rectOverlap(pos1, pos2) {
-		return ((pos1['row'] >= pos2['row'] && pos2['row'] + pos2['height'] - 1 >= pos1['row']) ||
-			(pos2['row'] >= pos1['row'] && pos1['row'] + pos1['height'] - 1 >= pos2['row'])) &&
-			((pos1['col'] >= pos2['col'] && pos2['col'] + pos2['width'] - 1 >= pos1['col']) ||
-			(pos2['col'] >= pos1['col'] && pos1['col'] + pos1['width'] - 1 >= pos2['col']));
+		return ((pos1['x'] >= pos2['x'] && pos2['x'] + pos2['width'] - 1 >= pos1['x'])
+			|| (pos2['x'] >= pos1['x'] && pos1['x'] + pos1['width'] - 1 >= pos2['x'])) &&
+			((pos1['y'] >= pos2['y'] && pos2['y'] + pos2['height'] - 1 >= pos1['y'])
+			|| (pos2['y'] >= pos1['y'] && pos1['y'] + pos1['height'] - 1 >= pos2['y']));
 	}
 
 	function realignWidget($obj, data, widget) {
-		var to_row = widget['current_pos']['row'] + widget['current_pos']['height'],
+		var to_row = widget['current_pos']['y'] + widget['current_pos']['height'],
 			overlapped_widgets = [];
 
 		$.each(data['widgets'], function() {
@@ -192,11 +199,11 @@
 		});
 
 		overlapped_widgets.sort(function (widget1, widget2) {
-			return widget2['current_pos']['row'] - widget1['current_pos']['row'];
+			return widget2['current_pos']['y'] - widget1['current_pos']['y'];
 		});
 
 		for (var i = 0; i < overlapped_widgets.length; i++) {
-			overlapped_widgets[i]['current_pos']['row'] = to_row;
+			overlapped_widgets[i]['current_pos']['y'] = to_row;
 
 			realignWidget($obj, data, overlapped_widgets[i]);
 		}
@@ -238,7 +245,7 @@
 		var min_rows = 0;
 
 		$.each(data['widgets'], function() {
-			var rows = this['current_pos']['row'] + this['current_pos']['height'];
+			var rows = this['current_pos']['y'] + this['current_pos']['height'];
 
 			if (min_rows < rows) {
 				min_rows = rows;
@@ -264,7 +271,7 @@
 				old_pos = this['pos'],
 				changed = false;
 
-			$.each(['row', 'col', 'height', 'width'], function(index, value) {
+			$.each(['x', 'y', 'width', 'height'], function(index, value) {
 				if (new_pos[value] !== old_pos[value]) {
 					changed = true;
 				}
@@ -338,10 +345,6 @@
 				doAction('onResizeEnd', $obj, data, widget);
 			}
 		});
-	}
-
-	function stopResizable($obj, data, widget) {
-		widget['div'].resizable("destroy");
 	}
 
 	function showPreloader(widget) {
@@ -426,12 +429,14 @@
 
 		ajax_data = {
 			'fullscreen': data['options']['fullscreen'],
+			'dashboardid': data['dashboard']['id'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
-			'storage': widget['storage']
-		}
-		widget['initial_load'] = false;
+			'storage': widget['storage'],
+			'content_width': widget['content_body'].width(),
+			'content_height': widget['content_body'].height() - 10 // -10 is added to avoid scrollbar
+		};
 
 		if (widget['widgetid'] !== '') {
 			ajax_data['widgetid'] = widget['widgetid'];
@@ -440,8 +445,8 @@
 			ajax_data['name'] = widget['header'];
 		}
 		// display widget with yet unsaved changes
-		if (typeof widget['fields'] !== 'undefined') {
-			ajax_data['fields'] = widget['fields'];
+		if (typeof widget['fields'] !== 'undefined' && Object.keys(widget['fields']).length != 0) {
+			ajax_data['fields'] = JSON.stringify(widget['fields']);
 		}
 		if (typeof(widget['dynamic']) !== 'undefined') {
 			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
@@ -471,7 +476,7 @@
 
 				widget['content_footer'].html(resp.footer);
 
-				// Creates new script elements and removes previous ones to force their reexecution
+				// Creates new script elements and removes previous ones to force their re-execution.
 				widget['content_script'].empty();
 				if (typeof(resp.script_file) !== 'undefined' && resp.script_file.length) {
 					// NOTE: it is done this way to make sure, this script is executed before script_run function below.
@@ -487,7 +492,7 @@
 					}
 				}
 				if (typeof(resp.script_inline) !== 'undefined') {
-					// NOTE: to execute scrpt with current widget context, add unique ID for required div, and use it in script
+					// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
 					var new_script = $('<script>')
 						.text(resp.script_inline);
 					widget['content_script'].append(new_script);
@@ -496,10 +501,26 @@
 				if (widget['update_attempts'] == 1) {
 					widget['update_attempts'] = 0;
 					startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+					doAction('onContentUpdated', $obj, data, null);
 				}
 				else {
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
+				}
+
+				var callOnDashboardReadyTrigger = false;
+				if (!widget['ready']) {
+					widget['ready'] = true; // leave it before registerDataExchangeCommit.
+					methods.registerDataExchangeCommit.call($obj);
+
+					// If this is the last trigger loaded, then set callOnDashboardReadyTrigger to be true.
+					callOnDashboardReadyTrigger
+						= (data['widgets'].filter(function(widget) {return !widget['ready']}).length == 0);
+				}
+				widget['ready'] = true;
+
+				if (callOnDashboardReadyTrigger) {
+					doAction('onDashboardReady', $obj, data, null);
 				}
 			},
 			error: function() {
@@ -508,6 +529,8 @@
 				startWidgetRefreshTimer($obj, data, widget, 3);
 			}
 		});
+
+		widget['initial_load'] = false;
 	}
 
 	function refreshWidget($obj, data, widget) {
@@ -522,90 +545,110 @@
 		var	url = new Curl('zabbix.php'),
 			fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
-			name = fields['name'];
+			name = fields['name'],
+			ajax_data = {
+				type: type,
+				name: name
+			};
 
 		delete fields['type'];
 		delete fields['name'];
 
 		url.setArgument('action', 'dashbrd.widget.check');
 
+		if (Object.keys(fields).length != 0) {
+			ajax_data['fields'] = JSON.stringify(fields);
+		}
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
-			data: {
-				type: type,
-				name: name,
-				fields: fields
-			},
+			data: ajax_data,
 			success: function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
-					// Error returned
-					// Remove previous errors
+					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
 				}
 				else {
-					// No errors, proceed with update
+					// No errors, proceed with update.
 					overlayDialogueDestroy();
 
 					if (widget === null) {
-						// In case of ADD widget
-						// create widget with required selected fields and add it to dashboard
+						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
 						var pos = findEmptyPosition($obj, data, type),
+							scroll_by = (pos['y'] * data['options']['widget-height'])
+								- $('.dashbrd-grid-widget-container').scrollTop(),
 							widget_data = {
-							'type': type,
-							'header': name,
-							'pos': pos,
-							'rf_rate': data['widget_defaults'][type]['rf_rate'],
-							'fields': fields
+								'type': type,
+								'header': name,
+								'pos': pos,
+								'rf_rate': 0,
+								'fields': fields
+							},
+							add_new_widget = function() {
+								methods.addWidget.call($obj, widget_data);
+								// New widget is last element in data['widgets'] array.
+								widget = data['widgets'].slice(-1)[0];
+								updateWidgetContent($obj, data, widget);
+								setWidgetModeEdit($obj, data, widget);
+							};
+
+						if (scroll_by > 0) {
+							var new_height = (pos['y'] + pos['height']) * data['options']['widget-height'];
+
+							if (new_height > $('.dashbrd-grid-widget-container').height()) {
+								$('.dashbrd-grid-widget-container').height(new_height);
+							}
+
+							$('html, body')
+								.animate({scrollTop: '+=' + scroll_by + 'px'}, 800)
+								.promise()
+								.then(add_new_widget);
 						}
-						updateWidgetDynamic($obj, data, widget_data);
-						methods.addWidget.call($obj, widget_data);
-						// new widget is last element in data['widgets'] array
-						widget = data['widgets'].slice(-1)[0];
-						setWidgetModeEdit($obj, data, widget);
+						else {
+							add_new_widget();
+						}
 					}
 					else {
-						// In case of EDIT widget
+						// In case of EDIT widget.
 						if (widget['type'] !== type) {
 							widget['type'] = type;
 							widget['initial_load'] = true;
 						}
+
 						widget['header'] = name;
 						widget['fields'] = fields;
-
+						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					}
 
-					// mark dashboard as updated
+					// Mark dashboard as updated.
 					data['options']['updated'] = true;
 				}
-			},
-			error: function() {
-				// TODO VM: Add error message box in this case
 			}
 		});
 	}
 
 	function findEmptyPosition($obj, data, type) {
 		var pos = {
-			'row': 0,
-			'col': 0,
-			'height': data['widget_defaults'][type]['size']['height'],
-			'width': data['widget_defaults'][type]['size']['width']
+			'x': 0,
+			'y': 0,
+			'width': data['widget_defaults'][type]['size']['width'],
+			'height': data['widget_defaults'][type]['size']['height']
 		}
 
-		// go row by row and try to position widget in each space
+		// go y by row and try to position widget in each space
 		var	max_col = data['options']['max-columns'] - pos['width'],
 			found = false,
-			col, row;
+			x, y;
 
-		for (row = 0; !found; row++) {
-			for (col = 0; col <= max_col && !found; col++) {
-				pos['row'] = row;
-				pos['col'] = col;
+		for (y = 0; !found; y++) {
+			for (x = 0; x <= max_col && !found; x++) {
+				pos['x'] = x;
+				pos['y'] = y;
 				found = isPosFree($obj, data, pos);
 			}
 		}
@@ -636,7 +679,7 @@
 			'content': '',
 			'buttons': [
 				{
-					'title': (edit_mode ? t('Update') : t('Add')),
+					'title': (edit_mode ? t('Apply') : t('Add')),
 					'class': 'dialogue-widget-save',
 					'keepOpen': true,
 					'action': function() {
@@ -660,6 +703,7 @@
 
 	function setModeEditDashboard($obj, data) {
 		$.each(data['widgets'], function(index, widget) {
+			widget['rf_rate'] = 0;
 			setWidgetModeEdit($obj, data, widget);
 		});
 	}
@@ -715,7 +759,7 @@
 		var	url = new Curl('zabbix.php'),
 			ajax_widgets = [];
 
-		// Remove previous messages
+		// Remove previous messages.
 		dashboardRemoveMessages();
 
 		url.setArgument('action', 'dashbrd.widget.update');
@@ -724,22 +768,29 @@
 			var	ajax_widget = {};
 
 			if (widget['widgetid'] !== '') {
-				ajax_widget.widgetid = widget['widgetid'];
+				ajax_widget['widgetid'] = widget['widgetid'];
 			}
 			ajax_widget['pos'] = widget['pos'];
 			ajax_widget['type'] = widget['type'];
 			ajax_widget['name'] = widget['header'];
-			ajax_widget['fields'] = widget['fields'];
+			if (Object.keys(widget['fields']).length != 0) {
+				ajax_widget['fields'] = JSON.stringify(widget['fields']);
+			}
 
 			ajax_widgets.push(ajax_widget);
 		});
 
 		var ajax_data = {
+			fullscreen: data['options']['fullscreen'],
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
 			widgets: ajax_widgets
 		};
+
+		if (isset('sharing', data['dashboard'])) {
+			ajax_data['sharing'] = data['dashboard']['sharing'];
+		}
 
 		$.ajax({
 			url: url.getUrl(),
@@ -747,21 +798,24 @@
 			dataType: 'json',
 			data: ajax_data,
 			success: function(resp) {
-				// we can have redirect with errors
+				// We can have redirect with errors.
 				if ('redirect' in resp) {
-					// There are no more unsaved changes
+					// There are no more unsaved changes.
 					data['options']['updated'] = false;
-					// Replace add possibility to remove previous url (as ..&new=1) from the document history
-					// it allows to use back browser button more user-friendly
+					/*
+					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
+					 * It allows to use back browser button more user-friendly.
+					 */
 					window.location.replace(resp.redirect);
 				}
 				else if ('errors' in resp) {
-					// Error returned
+					// Error returned.
 					dashbaordAddMessages(resp.errors);
 				}
 			},
-			error: function() {
-				// TODO VM: add error message box
+			complete: function() {
+				var ul = $('#dashbrd-config').closest('ul');
+				$('#dashbrd-save', ul).prop('disabled', false);
 			}
 		});
 	}
@@ -808,14 +862,49 @@
 	}
 
 	/**
-	 * Performs action added by addAction function
+	 * Creates div for empty dashboard.
 	 *
-	 * @param string hook_name  name of trigger that is currently beeing called
-	 * @param object $obj  dashboard grid object
-	 * @param object data  data from dashboard grid
-	 * @param object widget  current widget object (can be null for generic actions)
+	 * @param {object} $obj     Dashboard grid object.
+	 * @param {object} options  Dashboard options (will be put in data['options'] in dashboard grid).
 	 *
-	 * @returns int  number of triggers, that were called
+	 * @return {object}         jQuery <div> object for placeholder.
+	 */
+	function emptyPlaceholderDiv($obj, options) {
+		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'}),
+			$text = $('<h1>');
+
+		if (options['editable']) {
+			$text.append(
+				$('<a>', {'href':'#'})
+				.text(t('Add a new widget'))
+				.click(function(e){
+					// To prevent going by href link.
+					e.preventDefault();
+
+					if (!methods.isEditMode.call($obj)) {
+						showEditMode();
+					}
+
+					methods.addNewWidget.call($obj);
+				})
+			);
+		}
+		else {
+			$text.addClass('disabled').text(t('Add a new widget'));
+		}
+
+		return $div.append($text);
+	}
+
+	/**
+	 * Performs action added by addAction function.
+	 *
+	 * @param {string} hook_name  Name of trigger that is currently being called.
+	 * @param {object} $obj       Dashboard grid object.
+	 * @param {object} data       Data from dashboard grid.
+	 * @param {object} widget     Current widget object (can be null for generic actions).
+	 *
+	 * @return int               Number of triggers, that were called.
 	 */
 	function doAction(hook_name, $obj, data, widget) {
 		if (typeof(data['triggers'][hook_name]) === 'undefined') {
@@ -880,7 +969,6 @@
 				params.push(grid);
 			}
 
-			// TODO VM: (?) try-catch may be unnecessary, but it prevents from JS from braking, if this function is not working properly
 			try {
 				window[trigger['function']].apply(null, params);
 			}
@@ -898,7 +986,8 @@
 				'max-rows': 64,
 				'max-columns': 12,
 				'rows': 0,
-				'updated': false
+				'updated': false,
+				'editable': true
 			};
 			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['max-columns'];
@@ -906,7 +995,8 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'});
+					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}),
+					$empty_placeholder = emptyPlaceholderDiv($this, options);
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -915,17 +1005,24 @@
 					widget_defaults: {},
 					triggers: {},
 					placeholder: $placeholder,
+					empty_placeholder: $empty_placeholder,
+					widget_relation_submissions: [],
+					widget_relations: {
+						relations: [],
+						tasks: {}
+					},
 					data_buffer: []
 				});
 
 				var	data = $this.data('dashboardGrid');
 
 				$this.append($placeholder.hide());
+				$this.append($empty_placeholder);
 
 				$(window).bind('beforeunload', function() {
 					var	res = confirmExit($this, data);
 
-					// return value only if we need confirmation window, return nothing othervise
+					// Return value only if we need confirmation window, return nothing otherwise.
 					if (typeof res !== 'undefined') {
 						return res;
 					}
@@ -937,6 +1034,11 @@
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
+
+				if (!$.isEmptyObject(data['dashboard']) && (data['dashboard']['name'] !== dashboard['name']
+						|| data['dashboard']['userid'] !== dashboard['userid'])) {
+					data['options']['updated'] = true;
+				}
 
 				dashboard = $.extend({}, data['dashboard'], dashboard);
 				data['dashboard'] = dashboard;
@@ -963,16 +1065,17 @@
 				'type': '',
 				'header': '',
 				'pos': {
-					'row': 0,
-					'col': 0,
-					'height': 1,
-					'width': 1
+					'x': 0,
+					'y': 0,
+					'width': 1,
+					'height': 1
 				},
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
 				'initial_load': true,
+				'ready': false,
 				'fields': {},
 				'storage': {}
 			}, widget);
@@ -984,6 +1087,7 @@
 				widget['uniqueid'] = generateUniqueId($this, data);
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
 				updateWidgetDynamic($this, data, widget);
+				data['empty_placeholder'].hide();
 
 				data['widgets'].push(widget);
 				$this.append(widget['div']);
@@ -994,7 +1098,6 @@
 				resizeDashboardGrid($this, data);
 
 				showPreloader(widget);
-				updateWidgetContent($this, data, widget);
 			});
 		},
 
@@ -1040,10 +1143,15 @@
 
 		addWidgets: function(widgets) {
 			return this.each(function() {
-				var	$this = $(this);
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
 
 				$.each(widgets, function(index, value) {
 					methods.addWidget.apply($this, Array.prototype.slice.call(arguments, 1));
+				});
+
+				$.each(data['widgets'], function(index, value) {
+					updateWidgetContent($this, data, value);
 				});
 			});
 		},
@@ -1065,12 +1173,12 @@
 		saveDashboardChanges: function() {
 			return this.each(function() {
 				var	$this = $(this),
+					ul = $('#dashbrd-config').closest('ul'),
 					data = $this.data('dashboardGrid');
 
+				$('#dashbrd-save', ul).prop('disabled', true);
 				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
-				data['options']['edit_mode'] = false;
-				doAction('afterDashboardSave', $this, data, null);
 			});
 		},
 
@@ -1080,8 +1188,6 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					url = new Curl('zabbix.php');
-
-				doAction('onEditStop', $this, data, null);
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;
@@ -1120,8 +1226,10 @@
 			});
 		},
 
-		// Add or update form on widget configuration dialogue
-		// (when opened, as well as when requested by 'onchange' attributes in form itself)
+		/*
+		 * Add or update form on widget configuration dialogue (when opened, as well as when requested by 'onchange'
+		 * attributes in form itself).
+		 */
 		updateWidgetConfigDialogue: function() {
 			return this.each(function() {
 				var	$this = $(this),
@@ -1131,35 +1239,34 @@
 					form = $('form', body),
 					widget = data.dialogue['widget'], // widget currently beeing edited
 					url = new Curl('zabbix.php'),
-					ajax_data = {};
+					ajax_data = {},
+					fields;
 
-				// disable saving, while form is beeing updated
+				// Disable saving, while form is beeing updated.
 				$('.dialogue-widget-save', footer).prop('disabled', true);
 
 				url.setArgument('action', 'dashbrd.widget.config');
 
-				// Don't send on "Add widget" or on "Edit widget", if widget was not saved yet
-				if (widget !== null && widget['widgetid'] !== '') {
-					ajax_data.widgetid = widget['widgetid'];
-				}
-
 				if (form.length) {
-					// Take values from form
-					ajax_data.fields = form.serializeJSON();
-					ajax_data.type = ajax_data['fields']['type'];
-					ajax_data.name = ajax_data['fields']['name'];
-					delete ajax_data['fields']['type'];
-					delete ajax_data['fields']['name'];
+					// Take values from form.
+					fields = form.serializeJSON();
+					ajax_data['type'] = fields['type'];
+					ajax_data['name'] = fields['name'];
+					delete fields['type'];
+					delete fields['name'];
 				}
 				else if (widget !== null) {
-					// Open form with current config
-					ajax_data.type = widget['type'];
-					ajax_data.name = widget['header'];
-					ajax_data.fields = widget['fields'];
+					// Open form with current config.
+					ajax_data['type'] = widget['type'];
+					ajax_data['name'] = widget['header'];
+					fields = widget['fields'];
 				}
 				else {
-					// Get default config for new widget
-					ajax_data.fields = [];
+					// Get default config for new widget.
+					fields = {};
+				}
+				if (Object.keys(fields).length != 0) {
+					ajax_data['fields'] = JSON.stringify(fields);
 				}
 
 				jQuery.ajax({
@@ -1167,6 +1274,20 @@
 					method: 'POST',
 					data: ajax_data,
 					dataType: 'json',
+					beforeSend: function() {
+						body.empty()
+							.append($('<div>')
+								// The smallest possible size of configuration dialog.
+								.css({
+									'width': '544px',
+									'height': '68px',
+									'max-width': '100%'
+								})
+								.append($('<div>')
+									.addClass('preloader-container')
+									.append($('<div>').addClass('preloader'))
+								));
+					},
 					success: function(resp) {
 						body.empty();
 						body.append(resp.body);
@@ -1177,26 +1298,17 @@
 							body.append(resp.messages);
 						}
 
-						// Change submit function for returned form
+						// Change submit function for returned form.
 						$('#widget_dialogue_form', body).on('submit', function(e) {
 							e.preventDefault();
 							updateWidgetConfig($this, data, widget);
 						});
 
-						// position dialogue in middle of screen
-						data.dialogue['div'].css({
-							'margin-top': '-' + (data.dialogue['div'].outerHeight() / 2) + 'px',
-							'margin-left': '-' + (data.dialogue['div'].outerWidth() / 2) + 'px'
-						});
-
-						// Enable save button after sucessfull form update
+						// Enable save button after sucessfull form update.
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
 						overlayDialogueOnLoad(true);
-					},
-					error: function() {
-						// TODO VM: add error message box
 					}
 				});
 			});
@@ -1220,92 +1332,167 @@
 		},
 
 		// Register widget as data receiver shared by other widget
-		registerAsSharedDataReceiver: function(obj) {
+		registerDataExchange: function(obj) {
 			return this.each(function() {
 				var $this = $(this),
 					data = $this.data('dashboardGrid');
 
-				for (var i = 0, l = data['widgets'].length; l > i; i++) {
-					if (data['widgets'][i]['uniqueid'] == obj.uniqueid) {
-						if (typeof data['widgets'][i]['listen_for'] === 'undefined') {
-							data['widgets'][i]['listen_for'] = [];
+				data['widget_relation_submissions'].push(obj);
+			});
+		},
+
+		registerDataExchangeCommit: function() {
+			return this.each(function() {
+				var $this = $(this),
+					used_indexes = [],
+					data = $this.data('dashboardGrid'),
+					erase;
+
+				if (data['widget_relation_submissions'].length
+						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length) {
+					$.each(data['widget_relation_submissions'], function(rel_index, rel) {
+						erase = false;
+
+						// No linked widget reference given. Just register as data receiver.
+						if (typeof rel.linkedto === 'undefined') {
+							if (typeof data['widget_relations']['tasks'][rel.uniqueid] === 'undefined') {
+								data['widget_relations']['tasks'][rel.uniqueid] = [];
+							}
+
+							data['widget_relations']['tasks'][rel.uniqueid].push({
+								data_name: rel.data_name,
+								callback: rel.callback
+							});
+							erase = true;
 						}
-						data['widgets'][i]['listen_for'].push(obj);
+						/*
+						 * Linked widget reference is given. Register two direction relationship as well as
+						 * register data receiver.
+						 */
+						else {
+							$.each(data['widgets'], function(index, widget) {
+								if (typeof widget['fields']['reference'] !== 'undefined'
+										&& widget['fields']['reference'] === rel.linkedto) {
+									if (typeof data['widget_relations']['relations'][widget.uniqueid] === 'undefined') {
+										data['widget_relations']['relations'][widget.uniqueid] = [];
+									}
+									if (typeof data['widget_relations']['relations'][rel.uniqueid] === 'undefined') {
+										data['widget_relations']['relations'][rel.uniqueid] = [];
+									}
+									if (typeof data['widget_relations']['tasks'][rel.uniqueid] === 'undefined') {
+										data['widget_relations']['tasks'][rel.uniqueid] = [];
+									}
+
+									data['widget_relations']['relations'][widget.uniqueid].push(rel.uniqueid);
+									data['widget_relations']['relations'][rel.uniqueid].push(widget.uniqueid);
+									data['widget_relations']['tasks'][rel.uniqueid].push({
+										data_name: rel.data_name,
+										callback: rel.callback
+									});
+									erase = true;
+								}
+							});
+						}
+
+						if (erase) {
+							used_indexes.push(rel_index);
+						}
+					});
+
+					for (var i = used_indexes.length - 1; i >= 0; i--) {
+						data['widget_relation_submissions'].splice(used_indexes[i], 1);
 					}
+
+					methods.callWidgetDataShare.call($this);
 				}
 			});
 		},
 
-		widgetDataShare: function(widget, data_key) {
-			var args = Array.prototype.slice.call(arguments, 2);
+		/**
+		 * Pushes received data in data buffer and calls sharing method.
+		 *
+		 * @param object widget  data origin widget
+		 * @param string data_name  string to identify data shared
+		 *
+		 * @returns boolean		indicates either there was linked widget that was related to data origin widget
+		 */
+		widgetDataShare: function(widget, data_name) {
+			var args = Array.prototype.slice.call(arguments, 2),
+				uniqueid = widget['uniqueid'],
+				ret = true;
 
 			if (!args.length) {
 				return false;
 			}
 
-			if (typeof widget['fields'] === 'object' && typeof widget['fields']['reference'] !== 'undefined') {
-				var reference = widget['fields']['reference'];
+			this.each(function() {
+				var $this = $(this),
+					data = $this.data('dashboardGrid'),
+					indx = -1;
 
-				return this.each(function() {
-					var $this = $(this),
-						data = $this.data('dashboardGrid'),
-						indx = -1;
+				if (typeof data['widget_relations']['relations'][widget['uniqueid']] === 'undefined'
+						|| data['widget_relations']['relations'][widget['uniqueid']].length == 0) {
+					ret = false;
+				}
 
-					if (typeof data['data_buffer'][reference] === 'undefined') {
-						data['data_buffer'][reference] = [];
-					}
-					else if (typeof data['data_buffer'][reference] !== 'undefined') {
-						$.each(data['data_buffer'][reference], function(i, arr) {
-							if (arr['data_key'] === data_key) {
-								indx = i;
-							}
-						});
-					}
-
-					if (indx === -1) {
-						data['data_buffer'][reference].push({
-							data_key: data_key,
-							args: args,
-							old: false
-						});
-					}
-					else {
-						if (data['data_buffer'][reference][indx]['args'] !== args) {
-							data['data_buffer'][reference][indx]['args'] = args;
-							data['data_buffer'][reference][indx]['old'] = false;
+				if (typeof data['data_buffer'][uniqueid] === 'undefined') {
+					data['data_buffer'][uniqueid] = [];
+				}
+				else if (typeof data['data_buffer'][uniqueid] !== 'undefined') {
+					$.each(data['data_buffer'][uniqueid], function(i, arr) {
+						if (arr['data_name'] === data_name) {
+							indx = i;
 						}
-					}
+					});
+				}
 
-					methods.callWidgetDataShare.call($(this), true);
-				});
-			}
+				if (indx === -1) {
+					data['data_buffer'][uniqueid].push({
+						data_name: data_name,
+						args: args,
+						old: []
+					});
+				}
+				else {
+					if (data['data_buffer'][uniqueid][indx]['args'] !== args) {
+						data['data_buffer'][uniqueid][indx]['args'] = args;
+						data['data_buffer'][uniqueid][indx]['old'] = [];
+					}
+				}
+
+				methods.callWidgetDataShare.call($this);
+			});
+
+			return ret;
 		},
 
 		callWidgetDataShare: function($obj) {
-			var ignore_old_data = arguments[0];
-
 			return this.each(function() {
 				var $this = $(this),
 					data = $this.data('dashboardGrid');
 
-				for (var reference in data['data_buffer']) {
-					if (typeof data['data_buffer'][reference] === 'object') {
-						$.each(data['data_buffer'][reference], function(i, shared_data) {
-							if (!shared_data['old'] || !ignore_old_data) {
-								for (var i = 0, l = data['widgets'].length; l > i; i++) {
-									if (typeof(data['widgets'][i]['listen_for']) != 'undefined') {
-										for (var t = 0, j = data['widgets'][i]['listen_for'].length; j > t; t++) {
-											var wr = data['widgets'][i]['listen_for'][t]['source_widget_reference'];
-											if (wr === reference) {
-												data['widgets'][i]['listen_for'][t].callback.apply($obj,
-													[data['widgets'][i], shared_data['args']]
-												);
+				for (var src_uniqueid in data['data_buffer']) {
+					if (typeof data['data_buffer'][src_uniqueid] === 'object') {
+						$.each(data['data_buffer'][src_uniqueid], function(index, buffer_data) {
+							if (typeof data['widget_relations']['relations'][src_uniqueid] !== 'undefined') {
+								$.each(data['widget_relations']['relations'][src_uniqueid], function(index,
+										dest_uid) {
+									if (buffer_data['old'].indexOf(dest_uid) == -1) {
+										if (typeof data['widget_relations']['tasks'][dest_uid] !== 'undefined') {
+											var widget = methods.getWidgetsBy.call($this, 'uniqueid', dest_uid);
+											if (widget.length) {
+												$.each(data['widget_relations']['tasks'][dest_uid], function(i, task) {
+													if (task['data_name'] === buffer_data['data_name']) {
+														task.callback.apply($obj, [widget[0], buffer_data['args']]);
+													}
+												});
+
+												buffer_data['old'].push(dest_uid);
 											}
 										}
 									}
-								}
+								});
 							}
-							shared_data['old'] = true;
 						});
 					}
 				}

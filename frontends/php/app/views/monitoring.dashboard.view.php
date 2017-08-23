@@ -19,7 +19,11 @@
 **/
 
 
+$this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('gtlc.js');
 $this->addJsFile('dashboard.grid.js');
+$this->addJsFile('class.calendar.js');
+
 $this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
 $sharing_form = include 'monitoring.dashboard.sharing_form.php';
@@ -28,6 +32,7 @@ $breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
 $item_groupid = null;
 $item_hostid = null;
+
 if ($data['dynamic']['has_dynamic_widgets']) {
 	$item_groupid = [
 		new CLabel(_('Group'), 'groupid'),
@@ -49,6 +54,7 @@ $url_clone = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
 	->setArgument('source_dashboardid', $data['dashboard']['dashboardid'])
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+
 if ($data['dashboard']['editable']) {
 	$url_delete = (new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.delete')
@@ -67,8 +73,10 @@ if ($data['dashboard']['editable']) {
 			// $item_groupid and $item_hostid will be hidden, when 'Edit Dashboard' will be clicked.
 			->addItem($item_groupid)
 			->addItem($item_hostid)
-			// 'Edit dashboard' should be first one in list,
-			// because it will be visually replaced by last item of new list, when clicked
+			/*
+			 * 'Edit dashboard' should be first one in list, because it will be visually replaced by last item of
+			 * new list, when clicked.
+			 */
 			->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable']))
 			->addItem((new CButton(SPACE))
 				->addClass(ZBX_STYLE_BTN_ACTION)
@@ -112,6 +120,7 @@ if ($data['dashboard']['editable']) {
 		->addItem($breadcrumbs)
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 	)
+	->addItem(($data['show_timeline']) ? (new CFilter('web.dashbrd.filter.state'))->addNavigator() : null)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->addItem($edit_form)
 	->addItem($sharing_form)
@@ -120,19 +129,25 @@ if ($data['dashboard']['editable']) {
 /*
  * Javascript
  */
-// activating blinking
+// Activate blinking.
 $this->addPostJS('jqBlink.blink();');
 
 $dashboard_data = [
-	// name is required for new dashboard creation
-	'name'   => $data['dashboard']['name'],
-	'userid' => $data['dashboard']['owner']['id'],
-	'dynamic' => $data['dynamic']
+	// Name is required for new dashboard creation.
+	'name'		=> $data['dashboard']['name'],
+	'userid'	=> $data['dashboard']['owner']['id'],
+	'dynamic'	=> $data['dynamic']
 ];
+
+if (array_key_exists('sharing', $data['dashboard'])) {
+	$dashboard_data['sharing'] = $data['dashboard']['sharing'];
+}
+
 $dashboard_options = [
 	'fullscreen' => $data['fullscreen'],
 	'max-rows' => DASHBOARD_MAX_ROWS,
-	'max-columns' => DASHBOARD_MAX_COLUMNS
+	'max-columns' => DASHBOARD_MAX_COLUMNS,
+	'editable' => $data['dashboard']['editable']
 ];
 if ($data['dashboard']['dashboardid'] != 0) {
 	$dashboard_data['id'] = $data['dashboard']['dashboardid'];
@@ -140,11 +155,24 @@ if ($data['dashboard']['dashboardid'] != 0) {
 else {
 	$dashboard_options['updated'] = true;
 }
-// Initialize dashboard grid
+
+// must be done before adding widgets, because it causes dashboard to resize.
+if ($data['show_timeline']) {
+	$this->addPostJS(
+		'timeControl.useTimeRefresh('.CWebUser::getRefresh().');'.
+		'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.
+			CJs::encodeJson($data['timeControlData']).
+		');'.
+		'timeControl.processObjects();'
+	);
+}
+
+// Initialize dashboard grid.
 $this->addPostJS(
 	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
 		'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
 		'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
 		'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
-		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).');'
+		'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).
+	');'
 );

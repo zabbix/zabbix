@@ -326,7 +326,7 @@ class CScreenProblem extends CScreenBase {
 				$eventid_till = end($problems)['eventid'] - 1;
 				$triggerids = [];
 
-				foreach ($problems as $eventid => $problem) {
+				foreach ($problems as $problem) {
 					if (!array_key_exists($problem['objectid'], $seen_triggerids)) {
 						$triggerids[$problem['objectid']] = true;
 					}

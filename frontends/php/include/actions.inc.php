@@ -880,13 +880,18 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 					: $operation['opmessage']['message'];
 
 				$result_hint = [];
-				if ($subject) {
+
+				if (trim($subject)) {
 					$result_hint = [bold($subject), BR(), BR()];
 				}
-				if ($message) {
+
+				if (trim($message)) {
 					$result_hint[] = zbx_nl2br($message);
 				}
-				$result[$key][] = $result_hint;
+
+				if ($result_hint) {
+					$result[$key][] = $result_hint;
+				}
 				break;
 
 			case OPERATION_TYPE_COMMAND:
@@ -961,7 +966,19 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 					$message = $opmessage['message'];
 				}
 
-				$result[$key][] = [bold($subject), BR(), BR(), zbx_nl2br($message)];
+				$result_hint = [];
+
+				if (trim($subject)) {
+					$result_hint = [bold($subject), BR(), BR()];
+				}
+
+				if (trim($message)) {
+					$result_hint[] = zbx_nl2br($message);
+				}
+
+				if ($result_hint) {
+					$result[$key][] = $result_hint;
+				}
 				break;
 		}
 	}

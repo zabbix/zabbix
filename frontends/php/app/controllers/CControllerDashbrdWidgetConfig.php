@@ -23,10 +23,9 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgetid'	=> 'db widget.widgetid',
-			'type'		=> 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
-			'name'		=> 'string',
-			'fields'	=> 'array'
+			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'name' => 'string',
+			'fields' => 'json'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -38,7 +37,6 @@ class CControllerDashbrdWidgetConfig extends CController {
 		}
 
 		if (!$ret) {
-			// TODO VM: prepare propper response for case of incorrect fields
 			$this->setResponse(new CControllerResponseData(['body' => CJs::encodeJson('')]));
 		}
 
@@ -50,31 +48,39 @@ class CControllerDashbrdWidgetConfig extends CController {
 	}
 
 	protected function doAction() {
-		$type = $this->getInput('type', WIDGET_CLOCK);
-		$form = CWidgetConfig::getForm($type, $this->getInput('fields', []));
+		$known_widget_types = CWidgetConfig::getKnownWidgetTypes();
+		natsort($known_widget_types);
+
+		$type = $this->getInput('type', array_keys($known_widget_types)[0]);
+		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
 
 		$config = select_config();
-		$global_config = [];
-		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-			$global_config['severity_name_'.$severity] = getSeverityName($severity, $config);
-		}
 
 		$this->setResponse(new CControllerResponseData([
-			'config' => $global_config,
+			'config' => [
+				'event_ack_enable' => $config['event_ack_enable'],
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
 			'dialogue' => [
 				'type' => $type,
 				'name' => $this->getInput('name', ''),
-				'form' => $form,
+				'fields' => $form->getFields(),
 			],
+			'known_widget_types' => $known_widget_types,
 			'captions' => $this->getCaptions($form)
 		]));
 	}
 
 	/**
-	 * Prepares mapped list of names for all required resources
+	 * Prepares mapped list of names for all required resources.
 	 *
 	 * @param CWidgetForm $form
 	 *
@@ -100,6 +106,10 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 						case WIDGET_FIELD_SELECT_RES_SYSMAP:
 							$captions['simple'][$resource_type][$id] = _('Inaccessible map');
+							break;
+
+						case WIDGET_FIELD_SELECT_RES_GRAPH:
+							$captions['simple'][$resource_type][$id] = _('Inaccessible graph');
 							break;
 					}
 				}
@@ -138,6 +148,22 @@ class CControllerDashbrdWidgetConfig extends CController {
 					if ($maps) {
 						foreach ($maps as $key => $map) {
 							$list[$map['sysmapid']] = $map['name'];
+						}
+					}
+					break;
+
+				case WIDGET_FIELD_SELECT_RES_GRAPH:
+					$graphs = API::Graph()->get([
+						'graphids' => array_keys($list),
+						'selectHosts' => ['name'],
+						'output' => ['graphid', 'name']
+					]);
+
+					if ($graphs) {
+						foreach ($graphs as $key => $graph) {
+							order_result($graph['hosts'], 'name');
+							$graph['host'] = reset($graph['hosts']);
+							$list[$graph['graphid']] = $graph['host']['name'].NAME_DELIMITER.$graph['name'];
 						}
 					}
 					break;

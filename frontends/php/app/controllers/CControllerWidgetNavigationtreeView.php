@@ -30,11 +30,11 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 
 		$this->setType(WIDGET_NAVIGATION_TREE);
 		$this->setValidationRules([
-			'name' =>			'string',
-			'uniqueid' =>		'required|string',
-			'widgetid'	=>		'db widget.widgetid',
-			'initial_load' =>	'in 0,1',
-			'fields' =>			'array'
+			'name' => 'string',
+			'uniqueid' => 'required|string',
+			'widgetid' => 'db widget.widgetid',
+			'initial_load' => 'in 0,1',
+			'fields' => 'json'
 		]);
 	}
 
@@ -263,6 +263,14 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 			}
 		}
 
+		foreach ($response as &$row) {
+			// Reduce the amount of data transferred over Ajax.
+			if ($row === $this->problems_per_severity_tpl) {
+				$row = 0;
+			}
+		}
+		unset($row);
+
 		return $response;
 	}
 
@@ -413,6 +421,25 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 			}
 		}
 
+		// Find and fix circular dependencies.
+		foreach ($navtree_items as $fieldid => $field_details) {
+			if ($field_details['parent'] != 0) {
+				$parent = $navtree_items[$field_details['parent']];
+				while ($parent['parent'] != 0) {
+					if ($parent['parent'] == $fieldid) {
+						$navtree_items[$fieldid]['parent'] = 0;
+						break;
+					}
+					elseif (array_key_exists($parent['parent'], $navtree_items)) {
+						$parent = $navtree_items[$parent['parent']];
+					}
+					else {
+						break;
+					}
+				}
+			}
+		}
+
 		// Propagate item mapids to all its parent items.
 		foreach ($navtree_items as $field_details) {
 			$parentid = $field_details['parent'];
@@ -462,6 +489,7 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,
 			'problems' => $this->getNumberOfProblemsBySysmap($navtree_items),
+			'show_unavailable' => array_key_exists('show_unavailable', $fields) ? $fields['show_unavailable'] : 0,
 			'maps_accessible' => $maps_accessible,
 			'severity_config' => $severity_config,
 			'initial_load' => $this->getInput('initial_load', 0),

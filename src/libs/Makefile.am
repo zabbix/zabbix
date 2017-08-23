@@ -25,7 +25,8 @@ DIST_SUBDIRS = \
 	zbxmodules \
 	zbxregexp \
 	zbxtasks \
-	zbxhttp
+	zbxhttp \
+	zbxipcservice
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -78,6 +79,7 @@ SUBDIRS = \
 	zbxexec \
 	zbxmodules \
 	zbxregexp \
+	zbxipcservice \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)

@@ -23,8 +23,50 @@ class CWidgetForm {
 
 	protected $fields;
 
+	/**
+	 * Widget fields array that came from AJAX request.
+	 *
+	 * @var array
+	 */
+	protected $data;
+
 	public function __construct($data) {
+		$this->data = CJs::decodeJson($data);
+
 		$this->fields = [];
+	}
+
+	/**
+	 * Convert all dot-delimited keys to arrays of objets.
+	 * Example:
+	 *   source: [
+	 *               'tags.tag.1' => 'tag1',
+	 *               'tags.value.1' => 'value1',
+	 *               'tags.tag.2' => 'tag2',
+	 *               'tags.value.2' => 'value2'
+	 *           ]
+	 *   result: [
+	 *               'tags' => [
+	 *                   ['tag' => 'tag1', 'value' => 'value1'],
+	 *                   ['tag' => 'tag2', 'value' => 'value2']
+	 *               ]
+	 *           ]
+	 *
+	 * @static
+	 *
+	 * @param array $data  An array of key => value pairs.
+	 *
+	 * @return array
+	 */
+	protected static function convertDottedKeys(array $data) {
+		foreach ($data as $key => $value) {
+			if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
+				unset($data[$key]);
+			}
+		}
+
+		return $data;
 	}
 
 	/**
@@ -52,11 +94,19 @@ class CWidgetForm {
 		return $data;
 	}
 
-	public function validate() {
+	/**
+	 * Validate form fields.
+	 *
+	 * @param bool $strict  Enables more strict validation of the form fields.
+	 *                      Must be enabled for validation of input parameters in the widget configuration form.
+	 *
+	 * @return bool
+	 */
+	public function validate($strict = false) {
 		$errors = [];
 
 		foreach ($this->fields as $field) {
-			$errors = array_merge($errors, $field->validate());
+			$errors = array_merge($errors, $field->validate($strict));
 		}
 
 		return $errors;
@@ -71,7 +121,7 @@ class CWidgetForm {
 		$api_fields = [];
 
 		foreach ($this->fields as $field) {
-			$api_fields = array_merge($api_fields, $field->toApi());
+			$field->toApi($api_fields);
 		}
 
 		return $api_fields;

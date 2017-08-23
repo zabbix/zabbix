@@ -168,6 +168,7 @@ typedef struct
 	int			lastclock;
 	int			mtime;
 	int			preproc_ops_num;
+	int			dep_itemids_num;
 	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
 	char			snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
@@ -186,6 +187,7 @@ typedef struct
 	char			*db_error;
 
 	zbx_item_preproc_t	*preproc_ops;
+	zbx_uint64_t		*dep_itemids;
 }
 DC_ITEM;
 
@@ -417,6 +419,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	zbx_timespec_t		timestamp;
 	zbx_variant_t		value;
+	unsigned char		value_type;
 }
 zbx_item_history_value_t;
 
@@ -485,6 +488,7 @@ void	*DCget_stats(int request);
 /* flags for DCconfig_get_items_by_itemids() function to specify the data needed */
 #define ZBX_FLAG_ITEM_FIELDS_DEFAULT		__UINT64_C(0x0000)
 #define ZBX_FLAG_ITEM_FIELDS_PREPROC		__UINT64_C(0x0001)
+#define ZBX_FLAG_ITEM_FIELDS_DEPENDENT		__UINT64_C(0x0002)
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
@@ -505,6 +509,7 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
 		zbx_uint64_t flags);
+void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp);
 void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
@@ -578,9 +583,6 @@ int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_tim
 
 int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timespec_t *ts,
 		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error);
-
-void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
-void	DCset_delta_items(zbx_hashset_t *items);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
@@ -676,5 +678,11 @@ zbx_agent_value_t;
 void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
 void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess);
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
+
+/* item preprocessing support */
+void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
+		zbx_timespec_t *ts, unsigned char state, char *error);
+void	zbx_preprocessor_flush();
+zbx_uint64_t	zbx_preprocessor_get_queue_size();
 
 #endif

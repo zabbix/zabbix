@@ -340,6 +340,12 @@ class CItemPrototype extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
+
+		foreach ($items as &$item) {
+			unset($item['itemid']);
+		}
+		$this->validateDependentItems($items, API::ItemPrototype());
+
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -347,6 +353,12 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	protected function createReal(&$items) {
+		foreach ($items as &$item) {
+			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = null;
+			}
+		}
+		unset($item);
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = $insertItemDiscovery = [];
@@ -696,7 +708,29 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
+
 		$this->checkInput($items, true);
+		$this->validateDependentItems($items, API::ItemPrototype());
+
+		$dbItems = $this->get([
+			'output' => ['type', 'master_itemid'],
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $dbItems, ['type']);
+
+		foreach ($items as &$item) {
+			if ($item['type'] != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
+				$item['master_itemid'] = null;
+			}
+			elseif (!array_key_exists('master_itemid', $item)) {
+				$item['master_itemid'] = $dbItems[$item['itemid']]['master_itemid'];
+			}
+		}
+		unset($item);
+
 		$this->updateReal($items);
 		$this->inherit($items);
 
@@ -750,6 +784,22 @@ class CItemPrototype extends CItemGeneral {
 				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
 		} while ($parentItemids);
+
+		$db_dependent_items = $delItemPrototypes + $childPrototypeids;
+		$dependent_itemprototypes = [];
+		// Master item deletion will remove dependent items on database level.
+		while ($db_dependent_items) {
+			$db_dependent_items = $this->get([
+				'output' => ['itemid', 'name'],
+				'filter' => ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+				'selectHosts' => ['name'],
+				'preservekeys' => true
+			]);
+			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_itemprototypes);
+			$dependent_itemprototypes += $db_dependent_items;
+		};
+		$dependent_itemprototypeids = array_keys($dependent_itemprototypes);
+		$childPrototypeids += array_combine($dependent_itemprototypeids, $dependent_itemprototypeids);
 
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
@@ -831,10 +881,12 @@ class CItemPrototype extends CItemGeneral {
 
 
 // TODO: remove info from API
+		$delItemPrototypes = zbx_toHash($delItemPrototypes, 'itemid') + $dependent_itemprototypes;
 		foreach ($delItemPrototypes as $item) {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
+		$prototypeids = array_map('strval', $prototypeids);
 
 		return ['prototypeids' => $prototypeids];
 	}
@@ -1008,6 +1060,9 @@ class CItemPrototype extends CItemGeneral {
 		if ($updateItems) {
 			$this->updateReal($updateItems);
 		}
+
+		// Update master_itemid for inserted or updated inherited dependent items.
+		$this->inheritDependentItems(array_merge($updateItems, $insertItems));
 
 		// propagate the inheritance to the children
 		$this->inherit(array_merge($insertItems, $updateItems));

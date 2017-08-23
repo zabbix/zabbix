@@ -20,7 +20,7 @@
 
 
 /**
- * Controller to get dashboard data
+ * Controller to get dashboard data.
  */
 class CControllerDashboardGet extends CController {
 
@@ -28,8 +28,8 @@ class CControllerDashboardGet extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>	'required|db dashboard.dashboardid',
-			'editable' =>		'in 0,1'
+			'dashboardid' => 'required|db dashboard.dashboardid',
+			'editable' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);

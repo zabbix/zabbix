@@ -18,7 +18,7 @@
  **/
 
 
-jQuery(function($) {
+(function($) {
 
 	window.flickerfreeScreen = {
 
@@ -346,7 +346,8 @@ jQuery(function($) {
 
 				$('#flickerfreescreen_' + id + ' img').each(function() {
 					var domImg = $(this),
-						url = new Curl(domImg.attr('src'));
+						url = new Curl(domImg.attr('src')),
+						on_dashboard = timeControl.objectList[id].onDashboard;
 
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
 					url.setArgument('updateProfile', (typeof screen.updateProfile === 'undefined')
@@ -355,67 +356,94 @@ jQuery(function($) {
 					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					url.setArgument('curtime', new CDate().getTime());
 
-					// create temp image in buffer
-					$('<img>', {
-						'class': domImg.attr('class'),
-						'data-timestamp': new CDate().getTime(),
-						id: domImg.attr('id') + '_tmp',
-						name: domImg.attr('name'),
-						border: domImg.attr('border'),
-						usemap: domImg.attr('usemap'),
-						alt: domImg.attr('alt'),
-						src: url.getUrl(),
-						css: {
-							position: 'relative',
-							zIndex: 2
-						}
-					})
-					.error(function() {
-						screen.error++;
-						window.flickerfreeScreen.calculateReRefresh(id);
-					})
-					.load(function() {
-						if (screen.error > 0) {
-							return;
-						}
-
-						screen.isRefreshing = false;
-
-						// re-refresh image
-						var bufferImg = $(this);
-
-						if (bufferImg.data('timestamp') > screen.timestamp) {
-							screen.timestamp = bufferImg.data('timestamp');
-
-							// set id
-							bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
-
-							// set opacity state
-							if (window.flickerfreeScreenShadow.isShadowed(id)) {
-								bufferImg.fadeTo(0, 0.6);
+					// Create temp image in buffer.
+					var img = $('<img>', {
+							'class': domImg.attr('class'),
+							'data-timestamp': new CDate().getTime(),
+							id: domImg.attr('id') + '_tmp',
+							name: domImg.attr('name'),
+							border: domImg.attr('border'),
+							usemap: domImg.attr('usemap'),
+							alt: domImg.attr('alt'),
+							css: {
+								position: 'relative',
+								zIndex: 2
+							}
+						})
+						.error(function() {
+							screen.error++;
+							window.flickerfreeScreen.calculateReRefresh(id);
+						})
+						.on('load', function() {
+							if (screen.error > 0) {
+								return;
 							}
 
-							// set loaded image from buffer to dom
-							domImg.replaceWith(bufferImg);
+							screen.isRefreshing = false;
 
-							// callback function on success
-							if (!empty(successAction)) {
-								successAction();
+							// Re-refresh image.
+							var bufferImg = $(this);
+
+							if (bufferImg.data('timestamp') > screen.timestamp) {
+								screen.timestamp = bufferImg.data('timestamp');
+
+								// Set id.
+								bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
+
+								// Set opacity state.
+								if (window.flickerfreeScreenShadow.isShadowed(id)) {
+									bufferImg.fadeTo(0, 0.6);
+								}
+
+								if (!empty(bufferImg.data('height'))) {
+									timeControl.changeSBoxHeight(id, bufferImg.data('height'));
+								}
+
+								// Set loaded image from buffer to dom.
+								domImg.replaceWith(bufferImg);
+
+								// Callback function on success.
+								if (!empty(successAction)) {
+									successAction();
+								}
+
+								// Rebuild timeControl sbox listeners.
+								if (!empty(ZBX_SBOX[id])) {
+									ZBX_SBOX[id].addListeners();
+								}
+
+								window.flickerfreeScreenShadow.end(id);
 							}
 
-							// rebuild timeControl sbox listeners
-							if (!empty(ZBX_SBOX[id])) {
-								ZBX_SBOX[id].addListeners();
+							if (screen.isReRefreshRequire) {
+								screen.isReRefreshRequire = false;
+								window.flickerfreeScreen.refresh(id, true);
 							}
 
-							window.flickerfreeScreenShadow.end(id);
-						}
+							if (on_dashboard) {
+								timeControl.updateDashboardFooter(id);
+							}
+						});
 
-						if (screen.isReRefreshRequire) {
-							screen.isReRefreshRequire = false;
-							window.flickerfreeScreen.refresh(id, true);
-						}
-					});
+					if (['chart.php','chart2.php','chart3.php'].indexOf(url.getPath()) > -1
+							&& url.getArgument('outer') === '1'
+					) {
+						// Getting height of graph inside image. Only for line graphs on dashboard.
+						var heightUrl = new Curl(url.getUrl());
+						heightUrl.setArgument('onlyHeight', '1');
+
+						$.ajax({
+							url: heightUrl.getUrl(),
+							success: function(response, status, xhr) {
+								// 'src' should be added only here to trigger load event after new height is received.
+								img.data('height', +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+								img.attr('src', url.getUrl());
+							}
+						});
+					}
+					else {
+						img.attr('src', url.getUrl());
+					}
 				});
 			}
 		},
@@ -777,4 +805,4 @@ jQuery(function($) {
 	$(window).resize(function() {
 		window.flickerfreeScreenShadow.moveShadows();
 	});
-});
+}(jQuery));

@@ -20,12 +20,11 @@
 
 
 /**
- * Action log widget form
+ * Action log widget form.
  */
 class CActionLogWidgetForm extends CWidgetForm {
 
-	public function __construct($data)
-	{
+	public function __construct($data) {
 		parent::__construct($data);
 
 		$sort_types = [
@@ -42,8 +41,8 @@ class CActionLogWidgetForm extends CWidgetForm {
 		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types))
 			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
-		if (array_key_exists('sort_triggers', $data)) {
-			$field_sort->setValue($data['sort_triggers']);
+		if (array_key_exists('sort_triggers', $this->data)) {
+			$field_sort->setValue($this->data['sort_triggers']);
 		}
 		$this->fields[] = $field_sort;
 
@@ -51,8 +50,8 @@ class CActionLogWidgetForm extends CWidgetForm {
 			ZBX_MAX_WIDGET_LINES
 		))->setDefault(25);
 
-		if (array_key_exists('show_lines', $data)) {
-			$field_lines->setValue($data['show_lines']);
+		if (array_key_exists('show_lines', $this->data)) {
+			$field_lines->setValue($this->data['show_lines']);
 		}
 		$this->fields[] = $field_lines;
 	}

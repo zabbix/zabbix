@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CWidgetFieldTextBox extends CWidgetField {
 
 	/**
@@ -31,5 +32,15 @@ class CWidgetFieldTextBox extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setDefault('');
+	}
+
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
+
+		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && $this->getValue() === '') {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
+		}
+
+		return $errors;
 	}
 }
