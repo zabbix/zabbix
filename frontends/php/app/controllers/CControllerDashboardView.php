@@ -51,11 +51,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
-			return false;
-		}
-
-		return true;
+		return  !($this->getUserType() < USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {

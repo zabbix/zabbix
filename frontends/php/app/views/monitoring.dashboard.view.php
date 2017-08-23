@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
 }
