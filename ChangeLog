@@ -10,6 +10,7 @@ Changes for 3.4.1rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBXNEXT-3006] fixed multiple issues with dependent items (vjaceslavs)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.0
