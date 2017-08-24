@@ -184,6 +184,11 @@ extern struct mallinfo	zbx_cu_minfo;
 
 void	zbx_cu_run(int args, char *argv[]);
 
+void	*zbx_cu_galloc(void *old, size_t size);
+
+const char	*zbx_cu_item_type_string(zbx_item_type_t item_type);
+const char	*zbx_cu_poller_type_string(unsigned char poller_type);
+
 #endif
 
 #endif
