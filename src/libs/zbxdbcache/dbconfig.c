@@ -167,11 +167,8 @@ clean:
 	return ret;
 }
 
-static unsigned char	poller_by_item(zbx_uint64_t proxy_hostid, unsigned char type, const char *key)
+static unsigned char	poller_by_item(unsigned char type, const char *key)
 {
-	if (0 != proxy_hostid && SUCCEED != is_item_processed_by_server(type, key))
-		return ZBX_NO_POLLER;
-
 	switch (type)
 	{
 		case ITEM_TYPE_SIMPLE:
@@ -237,6 +234,7 @@ static int	is_counted_in_item_queue(unsigned char type, const char *key)
 			}
 			break;
 		case ITEM_TYPE_TRAPPER:
+		case ITEM_TYPE_DEPENDENT:
 		case ITEM_TYPE_HTTPTEST:
 		case ITEM_TYPE_SNMPTRAP:
 			return FAIL;
@@ -383,16 +381,37 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
-	if (0 == (flags & ZBX_HOST_UNREACHABLE))
+	if (0 != dc_host->proxy_hostid && SUCCEED != is_item_processed_by_server(dc_item->type, dc_item->key))
 	{
-		if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
-			dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type, dc_item->key);
+		dc_item->poller_type = ZBX_NO_POLLER;
+		return;
 	}
-	else
+
+	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
 		if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type || ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
 			dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+
+		return;
 	}
+
+	if (0 == (flags & ZBX_ITEM_COLLECTED))
+	{
+		dc_item->poller_type = poller_by_item(dc_item->type, dc_item->key);
+		return;
+	}
+
+	if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
+	{
+		unsigned char	poller_type;
+
+		poller_type = poller_by_item(dc_item->type, dc_item->key);
+
+		if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type)
+			return;
+	}
+
+	dc_item->poller_type = poller_by_item(dc_item->type, dc_item->key);
 }
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
@@ -1768,7 +1787,6 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->ip);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-
 			DCstrpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
 		}
@@ -2112,8 +2130,6 @@ static void	dc_host_update_agent_stats(ZBX_DC_HOST *host, unsigned char type, in
 	}
 }
 
-static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags, int lastclock);
-
 static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 {
 	const char		*__function_name = "DCsync_items";
@@ -2139,11 +2155,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
-	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		status, type, value_type;
-	int			found, update_index, ret, i, index;
+	unsigned char		status, type, value_type, old_poller_type;
+	int			found, update_index, ret, i, index, old_nextcheck;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_ptr_t	dep_items;
 
@@ -2239,7 +2254,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCstrpool_replace(found, &item->db_error, row[36]);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
-			item->poller_type = poller_by_item(host->proxy_hostid, type, item->key);
+			item->poller_type = ZBX_NO_POLLER;
 			item->unreachable = 0;
 			item->schedulable = 1;
 
@@ -2256,13 +2271,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
-
-			/* remove deltaitem history if item value type has been changed */
-			if (item->value_type != value_type)
-			{
-				if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &itemid)))
-					zbx_hashset_remove_direct(&config->deltaitems, deltaitem);
-			}
 
 			if (ITEM_STATUS_ACTIVE == item->status)
 				dc_host_update_agent_stats(host, item->type, -1);
@@ -2569,16 +2577,24 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		/* it is crucial to update type specific (config->snmpitems, config->ipmiitems, etc.) hashsets before */
 		/* attempting to requeue an item because type specific properties are used to arrange items in queues */
 
-		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status &&
-				SUCCEED == is_counted_in_item_queue(item->type, item->key))
+		old_poller_type = item->poller_type;
+		old_nextcheck = item->nextcheck;
+
+		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			dc_requeue_item(item, host, flags, now);
+			DCitem_poller_type_update(item, host, flags);
+
+			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
+				DCitem_nextcheck_update(item, host, flags, now);
 		}
 		else
 		{
 			item->nextcheck = 0;
 			item->unreachable = 0;
+			item->poller_type = ZBX_NO_POLLER;
 		}
+
+		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 	}
 
 	/* update dependent item vectors within master items */
@@ -3157,7 +3173,7 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 	ZBX_DC_EXPRESSION	*expression;
 	ZBX_DC_REGEXP		*regexp, regexp_local;
 	zbx_uint64_t		expressionid;
-	int 			found, ret;
+	int			found, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3486,7 +3502,7 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		correlationid;
+	zbx_uint64_t		correlationid;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret;
 
@@ -3698,7 +3714,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		conditionid, correlationid;
+	zbx_uint64_t		conditionid, correlationid;
 	zbx_dc_corr_condition_t	*condition;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret, i, index;
@@ -3802,7 +3818,7 @@ static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		operationid, correlationid;
+	zbx_uint64_t		operationid, correlationid;
 	zbx_dc_corr_operation_t	*operation;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret, index;
@@ -3886,7 +3902,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		groupid;
+	zbx_uint64_t		groupid;
 	zbx_dc_hostgroup_t	*group;
 	int			found, ret, index;
 
@@ -4058,7 +4074,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		item_preprocid, itemid, lastitemid = 0;
+	zbx_uint64_t		item_preprocid, itemid, lastitemid = 0;
 	int			found, ret, i, index;
 	ZBX_DC_ITEM		*item = NULL;
 	zbx_dc_item_preproc_t	*preproc;
@@ -4757,6 +4773,8 @@ void	DCsync_configuration(unsigned char mode)
 				config->ipmiitems.num_data, config->ipmiitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __function_name,
 				config->trapitems.num_data, config->trapitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() dependentitems  : %d (%d slots)", __function_name,
+				config->dependentitems.num_data, config->dependentitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __function_name,
 				config->logitems.num_data, config->logitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __function_name,
@@ -4771,8 +4789,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->jmxitems.num_data, config->jmxitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
 				config->calcitems.num_data, config->calcitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() deltaitems : %d (%d slots)", __function_name,
-				config->deltaitems.num_data, config->deltaitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,

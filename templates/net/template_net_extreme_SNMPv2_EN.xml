@@ -11,12 +11,11 @@
       <template>
          <template>Template Net Extreme EXOS SNMPv2</template>
          <name>Template Net Extreme EXOS SNMPv2</name>
-         <description>Template Extreme EXOS version: 0.11
+         <description>Template Extreme EXOS version: 0.12
 MIBs used:
 EXTREME-SOFTWARE-MONITOR-MIB
 EXTREME-SYSTEM-MIB
-ENTITY-MIB
-</description>
+ENTITY-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -72,8 +71,7 @@ ENTITY-MIB
                <privatekey/>
                <port/>
                <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
-Total CPU utlization (percentage) as of last sampling.
-</description>
+Total CPU utlization (percentage) as of last sampling.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -116,8 +114,7 @@ Total CPU utlization (percentage) as of last sampling.
                <port/>
                <description>MIB: EXTREME-SYSTEM-MIB
 Temperature readings of testpoint: Device
-Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack
-</description>
+Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -159,8 +156,7 @@ Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-supp
                <privatekey/>
                <port/>
                <description>MIB: EXTREME-SYSTEM-MIB
-Temperature status of testpoint: Device
-</description>
+Temperature status of testpoint: Device</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -203,9 +199,7 @@ Temperature status of testpoint: Device
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -246,9 +240,7 @@ Temperature status of testpoint: Device
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -289,9 +281,7 @@ Temperature status of testpoint: Device
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -332,9 +322,7 @@ Temperature status of testpoint: Device
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -378,8 +366,7 @@ Temperature status of testpoint: Device
                <description>MIB: EXTREME-SYSTEM-MIB
 The software revision of the primary image stored in this device.
 This string will have a zero length if the revision is unknown, invalid or not present.
-This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.
-</description>
+This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -455,8 +442,7 @@ This will also be reported in RMON2 probeSoftwareRev if this is the software ima
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
-Total amount of free memory in Kbytes in the system.
-</description>
+Total amount of free memory in Kbytes in the system.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -504,8 +490,7 @@ Total amount of free memory in Kbytes in the system.
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
-Total amount of DRAM in Kbytes in the system.
-</description>
+Total amount of DRAM in Kbytes in the system.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -552,8 +537,7 @@ Total amount of DRAM in Kbytes in the system.
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>Memory utilization in %
-</description>
+                     <description>Memory utilization in %</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -579,8 +563,7 @@ Total amount of DRAM in Kbytes in the system.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -685,8 +668,7 @@ Total amount of DRAM in Kbytes in the system.
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SYSTEM-MIB
-Status of the power supply {#SNMPVALUE}
-</description>
+Status of the power supply {#SNMPVALUE}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -787,8 +769,7 @@ Please check the power supply unit for errors</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SYSTEM-MIB
-Operational status of a cooling fan.
-</description>
+Operational status of a cooling fan.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -833,8 +814,7 @@ Operational status of a cooling fan.
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SYSTEM-MIB
-The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}
-</description>
+The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -983,8 +963,7 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -1044,8 +1023,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>

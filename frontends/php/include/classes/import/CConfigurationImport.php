@@ -1316,8 +1316,6 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				$httptest['hostid'] = $hostid;
-
 				if (array_key_exists('name', $httptest['application'])) {
 					$applicationid = $this->referencer->resolveApplication($hostid, $httptest['application']['name']);
 
@@ -1350,6 +1348,7 @@ class CConfigurationImport {
 					$httptests_to_update[] = $httptest;
 				}
 				else {
+					$httptest['hostid'] = $hostid;
 					$httptests_to_create[] = $httptest;
 				}
 			}
@@ -2413,8 +2412,8 @@ class CConfigurationImport {
 			// Cache input array entities.
 			foreach ($entities as $entity_key => $entity) {
 				$resolved_masters_cache[$host_key][$entity['key_']] = [
-					'type'					=> $entity['type'],
-					$master_key_identifier	=> $entity[$master_key_identifier]
+					'type' => $entity['type'],
+					$master_key_identifier => $entity[$master_key_identifier]
 				];
 			}
 
@@ -2435,10 +2434,10 @@ class CConfigurationImport {
 			// 'resolveValueMap' method update references to existing items.
 			$this->referencer->initItemsReferences();
 			$resolved_entities = $data_provider->get([
-				'output'		=> ['key_', 'type', 'hostid', 'master_itemid'],
-				'hostids'		=> array_keys($find_hosts),
-				'filter'		=> ['key_' => array_keys($find_keys)],
-				'preservekeys'	=> true
+				'output' => ['key_', 'type', 'hostid', 'master_itemid'],
+				'hostids' => array_keys($find_hosts),
+				'filter' => ['key_' => array_keys($find_keys)],
+				'preservekeys' => true
 			]);
 			$resolve_entity_keys = [];
 			$host_entity_idkey_hash = [];
@@ -2453,22 +2452,22 @@ class CConfigurationImport {
 					$host_entity_idkey_hash[$host_key][$entityid] = $entity['key'];
 					$this->referencer->addItemRef($entity['hostid'], $entity['key'], $entityid);
 					$cache_entity = [
-						'type'	=> $entity['type']
+						'type' => $entity['type']
 					];
 
 					if ($entity['type'] == ITEM_TYPE_DEPENDENT) {
 						$master_itemid = $entity['master_itemid'];
 						if (array_key_exists($master_itemid, $host_entity_idkey_hash[$host_key])) {
 							$cache_entity[$master_key_identifier] = [
-								'key'	=> $host_entity_idkey_hash[$host_key][$master_itemid]
+								'key' => $host_entity_idkey_hash[$host_key][$master_itemid]
 							];
 						}
 						else {
 							$find_ids[] = $entity['master_itemid'];
 							$resolve_entity_keys[] = [
-								'host'			=> $host_key,
-								'key'			=> $entity['key'],
-								'master_itemid'	=> $entity['master_itemid']
+								'host' => $host_key,
+								'key' => $entity['key'],
+								'master_itemid' => $entity['master_itemid']
 							];
 						}
 					}
@@ -2477,9 +2476,9 @@ class CConfigurationImport {
 
 				if ($find_ids) {
 					$resolved_entities = $data_provider->get([
-						'output'		=> ['key_', 'type', 'hostid', 'master_itemid'],
-						'itemids'		=> $find_ids,
-						'preservekeys'	=> true
+						'output' => ['key_', 'type', 'hostid', 'master_itemid'],
+						'itemids' => $find_ids,
+						'preservekeys' => true
 					]);
 				}
 				else {
@@ -2532,7 +2531,7 @@ class CConfigurationImport {
 								&& $entity[$master_key_identifier]
 								&& $master_key == $entity[$master_key_identifier]['key'])) {
 							throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-								_('dependent item recursion')
+								_('circular item dependency is not allowed')
 							));
 						}
 

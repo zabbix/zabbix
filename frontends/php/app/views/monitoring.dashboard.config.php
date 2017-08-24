@@ -105,7 +105,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 		if (!$field->getValue()) {
 			$javascript = $field->getJavascript('#'.$form->getAttribute('id'));
-			$form->addItem(new CJsScript(get_js($javascript, true))); // TODO VM: rewrite to use js_scripts
+			$form->addItem(new CJsScript(get_js($javascript, true)));
 		}
 	}
 	elseif ($field instanceof CWidgetFieldHidden) {
@@ -132,7 +132,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
 		);
 
-		$form->addItem(new CJsScript(get_js($field->getJavascript(), true))); // TODO VM: rewrite to use js_scripts
+		$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
 	}
 	elseif ($field instanceof CWidgetFieldNumericBox) {
 		$form_list->addRow($field->getLabel(),

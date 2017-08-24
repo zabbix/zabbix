@@ -11,10 +11,9 @@
       <template>
          <template>Template Net Dell Force S-Series SNMPv2</template>
          <name>Template Net Dell Force S-Series SNMPv2</name>
-         <description>Template Dell Force S-Series version: 0.11
+         <description>Template Dell Force S-Series version: 0.12
 MIBs used:
-F10-S-SERIES-CHASSIS-MIB
-</description>
+F10-S-SERIES-CHASSIS-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -103,8 +102,7 @@ F10-S-SERIES-CHASSIS-MIB
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-CPU utilization in percentage for last 1 minute.
-</description>
+CPU utilization in percentage for last 1 minute.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -147,8 +145,7 @@ CPU utilization in percentage for last 1 minute.
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-Total memory usage in percentage.
-</description>
+Total memory usage in percentage.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -174,8 +171,7 @@ Total memory usage in percentage.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -191,8 +187,7 @@ Total memory usage in percentage.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -329,8 +324,7 @@ Total memory usage in percentage.
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-The status of the power supply {#SNMPVALUE}
-</description>
+The status of the power supply {#SNMPVALUE}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -431,8 +425,7 @@ Please check the power supply unit for errors</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-The status of the fan tray {#SNMPVALUE}.
-</description>
+The status of the fan tray {#SNMPVALUE}.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -533,8 +526,7 @@ Please check the fan unit</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-The temperature of the unit.
-</description>
+The temperature of the unit.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -577,8 +569,7 @@ The temperature of the unit.
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-The plugged-in model ID for this unit.
-</description>
+The plugged-in model ID for this unit.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -621,8 +612,7 @@ The plugged-in model ID for this unit.
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-The unit's serial number.
-</description>
+The unit's serial number.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -665,8 +655,7 @@ The unit's serial number.
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-The unit manufacturer's product revision
-</description>
+The unit manufacturer's product revision</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -709,8 +698,7 @@ The unit manufacturer's product revision
                      <privatekey/>
                      <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB
-Current code version of this unit.
-</description>
+Current code version of this unit.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -776,8 +764,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
