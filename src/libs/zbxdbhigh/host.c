@@ -871,10 +871,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d)"
 					" and",
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
-				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED);
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -4013,7 +4013,7 @@ typedef struct
 	char			*status_codes;
 	zbx_vector_ptr_t	httpstepitems;
 	int			no;
-	int			timeout;
+	char			*timeout;
 	int			post_type;
 	zbx_vector_ptr_t	fields;
 }
@@ -4214,7 +4214,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			httpstep->name = zbx_strdup(NULL, row[2]);
 			httpstep->no = atoi(row[3]);
 			httpstep->url = zbx_strdup(NULL, row[4]);
-			httpstep->timeout = atoi(row[5]);
+			httpstep->timeout = zbx_strdup(NULL, row[5]);
 			httpstep->posts = zbx_strdup(NULL, row[6]);
 			httpstep->required = zbx_strdup(NULL, row[7]);
 			httpstep->status_codes = zbx_strdup(NULL, row[8]);
@@ -4754,6 +4754,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 			zbx_free(httpstep->status_codes);
 			zbx_free(httpstep->required);
 			zbx_free(httpstep->posts);
+			zbx_free(httpstep->timeout);
 			zbx_free(httpstep->url);
 			zbx_free(httpstep->name);
 
