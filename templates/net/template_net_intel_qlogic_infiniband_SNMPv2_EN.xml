@@ -11,10 +11,9 @@
       <template>
          <template>Template Net Intel_Qlogic Infiniband SNMPv2</template>
          <name>Template Net Intel_Qlogic Infiniband SNMPv2</name>
-         <description>Template Net Intel_Qlogic Infiniband version: 0.11
+         <description>Template Net Intel_Qlogic Infiniband version: 0.12
 MIBs used:
-ICS-CHASSIS-MIB
-</description>
+ICS-CHASSIS-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -63,9 +62,7 @@ ICS-CHASSIS-MIB
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ICS-CHASSIS-MIB
-
-</description>
+               <description>MIB: ICS-CHASSIS-MIB</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -112,9 +109,7 @@ ICS-CHASSIS-MIB
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ICS-CHASSIS-MIB
-
-</description>
+               <description>MIB: ICS-CHASSIS-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -204,8 +199,7 @@ ICS-CHASSIS-MIB
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-The current value read from the sensor.
-</description>
+The current value read from the sensor.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -248,8 +242,7 @@ The current value read from the sensor.
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-The operational status of the sensor.
-</description>
+The operational status of the sensor.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -323,8 +316,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -404,8 +396,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-The serial number of the FRU.  If not available, this value is a zero-length string.
-</description>
+The serial number of the FRU.  If not available, this value is a zero-length string.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -512,8 +503,7 @@ Actual status of the power supply:
 (5) standby - power supply believed usable,but not supplying power.
 (6) engaged - power supply is supplying power.
 (7) redundant - power supply is supplying power, but not needed.
-(8) notPresent - power supply is supplying power is not present.
-</description>
+(8) notPresent - power supply is supplying power is not present.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -614,8 +604,7 @@ Please check the power supply unit for errors</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-The operational status of the fan unit.
-</description>
+The operational status of the fan unit.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>

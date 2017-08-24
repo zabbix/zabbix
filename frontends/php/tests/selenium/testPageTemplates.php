@@ -98,7 +98,7 @@ class testPageTemplates extends CWebTest {
 		$this->zbxTestInputTypeOverwrite('filter_name', $this->templateName);
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
 	}
 
 	public function testPageTemplates_FilterNone() {

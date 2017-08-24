@@ -11,15 +11,14 @@
       <template>
          <template>Template Net HP Enterprise Switch SNMPv2</template>
          <name>Template Net HP Enterprise Switch SNMPv2</name>
-         <description>Template Net HP Enterprise Switch version: 0.11
+         <description>Template Net HP Enterprise Switch version: 0.12
 MIBs used:
 STATISTICS-MIB
 NETSWITCH-MIB
 ENTITY-SENSORS-MIB
 HP-ICF-CHASSIS
 ENTITY-MIB
-SEMI-MIB
-</description>
+SEMI-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -76,8 +75,7 @@ SEMI-MIB
                <port/>
                <description>MIB: STATISTICS-MIB
 The CPU utilization in percent(%).
-Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c02597344&amp;sp4ts.oid=51079
-</description>
+Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c02597344&amp;sp4ts.oid=51079</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -118,9 +116,7 @@ Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c0259
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SEMI-MIB
-
-</description>
+               <description>MIB: SEMI-MIB</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -166,8 +162,7 @@ Contains the operating code version number (also known as software or firmware).
 For example, a software version such as A.08.01 is described as follows:
 A    the function set available in your router
 08   the common release number
-01   updates to the current common release
-</description>
+01   updates to the current common release</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -260,8 +255,7 @@ A    the function set available in your router
                      <description>MIB: ENTITY-SENSORS-MIB
 The most recent measurement obtained by the agent for this sensor.
 To correctly interpret the value of this object, the associated entPhySensorType,
-entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-</description>
+entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -327,8 +321,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -400,8 +393,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <privatekey/>
                      <port/>
                      <description>MIB: NETSWITCH-MIB
-The number of currently allocated bytes.
-</description>
+The number of currently allocated bytes.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -444,8 +436,7 @@ The number of currently allocated bytes.
                      <privatekey/>
                      <port/>
                      <description>MIB: NETSWITCH-MIB
-The number of available (unallocated) bytes.
-</description>
+The number of available (unallocated) bytes.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -487,8 +478,7 @@ The number of available (unallocated) bytes.
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>Memory utilization in %
-</description>
+                     <description>Memory utilization in %</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -514,8 +504,7 @@ The number of available (unallocated) bytes.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -634,8 +623,7 @@ The number of available (unallocated) bytes.
                      <privatekey/>
                      <port/>
                      <description>MIB: HP-ICF-CHASSIS
-Actual status indicated by the sensor: {#ENT_DESCR}
-</description>
+Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -750,8 +738,7 @@ Please check the fan unit</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: HP-ICF-CHASSIS
-Actual status indicated by the sensor: {#ENT_DESCR}
-</description>
+Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -866,8 +853,7 @@ Please check the power supply unit for errors</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: HP-ICF-CHASSIS
-Actual status indicated by the sensor: {#ENT_DESCR}
-</description>
+Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -957,9 +943,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1001,9 +985,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1130,8 +1112,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
