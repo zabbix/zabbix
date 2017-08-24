@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andžs, Ivo)
 A.F....... [ZBX-12430] fixed error when linking one template to another in template edit form (gcalenko)
 .........T [ZBXNEXT-3920] fixed extra new lines in Templates (vzhuravlev, vso)
 ..F....... [ZBX-12588] fixed clock and map widget scaling on Safari (Ivo)
