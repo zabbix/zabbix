@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-12598] fixed an unneeded data sharing to map widget on navigation tree refresh (miks)
 .......PS. [ZBX-12549] fixed requeueing of items from unreachable poller to normal poller (wiper, gleb)
 ..F....... [ZBX-12539] fixed sbox selection zone in monitoring web graphs (miks)
 ........S. [ZBX-12581] fixed crash when syncing actions without operations (wiper)
