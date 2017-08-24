@@ -916,7 +916,19 @@ static int	DBpatch_3030069(void)
 {
 	const ZBX_FIELD	field = {"sysmap_shapeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
-	return DBrename_field("sysmap_shape", "shapeid", &field);
+#ifdef HAVE_IBM_DB2
+	/* DB2 does not allow to rename primary key columns so we drop the primary key... */
+	if (ZBX_DB_OK > DBexecute("alter table sysmap_shape drop primary key"))
+		return FAIL;
+#endif
+	if (SUCCEED != DBrename_field("sysmap_shape", "shapeid", &field))
+		return FAIL;
+#ifdef HAVE_IBM_DB2
+	/* ...and recreate the primary key after renaming the field. */
+	if (ZBX_DB_OK > DBexecute("alter table sysmap_shape add primary key(sysmap_shapeid)"))
+		return FAIL;
+#endif
+	return SUCCEED;
 }
 
 static int	DBpatch_3030070(void)

@@ -11,16 +11,14 @@
       <template>
          <template>Template Net Brocade FC SNMPv2</template>
          <name>Template Net Brocade FC SNMPv2</name>
-         <description>Template Net Brocade FC version: 0.11
+         <description>Template Net Brocade FC version: 0.12
 MIBs used:
 SW-MIB
 ENTITY-MIB
-
 Known Issues:
 description : no IF-MIB::ifAlias is available
 version : v6.3.1c and v7.0.0c
-device : SW5480
-</description>
+device : SW5480</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -79,8 +77,7 @@ device : SW5480
                <privatekey/>
                <port/>
                <description>MIB: SW-MIB
-System's CPU usage.
-</description>
+System's CPU usage.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -122,8 +119,7 @@ System's CPU usage.
                <privatekey/>
                <port/>
                <description>MIB: SW-MIB
-Memory utilization in %
-</description>
+Memory utilization in %</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -169,8 +165,7 @@ The current operational status of the switch.The states are as follow:
 online(1) means the switch is accessible by an external  Fibre Channel port
 offline(2) means the switch is not accessible
 testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port
-faulty(4) means the switch is not operational.
-</description>
+faulty(4) means the switch is not operational.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -213,9 +208,7 @@ faulty(4) means the switch is not operational.
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SW-MIB
-
-</description>
+               <description>MIB: SW-MIB</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -256,9 +249,7 @@ faulty(4) means the switch is not operational.
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SW-MIB
-
-</description>
+               <description>MIB: SW-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -341,9 +332,7 @@ faulty(4) means the switch is not operational.
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -432,8 +421,7 @@ faulty(4) means the switch is not operational.
                      <privatekey/>
                      <port/>
                      <description>MIB: SW-MIB
-Temperature readings of testpoint: {#SENSOR_INFO}
-</description>
+Temperature readings of testpoint: {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -476,8 +464,7 @@ Temperature readings of testpoint: {#SENSOR_INFO}
                      <privatekey/>
                      <port/>
                      <description>MIB: SW-MIB
-Temperature status of testpoint: {#SENSOR_INFO}
-</description>
+Temperature status of testpoint: {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -547,8 +534,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -627,9 +613,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: SW-MIB
-
-</description>
+                     <description>MIB: SW-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -737,9 +721,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: SW-MIB
-
-</description>
+                     <description>MIB: SW-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -787,9 +769,7 @@ Please check the power supply unit for errors</description>
 
 		      The current value (reading) of the sensor.
 		      The value, -2147483648, represents an unknown quantity.
-			  The fan value will be in RPM(revolution per minute)
-		      
-</description>
+			  The fan value will be in RPM(revolution per minute)</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -979,8 +959,7 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -996,8 +975,7 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
