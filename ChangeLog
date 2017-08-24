@@ -11,6 +11,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-12581] fixed crash when syncing actions without operations (wiper)
 ..F....... [ZBX-12531] removed usage of SVG viewBox attribute in IE and disabled map scaling in screens (miks)
 ..F....... [ZBXNEXT-3987] fixed wrong response and error message when invalid or unavailable dashboardid has been requested (miks)
 ..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andžs, Ivo)
