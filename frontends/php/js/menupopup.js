@@ -539,16 +539,17 @@ function getMenuPopupDashboard(options) {
 }
 
 function showDialogForm(form, options, formData) {
-
 	var oldFormParent = form.parent(),
 		errorBlockId = 'dialog-form-error-container';
-	// trick to get outerWidth, outerHeight of "display:none" form
+
+	// Trick to get outerWidth, outerHeight of "display:none" form.
 	form.css('visibility', 'hidden');
 	form.css('display', 'block');
 
 	if (typeof formData !== 'undefined' && typeof form.fillForm === 'function') {
 		form.fillForm(formData);
 	}
+
 	function removeErrorBlock() {
 		form.find('#' + errorBlockId).remove();
 	}
@@ -564,20 +565,24 @@ function showDialogForm(form, options, formData) {
 				'keepOpen': false,
 				'action': function() {
 					removeErrorBlock();
-
 					form.submit();
+
 					var errors = form.data('errors');
+
 					// output errors
 					if (typeof errors === 'object' && errors.length > 0) {
 						var errorBlock = makeErrorMessageBox(errors, errorBlockId);
+
 						form.prepend(errorBlock);
-						// if form has errors dialog overlay not be destroyed
+
+						// If form has errors dialog overlay not be destroyed.
 						return false;
 					}
 
 					form.css('display', 'none');
 					form.css('visibility', 'hidden');
 					oldFormParent.append(form);
+
 					return true;
 				}
 			},
@@ -587,7 +592,7 @@ function showDialogForm(form, options, formData) {
 				'cancel': true,
 				'action': function() {
 					removeErrorBlock();
-					// to not destroy form need to move it to old place
+					// To not destroy form need to move it to old place.
 					form.css('display', 'none');
 					form.css('visibility', 'hidden');
 					oldFormParent.append(form);
