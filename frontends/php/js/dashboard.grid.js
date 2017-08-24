@@ -1206,6 +1206,7 @@
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
+					current_url = new Curl(location.href),
 					url = new Curl('zabbix.php');
 
 				// Don't show warning about existing updates
@@ -1215,6 +1216,9 @@
 				url.setArgument('action', 'dashboard.view');
 				if (data['options']['fullscreen'] == 1) {
 					url.setArgument('fullscreen', '1');
+				}
+				if (current_url.getArgument('dashboardid')) {
+					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
 				}
 
 				// Redirect to last active dashboard.
