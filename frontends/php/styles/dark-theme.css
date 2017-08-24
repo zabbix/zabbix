@@ -3122,8 +3122,7 @@ tr.cursor-move td * {
 .uppercase {
   text-transform: uppercase; }
 
-.flickerfreescreen > a,
-.flickerfreescreen > div {
+.flickerfreescreen {
   position: relative; }
 
 .clock {
