@@ -2292,7 +2292,7 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 	DB_ROW			dbrow;
 	DB_RESULT		result;
 	zbx_uint64_t		rowid, actionid = 0;
-	unsigned char		opclass, opflags = ZBX_ACTION_OPCLASS_NONE;
+	unsigned char		opflags = ZBX_ACTION_OPCLASS_NONE;
 
 	if (NULL == (result = DBselect(
 			"select a.actionid,o.recovery"
@@ -2312,7 +2312,6 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 	while (NULL != (dbrow = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(rowid, dbrow[0]);
-		opclass = atoi(dbrow[1]);
 
 		if (actionid != rowid)
 		{
@@ -2321,7 +2320,10 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 			opflags = ZBX_ACTION_OPCLASS_NONE;
 		}
 
-		switch (opclass)
+		if (SUCCEED == DBis_null(dbrow[1]))
+			continue;
+
+		switch (atoi(dbrow[1]))
 		{
 			case 0:
 				opflags |= ZBX_ACTION_OPCLASS_NORMAL;
