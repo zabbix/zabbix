@@ -14,10 +14,9 @@
       <template>
          <template>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-MEMORY-POOL-MIB version: 0.11
+         <description>Template Cisco CISCO-MEMORY-POOL-MIB version: 0.12
 MIBs used:
-CISCO-MEMORY-POOL-MIB
-</description>
+CISCO-MEMORY-POOL-MIB</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -93,8 +92,7 @@ CISCO-MEMORY-POOL-MIB
                      <port/>
                      <description>MIB: CISCO-MEMORY-POOL-MIB
 Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.
-Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
-</description>
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -138,8 +136,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      <port/>
                      <description>MIB: CISCO-MEMORY-POOL-MIB
 Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool
-Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
-</description>
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -181,8 +178,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>Memory utilization in %
-</description>
+                     <description>Memory utilization in %</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -208,8 +204,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -262,10 +257,9 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-PROCESS-MIB version: 0.11
+         <description>Template Cisco CISCO-PROCESS-MIB version: 0.12
 MIBs used:
-CISCO-PROCESS-MIB
-</description>
+CISCO-PROCESS-MIB</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -344,8 +338,7 @@ CISCO-PROCESS-MIB
                      <port/>
                      <description>MIB: CISCO-PROCESS-MIB
 The cpmCPUTotal5minRev MIB object provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev . These MIB objects are not accurate because they look at CPU at one minute and five second intervals, respectively. These MIBs enable you to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500s, can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
-Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
-</description>
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -371,8 +364,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -425,10 +417,9 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</template>
          <name>Template Module Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</name>
-         <description>Template Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 version: 0.11
+         <description>Template Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 version: 0.12
 MIBs used:
-CISCO-PROCESS-MIB
-</description>
+CISCO-PROCESS-MIB</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -507,12 +498,11 @@ CISCO-PROCESS-MIB
                      <port/>
                      <description>MIB: CISCO-PROCESS-MIB
 The overall CPU busy percentage in the last 5 minute
-		period. This object deprecates the avgBusy5 object from 
-		the OLD-CISCO-SYSTEM-MIB. This object is deprecated
-		by cpmCPUTotal5minRev which has the changed range 
-		of value (0..100)
-Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
-</description>
+period. This object deprecates the avgBusy5 object from
+the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+by cpmCPUTotal5minRev which has the changed range
+of value (0..100)
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -538,8 +528,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -592,10 +581,9 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</template>
          <name>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</name>
-         <description>Template Cisco OLD-CISCO-CPU-MIB version: 0.11
+         <description>Template Cisco OLD-CISCO-CPU-MIB version: 0.12
 MIBs used:
-OLD-CISCO-CPU-MIB
-</description>
+OLD-CISCO-CPU-MIB</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -636,10 +624,8 @@ OLD-CISCO-CPU-MIB
                <privatekey/>
                <port/>
                <description>MIB: OLD-CISCO-CPU-MIB
-5 minute exponentially-decayed moving 
-		average of the CPU busy percentage.
-Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
-</description>
+5 minute exponentially-decayed moving average of the CPU busy percentage.
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -662,11 +648,10 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco Inventory SNMPv2</template>
          <name>Template Module Cisco Inventory SNMPv2</name>
-         <description>Template Cisco Inventory version: 0.11
+         <description>Template Cisco Inventory version: 0.12
 MIBs used:
 ENTITY-MIB
-SNMPv2-MIB
-</description>
+SNMPv2-MIB</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -706,9 +691,7 @@ SNMPv2-MIB
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -749,9 +732,7 @@ SNMPv2-MIB
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -792,9 +773,7 @@ SNMPv2-MIB
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
-
-</description>
+               <description>MIB: SNMPv2-MIB</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -889,9 +868,7 @@ SNMPv2-MIB
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -938,10 +915,9 @@ Device serial number has changed. Ack to close</description>
       <template>
          <template>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-ENVMON-MIB version: 0.11
+         <description>Template Cisco CISCO-ENVMON-MIB version: 0.12
 MIBs used:
-CISCO-ENVMON-MIB
-</description>
+CISCO-ENVMON-MIB</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -991,8 +967,7 @@ CISCO-ENVMON-MIB
                </filter>
                <lifetime>30d</lifetime>
                <description>Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status
-	                 maintained by the environmental monitor.
-					</description>
+maintained by the environmental monitor.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Temperature</name>
@@ -1023,8 +998,7 @@ CISCO-ENVMON-MIB
                      <privatekey/>
                      <port/>
                      <description>MIB: CISCO-ENVMON-MIB
-The current measurement of the test point being instrumented.
-</description>
+The current measurement of the test point being instrumented.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1067,8 +1041,7 @@ The current measurement of the test point being instrumented.
                      <privatekey/>
                      <port/>
                      <description>MIB: CISCO-ENVMON-MIB
-The current state of the test point being instrumented.
-</description>
+The current state of the test point being instrumented.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1146,8 +1119,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -1218,9 +1190,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: CISCO-ENVMON-MIB
-
-</description>
+                     <description>MIB: CISCO-ENVMON-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1320,9 +1290,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: CISCO-ENVMON-MIB
-
-</description>
+                     <description>MIB: CISCO-ENVMON-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1408,12 +1376,11 @@ Please check the fan unit</description>
       <template>
          <template>Template Net Cisco IOS SNMPv2</template>
          <name>Template Net Cisco IOS SNMPv2</name>
-         <description>Template Cisco IOS Software releases 12.2(3.5) or later version: 0.11
+         <description>Template Cisco IOS Software releases 12.2(3.5) or later version: 0.12
 Known Issues:
 description : no if(in|out)(Errors|Discards) are available for vlan ifType
 version : IOS for example: 	12.1(22)EA11, 15.4(3)M2
-device : C2911, C7600
-</description>
+device : C2911, C7600</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -1481,7 +1448,7 @@ device : C2911, C7600
       <template>
          <template>Template Net Cisco IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</template>
          <name>Template Net Cisco IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</name>
-         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.11</description>
+         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.12</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -1546,7 +1513,7 @@ device : C2911, C7600
       <template>
          <template>Template Net Cisco IOS prior to 12.0_3_T SNMPv2</template>
          <name>Template Net Cisco IOS prior to 12.0_3_T SNMPv2</name>
-         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.11</description>
+         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.12</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -1651,8 +1618,7 @@ device : C2911, C7600
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>

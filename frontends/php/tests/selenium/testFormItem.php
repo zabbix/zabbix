@@ -1838,7 +1838,6 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMP trap',
 					'name' => 'SNMP trap',
 					'key' => 'snmptrap.fallback',
-					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],

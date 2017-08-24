@@ -14,10 +14,9 @@
       <template>
          <template>Template Module Brocade_Foundry Performance SNMPv2</template>
          <name>Template Module Brocade_Foundry Performance SNMPv2</name>
-         <description>Template Module Brocade_Foundry Performance version: 0.11
+         <description>Template Module Brocade_Foundry Performance version: 0.12
 MIBs used:
-FOUNDRY-SN-AGENT-MIB
-</description>
+FOUNDRY-SN-AGENT-MIB</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -61,8 +60,7 @@ FOUNDRY-SN-AGENT-MIB
                <privatekey/>
                <port/>
                <description>MIB: FOUNDRY-SN-AGENT-MIB
-The statistics collection of 1 minute CPU utilization.
-</description>
+The statistics collection of 1 minute CPU utilization.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -106,8 +104,7 @@ The statistics collection of 1 minute CPU utilization.
                <description>MIB: FOUNDRY-SN-AGENT-MIB
 The system dynamic memory utilization, in unit of percentage.
 Deprecated: Refer to snAgSystemDRAMUtil.
-For NI platforms, refer to snAgentBrdMemoryUtil100thPercent
-</description>
+For NI platforms, refer to snAgentBrdMemoryUtil100thPercent</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -130,7 +127,7 @@ For NI platforms, refer to snAgentBrdMemoryUtil100thPercent
       <template>
          <template>Template Net Brocade_Foundry Nonstackable SNMPv2</template>
          <name>Template Net Brocade_Foundry Nonstackable SNMPv2</name>
-         <description>Template Net Brocade_Foundry Nonstackable version: 0.11
+         <description>Template Net Brocade_Foundry Nonstackable version: 0.12
 Overview: For devices(old Foundry devices, MLXe and so on) that doesn't support Stackable SNMP Tables: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table -
 FOUNDRY-SN-AGENT-MIB::snChasFanTable, snChasPwrSupplyTable,snAgentTempTable are used instead.
 For example:
@@ -139,8 +136,7 @@ snChasFan2Table is not supported on  on the NetIron devices.
 snAgentTemp2Table is not supported on old versions of MLXe
 
 MIBs used:
-FOUNDRY-SN-AGENT-MIB
-</description>
+FOUNDRY-SN-AGENT-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -189,9 +185,7 @@ FOUNDRY-SN-AGENT-MIB
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: FOUNDRY-SN-AGENT-MIB
-
-</description>
+               <description>MIB: FOUNDRY-SN-AGENT-MIB</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -233,8 +227,7 @@ FOUNDRY-SN-AGENT-MIB
                <privatekey/>
                <port/>
                <description>MIB: FOUNDRY-SN-AGENT-MIB
-The version of the running software in the form'major.minor.maintenance[letters]'
-</description>
+The version of the running software in the form'major.minor.maintenance[letters]'</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -309,9 +302,7 @@ The version of the running software in the form'major.minor.maintenance[letters]
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: FOUNDRY-SN-AGENT-MIB
-
-</description>
+                     <description>MIB: FOUNDRY-SN-AGENT-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -411,9 +402,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: FOUNDRY-SN-AGENT-MIB
-
-</description>
+                     <description>MIB: FOUNDRY-SN-AGENT-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -514,8 +503,7 @@ Please check the fan unit</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: FOUNDRY-SN-AGENT-MIB
-Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.
-</description>
+Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -586,8 +574,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -698,8 +685,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <description>MIB: FOUNDRY-SN-AGENT-MIB
 Temperature of the chassis. Each unit is 0.5 degrees Celcius.
 Only management module built with temperature sensor hardware is applicable.
-For those non-applicable management module, it returns no-such-name.
-</description>
+For those non-applicable management module, it returns no-such-name.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -770,8 +756,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -846,18 +831,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
       <template>
          <template>Template Net Brocade_Foundry Stackable SNMPv2</template>
          <name>Template Net Brocade_Foundry Stackable SNMPv2</name>
-         <description>Template Brocade_Foundry Stackable version: 0.11
+         <description>Template Brocade_Foundry Stackable version: 0.12
 Overview: For devices(most of the IronWare Brocade devices) that support Stackable SNMP Tables in FOUNDRY-SN-AGENT-MIB: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table - so objects from all Stack members are provided.
 
 MIBs used:
 FOUNDRY-SN-AGENT-MIB
 FOUNDRY-SN-STACKING-MIB
-
 Known Issues:
 description : Correct fan(returns fan status as 'other(1)' and temperature (returns 0) for the non-master Switches are not available in SNMP
 version : Version 08.0.40b and above
-device : ICX 7750 in stack
-</description>
+device : ICX 7750 in stack</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -907,8 +890,7 @@ device : ICX 7750 in stack
                <privatekey/>
                <port/>
                <description>MIB: FOUNDRY-SN-AGENT-MIB
-The version of the running software in the form 'major.minor.maintenance[letters]'
-</description>
+The version of the running software in the form 'major.minor.maintenance[letters]'</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -983,9 +965,7 @@ The version of the running software in the form 'major.minor.maintenance[letters
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: FOUNDRY-SN-AGENT-MIB
-
-</description>
+                     <description>MIB: FOUNDRY-SN-AGENT-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1085,9 +1065,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: FOUNDRY-SN-AGENT-MIB
-
-</description>
+                     <description>MIB: FOUNDRY-SN-AGENT-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1188,8 +1166,7 @@ Please check the fan unit</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: FOUNDRY-SN-AGENT-MIB
-Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.
-</description>
+Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1260,8 +1237,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -1333,8 +1309,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <privatekey/>
                      <port/>
                      <description>MIB: FOUNDRY-SN-STACKING-MIB
-A description of the configured/active system type for each unit.
-</description>
+A description of the configured/active system type for each unit.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1415,8 +1390,7 @@ A description of the configured/active system type for each unit.
                      <privatekey/>
                      <port/>
                      <description>MIB: FOUNDRY-SN-AGENT-MIB
-The serial number of the chassis for each unit. If the serial number is unknown or unavailable then the value should be a zero length string.
-</description>
+The serial number of the chassis for each unit. If the serial number is unknown or unavailable then the value should be a zero length string.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -1593,8 +1567,7 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -1610,8 +1583,7 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>

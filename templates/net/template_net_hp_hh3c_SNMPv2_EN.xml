@@ -11,19 +11,17 @@
       <template>
          <template>Template Net HP Comware HH3C SNMPv2</template>
          <name>Template Net HP Comware HH3C SNMPv2</name>
-         <description>Template Net HP Comware (HH3C) version: 0.11
+         <description>Template Net HP Comware (HH3C) version: 0.12
 Overview: http://certifiedgeek.weebly.com/blog/hp-comware-snmp-mib-for-cpu-memory-and-temperature
 http://www.h3c.com.hk/products___solutions/technology/system_management/configuration_example/200912/656451_57_0.htm
 
 MIBs used:
 HH3C-ENTITY-EXT-MIB
 ENTITY-MIB
-
 Known Issues:
 description : No temperature sensors. All entities of them return 0 for HH3C-ENTITY-EXT-MIB::hh3cEntityExtTemperature
 version : 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010-2016 Hewlett Packard Enterprise Development LP
-device : HP 1910-48
-</description>
+device : HP 1910-48</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -129,8 +127,7 @@ device : HP 1910-48
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 The CPU usage for this entity. Generally, the CPU usage
 will calculate the overall CPU usage on the entity, and it
-is not sensible with the number of CPU on the entity
-</description>
+is not sensible with the number of CPU on the entity</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -174,8 +171,7 @@ is not sensible with the number of CPU on the entity
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 The memory usage for the entity. This object indicates what
-percent of memory are used.
-</description>
+percent of memory are used.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -201,8 +197,7 @@ percent of memory are used.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -218,8 +213,7 @@ percent of memory are used.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -378,8 +372,7 @@ percent of memory are used.
                      <privatekey/>
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
-The temperature for the {#SNMPVALUE}.
-</description>
+The temperature for the {#SNMPVALUE}.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -445,8 +438,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -526,8 +518,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 Indicate the error state of this entity object.
-fanError(41) means that the fan stops working.
-</description>
+fanError(41) means that the fan stops working.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -637,8 +628,7 @@ Please check the fan unit</description>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 Indicate the error state of this entity object.
 psuError(51) means that the Power Supply Unit is in the state of fault.
-rpsError(61) means the Redundant Power Supply is in the state of fault.
-</description>
+rpsError(61) means the Redundant Power Supply is in the state of fault.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -746,9 +736,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -790,9 +778,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -834,9 +820,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -878,9 +862,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -922,9 +904,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
