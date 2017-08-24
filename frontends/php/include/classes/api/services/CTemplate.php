@@ -687,6 +687,8 @@ class CTemplate extends CHostGeneral {
 	 * @param array $hostids    an array of host or template IDs
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
+	 *
+	 * @return void
 	 */
 	protected function checkHostPermissions(array $hostids) {
 		if ($hostids) {
@@ -695,6 +697,16 @@ class CTemplate extends CHostGeneral {
 			$count = API::Host()->get([
 				'countOutput' => true,
 				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count == count($hostids)) {
+				return;
+			}
+
+			$count += $this->get([
+				'countOutput' => true,
+				'templateids' => $hostids,
 				'editable' => true
 			]);
 
