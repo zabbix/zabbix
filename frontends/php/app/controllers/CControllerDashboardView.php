@@ -161,7 +161,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name', 'private'],
-				// TODO AV: remove widgetid from 'selectWidgets'; related CControllerDashbrdWidgetUpdate:155
 				'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
@@ -392,7 +391,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$grid_widgets = [];
 
 		foreach ($widgets as $widget) {
-			// TODO: better solution would be to create this widget in it's place and size with warning about error
 			if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
 				continue;
 			}
@@ -453,7 +451,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 */
 	private static function hasDynamicWidgets($grid_widgets) {
 		foreach ($grid_widgets as $widget) {
-			// TODO VM: document 'dynamic' as field with special interraction
 			if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {
 				return true;
 			}

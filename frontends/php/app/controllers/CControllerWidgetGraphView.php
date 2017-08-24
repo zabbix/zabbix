@@ -67,7 +67,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$profileIdx = 'web.dashbrd';
 		$profileIdx2 = $dashboardid;
 		$update_profile = $dashboardid ? UPDATE_PROFILE_ON : UPDATE_PROFILE_OFF;
-		$critical_error = null;
+		$unavailable_object = false;
 
 		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $fields['graphid']) {
 			$resource_type = SCREEN_RESOURCE_GRAPH;
@@ -128,7 +128,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$resourceid = !empty($new_itemid) ? $new_itemid : null;
 
 				if ($resourceid === null) {
-					$critical_error = _('No permissions to referred object or it does not exist!');
+					$unavailable_object = true;
 				}
 			}
 			// Find requested host and change graph details.
@@ -193,17 +193,17 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					);
 
 					if (!$new_dynamic) {
-						$critical_error = _('No permissions to referred object or it does not exist!');
+						$unavailable_object = true;
 					}
 				}
 				else {
-					$critical_error = _('No permissions to referred object or it does not exist!');
+					$unavailable_object = true;
 				}
 			}
 		}
 		else {
 			if (!$resourceid) {
-				$critical_error = _('No permissions to referred object or it does not exist!');
+				$unavailable_object = true;
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$item = API::Item()->get([
@@ -213,7 +213,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$item = reset($item);
 
 				if (!$item) {
-					$critical_error = _('No permissions to referred object or it does not exist!');
+					$unavailable_object = true;
 				}
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
@@ -225,12 +225,12 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$graph = reset($graph);
 
 				if (!$graph) {
-					$critical_error = _('No permissions to referred object or it does not exist!');
+					$unavailable_object = true;
 				}
 			}
 		}
 
-		if (!$critical_error) {
+		if (!$unavailable_object) {
 			// Build graph action and data source links.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				if (!$edit_mode) {
@@ -254,7 +254,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$graph_src = '';
 
 				if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
-					// TODO miks: why chart7 and chart3 are allowed only if dynamic is set?
 					$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
 						? 'chart7.php'
 						: 'chart3.php';
@@ -328,7 +327,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				'dataid' => $dataid,
 				'containerid' => $containerid,
 				'timestamp' => time(),
-				'critical_error' => $critical_error
+				'unavailable_object' => $unavailable_object
 			],
 			'widget' => [
 				'uniqueid' => $uniqueid,

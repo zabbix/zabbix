@@ -623,14 +623,16 @@ class CItem extends CItemGeneral {
 
 		while ($db_dependent_items) {
 			$db_dependent_items = $this->get([
-				'output'		=> ['itemid', 'name'],
-				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
-				'selectHosts'	=> ['name'],
-				'preservekeys'	=> true
+				'output' => ['itemid', 'name'],
+				'filter' => ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+				'selectHosts' => ['name'],
+				'preservekeys' => true
 			]);
 			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_items);
 			$dependent_items += $db_dependent_items;
 		};
+		$dependent_itemids = array_keys($dependent_items);
+		$itemIds += array_combine($dependent_itemids, $dependent_itemids);
 
 		// delete graphs, leave if graph still have item
 		$delGraphs = [];
@@ -713,8 +715,9 @@ class CItem extends CItemGeneral {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
+		$itemids = array_map('strval', array_values($itemIds));
 
-		return ['itemids' => $itemIds];
+		return ['itemids' => $itemids];
 	}
 
 	public function syncTemplates($data) {

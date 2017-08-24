@@ -11,12 +11,11 @@
       <template>
          <template>Template Net Mellanox SNMPv2</template>
          <name>Template Net Mellanox SNMPv2</name>
-         <description>Template Net Mellanox version: 0.11
+         <description>Template Net Mellanox version: 0.12
 MIBs used:
 ENTITY-SENSORS-MIB
 ENTITY-STATE-MIB
-ENTITY-MIB
-</description>
+ENTITY-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -116,8 +115,7 @@ ENTITY-MIB
                      <description>MIB: ENTITY-SENSORS-MIB
 The most recent measurement obtained by the agent for this sensor.
 				  To correctly interpret the value of this object, the associated entPhySensorType,
-				  entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-</description>
+				  entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -165,8 +163,7 @@ The most recent measurement obtained by the agent for this sensor.
                      <privatekey/>
                      <port/>
                      <description>MIB: ENTITY-SENSORS-MIB
-The operational status of the sensor {#SENSOR_INFO}
-</description>
+The operational status of the sensor {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -236,8 +233,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -319,8 +315,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <description>MIB: ENTITY-SENSORS-MIB
 The most recent measurement obtained by the agent for this sensor.
 To correctly interpret the value of this object, the associated entPhySensorType,
-entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-</description>
+entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -363,8 +358,7 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.
                      <privatekey/>
                      <port/>
                      <description>MIB: ENTITY-SENSORS-MIB
-The operational status of the sensor {#SENSOR_INFO}
-</description>
+The operational status of the sensor {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -472,9 +466,7 @@ Please check the fan unit</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -516,9 +508,7 @@ Please check the fan unit</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -624,9 +614,7 @@ Device serial number has changed. Ack to close</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-STATE-MIB
-
-</description>
+                     <description>MIB: ENTITY-STATE-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>

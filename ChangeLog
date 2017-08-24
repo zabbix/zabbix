@@ -1,8 +1,41 @@
-Changes for 3.4.0rc2
+Changes for 4.0.0alpha1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.4.1rc1
+
+New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+..F....... [ZBXNEXT-3987] fixed wrong response and error message when invalid or unavailable dashboardid has been requested (miks)
+..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andžs, Ivo)
+A.F....... [ZBX-12430] fixed error when linking one template to another in template edit form (gcalenko)
+.........T [ZBXNEXT-3920] fixed extra new lines in Templates (vso, vzhuravlev)
+..F....... [ZBX-12588] fixed clock and map widget scaling on Safari (Ivo)
+.......PS. [ZBX-12574] fixed crash when linking templates with web scenarios during auto registration (vso)
+..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
+.......PS. [ZBX-12524] fixed DB upgrade patch for map shapes on DB2 (vjaceslavs)
+.......PS. [ZBXNEXT-3006] fixed multiple issues with dependent items (vjaceslavs)
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0
+
+3.4.0rc2 was released as 3.4.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0rc2
+
+Bug fixes:
+A.F....... [ZBXNEXT-3883] fixed dependent trigger with dependent item deletion; dependent item recursion message; dependent item massupdate form master item being reset on error (gcalenko)
+..F....... [ZBX-12506] fixed wrong top position of the period selection box on the graphs after closing/opening filter (vmurzins)
+.......PS. [ZBX-12486] fixed item removal from poller queue during configuration cache synchronization (wiper)
+..F....... [ZBXNEXT-3890] fixed extra graph loading (vmurzins)
+........S. [ZBXNEXT-3926] fixed macros {EVENT.STATUS} and {EVENT.VALUE} to return correct value depending on the state of a problem (viktors)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.0rc1
@@ -168,6 +201,8 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
@@ -626,6 +661,8 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
