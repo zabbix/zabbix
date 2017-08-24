@@ -2372,7 +2372,6 @@ Changes for 2.2.20rc1
 New features:
 
 Bug fixes:
-..F....... [DEV-598] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES; thanks to Eric Lutjen for report (gcalenko)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
 
