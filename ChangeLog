@@ -8,8 +8,15 @@ Bug fixes:
 Changes for 3.4.1rc1
 
 New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-12588] fixed clock and map widget scaling on Safari (Ivo)
+.......PS. [ZBX-12574] fixed crash when linking templates with web scenarios during auto registration (vso)
+..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
+.......PS. [ZBX-12524] fixed DB upgrade patch for map shapes on DB2 (vjaceslavs)
+.......PS. [ZBXNEXT-3006] fixed multiple issues with dependent items (vjaceslavs)
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.0
@@ -190,6 +197,8 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
@@ -648,6 +657,8 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)
