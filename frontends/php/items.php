@@ -1197,9 +1197,9 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 
 		if ($host && getRequest('master_itemid')) {
 			$master_item_options = [
-				'itemids'	=> getRequest('master_itemid'),
-				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'filter'	=> ['hostid' => $host['hostid']]
+				'itemids' => getRequest('master_itemid'),
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'filter' => ['hostid' => $host['hostid']]
 			];
 		}
 	}
@@ -1276,7 +1276,9 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'preprocessing' => getRequest('preprocessing', []),
 		'initial_item_type' => null,
 		'multiple_interface_types' => false,
-		'visible' => getRequest('visible', [])
+		'visible' => getRequest('visible', []),
+		'master_itemname' => getRequest('master_itemname', ''),
+		'master_itemid' => getRequest('master_itemid', 0)
 	];
 
 	$data['displayApplications'] = true;

@@ -2264,8 +2264,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     position: fixed;
     top: 50%;
     left: 50%;
-    max-height: 90%;
-    max-width: 75%;
     overflow: hidden;
     -webkit-transform: translate(-50%, -50%);
     -moz-transform: translate(-50%, -50%);
@@ -2273,7 +2271,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transform: translate(-50%, -50%); }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
+      overflow-x: hidden;
       max-height: calc(100vh - 190px);
+      max-width: inherit;
       margin: 0 0 10px 0; }
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
@@ -3096,6 +3096,9 @@ tr.cursor-move td * {
 .uppercase {
   text-transform: uppercase; }
 
+.flickerfreescreen {
+  position: relative; }
+
 .clock {
   padding: 0 10px;
   height: 99%;
@@ -3138,7 +3141,10 @@ tr.cursor-move td * {
   height: 100%;
   width: 100%;
   max-height: 100%;
-  max-width: 100%; }
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
 
 @keyframes fadein {
   from {
