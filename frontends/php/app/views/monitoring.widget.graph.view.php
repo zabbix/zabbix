@@ -24,8 +24,8 @@ if ($data['only_footer']) {
 		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 	];
 }
-elseif ($data['graph']['critical_error'] !== null) {
-	$item = (new CTableInfo())->setNoDataMessage($data['graph']['critical_error']);
+elseif ($data['graph']['unavailable_object']) {
+	$item = (new CTableInfo())->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
 
 	$output = [
 		'header' => $data['name'],

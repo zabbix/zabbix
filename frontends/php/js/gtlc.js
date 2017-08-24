@@ -33,8 +33,7 @@ var timeControl = {
 
 	addObject: function(id, time, objData) {
 		if (typeof this.objectList[id] === 'undefined'
-			|| (typeof(objData['reloadOnAdd']) !== 'undefined' && objData['reloadOnAdd'] === 1)
-		) {
+				|| (typeof(objData['reloadOnAdd']) !== 'undefined' && objData['reloadOnAdd'] === 1)) {
 			this.objectList[id] = {
 				id: id,
 				containerid: null,
@@ -202,9 +201,8 @@ var timeControl = {
 			img.setAttribute('id', id);
 			$(obj.containerid).appendChild(img);
 
-			if (['chart.php','chart2.php','chart3.php'].indexOf(heightUrl.getPath()) > -1
-					&& heightUrl.getArgument('outer') === '1'
-			) {
+			if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(heightUrl.getPath()) > -1
+					&& heightUrl.getArgument('outer') === '1') {
 				// Getting height of graph inside image. Only for line graphs on dashboard.
 				heightUrl.setArgument('onlyHeight', '1');
 
@@ -258,9 +256,8 @@ var timeControl = {
 				}
 			});
 
-		if (['chart.php','chart2.php','chart3.php'].indexOf(imgUrl.getPath()) > -1
-				&& imgUrl.getArgument('outer') === '1'
-		) {
+		if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(imgUrl.getPath()) > -1
+				&& imgUrl.getArgument('outer') === '1') {
 			// Getting height of graph inside image. Only for line graphs on dashboard.
 			var heightUrl = new Curl(imgUrl.getUrl());
 			heightUrl.setArgument('onlyHeight', '1');
