@@ -11,6 +11,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+.......PS. [ZBX-12574] fixed crash when linking templates with web scenarios during auto registration (vso)
 ..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
 .......PS. [ZBX-12524] fixed DB upgrade patch for map shapes on DB2 (vjaceslavs)
 .......PS. [ZBXNEXT-3006] fixed multiple issues with dependent items (vjaceslavs)
