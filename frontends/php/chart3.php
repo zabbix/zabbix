@@ -77,7 +77,7 @@ if ($httptestid = getRequest('httptestid', false)) {
 	$hosts = zbx_toHash($httptests[0]['hosts'], 'hostid');
 
 	$dbItems = DBselect(
-		'SELECT i.itemid, i.type, i.name, i.delay, i.units, i.hostid, i.history, i.trends, i.value_type, i.key_'.
+		'SELECT i.itemid,i.type,i.name,i.delay,i.units,i.hostid,i.history,i.trends,i.value_type,i.key_'.
 		' FROM httpstepitem hi,items i,httpstep hs'.
 		' WHERE i.itemid=hi.itemid'.
 			' AND hs.httptestid='.zbx_dbstr($httptestid).

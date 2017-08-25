@@ -1,6 +1,7 @@
 Changes for 3.4.1rc2
 
 Bug fixes:
+..F....... [ZBX-12602] fixed displaying of graphs in the dashboard widgets; fixed displaying of the right axis in the graph test form (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.1rc1
