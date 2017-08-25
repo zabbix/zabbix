@@ -2711,10 +2711,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// $this->sizeX is required for selectData() method
 		$this->expandItems();
-		$this->selectData();
 		$this->selectTriggers();
-
 		$this->calcDimentions();
+		$this->selectData();
+
 		$this->calcSides();
 		$this->calcPercentile();
 		$this->calcMinMaxInterval();
