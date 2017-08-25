@@ -149,7 +149,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 */
 	private function getDashboard() {
 		$dashboard = null;
-		$default_dashboard = false;
 		$error = null;
 
 		if ($this->hasInput('new')) {
@@ -185,7 +184,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 			if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
 				$dashboardid = DASHBOARD_DEFAULT_ID;
-				$default_dashboard = true;
 			}
 
 			if ($dashboardid != 0) {
@@ -203,9 +201,11 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
-				elseif (!$default_dashboard) {
-					// In case default dashboard is deleted, show dashboard list.
+				elseif ($this->hasInput('dashboardid')) {
 					$error = _('No permissions to referred object or it does not exist!');
+				}
+				else {
+					// In case if previous dashboard is deleted, show dashboard list.
 				}
 			}
 		}
