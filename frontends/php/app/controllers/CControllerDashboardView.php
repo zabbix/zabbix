@@ -56,7 +56,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 	protected function doAction() {
 		$dashboard_requested = ($this->hasInput('dashboardid') || $this->hasInput('source_dashboardid')
-			|| $this->hasInput('new'));
+			|| CProfile::get('web.dashbrd.dashboardid', 0) || $this->hasInput('new'));
 		$this->dashboard = $this->getDashboard();
 
 		if (!$dashboard_requested) {
