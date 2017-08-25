@@ -55,22 +55,18 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
-		$dashboard_requested = ($this->hasInput('dashboardid') || $this->hasInput('source_dashboardid')
-			|| $this->hasInput('new'));
-		$this->dashboard = $this->getDashboard();
+		list($this->dashboard, $error) = $this->getDashboard();
 
-		if (!$dashboard_requested) {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.list')
-				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null);
-			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
+		if ($error !== null) {
+			$this->setResponse(new CControllerResponseData(['error' => $error]));
 
 			return;
 		}
 		elseif ($this->dashboard === null) {
-			$this->setResponse(new CControllerResponseData([
-				'error' => _('No permissions to referred object or it does not exist!')
-			]));
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null);
+			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;
 		}
@@ -153,6 +149,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 */
 	private function getDashboard() {
 		$dashboard = null;
+		$error = null;
 
 		if ($this->hasInput('new')) {
 			$dashboard = $this->getNewDashboard();
@@ -176,6 +173,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'users' => $dashboards[0]['users'],
 					'userGroups' => $dashboards[0]['userGroups']
 				];
+			}
+			else {
+				$error = _('No permissions to referred object or it does not exist!');
 			}
 		}
 		else {
@@ -201,10 +201,16 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
+				elseif ($this->hasInput('dashboardid')) {
+					$error = _('No permissions to referred object or it does not exist!');
+				}
+				else {
+					// In case if previous dashboard is deleted, show dashboard list.
+				}
 			}
 		}
 
-		return $dashboard;
+		return [$dashboard, $error];
 	}
 
 	/**
