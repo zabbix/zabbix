@@ -97,7 +97,7 @@ foreach ($dbGraph['gitems'] as $graph_item) {
 		'hostname' => $host['name'],
 		'color' => $graph_item['color'],
 		'drawtype' => $graph_item['drawtype'],
-		'axisside' => $graph_item['yaxisside'],
+		'yaxisside' => $graph_item['yaxisside'],
 		'calc_fnc' => $graph_item['calc_fnc']
 	]);
 }
