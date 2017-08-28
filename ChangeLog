@@ -3,6 +3,7 @@ Changes for 3.4.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.1
