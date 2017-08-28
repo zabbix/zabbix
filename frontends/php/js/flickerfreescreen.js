@@ -283,6 +283,10 @@
 							window.flickerfreeScreenShadow.fadeSpeed(id, 0);
 							window.flickerfreeScreenShadow.validate(id);
 						}
+						else if (!html.length) {
+							$('#flickerfreescreen_' + id).remove();
+						}
+
 						chkbxRange.init();
 					},
 					error: function() {
