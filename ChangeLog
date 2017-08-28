@@ -218,6 +218,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
 ..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
 ..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
 ...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
