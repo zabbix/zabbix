@@ -3,6 +3,7 @@ Changes for 3.4.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
 ..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
 
 --------------------------------------------------------------------------------
