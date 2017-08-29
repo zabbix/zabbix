@@ -1716,7 +1716,8 @@ out:
 static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *address2)
 {
 	unsigned char	netmask[16] = {0};
-	unsigned int	bytes, i, j;
+	int		i;
+	unsigned int	bytes, j;
 
 	if (af == AF_INET)
 	{
