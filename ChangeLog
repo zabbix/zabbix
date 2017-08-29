@@ -10,6 +10,7 @@ Changes for 3.4.2rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12618] fixed memory related bugs in item preprocessing (vjaceslavs)
 ..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
 ..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
 ..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
