@@ -657,6 +657,10 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
 	{
 		if (NULL != result && NULL != GET_TEXT_RESULT(result))
 			lld_process_discovery_rule(itemid, result->text, ts);
+
+		if (ITEM_STATE_NOTSUPPORTED == state)
+			dc_local_add_history_notsupported(itemid, ts, error);
+
 		goto out;
 	}
 	value.itemid = itemid;
