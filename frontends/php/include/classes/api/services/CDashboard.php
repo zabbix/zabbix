@@ -1048,7 +1048,7 @@ class CDashboard extends CApiService {
 		}
 
 		if ($ins_widgets) {
-			$widgetids = DB::insertBatch('widget', $ins_widgets);
+			$widgetids = DB::insert('widget', $ins_widgets);
 			$index = 0;
 
 			foreach ($dashboards as &$dashboard) {
