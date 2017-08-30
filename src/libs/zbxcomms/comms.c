@@ -22,8 +22,8 @@
 #include "log.h"
 #include "../zbxcrypto/tls_tcp.h"
 
-#define IPV4_MAX_CIDR_PREFIX	32
-#define IPV6_MAX_CIDR_PREFIX	128
+#define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
+#define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 
 #ifdef HAVE_IPV6
 #	define ZBX_SOCKADDR struct sockaddr_storage
@@ -1716,7 +1716,7 @@ out:
 static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *address2)
 {
 	unsigned char	netmask[16] = {0};
-	unsigned int	bytes, i, j;
+	int		i, j, bytes;
 
 	if (af == AF_INET)
 	{
@@ -1732,7 +1732,7 @@ static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *
 	}
 
 	/* CIDR notation to subnet mask */
-	for (i = prefix_size, j = 0; i > 0 && j < bytes; i -= 8, j++)
+	for (i = (int)prefix_size, j = 0; i > 0 && j < bytes; i -= 8, j++)
 		netmask[j] = i >= 8 ? 0xFF : ~((1 << (8 - i)) - 1);
 
 	/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix. */
