@@ -3,6 +3,10 @@ Changes for 3.4.2rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)
+...G...... [ZBX-12527] fixed inconsistency of 'mode' parameter check in vfs_dir_size(); thanks to MATSUDA Daiki for patch (Andris)
+..F....... [ZBX-12327] fixed XML import when preprocessing param value is space character (gcalenko, vjaceslavs)
+A......... [ZBX-12569] fixed possible SQL errors in dashboard.create() and dashboard.update() methods (Sasha)
 ..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
 ........S. [ZBX-12618] fixed memory related bugs in item preprocessing (vjaceslavs)
 ..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
@@ -223,6 +227,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)
 ..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
 ..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
 ..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
@@ -687,6 +692,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)
 ..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
 ..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
 ..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
