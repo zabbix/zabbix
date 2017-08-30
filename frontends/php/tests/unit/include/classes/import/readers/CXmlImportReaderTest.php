@@ -96,15 +96,19 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 			[
 				'<root>'."\n".
 				'    <tag>tag</tag>'."\n".
-				'        <empty_tag></empty_tag>'."\n".
-				'        <empty />'."\n".
-				'        <array>'."\n".
-				'            <tag>tag</tag>'."\n".
-				'        </array>'."\n".
+				'    <spaces><![CDATA[  ]]></spaces>'."\n".
+				'    <lr_spaces> string </lr_spaces>'."\n".
+				'    <empty_tag></empty_tag>'."\n".
+				'    <empty />'."\n".
+				'    <array>'."\n".
+				'        <tag>tag</tag>'."\n".
+				'    </array>'."\n".
 				'</root>',
 				[
 					'root' => [
 						'tag' => 'tag',
+						'spaces' => '  ',
+						'lr_spaces' => ' string ',
 						'empty_tag' => '',
 						'empty' => '',
 						'array' => [

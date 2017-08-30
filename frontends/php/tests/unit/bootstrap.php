@@ -53,6 +53,8 @@ $autoloader = new CAutoloader([
 	__DIR__.'/../../include/classes/import/validators',
 	__DIR__.'/../../include/classes/import/readers',
 	__DIR__.'/../../include/classes/import/converters',
+	__DIR__.'/../../include/classes/export',
+	__DIR__.'/../../include/classes/export/writers',
 	__DIR__.'/../../include/classes/services',
 	__DIR__.'/../../include/classes/helpers',
 	__DIR__.'/../../include/classes/regexp',
