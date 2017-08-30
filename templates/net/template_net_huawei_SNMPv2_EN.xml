@@ -9,16 +9,15 @@
    </groups>
    <templates>
       <template>
-         <template>Template Huawei VRP SNMPv2</template>
-         <name>Template Huawei VRP SNMPv2</name>
-         <description>Template Huawei VRP version: 0.10
+         <template>Template Net Huawei VRP SNMPv2</template>
+         <name>Template Net Huawei VRP SNMPv2</name>
+         <description>Template Net Huawei VRP version: 0.12
 Overview: Reference: https://www.slideshare.net/Huanetwork/huawei-s5700-naming-conventions-and-port-numbering-conventions
 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
 
 MIBs used:
 HUAWEI-ENTITY-EXTENT-MIB
-ENTITY-MIB
-</description>
+ENTITY-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -43,7 +42,7 @@ ENTITY-MIB
          </applications>
          <items/>
          <discovery_rules>
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>MPU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -68,18 +67,18 @@ ENTITY-MIB
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>0</evaltype>
-                        <formula/>
-                        <conditions>
-							              <condition>
-                                <macro>{#ENT_NAME}</macro>
-                                <value>MPU.*</value> 
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_NAME}</macro>
+                        <value>MPU.*</value>
                         <!-- Main Processing Unit -->
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234. Filter limits results to Main Processing Units</description>
                <item_prototypes>
@@ -113,8 +112,7 @@ ENTITY-MIB
                      <port/>
                      <description>MIB: HUAWEI-ENTITY-EXTENT-MIB
 The CPU usage for this entity. Generally, the CPU usage will calculate the overall CPU usage on the entity, and itis not sensible with the number of CPU on the entity.
-Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
-</description>
+Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -126,6 +124,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Memory utilization</name>
@@ -157,8 +156,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <port/>
                      <description>MIB: HUAWEI-ENTITY-EXTENT-MIB
 The memory usage for the entity. This object indicates what percent of memory are used.
-Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
-</description>
+Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -170,6 +168,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Temperature</name>
@@ -200,8 +199,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <privatekey/>
                      <port/>
                      <description>MIB: HUAWEI-ENTITY-EXTENT-MIB
-The temperature for the {#SNMPVALUE}.
-</description>
+The temperature for the {#SNMPVALUE}.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -213,6 +211,7 @@ The temperature for the {#SNMPVALUE}.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Hardware serial number</name>
@@ -242,9 +241,7 @@ The temperature for the {#SNMPVALUE}.
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -256,6 +253,7 @@ The temperature for the {#SNMPVALUE}.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Hardware version(revision)</name>
@@ -285,9 +283,7 @@ The temperature for the {#SNMPVALUE}.
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -299,6 +295,7 @@ The temperature for the {#SNMPVALUE}.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Operating system</name>
@@ -328,9 +325,7 @@ The temperature for the {#SNMPVALUE}.
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -342,11 +337,12 @@ The temperature for the {#SNMPVALUE}.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Huawei VRP SNMPv2:system.cpu.util[hwEntityCpuUsage.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:system.cpu.util[hwEntityCpuUsage.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: High CPU utilization</name>
@@ -355,15 +351,14 @@ The temperature for the {#SNMPVALUE}.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Huawei VRP SNMPv2:vm.memory.pused[hwEntityMemUsage.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:vm.memory.pused[hwEntityMemUsage.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: High memory utilization</name>
@@ -372,17 +367,16 @@ The temperature for the {#SNMPVALUE}.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#ENT_NAME}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -396,16 +390,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#ENT_NAME}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#ENT_NAME}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -420,27 +414,26 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net Huawei VRP SNMPv2:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#ENT_NAME}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Huawei VRP SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Huawei VRP SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Net Huawei VRP SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
-                     <name>{#ENT_NAME}: Device might have been replaced (new serial number received)</name>
+                     <name>{#ENT_NAME}: Device has been replaced (new serial number received)</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -481,7 +474,7 @@ Device serial number has changed. Ack to close</description>
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Huawei VRP SNMPv2</host>
+                              <host>Template Net Huawei VRP SNMPv2</host>
                               <key>system.cpu.util[hwEntityCpuUsage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -513,7 +506,7 @@ Device serial number has changed. Ack to close</description>
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Huawei VRP SNMPv2</host>
+                              <host>Template Net Huawei VRP SNMPv2</host>
                               <key>vm.memory.pused[hwEntityMemUsage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -523,8 +516,7 @@ Device serial number has changed. Ack to close</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  	
-  	         <discovery_rule>
+            <discovery_rule>
                <name>Entity Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -549,18 +541,18 @@ Device serial number has changed. Ack to close</description>
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#ENT_CLASS}</macro>
-                             <value>3</value> 
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>3</value>
                         <!-- 3 - chassis  -->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -592,9 +584,7 @@ Device serial number has changed. Ack to close</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -606,6 +596,7 @@ Device serial number has changed. Ack to close</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes/>
@@ -613,8 +604,7 @@ Device serial number has changed. Ack to close</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-  	
-		          <discovery_rule>
+            <discovery_rule>
                <name>FAN Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -674,9 +664,7 @@ Device serial number has changed. Ack to close</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HUAWEI-ENTITY-EXTENT-MIB
-
-</description>
+                     <description>MIB: HUAWEI-ENTITY-EXTENT-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -690,11 +678,12 @@ Device serial number has changed. Ack to close</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Huawei VRP SNMPv2:sensor.fan.status[hwEntityFanState.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:sensor.fan.status[hwEntityFanState.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Fan is in critical state</name>
@@ -715,8 +704,7 @@ Please check the fan unit</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  		  		  	
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -754,13 +742,13 @@ Please check the fan unit</description>
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -770,19 +758,19 @@ Please check the fan unit</description>
    <triggers/>
    <value_maps>
       <value_map>
-            <name>HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState</name>
-            <!-- 1: normal(1)
+         <name>HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState</name>
+         <!-- 1: normal(1)
 2: abnormal(2) -->
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>normal</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>abnormal</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>abnormal</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>

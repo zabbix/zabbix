@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template TP-LINK SNMPv2</template>
-         <name>Template TP-LINK SNMPv2</name>
-         <description>Template TP-LINK JetStream version: 0.10
+         <template>Template Net TP-LINK SNMPv2</template>
+         <name>Template Net TP-LINK SNMPv2</name>
+         <description>Template Net TP-LINK JetStream version: 0.12
 Overview: Link to MIBs: http://www.tp-linkru.com/download/T2600G-28TS.html#MIBs_Files
 Sample device overview page: http://www.tp-linkru.com/products/details/cat-39_T2600G-28TS.html#overview
 emulation page(web): http://www.tp-linkru.com/resources/simulator/T2600G-28TS(UN)_1.0/Index.htm
@@ -19,15 +19,12 @@ emulation page(web): http://www.tp-linkru.com/resources/simulator/T2600G-28TS(UN
 MIBs used:
 TPLINK-SYSMONITOR-MIB
 TPLINK-SYSINFO-MIB
-
 Known Issues:
 description : default sysLocation, sysName and sysContact is not filled with proper data. Real hostname and location can be found only in private branch(TPLINK-SYSINFO-MIB). Please check whether this problem exists in the latest firware: http://www.tp-linkru.com/download/T2600G-28TS.html#Firmware
 version : 2.0.0 Build 20170628 Rel.55184(Beta)
-device : T2600G-28TS 2.0
-description : The Serial number of the product(tpSysInfoSerialNum) is missing in HW versions prior to V2_170323
+device : T2600G-28TS 2.0description : The Serial number of the product(tpSysInfoSerialNum) is missing in HW versions prior to V2_170323
 version : prior to version V2_170323
-device : T2600G-28TS 2.0
-</description>
+device : T2600G-28TS 2.0</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -74,8 +71,7 @@ device : T2600G-28TS 2.0
                <privatekey/>
                <port/>
                <description>MIB: TPLINK-SYSINFO-MIB
-The hardware version of the product.
-</description>
+The hardware version of the product.</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -86,6 +82,7 @@ The hardware version of the product.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware serial number</name>
@@ -116,8 +113,7 @@ The hardware version of the product.
                <privatekey/>
                <port/>
                <description>MIB: TPLINK-SYSINFO-MIB
-The Serial number of the product.
-</description>
+The Serial number of the product.</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -128,6 +124,7 @@ The Serial number of the product.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Firmware version</name>
@@ -158,8 +155,7 @@ The Serial number of the product.
                <privatekey/>
                <port/>
                <description>MIB: TPLINK-SYSINFO-MIB
-The software version of the product.
-</description>
+The software version of the product.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -170,6 +166,7 @@ The software version of the product.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware version(revision)</name>
@@ -200,8 +197,7 @@ The software version of the product.
                <privatekey/>
                <port/>
                <description>MIB: TPLINK-SYSINFO-MIB
-The hardware version of the product.
-</description>
+The hardware version of the product.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -212,10 +208,11 @@ The hardware version of the product.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
          <discovery_rules>
-	 	         <discovery_rule>
+            <discovery_rule>
                <name>CPU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -277,8 +274,7 @@ The hardware version of the product.
                      <port/>
                      <description>MIB: TPLINK-SYSMONITOR-MIB
 Displays the CPU utilization in 1 minute.
-Reference: http://www.tp-link.com/faq-1330.html
-</description>
+Reference: http://www.tp-link.com/faq-1330.html</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -290,11 +286,12 @@ Reference: http://www.tp-link.com/faq-1330.html
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template TP-LINK SNMPv2:system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <expression>{Template Net TP-LINK SNMPv2:system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: High CPU utilization</name>
@@ -303,8 +300,7 @@ Reference: http://www.tp-link.com/faq-1330.html
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -338,7 +334,7 @@ Reference: http://www.tp-link.com/faq-1330.html
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template TP-LINK SNMPv2</host>
+                              <host>Template Net TP-LINK SNMPv2</host>
                               <key>system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -348,7 +344,7 @@ Reference: http://www.tp-link.com/faq-1330.html
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	 	         <discovery_rule>
+            <discovery_rule>
                <name>Memory Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -410,8 +406,7 @@ Reference: http://www.tp-link.com/faq-1330.html
                      <port/>
                      <description>MIB: TPLINK-SYSMONITOR-MIB
 Displays the memory utilization.
-Reference: http://www.tp-link.com/faq-1330.html
-</description>
+Reference: http://www.tp-link.com/faq-1330.html</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -423,11 +418,12 @@ Reference: http://www.tp-link.com/faq-1330.html
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template TP-LINK SNMPv2:vm.memory.pused[tpSysMonitorMemoryUtilization.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Net TP-LINK SNMPv2:vm.memory.pused[tpSysMonitorMemoryUtilization.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: High memory utilization</name>
@@ -436,8 +432,7 @@ Reference: http://www.tp-link.com/faq-1330.html
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -471,7 +466,7 @@ Reference: http://www.tp-link.com/faq-1330.html
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template TP-LINK SNMPv2</host>
+                              <host>Template Net TP-LINK SNMPv2</host>
                               <key>vm.memory.pused[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -481,7 +476,7 @@ Reference: http://www.tp-link.com/faq-1330.html
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -495,10 +490,10 @@ Reference: http://www.tp-link.com/faq-1330.html
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces Simple SNMPv2</name>
+               <name>Template Module Interfaces Simple SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -507,10 +502,10 @@ Reference: http://www.tp-link.com/faq-1330.html
    <graphs/>
    <triggers>
       <trigger>
-         <expression>{Template TP-LINK SNMPv2:system.hw.serialnumber.diff()}=1 and {Template TP-LINK SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Net TP-LINK SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net TP-LINK SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
-         <name>Device might have been replaced (new serial number received)</name>
+         <name>Device has been replaced (new serial number received)</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>
@@ -524,7 +519,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template TP-LINK SNMPv2:system.hw.firmware.diff()}=1 and {Template TP-LINK SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net TP-LINK SNMPv2:system.hw.firmware.diff()}=1 and {Template Net TP-LINK SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>

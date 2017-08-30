@@ -39,7 +39,8 @@ $fields = [
 	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
 	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
-	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -121,9 +122,9 @@ if (hasRequest('outer')) {
 
 foreach ($items as $item) {
 	$graph->addItem($item + [
-		'color'		=> rgb2hex(get_next_color(1)),
-		'axisside'	=> GRAPH_YAXIS_SIDE_DEFAULT,
-		'calc_fnc'	=> (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
+		'color' => rgb2hex(get_next_color(1)),
+		'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+		'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
 	]);
 }
 
@@ -135,8 +136,12 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 	$graph->setHeight($min_dimentions['height']);
 }
 
-$graph->draw();
-
-header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+if (getRequest('onlyHeight', '0') === '1') {
+	$graph->drawDimensions();
+	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+}
+else {
+	$graph->draw();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';

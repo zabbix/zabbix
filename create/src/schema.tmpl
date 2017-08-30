@@ -51,7 +51,7 @@ FIELD		|active_till	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|active_since,active_till
 UNIQUE		|2		|name
 
-TABLE|hosts|hostid|ZBX_DATA
+TABLE|hosts|hostid|ZBX_TEMPLATE
 FIELD		|hostid		|t_id		|	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|0			|1|hosts	|hostid		|RESTRICT
 FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
@@ -104,7 +104,7 @@ FIELD		|internal	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|name
 
-TABLE|group_prototype|group_prototypeid|ZBX_DATA
+TABLE|group_prototype|group_prototypeid|ZBX_TEMPLATE
 FIELD		|group_prototypeid|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
@@ -112,14 +112,14 @@ FIELD		|groupid	|t_id		|	|NULL		|0			|2|groups	|		|RESTRICT
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|group_prototype|group_prototypeid
 INDEX		|1		|hostid
 
-TABLE|group_discovery|groupid|ZBX_DATA
+TABLE|group_discovery|groupid|ZBX_TEMPLATE
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|1|groups
 FIELD		|parent_group_prototypeid|t_id	|	|NOT NULL	|0			|2|group_prototype|group_prototypeid|RESTRICT
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 
-TABLE|screens|screenid|ZBX_DATA
+TABLE|screens|screenid|ZBX_TEMPLATE
 FIELD		|screenid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
 FIELD		|hsize		|t_integer	|'1'	|NOT NULL	|0
@@ -129,7 +129,7 @@ FIELD		|userid		|t_id		|	|NULL		|0			|3|users	|		|RESTRICT
 FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
 INDEX		|1		|templateid
 
-TABLE|screens_items|screenitemid|ZBX_DATA
+TABLE|screens_items|screenitemid|ZBX_TEMPLATE
 FIELD		|screenitemid	|t_id		|	|NOT NULL	|0
 FIELD		|screenid	|t_id		|	|NOT NULL	|0			|1|screens
 FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|0
@@ -224,14 +224,14 @@ FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|druleid
 
-TABLE|applications|applicationid|ZBX_DATA
+TABLE|applications|applicationid|ZBX_TEMPLATE
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|2		|hostid,name
 
-TABLE|httptest|httptestid|ZBX_DATA
+TABLE|httptest|httptestid|ZBX_TEMPLATE
 FIELD		|httptestid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|applicationid	|t_id		|	|NULL		|0			|1|applications	|		|RESTRICT
@@ -256,7 +256,7 @@ UNIQUE		|2		|hostid,name
 INDEX		|3		|status
 INDEX		|4		|templateid
 
-TABLE|httpstep|httpstepid|ZBX_DATA
+TABLE|httpstep|httpstepid|ZBX_TEMPLATE
 FIELD		|httpstepid	|t_id		|	|NOT NULL	|0
 FIELD		|httptestid	|t_id		|	|NOT NULL	|ZBX_PROXY		|1|httptest
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
@@ -271,7 +271,7 @@ FIELD		|retrieve_mode	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|post_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|httptestid
 
-TABLE|interface|interfaceid|ZBX_DATA
+TABLE|interface|interfaceid|ZBX_TEMPLATE
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|main		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -284,12 +284,12 @@ FIELD		|bulk		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|hostid,type
 INDEX		|2		|ip,dns
 
-TABLE|valuemaps|valuemapid|ZBX_DATA
+TABLE|valuemaps|valuemapid|ZBX_TEMPLATE
 FIELD		|valuemapid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
 UNIQUE		|1		|name
 
-TABLE|items|itemid|ZBX_DATA
+TABLE|items|itemid|ZBX_TEMPLATE
 FIELD		|itemid		|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
@@ -342,7 +342,7 @@ INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
 
-TABLE|httpstepitem|httpstepitemid|ZBX_DATA
+TABLE|httpstepitem|httpstepitemid|ZBX_TEMPLATE
 FIELD		|httpstepitemid	|t_id		|	|NOT NULL	|0
 FIELD		|httpstepid	|t_id		|	|NOT NULL	|ZBX_PROXY		|1|httpstep
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY		|2|items
@@ -350,7 +350,7 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|httpstepid,itemid
 INDEX		|2		|itemid
 
-TABLE|httptestitem|httptestitemid|ZBX_DATA
+TABLE|httptestitem|httptestitemid|ZBX_TEMPLATE
 FIELD		|httptestitemid	|t_id		|	|NOT NULL	|0
 FIELD		|httptestid	|t_id		|	|NOT NULL	|ZBX_PROXY		|1|httptest
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY		|2|items
@@ -497,7 +497,7 @@ FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|groups	|		|RESTRICT
 UNIQUE		|1		|operationid,groupid
 INDEX		|2		|groupid
 
-TABLE|optemplate|optemplateid|ZBX_DATA
+TABLE|optemplate|optemplateid|ZBX_TEMPLATE
 FIELD		|optemplateid	|t_id		|	|NOT NULL	|0
 FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
 FIELD		|templateid	|t_id		|	|NOT NULL	|0			|2|hosts	|hostid		|RESTRICT
@@ -587,7 +587,7 @@ FIELD		|default_inventory_mode|t_integer|'-1'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
-TABLE|triggers|triggerid|ZBX_DATA
+TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
 FIELD		|expression	|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|0
@@ -611,14 +611,14 @@ INDEX		|1		|status
 INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
 
-TABLE|trigger_depends|triggerdepid|ZBX_DATA
+TABLE|trigger_depends|triggerdepid|ZBX_TEMPLATE
 FIELD		|triggerdepid	|t_id		|	|NOT NULL	|0
 FIELD		|triggerid_down	|t_id		|	|NOT NULL	|0			|1|triggers	|triggerid
 FIELD		|triggerid_up	|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid
 UNIQUE		|1		|triggerid_down,triggerid_up
 INDEX		|2		|triggerid_up
 
-TABLE|functions|functionid|ZBX_DATA
+TABLE|functions|functionid|ZBX_TEMPLATE
 FIELD		|functionid	|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|2|triggers
@@ -627,7 +627,7 @@ FIELD		|parameter	|t_varchar(255)	|'0'	|NOT NULL	|0
 INDEX		|1		|triggerid
 INDEX		|2		|itemid,function,parameter
 
-TABLE|graphs|graphid|ZBX_DATA
+TABLE|graphs|graphid|ZBX_TEMPLATE
 FIELD		|graphid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|width		|t_integer	|'900'	|NOT NULL	|0
@@ -652,7 +652,7 @@ INDEX		|2		|templateid
 INDEX		|3		|ymin_itemid
 INDEX		|4		|ymax_itemid
 
-TABLE|graphs_items|gitemid|ZBX_DATA
+TABLE|graphs_items|gitemid|ZBX_TEMPLATE
 FIELD		|gitemid	|t_id		|	|NOT NULL	|0
 FIELD		|graphid	|t_id		|	|NOT NULL	|0			|1|graphs
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|2|items
@@ -686,35 +686,35 @@ FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|macro
 
-TABLE|hostmacro|hostmacroid|ZBX_DATA
+TABLE|hostmacro|hostmacroid|ZBX_TEMPLATE
 FIELD		|hostmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,macro
 
-TABLE|hosts_groups|hostgroupid|ZBX_DATA
+TABLE|hosts_groups|hostgroupid|ZBX_TEMPLATE
 FIELD		|hostgroupid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|groups
 UNIQUE		|1		|hostid,groupid
 INDEX		|2		|groupid
 
-TABLE|hosts_templates|hosttemplateid|ZBX_DATA
+TABLE|hosts_templates|hosttemplateid|ZBX_TEMPLATE
 FIELD		|hosttemplateid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|templateid	|t_id		|	|NOT NULL	|ZBX_PROXY		|2|hosts	|hostid
 UNIQUE		|1		|hostid,templateid
 INDEX		|2		|templateid
 
-TABLE|items_applications|itemappid|ZBX_DATA
+TABLE|items_applications|itemappid|ZBX_TEMPLATE
 FIELD		|itemappid	|t_id		|	|NOT NULL	|0
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0			|1|applications
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|2|items
 UNIQUE		|1		|applicationid,itemid
 INDEX		|2		|itemid
 
-TABLE|mappings|mappingid|ZBX_DATA
+TABLE|mappings|mappingid|ZBX_TEMPLATE
 FIELD		|mappingid	|t_id		|	|NOT NULL	|0
 FIELD		|valuemapid	|t_id		|	|NOT NULL	|0			|1|valuemaps
 FIELD		|value		|t_varchar(64)	|''	|NOT NULL	|0
@@ -785,7 +785,7 @@ FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|iconmapid
 INDEX		|2		|iconid
 
-TABLE|sysmaps|sysmapid|ZBX_DATA
+TABLE|sysmaps|sysmapid|ZBX_TEMPLATE
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|width		|t_integer	|'600'	|NOT NULL	|0
@@ -820,7 +820,7 @@ UNIQUE		|1		|name
 INDEX		|2		|backgroundid
 INDEX		|3		|iconmapid
 
-TABLE|sysmaps_elements|selementid|ZBX_DATA
+TABLE|sysmaps_elements|selementid|ZBX_TEMPLATE
 FIELD		|selementid	|t_id		|	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|elementid	|t_id		|'0'	|NOT NULL	|0
@@ -846,7 +846,7 @@ INDEX		|3		|iconid_on
 INDEX		|4		|iconid_disabled
 INDEX		|5		|iconid_maintenance
 
-TABLE|sysmaps_links|linkid|ZBX_DATA
+TABLE|sysmaps_links|linkid|ZBX_TEMPLATE
 FIELD		|linkid		|t_id		|	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|selementid1	|t_id		|	|NOT NULL	|0			|2|sysmaps_elements|selementid
@@ -858,7 +858,7 @@ INDEX		|1		|sysmapid
 INDEX		|2		|selementid1
 INDEX		|3		|selementid2
 
-TABLE|sysmaps_link_triggers|linktriggerid|ZBX_DATA
+TABLE|sysmaps_link_triggers|linktriggerid|ZBX_TEMPLATE
 FIELD		|linktriggerid	|t_id		|	|NOT NULL	|0
 FIELD		|linkid		|t_id		|	|NOT NULL	|0			|1|sysmaps_links
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|2|triggers
@@ -867,14 +867,14 @@ FIELD		|color		|t_varchar(6)	|'000000'|NOT NULL	|0
 UNIQUE		|1		|linkid,triggerid
 INDEX		|2		|triggerid
 
-TABLE|sysmap_element_url|sysmapelementurlid|ZBX_DATA
+TABLE|sysmap_element_url|sysmapelementurlid|ZBX_TEMPLATE
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
 FIELD		|selementid	|t_id		|	|NOT NULL	|0			|1|sysmaps_elements
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|selementid,name
 
-TABLE|sysmap_url|sysmapurlid|ZBX_DATA
+TABLE|sysmap_url|sysmapurlid|ZBX_TEMPLATE
 FIELD		|sysmapurlid	|t_id		|	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
@@ -882,14 +882,14 @@ FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|sysmapid,name
 
-TABLE|sysmap_user|sysmapuserid|ZBX_DATA
+TABLE|sysmap_user|sysmapuserid|ZBX_TEMPLATE
 FIELD		|sysmapuserid|t_id		|	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|2|users
 FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
 UNIQUE		|1		|sysmapid,userid
 
-TABLE|sysmap_usrgrp|sysmapusrgrpid|ZBX_DATA
+TABLE|sysmap_usrgrp|sysmapusrgrpid|ZBX_TEMPLATE
 FIELD		|sysmapusrgrpid|t_id		|	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0			|2|usrgrp
@@ -1264,7 +1264,7 @@ FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
 FIELD		|image		|t_image	|''	|NOT NULL	|0
 UNIQUE		|1		|name
 
-TABLE|item_discovery|itemdiscoveryid|ZBX_DATA
+TABLE|item_discovery|itemdiscoveryid|ZBX_TEMPLATE
 FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|parent_itemid	|t_id		|	|NOT NULL	|0			|2|items	|itemid
@@ -1274,7 +1274,7 @@ FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|itemid,parent_itemid
 INDEX		|2		|parent_itemid
 
-TABLE|host_discovery|hostid|ZBX_DATA
+TABLE|host_discovery|hostid|ZBX_TEMPLATE
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|parent_hostid	|t_id		|	|NULL		|0			|2|hosts	|hostid		|RESTRICT
 FIELD		|parent_itemid	|t_id		|	|NULL		|0			|3|items	|itemid		|RESTRICT
@@ -1311,14 +1311,14 @@ FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
 FIELD		|parent_triggerid|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid	|RESTRICT
 INDEX		|1		|parent_triggerid
 
-TABLE|application_template|application_templateid|ZBX_DATA
+TABLE|application_template|application_templateid|ZBX_TEMPLATE
 FIELD		|application_templateid|t_id	|	|NOT NULL	|0
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0			|1|applications
 FIELD		|templateid	|t_id		|	|NOT NULL	|0			|2|applications	|applicationid
 UNIQUE		|1		|applicationid,templateid
 INDEX		|2		|templateid
 
-TABLE|item_condition|item_conditionid|ZBX_DATA
+TABLE|item_condition|item_conditionid|ZBX_TEMPLATE
 FIELD		|item_conditionid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|operator	|t_integer	|'8'	|NOT NULL	|0
@@ -1326,7 +1326,7 @@ FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|itemid
 
-TABLE|application_prototype|application_prototypeid|ZBX_DATA
+TABLE|application_prototype|application_prototypeid|ZBX_TEMPLATE
 FIELD		|application_prototypeid|t_id	|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|application_prototype|application_prototypeid
@@ -1334,14 +1334,14 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|itemid
 INDEX		|2		|templateid
 
-TABLE|item_application_prototype|item_application_prototypeid|ZBX_DATA
+TABLE|item_application_prototype|item_application_prototypeid|ZBX_TEMPLATE
 FIELD		|item_application_prototypeid|t_id|	|NOT NULL	|0
 FIELD		|application_prototypeid|t_id	|	|NOT NULL	|0			|1|application_prototype
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|2|items
 UNIQUE		|1		|application_prototypeid,itemid
 INDEX		|2		|itemid
 
-TABLE|application_discovery|application_discoveryid|ZBX_DATA
+TABLE|application_discovery|application_discoveryid|ZBX_TEMPLATE
 FIELD		|application_discoveryid|t_id	|	|NOT NULL	|0
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0			|1|applications
 FIELD		|application_prototypeid|t_id	|	|NOT NULL	|0			|2|application_prototype
@@ -1355,7 +1355,7 @@ TABLE|opinventory|operationid|ZBX_DATA
 FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
 FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 
-TABLE|trigger_tag|triggertagid|ZBX_DATA
+TABLE|trigger_tag|triggertagid|ZBX_TEMPLATE
 FIELD		|triggertagid	|t_id		|	|NOT NULL	|0
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
@@ -1457,7 +1457,7 @@ TABLE|task_close_problem|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 
-TABLE|item_preproc|item_preprocid|ZBX_DATA
+TABLE|item_preproc|item_preprocid|ZBX_TEMPLATE
 FIELD		|item_preprocid	|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|0
@@ -1490,7 +1490,7 @@ TABLE|task_acknowledge|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 
-TABLE|sysmap_shape|sysmap_shapeid|ZBX_DATA
+TABLE|sysmap_shape|sysmap_shapeid|ZBX_TEMPLATE
 FIELD		|sysmap_shapeid	|t_id		|	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
@@ -1511,13 +1511,13 @@ FIELD		|background_color|t_varchar(6)	|''	|NOT NULL	|0
 FIELD		|zindex		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|sysmapid
 
-TABLE|sysmap_element_trigger|selement_triggerid|ZBX_DATA
+TABLE|sysmap_element_trigger|selement_triggerid|ZBX_TEMPLATE
 FIELD		|selement_triggerid	|t_id	|	|NOT NULL	|0
 FIELD		|selementid		|t_id	|	|NOT NULL	|0			|1|sysmaps_elements
 FIELD		|triggerid		|t_id	|	|NOT NULL	|0			|2|triggers
 UNIQUE		|1			|selementid,triggerid
 
-TABLE|httptest_field|httptest_fieldid|ZBX_DATA
+TABLE|httptest_field|httptest_fieldid|ZBX_TEMPLATE
 FIELD		|httptest_fieldid	|t_id		|	|NOT NULL	|0
 FIELD		|httptestid		|t_id		|	|NOT NULL	|ZBX_PROXY	|1|httptest
 FIELD		|type			|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -1525,7 +1525,7 @@ FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value			|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1			|httptestid
 
-TABLE|httpstep_field|httpstep_fieldid|ZBX_DATA
+TABLE|httpstep_field|httpstep_fieldid|ZBX_TEMPLATE
 FIELD		|httpstep_fieldid	|t_id		|	|NOT NULL	|0
 FIELD		|httpstepid		|t_id		|	|NOT NULL	|ZBX_PROXY	|1|httpstep
 FIELD		|type			|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -1558,10 +1558,10 @@ FIELD		|widgetid	|t_id		|	|NOT NULL	|0
 FIELD		|dashboardid	|t_id		|	|NOT NULL	|0			|1|dashboard
 FIELD		|type		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|row		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|col		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|height		|t_integer	|'1'	|NOT NULL	|0
+FIELD		|x		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|y		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|width		|t_integer	|'1'	|NOT NULL	|0
+FIELD		|height		|t_integer	|'1'	|NOT NULL	|0
 INDEX		|1		|dashboardid
 
 TABLE|widget_field|widget_fieldid|ZBX_DATA
@@ -1586,4 +1586,4 @@ INDEX		|6		|value_sysmapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030186	|3030186
+ROW		|3040000	|3040000

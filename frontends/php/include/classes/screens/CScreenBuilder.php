@@ -190,8 +190,12 @@ class CScreenBuilder {
 				$options['screenitem'] = reset($options['screenitem']);
 			}
 
-			if (array_key_exists('screenitem', $options) && array_key_exists('resourcetype', $options['screenitem'])) {
+			if (is_array($options['screenitem']) && array_key_exists('screenitem', $options)
+					&& array_key_exists('resourcetype', $options['screenitem'])) {
 				$options['resourcetype'] = $options['screenitem']['resourcetype'];
+			}
+			else {
+				return null;
 			}
 		}
 
@@ -646,7 +650,7 @@ class CScreenBuilder {
 	 * @param string $options['profileIdx']
 	 */
 	public static function insertScreenScrollJs(array $options = []) {
-		$options['timeline'] = empty($options['timeline']) ? '' : $options['timeline']; // TODO VM: (?) usage of '' will result in error
+		$options['timeline'] = empty($options['timeline']) ? '' : $options['timeline'];
 		$options['profileIdx'] = empty($options['profileIdx']) ? '' : $options['profileIdx'];
 
 		$timeControlData = [

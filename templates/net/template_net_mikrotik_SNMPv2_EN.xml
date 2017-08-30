@@ -9,13 +9,18 @@
    </groups>
    <templates>
       <template>
-         <template>Template Mikrotik SNMPv2</template>
-         <name>Template Mikrotik SNMPv2</name>
-         <description>Template Mikrotik version: 0.10
+         <template>Template Net Mikrotik SNMPv2</template>
+         <name>Template Net Mikrotik SNMPv2</name>
+         <description>Template Net Mikrotik version: 0.12
 MIBs used:
 HOST-RESOURCES-MIB
 MIKROTIK-MIB
-</description>
+Known Issues:
+description : Doesn't have ifHighSpeed filled. fixed in more recent versions
+version : RotuerOS 6.28 or lower
+device : description : Doesn't have any temperature sensors
+version : RotuerOS 6.38.5
+device : Mikrotik 941-2nD, Mikrotik 951G-2HnD</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -68,8 +73,7 @@ MIKROTIK-MIB
                <privatekey/>
                <port/>
                <description>MIB: HOST-RESOURCES-MIB
-The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-</description>
+The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -85,6 +89,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Total memory</name>
@@ -116,16 +121,14 @@ The amount of the storage represented by this entry that is allocated, in units 
                <port/>
                <description>MIB: HOST-RESOURCES-MIB
 The size of the storage represented by this entry, in
-	      units of hrStorageAllocationUnits. This object is
-	      writable to allow remote configuration of the size of
-	      the storage area in those cases where such an
-	      operation makes sense and is possible on the
-	      underlying system. For example, the amount of main
-	      memory allocated to a buffer pool might be modified or
-	      the amount of disk space allocated to virtual memory
-	      might be modified.
-	      
-</description>
+units of hrStorageAllocationUnits. This object is
+writable to allow remote configuration of the size of
+the storage area in those cases where such an
+operation makes sense and is possible on the
+underlying system. For example, the amount of main
+memory allocated to a buffer pool might be modified or
+the amount of disk space allocated to virtual memory
+might be modified.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -141,6 +144,7 @@ The size of the storage represented by this entry, in
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Memory utilization</name>
@@ -170,8 +174,7 @@ The size of the storage represented by this entry, in
                <publickey/>
                <privatekey/>
                <port/>
-               <description>Memory utilization in %
-</description>
+               <description>Memory utilization in %</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -182,6 +185,7 @@ The size of the storage represented by this entry, in
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Device: Temperature</name>
@@ -213,8 +217,7 @@ The size of the storage represented by this entry, in
                <port/>
                <description>MIB: MIKROTIK-MIB
 (mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)
-Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
-</description>
+Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -230,6 +233,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Operating system</name>
@@ -260,8 +264,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
                <privatekey/>
                <port/>
                <description>MIB: MIKROTIK-MIB
-Software version
-</description>
+Software version</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -272,6 +275,7 @@ Software version
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware model name</name>
@@ -301,8 +305,7 @@ Software version
                <publickey/>
                <privatekey/>
                <port/>
-               <description>
-</description>
+               <description/>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -313,6 +316,7 @@ Software version
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware serial number</name>
@@ -343,8 +347,7 @@ Software version
                <privatekey/>
                <port/>
                <description>MIB: MIKROTIK-MIB
-RouterBOARD serial number
-</description>
+RouterBOARD serial number</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -355,6 +358,7 @@ RouterBOARD serial number
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Firmware version</name>
@@ -385,8 +389,7 @@ RouterBOARD serial number
                <privatekey/>
                <port/>
                <description>MIB: MIKROTIK-MIB
-Current firmware version
-</description>
+Current firmware version</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -397,10 +400,11 @@ Current firmware version
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
          <discovery_rules>
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>CPU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -461,8 +465,7 @@ Current firmware version
                      <privatekey/>
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB
-The average, over the last minute, of the percentage of time that this processor was not idle.Implementations may approximate this one minute smoothing period if necessary.
-</description>
+The average, over the last minute, of the percentage of time that this processor was not idle.Implementations may approximate this one minute smoothing period if necessary.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -474,11 +477,12 @@ The average, over the last minute, of the percentage of time that this processor
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Mikrotik SNMPv2:system.cpu.util[hrProcessorLoad.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <expression>{Template Net Mikrotik SNMPv2:system.cpu.util[hrProcessorLoad.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPINDEX}: High CPU utilization</name>
@@ -487,8 +491,7 @@ The average, over the last minute, of the percentage of time that this processor
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -522,7 +525,7 @@ The average, over the last minute, of the percentage of time that this processor
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Mikrotik SNMPv2</host>
+                              <host>Template Net Mikrotik SNMPv2</host>
                               <key>system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -532,7 +535,7 @@ The average, over the last minute, of the percentage of time that this processor
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		          <discovery_rule>
+            <discovery_rule>
                <name>Temperature Discovery CPU</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -594,8 +597,7 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                      <privatekey/>
                      <port/>
                      <description>MIB: MIKROTIK-MIB
-(mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)
-</description>
+(mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -612,13 +614,14 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                      </preprocessing>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"CPU"}</expression>
+                     <expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"CPU"}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
+                     <recovery_expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
                      <name>CPU: Temperature is above warning threshold: &gt;{$TEMP_WARN:"CPU"}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -632,16 +635,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>CPU: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                           <expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
-                           <recovery_expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                           <expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                           <recovery_expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                     <expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                     <recovery_expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                      <name>CPU: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -656,17 +659,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"CPU"}</expression>
+                     <expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"CPU"}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"CPU"}+3</recovery_expression>
+                     <recovery_expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"CPU"}+3</recovery_expression>
                      <name>CPU: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"CPU"}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -677,8 +679,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>Storage Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -703,23 +704,23 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>2</evaltype>
-                        <formula/>
-                        <conditions>
-                            <condition>
-                                <macro>{#STORAGE_TYPE}</macro>
-                                <value>.+4$</value>
-                                <operator>8</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                            <condition>
-                                <macro>{#STORAGE_TYPE}</macro>
-                                <value>.+hrStorageFixedDisk</value>
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                  <evaltype>2</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#STORAGE_TYPE}</macro>
+                        <value>.+4$</value>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#STORAGE_TYPE}</macro>
+                        <value>.+hrStorageFixedDisk</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>HOST-RESOURCES-MIB::hrStorage discovery with storage filter</description>
                <item_prototypes>
@@ -752,8 +753,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <privatekey/>
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB
-The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-</description>
+The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -770,6 +770,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      </preprocessing>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>Disk-{#SNMPINDEX}: Total space</name>
@@ -801,16 +802,14 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB
 The size of the storage represented by this entry, in
-	      units of hrStorageAllocationUnits. This object is
-	      writable to allow remote configuration of the size of
-	      the storage area in those cases where such an
-	      operation makes sense and is possible on the
-	      underlying system. For example, the amount of main
-	      memory allocated to a buffer pool might be modified or
-	      the amount of disk space allocated to virtual memory
-	      might be modified.
-	      
-</description>
+units of hrStorageAllocationUnits. This object is
+writable to allow remote configuration of the size of
+the storage area in those cases where such an
+operation makes sense and is possible on the
+underlying system. For example, the amount of main
+memory allocated to a buffer pool might be modified or
+the amount of disk space allocated to virtual memory
+might be modified.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -827,6 +826,7 @@ The size of the storage represented by this entry, in
                      </preprocessing>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>Disk-{#SNMPINDEX}: Storage utilization</name>
@@ -856,8 +856,7 @@ The size of the storage represented by this entry, in
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>Storage utilization in % for Disk-{#SNMPINDEX}
-</description>
+                     <description>Storage utilization in % for Disk-{#SNMPINDEX}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -869,44 +868,43 @@ The size of the storage represented by this entry, in
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
+                     <expression>{Template Net Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
-                     <name>Disk-{#SNMPINDEX}: Free disk space is low</name>
+                     <name>Disk-{#SNMPINDEX}: Disk space is critically low</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_WARN}</expression>
+                     <expression>{Template Net Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_WARN}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
-                     <name>Disk-{#SNMPINDEX}: Free disk space is low</name>
+                     <name>Disk-{#SNMPINDEX}: Disk space is low</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
                         <dependency>
-                           <name>Disk-{#SNMPINDEX}: Free disk space is low</name>
-                           <expression>{Template Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
+                           <name>Disk-{#SNMPINDEX}: Disk space is critically low</name>
+                           <expression>{Template Net Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
                            <recovery_expression/>
                         </dependency>
                      </dependencies>
@@ -917,8 +915,7 @@ The size of the storage represented by this entry, in
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  		
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -960,10 +957,10 @@ The size of the storage represented by this entry, in
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -988,24 +985,24 @@ The size of the storage represented by this entry, in
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template Mikrotik SNMPv2</host>
-                           <key>vm.memory.pused[memoryUsedPercentage.Memory]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net Mikrotik SNMPv2</host>
+                  <key>vm.memory.pused[memoryUsedPercentage.Memory]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template Mikrotik SNMPv2:vm.memory.pused[memoryUsedPercentage.Memory].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+         <expression>{Template Net Mikrotik SNMPv2:vm.memory.pused[memoryUsedPercentage.Memory].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High memory utilization</name>
@@ -1014,17 +1011,16 @@ The size of the storage represented by this entry, in
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].avg(5m)}&gt;{$TEMP_WARN:"Device"}</expression>
+         <expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].avg(5m)}&gt;{$TEMP_WARN:"Device"}</expression>
          <recovery_mode>1</recovery_mode>
-         <recovery_expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].max(5m)}&lt;{$TEMP_WARN:"Device"}-3</recovery_expression>
+         <recovery_expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].max(5m)}&lt;{$TEMP_WARN:"Device"}-3</recovery_expression>
          <name>Device: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Device"}</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
@@ -1038,16 +1034,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <dependencies>
             <dependency>
                <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
-               <expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
-               <recovery_expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+               <expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+               <recovery_expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
             </dependency>
          </dependencies>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+         <expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
          <recovery_mode>1</recovery_mode>
-         <recovery_expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+         <recovery_expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
          <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
@@ -1062,27 +1058,26 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].avg(5m)}&lt;{$TEMP_CRIT_LOW:"Device"}</expression>
+         <expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].avg(5m)}&lt;{$TEMP_CRIT_LOW:"Device"}</expression>
          <recovery_mode>1</recovery_mode>
-         <recovery_expression>{Template Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].min(5m)}&gt;{$TEMP_CRIT_LOW:"Device"}+3</recovery_expression>
+         <recovery_expression>{Template Net Mikrotik SNMPv2:sensor.temp.value[mtxrHlTemperature].min(5m)}&gt;{$TEMP_CRIT_LOW:"Device"}+3</recovery_expression>
          <name>Device: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Device"}</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Mikrotik SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Mikrotik SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Net Mikrotik SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net Mikrotik SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
-         <name>Device might have been replaced (new serial number received)</name>
+         <name>Device has been replaced (new serial number received)</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>
@@ -1096,7 +1091,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Mikrotik SNMPv2:system.hw.firmware.diff()}=1 and {Template Mikrotik SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net Mikrotik SNMPv2:system.hw.firmware.diff()}=1 and {Template Net Mikrotik SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>

@@ -50,7 +50,8 @@ $fields = [
 	'percent_left' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'outer' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null]
+	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
+	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -76,7 +77,7 @@ if ($httptestid = getRequest('httptestid', false)) {
 	$hosts = zbx_toHash($httptests[0]['hosts'], 'hostid');
 
 	$dbItems = DBselect(
-		'SELECT i.itemid, i.type, i.name, i.delay, i.units, i.hostid, i.history, i.trends, i.value_type, i.key_'.
+		'SELECT i.itemid,i.type,i.name,i.delay,i.units,i.hostid,i.history,i.trends,i.value_type,i.key_'.
 		' FROM httpstepitem hi,items i,httpstep hs'.
 		' WHERE i.itemid=hi.itemid'.
 			' AND hs.httptestid='.zbx_dbstr($httptestid).
@@ -86,9 +87,9 @@ if ($httptestid = getRequest('httptestid', false)) {
 	);
 	while ($item = DBfetch($dbItems)) {
 		$graph_items[] = $item + [
-			'color' 	=> ($color === false) ? reset($colors) : $color,
-			'host'		=> $hosts[$item['hostid']]['host'],
-			'hostname'	=> $hosts[$item['hostid']]['name']
+			'color' => ($color === false) ? reset($colors) : $color,
+			'host' => $hosts[$item['hostid']]['host'],
+			'hostname' => $hosts[$item['hostid']]['name']
 		];
 		$color = next($colors);
 	}
@@ -118,8 +119,8 @@ elseif ($items = getRequest('items', [])) {
 		$host = reset($dbItems[$item['itemid']]['hosts']);
 		unset($dbItems[$item['itemid']]['hosts']);
 		$graph_items[] = $dbItems[$item['itemid']] + $item + [
-			'host'		=> $host['host'],
-			'hostname'	=> $host['name']
+			'host' => $host['host'],
+			'hostname' => $host['name']
 		];
 	}
 	$name = getRequest('name', '');
@@ -167,8 +168,12 @@ foreach ($graph_items as $graph_item) {
 	$graph->addItem($graph_item);
 }
 
-$graph->draw();
-
-header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+if (getRequest('onlyHeight', '0') === '1') {
+	$graph->drawDimensions();
+	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+}
+else {
+	$graph->draw();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';

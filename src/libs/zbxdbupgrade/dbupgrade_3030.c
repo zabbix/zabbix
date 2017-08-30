@@ -916,7 +916,19 @@ static int	DBpatch_3030069(void)
 {
 	const ZBX_FIELD	field = {"sysmap_shapeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
-	return DBrename_field("sysmap_shape", "shapeid", &field);
+#ifdef HAVE_IBM_DB2
+	/* DB2 does not allow to rename primary key columns so we drop the primary key... */
+	if (ZBX_DB_OK > DBexecute("alter table sysmap_shape drop primary key"))
+		return FAIL;
+#endif
+	if (SUCCEED != DBrename_field("sysmap_shape", "shapeid", &field))
+		return FAIL;
+#ifdef HAVE_IBM_DB2
+	/* ...and recreate the primary key after renaming the field. */
+	if (ZBX_DB_OK > DBexecute("alter table sysmap_shape add primary key(sysmap_shapeid)"))
+		return FAIL;
+#endif
+	return SUCCEED;
 }
 
 static int	DBpatch_3030070(void)
@@ -1882,10 +1894,10 @@ static int	DBpatch_3030158(void)
 					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"type", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"row", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"col", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -2019,23 +2031,24 @@ static int	DBpatch_3030174(void)
 static int	DBpatch_3030175(void)
 {
 	int		i;
-	const char	*columns = "widgetid,dashboardid,type,name,row,col,height,width";
+	const char	*columns = "widgetid,dashboardid,type,name,x,y,width,height";
 	const char	*values[] = {
-		"1,1,'favgrph','',0,0,3,2",
-		"2,1,'favscr','',0,2,3,2",
-		"3,1,'favmap','',0,4,3,2",
-		"4,1,'problems','',3,0,6,6",
-		"5,1,'webovr','',9,0,4,3",
-		"6,1,'dscvry','',9,3,4,3",
-		"7,1,'hoststat','',0,6,4,6",
-		"8,1,'syssum','',4,6,4,6",
-		"9,1,'stszbx','',8,6,5,6",
+		"1,1,'favgrph','',0,0,2,3",
+		"2,1,'favscr','',2,0,2,3",
+		"3,1,'favmap','',4,0,2,3",
+		"4,1,'problems','',0,3,6,6",
+		"5,1,'webovr','',0,9,3,4",
+		"6,1,'dscvry','',3,9,3,4",
+		"7,1,'hoststat','',6,0,6,4",
+		"8,1,'syssum','',6,4,6,4",
+		"9,1,'stszbx','',6,8,6,5",
 		NULL
 	};
 
 	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
 	{
-		for (i = 0; NULL != values[i]; i++) {
+		for (i = 0; NULL != values[i]; i++)
+		{
 			if (ZBX_DB_OK > DBexecute("insert into widget (%s) values (%s)", columns, values[i]))
 				return FAIL;
 		}
@@ -2134,6 +2147,157 @@ static int	DBpatch_3030186(void)
 	const ZBX_FIELD	field = {"master_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("items", 5, &field);
+}
+
+/* Patches 3030187-3030198 are solve ZBX-12505 issue */
+
+static int	DBpatch_3030187(void)
+{
+	if (SUCCEED == DBfield_exists("widget", "row"))
+	{
+		const ZBX_TABLE table =
+				{"widget_tmp", "", 0,
+					{
+						{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+						{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+						{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+						{"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+						{"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+						{0}
+					},
+					NULL
+				};
+
+		return DBcreate_table(&table);
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030188(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+	{
+		if (ZBX_DB_OK > DBexecute("insert into widget_tmp (select widgetid,col,row,width,height from widget)"))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030189(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+		return DBdrop_field("widget", "width");
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030190(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+		return DBdrop_field("widget", "height");
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030191(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+		return DBdrop_field("widget", "col");
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030192(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+		return DBdrop_field("widget", "row");
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030193(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+	{
+		const ZBX_FIELD field = {"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+		return DBadd_field("widget", &field);
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030194(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+	{
+		const ZBX_FIELD field = {"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+		return DBadd_field("widget", &field);
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030195(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+	{
+		const ZBX_FIELD field = {"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+		return DBadd_field("widget", &field);
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030196(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+	{
+		const ZBX_FIELD field = {"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+		return DBadd_field("widget", &field);
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030197(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+	{
+		DB_RESULT	result;
+		DB_ROW		row;
+		int		ret = FAIL;
+
+		result = DBselect("select widgetid,x,y,width,height from widget_tmp");
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			if (ZBX_DB_OK > DBexecute("update widget set x=%s,y=%s,width=%s,height=%s where widgetid=%s",
+					row[1], row[2], row[3], row[4], row[0]))
+				goto out;
+		}
+
+		ret = SUCCEED;
+out:
+		DBfree_result(result);
+
+		return ret;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030198(void)
+{
+	if (SUCCEED == DBtable_exists("widget_tmp"))
+		return DBdrop_table("widget_tmp");
+
+	return SUCCEED;
 }
 #endif
 
@@ -2327,5 +2491,17 @@ DBPATCH_ADD(3030183, 0, 1)
 DBPATCH_ADD(3030184, 0, 1)
 DBPATCH_ADD(3030185, 0, 1)
 DBPATCH_ADD(3030186, 0, 1)
+DBPATCH_ADD(3030187, 0, 1)
+DBPATCH_ADD(3030188, 0, 1)
+DBPATCH_ADD(3030189, 0, 1)
+DBPATCH_ADD(3030190, 0, 1)
+DBPATCH_ADD(3030191, 0, 1)
+DBPATCH_ADD(3030192, 0, 1)
+DBPATCH_ADD(3030193, 0, 1)
+DBPATCH_ADD(3030194, 0, 1)
+DBPATCH_ADD(3030195, 0, 1)
+DBPATCH_ADD(3030196, 0, 1)
+DBPATCH_ADD(3030197, 0, 1)
+DBPATCH_ADD(3030198, 0, 1)
 
 DBPATCH_END()

@@ -9,13 +9,12 @@
    </groups>
    <templates>
       <template>
-         <template>Template QTech QSW SNMPv2</template>
-         <name>Template QTech QSW SNMPv2</name>
-         <description>Template QTech QSW version: 0.10
+         <template>Template Net QTech QSW SNMPv2</template>
+         <name>Template Net QTech QSW SNMPv2</name>
+         <description>Template Net QTech QSW version: 0.12
 MIBs used:
 QTECH-MIB
-ENTITY-MIB
-</description>
+ENTITY-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -62,8 +61,7 @@ ENTITY-MIB
                <privatekey/>
                <port/>
                <description>MIB: QTECH-MIB
-CPU utilization in %
-</description>
+CPU utilization in %</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -74,6 +72,7 @@ CPU utilization in %
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Used memory</name>
@@ -104,8 +103,7 @@ CPU utilization in %
                <privatekey/>
                <port/>
                <description>MIB: QTECH-MIB
-Used memory in Bytes
-</description>
+Used memory in Bytes</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -116,6 +114,7 @@ Used memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Total memory</name>
@@ -146,8 +145,7 @@ Used memory in Bytes
                <privatekey/>
                <port/>
                <description>MIB: QTECH-MIB
-Total memory in Bytes
-</description>
+Total memory in Bytes</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -158,6 +156,7 @@ Total memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Memory utilization</name>
@@ -187,8 +186,7 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port/>
-               <description>Memory utilization in %
-</description>
+               <description>Memory utilization in %</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -199,6 +197,7 @@ Total memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware model name</name>
@@ -228,9 +227,7 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -241,6 +238,7 @@ Total memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware serial number</name>
@@ -270,9 +268,7 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -283,6 +279,7 @@ Total memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Firmware version</name>
@@ -312,9 +309,7 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -325,6 +320,7 @@ Total memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware version(revision)</name>
@@ -354,9 +350,7 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -367,6 +361,7 @@ Total memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Operating system</name>
@@ -396,9 +391,7 @@ Total memory in Bytes
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: QTECH-MIB
-
-</description>
+               <description>MIB: QTECH-MIB</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -409,12 +402,10 @@ Total memory in Bytes
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
-         <discovery_rules>
-		
-	
-	  </discovery_rules>
+         <discovery_rules/>
          <httptests/>
          <macros>
             <macro>
@@ -456,13 +447,13 @@ Total memory in Bytes
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -487,19 +478,19 @@ Total memory in Bytes
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template QTech QSW SNMPv2</host>
-                           <key>system.cpu.util[switchCpuUsage.0]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net QTech QSW SNMPv2</host>
+                  <key>system.cpu.util[switchCpuUsage.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
       <graph>
          <name>Memory utilization</name>
@@ -519,24 +510,24 @@ Total memory in Bytes
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template QTech QSW SNMPv2</host>
-                           <key>vm.memory.pused[vm.memory.pused.0]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net QTech QSW SNMPv2</host>
+                  <key>vm.memory.pused[vm.memory.pused.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template QTech QSW SNMPv2:system.cpu.util[switchCpuUsage.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Net QTech QSW SNMPv2:system.cpu.util[switchCpuUsage.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization</name>
@@ -545,15 +536,14 @@ Total memory in Bytes
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template QTech QSW SNMPv2:vm.memory.pused[vm.memory.pused.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+         <expression>{Template Net QTech QSW SNMPv2:vm.memory.pused[vm.memory.pused.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High memory utilization</name>
@@ -562,18 +552,17 @@ Total memory in Bytes
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template QTech QSW SNMPv2:system.hw.serialnumber.diff()}=1 and {Template QTech QSW SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Net QTech QSW SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net QTech QSW SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
-         <name>Device might have been replaced (new serial number received)</name>
+         <name>Device has been replaced (new serial number received)</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>
@@ -587,7 +576,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template QTech QSW SNMPv2:system.hw.firmware.diff()}=1 and {Template QTech QSW SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net QTech QSW SNMPv2:system.hw.firmware.diff()}=1 and {Template Net QTech QSW SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>
@@ -606,34 +595,34 @@ Firmware version has changed. Ack to close</description>
    </triggers>
    <value_maps>
       <value_map>
-            <name>QTECH-MIB::sysFanStatus</name>
-            <mappings>
-                <mapping>
-                    <value>0</value>
-                    <newvalue>normal</newvalue>
-                </mapping>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>abnormal</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>QTECH-MIB::sysFanStatus</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>abnormal</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-            <name>QTECH-MIB::sysPowerStatus</name>
-            <mappings>
-                <mapping>
-                    <value>0</value>
-                    <newvalue>normal</newvalue>
-                </mapping>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>abnormal</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>not available</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>QTECH-MIB::sysPowerStatus</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>abnormal</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>not available</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>

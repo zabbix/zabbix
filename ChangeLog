@@ -1,10 +1,81 @@
-Changes for 3.4.0beta3
+Changes for 3.4.2rc1
 
 New features:
+
+Bug fixes:
+A......... [ZBX-12569] fixed possible SQL errors in dashboard.create() and dashboard.update() methods (Sasha)
+..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
+........S. [ZBX-12618] fixed memory related bugs in item preprocessing (vjaceslavs)
+..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
+..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
+..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.1
+
+3.4.1rc2 was released as 3.4.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.4.1rc2
+
+Bug fixes:
+..F....... [ZBX-12600] fixed display of previously opened dashboard (vmurzins)
+..F....... [ZBX-12602] fixed displaying of graphs in the dashboard widgets; fixed displaying of the right axis in the graph test form (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.1rc1
+
+New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+..F....... [ZBX-12598] fixed an unneeded data sharing to map widget on navigation tree refresh (miks)
+.......PS. [ZBX-12549] fixed requeueing of items from unreachable poller to normal poller (gleb, wiper)
+..F....... [ZBX-12539] fixed sbox selection zone in monitoring web graphs (miks)
+........S. [ZBX-12581] fixed crash when syncing actions without operations (wiper)
+..F....... [ZBX-12531] removed usage of SVG viewBox attribute in IE and disabled map scaling in screens (miks)
+..F....... [ZBXNEXT-3987] fixed wrong response and error message when invalid or unavailable dashboardid has been requested (miks)
+..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andžs, Ivo)
+A.F....... [ZBX-12430] fixed error when linking one template to another in template edit form (gcalenko)
+.........T [ZBXNEXT-3920] fixed extra new lines in Templates (vso, vzhuravlev)
+..F....... [ZBX-12588] fixed clock and map widget scaling on Safari (Ivo)
+.......PS. [ZBX-12574] fixed crash when linking templates with web scenarios during auto registration (vso)
+..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
+.......PS. [ZBX-12524] fixed DB upgrade patch for map shapes on DB2 (vjaceslavs)
+.......PS. [ZBXNEXT-3006] fixed multiple issues with dependent items (vjaceslavs)
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0
+
+3.4.0rc2 was released as 3.4.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0rc2
+
+Bug fixes:
+A.F....... [ZBXNEXT-3883] fixed dependent trigger with dependent item deletion; dependent item recursion message; dependent item massupdate form master item being reset on error (gcalenko)
+..F....... [ZBX-12506] fixed wrong top position of the period selection box on the graphs after closing/opening filter (vmurzins)
+.......PS. [ZBX-12486] fixed item removal from poller queue during configuration cache synchronization (wiper)
+..F....... [ZBXNEXT-3890] fixed extra graph loading (vmurzins)
+........S. [ZBXNEXT-3926] fixed macros {EVENT.STATUS} and {EVENT.VALUE} to return correct value depending on the state of a problem (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.0rc1
+
+New features:
+A......... [ZBXNEXT-2102] improved performance of event.get() and problem.get() methods with "selectTags" option (Sasha)
+....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vzhuravlev, vso)
 ..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
 Bug fixes:
+A......... [ZBX-12487] fixed undefined index error in item prototype update (gcalenko, Sasha)
+A.F....... [ZBXNEXT-2102] fixed several issues in dashboard (Ivo, miks, Sasha, vmurzins)
+....I..... [ZBX-12505] fixed Oracle database creation scripts (Sasha)
+..F....... [ZBXNEXT-18] fixed empty acknowledge operation message tooltip visibility (gcalenko)
+..F....... [ZBX-12468] fixed vertical text alignment for map shapes (vjaceslavs)
+..F....... [ZBX-12418] fixed draggable rectangle calculation for map shape lines (vjaceslavs)
 ...G...... [ZBX-12397] fixed system.cpu.num count for 64-bit Windows with more than 64 logical cpus (abs)
 .......PS. [ZBX-12483] fixed compilation with libevent 2.1.8 and IPC service initialization in proxy (Andris)
 ........S. [ZBX-12485] fixed PostgreSQL query errors during sending notifications on acknowledgement (Sergejs)
@@ -153,6 +224,12 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
+..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
+..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
+..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
@@ -611,6 +688,12 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
+..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
+..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
+..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)

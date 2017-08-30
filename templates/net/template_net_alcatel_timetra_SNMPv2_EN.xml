@@ -9,14 +9,13 @@
    </groups>
    <templates>
       <template>
-         <template>Template Alcatel Timetra TiMOS SNMPv2</template>
-         <name>Template Alcatel Timetra TiMOS SNMPv2</name>
-         <description>Template Alcatel Timetra TiMOS version: 0.10
+         <template>Template Net Alcatel Timetra TiMOS SNMPv2</template>
+         <name>Template Net Alcatel Timetra TiMOS SNMPv2</name>
+         <description>Template Net Alcatel Timetra TiMOS version: 0.12
 MIBs used:
 TIMETRA-SYSTEM-MIB
 SNMPv2-MIB
-TIMETRA-CHASSIS-MIB
-</description>
+TIMETRA-CHASSIS-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -69,8 +68,7 @@ TIMETRA-CHASSIS-MIB
                <privatekey/>
                <port/>
                <description>MIB: TIMETRA-SYSTEM-MIB
-The value of sgiCpuUsage indicates the current CPU utilization for the system.
-</description>
+The value of sgiCpuUsage indicates the current CPU utilization for the system.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -81,6 +79,7 @@ The value of sgiCpuUsage indicates the current CPU utilization for the system.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Used memory</name>
@@ -111,8 +110,7 @@ The value of sgiCpuUsage indicates the current CPU utilization for the system.
                <privatekey/>
                <port/>
                <description>MIB: TIMETRA-SYSTEM-MIB
-The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in kilobytes, currently in use on the system.
-</description>
+The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in kilobytes, currently in use on the system.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -128,6 +126,7 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Available memory</name>
@@ -158,8 +157,7 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                <privatekey/>
                <port/>
                <description>MIB: TIMETRA-SYSTEM-MIB
-The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobytes, in the overall system that is not allocated to memory pools, but is available in case a memory pool needs to grow.
-</description>
+The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobytes, in the overall system that is not allocated to memory pools, but is available in case a memory pool needs to grow.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -175,6 +173,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Memory utilization</name>
@@ -204,8 +203,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                <publickey/>
                <privatekey/>
                <port/>
-               <description>Memory utilization in %
-</description>
+               <description>Memory utilization in %</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -216,6 +214,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware model name</name>
@@ -245,9 +244,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
-
-</description>
+               <description>MIB: SNMPv2-MIB</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -264,6 +261,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Operating system</name>
@@ -293,9 +291,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
-
-</description>
+               <description>MIB: SNMPv2-MIB</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -312,12 +308,11 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
          <discovery_rules>
-  	  	  	  	
-  	  	
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -342,18 +337,18 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#TEMP_SENSOR}</macro>
-                             <value>1</value>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#TEMP_SENSOR}</macro>
+                        <value>1</value>
                         <!-- (1) - true temp sensor installed-->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -386,8 +381,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                      <privatekey/>
                      <port/>
                      <description>MIB: TIMETRA-SYSTEM-MIB
-The current temperature reading in degrees celsius from this hardware component's temperature sensor.  If this component does not contain a temperature sensor, then the value -1 is returned.
-</description>
+The current temperature reading in degrees celsius from this hardware component's temperature sensor.  If this component does not contain a temperature sensor, then the value -1 is returned.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -399,13 +393,14 @@ The current temperature reading in degrees celsius from this hardware component'
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -419,16 +414,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -443,17 +438,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -464,9 +458,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		
-		
-		          <discovery_rule>
+            <discovery_rule>
                <name>FAN Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -491,18 +483,18 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#SNMPVALUE}</macro>
-                             <value>[^1]</value>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>[^1]</value>
                         <!-- (1) - means not installed actually -->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -535,8 +527,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <privatekey/>
                      <port/>
                      <description>MIB: TIMETRA-SYSTEM-MIB
-Current status of the Fan tray.
-</description>
+Current status of the Fan tray.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -550,11 +541,12 @@ Current status of the Fan tray.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Alcatel Timetra TiMOS SNMPv2:sensor.fan.status[tmnxChassisFanOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.fan.status[tmnxChassisFanOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPINDEX}: Fan is in critical state</name>
@@ -575,8 +567,7 @@ Please check the fan unit</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		
-		          <discovery_rule>
+            <discovery_rule>
                <name>Entity Serial Numbers Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -601,17 +592,17 @@ Please check the fan unit</description>
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>1</evaltype>
-                        <formula/>
-                        <conditions>
-                            <condition>
-                                <macro>{#ENT_SN}</macro>
-                                <value>.+</value>
-                                <operator>8</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_SN}</macro>
+                        <value>.+</value>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -643,9 +634,7 @@ Please check the fan unit</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: TIMETRA-CHASSIS-MIB
-
-</description>
+                     <description>MIB: TIMETRA-CHASSIS-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -657,14 +646,15 @@ Please check the fan unit</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Alcatel Timetra TiMOS SNMPv2:system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}].diff()}=1 and {Template Alcatel Timetra TiMOS SNMPv2:system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}].diff()}=1 and {Template Net Alcatel Timetra TiMOS SNMPv2:system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
-                     <name>{#ENT_NAME}: Device might have been replaced (new serial number received)</name>
+                     <name>{#ENT_NAME}: Device has been replaced (new serial number received)</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -682,9 +672,7 @@ Device serial number has changed. Ack to close</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		
-		
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -726,13 +714,13 @@ Device serial number has changed. Ack to close</description>
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -757,19 +745,19 @@ Device serial number has changed. Ack to close</description>
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template Alcatel Timetra TiMOS SNMPv2</host>
-                           <key>system.cpu.util[sgiCpuUsage.0]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net Alcatel Timetra TiMOS SNMPv2</host>
+                  <key>system.cpu.util[sgiCpuUsage.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
       <graph>
          <name>Memory utilization</name>
@@ -789,24 +777,24 @@ Device serial number has changed. Ack to close</description>
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template Alcatel Timetra TiMOS SNMPv2</host>
-                           <key>vm.memory.pused[vm.memory.pused.0]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net Alcatel Timetra TiMOS SNMPv2</host>
+                  <key>vm.memory.pused[vm.memory.pused.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template Alcatel Timetra TiMOS SNMPv2:system.cpu.util[sgiCpuUsage.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:system.cpu.util[sgiCpuUsage.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization</name>
@@ -815,15 +803,14 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Alcatel Timetra TiMOS SNMPv2:vm.memory.pused[vm.memory.pused.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+         <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:vm.memory.pused[vm.memory.pused.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High memory utilization</name>
@@ -832,8 +819,7 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
@@ -842,29 +828,29 @@ Device serial number has changed. Ack to close</description>
    </triggers>
    <value_maps>
       <value_map>
-            <name>TIMETRA-CHASSIS-MIB::TmnxDeviceState</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>deviceStateUnknown</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>deviceNotEquipped</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>deviceStateOk</newvalue>
-                </mapping>
-                <mapping>
-                    <value>4</value>
-                    <newvalue>deviceStateFailed</newvalue>
-                </mapping>
-                <mapping>
-                    <value>5</value>
-                    <newvalue>deviceStateOutOfService</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>TIMETRA-CHASSIS-MIB::TmnxDeviceState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>deviceStateUnknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>deviceNotEquipped</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>deviceStateOk</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>deviceStateFailed</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>deviceStateOutOfService</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>

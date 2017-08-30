@@ -1,7 +1,12 @@
-[ -z "$1" ] && echo "Usage: ./export_data.sh <DB name>
-The script generates data file out of existing MySQL database." && exit 1
-
-dbname=$1
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+	echo "Usage: 
+	./export_data.sh -uroot -p<password> <DB name> ZBX_DATA > ../src/data.tmpl
+	./export_data.sh -uroot -p<password> <DB name> ZBX_TEMPLATE > ../src/templates.tmpl
+	The script generates data file out of existing MySQL database." && exit 1
+fi
+dblogin="$1 $2"
+dbname=$3
+dbflag=$4
 basedir=`dirname "$0"`
 schema=$basedir/../src/schema.tmpl
 
@@ -25,8 +30,8 @@ echo "--
 --
 "
 
-for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
-	if [ "0" == `echo "select count(*) from $table" | mysql -uroot $dbname | tail -1` ]; then
+for table in `grep TABLE "$schema" | grep $dbflag | awk -F'|' '{print $2}'`; do
+	if [ "0" == `echo "select count(*) from $table" | mysql $dblogin $dbname | tail -1` ]; then
 		continue
 	fi
 	echo "TABLE |$table"
@@ -44,7 +49,11 @@ for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
 			pri_field=`echo $line | cut -f2 -d'|' | sed -e 's/ //'`
 			ref_field=`echo $line | cut -f9 -d'|' | sed -e 's/ //'`
 			# this strange sort order works fine with MySQL
-			sortorder="order by $pri_field<$ref_field,$ref_field"
+			if [ -z "$sortorder" ]; then
+				sortorder="order by $pri_field<$ref_field,$ref_field"
+			else
+				sortorder="$sortorder,$pri_field<$ref_field,$ref_field"
+			fi
 		fi
 	done
 
@@ -59,6 +68,6 @@ for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
 
 	# remove first comma
 	fields=`echo $fields | cut -c2-`
-	echo "select $fields from $table $sortorder" | mysql -t -uroot $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g'
+	echo "select $fields from $table $sortorder" | mysql -t $dblogin $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g'
 	echo ""
 done

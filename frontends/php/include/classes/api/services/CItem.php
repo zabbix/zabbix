@@ -538,22 +538,21 @@ class CItem extends CItemGeneral {
 	public function update($items) {
 		$items = zbx_toArray($items);
 
+		parent::checkInput($items, true);
+		self::validateInventoryLinks($items, true);
+		$this->validateDependentItems($items, API::Item());
+
 		$dbItems = $this->get([
-			'output' => ['itemid', 'flags', 'type', 'master_itemid'],
+			'output' => ['flags', 'type', 'master_itemid'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		parent::checkInput($items, true);
-		self::validateInventoryLinks($items, true);
-		$this->validateDependentItems($items, API::Item());
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $dbItems, ['flags', 'type']);
 
 		foreach ($items as &$item) {
-			$item['flags'] = $dbItems[$item['itemid']]['flags'];
-			$item_type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
-
-			if ($item_type != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
+			if ($item['type'] != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
 				$item['master_itemid'] = null;
 			}
 			elseif (!array_key_exists('master_itemid', $item)) {
@@ -561,14 +560,8 @@ class CItem extends CItemGeneral {
 			}
 		}
 		unset($item);
-		$this->updateReal($items);
 
-		foreach ($items as &$item) {
-			if (!array_key_exists('type', $item)) {
-				$item['type'] = $dbItems[$item['itemid']]['type'];
-			}
-		}
-		unset($item);
+		$this->updateReal($items);
 		$this->inherit($items);
 
 		return ['itemids' => zbx_objectValues($items, 'itemid')];
@@ -630,14 +623,16 @@ class CItem extends CItemGeneral {
 
 		while ($db_dependent_items) {
 			$db_dependent_items = $this->get([
-				'output'		=> ['itemid', 'name'],
-				'filter'		=> ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
-				'selectHosts'	=> ['name'],
-				'preservekeys'	=> true
+				'output' => ['itemid', 'name'],
+				'filter' => ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+				'selectHosts' => ['name'],
+				'preservekeys' => true
 			]);
 			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_items);
 			$dependent_items += $db_dependent_items;
 		};
+		$dependent_itemids = array_keys($dependent_items);
+		$itemIds += array_combine($dependent_itemids, $dependent_itemids);
 
 		// delete graphs, leave if graph still have item
 		$delGraphs = [];
@@ -720,8 +715,9 @@ class CItem extends CItemGeneral {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
+		$itemids = array_map('strval', array_values($itemIds));
 
-		return ['itemids' => $itemIds];
+		return ['itemids' => $itemids];
 	}
 
 	public function syncTemplates($data) {

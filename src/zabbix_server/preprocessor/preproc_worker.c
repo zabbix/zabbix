@@ -73,11 +73,19 @@ static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			break;
 		}
 
-		if (SUCCEED != zbx_item_preproc(value_type, &value, ts, &steps[i], history_value, &error) ||
-				ZBX_VARIANT_NONE == value.type)
+		if (SUCCEED != zbx_item_preproc(value_type, &value, ts, &steps[i], history_value, &error))
 		{
+			char	*errmsg_full;
+
+			errmsg_full = zbx_dsprintf(NULL, "Item preprocessing step #%d failed: %s", i + 1, error);
+			zbx_free(error);
+			error = errmsg_full;
+
 			break;
 		}
+
+		if (ZBX_VARIANT_NONE == value.type)
+			break;
 	}
 
 	size = zbx_preprocessor_pack_result(&data, &value, history_value, error);

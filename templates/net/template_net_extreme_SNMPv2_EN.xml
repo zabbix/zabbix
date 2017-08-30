@@ -9,14 +9,13 @@
    </groups>
    <templates>
       <template>
-         <template>Template Extreme EXOS SNMPv2</template>
-         <name>Template Extreme EXOS SNMPv2</name>
-         <description>Template Extreme EXOS version: 0.10
+         <template>Template Net Extreme EXOS SNMPv2</template>
+         <name>Template Net Extreme EXOS SNMPv2</name>
+         <description>Template Extreme EXOS version: 0.12
 MIBs used:
 EXTREME-SOFTWARE-MONITOR-MIB
 EXTREME-SYSTEM-MIB
-ENTITY-MIB
-</description>
+ENTITY-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -72,8 +71,7 @@ ENTITY-MIB
                <privatekey/>
                <port/>
                <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
-Total CPU utlization (percentage) as of last sampling.
-</description>
+Total CPU utlization (percentage) as of last sampling.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -84,6 +82,7 @@ Total CPU utlization (percentage) as of last sampling.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Device: Temperature</name>
@@ -115,8 +114,7 @@ Total CPU utlization (percentage) as of last sampling.
                <port/>
                <description>MIB: EXTREME-SYSTEM-MIB
 Temperature readings of testpoint: Device
-Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack
-</description>
+Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -127,6 +125,7 @@ Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-supp
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Device: Temperature status</name>
@@ -157,8 +156,7 @@ Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-supp
                <privatekey/>
                <port/>
                <description>MIB: EXTREME-SYSTEM-MIB
-Temperature status of testpoint: Device
-</description>
+Temperature status of testpoint: Device</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -171,6 +169,7 @@ Temperature status of testpoint: Device
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware model name</name>
@@ -200,9 +199,7 @@ Temperature status of testpoint: Device
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -213,6 +210,7 @@ Temperature status of testpoint: Device
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware serial number</name>
@@ -242,9 +240,7 @@ Temperature status of testpoint: Device
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -255,6 +251,7 @@ Temperature status of testpoint: Device
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Firmware version</name>
@@ -284,9 +281,7 @@ Temperature status of testpoint: Device
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -297,6 +292,7 @@ Temperature status of testpoint: Device
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware version(revision)</name>
@@ -326,9 +322,7 @@ Temperature status of testpoint: Device
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -339,6 +333,7 @@ Temperature status of testpoint: Device
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Operating system</name>
@@ -370,10 +365,8 @@ Temperature status of testpoint: Device
                <port/>
                <description>MIB: EXTREME-SYSTEM-MIB
 The software revision of the primary image stored in this device.
-		    This string will have a zero length if the revision is unknown, invalid or not present.
-		    This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.
-		    
-</description>
+This string will have a zero length if the revision is unknown, invalid or not present.
+This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.</description>
                <inventory_link>5</inventory_link>
                <applications>
                   <application>
@@ -384,10 +377,11 @@ The software revision of the primary image stored in this device.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
          <discovery_rules>
-  	  	      <discovery_rule>
+            <discovery_rule>
                <name>Memory Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -448,8 +442,7 @@ The software revision of the primary image stored in this device.
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
-Total amount of free memory in Kbytes in the system.
-</description>
+Total amount of free memory in Kbytes in the system.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -466,6 +459,7 @@ Total amount of free memory in Kbytes in the system.
                      </preprocessing>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Total memory</name>
@@ -496,8 +490,7 @@ Total amount of free memory in Kbytes in the system.
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
-Total amount of DRAM in Kbytes in the system.
-</description>
+Total amount of DRAM in Kbytes in the system.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -514,6 +507,7 @@ Total amount of DRAM in Kbytes in the system.
                      </preprocessing>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Memory utilization</name>
@@ -543,8 +537,7 @@ Total amount of DRAM in Kbytes in the system.
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>Memory utilization in %
-</description>
+                     <description>Memory utilization in %</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -556,11 +549,12 @@ Total amount of DRAM in Kbytes in the system.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Extreme EXOS SNMPv2:vm.memory.pused[{#SNMPVALUE}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Net Extreme EXOS SNMPv2:vm.memory.pused[{#SNMPVALUE}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: High memory utilization</name>
@@ -569,8 +563,7 @@ Total amount of DRAM in Kbytes in the system.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -604,7 +597,7 @@ Total amount of DRAM in Kbytes in the system.
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Extreme EXOS SNMPv2</host>
+                              <host>Template Net Extreme EXOS SNMPv2</host>
                               <key>vm.memory.pused[{#SNMPVALUE}]</key>
                            </item>
                         </graph_item>
@@ -614,8 +607,7 @@ Total amount of DRAM in Kbytes in the system.
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-
-  	  	      <discovery_rule>
+            <discovery_rule>
                <name>PSU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -676,8 +668,7 @@ Total amount of DRAM in Kbytes in the system.
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SYSTEM-MIB
-Status of the power supply {#SNMPVALUE}
-</description>
+Status of the power supply {#SNMPVALUE}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -691,11 +682,12 @@ Status of the power supply {#SNMPVALUE}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Extreme EXOS SNMPv2:sensor.psu.status[extremePowerSupplyStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Extreme EXOS SNMPv2:sensor.psu.status[extremePowerSupplyStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>PSU {#SNMPVALUE}: Power supply is in critical state</name>
@@ -715,9 +707,8 @@ Please check the power supply unit for errors</description>
                <graph_prototypes/>
                <host_prototypes/>
                <jmx_endpoint/>
-            </discovery_rule>		
-
-  	  	      <discovery_rule>
+            </discovery_rule>
+            <discovery_rule>
                <name>FAN Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -778,8 +769,7 @@ Please check the power supply unit for errors</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SYSTEM-MIB
-Operational status of a cooling fan.
-</description>
+Operational status of a cooling fan.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -793,6 +783,7 @@ Operational status of a cooling fan.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>Fan {#SNMPVALUE}: Fan speed</name>
@@ -823,8 +814,7 @@ Operational status of a cooling fan.
                      <privatekey/>
                      <port/>
                      <description>MIB: EXTREME-SYSTEM-MIB
-The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}
-</description>
+The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -836,11 +826,12 @@ The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Extreme EXOS SNMPv2:sensor.fan.status[extremeFanOperational.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Extreme EXOS SNMPv2:sensor.fan.status[extremeFanOperational.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Fan {#SNMPVALUE}: Fan is in critical state</name>
@@ -861,8 +852,7 @@ Please check the fan unit</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -916,13 +906,13 @@ Please check the fan unit</description>
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -947,24 +937,24 @@ Please check the fan unit</description>
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template Extreme EXOS SNMPv2</host>
-                           <key>system.cpu.util[extremeCpuMonitorTotalUtilization.0]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net Extreme EXOS SNMPv2</host>
+                  <key>system.cpu.util[extremeCpuMonitorTotalUtilization.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template Extreme EXOS SNMPv2:system.cpu.util[extremeCpuMonitorTotalUtilization.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Net Extreme EXOS SNMPv2:system.cpu.util[extremeCpuMonitorTotalUtilization.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization</name>
@@ -973,17 +963,16 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+         <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
          <recovery_mode>1</recovery_mode>
-         <recovery_expression>{Template Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+         <recovery_expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
          <name>Device: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
@@ -997,20 +986,20 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <dependencies>
             <dependency>
                <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-               <expression>{Template Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}
+               <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}
 or
-{Template Extreme EXOS SNMPv2:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
-               <recovery_expression>{Template Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+{Template Net Extreme EXOS SNMPv2:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
+               <recovery_expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
             </dependency>
          </dependencies>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}
+         <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}
 or
-{Template Extreme EXOS SNMPv2:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
+{Template Net Extreme EXOS SNMPv2:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
          <recovery_mode>1</recovery_mode>
-         <recovery_expression>{Template Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+         <recovery_expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
          <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
@@ -1025,27 +1014,26 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+         <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
          <recovery_mode>1</recovery_mode>
-         <recovery_expression>{Template Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+         <recovery_expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
          <name>Device: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Extreme EXOS SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Extreme EXOS SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Net Extreme EXOS SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net Extreme EXOS SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
-         <name>Device might have been replaced (new serial number received)</name>
+         <name>Device has been replaced (new serial number received)</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>
@@ -1059,7 +1047,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Extreme EXOS SNMPv2:system.hw.firmware.diff()}=1 and {Template Extreme EXOS SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net Extreme EXOS SNMPv2:system.hw.firmware.diff()}=1 and {Template Net Extreme EXOS SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>
@@ -1078,66 +1066,66 @@ Firmware version has changed. Ack to close</description>
    </triggers>
    <value_maps>
       <value_map>
-            <name>TruthValue</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>true</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>false</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>TruthValue</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>true</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>false</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-        	<name>EXTREME-SYSTEM-MIB::extremeFanOperational</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>true - on</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>false - off</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>EXTREME-SYSTEM-MIB::extremeFanOperational</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>true - on</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>false - off</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-        	<name>EXTREME-SYSTEM-MIB::extremeOverTemperatureAlarm</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>alarm</newvalue> 
+         <name>EXTREME-SYSTEM-MIB::extremeOverTemperatureAlarm</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>alarm</newvalue>
                <!-- true -->
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>normal</newvalue> 
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>normal</newvalue>
                <!-- false -->
-                </mapping>
-            </mappings>
-        </value_map>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-            <name>EXTREME-SYSTEM-MIB::extremePowerSupplyStatus</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>notPresent</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>presentOK</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>presentNotOK</newvalue>
-                </mapping>
-                <mapping>
-                    <value>4</value>
-                    <newvalue>presentPowerOff</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>EXTREME-SYSTEM-MIB::extremePowerSupplyStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>notPresent</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>presentOK</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>presentNotOK</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>presentPowerOff</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>

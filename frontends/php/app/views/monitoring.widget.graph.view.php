@@ -18,13 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 if ($data['only_footer']) {
 	$output = [
 		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 	];
 }
-elseif ($data['graph']['critical_error'] !== null) {
-	$item = (new CTableInfo())->setNoDataMessage($data['graph']['critical_error']);
+elseif ($data['graph']['unavailable_object']) {
+	$item = (new CTableInfo())->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
 
 	$output = [
 		'header' => $data['name'],
@@ -41,81 +42,52 @@ else {
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
 	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJson($data['timeline']).', '.
-		CJs::encodeJson($data['time_control_data']).');'.
+			CJs::encodeJson($data['time_control_data']).
+		');'.
 		'timeControl.processObjects();'.
 		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
 
 if ($data['widget']['initial_load'] == 1) {
 	$script .=
-			'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
-				'function zbx_graph_widget_resize_end(img_id) {'.
-					'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
-						'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
-						'new_width = content.width(),'.
-						'new_height = content.height() - 10,'.
-						'src = jQuery("#"+img_id).attr("src");'.
+		'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
+			'function zbx_graph_widget_resize_end(img_id) {'.
+				'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
+					'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
+					'new_width = content.width(),'.
+					'new_height = content.height() - 10,'.
+					'src = jQuery("#"+img_id).attr("src");'.
 
-					'if (typeof src === "undefined") return;'.
-					'var img_url = new Curl(src);'.
-					'img_url.setArgument("width", new_width);'.
-					'img_url.setArgument("height", new_height);'.
-					'jQuery("#"+img_id)'.
-						'.load(img_url.getUrl(), function(response, status, xhr) {'.
-							'timeControl.changeSBoxHeight(img_id, +xhr.getResponseHeader("X-ZBX-SBOX-HEIGHT"));'.
-						'})'.
-						'.attr("src", img_url.getUrl());'.
-
-					'var tmpImg = jQuery("#"+img_id)'.
-						'.load(img_url.getUrl(), function(response, status, xhr) {'.
-							'timeControl.changeSBoxHeight(img_id, +xhr.getResponseHeader("X-ZBX-SBOX-HEIGHT"));'.
-						'});'.
-
-					'$("#"+img_id).replaceWith(tmpImg);'.
+				'if (typeof src === "undefined") {'.
+					'return;'.
 				'}'.
+
+				'var img_url = new Curl(src);'.
+
+				'img_url.setArgument("width", new_width);'.
+				'img_url.setArgument("height", new_height);'.
+				'jQuery("#"+img_id)'.
+					'.attr("src", img_url.getUrl());'.
 			'}'.
+		'}'.
 
-			'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
-				'function zbx_graph_widget_timer_refresh(img_id, grid) {'.
-					'timeControl.refreshObject(img_id);'.
-
-					'var url = new Curl("zabbix.php"),'.
-						'widget = grid["widget"];'.
-					'url.setArgument("action", "widget.'.WIDGET_GRAPH.'.view");'.
-					'jQuery.ajax({'.
-						'url: url.getUrl(),'.
-						'method: "POST",'.
-						'data: {'.
-							'uniqueid: widget["uniqueid"],'.
-							'only_footer: 1'.
-						'},'.
-						'dataType: "json",'.
-						'success: function(resp) {'.
-							'widget["content_footer"].html(resp.footer);'.
-						'}'.
-					'});'.
-				'}'.
+		'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
+			'function zbx_graph_widget_timer_refresh(img_id) {'.
+				'timeControl.refreshObject(img_id);'.
 			'}'.
+		'}'.
 
-			'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd", '.
-				'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
-					'parameters: ["'.$data['graph']['dataid'].'"],'.
-					'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
-				'});'.
-
-			'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
-				'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
-					'parameters: ["'.$data['graph']['dataid'].'"],'.
-					'grid: {widget: 1},'.
-					'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
-				'});';
-	}
-
-	$script .=
-		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onContentUpdated", '.
+		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd", '.
 			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 				'parameters: ["'.$data['graph']['dataid'].'"],'.
-				'trigger_name: "graph_widget_content_update_end_'.$data['widget']['uniqueid'].'"'.
+				'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
+			'});'.
+
+		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
+			'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
+				'parameters: ["'.$data['graph']['dataid'].'"],'.
+				'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
 			'});';
+	}
 
 	$output = [
 		'header' => $data['name'],

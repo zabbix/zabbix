@@ -9,12 +9,11 @@
    </groups>
    <templates>
       <template>
-         <template>Template Intel_Qlogic Infiniband SNMPv2</template>
-         <name>Template Intel_Qlogic Infiniband SNMPv2</name>
-         <description>Template Intel_Qlogic Infiniband version: 0.10
+         <template>Template Net Intel_Qlogic Infiniband SNMPv2</template>
+         <name>Template Net Intel_Qlogic Infiniband SNMPv2</name>
+         <description>Template Net Intel_Qlogic Infiniband version: 0.12
 MIBs used:
-ICS-CHASSIS-MIB
-</description>
+ICS-CHASSIS-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -63,9 +62,7 @@ ICS-CHASSIS-MIB
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ICS-CHASSIS-MIB
-
-</description>
+               <description>MIB: ICS-CHASSIS-MIB</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -82,6 +79,7 @@ ICS-CHASSIS-MIB
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Firmware version</name>
@@ -111,9 +109,7 @@ ICS-CHASSIS-MIB
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ICS-CHASSIS-MIB
-
-</description>
+               <description>MIB: ICS-CHASSIS-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -130,10 +126,11 @@ ICS-CHASSIS-MIB
                   </step>
                </preprocessing>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
          <discovery_rules>
-  	  	      <discovery_rule>
+            <discovery_rule>
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -158,18 +155,18 @@ ICS-CHASSIS-MIB
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>1</evaltype>
-                        <formula/>
-                        <conditions>
-                            <condition>
-                                <macro>{#SENSOR_TYPE}</macro>
-                                <value>2</value>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_TYPE}</macro>
+                        <value>2</value>
                         <!-- celsius -->
-                                <operator>8</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                        </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>Discovering sensor's table with temperature filter</description>
                <item_prototypes>
@@ -202,8 +199,7 @@ ICS-CHASSIS-MIB
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-The current value read from the sensor.
-</description>
+The current value read from the sensor.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -215,6 +211,7 @@ The current value read from the sensor.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SENSOR_INFO}: Temperature status</name>
@@ -245,8 +242,7 @@ The current value read from the sensor.
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-The operational status of the sensor.
-</description>
+The operational status of the sensor.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -260,15 +256,16 @@ The operational status of the sensor.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
 or
-{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -282,20 +279,20 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}
+                           <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}
 or
-{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
-                           <recovery_expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
+                           <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}
 or
-{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
+{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -310,17 +307,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -330,8 +326,8 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <graph_prototypes/>
                <host_prototypes/>
                <jmx_endpoint/>
-            </discovery_rule>	
-  	  	      <discovery_rule>
+            </discovery_rule>
+            <discovery_rule>
                <name>Unit Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -356,18 +352,18 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#ENT_CLASS}</macro>
-                             <value>2</value>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>2</value>
                         <!-- 3 - mainchassis-->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -400,8 +396,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-The serial number of the FRU.  If not available, this value is a zero-length string.
-</description>
+The serial number of the FRU.  If not available, this value is a zero-length string.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -413,14 +408,15 @@ The serial number of the FRU.  If not available, this value is a zero-length str
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Intel_Qlogic Infiniband SNMPv2:system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}].diff()}=1 and {Template Intel_Qlogic Infiniband SNMPv2:system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}].diff()}=1 and {Template Net Intel_Qlogic Infiniband SNMPv2:system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
-                     <name>{#ENT_NAME}: Device might have been replaced (new serial number received)</name>
+                     <name>{#ENT_NAME}: Device has been replaced (new serial number received)</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -437,8 +433,8 @@ Device serial number has changed. Ack to close</description>
                <graph_prototypes/>
                <host_prototypes/>
                <jmx_endpoint/>
-            </discovery_rule>		
-  	  	      <discovery_rule>
+            </discovery_rule>
+            <discovery_rule>
                <name>PSU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -499,17 +495,15 @@ Device serial number has changed. Ack to close</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-
-		      Actual status of the power supply:
-		      (1) unknown: status not known.
-		      (2) disabled: power supply is disabled.
-		      (3) failed - power supply is unable to supply power due to failure.
-		      (4) warning - power supply is supplying power, but an output or sensor is bad or warning.
-		      (5) standby - power supply believed usable,but not supplying power.
-		      (6) engaged - power supply is supplying power.
-		      (7) redundant - power supply is supplying power, but not needed.
-		      (8) notPresent - power supply is supplying power is not present.
-</description>
+Actual status of the power supply:
+(1) unknown: status not known.
+(2) disabled: power supply is disabled.
+(3) failed - power supply is unable to supply power due to failure.
+(4) warning - power supply is supplying power, but an output or sensor is bad or warning.
+(5) standby - power supply believed usable,but not supplying power.
+(6) engaged - power supply is supplying power.
+(7) redundant - power supply is supplying power, but not needed.
+(8) notPresent - power supply is supplying power is not present.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -523,11 +517,12 @@ Device serial number has changed. Ack to close</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: Power supply is in critical state</name>
@@ -547,10 +542,8 @@ Please check the power supply unit for errors</description>
                <graph_prototypes/>
                <host_prototypes/>
                <jmx_endpoint/>
-            </discovery_rule>		
-
-
-  	  	      <discovery_rule>
+            </discovery_rule>
+            <discovery_rule>
                <name>FAN Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -611,8 +604,7 @@ Please check the power supply unit for errors</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: ICS-CHASSIS-MIB
-The operational status of the fan unit.
-</description>
+The operational status of the fan unit.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -626,11 +618,12 @@ The operational status of the fan unit.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Intel_Qlogic Infiniband SNMPv2:sensor.fan.status[icsChassisFanOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.fan.status[icsChassisFanOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: Fan is in critical state</name>
@@ -651,10 +644,7 @@ Please check the fan unit</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-
-		
-		
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -704,10 +694,10 @@ Please check the fan unit</description>
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -716,7 +706,7 @@ Please check the fan unit</description>
    <graphs/>
    <triggers>
       <trigger>
-         <expression>{Template Intel_Qlogic Infiniband SNMPv2:system.hw.firmware.diff()}=1 and {Template Intel_Qlogic Infiniband SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:system.hw.firmware.diff()}=1 and {Template Net Intel_Qlogic Infiniband SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>
@@ -735,120 +725,120 @@ Firmware version has changed. Ack to close</description>
    </triggers>
    <value_maps>
       <value_map>
-            <name>ICS-CHASSIS-MIB::icsChassisFanOperStatus</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>online</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>operational</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>failed</newvalue>
-                </mapping>
-                 <mapping>
-                    <value>4</value>
-                    <newvalue>offline</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>ICS-CHASSIS-MIB::icsChassisFanOperStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>online</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>operational</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>offline</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-            <name>ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>invalid</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>bad</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>warning</newvalue>
-                </mapping>
-                 <mapping>
-                    <value>4</value>
-                    <newvalue>good</newvalue>
-                </mapping>
-                 <mapping>
-                    <value>5</value>
-                    <newvalue>disabled</newvalue>
-                </mapping>                
-            </mappings>
-        </value_map>
+         <name>ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>invalid</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>bad</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>warning</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>good</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>disabled</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-            <name>ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>unknown</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>disabled</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>failed</newvalue>
-                </mapping>
-                 <mapping>
-                    <value>4</value>
-                    <newvalue>warning</newvalue>
-                </mapping>
-                <mapping>
-                    <value>5</value>
-                    <newvalue>standby</newvalue>
-                </mapping>
-                <mapping>
-                    <value>6</value>
-                    <newvalue>engaged</newvalue>
-                </mapping>
-                <mapping>
-                    <value>7</value>
-                    <newvalue>redundant</newvalue>
-                </mapping>
-                 <mapping>
-                    <value>8</value>
-                    <newvalue>notPresent</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>disabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>warning</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>standby</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>engaged</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>redundant</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>notPresent</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-            <name>ICS-CHASSIS-MIB::icsChassisTemperatureStatus</name>
-            <mappings>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>normal</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>high</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>excessivelyHigh</newvalue>
-                </mapping>
-                 <mapping>
-                    <value>4</value>
-                    <newvalue>low</newvalue>
-                </mapping>
-                <mapping>
-                    <value>5</value>
-                    <newvalue>excessivelyLow</newvalue>
-                </mapping>
-                <mapping>
-                    <value>6</value>
-                    <newvalue>noSensor</newvalue>
-                </mapping>
-                <mapping>
-                    <value>7</value>
-                    <newvalue>unknown</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>ICS-CHASSIS-MIB::icsChassisTemperatureStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>high</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>excessivelyHigh</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>low</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>excessivelyLow</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>noSensor</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>

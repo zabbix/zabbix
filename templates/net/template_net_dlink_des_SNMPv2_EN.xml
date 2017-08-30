@@ -9,20 +9,18 @@
    </groups>
    <templates>
       <template>
-         <template>Template D-Link DES SNMPv2</template>
-         <name>Template D-Link DES SNMPv2</name>
-         <description>Template D-Link DES version: 0.10
+         <template>Template Net D-Link DES_DGS Switch SNMPv2</template>
+         <name>Template Net D-Link DES_DGS Switch SNMPv2</name>
+         <description>Template D-Link DES_DGS Switch version: 0.12
 MIBs used:
 DLINK-AGENT-MIB
 EQUIPMENT-MIB
 SNMPv2-MIB
 ENTITY-MIB
-
 Known Issues:
 description : D-Link reports missing PSU as fail(4)
 version : Firmware: 	1.73R008,hardware revision:	B1
-device : DGS-3420-26SC Gigabit Ethernet Switch
-</description>
+device : DGS-3420-26SC Gigabit Ethernet Switch</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -78,8 +76,7 @@ device : DGS-3420-26SC Gigabit Ethernet Switch
                <privatekey/>
                <port/>
                <description>MIB: DLINK-AGENT-MIB
-The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very busy).
-</description>
+The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very busy).</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -90,6 +87,7 @@ The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very 
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware model name</name>
@@ -121,9 +119,8 @@ The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very 
                <port/>
                <description>MIB: SNMPv2-MIB
 A textual description of the entity.  This value should
-				include the full name and version identification of thesystem's hardware type, software operating-system, and
-				networking software.
-</description>
+include the full name and version identification of the system's hardware type, software operating-system, and
+networking software.</description>
                <inventory_link>29</inventory_link>
                <applications>
                   <application>
@@ -134,6 +131,7 @@ A textual description of the entity.  This value should
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware serial number</name>
@@ -164,8 +162,7 @@ A textual description of the entity.  This value should
                <privatekey/>
                <port/>
                <description>MIB: DLINK-AGENT-MIB
-A text string containing the serial number of this device.
-</description>
+A text string containing the serial number of this device.</description>
                <inventory_link>8</inventory_link>
                <applications>
                   <application>
@@ -176,6 +173,7 @@ A text string containing the serial number of this device.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Firmware version</name>
@@ -205,9 +203,7 @@ A text string containing the serial number of this device.
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -218,6 +214,7 @@ A text string containing the serial number of this device.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
             <item>
                <name>Hardware version(revision)</name>
@@ -247,9 +244,7 @@ A text string containing the serial number of this device.
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: ENTITY-MIB
-
-</description>
+               <description>MIB: ENTITY-MIB</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -260,13 +255,11 @@ A text string containing the serial number of this device.
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <master_item/>
             </item>
          </items>
          <discovery_rules>
-  	  	
-  	   	
-  	  	
-  	  	      <discovery_rule>
+            <discovery_rule>
                <name>Memory Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -327,8 +320,7 @@ A text string containing the serial number of this device.
                      <privatekey/>
                      <port/>
                      <description>MIB: DLINK-AGENT-MIB
-The percentage of used DRAM memory of the total DRAM memory available.The value will be between 0%(idle) and 100%(very busy)
-</description>
+The percentage of used DRAM memory of the total DRAM memory available.The value will be between 0%(idle) and 100%(very busy)</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -340,11 +332,12 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv2:vm.memory.pused[agentDRAMutilization.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:vm.memory.pused[agentDRAMutilization.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: High memory utilization</name>
@@ -353,8 +346,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -388,7 +380,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template D-Link DES SNMPv2</host>
+                              <host>Template Net D-Link DES_DGS Switch SNMPv2</host>
                               <key>vm.memory.pused[agentDRAMutilization.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -398,8 +390,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  	
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -460,8 +451,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      <privatekey/>
                      <port/>
                      <description>MIB: EQUIPMENT-MIB
-The shelf current temperature.
-</description>
+The shelf current temperature.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -473,13 +463,14 @@ The shelf current temperature.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template D-Link DES SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>#{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -493,16 +484,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>#{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template D-Link DES SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template D-Link DES SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template D-Link DES SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>#{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -517,17 +508,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template D-Link DES SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>#{#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -538,8 +528,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		
-		          <discovery_rule>
+            <discovery_rule>
                <name>PSU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -564,18 +553,18 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#STATUS}</macro>
-                             <value>[^0]</value> 
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#STATUS}</macro>
+                        <value>[^0]</value>
                         <!-- (0)other - means not installed actually -->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>swPowerID of EQUIPMENT-MIB::swPowerTable</description>
                <item_prototypes>
@@ -614,9 +603,7 @@ overCurrent: The current of the power unit is too high.
 working    : The power unit is working normally.
 fail       : The power unit has failed.
 connect    : The power unit is connected but not powered on.
-disconnect : The power unit is not connected.
-
-</description>
+disconnect : The power unit is not connected.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -630,11 +617,12 @@ disconnect : The power unit is not connected.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv2:sensor.psu.status[swPowerStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.psu.status[swPowerStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Power supply is in critical state</name>
@@ -655,8 +643,7 @@ Please check the power supply unit for errors</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		
-		          <discovery_rule>
+            <discovery_rule>
                <name>FAN Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -681,18 +668,18 @@ Please check the power supply unit for errors</description>
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#STATUS}</macro>
-                             <value>[^0]</value>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#STATUS}</macro>
+                        <value>[^0]</value>
                         <!-- (0)other - means not installed actually -->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>swFanID of EQUIPMENT-MIB::swFanTable</description>
                <item_prototypes>
@@ -729,8 +716,7 @@ Indicates the current fan status.
 speed-0     : If the fan function is normal and the fan does not spin            due to the temperature not  reaching the threshold,              the status of the fan is speed 0.
 speed-low   : Fan spin using the lowest speed.
 speed-middle: Fan spin using the middle speed.
-speed-high  : Fan spin using the highest speed.
-</description>
+speed-high  : Fan spin using the highest speed.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -744,11 +730,12 @@ speed-high  : Fan spin using the highest speed.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template D-Link DES SNMPv2:sensor.fan.status[swFanStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.fan.status[swFanStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Fan is in critical state</name>
@@ -769,7 +756,7 @@ Please check the fan unit</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -811,13 +798,13 @@ Please check the fan unit</description>
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -842,24 +829,24 @@ Please check the fan unit</description>
          <ymin_item_1>0</ymin_item_1>
          <ymax_item_1>0</ymax_item_1>
          <graph_items>
-                     <graph_item>
-                        <sortorder>0</sortorder>
-                        <drawtype>5</drawtype>
-                        <color>1A7C11</color>
-                        <yaxisside>0</yaxisside>
-                        <calc_fnc>2</calc_fnc>
-                        <type>0</type>
-                        <item>
-                           <host>Template D-Link DES SNMPv2</host>
-                           <key>system.cpu.util[agentCPUutilizationIn1min.0]</key>
-                        </item>
-                     </graph_item>
-                  </graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net D-Link DES_DGS Switch SNMPv2</host>
+                  <key>system.cpu.util[agentCPUutilizationIn1min.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
       </graph>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template D-Link DES SNMPv2:system.cpu.util[agentCPUutilizationIn1min.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Net D-Link DES_DGS Switch SNMPv2:system.cpu.util[agentCPUutilizationIn1min.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization</name>
@@ -868,18 +855,17 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies/>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template D-Link DES SNMPv2:system.hw.serialnumber.diff()}=1 and {Template D-Link DES SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Net D-Link DES_DGS Switch SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net D-Link DES_DGS Switch SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
-         <name>Device might have been replaced (new serial number received)</name>
+         <name>Device has been replaced (new serial number received)</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>
@@ -893,7 +879,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template D-Link DES SNMPv2:system.hw.firmware.diff()}=1 and {Template D-Link DES SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net D-Link DES_DGS Switch SNMPv2:system.hw.firmware.diff()}=1 and {Template Net D-Link DES_DGS Switch SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>
@@ -912,70 +898,70 @@ Firmware version has changed. Ack to close</description>
    </triggers>
    <value_maps>
       <value_map>
-            <name>EQUIPMENT-MIB::swFanStatus</name>
-            <mappings>
-                <mapping>
-                    <value>0</value>
-                    <newvalue>other</newvalue>
-                </mapping>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>working</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>fail</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>speed-0</newvalue>
-                </mapping>
-                <mapping>
-                    <value>4</value>
-                    <newvalue>speed-low</newvalue>
-                </mapping>
-                <mapping>
-                    <value>5</value>
-                    <newvalue>speed-middle</newvalue>
-                </mapping>
-                <mapping>
-                    <value>6</value>
-                    <newvalue>speed-high</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>EQUIPMENT-MIB::swFanStatus</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>working</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>fail</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>speed-0</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>speed-low</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>speed-middle</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>speed-high</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
-            <name>EQUIPMENT-MIB::swPowerStatus</name>
-            <mappings>
-                <mapping>
-                    <value>0</value>
-                    <newvalue>other</newvalue>
-                </mapping>
-                <mapping>
-                    <value>1</value>
-                    <newvalue>lowVoltage</newvalue>
-                </mapping>
-                <mapping>
-                    <value>2</value>
-                    <newvalue>overCurrent</newvalue>
-                </mapping>
-                <mapping>
-                    <value>3</value>
-                    <newvalue>working</newvalue>
-                </mapping>
-                <mapping>
-                    <value>4</value>
-                    <newvalue>fail</newvalue>
-                </mapping>
-                <mapping>
-                    <value>5</value>
-                    <newvalue>connect</newvalue>
-                </mapping>
-                <mapping>
-                    <value>6</value>
-                    <newvalue>disconnect</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
+         <name>EQUIPMENT-MIB::swPowerStatus</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>lowVoltage</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>overCurrent</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>working</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>fail</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>connect</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>disconnect</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>

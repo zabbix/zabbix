@@ -9,21 +9,19 @@
    </groups>
    <templates>
       <template>
-         <template>Template HP Comware HH3C SNMPv2</template>
-         <name>Template HP Comware HH3C SNMPv2</name>
-         <description>Template HP Comware (HH3C) version: 0.10
+         <template>Template Net HP Comware HH3C SNMPv2</template>
+         <name>Template Net HP Comware HH3C SNMPv2</name>
+         <description>Template Net HP Comware (HH3C) version: 0.12
 Overview: http://certifiedgeek.weebly.com/blog/hp-comware-snmp-mib-for-cpu-memory-and-temperature
 http://www.h3c.com.hk/products___solutions/technology/system_management/configuration_example/200912/656451_57_0.htm
 
 MIBs used:
 HH3C-ENTITY-EXT-MIB
 ENTITY-MIB
-
 Known Issues:
 description : No temperature sensors. All entities of them return 0 for HH3C-ENTITY-EXT-MIB::hh3cEntityExtTemperature
 version : 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010-2016 Hewlett Packard Enterprise Development LP
-device : HP 1910-48
-</description>
+device : HP 1910-48</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -51,7 +49,7 @@ device : HP 1910-48
          </applications>
          <items/>
          <discovery_rules>
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>Module Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -76,25 +74,25 @@ device : HP 1910-48
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>2</evaltype>
-                        <formula/>
-                        <conditions>
-							              <condition>
-                                <macro>{#SNMPVALUE}</macro>
-                                <value>^(MODULE|Module) (LEVEL|level)1$</value> 
+                  <evaltype>2</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>^(MODULE|Module) (LEVEL|level)1$</value>
                         <!--  get Module level1 on smaller models -->
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-							              <condition>
-                                <macro>{#SNMPVALUE}</macro>
-                                <value>(Fabric|FABRIC) (.+) (Module|MODULE)</value> 
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>(Fabric|FABRIC) (.+) (Module|MODULE)</value>
                         <!-- get things like HP 384 Gbps Fabric A7500 Module JD194B -->
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>                           
-                        </conditions>
-                    </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>Filter limits results to 'Module level1' or Fabric Modules</description>
                <item_prototypes>
@@ -128,9 +126,8 @@ device : HP 1910-48
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 The CPU usage for this entity. Generally, the CPU usage
-	      will calculate the overall CPU usage on the entity, and it
-	      is not sensible with the number of CPU on the entity
-</description>
+will calculate the overall CPU usage on the entity, and it
+is not sensible with the number of CPU on the entity</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -142,6 +139,7 @@ The CPU usage for this entity. Generally, the CPU usage
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#MODULE_NAME}: Memory utilization</name>
@@ -173,8 +171,7 @@ The CPU usage for this entity. Generally, the CPU usage
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 The memory usage for the entity. This object indicates what
-percent of memory are used.
-</description>
+percent of memory are used.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -186,11 +183,12 @@ percent of memory are used.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#MODULE_NAME}: High CPU utilization</name>
@@ -199,15 +197,14 @@ percent of memory are used.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:vm.memory.pused[hh3cEntityExtMemUsage.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:vm.memory.pused[hh3cEntityExtMemUsage.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#MODULE_NAME}: High memory utilization</name>
@@ -216,8 +213,7 @@ percent of memory are used.
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -251,7 +247,7 @@ percent of memory are used.
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template HP Comware HH3C SNMPv2</host>
+                              <host>Template Net HP Comware HH3C SNMPv2</host>
                               <key>system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -283,7 +279,7 @@ percent of memory are used.
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template HP Comware HH3C SNMPv2</host>
+                              <host>Template Net HP Comware HH3C SNMPv2</host>
                               <key>vm.memory.pused[hh3cEntityExtMemUsage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -293,7 +289,7 @@ percent of memory are used.
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-	  	        <discovery_rule>
+            <discovery_rule>
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -318,32 +314,32 @@ percent of memory are used.
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>2</evaltype>
-                        <formula/>
-                        <conditions>
-							              <condition>
-                                <macro>{#SNMPVALUE}</macro>
-                                <value>^(MODULE|Module) (LEVEL|level)1$</value> 
+                  <evaltype>2</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>^(MODULE|Module) (LEVEL|level)1$</value>
                         <!--  get Module level1 on smaller models -->
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-							              <condition>
-                                <macro>{#SNMPVALUE}</macro>
-                                <value>(Fabric|FABRIC) (.+) (Module|MODULE)</value> 
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>(Fabric|FABRIC) (.+) (Module|MODULE)</value>
                         <!-- get things like HP 384 Gbps Fabric A7500 Module JD194B -->
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-							              <condition>
-                                <macro>{#SNMPVALUE}</macro>
-                                <value>(T|t)emperature.*(s|S)ensor</value> 
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>(T|t)emperature.*(s|S)ensor</value>
                         <!--  get things like 'Temperature Sensor 1 on Board' -->
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>                                                        
-                        </conditions>
-                    </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>Discovering modules temperature (same filter as in Module Discovery) plus and temperature sensors</description>
                <item_prototypes>
@@ -376,8 +372,7 @@ percent of memory are used.
                      <privatekey/>
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
-The temperature for the {#SNMPVALUE}.
-</description>
+The temperature for the {#SNMPVALUE}.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -389,13 +384,14 @@ The temperature for the {#SNMPVALUE}.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -409,16 +405,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -433,17 +429,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net HP Comware HH3C SNMPv2:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
-</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -454,7 +449,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-		          <discovery_rule>
+            <discovery_rule>
                <name>FAN Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -479,17 +474,17 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>0</evaltype>
-                        <formula/>
-                        <conditions>
-							              <condition>
-                                <macro>{#ENT_CLASS}</macro>
-                                <value>7</value>
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>7</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>Discovering all entities of PhysicalClass - 7: fan(7)</description>
                <item_prototypes>
@@ -523,8 +518,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 Indicate the error state of this entity object.
-		      fanError(41) means that the fan stops working.
-</description>
+fanError(41) means that the fan stops working.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -538,11 +532,12 @@ Indicate the error state of this entity object.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"fanError"} or {Template HP Comware HH3C SNMPv2:sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"hardwareFaulty"}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"fanError"} or {Template Net HP Comware HH3C SNMPv2:sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"hardwareFaulty"}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: Fan is in critical state</name>
@@ -562,9 +557,8 @@ Please check the fan unit</description>
                <graph_prototypes/>
                <host_prototypes/>
                <jmx_endpoint/>
-            </discovery_rule>	  	
-
-		          <discovery_rule>
+            </discovery_rule>
+            <discovery_rule>
                <name>PSU Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -589,17 +583,17 @@ Please check the fan unit</description>
                <privatekey/>
                <port/>
                <filter>
-                        <evaltype>0</evaltype>
-                        <formula/>
-                        <conditions>
-							              <condition>
-                                <macro>{#ENT_CLASS}</macro>
-                                <value>6</value>
-                                <operator>8</operator>
-                                <formulaid>A</formulaid>
-                            </condition>
-                        </conditions>
-                    </filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>6</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description>Discovering all entities of PhysicalClass - 6: powerSupply(6)</description>
                <item_prototypes>
@@ -633,10 +627,8 @@ Please check the fan unit</description>
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB
 Indicate the error state of this entity object.
-		      psuError(51) means that the Power Supply Unit is in the state of fault.
-		      rpsError(61) means the Redundant Power Supply is in the state of fault.
-		      
-</description>
+psuError(51) means that the Power Supply Unit is in the state of fault.
+rpsError(61) means the Redundant Power Supply is in the state of fault.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -650,11 +642,12 @@ Indicate the error state of this entity object.
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"psuError"} or {Template HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"rpsError"} or {Template HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"hardwareFaulty"}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"psuError"} or {Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"rpsError"} or {Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"hardwareFaulty"}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: Power supply is in critical state</name>
@@ -674,9 +667,8 @@ Please check the power supply unit for errors</description>
                <graph_prototypes/>
                <host_prototypes/>
                <jmx_endpoint/>
-            </discovery_rule>	  	
-	  	
-  	         <discovery_rule>
+            </discovery_rule>
+            <discovery_rule>
                <name>Entity Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -701,18 +693,18 @@ Please check the power supply unit for errors</description>
                <privatekey/>
                <port/>
                <filter>
-                     <evaltype>0</evaltype>
-                     <formula/>
-                     <conditions>
-						               <condition>
-                             <macro>{#ENT_CLASS}</macro>
-                             <value>3</value> 
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>3</value>
                         <!-- 3 - chassis  -->
-                             <operator>8</operator>
-                             <formulaid>A</formulaid>
-                         </condition>
-                     </conditions>
-                 </filter>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <lifetime>30d</lifetime>
                <description/>
                <item_prototypes>
@@ -744,9 +736,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -758,6 +748,7 @@ Please check the power supply unit for errors</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Hardware serial number</name>
@@ -787,9 +778,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -801,6 +790,7 @@ Please check the power supply unit for errors</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Firmware version</name>
@@ -830,9 +820,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -844,6 +832,7 @@ Please check the power supply unit for errors</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Hardware version(revision)</name>
@@ -873,9 +862,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -887,6 +874,7 @@ Please check the power supply unit for errors</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                   <item_prototype>
                      <name>{#ENT_NAME}: Operating system</name>
@@ -916,9 +904,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-MIB
-
-</description>
+                     <description>MIB: ENTITY-MIB</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -930,14 +916,15 @@ Please check the power supply unit for errors</description>
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
+                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template HP Comware HH3C SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Net HP Comware HH3C SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
-                     <name>{#ENT_NAME}: Device might have been replaced (new serial number received)</name>
+                     <name>{#ENT_NAME}: Device has been replaced (new serial number received)</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
@@ -951,7 +938,7 @@ Device serial number has changed. Ack to close</description>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template HP Comware HH3C SNMPv2:system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}].diff()}=1 and {Template HP Comware HH3C SNMPv2:system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}].diff()}=1 and {Template Net HP Comware HH3C SNMPv2:system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: Firmware has changed</name>
@@ -972,10 +959,7 @@ Firmware version has changed. Ack to close</description>
                <host_prototypes/>
                <jmx_endpoint/>
             </discovery_rule>
-  	
-
-	  		  		  	
-	        </discovery_rules>
+         </discovery_rules>
          <httptests/>
          <macros>
             <macro>
@@ -1029,13 +1013,13 @@ Firmware version has changed. Ack to close</description>
          </macros>
          <templates>
             <template>
-               <name>Template SNMP Interfaces SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP EtherLike-MIB SNMPv2</name>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template SNMP Generic SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -1045,93 +1029,77 @@ Firmware version has changed. Ack to close</description>
    <triggers/>
    <value_maps>
       <value_map>
-			      <name>HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus</name>
-			      <mappings>
-				        <mapping>
-					          <value>1</value>
-					          <newvalue>notSupported</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>2</value>
-					          <newvalue>normal</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>3</value>
-					          <newvalue>postFailure</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>4</value>
-					          <newvalue>entityAbsent</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>5</value>
-					          <newvalue>poeError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>6</value>
-					          <newvalue>stackError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>7</value>
-					          <newvalue>stackPortBlocked</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>8</value>
-					          <newvalue>stackPortFailed</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>9</value>
-					          <newvalue>sfpRecvError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>10</value>
-					          <newvalue>sfpSendError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>11</value>
-					          <newvalue>sfpBothError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>12</value>
-					          <newvalue>fanError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>13</value>
-					          <newvalue>psuError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>14</value>
-					          <newvalue>rpsError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>15</value>
-					          <newvalue>moduleFaulty</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>16</value>
-					          <newvalue>sensorError</newvalue>
-				        </mapping>
-
-				        <mapping>
-					          <value>17</value>
-					          <newvalue>hardwareFaulty</newvalue>
-				        </mapping>
-			      </mappings>
-		    </value_map>
+         <name>HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>notSupported</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>postFailure</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>entityAbsent</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>poeError</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>stackError</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>stackPortBlocked</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>stackPortFailed</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>sfpRecvError</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>sfpSendError</newvalue>
+            </mapping>
+            <mapping>
+               <value>11</value>
+               <newvalue>sfpBothError</newvalue>
+            </mapping>
+            <mapping>
+               <value>12</value>
+               <newvalue>fanError</newvalue>
+            </mapping>
+            <mapping>
+               <value>13</value>
+               <newvalue>psuError</newvalue>
+            </mapping>
+            <mapping>
+               <value>14</value>
+               <newvalue>rpsError</newvalue>
+            </mapping>
+            <mapping>
+               <value>15</value>
+               <newvalue>moduleFaulty</newvalue>
+            </mapping>
+            <mapping>
+               <value>16</value>
+               <newvalue>sensorError</newvalue>
+            </mapping>
+            <mapping>
+               <value>17</value>
+               <newvalue>hardwareFaulty</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
    </value_maps>
 </zabbix_export>
