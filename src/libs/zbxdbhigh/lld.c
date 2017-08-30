@@ -542,6 +542,13 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
 
+	if (FAIL == DCconfig_lock_discovery_rule(lld_ruleid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process discovery rule: another value for lld rule ID ["
+				ZBX_FS_UI64 "] is being processed", lld_ruleid);
+		goto out;
+	}
+
 	zbx_vector_ptr_create(&lld_rows);
 
 	lld_filter_init(&filter);
@@ -656,6 +663,8 @@ error:
 		DBcommit();
 	}
 clean:
+	DCconfig_unlock_discovery_rule(lld_ruleid);
+
 	zbx_free(error);
 	zbx_free(db_error);
 	zbx_free(discovery_key);
@@ -666,5 +675,6 @@ clean:
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
 
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
