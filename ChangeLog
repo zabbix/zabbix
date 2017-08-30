@@ -10,6 +10,7 @@ Changes for 3.4.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12327] fixed XML import when preprocessing param value is space character (gcalenko, vjaceslavs)
 A......... [ZBX-12569] fixed possible SQL errors in dashboard.create() and dashboard.update() methods (Sasha)
 ..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
 ........S. [ZBX-12618] fixed memory related bugs in item preprocessing (vjaceslavs)
