@@ -653,13 +653,10 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (0 != (item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	if (ITEM_STATE_NOTSUPPORTED != state && 0 != (item_flags & ZBX_FLAG_DISCOVERY_RULE))
 	{
 		if (NULL != result && NULL != GET_TEXT_RESULT(result))
 			lld_process_discovery_rule(itemid, result->text, ts);
-
-		if (ITEM_STATE_NOTSUPPORTED == state)
-			dc_local_add_history_notsupported(itemid, ts, error);
 
 		goto out;
 	}
