@@ -19,18 +19,16 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/func.inc.php';
-require_once dirname(__FILE__).'/../../include/classes/export/writers/CExportWriter.php';
-require_once dirname(__FILE__).'/../../include/classes/export/writers/CXmlExportWriter.php';
+class CXmlExportWriterTest extends PHPUnit_Framework_TestCase {
 
-class class_cxmlexportwriter extends PHPUnit_Framework_TestCase {
-
-	public static function provider() {
+	public function dataProvider() {
 		return [
 			[
 				[
 					'root' => [
 						'string' => 'string',
+						'spaces' => '  ',
+						'lr_spaces' => ' string ',
 						'null' => null,
 						'empty' => '',
 						'array' => [
@@ -38,26 +36,31 @@ class class_cxmlexportwriter extends PHPUnit_Framework_TestCase {
 						]
 					]
 				],
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
-				"<root>\n".
-				"    <string>string</string>\n".
-				"    <null/>\n".
-				"    <empty/>\n".
-				"    <array>\n".
-				"        <string>string</string>\n".
-				"    </array>\n".
-				"</root>\n"
+				'<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n".
+				'<root>'."\n".
+				'    <string>string</string>'."\n".
+				'    <spaces><![CDATA[  ]]></spaces>'."\n".
+				'    <lr_spaces> string </lr_spaces>'."\n".
+				'    <null/>'."\n".
+				'    <empty/>'."\n".
+				'    <array>'."\n".
+				'        <string>string</string>'."\n".
+				'    </array>'."\n".
+				'</root>'."\n"
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider provider
+	 * @dataProvider dataProvider
+	 *
+	 * @param array $array
+	 * @param mixed $expected
 	 */
-	public function test_writeXml($array, $expectedResult) {
+	public function test_writeXml(array $array, $expected) {
 		$writer = new CXmlExportWriter();
 		$xml = $writer->write($array);
 
-		$this->assertEquals($xml, $expectedResult);
+		$this->assertEquals($xml, $expected);
 	}
 }
