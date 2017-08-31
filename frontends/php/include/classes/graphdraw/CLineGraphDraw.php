@@ -2737,6 +2737,16 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$maxX = $this->sizeX;
 
+		if ($this->dataFrom === 'trends') {
+			// Correct item 'delay' field value when graph data requested for trends.
+			foreach ($this->items as &$item) {
+				if (!$item['has_scheduling_intervals'] || $item['delay'] != 0) {
+					$item['delay'] = max($item['delay'], SEC_PER_HOUR);
+				}
+			}
+			unset($item);
+		}
+
 		// for each metric
 		for ($item = 0; $item < $this->num; $item++) {
 			$minY = $this->m_minY[$this->items[$item]['yaxisside']];
