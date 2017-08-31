@@ -171,7 +171,7 @@ $firstAudit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
 
 $data['timeline'] = [
 	'period' => $effectivePeriod,
-	'starttime' => date(TIMESTAMP_FORMAT, $firstAudit ? $firstAudit['clock'] : null),
+	'starttime' => date(TIMESTAMP_FORMAT, $firstAudit ? $firstAudit['clock'] - 1 : null),
 	'usertime' => isset($_REQUEST['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
 ];
 
