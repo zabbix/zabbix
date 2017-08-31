@@ -19,29 +19,22 @@
 **/
 
 
-/**
- * URL widget form.
- */
-class CUrlWidgetForm extends CWidgetForm {
+class CHtmlUrlValidator {
 
-	public function __construct($data) {
-		parent::__construct($data);
+	/**
+	 * Relative URL should start with .php file name.
+	 * Absolute URL schema must match schemes mentioned in ZBX_URL_VALID_SCHEMES comma separated list.
+	 *
+	 * @static
+	 *
+	 * @param string $url	URL string to validate
+	 *
+	 * @return bool
+	 */
+	public static function validate($url) {
+		$scheme = (strpos($url, ':') === false) ? '' : substr($url, 0, strpos($url, ':'));
+		$allowed_schemes = explode(',', strtolower(ZBX_URI_VALID_SCHEMES));
 
-		// URL field
-		$field_url = (new CWidgetFieldUrl('url', _('URL')))
-			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
-
-		if (array_key_exists('url', $this->data)) {
-			$field_url->setValue($this->data['url']);
-		}
-		$this->fields[] = $field_url;
-
-		// dynamic item
-		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
-
-		if (array_key_exists('dynamic', $this->data)) {
-			$field_dynamic->setValue($this->data['dynamic']);
-		}
-		$this->fields[] = $field_dynamic;
+		return (in_array(strtolower($scheme), $allowed_schemes) || preg_match('/^[a-z_\.]+\.php/i', $url) == 1);
 	}
 }

@@ -52,7 +52,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues())
 		);
 	}
-	elseif ($field instanceof CWidgetFieldTextBox) {
+	elseif ($field instanceof CWidgetFieldTextBox || $field instanceof CWidgetFieldUrl) {
 		$form_list->addRow($field->getLabel(),
 			(new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
