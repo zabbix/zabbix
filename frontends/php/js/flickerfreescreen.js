@@ -107,7 +107,10 @@
 			// timeline params
 			// SCREEN_RESOURCE_HTTPTEST_DETAILS, SCREEN_RESOURCE_DISCOVERY, SCREEN_RESOURCE_HTTPTEST
 			if (jQuery.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
-				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
+				if (!empty(timeControl.timeline)) {
+					timeControl.timeline.refreshEndtime();
+				}
+				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : this.getCalculatedPeriod(screen));
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 			}
 
@@ -119,7 +122,10 @@
 							var obj = $(this),
 								url = new Curl(obj.attr('href'));
 
-							url.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
+							url.setArgument('period', empty(screen.timeline.period)
+								? null
+								: window.flickerfreeScreen.getCalculatedPeriod(screen)
+							);
 							url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 							obj.attr('href', url.getUrl());
 						});
@@ -356,7 +362,10 @@
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
 					url.setArgument('updateProfile', (typeof screen.updateProfile === 'undefined')
 						? null : + screen.updateProfile);
-					url.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
+					url.setArgument('period', empty(screen.timeline.period)
+						? null
+						: window.flickerfreeScreen.getCalculatedPeriod(screen)
+					);
 					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					url.setArgument('curtime', new CDate().getTime());
 
@@ -506,8 +515,8 @@
 		},
 
 		getCalculatedSTime: function(screen) {
-			if (!empty(timeControl.timeline) && screen.timeline.period > timeControl.timeline.maxperiod) {
-				return new CDate(timeControl.timeline.starttime() * 1000).getZBXDate();
+			if (timeControl.timeline && timeControl.timeline.is_selectall_period) {
+				return timeControl.timeline.usertime();
 			}
 
 			return (screen.timeline.isNow || screen.timeline.isNow == 1)
@@ -516,13 +525,24 @@
 				: screen.timeline.stime;
 		},
 
+		/**
+		 * Return period in seconds for requesting data. Automatically calculates period when 'All' period is selected.
+		 *
+		 * @property {Object} screen screen object
+		 *
+		 * @return {int}
+		 */
+		getCalculatedPeriod: function (screen) {
+			return !empty(timeControl.timeline) ? timeControl.timeline.period() : screen.timeline.period;
+		},
+
 		submitForm: function(formName) {
 			var period = '',
 				stime = '';
 
 			for (var id in this.screens) {
 				if (!empty(this.screens[id])) {
-					period = this.screens[id].timeline.period;
+					period = this.getCalculatedPeriod(this.screens[id]);
 					stime = this.getCalculatedSTime(this.screens[id]);
 					break;
 				}
