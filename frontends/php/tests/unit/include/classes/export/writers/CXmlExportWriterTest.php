@@ -19,46 +19,48 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/classes/import/readers/CImportReader.php';
-require_once dirname(__FILE__).'/../../include/classes/import/readers/CXmlImportReader.php';
+class CXmlExportWriterTest extends PHPUnit_Framework_TestCase {
 
-class class_cxmlimportreader extends PHPUnit_Framework_TestCase {
-
-	public static function provider() {
+	public function dataProvider() {
 		return [
 			[
-				<<< XML
-<root>
-	<tag>tag</tag>
-	<empty_tag></empty_tag>
-	<empty />
-	<array>
-		<tag>tag</tag>
-	</array>
-</root>
-XML
-				,
 				[
 					'root' => [
-						'tag' => 'tag',
-						'empty_tag' => '',
+						'string' => 'string',
+						'spaces' => '  ',
+						'lr_spaces' => ' string ',
+						'null' => null,
 						'empty' => '',
 						'array' => [
-							'tag' => 'tag'
+							'string' => 'string'
 						]
 					]
 				],
-			],
+				'<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n".
+				'<root>'."\n".
+				'    <string>string</string>'."\n".
+				'    <spaces><![CDATA[  ]]></spaces>'."\n".
+				'    <lr_spaces> string </lr_spaces>'."\n".
+				'    <null/>'."\n".
+				'    <empty/>'."\n".
+				'    <array>'."\n".
+				'        <string>string</string>'."\n".
+				'    </array>'."\n".
+				'</root>'."\n"
+			]
 		];
 	}
 
 	/**
-	 * @dataProvider provider
+	 * @dataProvider dataProvider
+	 *
+	 * @param array $array
+	 * @param mixed $expected
 	 */
-	public function test_readXml($xml, $expectedResult) {
-		$reader = new CXmlImportReader();
-		$array = $reader->read($xml);
+	public function test_writeXml(array $array, $expected) {
+		$writer = new CXmlExportWriter();
+		$xml = $writer->write($array);
 
-		$this->assertTrue($array === $expectedResult);
+		$this->assertEquals($xml, $expected);
 	}
 }

@@ -283,6 +283,10 @@
 							window.flickerfreeScreenShadow.fadeSpeed(id, 0);
 							window.flickerfreeScreenShadow.validate(id);
 						}
+						else if (!html.length) {
+							$('#flickerfreescreen_' + id).remove();
+						}
+
 						chkbxRange.init();
 					},
 					error: function() {
@@ -425,9 +429,8 @@
 							}
 						});
 
-					if (['chart.php','chart2.php','chart3.php'].indexOf(url.getPath()) > -1
-							&& url.getArgument('outer') === '1'
-					) {
+					if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(url.getPath()) > -1
+							&& url.getArgument('outer') === '1') {
 						// Getting height of graph inside image. Only for line graphs on dashboard.
 						var heightUrl = new Curl(url.getUrl());
 						heightUrl.setArgument('onlyHeight', '1');

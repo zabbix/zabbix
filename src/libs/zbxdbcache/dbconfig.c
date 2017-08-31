@@ -234,6 +234,7 @@ static int	is_counted_in_item_queue(unsigned char type, const char *key)
 			}
 			break;
 		case ITEM_TYPE_TRAPPER:
+		case ITEM_TYPE_DEPENDENT:
 		case ITEM_TYPE_HTTPTEST:
 		case ITEM_TYPE_SNMPTRAP:
 			return FAIL;
@@ -380,37 +381,36 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
+	unsigned char	poller_type;
+
 	if (0 != dc_host->proxy_hostid && SUCCEED != is_item_processed_by_server(dc_item->type, dc_item->key))
 	{
 		dc_item->poller_type = ZBX_NO_POLLER;
 		return;
 	}
 
+	poller_type = poller_by_item(dc_item->type, dc_item->key);
+
 	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
-		if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type || ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
-			dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-
-		return;
-	}
-
-	if (0 == (flags & ZBX_ITEM_COLLECTED))
-	{
-		dc_item->poller_type = poller_by_item(dc_item->type, dc_item->key);
-		return;
-	}
-
-	if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
-	{
-		unsigned char	poller_type;
-
-		poller_type = poller_by_item(dc_item->type, dc_item->key);
-
 		if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type)
-			return;
+			poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+
+		dc_item->poller_type = poller_type;
+		return;
 	}
 
-	dc_item->poller_type = poller_by_item(dc_item->type, dc_item->key);
+	if (0 != (flags & ZBX_ITEM_COLLECTED))
+	{
+		dc_item->poller_type = poller_type;
+		return;
+	}
+
+	if (ZBX_POLLER_TYPE_UNREACHABLE != dc_item->poller_type ||
+			(ZBX_POLLER_TYPE_NORMAL != poller_type && ZBX_POLLER_TYPE_JAVA != poller_type))
+	{
+		dc_item->poller_type = poller_type;
+	}
 }
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
@@ -1786,7 +1786,6 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->ip);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-
 			DCstrpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
 		}
@@ -2155,7 +2154,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
-	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
@@ -2272,13 +2270,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
-
-			/* remove deltaitem history if item value type has been changed */
-			if (item->value_type != value_type)
-			{
-				if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &itemid)))
-					zbx_hashset_remove_direct(&config->deltaitems, deltaitem);
-			}
 
 			if (ITEM_STATUS_ACTIVE == item->status)
 				dc_host_update_agent_stats(host, item->type, -1);
@@ -3181,7 +3172,7 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 	ZBX_DC_EXPRESSION	*expression;
 	ZBX_DC_REGEXP		*regexp, regexp_local;
 	zbx_uint64_t		expressionid;
-	int 			found, ret;
+	int			found, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3510,7 +3501,7 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		correlationid;
+	zbx_uint64_t		correlationid;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret;
 
@@ -3722,7 +3713,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		conditionid, correlationid;
+	zbx_uint64_t		conditionid, correlationid;
 	zbx_dc_corr_condition_t	*condition;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret, i, index;
@@ -3826,7 +3817,7 @@ static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		operationid, correlationid;
+	zbx_uint64_t		operationid, correlationid;
 	zbx_dc_corr_operation_t	*operation;
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret, index;
@@ -3910,7 +3901,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		groupid;
+	zbx_uint64_t		groupid;
 	zbx_dc_hostgroup_t	*group;
 	int			found, ret, index;
 
@@ -4082,7 +4073,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t 		item_preprocid, itemid, lastitemid = 0;
+	zbx_uint64_t		item_preprocid, itemid, lastitemid = 0;
 	int			found, ret, i, index;
 	ZBX_DC_ITEM		*item = NULL;
 	zbx_dc_item_preproc_t	*preproc;
@@ -4781,6 +4772,8 @@ void	DCsync_configuration(unsigned char mode)
 				config->ipmiitems.num_data, config->ipmiitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __function_name,
 				config->trapitems.num_data, config->trapitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() dependentitems  : %d (%d slots)", __function_name,
+				config->dependentitems.num_data, config->dependentitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __function_name,
 				config->logitems.num_data, config->logitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __function_name,
@@ -4795,8 +4788,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->jmxitems.num_data, config->jmxitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
 				config->calcitems.num_data, config->calcitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() deltaitems : %d (%d slots)", __function_name,
-				config->deltaitems.num_data, config->deltaitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
@@ -5258,6 +5249,11 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash, __config_interface_addr_compare);
 	CREATE_HASHSET_EXT(config->regexps, 0, __config_regexp_hash, __config_regexp_compare);
+
+	zbx_vector_uint64_create_ext(&config->locked_lld_ruleids,
+			__config_mem_malloc_func,
+			__config_mem_realloc_func,
+			__config_mem_free_func);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	CREATE_HASHSET_EXT(config->psks, 0, __config_psk_hash, __config_psk_compare);
@@ -6480,6 +6476,63 @@ void	DCconfig_unlock_all_triggers(void)
 
 	UNLOCK_CACHE;
 }
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_lock_lld_rule                                           *
+ *                                                                            *
+ * Purpose: Lock lld rule to avoid parallel processing of a same lld rule     *
+ *          that was causing deadlocks.                                       *
+ *                                                                            *
+ * Parameters: lld_ruleid - [IN] discovery rule id                            *
+ *                                                                            *
+ * Return value: Returns FAIL if lock failed and SUCCEED on successful lock.  *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_lock_discovery_rule(zbx_uint64_t lld_ruleid)
+{
+	int	ret = FAIL;
+
+	LOCK_CACHE;
+
+	if (FAIL == zbx_vector_uint64_search(&config->locked_lld_ruleids, lld_ruleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+	{
+		zbx_vector_uint64_append(&config->locked_lld_ruleids, lld_ruleid);
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_unlock_discovery_rule                                   *
+ *                                                                            *
+ * Purpose: Unlock (make it available for processing) lld rule.               *
+ *                                                                            *
+ * Parameters: lld_ruleid - [IN] discovery rule id                            *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_unlock_discovery_rule(zbx_uint64_t lld_ruleid)
+{
+	int	i;
+
+	LOCK_CACHE;
+
+	if (FAIL != (i = zbx_vector_uint64_search(&config->locked_lld_ruleids, lld_ruleid,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	{
+		zbx_vector_uint64_remove_noorder(&config->locked_lld_ruleids, i);
+	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;	/* attempt to unlock lld rule that is not locked */
+
+	UNLOCK_CACHE;
+}
+
 
 /******************************************************************************
  *                                                                            *

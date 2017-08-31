@@ -1,3 +1,56 @@
+Changes for 3.4.2rc1
+
+New features:
+
+Bug fixes:
+...G...PS. [ZBX-12634] fixed incorrect subnet mask calculation when CIDR is less than 8 (Andris, vso)
+........S. [ZBX-12635] fixed processing of lld rules in not supported state (vjaceslavs)
+........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)
+...G...... [ZBX-12527] fixed inconsistency of 'mode' parameter check in vfs_dir_size(); thanks to MATSUDA Daiki for patch (Andris)
+..F....... [ZBX-12327] fixed XML import when preprocessing param value is space character (gcalenko, vjaceslavs)
+A......... [ZBX-12569] fixed possible SQL errors in dashboard.create() and dashboard.update() methods (Sasha)
+..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
+........S. [ZBX-12618] fixed memory related bugs in item preprocessing (vjaceslavs)
+..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
+..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
+..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.1
+
+3.4.1rc2 was released as 3.4.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.4.1rc2
+
+Bug fixes:
+..F....... [ZBX-12600] fixed display of previously opened dashboard (vmurzins)
+..F....... [ZBX-12602] fixed displaying of graphs in the dashboard widgets; fixed displaying of the right axis in the graph test form (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.1rc1
+
+New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+..F....... [ZBX-12598] fixed an unneeded data sharing to map widget on navigation tree refresh (miks)
+.......PS. [ZBX-12549] fixed requeueing of items from unreachable poller to normal poller (gleb, wiper)
+..F....... [ZBX-12539] fixed sbox selection zone in monitoring web graphs (miks)
+........S. [ZBX-12581] fixed crash when syncing actions without operations (wiper)
+..F....... [ZBX-12531] removed usage of SVG viewBox attribute in IE and disabled map scaling in screens (miks)
+..F....... [ZBXNEXT-3987] fixed wrong response and error message when invalid or unavailable dashboardid has been requested (miks)
+..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andžs, Ivo)
+A.F....... [ZBX-12430] fixed error when linking one template to another in template edit form (gcalenko)
+.........T [ZBXNEXT-3920] fixed extra new lines in Templates (vso, vzhuravlev)
+..F....... [ZBX-12588] fixed clock and map widget scaling on Safari (Ivo)
+.......PS. [ZBX-12574] fixed crash when linking templates with web scenarios during auto registration (vso)
+..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
+.......PS. [ZBX-12524] fixed DB upgrade patch for map shapes on DB2 (vjaceslavs)
+.......PS. [ZBXNEXT-3006] fixed multiple issues with dependent items (vjaceslavs)
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+
+--------------------------------------------------------------------------------
 Changes for 3.4.0
 
 3.4.0rc2 was released as 3.4.0 without any changes
@@ -176,6 +229,14 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12463] fixed undefined index error in "Last 20 issues" (Sasha)
+........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)
+..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
+..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
+..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
+..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ........S. [ZBX-12295] fixed possible accumulation of executed tasks in database (Sergejs)
 ........S. [ZBX-12318] fixed maintenance status not being updated in cache if host is disabled (vso)
@@ -634,6 +695,15 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12404] fixed visibility of item data first row for 'latest data' page and 'audit log' page (gcalenko)
+..F....... [ZBX-12463] fixed undefined index error in "Last 20 issues" (Sasha)
+........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)
+..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
+..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
+..F....... [ZBX-12429] fixed template replacement in mass update form (gcalenko)
+..F....... [ZBX-12396] fixed an error in screens if screen trigger overview element contains deleted host group (miks)
+..F....... [ZBX-12439] fixed macro name field length in host configuration form (gcalenko)
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 .......PS. [ZBX-12224] fixed connection to Oracle database when database server gives out warnings (gleb)
 ...G...PS. [ZBX-12195] fixed contamination of script output with Zabbix'es own log messages when logging level is set to 4 or 5 and LogType=console (gleb)

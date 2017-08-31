@@ -1329,14 +1329,18 @@ jQuery(function($) {
 				makeSortable($obj);
 			};
 
-			var markTreeItemSelected = function($obj, item_id) {
+			var markTreeItemSelected = function($obj, item_id, send_data) {
 				var widget = getWidgetData($obj),
 					prefix = widget['uniqueid'] + '_',
 					selected_item = $('#' + prefix + 'tree-item-' + item_id),
 					step_in_path = selected_item;
 
+				/**
+				 * If 'send_data' is set to be 'false', use an unexisting 'data_name', just to check if widget has
+				 * linked widgets, but avoid real data sharing.
+				 */
 				if (item_id && $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
-						'selected_mapid', {mapid: $(selected_item).data('mapid')})
+						send_data ? 'selected_mapid' : '', {mapid: $(selected_item).data('mapid')})
 				) {
 					$('.selected', $obj).removeClass('selected');
 
@@ -1388,7 +1392,7 @@ jQuery(function($) {
 								.data('id');
 						}
 
-						markTreeItemSelected($this, widget_data.navtree_item_selected);
+						markTreeItemSelected($this, widget_data.navtree_item_selected, true);
 					});
 				},
 
@@ -1504,7 +1508,7 @@ jQuery(function($) {
 							switchToNavigationMode($this);
 
 							if (!options['initial_load']) {
-								markTreeItemSelected($this, options.navtree_item_selected);
+								markTreeItemSelected($this, options.navtree_item_selected, false);
 							}
 						}
 					});

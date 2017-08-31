@@ -98,7 +98,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * @param string $item['hostname']      Item host name.
 	 * @param string $item['color']         Item presentation color.
 	 * @param int    $item['drawtype']      Item presentation draw type, could be one of GRAPH_ITEM_DRAWTYPE_* constants.
-	 * @param int    $item['axisside']      Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
+	 * @param int    $item['yaxisside']     Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
 	 * @param int    $item['calc_fnc']      Item calculation function, could be one of CALC_FNC_* constants.
 	 * @param int    $item['calc_type']     Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or GRAPH_ITEM_SUM.
 	 *
@@ -118,25 +118,25 @@ class CLineGraphDraw extends CGraphDraw {
 		$graph_item += [
 			'color' => 'Dark Green',
 			'drawtype' => GRAPH_ITEM_DRAWTYPE_LINE,
-			'axisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+			'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
 			'calc_fnc' => CALC_FNC_AVG,
 			'calc_type' => GRAPH_ITEM_SIMPLE
 		];
 		$this->items[$this->num] = $graph_item;
 
-		$this->yaxis[$graph_item['axisside']] = true;
+		$this->yaxis[$graph_item['yaxisside']] = true;
 
 		$this->num++;
 	}
 
-	public function setGraphOrientation($value, $axisside) {
+	public function setGraphOrientation($value, $yaxisside) {
 		if ($value < 0) {
-			$this->graphOrientation[$axisside] = '-';
+			$this->graphOrientation[$yaxisside] = '-';
 		}
-		elseif (zbx_empty($this->graphOrientation[$axisside]) && $value > 0) {
-			$this->graphOrientation[$axisside] = '+';
+		elseif (zbx_empty($this->graphOrientation[$yaxisside]) && $value > 0) {
+			$this->graphOrientation[$yaxisside] = '+';
 		}
-		return $this->graphOrientation[$axisside];
+		return $this->graphOrientation[$yaxisside];
 	}
 
 	public function setYMinAxisType($yaxistype) {
@@ -205,11 +205,11 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->itemsHost = false;
 			}
 
-			if (!isset($this->axis_valuetype[$item['axisside']])) {
-				$this->axis_valuetype[$item['axisside']] = $item['value_type'];
+			if (!isset($this->axis_valuetype[$item['yaxisside']])) {
+				$this->axis_valuetype[$item['yaxisside']] = $item['value_type'];
 			}
-			elseif ($this->axis_valuetype[$item['axisside']] != $item['value_type']) {
-				$this->axis_valuetype[$item['axisside']] = ITEM_VALUE_TYPE_FLOAT;
+			elseif ($this->axis_valuetype[$item['yaxisside']] != $item['value_type']) {
+				$this->axis_valuetype[$item['yaxisside']] = ITEM_VALUE_TYPE_FLOAT;
 			}
 
 			$type = $item['calc_type'];
@@ -327,7 +327,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			$loc_min = is_array($curr_data['min']) ? min($curr_data['min']) : null;
-			$this->setGraphOrientation($loc_min, $item['axisside']);
+			$this->setGraphOrientation($loc_min, $item['yaxisside']);
 			unset($row);
 
 			$curr_data['avg_orig'] = is_array($curr_data['avg']) ? zbx_avg($curr_data['avg']) : null;
@@ -413,7 +413,7 @@ class CLineGraphDraw extends CGraphDraw {
 				for ($j = $i - 1; $j >= 0; $j--) {
 					$item2 = $this->items[$j];
 
-					if ($item2['axisside'] != $item1['axisside']) {
+					if ($item2['yaxisside'] != $item1['yaxisside']) {
 						continue;
 					}
 
@@ -481,7 +481,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$constant = $arr[3].$arr[4];
 
 				$this->triggers[] = [
-					'axisside' => $item['axisside'],
+					'yaxisside' => $item['yaxisside'],
 					'val' => convert($constant),
 					'color' => getSeverityColor($trigger['priority']),
 					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
@@ -539,7 +539,7 @@ class CLineGraphDraw extends CGraphDraw {
 						$value = $avg;
 				}
 
-				$values[$this->items[$item]['axisside']][] = $value;
+				$values[$this->items[$item]['yaxisside']][] = $value;
 			}
 		}
 
@@ -569,7 +569,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$minY = null;
 		for ($i = 0; $i < $this->num; $i++) {
-			if ($this->items[$i]['axisside'] != $side) {
+			if ($this->items[$i]['yaxisside'] != $side) {
 				continue;
 			}
 
@@ -643,7 +643,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$maxY = null;
 		for ($i = 0; $i < $this->num; $i++) {
-			if ($this->items[$i]['axisside'] != $side) {
+			if ($this->items[$i]['yaxisside'] != $side) {
 				continue;
 			}
 
@@ -769,7 +769,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
-				if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+				if ($this->items[$item]['yaxisside'] == GRAPH_YAXIS_SIDE_LEFT) {
 					$leftBase1024 = true;
 				}
 				else {
@@ -1675,7 +1675,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$byteStep = false;
 
 			for ($item = 0; $item < $this->num; $item++) {
-				if ($this->items[$item]['axisside'] == $side) {
+				if ($this->items[$item]['yaxisside'] == $side) {
 					// check if items use B or Bps units
 					if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
 						$byteStep = true;
@@ -1694,7 +1694,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			else {
 				for ($item = 0; $item < $this->num; $item++) {
-					if ($this->items[$item]['axisside'] == $side && !empty($this->items[$item]['unitsLong'])) {
+					if ($this->items[$item]['yaxisside'] == $side && !empty($this->items[$item]['unitsLong'])) {
 						$unitsLong = $this->items[$item]['unitsLong'];
 						break;
 					}
@@ -1974,8 +1974,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$oppColor = $this->getColor(GRAPH_TRIGGER_LINE_OPPOSITE_COLOR);
 
 		foreach ($this->triggers as $trigger) {
-			$minY = $this->m_minY[$trigger['axisside']];
-			$maxY = $this->m_maxY[$trigger['axisside']];
+			$minY = $this->m_minY[$trigger['yaxisside']];
+			$maxY = $this->m_maxY[$trigger['yaxisside']];
 
 			if ($minY >= $trigger['val'] || $trigger['val'] >= $maxY) {
 				continue;
@@ -2058,7 +2058,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// draw legend of an item with data
 			if (isset($data) && isset($data['min'])) {
-				if ($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+				if ($this->items[$i]['yaxisside'] == GRAPH_YAXIS_SIDE_LEFT) {
 					$units[GRAPH_YAXIS_SIDE_LEFT] = $this->items[$i]['units'];
 				}
 				else {
@@ -2245,14 +2245,14 @@ class CLineGraphDraw extends CGraphDraw {
 		return true;
 	}
 
-	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $axisside) {
+	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $yaxisside) {
 		if (!isset($data['max'][$from]) || !isset($data['max'][$to])) {
 			return;
 		}
 
-		$oxy = $this->oxy[$axisside];
-		$zero = $this->zero[$axisside];
-		$unit2px = $this->unit2px[$axisside];
+		$oxy = $this->oxy[$yaxisside];
+		$zero = $this->zero[$yaxisside];
+		$unit2px = $this->unit2px[$yaxisside];
 
 		$shift_min_from = $shift_min_to = 0;
 		$shift_max_from = $shift_max_to = 0;
@@ -2711,10 +2711,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// $this->sizeX is required for selectData() method
 		$this->expandItems();
-		$this->selectData();
 		$this->selectTriggers();
-
 		$this->calcDimentions();
+		$this->selectData();
+
 		$this->calcSides();
 		$this->calcPercentile();
 		$this->calcMinMaxInterval();
@@ -2739,8 +2739,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// for each metric
 		for ($item = 0; $item < $this->num; $item++) {
-			$minY = $this->m_minY[$this->items[$item]['axisside']];
-			$maxY = $this->m_maxY[$this->items[$item]['axisside']];
+			$minY = $this->m_minY[$this->items[$item]['yaxisside']];
+			$maxY = $this->m_maxY[$this->items[$item]['yaxisside']];
 
 			$data = &$this->data[$this->items[$item]['itemid']][$this->items[$item]['calc_type']];
 
@@ -2816,7 +2816,7 @@ class CLineGraphDraw extends CGraphDraw {
 						$min_color,
 						$minmax_color,
 						$calc_fnc,
-						$this->items[$item]['axisside']
+						$this->items[$item]['yaxisside']
 					);
 				}
 

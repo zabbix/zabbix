@@ -603,7 +603,6 @@ typedef struct
 	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
-	zbx_hashset_t		deltaitems;		/* history data for delta value calculations */
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
@@ -640,6 +639,7 @@ typedef struct
 #endif
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
+	zbx_vector_uint64_t	locked_lld_ruleids;	/* for keeping track of lld rules being processed */
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 }

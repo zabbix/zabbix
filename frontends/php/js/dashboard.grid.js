@@ -338,10 +338,29 @@
 				startWidgetPositioning($(event.target), data);
 			},
 			resize: function(event, ui) {
+				// Hack for Safari to manually accept parent container height in pixels on widget resize.
+				if (SF) {
+					$.each(data['widgets'], function() {
+						if (this.type === 'clock' || this.type === 'sysmap') {
+							this.content_body.find(':first').height(this.content_body.height());
+						}
+					});
+				}
+
 				doWidgetPositioning($obj, $(event.target), data);
 			},
 			stop: function(event, ui) {
 				stopWidgetPositioning($obj, $(event.target), data);
+
+				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
+				if (SF) {
+					$.each(data['widgets'], function() {
+						if (this.type === 'clock' || this.type === 'sysmap') {
+							this.content_body.find(':first').height(this.content_body.height());
+						}
+					});
+				}
+
 				doAction('onResizeEnd', $obj, data, widget);
 			}
 		});
@@ -1187,6 +1206,7 @@
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
+					current_url = new Curl(location.href),
 					url = new Curl('zabbix.php');
 
 				// Don't show warning about existing updates
@@ -1196,6 +1216,9 @@
 				url.setArgument('action', 'dashboard.view');
 				if (data['options']['fullscreen'] == 1) {
 					url.setArgument('fullscreen', '1');
+				}
+				if (current_url.getArgument('dashboardid')) {
+					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
 				}
 
 				// Redirect to last active dashboard.
