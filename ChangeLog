@@ -10,6 +10,7 @@ Changes for 3.4.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12404] fixed visibility of item data first row for 'latest data' page and 'audit log' page (gcalenko)
 ..F....... [ZBX-12546] fixed maps not loading without built-in JSON support (Ivo)
 ...G...PS. [ZBX-12634] fixed incorrect subnet mask calculation when CIDR is less than 8 (Andris, vso)
 ........S. [ZBX-12635] fixed processing of lld rules in not supported state (vjaceslavs)
