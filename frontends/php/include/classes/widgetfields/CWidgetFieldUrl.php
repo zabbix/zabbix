@@ -19,29 +19,29 @@
 **/
 
 
-/**
- * URL widget form.
- */
-class CUrlWidgetForm extends CWidgetForm {
+class CWidgetFieldUrl extends CWidgetField {
 
-	public function __construct($data) {
-		parent::__construct($data);
+	/**
+	 * URL widget field.
+	 *
+	 * @param string $name  field name in form
+	 * @param string $label  label for the field in form
+	 */
+	public function __construct($name, $label) {
+		parent::__construct($name, $label);
 
-		// URL field
-		$field_url = (new CWidgetFieldUrl('url', _('URL')))
-			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setValidationRules(['type' => API_URL]);
+		$this->setDefault('');
+	}
 
-		if (array_key_exists('url', $this->data)) {
-			$field_url->setValue($this->data['url']);
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
+
+		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && $this->getValue() === '') {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
 		}
-		$this->fields[] = $field_url;
 
-		// dynamic item
-		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
-
-		if (array_key_exists('dynamic', $this->data)) {
-			$field_dynamic->setValue($this->data['dynamic']);
-		}
-		$this->fields[] = $field_dynamic;
+		return $errors;
 	}
 }

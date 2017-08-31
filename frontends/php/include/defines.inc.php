@@ -150,6 +150,7 @@ define('P_NZERO',				0x0020);
 define('P_NO_TRIM',				0x0040);
 define('P_ALLOW_USER_MACRO',	0x0080);
 define('P_ALLOW_LLD_MACRO',		0x0100);
+define('ZBX_URI_VALID_SCHEMES', 'http,https,ftp,file,mailto,tel,ssh');
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');
@@ -1084,6 +1085,7 @@ define('API_HTTP_POST',			16);
 define('API_VARIABLE_NAME',		17);
 define('API_OUTPUT',			18);
 define('API_TIME_UNIT',			19);
+define('API_URL',				20);
 
 // flags
 define('API_REQUIRED',			0x01);

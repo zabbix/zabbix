@@ -132,6 +132,9 @@ class CApiInputValidator {
 
 			case API_TIME_UNIT:
 				return self::validateTimeUnit($rule, $data, $path, $error);
+
+			case API_URL:
+				return self::validateUrl($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -168,6 +171,7 @@ class CApiInputValidator {
 			case API_REGEX:
 			case API_HTTP_POST:
 			case API_VARIABLE_NAME:
+			case API_URL:
 				return true;
 
 			case API_IDS:
@@ -1140,6 +1144,35 @@ class CApiInputValidator {
 
 		if (preg_match('/^{[^{}]+}$/', $data) !== 1) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('is not enclosed in {} or is malformed'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * URL validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUrl($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ($data !== '' && CHtmlUrlValidator::validate($data) === false) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptible URL'));
 			return false;
 		}
 
