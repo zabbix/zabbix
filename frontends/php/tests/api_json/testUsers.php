@@ -1382,7 +1382,7 @@ class testUsers extends CZabbixTest {
 					'type' => 3,
 					'theme' => 'dark-theme',
 					'rows_per_page' => 25,
-					'url' => '/profile.php'
+					'url' => 'profile.php'
 				],
 				'success_expected' => true,
 				'expected_error' => null
