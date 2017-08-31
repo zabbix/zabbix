@@ -229,6 +229,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12463] fixed undefined index error in "Last 20 issues" (Sasha)
 ........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)
 ..F....... [ZBX-11887] fixed improper DB::refreshIds() call when selected row is locked (miks)
 ..F....... [ZBX-12022] fixed trigger resolving in services configuration; fixed popup window size (miks)
