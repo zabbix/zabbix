@@ -219,7 +219,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('expression', '{Inheritance test template:key-item-inheritance-test.last(0)}=0');
 		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
-		$this->zbxTestInputType('url', 'url');
+		$this->zbxTestInputType('url', 'zabbix.php');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
 		$this->zbxTestCheckboxSelect('status', false);
 
@@ -239,7 +239,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
-		$this->zbxTestAssertElementValue('url', 'url');
+		$this->zbxTestAssertElementValue('url', 'zabbix.php');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestTextPresent('Parent triggers');
@@ -429,7 +429,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('expression', '{Inheritance test template:item-discovery-prototype.last(0)}=0');
 		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
-		$this->zbxTestInputType('url', 'url');
+		$this->zbxTestInputType('url', 'zabbix.php');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
 		$this->zbxTestCheckboxSelect('status', false);
 
@@ -458,7 +458,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
-		$this->zbxTestAssertElementValue('url', 'url');
+		$this->zbxTestAssertElementValue('url', 'zabbix.php');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestTextPresent('Parent triggers');
