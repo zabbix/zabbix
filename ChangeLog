@@ -10,6 +10,7 @@ Changes for 3.4.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12554] fixed item helper description for proc_info and diplay order for vfs.dir.size (gcalenko)
 ..F....... [ZBX-12605] fixed line graph was displayed as points for data taken from trends (gcalenko)
 ..F....... [ZBX-12404] fixed visibility of item data first row for 'latest data' page and 'audit log' page (gcalenko)
 ..F....... [ZBX-12546] fixed maps not loading without built-in JSON support (Ivo)
