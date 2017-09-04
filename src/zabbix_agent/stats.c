@@ -177,12 +177,12 @@ int	init_collector_data(char **error)
 	sz = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_COLLECTOR_DATA));
 
 #ifdef _WINDOWS
-	sz_cpu = sizeof(PERF_COUNTER_DATA *) * (cpu_count + 1);
+	sz_cpu = sizeof(zbx_perf_counter_data_t *) * (cpu_count + 1);
 
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu_counter = (PERF_COUNTER_DATA **)((char *)collector + sz);
+	collector->cpus.cpu_counter = (zbx_perf_counter_data_t **)((char *)collector + sz);
 	collector->cpus.count = cpu_count;
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
