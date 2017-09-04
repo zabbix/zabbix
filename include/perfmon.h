@@ -38,7 +38,8 @@ typedef enum
 	PERF_COUNTER_INITIALIZED,
 	PERF_COUNTER_GET_SECOND_VALUE,	/* waiting for the second raw value (needed for some, e.g. rate, counters) */
 	PERF_COUNTER_ACTIVE,
-};
+}
+zbx_perf_counter_status_t;
 
 typedef struct perf_counter_id
 {
@@ -54,7 +55,7 @@ typedef struct perf_counter_data
 	char				*name;
 	char				*counterpath;
 	int				interval;
-	int				status;
+	zbx_perf_counter_status_t	status;
 	HCOUNTER			handle;
 	PDH_RAW_COUNTER			rawValues[2];	/* rate counters need two raw values */
 	int				olderRawValue;	/* index of the older of both values */
