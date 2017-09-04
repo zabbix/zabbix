@@ -11,6 +11,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-12416] optimized data selection of user preferences stored in profiles (gcalenko)
+..F....... [ZBX-12321] fixed removal of multiselect options using backspace button (miks)
 ..F....... [ZBX-11607] fixed a rounding of large unsigned numbers (miks)
 .......P.. [ZBX-12668] removed delay between sending batches of cached historical data by active proxies (wiper)
 ..F....... [ZBX-12554] fixed item helper description for proc_info and diplay order for vfs.dir.size (gcalenko)
@@ -243,6 +244,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12321] fixed removal of multiselect options using backspace button (miks)
 ..F....... [ZBX-12416] optimized data selection of user preferences stored in profiles (gcalenko)
 ..F....... [ZBX-11607] fixed a rounding of large unsigned numbers (miks)
 ..F....... [ZBX-12404] fixed visibility of item data first row for 'latest data' page and 'audit log' page (gcalenko)
