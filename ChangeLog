@@ -11,6 +11,7 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
 ..F....... [ZBX-12558] fixed scroll duration in dashboard after adding a new widget (miks)
 ..F.I...S. [ZBX-12434] fixed housekeeping of problems and events for deleted items and triggers; added optional database patch to cleanup problems for deleted items and triggers (vso)
 ..F....... [ZBX-12646] fixed incorrect SQL query in availability reports (Sasha)
