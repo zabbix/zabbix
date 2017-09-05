@@ -109,6 +109,12 @@ class CScreenHistory extends CScreenBase {
 			'preservekeys' => true
 		]);
 
+		if (!$items) {
+			show_error_message(_('No permissions to referred object or it does not exist!'));
+
+			return;
+		}
+
 		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$stime = zbxDateToTime($this->timeline['stime']);
