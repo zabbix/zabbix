@@ -36,36 +36,16 @@ class CDnsParser extends CParser {
 
 		$p = $pos;
 
-		// The first character must be an alphanumeric character.
-		if (!isset($source[$p]) || !self::isalnum($source[$p])) {
+		if (preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*(\.[A-Za-z0-9_-]+)*\.?/', substr($source, $p), $matches)) {
+			$p += strlen($matches[0]);
+		}
+		else {
 			return self::PARSE_FAIL;
-		}
-		$p++;
-
-		// Periods are only allowed when they serve to delimit components.
-		$component = false;
-
-		for (; isset($source[$p]); $p++) {
-			if ($source[$p] === '-' || self::isalnum($source[$p])) {
-				$component = true;
-			}
-			elseif ($source[$p] === '.' && $component) {
-				$component = false;
-			}
-			else {
-				break;
-			}
-		}
-
-		// The last character must not be a minus sign.
-		if ($source[$p - 1] === '-') {
-			$p--;
 		}
 
 		$length = $p - $pos;
 
-		// Single character names or nicknames are not allowed.
-		if ($length == 1) {
+		if ($length > 255) {
 			return self::PARSE_FAIL;
 		}
 
@@ -73,9 +53,5 @@ class CDnsParser extends CParser {
 		$this->match = substr($source, $pos, $this->length);
 
 		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
-	}
-
-	private static function isalnum($c) {
-		return ('a' <= $c && $c <= 'z') || ('A' <= $c && $c <= 'Z') || ('0' <= $c && $c <= '9');
 	}
 }
