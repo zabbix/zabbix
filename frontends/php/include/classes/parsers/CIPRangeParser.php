@@ -65,7 +65,7 @@ class CIPRangeParser {
 	 *   v6             enabled support of IPv6 addresses
 	 *   dns            enabled support of DNS names
 	 *   ranges         enabled support of IP ranges like 192.168.3.1-255
-	 *   max_ipv4_cidr  mximum value for IPv4 CIDR subnet mask notations
+	 *   max_ipv4_cidr  maximum value for IPv4 CIDR subnet mask notations
 	 *
 	 * @var array
 	 */
