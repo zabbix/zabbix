@@ -556,7 +556,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 #ifdef HAVE_SMTP_AUTHENTICATION
 	int			err, ret = FAIL;
 	CURL            	*easyhandle;
-	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE];
+	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE] = "";
 	size_t			url_offset= 0;
 	struct curl_slist	*recipients = NULL;
 	smtp_payload_status_t	payload_status;
@@ -609,27 +609,18 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 	if (SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
 	{
-#if 0x071e00 >= LIBCURL_VERSION_NUM	/* versions 7.20.0 to 7.30.0 do not support specifying login options */
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, username)) ||
 				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PASSWORD, password)))
 		{
 			goto error;
 		}
-#elif 0x072100 >= LIBCURL_VERSION_NUM	/* versions 7.31.0 to 7.33.0 support login options in CURLOPT_USERPWD */
-		char	userpwd[523];
 
-		zbx_snprintf(userpwd, sizeof(userpwd), "%s:%s;AUTH=PLAIN", username, password);
-
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, userpwd)))
-			goto error;
-#else					/* versions 7.34.0 and above support explicit CURLOPT_LOGIN_OPTIONS */
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, username)) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PASSWORD, password)) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_LOGIN_OPTIONS, "AUTH=PLAIN")))
-		{
-			goto error;
-		}
-#endif
+		/* Don't specify preferred authentication mechanism implying AUTH=* and let libcurl choose the best */
+		/* one (in its mind) among supported by SMTP server. If someday we decide to let user choose their  */
+		/* preferred authentication mechanism one should know that:                                         */
+		/*   - versions 7.20.0 to 7.30.0 do not support specifying login options                            */
+		/*   - versions 7.31.0 to 7.33.0 support login options in CURLOPT_USERPWD                           */
+		/*   - versions 7.34.0 and above support explicit CURLOPT_LOGIN_OPTIONS                             */
 	}
 
 	recipients = curl_slist_append(recipients, to_angle_addr);
@@ -670,7 +661,8 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		zbx_snprintf(error, max_error_len, "%s: %s", curl_easy_strerror(err), errbuf);
+		zbx_snprintf(error, max_error_len, "%s%s%s", curl_easy_strerror(err), ('\0' != *errbuf ? ": " : ""),
+				errbuf);
 		goto clean;
 	}
 
@@ -754,7 +746,7 @@ clean:
 	zbx_free(to_angle_addr);
 
 	if ('\0' != *error)
-		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to send email: %s", error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
