@@ -325,7 +325,7 @@ class CDashboard extends CApiService {
 				'x' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_X],
 				'y' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_Y],
 				'width' =>				['type' => API_INT32, 'in' => '1:12'],
-				'height' =>				['type' => API_INT32, 'in' => '1:32'],
+				'height' =>				['type' => API_INT32, 'in' => '2:32'],
 				'fields' =>				['type' => API_OBJECTS, 'fields' => [
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
 					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
