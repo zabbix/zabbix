@@ -32,6 +32,13 @@ static int	DBpatch_3040000(void)
 	return SUCCEED;
 }
 
+extern int	DBpatch_3020001(void);
+
+static int	DBpatch_3040001(void)
+{
+	return DBpatch_3020001();
+}
+
 #endif
 
 DBPATCH_START(3040)
@@ -39,5 +46,6 @@ DBPATCH_START(3040)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(3040000, 0, 1)
+DBPATCH_ADD(3040001, 0, 0)
 
 DBPATCH_END()

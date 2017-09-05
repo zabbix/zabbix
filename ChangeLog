@@ -10,6 +10,7 @@ Changes for 3.4.2rc1
 New features:
 
 Bug fixes:
+..F.I...S. [ZBX-12434] fixed housekeeping of problems and events for deleted items and triggers; added optional database patch to cleanup problems for deleted items and triggers (vso)
 ..F....... [ZBX-12646] fixed incorrect SQL query in availability reports (Sasha)
 ..F....... [ZBX-12545] fixed undefined index error on latest data page when host was deleted in another session (gcalenko)
 ..F....... [ZBX-12416] optimized data selection of user preferences stored in profiles (gcalenko)
@@ -246,6 +247,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F.I...S. [ZBX-12434] fixed housekeeping of problems and events for deleted items and triggers; added optional database patch to cleanup problems for deleted items and triggers (vso)
 ..F....... [ZBX-12646] fixed incorrect SQL query in availability reports (Sasha)
 ..F....... [ZBX-12545] fixed undefined index error on latest data page when host was deleted in another session (gcalenko)
 ..F....... [ZBX-12321] fixed removal of multiselect options using backspace button (miks)

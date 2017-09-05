@@ -719,6 +719,16 @@ class CTrigger extends CTriggerGeneral {
 			DB::delete('sysmaps_elements', ['selementid' => array_keys($selementids)]);
 		}
 
+		$insert = [];
+		foreach ($triggerIds as $triggerId) {
+			$insert[] = [
+				'tablename' => 'events',
+				'field' => 'triggerid',
+				'value' => $triggerId
+			];
+		}
+		DB::insertBatch('housekeeper', $insert);
+
 		parent::deleteByIds($triggerIds);
 	}
 
