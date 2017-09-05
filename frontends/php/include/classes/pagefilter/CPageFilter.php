@@ -373,6 +373,43 @@ class CPageFilter {
 	}
 
 	/**
+	 * Enriches host groups array by parent groups.
+	 *
+	 * @param array  $groups
+	 * @param string $groups[<groupid>]['groupid']
+	 * @param string $groups[<groupid>]['name']
+	 *
+	 * @return array
+	 */
+	public static function enrichParentGroups(array $groups) {
+		$parents = [];
+		foreach ($groups as $group) {
+			$parent = explode('/', $group['name']);
+			for (array_pop($parent); $parent; array_pop($parent)) {
+				$parents[implode('/', $parent)] = true;
+			}
+		}
+
+		if ($parents) {
+			foreach ($groups as $group) {
+				if (array_key_exists($group['name'], $parents)) {
+					unset($parents[$group['name']]);
+				}
+			}
+		}
+
+		if ($parents) {
+			$groups += API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'filter' => ['name' => array_keys($parents)],
+				'preservekeys' => true
+			]);
+		}
+
+		return $groups;
+	}
+
+	/**
 	 * Load available host groups, choose the selected host group and remember the selection.
 	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
 	 * will be reset to 0.
@@ -388,37 +425,7 @@ class CPageFilter {
 		];
 		$options = zbx_array_merge($defaultOptions, $options);
 		$this->data['groups'] = API::HostGroup()->get($options);
-
-		$parents = [];
-		foreach ($this->data['groups'] as $group) {
-			$parent = explode('/', $group['name']);
-			$count = count($parent) - 1;
-
-			if ($count !== 0) {
-				$parent_name = '';
-
-				for ($i = 0; $i < $count; $i++) {
-					$parent_name .= ($parent_name === '') ? '' : '/';
-					$parent_name .= $parent[$i];
-					$parents[$parent_name] = true;
-				}
-			}
-		}
-
-		// removing already selected parent groups
-		foreach ($this->data['groups'] as $group) {
-			if (array_key_exists($group['name'], $parents)) {
-				unset($parents[$group['name']]);
-			}
-		}
-
-		if ($parents) {
-			$this->data['groups'] += API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => array_keys($parents)],
-				'preservekeys' => true
-			]);
-		}
+		$this->data['groups'] = self::enrichParentGroups($this->data['groups']);
 
 		CArrayHelper::sort($this->data['groups'], ['name']);
 

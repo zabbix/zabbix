@@ -233,34 +233,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-
-		$parents = [];
-		$parent_name = '';
-		foreach ($groups as $group) {
-			$parent = explode('/', $group['name']);
-			if (count($parent) > 1) {
-				array_pop($parent);
-				foreach ($parent as $sub_parent) {
-					if ($parent_name === '') {
-						$parent_name = $sub_parent;
-					}
-					else {
-						$parent_name .= '/'.$sub_parent;
-					}
-					$parents[] = $parent_name;
-				}
-			}
-		}
-
-		if ($parents) {
-			$parent_groups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => $parents],
-				'preservekeys' => true
-			]);
-
-			$groups = array_replace($groups, $parent_groups);
-		}
+		$groups = CPageFilter::enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 
@@ -344,34 +317,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
-
-		$parents = [];
-		$parent_name = '';
-		foreach ($groups as $group) {
-			$parent = explode('/', $group['name']);
-			if (count($parent) > 1) {
-				array_pop($parent);
-				foreach ($parent as $sub_parent) {
-					if ($parent_name === '') {
-						$parent_name = $sub_parent;
-					}
-					else {
-						$parent_name .= '/'.$sub_parent;
-					}
-					$parents[] = $parent_name;
-				}
-			}
-		}
-
-		if ($parents) {
-			$parent_groups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => $parents],
-				'preservekeys' => true
-			]);
-
-			$groups = array_replace($groups, $parent_groups);
-		}
+		$groups = CPageFilter::enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 
@@ -414,34 +360,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-
-		$parents = [];
-		$parent_name = '';
-		foreach ($groups as $group) {
-			$parent = explode('/', $group['name']);
-			if (count($parent) > 1) {
-				array_pop($parent);
-				foreach ($parent as $sub_parent) {
-					if ($parent_name === '') {
-						$parent_name = $sub_parent;
-					}
-					else {
-						$parent_name .= '/'.$sub_parent;
-					}
-					$parents[] = $parent_name;
-				}
-			}
-		}
-
-		if ($parents) {
-			$parent_groups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => $parents],
-				'preservekeys' => true
-			]);
-
-			$groups = array_replace($groups, $parent_groups);
-		}
+		$groups = CPageFilter::enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 
