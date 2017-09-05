@@ -722,6 +722,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
 ..F....... [ZBX-12545] fixed undefined index error on latest data page when host was deleted in another session (gcalenko)
 ..F....... [ZBX-12416] optimized data selection of user preferences stored in profiles (gcalenko)
 ..F....... [ZBX-11607] fixed a rounding of large unsigned numbers (miks)
