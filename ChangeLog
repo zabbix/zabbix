@@ -11,6 +11,7 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
 ..F....... [ZBX-12374] fixed frontend side DNS parser logic to be same as server side DNS parser logic (gcalenko, Sasha)
 ..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
 ..F....... [ZBX-12558] fixed scroll duration in dashboard after adding a new widget (miks)
@@ -251,6 +252,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
 ..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
 ..F.I...S. [ZBX-12434] fixed housekeeping of problems and events for deleted items and triggers; added optional database patch to cleanup problems for deleted items and triggers (vso)
 ..F....... [ZBX-12646] fixed incorrect SQL query in availability reports (Sasha)
@@ -725,6 +727,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
 ..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
 ..F....... [ZBX-12545] fixed undefined index error on latest data page when host was deleted in another session (gcalenko)
 ..F....... [ZBX-12416] optimized data selection of user preferences stored in profiles (gcalenko)
