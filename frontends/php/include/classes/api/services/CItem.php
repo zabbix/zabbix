@@ -692,7 +692,7 @@ class CItem extends CItemGeneral {
 		]);
 
 		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
-			'history'
+			'history', 'events'
 		];
 
 		$insert = [];
