@@ -404,6 +404,12 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$widgetid = $widget['widgetid'];
 			$default_rf_rate = CWidgetConfig::getDefaultRfRate($widget['type']);
 
+			$widget_fields = self::convertWidgetFields($widget['fields']);
+			$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($widget_fields));
+			if ($widget_form->validate()) {
+				$widget_fields = $widget_form->getFieldsData();
+			}
+
 			$grid_widgets[$widgetid] = [
 				'widgetid' => $widgetid,
 				'type' => $widget['type'],
@@ -415,7 +421,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'height' => (int) $widget['height']
 				],
 				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
-				'fields' => self::convertWidgetFields($widget['fields'])
+				'fields' => $widget_fields
 			];
 		}
 
