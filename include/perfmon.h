@@ -37,7 +37,7 @@ typedef enum
 	PERF_COUNTER_NOTSUPPORTED = 0,
 	PERF_COUNTER_INITIALIZED,
 	PERF_COUNTER_GET_SECOND_VALUE,	/* waiting for the second raw value (needed for some, e.g. rate, counters) */
-	PERF_COUNTER_ACTIVE,
+	PERF_COUNTER_ACTIVE
 }
 zbx_perf_counter_status_t;
 
