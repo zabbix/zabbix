@@ -41,7 +41,7 @@ typedef enum
 }
 zbx_perf_counter_status_t;
 
-typedef struct
+typedef struct perf_counter_id
 {
 	struct perf_counter_id	*next;
 	unsigned long		pdhIndex;
@@ -49,7 +49,7 @@ typedef struct
 }
 zbx_perf_counter_id_t;
 
-typedef struct
+typedef struct perf_counter_data
 {
 	struct perf_counter_data	*next;
 	char				*name;
