@@ -222,7 +222,9 @@ int	init_collector_data(char **error)
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
 #endif
 	ret = SUCCEED;
+#ifndef _WINDOWS
 out:
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
