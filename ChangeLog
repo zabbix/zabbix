@@ -11,6 +11,7 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
 ..F....... [ZBX-12578] implemented widget field validation before dashboard is loaded and fixed undefined index for tag field in dashboard widgets (miks)
 A.F....... [ZBX-12499] fixed macro expansion in map editor (vjaceslavs)
 ..F....... [ZBX-12597] fixed graph not being displayed if item update interval contains macro (Ivo)
