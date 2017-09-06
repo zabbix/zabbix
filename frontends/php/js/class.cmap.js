@@ -247,6 +247,8 @@ ZABBIX.apps.map = (function($) {
 
 		CMap.prototype = {
 			copypaste_buffer: [],
+			buffered_expand: false,
+			expand_sources: [],
 
 			save: function() {
 				var url = new Curl(location.href);
@@ -266,6 +268,76 @@ ZABBIX.apps.map = (function($) {
 				});
 			},
 
+			setExpandedLabels: function (elements, labels) {
+				for (var i = 0, ln = elements.length; i < ln; i++) {
+					if (labels !== null) {
+						elements[i].expanded = labels[i];
+					}
+					else {
+						elements[i].expanded = null;
+					}
+				}
+
+				this.updateImage();
+
+				if (labels === null) {
+					alert(locale['S_MACRO_EXPAND_ERROR']);
+				}
+			},
+
+			expandMacros: function(source) {
+				var url = new Curl(location.href);
+
+				if (source !== null) {
+					if ((/\{.+\}/.test(source.data.label) || /\{.+\}/.test(source.data.text))) {
+						this.expand_sources.push(source);
+					}
+					else {
+						source.expanded = null;
+					}
+				}
+
+				if (this.buffered_expand === false && this.expand_sources.length > 0) {
+					var sources = this.expand_sources,
+						post = [],
+						map = this;
+
+					this.expand_sources = [];
+
+					for (var i = 0, ln = sources.length; i < ln; i++) {
+						post.push(sources[i].data);
+					}
+
+					$.ajax({
+						url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
+						type: 'post',
+						dataType: 'html',
+						data: {
+							favobj: 'sysmap',
+							action: 'expand',
+							sysmapid: this.sysmapid,
+							source: Object.toJSON(post)
+						},
+						success: function(data) {
+							try {
+								data = JSON.parse(data);
+							}
+							catch (e) {
+								data = null;
+							}
+
+							map.setExpandedLabels(sources, data);
+						},
+						error: function() {
+							map.setExpandedLabels(sources, null);
+						}
+					});
+				}
+				else if (this.buffered_expand === false) {
+					this.updateImage();
+				}
+			},
+
 			updateImage: function() {
 				var shapes = [],
 					links = [],
@@ -283,6 +355,10 @@ ZABBIX.apps.map = (function($) {
 					['selementid', 'x', 'y', 'label', 'label_location'].forEach(function (name) {
 						element[name] = this.selements[key].data[name];
 					}, this);
+
+					if (this.data.expand_macros === '1' && typeof(this.selements[key].expanded) === 'string') {
+						element['label'] = this.selements[key].expanded;
+					}
 
 					// host group elements
 					if (this.selements[key].data.elementtype == '3' && this.selements[key].data.elementsubtype == '1') {
@@ -306,6 +382,10 @@ ZABBIX.apps.map = (function($) {
 						link[name] = this.links[key].data[name];
 					}, this);
 
+					if (this.data.expand_macros === '1' && typeof(this.links[key].expanded) === 'string') {
+						link['label'] = this.links[key].expanded;
+					}
+
 					links.push(link);
 				}, this);
 
@@ -314,6 +394,18 @@ ZABBIX.apps.map = (function($) {
 					Object.keys(this.shapes[key].data).forEach(function (name) {
 						shape[name] = this.shapes[key].data[name];
 					}, this);
+
+					if (this.data.expand_macros === '1') {
+						if (typeof(this.shapes[key].expanded) === 'string') {
+							shape['text'] = this.shapes[key].expanded;
+						}
+
+						// Additional macro that is supported in shapes is {MAP.NAME}
+						if (typeof(shape['text']) === 'string' && shape['text'] !== '') {
+							shape['text'] = shape['text'].replace(/\{MAP\.NAME\}/g, this.data.name);
+						}
+					}
+
 					shapes.push(shape);
 				}, this);
 
@@ -399,6 +491,13 @@ ZABBIX.apps.map = (function($) {
 				/*
 				 * Map panel events
 				 */
+				// toggle expand macros
+				$('#expand_macros').click(function() {
+					that.data.expand_macros = (that.data.expand_macros === '1') ? '0' : '1';
+					$(this).html((that.data.expand_macros === '1') ? locale['S_ON'] : locale['S_OFF']);
+					that.updateImage();
+				});
+
 				// change grid size
 				$('#gridsize').change(function() {
 					var value = $(this).val();
@@ -736,9 +835,14 @@ ZABBIX.apps.map = (function($) {
 					var values = this.massShapeForm.getValues();
 
 					if (values) {
+						this.buffered_expand = true;
+
 						for (var shapeid in this.selection.shapes) {
 							this.shapes[shapeid].update(values);
 						}
+
+						this.buffered_expand = false;
+						this.expandMacros(null);
 					}
 				}, this));
 
@@ -784,9 +888,14 @@ ZABBIX.apps.map = (function($) {
 					var values = this.massForm.getValues();
 
 					if (values) {
+						this.buffered_expand = true;
+
 						for (var selementid in this.selection.selements) {
 							this.selements[selementid].update(values);
 						}
+
+						this.buffered_expand = false;
+						this.expandMacros(null);
 					}
 				}, this));
 
@@ -1497,6 +1606,8 @@ ZABBIX.apps.map = (function($) {
 
 			this.data = linkData;
 			this.id = this.data.linkid;
+			this.expanded = this.data.expanded;
+			delete this.data.expanded;
 
 			for (var linktrigger in this.data.linktriggers) {
 				this.sysmap.allLinkTriggerIds[linktrigger.triggerid] = true;
@@ -1513,13 +1624,19 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} data
 			 */
 			update: function(data) {
-				var key;
+				var key,
+					invalidate = (this.data.label !== data.label);
 
 				for (key in data) {
 					this.data[key] = data[key];
 				}
 
-				sysmap.updateImage();
+				if (invalidate) {
+					sysmap.expandMacros(this);
+				}
+				else {
+					sysmap.updateImage();
+				}
 			},
 
 			/**
@@ -1598,6 +1715,8 @@ ZABBIX.apps.map = (function($) {
 
 			this.data = shape_data;
 			this.id = this.data.sysmap_shapeid;
+			this.expanded = this.data.expanded;
+			delete this.data.expanded;
 
 			// assign by reference
 			this.sysmap.data.shapes[this.id] = this.data;
@@ -1632,7 +1751,9 @@ ZABBIX.apps.map = (function($) {
 			 */
 			update: function(data) {
 				var key,
-					dimensions;
+					dimensions,
+					invalidate = (data.type != SVGMapShape.TYPE_LINE && typeof(data.text) !== 'undefined'
+							&& this.data.text !== data.text);
 
 				if (typeof data['type'] !== 'undefined' && /^[0-9]+$/.test(this.data.sysmap_shapeid) === true
 						&& (data['type'] == SVGMapShape.TYPE_LINE) != (this.data.type == SVGMapShape.TYPE_LINE)) {
@@ -1662,7 +1783,16 @@ ZABBIX.apps.map = (function($) {
 				this.align(false);
 				this.trigger('afterMove', this);
 
-				sysmap.updateImage();
+				for (key in data) {
+					this.data[key] = data[key];
+				}
+
+				if (invalidate) {
+					sysmap.expandMacros(this);
+				}
+				else {
+					sysmap.updateImage();
+				}
 			},
 
 			/**
@@ -2061,6 +2191,8 @@ ZABBIX.apps.map = (function($) {
 
 			this.data = selementData;
 			this.id = this.data.selementid;
+			this.expanded = this.data.expanded;
+			delete this.data.expanded;
 
 			// assign by reference
 			this.sysmap.data.selements[this.id] = this.data;
@@ -2115,9 +2247,35 @@ ZABBIX.apps.map = (function($) {
 					],
 					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
 					i,
-					ln;
+					ln,
+					invalidate = ((typeof(data.label) !== 'undefined' && this.data.label !== data.label)
+							|| (typeof(data.elementtype) !== 'undefined' && this.data.elementtype !== data.elementtype)
+							|| (typeof(data.elements) !== 'undefined'
+							&& Object.keys(this.data.elements).length !== Object.keys(data.elements).length));
 
 				unsetUndefined = unsetUndefined || false;
+
+				if (!invalidate && typeof(data.elements) !== 'undefined') {
+					var k,
+						id,
+						key,
+						kln,
+						keys,
+						ids = Object.keys(this.data.elements);
+
+					for (i = 0, ln = ids.length; i < ln && !invalidate; i++) {
+						id = ids[i];
+						keys = Object.keys(this.data.elements[id]);
+
+						for (k = 0, kln = keys.length; k < kln; k++) {
+							key = keys[k];
+							if (this.data.elements[id][key] !== data.elements[id][key]) {
+								invalidate = true;
+								break;
+							}
+						}
+					}
+				}
 
 				// update elements fields, if not massupdate, remove fields that are not in new values
 				for (i = 0, ln = dataFelds.length; i < ln; i++) {
@@ -2168,6 +2326,10 @@ ZABBIX.apps.map = (function($) {
 				this.updateIcon();
 				this.align(false);
 				this.trigger('afterMove', this);
+
+				if (invalidate) {
+					this.sysmap.expandMacros(this);
+				}
 			},
 
 			/**
