@@ -49,7 +49,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'smtp_helo' => 'localhost',
 					'smtp_email' => 'zabbix@localhost',
 					'smtp_security' => 'STARTTLS',
-					'smtp_authentication' => 'Normal password'
+					'smtp_authentication' => 'Username and password'
 				]
 			],
 			[
