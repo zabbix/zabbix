@@ -218,7 +218,11 @@ abstract class CMapElement extends CApiService {
 		unset($selement);
 
 		// check permissions to used objects
-		$this->checkSelementPermissions($selements);
+		if (!CMapHelper::checkSelementPermissions($selements)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+			);
+		}
 
 		return $update ? $db_selements : true;
 	}
@@ -240,135 +244,6 @@ abstract class CMapElement extends CApiService {
 						&& !$color_validator->validate($shape[$field])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $color_validator->getError());
 				}
-			}
-		}
-	}
-
-	/**
-	 * Checks that the user has write permissions to objects used in the map elements.
-	 *
-	 * @throws APIException if the user has no permissions to at least one of the objects.
-	 *
-	 * @param array $selements
-	 */
-	protected function checkSelementPermissions(array $selements) {
-		$groupids = [];
-		$hostids = [];
-		$triggerids = [];
-		$sysmapids = [];
-
-		foreach ($selements as $selement) {
-			switch ($selement['elementtype']) {
-				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$groupids[$selement['elements'][0]['groupid']] = true;
-					break;
-
-				case SYSMAP_ELEMENT_TYPE_HOST:
-					$hostids[$selement['elements'][0]['hostid']] = true;
-					break;
-
-				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					foreach ($selement['elements'] as $element) {
-						$triggerids[$element['triggerid']] = true;
-					}
-					break;
-
-				case SYSMAP_ELEMENT_TYPE_MAP:
-					$sysmapids[$selement['elements'][0]['sysmapid']] = true;
-					break;
-			}
-		}
-
-		$this->checkHostGroupsPermissions(array_keys($groupids));
-		$this->checkHostsPermissions(array_keys($hostids));
-		$this->checkTriggersPermissions(array_keys($triggerids));
-		$this->checkMapsPermissions(array_keys($sysmapids));
-	}
-
-	/**
-	 * Checks if the current user has access to the given host groups.
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given host groups
-	 *
-	 * @param array $groupids
-	 */
-	private function checkHostGroupsPermissions(array $groupids) {
-		if ($groupids) {
-			$count = API::HostGroup()->get([
-				'countOutput' => true,
-				'groupids' => $groupids
-			]);
-
-			if ($count != count($groupids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-	}
-
-	/**
-	 * Checks if the current user has access to the given hosts.
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given hosts
-	 *
-	 * @param array $hostids
-	 */
-	private function checkHostsPermissions(array $hostids) {
-		if ($hostids) {
-			$count = API::Host()->get([
-				'countOutput' => true,
-				'hostids' => $hostids
-			]);
-
-			if ($count != count($hostids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-	}
-
-	/**
-	 * Checks if the current user has access to the given triggers.
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given triggers
-	 *
-	 * @param array $triggerids
-	 */
-	private function checkTriggersPermissions(array $triggerids) {
-		if ($triggerids) {
-			$count = API::Trigger()->get([
-				'countOutput' => true,
-				'triggerids' => $triggerids
-			]);
-
-			if ($count != count($triggerids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-	}
-
-	/**
-	 * Checks if the current user has access to the given maps.
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given maps
-	 *
-	 * @param array $sysmapids
-	 */
-	private function checkMapsPermissions(array $sysmapids) {
-		if ($sysmapids) {
-			$count = API::Map()->get([
-				'countOutput' => true,
-				'sysmapids' => $sysmapids
-			]);
-
-			if ($count != count($sysmapids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
 			}
 		}
 	}
