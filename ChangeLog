@@ -12,6 +12,8 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
+...G...PS. [ZBX-4252] eliminated sending of DNS AAAA queries when checking IPv4 incoming connection in agent or for trapper item and A queries in case of IPv6 (Andris)
 ..F....... [DEV-647]  fixed multiple browser sensitive javascript bugs in navigation tree widget and improved coding style (miks)
 ..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
 ..F....... [ZBX-12578] implemented widget field validation before dashboard is loaded and fixed undefined index for tag field in dashboard widgets (miks)

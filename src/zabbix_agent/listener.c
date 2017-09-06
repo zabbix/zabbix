@@ -135,7 +135,8 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		{
 			zbx_setproctitle("listener #%d [processing request]", process_num);
 
-			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, ZBX_TCP_REJECT_IF_EMPTY)))
+			if ('\0' != *CONFIG_HOSTS_ALLOWED &&
+					SUCCEED == (ret = zbx_tcp_check_allowed_peers(&s, CONFIG_HOSTS_ALLOWED)))
 			{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				if (ZBX_TCP_SEC_TLS_CERT != s.connection_type ||
