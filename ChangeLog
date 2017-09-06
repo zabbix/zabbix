@@ -8,6 +8,7 @@ Bug fixes:
 Changes for 3.4.2rc1
 
 New features:
+..F....... [ZBXNEXT-4054] implemented feature to open first available dashboard from the list (Ivo)
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
