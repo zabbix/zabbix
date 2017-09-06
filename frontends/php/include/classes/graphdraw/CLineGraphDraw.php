@@ -107,7 +107,7 @@ class CLineGraphDraw extends CGraphDraw {
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			$graph_item['drawtype'] = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
-		$update_interval_parser = new CUpdateIntervalParser();
+		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 		if ($update_interval_parser->parse($graph_item['delay']) != CParser::PARSE_SUCCESS) {
 			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('invalid delay')));
