@@ -241,7 +241,7 @@ out:
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
-void	free_collector_data()
+void	free_collector_data(void)
 {
 #ifdef _WINDOWS
 	zbx_free(collector);
@@ -277,7 +277,7 @@ void	free_collector_data()
  * Purpose: Allocate shared memory for collecting disk statistics             *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_init()
+void	diskstat_shm_init(void)
 {
 #ifndef _WINDOWS
 	size_t	shm_size;
@@ -314,7 +314,7 @@ void	diskstat_shm_init()
  * Purpose: If necessary, reattach to disk statistics shared memory segment.  *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_reattach()
+void	diskstat_shm_reattach(void)
 {
 #ifndef _WINDOWS
 	if (my_diskstat_shmid != collector->diskstat_shmid)
@@ -357,7 +357,7 @@ void	diskstat_shm_reattach()
  *          copy data from the old one.                                       *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_extend()
+void	diskstat_shm_extend(void)
 {
 #ifndef _WINDOWS
 	const char		*__function_name = "diskstat_shm_extend";
