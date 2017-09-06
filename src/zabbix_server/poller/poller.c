@@ -35,9 +35,7 @@
 #include "checks_simple.h"
 #include "checks_snmp.h"
 #include "checks_db.h"
-#ifdef HAVE_SSH2
-#	include "checks_ssh.h"
-#endif
+#include "checks_ssh.h"
 #include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"
