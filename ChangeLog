@@ -258,6 +258,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
 ..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
 ..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
 ..F.I...S. [ZBX-12434] fixed housekeeping of problems and events for deleted items and triggers; added optional database patch to cleanup problems for deleted items and triggers (vso)
@@ -733,6 +734,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
 ..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
 ..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
 ..F....... [ZBX-12545] fixed undefined index error on latest data page when host was deleted in another session (gcalenko)
