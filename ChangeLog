@@ -11,6 +11,7 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+..F....... [ZBXNEXT-3807] fixed delayed first refresh in map widget; improved coding style (miks)
 ........S. [ZBX-12500] fixed regular expression pre-processing step to fail if the pattern does not match input data (wiper)
 ..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
 ..F....... [ZBX-12374] fixed frontend side DNS parser logic to be same as server side DNS parser logic (gcalenko, Sasha)
