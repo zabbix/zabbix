@@ -6477,10 +6477,9 @@ void	DCconfig_unlock_all_triggers(void)
 	UNLOCK_CACHE;
 }
 
-
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_lock_lld_rule                                           *
+ * Function: DCconfig_lock_discovery_rule                                     *
  *                                                                            *
  * Purpose: Lock lld rule to avoid parallel processing of a same lld rule     *
  *          that was causing deadlocks.                                       *
@@ -6532,7 +6531,6 @@ void	DCconfig_unlock_discovery_rule(zbx_uint64_t lld_ruleid)
 
 	UNLOCK_CACHE;
 }
-
 
 /******************************************************************************
  *                                                                            *
