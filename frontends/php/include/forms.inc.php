@@ -1932,7 +1932,7 @@ function get_timeperiod_form() {
 
 			$cmbCount = new CComboBox('new_timeperiod[every]', $new_timeperiod['every']);
 			$cmbCount->addItem(1, _('First'));
-			$cmbCount->addItem(2, _('Second'));
+			$cmbCount->addItem(2, _x('Second', 'adjective'));
 			$cmbCount->addItem(3, _('Third'));
 			$cmbCount->addItem(4, _('Fourth'));
 			$cmbCount->addItem(5, _('Last'));
