@@ -13,6 +13,7 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 ..F....... [ZBX-12616] fixed trapper item "Allowed hosts" field user macro support (gcalenko)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
