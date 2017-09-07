@@ -742,6 +742,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
 ..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
