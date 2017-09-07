@@ -22,7 +22,7 @@
 #include "perfmon.h"
 #include "log.h"
 
-ZBX_THREAD_LOCAL static PERF_COUNTER_ID	*PerfCounterList = NULL;
+ZBX_THREAD_LOCAL static zbx_perf_counter_id_t	*PerfCounterList = NULL;
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath)
 {
@@ -72,7 +72,7 @@ PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query)
  *           do not call it for PERF_COUNTER_ACTIVE counters                  *
  *                                                                            *
  ******************************************************************************/
-PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTER_DATA *counter, PDH_HQUERY query,
+PDH_STATUS	zbx_PdhAddCounter(const char *function, zbx_perf_counter_data_t *counter, PDH_HQUERY query,
 		const char *counterpath, PDH_HCOUNTER *handle)
 {
 	PDH_STATUS	pdh_status = ERROR_SUCCESS;
@@ -209,10 +209,10 @@ close_query:
 
 wchar_t	*get_counter_name(DWORD pdhIndex)
 {
-	const char	*__function_name = "get_counter_name";
-	PERF_COUNTER_ID	*counterName;
-	DWORD		dwSize;
-	PDH_STATUS	pdh_status;
+	const char		*__function_name = "get_counter_name";
+	zbx_perf_counter_id_t	*counterName;
+	DWORD			dwSize;
+	PDH_STATUS		pdh_status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pdhIndex:%u", __function_name, pdhIndex);
 
@@ -226,9 +226,9 @@ wchar_t	*get_counter_name(DWORD pdhIndex)
 
 	if (NULL == counterName)
 	{
-		counterName = (PERF_COUNTER_ID *)zbx_malloc(counterName, sizeof(PERF_COUNTER_ID));
+		counterName = (zbx_perf_counter_id_t *)zbx_malloc(counterName, sizeof(zbx_perf_counter_id_t));
 
-		memset(counterName, 0, sizeof(PERF_COUNTER_ID));
+		memset(counterName, 0, sizeof(zbx_perf_counter_id_t));
 		counterName->pdhIndex = pdhIndex;
 		counterName->next = PerfCounterList;
 
