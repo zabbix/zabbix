@@ -3,7 +3,7 @@ Changes for 4.0.0alpha1
 New features:
 
 Bug fixes:
-........S. [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
+...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.2rc1
