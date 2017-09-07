@@ -266,6 +266,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
 ..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
