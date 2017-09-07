@@ -29,7 +29,7 @@
 
 typedef struct
 {
-	PERF_COUNTER_DATA	*pPerfCounterList;
+	zbx_perf_counter_data_t	*pPerfCounterList;
 	PDH_HQUERY		pdh_query;
 	time_t			nextcheck;	/* refresh time of not supported counters */
 }
@@ -51,7 +51,7 @@ static int	perf_collector_started(void)
  * Comments: counter failed or disappeared, dismiss all previous values       *
  *                                                                            *
  ******************************************************************************/
-static void	deactivate_perf_counter(PERF_COUNTER_DATA *counter)
+static void	deactivate_perf_counter(zbx_perf_counter_data_t *counter)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "deactivate_perf_counter() counterpath:'%s'", counter->counterpath);
 
@@ -68,10 +68,10 @@ static void	deactivate_perf_counter(PERF_COUNTER_DATA *counter)
  *           added, a pointer to that counter is returned, NULL otherwise     *
  *                                                                            *
  ******************************************************************************/
-PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, int interval, char **error)
+zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval, char **error)
 {
 	const char		*__function_name = "add_perf_counter";
-	PERF_COUNTER_DATA	*cptr = NULL;
+	zbx_perf_counter_data_t	*cptr = NULL;
 	PDH_STATUS		pdh_status;
 	int			added = FAIL;
 
@@ -90,10 +90,10 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 		/* add new parameters */
 		if (NULL == cptr)
 		{
-			cptr = (PERF_COUNTER_DATA *)zbx_malloc(cptr, sizeof(PERF_COUNTER_DATA));
+			cptr = (zbx_perf_counter_data_t *)zbx_malloc(cptr, sizeof(zbx_perf_counter_data_t));
 
 			/* initialize the counter */
-			memset(cptr, 0, sizeof(PERF_COUNTER_DATA));
+			memset(cptr, 0, sizeof(zbx_perf_counter_data_t));
 			if (NULL != name)
 				cptr->name = zbx_strdup(NULL, name);
 			cptr->counterpath = zbx_strdup(NULL, counterpath);
@@ -156,7 +156,7 @@ out:
  *             interval  - [IN] the new data collection interval in seconds   *
  *                                                                            *
  ******************************************************************************/
-static void	extend_perf_counter_interval(PERF_COUNTER_DATA *counter, int interval)
+static void	extend_perf_counter_interval(zbx_perf_counter_data_t *counter, int interval)
 {
 	if (interval <= counter->interval)
 		return;
@@ -185,9 +185,9 @@ static void	extend_perf_counter_interval(PERF_COUNTER_DATA *counter, int interva
  *           the memory is freed - do not use it again                        *
  *                                                                            *
  ******************************************************************************/
-void	remove_perf_counter(PERF_COUNTER_DATA *counter)
+void	remove_perf_counter(zbx_perf_counter_data_t *counter)
 {
-	PERF_COUNTER_DATA	*cptr;
+	zbx_perf_counter_data_t	*cptr;
 
 	LOCK_PERFCOUNTERS;
 
@@ -222,7 +222,7 @@ out:
 
 static void	free_perf_counter_list(void)
 {
-	PERF_COUNTER_DATA	*cptr;
+	zbx_perf_counter_data_t	*cptr;
 
 	LOCK_PERFCOUNTERS;
 
@@ -246,7 +246,7 @@ static void	free_perf_counter_list(void)
  *           interval must be less than or equal to counter->interval         *
  *                                                                            *
  ******************************************************************************/
-static double	compute_average_value(PERF_COUNTER_DATA *counter, int interval)
+static double	compute_average_value(zbx_perf_counter_data_t *counter, int interval)
 {
 	double	sum = 0;
 	int	i, j, count;
@@ -306,7 +306,7 @@ out:
 
 void	free_perf_collector(void)
 {
-	PERF_COUNTER_DATA	*cptr;
+	zbx_perf_counter_data_t	*cptr;
 
 	if (SUCCEED != perf_collector_started())
 		return;
@@ -331,7 +331,7 @@ void	free_perf_collector(void)
 void	collect_perfstat(void)
 {
 	const char		*__function_name = "collect_perfstat";
-	PERF_COUNTER_DATA	*cptr;
+	zbx_perf_counter_data_t	*cptr;
 	PDH_STATUS		pdh_status;
 	time_t			now;
 	PDH_FMT_COUNTERVALUE	value;
@@ -480,7 +480,7 @@ int	get_perf_counter_value_by_name(const char *name, double *value, char **error
 {
 	const char		*__function_name = "get_perf_counter_value_by_name";
 	int			ret = FAIL;
-	PERF_COUNTER_DATA	*perfs = NULL;
+	zbx_perf_counter_data_t	*perfs = NULL;
 	char			*counterpath = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:%s", __function_name, name);
@@ -555,7 +555,7 @@ int	get_perf_counter_value_by_path(const char *counterpath, int interval, double
 {
 	const char		*__function_name = "get_perf_counter_value_by_path";
 	int			ret = FAIL;
-	PERF_COUNTER_DATA	*perfs = NULL;
+	zbx_perf_counter_data_t	*perfs = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s interval:%d", __function_name, counterpath, interval);
 
@@ -617,7 +617,7 @@ out:
  *           FAIL    - otherwise                                              *
  *                                                                            *
  ******************************************************************************/
-int	get_perf_counter_value(PERF_COUNTER_DATA *counter, int interval, double *value, char **error)
+int	get_perf_counter_value(zbx_perf_counter_data_t *counter, int interval, double *value, char **error)
 {
 	const char	*__function_name = "get_perf_counter_value";
 	int		ret = FAIL;

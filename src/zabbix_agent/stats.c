@@ -177,12 +177,12 @@ int	init_collector_data(char **error)
 	sz = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_COLLECTOR_DATA));
 
 #ifdef _WINDOWS
-	sz_cpu = sizeof(PERF_COUNTER_DATA *) * (cpu_count + 1);
+	sz_cpu = sizeof(zbx_perf_counter_data_t *) * (cpu_count + 1);
 
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu_counter = (PERF_COUNTER_DATA **)((char *)collector + sz);
+	collector->cpus.cpu_counter = (zbx_perf_counter_data_t **)((char *)collector + sz);
 	collector->cpus.count = cpu_count;
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
@@ -222,7 +222,9 @@ int	init_collector_data(char **error)
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
 #endif
 	ret = SUCCEED;
+#ifndef _WINDOWS
 out:
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
@@ -239,7 +241,7 @@ out:
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
-void	free_collector_data()
+void	free_collector_data(void)
 {
 #ifdef _WINDOWS
 	zbx_free(collector);
@@ -275,7 +277,7 @@ void	free_collector_data()
  * Purpose: Allocate shared memory for collecting disk statistics             *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_init()
+void	diskstat_shm_init(void)
 {
 #ifndef _WINDOWS
 	size_t	shm_size;
@@ -312,7 +314,7 @@ void	diskstat_shm_init()
  * Purpose: If necessary, reattach to disk statistics shared memory segment.  *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_reattach()
+void	diskstat_shm_reattach(void)
 {
 #ifndef _WINDOWS
 	if (my_diskstat_shmid != collector->diskstat_shmid)
@@ -355,7 +357,7 @@ void	diskstat_shm_reattach()
  *          copy data from the old one.                                       *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_extend()
+void	diskstat_shm_extend(void)
 {
 #ifndef _WINDOWS
 	const char		*__function_name = "diskstat_shm_extend";
