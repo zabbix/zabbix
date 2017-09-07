@@ -137,8 +137,8 @@
 			width = data['options']['max-columns'];
 		}
 
-		if (height < 1) {
-			height = 1;
+		if (height < data['options']['widget-min-rows']) {
+			height = data['options']['widget-min-rows'];
 		}
 
 		return {'x': x, 'y': y, 'width': width, 'height': height};
@@ -362,7 +362,8 @@
 				}
 
 				doAction('onResizeEnd', $obj, data, widget);
-			}
+			},
+			minHeight: data['options']['widget-min-rows'] * data['options']['widget-height']
 		});
 	}
 
@@ -622,7 +623,8 @@
 							}
 
 							$('html, body')
-								.animate({scrollTop: '+=' + scroll_by + 'px'}, 800)
+								// Estimated scroll speed: 200ms for each 250px.
+								.animate({scrollTop: '+=' + scroll_by + 'px'}, Math.floor(scroll_by / 250) * 200)
 								.promise()
 								.then(add_new_widget);
 						}
@@ -1002,6 +1004,7 @@
 			var default_options = {
 				'fullscreen': 0,
 				'widget-height': 70,
+				'widget-min-rows': 2,
 				'max-rows': 64,
 				'max-columns': 12,
 				'rows': 0,

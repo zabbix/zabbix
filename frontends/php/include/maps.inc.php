@@ -254,13 +254,19 @@ function get_map_elements($db_element, &$elements) {
 			}
 			break;
 		case SYSMAP_ELEMENT_TYPE_MAP:
-			$db_mapselements = DBselect(
-				'SELECT DISTINCT se.elementtype,se.elementid'.
-				' FROM sysmaps_elements se'.
-				' WHERE se.sysmapid='.zbx_dbstr($db_element['elements'][0]['sysmapid'])
-			);
-			while ($db_mapelement = DBfetch($db_mapselements)) {
-				get_map_elements($db_mapelement, $elements);
+			$map = API::Map()->get([
+				'output' => [],
+				'selectSelements' => ['selementid', 'elements', 'elementtype'],
+				'sysmapids' => $db_element['elements'][0]['sysmapid'],
+				'nopermissions' => true
+			]);
+
+			if ($map) {
+				$map = reset($map);
+
+				foreach ($map['selements'] as $db_mapelement) {
+					get_map_elements($db_mapelement, $elements);
+				}
 			}
 			break;
 	}

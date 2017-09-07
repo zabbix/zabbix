@@ -1636,74 +1636,80 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return string
 	 */
 	public function resolveMapLabelMacros($label, $replaceHosts = null) {
-		$functionsPattern = '(last|max|min|avg)\(([0-9]+['.ZBX_TIME_SUFFIXES.']?)?\)';
+		$pattern = '/(?P<macros>{'.
+				'('.ZBX_PREG_HOST_FORMAT.(($replaceHosts !== null)
+						? '|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'})' : '').'):'.
+				ZBX_PREG_ITEM_KEY_FORMAT.'\.'.
+				'(last|max|min|avg)\('.
+				'([0-9]+['.ZBX_TIME_SUFFIXES.']?)?'.
+				'\)}{1})/Uux';
 
-		// Find functional macro pattern.
-		$pattern = ($replaceHosts === null)
-			? '/{'.ZBX_PREG_HOST_FORMAT.':.+\.'.$functionsPattern.'}/Uu'
-			: '/{('.ZBX_PREG_HOST_FORMAT.'|{HOSTNAME[0-9]?}|{HOST\.HOST[0-9]?}):.+\.'.$functionsPattern.'}/Uu';
+		if (preg_match_all($pattern, $label, $matches) != false && array_key_exists('macros', $matches)) {
+			// For each functional macro.
+			foreach ($matches['macros'] as $expr) {
+				$macro = $expr;
 
-		preg_match_all($pattern, $label, $matches);
+				if ($replaceHosts !== null) {
+					// Search for macros with all possible indices.
+					foreach ($replaceHosts as $i => $host) {
+						$macroTmp = $macro;
 
-		// For each functional macro.
-		foreach ($matches[0] as $expr) {
-			$macro = $expr;
+						// Replace only macro in first position.
+						$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U',
+								'{'.$host['host'].':$2}', $macro
+						);
 
-			if ($replaceHosts !== null) {
-				// Search for macros with all possible indices.
-				foreach ($replaceHosts as $i => $host) {
-					$macroTmp = $macro;
-
-					// Replace only macro in first position.
-					$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
-
-					// Only one simple macro possible inside functional macro.
-					if ($macro !== $macroTmp) {
-						break;
+						// Only one simple macro possible inside functional macro.
+						if ($macro !== $macroTmp) {
+							break;
+						}
 					}
 				}
-			}
 
-			// Try to create valid expression.
-			$expressionData = new CTriggerExpression();
+				// Try to create valid expression.
+				$expressionData = new CTriggerExpression();
 
-			if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
-				continue;
-			}
+				if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
+					continue;
+				}
 
-			// Look in DB for corresponding item.
-			$itemHost = $expressionData->expressions[0]['host'];
-			$key = $expressionData->expressions[0]['item'];
-			$function = $expressionData->expressions[0]['functionName'];
+				// Look in DB for corresponding item.
+				$itemHost = $expressionData->expressions[0]['host'];
+				$key = $expressionData->expressions[0]['item'];
+				$function = $expressionData->expressions[0]['functionName'];
 
-			$item = API::Item()->get([
-				'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'lastvalue', 'lastclock'],
-				'webitems' => true,
-				'filter' => [
-					'host' => $itemHost,
-					'key_' => $key
-				]
-			]);
+				$item = API::Item()->get([
+					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'lastvalue', 'lastclock'],
+					'webitems' => true,
+					'filter' => [
+						'host' => $itemHost,
+						'key_' => $key
+					]
+				]);
 
-			$item = reset($item);
+				$item = reset($item);
 
-			// If no corresponding item found with functional macro key and host.
-			if (!$item) {
-				$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
+				// If no corresponding item found with functional macro key and host.
+				if (!$item) {
+					$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 
-				continue;
-			}
+					continue;
+				}
 
-			// Do function type (last, min, max, avg) related actions.
-			if ($function === 'last') {
-				$value = $item['lastclock'] ? formatHistoryValue($item['lastvalue'], $item) : UNRESOLVED_MACRO_STRING;
-			}
-			else {
-				$value = getItemFunctionalValue($item, $function, $expressionData->expressions[0]['functionParamList'][0]);
-			}
+				// Do function type (last, min, max, avg) related actions.
+				if ($function === 'last') {
+					$value = $item['lastclock']
+							? formatHistoryValue($item['lastvalue'], $item) : UNRESOLVED_MACRO_STRING;
+				}
+				else {
+					$value = getItemFunctionalValue($item, $function,
+							$expressionData->expressions[0]['functionParamList'][0]
+					);
+				}
 
-			if (isset($value)) {
-				$label = str_replace($expr, $value, $label);
+				if (isset($value)) {
+					$label = str_replace($expr, $value, $label);
+				}
 			}
 		}
 

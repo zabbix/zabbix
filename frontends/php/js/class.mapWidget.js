@@ -18,11 +18,20 @@
 **/
 
 if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
-	function zbx_sysmap_widget_trigger(hook_name, data, grid) {
-		switch(hook_name) {
+	/**
+	 * Call widget internal processes externally.
+	 *
+	 * @param {string} hook_name - trigger name.
+	 * @param (array|null) data	 - data passed to method called.
+	 */
+	function zbx_sysmap_widget_trigger(hook_name, data) {
+		var grid = Array.prototype.slice.call(arguments, -1),
+			grid = grid.length ? grid[0] : null;
+
+		switch (hook_name) {
 			case 'onWidgetRefresh':
-				var div_id = jQuery('[data-uniqueid="'+grid['widget']['uniqueid']+'"]').attr('id');
-				jQuery('#'+div_id).zbx_mapwidget('update', grid['widget']);
+				var div_id = jQuery('[data-uniqueid="' + grid['widget']['uniqueid'] + '"]').attr('id');
+				jQuery('#' + div_id).zbx_mapwidget('update', grid['widget']);
 				break;
 			case 'afterUpdateWidgetConfig':
 				jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue',
@@ -41,6 +50,15 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 }
 
 if (typeof(navigateToSubmap) !== typeof(Function)) {
+	/**
+	 * Navigate to different map in map widget.
+	 *
+	 * @param {numeric} submapid		- id of map to navigate to.
+	 * @param {string}  uniqueid		- uniqueid of map widget which must be navigated.
+	 * @param (boolean) reset_previous	- erase a value from navigation history (in case of false) or store submapid
+	 *									  value to history (in case of true). This changes when user navigates in deeper
+	 *									  level or back to the top level.
+	 */
 	function navigateToSubmap(submapid, uniqueid, reset_previous) {
 		var widget = jQuery('.dashbrd-grid-widget-container').dashboardGrid('getWidgetsBy', 'uniqueid', uniqueid),
 			reset_previous = reset_previous || false,
@@ -48,8 +66,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 
 		if (widget.length) {
 			if (typeof widget[0]['storage']['current_sysmapid'] !== 'undefined'
-				&& widget[0]['storage']['current_sysmapid'] !== ''
-			) {
+					&& widget[0]['storage']['current_sysmapid'] !== '') {
 				if (typeof widget[0]['storage']['previous_maps'] === 'undefined') {
 					if (!reset_previous) {
 						previous_maps = widget[0]['storage']['current_sysmapid'];
@@ -62,13 +79,14 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 						previous_maps = previous_maps.filter(Number).join(',');
 					}
 					else {
-						previous_maps = widget[0]['storage']['previous_maps']+','+widget[0]['storage']['current_sysmapid'];
+						previous_maps
+							= widget[0]['storage']['previous_maps'] + ',' + widget[0]['storage']['current_sysmapid'];
 					}
 				}
 			}
 
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'current_sysmapid',
-				submapid);
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid,
+				'current_sysmapid', submapid);
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'previous_maps',
 				previous_maps);
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', uniqueid);
@@ -138,9 +156,11 @@ jQuery(function($) {
 
 			if (methods[input]) {
 				return methods[input].apply(this, Array.prototype.slice.call(arguments, 1));
-			} else if (typeof input === 'object') {
+			}
+			else if (typeof input === 'object') {
 				return methods.init.apply(this, arguments);
-			} else {
+			}
+			else {
 				return null;
 			}
 		}

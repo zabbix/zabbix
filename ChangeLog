@@ -8,8 +8,29 @@ Bug fixes:
 Changes for 3.4.2rc1
 
 New features:
+..F....... [ZBXNEXT-4054] implemented feature to open first available dashboard from the list (Ivo)
+..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
+...G...PS. [ZBX-4252] eliminated sending of DNS AAAA queries when checking IPv4 incoming connection in agent or for trapper item and A queries in case of IPv6 (Andris)
+..F....... [DEV-647]  fixed multiple browser sensitive javascript bugs in navigation tree widget and improved coding style (miks)
+..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
+..F....... [ZBX-12578] implemented widget field validation before dashboard is loaded and fixed undefined index for tag field in dashboard widgets (miks)
+A.F....... [ZBX-12499] fixed macro expansion in map editor (vjaceslavs)
+..F....... [ZBX-12597] fixed graph not being displayed if item update interval contains macro (Ivo)
+..F....... [ZBXNEXT-3807] fixed delayed first refresh in map widget; improved coding style (miks)
+........S. [ZBX-12500] fixed regular expression pre-processing step to fail if the pattern does not match input data (wiper)
+..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
+..F....... [ZBX-12374] fixed frontend side DNS parser logic to be same as server side DNS parser logic (gcalenko, Sasha)
+..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
+..F....... [ZBX-12558] fixed scroll duration in dashboard after adding a new widget (miks)
+..F.I...S. [ZBX-12434] fixed housekeeping of problems and events for deleted items and triggers; added optional database patch to cleanup problems for deleted items and triggers (vso)
+..F....... [ZBX-12646] fixed incorrect SQL query in availability reports (Sasha)
+..F....... [ZBX-12545] fixed undefined index error on latest data page when host was deleted in another session (gcalenko)
+..F....... [ZBX-12416] optimized data selection of user preferences stored in profiles (gcalenko)
+..F....... [ZBX-12321] fixed removal of multiselect options using backspace button (miks)
+..F....... [ZBX-11607] fixed a rounding of large unsigned numbers (miks)
 .......P.. [ZBX-12668] removed delay between sending batches of cached historical data by active proxies (wiper)
 ..F....... [ZBX-12554] fixed item helper description for proc_info and diplay order for vfs.dir.size (gcalenko)
 ..F....... [ZBX-12605] fixed line graph was displayed as points for data taken from trends (gcalenko)
@@ -241,6 +262,15 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
+..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
+..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
+..F.I...S. [ZBX-12434] fixed housekeeping of problems and events for deleted items and triggers; added optional database patch to cleanup problems for deleted items and triggers (vso)
+..F....... [ZBX-12646] fixed incorrect SQL query in availability reports (Sasha)
+..F....... [ZBX-12545] fixed undefined index error on latest data page when host was deleted in another session (gcalenko)
+..F....... [ZBX-12321] fixed removal of multiselect options using backspace button (miks)
+..F....... [ZBX-12416] optimized data selection of user preferences stored in profiles (gcalenko)
+..F....... [ZBX-11607] fixed a rounding of large unsigned numbers (miks)
 ..F....... [ZBX-12404] fixed visibility of item data first row for 'latest data' page and 'audit log' page (gcalenko)
 ..F....... [ZBX-12463] fixed undefined index error in "Last 20 issues" (Sasha)
 ........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)
@@ -708,6 +738,12 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
+..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
+..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
+..F....... [ZBX-12545] fixed undefined index error on latest data page when host was deleted in another session (gcalenko)
+..F....... [ZBX-12416] optimized data selection of user preferences stored in profiles (gcalenko)
+..F....... [ZBX-11607] fixed a rounding of large unsigned numbers (miks)
 ..F....... [ZBX-12404] fixed visibility of item data first row for 'latest data' page and 'audit log' page (gcalenko)
 ..F....... [ZBX-12463] fixed undefined index error in "Last 20 issues" (Sasha)
 ........S. [ZBX-12186] fixed parallel processing of multiple values for same lld rule (vjaceslavs)

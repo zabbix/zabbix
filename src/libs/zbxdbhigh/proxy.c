@@ -2933,8 +2933,6 @@ static int	agent_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  ******************************************************************************/
 static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error)
 {
-	char			*allowed_hosts;
-	int			ret;
 	zbx_host_rights_t	*rights;
 
 	if (0 != item->host.proxy_hostid)
@@ -2943,17 +2941,23 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 	if (ITEM_TYPE_TRAPPER != item->type)
 		return FAIL;
 
-	allowed_hosts = zbx_strdup(NULL, item->trapper_hosts);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, &allowed_hosts,
-			MACRO_TYPE_PARAMS_FIELD, NULL, 0);
-	ret = zbx_tcp_check_security(sock, allowed_hosts, ZBX_TCP_PERMIT_IF_EMPTY);
-	zbx_free(allowed_hosts);
-
-	if (FAIL == ret)
+	if ('\0' != *item->trapper_hosts)	/* list of allowed hosts not empty */
 	{
-		*error = zbx_dsprintf(*error,  "cannot process trapper item \"%s\": %s", item->key_orig,
-				zbx_socket_strerror());
-		return FAIL;
+		char	*allowed_peers;
+		int	ret;
+
+		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, &allowed_peers,
+				MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
+		zbx_free(allowed_peers);
+
+		if (FAIL == ret)
+		{
+			*error = zbx_dsprintf(*error,  "cannot process trapper item \"%s\": %s", item->key_orig,
+					zbx_socket_strerror());
+			return FAIL;
+		}
 	}
 
 	rights = (zbx_host_rights_t *)args;
@@ -3085,7 +3089,7 @@ out:
  *                                                                            *
  * Function: process_proxy_history_data                                       *
  *                                                                            *
- * Purpose: process history data received form Zabbix proxy                   *
+ * Purpose: process history data received from Zabbix proxy                   *
  *                                                                            *
  * Parameters: proxy        - [IN] the source proxy                           *
  *             jp           - [IN] the JSON with history data                 *
