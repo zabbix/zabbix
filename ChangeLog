@@ -13,6 +13,7 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+.......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ...G...PS. [ZBX-10820] fixed potential loss of data when server/proxy processes zabbix_sender data (Andris)
 ...G...PS. [ZBX-4252] eliminated sending of DNS AAAA queries when checking IPv4 incoming connection in agent or for trapper item and A queries in case of IPv6 (Andris)
 ..F....... [DEV-647]  fixed multiple browser sensitive javascript bugs in navigation tree widget and improved coding style (miks)
@@ -263,6 +264,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+.......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
 ..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
 ..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
@@ -739,6 +741,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ..F....... [ZBX-12623] fixed label macro resolving in maps (vjaceslavs)
 ..F.....S. [ZBX-11042] allowed libcurl to choose SMTP authentication mechanism other than PLAIN (gleb, vjaceslavs)
 ..F....... [ZBX-8997] fixed trigger expression validation test form (gcalenko, Sasha)
@@ -2469,6 +2472,7 @@ Changes for 2.2.20rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
 
