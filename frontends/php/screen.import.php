@@ -63,8 +63,12 @@ $data = [
 		'images' => ['updateExisting' => false, 'createMissing' => false],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 	],
-	'backurl' => getRequest('backurl', 'zabbix.php?action=dashboard.view')
+	'backurl' => getRequest('backurl', '')
 ];
+
+if (!CHtmlUrlValidator::validate($data['backurl'])) {
+	$data['backurl'] = 'zabbix.php?action=dashboard.view';
+}
 
 // rules presets
 if (hasRequest('rules_preset') && !hasRequest('rules')) {
