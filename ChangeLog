@@ -143,7 +143,7 @@ New features:
 ..F....... [ZBXNEXT-2102] implemented validation for empty fields in widget configuration forms (Sasha)
 ..F....... [ZBXNEXT-2102] added placeholder on empty dashboard (vmurzins)
 A.FG...PS. [ZBXNEXT-3006] implemented support of bulk metric collection for dependent items data population (gcalenko, vjaceslavs, wiper)
-....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta)
+....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta) (vzhuravlev)
 
 Bug fixes:
 ....I..... [ZBXNEXT-3006] fixed libevent build depenedencies (wiper)
