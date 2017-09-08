@@ -65,6 +65,11 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		'Sign out'
 	];
 
+	protected $capture_screenshot = true;
+
+	// Screenshot taken on test failure.
+	protected $screenshot = null;
+
 	protected function putBreak() {
 		fwrite(STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
 			while (fgets(STDIN, 1024) == '') {}
@@ -82,7 +87,42 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	protected function onNotSuccessfulTest($e) {
+		if ($this->screenshot !== null && $e instanceof PHPUnit_Framework_AssertionFailedError) {
+			$screenshot_name = md5(microtime(true)).'.png';
+
+			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
+				$message = 'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".$e->getMessage();
+
+				switch (true) {
+					case $e instanceof PHPUnit_Framework_ExpectationFailedException:
+						$e = new PHPUnit_Framework_ExpectationFailedException($message, $e->getComparisonFailure(),
+							$e->getPrevious()
+						);
+						break;
+
+					case $e instanceof PHPUnit_Framework_SyntheticError:
+						$e = new PHPUnit_Framework_SyntheticError($message, $e->getCode(), $e->getSyntheticFile(),
+							$e->getSyntheticLine(), $e->getSyntheticTrace()
+						);
+						break;
+
+					default:
+						$e = new PHPUnit_Framework_AssertionFailedError($message, $e->getCode(), $e->getPrevious());
+				}
+
+				$this->screenshot = null;
+			}
+		}
+
+		parent::onNotSuccessfulTest($e);
+	}
+
 	protected function tearDown() {
+		if ($this->capture_screenshot && $this->hasFailed()) {
+			$this->screenshot = $this->webDriver->takeScreenshot();
+		}
+
 		$this->webDriver->quit();
 	}
 
