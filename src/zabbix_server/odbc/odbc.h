@@ -20,30 +20,16 @@
 #ifndef ZABBIX_ZBXODBC_H
 #define ZABBIX_ZBXODBC_H
 
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
+typedef struct zbx_odbc_data_source	zbx_odbc_data_source_t;
+typedef struct zbx_odbc_query_result	zbx_odbc_query_result_t;
 
-#define ZBX_ODBC_ROW	char **
-#define ZBX_ODBC_RESULT	ZBX_ODBC_DBH *
+zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, const char *pass, int timeout, char **error);
+zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_source, const char *query, char **error);
 
-typedef struct
-{
-	SQLHENV		henv;
-	SQLHDBC		hdbc;
-	unsigned short	connected;
-	SQLHSTMT	hstmt;
-	SQLSMALLINT     col_num;
-	ZBX_ODBC_ROW	row_data;
-}
-ZBX_ODBC_DBH;
+int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char **string, char **error);
+int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, char **lld_json, char **error);
 
-int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_name, char *user, char *pass, int login_timeout);
-void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
-
-ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query);
-ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
-
-const char	*get_last_odbc_strerror(void);
+void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result);
+void	zbx_odbc_data_source_free(zbx_odbc_data_source_t *data_source);
 
 #endif
