@@ -4,7 +4,6 @@ noinst_LIBRARIES = libzbxdbhigh.a
 
 libzbxdbhigh_a_SOURCES = \
 	host.c \
-	odbc.c \
 	db.c \
 	dbschema.c \
 	proxy.c \
@@ -20,4 +19,4 @@ libzbxdbhigh_a_SOURCES = \
 	template.h \
 	trigger.c
 
-libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/ @UNIXODBC_CFLAGS@
+libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/
