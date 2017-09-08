@@ -13,6 +13,7 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+...G...... [ZBX-12653] fixed heap corruption in Windows agent (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
 ..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 ..F....... [ZBX-12616] fixed trapper item "Allowed hosts" field user macro support (gcalenko)
@@ -267,6 +268,7 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+...G...... [ZBX-12653] fixed heap corruption in Windows agent (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
 ..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
@@ -746,6 +748,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-12653] fixed heap corruption in Windows agent (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
 ..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
