@@ -92,7 +92,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			$screenshot_name = md5(microtime(true)).'.png';
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
-				$message = 'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".$e->getMessage();
+				$message =
+					'URL: '.PHPUNIT_URL."\n".
+					'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
+					$e->getMessage();
 
 				switch (true) {
 					case $e instanceof PHPUnit_Framework_ExpectationFailedException:
