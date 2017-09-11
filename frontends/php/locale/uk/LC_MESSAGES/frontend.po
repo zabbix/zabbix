@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-23 19:17+0300\n"
+"POT-Creation-Date: 2017-09-11 23:35+0300\n"
 "PO-Revision-Date: 2017-08-23 16:09+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -104,7 +104,7 @@ msgstr[0] "%1$s елемент даних"
 msgstr[1] "%1$s елементи даних"
 msgstr[2] "%1$s елементів даних"
 
-#: jsLoader.php:242 jsLoader.php:243 jsLoader.php:244 jsLoader.php:245
+#: jsLoader.php:243 jsLoader.php:244 jsLoader.php:245 jsLoader.php:246
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -122,7 +122,7 @@ msgstr[0] "залишилась %1$s спроба"
 msgstr[1] "залишилось %1$s спроби"
 msgstr[2] "залишилось %1$s спроб"
 
-#: jsLoader.php:240 jsLoader.php:241
+#: jsLoader.php:241 jsLoader.php:242
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
@@ -177,11 +177,7 @@ msgstr "(без проксі)"
 msgid "0 - use default port"
 msgstr "0 - використовувати порт по замовчуванню"
 
-#: include/triggers.inc.php:1795 include/triggers.inc.php:1797
-#: include/triggers.inc.php:1798 include/triggers.inc.php:1800
-#: include/triggers.inc.php:1802 include/triggers.inc.php:1805
-#: include/triggers.inc.php:1809 include/triggers.inc.php:1810
-#: include/triggers.inc.php:1823
+#: include/triggers.inc.php:1772
 msgid "0 or 1"
 msgstr "0 або 1"
 
@@ -261,11 +257,11 @@ msgid "Acceptable SLA"
 msgstr "Допустимий рівень SLA"
 
 #: app/views/monitoring.dashboard.sharing_form.js.php:27
-#: include/func.inc.php:1724 jsLoader.php:205
+#: include/func.inc.php:1726 jsLoader.php:206
 msgid "Access denied"
 msgstr "Доступ заборонено"
 
-#: sysmap.php:76
+#: sysmap.php:78
 msgid "Access denied!"
 msgstr "Доступ заборонено!"
 
@@ -288,7 +284,7 @@ msgid "Ack"
 msgstr "Підтверджено"
 
 #: app/views/monitoring.acknowledge.edit.php:59
-#: app/views/monitoring.acknowledge.edit.php:84 jsLoader.php:204
+#: app/views/monitoring.acknowledge.edit.php:84 jsLoader.php:205
 msgid "Acknowledge"
 msgstr "Підтвердити"
 
@@ -362,7 +358,7 @@ msgstr "Підтвердження"
 #: include/views/configuration.item.prototype.edit.php:392
 #: include/views/configuration.maintenance.edit.php:105
 #: include/views/configuration.services.edit.php:99
-#: include/views/configuration.services.edit.php:142
+#: include/views/configuration.services.edit.php:144
 #: include/views/configuration.template.edit.php:404
 #: include/views/configuration.trigger.prototype.edit.php:159
 #: include/views/configuration.trigger.prototype.edit.php:348
@@ -384,7 +380,7 @@ msgstr "Підтвердження"
 #: include/views/monitoring.slideconf.edit.php:204
 #: include/views/monitoring.sysmap.edit.php:235
 #: include/views/monitoring.sysmap.edit.php:296
-#: include/views/monitoring.sysmap.edit.php:326 services.php:482
+#: include/views/monitoring.sysmap.edit.php:326 services.php:447
 #: tr_logform.php:267 tr_logform.php:295
 msgid "Action"
 msgstr "Дія"
@@ -436,8 +432,8 @@ msgstr "Журнал дій"
 msgid "Action updated"
 msgstr "Дію оновлено"
 
-#: app/views/monitoring.dashboard.view.php:84
-#: app/views/monitoring.dashboard.view.php:87
+#: app/views/monitoring.dashboard.view.php:88
+#: app/views/monitoring.dashboard.view.php:91
 #: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:597
 #: include/blocks.inc.php:786 include/classes/screens/CScreenProblem.php:772
 #: include/classes/screens/CScreenProblem.php:950 include/events.inc.php:268
@@ -552,8 +548,8 @@ msgstr "Активно до"
 #: include/views/configuration.maintenance.edit.php:158
 #: include/views/configuration.maintenance.edit.php:225
 #: include/views/configuration.services.edit.php:128
-#: include/views/configuration.services.edit.php:317
-#: include/views/configuration.services.edit.php:354
+#: include/views/configuration.services.edit.php:319
+#: include/views/configuration.services.edit.php:356
 #: include/views/configuration.template.edit.php:464
 #: include/views/configuration.template.edit.php:516
 #: include/views/configuration.trigger.prototype.edit.php:76
@@ -604,7 +600,7 @@ msgstr "Активно до"
 #: include/views/monitoring.sysmap.edit.php:299
 #: include/views/monitoring.sysmap.edit.php:329
 #: include/views/monitoring.sysmap.edit.php:391 jsLoader.php:111
-#: jsLoader.php:257 popup_media.php:135 tr_logform.php:373 tr_logform.php:394
+#: jsLoader.php:258 popup_media.php:135 tr_logform.php:373 tr_logform.php:394
 #: tr_status.php:627
 msgid "Add"
 msgstr "Додати"
@@ -617,7 +613,7 @@ msgstr "Додати новий віджет"
 msgid "Add child"
 msgstr "Додати підлеглу"
 
-#: jsLoader.php:259
+#: jsLoader.php:260
 msgid "Add child element"
 msgstr "Додати підлеглий елемент"
 
@@ -625,7 +621,7 @@ msgstr "Додати підлеглий елемент"
 msgid "Add host"
 msgstr "Додати вузел мережі"
 
-#: jsLoader.php:260
+#: jsLoader.php:261
 msgid "Add multiple maps"
 msgstr "Додати кілька карт"
 
@@ -733,7 +729,7 @@ msgstr "Агреговані перевірки не потребують ная
 msgid "Alias"
 msgstr "Аліас"
 
-#: include/views/monitoring.sysmap.constructor.php:62
+#: include/views/monitoring.sysmap.constructor.php:67
 msgid "Align icons"
 msgstr "Вирівняти іконки"
 
@@ -937,7 +933,7 @@ msgstr "Групи елементів даних"
 #: include/views/js/monitoring.sysmaps.js.php:522
 #: include/views/js/monitoring.sysmaps.js.php:618
 #: include/views/js/monitoring.sysmaps.js.php:710 jsLoader.php:110
-#: jsLoader.php:256
+#: jsLoader.php:257
 msgid "Apply"
 msgstr "Задіяти"
 
@@ -1393,7 +1389,7 @@ msgstr "Канада (136 символів)"
 #: include/views/configuration.action.edit.php:1711
 #: include/views/configuration.action.edit.php:2141
 #: include/views/configuration.maintenance.edit.php:168
-#: include/views/configuration.services.parent.list.php:70
+#: include/views/configuration.services.parent.list.php:85
 #: include/views/conf.import.php:115
 #: include/views/js/administration.general.housekeeper.edit.js.php:40
 #: include/views/js/administration.general.trigger.options.js.php:13
@@ -1405,7 +1401,7 @@ msgstr "Канада (136 символів)"
 #: include/views/js/configuration.discovery.edit.js.php:670
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:264 jsLoader.php:113
-#: jsLoader.php:120 jsLoader.php:206 jsLoader.php:258 tr_logform.php:395
+#: jsLoader.php:120 jsLoader.php:207 jsLoader.php:259 tr_logform.php:395
 msgid "Cancel"
 msgstr "Скасувати та повернутись"
 
@@ -1461,12 +1457,12 @@ msgstr "Не вдалося додати кореляцію"
 msgid "Cannot add correlation condition"
 msgstr "Не вдалося додати умову кореляції"
 
-#: include/classes/api/services/CTrigger.php:1008
+#: include/classes/api/services/CTrigger.php:1018
 #: include/classes/api/services/CTriggerPrototype.php:832
 msgid "Cannot add dependency from a host to a template."
 msgstr "Не вдалося додати залежність від вузла мережі до шаблону."
 
-#: include/classes/api/services/CDiscoveryRule.php:706
+#: include/classes/api/services/CDiscoveryRule.php:716
 #: include/triggers.inc.php:513
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
@@ -1492,7 +1488,7 @@ msgstr "Не вдалося додати групу"
 msgid "Cannot add group."
 msgstr "Не вдалось додати групу."
 
-#: hosts.php:467
+#: hosts.php:461
 msgid "Cannot add host"
 msgstr "Не вдалося додати вузел мережі"
 
@@ -1632,21 +1628,21 @@ msgstr "Не вдалося змінити метод аутентифікаці
 msgid "Cannot clear history"
 msgstr "Не вдалося очистити історію"
 
-#: include/classes/api/services/CDiscoveryRule.php:1402
+#: include/classes/api/services/CDiscoveryRule.php:1412
 msgid "Cannot clone graph prototypes."
 msgstr "Не вдалося клонувати прототипи графіків."
 
-#: include/classes/api/services/CDiscoveryRule.php:1450
+#: include/classes/api/services/CDiscoveryRule.php:1460
 msgid "Cannot clone host prototypes."
 msgstr "Не вдалося клонувати прототипи вузлів мережі."
 
-#: include/classes/api/services/CDiscoveryRule.php:1218
-#: include/classes/api/services/CDiscoveryRule.php:1235
-#: include/classes/api/services/CDiscoveryRule.php:1284
+#: include/classes/api/services/CDiscoveryRule.php:1228
+#: include/classes/api/services/CDiscoveryRule.php:1245
+#: include/classes/api/services/CDiscoveryRule.php:1294
 msgid "Cannot clone item prototypes."
 msgstr "Не вдалося клонувати прототипи елементів даних."
 
-#: include/classes/api/services/CDiscoveryRule.php:619
+#: include/classes/api/services/CDiscoveryRule.php:629
 msgid "Cannot clone trigger prototypes."
 msgstr "Не вдалося клонувати прототипи тригерів."
 
@@ -1699,12 +1695,12 @@ msgstr "Не вдалося створити прототип вузла мер�
 msgid "Cannot create another database connection."
 msgstr "Не вдалося сворити інше з'єднання з базою даних."
 
-#: include/classes/api/services/CTrigger.php:1042
+#: include/classes/api/services/CTrigger.php:1052
 #: include/classes/api/services/CTriggerPrototype.php:863
 msgid "Cannot create circular dependencies."
 msgstr "Не вдалося створити залежності утворюючі кільце."
 
-#: include/classes/api/services/CTrigger.php:1014
+#: include/classes/api/services/CTrigger.php:1024
 msgid "Cannot create dependency on trigger itself."
 msgstr "Неможливо створити залежність тригера самого від себе."
 
@@ -1724,7 +1720,7 @@ msgstr "Не вдалося створити призначення іконок
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Не вдалося створити нову групу елементів даних, веб сценарій вже приєднано до групи елементів даних."
 
-#: include/js.inc.php:204
+#: include/js.inc.php:201
 msgid "Cannot create new element"
 msgstr "Не вдалося створити новий елемент"
 
@@ -1768,7 +1764,7 @@ msgstr[0] "Не вдалося видалити панель"
 msgstr[1] "Не вдалося видалити панелі"
 msgstr[2] "Не вдалося видалити панелі"
 
-#: include/classes/api/services/CTrigger.php:912
+#: include/classes/api/services/CTrigger.php:922
 #: include/classes/api/services/CTriggerPrototype.php:629
 msgid "Cannot delete dependency"
 msgstr "Не вдалося видалити залежність"
@@ -1814,7 +1810,7 @@ msgstr[0] "Не вдалося видалити групу"
 msgstr[1] "Не вдалося видалити групи"
 msgstr[2] "Не вдалося видалити групи"
 
-#: hosts.php:705 hosts.php:718
+#: hosts.php:699 hosts.php:712
 msgid "Cannot delete host"
 msgstr "Не вдалося видалити вузел мережі"
 
@@ -1944,7 +1940,7 @@ msgstr "Не вдалося видалити шаблонні елементи �
 msgid "Cannot delete templated items."
 msgstr "Не вдалося видалити шаблонні елементи даних."
 
-#: include/classes/api/services/CTrigger.php:1393
+#: include/classes/api/services/CTrigger.php:1403
 #: include/classes/api/services/CTriggerPrototype.php:534
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
@@ -2012,7 +2008,7 @@ msgstr[1] "Не вдалося дезактивувати правила вия�
 msgstr[2] "Не вдалося дезактивувати правила виявлення"
 
 #: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:300
-#: hosts.php:749
+#: hosts.php:743
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Не вдалося дезактивувати вузел мережі"
@@ -2084,7 +2080,7 @@ msgstr[1] "Не вдалося активувати правила виявле�
 msgstr[2] "Не вдалося активувати правила виявлення"
 
 #: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:299
-#: hosts.php:748
+#: hosts.php:742
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Не вдалося активувати вузел мережі"
@@ -2130,6 +2126,10 @@ msgstr[2] "Не вдалося активувати веб сценарії"
 msgid "Cannot execute script"
 msgstr "Не вдалося виконати скрипт"
 
+#: jsLoader.php:179
+msgid "Cannot expand macros."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:334
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -2165,8 +2165,8 @@ msgstr "Не вдалося знайти вузел мережі \"%1$s\" яки
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не вдалося знайти групу вузлів мережі \"%1$s\" для прототипу вузлів мережі \"%2$s\" правила виявлення \"%3$s\" на \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1120
-#: include/classes/api/services/CDiscoveryRule.php:1254
+#: include/classes/api/services/CDiscoveryRule.php:1130
+#: include/classes/api/services/CDiscoveryRule.php:1264
 #: include/classes/api/services/CItemGeneral.php:98 include/items.inc.php:566
 #: include/items.inc.php:681
 #, c-format
@@ -2228,7 +2228,7 @@ msgstr "Не вдалось знайти карту мережі \"%1$s\" яка
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти карту мережі \"%1$s\" яка використовується в комплексному екрані \"%2$s\"."
 
-#: include/js.inc.php:187
+#: include/js.inc.php:184
 msgid "Cannot find objects with name"
 msgstr "Не вдалося знайти об'єкти з іменем"
 
@@ -2262,11 +2262,11 @@ msgstr "Не вдалося знайти перетворення значень
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "Не вдалося побудувати дерево. Перевірте логічну структуру в з'єднаннях між послугами."
 
-#: services.php:487
+#: services.php:452
 msgid "Cannot format tree."
 msgstr "Не вдалося побудувати дерево."
 
-#: include/classes/api/services/CTemplate.php:786
+#: include/classes/api/services/CTemplate.php:798
 msgid "Cannot have empty visible template name."
 msgstr "Видиме ім'я шаблону не може бути пустим."
 
@@ -2308,8 +2308,8 @@ msgstr "Не вдалось вставити метод повідомлення
 msgid "Cannot link template"
 msgstr "Не вдалося приєднати шаблон"
 
-#: include/classes/api/services/CTemplate.php:873
-#: include/classes/api/services/CTemplate.php:887
+#: include/classes/api/services/CTemplate.php:885
+#: include/classes/api/services/CTemplate.php:899
 msgid "Cannot link template."
 msgstr "Не вдалося приєднати шаблон."
 
@@ -2325,7 +2325,7 @@ msgstr "Не вдалося виконати вихід."
 msgid "Cannot mass update host name."
 msgstr "Неможливо масово оновити ім'я вузла мережі."
 
-#: include/classes/api/services/CTemplate.php:1011
+#: include/classes/api/services/CTemplate.php:1023
 msgid "Cannot mass update template name."
 msgstr "Неможливо масово оновити ім'я шаблону."
 
@@ -2333,7 +2333,7 @@ msgstr "Неможливо масово оновити ім'я шаблону."
 msgid "Cannot mass update visible host name."
 msgstr "Неможливо масово оновити видиме ім'я вузла мережі."
 
-#: include/classes/api/services/CTemplate.php:976
+#: include/classes/api/services/CTemplate.php:988
 msgid "Cannot mass update visible template name."
 msgstr "Неможливо масово оновити видиме ім'я шаблону."
 
@@ -2342,17 +2342,17 @@ msgstr "Неможливо масово оновити видиме ім'я ша
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Неможливо передати одинакові ID шаблонів для приєднання: %s."
 
-#: include/classes/db/DB.php:818
+#: include/classes/db/DB.php:830
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Неможливо виконати запит видалення з таблиці \"%1$s\" без виразу where."
 
-#: include/classes/db/DB.php:531
+#: include/classes/db/DB.php:543
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Неможливо виконати запит оновлення таблиці \"%1$s\" без значень."
 
-#: include/classes/db/DB.php:544
+#: include/classes/db/DB.php:556
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Неможливо виконати запит оновлення таблиці \"%1$s\" без виразу where."
@@ -2452,8 +2452,8 @@ msgstr "Не вдалося встановити \"templateid\" для комп�
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Не вдалося задати поля інтентарних даних при відключеній інвентаризації."
 
-#: include/classes/api/services/CScreenItem.php:524
-#: include/classes/api/services/CScreenItem.php:550
+#: include/classes/api/services/CScreenItem.php:528
+#: include/classes/api/services/CScreenItem.php:554
 msgid "Cannot set resource ID for screen element."
 msgstr "Не вдалося встановити ID ресурсу для елемента комплексного екрану."
 
@@ -2502,8 +2502,8 @@ msgstr "Не вдалося від'єднати та очистити триге
 msgid "Cannot unlink template"
 msgstr "Не вдалося від'єднати шаблон"
 
-#: include/classes/api/services/CTemplate.php:838
-#: include/classes/api/services/CTemplate.php:861
+#: include/classes/api/services/CTemplate.php:850
+#: include/classes/api/services/CTemplate.php:873
 msgid "Cannot unlink template."
 msgstr "Не вдалося від'єднати шаблон."
 
@@ -2533,22 +2533,22 @@ msgstr "Не вдалося оновити \"%1$s\" для прототипу г
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для елемента даних \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:639
+#: include/classes/api/services/CTriggerGeneral.php:643
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для шаблонного графіка \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:645
+#: include/classes/api/services/CTriggerGeneral.php:649
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для шаблонного прототипу графіка \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:638
+#: include/classes/api/services/CTriggerGeneral.php:642
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для тригера \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:644
+#: include/classes/api/services/CTriggerGeneral.php:648
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для прототипу тригера \"%2$s\"."
@@ -2563,9 +2563,9 @@ msgstr "Не вдалося оновити \"%1$s\" для виявленого 
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для виявленого елемента даних \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:691
-#: include/classes/api/services/CTrigger.php:756
-#: include/classes/api/services/CTrigger.php:874
+#: include/classes/api/services/CTriggerGeneral.php:699
+#: include/classes/api/services/CTrigger.php:766
+#: include/classes/api/services/CTrigger.php:884
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Не вдалося оновити \"%2$s\" у виявленого тригера \"%1$s\"."
@@ -2656,7 +2656,7 @@ msgstr "Не вдалося оновити групу"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не вдалося оновити групи для виявленого вузла мережі \"%1$s\"."
 
-#: hosts.php:454
+#: hosts.php:448
 msgid "Cannot update host"
 msgstr "Не вдалося оновити вузел мережі"
 
@@ -2671,7 +2671,7 @@ msgstr[0] "Не вдалося оновити прототип вузла мер
 msgstr[1] "Не вдалося оновити прототипи вузлів мережі"
 msgstr[2] "Не вдалося оновити прототипи вузлів мережі"
 
-#: hosts.php:441
+#: hosts.php:435
 msgid "Cannot update hosts"
 msgstr "Не вдалося оновити вузли мережі"
 
@@ -2766,8 +2766,8 @@ msgstr "Не вдалося оновити шаблон"
 msgid "Cannot update templated applications."
 msgstr "Не вдалося оновити шаблоні групи елементів даних."
 
-#: include/classes/api/services/CTemplate.php:735
-#: include/classes/api/services/CTemplate.php:1071
+#: include/classes/api/services/CTemplate.php:747
+#: include/classes/api/services/CTemplate.php:1083
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Не вдалося оновити шаблони для виявленого вузла мережі \"%1$s\"."
@@ -2776,7 +2776,7 @@ msgstr "Не вдалося оновити шаблони для виявлен�
 msgid "Cannot update trigger"
 msgstr "Не вдалося оновити тригер"
 
-#: include/classes/api/services/CTriggerGeneral.php:1585
+#: include/classes/api/services/CTriggerGeneral.php:1593
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Не вдалося оновити тригер \"%1$s\": %2$s."
@@ -2788,7 +2788,7 @@ msgstr[0] "Не вдалося оновити прототип тригера"
 msgstr[1] "Не вдалося оновити прототипи тригерів"
 msgstr[2] "Не вдалося оновити прототипи тригерів"
 
-#: include/classes/api/services/CTriggerGeneral.php:1441
+#: include/classes/api/services/CTriggerGeneral.php:1449
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "Не вдалося оновити прототип тригера \"%1$s\": %2$s."
@@ -2859,7 +2859,7 @@ msgid "Change"
 msgstr "Зміна"
 
 #: include/classes/screens/CScreenBase.php:405
-#: include/classes/screens/CScreenBuilder.php:515
+#: include/classes/screens/CScreenBuilder.php:519
 #: include/classes/screens/CScreenMap.php:47
 #: include/views/configuration.services.edit.php:51
 #: include/views/hostmacros.php:100 include/views/js/hostmacros.js.php:37
@@ -2878,7 +2878,7 @@ msgid "Change per second"
 msgstr "Зміна в секунду"
 
 #: include/forms.inc.php:355 include/items.inc.php:130
-#: include/triggers.inc.php:1772 include/views/configuration.item.edit.php:323
+#: include/views/configuration.item.edit.php:323
 #: include/views/configuration.item.massupdate.php:197
 #: include/views/configuration.item.prototype.edit.php:244
 msgid "Character"
@@ -2935,7 +2935,7 @@ msgstr "Перевірки"
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "Перевіряє доступність DNS сервісу. Повертає 0 - DNS не доступний (сервер не відповів або DNS запит не виконано); 1 - DNS доступний"
 
-#: include/classes/items/CHelpItems.php:281
+#: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:579
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
 msgstr "Перевіряє існування файлу. Повертає 0 - файл не знайдено; 1 - звичайний файл або посилання (жорстке або символічне) на існуючий звичайний файл"
@@ -2995,7 +2995,7 @@ msgstr "Китайська (zh_CN)"
 msgid "Chinese (zh_TW)"
 msgstr "Китайська (zh_TW)"
 
-#: include/classes/api/services/CMapElement.php:200
+#: include/classes/api/services/CMapElement.php:208
 #, c-format
 msgid "Circular link cannot be created for map element \"%s\"."
 msgstr "Утворюючий кільце зв'язок не може бути створений для елемента карти мережі \"%s\"."
@@ -3020,7 +3020,7 @@ msgstr "Посилання, утворююче кільце, в шаблонах
 msgid "Circular template linkage is not allowed."
 msgstr "Приєднання шаблону, утворююче кільце, не дозволено."
 
-#: jsLoader.php:186
+#: jsLoader.php:187
 msgid "Clear"
 msgstr "Очистити"
 
@@ -3045,7 +3045,7 @@ msgstr "Годинник"
 #: app/views/administration.mediatype.edit.php:207
 #: app/views/administration.proxy.edit.php:142
 #: app/views/administration.script.edit.php:119
-#: app/views/monitoring.dashboard.view.php:101
+#: app/views/monitoring.dashboard.view.php:105
 #: include/views/administration.general.iconmap.edit.php:138
 #: include/views/administration.general.regularexpressions.edit.php:135
 #: include/views/administration.general.valuemapping.edit.php:96
@@ -3071,11 +3071,11 @@ msgstr "Годинник"
 msgid "Clone"
 msgstr "Клонувати"
 
-#: include/func.inc.php:1821 include/views/js/monitoring.sysmaps.js.php:259
+#: include/func.inc.php:1823 include/views/js/monitoring.sysmaps.js.php:259
 #: include/views/js/monitoring.sysmaps.js.php:408
 #: include/views/js/monitoring.sysmaps.js.php:529
 #: include/views/js/monitoring.sysmaps.js.php:625
-#: include/views/js/monitoring.sysmaps.js.php:714 tr_testexpr.php:193
+#: include/views/js/monitoring.sysmaps.js.php:714 tr_testexpr.php:194
 msgid "Close"
 msgstr "Закрити"
 
@@ -3100,7 +3100,7 @@ msgstr "Закрити старі події"
 msgid "Close problem"
 msgstr "Закрити проблему"
 
-#: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:194
+#: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:195
 msgid "Collapse"
 msgstr "Згорнути"
 
@@ -3113,7 +3113,7 @@ msgid "Colour"
 msgstr "Колір"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:208 jsLoader.php:180
+#: include/validate.inc.php:208 jsLoader.php:181
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Колір \"%1$s\" не коректний: очікується шістнадцятковий код кольору (6 символів)."
@@ -3192,7 +3192,7 @@ msgstr "Умова \"%2$s\" не використовується в форму�
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
 msgstr "Умова \"%2$s\" не використовується в формулі \"%3$s\" для кореляції \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:968
+#: include/classes/api/services/CDiscoveryRule.php:978
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr "Умова \"%2$s\" не використовується в формулі \"%3$s\" для правила виявлення \"%1$s\"."
@@ -3207,7 +3207,7 @@ msgstr "Умову \"%2$s\" яка використовується в форм�
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
 msgstr "Умову \"%2$s\", використовувану в формулі \"%3$s\" для кореляції \"%1$s\", не визначено."
 
-#: include/classes/api/services/CDiscoveryRule.php:967
+#: include/classes/api/services/CDiscoveryRule.php:977
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
 msgstr "Умову \"%2$s\" яка використовується в формулі \"%3$s\" для правила виявлення \"%1$s\" не задано."
@@ -3226,7 +3226,7 @@ msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Дублікати умов для кореляції \"%1$s\"."
 
 #: include/menu.inc.php:183 include/views/inventory.host.view.php:182
-#: jsLoader.php:207
+#: jsLoader.php:208
 msgid "Configuration"
 msgstr "Налаштування"
 
@@ -3711,7 +3711,8 @@ msgstr "Створити карту мережі"
 msgid "Create media type"
 msgstr "Створити метод повідомлень"
 
-#: app/views/monitoring.dashboard.view.php:97 include/views/conf.import.php:25
+#: app/views/monitoring.dashboard.view.php:101
+#: include/views/conf.import.php:25
 msgid "Create new"
 msgstr "Створити нові"
 
@@ -3735,7 +3736,7 @@ msgstr "Створити слайд-шоу"
 msgid "Create template"
 msgstr "Створити шаблон"
 
-#: include/views/configuration.triggers.list.php:28 jsLoader.php:208
+#: include/views/configuration.triggers.list.php:28 jsLoader.php:209
 msgid "Create trigger"
 msgstr "Створити тригер"
 
@@ -3767,7 +3768,7 @@ msgstr "Створити веб сценарій"
 msgid "Create web scenario (select host first)"
 msgstr "Створити веб сценарій (спочатку виберіть вузел мережі)"
 
-#: include/classes/api/services/CDiscoveryRule.php:781
+#: include/classes/api/services/CDiscoveryRule.php:791
 #, c-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Створено: Правило виявлення\"%1$s\" у \"%2$s\"."
@@ -3870,7 +3871,7 @@ msgid "Custom label"
 msgstr "Ярлик користувача"
 
 #: include/classes/api/services/CMap.php:843
-#: include/classes/api/services/CMap.php:1278
+#: include/classes/api/services/CMap.php:1282
 #, c-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Ярлик користувача для елементів карти мережі \"%2$s\" типу \"%1$s\" не може бути пустим."
@@ -3919,8 +3920,8 @@ msgstr "DD.MM.YY"
 msgid "DES"
 msgstr "DES"
 
-#: include/maps.inc.php:464 include/maps.inc.php:556 include/maps.inc.php:654
-#: include/maps.inc.php:754
+#: include/maps.inc.php:470 include/maps.inc.php:562 include/maps.inc.php:660
+#: include/maps.inc.php:760
 msgid "DISABLED"
 msgstr "ДЕЗАКТИВОВАНО"
 
@@ -3948,7 +3949,7 @@ msgstr "Щодня"
 msgid "Dark"
 msgstr "Темна"
 
-#: app/controllers/CControllerDashboardView.php:139 include/menu.inc.php:46
+#: app/controllers/CControllerDashboardView.php:140 include/menu.inc.php:46
 msgid "Dashboard"
 msgstr "ПАНЕЛЬ"
 
@@ -3982,7 +3983,7 @@ msgstr[2] "Панелі видалено"
 msgid "Dashboard properties"
 msgstr "Властивості панелі"
 
-#: jsLoader.php:209
+#: jsLoader.php:210
 msgid "Dashboard sharing"
 msgstr "Спільний доступ до панелі"
 
@@ -4009,7 +4010,7 @@ msgstr "Дані"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Статистика кешу даних. Cache - одне із значень (режими: all, float, uint, str, log, text), history (режими: pfree, total, used, free), trends (режими: pfree, total, used, free), text (режими: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2838
+#: include/classes/graphdraw/CLineGraphDraw.php:2848
 #: include/classes/graphdraw/CPieGraphDraw.php:756
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4235,7 +4236,7 @@ msgstr "Затримується на"
 #: app/views/administration.script.edit.php:120
 #: app/views/administration.script.list.php:105
 #: app/views/monitoring.dashboard.list.php:78
-#: app/views/monitoring.dashboard.view.php:105
+#: app/views/monitoring.dashboard.view.php:109
 #: include/classes/html/CButtonDelete.php:25 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.general.regularexpressions.list.php:76
@@ -4294,7 +4295,7 @@ msgstr "Видалити поточну дію?"
 msgid "Delete current correlation?"
 msgstr "Видалити потчну кореляцію?"
 
-#: app/views/monitoring.dashboard.view.php:106
+#: app/views/monitoring.dashboard.view.php:110
 msgid "Delete dashboard?"
 msgstr "Видалити панель?"
 
@@ -4528,7 +4529,7 @@ msgstr "Видалити вибрані перетворення значень?
 msgid "Delete selected web scenarios?"
 msgstr "Видалити вибрані веб сценарії?"
 
-#: include/services.inc.php:120 jsLoader.php:210
+#: include/services.inc.php:120 jsLoader.php:211
 #, c-format
 msgid "Delete service \"%1$s\"?"
 msgstr "Видалити послугу \"%1$s\"?"
@@ -4557,7 +4558,7 @@ msgstr "Видалити веб сценарій?"
 msgid "Deleted"
 msgstr "Видалено"
 
-#: include/classes/api/services/CDiscoveryRule.php:426
+#: include/classes/api/services/CDiscoveryRule.php:436
 #, c-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Видалено: Правило виявлення \"%1$s\" із \"%2$s\"."
@@ -4617,7 +4618,7 @@ msgstr "Розділювач"
 msgid "Deny"
 msgstr "Заборонено"
 
-#: include/views/configuration.services.edit.php:334
+#: include/views/configuration.services.edit.php:336
 #: include/views/configuration.trigger.prototype.edit.php:568
 #: include/views/configuration.trigger.prototype.edit.php:585
 #: include/views/configuration.triggers.edit.php:590
@@ -4677,7 +4678,7 @@ msgid "Description updated"
 msgstr "Опис оновлено"
 
 #: app/views/administration.mediatype.list.php:62 include/actions.inc.php:1540
-#: include/blocks.inc.php:420 include/func.inc.php:1793
+#: include/blocks.inc.php:420 include/func.inc.php:1795
 #: include/views/administration.auditlogs.list.php:68
 #: include/views/configuration.action.edit.php:399
 #: include/views/configuration.action.edit.php:403
@@ -4753,16 +4754,11 @@ msgstr "Різниця між останнім і попереднім знач�
 msgid "Difference between last and previous value is NOT N"
 msgstr "Різниця між останнім і попереднім значенням НЕ є N"
 
-#: include/classes/items/CHelpItems.php:157
-#: include/classes/items/CHelpItems.php:455
-msgid "Different information about specific process(es). Returns float"
-msgstr "Різна інформація про певний процес(и). Повертає дробове число"
-
 #: include/views/monitoring.screen.list.php:73
 msgid "Dimension (cols x rows)"
 msgstr "Розмір (стовпчиків Х рядків)"
 
-#: include/classes/items/CHelpItems.php:313
+#: include/classes/items/CHelpItems.php:273
 msgid "Directory size (in bytes), dir - absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - mode used to get directory size (\"apparent\" or \"disk\"), <max_depth> - maximal traversal depth for directories. Returns integer."
 msgstr "Розмір теки (в байтах), dir - абсолютний шлях до теки, <regex_incl> - регулярний вираз, який описує маску файлів для включення, <regex_excl> - регулярний вираз, який описує маску файлів для виключення, <mode> - режим, який використовується для визначення розміру теки (\"apparent\" або \"disk\"), <max_depth> - максимальна глибина сканування тек. Повертає ціле число."
 
@@ -4869,7 +4865,7 @@ msgstr "Дезактивувати вибрані веб сценарії?"
 #: include/html.inc.php:332 include/httptest.inc.php:46
 #: include/items.inc.php:141 include/items.inc.php:144
 #: include/items.inc.php:188 include/triggers.inc.php:1178
-#: include/triggers.inc.php:2034 include/users.inc.php:85
+#: include/triggers.inc.php:2091 include/users.inc.php:85
 #: include/views/administration.general.other.edit.php:50
 #: include/views/administration.usergroups.list.php:37
 #: include/views/administration.usergroups.list.php:67
@@ -5025,7 +5021,7 @@ msgstr "Стан виявлення"
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Статистика читання диска. Повертає ціле число для типів sectors, operations, bytes; дробове число для типів sps, ops, bps"
 
-#: include/classes/items/CHelpItems.php:309
+#: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:607
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Розмір дискового простору в байтах або відсотках від загального. Повертає ціле число для байт; дробове для відсотків"
@@ -5052,13 +5048,13 @@ msgstr "Відображення проблем"
 msgid "Display stacked graph"
 msgstr "Показати стекований графік"
 
-#: include/actions.inc.php:1624 include/func.inc.php:1612 queue.php:283
+#: include/actions.inc.php:1624 include/func.inc.php:1614 queue.php:283
 #: search.php:256 search.php:357 search.php:498
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Відображено %1$s із %2$s знайдених"
 
-#: include/func.inc.php:1615
+#: include/func.inc.php:1617
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
 msgstr "Відображено від %1$s до %2$s з %3$s знайдених"
@@ -5067,7 +5063,7 @@ msgstr "Відображено від %1$s до %2$s з %3$s знайдених"
 msgid "Do not calculate"
 msgstr "Не підраховувати"
 
-#: jsLoader.php:211
+#: jsLoader.php:212
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Ви дійсно хочете замінити умовний вираз?"
 
@@ -5098,8 +5094,8 @@ msgstr "Завантажити конфігураційний файл"
 #: app/views/report.services.php:62 app/views/report.services.php:63
 #: include/classes/screens/CScreenDiscovery.php:124
 #: include/classes/screens/CScreenDiscovery.php:253
-#: include/views/configuration.services.edit.php:153
-#: include/views/configuration.services.edit.php:195
+#: include/views/configuration.services.edit.php:155
+#: include/views/configuration.services.edit.php:197
 msgid "Downtime"
 msgstr "Недоступний"
 
@@ -5145,7 +5141,7 @@ msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item proto
 msgstr "Дублікат значення \"%1$s\" для \"name\" у прототипу групи елементів даних \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:579
-#: include/classes/api/services/CMap.php:1004
+#: include/classes/api/services/CMap.php:1008
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
 msgstr "Дублікат значення \"%1$s\" для \"name\" у карти мережі."
@@ -5156,7 +5152,7 @@ msgstr "Дублікат значення \"%1$s\" для \"name\" у карти
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr "Дублікат значення \"%1$s\" для \"name\" у комплексного екрану."
 
-#: include/classes/api/services/CTrigger.php:1184
+#: include/classes/api/services/CTrigger.php:1194
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Дублюючі залежності в тригері \"%1$s\"."
@@ -5194,7 +5190,7 @@ msgid "Duplicate severity name \"%s\"."
 msgstr "Дублікат назви важливості \"%s\"."
 
 #: include/classes/api/services/CMap.php:697
-#: include/classes/api/services/CMap.php:1128
+#: include/classes/api/services/CMap.php:1132
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Дублікат userid \"%1$s\" у користувачів для карти мережі \"%2$s\"."
@@ -5206,7 +5202,7 @@ msgid "Duplicate userid \"%1$s\" in users for screen \"%2$s\"."
 msgstr "Дублікат userid \"%1$s\" у користувачів для комплексного екрану \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:772
-#: include/classes/api/services/CMap.php:1202
+#: include/classes/api/services/CMap.php:1206
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Дублікат usrgrpid \"%1$s\" у групах користувачів для карти мережі \"%2$s\"."
@@ -5254,11 +5250,11 @@ msgstr "Кожнен URL-запит повинен мати унікальне �
 #: include/views/js/monitoring.sysmaps.js.php:731
 #: include/views/js/monitoring.sysmaps.js.php:746
 #: include/views/monitoring.triggerComment.php:53 jsLoader.php:112
-#: jsLoader.php:252
+#: jsLoader.php:253
 msgid "Edit"
 msgstr "Змінити"
 
-#: app/views/monitoring.dashboard.view.php:80
+#: app/views/monitoring.dashboard.view.php:84
 msgid "Edit dashboard"
 msgstr "Редагувати панель"
 
@@ -5274,11 +5270,11 @@ msgstr "Редагувати комплексний екран"
 msgid "Edit slide show"
 msgstr "Редагувати слайд шоу"
 
-#: jsLoader.php:255
+#: jsLoader.php:256
 msgid "Edit tree element"
 msgstr "Редагувати елемент дерева"
 
-#: jsLoader.php:212
+#: jsLoader.php:213
 msgid "Edit trigger"
 msgstr "Редагувати тригер"
 
@@ -5358,12 +5354,12 @@ msgstr "Пустий ID кореляції."
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr "Пустий ID формули умови фільтру для дії \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:995
+#: include/classes/api/services/CDiscoveryRule.php:1005
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Пустий ID формули умови фільтру для правила виявлення \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:987
+#: include/classes/api/services/CDiscoveryRule.php:997
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr "Пустий макрос умови фільтру для правила виявлення \"%1$s\"."
@@ -5393,7 +5389,7 @@ msgstr "Пусте ім'я вузла мережі."
 #: include/classes/api/services/CItemPrototype.php:750
 #: include/classes/api/services/CMap.php:528
 #: include/classes/api/services/CMap.php:554
-#: include/classes/api/services/CMap.php:962
+#: include/classes/api/services/CMap.php:966
 #: include/classes/api/services/CMediatype.php:174
 #: include/classes/api/services/CMediatype.php:440
 #: include/classes/api/services/CProxy.php:442
@@ -5406,8 +5402,8 @@ msgstr "Пусте ім'я вузла мережі."
 #: include/classes/api/services/CService.php:498
 #: include/classes/api/services/CTemplate.php:542
 #: include/classes/api/services/CTrigger.php:644
-#: include/classes/api/services/CTrigger.php:734
-#: include/classes/api/services/CTrigger.php:852
+#: include/classes/api/services/CTrigger.php:744
+#: include/classes/api/services/CTrigger.php:862
 #: include/classes/api/services/CTriggerPrototype.php:513
 #: include/classes/api/services/CUserMacro.php:601
 msgid "Empty input parameter."
@@ -5417,7 +5413,7 @@ msgstr "Вхідний параметр пустий."
 msgid "Empty input parameters."
 msgstr "Пусті вхідні параметри."
 
-#: include/classes/api/services/CMap.php:970
+#: include/classes/api/services/CMap.php:974
 msgid "Empty map ID."
 msgstr "Пустий ID карти мережі."
 
@@ -5578,7 +5574,7 @@ msgstr "Активувати вибрані прототипи веб сцена
 #: include/discovery.inc.php:107 include/html.inc.php:328
 #: include/httptest.inc.php:45 include/items.inc.php:141
 #: include/items.inc.php:144 include/items.inc.php:185
-#: include/triggers.inc.php:2031
+#: include/triggers.inc.php:2088
 #: include/views/administration.usergroups.edit.php:64
 #: include/views/administration.usergroups.edit.php:78
 #: include/views/administration.usergroups.edit.php:79
@@ -5645,7 +5641,7 @@ msgstr "Помилка: %1$s"
 msgid "Event"
 msgstr "Подія"
 
-#: include/classes/screens/CScreenHistory.php:165
+#: include/classes/screens/CScreenHistory.php:171
 msgid "Event ID"
 msgstr "ID події"
 
@@ -5781,9 +5777,13 @@ msgstr "Скрипт для виконання"
 msgid "Execution confirmation"
 msgstr "Підтвердження виконання"
 
-#: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:193
+#: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:194
 msgid "Expand"
 msgstr "Розгорнути"
+
+#: include/views/monitoring.sysmap.constructor.php:46
+msgid "Expand macros"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:142
 msgid "Expand single problem"
@@ -5832,11 +5832,11 @@ msgstr "Експортувати в CSV"
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/configuration.triggers.edit.js.php:40
 #: trigger_prototypes.php:38 trigger_prototypes.php:49 triggers.php:42
-#: triggers.php:53 tr_logform.php:295 tr_logform.php:352 tr_testexpr.php:146
+#: triggers.php:53 tr_logform.php:295 tr_logform.php:352 tr_testexpr.php:147
 msgid "Expression"
 msgstr "Вираз"
 
-#: tr_testexpr.php:50
+#: tr_testexpr.php:51
 msgid "Expression Variable Elements"
 msgstr "Значення елементів Виразу"
 
@@ -5960,7 +5960,7 @@ msgstr "Лютий"
 msgid "Field"
 msgstr "Поле"
 
-#: include/classes/db/DB.php:337
+#: include/classes/db/DB.php:349
 #, c-format
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Поле \"%1$s\" не може бути встановлено в NULL."
@@ -5972,7 +5972,7 @@ msgstr "Поле \"%1$s\" не може бути встановлено в NULL.
 #: include/classes/api/services/CDRule.php:503
 #: include/classes/api/services/CHostGroup.php:843
 #: include/classes/api/services/CHost.php:747
-#: include/classes/api/services/CTemplate.php:765
+#: include/classes/api/services/CTemplate.php:777
 #: include/classes/api/services/CTriggerGeneral.php:236
 #: include/classes/validators/CNewValidator.php:248
 #: include/validate.inc.php:284
@@ -6026,7 +6026,7 @@ msgstr "Поле \"%1$s\" не повинно бути присутнім."
 msgid "Field \"host\" is mandatory."
 msgstr "Поле \"host\" є обов'язковим."
 
-#: include/classes/items/CHelpItems.php:273
+#: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:571
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Контрольна сума файлу, вираховується алгоритмом UNIX cksum. Повертає ціле число"
@@ -6045,12 +6045,12 @@ msgstr "Файл занадто великий, максимальний роз�
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
 msgstr "Файл вказаний для відображення не існує. Була спроба знайти \"%s\"."
 
-#: include/classes/items/CHelpItems.php:297
+#: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:595
 msgid "File size (in bytes). Returns integer"
 msgstr "Розмір файлу (в байтах). Повертає ціле число"
 
-#: include/classes/items/CHelpItems.php:301
+#: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:599
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Інформація часу файлу. Повертає ціле число (Unix timestamp)"
@@ -6077,12 +6077,12 @@ msgstr "Пошук рядока V в останньому (найновішом�
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
 msgstr "Пошук рядка V в останньому (найновішому) значенні. N НЕ є 1 - якщо знайдено, 0 - в іншому випадку"
 
-#: include/classes/items/CHelpItems.php:293
+#: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:591
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "Пошук рядка в файлі. Повертає 0 - відповідностей не знайдено; 1 - знайдено"
 
-#: include/classes/items/CHelpItems.php:289
+#: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:587
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "Пошук рядка в файлі. Повертає рядок, який містить відповідність, або як задано в додатковому параметрі output"
@@ -6104,7 +6104,7 @@ msgstr "Фінська (fi_FI)"
 msgid "First"
 msgstr "Перший"
 
-#: include/func.inc.php:1572
+#: include/func.inc.php:1574
 msgctxt "page navigation"
 msgid "First"
 msgstr "Перша"
@@ -6197,10 +6197,10 @@ msgid "Friday"
 msgstr "П'ятниця"
 
 #: app/views/report.services.php:62
-#: include/views/configuration.services.edit.php:254
-#: include/views/configuration.services.edit.php:284
+#: include/views/configuration.services.edit.php:256
+#: include/views/configuration.services.edit.php:286
 #: include/views/js/monitoring.sysmaps.js.php:657
-#: include/views/reports.toptriggers.php:67 report2.php:491 report4.php:191
+#: include/views/reports.toptriggers.php:67 report2.php:410 report4.php:191
 #: services.php:188 services.php:194
 msgid "From"
 msgstr "З"
@@ -6309,16 +6309,16 @@ msgstr "Глобальні скрипти"
 msgid "Global value"
 msgstr "Глобальне значення"
 
-#: include/classes/html/CDashboardWidgetMap.php:227
+#: include/classes/html/CDashboardWidgetMap.php:231
 #, c-format
 msgid "Go back to %1$s"
 msgstr "Повернутись до %1$s"
 
-#: jsLoader.php:217
+#: jsLoader.php:218
 msgid "Go to"
 msgstr "Перейти до"
 
-#: app/views/system.warning.php:26 include/func.inc.php:1737
+#: app/views/system.warning.php:26 include/func.inc.php:1739
 msgid "Go to dashboard"
 msgstr "Перейти на ПАНЕЛЬ"
 
@@ -6337,7 +6337,7 @@ msgstr "Градієнтна лінія"
 #: include/views/monitoring.charts.php:33
 #: include/views/monitoring.history.php:77
 #: include/views/monitoring.screen.constructor.edit.php:136 latest.php:547
-#: latest.php:706 report2.php:508
+#: latest.php:706 report2.php:427
 msgid "Graph"
 msgstr "Графік"
 
@@ -6511,7 +6511,7 @@ msgstr "Графік з таким же іменем, але іншого тип
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:153
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:177
-#: include/views/monitoring.charts.php:46 jsLoader.php:218 popup.php:88
+#: include/views/monitoring.charts.php:46 jsLoader.php:219 popup.php:88
 #: search.php:131 search.php:137 search.php:172 search.php:201 search.php:240
 #: search.php:292 search.php:347 search.php:412 search.php:446 search.php:469
 msgid "Graphs"
@@ -6526,11 +6526,11 @@ msgid "Greek (el_GR)"
 msgstr "Грецька (el_GR)"
 
 #: include/views/js/monitoring.sysmaps.js.php:107
-#: include/views/monitoring.sysmap.constructor.php:46
+#: include/views/monitoring.sysmap.constructor.php:51
 msgid "Grid"
 msgstr "Сітка"
 
-#: app/views/monitoring.dashboard.view.php:38
+#: app/views/monitoring.dashboard.view.php:42
 #: app/views/monitoring.web.view.php:33 hostinventoriesoverview.php:90
 #: include/classes/screens/CScreenDataOverview.php:40
 #: include/classes/screens/CScreenHostgroupTriggers.php:67
@@ -6717,7 +6717,7 @@ msgstr "Допомога"
 msgid "Hexadecimal to decimal"
 msgstr "Шістнадцяткове в десяткове"
 
-#: include/views/monitoring.sysmap.constructor.php:48 jsLoader.php:154
+#: include/views/monitoring.sysmap.constructor.php:53 jsLoader.php:154
 msgid "Hidden"
 msgstr "Прихована"
 
@@ -6750,7 +6750,7 @@ msgstr "Висока"
 #: include/views/administration.general.housekeeper.edit.php:98
 #: include/views/configuration.item.list.php:61
 #: include/views/configuration.item.prototype.list.php:46 items.php:163
-#: jsLoader.php:219 latest.php:410 latest.php:552 latest.php:711
+#: jsLoader.php:220 latest.php:410 latest.php:552 latest.php:711
 msgid "History"
 msgstr "Історія"
 
@@ -6793,7 +6793,7 @@ msgstr "Горизонтальний"
 msgid "Horizontal align"
 msgstr "Вирівнювання по горизонталі"
 
-#: app/views/monitoring.dashboard.view.php:43
+#: app/views/monitoring.dashboard.view.php:47
 #: app/views/monitoring.web.view.php:38
 #: app/views/monitoring.widget.hosts.view.php:76
 #: app/views/monitoring.widget.hosts.view.php:135
@@ -6838,7 +6838,7 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/monitoring.slides.php:79
 #: include/views/reports.toptriggers.php:105 items.php:758 items.php:1106
 #: items.php:1139 jsLoader.php:156 latest.php:406 latest.php:426 popup.php:487
-#: popup.php:524 popup.php:1223 queue.php:248 report2.php:481 report2.php:504
+#: popup.php:524 popup.php:1223 queue.php:248 report2.php:400 report2.php:423
 #: search.php:125 tr_status.php:496 tr_status.php:758
 msgid "Host"
 msgid_plural "Hosts"
@@ -6877,11 +6877,11 @@ msgstr "IP адреса вузла мережі"
 msgid "Host access"
 msgstr "Доступ до вузла мережі"
 
-#: hosts.php:466
+#: hosts.php:460
 msgid "Host added"
 msgstr "Вузел мережі додано"
 
-#: include/classes/api/services/CHostInterface.php:814
+#: include/classes/api/services/CHostInterface.php:825
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "У вузла мережі не може бути більше одного інтерфейсу по замовчуванню однакового типу."
 
@@ -6889,12 +6889,12 @@ msgstr "У вузла мережі не може бути більше одно�
 msgid "Host count"
 msgstr "Кількість вузлів мережі"
 
-#: hosts.php:705 hosts.php:718
+#: hosts.php:699 hosts.php:712
 msgid "Host deleted"
 msgstr "Вузел мережі видалено"
 
 #: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:297
-#: hosts.php:746
+#: hosts.php:740
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Вузел мережі дезактивовано"
@@ -6902,7 +6902,7 @@ msgstr[1] "Вузли мережі дезактивовано"
 msgstr[2] "Вузли мережі дезактивовано"
 
 #: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:296
-#: hosts.php:745
+#: hosts.php:739
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Вузел мережі активовано"
@@ -6923,7 +6923,7 @@ msgstr[2] "Вузли мережі активовано"
 #: include/views/js/monitoring.sysmaps.js.php:72
 #: include/views/js/monitoring.sysmaps.js.php:78
 #: include/views/js/monitoring.sysmaps.js.php:126 jsLoader.php:159
-#: report2.php:401 report2.php:451 search.php:288
+#: report2.php:347 report2.php:370 search.php:288
 msgid "Host group"
 msgstr "Група вузлів мережі"
 
@@ -6996,7 +6996,7 @@ msgstr "Інтерфейс вузла мережі"
 #: include/views/configuration.host.edit.php:767
 #: include/views/configuration.host.prototype.edit.php:374
 #: include/views/inventory.host.list.php:22
-#: include/views/inventory.host.view.php:22 jsLoader.php:220
+#: include/views/inventory.host.view.php:22 jsLoader.php:221
 msgid "Host inventory"
 msgstr "Інвентарні дані вузла мережі"
 
@@ -7104,7 +7104,7 @@ msgstr "Прототипи вузлів мережі видалено"
 msgid "Host router"
 msgstr "Шлюз вузла мережі"
 
-#: host_screen.php:27 jsLoader.php:221
+#: host_screen.php:27 jsLoader.php:222
 msgid "Host screens"
 msgstr "Комплексні екрани вузла мережі"
 
@@ -7125,7 +7125,7 @@ msgstr "Час вузла мережі"
 msgid "Host update failed."
 msgstr "Помилка при оновленні вузла мережі."
 
-#: hosts.php:453
+#: hosts.php:447
 msgid "Host updated"
 msgstr "Вузел мережі оновлено"
 
@@ -7134,7 +7134,7 @@ msgstr "Вузел мережі оновлено"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Вузел мережі з ID \"%1$s\" недоступний."
 
-#: include/classes/api/services/CTemplate.php:1037
+#: include/classes/api/services/CTemplate.php:1049
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Вузел мережі з таким самим іменем \"%1$s\" вже існує."
@@ -7146,7 +7146,7 @@ msgid "Host with the same name \"%s\" already exists."
 msgstr "Вузел мережі з цим самим іменем \"%s\" вже існує."
 
 #: include/classes/api/services/CTemplate.php:458
-#: include/classes/api/services/CTemplate.php:1002
+#: include/classes/api/services/CTemplate.php:1014
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Вузел мережі з таким самим видимим іменем \"%1$s\" вже існує."
@@ -7204,7 +7204,7 @@ msgstr "Вузли, в яких проводиться сервіс"
 msgid "Hosts location"
 msgstr "Розміщення вузлів"
 
-#: hosts.php:435
+#: hosts.php:429
 msgid "Hosts updated"
 msgstr "Вузли мережі оновлено"
 
@@ -7399,13 +7399,13 @@ msgstr "Іконки"
 msgid "Identification of the system. Returns string"
 msgstr "Ідентифікатор системи. Повертає рядок"
 
-#: include/func.inc.php:1727 include/func.inc.php:1746
+#: include/func.inc.php:1729 include/func.inc.php:1748
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Якщо Ви вважаєте це повідомлення помилковим, то зверніться до вашого адміністратора для отримання необхідних прав доступу."
 
 #: image.php:26 include/audit.inc.php:37
 #: include/classes/helpers/CMapHelper.php:151 include/maps.inc.php:28
-#: include/maps.inc.php:776
+#: include/maps.inc.php:782
 #: include/views/administration.general.image.edit.php:46
 #: include/views/administration.general.image.edit.php:49
 #: include/views/js/monitoring.sysmaps.js.php:73 jsLoader.php:160
@@ -7470,7 +7470,7 @@ msgstr "Негайно"
 msgid "Import"
 msgstr "Імпорт"
 
-#: conf.import.php:169 map.import.php:169 screen.import.php:169
+#: conf.import.php:173 map.import.php:173 screen.import.php:173
 msgid "Import failed"
 msgstr "Імпорт не вдався"
 
@@ -7478,7 +7478,7 @@ msgstr "Імпорт не вдався"
 msgid "Import file"
 msgstr "Імпорт файлу"
 
-#: conf.import.php:169 map.import.php:169 screen.import.php:169
+#: conf.import.php:173 map.import.php:173 screen.import.php:173
 msgid "Imported successfully"
 msgstr "Імпортовано успішно"
 
@@ -7537,7 +7537,7 @@ msgstr "Недоступний елемент даних"
 msgid "Inaccessible map"
 msgstr "Недоступна карта мережі"
 
-#: app/controllers/CControllerDashboardView.php:364
+#: app/controllers/CControllerDashboardView.php:385
 #: app/views/monitoring.acknowledge.edit.php:42 include/acknow.inc.php:43
 #: include/actions.inc.php:1418 include/actions.inc.php:1567
 #: include/events.inc.php:735 include/views/monitoring.screen.edit.php:98
@@ -7563,13 +7563,13 @@ msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Статистика вхідного трафіку мережевого інтерфейсу. Повертає ціле число"
 
 #: include/classes/api/services/CMap.php:617
-#: include/classes/api/services/CMap.php:1063
+#: include/classes/api/services/CMap.php:1067
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
 msgstr "Некоректне значення \"height\" у карти мережі \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:757
-#: include/classes/api/services/CMap.php:1188
+#: include/classes/api/services/CMap.php:1192
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Некоректне значення \"%1$s\" для \"permission\" в групах користувачів для карти мережі \"%2$s\"."
@@ -7581,7 +7581,7 @@ msgid "Incorrect \"permission\" value \"%1$s\" in user groups for screen \"%2$s\
 msgstr "Некоректне значення \"%1$s\" для \"permission\" в групах користувачів для комплексного екрану \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:682
-#: include/classes/api/services/CMap.php:1114
+#: include/classes/api/services/CMap.php:1118
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
 msgstr "Некоректне значення \"%1$s\" для \"permission\" в користувачах для карти мережі \"%2$s\"."
@@ -7593,7 +7593,7 @@ msgid "Incorrect \"permission\" value \"%1$s\" in users for screen \"%2$s\"."
 msgstr "Некоректне значення \"%1$s\" для \"permission\" в користувачах для комплексного екрану \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:636
-#: include/classes/api/services/CMap.php:1069
+#: include/classes/api/services/CMap.php:1073
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
 msgstr "Некоректне значення \"%1$s\" для \"private\" для карти мережі \"%2$s\"."
@@ -7610,7 +7610,7 @@ msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Некоректне значення поля \"не жорстка\" для залежності у послуги \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:611
-#: include/classes/api/services/CMap.php:1057
+#: include/classes/api/services/CMap.php:1061
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
 msgstr "Некоректне значення \"width\" для карти мережі \"%1$s\"."
@@ -7619,10 +7619,10 @@ msgstr "Некоректне значення \"width\" для карти мер
 #: include/classes/api/services/CMap.php:837
 #: include/classes/api/services/CMap.php:853
 #: include/classes/api/services/CMap.php:863
-#: include/classes/api/services/CMap.php:1261
-#: include/classes/api/services/CMap.php:1270
-#: include/classes/api/services/CMap.php:1287
-#: include/classes/api/services/CMap.php:1299
+#: include/classes/api/services/CMap.php:1265
+#: include/classes/api/services/CMap.php:1274
+#: include/classes/api/services/CMap.php:1291
+#: include/classes/api/services/CMap.php:1303
 #, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "Некоректне значення %1$s типу підпису для карти мережі \"%2$s\"."
@@ -7805,18 +7805,18 @@ msgstr "Функції передано некоректні параметри"
 #: include/classes/api/services/CItemGeneral.php:1096
 #: include/classes/api/services/CItemGeneral.php:1110
 #: include/classes/api/services/CMapElement.php:46
-#: include/classes/api/services/CMapElement.php:109
-#: include/classes/api/services/CMapElement.php:121
-#: include/classes/api/services/CMapElement.php:134
-#: include/classes/api/services/CMapElement.php:163
-#: include/classes/api/services/CMapElement.php:173
+#: include/classes/api/services/CMapElement.php:117
+#: include/classes/api/services/CMapElement.php:129
+#: include/classes/api/services/CMapElement.php:142
+#: include/classes/api/services/CMapElement.php:171
+#: include/classes/api/services/CMapElement.php:181
 #: include/classes/api/services/CMap.php:652
 #: include/classes/api/services/CMap.php:726
-#: include/classes/api/services/CMap.php:924
-#: include/classes/api/services/CMap.php:987
-#: include/classes/api/services/CMap.php:1084
-#: include/classes/api/services/CMap.php:1157
-#: include/classes/api/services/CMap.php:1362
+#: include/classes/api/services/CMap.php:928
+#: include/classes/api/services/CMap.php:991
+#: include/classes/api/services/CMap.php:1088
+#: include/classes/api/services/CMap.php:1161
+#: include/classes/api/services/CMap.php:1370
 #: include/classes/api/services/CMediatype.php:181
 #: include/classes/api/services/CMediatype.php:475
 #: include/classes/api/services/CScreen.php:526
@@ -7836,7 +7836,7 @@ msgstr "Некоректні параметри передано методу."
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Некоректний протокол аутентифікації для елемента даних \"%1$s\"."
 
-#: include/classes/api/services/CHostInterface.php:657
+#: include/classes/api/services/CHostInterface.php:668
 msgid "Incorrect bulk value for interface."
 msgstr "Некоректне масове значення для інтерфейсу."
 
@@ -7864,7 +7864,7 @@ msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Використано некоректні символи в імені проксі \"%1$s\"."
 
 #: include/classes/api/services/CTemplate.php:409
-#: include/classes/api/services/CTemplate.php:1045
+#: include/classes/api/services/CTemplate.php:1057
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Використано некоректні символи в імені шаблону \"%1$s\"."
@@ -7874,7 +7874,7 @@ msgstr "Використано некоректні символи в імені
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr "Некоректні умови для дії \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:961
+#: include/classes/api/services/CDiscoveryRule.php:971
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Некоректні умови для правила виявлення \"%1$s\"."
@@ -7893,7 +7893,7 @@ msgstr "Некоректний довільний вираз \"%2$s\" для д�
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
 msgstr "Некоректний довільний вираз \"%2$s\" для кореляції \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:966
+#: include/classes/api/services/CDiscoveryRule.php:976
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "Некоректний довільний вираз \"%2$s\" для правила виявлення \"%1$s\": %3$s."
@@ -7920,7 +7920,7 @@ msgstr "Некоректне значення eventobject."
 msgid "Incorrect eventsource value."
 msgstr "Некоректне значення eventsource."
 
-#: include/classes/db/DB.php:551 include/classes/db/DB.php:825
+#: include/classes/db/DB.php:563 include/classes/db/DB.php:837
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Некоректне ім'я або значення поля \"%1$s\" в операторі where для таблиці \"%2$s\"."
@@ -7938,7 +7938,7 @@ msgstr "Некоректний завантажуваний файл."
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "Некоректний ID формули умови фільтру для дії \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:996
+#: include/classes/api/services/CDiscoveryRule.php:1006
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Некоректний ID формули умови фільтру для правила виявлення \"%1$s\"."
@@ -7948,7 +7948,7 @@ msgstr "Некоректний ID формули умови фільтру дл�
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
 msgstr "Задано некоректний ID формули умови фільтру для кореляції \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:988
+#: include/classes/api/services/CDiscoveryRule.php:998
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "Некоректний макрос умови фільтру для правила виявлення \"%1$s\"."
@@ -7958,7 +7958,7 @@ msgstr "Некоректний макрос умови фільтру для п�
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "Некоректний оператор умови фільтру для дії \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1000
+#: include/classes/api/services/CDiscoveryRule.php:1010
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "Некоректний оператор умови фільтру для правила виявлення \"%1$s\"."
@@ -7973,12 +7973,12 @@ msgstr "Некоректний тип умови фільтру для дії \"
 msgid "Incorrect function is used"
 msgstr "Використано некоректну функцію"
 
-#: include/classes/api/services/CScreenItem.php:646
+#: include/classes/api/services/CScreenItem.php:650
 #, c-format
 msgid "Incorrect graph ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID графіку \"%1$s\" вказано для елементу комплексного екрану."
 
-#: include/classes/api/services/CScreenItem.php:663
+#: include/classes/api/services/CScreenItem.php:667
 #, c-format
 msgid "Incorrect graph prototype ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID прототипу графіку \"%1$s\" вказано для елементу комплексного екрану."
@@ -7993,12 +7993,12 @@ msgstr "Некоректний ID прототипу групи."
 msgid "Incorrect group prototypes for host prototype \"%1$s\"."
 msgstr "Некоректні прототипи груп для прототипу вузла мережі \"%1$s\"."
 
-#: include/classes/api/services/CScreenItem.php:629
+#: include/classes/api/services/CScreenItem.php:633
 #, c-format
 msgid "Incorrect host ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID вузла мережі \"%1$s\" вказано для елементу комплексного екрану."
 
-#: include/classes/api/services/CScreenItem.php:612
+#: include/classes/api/services/CScreenItem.php:616
 #, c-format
 msgid "Incorrect host group ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID групи вузлів мережі \"%1$s\" вказано для елементу комплексного екрану."
@@ -8030,12 +8030,12 @@ msgstr "Некоректний номер картинки."
 msgid "Incorrect input parameters."
 msgstr "Некоректні вхідні параметри."
 
-#: include/classes/api/services/CHostInterface.php:569
+#: include/classes/api/services/CHostInterface.php:580
 #, c-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "Для інтерфейсу вказано некоректний параметр DNS \"%s\"."
 
-#: include/classes/api/services/CHostInterface.php:613
+#: include/classes/api/services/CHostInterface.php:624
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Для інтерфейсу вказано некоректний порт \"%s\"."
@@ -8050,7 +8050,7 @@ msgstr "Некоректне поле \"%s\" інвентарних даних."
 msgid "Incorrect inventory mode in action operation."
 msgstr "Некоректний режим інвентарних даних в операції дії."
 
-#: include/classes/api/services/CScreenItem.php:681
+#: include/classes/api/services/CScreenItem.php:685
 #, c-format
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID елемента даних \"%1$s\" вказано для елемента комплексного екрану."
@@ -8059,15 +8059,19 @@ msgstr "Некоректний ID елемента даних \"%1$s\" вказ�
 msgid "Incorrect item for axis value."
 msgstr "Некоректний елемент даних для значення вісі."
 
-#: include/classes/api/services/CTriggerGeneral.php:1355
+#: include/classes/api/services/CTriggerGeneral.php:1363
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "У виразі тригера \"%2$s\" вказано некоректний ключ елемента даних \"%1$s\"."
 
-#: include/classes/api/services/CScreenItem.php:698
+#: include/classes/api/services/CScreenItem.php:702
 #, c-format
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID прототипу елемента даних \"%1$s\" вказано для елемента комплексного екрану."
+
+#: include/triggers.inc.php:1325 tr_testexpr.php:37
+msgid "Incorrect item value type"
+msgstr ""
 
 #: include/classes/validators/CFunctionValidator.php:299
 #, c-format
@@ -8110,16 +8114,16 @@ msgstr "Некоректний період сервісу (мінімум 5 х�
 msgid "Incorrect maintenance week period"
 msgstr "Некоректний тиждень періоду сервісу"
 
-#: include/classes/api/services/CScreenItem.php:715
+#: include/classes/api/services/CScreenItem.php:719
 #, c-format
 msgid "Incorrect map ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID карти мережі \"%1$s\" вказано для елемента комплексного екрану."
 
-#: include/classes/api/services/CMap.php:971
+#: include/classes/api/services/CMap.php:975
 msgid "Incorrect map ID."
 msgstr "Некоректний ID карти мережі."
 
-#: include/classes/api/services/CScreenItem.php:591
+#: include/classes/api/services/CScreenItem.php:595
 msgid "Incorrect max columns provided for screen element."
 msgstr "Некоректне значення максимальної кількості колонок вказано для елемента комплексного екрану."
 
@@ -8183,7 +8187,7 @@ msgstr "Некоректний протокол приватності для е
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "Некоректний регулярний вираз \"%1$s\": \"%2$s\""
 
-#: include/classes/api/services/CScreenItem.php:443
+#: include/classes/api/services/CScreenItem.php:447
 msgid "Incorrect resource type provided for screen item."
 msgstr "Вказано некоректний тип ресурсу для елементу комплексного екрану."
 
@@ -8192,7 +8196,7 @@ msgstr "Вказано некоректний тип ресурсу для ел�
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Некоректну відповідь отримано від Zabbix сервера \"%1$s\"."
 
-#: include/classes/api/services/CScreenItem.php:744
+#: include/classes/api/services/CScreenItem.php:748
 #, c-format
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID комплексного екрану \"%1$s\" вказано для елемента комплексного екрану."
@@ -8244,7 +8248,7 @@ msgstr "Некоректний статус для прототипу вузлі
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Некоректний стан для послуги \"%1$s\"."
 
-#: include/classes/api/services/CScreenItem.php:597
+#: include/classes/api/services/CScreenItem.php:601
 msgid "Incorrect style provided for screen element."
 msgstr "Некоректний стиль вказано для елемента комплексного екрану."
 
@@ -8270,13 +8274,13 @@ msgstr "Некоректний вираз тригера"
 msgid "Incorrect trigger expression."
 msgstr "Некоректний вираз тригера."
 
-#: include/classes/api/services/CTriggerGeneral.php:1147
+#: include/classes/api/services/CTriggerGeneral.php:1155
 #: include/triggers.inc.php:615
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Некоректний вираз тригера. Вузел мережі \"%1$s\" не існує або ви не маєте до цього вузла мережі."
 
-#: include/classes/api/services/CTriggerGeneral.php:1148
+#: include/classes/api/services/CTriggerGeneral.php:1156
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Некоректний вираз тригера. Елементи виразу тригера не повинні належати шаблону та вузлу мережі одночасно."
 
@@ -8288,16 +8292,16 @@ msgstr "Некоректний вираз тригера. Елементи ви�
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "У виразі вказано некоректну функцію тригера \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1154
+#: include/classes/api/services/CTriggerGeneral.php:1162
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Некоректний вираз прототипу тригера. Вузел мережі \"%1$s\" не існує або у вас немає права доступу до нього."
 
-#: include/classes/api/services/CTriggerGeneral.php:1155
+#: include/classes/api/services/CTriggerGeneral.php:1163
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr "Некоректний вираз прототипу тригера. Елементи виразу прототипу тригера не повинні належати шаблону та вузлу мережі одночасно."
 
-#: include/func.inc.php:1057
+#: include/func.inc.php:1059
 msgid "Incorrect type of asort_by_key."
 msgstr "Некоректний тип asort_by_key."
 
@@ -8311,13 +8315,13 @@ msgstr "Некоректний тип підрахунку для дії \"%1$s\
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
 msgstr "Некоректний тип обчислення для кореляції \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:954
+#: include/classes/api/services/CDiscoveryRule.php:964
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Некоректний тип підрахунку для правила виявлення \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:718
-#: include/classes/api/services/CMap.php:1149
+#: include/classes/api/services/CMap.php:1153
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
 msgstr "Некоректне значення ID користувача вказано для карти мережі \"%1$s\"."
@@ -8329,7 +8333,7 @@ msgid "Incorrect user ID specified for screen \"%1$s\"."
 msgstr "Некоректне значення ID користувача вказано для комплексного екрану \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:789
-#: include/classes/api/services/CMap.php:1219
+#: include/classes/api/services/CMap.php:1223
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
 msgstr "Некоректне значення ID групи користувачів вказано для карти мережі \"%1$s\"."
@@ -8352,7 +8356,7 @@ msgstr "Некоректна група користувачів."
 #: include/classes/api/services/CAction.php:1750
 #: include/classes/api/services/CAction.php:2776
 #: include/classes/api/services/CAction.php:2910
-#: include/classes/api/services/CDiscoveryRule.php:902
+#: include/classes/api/services/CDiscoveryRule.php:912
 #: include/classes/api/services/CDRule.php:237
 #: include/classes/api/services/CDRule.php:244
 #: include/classes/api/services/CDRule.php:292
@@ -8378,23 +8382,23 @@ msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Некоректне значення \"%1$s\" для поля \"%2$s\"."
 
 #: include/classes/api/services/CAction.php:1683
-#: include/classes/api/services/CScreenItem.php:572
+#: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:331
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Некоректне значення \"%1$s\" для поля \"%2$s\": має бути між %3$s та %4$s."
 
-#: include/classes/db/DB.php:367
+#: include/classes/db/DB.php:379
 #, c-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr "Значення \"%1$s\" є некоректним для поля дробового числа \"%2$s\"."
 
-#: include/classes/db/DB.php:361
+#: include/classes/db/DB.php:373
 #, c-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr "Значення \"%1$s\" є некоректним для поля цілого числа \"%2$s\"."
 
-#: include/classes/db/DB.php:355
+#: include/classes/db/DB.php:367
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Значення \"%1$s\" є некоректним для поля числа без знаку \"%2$s\"."
@@ -8441,7 +8445,7 @@ msgstr "Некоректне значення \"%1$s\" в полі \"%2$s\" дл
 #: include/classes/api/services/CCorrelation.php:1101
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
-#: include/classes/api/services/CDiscoveryRule.php:1022
+#: include/classes/api/services/CDiscoveryRule.php:1032
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -8509,13 +8513,13 @@ msgstr "Некоректне значення \"%1$s\" в полі \"%2$s\" дл
 #: include/classes/api/services/CItem.php:775
 #: include/classes/api/services/CItemPrototype.php:999
 #: include/classes/api/services/CItemPrototype.php:1007
-#: include/classes/api/services/CMapElement.php:93
-#: include/classes/api/services/CMapElement.php:114
-#: include/classes/api/services/CMapElement.php:139
-#: include/classes/api/services/CMapElement.php:177
-#: include/classes/api/services/CMapElement.php:183
+#: include/classes/api/services/CMapElement.php:101
+#: include/classes/api/services/CMapElement.php:122
+#: include/classes/api/services/CMapElement.php:147
+#: include/classes/api/services/CMapElement.php:185
+#: include/classes/api/services/CMapElement.php:191
 #: include/classes/api/services/CMap.php:642
-#: include/classes/api/services/CMap.php:1074
+#: include/classes/api/services/CMap.php:1078
 #: include/classes/api/services/CMediatype.php:369
 #: include/classes/api/services/CMediatype.php:379
 #: include/classes/api/services/CMediatype.php:388
@@ -8541,20 +8545,20 @@ msgstr "Некоректне значення \"%1$s\" в полі \"%2$s\" дл
 #: include/classes/api/services/CTriggerGeneral.php:241
 #: include/classes/api/services/CTriggerGeneral.php:247
 #: include/classes/api/services/CTriggerGeneral.php:257
-#: include/classes/api/services/CTriggerGeneral.php:529
-#: include/classes/api/services/CTriggerGeneral.php:537
-#: include/classes/api/services/CTriggerGeneral.php:555
-#: include/classes/api/services/CTriggerGeneral.php:562
-#: include/classes/api/services/CTriggerGeneral.php:569
-#: include/classes/api/services/CTriggerGeneral.php:575
-#: include/classes/api/services/CTriggerGeneral.php:583
-#: include/classes/api/services/CTriggerGeneral.php:761
-#: include/classes/api/services/CTriggerGeneral.php:770
+#: include/classes/api/services/CTriggerGeneral.php:533
+#: include/classes/api/services/CTriggerGeneral.php:541
+#: include/classes/api/services/CTriggerGeneral.php:559
+#: include/classes/api/services/CTriggerGeneral.php:566
+#: include/classes/api/services/CTriggerGeneral.php:573
+#: include/classes/api/services/CTriggerGeneral.php:579
+#: include/classes/api/services/CTriggerGeneral.php:587
+#: include/classes/api/services/CTriggerGeneral.php:769
 #: include/classes/api/services/CTriggerGeneral.php:778
-#: include/classes/api/services/CTriggerGeneral.php:788
+#: include/classes/api/services/CTriggerGeneral.php:786
 #: include/classes/api/services/CTriggerGeneral.php:796
-#: include/classes/api/services/CTriggerGeneral.php:802
+#: include/classes/api/services/CTriggerGeneral.php:804
 #: include/classes/api/services/CTriggerGeneral.php:810
+#: include/classes/api/services/CTriggerGeneral.php:818
 #: include/classes/graphdraw/CLineGraphDraw.php:113
 #: include/classes/graphdraw/CLineGraphDraw.php:245
 #: include/classes/graphdraw/CLineGraphDraw.php:255
@@ -8644,7 +8648,7 @@ msgid "Insert"
 msgstr "Вставити"
 
 #: include/views/configuration.trigger.prototype.edit.php:99
-#: include/views/configuration.triggers.edit.php:124 jsLoader.php:213
+#: include/views/configuration.triggers.edit.php:124 jsLoader.php:214
 msgid "Insert expression"
 msgstr "Вставити вираз"
 
@@ -8667,7 +8671,7 @@ msgstr "Ім'я інсталятора"
 msgid "Interface"
 msgstr "Інтерфейс"
 
-#: include/classes/api/services/CHostInterface.php:834
+#: include/classes/api/services/CHostInterface.php:845
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Інтерфейс зв'язаний з елементом даних \"%1$s\" у \"%2$s\"."
@@ -8720,11 +8724,11 @@ msgstr "Період зберігання внутрішніх даних"
 #: include/classes/api/services/CTriggerGeneral.php:299
 #: include/classes/api/services/CTriggerGeneral.php:437
 #: include/classes/api/services/CTriggerGeneral.php:500
-#: include/classes/api/services/CTriggerGeneral.php:649
-#: include/classes/api/services/CTriggerGeneral.php:873
-#: include/classes/api/services/CTriggerGeneral.php:981
-#: include/classes/api/services/CTriggerGeneral.php:1160
-#: include/classes/api/services/CTriggerGeneral.php:1520
+#: include/classes/api/services/CTriggerGeneral.php:653
+#: include/classes/api/services/CTriggerGeneral.php:881
+#: include/classes/api/services/CTriggerGeneral.php:989
+#: include/classes/api/services/CTriggerGeneral.php:1168
+#: include/classes/api/services/CTriggerGeneral.php:1528
 #: include/classes/core/CJsonRpc.php:203
 #: include/classes/import/validators/CXmlValidatorGeneral.php:147
 #: include/classes/widgetfields/CWidgetField.php:97
@@ -8753,11 +8757,11 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.massupdate.php:374
 #: include/views/configuration.item.prototype.edit.php:263
 #: include/views/configuration.item.prototype.list.php:45
-#: include/views/configuration.services.edit.php:142 latest.php:409
+#: include/views/configuration.services.edit.php:144 latest.php:409
 msgid "Interval"
 msgstr "Інтервал"
 
-#: include/classes/api/services/CHostInterface.php:597
+#: include/classes/api/services/CHostInterface.php:608
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
 msgstr "Неправильна IP адреса \"%1$s\"."
@@ -8875,8 +8879,8 @@ msgid "Invalid maintenance period"
 msgstr "Неправильний період обслуговування"
 
 #: include/classes/api/services/CScreenItem.php:154
-#: include/classes/api/services/CScreenItem.php:269
-#: include/classes/api/services/CScreenItem.php:333
+#: include/classes/api/services/CScreenItem.php:271
+#: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
 #: include/classes/api/services/CService.php:1207
@@ -8906,47 +8910,50 @@ msgstr "Неправильна кількість параметрів."
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:126
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:135
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:143
-#: include/classes/validators/CApiInputValidator.php:200
-#: include/classes/validators/CApiInputValidator.php:205
-#: include/classes/validators/CApiInputValidator.php:210
-#: include/classes/validators/CApiInputValidator.php:269
-#: include/classes/validators/CApiInputValidator.php:276
-#: include/classes/validators/CApiInputValidator.php:308
-#: include/classes/validators/CApiInputValidator.php:313
-#: include/classes/validators/CApiInputValidator.php:355
-#: include/classes/validators/CApiInputValidator.php:360
-#: include/classes/validators/CApiInputValidator.php:413
-#: include/classes/validators/CApiInputValidator.php:446
-#: include/classes/validators/CApiInputValidator.php:451
-#: include/classes/validators/CApiInputValidator.php:492
-#: include/classes/validators/CApiInputValidator.php:497
-#: include/classes/validators/CApiInputValidator.php:526
-#: include/classes/validators/CApiInputValidator.php:580
-#: include/classes/validators/CApiInputValidator.php:587
-#: include/classes/validators/CApiInputValidator.php:610
-#: include/classes/validators/CApiInputValidator.php:655
-#: include/classes/validators/CApiInputValidator.php:684
-#: include/classes/validators/CApiInputValidator.php:689
-#: include/classes/validators/CApiInputValidator.php:726
-#: include/classes/validators/CApiInputValidator.php:731
-#: include/classes/validators/CApiInputValidator.php:773
-#: include/classes/validators/CApiInputValidator.php:780
-#: include/classes/validators/CApiInputValidator.php:804
-#: include/classes/validators/CApiInputValidator.php:814
-#: include/classes/validators/CApiInputValidator.php:839
-#: include/classes/validators/CApiInputValidator.php:844
-#: include/classes/validators/CApiInputValidator.php:871
-#: include/classes/validators/CApiInputValidator.php:878
-#: include/classes/validators/CApiInputValidator.php:905
-#: include/classes/validators/CApiInputValidator.php:914
-#: include/classes/validators/CApiInputValidator.php:951
-#: include/classes/validators/CApiInputValidator.php:962
-#: include/classes/validators/CApiInputValidator.php:995
-#: include/classes/validators/CApiInputValidator.php:1050
-#: include/classes/validators/CApiInputValidator.php:1137
-#: include/classes/validators/CApiInputValidator.php:1142
+#: include/classes/validators/CApiInputValidator.php:204
+#: include/classes/validators/CApiInputValidator.php:209
+#: include/classes/validators/CApiInputValidator.php:214
+#: include/classes/validators/CApiInputValidator.php:273
+#: include/classes/validators/CApiInputValidator.php:280
+#: include/classes/validators/CApiInputValidator.php:312
+#: include/classes/validators/CApiInputValidator.php:317
+#: include/classes/validators/CApiInputValidator.php:359
+#: include/classes/validators/CApiInputValidator.php:364
+#: include/classes/validators/CApiInputValidator.php:417
+#: include/classes/validators/CApiInputValidator.php:450
+#: include/classes/validators/CApiInputValidator.php:455
+#: include/classes/validators/CApiInputValidator.php:496
+#: include/classes/validators/CApiInputValidator.php:501
+#: include/classes/validators/CApiInputValidator.php:530
+#: include/classes/validators/CApiInputValidator.php:584
+#: include/classes/validators/CApiInputValidator.php:591
+#: include/classes/validators/CApiInputValidator.php:614
+#: include/classes/validators/CApiInputValidator.php:659
+#: include/classes/validators/CApiInputValidator.php:688
+#: include/classes/validators/CApiInputValidator.php:693
+#: include/classes/validators/CApiInputValidator.php:730
+#: include/classes/validators/CApiInputValidator.php:735
+#: include/classes/validators/CApiInputValidator.php:777
+#: include/classes/validators/CApiInputValidator.php:784
+#: include/classes/validators/CApiInputValidator.php:808
+#: include/classes/validators/CApiInputValidator.php:818
+#: include/classes/validators/CApiInputValidator.php:843
+#: include/classes/validators/CApiInputValidator.php:848
+#: include/classes/validators/CApiInputValidator.php:875
+#: include/classes/validators/CApiInputValidator.php:882
+#: include/classes/validators/CApiInputValidator.php:909
+#: include/classes/validators/CApiInputValidator.php:918
+#: include/classes/validators/CApiInputValidator.php:955
+#: include/classes/validators/CApiInputValidator.php:966
+#: include/classes/validators/CApiInputValidator.php:999
+#: include/classes/validators/CApiInputValidator.php:1054
+#: include/classes/validators/CApiInputValidator.php:1141
+#: include/classes/validators/CApiInputValidator.php:1146
+#: include/classes/validators/CApiInputValidator.php:1170
+#: include/classes/validators/CApiInputValidator.php:1175
 #: include/classes/widgetfields/CWidgetFieldSelectResource.php:102
 #: include/classes/widgetfields/CWidgetFieldTextBox.php:41
+#: include/classes/widgetfields/CWidgetFieldUrl.php:42
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr "Неправильний параметр \"%1$s\": %2$s."
@@ -8972,7 +8979,7 @@ msgstr "Неправильний другий параметр."
 
 #: include/classes/import/readers/CXmlImportReader.php:77
 #: include/classes/import/readers/CXmlImportReader.php:116
-#: include/classes/import/readers/CXmlImportReader.php:132
+#: include/classes/import/readers/CXmlImportReader.php:134
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
 #: include/classes/import/validators/C10XmlValidator.php:393
@@ -9071,7 +9078,7 @@ msgstr "Неможливо виконувати пошук по паролю к�
 msgid "Italian (it_IT)"
 msgstr "Італійська (it_IT)"
 
-#: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:156
+#: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:162
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/CClockWidgetForm.php:47
 #: include/classes/widgets/CGraphWidgetForm.php:46
@@ -9086,7 +9093,7 @@ msgstr "Італійська (it_IT)"
 msgid "Item"
 msgstr "Елемент даних"
 
-#: jsLoader.php:216
+#: jsLoader.php:217
 #, c-format
 msgid "Item \"%1$s\""
 msgstr "Елемент даних \"%1$s\""
@@ -9178,7 +9185,7 @@ msgstr "Елемент даних не вибрано"
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "Відсутні параметри в попередній обробці елемента даних: %1$s"
 
-#: include/classes/api/services/CDiscoveryRule.php:1027
+#: include/classes/api/services/CDiscoveryRule.php:1037
 msgid "Item pre-processing is not allowed for discovery rules."
 msgstr "Попередня обробка елементів даних не дозволена для правил виявлення."
 
@@ -9492,7 +9499,7 @@ msgstr "Мова"
 msgid "Last"
 msgstr "Останній"
 
-#: include/func.inc.php:1599
+#: include/func.inc.php:1601
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Остання"
@@ -9542,7 +9549,7 @@ msgstr "Остання зміна (в порядку спадання)"
 msgid "Last check"
 msgstr "Остання перевірка"
 
-#: jsLoader.php:224
+#: jsLoader.php:225
 msgid "Last hour graph"
 msgstr "Графік за останню годину"
 
@@ -9550,7 +9557,7 @@ msgstr "Графік за останню годину"
 msgid "Last month"
 msgstr "Попередній місяць"
 
-#: jsLoader.php:225
+#: jsLoader.php:226
 msgid "Last month graph"
 msgstr "Графік за останній місяць"
 
@@ -9572,7 +9579,7 @@ msgstr "Останнє значення"
 msgid "Last week"
 msgstr "Останній тиждень"
 
-#: jsLoader.php:226
+#: jsLoader.php:227
 msgid "Last week graph"
 msgstr "Графік за останній тиждень"
 
@@ -9581,12 +9588,12 @@ msgid "Last year"
 msgstr "Останній рік"
 
 #: include/menu.inc.php:68 include/views/inventory.host.view.php:140
-#: jsLoader.php:222 latest.php:27 latest.php:324 search.php:128 search.php:232
+#: jsLoader.php:223 latest.php:27 latest.php:324 search.php:128 search.php:232
 #: search.php:289 search.php:339
 msgid "Latest data"
 msgstr "Останні дані"
 
-#: jsLoader.php:223
+#: jsLoader.php:224
 msgid "Latest values"
 msgstr "Останні значення"
 
@@ -9667,14 +9674,14 @@ msgstr "Індикатори лінка"
 msgid "Link new templates"
 msgstr "Приєднати нові шаблони"
 
-#: include/classes/api/services/CMap.php:934
-#: include/classes/api/services/CMap.php:1372
+#: include/classes/api/services/CMap.php:938
+#: include/classes/api/services/CMap.php:1380
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Поле лінку selementid1 вказує на не існуючий selement ID \"%1$s\" для карти мережі \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:942
-#: include/classes/api/services/CMap.php:1380
+#: include/classes/api/services/CMap.php:946
+#: include/classes/api/services/CMap.php:1388
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Поле лінку selementid2 вказує на не існуючий selement ID \"%1$s\" для карти мережі \"%2$s\"."
@@ -9766,7 +9773,7 @@ msgstr "Повний час завантаження веб сторінки (в
 msgid "Local"
 msgstr "Локальний"
 
-#: include/classes/screens/CScreenHistory.php:157
+#: include/classes/screens/CScreenHistory.php:163
 #: include/classes/widgets/CClockWidgetForm.php:32
 #: include/views/monitoring.screen.constructor.edit.php:612
 msgid "Local time"
@@ -9785,7 +9792,7 @@ msgid "Location longitude"
 msgstr "Розміщення (довгота)"
 
 #: include/forms.inc.php:356 include/items.inc.php:132
-#: include/triggers.inc.php:1773 include/views/configuration.item.edit.php:324
+#: include/views/configuration.item.edit.php:324
 #: include/views/configuration.item.massupdate.php:198
 #: include/views/configuration.item.prototype.edit.php:245
 msgid "Log"
@@ -9833,7 +9840,7 @@ msgstr "Формат часу в журналі"
 msgid "Log unmatched SNMP traps"
 msgstr "Записувати не співпадаючі SNMP трапи"
 
-#: auditlogs.php:130 include/func.inc.php:1734 include/func.inc.php:1749
+#: auditlogs.php:130 include/func.inc.php:1736 include/func.inc.php:1751
 #: include/menu.inc.php:305 include/views/administration.auditlogs.list.php:39
 #: include/views/administration.authentication.edit.php:102
 #: include/views/administration.users.list.php:78
@@ -9888,7 +9895,7 @@ msgstr "MAC адреса A"
 msgid "MAC address B"
 msgstr "MAC адреса B"
 
-#: include/maps.inc.php:456 include/maps.inc.php:548
+#: include/maps.inc.php:462 include/maps.inc.php:554
 msgid "MAINTENANCE"
 msgstr "В СТАНІ СЕРВІСУ"
 
@@ -9906,7 +9913,7 @@ msgstr "MD2"
 msgid "MD5"
 msgstr "MD5"
 
-#: include/classes/items/CHelpItems.php:285
+#: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:583
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "MD5 контрольна сума файлу. Повертає рядок символів (MD5 хеш файлу)"
@@ -9951,7 +9958,7 @@ msgstr "Макроси"
 msgid "Macros updated"
 msgstr "Макроси оновлено"
 
-#: include/audit.inc.php:47 include/maps.inc.php:643 include/maps.inc.php:743
+#: include/audit.inc.php:47 include/maps.inc.php:649 include/maps.inc.php:749
 #: include/menu.inc.php:223
 #: include/views/configuration.maintenance.edit.php:205
 #: include/views/js/monitoring.sysmaps.js.php:212
@@ -10008,12 +10015,12 @@ msgstr "Тип сервісу"
 msgid "Maintenance updated"
 msgstr "Сервіс оновлено"
 
-#: include/blocks.inc.php:648 include/triggers.inc.php:2202
+#: include/blocks.inc.php:648 include/triggers.inc.php:2259
 #: include/views/inventory.host.view.php:47
 msgid "Maintenance with data collection"
 msgstr "Сервіс зі збором даних"
 
-#: include/blocks.inc.php:647 include/triggers.inc.php:2201
+#: include/blocks.inc.php:647 include/triggers.inc.php:2258
 #: include/views/inventory.host.view.php:46
 msgid "Maintenance without data collection"
 msgstr "Сервіс без збору даних"
@@ -10042,15 +10049,15 @@ msgid "Map"
 msgstr "Карта мережі"
 
 #: include/classes/api/services/CMap.php:592
-#: include/classes/api/services/CMap.php:1020
+#: include/classes/api/services/CMap.php:1024
 #, c-format
 msgid "Map \"%1$s\" already exists."
 msgstr "Карта мережі \"%1$s\" вже існує."
 
 #: include/classes/api/services/CMap.php:691
 #: include/classes/api/services/CMap.php:766
-#: include/classes/api/services/CMap.php:1122
-#: include/classes/api/services/CMap.php:1196
+#: include/classes/api/services/CMap.php:1126
+#: include/classes/api/services/CMap.php:1200
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
 msgstr "Карта мережі \"%1$s\" є публічною, тому спільний доступ тільки на читання не дозволений."
@@ -10060,14 +10067,14 @@ msgid "Map element"
 msgstr "Елемент карти мережі"
 
 #: include/classes/api/services/CMapElement.php:55
-#: include/classes/api/services/CMapElement.php:104
-#: include/classes/api/services/CMapElement.php:129
-#: include/classes/api/services/CMapElement.php:168
+#: include/classes/api/services/CMapElement.php:112
+#: include/classes/api/services/CMapElement.php:137
+#: include/classes/api/services/CMapElement.php:176
 #, c-format
 msgid "Map element is missing parameters: %1$s"
 msgstr "Відсутні параметри в елемента карти мережі: %1$s"
 
-#: sysmap.php:100
+#: sysmap.php:102
 msgid "Map is updated! Return?"
 msgstr "Карту мережі оновлено! Повернутись?"
 
@@ -10075,7 +10082,7 @@ msgstr "Карту мережі оновлено! Повернутись?"
 msgid "Map label type"
 msgstr "Тип позначки карти мережі"
 
-#: include/classes/api/services/CMap.php:990
+#: include/classes/api/services/CMap.php:994
 msgid "Map name cannot be empty."
 msgstr "Ім'я карти мережі не може бути пустим."
 
@@ -10085,7 +10092,7 @@ msgid "Map navigation tree"
 msgstr "Дерево навігації карт мереж"
 
 #: include/classes/api/services/CMap.php:624
-#: include/classes/api/services/CMap.php:1041
+#: include/classes/api/services/CMap.php:1045
 msgid "Map owner cannot be empty."
 msgstr "Власник карти мережі не може бути пустим."
 
@@ -10093,7 +10100,7 @@ msgstr "Власник карти мережі не може бути пусти
 msgid "Map shape"
 msgstr "Фігура карти мережі"
 
-#: sysmap.php:103
+#: sysmap.php:105
 msgid "Map update failed."
 msgstr "Оновлення карти мережі неуспішне."
 
@@ -10194,7 +10201,7 @@ msgstr "Максимальна кількість відкритих файлі�
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Максимальна кількість процесів яку підтримує ОС. Повертає ціле число"
 
-#: include/classes/screens/CScreenBase.php:497 include/func.inc.php:2538
+#: include/classes/screens/CScreenBase.php:497 include/func.inc.php:2540
 #: include/graphs.inc.php:416
 #, c-format
 msgid "Maximum time period to display is %1$s day."
@@ -10342,7 +10349,7 @@ msgstr "Обреження тексту повідомлення"
 msgid "Message timeout"
 msgstr "Таймаут повідомлення"
 
-#: jsLoader.php:185
+#: jsLoader.php:186
 msgid "Messages"
 msgstr "Повідомлення"
 
@@ -10393,7 +10400,7 @@ msgstr "Мінімально необхідний розмір PHP post - %s (п
 msgid "Minimum severity"
 msgstr "Мінімальна важливість"
 
-#: include/classes/screens/CScreenBase.php:490 include/func.inc.php:2531
+#: include/classes/screens/CScreenBase.php:490 include/func.inc.php:2533
 #: include/graphs.inc.php:409
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
@@ -10515,7 +10522,7 @@ msgstr "Місяць"
 msgid "Monthly"
 msgstr "Щомісяця"
 
-#: include/classes/html/CMultiSelect.php:59 jsLoader.php:198
+#: include/classes/html/CMultiSelect.php:59 jsLoader.php:199
 msgid "More matches found..."
 msgstr "Знайдено більше співпадінь..."
 
@@ -10541,7 +10548,7 @@ msgstr "Багатократно"
 msgid "Multiple PROBLEM events"
 msgstr "Багатократні події ПРОБЛЕМА"
 
-#: jsLoader.php:183
+#: jsLoader.php:184
 msgid "Mute"
 msgstr "Вимкнути звук"
 
@@ -10657,7 +10664,7 @@ msgstr "NTLM"
 #: popup.php:1042 popup.php:1071 popup.php:1230 popup.php:1375 popup.php:1450
 #: popup.php:1554 popup.php:1626 popup.php:1677 popup.php:1703 popup.php:1722
 #: popup.php:1746 popup.php:1778 popup_usrgrp.php:88 queue.php:249
-#: report2.php:505 screenconf.php:52 services.php:40 slideconf.php:36
+#: report2.php:424 screenconf.php:52 services.php:40 slideconf.php:36
 #: sysmaps.php:50 trigger_prototypes.php:37 triggers.php:41 tr_logform.php:39
 #: tr_logform.php:336 tr_status.php:497
 msgid "Name"
@@ -10709,7 +10716,7 @@ msgid "Network map updated"
 msgstr "Карту мережі оновлено"
 
 #: app/controllers/CControllerMapView.php:123
-#: include/views/monitoring.sysmap.constructor.php:80
+#: include/views/monitoring.sysmap.constructor.php:85
 #: include/views/monitoring.sysmap.edit.php:24
 msgid "Network maps"
 msgstr "Карти мереж"
@@ -10746,7 +10753,7 @@ msgstr "Новий прототип групи елементів даних"
 msgid "New condition"
 msgstr "Нова умова"
 
-#: app/controllers/CControllerDashboardView.php:348
+#: app/controllers/CControllerDashboardView.php:369
 msgid "New dashboard"
 msgstr "Нова панель"
 
@@ -10784,7 +10791,7 @@ msgstr "Нова операція"
 msgid "New regular expression"
 msgstr "Новий регулярний вираз"
 
-#: include/views/configuration.services.edit.php:314
+#: include/views/configuration.services.edit.php:316
 msgid "New service time"
 msgstr "Новий період послуги"
 
@@ -10851,7 +10858,7 @@ msgstr "Не вказано \"%1$s\" для графіку."
 msgid "No \"%1$s\" given for host prototype."
 msgstr "Не вказано \"%1$s\" для прототипу вузла мережі."
 
-#: include/classes/api/services/CMap.php:969
+#: include/classes/api/services/CMap.php:973
 #, c-format
 msgid "No \"%1$s\" given for map."
 msgstr "Не вказано \"%1$s\" для карти мережі."
@@ -10879,7 +10886,7 @@ msgstr "Не вказано \"%1$s\" для шаблонного екрану."
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "Не вказано \"%2$s\" для умови фільтру в дії \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1004
+#: include/classes/api/services/CDiscoveryRule.php:1014
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr "Не вказано \"%2$s\" для умови фільтру в правилі виявлення \"%1$s\"."
@@ -10894,7 +10901,7 @@ msgstr "Не вказано \"%2$s\" для прототипу вузла мер
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "Не вказано \"%2$s\" для фільтру в дії \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:972
+#: include/classes/api/services/CDiscoveryRule.php:982
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "Не вказано \"%2$s\" для фільтру в правилі виявлення \"%1$s\"."
@@ -10922,7 +10929,7 @@ msgstr "Не вказано SNMP community."
 msgid "No SNMP interfaces found."
 msgstr "Інтерфейсів SNMP не знайдено."
 
-#: include/classes/api/services/CScreenItem.php:558
+#: include/classes/api/services/CScreenItem.php:562
 msgid "No URL provided for screen element."
 msgstr "Для елемента комплексного екрану не вказано URL."
 
@@ -10995,7 +11002,7 @@ msgstr "Не отримано даних за період часу T, тоді 
 msgid "No data."
 msgstr "Данні відсутні."
 
-#: include/classes/api/services/CHostInterface.php:810
+#: include/classes/api/services/CHostInterface.php:821
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Відсутній інтерфейс по замовчуванню \"%1$s\" типу у вузла мережі \"%2$s\"."
@@ -11010,7 +11017,7 @@ msgstr "Подробиці відсутні"
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
 msgstr "Не вказано ID правила виявлення для прототипу вузлів мережі \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:482
+#: include/classes/api/services/CDiscoveryRule.php:492
 msgid "No discovery rule IDs given."
 msgstr "ID правил виявлення не вказано."
 
@@ -11038,7 +11045,7 @@ msgstr "Не вказано ціль виконання для команди \"
 msgid "No file was uploaded."
 msgstr "Файл не було завантажено."
 
-#: include/classes/api/services/CScreenItem.php:479
+#: include/classes/api/services/CScreenItem.php:483
 msgid "No graph ID provided for screen element."
 msgstr "Для елемента комплексного екрану не вказано ID графіка."
 
@@ -11047,7 +11054,7 @@ msgstr "Для елемента комплексного екрану не вк�
 msgid "No graph item with graphid \"%s\"."
 msgstr "Немає елемента графіку з graphid \"%s\"."
 
-#: include/classes/api/services/CScreenItem.php:488
+#: include/classes/api/services/CScreenItem.php:492
 msgid "No graph prototype ID provided for screen element."
 msgstr "Не вказано ID прототипу графіка для елемента комплексного екрану."
 
@@ -11055,7 +11062,7 @@ msgstr "Не вказано ID прототипу графіка для елем
 msgid "No graphs added."
 msgstr "Графіків не додано."
 
-#: include/classes/api/services/CDiscoveryRule.php:485
+#: include/classes/api/services/CDiscoveryRule.php:495
 msgid "No host IDs given."
 msgstr "Не вказано ID вузлів мережі."
 
@@ -11068,7 +11075,7 @@ msgstr "Не вказано вузел мережі для макросу \"%1$s
 msgid "No host group ID for group prototype."
 msgstr "Немає ID групи вузлів мережі для прототипу групи."
 
-#: include/classes/api/services/CScreenItem.php:461
+#: include/classes/api/services/CScreenItem.php:465
 msgid "No host group ID provided for screen element."
 msgstr "Не вказано ID групи вузлів мережі для елемента комплексного екрану."
 
@@ -11087,7 +11094,7 @@ msgstr "Не вибрано вузел мережі."
 msgid "No host with hostid \"%s\"."
 msgstr "Немає вузла мережі з hostid \"%s\"."
 
-#: include/classes/api/services/CMapElement.php:191
+#: include/classes/api/services/CMapElement.php:199
 #, c-format
 msgid "No icon for map element \"%s\"."
 msgstr "Немає іконки для елемента карти мережі \"%s\"."
@@ -11099,7 +11106,7 @@ msgstr "Немає картинки"
 #: include/views/configuration.host.discovery.edit.php:95
 #: include/views/configuration.item.edit.php:150
 #: include/views/configuration.item.massupdate.php:76
-#: include/views/configuration.item.prototype.edit.php:126 jsLoader.php:249
+#: include/views/configuration.item.prototype.edit.php:126 jsLoader.php:250
 msgid "No interface found"
 msgstr "Інтерфейсу не знайдено"
 
@@ -11123,12 +11130,12 @@ msgstr "Немає інтерфейсів для вузла мережі \"%s\".
 msgid "No inventory mode specified for action operation."
 msgstr "Не вказано режим інвентарних даних для операції дії."
 
-#: include/classes/api/services/CScreenItem.php:508
-#: include/classes/api/services/CScreenItem.php:518
+#: include/classes/api/services/CScreenItem.php:512
+#: include/classes/api/services/CScreenItem.php:522
 msgid "No item ID provided for screen element."
 msgstr "Не вказано ID елемента даних для елемента комплексного екрану."
 
-#: include/classes/api/services/CScreenItem.php:498
+#: include/classes/api/services/CScreenItem.php:502
 msgid "No item prototype ID provided for screen element."
 msgstr "Не вказано ID прототипу елемента даних для елемента комплексного екрану."
 
@@ -11150,7 +11157,7 @@ msgstr "Елементів даних не визначено."
 msgid "No macros found."
 msgstr "Макроси не знайдено."
 
-#: include/classes/api/services/CScreenItem.php:531
+#: include/classes/api/services/CScreenItem.php:535
 msgid "No map ID provided for screen element."
 msgstr "Не вказано ID карти мережі для елемента комплексного екрану."
 
@@ -11158,7 +11165,7 @@ msgstr "Не вказано ID карти мережі для елемента �
 msgid "No maps added."
 msgstr "Карти мереж не додано."
 
-#: include/classes/html/CMultiSelect.php:58 jsLoader.php:197
+#: include/classes/html/CMultiSelect.php:58 jsLoader.php:198
 msgid "No matches found"
 msgstr "Відповідностей не знайдено"
 
@@ -11171,16 +11178,13 @@ msgstr "Тип операції не задано для кореляції \"%1
 msgid "No permissions for system access."
 msgstr "Немає прав доступу до системи."
 
+#: app/controllers/CControllerDashboardView.php:178
+#: app/controllers/CControllerDashboardView.php:214
 #: app/controllers/CControllerWidgetClockView.php:80
 #: app/controllers/CControllerWidgetDiscoveryView.php:63
-#: app/controllers/CControllerWidgetGraphView.php:131
-#: app/controllers/CControllerWidgetGraphView.php:196
-#: app/controllers/CControllerWidgetGraphView.php:200
-#: app/controllers/CControllerWidgetGraphView.php:206
-#: app/controllers/CControllerWidgetGraphView.php:216
-#: app/controllers/CControllerWidgetGraphView.php:228
 #: app/controllers/CControllerWidgetPlainTextView.php:83
-#: app/controllers/CControllerWidgetSysmapView.php:74 disc_prototypes.php:572
+#: app/controllers/CControllerWidgetSysmapView.php:74
+#: app/views/monitoring.widget.graph.view.php:28 disc_prototypes.php:572
 #: include/classes/api/services/CAction.php:1550
 #: include/classes/api/services/CAction.php:1895
 #: include/classes/api/services/CAction.php:2867
@@ -11197,8 +11201,8 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CDashboard.php:394
 #: include/classes/api/services/CDashboard.php:1234
 #: include/classes/api/services/CDiscoveryRule.php:361
-#: include/classes/api/services/CDiscoveryRule.php:461
-#: include/classes/api/services/CDiscoveryRule.php:497
+#: include/classes/api/services/CDiscoveryRule.php:471
+#: include/classes/api/services/CDiscoveryRule.php:507
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
@@ -11222,7 +11226,7 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CHostInterface.php:241
 #: include/classes/api/services/CHostInterface.php:257
 #: include/classes/api/services/CHostInterface.php:388
-#: include/classes/api/services/CHostInterface.php:636
+#: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:1110
 #: include/classes/api/services/CHost.php:1145
 #: include/classes/api/services/CHost.php:1628
@@ -11250,15 +11254,12 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CMaintenance.php:439
 #: include/classes/api/services/CMaintenance.php:456
 #: include/classes/api/services/CMaintenance.php:553
-#: include/classes/api/services/CMapElement.php:296
-#: include/classes/api/services/CMapElement.php:318
-#: include/classes/api/services/CMapElement.php:340
-#: include/classes/api/services/CMapElement.php:362
-#: include/classes/api/services/CMapElement.php:471
+#: include/classes/api/services/CMapElement.php:223
+#: include/classes/api/services/CMapElement.php:354
 #: include/classes/api/services/CMap.php:540
-#: include/classes/api/services/CMap.php:980
-#: include/classes/api/services/CMap.php:1797
-#: include/classes/api/services/CMap.php:1859
+#: include/classes/api/services/CMap.php:984
+#: include/classes/api/services/CMap.php:1805
+#: include/classes/api/services/CMap.php:1867
 #: include/classes/api/services/CMediatype.php:468
 #: include/classes/api/services/CProxy.php:165
 #: include/classes/api/services/CProxy.php:255
@@ -11266,8 +11267,8 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CProxy.php:687
 #: include/classes/api/services/CProxy.php:718
 #: include/classes/api/services/CProxy.php:778
-#: include/classes/api/services/CScreenItem.php:392
-#: include/classes/api/services/CScreenItem.php:439
+#: include/classes/api/services/CScreenItem.php:396
+#: include/classes/api/services/CScreenItem.php:443
 #: include/classes/api/services/CScreen.php:771
 #: include/classes/api/services/CScreen.php:1238
 #: include/classes/api/services/CScript.php:322
@@ -11276,17 +11277,17 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CScript.php:603
 #: include/classes/api/services/CService.php:993
 #: include/classes/api/services/CService.php:1017
-#: include/classes/api/services/CTemplate.php:703
-#: include/classes/api/services/CTemplate.php:725
+#: include/classes/api/services/CTemplate.php:715
+#: include/classes/api/services/CTemplate.php:737
 #: include/classes/api/services/CTemplateScreen.php:632
 #: include/classes/api/services/CTemplateScreen.php:683
 #: include/classes/api/services/CTemplateScreen.php:746
 #: include/classes/api/services/CTemplateScreen.php:757
-#: include/classes/api/services/CTriggerGeneral.php:707
-#: include/classes/api/services/CTrigger.php:749
-#: include/classes/api/services/CTrigger.php:785
-#: include/classes/api/services/CTrigger.php:867
-#: include/classes/api/services/CTrigger.php:1370
+#: include/classes/api/services/CTriggerGeneral.php:715
+#: include/classes/api/services/CTrigger.php:759
+#: include/classes/api/services/CTrigger.php:795
+#: include/classes/api/services/CTrigger.php:877
+#: include/classes/api/services/CTrigger.php:1380
 #: include/classes/api/services/CTriggerPrototype.php:528
 #: include/classes/api/services/CTriggerPrototype.php:752
 #: include/classes/api/services/CTriggerPrototype.php:770
@@ -11303,8 +11304,9 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CValueMap.php:236
 #: include/classes/api/services/CValueMap.php:336
 #: include/classes/helpers/CMapHelper.php:84
+#: include/classes/screens/CScreenHistory.php:113
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1712 items.php:1213 scripts_exec.php:85
+#: include/func.inc.php:1714 items.php:1213 scripts_exec.php:85
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Немає прав доступу до запитуваного об'єкту або він не існує!"
 
@@ -11334,11 +11336,11 @@ msgstr "Файл публічного ключа не вказано."
 msgid "No recipients for action operation message."
 msgstr "Немає отримувачів повідомлення в операції дії."
 
-#: jsLoader.php:238
+#: jsLoader.php:239
 msgid "No refresh"
 msgstr "Не оновлювати"
 
-#: include/classes/api/services/CScreenItem.php:539
+#: include/classes/api/services/CScreenItem.php:543
 msgid "No screen ID provided for screen element."
 msgstr "Не вказано ID комплексного екрану для елемента комплексного екрану."
 
@@ -11371,7 +11373,7 @@ msgstr "Немає тригера з triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Тригерів не визначено."
 
-#: include/classes/validators/CApiInputValidator.php:551
+#: include/classes/validators/CApiInputValidator.php:555
 msgid "Non-boolean flags are deprecated."
 msgstr "Не логічні атрибути більше не використовуються."
 
@@ -11406,10 +11408,6 @@ msgstr "Немає"
 msgid "Normal"
 msgstr "Звичайний"
 
-#: app/views/administration.mediatype.edit.php:81
-msgid "Normal password"
-msgstr "Звичайний пароль"
-
 #: include/html.inc.php:178
 msgid "Normal view"
 msgstr "Звичайний вигляд"
@@ -11423,7 +11421,7 @@ msgstr "Не підтверджено"
 msgid "Not Templated items"
 msgstr "Немає елементів даних з шаблону"
 
-#: include/classes/api/services/CTrigger.php:1087
+#: include/classes/api/services/CTrigger.php:1097
 #: include/classes/api/services/CTriggerPrototype.php:911
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
@@ -11450,9 +11448,9 @@ msgstr "Не класифіковано"
 msgid "Not supported"
 msgstr "Не підтримується"
 
-#: include/views/configuration.services.edit.php:142
-#: include/views/configuration.services.edit.php:249
-#: include/views/configuration.services.parent.list.php:50
+#: include/views/configuration.services.edit.php:144
+#: include/views/configuration.services.edit.php:251
+#: include/views/configuration.services.parent.list.php:57
 msgid "Note"
 msgstr "Примітка"
 
@@ -11657,7 +11655,7 @@ msgstr "Кількість значений збережених в таблиц
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Кількість віртуальних машин на гіпервізорі VMware, <url> - URL служби VMware, <uuid> - ім'я хоста VMware гіпервізора"
 
-#: include/classes/items/CHelpItems.php:305
+#: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:603
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Кількість inode у відсотках. Повертає ціле число для кількості; дробове - для відсотків"
@@ -11667,17 +11665,15 @@ msgid "Numeral systems"
 msgstr "Числові системи"
 
 #: include/forms.inc.php:354 include/items.inc.php:128
-#: include/triggers.inc.php:1771 include/views/configuration.item.edit.php:322
+#: include/triggers.inc.php:1770 include/views/configuration.item.edit.php:322
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.prototype.edit.php:243
 msgid "Numeric (float)"
 msgstr "Числовий (дробове)"
 
-#: include/triggers.inc.php:1770 include/triggers.inc.php:1786
-#: include/triggers.inc.php:1790 include/triggers.inc.php:1801
-#: include/triggers.inc.php:1806 include/triggers.inc.php:1811
-msgid "Numeric (integer 64bit)"
-msgstr "Числовий (64 біти)"
+#: include/triggers.inc.php:1771
+msgid "Numeric (integer)"
+msgstr ""
 
 #: include/forms.inc.php:353 include/items.inc.php:126
 #: include/views/configuration.item.edit.php:321
@@ -11694,8 +11690,8 @@ msgstr "OEM"
 #: include/classes/screens/CScreenHttpTestDetails.php:101
 #: include/classes/screens/CScreenHttpTestDetails.php:187
 #: include/classes/screens/CScreenHttpTest.php:156
-#: include/classes/tree/CServiceTree.php:47 include/maps.inc.php:472
-#: include/maps.inc.php:564 include/maps.inc.php:664 include/maps.inc.php:764
+#: include/classes/tree/CServiceTree.php:47 include/maps.inc.php:478
+#: include/maps.inc.php:570 include/maps.inc.php:670 include/maps.inc.php:770
 #: include/triggers.inc.php:172
 #: include/views/monitoring.overview.triggers.php:31
 msgid "OK"
@@ -11752,7 +11748,8 @@ msgstr "Вісімкове в десяткове"
 msgid "October"
 msgstr "Жовтень"
 
-#: include/views/monitoring.sysmap.constructor.php:52 jsLoader.php:153
+#: include/views/monitoring.sysmap.constructor.php:48
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:153
 msgid "Off"
 msgstr "Вимкн"
 
@@ -11763,7 +11760,7 @@ msgstr "Вимкн"
 #: include/views/administration.users.list.php:113
 #: include/views/js/configuration.httpconf.popup.js.php:293
 #: include/views/js/configuration.httpconf.popup.js.php:379
-#: include/views/js/conf.import.js.php:24 report2.php:507
+#: include/views/js/conf.import.js.php:24 report2.php:426
 msgid "Ok"
 msgstr "Ок"
 
@@ -11776,7 +11773,8 @@ msgstr "Тег старої події"
 msgid "Old event tag value"
 msgstr "Значення тега старої події"
 
-#: include/views/monitoring.sysmap.constructor.php:52 jsLoader.php:152
+#: include/views/monitoring.sysmap.constructor.php:48
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:152
 msgid "On"
 msgstr "Увімк"
 
@@ -11801,8 +11799,8 @@ msgstr "Один із об'єктів залишився без групи ву�
 msgid "One time only"
 msgstr "Одноразово"
 
-#: include/views/configuration.services.edit.php:158
-#: include/views/configuration.services.edit.php:196
+#: include/views/configuration.services.edit.php:160
+#: include/views/configuration.services.edit.php:198
 msgid "One-time downtime"
 msgstr "Однократна недоступність"
 
@@ -11857,7 +11855,7 @@ msgid "Only administrators can set dashboard owner."
 msgstr "Тільки адміністратори можуть призначати власника панелі."
 
 #: include/classes/api/services/CMap.php:628
-#: include/classes/api/services/CMap.php:1045
+#: include/classes/api/services/CMap.php:1049
 msgid "Only administrators can set map owner."
 msgstr "Тільки адміністратори можуть задавати власника карти мережі."
 
@@ -12302,8 +12300,8 @@ msgstr "POP"
 #: include/classes/screens/CScreenEvents.php:129
 #: include/classes/screens/CScreenProblem.php:833
 #: include/classes/screens/CScreenProblem.php:974 include/events.inc.php:351
-#: include/events.inc.php:546 include/maps.inc.php:420
-#: include/maps.inc.php:504 include/maps.inc.php:597 include/maps.inc.php:698
+#: include/events.inc.php:546 include/maps.inc.php:426
+#: include/maps.inc.php:510 include/maps.inc.php:603 include/maps.inc.php:704
 #: include/triggers.inc.php:173 include/views/monitoring.overview.items.php:32
 #: include/views/monitoring.overview.triggers.php:40 tr_status.php:684
 msgid "PROBLEM"
@@ -12354,7 +12352,7 @@ msgstr "Сторінка отримала некоректні дані"
 msgid "Parameter"
 msgstr "Параметр"
 
-#: include/classes/validators/CApiInputValidator.php:606
+#: include/classes/validators/CApiInputValidator.php:610
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
 msgstr "Параметр \"%1$s\" застарів."
@@ -12522,7 +12520,7 @@ msgstr "Період"
 
 #: include/forms.inc.php:1808
 #: include/views/configuration.maintenance.edit.php:105
-#: include/views/configuration.services.edit.php:192
+#: include/views/configuration.services.edit.php:194
 msgid "Period type"
 msgstr "Тип періоду"
 
@@ -12631,7 +12629,7 @@ msgstr "Заповнює поле інвентарних даних вузла �
 msgid "Port"
 msgstr "Порт"
 
-#: include/classes/api/services/CHostInterface.php:610
+#: include/classes/api/services/CHostInterface.php:621
 msgid "Port cannot be empty for host interface."
 msgstr "Порт не може бути порожнім для інтерфейсу вузла мережі."
 
@@ -12793,7 +12791,7 @@ msgstr "Відображення проблем"
 msgid "Problem expression"
 msgstr "Вираз для проблеми"
 
-#: jsrpc.php:118
+#: jsrpc.php:119
 msgid "Problem on"
 msgstr "Проблема на"
 
@@ -12816,12 +12814,12 @@ msgstr "Проблема, якщо хоча б у одного із підлег
 #: app/views/report.services.php:63 chart4.php:165
 #: include/classes/widgets/CProblemsWidgetForm.php:35
 #: include/classes/widgets/CTrigOverviewWidgetForm.php:33
-#: include/classes/widgets/CWidgetConfig.php:35 include/maps.inc.php:423
-#: include/maps.inc.php:435 include/maps.inc.php:507 include/maps.inc.php:519
-#: include/maps.inc.php:600 include/maps.inc.php:612 include/maps.inc.php:701
-#: include/maps.inc.php:713 include/menu.inc.php:52
+#: include/classes/widgets/CWidgetConfig.php:35 include/maps.inc.php:429
+#: include/maps.inc.php:441 include/maps.inc.php:513 include/maps.inc.php:525
+#: include/maps.inc.php:606 include/maps.inc.php:618 include/maps.inc.php:707
+#: include/maps.inc.php:719 include/menu.inc.php:52
 #: include/views/common.filter.trigger.php:37
-#: include/views/inventory.host.view.php:147 jsLoader.php:227 report2.php:506
+#: include/views/inventory.host.view.php:147 jsLoader.php:228 report2.php:425
 #: search.php:130 search.php:234 search.php:291 search.php:341
 msgid "Problems"
 msgstr "Проблеми"
@@ -13071,11 +13069,11 @@ msgstr "Прямокутник"
 msgid "Refresh"
 msgstr "Оновити"
 
-#: include/html.inc.php:192 jsLoader.php:228
+#: include/html.inc.php:192 jsLoader.php:229
 msgid "Refresh time"
 msgstr "Час оновлення"
 
-#: jsLoader.php:229
+#: jsLoader.php:230
 msgid "Refresh time multiplier"
 msgstr "Множник інтервалу оновлення"
 
@@ -13186,7 +13184,7 @@ msgstr "Віддалена команда"
 #: include/views/configuration.item.prototype.edit.php:486
 #: include/views/configuration.maintenance.edit.php:119
 #: include/views/configuration.services.edit.php:116
-#: include/views/configuration.services.edit.php:174
+#: include/views/configuration.services.edit.php:176
 #: include/views/configuration.trigger.prototype.edit.php:206
 #: include/views/configuration.trigger.prototype.edit.php:396
 #: include/views/configuration.trigger.prototype.edit.php:482
@@ -13244,7 +13242,7 @@ msgstr "Віддалена команда"
 #: include/views/monitoring.sysmap.constructor.php:43
 #: include/views/monitoring.sysmap.edit.php:247
 #: include/views/monitoring.sysmap.edit.php:265 jsLoader.php:125
-#: jsLoader.php:171 jsLoader.php:253 tr_logform.php:276 tr_logform.php:315
+#: jsLoader.php:171 jsLoader.php:254 tr_logform.php:276 tr_logform.php:315
 msgid "Remove"
 msgstr "Видалити"
 
@@ -13352,7 +13350,7 @@ msgstr "Скинути підтвердження"
 msgid "Reset defaults"
 msgstr "Скинути по замовчуванню"
 
-#: jsrpc.php:113
+#: jsrpc.php:114
 msgid "Resolved"
 msgstr "Вирішено"
 
@@ -13401,7 +13399,7 @@ msgstr "Час відповіді"
 #: include/classes/debug/CProfiler.php:157
 #: include/views/administration.general.regularexpressions.edit.php:112
 #: include/views/administration.general.regularexpressions.edit.php:117
-#: tr_testexpr.php:146 tr_testexpr.php:183
+#: tr_testexpr.php:147 tr_testexpr.php:184
 msgid "Result"
 msgstr "Результат"
 
@@ -13413,7 +13411,7 @@ msgstr "Результат ФАЛЬШ"
 msgid "Result is TRUE"
 msgstr "Результат ІСТИНА"
 
-#: tr_testexpr.php:50
+#: tr_testexpr.php:51
 msgid "Result type"
 msgstr "Тип результату"
 
@@ -13425,7 +13423,7 @@ msgstr "Залишилось повторних спроб"
 msgid "Retrieve only headers"
 msgstr "Отримати тільки заголовки"
 
-#: include/classes/items/CHelpItems.php:277
+#: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:575
 msgid "Retrieving contents of a file. Returns text"
 msgstr "Отримує вміст файлу. Повертає текст"
@@ -13667,7 +13665,7 @@ msgstr "SNMPv3 агент"
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr "SQL запитів: %1$s (selects: %2$s | executes: %3$s)"
 
-#: include/db.inc.php:188 include/func.inc.php:1871
+#: include/db.inc.php:188 include/func.inc.php:1873
 msgid "SQL error. Please contact Zabbix administrator."
 msgstr "Помилка в SQL. Будь-ласка, зверніться до Zabbix адміністратора."
 
@@ -13678,13 +13676,13 @@ msgstr "Помилка в SQL. Будь-ласка, зверніться до Za
 msgid "SQL query"
 msgstr "SQL запит"
 
-#: include/classes/db/DB.php:835
+#: include/classes/db/DB.php:847
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "Помилка при виконанні SQL запиту \"%1$s\""
 
-#: include/classes/db/DB.php:456 include/classes/db/DB.php:503
-#: include/classes/db/DB.php:562
+#: include/classes/db/DB.php:468 include/classes/db/DB.php:515
+#: include/classes/db/DB.php:574
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Помилка при виконанні SQL запиту \"%1$s\"."
@@ -13797,17 +13795,17 @@ msgstr "Комплексний екран \"%1$s\" вже існує в шабл
 msgid "Screen \"%1$s\" already exists."
 msgstr "Комплексний екран \"%1$s\" вже існує."
 
-#: include/classes/api/services/CScreenItem.php:883
+#: include/classes/api/services/CScreenItem.php:887
 #, c-format
 msgid "Screen \"%1$s\" cell X - %2$s Y - %3$s is already taken."
 msgstr "Комірка X - %2$s Y - %3$s комплексного екрану \"%1$s\" вже зайнята."
 
-#: include/classes/api/services/CScreenItem.php:790
+#: include/classes/api/services/CScreenItem.php:794
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is incorrect."
 msgstr "Об'єднання стовпчиків в комірці X - %2$s Y - %3$s комплексного екрану \"%1$s\" некоректне."
 
-#: include/classes/api/services/CScreenItem.php:839
+#: include/classes/api/services/CScreenItem.php:843
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is too big."
 msgstr "Об'єднання стовпчиків в комірці X - %2$s Y - %3$s комплексного екрану \"%1$s\" занадто велике."
@@ -13820,12 +13818,12 @@ msgstr "Об'єднання стовпчиків в комірці X - %2$s Y - 
 msgid "Screen \"%1$s\" is public and read-only sharing is disallowed."
 msgstr "Комплексний екран \"%1$s\" є публічним, тому спільний доступ тільки на читання не дозволений."
 
-#: include/classes/api/services/CScreenItem.php:776
+#: include/classes/api/services/CScreenItem.php:780
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is incorrect."
 msgstr "Об'єднання рядків в комірці X - %2$s Y - %3$s комплексного екрану \"%1$s\" некоректне."
 
-#: include/classes/api/services/CScreenItem.php:826
+#: include/classes/api/services/CScreenItem.php:830
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr "Об'єднання рядків в комірці X - %2$s Y - %3$s комплексного екрану \"%1$s\" занадто велике."
@@ -13931,7 +13929,7 @@ msgstr "Скрипт оновлено"
 
 #: app/views/administration.script.edit.php:25
 #: app/views/administration.script.list.php:27 include/menu.inc.php:296
-#: jsLoader.php:230 scripts_exec.php:24
+#: jsLoader.php:231 scripts_exec.php:24
 msgid "Scripts"
 msgstr "Скрипти"
 
@@ -13949,8 +13947,9 @@ msgid "Search pattern is empty"
 msgstr "Шаблон пошуку пустий"
 
 #: include/forms.inc.php:1935 include/maintenances.inc.php:112
+msgctxt "adjective"
 msgid "Second"
-msgstr "Другий"
+msgstr ""
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -14040,7 +14039,7 @@ msgstr "Ім'я безпеки"
 #: include/views/monitoring.screen.constructor.edit.php:356
 #: include/views/monitoring.screen.constructor.edit.php:548
 #: include/views/monitoring.screen.constructor.edit.php:621
-#: include/views/monitoring.screen.constructor.edit.php:628 jsLoader.php:201
+#: include/views/monitoring.screen.constructor.edit.php:628 jsLoader.php:202
 #: latest.php:359 popup.php:615 popup.php:699 popup.php:785 popup.php:866
 #: popup.php:948 popup.php:1026 popup.php:1199 popup.php:1347 popup.php:1418
 #: popup.php:1527 popup.php:1597 popup.php:1660 popup.php:1838
@@ -14176,8 +14175,8 @@ msgstr "Час на сервері"
 
 #: include/actions.inc.php:72 include/audit.inc.php:39
 #: include/views/configuration.services.child.list.php:38
-#: include/views/configuration.services.edit.php:333
-#: include/views/configuration.services.parent.list.php:35 services.php:481
+#: include/views/configuration.services.edit.php:335
+#: include/views/configuration.services.parent.list.php:35 services.php:446
 #: srv_status.php:142
 msgid "Service"
 msgstr "Послуга"
@@ -14244,7 +14243,7 @@ msgstr "Порт сервісу"
 msgid "Service start time must be less than end time."
 msgstr "Час початку послуги має бути меншим за час закінчення."
 
-#: include/views/configuration.services.edit.php:183
+#: include/views/configuration.services.edit.php:185
 msgid "Service times"
 msgstr "Періоди послуги"
 
@@ -14281,7 +14280,7 @@ msgstr "Встановити режим інвентарних даних вуз
 
 #: app/views/monitoring.widget.problems.view.php:60
 #: include/classes/screens/CScreenEvents.php:33
-#: include/classes/screens/CScreenHistory.php:162
+#: include/classes/screens/CScreenHistory.php:168
 #: include/classes/screens/CScreenProblem.php:764
 #: include/classes/screens/CScreenProblem.php:942
 #: include/classes/widgets/CHostsWidgetForm.php:63
@@ -14313,7 +14312,7 @@ msgstr "Важливість (в порядку спадання)"
 msgid "Shape"
 msgstr "Фігура"
 
-#: app/views/monitoring.dashboard.view.php:90
+#: app/views/monitoring.dashboard.view.php:94
 #: include/views/monitoring.screen.edit.php:208
 #: include/views/monitoring.slideconf.edit.php:255
 #: include/views/monitoring.sysmap.edit.php:375
@@ -14321,8 +14320,8 @@ msgid "Sharing"
 msgstr "Спільний доступ"
 
 #: include/classes/api/services/CMap.php:672
-#: include/classes/api/services/CMap.php:1104
-#: include/classes/api/services/CMap.php:1178
+#: include/classes/api/services/CMap.php:1108
+#: include/classes/api/services/CMap.php:1182
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "В опції спільного доступу \"%1$s\" відсутнє значення для карти мережі \"%2$s\"."
@@ -14338,7 +14337,7 @@ msgstr "В опції спільного доступу \"%1$s\" відсутн�
 #: include/classes/widgets/CProblemsWidgetForm.php:33
 #: include/classes/widgets/CTrigOverviewWidgetForm.php:31
 #: include/views/common.filter.trigger.php:34
-#: include/views/js/monitoring.sysmaps.js.php:76 report2.php:533
+#: include/views/js/monitoring.sysmaps.js.php:76 report2.php:452
 #: tr_status.php:627 tr_status.php:632
 msgid "Show"
 msgstr "Відобразити"
@@ -14439,7 +14438,7 @@ msgstr "Відображувати попередження, якщо Zabbix с�
 msgid "Show working time"
 msgstr "Відображувати робочий час"
 
-#: include/views/monitoring.sysmap.constructor.php:48 jsLoader.php:155
+#: include/views/monitoring.sysmap.constructor.php:53 jsLoader.php:155
 msgid "Shown"
 msgstr "Показана"
 
@@ -14588,7 +14587,7 @@ msgstr "Слайди"
 msgid "Slovak (sk_SK)"
 msgstr "Словацька (sk_SK)"
 
-#: jsLoader.php:187
+#: jsLoader.php:188
 msgid "Snooze"
 msgstr "Подрімати"
 
@@ -14629,7 +14628,7 @@ msgstr "Програмне забезпечення E"
 msgid "Software architecture information. Returns string"
 msgstr "Інформація про архітектуру програмного забезпечення. Повертає рядок"
 
-#: app/views/monitoring.dashboard.sharing_form.js.php:33 jsLoader.php:231
+#: app/views/monitoring.dashboard.sharing_form.js.php:33 jsLoader.php:232
 msgid "Something went wrong. Please try again later!"
 msgstr "Щось пішло не так. Будь-ласка, повторіть спробу пізніше!"
 
@@ -14652,7 +14651,7 @@ msgstr "Сортувати тригери за"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Сортування по полю \"%1$s\" не дозволено."
 
-#: include/classes/screens/CScreenHistory.php:159
+#: include/classes/screens/CScreenHistory.php:165
 #: include/classes/widgets/CGraphWidgetForm.php:32
 msgid "Source"
 msgstr "Джерело"
@@ -14752,7 +14751,7 @@ msgid "Status (descending)"
 msgstr "Статус (в порядку спадання)"
 
 #: include/views/configuration.services.child.list.php:39
-#: include/views/configuration.services.parent.list.php:35 services.php:483
+#: include/views/configuration.services.parent.list.php:35 services.php:448
 msgid "Status calculation"
 msgstr "Підрахунок статусу"
 
@@ -14850,7 +14849,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Суб'єкт"
 
-#: jsLoader.php:232
+#: jsLoader.php:233
 msgid "Submap"
 msgstr "Суб-карта"
 
@@ -14987,12 +14986,12 @@ msgstr "ВСЬОГО"
 msgid "TRUE"
 msgstr "ІСТИНА"
 
-#: include/classes/db/DB.php:209
+#: include/classes/db/DB.php:221
 #, c-format
 msgid "Table \"%1$s\" does not exist."
 msgstr "Таблиця \"%1$s\" не існує."
 
-#: include/classes/db/DB.php:404
+#: include/classes/db/DB.php:416
 #, c-format
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "Таблиця \"%1$s\" не має поля з ім'ям \"%2$s\"."
@@ -15063,7 +15062,7 @@ msgstr "Telnet"
 #: include/forms.inc.php:461 include/forms.inc.php:830
 #: include/views/configuration.template.edit.php:37
 #: include/views/configuration.template.edit.php:388
-#: include/views/configuration.trigger.prototype.list.php:62 report2.php:302
+#: include/views/configuration.trigger.prototype.list.php:62 report2.php:275
 #: search.php:408
 msgid "Template"
 msgstr "Шаблон"
@@ -15076,7 +15075,7 @@ msgstr "Шаблон \"%1$s\" вже існує."
 
 #: include/classes/api/services/CHostGroup.php:1400
 #: include/classes/api/services/CTemplate.php:371
-#: include/classes/api/services/CTemplate.php:969
+#: include/classes/api/services/CTemplate.php:981
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Шаблон \"%1$s\" не може бути без групи вузлів мережі."
@@ -15098,7 +15097,7 @@ msgstr "Шаблон не може бути приєднано до іншого
 msgid "Template deleted"
 msgstr "Шаблон видалено"
 
-#: report2.php:270
+#: report2.php:243
 msgid "Template group"
 msgstr "Група шаблону"
 
@@ -15124,7 +15123,7 @@ msgstr "Шаблонний комплексний екран \"%1$s\" вже і�
 msgid "Template screens"
 msgstr "Комплексні екрани з шаблону"
 
-#: report2.php:335
+#: report2.php:308
 msgid "Template trigger"
 msgstr "Тригер з шаблону"
 
@@ -15136,7 +15135,7 @@ msgstr "Шаблон оновлено"
 msgid "Template value"
 msgstr "Значення з шаблону"
 
-#: include/classes/api/services/CTemplate.php:1024
+#: include/classes/api/services/CTemplate.php:1036
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Шаблон з таким самим іменем \"%1$s\" вже існує."
@@ -15148,7 +15147,7 @@ msgid "Template with the same name \"%s\" already exists."
 msgstr "Шаблон із цим самим ім'ям \"%s\" вже існує."
 
 #: include/classes/api/services/CTemplate.php:445
-#: include/classes/api/services/CTemplate.php:989
+#: include/classes/api/services/CTemplate.php:1001
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Шаблон із цим самим видимим ім'ям \"%1$s\" вже існує."
@@ -15190,7 +15189,7 @@ msgstr "Шаблони \"%1$s\" від'єднано від вузлів мере
 #: include/views/configuration.trigger.prototype.edit.php:416
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.edit.php:433 tr_testexpr.php:25
-#: tr_testexpr.php:132 tr_testexpr.php:192
+#: tr_testexpr.php:133 tr_testexpr.php:193
 msgid "Test"
 msgstr "Тест"
 
@@ -15202,7 +15201,7 @@ msgstr "Тест аутентифікації"
 msgid "Test confirmation"
 msgstr "Тест підтвердження"
 
-#: tr_testexpr.php:138
+#: tr_testexpr.php:139
 msgid "Test data"
 msgstr "Тестові дані"
 
@@ -15216,8 +15215,7 @@ msgid "Test string"
 msgstr "Тестовий рядок"
 
 #: include/forms.inc.php:357 include/items.inc.php:134
-#: include/items.inc.php:1656 include/triggers.inc.php:1774
-#: include/views/configuration.item.edit.php:325
+#: include/items.inc.php:1656 include/views/configuration.item.edit.php:325
 #: include/views/configuration.item.massupdate.php:199
 #: include/views/configuration.item.prototype.edit.php:246
 #: include/views/js/monitoring.sysmaps.js.php:292
@@ -15230,12 +15228,12 @@ msgstr "Текст (одне поле)"
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "Метод \"%1$s.%2$s\" повинен викликатись без \"auth\" параметра."
 
-#: include/classes/api/services/CScreenItem.php:907
+#: include/classes/api/services/CScreenItem.php:911
 #, c-format
 msgid "The X coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr "X координата елементу комплексного екрана розміщеного в X - %1$s та Y - %2$s на комплексному екрані \"%3$s\" занадто велика."
 
-#: include/classes/api/services/CScreenItem.php:919
+#: include/classes/api/services/CScreenItem.php:923
 #, c-format
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr "Y координата елементу комплексного екрана розміщеного в X - %1$s та Y - %2$s на комплексному екрані \"%3$s\" занадто велика."
@@ -15346,11 +15344,11 @@ msgstr "Це поле автоматично заповнюється елеме
 msgid "This month"
 msgstr "Цей місяць"
 
-#: include/classes/screens/CScreenBuilder.php:623
+#: include/classes/screens/CScreenBuilder.php:627
 msgid "This screen column is not empty. Delete it?"
 msgstr "Стовпчик комплексного екрану не порожній. Видалити його?"
 
-#: include/classes/screens/CScreenBuilder.php:577
+#: include/classes/screens/CScreenBuilder.php:581
 msgid "This screen row is not empty. Delete it?"
 msgstr "Рядок комплексного екрану не порожній. Видалити його?"
 
@@ -15376,8 +15374,8 @@ msgid "Thursday"
 msgstr "Четвер"
 
 #: app/views/report.services.php:62
-#: include/views/configuration.services.edit.php:255
-#: include/views/configuration.services.edit.php:298
+#: include/views/configuration.services.edit.php:257
+#: include/views/configuration.services.edit.php:300
 #: include/views/reports.toptriggers.php:68 report4.php:191 services.php:202
 #: services.php:208
 msgid "Till"
@@ -15400,9 +15398,9 @@ msgstr "До"
 #: include/events.inc.php:728
 #: include/views/administration.auditacts.list.php:47
 #: include/views/administration.auditlogs.list.php:61
-#: include/views/configuration.services.edit.php:288
-#: include/views/configuration.services.edit.php:302
-#: include/views/configuration.services.edit.php:335
+#: include/views/configuration.services.edit.php:290
+#: include/views/configuration.services.edit.php:304
+#: include/views/configuration.services.edit.php:337
 #: include/views/configuration.triggers.expression.php:85
 #: include/views/configuration.triggers.expression.php:93 jsLoader.php:149
 #: popup_trexpr.php:33 popup_trexpr.php:130 tr_status.php:491
@@ -15465,18 +15463,18 @@ msgid "Timeout"
 msgstr "Час очікування"
 
 #: app/views/monitoring.widget.plaintext.view.php:23
-#: include/classes/screens/CScreenHistory.php:155
-#: include/classes/screens/CScreenHistory.php:270
+#: include/classes/screens/CScreenHistory.php:161
+#: include/classes/screens/CScreenHistory.php:276
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:53
 msgid "Timestamp"
 msgstr "Час виникнення (штамп)"
 
-#: include/views/js/monitoring.sysmaps.js.php:657 report2.php:492
+#: include/views/js/monitoring.sysmaps.js.php:657 report2.php:411
 msgid "To"
 msgstr "Для"
 
-#: jsLoader.php:248
+#: jsLoader.php:249
 msgid "To set a host interface select a single item type for all items"
 msgstr "Для встановлення інтерфейсу вузла мережі виберіть один тип елемента даних для всіх елементів даних"
 
@@ -15558,8 +15556,8 @@ msgstr "Динаміка"
 #: include/views/configuration.triggers.edit.php:558
 #: include/views/js/monitoring.sysmaps.js.php:71
 #: include/views/js/monitoring.sysmaps.js.php:695
-#: include/views/reports.toptriggers.php:105 jsLoader.php:158 jsLoader.php:233
-#: services.php:484 tr_logform.php:27 tr_logform.php:178 tr_logform.php:400
+#: include/views/reports.toptriggers.php:105 jsLoader.php:158 jsLoader.php:234
+#: services.php:449 tr_logform.php:27 tr_logform.php:178 tr_logform.php:400
 msgid "Trigger"
 msgstr "Тригер"
 
@@ -15568,7 +15566,7 @@ msgstr "Тригер"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Тригер \"%1$s\" вже існує у \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1512
+#: include/classes/api/services/CTriggerGeneral.php:1520
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Тригер \"%1$s\" належить шаблонам з різними зв'язками."
@@ -15582,7 +15580,7 @@ msgstr "Тригер \"%1$s\" залежить від тригера \"%2$s\", �
 msgid "Trigger added"
 msgstr "Тригер додано"
 
-#: include/classes/api/services/CTrigger.php:1130
+#: include/classes/api/services/CTrigger.php:1140
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Тригер не може залежати від тригера, який успадкований від нього."
 
@@ -15684,12 +15682,12 @@ msgstr "Прототип тригера"
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Прототип тригера \"%1$s\" вже існує в \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1516
+#: include/classes/api/services/CTriggerGeneral.php:1524
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "Прототип тригера \"%1$s\" належить шаблонам з різними зв'язками."
 
-#: include/classes/api/services/CTriggerGeneral.php:1435
+#: include/classes/api/services/CTriggerGeneral.php:1443
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Прототип тригера \"%1$s\" містить прототипи елементів даних з декількох правил виявлення."
@@ -15699,7 +15697,7 @@ msgstr "Прототип тригера \"%1$s\" містить прототип
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Прототип тригера \"%1$s\" залежить від тригера \"%2$s\", який не існує."
 
-#: include/classes/api/services/CTriggerGeneral.php:1430
+#: include/classes/api/services/CTriggerGeneral.php:1438
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "Прототип тригера \"%1$s\" повинен містити принаймні один прототип елемента даних."
@@ -15756,11 +15754,11 @@ msgstr "Важливість тригера"
 msgid "Trigger severity"
 msgstr "Важливість тригера"
 
-#: jsLoader.php:214
+#: jsLoader.php:215
 msgid "Trigger status \"OK\""
 msgstr "Стан тригера \"ОК\""
 
-#: jsLoader.php:215
+#: jsLoader.php:216
 msgid "Trigger status \"Problem\""
 msgstr "Стан тригера \"Проблема\""
 
@@ -15788,7 +15786,7 @@ msgstr "Тригер оновлено"
 #: include/views/inventory.host.view.php:176
 #: include/views/js/monitoring.sysmaps.js.php:140
 #: include/views/monitoring.overview.items.php:54
-#: include/views/monitoring.overview.triggers.php:88 jsLoader.php:234
+#: include/views/monitoring.overview.triggers.php:88 jsLoader.php:235
 #: popup.php:60 search.php:129 search.php:136 search.php:168 search.php:197
 #: search.php:233 search.php:290 search.php:340 search.php:411 search.php:442
 #: search.php:468 tr_status.php:26 tr_status.php:746
@@ -15867,7 +15865,7 @@ msgstr "Два елементи даних (\"%1$s\" та \"%2$s\") не мож�
 #: include/views/configuration.item.prototype.edit.php:263
 #: include/views/configuration.item.prototype.list.php:48
 #: include/views/configuration.maintenance.list.php:59
-#: include/views/configuration.services.edit.php:142
+#: include/views/configuration.services.edit.php:144
 #: include/views/inventory.host.list.php:68
 #: include/views/js/monitoring.sysmaps.js.php:67
 #: include/views/js/monitoring.sysmaps.js.php:339
@@ -15936,7 +15934,7 @@ msgstr "НЕВІДОМО"
 #: include/views/configuration.triggers.edit.php:545
 #: include/views/js/monitoring.sysmaps.js.php:239
 #: include/views/monitoring.screen.constructor.edit.php:668
-#: include/views/monitoring.sysmap.edit.php:235 jsLoader.php:236
+#: include/views/monitoring.sysmap.edit.php:235 jsLoader.php:237
 #: popup_httpstep.php:37 tr_logform.php:387
 msgid "URL"
 msgstr "URL"
@@ -15962,7 +15960,7 @@ msgid "URL is not properly encoded."
 msgstr "URL закодовано некоректно."
 
 #: include/classes/api/services/CMap.php:915
-#: include/classes/api/services/CMap.php:1353
+#: include/classes/api/services/CMap.php:1357
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Ім'я URL має бути унікальним для карти мережі \"%1$s\"."
@@ -15976,13 +15974,13 @@ msgid "URL parameter name is empty."
 msgstr "Ім'я параметра URL не може бути пустим."
 
 #: include/classes/api/services/CMap.php:909
-#: include/classes/api/services/CMap.php:1347
+#: include/classes/api/services/CMap.php:1351
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL повинен мати обидва поля \"name\" та \"url\" для карти мережі \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:236
-#: include/views/monitoring.sysmap.edit.php:286 jsLoader.php:237
+#: include/views/monitoring.sysmap.edit.php:286 jsLoader.php:238
 msgid "URLs"
 msgstr "URLи"
 
@@ -16010,7 +16008,7 @@ msgstr "Неможливо вибрати конфігурацію."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Неможливо завантажити файл, так як \"file_uploads\" відімкнено."
 
-#: include/maps.inc.php:531 include/maps.inc.php:624 include/maps.inc.php:725
+#: include/maps.inc.php:537 include/maps.inc.php:630 include/maps.inc.php:731
 msgid "Unacknowledged"
 msgstr "Непідтверджено"
 
@@ -16063,7 +16061,7 @@ msgstr "Одиниця виміру"
 #: include/items.inc.php:170 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:68
-#: include/triggers.inc.php:183 include/triggers.inc.php:2031
+#: include/triggers.inc.php:183 include/triggers.inc.php:2088
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/configuration.action.edit.php:457
 #: include/views/configuration.triggers.list.php:43
@@ -16185,7 +16183,7 @@ msgstr "Від'єднано: Прототип тригера \"%1$s\" від \"%
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Від'єднано: Веб сценарій \"%1$s\" на \"%2$s\"."
 
-#: jsLoader.php:184
+#: jsLoader.php:185
 msgid "Unmute"
 msgstr "Увімк. звук"
 
@@ -16210,7 +16208,7 @@ msgstr "Непідтримуваний параметр \"%1$s\" для прот
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr "Непідтримуваний параметр \"%2$s\" для дії умови фільтру \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1005
+#: include/classes/api/services/CDiscoveryRule.php:1015
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr "Непідтримуваний параметр \"%2$s\" для правила виявлення умови фільтру \"%1$s\"."
@@ -16230,7 +16228,7 @@ msgstr "Непідтримуваний параметр \"%2$s\" для інве
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr "Непідтримуваний параметр \"%2$s\" для фільтру в дії \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:973
+#: include/classes/api/services/CDiscoveryRule.php:983
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Непідтримуваний параметр \"%2$s\" для фільтру в правилі виявлення \"%1$s\"."
@@ -16283,7 +16281,7 @@ msgstr "Доступний"
 #: include/views/configuration.item.prototype.edit.php:518
 #: include/views/configuration.maintenance.edit.php:155
 #: include/views/configuration.maintenance.edit.php:215
-#: include/views/configuration.services.edit.php:348
+#: include/views/configuration.services.edit.php:350
 #: include/views/configuration.template.edit.php:499
 #: include/views/configuration.trigger.prototype.edit.php:598
 #: include/views/configuration.trigger.prototype.massupdate.php:163
@@ -16293,9 +16291,9 @@ msgstr "Доступний"
 #: include/views/monitoring.screen.constructor.edit.php:751
 #: include/views/monitoring.screen.edit.php:213
 #: include/views/monitoring.slideconf.edit.php:260
-#: include/views/monitoring.sysmap.constructor.php:63
+#: include/views/monitoring.sysmap.constructor.php:68
 #: include/views/monitoring.sysmap.edit.php:380
-#: include/views/monitoring.triggerComment.php:45 jsLoader.php:235
+#: include/views/monitoring.triggerComment.php:45 jsLoader.php:236
 #: popup_media.php:135 tr_logform.php:394
 msgid "Update"
 msgstr "Оновити"
@@ -16362,7 +16360,7 @@ msgstr "Стан вузла мережі \"%1$s\" оновлено."
 msgid "Updated: %s"
 msgstr "Оновлено: %s"
 
-#: include/classes/api/services/CDiscoveryRule.php:865
+#: include/classes/api/services/CDiscoveryRule.php:875
 #, c-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Оновлено: Прототип вузла мережі \"%1$s\" на \"%2$s\"."
@@ -16392,8 +16390,8 @@ msgstr "Карти верхнього рівня"
 
 #: include/classes/screens/CScreenDiscovery.php:124
 #: include/classes/screens/CScreenDiscovery.php:250
-#: include/views/configuration.services.edit.php:148
-#: include/views/configuration.services.edit.php:194
+#: include/views/configuration.services.edit.php:150
+#: include/views/configuration.services.edit.php:196
 msgid "Uptime"
 msgstr "Доступний"
 
@@ -16561,7 +16559,7 @@ msgid "User group for database down message \"%1$s\"."
 msgstr "Група користувачів для повідомлення про недоступність бази даних \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:738
-#: include/classes/api/services/CMap.php:1169
+#: include/classes/api/services/CMap.php:1173
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "У спільного доступу групи користувачів відсутні параметри: %1$s для карти мережі \"%2$s\"."
@@ -16638,7 +16636,7 @@ msgid "User sessions"
 msgstr "Сесії користувачів"
 
 #: include/classes/api/services/CMap.php:663
-#: include/classes/api/services/CMap.php:1095
+#: include/classes/api/services/CMap.php:1099
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "У спільного доступу користувачів відсутні параметри: %1$s для карти мережі \"%2$s\"."
@@ -16679,6 +16677,10 @@ msgstr "Користувач з псевдонімом \"%s\" вже існує.
 #: include/views/general.login.php:51 index.php:30
 msgid "Username"
 msgstr "Ім'я користувача"
+
+#: app/views/administration.mediatype.edit.php:81
+msgid "Username and password"
+msgstr ""
 
 #: app/views/monitoring.dashboard.sharing_form.php:48 include/menu.inc.php:281
 #: include/views/administration.usergroups.edit.php:54
@@ -16890,43 +16892,43 @@ msgstr "Час роботи (uptime) віртуальної машини VMware,
 #: app/views/monitoring.widget.plaintext.view.php:23
 #: include/blocks.inc.php:420 include/classes/graphdraw/CPieGraphDraw.php:340
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenHistory.php:167
-#: include/classes/screens/CScreenHistory.php:271
+#: include/classes/screens/CScreenHistory.php:173
+#: include/classes/screens/CScreenHistory.php:277
 #: include/classes/screens/CScreenPlainText.php:53
 #: include/views/administration.general.macros.edit.php:33
 #: include/views/administration.general.valuemapping.edit.php:46
 #: include/views/configuration.httpconf.edit.php:117
 #: include/views/configuration.httpconf.popup.php:146
 #: include/views/hostmacros.php:50 include/views/monitoring.history.php:147
-#: tr_testexpr.php:50
+#: tr_testexpr.php:51
 #, c-format
 msgid "Value"
 msgstr "Значення"
 
 #: include/classes/api/services/CMap.php:884
-#: include/classes/api/services/CMap.php:1322
+#: include/classes/api/services/CMap.php:1326
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Значення \"%1$s\" являється недопустимим для параметра \"grid_align\". Варіанти: \"%2$s\" та \"%3$s\""
 
 #: include/classes/api/services/CMap.php:895
-#: include/classes/api/services/CMap.php:1333
+#: include/classes/api/services/CMap.php:1337
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\"."
 msgstr "Значення \"%1$s\" є недопустимим для параметра \"grid_show\". Варіанти: \"%2$s\" та \"%3$s\"."
 
 #: include/classes/api/services/CMap.php:874
-#: include/classes/api/services/CMap.php:1312
+#: include/classes/api/services/CMap.php:1316
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "Значення \"%1$s\" є недопустимим для параметра \"grid_show\". Варіанти: \"%2$s\"."
 
-#: include/classes/db/DB.php:347
+#: include/classes/db/DB.php:359
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Значення \"%1$s\" являється занадто довгим для поля \"%2$s\" - %3$d символів. Допустима довжина %4$d символів."
 
-#: include/classes/db/DB.php:376
+#: include/classes/db/DB.php:388
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "Значення \"%1$s\" являється занадто довгим для поля \"%2$s\" - %3$d символів. Допустима довжина 2048 символів."
@@ -17022,6 +17024,11 @@ msgstr "Значення без імені не дозволені в полях
 msgid "Variables"
 msgstr "Змінні"
 
+#: include/classes/items/CHelpItems.php:157
+#: include/classes/items/CHelpItems.php:455
+msgid "Various information about specific process(es). Returns float"
+msgstr ""
+
 #: include/hosts.inc.php:249
 msgid "Vendor"
 msgstr "Постачальник"
@@ -17086,7 +17093,7 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Попередження"
 
-#: jsLoader.php:190
+#: jsLoader.php:191
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Вибачте, але досягнуто максимум для запам'ятовування елементів."
 
@@ -17269,15 +17276,15 @@ msgstr "Помилкові поля для вузла мережі \"%1$s\"."
 msgid "Wrong fields for image \"%1$s\"."
 msgstr "Помилкові поля для картинки \"%1$s\"."
 
-#: include/classes/api/services/CMapElement.php:969
+#: include/classes/api/services/CMapElement.php:852
 msgid "Wrong fields for linktrigger delete."
 msgstr "Помилкові поля для видалення linktrigger."
 
-#: include/classes/api/services/CMapElement.php:944
+#: include/classes/api/services/CMapElement.php:827
 msgid "Wrong fields for linktrigger update."
 msgstr "Помилкові поля для оновлення linktrigger."
 
-#: include/classes/api/services/CMapElement.php:909
+#: include/classes/api/services/CMapElement.php:792
 msgid "Wrong fields for linktrigger."
 msgstr "Помилкові поля для linktrigger."
 
@@ -17287,7 +17294,7 @@ msgstr "Помилкові поля для linktrigger."
 msgid "Wrong fields for macro \"%1$s\"."
 msgstr "Помилкові поля для макросу \"%1$s\"."
 
-#: include/classes/api/services/CMapElement.php:462
+#: include/classes/api/services/CMapElement.php:345
 msgid "Wrong fields for map link."
 msgstr "Помилкові поля для зв'язку на карті мережі."
 
@@ -17309,14 +17316,23 @@ msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Помилкові поля для часу послуги \"%1$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:495
-#: include/classes/api/services/CTriggerGeneral.php:643
+#: include/classes/api/services/CTriggerGeneral.php:647
 msgid "Wrong fields for trigger prototype."
 msgstr "Помилкові поля для прототипу тригера."
 
 #: include/classes/api/services/CTriggerGeneral.php:490
-#: include/classes/api/services/CTriggerGeneral.php:637
+#: include/classes/api/services/CTriggerGeneral.php:641
 msgid "Wrong fields for trigger."
 msgstr "Помилкові поля для тригера."
+
+#: include/classes/api/services/CMapElement.php:63
+#: include/classes/api/services/CMap.php:920
+#: include/classes/api/services/CMap.php:1362
+#: include/classes/api/services/CScreenItem.php:967
+#: include/classes/api/services/CTriggerGeneral.php:515
+#: include/classes/api/services/CTriggerGeneral.php:668
+msgid "Wrong value for url field."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:228
 #: include/views/js/monitoring.sysmaps.js.php:361
@@ -17417,7 +17433,7 @@ msgstr "Так"
 msgid "Yesterday"
 msgstr "Вчора"
 
-#: include/func.inc.php:1726
+#: include/func.inc.php:1728
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Ви увійшли під іменем \"%1$s\"."
@@ -17426,7 +17442,7 @@ msgstr "Ви увійшли під іменем \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Ви не можете вибрати деякі з мов, тому що їх локалі не встановлено на веб-сервері."
 
-#: include/func.inc.php:1743
+#: include/func.inc.php:1745
 msgid "You are not logged in"
 msgstr "Ви не увійшли в систему"
 
@@ -17467,8 +17483,8 @@ msgstr "Ви не вказали цілі глобального скрипта 
 #: include/classes/api/services/CTemplate.php:391
 #: include/classes/api/services/CTemplate.php:527
 #: include/classes/api/services/CTemplate.php:554
-#: include/classes/api/services/CTemplate.php:961
-#: include/classes/api/services/CTemplate.php:1066
+#: include/classes/api/services/CTemplate.php:973
+#: include/classes/api/services/CTemplate.php:1078
 #: include/classes/api/services/CUserMacro.php:267
 #: include/classes/api/services/CUserMacro.php:351
 #: include/classes/api/services/CUserMacro.php:444
@@ -17479,7 +17495,7 @@ msgstr "У вас немає повноважень для виконання ц
 msgid "You do not have permissions to create users."
 msgstr "У вас немає повноважень для створення користувачів."
 
-#: include/func.inc.php:1726
+#: include/func.inc.php:1728
 msgid "You have no permissions to access this page."
 msgstr "У вас недостатньо прав для доступу до цієї сторінки."
 
@@ -17487,13 +17503,17 @@ msgstr "У вас недостатньо прав для доступу до ц�
 msgid "You have unsaved changes."
 msgstr "У вас є незбережені зміни."
 
-#: include/func.inc.php:1745
+#: include/func.inc.php:1747
 msgid "You must login to view this page."
 msgstr "Ви маєте увійти в систему для перегляду цієї сторінки."
 
-#: app/views/monitoring.dashboard.sharing_form.js.php:28 jsLoader.php:239
+#: app/views/monitoring.dashboard.sharing_form.js.php:28 jsLoader.php:240
 msgid "You need permission to perform this action!"
 msgstr "Для виконання цієї дії вам необхідно мати права доступу!"
+
+#: include/classes/db/DB.php:136
+msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
+msgstr ""
 
 #: index.php:25
 msgid "ZABBIX"
@@ -17583,7 +17603,7 @@ msgstr "IP адресу або порт Zabbix сервера не задано!
 msgid "Zabbix server details"
 msgstr "Деталі Zabbix сервера"
 
-#: jsrpc.php:182
+#: jsrpc.php:183
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix сервер не запущено: відображувана інформація може бути не актуальною."
 
@@ -17622,26 +17642,26 @@ msgstr "[Неправильне значення дня: \"%s\" ]"
 msgid "[Wrong value for month: \"%s\" ]"
 msgstr "[Неправильне значення місяця: \"%s\" ]"
 
-#: include/classes/validators/CApiInputValidator.php:526
+#: include/classes/validators/CApiInputValidator.php:530
 msgid "a boolean is expected"
 msgstr "очікується логічне значення"
 
 #: include/classes/api/services/CTriggerGeneral.php:241
 #: include/classes/api/services/CTriggerGeneral.php:257
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
-#: include/classes/validators/CApiInputValidator.php:200
+#: include/classes/validators/CApiInputValidator.php:204
 #: include/classes/validators/CNewValidator.php:259
 msgid "a character string is expected"
 msgstr "очікується рядок символів"
 
-#: include/classes/validators/CApiInputValidator.php:355
-#: include/classes/validators/CApiInputValidator.php:492
+#: include/classes/validators/CApiInputValidator.php:359
+#: include/classes/validators/CApiInputValidator.php:496
 msgid "a number is expected"
 msgstr "очікується число"
 
-#: include/classes/validators/CApiInputValidator.php:360
-#: include/classes/validators/CApiInputValidator.php:497
-#: include/classes/validators/CApiInputValidator.php:962
+#: include/classes/validators/CApiInputValidator.php:364
+#: include/classes/validators/CApiInputValidator.php:501
+#: include/classes/validators/CApiInputValidator.php:966
 msgid "a number is too large"
 msgstr "число занадто велике"
 
@@ -17655,17 +17675,17 @@ msgstr "очікується числове значення"
 msgid "a time is expected"
 msgstr "очікувався час"
 
-#: include/classes/validators/CApiInputValidator.php:878
+#: include/classes/validators/CApiInputValidator.php:882
 #: include/validate.inc.php:216
 msgid "a time period is expected"
 msgstr "очікується період часу"
 
-#: include/classes/validators/CApiInputValidator.php:951
+#: include/classes/validators/CApiInputValidator.php:955
 #: include/validate.inc.php:227 include/validate.inc.php:507
 msgid "a time unit is expected"
 msgstr "очікується одиниця часу"
 
-#: include/classes/validators/CApiInputValidator.php:844
+#: include/classes/validators/CApiInputValidator.php:848
 msgid "a user macro is expected"
 msgstr "очікується макрос користувача"
 
@@ -17679,7 +17699,7 @@ msgstr "агент"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2033
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:842
+#: include/classes/pagefilter/CPageFilter.php:849
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -17691,8 +17711,8 @@ msgstr "агент"
 #: include/views/configuration.triggers.list.php:41
 #: include/views/configuration.triggers.list.php:48
 #: include/views/js/configuration.graph.edit.js.php:55 report2.php:228
-#: report2.php:274 report2.php:306 report2.php:339 report2.php:409
-#: report2.php:455 report4.php:87 report4.php:283
+#: report2.php:247 report2.php:279 report2.php:312 report2.php:355
+#: report2.php:374 report4.php:87 report4.php:283
 msgid "all"
 msgstr "всі"
 
@@ -17703,15 +17723,15 @@ msgstr "всі методи повідомлень"
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
-#: include/classes/validators/CApiInputValidator.php:308
-#: include/classes/validators/CApiInputValidator.php:446
-#: include/classes/validators/CApiInputValidator.php:580
-#: include/classes/validators/CApiInputValidator.php:684
-#: include/classes/validators/CApiInputValidator.php:726
+#: include/classes/validators/CApiInputValidator.php:312
+#: include/classes/validators/CApiInputValidator.php:450
+#: include/classes/validators/CApiInputValidator.php:584
+#: include/classes/validators/CApiInputValidator.php:688
+#: include/classes/validators/CApiInputValidator.php:730
 msgid "an array is expected"
 msgstr "очікується масив"
 
-#: include/classes/validators/CApiInputValidator.php:655
+#: include/classes/validators/CApiInputValidator.php:659
 msgid "an array or a character string is expected"
 msgstr "очікується масив або рядок символів"
 
@@ -17800,9 +17820,9 @@ msgstr "неможливо змінити"
 #: include/classes/api/services/CItemGeneral.php:1036
 #: include/classes/api/services/CItemGeneral.php:1059
 #: include/classes/api/services/CItemGeneral.php:1072
-#: include/classes/api/services/CMapElement.php:114
-#: include/classes/api/services/CMapElement.php:139
-#: include/classes/api/services/CMapElement.php:177
+#: include/classes/api/services/CMapElement.php:122
+#: include/classes/api/services/CMapElement.php:147
+#: include/classes/api/services/CMapElement.php:185
 #: include/classes/api/services/CMediatype.php:370
 #: include/classes/api/services/CMediatype.php:389
 #: include/classes/api/services/CMediatype.php:405
@@ -17813,19 +17833,20 @@ msgstr "неможливо змінити"
 #: include/classes/api/services/CProxy.php:593
 #: include/classes/api/services/CProxy.php:599
 #: include/classes/api/services/CTriggerGeneral.php:247
-#: include/classes/api/services/CTriggerGeneral.php:537
-#: include/classes/api/services/CTriggerGeneral.php:569
-#: include/classes/api/services/CTriggerGeneral.php:778
-#: include/classes/api/services/CTriggerGeneral.php:796
-#: include/classes/validators/CApiInputValidator.php:210
-#: include/classes/validators/CApiInputValidator.php:313
-#: include/classes/validators/CApiInputValidator.php:451
-#: include/classes/validators/CApiInputValidator.php:689
-#: include/classes/validators/CApiInputValidator.php:731
+#: include/classes/api/services/CTriggerGeneral.php:541
+#: include/classes/api/services/CTriggerGeneral.php:573
+#: include/classes/api/services/CTriggerGeneral.php:786
+#: include/classes/api/services/CTriggerGeneral.php:804
+#: include/classes/validators/CApiInputValidator.php:214
+#: include/classes/validators/CApiInputValidator.php:317
+#: include/classes/validators/CApiInputValidator.php:455
+#: include/classes/validators/CApiInputValidator.php:693
+#: include/classes/validators/CApiInputValidator.php:735
 #: include/classes/validators/CNewValidator.php:88
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:41
 #: include/classes/widgetfields/CWidgetFieldSelectResource.php:102
 #: include/classes/widgetfields/CWidgetFieldTextBox.php:41
+#: include/classes/widgetfields/CWidgetFieldUrl.php:42
 msgid "cannot be empty"
 msgstr "не може бути пустим"
 
@@ -17865,7 +17886,7 @@ msgid "dd"
 msgstr "дд"
 
 #: app/views/monitoring.dashboard.config.php:38
-#: include/classes/pagefilter/CPageFilter.php:734
+#: include/classes/pagefilter/CPageFilter.php:741
 #: include/classes/setup/CSetupWizard.php:303
 #: include/views/js/monitoring.slideconf.edit.js.php:13
 #: include/views/monitoring.slideconf.edit.php:129
@@ -17883,7 +17904,7 @@ msgstr "по замовчуванню"
 msgid "descending"
 msgstr "за спаданням"
 
-#: include/classes/validators/CApiInputValidator.php:814
+#: include/classes/validators/CApiInputValidator.php:818
 msgid "directory or script name cannot be empty"
 msgstr "тека або ім'я скрипта не можуть бути пустими"
 
@@ -17941,8 +17962,8 @@ msgctxt "hour short"
 msgid "h"
 msgstr "г"
 
-#: include/html.inc.php:774 include/views/configuration.services.edit.php:269
-#: include/views/configuration.services.edit.php:277
+#: include/html.inc.php:774 include/views/configuration.services.edit.php:271
+#: include/views/configuration.services.edit.php:279
 msgid "hh"
 msgstr "гг"
 
@@ -17952,12 +17973,12 @@ msgid "hh.mm"
 msgstr "hh.mm"
 
 #: include/classes/api/services/CMap.php:807
-#: include/classes/api/services/CMap.php:1238
+#: include/classes/api/services/CMap.php:1242
 msgid "host"
 msgstr "вузел мережі"
 
 #: include/classes/api/services/CMap.php:803
-#: include/classes/api/services/CMap.php:1234
+#: include/classes/api/services/CMap.php:1238
 msgid "host group"
 msgstr "група вузлів мережі"
 
@@ -17966,12 +17987,12 @@ msgid "hostid of dependent item and master item should match"
 msgstr "hostid залежного елемента даних та головного елемента даних мають співпадати"
 
 #: include/classes/api/services/CMap.php:798
-#: include/classes/api/services/CMap.php:1228
+#: include/classes/api/services/CMap.php:1232
 msgid "icon"
 msgstr "іконка"
 
 #: include/classes/api/services/CMap.php:819
-#: include/classes/api/services/CMap.php:1250
+#: include/classes/api/services/CMap.php:1254
 msgid "image"
 msgstr "картинка"
 
@@ -17984,7 +18005,7 @@ msgstr "в"
 msgid "including subgroups"
 msgstr "включаючи субгрупи"
 
-#: include/classes/api/services/CMapElement.php:183
+#: include/classes/api/services/CMapElement.php:191
 msgid "incorrect element count"
 msgstr "некоректна кількість елементів"
 
@@ -17999,12 +18020,12 @@ msgctxt "event source"
 msgid "internal"
 msgstr "внутрішній"
 
-#: include/classes/parsers/CIPRangeParser.php:114
+#: include/classes/parsers/CIPRangeParser.php:125
 #, c-format
 msgid "invalid address range \"%1$s\""
 msgstr "неправильний діапазон адрес \"%1$s\""
 
-#: include/classes/validators/CApiInputValidator.php:205
+#: include/classes/validators/CApiInputValidator.php:209
 msgid "invalid byte sequence in UTF-8"
 msgstr "помилкова послідовність байт в UTF-8"
 
@@ -18023,7 +18044,7 @@ msgstr "недійсна назва групи \"%1$s\""
 msgid "invalid history storage period"
 msgstr "некоректний період зберігання історії"
 
-#: include/classes/validators/CApiInputValidator.php:914
+#: include/classes/validators/CApiInputValidator.php:918
 msgid "invalid regular expression"
 msgstr "помилковий регулярний вираз"
 
@@ -18032,7 +18053,7 @@ msgstr "помилковий регулярний вираз"
 msgid "invalid trend storage period"
 msgstr "некоректний період зберігання трендів"
 
-#: include/classes/validators/CApiInputValidator.php:1142
+#: include/classes/validators/CApiInputValidator.php:1146
 msgid "is not enclosed in {} or is malformed"
 msgstr "не обгорнуте в {} або неправильно сформоване"
 
@@ -18102,7 +18123,7 @@ msgid "maintenance"
 msgstr "сервісі"
 
 #: include/classes/api/services/CMap.php:815
-#: include/classes/api/services/CMap.php:1246
+#: include/classes/api/services/CMap.php:1250
 msgid "map"
 msgstr "карта мережі"
 
@@ -18146,8 +18167,8 @@ msgid "minimum length is %1$s characters"
 msgstr "мінімальна довжина %1$s символів"
 
 #: include/html.inc.php:759 include/html.inc.php:782
-#: include/views/configuration.services.edit.php:273
-#: include/views/configuration.services.edit.php:281
+#: include/views/configuration.services.edit.php:275
+#: include/views/configuration.services.edit.php:283
 msgid "mm"
 msgstr "мм"
 
@@ -18183,7 +18204,7 @@ msgstr "має бути між \"%1$s\" та \"%2$s\""
 msgid "name"
 msgstr "назва"
 
-#: include/classes/html/CMultiSelect.php:61 jsLoader.php:200
+#: include/classes/html/CMultiSelect.php:61 jsLoader.php:201
 msgid "new"
 msgstr "новий"
 
@@ -18211,10 +18232,10 @@ msgstr "не в"
 msgid "not like"
 msgstr "не містить"
 
-#: app/controllers/CControllerDashboardView.php:118
+#: app/controllers/CControllerDashboardView.php:119
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:780
-#: include/classes/pagefilter/CPageFilter.php:842 include/forms.inc.php:1073
+#: include/classes/pagefilter/CPageFilter.php:787
+#: include/classes/pagefilter/CPageFilter.php:849 include/forms.inc.php:1073
 #: include/views/monitoring.screen.php:60 slides.php:203
 msgid "not selected"
 msgstr "не обрано"
@@ -18332,9 +18353,10 @@ msgstr "справа"
 
 #: include/services.inc.php:72 include/services.inc.php:75
 #: include/services.inc.php:163
-#: include/views/configuration.services.parent.list.php:40
 #: include/views/configuration.services.parent.list.php:42
-#: include/views/configuration.services.parent.list.php:43 jsLoader.php:254
+#: include/views/configuration.services.parent.list.php:45
+#: include/views/configuration.services.parent.list.php:47
+#: include/views/configuration.services.parent.list.php:48 jsLoader.php:255
 msgid "root"
 msgstr "корінь"
 
@@ -18351,7 +18373,7 @@ msgstr "очікується другий параметр"
 msgid "selected"
 msgstr "вибрано"
 
-#: include/views/configuration.services.edit.php:252
+#: include/views/configuration.services.edit.php:254
 msgid "short description"
 msgstr "короткий опис"
 
@@ -18365,10 +18387,10 @@ msgstr "короткий опис"
 #: include/classes/api/services/CItemGeneral.php:453
 #: include/classes/api/services/CItemGeneral.php:1101
 #: include/classes/api/services/CItemGeneral.php:1115
-#: include/classes/api/services/CTriggerGeneral.php:529
-#: include/classes/api/services/CTriggerGeneral.php:555
-#: include/classes/api/services/CTriggerGeneral.php:770
-#: include/classes/api/services/CTriggerGeneral.php:788
+#: include/classes/api/services/CTriggerGeneral.php:533
+#: include/classes/api/services/CTriggerGeneral.php:559
+#: include/classes/api/services/CTriggerGeneral.php:778
+#: include/classes/api/services/CTriggerGeneral.php:796
 msgid "should be empty"
 msgstr "має бути пустим"
 
@@ -18414,7 +18436,7 @@ msgstr "шаблон з ID \"%1$s\" передано %2$s разів"
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:144
 #: include/classes/api/services/CDashboard.php:386
 #: include/classes/api/services/CHttpTest.php:755
-#: include/classes/validators/CApiInputValidator.php:611
+#: include/classes/validators/CApiInputValidator.php:615
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "параметр \"%1$s\" відсутній"
@@ -18426,7 +18448,7 @@ msgid "the tag \"%1$s\" is missing"
 msgstr "тег \"%1$s\" відсутній"
 
 #: include/classes/api/services/CMap.php:811
-#: include/classes/api/services/CMap.php:1242 include/events.inc.php:34
+#: include/classes/api/services/CMap.php:1246 include/events.inc.php:34
 #: include/events.inc.php:63
 msgid "trigger"
 msgstr "тригер"
@@ -18435,17 +18457,21 @@ msgstr "тригер"
 msgid "trigger does not allow manual closing"
 msgstr "для тригера не дозволено закриття вручну"
 
-#: include/classes/api/services/CTriggerGeneral.php:1442
+#: include/classes/api/services/CTriggerGeneral.php:1450
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "прототип тригера неможливо перемістити в другий шаблон або вузел мережі"
 
-#: include/classes/api/services/CTriggerGeneral.php:1587
+#: include/classes/api/services/CTriggerGeneral.php:1595
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "тригера зв зв'язками неможливо перемістити в другий шаблон або вузел мережі"
 
-#: include/classes/html/CMultiSelect.php:60 jsLoader.php:199
+#: include/classes/html/CMultiSelect.php:60 jsLoader.php:200
 msgid "type here to search"
 msgstr "почніть друкувати для пошуку"
+
+#: include/classes/validators/CApiInputValidator.php:1175
+msgid "unacceptible URL"
+msgstr ""
 
 #: include/classes/parsers/CItemKey.php:178
 msgid "unexpected end of key"
@@ -18457,7 +18483,7 @@ msgstr "неочікуваний кінець макросу"
 
 #: include/classes/api/services/CHttpTest.php:469
 #: include/classes/api/services/CHttpTest.php:493
-#: include/classes/validators/CApiInputValidator.php:587
+#: include/classes/validators/CApiInputValidator.php:591
 #, c-format
 msgid "unexpected parameter \"%1$s\""
 msgstr "неочікуваний параметр \"%1$s\""
@@ -18470,7 +18496,7 @@ msgstr "неочікуваний тег \"%1$s\""
 
 #: include/classes/import/readers/CXmlImportReader.php:78
 #: include/classes/import/readers/CXmlImportReader.php:117
-#: include/classes/import/readers/CXmlImportReader.php:133
+#: include/classes/import/readers/CXmlImportReader.php:135
 #, c-format
 msgid "unexpected text \"%1$s\""
 msgstr "неочікуваний текст \"%1$s\""
@@ -18481,12 +18507,12 @@ msgstr "неочікуваний текст \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1023
 #: include/classes/api/services/CProxy.php:574
 #: include/classes/api/services/CProxy.php:581
-#: include/classes/api/services/CTriggerGeneral.php:563
-#: include/classes/api/services/CTriggerGeneral.php:576
-#: include/classes/api/services/CTriggerGeneral.php:584
-#: include/classes/api/services/CTriggerGeneral.php:762
-#: include/classes/api/services/CTriggerGeneral.php:803
+#: include/classes/api/services/CTriggerGeneral.php:567
+#: include/classes/api/services/CTriggerGeneral.php:580
+#: include/classes/api/services/CTriggerGeneral.php:588
+#: include/classes/api/services/CTriggerGeneral.php:770
 #: include/classes/api/services/CTriggerGeneral.php:811
+#: include/classes/api/services/CTriggerGeneral.php:819
 #, c-format
 msgid "unexpected value \"%1$s\""
 msgstr "неочікуване значення \"%1$s\""
@@ -18530,27 +18556,28 @@ msgstr "значення"
 msgid "value \"%1$s\" not found"
 msgstr "значення \"%1$s\" не знайдено"
 
-#: include/classes/validators/CApiInputValidator.php:996
-#: include/classes/validators/CApiInputValidator.php:1050
+#: include/classes/validators/CApiInputValidator.php:1000
+#: include/classes/validators/CApiInputValidator.php:1054
 #, c-format
 msgid "value %1$s already exists"
 msgstr "значення %1$s вже існує"
 
-#: include/classes/validators/CApiInputValidator.php:276
-#: include/classes/validators/CApiInputValidator.php:773
-#: include/classes/validators/CApiInputValidator.php:804
-#: include/classes/validators/CApiInputValidator.php:839
-#: include/classes/validators/CApiInputValidator.php:871
-#: include/classes/validators/CApiInputValidator.php:905
-#: include/classes/validators/CApiInputValidator.php:1137
+#: include/classes/validators/CApiInputValidator.php:280
+#: include/classes/validators/CApiInputValidator.php:777
+#: include/classes/validators/CApiInputValidator.php:808
+#: include/classes/validators/CApiInputValidator.php:843
+#: include/classes/validators/CApiInputValidator.php:875
+#: include/classes/validators/CApiInputValidator.php:909
+#: include/classes/validators/CApiInputValidator.php:1141
+#: include/classes/validators/CApiInputValidator.php:1170
 msgid "value is too long"
 msgstr "значення надто довге"
 
-#: include/classes/api/services/CMapElement.php:94
+#: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:643
-#: include/classes/api/services/CMap.php:1075
-#: include/classes/validators/CApiInputValidator.php:270
-#: include/classes/validators/CApiInputValidator.php:414
+#: include/classes/api/services/CMap.php:1079
+#: include/classes/validators/CApiInputValidator.php:274
+#: include/classes/validators/CApiInputValidator.php:418
 #, c-format
 msgid "value must be one of %1$s"
 msgstr "значення має бути одне з %1$s"
