@@ -13,6 +13,7 @@ New features:
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
 ...G...... [ZBX-12653] fixed heap corruption in Windows agent. Patch from Ronnie Kaech, thanks! (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
@@ -750,6 +751,7 @@ Changes for 3.0.11rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
 ...G...... [ZBX-12653] fixed heap corruption in Windows agent. Patch from Ronnie Kaech, thanks! (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
@@ -2485,6 +2487,7 @@ Changes for 2.2.20rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
 ...G...... [ZBX-12270] fixed processing of AIX item 'system.stat[ent]' in agent; thanks to Marc for patch (Andris)
