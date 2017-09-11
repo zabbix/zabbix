@@ -88,6 +88,7 @@ switch ($data['method']) {
 		}
 
 		$options = [
+			'monitored' => true,
 			'lastChangeSince' => max([$lastMsgTime, $msgsettings['last.clock'], $timeout]),
 			'value' => [TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE],
 			'priority' => array_keys($msgsettings['triggers.severities']),

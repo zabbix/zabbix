@@ -48,7 +48,9 @@ var CMessageList = Class.create({
 		'sound':	null,		// sound to play
 		'repeat':	1,			// loop sound for 1,3,5,10 .. times
 		'mute':		0,			// mute alarms
-		'timeout':	0
+		'timeout':	0,
+		'sourceid': null,		// Id of played message.
+		'time': 0				// Message timestamp.
 	},
 
 	initialize: function(messagesListId, args) {
@@ -205,10 +207,6 @@ var CMessageList = Class.create({
 			return true;
 		}
 
-		this.stopSound();
-		this.sounds.priority = 0;
-		this.sounds.sound = null;
-
 		for (var i = 0; i < this.messages.length; i++) {
 			var message = this.messages[i];
 
@@ -216,16 +214,21 @@ var CMessageList = Class.create({
 				continue;
 			}
 
-			if (message.priority >= this.sounds.priority) {
+			if (message.priority > this.sounds.priority || (message.priority == this.sounds.priority
+					&& this.sounds.time < message.time)) {
 				this.sounds.priority = message.priority;
 				this.sounds.sound = message.sound;
 				this.sounds.timeout = message.timeout;
+				this.sounds.sourceid = message.sourceid;
+				this.sounds.time = message.time;
 			}
 		}
 
 		this.ready = true;
 
 		if (this.sounds.sound !== null) {
+			this.stopSound();
+
 			if (this.sounds.repeat == 1) {
 				AudioControl.playOnce(this.sounds.sound);
 			}
@@ -249,7 +252,12 @@ var CMessageList = Class.create({
 			return true;
 		}
 
-		AudioControl.stop();
+		if (this.sounds.sourceid == this.messageList[messageid].sourceid) {
+			this.sounds.timeout = 0;
+			this.sounds.priority = 0;
+			this.sounds.sourceid = null;
+			this.stopSound();
+		}
 
 		if (withEffect) {
 			this.messageList[messageid].remove();
@@ -311,7 +319,7 @@ var CMessageList = Class.create({
 			count++;
 		}
 
-		AudioControl.stop();
+		this.stopSound();
 	},
 
 	timeoutMessages: function() {
@@ -352,12 +360,15 @@ var CMessageList = Class.create({
 	},
 
 	serverRespond: function(messages) {
-		for (var i = 0; i < messages.length; i++) {
-			this.addMessage(messages[i]);
+		if (messages.length) {
+			for (var i = 0; i < messages.length; i++) {
+				this.addMessage(messages[i]);
+			}
+
+			this.messages = messages;
+			this.playSound();
 		}
 
-		this.messages = messages;
-		this.playSound();
 		this.ready = true;
 	},
 
