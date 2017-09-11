@@ -4473,7 +4473,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 		/*     evaluated to regular numbers even for NOTSUPPORTED items. */
 		/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].state &&
+		if (ITEM_STATE_NOTSUPPORTED == items[i].db_state &&
 				FAIL == evaluatable_for_notsupported(func->function))
 		{
 			/* compose and store 'unknown' message for future use */
