@@ -270,8 +270,8 @@ New features:
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
-..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
+..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
 ...G...... [ZBX-12653] fixed heap corruption in Windows agent. Patch from Ronnie Kaech, thanks! (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
 ..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
