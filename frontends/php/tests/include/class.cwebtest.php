@@ -69,6 +69,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	// Screenshot taken on test failure.
 	protected $screenshot = null;
+	// Failed test URL.
+	protected $current_url = null;
 
 	protected function putBreak() {
 		fwrite(STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
@@ -93,7 +95,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
 				$message =
-					'URL: '.PHPUNIT_URL."\n".
+					'URL: '.$this->current_url."\n".
 					'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
 					$e->getMessage();
 
@@ -123,6 +125,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	protected function tearDown() {
 		if ($this->capture_screenshot && $this->hasFailed()) {
+			$this->current_url = $this->webDriver->getCurrentURL();
 			$this->screenshot = $this->webDriver->takeScreenshot();
 		}
 
@@ -168,7 +171,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 		$this->authenticate();
 		$this->zbxTestOpen($url);
-//$this->webDriver->takeScreenshot('/home/jenkins/public_html/screenshots/1.png');
 
 		if ($server_name && $ZBX_SERVER_NAME !== '') {
 			$this->zbxTestWaitUntilMessageTextPresent('server-name', $ZBX_SERVER_NAME);
