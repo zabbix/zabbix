@@ -15,7 +15,7 @@ New features:
 Bug fixes:
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
-...G...... [ZBX-12653] fixed heap corruption in Windows agent. Patch from Ronnie Kaech, thanks! (abs)
+...G...... [ZBX-12653] fixed heap corruption in Windows agent; thanks to Ronnie Kaech for the patch (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
 ..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 ..F....... [ZBX-12616] fixed trapper item "Allowed hosts" field user macro support (gcalenko)
@@ -272,7 +272,7 @@ New features:
 Bug fixes:
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
-...G...... [ZBX-12653] fixed heap corruption in Windows agent. Patch from Ronnie Kaech, thanks! (abs)
+...G...... [ZBX-12653] fixed heap corruption in Windows agent; thanks to Ronnie Kaech for the patch (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
 ..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
@@ -754,7 +754,7 @@ New features:
 Bug fixes:
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
-...G...... [ZBX-12653] fixed heap corruption in Windows agent. Patch from Ronnie Kaech, thanks! (abs)
+...G...... [ZBX-12653] fixed heap corruption in Windows agent; thanks to Ronnie Kaech for the patch (abs)
 A......... [ZBX-12660] fixed result of hostinterface.replacehostinterfaces method (Sasha)
 ..F....... [ZBX-12469] added new context for 'Second' string to be properly translated in maintenance period form (gcalenko)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
