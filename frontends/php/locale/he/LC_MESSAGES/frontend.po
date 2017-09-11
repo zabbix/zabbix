@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-11 23:35+0300\n"
-"PO-Revision-Date: 2016-09-08 08:15+0300\n"
+"PO-Revision-Date: 2017-08-23 21:26+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1473315355.000000\n"
+"X-POOTLE-MTIME: 1503516402.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -42,7 +42,7 @@ msgstr "אמור להיות „מארח:מפתח“"
 #: include/classes/api/services/CDRule.php:520
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d תווים חורגים מהאורך המרבי המותר של %2$d תווים"
 
 #: include/func.inc.php:453
 #, c-format
@@ -62,8 +62,8 @@ msgstr[1] "%1$d בעיות מוצגות מתוך %2$d"
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "מוצגת בעיה %1$d מתוך %3$d%2$s"
+msgstr[1] "מוצגות %1$d מתוך %3$d%2$s בעיות"
 
 #: chart4.php:91 chart5.php:86
 #, c-format
@@ -146,7 +146,7 @@ msgstr "(0 - אינסוף)"
 
 #: include/views/configuration.action.edit.php:570
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - שימוש בבררת המחדל של הפעולה)"
 
 #: include/views/configuration.host.edit.php:94
 #: include/views/configuration.hostgroups.list.php:26
@@ -257,8 +257,8 @@ msgstr "הגישה נדחתה!"
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "החשבון חסום למשך שנייה %1$s."
+msgstr[1] "החשבון חסום למשך %1$s שניות."
 
 #: app/views/monitoring.widget.problems.view.php:63
 #: include/actions.inc.php:153 include/actions.inc.php:337
@@ -295,7 +295,7 @@ msgstr "אירועי תקלה מוכרים"
 
 #: include/views/configuration.action.edit.php:2162
 msgid "Acknowledgement operations"
-msgstr ""
+msgstr "פעילויות הכרה"
 
 #: tr_events.php:166
 msgid "Acknowledgements"
@@ -592,7 +592,7 @@ msgstr "הוספה"
 
 #: jsLoader.php:117
 msgid "Add a new widget"
-msgstr ""
+msgstr "הוספת וידג׳ט חדש"
 
 #: include/services.inc.php:75 include/services.inc.php:114
 msgid "Add child"
@@ -626,7 +626,7 @@ msgstr "הוספת אבטיפוס"
 
 #: app/controllers/CControllerWidgetNavigationtreeItemEditDialog.php:109
 msgid "Add submaps"
-msgstr ""
+msgstr "הוספת תת־מפות"
 
 #: app/controllers/CControllerFavouriteDelete.php:72 include/html.inc.php:157
 msgid "Add to favourites"
@@ -642,7 +642,7 @@ msgstr "הוספה לקבוצות מארחים"
 
 #: app/views/monitoring.dashboard.view.js.php:51 jsLoader.php:109
 msgid "Add widget"
-msgstr ""
+msgstr "הוספת וידג׳ט"
 
 #: auditlogs.php:121
 msgid "Added"
@@ -739,13 +739,13 @@ msgstr "הכול"
 
 #: app/views/monitoring.dashboard.breadcrumbs.php:27
 msgid "All dashboards"
-msgstr ""
+msgstr "כל לוחות המחוונים"
 
 #: include/views/administration.usergroups.edit.php:99
 #: include/views/administration.users.edit.php:401
 #: include/views/administration.users.edit.php:407
 msgid "All groups"
-msgstr ""
+msgstr "כל הקבוצות"
 
 #: include/html.inc.php:346
 msgid "All hosts"
@@ -889,7 +889,7 @@ msgstr "היישום עם המזהה „%1$s“ אינו זמין על גבי �
 #: include/classes/api/services/CHttpTest.php:705
 #, c-format
 msgid "Application with applicationid \"%1$s\" does not exist."
-msgstr ""
+msgstr "היישום עם ה־applicationid‏ „%1$s“ לא קיים."
 
 #: include/forms.inc.php:805 include/html.inc.php:365
 #: include/views/configuration.application.edit.php:23
@@ -923,7 +923,7 @@ msgstr "החלה"
 
 #: include/views/configuration.hostgroups.edit.php:67
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "החלת ההרשאות על כל תת הקבוצות"
 
 #: include/views/configuration.maintenance.list.php:43
 #: include/views/configuration.maintenance.list.php:74
@@ -950,7 +950,7 @@ msgstr "האם למחוק את"
 
 #: jsLoader.php:116
 msgid "Are you sure, you want to leave this page?"
-msgstr ""
+msgstr "לעזוב את העמוד הזה?"
 
 #: include/views/js/monitoring.sysmaps.js.php:92
 msgid "Area size"
@@ -1022,11 +1022,11 @@ msgstr "יש ליצור תקופת תחזוקה אחת לפחות."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
-msgstr ""
+msgstr "נדרשת תמיכה באחד לפחות מתוך MySQL,‏ PostgreSQL,‏ Oracle או IBM DB2."
 
 #: app/views/administration.mediatype.edit.php:188
 msgid "Attempt interval"
-msgstr ""
+msgstr "הפרש בין ניסיונות"
 
 #: app/views/administration.mediatype.edit.php:184 httpconf.php:45
 #: include/views/configuration.httpconf.edit.php:80
@@ -1125,7 +1125,7 @@ msgstr ""
 
 #: include/views/administration.users.edit.php:177 profile.php:49 users.php:60
 msgid "Auto-logout"
-msgstr ""
+msgstr "יציאה אוטומטית"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period"
@@ -1204,7 +1204,7 @@ msgstr "רקע"
 
 #: include/views/js/monitoring.sysmaps.js.php:485
 msgid "Background colour"
-msgstr ""
+msgstr "צבע הרקע"
 
 #: include/views/monitoring.sysmap.edit.php:120
 msgid "Background image"
@@ -1257,23 +1257,23 @@ msgstr "קו עבה"
 
 #: include/items.inc.php:1687
 msgid "Boolean to decimal"
-msgstr ""
+msgstr "בוליאני לעשרוני"
 
 #: include/views/js/monitoring.sysmaps.js.php:336
 msgid "Border"
-msgstr ""
+msgstr "מסגרת"
 
 #: include/views/js/monitoring.sysmaps.js.php:514
 msgid "Border colour"
-msgstr ""
+msgstr "צבע המסגרת"
 
 #: include/views/js/monitoring.sysmaps.js.php:494
 msgid "Border type"
-msgstr ""
+msgstr "סוג המסגרת"
 
 #: include/views/js/monitoring.sysmaps.js.php:504
 msgid "Border width"
-msgstr ""
+msgstr "עובי המסגרת"
 
 #: include/views/js/monitoring.sysmaps.js.php:18
 #: include/views/js/monitoring.sysmaps.js.php:120
@@ -1285,11 +1285,11 @@ msgstr "תחתית"
 
 #: jsLoader.php:168
 msgid "Bring forward"
-msgstr ""
+msgstr "קידום לעבר החזית"
 
 #: jsLoader.php:167
 msgid "Bring to front"
-msgstr ""
+msgstr "קידום לחזית"
 
 #: include/locales.inc.php:54
 msgid "Bulgarian (bg_BG)"
@@ -1737,8 +1737,8 @@ msgstr "לא ניתן למחוק את היחס"
 #: app/controllers/CControllerDashboardDelete.php:66
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק את לוח המחוונים"
+msgstr[1] "לא ניתן למחוק את לוחות המחוונים"
 
 #: include/classes/api/services/CTrigger.php:922
 #: include/classes/api/services/CTriggerPrototype.php:629
@@ -2115,7 +2115,7 @@ msgstr "לא ניתן למצוא את המארח „%1$s“ הנמצא בשימ�
 #: include/classes/import/CConfigurationImport.php:1029
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את קבוצת המארחים „%1$s“ עבור האב־טיפוס למארח „%2$s“ של כלל הגילוי „%3$s“ על „%4$s“."
 
 #: include/classes/api/services/CDiscoveryRule.php:1130
 #: include/classes/api/services/CDiscoveryRule.php:1264
@@ -2123,7 +2123,7 @@ msgstr ""
 #: include/items.inc.php:681
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את מנשק המארח על גבי „%1$s“ עבור מפתח הפריט „%2$s“."
 
 #: include/classes/import/importers/CMapImporter.php:268
 #, c-format
@@ -2133,7 +2133,7 @@ msgstr "לא ניתן למצוא את הסמל „%1$s“ הנמצא בשימו�
 #: include/classes/import/importers/CMapImporter.php:324
 #, c-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את מפת הסמלים „%1$s“ בה נעשה שימוש במפה „%2$s“."
 
 #: include/classes/import/CConfigurationImport.php:1411
 #, c-format
@@ -2528,12 +2528,12 @@ msgstr "לא ניתן לעדכן את „imagetype“ עבור התמונה „%
 #: include/classes/api/services/CScreen.php:783
 #, c-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את ה־„templateid“ עבור המסך „%1$s“."
 
 #: include/classes/api/services/CTemplateScreen.php:694
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את ה־„templateid“ עבור תבנית המסך „%1$s“."
 
 #: include/classes/api/services/CGraphGeneral.php:58
 msgid "Cannot update a discovered graph."
@@ -2787,7 +2787,7 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:11
 #: include/views/monitoring.screen.constructor.edit.php:709
 msgid "Center"
-msgstr ""
+msgstr "מרכז"
 
 #: app/views/administration.proxy.edit.php:103
 #: app/views/administration.proxy.edit.php:111
@@ -2803,7 +2803,7 @@ msgstr "אישור"
 #: include/items.inc.php:1678 latest.php:415 latest.php:431
 msgctxt "noun"
 msgid "Change"
-msgstr ""
+msgstr "שינוי"
 
 #: include/classes/screens/CScreenBase.php:405
 #: include/classes/screens/CScreenBuilder.php:519
@@ -2812,7 +2812,7 @@ msgstr ""
 #: include/views/hostmacros.php:100 include/views/js/hostmacros.js.php:37
 msgctxt "verb"
 msgid "Change"
-msgstr ""
+msgstr "שינוי"
 
 #: app/views/administration.mediatype.edit.php:122
 #: include/views/administration.authentication.edit.php:93
@@ -2822,7 +2822,7 @@ msgstr "שינוי ססמה"
 
 #: include/items.inc.php:1681
 msgid "Change per second"
-msgstr ""
+msgstr "שינויים בשנייה"
 
 #: include/forms.inc.php:355 include/items.inc.php:130
 #: include/views/configuration.item.edit.php:323
@@ -2855,12 +2855,12 @@ msgstr "הבדיקה כבר קיימת."
 #: include/classes/parsers/CTriggerExpression.php:467
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr ""
+msgstr "בדיקת החלק של הביטוי שמתחיל ב־„%1$s“."
 
 #: include/classes/setup/CSetupWizard.php:37
 #: include/classes/setup/CSetupWizard.php:204
 msgid "Check of pre-requisites"
-msgstr ""
+msgstr "בדיקת דרישות הקדם"
 
 #: include/classes/api/services/CItemGeneral.php:347
 #: include/classes/api/services/CItemGeneral.php:354
@@ -3063,7 +3063,7 @@ msgstr "צבע"
 #: include/validate.inc.php:208 jsLoader.php:181
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "הצבע %1$s שגוי: יש להשתמש בקוד צבע הקסדצימלי (6 תווים)."
 
 #: include/views/js/monitoring.sysmaps.js.php:689
 msgid "Colour (OK)"
@@ -3123,7 +3123,7 @@ msgstr "השוואת מספר הקפצות עם „וגם“ אינה מורשי
 
 #: app/views/administration.mediatype.edit.php:169
 msgid "Concurrent sessions"
-msgstr ""
+msgstr "הפעלות בו־זמנית"
 
 #: popup_trexpr.php:25
 msgid "Condition"
@@ -3555,18 +3555,18 @@ msgstr "יצירת יחס"
 
 #: app/views/monitoring.dashboard.list.php:26
 msgid "Create dashboard"
-msgstr ""
+msgstr "יצירת לוח מחוונים"
 
 #: include/classes/helpers/CMenuPopupHelper.php:295
 #: include/classes/helpers/CMenuPopupHelper.php:317
 msgid "Create dependent item"
-msgstr ""
+msgstr "יצירת פריט תלוי"
 
 #: include/views/configuration.host.prototype.list.php:158
 #: include/views/configuration.item.prototype.list.php:152
 #: include/views/configuration.trigger.prototype.list.php:170
 msgid "Create disabled"
-msgstr ""
+msgstr "היצירה מנוטרלת"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3583,7 +3583,7 @@ msgstr "יצירת כלל גילוי"
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.trigger.prototype.list.php:167
 msgid "Create enabled"
-msgstr ""
+msgstr "היצירה פעילה"
 
 #: include/views/configuration.graph.list.php:34
 msgid "Create graph"
@@ -3780,7 +3780,7 @@ msgstr "שנה נוכחית"
 
 #: app/views/administration.mediatype.edit.php:177
 msgid "Custom"
-msgstr ""
+msgstr "בהתאמה אישית"
 
 #: include/views/configuration.action.edit.php:110
 #: include/views/configuration.correlation.edit.php:92
@@ -3889,44 +3889,44 @@ msgstr "לוח בקרה"
 #: include/classes/api/services/CDashboard.php:433
 #, c-format
 msgid "Dashboard \"%1$s\" already exists."
-msgstr ""
+msgstr "לוח המחוונים „%1$s“ כבר קיים."
 
 #: include/classes/api/services/CDashboard.php:556
 #, c-format
 msgid "Dashboard \"%1$s\" cell X - %2$s Y - %3$s is already taken."
-msgstr ""
+msgstr "לוח המחוונים „%1$s“ תא X‏ - %2$s‏ Y‏ - %3$s כבר תפוס."
 
 #: include/classes/api/services/CDashboard.php:569
 #, c-format
 msgid "Dashboard \"%1$s\" widget in cell X - %2$s Y - %3$s is ouf of bounds."
-msgstr ""
+msgstr "וידג׳ט לוח המחוונים „%1$s“ בתא X‏ - %2$s‏ Y‏ - %3$s הוא מחוץ לגבול."
 
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:238
 msgid "Dashboard created"
-msgstr ""
+msgstr "נוצר לוח מחוונים"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לוח מחוונים נמחק"
+msgstr[1] "נמחקו לוחות מחוונים"
 
 #: app/views/monitoring.dashboard.view.js.php:69
 msgid "Dashboard properties"
-msgstr ""
+msgstr "מאפייני לוח המחוונים"
 
 #: jsLoader.php:210
 msgid "Dashboard sharing"
-msgstr ""
+msgstr "שיתוף לוח מחוונים"
 
 #: app/controllers/CControllerDashbrdWidgetUpdate.php:233
 msgid "Dashboard updated"
-msgstr ""
+msgstr "לוח המחוונים עודכן"
 
 #: app/controllers/CControllerDashboardList.php:94
 #: app/views/monitoring.dashboard.list.php:35
 msgid "Dashboards"
-msgstr ""
+msgstr "לוחות מחוונים"
 
 #: include/graphs.inc.php:63 include/views/js/monitoring.sysmaps.js.php:686
 #: include/views/js/monitoring.sysmaps.js.php:766
@@ -3950,7 +3950,7 @@ msgstr ""
 
 #: include/views/js/configuration.httpconf.popup.js.php:355
 msgid "Data is not properly encoded."
-msgstr ""
+msgstr "הנתונים אינם מוצפנים כראוי."
 
 #: include/classes/screens/CScreenDataOverview.php:38
 #: include/classes/widgets/CWidgetConfig.php:48 include/screens.inc.php:29
@@ -4229,7 +4229,7 @@ msgstr "למחוק את היחס הנוכחי?"
 
 #: app/views/monitoring.dashboard.view.php:110
 msgid "Delete dashboard?"
-msgstr ""
+msgstr "למחוק את לוח המחוונים?"
 
 #: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:363
@@ -4321,7 +4321,7 @@ msgstr "למחוק את היחסים הנבחרים?"
 
 #: app/views/monitoring.dashboard.list.php:78
 msgid "Delete selected dashboards?"
-msgstr ""
+msgstr "למחוק את לוחות המחוונים הנבחרים?"
 
 #: include/views/configuration.discovery.list.php:89
 #: include/views/configuration.host.discovery.list.php:164
@@ -4415,7 +4415,7 @@ msgstr "למחוק את הסקריפטים הנבחרים?"
 
 #: jsLoader.php:166
 msgid "Delete selected shapes?"
-msgstr ""
+msgstr "למחוק את הצורות הנבחרות?"
 
 #: include/views/monitoring.slideconf.list.php:89
 msgid "Delete selected slide shows?"
@@ -4675,15 +4675,15 @@ msgstr ""
 
 #: popup_trexpr.php:250
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "ההפרש בין הערך האחרון לזה שלפניו = N"
 
 #: popup_trexpr.php:246
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "ההפרש בין הערך האחרון לזה שלפניו > N (גדול)"
 
 #: popup_trexpr.php:254
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "ההפרש בין הערך האחרון לזה שלפניו הוא לא N"
 
 #: include/views/monitoring.screen.list.php:73
 msgid "Dimension (cols x rows)"
@@ -16803,7 +16803,7 @@ msgstr ""
 #: tr_testexpr.php:51
 #, c-format
 msgid "Value"
-msgstr ""
+msgstr "ערך"
 
 #: include/classes/api/services/CMap.php:884
 #: include/classes/api/services/CMap.php:1326
@@ -16865,22 +16865,22 @@ msgstr ""
 #: include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:43
 msgid "Value map"
-msgstr ""
+msgstr "מפת ערכים"
 
 #: include/classes/api/services/CValueMap.php:271
 #, c-format
 msgid "Value map \"%1$s\" already exists."
-msgstr ""
+msgstr "מפת הערכים „%1$s“ כבר קיימת."
 
 #: adm.valuemapping.php:110
 msgid "Value map added"
-msgstr ""
+msgstr "נוצרה מפת ערכים"
 
 #: adm.valuemapping.php:130
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "מפת ערכים נמחקה"
+msgstr[1] "מפות ערכים נמחקו"
 
 #: adm.valuemapping.php:105
 msgid "Value map updated"
@@ -17006,7 +17006,7 @@ msgstr "אנו מתנצלים, כמות הרכיבים המרבית האפשרי
 #: search.php:180 search.php:209 search.php:242 search.php:293 search.php:348
 #: search.php:415 search.php:458 search.php:472
 msgid "Web"
-msgstr ""
+msgstr "אינטרנט"
 
 #: app/controllers/CControllerWebView.php:105
 #: app/views/monitoring.web.view.php:26
@@ -17014,22 +17014,22 @@ msgstr ""
 #: include/views/configuration.httpconf.edit.php:22
 #: include/views/configuration.httpconf.list.php:42
 msgid "Web monitoring"
-msgstr ""
+msgstr "מעקב אחר עמוד אינטרנט"
 
 #: httpconf.php:190 httpconf.php:494 include/audit.inc.php:42
 msgid "Web scenario"
-msgstr ""
+msgstr "תרחיש אינטרנט"
 
 #: include/classes/api/managers/CHttpTestManager.php:387
 #: include/classes/api/managers/CHttpTestManager.php:395
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
-msgstr ""
+msgstr "תרחיש האינטרנט „%1$s“ כבר קיים במארח „%2$s“."
 
 #: include/classes/api/services/CHttpTest.php:664
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
-msgstr ""
+msgstr "תרחיש האינטרנט „%1$s“ כבר קיים."
 
 #: include/classes/import/CConfigurationImport.php:1323
 #, c-format
@@ -17155,7 +17155,7 @@ msgstr "זמן עבודה „%1$s“."
 #: app/views/administration.script.edit.php:90
 #: app/views/administration.script.list.php:96
 msgid "Write"
-msgstr ""
+msgstr "כתיבה"
 
 #: include/classes/api/services/CService.php:386
 #, c-format
@@ -17398,7 +17398,7 @@ msgstr "אין לך הרשאה לגשת לעמוד זה."
 
 #: jsLoader.php:115
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "יש לך שינויים שלא נשמרו."
 
 #: include/func.inc.php:1747
 msgid "You must login to view this page."
@@ -17406,7 +17406,7 @@ msgstr "עליך להיכנס כדי לצפות בעמוד זה."
 
 #: app/views/monitoring.dashboard.sharing_form.js.php:28 jsLoader.php:240
 msgid "You need permission to perform this action!"
-msgstr ""
+msgstr "יש לך צורך בהרשאות כדי לבצע פעולה זו!"
 
 #: include/classes/db/DB.php:136
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -17426,7 +17426,7 @@ msgstr "מנהל Zabbix"
 
 #: app/views/layout.htmlpage.menu.php:36
 msgid "Zabbix Share"
-msgstr ""
+msgstr "שיתוף Zabbix"
 
 #: include/users.inc.php:56
 msgid "Zabbix Super Admin"
@@ -17489,7 +17489,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1598
 #: include/views/configuration.action.edit.php:2026
 msgid "Zabbix server (proxy)"
-msgstr ""
+msgstr "שרת Zabbix (מתווך)"
 
 #: include/blocks.inc.php:414
 msgid "Zabbix server IP or port is not set!"
@@ -17541,7 +17541,7 @@ msgstr "[ערך החודש שגוי: „%s“ ]"
 
 #: include/classes/validators/CApiInputValidator.php:530
 msgid "a boolean is expected"
-msgstr ""
+msgstr "אמור להיות בוליאני"
 
 #: include/classes/api/services/CTriggerGeneral.php:241
 #: include/classes/api/services/CTriggerGeneral.php:257
@@ -17554,13 +17554,13 @@ msgstr "אמור להיות מחרוזת תווים"
 #: include/classes/validators/CApiInputValidator.php:359
 #: include/classes/validators/CApiInputValidator.php:496
 msgid "a number is expected"
-msgstr ""
+msgstr "אמור להיות מספר"
 
 #: include/classes/validators/CApiInputValidator.php:364
 #: include/classes/validators/CApiInputValidator.php:501
 #: include/classes/validators/CApiInputValidator.php:966
 msgid "a number is too large"
-msgstr ""
+msgstr "המספר גדול מדי"
 
 #: include/classes/api/services/CDRule.php:320
 #: include/classes/api/services/CItemGeneral.php:1042
@@ -17570,21 +17570,21 @@ msgstr "אמור להיות ערך מספרי"
 
 #: include/classes/validators/CNewValidator.php:271
 msgid "a time is expected"
-msgstr ""
+msgstr "אמור להיות זמן"
 
 #: include/classes/validators/CApiInputValidator.php:882
 #: include/validate.inc.php:216
 msgid "a time period is expected"
-msgstr ""
+msgstr "אמור להיות טווח זמנים"
 
 #: include/classes/validators/CApiInputValidator.php:955
 #: include/validate.inc.php:227 include/validate.inc.php:507
 msgid "a time unit is expected"
-msgstr ""
+msgstr "אמור להיות יחידת זמן"
 
 #: include/classes/validators/CApiInputValidator.php:848
 msgid "a user macro is expected"
-msgstr ""
+msgstr "אמור להיות מאקרו משתמש"
 
 #: include/forms.inc.php:487
 msgid "affects only filtered data"
@@ -17630,7 +17630,7 @@ msgstr "אמור להיות מערך"
 
 #: include/classes/validators/CApiInputValidator.php:659
 msgid "an array or a character string is expected"
-msgstr ""
+msgstr "אמור להיות מערך או מחרוזת תווים"
 
 #: include/classes/import/validators/C10XmlValidator.php:397
 #: include/classes/import/validators/C10XmlValidator.php:419
@@ -17639,7 +17639,7 @@ msgstr "אמור להיות מחרוזת ריקה"
 
 #: include/classes/api/services/CHost.php:1515
 msgid "an even number of hexadecimal characters is expected"
-msgstr ""
+msgstr "אמור להיות מספר זוגי או תווים הקסדצימליים"
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
@@ -17662,7 +17662,7 @@ msgstr "כאדום"
 #: include/classes/widgets/CProblemsWidgetForm.php:118
 #: include/classes/widgets/CProblemsWidgetForm.php:120
 msgid "ascending"
-msgstr ""
+msgstr "עולה"
 
 #: include/events.inc.php:36
 msgid "auto registration"
@@ -17689,7 +17689,7 @@ msgstr "מהבהב"
 
 #: include/classes/api/services/CItemGeneral.php:181
 msgid "cannot be changed"
-msgstr ""
+msgstr "לא ניתן לשנות"
 
 #: correlation.php:227 correlation.php:237 correlation.php:243
 #: correlation.php:263 correlation.php:267 correlation.php:280
@@ -17799,7 +17799,7 @@ msgstr "בררת מחדל"
 #: include/classes/widgets/CProblemsWidgetForm.php:117
 #: include/classes/widgets/CProblemsWidgetForm.php:119
 msgid "descending"
-msgstr ""
+msgstr "סדר יורד"
 
 #: include/classes/validators/CApiInputValidator.php:818
 msgid "directory or script name cannot be empty"
@@ -17852,7 +17852,7 @@ msgstr "קבוע"
 #: include/views/configuration.item.edit.php:438
 msgctxt "item_form"
 msgid "global housekeeping settings"
-msgstr ""
+msgstr "הגדרות תחזוקה כלליות"
 
 #: include/func.inc.php:565 jsLoader.php:103
 msgctxt "hour short"

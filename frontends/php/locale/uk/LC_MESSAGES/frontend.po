@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-11 23:35+0300\n"
-"PO-Revision-Date: 2017-08-23 16:09+0300\n"
+"PO-Revision-Date: 2017-08-23 11:06+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1503497354.000000\n"
+"X-POOTLE-MTIME: 1503479193.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -11476,7 +11476,7 @@ msgstr "Повідомлення"
 
 #: include/actions.inc.php:821 include/actions.inc.php:1135
 msgid "Notify all who left acknowledgement and comments"
-msgstr "Сповістити всіх, хто залишив підтвердження та коментарі"
+msgstr ""
 
 #: include/actions.inc.php:816
 msgid "Notify all who received any messages regarding the problem before"
@@ -11535,11 +11535,11 @@ msgstr "Кількість колізій out-of-window. Повертає ціл
 
 #: include/views/monitoring.sysmap.edit.php:143
 msgid "Number of problems"
-msgstr "Кількість проблем"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:144
 msgid "Number of problems and expand most critical one"
-msgstr "Кількість проблем та розкривати найбільш критичну"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:715
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -11662,7 +11662,7 @@ msgstr "Кількість inode у відсотках. Повертає ціл�
 
 #: include/items.inc.php:1685
 msgid "Numeral systems"
-msgstr "Числові системи"
+msgstr ""
 
 #: include/forms.inc.php:354 include/items.inc.php:128
 #: include/triggers.inc.php:1770 include/views/configuration.item.edit.php:322
@@ -11741,7 +11741,7 @@ msgstr "Жов"
 
 #: include/items.inc.php:1688
 msgid "Octal to decimal"
-msgstr "Вісімкове в десяткове"
+msgstr ""
 
 #: include/forms.inc.php:1902 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:137
@@ -11789,7 +11789,7 @@ msgstr "Один раз"
 
 #: app/views/administration.mediatype.edit.php:175
 msgid "One"
-msgstr "Одна"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:1115
 msgid "One of the objects is left without a host group."
@@ -11814,7 +11814,7 @@ msgstr "Тільки Супер-Адміністратори можуть ств
 
 #: include/classes/api/services/CUserGroup.php:204
 msgid "Only Super Admins can create user groups."
-msgstr "Тільки Супер Адміністратори можуть створювати групи користувачів."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:885
 msgid "Only Super Admins can delete media types."
@@ -11832,7 +11832,7 @@ msgstr "Тільки Супер-Адміністратори можуть ред
 
 #: include/classes/api/services/CUserGroup.php:284
 msgid "Only Super Admins can update user groups."
-msgstr "Тільки Супер Адміністратори можуть оновлювати групи користувачів."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:962
 msgid "Only Zabbix Admins can add user media."
@@ -11852,7 +11852,7 @@ msgstr "Тільки Zabbix агент, SNMPv1, SNMPv2 та SNMPv3 переві�
 
 #: include/classes/api/services/CDashboard.php:460
 msgid "Only administrators can set dashboard owner."
-msgstr "Тільки адміністратори можуть призначати власника панелі."
+msgstr ""
 
 #: include/classes/api/services/CMap.php:628
 #: include/classes/api/services/CMap.php:1049
@@ -11874,7 +11874,7 @@ msgstr "Підраховуються елементи даних тільки у
 
 #: include/classes/api/services/CItemGeneral.php:1121
 msgid "Only one change step is allowed."
-msgstr "Дозволено тільки один крок зміни."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:583
 msgid "Only one check can be unique."
@@ -11990,7 +11990,7 @@ msgstr "Оператор"
 
 #: app/views/administration.mediatype.edit.php:192
 msgid "Options"
-msgstr "Опції"
+msgstr ""
 
 #: include/triggers.inc.php:1239
 #: include/views/configuration.action.edit.php:109
@@ -12355,7 +12355,7 @@ msgstr "Параметр"
 #: include/classes/validators/CApiInputValidator.php:610
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
-msgstr "Параметр \"%1$s\" застарів."
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:156
 #: include/views/configuration.item.edit.php:550
@@ -13063,11 +13063,11 @@ msgstr "Час відновлення"
 #: include/views/js/monitoring.sysmaps.js.php:286
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "Rectangle"
-msgstr "Прямокутник"
+msgstr ""
 
 #: include/views/administration.users.edit.php:185 profile.php:52 users.php:63
 msgid "Refresh"
-msgstr "Оновити"
+msgstr ""
 
 #: include/html.inc.php:192 jsLoader.php:229
 msgid "Refresh time"
@@ -13079,12 +13079,12 @@ msgstr "Множник інтервалу оновлення"
 
 #: adm.other.php:30 include/views/administration.general.other.edit.php:43
 msgid "Refresh unsupported items"
-msgstr "Оновлювати непідтримувані елементи даних"
+msgstr ""
 
 #: include/profiles.inc.php:274
 #, c-format
 msgid "Refresh unsupported items \"%1$s\"."
-msgstr "Оновлювати непідтримувані елементи даних \"%1$s\"."
+msgstr ""
 
 #: include/audit.inc.php:46 include/items.inc.php:1658
 #: include/views/configuration.host.discovery.edit.php:294
@@ -13434,7 +13434,7 @@ msgstr "Повторити"
 
 #: include/classes/items/CHelpItems.php:1019
 msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "Повертає JSON об'єкт, який описує MBean об'єкти або їх атрибути. Може бути використано для LLD правила."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1005
 msgid "Return first column of the first row of the SQL query result."
@@ -13442,7 +13442,7 @@ msgstr "Повертає першу колонку першого рядка р�
 
 #: include/classes/items/CHelpItems.php:1015
 msgid "Return value of an attribute of MBean object."
-msgstr "Повертає значення атрибута MBean об'єкта."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:651
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -13450,7 +13450,7 @@ msgstr "Повертає час відповіді в секундах на ICMP
 
 #: include/classes/items/CHelpItems.php:923
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr "Повертає JSON об'єкт, який описує мережеві інтерфейси вузла мережі створеного в Zabbix. Може бути використано для LLD правила."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:927
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -13479,7 +13479,7 @@ msgstr "З правого боку"
 
 #: include/items.inc.php:1660
 msgid "Right trim"
-msgstr "Обрізати справа"
+msgstr ""
 
 #: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
@@ -13529,7 +13529,7 @@ msgstr "Виконати команди"
 #: include/actions.inc.php:929
 #, c-format
 msgid "Run custom commands on %1$s"
-msgstr "Виконати команди користувача на %1$s"
+msgstr ""
 
 #: include/actions.inc.php:939
 msgid "Run global script"
@@ -13667,7 +13667,7 @@ msgstr "SQL запитів: %1$s (selects: %2$s | executes: %3$s)"
 
 #: include/db.inc.php:188 include/func.inc.php:1873
 msgid "SQL error. Please contact Zabbix administrator."
-msgstr "Помилка в SQL. Будь-ласка, зверніться до Zabbix адміністратора."
+msgstr ""
 
 #: include/items.inc.php:1618
 #: include/views/configuration.host.discovery.edit.php:191
@@ -13735,7 +13735,7 @@ msgstr "Safari"
 
 #: include/views/js/monitoring.sysmaps.js.php:37
 msgid "Sans-Serif"
-msgstr "Sans-Serif"
+msgstr ""
 
 #: include/func.inc.php:218
 msgid "Sat"
@@ -13748,7 +13748,7 @@ msgstr "Субота"
 
 #: app/views/monitoring.dashboard.view.js.php:53
 msgid "Save changes"
-msgstr "Зберегти зміни"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:370
 #, c-format
@@ -14359,12 +14359,12 @@ msgstr "Відображувати макс \"%1$s\" подій."
 
 #: adm.gui.php:46 include/views/administration.general.gui.edit.php:52
 msgid "Show events not older than"
-msgstr "Відображати події не старше ніж"
+msgstr ""
 
 #: include/profiles.inc.php:256
 #, c-format
 msgid "Show events not older than \"%1$s\"."
-msgstr "Відображати події не старше ніж \"%1$s\"."
+msgstr ""
 
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/CHostsWidgetForm.php:71
@@ -14399,7 +14399,7 @@ msgstr "Відобразити тільки відібрані"
 
 #: include/classes/widgets/CProblemsWidgetForm.php:139
 msgid "Show tags"
-msgstr "Відображати теги"
+msgstr ""
 
 #: include/classes/widgets/CPlainTextWidgetForm.php:49
 #: include/views/monitoring.screen.constructor.edit.php:372
@@ -14413,7 +14413,7 @@ msgstr "Відображувати тригери"
 #: include/views/common.filter.trigger.php:62
 #, c-format
 msgid "Show unacknowledged (%1$s)"
-msgstr "Відображати непідтверджені (%1$s)"
+msgstr ""
 
 #: app/views/monitoring.problem.view.php:233
 #: include/classes/widgets/CProblemsWidgetForm.php:103
@@ -14456,7 +14456,7 @@ msgstr "Простий"
 
 #: include/items.inc.php:1680
 msgid "Simple change"
-msgstr "Проста зміна"
+msgstr ""
 
 #: include/items.inc.php:87
 msgid "Simple check"
@@ -14513,7 +14513,7 @@ msgstr "Область / район"
 
 #: include/views/js/monitoring.sysmaps.js.php:376
 msgid "Size"
-msgstr "Розмір"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:320
 #, c-format
@@ -14630,7 +14630,7 @@ msgstr "Інформація про архітектуру програмног�
 
 #: app/views/monitoring.dashboard.sharing_form.js.php:33 jsLoader.php:232
 msgid "Something went wrong. Please try again later!"
-msgstr "Щось пішло не так. Будь-ласка, повторіть спробу пізніше!"
+msgstr ""
 
 #: include/classes/widgets/CActionLogWidgetForm.php:41
 #: include/classes/widgets/CProblemsWidgetForm.php:112
@@ -14658,7 +14658,7 @@ msgstr "Джерело"
 
 #: include/classes/widgets/CSysmapWidgetForm.php:42
 msgid "Source type"
-msgstr "Тип джерела"
+msgstr ""
 
 #: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
@@ -14823,7 +14823,7 @@ msgstr "Straight"
 
 #: include/items.inc.php:1665
 msgid "Structured data"
-msgstr "Структуровані дані"
+msgstr ""
 
 #: include/views/monitoring.screen.constructor.edit.php:648
 msgid "Style"
@@ -15530,7 +15530,7 @@ msgstr "Період зберігання даних трендів"
 #: include/profiles.inc.php:244
 #, c-format
 msgid "Trend data storage period \"%1$s\"."
-msgstr "Період зберігання даних трендів \"%1$s\"."
+msgstr ""
 
 #: disc_prototypes.php:162 include/views/configuration.item.edit.php:444
 #: include/views/configuration.item.massupdate.php:442
@@ -15593,7 +15593,7 @@ msgstr[2] "Тригери скопійовано"
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period"
-msgstr "Період зберігання даних тригерів"
+msgstr ""
 
 #: triggers.php:376
 msgid "Trigger deleted"
@@ -15630,7 +15630,7 @@ msgstr "Період зберігання даних подій і повідо�
 #: include/profiles.inc.php:214
 #, c-format
 msgid "Trigger event and alert data storage period \"%1$s\"."
-msgstr "Період зберігання даних подій про тригери та повідомлення \"%1$s\"."
+msgstr ""
 
 #: include/views/configuration.triggers.expression.php:124
 msgid "Trigger expression condition"
@@ -17345,11 +17345,11 @@ msgstr "X1"
 
 #: include/views/js/monitoring.sysmaps.js.php:382
 msgid "X2"
-msgstr "X2"
+msgstr ""
 
 #: include/items.inc.php:1667
 msgid "XML XPath"
-msgstr "XML XPath"
+msgstr ""
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
@@ -17391,11 +17391,11 @@ msgstr "d.m.Y H:i:s"
 
 #: include/views/js/monitoring.sysmaps.js.php:369
 msgid "Y1"
-msgstr "Y1"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:391
 msgid "Y2"
-msgstr "Y2"
+msgstr ""
 
 #: include/classes/import/validators/C20XmlValidator.php:833
 #: include/classes/import/validators/C30XmlValidator.php:896
@@ -17501,7 +17501,7 @@ msgstr "У вас недостатньо прав для доступу до ц�
 
 #: jsLoader.php:115
 msgid "You have unsaved changes."
-msgstr "У вас є незбережені зміни."
+msgstr ""
 
 #: include/func.inc.php:1747
 msgid "You must login to view this page."
@@ -17509,7 +17509,7 @@ msgstr "Ви маєте увійти в систему для перегляду
 
 #: app/views/monitoring.dashboard.sharing_form.js.php:28 jsLoader.php:240
 msgid "You need permission to perform this action!"
-msgstr "Для виконання цієї дії вам необхідно мати права доступу!"
+msgstr ""
 
 #: include/classes/db/DB.php:136
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -17592,7 +17592,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1598
 #: include/views/configuration.action.edit.php:2026
 msgid "Zabbix server (proxy)"
-msgstr "Zabbix сервер (проксі)"
+msgstr ""
 
 #: include/blocks.inc.php:414
 msgid "Zabbix server IP or port is not set!"
@@ -17644,7 +17644,7 @@ msgstr "[Неправильне значення місяця: \"%s\" ]"
 
 #: include/classes/validators/CApiInputValidator.php:530
 msgid "a boolean is expected"
-msgstr "очікується логічне значення"
+msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:241
 #: include/classes/api/services/CTriggerGeneral.php:257
@@ -17657,13 +17657,13 @@ msgstr "очікується рядок символів"
 #: include/classes/validators/CApiInputValidator.php:359
 #: include/classes/validators/CApiInputValidator.php:496
 msgid "a number is expected"
-msgstr "очікується число"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:364
 #: include/classes/validators/CApiInputValidator.php:501
 #: include/classes/validators/CApiInputValidator.php:966
 msgid "a number is too large"
-msgstr "число занадто велике"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:320
 #: include/classes/api/services/CItemGeneral.php:1042
@@ -17678,12 +17678,12 @@ msgstr "очікувався час"
 #: include/classes/validators/CApiInputValidator.php:882
 #: include/validate.inc.php:216
 msgid "a time period is expected"
-msgstr "очікується період часу"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:955
 #: include/validate.inc.php:227 include/validate.inc.php:507
 msgid "a time unit is expected"
-msgstr "очікується одиниця часу"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:848
 msgid "a user macro is expected"
@@ -18032,7 +18032,7 @@ msgstr "помилкова послідовність байт в UTF-8"
 #: include/classes/api/services/CItemGeneral.php:272
 #: include/classes/graphdraw/CLineGraphDraw.php:113
 msgid "invalid delay"
-msgstr "некоректна затримка"
+msgstr ""
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:47
 #, c-format
@@ -18042,20 +18042,20 @@ msgstr "недійсна назва групи \"%1$s\""
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CPieGraphDraw.php:198
 msgid "invalid history storage period"
-msgstr "некоректний період зберігання історії"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:918
 msgid "invalid regular expression"
-msgstr "помилковий регулярний вираз"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:256
 #: include/classes/graphdraw/CPieGraphDraw.php:208
 msgid "invalid trend storage period"
-msgstr "некоректний період зберігання трендів"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:1146
 msgid "is not enclosed in {} or is malformed"
-msgstr "не обгорнуте в {} або неправильно сформоване"
+msgstr ""
 
 #: include/events.inc.php:67
 msgid "item"
@@ -18073,7 +18073,7 @@ msgstr "ост."
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2150
 msgid "left"
-msgstr "зліва"
+msgstr ""
 
 #: include/actions.inc.php:26 include/correlation.inc.php:33
 #: include/views/inventory.host.list.php:52
@@ -18086,7 +18086,7 @@ msgstr "містить"
 #: include/views/js/common.item.edit.js.php:140
 #: include/views/js/configuration.item.massupdate.js.php:154
 msgid "list of characters"
-msgstr "список символів"
+msgstr ""
 
 #: include/events.inc.php:68
 msgid "low-level discovery rule"
@@ -18142,7 +18142,7 @@ msgstr "макс."
 
 #: include/classes/api/services/CItemGeneral.php:1446
 msgid "maximum dependent items count reached"
-msgstr "досягнуто максимальну кількість залежних елементів даних"
+msgstr ""
 
 #: include/classes/api/services/CHostGeneral.php:1050
 #: include/classes/api/services/CItemGeneral.php:1371
@@ -18151,7 +18151,7 @@ msgstr "досягнуто максимальну кількість залеж�
 #: include/classes/import/CConfigurationImport.php:2491
 #: include/classes/import/CConfigurationImport.php:2550
 msgid "maximum number of dependency levels reached"
-msgstr "досягнуто максимальну кількість рівнів залежності"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2014
 #: include/classes/graphdraw/CLineGraphDraw.php:2027
@@ -18202,7 +18202,7 @@ msgstr "має бути між \"%1$s\" та \"%2$s\""
 #: include/views/js/configuration.httpconf.edit.js.php:13
 #: include/views/js/configuration.httpconf.popup.js.php:13
 msgid "name"
-msgstr "назва"
+msgstr ""
 
 #: include/classes/html/CMultiSelect.php:61 jsLoader.php:201
 msgid "new"
@@ -18251,7 +18251,7 @@ msgstr "зараз"
 #: include/views/js/configuration.item.massupdate.js.php:45
 #: include/views/js/configuration.item.massupdate.js.php:145
 msgid "number"
-msgstr "число"
+msgstr ""
 
 #: app/views/monitoring.widget.hosts.view.php:225 include/blocks.inc.php:392
 msgid "of"
@@ -18314,7 +18314,7 @@ msgstr "інший"
 #: include/views/js/common.item.edit.js.php:49
 #: include/views/js/configuration.item.massupdate.js.php:46
 msgid "output"
-msgstr "вивід"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:597
 #: include/views/configuration.item.massupdate.php:303
@@ -18439,7 +18439,7 @@ msgstr "шаблон з ID \"%1$s\" передано %2$s разів"
 #: include/classes/validators/CApiInputValidator.php:615
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
-msgstr "параметр \"%1$s\" відсутній"
+msgstr ""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:106
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125
@@ -18486,7 +18486,7 @@ msgstr "неочікуваний кінець макросу"
 #: include/classes/validators/CApiInputValidator.php:591
 #, c-format
 msgid "unexpected parameter \"%1$s\""
-msgstr "неочікуваний параметр \"%1$s\""
+msgstr ""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:91
 #: include/classes/import/validators/CXmlValidatorGeneral.php:151
@@ -18554,13 +18554,13 @@ msgstr "значення"
 #: include/classes/import/CConfigurationImport.php:2543
 #, c-format
 msgid "value \"%1$s\" not found"
-msgstr "значення \"%1$s\" не знайдено"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:1000
 #: include/classes/validators/CApiInputValidator.php:1054
 #, c-format
 msgid "value %1$s already exists"
-msgstr "значення %1$s вже існує"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:280
 #: include/classes/validators/CApiInputValidator.php:777
@@ -18571,7 +18571,7 @@ msgstr "значення %1$s вже існує"
 #: include/classes/validators/CApiInputValidator.php:1141
 #: include/classes/validators/CApiInputValidator.php:1170
 msgid "value is too long"
-msgstr "значення надто довге"
+msgstr ""
 
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:643
@@ -18580,7 +18580,7 @@ msgstr "значення надто довге"
 #: include/classes/validators/CApiInputValidator.php:418
 #, c-format
 msgid "value must be one of %1$s"
-msgstr "значення має бути одне з %1$s"
+msgstr ""
 
 #: include/actions.inc.php:586 include/actions.inc.php:604
 #: include/actions.inc.php:749 include/actions.inc.php:767

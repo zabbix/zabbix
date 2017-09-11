@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-11 23:35+0300\n"
-"PO-Revision-Date: 2017-08-23 12:41+0300\n"
+"PO-Revision-Date: 2017-09-11 21:19+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1503484915.000000\n"
+"X-POOTLE-MTIME: 1505157596.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -2080,7 +2080,7 @@ msgstr "Cannot execute script"
 
 #: jsLoader.php:179
 msgid "Cannot expand macros."
-msgstr ""
+msgstr "Cannot expand macros."
 
 #: include/classes/import/importers/CMapImporter.php:334
 #, c-format
@@ -5722,7 +5722,7 @@ msgstr "Expand"
 
 #: include/views/monitoring.sysmap.constructor.php:46
 msgid "Expand macros"
-msgstr ""
+msgstr "Expand macros"
 
 #: include/views/monitoring.sysmap.edit.php:142
 msgid "Expand single problem"
@@ -8004,7 +8004,7 @@ msgstr "Incorrect item prototype ID \"%1$s\" provided for screen element."
 
 #: include/triggers.inc.php:1325 tr_testexpr.php:37
 msgid "Incorrect item value type"
-msgstr ""
+msgstr "Incorrect item value type"
 
 #: include/classes/validators/CFunctionValidator.php:299
 #, c-format
@@ -11597,7 +11597,7 @@ msgstr "Numeric (float)"
 
 #: include/triggers.inc.php:1771
 msgid "Numeric (integer)"
-msgstr ""
+msgstr "Numeric (integer)"
 
 #: include/forms.inc.php:353 include/items.inc.php:126
 #: include/views/configuration.item.edit.php:321
@@ -13869,7 +13869,7 @@ msgstr "Search pattern is empty"
 #: include/forms.inc.php:1935 include/maintenances.inc.php:112
 msgctxt "adjective"
 msgid "Second"
-msgstr ""
+msgstr "Second"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -16591,7 +16591,7 @@ msgstr "Username"
 
 #: app/views/administration.mediatype.edit.php:81
 msgid "Username and password"
-msgstr ""
+msgstr "Username and password"
 
 #: app/views/monitoring.dashboard.sharing_form.php:48 include/menu.inc.php:281
 #: include/views/administration.usergroups.edit.php:54
@@ -16937,7 +16937,7 @@ msgstr "Variables"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:455
 msgid "Various information about specific process(es). Returns float"
-msgstr ""
+msgstr "Various information about specific process(es). Returns float"
 
 #: include/hosts.inc.php:249
 msgid "Vendor"
@@ -17240,7 +17240,7 @@ msgstr "Wrong fields for trigger."
 #: include/classes/api/services/CTriggerGeneral.php:515
 #: include/classes/api/services/CTriggerGeneral.php:668
 msgid "Wrong value for url field."
-msgstr ""
+msgstr "Wrong value for url field."
 
 #: include/views/js/monitoring.sysmaps.js.php:228
 #: include/views/js/monitoring.sysmaps.js.php:361
@@ -17421,7 +17421,7 @@ msgstr "You need permission to perform this action!"
 
 #: include/classes/db/DB.php:136
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
-msgstr ""
+msgstr "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 
 #: index.php:25
 msgid "ZABBIX"
@@ -18379,7 +18379,7 @@ msgstr "type here to search"
 
 #: include/classes/validators/CApiInputValidator.php:1175
 msgid "unacceptible URL"
-msgstr ""
+msgstr "unacceptible URL"
 
 #: include/classes/parsers/CItemKey.php:178
 msgid "unexpected end of key"
