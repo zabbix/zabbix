@@ -750,6 +750,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.11rc1
 
 New features:
+...... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Russian, Turkish translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
