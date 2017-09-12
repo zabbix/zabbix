@@ -489,10 +489,22 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
+	if (NULL == CONFIG_SERVER)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter is not defined."
-				" This parameter is mandatory for active proxies.");
+				" This parameter is mandatory.");
+		err = 1;
+	}
+	else if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE && (FAIL == is_supported_ip(CONFIG_SERVER) &&
+			FAIL == zbx_validate_hostname(CONFIG_SERVER)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Server\" configuration parameter: '%s'", CONFIG_SERVER);
+		err = 1;
+	}
+	else if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
+		zbx_free(ch_error);
 		err = 1;
 	}
 

@@ -113,7 +113,8 @@ static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
  *                                                                            *
  * Function: zbx_proxy_check_permissions                                      *
  *                                                                            *
- * Purpose: checks proxy connection permissions (encryption configuration)    *
+ * Purpose: checks proxy connection permissions (encryption configuration and *
+*           if peer proxy address is allowed)                                  *
  *                                                                            *
  * Parameters:                                                                *
  *     proxy   - [IN] the proxy data                                          *
