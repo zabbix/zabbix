@@ -8245,6 +8245,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	if (NULL != (host = zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
 		strscpy(dst_proxy->host, host->host);
+		strscpy(dst_proxy->proxy_address, host->proxy_address);
 
 		dst_proxy->tls_connect = host->tls_connect;
 		dst_proxy->tls_accept = host->tls_accept;
@@ -8269,6 +8270,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 		/* DCget_proxy() is called only from DCconfig_get_proxypoller_hosts(), which is called only from */
 		/* process_proxy(). So, this branch should never happen. */
 		*dst_proxy->host = '\0';
+		*dst_proxy->proxy_address = '\0';
 		dst_proxy->tls_connect = ZBX_TCP_SEC_TLS_PSK;	/* set PSK to deliberately fail in this case */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		*dst_proxy->tls_psk_identity = '\0';
