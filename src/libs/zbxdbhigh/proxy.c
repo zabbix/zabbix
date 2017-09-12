@@ -129,7 +129,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 {
 	if ('\0' != *proxy->proxy_address && FAIL == zbx_tcp_check_allowed_peers(sock, proxy->proxy_address))
 	{
-		*error = zbx_strdup(*error, zbx_socket_strerror());
+		*error = zbx_strdup(*error, "connection is not allowed");
 		return FAIL;
 	}
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
