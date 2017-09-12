@@ -1023,6 +1023,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		DCstrpool_replace(found, &host->proxy_address, row[35]);
 		DCstrpool_replace(found, &host->tls_issuer, row[31]);
 		DCstrpool_replace(found, &host->tls_subject, row[32]);
 
@@ -1212,6 +1213,8 @@ done:
 				zbx_hashset_insert(&psk_owners, &psk_owner_local, sizeof(psk_owner_local));
 			}
 		}
+#else
+		DCstrpool_replace(found, &host->proxy_address, row[31]);
 #endif
 		ZBX_STR2UCHAR(host->tls_connect, row[29]);
 		ZBX_STR2UCHAR(host->tls_accept, row[30]);
@@ -1409,6 +1412,8 @@ done:
 
 		zbx_strpool_release(host->host);
 		zbx_strpool_release(host->name);
+		zbx_strpool_release(host->proxy_address);
+
 		zbx_strpool_release(host->error);
 		zbx_strpool_release(host->snmp_error);
 		zbx_strpool_release(host->ipmi_error);
