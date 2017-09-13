@@ -9,6 +9,8 @@ Bug fixes:
 Changes for 3.4.2rc1
 
 New features:
+A.F....... [ZBXNEXT-4084] renamed action acknowledgment operation 'Notify all who left acknowledgement and comments' to 'Notify all involved' (gcalenko)
+........S. [ZBXNEXT-4084] added users who received notifications regarding the problem to 'Notify all involved' acknowledgment operation recipient list (wiper)
 A.F....... [ZBX-1357] enabled Turkish translation to be displayed by default (zalex_ua)
 A.F....... [ZBX-1357] updated Chinese (China), English (United States), Japanese, Korean, Turkish translations; thanks to Zabbix translators (zalex_ua)
 ..F....... [ZBXNEXT-4054] implemented feature to open first available dashboard from the list (Ivo)
