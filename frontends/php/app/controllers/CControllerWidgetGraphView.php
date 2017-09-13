@@ -208,6 +208,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$item = API::Item()->get([
 					'itemids' => $resourceid,
+					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
 					'output' => null
 				]);
 				$item = reset($item);

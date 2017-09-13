@@ -1181,9 +1181,10 @@ define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
 define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
 
 // widget select resource field types
-define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
-define('WIDGET_FIELD_SELECT_RES_ITEM',		2);
-define('WIDGET_FIELD_SELECT_RES_GRAPH',		3);
+define('WIDGET_FIELD_SELECT_RES_SYSMAP',		1);
+define('WIDGET_FIELD_SELECT_RES_ITEM',			2);
+define('WIDGET_FIELD_SELECT_RES_GRAPH',			3);
+define('WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH',  4);
 
 // max depth of navigation tree
 define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
