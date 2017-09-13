@@ -15,6 +15,7 @@ A.F....... [ZBX-1357] updated Chinese (China), English (United States), Japanese
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-12577] added item select filter for simple graph to allow select only supported item (gcalenko)
 ..F....... [ZBX-12647] fixed map minimum severity option in screens (miks)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
