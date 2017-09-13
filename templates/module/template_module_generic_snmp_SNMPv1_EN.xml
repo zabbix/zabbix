@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Generic SNMPv1</template>
          <name>Template Module Generic SNMPv1</name>
-         <description>Template Module Generic version: 0.12
+         <description>Template Module Generic version: 0.13
 MIBs used:
 SNMPv2-MIB</description>
          <groups>
