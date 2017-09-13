@@ -429,7 +429,18 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	$triggers = API::Trigger()->get($triggerOptions);
 
-	CArrayHelper::sort($triggers, ['host', 'description']);
+	if (getRequest('filter_hostid') === '0' || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		foreach ($triggers as &$trigger) {
+			$trigger_host = reset($trigger['hosts']);
+			$trigger['host'] = $trigger_host['name'];
+		}
+		unset($trigger);
+
+		CArrayHelper::sort($triggers, ['host', 'description']);
+	}
+	else {
+		CArrayHelper::sort($triggers, ['description']);
+	}
 
 	$paging = getPagingLine($triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
