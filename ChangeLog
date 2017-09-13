@@ -761,6 +761,7 @@ A.F....... [ZBX-1357] enabled Turkish translation to be displayed by default (za
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Russian, Turkish translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
 ...G...... [ZBX-12653] fixed heap corruption in Windows agent; thanks to Ronnie Kaech for the patch (abs)
