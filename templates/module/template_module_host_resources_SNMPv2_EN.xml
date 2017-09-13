@@ -11,7 +11,7 @@
       <template>
          <template>Template Module HOST-RESOURCES-MIB SNMPv2</template>
          <name>Template Module HOST-RESOURCES-MIB SNMPv2</name>
-         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.12
+         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.13
 MIBs used:
 HOST-RESOURCES-MIB</description>
          <groups>
@@ -170,7 +170,7 @@ The average, over the last minute, of the percentage of time that this processor
                <name>Memory Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},.1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},.1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
                <key>memory.discovery</key>
                <delay>3600</delay>
                <status>0</status>
@@ -215,7 +215,7 @@ The average, over the last minute, of the percentage of time that this processor
                      <name>#{#SNMPINDEX}: Memory units</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>.1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units[hrStorageAllocationUnits.{#SNMPINDEX}]</key>
                      <delay>180</delay>
                      <history>1w</history>
@@ -260,7 +260,7 @@ The size, in bytes, of the data objects allocated from this pool.
                      <name>#{#SNMPINDEX}: Used memory in units</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>.1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units.used[hrStorageUsed.{#SNMPINDEX}]</key>
                      <delay>180</delay>
                      <history>1w</history>
@@ -303,7 +303,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <name>#{#SNMPINDEX}: Total memory in units</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>.1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units.total[hrStorageSize.{#SNMPINDEX}]</key>
                      <delay>180</delay>
                      <history>1w</history>
@@ -528,7 +528,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                <name>Storage Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},.1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},.1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
                <key>storage.discovery</key>
                <delay>3600</delay>
                <status>0</status>
@@ -555,7 +555,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <condition>
                         <macro>{#STORAGE_TYPE}</macro>
                         <value>.+4$</value>
-                        <!-- OID: .1.3.6.1.2.1.25.2.1.4 -->
+                        <!-- OID: 1.3.6.1.2.1.25.2.1.4 -->
                         <operator>8</operator>
                         <formulaid>B</formulaid>
                      </condition>
@@ -574,7 +574,7 @@ The size of the storage represented by this entry, in units of hrStorageAllocati
                      <name>{#SNMPVALUE}: Storage units</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>.1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units[hrStorageAllocationUnits.{#SNMPINDEX}]</key>
                      <delay>300</delay>
                      <history>1w</history>
@@ -619,7 +619,7 @@ this number will commonly be greater than one.  Otherwise this number will typic
                      <name>{#SNMPVALUE}: Used storage in units</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>.1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units.used[hrStorageUsed.{#SNMPINDEX}]</key>
                      <delay>300</delay>
                      <history>1w</history>
@@ -662,7 +662,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <name>{#SNMPVALUE}: Total space in units</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>.1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units.total[hrStorageSize.{#SNMPINDEX}]</key>
                      <delay>300</delay>
                      <history>1w</history>

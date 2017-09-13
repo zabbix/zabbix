@@ -9,6 +9,8 @@ Bug fixes:
 Changes for 3.4.2rc1
 
 New features:
+.........T [ZBXNEXT-4099] removed starting point from all OIDs; shortened old IOS Cisco templates names (vso, vzhuravlev)
+.........T [ZBXNEXT-4067] added preprocessing_queue item/graph/screen widget in Template App Zabbix Server (vso, vzhuravlev)
 A.F....... [ZBXNEXT-4084] renamed action acknowledgment operation 'Notify all who left acknowledgement and comments' to 'Notify all involved' (gcalenko)
 ........S. [ZBXNEXT-4084] added users who received notifications regarding the problem to 'Notify all involved' acknowledgment operation recipient list (wiper)
 A.F....... [ZBX-1357] enabled Turkish translation to be displayed by default (zalex_ua)
@@ -17,6 +19,7 @@ A.F....... [ZBX-1357] updated Chinese (China), English (United States), Japanese
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+.........T [ZBX-12688] fixed false positives on 'High bandwidth usage' trigger in Template_Module_Interfaces_* templates (vso, vzhuravlev)
 .......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 A......... [ZBX-12699] added support of strings in "sortfield" and "sortorder" parameters, and added sorting by "name" for dashboard.get() (Sasha)

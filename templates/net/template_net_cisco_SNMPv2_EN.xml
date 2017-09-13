@@ -14,7 +14,7 @@
       <template>
          <template>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-MEMORY-POOL-MIB version: 0.12
+         <description>Template Cisco CISCO-MEMORY-POOL-MIB version: 0.13
 MIBs used:
 CISCO-MEMORY-POOL-MIB</description>
          <groups>
@@ -257,7 +257,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-PROCESS-MIB version: 0.12
+         <description>Template Cisco CISCO-PROCESS-MIB version: 0.13
 MIBs used:
 CISCO-PROCESS-MIB</description>
          <groups>
@@ -312,7 +312,7 @@ CISCO-PROCESS-MIB</description>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>.1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}]</key>
                      <delay>180</delay>
                      <history>30d</history>
@@ -415,9 +415,9 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
          <screens/>
       </template>
       <template>
-         <template>Template Module Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</template>
-         <name>Template Module Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</name>
-         <description>Template Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 version: 0.12
+         <template>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</template>
+         <name>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
+         <description>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 version: 0.13
 MIBs used:
 CISCO-PROCESS-MIB</description>
          <groups>
@@ -472,7 +472,7 @@ CISCO-PROCESS-MIB</description>
                      <name>{#SNMPVALUE}: CPU utilization</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>.1.3.6.1.4.1.9.9.109.1.1.1.1.5.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.4.1.9.9.109.1.1.1.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]</key>
                      <delay>180</delay>
                      <history>30d</history>
@@ -519,7 +519,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2:system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <expression>{Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2:system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: High CPU utilization</name>
@@ -562,7 +562,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Module Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</host>
+                              <host>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</host>
                               <key>system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -581,7 +581,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</template>
          <name>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</name>
-         <description>Template Cisco OLD-CISCO-CPU-MIB version: 0.12
+         <description>Template Cisco OLD-CISCO-CPU-MIB version: 0.13
 MIBs used:
 OLD-CISCO-CPU-MIB</description>
          <groups>
@@ -599,7 +599,7 @@ OLD-CISCO-CPU-MIB</description>
                <name>CPU utilization</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>.1.3.6.1.4.1.9.2.1.58</snmp_oid>
+               <snmp_oid>1.3.6.1.4.1.9.2.1.58</snmp_oid>
                <key>system.cpu.util[avgBusy5]</key>
                <delay>180</delay>
                <history>30d</history>
@@ -648,7 +648,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco Inventory SNMPv2</template>
          <name>Template Module Cisco Inventory SNMPv2</name>
-         <description>Template Cisco Inventory version: 0.12
+         <description>Template Cisco Inventory version: 0.13
 MIBs used:
 ENTITY-MIB
 SNMPv2-MIB</description>
@@ -798,7 +798,7 @@ SNMPv2-MIB</description>
                <name>Entity Serial Numbers Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#ENT_CLASS},.1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},.1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_SN},1.3.6.1.2.1.47.1.1.1.1.11]</snmp_oid>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_SN},1.3.6.1.2.1.47.1.1.1.1.11]</snmp_oid>
                <key>entity_sn.discovery</key>
                <delay>3600</delay>
                <status>0</status>
@@ -915,7 +915,7 @@ Device serial number has changed. Ack to close</description>
       <template>
          <template>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-ENVMON-MIB version: 0.12
+         <description>Template Cisco CISCO-ENVMON-MIB version: 0.13
 MIBs used:
 CISCO-ENVMON-MIB</description>
          <groups>
@@ -1376,7 +1376,7 @@ Please check the fan unit</description>
       <template>
          <template>Template Net Cisco IOS SNMPv2</template>
          <name>Template Net Cisco IOS SNMPv2</name>
-         <description>Template Cisco IOS Software releases 12.2(3.5) or later version: 0.12
+         <description>Template Cisco IOS Software releases 12.2(3.5) or later version: 0.13
 Known Issues:
 description : no if(in|out)(Errors|Discards) are available for vlan ifType
 version : IOS for example: 	12.1(22)EA11, 15.4(3)M2
@@ -1446,9 +1446,9 @@ device : C2911, C7600</description>
          <screens/>
       </template>
       <template>
-         <template>Template Net Cisco IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</template>
-         <name>Template Net Cisco IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</name>
-         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.12</description>
+         <template>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMPv2</template>
+         <name>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
+         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.13</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -1499,7 +1499,7 @@ device : C2911, C7600</description>
                <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template Module Cisco CISCO-PROCESS-MIB IOS later to 12.0_3_T and prior to 12.2_3.5 SNMPv2</name>
+               <name>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
             </template>
             <template>
                <name>Template Module Interfaces SNMPv2</name>
@@ -1513,7 +1513,7 @@ device : C2911, C7600</description>
       <template>
          <template>Template Net Cisco IOS prior to 12.0_3_T SNMPv2</template>
          <name>Template Net Cisco IOS prior to 12.0_3_T SNMPv2</name>
-         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.12</description>
+         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.13</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
