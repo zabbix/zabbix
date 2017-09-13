@@ -43,7 +43,7 @@ class CGraphWidgetForm extends CWidgetForm {
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 			// item field
-			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
+			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
 			if (array_key_exists('itemid', $this->data)) {
