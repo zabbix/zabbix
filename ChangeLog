@@ -16,7 +16,7 @@ A.F....... [ZBX-1357] updated Chinese (China), English (United States), Japanese
 
 Bug fixes:
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
-A......... [ZBX-12699] added support of strings in "sortfield" and "sortorder" parameters for dashboard.get() (Sasha)
+A......... [ZBX-12699] added support of strings in "sortfield" and "sortorder" parameters, and added sorting by "name" for dashboard.get() (Sasha)
 ..F....... [ZBX-12577] added item select filter for simple graph to allow select only supported item (gcalenko)
 ..F....... [ZBX-12647] fixed map minimum severity option in screens (miks)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
