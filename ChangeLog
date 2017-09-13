@@ -17,6 +17,7 @@ A.F....... [ZBX-1357] updated Chinese (China), English (United States), Japanese
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+.......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 A......... [ZBX-12699] added support of strings in "sortfield" and "sortorder" parameters, and added sorting by "name" for dashboard.get() (Sasha)
 ..F....... [ZBX-12577] added item select filter for simple graph to allow select only supported item (gcalenko)
@@ -280,6 +281,7 @@ A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, J
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+.......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)
@@ -765,6 +767,7 @@ A.F....... [ZBX-1357] enabled Turkish translation to be displayed by default (za
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Russian, Turkish translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+.......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 ..F....... [ZBX-12548] fixed notification sound not being played for message with timeout set to greater than minute (gcalenko)

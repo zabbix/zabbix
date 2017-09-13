@@ -411,11 +411,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* set to prior to the connection. MySQL allows changing connection	*/
 	/* options on an open connection, so setting it here is safe.		*/
 
-	if (0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
+	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
 	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (0 != mysql_set_character_set(conn, "utf8"))
+	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, "utf8"))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"utf8\"");
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
