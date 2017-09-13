@@ -185,13 +185,13 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
 				// Get first available dashboard that user has read permissions.
 				$dashboards = API::Dashboard()->get([
-					'output' => ['dashboardid', 'name']
+					'output' => ['dashboardid'],
+					'sortfield' => 'name',
+					'limit' => 1
 				]);
 
 				if ($dashboards) {
-					CArrayHelper::sort($dashboards, ['name']);
-					$dashboard = reset($dashboards);
-					$dashboardid = $dashboard['dashboardid'];
+					$dashboardid = $dashboards[0]['dashboardid'];
 				}
 			}
 
