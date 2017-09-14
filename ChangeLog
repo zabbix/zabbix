@@ -20,6 +20,7 @@ A.F....... [ZBX-1357] updated Chinese (China), English (United States), Japanese
 ..F....... [ZBXNEXT-4046] implemented dashboard widget minimum height limit (gcalenko)
 
 Bug fixes:
+.......PS. [ZBX-12708] fixed service port validation if auto-discovery is performed by the zabbix proxy (abs, vso)
 ...G...PS. [ZBX-12718] fixed crash when using item of log value type as master item for dependent items (wiper)
 .......P.. [ZBX-12720] fixed processing of log keys with non log value types for items monitored by proxies (wiper)
 ..F....... [ZBX-12530] fixed non well formed numeric value encaunteration in slideshow; implemented getBBox workaround for Firefox (miks)
