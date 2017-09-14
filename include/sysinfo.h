@@ -86,6 +86,7 @@ do									\
 	if ((res)->type & AR_LOG)					\
 	{								\
 		zbx_log_free((res)->log);				\
+		(res)->log = NULL;					\
 		(res)->type &= ~AR_LOG;					\
 	}								\
 }									\
