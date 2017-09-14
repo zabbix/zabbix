@@ -332,7 +332,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void    free_result_ptr(AGENT_RESULT *result)
+static void	free_result_ptr(AGENT_RESULT *result)
 {
 	free_result(result);
 	zbx_free(result);
