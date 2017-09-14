@@ -24,8 +24,20 @@
 
 static const DWORD	service_states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING,
 	SERVICE_PAUSE_PENDING, SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING, SERVICE_STOPPED};
-static const DWORD	start_types[4] = {SERVICE_AUTO_START, SERVICE_AUTO_START, SERVICE_DEMAND_START,
-	SERVICE_DISABLED};
+static const DWORD	start_types[2] = {SERVICE_AUTO_START, SERVICE_DEMAND_START};
+
+typedef enum
+{
+	STARTUP_TYPE_AUTO,
+	STARTUP_TYPE_AUTO_DELAYED,
+	STARTUP_TYPE_MANUAL,
+	STARTUP_TYPE_DISABLED,
+	STARTUP_TYPE_UNKNOWN,
+	STARTUP_TYPE_AUTO_TRIGGER,
+	STARTUP_TYPE_AUTO_DELAYED_TRIGGER,
+	STARTUP_TYPE_MANUAL_TRIGGER
+}
+zbx_startup_type_t;
 
 static const char	*get_state_string(DWORD state)
 {
@@ -50,19 +62,45 @@ static const char	*get_state_string(DWORD state)
 	}
 }
 
-static const char	*get_startup_string(DWORD startup)
+static const char	*get_startup_string(zbx_startup_type_t startup_type)
 {
-	switch (startup)
+	switch (startup_type)
 	{
-		case SERVICE_AUTO_START:
+		case STARTUP_TYPE_AUTO:
 			return "automatic";
-		case SERVICE_DEMAND_START:
+		case STARTUP_TYPE_AUTO_DELAYED:
+			return "automatic delayed";
+		case STARTUP_TYPE_MANUAL:
 			return "manual";
-		case SERVICE_DISABLED:
+		case STARTUP_TYPE_DISABLED:
 			return "disabled";
 		default:
 			return "unknown";
 	}
+}
+
+static int	check_trigger_start(SC_HANDLE h_srv, int *trigger_start)
+{
+	SERVICE_TRIGGER_INFO	*sti = NULL;
+	DWORD			sz = 0;
+	int			ret = FAIL;
+
+	QueryServiceConfig2(h_srv, SERVICE_CONFIG_TRIGGER_INFO, NULL, 0, &sz);
+
+	if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+	{
+		sti = (SERVICE_TRIGGER_INFO *)zbx_malloc(sti, sz);
+
+		if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_TRIGGER_INFO, (LPBYTE)sti, sz, &sz))
+		{
+			*trigger_start = (0 < sti->cTriggers ? 1 : 0);
+			ret = SUCCEED;
+		}
+
+		zbx_free(sti);
+	}
+
+	return ret;
 }
 
 static int	check_delayed_start(SC_HANDLE h_srv)
@@ -89,6 +127,47 @@ static int	check_delayed_start(SC_HANDLE h_srv)
 	return ret;
 }
 
+static zbx_startup_type_t	check_service_startup(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc)
+{
+	int			i, delayed = 0, trigger_start;
+
+	for (i = 0; i < ARRSIZE(start_types) &&	qsc->dwStartType != start_types[i]; i++)
+		;
+
+	if (2 == i)
+		return STARTUP_TYPE_UNKNOWN;
+
+	if (SUCCEED == check_delayed_start(h_srv))
+		delayed = 1;
+
+	if (SUCCEED != check_trigger_start(h_srv, &trigger_start))
+		trigger_start = 0;
+
+	if (SERVICE_AUTO_START == qsc->dwStartType)
+	{
+		if (delayed)
+		{
+			if (trigger_start)
+				return STARTUP_TYPE_AUTO_DELAYED_TRIGGER;
+			else
+				return STARTUP_TYPE_AUTO_DELAYED;
+		}
+		else if (trigger_start)
+		{
+			return STARTUP_TYPE_AUTO_TRIGGER;
+		}
+		else
+			return STARTUP_TYPE_AUTO;
+	}
+	else
+	{
+		if (trigger_start)
+			return STARTUP_TYPE_MANUAL_TRIGGER;
+		else
+			return STARTUP_TYPE_MANUAL;
+	}
+}
+
 int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
@@ -113,8 +192,9 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		for (i = 0; i < services; i++)
 		{
-			SC_HANDLE	h_srv;
-			DWORD		current_state;
+			SC_HANDLE		h_srv;
+			DWORD			current_state;
+			zbx_startup_type_t	startup_type;
 
 			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_CONFIG)))
 				continue;
@@ -190,28 +270,28 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "{#SERVICE.USER}", utf8, ZBX_JSON_TYPE_STRING);
 			zbx_free(utf8);
 
-			if (SERVICE_AUTO_START == qsc->dwStartType)
+			if (SERVICE_DISABLED == qsc->dwStartType)
 			{
-				if (SUCCEED == check_delayed_start(h_srv))
-				{
-					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 1);
-					zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "automatic delayed",
-							ZBX_JSON_TYPE_STRING);
-				}
-				else
-				{
-					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 0);
-					zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "automatic",
-							ZBX_JSON_TYPE_STRING);
-				}
+				zbx_json_adduint64(&j, "{#SERVICE.STARTUPTRIGGER}", 0);
+				zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", STARTUP_TYPE_DISABLED);
+				zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}",
+						get_startup_string(STARTUP_TYPE_DISABLED), ZBX_JSON_TYPE_STRING);
 			}
 			else
 			{
-				for (k = 2; k < ARRSIZE(start_types) &&	qsc->dwStartType != start_types[k]; k++)
-					;
+				startup_type = check_service_startup(h_srv, qsc);
 
-				zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
-				zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", get_startup_string(qsc->dwStartType),
+				/* for LLD backwards compatibility startup types with trigger start are ignored */
+				if (STARTUP_TYPE_UNKNOWN < startup_type)
+				{
+					startup_type -= 5;
+					zbx_json_adduint64(&j, "{#SERVICE.STARTUPTRIGGER}", 1);
+				}
+				else
+					zbx_json_adduint64(&j, "{#SERVICE.STARTUPTRIGGER}", 0);
+
+				zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", startup_type);
+				zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", get_startup_string(startup_type),
 						ZBX_JSON_TYPE_STRING);
 			}
 
@@ -264,6 +344,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*name, *param;
 	wchar_t			*wname, service_name[MAX_STRING_LEN];
 	DWORD			max_len_name = MAX_STRING_LEN;
+	zbx_startup_type_t	startup_type;
 
 	if (2 < request->nparam)
 	{
@@ -412,19 +493,14 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 				SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpServiceStartName));
 				break;
 			case ZBX_SRV_PARAM_STARTUP:
-				if (SERVICE_AUTO_START == qsc->dwStartType)
+				if (SERVICE_DISABLED == qsc->dwStartType)
 				{
-					if (SUCCEED == check_delayed_start(h_srv))
-						SET_UI64_RESULT(result, 1);
-					else
-						SET_UI64_RESULT(result, 0);
+					SET_UI64_RESULT(result, STARTUP_TYPE_DISABLED);
 				}
 				else
 				{
-					for (i = 2; i < ARRSIZE(start_types) && qsc->dwStartType != start_types[i]; i++)
-						;
-
-					SET_UI64_RESULT(result, i);
+					startup_type = check_service_startup(h_srv, qsc);
+					SET_UI64_RESULT(result, startup_type);
 				}
 				break;
 		}
