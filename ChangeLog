@@ -9,7 +9,7 @@ Bug fixes:
 Changes for 3.4.2rc1
 
 New features:
-A.F....... [ZBXNEXT-4091] improved permission schema of the dashboards for normal adminitrators (Sasha)
+A.F....... [ZBXNEXT-4091] improved permission schema of the dashboards for normal administrators (Sasha)
 .........T [ZBXNEXT-4099] removed starting point from all OIDs; shortened old IOS Cisco templates names (vso, vzhuravlev)
 .........T [ZBXNEXT-4067] added preprocessing_queue item/graph/screen widget in Template App Zabbix Server (vso, vzhuravlev)
 A.F....... [ZBXNEXT-4084] renamed action acknowledgment operation 'Notify all who left acknowledgement and comments' to 'Notify all involved' (gcalenko)
