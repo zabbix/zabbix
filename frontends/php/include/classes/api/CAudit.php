@@ -87,6 +87,18 @@ class CAudit {
 				$table_name = 'globalmacro';
 				break;
 
+			case AUDIT_RESOURCE_PROXY:
+				$field_name_resourceid = 'proxyid';
+				$field_name_resourcename = 'host';
+				$table_name = 'hosts';
+				break;
+
+			case AUDIT_RESOURCE_SCENARIO:
+				$field_name_resourceid = 'httptestid';
+				$field_name_resourcename = 'name';
+				$table_name = 'httptest';
+				break;
+
 			case AUDIT_RESOURCE_SCRIPT:
 				$field_name_resourceid = 'scriptid';
 				$field_name_resourcename = 'name';
@@ -109,12 +121,6 @@ class CAudit {
 				$field_name_resourceid = 'valuemapid';
 				$field_name_resourcename = 'name';
 				$table_name = 'valuemaps';
-				break;
-
-			case AUDIT_RESOURCE_SCENARIO:
-				$field_name_resourceid = 'httptestid';
-				$field_name_resourcename = 'name';
-				$table_name = 'httptest';
 				break;
 
 			default:

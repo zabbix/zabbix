@@ -372,79 +372,37 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Delete proxy.
-	 *
-	 * @param array	$proxyIds
+	 * @param array	$proxyids
 	 *
 	 * @return array
 	 */
-	public function delete(array $proxyIds) {
-		$this->validateDelete($proxyIds);
+	public function delete(array $proxyids) {
+		$this->validateDelete($proxyids, $db_proxies);
 
-		$dbProxies = DBselect(
-			'SELECT h.hostid,h.host'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.hostid', $proxyIds)
-		);
-		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
+		DB::delete('interface', ['hostid' => $proxyids]);
+		DB::delete('hosts', ['hostid' => $proxyids]);
 
-		$actionIds = [];
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, $db_proxies);
 
-		// get conditions
-		$dbActions = DBselect(
-			'SELECT DISTINCT c.actionid'.
-			' FROM conditions c'.
-			' WHERE c.conditiontype='.CONDITION_TYPE_PROXY.
-				' AND '.dbConditionString('c.value', $proxyIds)
-		);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionIds[$dbAction['actionid']] = $dbAction['actionid'];
-		}
-
-		if ($actionIds) {
-			DB::update('actions', [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionIds]
-			]);
-		}
-
-		// delete action conditions
-		DB::delete('conditions', [
-			'conditiontype' => CONDITION_TYPE_PROXY,
-			'value' => $proxyIds
-		]);
-
-		// delete interface
-		DB::delete('interface', ['hostid' => $proxyIds]);
-
-		// delete host
-		DB::delete('hosts', ['hostid' => $proxyIds]);
-
-		// TODO: remove info from API
-		foreach ($dbProxies as $proxy) {
-			info(_s('Deleted: Proxy "%1$s".', $proxy['host']));
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].'] ['.$proxy['hostid'].']');
-		}
-
-		return ['proxyids' => $proxyIds];
+		return ['proxyids' => $proxyids];
 	}
 
 	/**
-	 * Check if proxies can be deleted.
-	 *  - only super admin can delete proxy
-	 *  - cannot delete proxy if it is used to monitor host
-	 *  - cannot delete proxy if it is used in discovery rule
-	 *
 	 * @param array $proxyids
+	 * @param array $db_proxies
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $proxyids) {
-		if (empty($proxyids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	private function validateDelete(array &$proxyids, array &$db_proxies = null) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $proxyids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_proxies = $this->get([
-			'output' => [],
+			'output' => ['proxyid', 'host'],
 			'proxyids' => $proxyids,
+			'editable' => true,
 			'preservekeys' => true
 		]);
 
@@ -456,47 +414,71 @@ class CProxy extends CApiService {
 			}
 		}
 
-		$this->checkUsedInDiscoveryRule($proxyids);
-		$this->checkUsedForMonitoring($proxyids);
+		$this->checkUsedInDiscovery($db_proxies);
+		$this->checkUsedInHosts($db_proxies);
+		$this->checkUsedInActions($db_proxies);
 	}
 
 	/**
-	 * Check if proxy is used in discovery rule.
+	 * Check if proxy is used in network discovery rule.
 	 *
-	 * @param array $proxyIds
+	 * @param array  $proxies
+	 * @param string $proxies[<proxyid>]['host']
 	 */
-	protected function checkUsedInDiscoveryRule(array $proxyIds) {
-		$dRule = DBfetch(DBselect(
-			'SELECT dr.druleid,dr.name,dr.proxy_hostid'.
-			' FROM drules dr'.
-			' WHERE '.dbConditionInt('dr.proxy_hostid', $proxyIds),
-			1
-		));
-		if ($dRule) {
-			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($dRule['proxy_hostid'])));
+	private function checkUsedInDiscovery(array $proxies) {
+		$db_drules = DB::select('drules', [
+			'output' => ['proxy_hostid', 'name'],
+			'filter' => ['proxy_hostid' => array_keys($proxies)],
+			'limit' => 1
+		]);
 
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Proxy "%1$s" is used by discovery rule "%2$s".', $proxy['host'], $dRule['name']));
+		if ($db_drules) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%1$s" is used by discovery rule "%2$s".',
+				$proxies[$db_drules[0]['proxy_hostid']]['host'], $db_drules[0]['name']
+			));
 		}
 	}
 
 	/**
 	 * Check if proxy is used to monitor hosts.
 	 *
-	 * @param array $proxyIds
+	 * @param array  $proxies
+	 * @param string $proxies[<proxyid>]['host']
 	 */
-	protected function checkUsedForMonitoring(array $proxyIds) {
-		$host = DBfetch(DBselect(
-			'SELECT h.name,h.proxy_hostid'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.proxy_hostid', $proxyIds),
+	protected function checkUsedInHosts(array $proxies) {
+		$db_hosts = DB::select('hosts', [
+			'output' => ['proxy_hostid', 'name'],
+			'filter' => ['proxy_hostid' => array_keys($proxies)],
+			'limit' => 1
+		]);
+
+		if ($db_hosts) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" is monitored with proxy "%2$s".',
+				$db_hosts[0]['name'], $proxies[$db_hosts[0]['proxy_hostid']]['host']
+			));
+		}
+	}
+
+	/**
+	 * Check if proxy is used in actions.
+	 *
+	 * @param array  $proxies
+	 * @param string $proxies[<proxyid>]['host']
+	 */
+	private function checkUsedInActions(array $proxies) {
+		$db_actions = DBfetchArray(DBselect(
+			'SELECT a.name,c.value AS proxy_hostid'.
+			' FROM actions a,conditions c'.
+			' WHERE a.actionid=c.actionid'.
+				' AND c.conditiontype='.CONDITION_TYPE_PROXY.
+				' AND '.dbConditionString('c.value', array_keys($proxies)),
 			1
 		));
-		if ($host) {
-			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($host['proxy_hostid'])));
 
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Host "%1$s" is monitored with proxy "%2$s".', $host['name'], $proxy['host']));
+		if ($db_actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%1$s" is used by action "%2$s".',
+				$proxies[$db_actions[0]['proxy_hostid']]['host'], $db_actions[0]['name']
+			));
 		}
 	}
 
