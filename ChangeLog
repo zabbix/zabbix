@@ -9,6 +9,7 @@ Bug fixes:
 Changes for 3.4.2rc2
 
 Bug fixes:
+.......PS. [ZBX-12739] fixed data conversion for ssh checks of numeric value type (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.2rc1
