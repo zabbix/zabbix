@@ -53,8 +53,8 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
-				proxy.host, sock->peer, error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
+				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
 		goto out;
 	}
 
