@@ -8600,7 +8600,7 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 	}
 }
 
-void	dc_get_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
+static void	dc_get_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
 		char **replace_to)
 {
 	char	*value = NULL, *value_default = NULL;

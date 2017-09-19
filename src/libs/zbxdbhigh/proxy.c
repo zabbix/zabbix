@@ -208,7 +208,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
  *     FAIL    - otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, char **error)
+static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, char **error)
 {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
