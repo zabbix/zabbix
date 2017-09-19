@@ -127,9 +127,9 @@ static int	check_delayed_start(SC_HANDLE h_srv)
 	return ret;
 }
 
-static zbx_startup_type_t	check_service_startup(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc)
+static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc)
 {
-	int			i, delayed = 0, trigger_start;
+	int	i, trigger_start, delayed = 0;
 
 	for (i = 0; i < ARRSIZE(start_types) &&	qsc->dwStartType != start_types[i]; i++)
 		;
@@ -279,7 +279,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 			else
 			{
-				startup_type = check_service_startup(h_srv, qsc);
+				startup_type = get_service_startup_type(h_srv, qsc);
 
 				/* for LLD backwards compatibility startup types with trigger start are ignored */
 				if (STARTUP_TYPE_UNKNOWN < startup_type)
@@ -499,7 +499,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 				}
 				else
 				{
-					startup_type = check_service_startup(h_srv, qsc);
+					startup_type = get_service_startup_type(h_srv, qsc);
 					SET_UI64_RESULT(result, startup_type);
 				}
 				break;
