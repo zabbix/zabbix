@@ -55,8 +55,12 @@ switch ($data['filter']['show']) {
 		break;
 
 	case TRIGGERS_OPTION_ALL:
-		$options['period'] = $data['filter']['period'];
-		$options['stime'] = $data['filter']['stime'];
+		$options['profileIdx'] = $data['profileIdx'];
+		$options['profileIdx2'] = $data['profileIdx2'];
+		$options['updateProfile'] = $data['updateProfile'];
+		$options['period'] = $data['period'];
+		$options['stime'] = $data['stime'];
+		$options['isNow'] = $data['isNow'];
 		break;
 }
 
@@ -275,18 +279,6 @@ if ($data['action'] == 'problem.view') {
 	$this->addPostJS('jqBlink.blink();');
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		$time = time();
-		$stime = zbxDateToTime($data['filter']['stime']);
-		if ($stime > $time - $data['filter']['period']) {
-			$stime = $time - $data['filter']['period'];
-		}
-
-		$timeline = [
-			'period' => $data['filter']['period'],
-			'starttime' => date(TIMESTAMP_FORMAT, $stime + $data['filter']['period'] - ZBX_MAX_PERIOD),
-			'usertime' => date(TIMESTAMP_FORMAT, $stime + $data['filter']['period'])
-		];
-
 		$objData = [
 			'id' => 'timeline_1',
 			'loadSBox' => 0,
@@ -295,10 +287,15 @@ if ($data['action'] == 'problem.view') {
 			'dynamic' => 0,
 			'mainObject' => 1,
 			'periodFixed' => CProfile::get('web.problem.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
+			'profile' => [
+				'idx' => 'web.problem.timeline',
+				'idx2' => 0,
+			]
 		];
 
-		$this->addPostJS('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+		$this->addPostJS('timeControl.useTimeRefresh('.zbx_jsvalue(CWebUser::getRefresh()).');');
+		$this->addPostJS('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($screen->timeline).', '.zbx_jsvalue($objData).');');
 		$this->addPostJS('timeControl.processObjects();');
 	}
 }

@@ -42,10 +42,8 @@ $fields = [
 	'graphid' =>	[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
 	'period' =>		[T_ZBX_INT, O_OPT, P_SYS, null,		null],
 	'stime' =>		[T_ZBX_STR, O_OPT, P_SYS, null,		null],
-	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null],
-	// ajax
-	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT, null,		null],
-	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT, null,		null]
+	'isNow' =>		[T_ZBX_INT, O_OPT, null,  IN('0,1'),	null],
+	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null]
 ];
 check_fields($fields);
 
@@ -77,27 +75,20 @@ $pageFilter = new CPageFilter([
 	'graphid' => getRequest('graphid')
 ]);
 
-/*
- * Ajax
- */
-if (isset($_REQUEST['favobj'])) {
-	if (getRequest('favobj') === 'timelinefixedperiod' && hasRequest('favid')) {
-		CProfile::update('web.screens.timelinefixed', getRequest('favid'), PROFILE_TYPE_INT);
-	}
-}
-
-if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
-	CScreenBase::calculateTime([
-		'profileIdx' => 'web.screens',
+if (hasRequest('period') || hasRequest('stime') || hasRequest('isNow')) {
+	calculateTime([
+		'profileIdx' => 'web.graphs',
 		'profileIdx2' => $pageFilter->graphid,
 		'updateProfile' => true,
 		'period' => getRequest('period'),
-		'stime' => getRequest('stime')
+		'stime' => getRequest('stime'),
+		'isNow' => getRequest('isNow')
 	]);
 
 	$curl = (new CUrl())
 		->removeArgument('period')
-		->removeArgument('stime');
+		->removeArgument('stime')
+		->removeArgument('isNow');
 
 	ob_end_clean();
 

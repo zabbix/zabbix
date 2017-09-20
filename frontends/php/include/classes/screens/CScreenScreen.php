@@ -40,7 +40,8 @@ class CScreenScreen extends CScreenBase {
 			'timestamp' => $this->timestamp,
 			'screen' => $screen,
 			'period' => $this->timeline['period'],
-			'stime' => $this->timeline['stimeNow'],
+			'stime' => $this->timeline['stime'],
+			'isNow' => $this->timeline['isNow'],
 			'profileIdx' => $this->profileIdx,
 			'updateProfile' => false
 		]);

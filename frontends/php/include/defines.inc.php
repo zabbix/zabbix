@@ -1221,9 +1221,6 @@ define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
 define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',				0);
 define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',		1);
 
-define('UPDATE_PROFILE_OFF',	0);
-define('UPDATE_PROFILE_ON',		1);
-
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
 define('NOT_EMPTY',	"({}!='')&&");

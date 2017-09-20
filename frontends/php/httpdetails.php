@@ -35,26 +35,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'period' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'stime' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'isNow' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'reset' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'httptestid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
-	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
-	// ajax
-	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
-	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null]
+	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null]
 ];
 check_fields($fields);
-
-/*
- * Ajax
- */
-if (isset($_REQUEST['favobj'])) {
-	// saving fixed/dynamic setting to profile
-	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
-		if (isset($_REQUEST['favid'])) {
-			CProfile::update('web.httptest.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
-		}
-	}
-}
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -105,6 +91,10 @@ $graph_dims = getGraphDims();
 $graph_dims['width'] = -50;
 $graph_dims['graphHeight'] = 150;
 
+// profile
+$profileIdx = 'web.httptest';
+$profileIdx2 = getRequest('httptestid');
+
 /*
  * Graph in
  */
@@ -112,10 +102,12 @@ $graph_in = new CScreenBase([
 	'resourcetype' => SCREEN_RESOURCE_GRAPH,
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_in',
-	'profileIdx' => 'web.httptest',
-	'profileIdx2' => getRequest('httptestid'),
+	'profileIdx' => $profileIdx,
+	'profileIdx2' => $profileIdx2,
 	'period' => getRequest('period'),
-	'stime' => getRequest('stime')
+	'stime' => getRequest('stime'),
+	'isNow' => getRequest('isNow'),
+	'updateProfile' => (hasRequest('period') || hasRequest('stime') || hasRequest('isNow'))
 ]);
 
 $items = DBfetchArray(DBselect(
@@ -136,6 +128,7 @@ $url = (new CUrl('chart3.php'))
 	->setArgument('graphtype', GRAPH_TYPE_STACKED)
 	->setArgument('period', $graph_in->timeline['period'])
 	->setArgument('stime', $graph_in->timeline['stime'])
+	->setArgument('isNow', $graph_in->timeline['isNow'])
 	->setArgument('profileIdx', $graph_in->profileIdx)
 	->setArgument('profileIdx2', $graph_in->profileIdx2)
 	->getUrl();
@@ -167,10 +160,12 @@ $graph_time = new CScreenBase([
 	'resourcetype' => SCREEN_RESOURCE_GRAPH,
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_time',
-	'profileIdx' => 'web.httptest',
-	'profileIdx2' => getRequest('httptestid'),
+	'profileIdx' => $profileIdx,
+	'profileIdx2' => $profileIdx2,
 	'period' => getRequest('period'),
-	'stime' => getRequest('stime')
+	'stime' => getRequest('stime'),
+	'isNow' => getRequest('isNow'),
+	'updateProfile' => (hasRequest('period') || hasRequest('stime') || hasRequest('isNow'))
 ]);
 
 $url = (new CUrl('chart3.php'))
@@ -181,6 +176,7 @@ $url = (new CUrl('chart3.php'))
 	->setArgument('graphtype', GRAPH_TYPE_STACKED)
 	->setArgument('period', $graph_time->timeline['period'])
 	->setArgument('stime', $graph_time->timeline['stime'])
+	->setArgument('isNow', $graph_time->timeline['isNow'])
 	->setArgument('profileIdx', $graph_time->profileIdx)
 	->setArgument('profileIdx2', $graph_time->profileIdx2)
 	->getUrl();
@@ -206,7 +202,11 @@ zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($graph_in->ti
 $graph_time->insertFlickerfreeJs();
 
 // scroll
-CScreenBuilder::insertScreenStandardJs(['timeline' => $graph_in->timeline]);
+CScreenBuilder::insertScreenStandardJs([
+	'timeline' => $graph_in->timeline,
+	'profileIdx' => $profileIdx,
+	'profileIdx2' => $profileIdx2
+]);
 
 // Create graphs widget.
 (new CWidget())

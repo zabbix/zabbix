@@ -112,6 +112,9 @@
 				}
 				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : this.getCalculatedPeriod(screen));
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
+				if (typeof screen.timeline.isNow !== 'undefined') {
+					ajaxUrl.setArgument('isNow', + screen.timeline.isNow);
+				}
 			}
 
 			// SCREEN_RESOURCE_GRAPH or SCREEN_RESOURCE_SIMPLE_GRAPH
@@ -127,6 +130,9 @@
 								: window.flickerfreeScreen.getCalculatedPeriod(screen)
 							);
 							url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
+							if (typeof screen.timeline.isNow !== 'undefined') {
+								url.setArgument('isNow', + screen.timeline.isNow);
+							}
 							obj.attr('href', url.getUrl());
 						});
 					});
@@ -360,13 +366,17 @@
 						on_dashboard = timeControl.objectList[id].onDashboard;
 
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
-					url.setArgument('updateProfile', (typeof screen.updateProfile === 'undefined')
-						? null : + screen.updateProfile);
+					if (typeof screen.updateProfile === 'undefined') {
+						url.setArgument('updateProfile', + screen.updateProfile);
+					}
 					url.setArgument('period', empty(screen.timeline.period)
 						? null
 						: window.flickerfreeScreen.getCalculatedPeriod(screen)
 					);
 					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
+					if (typeof screen.timeline.isNow !== 'undefined') {
+						url.setArgument('isNow', + screen.timeline.isNow);
+					}
 					url.setArgument('curtime', new CDate().getTime());
 
 					// Create temp image in buffer.
@@ -519,10 +529,7 @@
 				return timeControl.timeline.usertime();
 			}
 
-			return (screen.timeline.isNow || screen.timeline.isNow == 1)
-				// 31536000 = 86400 * 365 = 1 year
-				? new CDate((new CDate().setZBXDate(screen.timeline.stime) / 1000 + 31536000) * 1000).getZBXDate()
-				: screen.timeline.stime;
+			return screen.timeline.stime;
 		},
 
 		/**
@@ -534,23 +541,6 @@
 		 */
 		getCalculatedPeriod: function (screen) {
 			return !empty(timeControl.timeline) ? timeControl.timeline.period() : screen.timeline.period;
-		},
-
-		submitForm: function(formName) {
-			var period = '',
-				stime = '';
-
-			for (var id in this.screens) {
-				if (!empty(this.screens[id])) {
-					period = this.getCalculatedPeriod(this.screens[id]);
-					stime = this.getCalculatedSTime(this.screens[id]);
-					break;
-				}
-			}
-
-			$('form[name=' + formName + ']').append('<input type="hidden" name="period" value="' + period + '" />');
-			$('form[name=' + formName + ']').append('<input type="hidden" name="stime" value="' + stime + '" />');
-			$('form[name=' + formName + ']').submit();
 		},
 
 		cleanAll: function() {
