@@ -3,6 +3,7 @@ Changes for 4.0.0alpha1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12572] fixed loosing "now" on timeline (vmurzins)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
 
 --------------------------------------------------------------------------------
