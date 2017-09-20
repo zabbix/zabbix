@@ -297,7 +297,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
  * Parameters: hosts - [IN] list of hosts; should be sorted by hostid         *
  *                                                                            *
  ******************************************************************************/
-void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
+static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 {
 	const char		*__function_name = "lld_hosts_validate";
 

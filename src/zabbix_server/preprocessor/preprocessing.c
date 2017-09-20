@@ -41,8 +41,8 @@ zbx_packed_field_t;
 
 #define PACKED_FIELD(value, size) (zbx_packed_field_t){value, size, (0 == size)?PACKED_FIELD_STRING : PACKED_FIELD_RAW};
 
-zbx_ipc_message_t	message		= (zbx_ipc_message_t){0, 0, NULL};
-int			values_num	= 0;
+static zbx_ipc_message_t	message		= (zbx_ipc_message_t){0, 0, NULL};
+static int			values_num	= 0;
 
 /******************************************************************************
  *                                                                            *
