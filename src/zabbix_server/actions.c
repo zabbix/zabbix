@@ -1631,7 +1631,7 @@ zbx_escalation_rec_t;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	is_recovery_event(const DB_EVENT *event)
+static int	is_recovery_event(const DB_EVENT *event)
 {
 	if (EVENT_SOURCE_TRIGGERS == event->source)
 	{

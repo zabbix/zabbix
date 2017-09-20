@@ -30,7 +30,7 @@ extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-void	zbx_dbconfig_sigusr_handler(int flags)
+static void	zbx_dbconfig_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
 	{
