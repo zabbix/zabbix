@@ -143,14 +143,15 @@ class CScreenBuilder {
 		// calculate time
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
-		$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
+		$this->updateProfile = array_key_exists('updateProfile', $options) ? $options['updateProfile'] : false;
 
-		$this->timeline = CScreenBase::calculateTime([
+		$this->timeline = calculateTime([
 			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
 			'updateProfile' => $this->updateProfile,
-			'period' => !empty($options['period']) ? $options['period'] : null,
-			'stime' => !empty($options['stime']) ? $options['stime'] : null
+			'period' => array_key_exists('period', $options) ? $options['period'] : null,
+			'stime' => array_key_exists('stime', $options) ? $options['stime'] : null,
+			'isNow' => array_key_exists('isNow', $options) ? $options['isNow'] : null
 		]);
 	}
 
@@ -281,12 +282,6 @@ class CScreenBuilder {
 				return new CScreenHttpTest($options);
 
 			case SCREEN_RESOURCE_PROBLEM:
-				if (array_key_exists('period', $options)) {
-					$options['data']['filter']['period'] = $options['period'];
-				}
-				if (array_key_exists('stime', $options)) {
-					$options['data']['filter']['stime'] = $options['stime'];
-				}
 				return new CScreenProblem($options);
 
 			default:
@@ -650,15 +645,20 @@ class CScreenBuilder {
 	 * @param string $options['profileIdx']
 	 */
 	public static function insertScreenScrollJs(array $options = []) {
-		$options['timeline'] = empty($options['timeline']) ? '' : $options['timeline'];
-		$options['profileIdx'] = empty($options['profileIdx']) ? '' : $options['profileIdx'];
+		$options['timeline'] = array_key_exists('timeline', $options) ? $options['timeline'] : '';
+		$options['profileIdx'] = array_key_exists('profileIdx', $options) ? $options['profileIdx'] : '';
+		$options['profileIdx2'] = array_key_exists('profileIdx2', $options) ? $options['profileIdx2'] : 0;
 
 		$timeControlData = [
 			'id' => 'scrollbar',
 			'loadScroll' => 1,
 			'mainObject' => 1,
 			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
+			'profile' => [
+				'idx' => $options['profileIdx'],
+				'idx2' => $options['profileIdx2']
+			]
 		];
 
 		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($options['timeline']).', '.zbx_jsvalue($timeControlData).');');

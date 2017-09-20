@@ -68,6 +68,7 @@ else {
 		'hostid' => $this->data['hostid'],
 		'period' => $this->data['period'],
 		'stime' => $this->data['stime'],
+		'isNow' => $this->data['isNow'],
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['screen']['screenid']
 	]);
@@ -78,7 +79,8 @@ else {
 
 	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screenBuilder->timeline,
-		'profileIdx' => $screenBuilder->profileIdx
+		'profileIdx' => $screenBuilder->profileIdx,
+		'profileIdx2' => $screenBuilder->profileIdx2
 	]);
 }
 

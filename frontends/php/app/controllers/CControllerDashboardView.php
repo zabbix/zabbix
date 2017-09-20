@@ -38,7 +38,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
 			'period' =>				'int32',
-			'stime' =>				'time'
+			'stime' =>				'time',
+			'isNow' =>				'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -90,9 +91,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$data['timeline'] = calculateTime([
 				'profileIdx' => $options['profileIdx'],
 				'profileIdx2' => $options['profileIdx2'],
-				'updateProfile' => 1,
+				'updateProfile' => true,
 				'period' => $this->hasInput('period') ? $this->getInput('period') : null,
-				'stime' => $this->hasInput('stime') ? $this->getInput('stime') : null
+				'stime' => $this->hasInput('stime') ? $this->getInput('stime') : null,
+				'isNow' => $this->hasInput('isNow') ? $this->getInput('isNow') : null
 			]);
 
 			$data['timeControlData'] = [

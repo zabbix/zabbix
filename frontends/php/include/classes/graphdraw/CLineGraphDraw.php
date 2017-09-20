@@ -1910,7 +1910,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$this->to_time = $this->stime + $this->period;
 		}
 		else {
-			$this->to_time = $now - SEC_PER_HOUR * $this->from;
+			$this->to_time = $now;
 			$this->from_time = $this->to_time - $this->period;
 		}
 

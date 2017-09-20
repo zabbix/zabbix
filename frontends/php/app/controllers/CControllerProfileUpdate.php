@@ -72,6 +72,14 @@ class CControllerProfileUpdate extends CController {
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
 				case 'web.dashbrd.timelinefixed':
+				case 'web.screens.timelinefixed':
+				case 'web.graphs.timelinefixed':
+				case 'web.httptest.timelinefixed':
+				case 'web.problem.timeline':
+				case 'web.auditacts.timelinefixed':
+				case 'web.auditlogs.timelinefixed':
+				case 'web.item.graph.timelinefixed':
+				case 'web.slides.timelinefixed':
 				case 'web.dashbrd.navtree.item.selected':
 				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 					$ret = $this->hasInput('idx2');

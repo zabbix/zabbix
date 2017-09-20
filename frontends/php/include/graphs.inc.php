@@ -388,51 +388,6 @@ function copyGraphToHost($graphid, $hostid) {
 	return API::Graph()->create($graph);
 }
 
-function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
-	if (!empty($idx)) {
-		if ($update) {
-			if (!empty($_REQUEST['period']) && $_REQUEST['period'] >= ZBX_MIN_PERIOD) {
-				CProfile::update($idx.'.period', $_REQUEST['period'], PROFILE_TYPE_INT, $idx2);
-			}
-			if (!empty($_REQUEST['stime'])) {
-				CProfile::update($idx.'.stime', $_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
-			}
-		}
-		$_REQUEST['period'] = getRequest('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
-		$_REQUEST['stime'] = getRequest('stime', CProfile::get($idx.'.stime', null, $idx2));
-	}
-
-	$_REQUEST['period'] = getRequest('period', ZBX_PERIOD_DEFAULT);
-	$_REQUEST['stime'] = getRequest('stime');
-
-	if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
-		show_error_message(_n('Minimum time period to display is %1$s minute.',
-			'Minimum time period to display is %1$s minutes.',
-			(int) ZBX_MIN_PERIOD / SEC_PER_MIN
-		));
-		$_REQUEST['period'] = ZBX_MIN_PERIOD;
-	}
-	elseif ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
-		show_error_message(_n('Maximum time period to display is %1$s day.',
-			'Maximum time period to display is %1$s days.',
-			(int) ZBX_MAX_PERIOD / SEC_PER_DAY
-		));
-		$_REQUEST['period'] = ZBX_MAX_PERIOD;
-	}
-
-	if (!empty($_REQUEST['stime'])) {
-		$time = zbxDateToTime($_REQUEST['stime']);
-		if (($time + $_REQUEST['period']) > time()) {
-			$_REQUEST['stime'] = date(TIMESTAMP_FORMAT, time() - $_REQUEST['period']);
-		}
-	}
-	else {
-		$_REQUEST['stime'] = date(TIMESTAMP_FORMAT, time() - $_REQUEST['period']);
-	}
-
-	return $_REQUEST['period'];
-}
-
 function get_next_color($palettetype = 0) {
 	static $prev_color = ['dark' => true, 'color' => 0, 'grad' => 0];
 
