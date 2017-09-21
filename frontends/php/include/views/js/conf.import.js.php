@@ -2,7 +2,7 @@
 	jQuery(function($) {
 		$('#import').click(function() {
 			if ($('.deleteMissing:checked').length > 0) {
-				return confirm('<?= _('Delete all elements that are not present in the XML file?') ?>');
+				return confirm(<?= CJs::encodeJson(_('Delete all elements that are not present in the XML file?')) ?>);
 			}
 		});
 	});
@@ -13,7 +13,7 @@
 				'content': jQuery('<span>').text(content),
 				'buttons': [
 					{
-						'title': '<?= _('Cancel') ?>',
+						'title': <?= CJs::encodeJson(_('Cancel')) ?>,
 						'cancel': true,
 						'class': '<?= ZBX_STYLE_BTN_ALT ?>',
 						'action': function() {
@@ -21,7 +21,7 @@
 						}
 					},
 					{
-						'title': '<?= _('Ok') ?>',
+						'title': <?= CJs::encodeJson(_('Ok')) ?>,
 						'focused': true,
 						'action': function() {}
 					}
