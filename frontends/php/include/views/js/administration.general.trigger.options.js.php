@@ -6,17 +6,17 @@ $schema = DB::getSchema('config');
 	jQuery(document).ready(function() {
 		jQuery("#resetDefaults").click(function() {
 			overlayDialogue({
-				'title': <?= CJs::encodeJson(_('Reset confirmation')) ?>,
-				'content': jQuery('<span>').text(<?= CJs::encodeJson(_('Reset all fields to default values?')) ?>),
+				'title': '<?= _('Reset confirmation') ?>',
+				'content': jQuery('<span>').text('<?= _('Reset all fields to default values?') ?>'),
 				'buttons': [
 					{
-						'title': <?= CJs::encodeJson(_('Cancel')) ?>,
+						'title': '<?= _('Cancel') ?>',
 						'cancel': true,
 						'class': '<?= ZBX_STYLE_BTN_ALT ?>',
 						'action': function() {}
 					},
 					{
-						'title': <?= CJs::encodeJson(_('Reset defaults')) ?>,
+						'title': '<?= _('Reset defaults') ?>',
 						'focused': true,
 						'action': function() {
 							// Unacknowledged problem events

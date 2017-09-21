@@ -66,10 +66,7 @@
 		var form = jQuery('form[name="dashboard_form"]');
 		showDialogForm(
 			form,
-			{
-				"title": <?= CJs::encodeJson(_('Dashboard properties')) ?>,
-				"action_title": <?= CJs::encodeJson(_('Apply')) ?>
-			},
+			{"title": "<?= _('Dashboard properties') ?>", "action_title": "<?= _('Apply') ?>"},
 			{"name": form.data('data').name, "owner": form.data('data').owner}
 		);
 	};
