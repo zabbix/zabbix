@@ -284,13 +284,13 @@
 
 			if (true === hasErrors) {
 				overlayDialogue({
-					'title': '<?= _('Error'); ?>',
-					'content': jQuery('<span>').html(
-						'<?= _('Failed to parse URL.') ?><br><br><?= _('URL is not properly encoded.'); ?>'
-					),
+					'title': <?= CJs::encodeJson(_('Error')); ?>,
+					'content': jQuery('<span>').html(<?=
+						CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+					?>),
 					'buttons': [
 						{
-							title: '<?= _('Ok'); ?>',
+							title: <?= CJs::encodeJson(_('Ok')); ?>,
 							class: 'btn-alt',
 							focused: true,
 							action: function() {}
@@ -352,15 +352,15 @@
 							pair.value = decodeURIComponent(parts[1].replace(/\+/g, " "));
 						}
 						catch(e) {
-							throw '<?= _('Data is not properly encoded.'); ?>';
+							throw <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>;
 						}
 
 						if (pair.name === '') {
-							throw '<?= _('Values without names are not allowed in form fields.'); ?>';
+							throw <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')); ?>;
 						}
 
 						if (pair.name.length > 255) {
-							throw '<?= _('Name of the form field should not exceed 255 characters.'); ?>';
+							throw <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')); ?>;
 						}
 
 						pairs.push(pair);
@@ -370,13 +370,14 @@
 					jQuery('input[name="post_type"][value="<?= ZBX_POSTTYPE_RAW ?>"]').prop("checked", true);
 
 					overlayDialogue({
-						'title': '<?= _('Error'); ?>',
-						'content': jQuery('<span>').html(
-							'<?= _('Cannot convert POST data from raw data format to form field data format.') ?><br><br>' + e
-						),
+						'title': <?= CJs::encodeJson(_('Error')); ?>,
+						'content': jQuery('<span>').html(<?=
+							CJs::encodeJson(
+								_('Cannot convert POST data from raw data format to form field data format.').'<br><br>'
+							); ?> + e),
 						'buttons': [
 							{
-								title: '<?= _('Ok'); ?>',
+								title: <?= CJs::encodeJson(_('Ok')); ?>,
 								class: 'btn-alt',
 								focused: true,
 								action: function() {}
