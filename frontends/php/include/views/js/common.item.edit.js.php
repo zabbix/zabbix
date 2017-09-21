@@ -128,7 +128,7 @@
 						case '<?= ZBX_PREPROC_MULTIPLIER ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('number')) ?>);
+								.attr('placeholder', '<?= _('number') ?>');
 							$(inputs[1]).hide();
 							break;
 
@@ -137,7 +137,7 @@
 						case '<?= ZBX_PREPROC_TRIM ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('list of characters')) ?>);
+								.attr('placeholder', '<?= _('list of characters') ?>');
 							$(inputs[1]).hide();
 							break;
 
@@ -145,14 +145,14 @@
 						case '<?= ZBX_PREPROC_JSONPATH ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('path')) ?>);
+								.attr('placeholder', '<?= _('path') ?>');
 							$(inputs[1]).hide();
 							break;
 
 						case '<?= ZBX_PREPROC_REGSUB ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>);
+								.attr('placeholder', '<?= _('pattern') ?>');
 							$(inputs[1]).show();
 							break;
 
