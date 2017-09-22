@@ -1710,32 +1710,6 @@ class testUsers extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": unexpected parameter "sessionid".'
 			],
-			// Successfully login.
-			[
-				'login' => [
-					'user' => 'Admin',
-					'password' => 'zabbix'
-					],
-				'success_expected' => true,
-				'expected_error' => null
-			],
-			[
-				'login' => [
-					'user' => 'Admin',
-					'password' => 'zabbix',
-					'userData' => true
-					],
-				'success_expected' => true,
-				'expected_error' => null
-			],
-			[
-				'login' => [
-					'user' => 'guest',
-					'password' => ''
-					],
-				'success_expected' => true,
-				'expected_error' => null
-			],
 			// Check login
 			[
 				'login' => [
@@ -1800,31 +1774,6 @@ class testUsers extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Login name or password is incorrect.'
 			],
-			// Check blocked user.
-			[
-				'login' => [
-					'user' => 'Admin',
-					'password' => 'attempt 4'
-					],
-				'success_expected' => false,
-				'expected_error' => 'Login name or password is incorrect.'
-			],
-			[
-				'login' => [
-					'user' => 'Admin',
-					'password' => 'attempt 5'
-					],
-				'success_expected' => false,
-				'expected_error' => 'Login name or password is incorrect.'
-			],
-			[
-				'login' => [
-					'user' => 'Admin',
-					'password' => 'attempt 6'
-					],
-				'success_expected' => false,
-				'expected_error' => 'Account is blocked for 30 seconds.'
-			],
 			// Check disabled user.
 			[
 				'login' => [
@@ -1833,6 +1782,32 @@ class testUsers extends CZabbixTest {
 					],
 				'success_expected' => false,
 				'expected_error' => 'No permissions for system access.'
+			],
+			// Successfully login.
+			[
+				'login' => [
+					'user' => 'Admin',
+					'password' => 'zabbix'
+					],
+				'success_expected' => true,
+				'expected_error' => null
+			],
+			[
+				'login' => [
+					'user' => 'Admin',
+					'password' => 'zabbix',
+					'userData' => true
+					],
+				'success_expected' => true,
+				'expected_error' => null
+			],
+			[
+				'login' => [
+					'user' => 'guest',
+					'password' => ''
+					],
+				'success_expected' => true,
+				'expected_error' => null
 			]
 		];
 	}
@@ -1852,6 +1827,23 @@ class testUsers extends CZabbixTest {
 			$this->assertTrue(array_key_exists('error', $result));
 			$this->assertEquals($expected_error, $result['error']['data']);
 		}
+	}
+
+	public function testUsers_LoginBlocked() {
+		for ($i = 1; $i <= 6; $i++) {
+			$result = $this->api_call(
+				'user.login',
+					[
+						'user' => 'Admin',
+						'password' => 'attempt '.$i
+					],
+				$debug);
+
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+		}
+
+		$this->assertRegExp('/Account is blocked for (2[5-9]|30) seconds./', $result['error']['data']);
 	}
 
 	public function testUsers_restore() {
