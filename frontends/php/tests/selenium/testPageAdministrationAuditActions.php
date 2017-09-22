@@ -48,13 +48,13 @@ class testPageAdministrationAuditActions extends CWebTest {
 	*/
 	public function testPageAdministrationAuditActions_CheckValues($auditactions) {
 
-		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000');
+		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000&isNow=0');
 		$this->zbxTestCheckTitle('Action log');
 		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');
 
 		$time = $auditactions['clock'];
-		$today = date("Y-m-d H:i:s", $time);
+		$today = date("m/d/Y H:i:s", $time);
 
 		$status = '';
 		$type = '';
