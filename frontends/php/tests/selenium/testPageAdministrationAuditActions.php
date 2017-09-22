@@ -54,7 +54,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 		$this->zbxTestCheckHeader('Action log');
 
 		$time = $auditactions['clock'];
-		$today = date("m/d/Y H:i:s", $time);
+		$today = date("Y-m-d H:i:s", $time);
 
 		$status = '';
 		$type = '';
