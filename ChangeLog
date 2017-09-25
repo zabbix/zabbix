@@ -12,6 +12,7 @@ Changes for 3.4.3rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-12681] fixed SQL errors in event.get() method (Sasha)
 ..F....... [ZBX-12709] fixed possibility to enter deleys with suffixes for new elements of slideshows (Sasha)
 A......... [ZBX-12482] fixed behavior for graph prototypes when item prototype is deleted (Sasha)
 A......... [ZBX-12727] fixed response for script.get() method with "editable" flag (Sasha)
