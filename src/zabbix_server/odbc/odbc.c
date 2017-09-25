@@ -236,7 +236,7 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, query);
 
-	zbx_malloc(query_result, sizeof(zbx_odbc_query_result_t));
+	query_result = zbx_malloc(query_result, sizeof(zbx_odbc_query_result_t));
 
 	if (0 == CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, data_source->hdbc, &query_result->hstmt),
 			rc, SQL_HANDLE_DBC, data_source->hdbc,
