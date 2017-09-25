@@ -305,6 +305,7 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.9rc1
 
 New features:
+...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
 A......... [ZBX-12727] fixed response for script.get() method with "editable" flag (Sasha)
@@ -808,6 +809,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.12rc1
 
 New features:
+...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
 A......... [ZBX-12727] fixed response for script.get() method with "editable" flag (Sasha)
