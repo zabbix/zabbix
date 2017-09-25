@@ -567,6 +567,7 @@ class CEvent extends CApiService {
 
 				$sqlParts['select']['r_eventid'] = 'er1.r_eventid';
 				$sqlParts['left_join'][] = ['from' => 'event_recovery er1', 'on' => 'er1.eventid=e.eventid'];
+				$sqlParts['left_table'] = 'e';
 			}
 
 			if ($this->outputIsRequested('c_eventid', $options['output'])
@@ -585,6 +586,7 @@ class CEvent extends CApiService {
 				}
 
 				$sqlParts['left_join'][] = ['from' => 'event_recovery er2', 'on' => 'er2.r_eventid=e.eventid'];
+				$sqlParts['left_table'] = 'e';
 			}
 
 			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
