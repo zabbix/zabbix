@@ -312,6 +312,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+A......... [ZBX-12681] fixed SQL errors in event.get() method (Sasha)
 A......... [ZBX-12727] fixed response for script.get() method with "editable" flag (Sasha)
 A......... [ZBX-12727] fixed dcheck.get(), dhost.get() and dservice.get() permission checks for admin users; related to ZBX-7238 (Sasha)
 
