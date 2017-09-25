@@ -7,6 +7,13 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.3rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 3.4.2
 
 3.4.2rc2 was released as 3.4.2 without any changes
