@@ -45,131 +45,168 @@ struct zbx_odbc_query_result
 	zbx_odbc_row_t	row_data;
 };
 
-#define CALLODBC(fun, rc, h_type, h, msg)	(SQL_SUCCESS != (rc = (fun)) && 0 == odbc_Diag((h_type), (h), rc, (msg)))
-
-#define ODBC_ERR_MSG_LEN	255
-
-static char	zbx_last_odbc_strerror[ODBC_ERR_MSG_LEN];
-
-#ifdef HAVE___VA_ARGS__
-#	define set_last_odbc_strerror(fmt, ...) __zbx_set_last_odbc_strerror(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define set_last_odbc_strerror __zbx_set_last_odbc_strerror
-#endif
-static void	__zbx_set_last_odbc_strerror(const char *fmt, ...)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_odbc_rc_str                                                  *
+ *                                                                            *
+ * Purpose: get human readable representation of ODBC return code             *
+ *                                                                            *
+ * Parameters: rc - [IN] ODBC return code                                     *
+ *                                                                            *
+ * Return value: human readable representation of error code or NULL if the   *
+ *               given code is unknown                                        *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*zbx_odbc_rc_str(SQLRETURN rc)
 {
-	va_list	args;
-
-	va_start(args, fmt);
-
-	zbx_vsnprintf(zbx_last_odbc_strerror, sizeof(zbx_last_odbc_strerror), fmt, args);
-
-	va_end(args);
-}
-
-static int	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const char *msg)
-{
-	const char	*__function_name = "odbc_Diag";
-	SQLCHAR		sql_state[SQL_SQLSTATE_SIZE + 1] = "", err_msg[128] = "";
-	SQLINTEGER	native_err_code = 0;
-	int		rec_nr = 1;
-	char		rc_msg[40];		/* the longest message is "%d (unknown SQLRETURN code)" */
-	char		diag_msg[ODBC_ERR_MSG_LEN] = "";
-	size_t		offset = 0;
-
-	switch (sql_rc)
+	switch (rc)
 	{
 		case SQL_ERROR:
-			zbx_strlcpy(rc_msg, "SQL_ERROR", sizeof(rc_msg));
-			break;
+			return "SQL_ERROR";
 		case SQL_SUCCESS_WITH_INFO:
-			zbx_strlcpy(rc_msg, "SQL_SUCCESS_WITH_INFO", sizeof(rc_msg));
-			break;
+			return "SQL_SUCCESS_WITH_INFO";
 		case SQL_NO_DATA:
-			zbx_strlcpy(rc_msg, "SQL_NO_DATA", sizeof(rc_msg));
-			break;
+			return "SQL_NO_DATA";
 		case SQL_INVALID_HANDLE:
-			zbx_strlcpy(rc_msg, "SQL_INVALID_HANDLE", sizeof(rc_msg));
-			break;
+			return "SQL_INVALID_HANDLE";
 		case SQL_STILL_EXECUTING:
-			zbx_strlcpy(rc_msg, "SQL_STILL_EXECUTING", sizeof(rc_msg));
-			break;
+			return "SQL_STILL_EXECUTING";
 		case SQL_NEED_DATA:
-			zbx_strlcpy(rc_msg, "SQL_NEED_DATA", sizeof(rc_msg));
-			break;
+			return "SQL_NEED_DATA";
 		case SQL_SUCCESS:
-			zbx_strlcpy(rc_msg, "SQL_SUCCESS", sizeof(rc_msg));
-			break;
+			return "SQL_SUCCESS";
 		default:
-			zbx_snprintf(rc_msg, sizeof(rc_msg), "%d (unknown SQLRETURN code)", (int)sql_rc);
+			return NULL;
 	}
-
-	if (SQL_ERROR == sql_rc || SQL_SUCCESS_WITH_INFO == sql_rc)
-	{
-		while (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, (SQLSMALLINT)rec_nr, sql_state, &native_err_code,
-				err_msg, sizeof(err_msg), NULL)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): rc_msg:'%s' rec_nr:%d sql_state:'%s' native_err_code:%ld "
-					"err_msg:'%s'", __function_name, rc_msg, rec_nr, sql_state,
-					(long)native_err_code, err_msg);
-
-			if (sizeof(diag_msg) > offset)
-			{
-				offset += zbx_snprintf(diag_msg + offset, sizeof(diag_msg) - offset, "[%s][%ld][%s]|",
-						sql_state, (long)native_err_code, err_msg);
-			}
-
-			rec_nr++;
-		}
-
-		*(diag_msg + offset) = '\0';
-	}
-
-	set_last_odbc_strerror("%s:[%s]:%s", msg, rc_msg, diag_msg);
-
-	return (int)SQL_SUCCEEDED(sql_rc);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_odbc_diag                                                    *
+ *                                                                            *
+ * Purpose: diagnose result of ODBC function call                             *
+ *                                                                            *
+ * Parameters: h_type - [IN] type of handle call was executed on              *
+ *             h      - [IN] handle call was executed on                      *
+ *             rc     - [IN] function return code                             *
+ *             diag   - [OUT] diagnostic message                              *
+ *                                                                            *
+ * Return value: SUCCEED - function call was successful                       *
+ *               FAIL    - otherwise, error message is returned in diag       *
+ *                                                                            *
+ * Comments: It is caller's responsibility to free diag in case this function *
+ *           returns FAIL!                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **diag)
+{
+	const char	*__function_name = "zbx_odbc_diag";
+	const char	*rc_str = NULL;
+	char		*buffer = NULL;
+	size_t		alloc = 0, offset = 0;
+
+	if (SQL_ERROR == rc || SQL_SUCCESS_WITH_INFO == rc)
+	{
+		SQLCHAR		sql_state[SQL_SQLSTATE_SIZE + 1], err_msg[128];
+		SQLINTEGER	err_code = 0;
+		SQLSMALLINT	rec_nr = 1;
+
+		while (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, rec_nr++, sql_state, &err_code, err_msg,
+				sizeof(err_msg), NULL)))
+		{
+			zbx_chrcpy_alloc(&buffer, &alloc, &offset, (NULL == buffer ? ':' : '|'));
+			zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s][%ld][%s]", sql_state, (long)err_code, err_msg);
+		}
+	}
+
+	if (0 != SQL_SUCCEEDED(rc))
+	{
+		if (NULL == (rc_str = zbx_odbc_rc_str(rc)))
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "%s(): [%d (unknown SQLRETURN code)]%s", __function_name,
+					(int)rc, ZBX_NULL2EMPTY_STR(buffer));
+		}
+		else
+			zabbix_log(LOG_LEVEL_TRACE, "%s(): [%s]%s", __function_name, rc_str, ZBX_NULL2EMPTY_STR(buffer));
+	}
+	else
+	{
+		if (NULL == (rc_str = zbx_odbc_rc_str(rc)))
+		{
+			*diag = zbx_dsprintf(*diag, "[%d (unknown SQLRETURN code)]%s",
+					(int)rc, ZBX_NULL2EMPTY_STR(buffer));
+		}
+		else
+			*diag = zbx_dsprintf(*diag, "[%s]%s", rc_str, ZBX_NULL2EMPTY_STR(buffer));
+
+		zabbix_log(LOG_LEVEL_TRACE, "%s(): %s", __function_name, *diag);
+	}
+
+	zbx_free(buffer);
+
+	return 0 != SQL_SUCCEEDED(rc) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_log_odbc_connection_info                                     *
+ *                                                                            *
+ * Purpose: log details upon successful connection on behalf of caller        *
+ *                                                                            *
+ * Parameters: function - [IN] caller function name                           *
+ *             hdbc     - [IN] ODBC connection handle                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
 {
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
 		char		driver_name[MAX_STRING_LEN + 1], driver_ver[MAX_STRING_LEN + 1],
-				db_name[MAX_STRING_LEN + 1], db_ver[MAX_STRING_LEN + 1];
+				db_name[MAX_STRING_LEN + 1], db_ver[MAX_STRING_LEN + 1], *diag = NULL;
 		SQLRETURN	rc;
 
-		if (0 != CALLODBC(SQLGetInfo(hdbc, SQL_DRIVER_NAME, driver_name, MAX_STRING_LEN, NULL),
-				rc, SQL_HANDLE_DBC, hdbc, "Cannot obtain driver name"))
+		rc = SQLGetInfo(hdbc, SQL_DRIVER_NAME, driver_name, MAX_STRING_LEN, NULL);
+
+		if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_DBC, hdbc, rc, &diag))
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot obtain driver name: %s", diag);
 			zbx_strlcpy(driver_name, "unknown", sizeof(driver_name));
 		}
 
-		if (0 != CALLODBC(SQLGetInfo(hdbc, SQL_DRIVER_VER, driver_ver, MAX_STRING_LEN, NULL),
-				rc, SQL_HANDLE_DBC, hdbc, "Cannot obtain driver version"))
+		rc = SQLGetInfo(hdbc, SQL_DRIVER_VER, driver_ver, MAX_STRING_LEN, NULL);
+
+		if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_DBC, hdbc, rc, &diag))
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot obtain driver version: %s", diag);
 			zbx_strlcpy(driver_ver, "unknown", sizeof(driver_ver));
 		}
 
-		if (0 != CALLODBC(SQLGetInfo(hdbc, SQL_DBMS_NAME, db_name, MAX_STRING_LEN, NULL),
-				rc, SQL_HANDLE_DBC, hdbc, "Cannot obtain database name"))
+		rc = SQLGetInfo(hdbc, SQL_DBMS_NAME, db_name, MAX_STRING_LEN, NULL);
+
+		if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_DBC, hdbc, rc, &diag))
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot obtain database name: %s", diag);
 			zbx_strlcpy(db_name, "unknown", sizeof(db_name));
 		}
 
-		if (0 != CALLODBC(SQLGetInfo(hdbc, SQL_DBMS_VER, db_ver, MAX_STRING_LEN, NULL),
-				rc, SQL_HANDLE_DBC, hdbc, "Cannot obtain database version"))
+		rc = SQLGetInfo(hdbc, SQL_DBMS_VER, db_ver, MAX_STRING_LEN, NULL);
+
+		if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_DBC, hdbc, rc, &diag))
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot obtain database version: %s", diag);
 			zbx_strlcpy(db_ver, "unknown", sizeof(db_ver));
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() connected to %s(%s) using %s(%s)", function,
 				db_name, db_ver, driver_name, driver_ver);
+		zbx_free(diag);
 	}
 }
 
 zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, const char *pass, int timeout, char **error)
 {
 	const char		*__function_name = "zbx_odbc_connect";
+	char			*diag = NULL;
 	zbx_odbc_data_source_t	*data_source = NULL;
 	SQLRETURN		rc;
 
@@ -179,42 +216,50 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 
 	if (0 != SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &data_source->henv)))
 	{
-		if (0 == CALLODBC(SQLSetEnvAttr(data_source->henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0),
-				rc, SQL_HANDLE_ENV, data_source->henv,
-				"Cannot set ODBC version"))
+		rc = SQLSetEnvAttr(data_source->henv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+
+		if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_ENV, data_source->henv, rc, &diag))
 		{
-			if(0 == CALLODBC(SQLAllocHandle(SQL_HANDLE_DBC, data_source->henv, &data_source->hdbc),
-					rc, SQL_HANDLE_ENV, data_source->henv,
-					"Cannot create ODBC connection handle"))
+			rc = SQLAllocHandle(SQL_HANDLE_DBC, data_source->henv, &data_source->hdbc);
+
+			if(SUCCEED == zbx_odbc_diag(SQL_HANDLE_ENV, data_source->henv, rc, &diag))
 			{
-				if (0 == CALLODBC(SQLSetConnectAttr(data_source->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT,
-						(SQLPOINTER)(intptr_t)timeout, (SQLINTEGER)0),
-						rc, SQL_HANDLE_DBC, data_source->hdbc,
-						"Cannot set ODBC login timeout"))
+				rc = SQLSetConnectAttr(data_source->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT,
+						(SQLPOINTER)(intptr_t)timeout, (SQLINTEGER)0);
+
+				if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 				{
-					if (0 == CALLODBC(SQLConnect(data_source->hdbc, (SQLCHAR *)dsn, SQL_NTS,
-							(SQLCHAR *)user, SQL_NTS, (SQLCHAR *)pass, SQL_NTS),
-							rc, SQL_HANDLE_DBC, data_source->hdbc,
-							"Cannot connect to ODBC DSN"))
+					rc = SQLConnect(data_source->hdbc, (SQLCHAR *)dsn, SQL_NTS, (SQLCHAR *)user,
+							SQL_NTS, (SQLCHAR *)pass, SQL_NTS);
+
+					if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 					{
 						zbx_log_odbc_connection_info(__function_name, data_source->hdbc);
 						goto out;
 					}
+
+					*error = zbx_dsprintf(*error, "Cannot connect to ODBC DSN: %s", diag);
 				}
+				else
+					*error = zbx_dsprintf(*error, "Cannot set ODBC login timeout: %s", diag);
 
 				SQLFreeHandle(SQL_HANDLE_DBC, data_source->hdbc);
 			}
+			else
+				*error = zbx_dsprintf(*error, "Cannot create ODBC connection handle: %s", diag);
 		}
+		else
+			*error = zbx_dsprintf(*error, "Cannot set ODBC version: %s", diag);
 
 		SQLFreeHandle(SQL_HANDLE_ENV, data_source->henv);
 	}
 	else
-		set_last_odbc_strerror("Cannot create ODBC environment handle.");
+		*error = zbx_strdup(*error, "Cannot create ODBC environment handle.");
 
 	zbx_free(data_source);
-
-	*error = zbx_strdup(*error, zbx_last_odbc_strerror);
 out:
+	zbx_free(diag);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return data_source;
@@ -231,6 +276,7 @@ void	zbx_odbc_data_source_free(zbx_odbc_data_source_t *data_source)
 zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_source, const char *query, char **error)
 {
 	const char		*__function_name = "zbx_odbc_select";
+	char			*diag = NULL;
 	zbx_odbc_query_result_t	*query_result = NULL;
 	SQLRETURN		rc;
 
@@ -238,17 +284,17 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 
 	query_result = zbx_malloc(query_result, sizeof(zbx_odbc_query_result_t));
 
-	if (0 == CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, data_source->hdbc, &query_result->hstmt),
-			rc, SQL_HANDLE_DBC, data_source->hdbc,
-			"Cannot create ODBC statement handle."))
+	rc = SQLAllocHandle(SQL_HANDLE_STMT, data_source->hdbc, &query_result->hstmt);
+
+	if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 	{
-		if (0 == CALLODBC(SQLExecDirect(query_result->hstmt, (SQLCHAR *)query, SQL_NTS),
-				rc, SQL_HANDLE_STMT, query_result->hstmt,
-				"Cannot execute ODBC query"))
+		rc = SQLExecDirect(query_result->hstmt, (SQLCHAR *)query, SQL_NTS);
+
+		if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 		{
-			if (0 == CALLODBC(SQLNumResultCols(query_result->hstmt, &query_result->col_num),
-					rc, SQL_HANDLE_STMT, query_result->hstmt,
-					"Cannot get number of columns in ODBC result"))
+			rc = SQLNumResultCols(query_result->hstmt, &query_result->col_num);
+
+			if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 			{
 				query_result->row_data = zbx_malloc(NULL, sizeof(char *) * (size_t)query_result->col_num);
 				memset(query_result->row_data, 0, sizeof(char *) * (size_t)query_result->col_num);
@@ -256,15 +302,21 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 						query_result->col_num);
 				goto out;
 			}
+
+			*error = zbx_dsprintf(*error, "Cannot get number of columns in ODBC result: %s", diag);
 		}
+		else
+			*error = zbx_dsprintf(*error, "Cannot execute ODBC query: %s", diag);
 
 		SQLFreeHandle(SQL_HANDLE_STMT, query_result->hstmt);
 	}
+	else
+		*error = zbx_dsprintf(*error, "Cannot create ODBC statement handle: %s", diag);
 
 	zbx_free(query_result);
-
-	*error = zbx_strdup(*error, zbx_last_odbc_strerror);
 out:
+	zbx_free(diag);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return query_result;
@@ -286,20 +338,24 @@ void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result)
 static zbx_odbc_row_t	zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 {
 	const char	*__function_name = "zbx_odbc_fetch";
-	SQLRETURN	retcode;
+	char		*diag = NULL;
+	SQLRETURN	rc;
 	SQLSMALLINT	i;
 	zbx_odbc_row_t	row = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SQL_NO_DATA == (retcode = SQLFetch(query_result->hstmt)))
+	if (SQL_NO_DATA == (rc = SQLFetch(query_result->hstmt)))
 	{
 		/* end of rows */
 		goto out;
 	}
 
-	if (SQL_SUCCESS != retcode && 0 == odbc_Diag(SQL_HANDLE_STMT, query_result->hstmt, retcode, "cannot fetch row"))
+	if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot fetch row: %s", diag);
 		goto out;
+	}
 
 	for (i = 0; i < query_result->col_num; i++)
 	{
@@ -310,9 +366,11 @@ static zbx_odbc_row_t	zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 
 		zbx_free(query_result->row_data[i]);
 
-		if (0 != CALLODBC(SQLColAttribute(query_result->hstmt, i + 1, SQL_DESC_TYPE, NULL, 0, NULL, &col_type),
-				retcode, SQL_HANDLE_STMT, query_result->hstmt, "Cannot get column type"))
+		rc = SQLColAttribute(query_result->hstmt, i + 1, SQL_DESC_TYPE, NULL, 0, NULL, &col_type);
+
+		if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot get column type: %s", diag);
 			goto out;
 		}
 
@@ -329,11 +387,11 @@ static zbx_odbc_row_t	zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 		/* force len to integer value for DB2 compatibility */
 		do
 		{
-			retcode = SQLGetData(query_result->hstmt, i + 1, c_type, buffer, MAX_STRING_LEN, &len);
+			rc = SQLGetData(query_result->hstmt, i + 1, c_type, buffer, MAX_STRING_LEN, &len);
 
-			if (0 == SQL_SUCCEEDED(retcode))
+			if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 			{
-				odbc_Diag(SQL_HANDLE_STMT, query_result->hstmt, retcode, "Cannot get column data");
+				zabbix_log(LOG_LEVEL_DEBUG, "Cannot get column data: %s", diag);
 				goto out;
 			}
 
@@ -344,7 +402,7 @@ static zbx_odbc_row_t	zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 
 			zbx_strcpy_alloc(&query_result->row_data[i], &alloc, &offset, buffer);
 		}
-		while (SQL_SUCCESS != retcode);
+		while (SQL_SUCCESS != rc);
 
 		if (NULL != query_result->row_data[i])
 			zbx_rtrim(query_result->row_data[i], " ");
@@ -355,6 +413,8 @@ static zbx_odbc_row_t	zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 
 	row = query_result->row_data;
 out:
+	zbx_free(diag);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return row;
