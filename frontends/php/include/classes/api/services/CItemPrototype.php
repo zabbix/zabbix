@@ -810,15 +810,27 @@ class CItemPrototype extends CItemGeneral {
 		$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChildren);
 		$prototypeids = array_merge($prototypeids, $childPrototypeids);
 
-		// delete graphs with this item prototype
-		$delGraphPrototypes = API::GraphPrototype()->get([
-			'output' => [],
-			'itemids' => $prototypeids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-		if ($delGraphPrototypes) {
-			API::GraphPrototype()->delete(array_keys($delGraphPrototypes), true);
+		// Delete graphs or leave them if graphs still have at least one item prototype.
+		$del_graph_prototypes = [];
+		$db_graph_prototypes = DBselect(
+			'SELECT gi.graphid'.
+			' FROM graphs_items gi'.
+			' WHERE '.dbConditionInt('gi.itemid', $prototypeids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM graphs_items gii,items i'.
+					' WHERE gi.graphid=gii.graphid'.
+						' AND gii.itemid=i.itemid'.
+						' AND '.dbConditionInt('i.itemid', $prototypeids, true).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
+				')'
+		);
+		while ($db_graph_prototype = DBfetch($db_graph_prototypes)) {
+			$del_graph_prototypes[] = $db_graph_prototype['graphid'];
+		}
+
+		if ($del_graph_prototypes) {
+			API::GraphPrototype()->delete($del_graph_prototypes, true);
 		}
 
 		// check if any graphs are referencing this item
