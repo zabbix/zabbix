@@ -48,8 +48,6 @@ class CMaintenance extends CApiService {
 	 */
 	public function get(array $options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['maintenance' => 'm.maintenanceid'],
@@ -64,7 +62,7 @@ class CMaintenance extends CApiService {
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'maintenanceids'			=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -90,7 +88,7 @@ class CMaintenance extends CApiService {
 
 		// editable + PERMISSION CHECK
 		$maintenanceids = [];
-		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 			if (!is_null($options['groupids']) || !is_null($options['hostids'])) {
 				if (!is_null($options['groupids'])) {
 					zbx_value2array($options['groupids']);
@@ -126,8 +124,7 @@ class CMaintenance extends CApiService {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sql = 'SELECT m.maintenanceid'.
 					' FROM maintenances m'.

@@ -36,11 +36,11 @@ class CHistory extends CApiService {
 	/**
 	 * Get history data.
 	 *
-	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param boolean $options['editable']
+	 * @param array  $options
+	 * @param array  $options['itemids']
+	 * @param bool   $options['editable']
 	 * @param string $options['pattern']
-	 * @param int $options['limit']
+	 * @param int    $options['limit']
 	 * @param string $options['order']
 	 *
 	 * @return array|int item data as array or false if error
@@ -61,7 +61,7 @@ class CHistory extends CApiService {
 			'history'					=> ITEM_VALUE_TYPE_UINT64,
 			'hostids'					=> null,
 			'itemids'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,

@@ -45,8 +45,6 @@ class CProxy extends CApiService {
 	public function get($options = []) {
 		$result = [];
 
-		$userType = self::$userData['type'];
-
 		$sqlParts = [
 			'select'	=> ['hostid' => 'h.hostid'],
 			'from'		=> ['hosts' => 'hosts h'],
@@ -57,7 +55,7 @@ class CProxy extends CApiService {
 
 		$defOptions = [
 			'proxyids'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -79,7 +77,7 @@ class CProxy extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			if ($permission == PERM_READ_WRITE) {
 				return [];

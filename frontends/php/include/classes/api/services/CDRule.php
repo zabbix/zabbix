@@ -51,7 +51,7 @@ class CDRule extends CApiService {
 			'druleids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'selectDHosts'				=> null,
 			'selectDChecks'				=> null,
 			// filter
