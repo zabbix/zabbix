@@ -9,6 +9,7 @@ Bug fixes:
 Changes for 3.4.2rc2
 
 Bug fixes:
+A.F....... [ZBX-12768] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES (gcalenko, Sasha)
 ..F....... [ZBX-12572] fixed losing "now" on timeline (vmurzins)
 .......PS. [ZBX-12739] fixed data conversion for ssh checks of numeric value type (wiper)
 
@@ -296,6 +297,7 @@ A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, J
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+A.F....... [ZBX-12768] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES (gcalenko, Sasha)
 .......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
@@ -782,6 +784,7 @@ A.F....... [ZBX-1357] enabled Turkish translation to be displayed by default (za
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Russian, Turkish translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A.F....... [ZBX-12768] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES (gcalenko, Sasha)
 .......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
@@ -2523,6 +2526,7 @@ Changes for 2.2.20
 Changes for 2.2.20rc1
 
 Bug fixes:
+A.F....... [ZBX-12768] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES (gcalenko, Sasha)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)
