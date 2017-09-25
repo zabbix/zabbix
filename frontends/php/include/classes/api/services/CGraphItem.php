@@ -36,8 +36,6 @@ class CGraphItem extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['gitems' => 'gi.gitemid'],
@@ -51,7 +49,7 @@ class CGraphItem extends CApiService {
 			'graphids'		=> null,
 			'itemids'		=> null,
 			'type'			=> null,
-			'editable'		=> null,
+			'editable'		=> false,
 			'nopermissions'	=> null,
 			// output
 			'selectGraphs'	=> null,
@@ -65,10 +63,9 @@ class CGraphItem extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.

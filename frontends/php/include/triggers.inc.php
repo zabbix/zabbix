@@ -603,7 +603,7 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 
 	$hosts = API::Host()->get([
 		'filter' => ['host' => $expressionHosts],
-		'editable' => ($permission == PERM_READ_WRITE) ? 1 : null,
+		'editable' => ($permission == PERM_READ_WRITE),
 		'output' => ['hostid', 'host'],
 		'templated_hosts' => true,
 		'preservekeys' => true

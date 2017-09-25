@@ -56,7 +56,7 @@ class CProblem extends CApiService {
 			'applicationids'			=> null,
 			'objectids'					=> null,
 
-			'editable'					=> null,
+			'editable'					=> false,
 			'source'					=> EVENT_SOURCE_TRIGGERS,
 			'object'					=> EVENT_OBJECT_TRIGGER,
 			'severities'				=> null,
