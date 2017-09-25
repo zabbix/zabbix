@@ -588,6 +588,9 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$this->zbxTestClickXpath("//label[text()='".$data['sessions']."']");
 			if ($data['sessions'] == 'Custom' && array_key_exists('maxsessions', $data)) {
 				$this->zbxTestInputTypeOverwrite('maxsessions', $data['maxsessions']);
+				sleep(2);
+				$this->webDriver->findElement(WebDriverBy::id('search'))->click();
+				sleep(2);
 			}
 		}
 
