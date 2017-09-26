@@ -298,15 +298,16 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int flags, int now)
+static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, unsigned char new_state,
+		int flags, int now)
 {
 	ZBX_DC_PROXY	*proxy = NULL;
 	zbx_uint64_t	seed;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
-			((ITEM_STATE_NORMAL == item->state && 0 == (flags & ZBX_ITEM_DELAY_CHANGED)) ||
-			(ITEM_STATE_NOTSUPPORTED == item->state && 0 == (flags & (0 == item->schedulable ?
+			((ITEM_STATE_NORMAL == new_state && 0 == (flags & ZBX_ITEM_DELAY_CHANGED)) ||
+			(ITEM_STATE_NOTSUPPORTED == new_state && 0 == (flags & (0 == item->schedulable ?
 					ZBX_ITEM_DELAY_CHANGED : ZBX_REFRESH_UNSUPPORTED_CHANGED)))))
 	{
 		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
@@ -322,7 +323,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 
 	/* for new items, supported items and items that are notsupported due to invalid update interval try to parse */
 	/* interval first and then decide whether it should become/remain supported/notsupported */
-	if (0 == item->nextcheck || ITEM_STATE_NORMAL == item->state || 0 == item->schedulable)
+	if (0 == item->nextcheck || ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
 	{
 		int			simple_interval;
 		zbx_custom_interval_t	*custom_intervals;
@@ -350,7 +351,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 			return;
 		}
 
-		if (ITEM_STATE_NORMAL == item->state || 0 == item->schedulable)
+		if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
 		{
 			/* supported items and items that could not have been scheduled previously, but had their */
 			/* update interval fixed, should be scheduled using their update intervals */
@@ -2282,10 +2283,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			item->nextcheck = 0;
 			item->lastclock = 0;
 			item->state = (unsigned char)atoi(row[18]);
-			item->db_state = item->state;
 			ZBX_STR2UINT64(item->lastlogsize, row[29]);
 			item->mtime = atoi(row[30]);
-			DCstrpool_replace(found, &item->db_error, row[36]);
+			DCstrpool_replace(found, &item->error, row[36]);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
@@ -2606,7 +2606,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
-				DCitem_nextcheck_update(item, host, flags, now);
+				DCitem_nextcheck_update(item, host, item->state, flags, now);
 		}
 		else
 		{
@@ -2813,7 +2813,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		zbx_strpool_release(item->key);
 		zbx_strpool_release(item->port);
-		zbx_strpool_release(item->db_error);
+		zbx_strpool_release(item->error);
 
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
@@ -5729,8 +5729,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
 
-	dst_item->db_state = src_item->db_state;
-	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
+	dst_item->error = zbx_strdup(NULL, src_item->error);
 
 	switch (src_item->value_type)
 	{
@@ -5925,7 +5924,7 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 		}
 
 		zbx_free(items[i].delay);
-		zbx_free(items[i].db_error);
+		zbx_free(items[i].error);
 	}
 }
 
@@ -6276,28 +6275,6 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
 
 		DCget_trigger(&triggers[i], dc_trigger);
 		errcode[i] = SUCCEED;
-	}
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_set_item_db_state                                       *
- *                                                                            *
- * Purpose: set item db_state and db_error                                    *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error)
-{
-	ZBX_DC_ITEM	*dc_item;
-
-	LOCK_CACHE;
-
-	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)))
-	{
-		dc_item->db_state = state;
-		DCstrpool_replace(1, &dc_item->db_error, error);
 	}
 
 	UNLOCK_CACHE;
@@ -7020,13 +6997,14 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 	return nextcheck;
 }
 
-static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags, int lastclock)
+static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, unsigned char new_state, int flags,
+		int lastclock)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, dc_host, flags, lastclock);
+	DCitem_nextcheck_update(dc_item, dc_host, new_state, flags, lastclock);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -7128,7 +7106,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
-			dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED, now);
+			dc_requeue_item(dc_item, dc_host, dc_item->state, ZBX_ITEM_COLLECTED, now);
 			continue;
 		}
 
@@ -7137,7 +7115,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			/* move reachable items on reachable hosts to normal pollers */
 			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type && 0 == dc_item->unreachable)
 			{
-				dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED, now);
+				dc_requeue_item(dc_item, dc_host, dc_item->state, ZBX_ITEM_COLLECTED, now);
 				continue;
 			}
 		}
@@ -7148,7 +7126,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type ||
 					disable_until > now)
 			{
-				dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
+				dc_requeue_item(dc_item, dc_host, dc_item->state,
+						ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
 				continue;
 			}
 
@@ -7241,7 +7220,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
-			dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED, now);
+			dc_requeue_item(dc_item, dc_host, dc_item->state, ZBX_ITEM_COLLECTED, now);
 			continue;
 		}
 
@@ -7249,7 +7228,8 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 		{
 			if (disable_until > now)
 			{
-				dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
+				dc_requeue_item(dc_item, dc_host, dc_item->state,
+						ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
 				continue;
 			}
 
@@ -7386,7 +7366,7 @@ unlock:
 }
 
 static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
-		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num)
+		const int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -7412,13 +7392,6 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *s
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		dc_item->state = states[i];
-		dc_item->lastclock = lastclocks[i];
-		if (NULL != lastlogsizes)
-			dc_item->lastlogsize = lastlogsizes[i];
-		if (NULL != mtimes)
-			dc_item->mtime = mtimes[i];
-
 		if (SUCCEED != is_counted_in_item_queue(dc_item->type, dc_item->key))
 			continue;
 
@@ -7429,13 +7402,14 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *s
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
 				dc_item->unreachable = 0;
-				dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED, lastclocks[i]);
+				dc_requeue_item(dc_item, dc_host, states[i], ZBX_ITEM_COLLECTED, lastclocks[i]);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
 				dc_item->unreachable = 1;
-				dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, time(NULL));
+				dc_requeue_item(dc_item, dc_host, states[i], ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
+						time(NULL));
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -7444,22 +7418,21 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *s
 }
 
 void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
-		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num)
+		const int *errcodes, size_t num)
 {
 	LOCK_CACHE;
 
-	dc_requeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes, num);
+	dc_requeue_items(itemids, states, lastclocks, errcodes, num);
 
 	UNLOCK_CACHE;
 }
 
 void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
-		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num,
-		unsigned char poller_type, int *nextcheck)
+		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck)
 {
 	LOCK_CACHE;
 
-	dc_requeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes, num);
+	dc_requeue_items(itemids, states, lastclocks, errcodes, num);
 	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);
 
 	UNLOCK_CACHE;
@@ -7506,7 +7479,8 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, time(NULL));
+		dc_requeue_item(dc_item, dc_host, dc_item->state, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
+				time(NULL));
 	}
 
 	UNLOCK_CACHE;
@@ -10606,9 +10580,9 @@ void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_items_update_runtime_data                                 *
+ * Function: zbx_dc_items_update_nextcheck                                    *
  *                                                                            *
- * Purpose: updates item runtime properties in configuration cache            *
+ * Purpose: updates item nextcheck values in configuration cache              *
  *                                                                            *
  * Parameters: items      - [IN] the items to update                          *
  *             values     - [IN] the items values containing new properties   *
@@ -10618,7 +10592,7 @@ void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version)
  *                               errcodes arrays                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num)
+void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -10643,14 +10617,9 @@ void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values,
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		dc_item->state = values[i].state;
-		dc_item->lastclock = values[i].ts.sec;
-		dc_item->lastlogsize = values[i].lastlogsize;
-		dc_item->mtime = values[i].mtime;
-
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, dc_host, ZBX_ITEM_COLLECTED, dc_item->lastclock);
+			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
 	}
 
 	UNLOCK_CACHE;
@@ -10741,4 +10710,46 @@ unlock:
 	UNLOCK_CACHE;
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_items_apply_changes                                     *
+ *                                                                            *
+ * Purpose: apply item state, error, mtime, lastlogsize changes to            *
+ *          configuration cache                                               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
+{
+	int			i;
+	const zbx_item_diff_t	*diff;
+	ZBX_DC_ITEM		*dc_item;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < item_diff->values_num; i++)
+	{
+		diff = (const zbx_item_diff_t *)item_diff->values[i];
+
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &diff->itemid)))
+			continue;
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE & diff->flags))
+			dc_item->lastlogsize = diff->lastlogsize;
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME & diff->flags))
+			dc_item->mtime = diff->mtime;
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & diff->flags))
+			DCstrpool_replace(1, &dc_item->error, diff->error);
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & diff->flags))
+			dc_item->state = diff->state;
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK & diff->flags))
+			dc_item->lastclock = diff->lastclock;
+	}
+
+	UNLOCK_CACHE;
 }
