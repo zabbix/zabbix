@@ -2085,7 +2085,7 @@ try_again:
 	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
-	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
 
 	for (i = 0; i < data_num; i++)
 	{
@@ -3653,7 +3653,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 	while (SUCCEED == parse_history_data_33(jp_data, &pnext, values, itemids, &values_num, &read_num,
 			client_timediff, &error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num);
 
 		for (i = 0; i < values_num; i++)
 		{
