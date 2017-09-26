@@ -12,6 +12,7 @@ Changes for 3.4.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12576] fixed error in simple graph widget for web scenario items (gcalenko)
 ........S. [DEV-658] reduced memory used by pre-processor manager item cache (wiper)
 ..F....... [ZBX-12619] fixed error displaying of zabbix server status widget (gcalenko)
 A......... [ZBX-12681] fixed SQL errors in event.get() method (Sasha)
