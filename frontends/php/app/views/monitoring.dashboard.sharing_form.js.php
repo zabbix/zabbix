@@ -24,13 +24,13 @@
 							errors = response.errors;
 						}
 					}
-					else if (typeof response === 'string' && response.indexOf('<?= _('Access denied') ?>') !== -1) {
-						errors.push('<?= _('You need permission to perform this action!') ?>');
+					else if (typeof response === 'string' && response.indexOf(<?= CJs::encodeJson(_('Access denied')) ?>) !== -1) {
+						errors.push(<?= CJs::encodeJson(_('You need permission to perform this action!')) ?>);
 					}
 					saveErrors(errors);
 				},
 				error: function (response) {
-					saveErrors(['<?= _('Something went wrong. Please try again later!') ?>']);
+					saveErrors([<?= CJs::encodeJson(_('Something went wrong. Please try again later!')) ?>]);
 				}
 			});
 		});
