@@ -607,8 +607,8 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	{
 		rule->min_clock = MIN(keep_from, rule->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
-		rc = DBexecute("delete from %s where %s%sclock<%d", rule->table, rule->filter,
-				('\0' != *rule->filter ? " and " : ""), rule->min_clock);
+		rc = DBexecute("delete from %s where clock<%d%s%s", rule->table, rule->min_clock,
+				('\0' != *rule->filter ? " and " : ""), rule->filter);
 
 		if (ZBX_DB_OK <= rc)
 			deleted = rc;
@@ -890,20 +890,28 @@ static int	housekeeping_audit(int now)
 static int	housekeeping_events(int now)
 {
 	static zbx_hk_rule_t 	rules[] = {
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
-			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &cfg.hk.events_trigger},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
-			" and object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &cfg.hk.events_internal},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_ITEM), 0, &cfg.hk.events_internal},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_LLDRULE), 0, &cfg.hk.events_internal},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
+			" and not exists (select null from problem where events.eventid = problem.eventid)",
+			0, &cfg.hk.events_trigger},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
+			" and not exists (select null from problem where events.eventid = problem.eventid)",
+			0, &cfg.hk.events_internal},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
+			" and not exists (select null from problem where events.eventid = problem.eventid)",
+			0, &cfg.hk.events_internal},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
+			" and not exists (select null from problem where events.eventid = problem.eventid)",
+			0, &cfg.hk.events_internal},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
 		{NULL}
 	};
 
