@@ -12,6 +12,7 @@ Changes for 3.4.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12679] fixed escaping of translation strings with apostrophe in forms: dashboard sharing and monitoring, administration of housekeeper and trigger options, item edit and mass update, xml import, host edit, web scenario, trigger configuration. (gcalenko)
 ........S. [ZBX-11426] fixed the housekeeper for not deleting events in open problem state (abs)
 .......PS. [ZBX-12691] moved item state,lastlogsize,mtime,lastclock configuration cache update from value reception to value processing (wiper)
 ........S. [DEV-658] reduced memory used by pre-processor manager item cache (wiper)
