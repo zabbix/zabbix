@@ -22,8 +22,6 @@
 #include "log.h"
 #include "zbxjson.h"
 
-static const DWORD	service_states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING,
-	SERVICE_PAUSE_PENDING, SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING, SERVICE_STOPPED};
 static const DWORD	start_types[2] = {SERVICE_AUTO_START, SERVICE_DEMAND_START};
 
 typedef enum
@@ -38,6 +36,34 @@ typedef enum
 	STARTUP_TYPE_MANUAL_TRIGGER
 }
 zbx_startup_type_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_state_code                                                   *
+ *                                                                            *
+ * Purpose: convert service state code from value used in Microsoft Windows   *
+ *          to value used in Zabbix                                           *
+ *                                                                            *
+ * Parameters: state - [IN] service state code (e.g. obtained via             *
+ *                     QueryServiceStatus() function)                         *
+ *                                                                            *
+ * Return value: service state code used in Zabbix or 7 if service state code *
+ *               is not recognized by this function                           *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	get_state_code(DWORD state)
+{
+	/* these are called "Status" in MS Windows "Services" program and */
+	/* "States" in EnumServicesStatusEx() function documentation */
+	static const DWORD	service_states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING,
+			SERVICE_PAUSE_PENDING, SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING, SERVICE_STOPPED};
+	DWORD	i;
+
+	for (i = 0; i < ARRSIZE(service_states) && state != service_states[i]; i++)
+		;
+
+	return i;
+}
 
 static const char	*get_state_string(DWORD state)
 {
@@ -174,7 +200,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	QUERY_SERVICE_CONFIG		*qsc = NULL;
 	SERVICE_DESCRIPTION		*scd = NULL;
 	SC_HANDLE			h_mgr;
-	DWORD				sz = 0, szn, i, k, services, resume_handle = 0;
+	DWORD				sz = 0, szn, i, services, resume_handle = 0;
 	char				*utf8;
 	struct zbx_json			j;
 
@@ -255,10 +281,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 				zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", "", ZBX_JSON_TYPE_STRING);
 
 			current_state = ssp[i].ServiceStatusProcess.dwCurrentState;
-			for (k = 0; k < ARRSIZE(service_states) && current_state != service_states[k]; k++)
-				;
-
-			zbx_json_adduint64(&j, "{#SERVICE.STATE}", k);
+			zbx_json_adduint64(&j, "{#SERVICE.STATE}", get_state_code(current_state));
 			zbx_json_addstring(&j, "{#SERVICE.STATENAME}", get_state_string(current_state),
 					ZBX_JSON_TYPE_STRING);
 
@@ -340,7 +363,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SERVICE_STATUS		status;
 	SC_HANDLE		h_mgr, h_srv;
 	DWORD			sz = 0;
-	int			param_type, i;
+	int			param_type;
 	char			*name, *param;
 	wchar_t			*wname, service_name[MAX_STRING_LEN];
 	DWORD			max_len_name = MAX_STRING_LEN;
@@ -415,12 +438,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (ZBX_SRV_PARAM_STATE == param_type)
 	{
 		if (0 != QueryServiceStatus(h_srv, &status))
-		{
-			for (i = 0; i < ARRSIZE(service_states) && status.dwCurrentState != service_states[i]; i++)
-				;
-
-			SET_UI64_RESULT(result, i);
-		}
+			SET_UI64_RESULT(result, get_state_code(status.dwCurrentState));
 		else
 			SET_UI64_RESULT(result, 7);
 	}
@@ -521,7 +539,6 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	wchar_t		*wname;
 	wchar_t		service_name[MAX_STRING_LEN];
 	DWORD		max_len_name = MAX_STRING_LEN;
-	int		i;
 	SERVICE_STATUS	status;
 
 	if (1 < request->nparam)
@@ -559,12 +576,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		if (0 != QueryServiceStatus(service, &status))
-		{
-			for (i = 0; i < ARRSIZE(service_states) && status.dwCurrentState != service_states[i]; i++)
-				;
-
-			SET_UI64_RESULT(result, i);
-		}
+			SET_UI64_RESULT(result, get_state_code(status.dwCurrentState));
 		else
 			SET_UI64_RESULT(result, 7);
 
