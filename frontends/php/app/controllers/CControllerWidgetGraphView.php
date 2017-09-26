@@ -205,18 +205,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			if (!$resourceid) {
 				$unavailable_object = true;
 			}
-			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				$item = API::Item()->get([
-					'itemids' => $resourceid,
-					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
-					'output' => null
-				]);
-				$item = reset($item);
-
-				if (!$item) {
-					$unavailable_object = true;
-				}
-			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get graph, used below
 				$graph = API::Graph()->get([
@@ -231,6 +219,28 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			}
 		}
 
+		if (!$unavailable_object && $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			$item = API::Item()->get([
+				'itemids' => $resourceid,
+				'output' => ['type', 'name', 'hostid', 'key_'],
+				'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
+				'selectHosts' => ['name'],
+				'webitems' => true
+			]);
+
+			if ($item && $item[0]['type'] == ITEM_TYPE_HTTPTEST) {
+				$item = CMacrosResolverHelper::resolveItemNames($item)[0];
+
+				$item['name_expanded'] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+			}
+			elseif ($item) {
+				$item = reset($item);
+			}
+			else {
+				$unavailable_object = true;
+			}
+		}
+
 		if (!$unavailable_object) {
 			// Build graph action and data source links.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
@@ -238,7 +248,14 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					$time_control_data['loadSBox'] = 1;
 				}
 
-				if ($resourceid) {
+				if ($item && $item['type'] == ITEM_TYPE_HTTPTEST) {
+					$graph_src = new CUrl('chart3.php');
+					$graph_src->setArgument('items[0][itemid]', $resourceid);
+					$graph_src->setArgument('name', $item['name_expanded']);
+					$graph_src->setArgument('width', $width);
+					$graph_src->setArgument('height', $height);
+				}
+				elseif ($resourceid) {
 					$graph_src = new CUrl('chart.php');
 					$graph_src->setArgument('itemids[]', $resourceid);
 					$graph_src->setArgument('width', $width);
