@@ -3172,6 +3172,10 @@ tr.cursor-move td * {
   align-items: center;
   justify-content: center; }
 
+@supports (-ms-ime-align: auto) {
+  .navtree .problems {
+    margin-left: 10px;
+    left: -15px; } }
 @keyframes fadein {
   from {
     opacity: 0; }
@@ -3308,6 +3312,7 @@ tr.cursor-move td * {
       display: flex; }
       .navtree .tree .tree-item > .tree-row > .problems .problems-per-item {
         flex: 0 0 7px;
+        -ms-flex: 0 0 auto;
         background: gray;
         color: #fff;
         padding: 3px 4px 2px;
