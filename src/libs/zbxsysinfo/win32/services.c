@@ -22,8 +22,6 @@
 #include "log.h"
 #include "zbxjson.h"
 
-static const DWORD	start_types[2] = {SERVICE_AUTO_START, SERVICE_DEMAND_START};
-
 typedef enum
 {
 	STARTUP_TYPE_AUTO,
@@ -155,7 +153,8 @@ static int	check_delayed_start(SC_HANDLE h_srv)
 
 static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc)
 {
-	int	i, trigger_start, delayed = 0;
+	int		i, trigger_start, delayed = 0;
+	const DWORD	start_types[2] = {SERVICE_AUTO_START, SERVICE_DEMAND_START};
 
 	for (i = 0; i < ARRSIZE(start_types) &&	qsc->dwStartType != start_types[i]; i++)
 		;
@@ -220,7 +219,6 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SC_HANDLE		h_srv;
 			DWORD			current_state;
-			zbx_startup_type_t	startup_type;
 
 			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_CONFIG)))
 				continue;
@@ -302,6 +300,8 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 			else
 			{
+				zbx_startup_type_t	startup_type;
+
 				startup_type = get_service_startup_type(h_srv, qsc);
 
 				/* for LLD backwards compatibility startup types with trigger start are ignored */
@@ -367,7 +367,6 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*name, *param;
 	wchar_t			*wname, service_name[MAX_STRING_LEN];
 	DWORD			max_len_name = MAX_STRING_LEN;
-	zbx_startup_type_t	startup_type;
 
 	if (2 < request->nparam)
 	{
@@ -512,14 +511,9 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 				break;
 			case ZBX_SRV_PARAM_STARTUP:
 				if (SERVICE_DISABLED == qsc->dwStartType)
-				{
 					SET_UI64_RESULT(result, STARTUP_TYPE_DISABLED);
-				}
 				else
-				{
-					startup_type = get_service_startup_type(h_srv, qsc);
-					SET_UI64_RESULT(result, startup_type);
-				}
+					SET_UI64_RESULT(result, get_service_startup_type(h_srv, qsc));
 				break;
 		}
 
