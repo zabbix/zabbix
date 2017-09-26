@@ -153,13 +153,9 @@ static int	check_delayed_start(SC_HANDLE h_srv)
 
 static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc)
 {
-	int		i, trigger_start, delayed = 0;
-	const DWORD	start_types[2] = {SERVICE_AUTO_START, SERVICE_DEMAND_START};
+	int		trigger_start, delayed = 0;
 
-	for (i = 0; i < ARRSIZE(start_types) &&	qsc->dwStartType != start_types[i]; i++)
-		;
-
-	if (2 == i)
+	if (SERVICE_AUTO_START != qsc->dwStartType && SERVICE_DEMAND_START != qsc->dwStartType)
 		return STARTUP_TYPE_UNKNOWN;
 
 	if (SUCCEED == check_delayed_start(h_srv))
