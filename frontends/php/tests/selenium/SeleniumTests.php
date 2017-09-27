@@ -187,6 +187,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormWeb');
+		$suite->addTestSuite('testFormApplication');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItem');
