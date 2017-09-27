@@ -368,7 +368,7 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 						break;
 					}
 
-					zabbix_log(LOG_LEVEL_DEBUG, "column #%d type:%d", (int)i, (int)col_type);
+					zabbix_log(LOG_LEVEL_DEBUG, "column #%d type:%d", (int)i + 1, (int)col_type);
 
 					/* force col_type to integer value for DB2 compatibility */
 					query_result->c_types[i] = (SQL_WLONGVARCHAR == (int)col_type ?
@@ -493,7 +493,7 @@ static const const char	**zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 		if (NULL != query_result->row[i])
 			zbx_rtrim(query_result->row[i], " ");
 
-		zabbix_log(LOG_LEVEL_DEBUG, "column #%d value:'%s'", (int)i, ZBX_NULL2STR(query_result->row[i]));
+		zabbix_log(LOG_LEVEL_DEBUG, "column #%d value:'%s'", (int)i + 1, ZBX_NULL2STR(query_result->row[i]));
 	}
 
 	row = (const const char **)query_result->row;
