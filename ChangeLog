@@ -12,6 +12,7 @@ Changes for 3.4.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12633] added horizontal scrollbar to the map in view mode; removed homepage label in maps and graphs; made graph timestamp visible only if debug-mode is on (miks)
 ..F....... [ZBX-12576] fixed error in simple graph widget for web scenario items (gcalenko)
 ..F....... [ZBX-12715] fixed problem box stretching in navigation tree in IE11; fixed position of all navigation tree problem boxes in Edge (miks)
 ..F....... [ZBX-12679] fixed escaping of translation strings with apostrophe in forms: dashboard sharing and monitoring, administration of housekeeper and trigger options, item edit and mass update, xml import, host edit, web scenario, trigger configuration. (gcalenko)

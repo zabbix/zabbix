@@ -4568,6 +4568,26 @@ tr.cursor-move {
 	text-align: center;
 }
 
+.sysmap-scroll-container {
+	overflow-x: auto;
+	overflow-y: hidden;
+	position: relative;
+	width: calc(100% - 20px);
+	border: 10px solid $ui-bg-color;
+	background: $ui-bg-color;
+	display: block;
+
+	.map-container {
+		display: table;
+	}
+	.table-forms-container {
+		display: table;
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+}
+
 .sysmap-widget-container {
 	overflow: hidden;
 	height: 100%;
