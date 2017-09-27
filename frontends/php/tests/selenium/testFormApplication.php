@@ -36,14 +36,14 @@ class testFormApplication extends CWebTest {
 	 */
 	protected static $instances = 0;
 
-	public function __construct() {
+	public function __construct(string $name = NULL, array $data = [], string $data_name = '') {
 		global $DB;
 
 		if (!isset($DB['DB'])) {
 			DBconnect($error);
 		}
 
-		call_user_func_array('parent::__construct', func_get_args());
+		parent::__construct($name, $data, $data_name);
 
 		// Methods called once per suite.
 		if (self::$instances === 0) {
