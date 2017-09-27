@@ -62,16 +62,16 @@ function zbx_jsvalue($value, $as_object = false, $addQuotes = true) {
 		return $as_object ? '{}' : '[]';
 	}
 
-	// Check is array simple or hash type array.
-	$as_object = ($as_object || ((bool) (array_diff_key(array_values($value), $value))));
+	$is_object = $as_object;
 
 	foreach ($value as $key => &$v) {
-		$escaped_key = $as_object ? zbx_jsvalue($key).':' : '';
+		$is_object |= is_string($key);
+		$escaped_key = $is_object ? '"'.zbx_jsvalue($key, false, false).'":' : '';
 		$v = $escaped_key.zbx_jsvalue($v, $as_object, $addQuotes);
 	}
 	unset($v);
 
-	return $as_object ? '{'.implode(',', $value).'}' : '['.implode(',', $value).']';
+	return $is_object ? '{'.implode(',', $value).'}' : '['.implode(',', $value).']';
 }
 
 function encodeValues(&$value, $encodeTwice = true) {

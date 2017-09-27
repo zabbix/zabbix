@@ -419,7 +419,6 @@ function make_status_of_zbx() {
 
 	$table = (new CTableInfo())->setHeader([_('Parameter'), _('Value'), _('Details')]);
 
-	show_messages(); // because in function get_status(); function clear_messages() is called when fsockopen() fails.
 	$status = get_status();
 
 	$table->addRow([

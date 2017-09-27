@@ -685,4 +685,27 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 		const zbx_host_availability_t *ha);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	lastlogsize;
+	unsigned char	state;
+	int		mtime;
+	int		lastclock;
+	const char	*error;
+
+	zbx_uint64_t	flags;
+#define ZBX_FLAGS_ITEM_DIFF_UNSET			0x0000
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE		0x0001
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR		0x0002
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME		0x0004
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE		0x0008
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK		0x1000
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_DB			\
+	(ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR |\
+	ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE	(ZBX_FLAGS_ITEM_DIFF_UPDATE_DB | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK)
+}
+zbx_item_diff_t;
+
 #endif

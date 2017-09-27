@@ -50,7 +50,7 @@ var timeControl = {
 				mainObject: 0, // object on changing will reflect on all others
 				onDashboard: 0, // object is on dashboard
 				sliderMaximumTimePeriod: null, // max period in seconds
-				profile: { // if values are not null, will save fixedperiod state here, on change
+				profile: { // if values are not null, will save timeline and fixedperiod state here, on change
 					idx: null,
 					idx2: null
 				}
@@ -62,7 +62,7 @@ var timeControl = {
 				}
 			}
 
-			if (isset('isNow', time) && time.isNow === '0') {
+			if (isset('isNow', time) && time.isNow == 0) {
 				time.isNow = false;
 			}
 			this.objectList[id].time = time;
@@ -118,7 +118,7 @@ var timeControl = {
 					? obj.time.endtime - 3 * ((obj.time.period < 86400) ? 86400 : obj.time.period)
 					: nowDate.setZBXDate(obj.time.starttime) / 1000;
 
-				obj.time.usertime = (!isset('usertime', obj.time))
+				obj.time.usertime = (!isset('usertime', obj.time) || obj.time.isNow)
 					? obj.time.endtime
 					: nowDate.setZBXDate(obj.time.usertime) / 1000;
 
@@ -232,12 +232,14 @@ var timeControl = {
 	refreshImage: function(id) {
 		var obj = this.objectList[id],
 			period = this.timeline.period(),
-			stime = new CDate((this.timeline.usertime() - this.timeline.period()) * 1000).getZBXDate();
+			stime = new CDate((this.timeline.usertime() - this.timeline.period()) * 1000).getZBXDate(),
+			isNow = this.timeline.isNow();
 
 		// image
 		var imgUrl = new Curl(obj.src);
 		imgUrl.setArgument('period', period);
 		imgUrl.setArgument('stime', stime);
+		imgUrl.setArgument('isNow', + isNow);
 
 		var img = jQuery('<img />', {id: id + '_tmp'})
 			.on('load', function() {
@@ -280,6 +282,7 @@ var timeControl = {
 		graphUrl.setArgument('width', obj.objDims.width);
 		graphUrl.setArgument('period', period);
 		graphUrl.setArgument('stime', stime);
+		graphUrl.setArgument('isNow', + isNow);
 
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
 	},
@@ -358,7 +361,8 @@ var timeControl = {
 
 	objectUpdate: function() {
 		var usertime = this.timeline.usertime(),
-			period = this.timeline.period();
+			period = this.timeline.period(),
+			isNow = (this.timeline.now() || this.timeline.isNow());
 
 		// secure browser from fast user operations
 		if (isNaN(usertime) || isNaN(period)) {
@@ -371,16 +375,14 @@ var timeControl = {
 			return;
 		}
 
-		if (this.timeline.now() || this.timeline.isNow()) {
-			usertime += 31536000; // 31536000 = 86400 * 365 = 1 year
-		}
-
-		var date = new CDate((usertime - period) * 1000);
+		var date = new CDate((usertime - period) * 1000),
+			stime = date.getZBXDate();
 
 		if (this.refreshPage) {
 			var url = new Curl(location.href);
 			url.setArgument('period', period);
-			url.setArgument('stime', date.getZBXDate());
+			url.setArgument('stime', stime);
+			url.setArgument('isNow', + isNow);
 			url.unsetArgument('output');
 
 			location.href = url.getUrl();
@@ -394,7 +396,20 @@ var timeControl = {
 			this.scrollbar.setBarPosition();
 			this.scrollbar.setGhostByBar();
 
-			flickerfreeScreen.refreshAll(period, date.getZBXDate(), this.timeline.isNow());
+			var url = new Curl('zabbix.php');
+			url.setArgument('action', 'timeline.update');
+
+			sendAjaxData(url.getUrl(), {
+				data: {
+					idx: this.scrollbar.profile.idx,
+					idx2: this.scrollbar.profile.idx2,
+					period: period,
+					stime: stime,
+					isNow: + isNow
+				}
+			});
+
+			flickerfreeScreen.refreshAll(period, stime, isNow);
 		}
 	},
 
@@ -1100,25 +1115,17 @@ var CScrollBar = Class.create({
 
 		this.fixedperiod = (this.fixedperiod == 1) ? 0 : 1;
 
-		var url = location.href,
-			ajax_data = {
-				favobj: 'timelinefixedperiod',
-				favid: this.fixedperiod
-			};
-
-		// If we know profile entry, that should be updated, update it directly
-		if (isset('idx', this.profile) && !is_null(this.profile.idx)) {
-			var url = new Curl('zabbix.php');
-			url.setArgument('action', 'profile.update');
-			url = url.getUrl();
-
+		var url = new Curl('zabbix.php'),
 			ajax_data = {
 				idx: this.profile.idx + '.timelinefixed',
 				value_int: this.fixedperiod
 			};
-			if (isset('idx2', this.profile) && !is_null(this.profile.idx2)) {
-				ajax_data.idx2 = [this.profile.idx2];
-			}
+
+		url.setArgument('action', 'profile.update');
+		url = url.getUrl();
+
+		if (isset('idx2', this.profile) && !is_null(this.profile.idx2)) {
+			ajax_data.idx2 = [this.profile.idx2];
 		}
 
 		// sending fixed/dynamic setting to server to save in a profile

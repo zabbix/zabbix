@@ -57,7 +57,6 @@ class CDService extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
 
 		$sqlParts = [
 			'select'	=> ['dservices' => 'ds.dserviceid'],
@@ -73,7 +72,7 @@ class CDService extends CApiService {
 			'dhostids'					=> null,
 			'dcheckids'					=> null,
 			'druleids'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -97,12 +96,7 @@ class CDService extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
-		}
-		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-		}
-		elseif (!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)) {
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			return [];
 		}
 

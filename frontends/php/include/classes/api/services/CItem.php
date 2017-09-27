@@ -59,8 +59,6 @@ class CItem extends CItemGeneral {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
@@ -85,7 +83,7 @@ class CItem extends CItemGeneral {
 			'inherited'					=> null,
 			'templated'					=> null,
 			'monitored'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			'group'						=> null,
 			'host'						=> null,
@@ -119,10 +117,9 @@ class CItem extends CItemGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + permission check
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.

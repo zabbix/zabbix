@@ -70,7 +70,7 @@ class CUser extends CApiService {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
-			'editable'					=> null,
+			'editable'					=> false,
 			'selectUsrgrps'				=> null,
 			'selectMedias'				=> null,
 			'selectMediatypes'			=> null,

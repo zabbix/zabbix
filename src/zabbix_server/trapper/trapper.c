@@ -570,10 +570,10 @@ out:
 
 /* auxiliary variables for status_stats_export() */
 
-zbx_entry_info_t	templates, hosts_monitored, hosts_not_monitored, items_active_normal, items_active_notsupported,
+static zbx_entry_info_t	templates, hosts_monitored, hosts_not_monitored, items_active_normal, items_active_notsupported,
 			items_disabled, triggers_enabled_ok, triggers_enabled_problem, triggers_disabled, users_online,
 			users_offline, required_performance;
-int			templates_res, users_res;
+static int		templates_res, users_res;
 
 static void	zbx_status_counters_init(void)
 {

@@ -38,7 +38,7 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $options['triggerids']
 	 * @param array $options['applicationids']
 	 * @param array $options['status']
-	 * @param array $options['editable']
+	 * @param bool  $options['editable']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
 	 * @param array $options['limit']
@@ -48,8 +48,6 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	public function get(array $options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['triggers' => 't.triggerid'],
@@ -78,7 +76,7 @@ class CTrigger extends CTriggerGeneral {
 			'withLastEventUnacknowledged'	=> null,
 			'skipDependent'					=> null,
 			'nopermissions'					=> null,
-			'editable'						=> null,
+			'editable'						=> false,
 			// timing
 			'lastChangeSince'				=> null,
 			'lastChangeTill'				=> null,
@@ -117,10 +115,9 @@ class CTrigger extends CTriggerGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.

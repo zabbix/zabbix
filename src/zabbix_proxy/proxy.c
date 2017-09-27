@@ -129,7 +129,7 @@ unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
 int		server_num		= 0;
 
-int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
+static int	CONFIG_PROXYMODE	= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
@@ -248,7 +248,7 @@ char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 
-char	*CONFIG_SOCKET_PATH		= NULL;
+static char	*CONFIG_SOCKET_PATH	= NULL;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 

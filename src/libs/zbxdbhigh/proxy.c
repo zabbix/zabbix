@@ -216,7 +216,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
  *     FAIL    - otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, char **error)
+static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, char **error)
 {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
@@ -2103,7 +2103,7 @@ try_again:
 	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
-	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
 
 	for (i = 0; i < data_num; i++)
 	{
@@ -2463,7 +2463,7 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 	}
 
 	if (0 < processed_num)
-		zbx_dc_items_update_runtime_data(items, values, errcodes, values_num);
+		zbx_dc_items_update_nextcheck(items, values, errcodes, values_num);
 
 	zbx_preprocessor_flush();
 
@@ -2603,11 +2603,20 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
 		av->state = (unsigned char)atoi(tmp);
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
-	{
-		av->meta = 1;	/* contains meta information */
 
-		is_uint64(tmp, &av->lastlogsize);
+	/* Unsupported item meta information must be ignored for backwards compatibility. */
+	/* New agents will not send meta information for items in unsupported state.      */
+	if (ITEM_STATE_NOTSUPPORTED != av->state)
+	{
+		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
+		{
+			av->meta = 1;	/* contains meta information */
+
+			is_uint64(tmp, &av->lastlogsize);
+
+			if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
+				av->mtime = atoi(tmp);
+		}
 	}
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
@@ -2616,21 +2625,12 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 	}
 	else
 	{
-		if (ITEM_STATE_NOTSUPPORTED == av->state)
-		{
-			/* unsupported items cannot have empty error message */
-			goto out;
-		}
-
 		if (0 == av->meta)
 		{
 			/* only meta information update packets can have empty value */
 			goto out;
 		}
 	}
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
-		av->mtime = atoi(tmp);
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, &tmp, &tmp_alloc))
 		av->timestamp = atoi(tmp);
@@ -3242,14 +3242,15 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 			continue;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)) &&
-				FAIL == is_ushort(tmp, &port))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
+		{
+			port = 0;
+		}
+		else if (FAIL == is_ushort(tmp, &port))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __function_name, tmp);
 			continue;
 		}
-		else
-			port = 0;
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 			*value = '\0';
@@ -3670,7 +3671,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 	while (SUCCEED == parse_history_data_33(jp_data, &pnext, values, itemids, &values_num, &read_num,
 			client_timediff, &error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num);
 
 		for (i = 0; i < values_num; i++)
 		{

@@ -46,7 +46,6 @@ class CUserMacro extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		$sqlParts = [
@@ -72,7 +71,7 @@ class CUserMacro extends CApiService {
 			'globalmacroids'			=> null,
 			'templateids'				=> null,
 			'globalmacro'				=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -95,8 +94,8 @@ class CUserMacro extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (!is_null($options['editable']) && !is_null($options['globalmacro'])) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			if ($options['editable'] && !is_null($options['globalmacro'])) {
 				return [];
 			}
 			else {

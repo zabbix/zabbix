@@ -40,23 +40,13 @@ $fields = [
 	'alias' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'period' =>			[T_ZBX_INT, O_OPT, null,	null,	null],
 	'stime' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
-	// ajax
-	'favobj' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,	null],
-	'favid' =>			[T_ZBX_INT, O_OPT, P_ACT,	null,	null]
+	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 check_fields($fields);
 
 /*
  * Ajax
  */
-if (isset($_REQUEST['favobj'])) {
-	// saving fixed/dynamic setting to profile
-	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
-		if (isset($_REQUEST['favid'])) {
-			CProfile::update('web.auditlogs.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
-		}
-	}
-}
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
@@ -81,17 +71,20 @@ elseif (hasRequest('filter_rst')) {
 /*
  * Display
  */
-$effectivePeriod = navigation_bar_calc('web.auditlogs.timeline', 0, true);
 $data = [
-	'stime' => getRequest('stime'),
 	'actions' => [],
 	'action' => CProfile::get('web.auditlogs.filter.action', -1),
 	'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
-	'alias' => CProfile::get('web.auditlogs.filter.alias', '')
+	'alias' => CProfile::get('web.auditlogs.filter.alias', ''),
+	'timeline' => calculateTime([
+		'profileIdx' => 'web.auditlogs.timeline',
+		'profileIdx2' => 0,
+		'updateProfile' => (hasRequest('period') || hasRequest('stime') || hasRequest('isNow')),
+		'period' => getRequest('period'),
+		'stime' => getRequest('stime'),
+		'isNow' => getRequest('isNow')
+	])
 ];
-
-$from = zbxDateToTime($data['stime']);
-$till = $from + $effectivePeriod;
 
 // get audit
 $config = select_config();
@@ -106,8 +99,8 @@ if ($data['action'] > -1) {
 if ($data['resourcetype'] > -1) {
 	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
 }
-$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr($from);
-$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr($till);
+$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr(zbxDateToTime($data['timeline']['stime']));
+$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr(zbxDateToTime($data['timeline']['usertime']));
 
 $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
 		' FROM auditlog a,users u'.
@@ -167,13 +160,13 @@ $sql = 'SELECT MIN(a.clock) AS clock'.
 		' FROM auditlog a,users u'.
 		' WHERE a.userid=u.userid'.
 			implode('', $sqlWhere);
-$firstAudit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
+$first_audit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
+$min_start_time = ($first_audit) ? $first_audit['clock'] - 1 : null;
 
-$data['timeline'] = [
-	'period' => $effectivePeriod,
-	'starttime' => date(TIMESTAMP_FORMAT, $firstAudit ? $firstAudit['clock'] - 1 : null),
-	'usertime' => isset($_REQUEST['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
-];
+// Show shorter timeline.
+if ($min_start_time !== null && $min_start_time > 0) {
+	$data['timeline']['starttime'] = date(TIMESTAMP_FORMAT, $min_start_time);
+}
 
 // render view
 $auditView = new CView('administration.auditlogs.list', $data);

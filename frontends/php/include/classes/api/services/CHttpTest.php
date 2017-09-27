@@ -37,8 +37,6 @@ class CHttpTest extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['httptests' => 'ht.httptestid'],
@@ -55,7 +53,7 @@ class CHttpTest extends CApiService {
 			'hostids'        => null,
 			'groupids'       => null,
 			'templateids'    => null,
-			'editable'       => null,
+			'editable'       => false,
 			'inherited'      => null,
 			'templated'      => null,
 			'monitored'      => null,
@@ -82,10 +80,9 @@ class CHttpTest extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.

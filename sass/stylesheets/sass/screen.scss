@@ -4568,6 +4568,26 @@ tr.cursor-move {
 	text-align: center;
 }
 
+.sysmap-scroll-container {
+	overflow-x: auto;
+	overflow-y: hidden;
+	position: relative;
+	width: calc(100% - 20px);
+	border: 10px solid $ui-bg-color;
+	background: $ui-bg-color;
+	display: block;
+
+	.map-container {
+		display: table;
+	}
+	.table-forms-container {
+		display: table;
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+}
+
 .sysmap-widget-container {
 	overflow: hidden;
 	height: 100%;
@@ -4577,6 +4597,13 @@ tr.cursor-move {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+@supports (-ms-ime-align:auto) {
+	.navtree .problems {
+		margin-left: 10px;
+		left: -15px;
+	}
 }
 
 .navtree {
@@ -4673,6 +4700,7 @@ tr.cursor-move {
 
 					.problems-per-item {
 						flex: 0 0 7px;
+						-ms-flex: 0 0 auto;
 						background: gray;
 						color: $white;
 						padding: 3px 4px 2px;

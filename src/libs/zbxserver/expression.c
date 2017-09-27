@@ -312,8 +312,7 @@ static void	DCexpand_trigger_expression(char **expression)
 
 			if (SUCCEED == errcode[0])
 			{
-				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1,
-						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1);
 
 				if (SUCCEED == errcode[1])
 				{
@@ -826,8 +825,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
-				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1,
-						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
 				{
@@ -1196,7 +1194,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
@@ -2447,7 +2445,7 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 		DC_ITEM	item;
 		int	errcode;
 
-		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 		if (SUCCEED == errcode)
 			zbx_vector_uint64_append(hostids, item.host.hostid);
@@ -4431,8 +4429,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
-			ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	zbx_hashset_iter_reset(funcs, &iter);
 	while (NULL != (func = zbx_hashset_iter_next(&iter)))
@@ -4473,8 +4470,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 		/*     evaluated to regular numbers even for NOTSUPPORTED items. */
 		/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].state &&
-				FAIL == evaluatable_for_notsupported(func->function))
+		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == evaluatable_for_notsupported(func->function))
 		{
 			/* compose and store 'unknown' message for future use */
 			unknown_msg = zbx_dsprintf(NULL,

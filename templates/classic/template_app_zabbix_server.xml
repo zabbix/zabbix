@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2017-08-11T09:08:26Z</date>
+    <date>2017-09-13T08:48:58Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -23,6 +23,47 @@
                 </application>
             </applications>
             <items>
+                <item>
+                    <name>Zabbix preprocessing queue</name>
+                    <type>5</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>zabbix[preprocessing_queue]</key>
+                    <delay>10m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description>Count of values enqueued in the preprocessing queue.</description>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Zabbix server</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing/>
+                    <jmx_endpoint/>
+                    <master_item/>
+                </item>
                 <item>
                     <name>Zabbix $4 $2 processes, in %</name>
                     <type>5</type>
@@ -1580,7 +1621,7 @@
                             <height>160</height>
                             <x>0</x>
                             <y>2</y>
-                            <colspan>2</colspan>
+                            <colspan>1</colspan>
                             <rowspan>1</rowspan>
                             <elements>0</elements>
                             <valign>0</valign>
@@ -1591,6 +1632,28 @@
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>Value cache effectiveness</name>
+                                <host>Template App Zabbix Server</host>
+                            </resource>
+                            <max_columns>3</max_columns>
+                            <application/>
+                        </screen_item>
+                        <screen_item>
+                            <resourcetype>0</resourcetype>
+                            <width>500</width>
+                            <height>160</height>
+                            <x>1</x>
+                            <y>2</y>
+                            <colspan>1</colspan>
+                            <rowspan>1</rowspan>
+                            <elements>0</elements>
+                            <valign>0</valign>
+                            <halign>0</halign>
+                            <style>0</style>
+                            <url/>
+                            <dynamic>0</dynamic>
+                            <sort_triggers>0</sort_triggers>
+                            <resource>
+                                <name>Zabbix preprocessing queue</name>
                                 <host>Template App Zabbix Server</host>
                             </resource>
                             <max_columns>3</max_columns>
@@ -2548,6 +2611,38 @@
                     <item>
                         <host>Template App Zabbix Server</host>
                         <key>zabbix[process,preprocessing worker,avg,busy]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Zabbix preprocessing queue</name>
+            <width>900</width>
+            <height>200</height>
+            <yaxismin>0.0000</yaxismin>
+            <yaxismax>100.0000</yaxismax>
+            <show_work_period>1</show_work_period>
+            <show_triggers>1</show_triggers>
+            <type>0</type>
+            <show_legend>1</show_legend>
+            <show_3d>0</show_3d>
+            <percent_left>0.0000</percent_left>
+            <percent_right>0.0000</percent_right>
+            <ymin_type_1>0</ymin_type_1>
+            <ymax_type_1>0</ymax_type_1>
+            <ymin_item_1>0</ymin_item_1>
+            <ymax_item_1>0</ymax_item_1>
+            <graph_items>
+                <graph_item>
+                    <sortorder>0</sortorder>
+                    <drawtype>5</drawtype>
+                    <color>1A7C11</color>
+                    <yaxisside>0</yaxisside>
+                    <calc_fnc>2</calc_fnc>
+                    <type>0</type>
+                    <item>
+                        <host>Template App Zabbix Server</host>
+                        <key>zabbix[preprocessing_queue]</key>
                     </item>
                 </graph_item>
             </graph_items>
