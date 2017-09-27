@@ -3136,6 +3136,22 @@ tr.cursor-move td * {
   padding: 0 10px;
   text-align: center; }
 
+.sysmap-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  width: calc(100% - 20px);
+  border: 10px solid #fff;
+  background: #fff;
+  display: block; }
+  .sysmap-scroll-container .map-container {
+    display: table; }
+  .sysmap-scroll-container .table-forms-container, .sysmap-scroll-container .browser-warning-container {
+    display: table;
+    margin: 0;
+    padding: 0;
+    border: 0; }
+
 .sysmap-widget-container {
   overflow: hidden;
   height: 100%;

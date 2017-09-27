@@ -85,7 +85,9 @@ return (new CWidget())
 	->setTitle(_('Network maps'))
 	->addItem($menu)
 	->addItem(
-		(new CDiv())
-			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-			->addItem($container)
+		(new CDiv(
+			(new CDiv())
+				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+				->addItem($container)
+		))->addClass('sysmap-scroll-container')
 	);
