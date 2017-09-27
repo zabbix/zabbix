@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
+require_once dirname(__FILE__).'/class.cexceptionhelper.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
@@ -94,27 +95,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			$screenshot_name = md5(microtime(true)).'.png';
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
-				$message =
-					'URL: '.$this->current_url."\n".
-					'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
-					$e->getMessage();
-
-				switch (true) {
-					case $e instanceof PHPUnit_Framework_ExpectationFailedException:
-						$e = new PHPUnit_Framework_ExpectationFailedException($message, $e->getComparisonFailure(),
-							$e->getPrevious()
-						);
-						break;
-
-					case $e instanceof PHPUnit_Framework_SyntheticError:
-						$e = new PHPUnit_Framework_SyntheticError($message, $e->getCode(), $e->getSyntheticFile(),
-							$e->getSyntheticLine(), $e->getSyntheticTrace()
-						);
-						break;
-
-					default:
-						$e = new PHPUnit_Framework_AssertionFailedError($message, $e->getCode(), $e->getPrevious());
-				}
+				CExceptionHelper::setMessage($e, 'URL: '.$this->current_url."\n".
+						'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
+						$e->getMessage()
+				);
 
 				$this->screenshot = null;
 			}
