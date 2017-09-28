@@ -180,6 +180,10 @@ function DBcount($sql, $limit = null, $offset = null) {
 		$result = DBselect($sql);
 	}
 
+	if ($result === false) {
+		return -1;
+	}
+
 	while (DBfetch($result)) {
 		$cnt++;
 	}
