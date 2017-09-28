@@ -1,0 +1,74 @@
+[
+    {
+        "successfully close the problem" : {
+            "tested_function" : "try_task_closes_problem",
+            "in" : {
+                "taskid" : 1
+            },
+            "out" : {
+                "return" : 0
+            },
+            "db_data" : {
+                "task_close_problem_events" : [
+                    {
+                        "row" : [
+                            {"userid" : 1},
+                            {"eventid" : 1},
+                            {"objectid" : 1}
+                        ]
+                    }
+                ],
+                "problem" : []
+            },
+            "functions" : {
+                "DCconfig_lock_triggers_by_triggerids" : {
+                    "out": [
+                        {"triggerids" : 1}
+                    ]
+                }
+            }
+        }
+    },
+    {
+        "cannot find a task in the db" : {
+            "tested_function" : "try_task_closes_problem",
+            "in" : {
+                "taskid" : 1
+            },
+            "out" : {
+                "return" : -1
+            },
+            "db_data" : {
+                "task_close_problem_events" : []
+            }
+        }
+    },
+    {
+        "fail close the problem if source trigger was not locked" : {
+            "tested_function" : "try_task_closes_problem",
+            "in" : {
+                "taskid" : 1
+            },
+            "out" : {
+                "return" : -1
+            },
+            "db_data" : {
+                "task_close_problem_events" : [
+                    {
+                        "row" : [
+                            {"userid" : 1},
+                            {"eventid" : 1},
+                            {"objectid" : 1}
+                        ]
+                    }
+                ],
+                "problem" : []
+            },
+            "functions" : {
+                "DCconfig_lock_triggers_by_triggerids" : {
+                    "out": []
+                }
+            }
+        }
+    }
+]
