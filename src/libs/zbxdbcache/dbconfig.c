@@ -4093,9 +4093,9 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_uint64_t		item_preprocid, itemid, lastitemid = 0;
+	zbx_uint64_t		item_preprocid, itemid;
 	int			found, ret, i, index;
-	ZBX_DC_PREPROCITEM	*preprocitem;
+	ZBX_DC_PREPROCITEM	*preprocitem = NULL;
 	zbx_dc_preproc_op_t	*op;
 	zbx_vector_ptr_t	items;
 
@@ -4111,9 +4111,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		if (itemid != lastitemid)
+		if (NULL == preprocitem || itemid != preprocitem->itemid)
 		{
-			lastitemid = itemid;
 			if (NULL == (preprocitem = zbx_hashset_search(&config->preprocitems, &itemid)))
 			{
 				ZBX_DC_PREPROCITEM	preprocitem_local;
