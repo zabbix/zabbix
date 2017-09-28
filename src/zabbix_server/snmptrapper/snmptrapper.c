@@ -644,6 +644,10 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 				get_process_type_string(process_type), sec);
 
 		zbx_sleep_loop(1);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 
 	zbx_free(buffer);

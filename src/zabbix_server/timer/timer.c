@@ -744,7 +744,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		/* only the "timer #1" process evaluates the maintenance periods */
 		if (1 != process_num)
-			continue;
+			goto next;
 
 		/* we process maintenance at every 00 sec */
 		/* process time functions can take long time */
@@ -760,6 +760,12 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			hm_count += process_maintenance();
 			total_sec_maint += zbx_time() - sec_maint;
 		}
+next:
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#else
+		;
+#endif
 	}
 
 #undef STAT_INTERVAL
