@@ -4095,7 +4095,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 	unsigned char		tag;
 	zbx_uint64_t		item_preprocid, itemid, lastitemid = 0;
 	int			found, ret, i, index;
-	ZBX_DC_PREPROCITEM	*preprocitem = NULL;
+	ZBX_DC_PREPROCITEM	*preprocitem;
 	zbx_dc_preproc_op_t	*op;
 	zbx_vector_ptr_t	items;
 
