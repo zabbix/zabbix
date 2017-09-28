@@ -1175,5 +1175,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
 					zbx_socket_strerror());
 		}
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

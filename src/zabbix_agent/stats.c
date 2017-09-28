@@ -476,6 +476,10 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #endif
 		zbx_setproctitle("collector [idle 1 sec]");
 		zbx_sleep(1);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 
 #ifdef _WINDOWS

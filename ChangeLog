@@ -11,6 +11,7 @@ Bug fixes:
 Changes for 3.4.3rc1
 
 New features:
+...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
 .....J.... [ZBX-12705] fixed processing of MBean properties in jmx discovery (vjaceslavs)
