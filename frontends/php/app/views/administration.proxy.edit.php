@@ -39,12 +39,7 @@ if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interfacei
 }
 
 $interfaceTable = (new CTable())
-	->setHeader([
-		_('IP address'),
-		_('DNS name'),
-		_('Connect to'),
-		_('Port')
-	])
+	->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')])
 	->addRow([
 		(new CTextBox('ip', $data['ip'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
 		(new CTextBox('dns', $data['dns'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
@@ -86,6 +81,9 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 			->setModern(true)
 	)
 	->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
+	->addRow(_('Proxy address'),
+		(new CTextBox('proxy_address', $data['proxy_address'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Hosts'), $hosts_tween_box->get(_('Proxy hosts'), _('Other hosts')))
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
