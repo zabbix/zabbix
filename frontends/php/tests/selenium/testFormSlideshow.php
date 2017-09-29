@@ -102,6 +102,9 @@ class testFormSlideshow extends CWebTest {
 		// Log in.
 		$this->zbxTestLogin('slideconf.php');
 
+		// Name must be different for 'Cancel' test because slideshow with similar name can be created by 'Create' test.
+		$data['name'] = $data['name'] . ' for cancel';
+
 		// Click on 'Create slide show' button.
 		$this->zbxTestClick('form');
 
