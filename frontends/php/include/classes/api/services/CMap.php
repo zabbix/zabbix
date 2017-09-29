@@ -68,7 +68,7 @@ class CMap extends CMapElement {
 		$defOptions = [
 			'sysmapids'					=> null,
 			'userids'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -916,6 +916,10 @@ class CMap extends CMapElement {
 						);
 					}
 
+					if (!CHtmlUrlValidator::validate($url['url'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+					}
+
 					unset($url_names[$url['name']]);
 				}
 			}
@@ -1352,6 +1356,10 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('URL name should be unique for map "%1$s".', $map['name'])
 						);
+					}
+
+					if (!CHtmlUrlValidator::validate($url['url'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 					}
 
 					unset($urlNames[$url['name']]);

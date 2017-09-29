@@ -120,8 +120,10 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 			'timestamp' => $this->timestamp,
 			'screen' => $this->surrogateScreen,
 			'period' => $this->timeline['period'],
-			'stime' => $this->timeline['stimeNow'],
+			'stime' => $this->timeline['stime'],
+			'isNow' => $this->timeline['isNow'],
 			'profileIdx' => $this->profileIdx,
+			'profileIdx2' => $this->profileIdx2,
 			'hostid' => $this->hostid,
 			'updateProfile' => false
 		]);

@@ -38,7 +38,7 @@ class CHostPrototype extends CHostBase {
 			'selectParentHost'		=> null,
 			'selectTemplates' 		=> null,
 			'selectInventory' 		=> null,
-			'editable'				=> null,
+			'editable'				=> false,
 			'nopermissions'			=> null,
 			'sortfield'    			=> '',
 			'sortorder'     		=> ''

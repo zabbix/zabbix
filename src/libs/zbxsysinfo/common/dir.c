@@ -500,18 +500,9 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 					}
 
 					if (SIZE_MODE_APPARENT == mode)
-					{
 						size += (zbx_uint64_t)status.st_size;
-					}
-					else if (SIZE_MODE_DISK == mode)
-					{
+					else	/* must be SIZE_MODE_DISK */
 						size += (zbx_uint64_t)status.st_blocks * DISK_BLOCK_SIZE;
-					}
-					else
-					{
-						THIS_SHOULD_NEVER_HAPPEN;
-						exit(EXIT_FAILURE);
-					}
 				}
 
 				if (!(0 != S_ISDIR(status.st_mode) && SUCCEED == queue_directory(&list, path,

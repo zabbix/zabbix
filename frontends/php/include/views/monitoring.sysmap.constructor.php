@@ -43,6 +43,11 @@ $menu = (new CList())
 		(new CButton('linkRemove', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
 	])
 	->addItem([
+		_('Expand macros').':'.SPACE,
+		(new CButton('expand_macros', ($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON)
+				? _('On') : _('Off')))->addClass(ZBX_STYLE_BTN_LINK)
+	])
+	->addItem([
 		_('Grid').':'.SPACE,
 		(new CButton('gridshow',
 			($data['sysmap']['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden')
@@ -80,7 +85,9 @@ return (new CWidget())
 	->setTitle(_('Network maps'))
 	->addItem($menu)
 	->addItem(
-		(new CDiv())
-			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-			->addItem($container)
+		(new CDiv(
+			(new CDiv())
+				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+				->addItem($container)
+		))->addClass('sysmap-scroll-container')
 	);

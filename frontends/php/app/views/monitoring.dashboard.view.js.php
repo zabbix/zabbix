@@ -66,7 +66,10 @@
 		var form = jQuery('form[name="dashboard_form"]');
 		showDialogForm(
 			form,
-			{"title": "<?= _('Dashboard properties') ?>", "action_title": "<?= _('Apply') ?>"},
+			{
+				"title": <?= CJs::encodeJson(_('Dashboard properties')) ?>,
+				"action_title": <?= CJs::encodeJson(_('Apply')) ?>
+			},
 			{"name": form.data('data').name, "owner": form.data('data').owner}
 		);
 	};
@@ -106,12 +109,11 @@
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
 
 		// Hide filter with timeline.
-		jQuery('.filter-btn-container').hide();
-		jQuery('#filter-space').hide();
+		jQuery('.filter-btn-container, #filter-space').hide();
 		timeControl.removeAllSBox();
 	};
 
-	// This method related to forms: "sharing", "dashboard properties".
+	// This method is related to forms: "sharing", "dashboard properties".
 	jQuery.fn.fillForm = function(data) {
 		if (typeof data.name) {
 			this.find('#name').val(data.name);

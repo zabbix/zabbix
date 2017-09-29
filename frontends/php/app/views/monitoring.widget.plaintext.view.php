@@ -19,18 +19,12 @@
 **/
 
 
-$widget_div = (new CDiv())
-	->addClass(ZBX_STYLE_SYSMAP)
-	->setId(uniqid());
-
 if ($data['error'] === null) {
 	$table = (new CTableInfo())->setHeader([_('Timestamp'), _('Value')]);
 
 	foreach ($data['table_rows'] as $table_row) {
 		$table->addRow($table_row);
 	}
-
-	$widget_div->addItem($table);
 }
 else {
 	$table = (new CTableInfo())->setNoDataMessage($data['error']);

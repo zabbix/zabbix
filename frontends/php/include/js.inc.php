@@ -26,12 +26,12 @@
  * @see CJs::encodeJson()
  *
  * @param mixed $value
- * @param bool  $asObject  return string containing javascript object
+ * @param bool  $as_object return string containing javascript object
  * @param bool  $addQuotes whether quotes should be added at the beginning and at the end of string
  *
  * @return string
  */
-function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
+function zbx_jsvalue($value, $as_object = false, $addQuotes = true) {
 	if (!is_array($value)) {
 		if (is_object($value)) {
 			return unpack_object($value);
@@ -59,22 +59,19 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 		}
 	}
 	elseif (count($value) == 0) {
-		return $asObject ? '{}' : '[]';
+		return $as_object ? '{}' : '[]';
 	}
 
-	foreach ($value as $id => $v) {
-		if ((!isset($is_object) && is_string($id)) || $asObject) {
-			$is_object = true;
-		}
-		$value[$id] = (isset($is_object) ? '"'.str_replace('\'', '\\\'', $id).'":' : '').zbx_jsvalue($v, $asObject, $addQuotes);
-	}
+	$is_object = $as_object;
 
-	if (isset($is_object)) {
-		return '{'.implode(',', $value).'}';
+	foreach ($value as $key => &$v) {
+		$is_object |= is_string($key);
+		$escaped_key = $is_object ? '"'.zbx_jsvalue($key, false, false).'":' : '';
+		$v = $escaped_key.zbx_jsvalue($v, $as_object, $addQuotes);
 	}
-	else {
-		return '['.implode(',', $value).']';
-	}
+	unset($v);
+
+	return $is_object ? '{'.implode(',', $value).'}' : '['.implode(',', $value).']';
 }
 
 function encodeValues(&$value, $encodeTwice = true) {

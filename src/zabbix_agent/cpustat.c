@@ -264,7 +264,7 @@ int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **
 	return get_perf_counter_value(collector->cpus.cpu_counter[idx], interval, value, error);
 }
 
-static int	get_cpu_perf_counter_status(int pc_status)
+static int	get_cpu_perf_counter_status(zbx_perf_counter_status_t pc_status)
 {
 	switch (pc_status)
 	{

@@ -27,6 +27,14 @@ class CIPRangeValidatorTest extends PHPUnit_Framework_TestCase {
 	public function testProvider() {
 		return [
 			[
+				'{$MACRO}', ['usermacros' => true], [
+					'rc' => true,
+					'error' => '',
+					'max_ip_count' => '0',
+					'max_ip_range' => ''
+				]
+			],
+			[
 				"0.0.0.0,255.255.255.255 \t\r\n,\t\r\n 192.168.1.0,2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com", [], [
 					'rc' => true,
 					'error' => '',
@@ -44,10 +52,10 @@ class CIPRangeValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'www.zabbix.com,bad.dns-', [], [
-					'rc' => false,
-					'error' => 'invalid address range "bad.dns-"',
-					'max_ip_count' => '0',
-					'max_ip_range' => ''
+					'rc' => true,
+					'error' => '',
+					'max_ip_count' => '1',
+					'max_ip_range' => 'www.zabbix.com'
 				]
 			],
 			[
@@ -331,7 +339,7 @@ class CIPRangeValidatorTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'0.0.0.0000-255', [], [
+				'0.0.0.0000-255', ['dns' => false], [
 					'rc' => false,
 					'error' => 'invalid address range "0.0.0.0000-255"',
 					'max_ip_count' => '0',
@@ -339,7 +347,7 @@ class CIPRangeValidatorTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'0.0.0.0-0255', [], [
+				'0.0.0.0-0255', ['dns' => false], [
 					'rc' => false,
 					'error' => 'invalid address range "0.0.0.0-0255"',
 					'max_ip_count' => '0',

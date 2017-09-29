@@ -36,8 +36,8 @@
 
 			$('#expression_row').find('label').text(
 				(recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)
-					? '<?= _('Problem expression') ?>'
-					: '<?= _('Expression') ?>'
+					? <?= CJs::encodeJson(_('Problem expression')) ?>
+					: <?= CJs::encodeJson(_('Expression')) ?>
 			);
 			$('.recovery_expression_constructor_row')
 				.toggle(recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>);

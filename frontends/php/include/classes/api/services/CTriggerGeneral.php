@@ -511,6 +511,10 @@ abstract class CTriggerGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_wrong_fields);
 			}
 
+			if (array_key_exists('url', $trigger) && $trigger['url'] && !CHtmlUrlValidator::validate($trigger['url'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+			}
+
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_set, $trigger['description']);
 
 			if (!array_key_exists('recovery_mode', $trigger)) {
@@ -658,6 +662,10 @@ abstract class CTriggerGeneral extends CApiService {
 		foreach ($triggers as $trigger) {
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_wrong_fields);
+			}
+
+			if (array_key_exists('url', $trigger) && $trigger['url'] && !CHtmlUrlValidator::validate($trigger['url'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 			}
 		}
 

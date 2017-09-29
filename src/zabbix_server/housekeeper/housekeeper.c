@@ -77,6 +77,8 @@ typedef struct
 }
 zbx_hk_cleanup_table_t;
 
+static unsigned char poption_mode_enabled = ZBX_HK_OPTION_ENABLED;
+
 /* Housekeeper table mapping to housekeeping configuration values.    */
 /* This mapping is used to exclude disabled tables from housekeeping  */
 /* cleanup procedure.                                                 */
@@ -88,6 +90,8 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"history_uint", &cfg.hk.history_mode},
 	{"trends", &cfg.hk.trends_mode},
 	{"trends_uint", &cfg.hk.trends_mode},
+	/* force events housekeeping mode on to perform problem cleanup when events housekeeping is disabled */
+	{"events", &poption_mode_enabled},
 	{NULL}
 };
 
@@ -159,7 +163,7 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{NULL}
 };
 
-void	zbx_housekeeper_sigusr_handler(int flags)
+static void	zbx_housekeeper_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
 	{
@@ -603,8 +607,8 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	{
 		rule->min_clock = MIN(keep_from, rule->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
-		rc = DBexecute("delete from %s where %s%sclock<%d", rule->table, rule->filter,
-				('\0' != *rule->filter ? " and " : ""), rule->min_clock);
+		rc = DBexecute("delete from %s where clock<%d%s%s", rule->table, rule->min_clock,
+				('\0' != *rule->filter ? " and " : ""), rule->filter);
 
 		if (ZBX_DB_OK <= rc)
 			deleted = rc;
@@ -617,9 +621,128 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBdelete_from_table                                              *
+ *                                                                            *
+ * Purpose: delete limited count of rows from table                           *
+ *                                                                            *
+ * Return value: number of deleted rows or less than 0 if an error occurred   *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBdelete_from_table(const char *tablename, const char *filter, int limit)
+{
+	if (0 == limit)
+	{
+		return DBexecute(
+				"delete from %s"
+				" where %s",
+				tablename,
+				filter);
+	}
+	else
+	{
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+		return DBexecute(
+				"delete from %s"
+				" where %s"
+					" and rownum<=%d",
+				tablename,
+				filter,
+				limit);
+#elif defined(HAVE_MYSQL)
+		return DBexecute(
+				"delete from %s"
+				" where %s limit %d",
+				tablename,
+				filter,
+				limit);
+#elif defined(HAVE_POSTGRESQL)
+		return DBexecute(
+				"delete from %s"
+				" where ctid = any(array(select ctid from %s"
+					" where %s limit %d))",
+				tablename,
+				tablename,
+				filter,
+				limit);
+#elif defined(HAVE_SQLITE3)
+		return DBexecute(
+				"delete from %s"
+				" where %s",
+				tablename,
+				filter);
+#endif
+	}
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: hk_events_cleanup                                                *
+ *                                                                            *
+ * Purpose: perform events or problems table cleanup                          *
+ *                                                                            *
+ * Parameters: table    - [IN] the table name                                 *
+ * Parameters: source   - [IN] the event source                               *
+ *             object   - [IN] the event object type                          *
+ *             objectid - [IN] the event object identifier                    *
+ *             more     - [OUT] 1 if there might be more data to remove,      *
+ *                              otherwise the value is not changed            *
+ *                                                                            *
+ * Return value: number of rows deleted                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	hk_events_cleanup(const char *table, int source, int object, zbx_uint64_t objectid, int *more)
+{
+	char	filter[MAX_STRING_LEN];
+	int	ret;
+
+	zbx_snprintf(filter, sizeof(filter), "source=%d and object=%d and objectid=" ZBX_FS_UI64,
+			source, object, objectid);
+
+	ret = DBdelete_from_table(table, filter, CONFIG_MAX_HOUSEKEEPER_DELETE);
+
+	if (ZBX_DB_OK > ret || (0 != CONFIG_MAX_HOUSEKEEPER_DELETE && ret >= CONFIG_MAX_HOUSEKEEPER_DELETE))
+		*more = 1;
+
+	return ZBX_DB_OK <= ret ? ret : 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: hk_table_cleanup                                                 *
+ *                                                                            *
+ * Purpose: perform generic table cleanup                                     *
+ *                                                                            *
+ * Parameters: table    - [IN] the table name                                 *
+ *             field    - [IN] the field name                                 *
+ *             objectid - [IN] the field value                                *
+ *             more     - [OUT] 1 if there might be more data to remove,      *
+ *                              otherwise the value is not changed            *
+ *                                                                            *
+ * Return value: number of rows deleted                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t id, int *more)
+{
+	char	filter[MAX_STRING_LEN];
+	int	ret;
+
+	zbx_snprintf(filter, sizeof(filter), "%s=" ZBX_FS_UI64, field, id);
+
+	ret = DBdelete_from_table(table, filter, CONFIG_MAX_HOUSEKEEPER_DELETE);
+
+	if (ZBX_DB_OK > ret || (0 != CONFIG_MAX_HOUSEKEEPER_DELETE && ret >= CONFIG_MAX_HOUSEKEEPER_DELETE))
+		*more = 1;
+
+	return ZBX_DB_OK <= ret ? ret : 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: housekeeping_cleanup                                             *
  *                                                                            *
- * Purpose: remove deleted items data                                         *
+ * Purpose: remove deleted items/triggers data                                *
  *                                                                            *
  * Return value: number of rows deleted                                       *
  *                                                                            *
@@ -632,20 +755,16 @@ static int	housekeeping_cleanup()
 {
 	const char		*__function_name = "housekeeping_cleanup";
 
-	DB_HOUSEKEEPER		housekeeper;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			d, deleted = 0;
+	int			deleted = 0;
 	zbx_vector_uint64_t	housekeeperids;
 	char			*sql = NULL, *table_name_esc;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_hk_cleanup_table_t *table;
+	zbx_uint64_t		housekeeperid, objectid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* first handle the trivial case when history and trend housekeeping is disabled */
-	if (ZBX_HK_OPTION_DISABLED == cfg.hk.history_mode && ZBX_HK_OPTION_DISABLED == cfg.hk.trends_mode)
-		goto out;
 
 	zbx_vector_uint64_create(&housekeeperids);
 
@@ -677,80 +796,51 @@ static int	housekeeping_cleanup()
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(housekeeper.housekeeperid, row[0]);
-		housekeeper.tablename = row[1];
-		housekeeper.field = row[2];
-		ZBX_STR2UINT64(housekeeper.value, row[3]);
+		int	more = 0;
 
-		if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
+		ZBX_STR2UINT64(housekeeperid, row[0]);
+		ZBX_STR2UINT64(objectid, row[3]);
+
+		if (0 == strcmp(row[1], "events"))
 		{
-			d = DBexecute(
-					"delete from %s"
-					" where %s=" ZBX_FS_UI64,
-					housekeeper.tablename,
-					housekeeper.field,
-					housekeeper.value);
+			const char	*table_name = ZBX_HK_OPTION_ENABLED == cfg.hk.events_mode ? "events" : "problem";
+
+			if (0 == strcmp(row[2], "triggerid"))
+			{
+				deleted += hk_events_cleanup(table_name, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
+						objectid, &more);
+				deleted += hk_events_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER,
+						objectid, &more);
+			}
+			else if (0 == strcmp(row[2], "itemid"))
+			{
+				deleted += hk_events_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM,
+						objectid, &more);
+			}
+			else if (0 == strcmp(row[2], "lldruleid"))
+			{
+				deleted += hk_events_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE,
+						objectid, &more);
+			}
 		}
 		else
-		{
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
-			d = DBexecute(
-					"delete from %s"
-					" where %s=" ZBX_FS_UI64
-						" and rownum<=%d",
-					housekeeper.tablename,
-					housekeeper.field,
-					housekeeper.value,
-					CONFIG_MAX_HOUSEKEEPER_DELETE);
-#elif defined(HAVE_MYSQL)
-			d = DBexecute(
-					"delete from %s"
-					" where %s=" ZBX_FS_UI64 " limit %d",
-					housekeeper.tablename,
-					housekeeper.field,
-					housekeeper.value,
-					CONFIG_MAX_HOUSEKEEPER_DELETE);
-#elif defined(HAVE_POSTGRESQL)
-			d = DBexecute(
-					"delete from %s"
-					" where ctid = any(array(select ctid from %s"
-						" where %s=" ZBX_FS_UI64 " limit %d))",
-					housekeeper.tablename,
-					housekeeper.tablename,
-					housekeeper.field,
-					housekeeper.value,
-					CONFIG_MAX_HOUSEKEEPER_DELETE);
-#elif defined(HAVE_SQLITE3)
-			d = 0;
-#endif
-		}
+			deleted += hk_table_cleanup(row[1], row[2], objectid, &more);
 
-		if (ZBX_DB_OK <= d)
-		{
-			if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > d)
-				zbx_vector_uint64_append(&housekeeperids, housekeeper.housekeeperid);
-
-			deleted += d;
-		}
+		if (0 == more)
+			zbx_vector_uint64_append(&housekeeperids, housekeeperid);
 	}
 	DBfree_result(result);
 
 	if (0 != housekeeperids.values_num)
 	{
 		zbx_vector_uint64_sort(&housekeeperids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from housekeeper where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid",
-				housekeeperids.values, housekeeperids.values_num);
-
-		DBexecute("%s", sql);
+		DBexecute_multiple_query("delete from housekeeper where", "housekeeperid", &housekeeperids);
 	}
 
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&housekeeperids);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
 	return deleted;
@@ -800,20 +890,28 @@ static int	housekeeping_audit(int now)
 static int	housekeeping_events(int now)
 {
 	static zbx_hk_rule_t 	rules[] = {
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
-			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &cfg.hk.events_trigger},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
-			" and object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &cfg.hk.events_internal},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_ITEM), 0, &cfg.hk.events_internal},
-		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_LLDRULE), 0, &cfg.hk.events_internal},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
+			" and not exists (select null from problem where events.eventid = problem.eventid)",
+			0, &cfg.hk.events_trigger},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
+			" and not exists (select null from problem where events.eventid = problem.eventid)",
+			0, &cfg.hk.events_internal},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
+			" and not exists (select null from problem where events.eventid = problem.eventid)",
+			0, &cfg.hk.events_internal},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
+			" and not exists (select null from problem where events.eventid = problem.eventid)",
+			0, &cfg.hk.events_internal},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
+		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
 		{NULL}
 	};
 
@@ -933,7 +1031,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items, %d events, %d problems,"
+		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
 				" %d sessions, %d alarms, %d audit items in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
 				d_problems, d_sessions, d_services, d_audit, sec, sleeptext);
@@ -942,12 +1040,16 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		DBclose();
 
-		zbx_setproctitle("%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms, %d audit "
-				"items in " ZBX_FS_DBL " sec, %s]",
+		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
+				" %d audit items in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
 				d_sessions, d_services, d_audit, sec, sleeptext);
 
 		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

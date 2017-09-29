@@ -19,9 +19,12 @@
 **/
 
 
+// indicator of sort field
+$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
+
 $table = (new CTableInfo())
 	->setHeader([
-		_('Host group'),
+		[_('Host group'), $sort_div],
 		_('Without problems'),
 		_('With problems'),
 		_('Total')

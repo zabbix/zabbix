@@ -500,10 +500,9 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 
 	if (NULL == item->key) /* existing item */
 	{
-		char	*name_esc, *delay_esc, *history_esc, *trends_esc, *trapper_hosts_esc,
-			*units_esc, *formula_esc, *logtimefmt_esc, *params_esc, *ipmi_sensor_esc,
-			*snmp_community_esc, *snmp_oid_esc, *snmpv3_securityname_esc,
-			*snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc, *username_esc,
+		char	*name_esc, *delay_esc, *history_esc, *trends_esc, *trapper_hosts_esc, *units_esc, *formula_esc,
+			*logtimefmt_esc, *params_esc, *ipmi_sensor_esc, *snmp_community_esc, *snmp_oid_esc,
+			*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc, *username_esc,
 			*password_esc, *publickey_esc, *privatekey_esc, *description_esc, *lifetime_esc,
 			*snmpv3_contextname_esc, *port_esc, *jmx_endpoint_esc;
 
@@ -573,21 +572,17 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					"jmx_endpoint='%s',"
 					"master_itemid=%s"
 				" where itemid=" ZBX_FS_UI64 ";\n",
-				name_esc, (int)item->type, (int)item->value_type,
-				delay_esc,
-				history_esc, trends_esc, (int)item->status, trapper_hosts_esc,
-				units_esc, formula_esc,
-				logtimefmt_esc, DBsql_id_ins(item->valuemapid), params_esc,
-				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc,
-				snmpv3_securityname_esc, (int)item->snmpv3_securitylevel,
-				(int)item->snmpv3_authprotocol, snmpv3_authpassphrase_esc,
-				(int)item->snmpv3_privprotocol, snmpv3_privpassphrase_esc,
-				snmpv3_contextname_esc, (int)item->authtype, username_esc,
-				password_esc, publickey_esc, privatekey_esc,
-				item->templateid, (int)item->flags, description_esc,
-				(int)item->inventory_link, DBsql_id_ins(item->interfaceid),
-				lifetime_esc, (int)item->evaltype, port_esc, jmx_endpoint_esc,
-				DBsql_id_ins(item->master_itemid), item->itemid);
+				name_esc, (int)item->type, (int)item->value_type, delay_esc,
+				history_esc, trends_esc, (int)item->status, trapper_hosts_esc, units_esc,
+				formula_esc, logtimefmt_esc, DBsql_id_ins(item->valuemapid), params_esc,
+				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, snmpv3_securityname_esc,
+				(int)item->snmpv3_securitylevel, (int)item->snmpv3_authprotocol,
+				snmpv3_authpassphrase_esc, (int)item->snmpv3_privprotocol, snmpv3_privpassphrase_esc,
+				snmpv3_contextname_esc, (int)item->authtype, username_esc, password_esc, publickey_esc,
+				privatekey_esc, item->templateid, (int)item->flags, description_esc,
+				(int)item->inventory_link, DBsql_id_ins(item->interfaceid), lifetime_esc,
+				(int)item->evaltype, port_esc, jmx_endpoint_esc, DBsql_id_ins(item->master_itemid),
+				item->itemid);
 
 		zbx_free(jmx_endpoint_esc);
 		zbx_free(port_esc);

@@ -38,7 +38,7 @@ class CAction extends CApiService {
 	 * @param array $options['actionids']
 	 * @param array $options['applicationids']
 	 * @param array $options['status']
-	 * @param array $options['editable']
+	 * @param bool  $options['editable']
 	 * @param array $options['extendoutput']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
@@ -49,8 +49,6 @@ class CAction extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userId = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['actions' => 'a.actionid'],
@@ -70,7 +68,7 @@ class CAction extends CApiService {
 			'userids'						=> null,
 			'scriptids'						=> null,
 			'nopermissions'					=> null,
-			'editable'						=> null,
+			'editable'						=> false,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -93,11 +91,10 @@ class CAction extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// conditions are checked here by sql, operations after, by api queries
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userId);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			// condition hostgroup
 			$sqlParts['where'][] = 'NOT EXISTS ('.
@@ -268,7 +265,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// check hosts, templates
 			$hosts = [];
 			$hostIds = [];
@@ -528,10 +525,10 @@ class CAction extends CApiService {
 				$action['evaltype'] = $action['filter']['evaltype'];
 			}
 			$action += [
-				'r_shortdata'	=> ACTION_DEFAULT_SUBJ_TRIGGER,
-				'r_longdata'	=> ACTION_DEFAULT_MSG_TRIGGER,
-				'ack_shortdata'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-				'ack_longdata'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+				'r_shortdata' => ACTION_DEFAULT_SUBJ_RECOVERY,
+				'r_longdata' => ACTION_DEFAULT_MSG_RECOVERY,
+				'ack_shortdata' => ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+				'ack_longdata' => ACTION_DEFAULT_MSG_ACKNOWLEDGE
 			];
 
 			// Set default values for recovery operations and their messages.
@@ -555,10 +552,10 @@ class CAction extends CApiService {
 						}
 
 						$operation['opmessage'] = $message + [
-							'default_msg'	=> 0,
-							'mediatypeid'	=> 0,
-							'subject'		=> ACTION_DEFAULT_SUBJ_TRIGGER,
-							'message'		=> ACTION_DEFAULT_MSG_TRIGGER
+							'default_msg' => 0,
+							'mediatypeid' => 0,
+							'subject' => ACTION_DEFAULT_SUBJ_RECOVERY,
+							'message' => ACTION_DEFAULT_MSG_RECOVERY
 						];
 					}
 				}
@@ -3041,9 +3038,19 @@ class CAction extends CApiService {
 						if (array_key_exists('operationid', $ack_operation)
 								&& array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 							$db_ack_operation = $db_ack_operations[$ack_operation['operationid']];
+							$operation_type = array_key_exists('operationtype', $ack_operation)
+								? $ack_operation['operationtype']
+								: $db_ack_operation['operationtype'];
 
 							// Field 'operationtype' is required.
 							unset($db_ack_operation['operationtype']);
+
+							if ($operation_type == OPERATION_TYPE_MESSAGE) {
+								unset($db_ack_operation['opmessage_grp'], $db_ack_operation['opmessage_usr']);
+							}
+							elseif ($operation_type == OPERATION_TYPE_COMMAND) {
+								unset($db_ack_operation['opcommand_grp'], $db_ack_operation['opcommand_hst']);
+							}
 
 							$ack_operation += $db_ack_operation;
 						}

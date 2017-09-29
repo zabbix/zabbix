@@ -41,16 +41,25 @@ function SVGCanvas(options, shadowBuffer) {
 	if (typeof options.mask !== 'undefined') {
 		this.mask = (options.mask === true);
 	}
+	if (typeof options.useViewBox !== 'boolean') {
+		options.useViewBox = false;
+	}
 
 	this.buffer = null;
 
-	this.root = this.createElement('svg', {
-		'viewBox': '0 0 ' + options.width + ' ' + options.height,
-		'width': '100%',
-		'height': '100%',
-		'style': 'max-width: ' + options.width + 'px; max-height: ' + options.height + 'px;'
-	}, null);
+	var svg_options = options.useViewBox
+		? {
+			'viewBox': '0 0 ' + options.width + ' ' + options.height,
+			'width': '100%',
+			'height': '100%',
+			'style': 'max-width: ' + options.width + 'px; max-height: ' + options.height + 'px;'
+		}
+		: {
+			'width': options.width,
+			'height': options.height
+		};
 
+	this.root = this.createElement('svg', svg_options, null);
 	if (shadowBuffer === true) {
 		this.buffer = this.root.add('g', {
 			class: 'shadow-buffer',
@@ -409,13 +418,14 @@ SVGTextArea.prototype.alignToAnchor = function() {
 	}
 
 	this.x -= this.getHorizontalOffset();
+
 	switch (this.anchor.vertical) {
-		case 'top':
-			this.y -= this.height + this.canvas.textPadding;
+		case 'middle':
+			this.y -= Math.floor(this.height/2);
 			break;
 
-		case 'middle':
-			this.y -= Math.floor(this.height / 2);
+		case 'bottom':
+			this.y -= this.height;
 			break;
 	}
 };
@@ -536,7 +546,7 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.parseContent(content, parse_links);
 	this.text = this.element.add('text', attributes, this.lines);
 
-	size = this.text.element.getBBox();
+	size = this.ZBX_getBBox();
 	this.width = Math.ceil(size.width);
 	this.height = Math.ceil(size.height + size.y);
 
@@ -561,6 +571,31 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.element.element.setAttribute('transform', 'translate(' + this.x + ' ' + this.y + ')');
 
 	return this.element;
+};
+
+/**
+ * getBBox workaround for Firefox and probably also old versions of IE.
+ *
+ * Firefox is not able to get element dimensions using getBBox unless it is appended to the DOM.
+ * The workaround creates a SVG element and appends it to the DOM to be able get element dimensions using the getBBox.
+ *
+ * Read more about this bug here https://bugzilla.mozilla.org/show_bug.cgi?id=612118
+ */
+SVGTextArea.prototype.ZBX_getBBox = function() {
+	try {
+		return this.text.element.getBBox();
+	}
+	catch (err) {
+		var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+			ret;
+
+		svg.appendChild(this.text.element);
+		document.body.appendChild(svg);
+		ret = this.text.element.getBBox();
+		svg.parentNode.removeChild(svg);
+
+		return ret;
+	}
 };
 
 /**

@@ -667,7 +667,7 @@ static void	ipmi_manager_activate_host(zbx_ipmi_manager_t *manager, zbx_uint64_t
 	DC_ITEM	item;
 	int	errcode;
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	zbx_activate_item_host(&item, ts);
 	ipmi_manager_update_host(manager, &item.host);
@@ -693,7 +693,7 @@ static void	ipmi_manager_deactivate_host(zbx_ipmi_manager_t *manager, zbx_uint64
 	DC_ITEM	item;
 	int	errcode;
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	zbx_deactivate_item_host(&item, ts, error);
 	ipmi_manager_update_host(manager, &item.host);
@@ -780,7 +780,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 	zbx_free(value);
 
 	/* put back the item in configuration cache IPMI poller queue */
-	DCrequeue_items(&itemid, &state, &ts.sec, NULL, NULL, &errcode, 1);
+	DCrequeue_items(&itemid, &state, &ts.sec, &errcode, 1);
 
 	ipmi_poller_free_request(poller);
 	ipmi_manager_process_poller_queue(manager, poller, now);
@@ -865,7 +865,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 
 			zbx_timespec(&ts);
 			zbx_preprocess_item_value(items[i].itemid, 0, NULL, &ts, state, error);
-			DCrequeue_items(&items[i].itemid, &state, &ts.sec, NULL, NULL, &errcode, 1);
+			DCrequeue_items(&items[i].itemid, &state, &ts.sec, &errcode, 1);
 			zbx_free(error);
 			continue;
 		}
@@ -958,6 +958,9 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 	zbx_ipmi_poller_t	*poller;
 	int			ret, nextcheck, timeout, nextcleanup, polled_num, scheduled_num, now;
 	double			time_stat, time_idle, time_now;
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+	double			resolver_timestamp = 0.0;
+#endif
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1024,11 +1027,18 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 			timeout = ZBX_IPMI_MANAGER_DELAY;
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-
 		ret = zbx_ipc_service_recv(&ipmi_service, timeout, &client, &message);
-
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		/* handle /etc/resolv.conf update less often than once a second */
+
+		if (1.0 < time_now - resolver_timestamp)
+		{
+			resolver_timestamp = time_now;
+			zbx_update_resolver_conf();
+		}
+#endif
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += zbx_time() - time_now;
 

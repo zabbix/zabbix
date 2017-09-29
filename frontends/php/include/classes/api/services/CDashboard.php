@@ -24,12 +24,12 @@
  */
 class CDashboard extends CApiService {
 
-	const MAX_ROW = 63; // DASHBOARD_MAX_ROWS - 1
-	const MAX_COL = 11; // DASHBOARD_MAX_COLUMNS - 1
+	const MAX_X = 11; // DASHBOARD_MAX_COLUMNS - 1
+	const MAX_Y = 63; // DASHBOARD_MAX_ROWS - 1
 
 	protected $tableName = 'dashboard';
 	protected $tableAlias = 'd';
-	protected $sortColumns = ['dashboardid'];
+	protected $sortColumns = ['dashboardid', 'name'];
 
 	/**
 	 * @param array $options
@@ -57,16 +57,15 @@ class CDashboard extends CApiService {
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private']), 'default' => API_OUTPUT_EXTEND],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
 			'selectUserGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['usrgrpid', 'permission']), 'default' => null],
-			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width', 'fields']), 'default' => null],
+			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
-			'sortfield' =>				['type' => API_STRINGS_UTF8, 'in' => implode(',', $this->sortColumns), 'default' => []],
-			'sortorder' =>				['type' => API_STRINGS_UTF8, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => []],
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'default' => []],
+			'sortorder' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
-			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
-			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -81,7 +80,7 @@ class CDashboard extends CApiService {
 		];
 
 		// permissions
-		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER && !$options['nopermissions']) {
+		if (in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$user_groups = getUserGroupsByUserId(self::$userData['userid']);
@@ -212,10 +211,10 @@ class CDashboard extends CApiService {
 			'widgets' =>			['type' => API_OBJECTS, 'fields' => [
 				'type' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
-				'row' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_ROW, 'default' => DB::getDefault('widget', 'row')],
-				'col' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_COL, 'default' => DB::getDefault('widget', 'col')],
-				'height' =>				['type' => API_INT32, 'in' => '1:32', 'default' => DB::getDefault('widget', 'height')],
+				'x' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_X, 'default' => DB::getDefault('widget', 'x')],
+				'y' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_Y, 'default' => DB::getDefault('widget', 'y')],
 				'width' =>				['type' => API_INT32, 'in' => '1:12', 'default' => DB::getDefault('widget', 'width')],
+				'height' =>				['type' => API_INT32, 'in' => '2:32', 'default' => DB::getDefault('widget', 'height')],
 				'fields' =>				['type' => API_OBJECTS, 'fields' => [
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
 					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
@@ -322,10 +321,10 @@ class CDashboard extends CApiService {
 				'widgetid' =>			['type' => API_ID],
 				'type' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name')],
-				'row' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_ROW],
-				'col' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_COL],
-				'height' =>				['type' => API_INT32, 'in' => '1:32'],
+				'x' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_X],
+				'y' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_Y],
 				'width' =>				['type' => API_INT32, 'in' => '1:12'],
+				'height' =>				['type' => API_INT32, 'in' => '2:32'],
 				'fields' =>				['type' => API_OBJECTS, 'fields' => [
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
 					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
@@ -345,7 +344,7 @@ class CDashboard extends CApiService {
 		$db_dashboards = $this->get([
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
 			'dashboardids' => zbx_objectValues($dashboards, 'dashboardid'),
-			'selectWidgets' => ['widgetid', 'type', 'name', 'row', 'col', 'height', 'width'],
+			'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height'],
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -356,10 +355,10 @@ class CDashboard extends CApiService {
 
 		$widget_defaults = [
 			'name' => DB::getDefault('widget', 'name'),
-			'row' => DB::getDefault('widget', 'row'),
-			'col' => DB::getDefault('widget', 'col'),
-			'height' => DB::getDefault('widget', 'height'),
-			'width' => DB::getDefault('widget', 'width')
+			'x' => DB::getDefault('widget', 'x'),
+			'y' => DB::getDefault('widget', 'y'),
+			'width' => DB::getDefault('widget', 'width'),
+			'height' => DB::getDefault('widget', 'height')
 		];
 
 		foreach ($dashboards as &$dashboard) {
@@ -399,7 +398,7 @@ class CDashboard extends CApiService {
 				unset($widget);
 
 				$dashboard['widgets'] = $this->extendObjectsByKey($dashboard['widgets'], $db_widgets, 'widgetid',
-					['row', 'col', 'height', 'width']
+					['x', 'y', 'width', 'height']
 				);
 			}
 		}
@@ -456,8 +455,8 @@ class CDashboard extends CApiService {
 			if (array_key_exists('userid', $dashboard)
 					&& ($db_dashboard === null || bccomp($dashboard['userid'], $db_dashboard['userid']) != 0)) {
 				if (bccomp($dashboard['userid'], self::$userData['userid']) != 0
-						&& !in_array(self::$userData['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set dashboard owner.'));
+						&& in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only super admins can set dashboard owner.'));
 				}
 
 				$userids[$dashboard['userid']] = true;
@@ -536,10 +535,10 @@ class CDashboard extends CApiService {
 	 * @param array  $dashboards
 	 * @param string $dashboards[]['name']
 	 * @param array  $dashboards[]['widgets']              (optional)
-	 * @param int    $dashboards[]['widgets'][]['row']
-	 * @param int    $dashboards[]['widgets'][]['col']
-	 * @param int    $dashboards[]['widgets'][]['height']
+	 * @param int    $dashboards[]['widgets'][]['x']
+	 * @param int    $dashboards[]['widgets'][]['y']
 	 * @param int    $dashboards[]['widgets'][]['width']
+	 * @param int    $dashboards[]['widgets'][]['height']
 	 *
 	 * @throws APIException if input is invalid.
 	 */
@@ -549,25 +548,25 @@ class CDashboard extends CApiService {
 				$filled = [];
 
 				foreach ($dashboard['widgets'] as $widget) {
-					for ($row = $widget['row']; $row < $widget['row'] + $widget['height']; $row++) {
-						for ($col = $widget['col']; $col < $widget['col'] + $widget['width']; $col++) {
-							if (array_key_exists($row, $filled) && array_key_exists($col, $filled[$row])) {
+					for ($x = $widget['x']; $x < $widget['x'] + $widget['width']; $x++) {
+						for ($y = $widget['y']; $y < $widget['y'] + $widget['height']; $y++) {
+							if (array_key_exists($x, $filled) && array_key_exists($y, $filled[$x])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('Dashboard "%1$s" cell X - %2$s Y - %3$s is already taken.',
-										$dashboard['name'], $widget['col'], $widget['row']
+										$dashboard['name'], $widget['x'], $widget['y']
 									)
 								);
 							}
 
-							$filled[$row][$col] = true;
+							$filled[$x][$y] = true;
 						}
 					}
 
-					if ($widget['row'] + $widget['height'] - 1 > self::MAX_ROW
-							|| $widget['col'] + $widget['width'] - 1 > self::MAX_COL) {
+					if ($widget['x'] + $widget['width'] - 1 > self::MAX_X
+							|| $widget['y'] + $widget['height'] - 1 > self::MAX_Y) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Dashboard "%1$s" widget in cell X - %2$s Y - %3$s is ouf of bounds.',
-								$dashboard['name'], $widget['col'], $widget['row']
+								$dashboard['name'], $widget['x'], $widget['y']
 							)
 						);
 					}
@@ -1006,7 +1005,7 @@ class CDashboard extends CApiService {
 
 		$field_names = [
 			'str' => ['type', 'name'],
-			'int' => ['row', 'col', 'height', 'width']
+			'int' => ['x', 'y', 'width', 'height']
 		];
 
 		foreach ($dashboards as $dashboard) {
@@ -1048,7 +1047,7 @@ class CDashboard extends CApiService {
 		}
 
 		if ($ins_widgets) {
-			$widgetids = DB::insertBatch('widget', $ins_widgets);
+			$widgetids = DB::insert('widget', $ins_widgets);
 			$index = 0;
 
 			foreach ($dashboards as &$dashboard) {

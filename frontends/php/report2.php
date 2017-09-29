@@ -233,34 +233,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-
-		$parents = [];
-		$parent_name = '';
-		foreach ($groups as $group) {
-			$parent = explode('/', $group['name']);
-			if (count($parent) > 1) {
-				array_pop($parent);
-				foreach ($parent as $sub_parent) {
-					if ($parent_name === '') {
-						$parent_name = $sub_parent;
-					}
-					else {
-						$parent_name .= '/'.$sub_parent;
-					}
-					$parents[] = $parent_name;
-				}
-			}
-		}
-
-		if ($parents) {
-			$parent_groups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => $parents],
-				'preservekeys' => true
-			]);
-
-			$groups = array_replace($groups, $parent_groups);
-		}
+		$groups = CPageFilter::enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 
@@ -344,34 +317,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
-
-		$parents = [];
-		$parent_name = '';
-		foreach ($groups as $group) {
-			$parent = explode('/', $group['name']);
-			if (count($parent) > 1) {
-				array_pop($parent);
-				foreach ($parent as $sub_parent) {
-					if ($parent_name === '') {
-						$parent_name = $sub_parent;
-					}
-					else {
-						$parent_name .= '/'.$sub_parent;
-					}
-					$parents[] = $parent_name;
-				}
-			}
-		}
-
-		if ($parents) {
-			$parent_groups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => $parents],
-				'preservekeys' => true
-			]);
-
-			$groups = array_replace($groups, $parent_groups);
-		}
+		$groups = CPageFilter::enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 
@@ -414,34 +360,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-
-		$parents = [];
-		$parent_name = '';
-		foreach ($groups as $group) {
-			$parent = explode('/', $group['name']);
-			if (count($parent) > 1) {
-				array_pop($parent);
-				foreach ($parent as $sub_parent) {
-					if ($parent_name === '') {
-						$parent_name = $sub_parent;
-					}
-					else {
-						$parent_name .= '/'.$sub_parent;
-					}
-					$parents[] = $parent_name;
-				}
-			}
-		}
-
-		if ($parents) {
-			$parent_groups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => $parents],
-				'preservekeys' => true
-			]);
-
-			$groups = array_replace($groups, $parent_groups);
-		}
+		$groups = CPageFilter::enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 
@@ -510,7 +429,17 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	$triggers = API::Trigger()->get($triggerOptions);
 
-	CArrayHelper::sort($triggers, ['host', 'description']);
+	if (getRequest('filter_hostid') == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		foreach ($triggers as &$trigger) {
+			$trigger['host_name'] = $trigger['hosts'][0]['name'];
+		}
+		unset($trigger);
+
+		CArrayHelper::sort($triggers, ['host_name', 'description']);
+	}
+	else {
+		CArrayHelper::sort($triggers, ['description']);
+	}
 
 	$paging = getPagingLine($triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
@@ -521,7 +450,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 		$triggerTable->addRow([
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
-				? $trigger['hosts'][0]['name'] : null,
+				? $trigger['host_name'] : null,
 			new CLink($trigger['description'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')

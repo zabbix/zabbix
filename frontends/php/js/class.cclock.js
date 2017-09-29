@@ -46,7 +46,6 @@ jQuery(function($) {
 			}
 
 			function clock_hands_rotate(time_offset) {
-
 				var now = new Date();
 
 				if (time_offset != 0) {
@@ -75,6 +74,6 @@ jQuery(function($) {
 			function clock_hand_rotate(clock_hand, degree) {
 				$(clock_hand).attr('transform', 'rotate(' + degree + ' 50 50)');
 			}
-		}
+		};
 	}
 });

@@ -404,8 +404,10 @@ var hintBox = {
 		return box;
 	},
 
-	HintWraper: function(e, target, hintText, className, styles) {
+	HintWrapper: function(e, target, className, styles) {
 		target.isStatic = false;
+
+		var	hintText = jQuery('.hint-box', target).html();
 
 		jQuery(target).on('mouseenter', function(e, d) {
 			if (d) {
@@ -424,16 +426,20 @@ var hintBox = {
 		jQuery(target).trigger('mouseenter', e);
 	},
 
-	showStaticHint: function(e, target, hint, className, resizeAfterLoad, styles) {
+	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
 		if (!isStatic) {
+			if (typeof hintText === 'undefined') {
+				hintText = jQuery('.hint-box', target).html();
+			}
+
 			target.isStatic = true;
-			hintBox.showHint(e, target, hint, className, true, styles);
+			hintBox.showHint(e, target, hintText, className, true, styles);
 
 			if (resizeAfterLoad) {
-				hint.one('load', function(e) {
+				hintText.one('load', function(e) {
 					hintBox.positionHint(e, target);
 				});
 			}

@@ -109,6 +109,12 @@ class CScreenHistory extends CScreenBase {
 			'preservekeys' => true
 		]);
 
+		if (!$items) {
+			show_error_message(_('No permissions to referred object or it does not exist!'));
+
+			return;
+		}
+
 		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$stime = zbxDateToTime($this->timeline['stime']);
@@ -316,7 +322,12 @@ class CScreenHistory extends CScreenBase {
 		if (!$this->plaintext && str_in_array($this->action, [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
 			$graphDims = getGraphDims();
 
-			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid([$firstItem]));
+			/*
+			 * Interval start value is non-inclusive, therefore should subtract 1 second to be able to show row with
+			 * minimum clock value.
+			 */
+			$this->timeline['starttime']
+				= date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid([$firstItem]) - 1);
 
 			$this->dataId = 'historyGraph';
 
@@ -383,6 +394,7 @@ class CScreenHistory extends CScreenBase {
 		$url = new CUrl('chart.php');
 		$url->setArgument('period', $this->timeline['period']);
 		$url->setArgument('stime', $this->timeline['stime']);
+		$url->setArgument('isNow', $this->timeline['isNow']);
 		$url->setArgument('itemids', $itemIds);
 		$url->setArgument('type', $this->graphType);
 

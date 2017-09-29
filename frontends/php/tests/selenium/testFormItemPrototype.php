@@ -2009,6 +2009,28 @@ class testFormItemPrototype extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with macro in allowed hosts field',
+					'key' => 'item-zabbix-trapper-macro',
+					'allowed_hosts' => '{$TEST}',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with macro and ip in allowed hosts field',
+					'key' => 'item-zabbix-trapper-macro-ip',
+					'allowed_hosts' => '{$MACRO},127.0.0.1',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix aggregate',
 					'name' => 'Zabbix aggregate',
 					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
@@ -2287,6 +2309,10 @@ class testFormItemPrototype extends CWebTest {
 		if (isset($data['ipmi_sensor'])) {
 				$this->zbxTestInputType('ipmi_sensor', $data['ipmi_sensor']);
 				$ipmi_sensor = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
+		}
+
+		if (isset($data['allowed_hosts'])) {
+			$this->zbxTestInputType('trapper_hosts', $data['allowed_hosts']);
 		}
 
 		if (isset($data['params_ap'])) {

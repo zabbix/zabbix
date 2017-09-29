@@ -453,7 +453,6 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
 
-
 	public static function create() {
 		return [
 			[
@@ -574,9 +573,29 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<5',
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
-					'url' => 'www.zabbix.com',
+					'url' => 'http://www.zabbix.com',
 					'severity' => 'High',
 					'status' => false,
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'description' => 'MyTrigger_CheckUrl',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<5',
+					'url' => 'index.php',
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_CheckWrongUrl',
+					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
+					'url' => 'www.zabbix.com',
+					'error_msg' => 'Cannot add trigger prototype',
+					'errors' => [
+						'Wrong value for url field.'
+					]
 				]
 			],
 			[

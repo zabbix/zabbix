@@ -61,14 +61,34 @@ ZBX_MUTEX		diskstats_lock = ZBX_MUTEX_NULL;
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_get_cpu_num()
+static int	zbx_get_cpu_num(void)
 {
 #if defined(_WINDOWS)
+	/* Define a function pointer type for the GetActiveProcessorCount API */
+	typedef DWORD (WINAPI *GETACTIVEPC) (WORD);
+
+	GETACTIVEPC	get_act;
 	SYSTEM_INFO	sysInfo;
 
-	GetSystemInfo(&sysInfo);
+	/* The rationale for checking dynamically if the GetActiveProcessorCount is implemented */
+	/* in kernel32.lib, is because the function is implemented only on 64 bit versions of Windows */
+	/* from Windows 7 onward. Windows Vista 64 bit doesn't have it and also Windows XP does */
+	/* not. We can't resolve this using conditional compilation unless we release multiple agents */
+	/* targeting different sets of Windows APIs. */
+	get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorCount");
 
-	return (int)sysInfo.dwNumberOfProcessors;
+	if (NULL != get_act)
+	{
+		return (int)get_act(ALL_PROCESSOR_GROUPS);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find address of GetActiveProcessorCount function");
+
+		GetNativeSystemInfo(&sysInfo);
+
+		return (int)sysInfo.dwNumberOfProcessors;
+	}
 #elif defined(HAVE_SYS_PSTAT_H)
 	struct pst_dynamic	psd;
 
@@ -157,12 +177,12 @@ int	init_collector_data(char **error)
 	sz = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_COLLECTOR_DATA));
 
 #ifdef _WINDOWS
-	sz_cpu = sizeof(PERF_COUNTER_DATA *) * (cpu_count + 1);
+	sz_cpu = sizeof(zbx_perf_counter_data_t *) * (cpu_count + 1);
 
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu_counter = (PERF_COUNTER_DATA **)((char *)collector + sz);
+	collector->cpus.cpu_counter = (zbx_perf_counter_data_t **)((char *)collector + sz);
 	collector->cpus.count = cpu_count;
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
@@ -202,7 +222,9 @@ int	init_collector_data(char **error)
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
 #endif
 	ret = SUCCEED;
+#ifndef _WINDOWS
 out:
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
@@ -219,7 +241,7 @@ out:
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
-void	free_collector_data()
+void	free_collector_data(void)
 {
 #ifdef _WINDOWS
 	zbx_free(collector);
@@ -255,7 +277,7 @@ void	free_collector_data()
  * Purpose: Allocate shared memory for collecting disk statistics             *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_init()
+void	diskstat_shm_init(void)
 {
 #ifndef _WINDOWS
 	size_t	shm_size;
@@ -292,7 +314,7 @@ void	diskstat_shm_init()
  * Purpose: If necessary, reattach to disk statistics shared memory segment.  *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_reattach()
+void	diskstat_shm_reattach(void)
 {
 #ifndef _WINDOWS
 	if (my_diskstat_shmid != collector->diskstat_shmid)
@@ -335,7 +357,7 @@ void	diskstat_shm_reattach()
  *          copy data from the old one.                                       *
  *                                                                            *
  ******************************************************************************/
-void	diskstat_shm_extend()
+void	diskstat_shm_extend(void)
 {
 #ifndef _WINDOWS
 	const char		*__function_name = "diskstat_shm_extend";
@@ -454,6 +476,10 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #endif
 		zbx_setproctitle("collector [idle 1 sec]");
 		zbx_sleep(1);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 
 #ifdef _WINDOWS

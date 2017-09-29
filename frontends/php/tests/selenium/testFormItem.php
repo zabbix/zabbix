@@ -1838,7 +1838,6 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMP trap',
 					'name' => 'SNMP trap',
 					'key' => 'snmptrap.fallback',
-					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
@@ -1858,6 +1857,28 @@ class testFormItem extends CWebTest {
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper',
 					'key' => 'item-zabbix-trapper',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with macro in allowed hosts field',
+					'key' => 'item-zabbix-trapper-macro',
+					'allowed_hosts' => '{$TEST}',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with macro and ip in allowed hosts field',
+					'key' => 'item-zabbix-trapper-macro-ip',
+					'allowed_hosts' => '{$MACRO},127.0.0.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -2121,6 +2142,10 @@ class testFormItem extends CWebTest {
 				$ipmi_sensor = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 		}
 
+		if (isset($data['allowed_hosts'])) {
+			$this->zbxTestInputType('trapper_hosts', $data['allowed_hosts']);
+		}
+
 		if (isset($data['params_f'])) {
 			$this->zbxTestInputType('params_f', $data['params_f']);
 		}
@@ -2308,7 +2333,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//li[29]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText("//li[30]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99d)');
 		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('adm.gui.php');

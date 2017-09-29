@@ -61,11 +61,17 @@ class CIPRangeParser {
 	private $dns_parser;
 
 	/**
+	 * @var CUserMacroParser
+	 */
+	private $user_macro_parser;
+
+	/**
 	 * Supported options:
 	 *   v6             enabled support of IPv6 addresses
 	 *   dns            enabled support of DNS names
 	 *   ranges         enabled support of IP ranges like 192.168.3.1-255
-	 *   max_ipv4_cidr  mximum value for IPv4 CIDR subnet mask notations
+	 *   max_ipv4_cidr  maximum value for IPv4 CIDR subnet mask notations
+	 *   usermacros     allow usermacros syntax
 	 *
 	 * @var array
 	 */
@@ -73,14 +79,15 @@ class CIPRangeParser {
 		'v6' => true,
 		'dns' => true,
 		'ranges' => true,
-		'max_ipv4_cidr' => 32
+		'max_ipv4_cidr' => 32,
+		'usermacros' => false
 	];
 
 	/**
 	 * @param array $options
 	 */
 	public function __construct(array $options = []) {
-		foreach (['v6', 'dns', 'ranges', 'max_ipv4_cidr'] as $option) {
+		foreach (['v6', 'dns', 'ranges', 'max_ipv4_cidr', 'usermacros'] as $option) {
 			if (array_key_exists($option, $options)) {
 				$this->options[$option] = $options[$option];
 			}
@@ -92,6 +99,9 @@ class CIPRangeParser {
 		}
 		if ($this->options['dns']) {
 			$this->dns_parser = new CDnsParser();
+		}
+		if ($this->options['usermacros']) {
+			$this->user_macro_parser = new CUserMacroParser();
 		}
 	}
 
@@ -110,7 +120,8 @@ class CIPRangeParser {
 		foreach (explode(',', $ranges) as $range) {
 			$range = trim($range, " \t\r\n");
 
-			if (!$this->isValidMask($range) && !$this->isValidRange($range) && !$this->isValidDns($range)) {
+			if (!$this->isValidMask($range) && !$this->isValidRange($range) && !$this->isValidDns($range)
+					&& !$this->isValidUserMacro($range)) {
 				$this->error = _s('invalid address range "%1$s"', $range);
 				$this->max_ip_count = '0';
 				$this->max_ip_range = '';
@@ -346,5 +357,20 @@ class CIPRangeParser {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Validate a user macros syntax.
+	 *
+	 * @param string $range
+	 *
+	 * @return bool
+	 */
+	protected function isValidUserMacro($range) {
+		if (!$this->options['usermacros']) {
+			return false;
+		}
+
+		return ($this->user_macro_parser->parse($range) == CParser::PARSE_SUCCESS);
 	}
 }

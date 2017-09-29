@@ -1212,7 +1212,20 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 	const char		*__function_name = "zbx_init_ipmi_host";
 	zbx_ipmi_host_t		*h;
 	ipmi_open_option_t	options[4];
-	char			*addrs[1] = {NULL}, *ports[1] = {NULL}, domain_name[11];	/* max int length */
+
+	/* Although we use only one address and port we pass them in 2-element arrays. The reason is */
+	/* OpenIPMI v.2.0.16 - 2.0.24 file lib/ipmi_lan.c, function ipmi_lanp_setup_con() ending with loop */
+	/* in OpenIPMI file lib/ipmi_lan.c, function ipmi_lanp_setup_con() ending with */
+	/*    for (i=0; i<MAX_IP_ADDR; i++) {           */
+	/*        if (!ports[i])                        */
+	/*            ports[i] = IPMI_LAN_STD_PORT_STR; */
+	/*    }                                         */
+	/* MAX_IP_ADDR is '#define MAX_IP_ADDR 2' in OpenIPMI and not available to library users. */
+	/* The loop is running two times regardless of number of addresses supplied by the caller, so we use */
+	/* 2-element arrays to match OpenIPMI internals. */
+	char			*addrs[2] = {NULL}, *ports[2] = {NULL};
+
+	char			domain_name[11];	/* max int length */
 	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __function_name, ip, port);

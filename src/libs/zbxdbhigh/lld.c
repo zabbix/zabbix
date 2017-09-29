@@ -146,7 +146,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 	DC_ITEM		item;
 	int		errcode, ret = SUCCEED;
 
-	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
 
 	if (SUCCEED != errcode)
 	{
@@ -542,6 +542,13 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
 
+	if (FAIL == DCconfig_lock_lld_rule(lld_ruleid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process discovery rule \"%s\": another value is being processed",
+				zbx_host_key_string(lld_ruleid));
+		goto out;
+	}
+
 	zbx_vector_ptr_create(&lld_rows);
 
 	lld_filter_init(&filter);
@@ -624,11 +631,10 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
-				lld_ruleid, zbx_host_key_string(lld_ruleid));
+		zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became supported", zbx_host_key_string(lld_ruleid));
 
 		add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
-				NULL, NULL, NULL, 0, 0, NULL, 0, NULL);
+				NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0);
 		process_events();
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);
@@ -656,6 +662,8 @@ error:
 		DBcommit();
 	}
 clean:
+	DCconfig_unlock_lld_rule(lld_ruleid);
+
 	zbx_free(error);
 	zbx_free(db_error);
 	zbx_free(discovery_key);
@@ -666,5 +674,6 @@ clean:
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
 
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -121,7 +121,7 @@ class CWidgetForm {
 		$api_fields = [];
 
 		foreach ($this->fields as $field) {
-			$api_fields = array_merge($api_fields, $field->toApi());
+			$field->toApi($api_fields);
 		}
 
 		return $api_fields;

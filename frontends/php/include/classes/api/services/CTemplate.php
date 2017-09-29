@@ -47,8 +47,6 @@ class CTemplate extends CHostGeneral {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['templates' => 'h.hostid'],
@@ -71,7 +69,7 @@ class CTemplate extends CHostGeneral {
 			'with_triggers'				=> null,
 			'with_graphs'				=> null,
 			'with_httptests'			=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -105,10 +103,9 @@ class CTemplate extends CHostGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
@@ -687,6 +684,8 @@ class CTemplate extends CHostGeneral {
 	 * @param array $hostids    an array of host or template IDs
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
+	 *
+	 * @return void
 	 */
 	protected function checkHostPermissions(array $hostids) {
 		if ($hostids) {
@@ -695,6 +694,16 @@ class CTemplate extends CHostGeneral {
 			$count = API::Host()->get([
 				'countOutput' => true,
 				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count == count($hostids)) {
+				return;
+			}
+
+			$count += $this->get([
+				'countOutput' => true,
+				'templateids' => $hostids,
 				'editable' => true
 			]);
 

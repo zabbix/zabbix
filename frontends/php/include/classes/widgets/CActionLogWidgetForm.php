@@ -20,7 +20,7 @@
 
 
 /**
- * Action log widget form
+ * Action log widget form.
  */
 class CActionLogWidgetForm extends CWidgetForm {
 

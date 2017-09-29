@@ -256,7 +256,7 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
-char	*CONFIG_SOCKET_PATH		= NULL;
+static char	*CONFIG_SOCKET_PATH	= NULL;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 

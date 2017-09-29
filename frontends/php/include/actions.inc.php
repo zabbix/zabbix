@@ -812,13 +812,8 @@ function getActionOperationDescriptions(array $actions, $type) {
 						break;
 
 					case OPERATION_TYPE_RECOVERY_MESSAGE:
-						$result[$i][$j][] = bold(
-							_('Notify all who received any messages regarding the problem before')
-						);
-						break;
-
 					case OPERATION_TYPE_ACK_MESSAGE:
-						$result[$i][$j][] = bold(_('Notify all who left acknowledgement and comments'));
+						$result[$i][$j][] = bold(_('Notify all involved'));
 						break;
 				}
 			}
@@ -880,13 +875,18 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 					: $operation['opmessage']['message'];
 
 				$result_hint = [];
-				if ($subject) {
+
+				if (trim($subject)) {
 					$result_hint = [bold($subject), BR(), BR()];
 				}
-				if ($message) {
+
+				if (trim($message)) {
 					$result_hint[] = zbx_nl2br($message);
 				}
-				$result[$key][] = $result_hint;
+
+				if ($result_hint) {
+					$result[$key][] = $result_hint;
+				}
 				break;
 
 			case OPERATION_TYPE_COMMAND:
@@ -945,23 +945,24 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 				break;
 
 			case OPERATION_TYPE_ACK_MESSAGE:
-				$opmessage = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
+			case OPERATION_TYPE_RECOVERY_MESSAGE:
+				$result_hint = [];
+				$message = (array_key_exists('default_msg', $operation['opmessage'])
+					&& $operation['opmessage']['default_msg'])
+					? $defaultMessage
+					: $operation['opmessage'];
 
-				if (array_key_exists('default_msg', $opmessage) && $opmessage['default_msg']) {
-					$subject = $defaultMessage['subject'];
-					$message = $defaultMessage['message'];
-				}
-				else {
-					$opmessage += [
-						'subject'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-						'message'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
-					];
-
-					$subject = $opmessage['subject'];
-					$message = $opmessage['message'];
+				if (trim($message['subject'])) {
+					$result_hint = [bold($message['subject']), BR(), BR()];
 				}
 
-				$result[$key][] = [bold($subject), BR(), BR(), zbx_nl2br($message)];
+				if (trim($message['message'])) {
+					$result_hint[] = zbx_nl2br($message['message']);
+				}
+
+				if ($result_hint) {
+					$result[$key][] = $result_hint;
+				}
 				break;
 		}
 	}
@@ -1101,7 +1102,15 @@ function getAllowedOperations($eventsource) {
 	return $operations;
 }
 
-function operation_type2str($type = null) {
+/**
+ * Get operation type text label according $type value. If $type is equal null array of all available operation types
+ * will be returned.
+ *
+ * @param int|null $type  Operation type, one of OPERATION_TYPE_* constant or null.
+ *
+ * @return string|array
+ */
+function operation_type2str($type) {
 	$types = [
 		OPERATION_TYPE_MESSAGE => _('Send message'),
 		OPERATION_TYPE_COMMAND => _('Remote command'),
@@ -1114,8 +1123,8 @@ function operation_type2str($type = null) {
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
-		OPERATION_TYPE_RECOVERY_MESSAGE => _('Send recovery message'),
-		OPERATION_TYPE_ACK_MESSAGE => _('Notify all who left acknowledgement and comments')
+		OPERATION_TYPE_RECOVERY_MESSAGE => _('Notify all involved'),
+		OPERATION_TYPE_ACK_MESSAGE => _('Notify all involved')
 	];
 
 	if (is_null($type)) {
@@ -1384,7 +1393,6 @@ function getActionMessages(array $alerts, array $r_alerts) {
 					break;
 
 				case ALERT_STATUS_NEW:
-					// falls through
 				case ALERT_STATUS_NOT_SENT:
 					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 					$retries = (new CSpan($mediaType['maxattempts'] - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
@@ -1477,7 +1485,6 @@ function getActionCommands(array $alerts, array $r_alerts) {
 					$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 					break;
 				case ALERT_STATUS_NEW:
-					// falls through
 				case ALERT_STATUS_NOT_SENT:
 					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 					break;
@@ -1535,7 +1542,6 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 						->addClass(ZBX_STYLE_GREEN);
 					break;
 				case ALERT_STATUS_NEW:
-					// falls through
 				case ALERT_STATUS_NOT_SENT:
 					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 					break;

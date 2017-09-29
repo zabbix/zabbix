@@ -23,6 +23,7 @@ $font-color: #f2f2f2;
 $font-selected-color: #f2f2f2;
 $font-alt-color: #737373;
 $body-bg-color: #0e1012;
+$overlay-bg-color: #000;
 
 
 // UI
@@ -72,6 +73,9 @@ $btn-disabled-font-color: #525252;
 $btn-disabled-bg-color: transparent;
 $btn-disabled-border-color: #3d3d3d;
 
+$btn-back-map-background-color: rgba(0, 0, 0, 0.8);
+$btn-back-text-color: white;
+$btn-back-background-hover: #768d99;
 
 // LINKS
 $link-color: #4796c4;
@@ -110,11 +114,16 @@ $clock-lines-color: #4f4f4f;
 .btn-search{
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
+.btn-back-map {
+	.btn-back-map-icon {
+		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
+	}
+}
 
 .list-table {
 
 	thead th {
-		border-color: lighten($table-border-color, 3%) !important;;
+		border-color: lighten($table-border-color, 3%) !important;
 	}
 }
 

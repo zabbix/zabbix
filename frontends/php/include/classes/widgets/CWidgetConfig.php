@@ -42,7 +42,7 @@ class CWidgetConfig {
 			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_SYSMAP				=> _('Map'),
-			WIDGET_NAVIGATION_TREE		=> _('Map Navigation Tree'),
+			WIDGET_NAVIGATION_TREE		=> _('Map navigation tree'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_ACTION_LOG			=> _('Action log'),
 			WIDGET_DATA_OVERVIEW		=> _('Data overview'),
@@ -59,7 +59,6 @@ class CWidgetConfig {
 	 * @return array
 	 */
 	private static function getDefaultDimensions() {
-		// TODO AV: review and accept default dimentions
 		return [
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
@@ -96,7 +95,6 @@ class CWidgetConfig {
 		foreach (self::getKnownWidgetTypes() as $type => $name) {
 			$ret[$type] = [
 				'header' => $name,
-				'rf_rate' => self::getDefaultRfRate($type),
 				'size' => $dimensions[$type]
 			];
 		}
@@ -209,7 +207,6 @@ class CWidgetConfig {
 				return new CPlainTextWidgetForm($data);
 
 			default:
-				// TODO VM: delete this case after all widget forms will be created
 				return new CWidgetForm($data);
 		}
 	}

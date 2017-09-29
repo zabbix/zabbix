@@ -295,7 +295,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	output = convert_to_utf8(buffer, bytecount, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
 
-	if (SUCCEED == set_result_type(result, item->value_type, output))
+	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_TEXT, output))
 		ret = SYSINFO_RET_OK;
 
 	zbx_free(output);

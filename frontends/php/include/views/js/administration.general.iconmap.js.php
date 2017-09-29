@@ -92,7 +92,7 @@
 			})
 			.on('click', 'img.preview', function(e) {
 				var img = $('<img>', {src: $(this).data('imageFull')});
-				hintBox.showStaticHint(e, this, img, '', true);
+				hintBox.showStaticHint(e, this, '', true, '', img);
 			});
 
 		addMappingButton.click(function() {

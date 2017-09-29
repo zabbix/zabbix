@@ -84,6 +84,7 @@ static void	test_queue_range(int iterations, ...)
 	test_queue_range_values(iterations, &values);
 
 	zbx_vector_ptr_destroy(&values);
+	va_end(args);
 }
 
 static void	test_queue_ptr_basic()

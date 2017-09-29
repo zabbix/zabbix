@@ -65,6 +65,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		'Sign out'
 	];
 
+	protected $capture_screenshot = true;
+
+	// Screenshot taken on test failure.
+	protected $screenshot = null;
+	// Failed test URL.
+	protected $current_url = null;
+
 	protected function putBreak() {
 		fwrite(STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
 			while (fgets(STDIN, 1024) == '') {}
@@ -82,7 +89,46 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	protected function onNotSuccessfulTest($e) {
+		if ($this->screenshot !== null && $e instanceof PHPUnit_Framework_AssertionFailedError) {
+			$screenshot_name = md5(microtime(true)).'.png';
+
+			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
+				$message =
+					'URL: '.$this->current_url."\n".
+					'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
+					$e->getMessage();
+
+				switch (true) {
+					case $e instanceof PHPUnit_Framework_ExpectationFailedException:
+						$e = new PHPUnit_Framework_ExpectationFailedException($message, $e->getComparisonFailure(),
+							$e->getPrevious()
+						);
+						break;
+
+					case $e instanceof PHPUnit_Framework_SyntheticError:
+						$e = new PHPUnit_Framework_SyntheticError($message, $e->getCode(), $e->getSyntheticFile(),
+							$e->getSyntheticLine(), $e->getSyntheticTrace()
+						);
+						break;
+
+					default:
+						$e = new PHPUnit_Framework_AssertionFailedError($message, $e->getCode(), $e->getPrevious());
+				}
+
+				$this->screenshot = null;
+			}
+		}
+
+		parent::onNotSuccessfulTest($e);
+	}
+
 	protected function tearDown() {
+		if ($this->capture_screenshot && $this->hasFailed()) {
+			$this->current_url = $this->webDriver->getCurrentURL();
+			$this->screenshot = $this->webDriver->takeScreenshot();
+		}
+
 		$this->webDriver->quit();
 	}
 
@@ -125,7 +171,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 		$this->authenticate();
 		$this->zbxTestOpen($url);
-//$this->webDriver->takeScreenshot('/home/jenkins/public_html/screenshots/1.png');
 
 		if ($server_name && $ZBX_SERVER_NAME !== '') {
 			$this->zbxTestWaitUntilMessageTextPresent('server-name', $ZBX_SERVER_NAME);

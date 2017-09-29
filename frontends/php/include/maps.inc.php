@@ -254,13 +254,19 @@ function get_map_elements($db_element, &$elements) {
 			}
 			break;
 		case SYSMAP_ELEMENT_TYPE_MAP:
-			$db_mapselements = DBselect(
-				'SELECT DISTINCT se.elementtype,se.elementid'.
-				' FROM sysmaps_elements se'.
-				' WHERE se.sysmapid='.zbx_dbstr($db_element['elements'][0]['sysmapid'])
-			);
-			while ($db_mapelement = DBfetch($db_mapselements)) {
-				get_map_elements($db_mapelement, $elements);
+			$map = API::Map()->get([
+				'output' => [],
+				'selectSelements' => ['selementid', 'elements', 'elementtype'],
+				'sysmapids' => $db_element['elements'][0]['sysmapid'],
+				'nopermissions' => true
+			]);
+
+			if ($map) {
+				$map = reset($map);
+
+				foreach ($map['selements'] as $db_mapelement) {
+					get_map_elements($db_mapelement, $elements);
+				}
 			}
 			break;
 	}
@@ -1225,7 +1231,12 @@ function getSelementsInfo($sysmap, array $options = []) {
 		$subSysmaps = zbx_toHash($subSysmaps, 'sysmapid');
 
 		foreach ($elems['sysmaps'] as $elem) {
-			$info[$elem['selementid']]['name'] = $subSysmaps[$elem['elements'][0]['sysmapid']]['name'];
+			if (array_key_exists($elem['elements'][0]['sysmapid'], $subSysmaps)) {
+				$info[$elem['selementid']]['name'] = $subSysmaps[$elem['elements'][0]['sysmapid']]['name'];
+			}
+			else {
+				$info[$elem['selementid']]['name'] = '';
+			}
 		}
 	}
 	if ($elems['hostgroups'] && $hglabel) {
@@ -1257,7 +1268,12 @@ function getSelementsInfo($sysmap, array $options = []) {
 	}
 	if ($elems['hosts'] && $hlabel) {
 		foreach ($elems['hosts'] as $elem) {
-			$info[$elem['selementid']]['name'] = $allHosts[$elem['elements'][0]['hostid']]['name'];
+			if (array_key_exists($elem['elements'][0]['hostid'], $allHosts)) {
+				$info[$elem['selementid']]['name'] = $allHosts[$elem['elements'][0]['hostid']]['name'];
+			}
+			else {
+				$info[$elem['selementid']]['name'] = '';
+			}
 		}
 	}
 

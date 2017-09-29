@@ -562,11 +562,11 @@
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_contextname'] === dCheck['snmpv3_contextname'])) {
 
 					overlayDialogue({
-						'title': '<?= _('Discovery check error') ?>',
-						'content': jQuery('<span>').text('<?= _('Check already exists.') ?>'),
+						'title': <?= CJs::encodeJson(_('Discovery check error')) ?>,
+						'content': jQuery('<span>').text(<?= CJs::encodeJson(_('Check already exists.')) ?>),
 						'buttons': [
 							{
-								'title': '<?= _('Cancel') ?>',
+								'title': <?= CJs::encodeJson(_('Cancel')) ?>,
 								'cancel': true,
 								'focused': true,
 								'action': function() {}
@@ -631,13 +631,13 @@
 				},
 				error: function() {
 					overlayDialogue({
-						'title': '<?= _('Discovery check error') ?>',
+						'title': <?= CJs::encodeJson(_('Discovery check error')) ?>,
 						'content': jQuery('<span>').text(<?= CJs::encodeJson(
 							_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')
 						) ?>),
 						'buttons': [
 							{
-								'title': '<?= _('Cancel') ?>',
+								'title': <?= CJs::encodeJson(_('Cancel')) ?>,
 								'cancel': true,
 								'focused': true,
 								'action': function() {}
@@ -663,11 +663,11 @@
 				}
 
 				overlayDialogue({
-					'title': '<?= _('Discovery check error') ?>',
+					'title': <?= CJs::encodeJson(_('Discovery check error')) ?>,
 					'content': content,
 					'buttons': [
 						{
-							'title': '<?= _('Cancel') ?>',
+							'title': <?= CJs::encodeJson(_('Cancel')) ?>,
 							'cancel': true,
 							'focused': true,
 							'action': function() {}

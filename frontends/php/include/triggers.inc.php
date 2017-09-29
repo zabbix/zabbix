@@ -603,7 +603,7 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 
 	$hosts = API::Host()->get([
 		'filter' => ['host' => $expressionHosts],
-		'editable' => ($permission == PERM_READ_WRITE) ? 1 : null,
+		'editable' => ($permission == PERM_READ_WRITE),
 		'output' => ['hostid', 'host'],
 		'templated_hosts' => true,
 		'preservekeys' => true
@@ -1321,7 +1321,8 @@ function expressionHighLevelErrors($expression) {
 			EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
 			EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
 			EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro'),
-			EXPRESSION_FUNCTION_UNKNOWN => _('Incorrect function is used')
+			EXPRESSION_FUNCTION_UNKNOWN => _('Incorrect function is used'),
+			EXPRESSION_UNSUPPORTED_VALUE_TYPE => _('Incorrect item value type')
 		];
 		$errors = [];
 	}
@@ -1766,130 +1767,186 @@ function makeExpression(array $expressionTree, $level = 0, $operator = null) {
 }
 
 function get_item_function_info($expr) {
-	$value_type = [
-		ITEM_VALUE_TYPE_UINT64	=> _('Numeric (integer 64bit)'),
-		ITEM_VALUE_TYPE_FLOAT	=> _('Numeric (float)'),
-		ITEM_VALUE_TYPE_STR		=> _('Character'),
-		ITEM_VALUE_TYPE_LOG		=> _('Log'),
-		ITEM_VALUE_TYPE_TEXT	=> _('Text')
+	$rule_float = [_('Numeric (float)'), 'preg_match("/^'.ZBX_PREG_NUMBER.'$/", {})'];
+	$rule_int = [_('Numeric (integer)'), 'preg_match("/^'.ZBX_PREG_INT.'$/", {})'];
+	$rule_0or1 = [_('0 or 1'), IN('0,1')];
+	$rules = [
+		// Every nested array should have two elements: label, validation.
+		'integer' => [
+			ITEM_VALUE_TYPE_UINT64 => $rule_int
+		],
+		'numeric' => [
+			ITEM_VALUE_TYPE_UINT64 => $rule_int,
+			ITEM_VALUE_TYPE_FLOAT => $rule_float
+		],
+		'numeric_as_float' => [
+			ITEM_VALUE_TYPE_UINT64 => $rule_float,
+			ITEM_VALUE_TYPE_FLOAT => $rule_float
+		],
+		'numeric_as_uint' => [
+			ITEM_VALUE_TYPE_UINT64 => $rule_int,
+			ITEM_VALUE_TYPE_FLOAT => $rule_int
+		],
+		'numeric_as_0or1' => [
+			ITEM_VALUE_TYPE_UINT64 => $rule_0or1,
+			ITEM_VALUE_TYPE_FLOAT => $rule_0or1
+		],
+		'string_as_0or1' => [
+			ITEM_VALUE_TYPE_TEXT => $rule_0or1,
+			ITEM_VALUE_TYPE_STR => $rule_0or1,
+			ITEM_VALUE_TYPE_LOG => $rule_0or1
+		],
+		'string_as_uint' => [
+			ITEM_VALUE_TYPE_TEXT => $rule_int,
+			ITEM_VALUE_TYPE_STR => $rule_int,
+			ITEM_VALUE_TYPE_LOG => $rule_int
+		],
+		'string_as_float' => [
+			ITEM_VALUE_TYPE_TEXT => $rule_float,
+			ITEM_VALUE_TYPE_STR => $rule_float,
+			ITEM_VALUE_TYPE_LOG => $rule_float
+		],
+		'log_as_uint' => [
+			ITEM_VALUE_TYPE_LOG => $rule_int
+		],
+		'log_as_0or1' => [
+			ITEM_VALUE_TYPE_LOG => $rule_0or1
+		],
+		'date' => [
+			'any' => ['YYYYMMDD', '{}>=19700101&&{}<=99991231']
+		],
+		'time' => [
+			'any' => ['HHMMSS', 'preg_match("/^([01]?\d|2[0-3])([0-5]?\d)([0-5]?\d)$/", {})']
+		],
+		'day_of_month' => [
+			'any' => ['1-31', '{}>=1&&{}<=31']
+		],
+		'day_of_week' => [
+			'any' => ['1-7', IN('1,2,3,4,5,6,7')]
+		]
 	];
 
-	$type_of_value_type = [
-		ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
-		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL_BIG,
-		ITEM_VALUE_TYPE_STR		=> T_ZBX_STR,
-		ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
-		ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
+	$functions = [
+		'abschange' => $rules['numeric'] + $rules['string_as_0or1'],
+		'avg' => $rules['numeric_as_float'],
+		'band' => $rules['integer'],
+		'change' => $rules['numeric'] + $rules['string_as_0or1'],
+		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
+		'date' => $rules['date'],
+		'dayofmonth' => $rules['day_of_month'],
+		'dayofweek' => $rules['day_of_week'],
+		'delta' => $rules['numeric'],
+		'diff' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
+		'forecast' => $rules['numeric_as_float'],
+		'fuzzytime' => $rules['numeric_as_0or1'],
+		'iregexp' => $rules['string_as_0or1'],
+		'last' => $rules['numeric'] + $rules['string_as_float'],
+		'logeventid' => $rules['log_as_0or1'],
+		'logseverity' => $rules['log_as_uint'],
+		'logsource' => $rules['log_as_0or1'],
+		'max' => $rules['numeric'],
+		'min' => $rules['numeric'],
+		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
+		'now' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
+		'percentile' => $rules['numeric'],
+		'prev' => $rules['numeric'] + $rules['string_as_float'],
+		'regexp' => $rules['string_as_0or1'],
+		'str' => $rules['string_as_0or1'],
+		'strlen' => $rules['string_as_uint'],
+		'sum' => $rules['numeric'],
+		'time' => $rules['time'],
+		'timeleft' => $rules['numeric_as_float']
 	];
 
-	$function_info = [
-		'band' =>		['value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
-		'abschange' =>	['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'avg' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'change' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'count' =>		['value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
-		'date' =>		['value_type' => 'YYYYMMDD',	'type' => T_ZBX_INT,			'validation' => '{}>=19700101&&{}<=99991231'],
-		'dayofmonth' =>	['value_type' => '1-31',		'type' => T_ZBX_INT,			'validation' => '{}>=1&&{}<=31'],
-		'dayofweek' =>	['value_type' => '1-7',		'type' => T_ZBX_INT,			'validation' => IN('1,2,3,4,5,6,7')],
-		'delta' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'diff' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'forecast' =>	['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'fuzzytime' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'iregexp' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'last' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'logeventid' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'logseverity' =>['value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
-		'logsource' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'max' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'min' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'nodata' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'now' =>		['value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
-		'percentile' =>	['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'prev' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'regexp' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'str' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'strlen' =>		['value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
-		'sum' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'time' =>		['value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6'],
-		'timeleft' =>	['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY]
-	];
+	$expr_data = new CTriggerExpression();
+	$expression = $expr_data->parse($expr);
 
-	$expressionData = new CTriggerExpression();
-	$parseResult = $expressionData->parse($expr);
+	if (!$expression) {
+		return EXPRESSION_NOT_A_MACRO_ERROR;
+	}
 
-	if ($parseResult) {
-		if ($parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)) {
+	switch (true) {
+		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)):
 			$result = [
-				'value_type' => _('0 or 1'),
-				'type' => T_ZBX_INT,
-				'validation' => IN('0,1')
-			];
-		}
-		elseif ($parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)
-				|| $parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
-
-			$result = [
-				'value_type' => $value_type[ITEM_VALUE_TYPE_FLOAT],
 				'type' => T_ZBX_STR,
-				'validation' => 'preg_match("/^'.ZBX_PREG_NUMBER.'$/", {})'
+				'value_type' => $rule_0or1[0],
+				'validation' => $rule_0or1[1]
 			];
-		}
-		elseif ($parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO)) {
-			$exprPart = reset($expressionData->expressions);
+			break;
 
-			if (!isset($function_info[$exprPart['functionName']])) {
-				return EXPRESSION_FUNCTION_UNKNOWN;
+		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)):
+			$result = [
+				'type' => T_ZBX_STR,
+				'value_type' => $rule_float[0],
+				'validation' => $rule_float[1]
+			];
+			break;
+
+		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
+			$expr_part = reset($expr_data->expressions);
+
+			if (!array_key_exists($expr_part['functionName'], $functions)) {
+				$result = EXPRESSION_FUNCTION_UNKNOWN;
+				break;
 			}
 
-			$hostFound = API::Host()->get([
+			$host = API::Host()->get([
 				'output' => ['hostid'],
-				'filter' => ['host' => [$exprPart['host']]],
+				'filter' => ['host' => [$expr_part['host']]],
 				'templated_hosts' => true
 			]);
 
-			if (!$hostFound) {
-				return EXPRESSION_HOST_UNKNOWN;
+			if (!$host) {
+				$result = EXPRESSION_HOST_UNKNOWN;
+				break;
 			}
 
-			$itemFound = API::Item()->get([
+			$item = API::Item()->get([
 				'output' => ['value_type'],
-				'hostids' => zbx_objectValues($hostFound, 'hostid'),
+				'hostids' => $host[0]['hostid'],
 				'filter' => [
-					'key_' => [$exprPart['item']]
+					'key_' => [$expr_part['item']]
 				],
 				'webitems' => true
 			]);
 
-			if (!$itemFound) {
-				$itemFound = API::ItemPrototype()->get([
+			if (!$item) {
+				$item = API::ItemPrototype()->get([
 					'output' => ['value_type'],
-					'hostids' => zbx_objectValues($hostFound, 'hostid'),
+					'hostids' => $host[0]['hostid'],
 					'filter' => [
-						'key_' => [$exprPart['item']]
+						'key_' => [$expr_part['item']]
 					]
 				]);
-
-				if (!$itemFound) {
-					return EXPRESSION_HOST_ITEM_UNKNOWN;
-				}
 			}
 
-			$itemFound = reset($itemFound);
-			$result = $function_info[$exprPart['functionName']];
-
-			if (is_array($result['value_type'])) {
-				$result['value_type'] = $result['value_type'][$itemFound['value_type']];
-				$result['type'] = $result['type'][$itemFound['value_type']];
-
-				if ($result['type'] == T_ZBX_INT) {
-					$result['type'] = T_ZBX_STR;
-					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/", {})';
-				}
+			if (!$item) {
+				$result = EXPRESSION_HOST_ITEM_UNKNOWN;
+				break;
 			}
-		}
-		else {
-			return EXPRESSION_NOT_A_MACRO_ERROR;
-		}
+
+			$function = $functions[$expr_part['functionName']];
+			$value_type = $item[0]['value_type'];
+
+			if (array_key_exists('any', $function)) {
+				$value_type = 'any';
+			}
+			elseif (!array_key_exists($value_type, $function)) {
+				$result = EXPRESSION_UNSUPPORTED_VALUE_TYPE;
+				break;
+			}
+
+			$result = [
+				'type' => T_ZBX_STR,
+				'value_type' => $function[$value_type][0],
+				'validation' => $function[$value_type][1]
+			];
+			break;
+
+		default:
+			$result = EXPRESSION_NOT_A_MACRO_ERROR;
+			break;
 	}
 
 	return $result;

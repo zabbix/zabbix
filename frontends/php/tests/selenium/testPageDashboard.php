@@ -46,40 +46,40 @@ class testPageDashboard extends CWebTest {
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//a[@href='zabbix.php?action=discovery.view&druleid=3']", 'External network');
+					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//a[@href='zabbix.php?action=discovery.view&druleid=3']", 'External network');
 					break;
 				case 'user';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , 5);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
+					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 				case 'guest';
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
+					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 			}
 			if ($user != 'super-admin'){
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//tr[@class='nothing-to-show']/td", 'No graphs added.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//tr[@class='nothing-to-show']/td", 'No screens added.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No maps added.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//tr[@class='nothing-to-show']/td", 'No data found.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No screens added.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//tr[@class='nothing-to-show']/td", 'No maps added.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No data found.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No data found.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//tr[@class='nothing-to-show']/td", 'No data found.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//tr[@class='nothing-to-show']/td", 'No data found.');
 			}
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//h4", 'Favourite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'Favourite screens');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Favourite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Problems');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Web monitoring');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Discovery status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'Host status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'System status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'Status of Zabbix');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'Favourite graphs');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Favourite screens');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Favourite maps');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Problems');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Web monitoring');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'Discovery status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'Host status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'System status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//h4", 'Status of Zabbix');
 		}
 	}
 
@@ -101,8 +101,8 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//a[@href='charts.php?graphid=$this->graphCpuId']", 'ЗАББИКС Сервер: '.$this->graphCpu);
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//a[@href='charts.php?graphid=$this->graphMemoryId']", 'ЗАББИКС Сервер: '.$this->graphMemory);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//a[@href='charts.php?graphid=$this->graphCpuId']", 'ЗАББИКС Сервер: '.$this->graphCpu);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//a[@href='charts.php?graphid=$this->graphMemoryId']", 'ЗАББИКС Сервер: '.$this->graphMemory);
 		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphCpuId"));
 		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphMemoryId"));
@@ -112,11 +112,11 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
 		foreach ($FavouriteGraphs as $FavouriteGraph) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[2]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
-			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[2]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[2]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]");
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
 		}
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//tr[@class='nothing-to-show']/td", 'No graphs added.');
 		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
 	}
@@ -132,7 +132,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//a[@href='screens.php?elementid=$this->screenClockId']", $this->screenClock);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//a[@href='screens.php?elementid=$this->screenClockId']", $this->screenClock);
 		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.screenids' AND value_id=$this->screenClockId"));
 	}
@@ -141,11 +141,11 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.screenids'"));
 		foreach ($FavouriteScreens as $FavouriteScreen) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]"));
-			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]"));
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]"));
+			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]");
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]"));
 		}
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//tr[@class='nothing-to-show']/td", 'No screens added.');
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No screens added.');
 		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.screenids'"));
 	}
@@ -161,7 +161,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//a[@href='zabbix.php?action=map.view&sysmapid=$this->mapTestId']", $this->mapTest);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//a[@href='zabbix.php?action=map.view&sysmapid=$this->mapTestId']", $this->mapTest);
 		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids' AND value_id=$this->mapTestId"));
 	}
@@ -170,11 +170,11 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.sysmapids'"));
 		foreach ($FavouriteScreens as $FavouriteScreen) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
-			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[5]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
+			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[5]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]");
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[5]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
 		}
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No maps added.');
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//tr[@class='nothing-to-show']/td", 'No maps added.');
 		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids'"));
 	}

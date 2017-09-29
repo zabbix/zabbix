@@ -58,7 +58,7 @@ class CMediatype extends CApiService {
 			'mediatypeids'				=> null,
 			'mediaids'					=> null,
 			'userids'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -81,9 +81,9 @@ class CMediatype extends CApiService {
 		// permission check
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 		}
-		elseif (is_null($options['editable']) && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+		elseif (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 		}
-		elseif (!is_null($options['editable']) || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		elseif ($options['editable'] || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return [];
 		}
 

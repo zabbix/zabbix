@@ -94,6 +94,30 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'<root>'."\n".
+				'    <tag>tag</tag>'."\n".
+				'    <spaces><![CDATA[  ]]></spaces>'."\n".
+				'    <lr_spaces> string </lr_spaces>'."\n".
+				'    <empty_tag></empty_tag>'."\n".
+				'    <empty />'."\n".
+				'    <array>'."\n".
+				'        <tag>tag</tag>'."\n".
+				'    </array>'."\n".
+				'</root>',
+				[
+					'root' => [
+						'tag' => 'tag',
+						'spaces' => '  ',
+						'lr_spaces' => ' string ',
+						'empty_tag' => '',
+						'empty' => '',
+						'array' => [
+							'tag' => 'tag'
+						]
+					]
+				]
+			],
+			[
 				'<'.'?xml version="1.0"?'.'>'."\n".
 				'<zabbix_export version="1.0" date="09.01.10" time="14.23">'."\n".
 				'<hosts></hosts>'."\n".

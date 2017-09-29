@@ -18,17 +18,38 @@
 **/
 
 #include "common.h"
+#include "log.h"
 #include "sysinfo.h"
 #include "stats.h"
 #include "perfstat.h"
 
-static int	get_cpu_num()
+static int	get_cpu_num(void)
 {
+	/* Define a function pointer type for the GetActiveProcessorCount API */
+	typedef DWORD (WINAPI *GETACTIVEPC) (WORD);
+
+	GETACTIVEPC	get_act;
 	SYSTEM_INFO	sysInfo;
 
-	GetSystemInfo(&sysInfo);
+	/* The rationale for checking dynamically if the GetActiveProcessorCount is implemented */
+	/* in kernel32.lib, is because the function is implemented only on 64 bit versions of Windows */
+	/* from Windows 7 onward. Windows Vista 64 bit doesn't have it and also Windows XP does */
+	/* not. We can't resolve this using conditional compilation unless we release multiple agents */
+	/* targeting different sets of Windows APIs. */
+	get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorCount");
 
-	return (int)sysInfo.dwNumberOfProcessors;
+	if (NULL != get_act)
+	{
+		return (int)get_act(ALL_PROCESSOR_GROUPS);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find address of GetActiveProcessorCount function");
+
+		GetNativeSystemInfo(&sysInfo);
+
+		return (int)sysInfo.dwNumberOfProcessors;
+	}
 }
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)

@@ -28,7 +28,7 @@ class CUrlWidgetForm extends CWidgetForm {
 		parent::__construct($data);
 
 		// URL field
-		$field_url = (new CWidgetFieldTextBox('url', _('URL')))
+		$field_url = (new CWidgetFieldUrl('url', _('URL')))
 			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
 		if (array_key_exists('url', $this->data)) {
@@ -36,7 +36,7 @@ class CUrlWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_url;
 
-		// Dynamic item
+		// dynamic item
 		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 
 		if (array_key_exists('dynamic', $this->data)) {

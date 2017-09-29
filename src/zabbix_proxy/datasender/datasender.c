@@ -82,8 +82,6 @@ static int	proxy_data_sender(int *more, int now)
 
 	if (CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp)
 	{
-		data_timestamp = now;
-
 		if (SUCCEED == get_host_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
@@ -95,6 +93,12 @@ static int	proxy_data_sender(int *more, int now)
 
 		if  (0 != (areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg)))
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
+
+		if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&
+						ZBX_PROXY_DATA_MORE != more_areg)
+		{
+			data_timestamp = now;
+		}
 	}
 
 	zbx_vector_ptr_create(&tasks);
@@ -240,5 +244,9 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		if (ZBX_PROXY_DATA_MORE != more)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

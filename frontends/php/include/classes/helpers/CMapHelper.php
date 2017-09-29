@@ -110,8 +110,7 @@ class CMapHelper {
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
-			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS),
-			'homepage' => ZABBIX_HOMEPAGE
+			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
 		];
 	}
 
@@ -203,6 +202,7 @@ class CMapHelper {
 
 		foreach ($sysmap['shapes'] as &$shape) {
 			if (array_key_exists('text', $shape)) {
+				$shape['text'] = CMacrosResolverHelper::resolveMapLabelMacros($shape['text']);
 				$shape['text'] = str_replace('{MAP.NAME}', $sysmap['name'], $shape['text']);
 			}
 		}
@@ -318,5 +318,126 @@ class CMapHelper {
 		$shape['type'] = SYSMAP_SHAPE_TYPE_LINE;
 
 		return $shape;
+	}
+
+	/**
+	 * Checks that the user has read permissions to objects used in the map elements.
+	 *
+	 * @param array $selements    selements to check
+	 *
+	 * @return boolean
+	 */
+	public static function checkSelementPermissions(array $selements) {
+		$groupids = [];
+		$hostids = [];
+		$triggerids = [];
+		$sysmapids = [];
+
+		foreach ($selements as $selement) {
+			switch ($selement['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$groupids[$selement['elements'][0]['groupid']] = true;
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$hostids[$selement['elements'][0]['hostid']] = true;
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					foreach ($selement['elements'] as $element) {
+						$triggerids[$element['triggerid']] = true;
+					}
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$sysmapids[$selement['elements'][0]['sysmapid']] = true;
+					break;
+			}
+		}
+
+		return self::checkHostGroupsPermissions(array_keys($groupids))
+				&& self::checkHostsPermissions(array_keys($hostids))
+				&& self::checkTriggersPermissions(array_keys($triggerids))
+				&& self::checkMapsPermissions(array_keys($sysmapids));
+	}
+
+	/**
+	 * Checks if the current user has access to the given host groups.
+	 *
+	 * @param array $groupids
+	 *
+	 * @return boolean
+	 */
+	private static function checkHostGroupsPermissions(array $groupids) {
+		if ($groupids) {
+			$count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => $groupids
+			]);
+
+			return ($count == count($groupids));
+		}
+
+		return true;
+	}
+
+	/**
+	 * Checks if the current user has access to the given hosts.
+	 *
+	 * @param array $hostids
+	 *
+	 * @return boolean
+	 */
+	private static function checkHostsPermissions(array $hostids) {
+		if ($hostids) {
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids
+			]);
+
+			return ($count == count($hostids));
+		}
+
+		return true;
+	}
+
+	/**
+	 * Checks if the current user has access to the given triggers.
+	 *
+	 * @param array $triggerids
+	 *
+	 * @return boolean
+	 */
+	private static function checkTriggersPermissions(array $triggerids) {
+		if ($triggerids) {
+			$count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $triggerids
+			]);
+
+			return ($count == count($triggerids));
+		}
+
+		return true;
+	}
+
+	/**
+	 * Checks if the current user has access to the given maps.
+	 *
+	 * @param array $sysmapids
+	 *
+	 * @return boolean
+	 */
+	private static function checkMapsPermissions(array $sysmapids) {
+		if ($sysmapids) {
+			$count = API::Map()->get([
+				'countOutput' => true,
+				'sysmapids' => $sysmapids
+			]);
+
+			return ($count == count($sysmapids));
+		}
+
+		return true;
 	}
 }

@@ -31,23 +31,21 @@ class CHostInterface extends CApiService {
 	/**
 	 * Get interface data.
 	 *
-	 * @param array   $options
-	 * @param array   $options['hostids']		Interface IDs
-	 * @param boolean $options['editable']		only with read-write permission. Ignored for SuperAdmins
-	 * @param boolean $options['selectHosts']	select Interface hosts
-	 * @param boolean $options['selectItems']	select Items
-	 * @param int     $options['count']			count Interfaces, returned column name is rowscount
-	 * @param string  $options['pattern']		search hosts by pattern in Interface name
-	 * @param int     $options['limit']			limit selection
-	 * @param string  $options['sortfield']		field to sort by
-	 * @param string  $options['sortorder']		sort order
+	 * @param array  $options
+	 * @param array  $options['hostids']		Interface IDs
+	 * @param bool   $options['editable']		only with read-write permission. Ignored for SuperAdmins
+	 * @param bool   $options['selectHosts']	select Interface hosts
+	 * @param bool   $options['selectItems']	select Items
+	 * @param int    $options['count']			count Interfaces, returned column name is rowscount
+	 * @param string $options['pattern']		search hosts by pattern in Interface name
+	 * @param int    $options['limit']			limit selection
+	 * @param string $options['sortfield']		field to sort by
+	 * @param string $options['sortorder']		sort order
 	 *
 	 * @return array|boolean Interface data as array or false if error
 	 */
 	public function get(array $options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userId = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['interface' => 'hi.interfaceid'],
@@ -64,7 +62,7 @@ class CHostInterface extends CApiService {
 			'interfaceids'				=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -88,10 +86,9 @@ class CHostInterface extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userId);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
@@ -494,7 +491,7 @@ class CHostInterface extends CApiService {
 	/**
 	 * Replace existing interfaces with input interfaces.
 	 *
-	 * @param $host
+	 * @param array $host
 	 */
 	public function replaceHostInterfaces(array $host) {
 		if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
@@ -503,8 +500,8 @@ class CHostInterface extends CApiService {
 			$this->checkHostInterfaces($host['interfaces'], $host['hostid']);
 
 			$interfacesToDelete = API::HostInterface()->get([
+				'output' => [],
 				'hostids' => $host['hostid'],
-				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 				'nopermissions' => true
 			]);
@@ -539,13 +536,24 @@ class CHostInterface extends CApiService {
 
 			if ($interfacesToAdd) {
 				$this->checkInput($interfacesToAdd, 'create');
-				DB::insert('interface', $interfacesToAdd);
+				$interfaceids = DB::insert('interface', $interfacesToAdd);
+
+				foreach ($host['interfaces'] as &$interface) {
+					if (!array_key_exists('interfaceid', $interface)) {
+						$interface['interfaceid'] = array_shift($interfaceids);
+					}
+				}
+				unset($interface);
 			}
 
 			if ($interfacesToDelete) {
 				$this->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
 			}
+
+			return ['interfaceids' => zbx_objectValues($host['interfaces'], 'interfaceid')];
 		}
+
+		return ['interfaceids' => []];
 	}
 
 	/**

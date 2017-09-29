@@ -541,23 +541,23 @@ if (isset($_REQUEST['form'])) {
 
 		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_prototype_options = [
-				'itemids'	=> $itemPrototype['master_itemid'],
-				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
+				'itemids' => $itemPrototype['master_itemid'],
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_']
 			];
 		}
 	}
 	elseif (getRequest('master_itemid') && getRequest('parent_discoveryid')) {
 		$discovery_rule = API::DiscoveryRule()->get([
-			'output'	=> ['hostid'],
-			'itemids'	=> getRequest('parent_discoveryid'),
-			'editable'	=> true
+			'output' => ['hostid'],
+			'itemids' => getRequest('parent_discoveryid'),
+			'editable' => true
 		]);
 
 		if ($discovery_rule) {
 			$master_prototype_options = [
-				'itemids'	=> getRequest('master_itemid'),
-				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'filter'	=> ['hostid' => $discovery_rule[0]['hostid']]
+				'itemids' => getRequest('master_itemid'),
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'filter' => ['hostid' => $discovery_rule[0]['hostid']]
 			];
 		}
 	}

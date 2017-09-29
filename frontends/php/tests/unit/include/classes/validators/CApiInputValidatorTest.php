@@ -1794,6 +1794,109 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['hostid', 'name', 'name'],
 				'/output',
 				'Invalid parameter "/output/3": value (name) already exists.'
+			],
+			[
+				['type' => API_URL],
+				'',
+				'/1/url',
+				''
+			],
+			[
+				['type' => API_URL],
+				'http://www.zabbix.com',
+				'/1/url',
+				'http://www.zabbix.com'
+			],
+			[
+				['type' => API_URL],
+				'https://www.zabbix.com',
+				'/1/url',
+				'https://www.zabbix.com'
+			],
+			[
+				['type' => API_URL],
+				'mailto:example@example.com',
+				'/1/url',
+				'mailto:example@example.com'
+			],
+			[
+				['type' => API_URL],
+				'file://localhost/path',
+				'/1/url',
+				'file://localhost/path'
+			],
+			[
+				['type' => API_URL],
+				'ssh://username@hostname',
+				'/1/url',
+				'ssh://username@hostname'
+			],
+			[
+				['type' => API_URL],
+				'ftp://user@host:port',
+				'/1/url',
+				'ftp://user@host:port'
+			],
+			[
+				['type' => API_URL],
+				'tel:1-111-111-1111',
+				'/1/url',
+				'tel:1-111-111-1111'
+			],
+			[
+				['type' => API_URL],
+				'zabbix.php?action=dashboard.view',
+				'/1/url',
+				'zabbix.php?action=dashboard.view'
+			],
+			[
+				['type' => API_URL, 'length' => 9],
+				'hosts.php',
+				'/1/url',
+				'hosts.php'
+			],
+			[
+				['type' => API_URL, 'length' => 8],
+				'hosts.php',
+				'/1/url',
+				'Invalid parameter "/1/url": value is too long.'
+			],
+			[
+				['type' => API_URL],
+				[],
+				'/1/url',
+				'Invalid parameter "/1/url": a character string is expected.'
+			],
+			[
+				['type' => API_URL],
+				true,
+				'/1/url',
+				'Invalid parameter "/1/url": a character string is expected.'
+			],
+			[
+				['type' => API_URL],
+				null,
+				'/1/url',
+				'Invalid parameter "/1/url": a character string is expected.'
+			],
+			[
+				['type' => API_URL],
+				// broken UTF-8 byte sequence
+				'hosts.'."\xd1".'hp',
+				'/1/url',
+				'Invalid parameter "/1/url": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_URL],
+				'javascript:alert()',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptible URL.'
+			],
+			[
+				['type' => API_URL],
+				'/chart_bar.php?a=1&b=2',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptible URL.'
 			]
 		];
 	}

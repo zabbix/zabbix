@@ -154,7 +154,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc_info[process,<attribute>,<type>]',
-					'description' => _('Different information about specific process(es). Returns float')
+					'description' => _('Various information about specific process(es). Returns float')
 				],
 				[
 					'key' => 'sensor[device,sensor,<mode>]',
@@ -269,6 +269,10 @@ class CHelpItems {
 					'description' => _('Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				],
 				[
+					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
+					'description' => _('Directory size (in bytes), dir - absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - mode used to get directory size ("apparent" or "disk"), <max_depth> - maximal traversal depth for directories. Returns integer.')
+				],
+				[
 					'key' => 'vfs.file.cksum[file]',
 					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer')
 				],
@@ -307,10 +311,6 @@ class CHelpItems {
 				[
 					'key' => 'vfs.fs.size[fs,<mode>]',
 					'description' => _('Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage')
-				],
-				[
-					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
-					'description' => _('Directory size (in bytes), dir - absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - mode used to get directory size ("apparent" or "disk"), <max_depth> - maximal traversal depth for directories. Returns integer.')
 				],
 				[
 					'key' => 'vm.memory.size[<mode>]',
@@ -452,7 +452,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc_info[process,<attribute>,<type>]',
-					'description' => _('Different information about specific process(es). Returns float')
+					'description' => _('Various information about specific process(es). Returns float')
 				],
 				[
 					'key' => 'sensor[device,sensor,<mode>]',

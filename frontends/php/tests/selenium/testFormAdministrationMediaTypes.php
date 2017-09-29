@@ -49,7 +49,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'smtp_helo' => 'localhost',
 					'smtp_email' => 'zabbix@localhost',
 					'smtp_security' => 'STARTTLS',
-					'smtp_authentication' => 'Normal password'
+					'smtp_authentication' => 'Username and password'
 				]
 			],
 			[
@@ -588,6 +588,9 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$this->zbxTestClickXpath("//label[text()='".$data['sessions']."']");
 			if ($data['sessions'] == 'Custom' && array_key_exists('maxsessions', $data)) {
 				$this->zbxTestInputTypeOverwrite('maxsessions', $data['maxsessions']);
+				sleep(2);
+				$this->webDriver->findElement(WebDriverBy::id('search'))->click();
+				sleep(2);
 			}
 		}
 

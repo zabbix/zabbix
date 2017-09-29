@@ -272,9 +272,7 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	$wizard = (new CSpan(
-		(new CButton(null))
-			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-			->setMenuPopup($item_menu)
+		(new CButton(null))->addClass(ZBX_STYLE_ICON_WZRD_ACTION)->setMenuPopup($item_menu)
 	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
 	$itemTable->addRow([

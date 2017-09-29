@@ -19,7 +19,10 @@
 **/
 
 
-$table = (new CTableInfo())->setHeader([_('Host group'), _('Ok'), _('Failed'), _('Unknown')]);
+// indicator of sort field
+$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
+
+$table = (new CTableInfo())->setHeader([[_('Host group'), $sort_div], _('Ok'), _('Failed'), _('Unknown')]);
 
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'web.view')

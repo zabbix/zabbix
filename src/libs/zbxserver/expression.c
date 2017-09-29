@@ -312,8 +312,7 @@ static void	DCexpand_trigger_expression(char **expression)
 
 			if (SUCCEED == errcode[0])
 			{
-				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1,
-						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1);
 
 				if (SUCCEED == errcode[1])
 				{
@@ -826,8 +825,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
-				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1,
-						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
 				{
@@ -1196,7 +1194,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
@@ -1647,9 +1645,9 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_RECOVERY		MVAR_EVENT "RECOVERY."		/* a prefix for all recovery event macros */
 #define MVAR_EVENT_RECOVERY_DATE	MVAR_EVENT_RECOVERY "DATE}"
 #define MVAR_EVENT_RECOVERY_ID		MVAR_EVENT_RECOVERY "ID}"
-#define MVAR_EVENT_RECOVERY_STATUS	MVAR_EVENT_RECOVERY "STATUS}"
+#define MVAR_EVENT_RECOVERY_STATUS	MVAR_EVENT_RECOVERY "STATUS}"	/* deprecated */
 #define MVAR_EVENT_RECOVERY_TIME	MVAR_EVENT_RECOVERY "TIME}"
-#define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"
+#define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"	/* deprecated */
 #define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
 
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
@@ -2201,6 +2199,26 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_current_event_value                                          *
+ *                                                                            *
+ * Purpose: request current event value by macro                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_current_event_value(const char *macro, const DB_EVENT *event, char **replace_to)
+{
+	if (0 == strcmp(macro, MVAR_EVENT_STATUS))
+	{
+		*replace_to = zbx_strdup(*replace_to,
+				zbx_event_value_string(event->source, event->object, event->value));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", event->value);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_event_value                                                  *
  *                                                                            *
  * Purpose: request event value by macro                                      *
@@ -2224,31 +2242,19 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	{
 		*replace_to = zbx_strdup(*replace_to, zbx_time2str(event->clock));
 	}
-	else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
+	else if (EVENT_SOURCE_TRIGGERS == event->source)
 	{
-		if (0 == strcmp(macro, MVAR_EVENT_STATUS))
+		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY))
 		{
-			*replace_to = zbx_strdup(*replace_to,
-					zbx_event_value_string(event->source, event->object, event->value));
+			get_event_ack_history(event, replace_to);
 		}
-		else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
+		else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
 		{
-			*replace_to = zbx_dsprintf(*replace_to, "%d", event->value);
+			*replace_to = zbx_strdup(*replace_to, event->acknowledged ? "Yes" : "No");
 		}
-		else if (EVENT_SOURCE_TRIGGERS == event->source)
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
 		{
-			if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY))
-			{
-				get_event_ack_history(event, replace_to);
-			}
-			else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
-			{
-				*replace_to = zbx_strdup(*replace_to, event->acknowledged ? "Yes" : "No");
-			}
-			else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
-			{
-				get_event_tags(event, replace_to);
-			}
+			get_event_tags(event, replace_to);
 		}
 	}
 }
@@ -2439,7 +2445,7 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 		DC_ITEM	item;
 		int	errcode;
 
-		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 		if (SUCCEED == errcode)
 			zbx_vector_uint64_append(hostids, item.host.hostid);
@@ -2683,6 +2689,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
+				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
+				{
+					get_current_event_value(m, c_event, &replace_to);
+				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to);
@@ -2889,7 +2899,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_STATUS))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_trigger_value_string(c_event->value));
+					replace_to = zbx_strdup(replace_to,
+							zbx_trigger_value_string(c_event->trigger.value));
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
 				{
@@ -2907,7 +2918,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 				{
-					replace_to = zbx_dsprintf(replace_to, "%d", c_event->value);
+					replace_to = zbx_dsprintf(replace_to, "%d", c_event->trigger.value);
 				}
 				else if (0 == strcmp(m, MVAR_ACK_MESSAGE))
 				{
@@ -2955,6 +2966,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
+				{
+					get_current_event_value(m, c_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
@@ -3336,6 +3351,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
+				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
+				{
+					get_current_event_value(m, c_event, &replace_to);
+				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to);
@@ -3444,6 +3463,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
+				{
+					get_current_event_value(m, c_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
@@ -4406,8 +4429,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
-			ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	zbx_hashset_iter_reset(funcs, &iter);
 	while (NULL != (func = zbx_hashset_iter_next(&iter)))
@@ -4448,8 +4470,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 		/*     evaluated to regular numbers even for NOTSUPPORTED items. */
 		/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].state &&
-				FAIL == evaluatable_for_notsupported(func->function))
+		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == evaluatable_for_notsupported(func->function))
 		{
 			/* compose and store 'unknown' message for future use */
 			unknown_msg = zbx_dsprintf(NULL,

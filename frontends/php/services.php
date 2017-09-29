@@ -268,9 +268,9 @@ if (isset($_REQUEST['form'])) {
  * Display parent services list
  */
 if (isset($_REQUEST['pservices'])) {
-	$parentServices = API::Service()->get([
+	$parent_services = API::Service()->get([
 		'output' => ['serviceid', 'name', 'algorithm'],
-		'selectTrigger' => ['triggerid', 'description', 'expression'],
+		'selectTrigger' => ['description'],
 		'preservekeys' => true,
 		'sortfield' => ['name']
 	]);
@@ -280,7 +280,7 @@ if (isset($_REQUEST['pservices'])) {
 		$childServicesIds = get_service_children($service['serviceid']);
 		$childServicesIds[] = $service['serviceid'];
 		foreach ($childServicesIds as $childServiceId) {
-			unset($parentServices[$childServiceId]);
+			unset($parent_services[$childServiceId]);
 		}
 
 		$data = ['service' => $service];
@@ -289,19 +289,12 @@ if (isset($_REQUEST['pservices'])) {
 		$data = [];
 	}
 
-	// expand trigger descriptions
-	$triggers = zbx_objectValues(
-		array_filter($parentServices, function($service) { return (bool) $service['trigger']; }), 'trigger'
-	);
-	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
-
-	foreach ($parentServices as $key => $parentService) {
-		$parentServices[$key]['trigger'] = !empty($parentService['trigger'])
-			? $triggers[$parentService['trigger']['triggerid']]['description']
-			: '';
+	foreach ($parent_services as &$parent_service) {
+		$parent_service['trigger'] = $parent_service['trigger'] ? $parent_service['trigger']['description'] : '';
 	}
+	unset($parent_service);
 
-	$data['db_pservices'] = $parentServices;
+	$data['db_pservices'] = $parent_services;
 
 	// render view
 	$servicesView = new CView('configuration.services.parent.list', $data);
@@ -312,9 +305,9 @@ if (isset($_REQUEST['pservices'])) {
  * Display child services list
  */
 elseif (isset($_REQUEST['cservices'])) {
-	$childServices = API::Service()->get([
+	$child_services = API::Service()->get([
 		'output' => ['serviceid', 'name', 'algorithm'],
-		'selectTrigger' => ['triggerid', 'description', 'expression'],
+		'selectTrigger' => ['description'],
 		'preservekeys' => true,
 		'sortfield' => ['name']
 	]);
@@ -324,7 +317,7 @@ elseif (isset($_REQUEST['cservices'])) {
 		$childServicesIds = get_service_children($service['serviceid']);
 		$childServicesIds[] = $service['serviceid'];
 		foreach ($childServicesIds as $childServiceId) {
-			unset($childServices[$childServiceId]);
+			unset($child_services[$childServiceId]);
 		}
 
 		$data = ['service' => $service];
@@ -333,19 +326,12 @@ elseif (isset($_REQUEST['cservices'])) {
 		$data = [];
 	}
 
-	// expand trigger descriptions
-	$triggers = zbx_objectValues(
-		array_filter($childServices, function($service) { return (bool) $service['trigger']; }), 'trigger'
-	);
-	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
-
-	foreach ($childServices as $key => $childService) {
-		$childServices[$key]['trigger'] = !empty($childService['trigger'])
-			? $triggers[$childService['trigger']['triggerid']]['description']
-			: '';
+	foreach ($child_services as &$child_service) {
+		$child_service['trigger'] = $child_service['trigger'] ? $child_service['trigger']['description'] : '';
 	}
+	unset($child_service);
 
-	$data['db_cservices'] = $childServices;
+	$data['db_cservices'] = $child_services;
 
 	// render view
 	$servicesView = new CView('configuration.services.child.list', $data);
@@ -387,27 +373,19 @@ elseif (isset($_REQUEST['form'])) {
 		// get children
 		$data['children'] = [];
 		if ($service['dependencies']) {
-			$childServices = API::Service()->get([
+			$child_services = API::Service()->get([
 				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
-				'selectTrigger' => ['triggerid', 'description', 'expression'],
+				'selectTrigger' => ['description'],
 				'output' => ['name', 'triggerid'],
 				'preservekeys' => true,
 			]);
 
-			// expand trigger descriptions
-			$triggers = zbx_objectValues(
-				array_filter($childServices, function($service) { return (bool) $service['trigger']; }), 'trigger'
-			);
-			$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
-
 			foreach ($service['dependencies'] as $dependency) {
-				$childService = $childServices[$dependency['servicedownid']];
+				$child_service = $child_services[$dependency['servicedownid']];
 				$data['children'][] = [
-					'name' => $childService['name'],
-					'triggerid' => $childService['triggerid'],
-					'trigger' => !empty($childService['triggerid'])
-							? $triggers[$childService['trigger']['triggerid']]['description']
-							: '',
+					'name' => $child_service['name'],
+					'triggerid' => $child_service['triggerid'],
+					'trigger' => ($child_service['triggerid'] == 0) ? '' : $child_service['trigger']['description'],
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
 				];
@@ -456,24 +434,11 @@ else {
 		'output' => ['name', 'serviceid', 'algorithm'],
 		'selectParent' => ['serviceid'],
 		'selectDependencies' => ['servicedownid', 'soft', 'linkid'],
-		'selectTrigger' => ['description', 'triggerid', 'expression'],
+		'selectTrigger' => ['description'],
 		'preservekeys' => true,
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	]);
-
-	// triggers
-	$triggers = zbx_objectValues(
-		array_filter($services, function($service) { return (bool) $service['trigger']; }), 'trigger'
-	);
-	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
-
-	foreach ($services as &$service) {
-		if ($service['trigger']) {
-			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
-		}
-	}
-	unset($service);
 
 	$treeData = [];
 	createServiceConfigurationTree($services, $treeData);

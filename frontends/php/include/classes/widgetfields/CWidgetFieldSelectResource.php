@@ -49,6 +49,8 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				$this->srcfld2 = 'name';
 				break;
 
+			case WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH:
+				// falls through
 			case WIDGET_FIELD_SELECT_RES_ITEM:
 				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 				$this->srctbl = 'items';
@@ -57,11 +59,10 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				break;
 
 			case WIDGET_FIELD_SELECT_RES_GRAPH:
+				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
 				$this->srctbl = 'graphs';
 				$this->srcfld1 = 'graphid';
 				$this->srcfld2 = 'name';
-
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
 				break;
 		}
 
@@ -90,6 +91,10 @@ class CWidgetFieldSelectResource extends CWidgetField {
 			case WIDGET_FIELD_SELECT_RES_GRAPH:
 				$url->setArgument('real_hosts', '1');
 				$url->setArgument('with_graphs', '1');
+				break;
+
+			case WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH:
+				$url->setArgument('numeric', '1');
 				break;
 		}
 

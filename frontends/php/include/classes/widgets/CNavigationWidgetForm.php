@@ -69,5 +69,15 @@ class CNavigationWidgetForm extends CWidgetForm {
 				}
 			}
 		}
+
+		// show unavailable maps
+		$show_unavailable_maps = (new CWidgetFieldCheckBox('show_unavailable', _('Show unavailable maps')))
+			->setDefault(0);
+
+		if (array_key_exists('show_unavailable', $this->data)) {
+			$show_unavailable_maps->setValue($this->data['show_unavailable']);
+		}
+
+		$this->fields[] = $show_unavailable_maps;
 	}
 }

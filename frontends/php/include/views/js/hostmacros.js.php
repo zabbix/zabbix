@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="macroRow">
 	<tr class="form_row">
 		<td>
-			<input class="macro" type="text" id="macros_#{rowNum}_macro" name="macros[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{$MACRO}">
+			<input class="macro" type="text" id="macros_#{rowNum}_macro" name="macros[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="255" placeholder="{$MACRO}">
 		<?php if ($data['show_inherited_macros']): ?>
 			<input id="macros_#{rowNum}_type" type="hidden" value="2" name="macros[#{rowNum}][type]">
 		<?php endif ?>

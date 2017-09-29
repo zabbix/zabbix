@@ -223,7 +223,7 @@ zbx_tm_task_t	*zbx_tm_task_create(zbx_uint64_t taskid, unsigned char type, unsig
  * Comments: The tasks array can contain mixture of task types.               *
  *                                                                            *
  ******************************************************************************/
-int	tm_save_remote_command_tasks(zbx_tm_task_t **tasks, int tasks_num)
+static int	tm_save_remote_command_tasks(zbx_tm_task_t **tasks, int tasks_num)
 {
 	int			i, ret;
 	zbx_db_insert_t		db_insert;
@@ -269,7 +269,7 @@ int	tm_save_remote_command_tasks(zbx_tm_task_t **tasks, int tasks_num)
  * Comments: The tasks array can contain mixture of task types.               *
  *                                                                            *
  ******************************************************************************/
-int	tm_save_remote_command_result_tasks(zbx_tm_task_t **tasks, int tasks_num)
+static int	tm_save_remote_command_result_tasks(zbx_tm_task_t **tasks, int tasks_num)
 {
 	int				i, ret;
 	zbx_db_insert_t			db_insert;

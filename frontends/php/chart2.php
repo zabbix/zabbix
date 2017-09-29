@@ -32,12 +32,14 @@ $fields = [
 	'graphid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
 	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
 	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
-	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -66,12 +68,13 @@ else {
 /*
  * Display
  */
-$timeline = CScreenBase::calculateTime([
+$timeline = calculateTime([
 	'profileIdx' => getRequest('profileIdx', 'web.screens'),
 	'profileIdx2' => getRequest('profileIdx2'),
-	'updateProfile' => getRequest('updateProfile', true),
+	'updateProfile' => (getRequest('updateProfile', '0') === '1'),
 	'period' => getRequest('period'),
-	'stime' => getRequest('stime')
+	'stime' => getRequest('stime'),
+	'isNow' => getRequest('isNow')
 ]);
 
 CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
@@ -96,7 +99,7 @@ foreach ($dbGraph['gitems'] as $graph_item) {
 		'hostname' => $host['name'],
 		'color' => $graph_item['color'],
 		'drawtype' => $graph_item['drawtype'],
-		'axisside' => $graph_item['yaxisside'],
+		'yaxisside' => $graph_item['yaxisside'],
 		'calc_fnc' => $graph_item['calc_fnc']
 	]);
 }
@@ -153,8 +156,12 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 	$graph->setHeight($min_dimentions['height']);
 }
 
-$graph->draw();
-
-header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+if (getRequest('onlyHeight', '0') === '1') {
+	$graph->drawDimensions();
+	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+}
+else {
+	$graph->draw();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';

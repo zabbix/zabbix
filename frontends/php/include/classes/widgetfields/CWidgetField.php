@@ -79,7 +79,6 @@ class CWidgetField {
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_STR:
-				// TODO VM: (?) should we have define for this?
 				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
 				break;
 
@@ -95,7 +94,7 @@ class CWidgetField {
 				break;
 
 			default:
-				exit(_('Internal error'));
+				exit(_('Internal error.'));
 		}
 
 		$this->save_type = $save_type;
@@ -173,6 +172,7 @@ class CWidgetField {
 		$label = ($this->label === null) ? $this->name : $this->label;
 
 		if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
+			$this->setValue($this->default);
 			$errors[] = $error;
 		}
 
@@ -180,13 +180,14 @@ class CWidgetField {
 	}
 
 	/**
-	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions
+	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
+	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
+	 * fields it causes significant performance decrease.
 	 *
-	 * @return array  An array of widget fields ready for saving in API.
+	 * @param array $widget_fields   reference to Array of widget fields.
 	 */
-	public function toApi() {
+	public function toApi(array &$widget_fields = []) {
 		$value = $this->getValue();
-		$widget_fields = [];
 
 		if ($value !== null && $value !== $this->default) {
 			$widget_field = [
@@ -205,7 +206,5 @@ class CWidgetField {
 				$widget_fields[] = $widget_field;
 			}
 		}
-
-		return $widget_fields;
 	}
 }

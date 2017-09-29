@@ -86,7 +86,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	unsigned short	port;
 	int		value_int, ret;
-	char		*ip_str, ip[64], *port_str;
+	char		*ip_str, ip[MAX_ZBX_DNSNAME_LEN + 1], *port_str;
 
 	if (2 < request->nparam)
 	{
