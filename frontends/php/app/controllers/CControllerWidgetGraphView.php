@@ -228,12 +228,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				'webitems' => true
 			]);
 
-			if ($item && $item[0]['type'] == ITEM_TYPE_HTTPTEST) {
-				$item = CMacrosResolverHelper::resolveItemNames($item)[0];
-
-				$item['name_expanded'] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
-			}
-			elseif ($item) {
+			if ($item) {
 				$item = reset($item);
 			}
 			else {
@@ -248,14 +243,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					$time_control_data['loadSBox'] = 1;
 				}
 
-				if ($item && $item['type'] == ITEM_TYPE_HTTPTEST) {
-					$graph_src = new CUrl('chart3.php');
-					$graph_src->setArgument('items[0][itemid]', $resourceid);
-					$graph_src->setArgument('name', $item['name_expanded']);
-					$graph_src->setArgument('width', $width);
-					$graph_src->setArgument('height', $height);
-				}
-				elseif ($resourceid) {
+				if ($resourceid) {
 					$graph_src = new CUrl('chart.php');
 					$graph_src->setArgument('itemids[]', $resourceid);
 					$graph_src->setArgument('width', $width);
