@@ -14,6 +14,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBX-12576] fixed difference between item and web scenario item graphs on simple graph widget (gcalenko)
 A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
 .....J.... [ZBX-12705] fixed processing of MBean properties in jmx discovery (vjaceslavs)
 ..F....... [ZBX-12633] added horizontal scrollbar to the map in view mode; removed homepage label in maps and graphs; made graph timestamp visible only if debug-mode is on (miks)
