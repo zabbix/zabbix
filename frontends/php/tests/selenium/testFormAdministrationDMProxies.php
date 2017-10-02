@@ -384,8 +384,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 	public static function dataDelete() {
 		return [
-			['Active proxy 2'],
-			['Passive proxy 2']
+			['Active proxy to delete'],
+			['Passive proxy to delete']
 		];
 	}
 
