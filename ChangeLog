@@ -22,7 +22,7 @@ A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed
 ..F....... [ZBX-12679] fixed escaping of translation strings with apostrophe in forms: dashboard sharing and monitoring, administration of housekeeper and trigger options, item edit and mass update, xml import, host edit, web scenario, trigger configuration. (gcalenko)
 ........S. [ZBX-11426] fixed the housekeeper for not deleting events in open problem state (abs)
 .......PS. [ZBX-12691] moved item state,lastlogsize,mtime,lastclock configuration cache update from value reception to value processing (wiper)
-........S. [DEV-658] reduced memory used by pre-processor manager item cache (wiper)
+........S. [ZBX-12802] reduced memory used by pre-processor manager item cache (wiper)
 ..F....... [ZBX-12619] fixed error displaying of zabbix server status widget (gcalenko)
 A......... [ZBX-12681] fixed SQL errors in event.get() method (Sasha)
 ..F....... [ZBX-12709] fixed possibility to enter deleys with suffixes for new elements of slideshows (Sasha)
