@@ -23,7 +23,7 @@ int	main(void)
 {
 	int 	result;
 
-	if (SUCCEED == result)
+	if (SUCCEED == (result = load_data("parsed_data")))
 	{
 		/* debug_print_cases(); */
 
