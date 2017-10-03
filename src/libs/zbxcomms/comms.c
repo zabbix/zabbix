@@ -1747,8 +1747,11 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
 	/* All hosts on a subnetwork have the same network prefix. */
 	for (i = 0; i < bytes; i++)
 	{
-		if ((((unsigned char *)address1)[i] & netmask[i]) != (((unsigned char *)address2)[i] & netmask[i]))
+		if ((((const unsigned char *)address1)[i] & netmask[i]) !=
+				(((const unsigned char *)address2)[i] & netmask[i]))
+		{
 			return FAIL;
+		}
 	}
 
 	return SUCCEED;
