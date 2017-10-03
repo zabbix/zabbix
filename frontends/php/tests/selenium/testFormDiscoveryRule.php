@@ -357,7 +357,7 @@ class testFormDiscoveryRule extends CWebTest {
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType), false
 					);
 					$dbInterfaces = reset($dbInterfaces);
 					if ($dbInterfaces != null) {

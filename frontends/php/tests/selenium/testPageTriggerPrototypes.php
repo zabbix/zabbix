@@ -132,7 +132,11 @@ class testPageTriggerPrototypes extends CWebTest {
 	*/
 	public function testPageTriggerPrototypes_MassDelete($rule) {
 		$druleid = $rule['parent_itemid'];
-		$triggerids = DBdata('select i.itemid from item_discovery id, items i where parent_itemid='.$druleid.' and i.itemid = id.itemid');
+		$triggerids = DBdata(
+				'SELECT i.itemid'.
+				' FROM item_discovery id, items i'.
+				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid', false
+		);
 		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid);

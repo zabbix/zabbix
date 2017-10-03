@@ -140,7 +140,7 @@ class testPageDiscoveryRules extends CWebTest {
 			'SELECT hostid'.
 			' FROM items'.
 			' WHERE hostid='.$rule['hostid'].
-				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE
+				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE, false
 		);
 		$hostids = zbx_objectValues($hostids, 'hostids');
 

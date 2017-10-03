@@ -127,7 +127,7 @@ class testPageItemPrototypes extends CWebTest {
 		$drule = $rule['d_name'];
 		$hostid = $rule['hostid'];
 
-		$itemids = DBdata('select itemid from item_discovery where parent_itemid='.$druleid);
+		$itemids = DBdata('select itemid from item_discovery where parent_itemid='.$druleid, false);
 		$itemids = zbx_objectValues($itemids, 'itemid');
 
 
