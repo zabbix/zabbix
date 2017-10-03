@@ -34,9 +34,9 @@ class testFormAdministrationUserCreate extends CWebTest {
 		$this->zbxTestInputType('alias', 'User alias');
 		$this->zbxTestInputType('name', 'User name');
 		$this->zbxTestInputType('surname', 'User surname');
-		$this->zbxTestClick('add_group');
+		$this->zbxTestClickButtonText('Select');
 		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
-		$this->zbxTestCheckboxSelect('new_groups_7');
+		$this->zbxTestCheckboxSelect('usrgrps_7');
 		$this->zbxTestClick('select');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestInputTypeWait('password1', '123');
