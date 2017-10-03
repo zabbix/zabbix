@@ -23,6 +23,9 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 define('PROXY_GOOD', 0);
 define('PROXY_BAD', 1);
 
+/**
+ * @backup hosts
+ */
 class testFormAdministrationDMProxies extends CWebTest {
 	private $proxy_name = 'proxy_name_1';
 	private $new_proxy_name = 'proxy_name_new';
@@ -32,10 +35,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 	private $proxy_host = 'Zabbix server';
 	private $passive_proxy_host = 'H1';
 	private $passive_proxy_name = 'passive_proxy_name1';
-
-	public function testFormAdministrationDMProxies_backup() {
-		DBsave_tables('hosts');
-	}
 
 	public function testFormAdministrationDMProxies_CheckLayout() {
 
@@ -411,9 +410,5 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		$sql = "SELECT * FROM hosts WHERE host='$name'";
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Proxy has not been deleted');
-	}
-
-	public function testFormAdministrationDMProxies_restore() {
-		DBrestore_tables('hosts');
 	}
 }

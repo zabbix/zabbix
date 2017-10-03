@@ -23,11 +23,10 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 define('ACTION_GOOD', 0);
 define('ACTION_BAD', 1);
 
+/**
+ * @backup actions
+ */
 class testFormAction extends CWebTest {
-
-	public function testFormAction_Setup() {
-		DBsave_tables('actions');
-	}
 
 	public static function layout() {
 		return [
@@ -2118,9 +2117,5 @@ class testFormAction extends CWebTest {
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";
 		$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');
-	}
-
-	public function testFormAction_Teardown() {
-		DBrestore_tables('actions');
 	}
 }

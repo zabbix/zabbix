@@ -20,6 +20,11 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * Test checks Configuration → Hosts or Templates → Applications form.
+ *
+ * @backup applications
+ */
 class testFormApplication extends CWebTest {
 
 	/**
@@ -30,70 +35,11 @@ class testFormApplication extends CWebTest {
 	public static $application;
 
 	/**
-	 * The number of test case instances.
-	 *
-	 * @var integer
+	 * @beforeClass
 	 */
-	protected static $instances = 0;
-
-	public function __construct(string $name = NULL, array $data = [], string $data_name = '') {
-		global $DB;
-
-		if (!isset($DB['DB'])) {
-			DBconnect($error);
-		}
-
-		parent::__construct($name, $data, $data_name);
-
-		// Methods called once per suite.
-		if (self::$instances === 0) {
-			$this->backup();
-			$this->prepareSuite();
-		}
-
-		DBclose();
-		self::$instances++;
-	}
-
-	public function __destruct() {
-		global $DB;
-
-		self::$instances--;
-
-		if (is_callable('parent::__destruct')) {
-			parent::__destruct();
-		}
-
-		// Methods called once per suite.
-		if (self::$instances === 0) {
-			if (!isset($DB['DB'])) {
-				DBconnect($error);
-			}
-
-			$this->restore();
-			DBclose();
-		}
-	}
-
-	/**
-	 * Initialize test application name - random name is used.
-	 */
-	protected function prepareSuite() {
+	public static function initializeTest() {
+		// Initialize test application name - random name is used.
 		self::$application .= 'Test application '.microtime(true);
-	}
-
-	/**
-	 * Perform backup of DB tables.
-	 */
-	protected function backup() {
-		DBsave_tables('applications');
-	}
-
-	/**
-	 * Restore DB from a backup.
-	 */
-	protected function restore() {
-		DBrestore_tables('applications');
 	}
 
 	/**

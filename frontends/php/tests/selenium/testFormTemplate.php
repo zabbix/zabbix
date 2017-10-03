@@ -20,15 +20,14 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup hosts
+ */
 class testFormTemplate extends CWebTest {
 	public $template = 'Form test template';
 	public $template_edit_name = 'Template-layout-test-001';
 	public $template_clone = 'Template OS Linux';
 	public $template_full_delete = 'Inheritance test template';
-
-	public function testFormTemplate_backup() {
-		DBsave_tables('hosts');
-	}
 
 	public static function create() {
 		return [
@@ -333,9 +332,5 @@ class testFormTemplate extends CWebTest {
 		$this->assertEquals(0, DBcount("SELECT triggerid FROM triggers WHERE templateid='".$template['hostid']."'"));
 		$this->assertEquals(0, DBcount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(0, DBcount("SELECT httptestid FROM httptest WHERE hostid='".$template['hostid']."'"));
-	}
-
-	public function testFormTemplate_restore() {
-		DBrestore_tables('hosts');
 	}
 }
