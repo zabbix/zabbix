@@ -840,6 +840,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBX-12191] fixed start time and timeline period in events screen when switching to next pages (miks)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
 .......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
 ..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
