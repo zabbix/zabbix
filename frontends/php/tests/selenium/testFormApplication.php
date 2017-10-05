@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
- * Test checks Configuration → Hosts or Templates → Applications form.
+ * Test checks Configuration -> Hosts or Templates -> Applications form.
  *
  * @backup applications
  */
