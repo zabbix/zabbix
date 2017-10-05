@@ -39,7 +39,7 @@ class testFormApplication extends CWebTest {
 	 */
 	public static function initializeTest() {
 		// Initialize test application name - random name is used.
-		self::$application .= 'Test application '.microtime(true);
+		self::$application = 'Test application '.microtime(true);
 	}
 
 	/**
@@ -72,13 +72,11 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestTextPresent($new_name);
 
 		// Check the results in DB.
-		$sql = "SELECT null FROM applications WHERE name='$new_name'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, DBcount("SELECT NULL FROM applications WHERE name='".$new_name."'"));
 
 		if ($new_name !== $name) {
 			// There should be no application with previous name if name was changed.
-			$sql = "SELECT null FROM applications WHERE name='$name'";
-			$this->assertEquals(0, DBcount($sql));
+			$this->assertEquals(0, DBcount("SELECT NULL FROM applications WHERE name='".$name."'"));
 		}
 	}
 
@@ -96,7 +94,7 @@ class testFormApplication extends CWebTest {
 
 		// Set application name and submit the form.
 		$this->zbxTestInputTypeWait('appname', $name);
-		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+		$this->zbxTestClickWait('add');
 
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of applications');
@@ -104,8 +102,7 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestTextPresent($name);
 
 		// Check the results in DB.
-		$sql = "SELECT null FROM applications WHERE name='{$name}'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, DBcount("SELECT NULL FROM applications WHERE name='".$name."'"));
 	}
 
 	/**
@@ -119,12 +116,12 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestClickWait('form');
 
 		// Check error message on posting the empty form.
-		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Incorrect value for field "Name": cannot be empty.');
 
 		// Change application name to multiple spaces and check an error message.
 		$this->zbxTestInputTypeOverwrite('appname', '      ');
-		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Incorrect value for field "Name": cannot be empty.');
 	}
 
@@ -132,7 +129,12 @@ class testFormApplication extends CWebTest {
 	 * Test update without any modification of application data.
 	 */
 	public function testFormApplication_SimpleUpdate() {
+		$sql_hash = 'SELECT * FROM applications ORDER BY applicationid';
+		$old_hash = DBhash($sql_hash);
+
 		$this->updateApplication(self::$application);
+
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	/**
@@ -154,17 +156,25 @@ class testFormApplication extends CWebTest {
 	 * Test form canceling functionality.
 	 */
 	public function testFormApplication_Cancel() {
+		$sql_hash = 'SELECT * FROM applications ORDER BY applicationid';
+		$old_hash = DBhash($sql_hash);
+
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestDropdownSelectWait('hostid', 'Simple form test host');
 		$this->zbxTestClickLinkTextWait(self::$application);
 
+		// Change application name.
+		$this->zbxTestInputTypeOverwrite('appname', self::$application.' (updated)');
+
 		// Close the form.
-		$this->zbxTestClickXpathWait("//button[@id='cancel']");
+		$this->zbxTestClickWait('cancel');
 
 		// Check the result in frontend.
 		$this->zbxTestCheckTitle('Configuration of applications');
+
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	/**
@@ -181,9 +191,9 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestClickLinkTextWait($name);
 
 		// Clone the application, rename the clone and save it.
-		$this->zbxTestClickXpathWait("//button[@id='clone' and @type='submit']");
+		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputTypeOverwrite('appname', $name.$suffix);
-		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+		$this->zbxTestClickWait('add');
 
 		// Check the result in frontend.
 		$this->zbxTestCheckTitle('Configuration of applications');
@@ -211,7 +221,6 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Application deleted');
 
 		// Check the result in DB.
-		$sql = "SELECT null FROM applications WHERE name='$name'";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, DBcount("SELECT NULL FROM applications WHERE name='".$name."'"));
 	}
 }
