@@ -271,81 +271,72 @@ abstract class CHostGeneral extends CHostBase {
 			);
 		}
 
-		$sqlFrom = ' triggers t,hosts h';
-		$sqlWhere = ' EXISTS ('.
-			'SELECT ff.triggerid'.
-			' FROM functions ff,items ii'.
-			' WHERE ff.triggerid=t.templateid'.
-			' AND ii.itemid=ff.itemid'.
-			' AND '.dbConditionInt('ii.hostid', $templateids).')'.
-			' AND '.dbConditionInt('t.flags', $flags);
+		$templ_triggerids = [];
 
+		$db_triggers = DBselect(
+			'SELECT DISTINCT f.triggerid'.
+			' FROM functions f,items i'.
+			' WHERE f.itemid=i.itemid'.
+				' AND '.dbConditionInt('i.hostid', $templateids)
+		);
 
-		if (!is_null($targetids)) {
-			$sqlFrom = ' triggers t,functions f,items i,hosts h';
-			$sqlWhere .= ' AND '.dbConditionInt('i.hostid', $targetids).
-				' AND f.itemid=i.itemid'.
-				' AND t.triggerid=f.triggerid'.
-				' AND h.hostid=i.hostid';
+		while ($db_trigger = DBfetch($db_triggers)) {
+			$templ_triggerids[] = $db_trigger['triggerid'];
 		}
-		$sql = 'SELECT DISTINCT t.triggerid,t.description,t.flags,t.expression,h.name as host'.
-			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere;
-		$dbTriggers = DBSelect($sql);
-		$triggers = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
-		$triggerids = [];
-		while ($trigger = DBfetch($dbTriggers)) {
-			$triggers[$trigger['flags']][$trigger['triggerid']] = [
-				'description' => $trigger['description'],
-				'expression' => $trigger['expression'],
-				'triggerid' => $trigger['triggerid'],
-				'host' => $trigger['host']
-			];
-			if (!in_array($trigger['triggerid'], $triggerids)) {
-				array_push($triggerids, $trigger['triggerid']);
+
+		$triggerids = [ZBX_FLAG_DISCOVERY_NORMAL => [], ZBX_FLAG_DISCOVERY_PROTOTYPE => []];
+
+		if ($templ_triggerids) {
+			$sql_distinct = ($targetids !== null) ? ' DISTINCT' : '';
+			$sql_from = ($targetids !== null) ? ',functions f,items i' : '';
+			$sql_where = ($targetids !== null)
+				? ' AND t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.dbConditionInt('i.hostid', $targetids)
+				: '';
+
+			$db_triggers = DBSelect(
+				'SELECT'.$sql_distinct.' t.triggerid,t.flags'.
+				' FROM triggers t'.$sql_from.
+				' WHERE '.dbConditionInt('t.templateid', $templ_triggerids).
+					' AND '.dbConditionInt('t.flags', $flags).
+					$sql_where
+			);
+
+			while ($db_trigger = DBfetch($db_triggers)) {
+				$triggerids[$db_trigger['flags']][] = $db_trigger['triggerid'];
 			}
 		}
 
-		if (!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])) {
-			$triggers[ZBX_FLAG_DISCOVERY_NORMAL] =
-				CMacrosResolverHelper::resolveTriggerExpressions($triggers[ZBX_FLAG_DISCOVERY_NORMAL]);
-
+		if ($triggerids[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				$result = API::Trigger()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
-			}
-			else{
-				DB::update('triggers', [
-					'values' => ['templateid' => 0],
-					'where' => ['triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL])]
-				]);
+				$result = API::Trigger()->delete($triggerids[ZBX_FLAG_DISCOVERY_NORMAL], true);
 
-				foreach ($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger) {
-					info(_s('Unlinked: Trigger "%1$s" on "%2$s".', $trigger['description'], $trigger['host']));
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 				}
 			}
-		}
-
-		if (!empty($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-			$triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE] =
-				CMacrosResolverHelper::resolveTriggerExpressions($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-
-			if ($clear) {
-				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
-			}
-			else{
+			else {
 				DB::update('triggers', [
 					'values' => ['templateid' => 0],
-					'where' => ['triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])]
+					'where' => ['triggerid' => $triggerids[ZBX_FLAG_DISCOVERY_NORMAL]]
 				]);
+			}
+		}
 
-				foreach ($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $trigger) {
-					info(_s('Unlinked: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], $trigger['host']));
+		if ($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			if ($clear) {
+				$result = API::TriggerPrototype()->delete($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE], true);
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 				}
+			}
+			else {
+				DB::update('triggers', [
+					'values' => ['templateid' => 0],
+					'where' => ['triggerid' => $triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]]
+				]);
 			}
 		}
 

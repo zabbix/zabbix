@@ -54,7 +54,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestInputType('name', $this->icon_image_name);
-		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
+		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
@@ -73,7 +73,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
 		$this->zbxTestInputTypeWait('name', $this->icon_image_name2);
-		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
+		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
 		$this->zbxTestClick('cancel');
 
 		// checking that image has not been changed after clicking on the "Cancel" button in the confirm dialog box
@@ -86,7 +86,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
 		$this->zbxTestInputTypeOverwrite('name', $this->icon_image_name2);
-		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
+		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');;
@@ -115,7 +115,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestInputType('name', $this->bg_image_name);
-		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
+		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(['Images', 'Type', 'Image added']);
@@ -132,7 +132,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebdriverBy::xpath("//div[@class='cell']"));
 		$this->zbxTestClickLinkText($this->bg_image_name);
 		$this->zbxTestInputTypeOverwrite('name', $this->bg_image_name2);
-		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
+		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');

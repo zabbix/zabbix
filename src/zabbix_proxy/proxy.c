@@ -45,6 +45,7 @@
 #include "../zabbix_server/pinger/pinger.h"
 #include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/trapper/trapper.h"
+#include "../zabbix_server/trapper/proxydata.h"
 #include "../zabbix_server/snmptrapper/snmptrapper.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
@@ -129,7 +130,7 @@ unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
 int		server_num		= 0;
 
-int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
+static int	CONFIG_PROXYMODE	= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
@@ -248,7 +249,7 @@ char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 
-char	*CONFIG_SOCKET_PATH		= NULL;
+static char	*CONFIG_SOCKET_PATH	= NULL;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -946,6 +947,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+	init_proxy_history_lock();
 
 	if (SUCCEED != init_configuration_cache(&error))
 	{
@@ -1166,6 +1168,7 @@ void	zbx_on_exit(void)
 		zbx_vmware_destroy();
 
 	free_selfmon_collector();
+	free_proxy_history_lock();
 
 	zbx_unload_modules();
 

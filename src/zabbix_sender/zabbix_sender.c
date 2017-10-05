@@ -239,12 +239,12 @@ static char	*INPUT_FILE = NULL;
 static int	WITH_TIMESTAMPS = 0;
 static int	REAL_TIME = 0;
 
-static char	*CONFIG_SOURCE_IP = NULL;
-static char	*ZABBIX_SERVER = NULL;
-unsigned short	ZABBIX_SERVER_PORT = 0;
-static char	*ZABBIX_HOSTNAME = NULL;
-static char	*ZABBIX_KEY = NULL;
-static char	*ZABBIX_KEY_VALUE = NULL;
+static char		*CONFIG_SOURCE_IP = NULL;
+static char		*ZABBIX_SERVER = NULL;
+static unsigned short	ZABBIX_SERVER_PORT = 0;
+static char		*ZABBIX_HOSTNAME = NULL;
+static char		*ZABBIX_KEY = NULL;
+static char		*ZABBIX_KEY_VALUE = NULL;
 
 #if !defined(_WINDOWS)
 static void	send_signal_handler(int sig)

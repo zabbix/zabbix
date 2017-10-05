@@ -33,7 +33,7 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-void	zbx_proxyconfig_sigusr_handler(int flags)
+static void	zbx_proxyconfig_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
 	{
@@ -170,5 +170,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				CONFIG_PROXYCONFIG_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_PROXYCONFIG_FREQUENCY);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

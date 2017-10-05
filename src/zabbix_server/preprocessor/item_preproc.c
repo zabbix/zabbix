@@ -1009,7 +1009,7 @@ static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **e
  *                                                                            *
  ******************************************************************************/
 int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_item_preproc_t *op, zbx_item_history_value_t *history_value, char **errmsg)
+		const zbx_preproc_op_t *op, zbx_item_history_value_t *history_value, char **errmsg)
 {
 	switch (op->type)
 	{

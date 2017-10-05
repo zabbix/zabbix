@@ -42,19 +42,11 @@ $fields = [
 	'step' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(0, 65535), null],
 	'period' =>		[T_ZBX_INT, O_OPT, P_SYS, null,		null],
 	'stime' =>		[T_ZBX_STR, O_OPT, P_SYS, null,		null],
+	'isNow' =>		[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null],
 	'reset' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"reset"'), null],
-	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null],
-	// ajax
-	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT, null,		null]
+	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null]
 ];
 check_fields($fields);
-
-/*
- * Ajax
- */
-if (getRequest('favobj') === 'timeline' && hasRequest('elementid') && hasRequest('period')) {
-	navigation_bar_calc('web.hostscreen', getRequest('elementid'), true);
-}
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -66,10 +58,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $data = [
 	'hostid' => getRequest('hostid', 0),
-	'fullscreen' => $_REQUEST['fullscreen'],
+	'fullscreen' => getRequest('fullscreen', 0),
 	'screenid' => getRequest('screenid', CProfile::get('web.hostscreen.screenid', null)),
 	'period' => getRequest('period'),
-	'stime' => getRequest('stime')
+	'stime' => getRequest('stime'),
+	'isNow' => getRequest('isNow')
 ];
 CProfile::update('web.hostscreen.screenid', $data['screenid'], PROFILE_TYPE_ID);
 

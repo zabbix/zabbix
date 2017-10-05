@@ -69,7 +69,6 @@ if (getRequest('used_in_widget', 0)) {
 
 if ($map_data['id'] == -1) {
 	$options['timestamp'] = null;
-	$options['homepage'] = null;
 }
 
 echo CJs::encodeJson($options);

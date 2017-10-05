@@ -27,6 +27,14 @@ class CIPRangeValidatorTest extends PHPUnit_Framework_TestCase {
 	public function testProvider() {
 		return [
 			[
+				'{$MACRO}', ['usermacros' => true], [
+					'rc' => true,
+					'error' => '',
+					'max_ip_count' => '0',
+					'max_ip_range' => ''
+				]
+			],
+			[
 				"0.0.0.0,255.255.255.255 \t\r\n,\t\r\n 192.168.1.0,2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com", [], [
 					'rc' => true,
 					'error' => '',

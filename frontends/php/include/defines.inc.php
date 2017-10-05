@@ -701,7 +701,6 @@ define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
-define('DASHBOARD_DEFAULT_ID', 1);
 define('DASHBOARD_MAX_ROWS', 64);
 define('DASHBOARD_MAX_COLUMNS', 12);
 
@@ -1182,9 +1181,10 @@ define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
 define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
 
 // widget select resource field types
-define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
-define('WIDGET_FIELD_SELECT_RES_ITEM',		2);
-define('WIDGET_FIELD_SELECT_RES_GRAPH',		3);
+define('WIDGET_FIELD_SELECT_RES_SYSMAP',		1);
+define('WIDGET_FIELD_SELECT_RES_ITEM',			2);
+define('WIDGET_FIELD_SELECT_RES_GRAPH',			3);
+define('WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH',  4);
 
 // max depth of navigation tree
 define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
@@ -1221,9 +1221,6 @@ define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
 define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',				0);
 define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',		1);
 
-define('UPDATE_PROFILE_OFF',	0);
-define('UPDATE_PROFILE_ON',		1);
-
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
 define('NOT_EMPTY',	"({}!='')&&");
@@ -1239,7 +1236,6 @@ define('THEME_DEFAULT', 'default');
 // the default theme
 define('ZBX_DEFAULT_THEME', 'blue-theme');
 
-define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
 
 // non translatable date formats

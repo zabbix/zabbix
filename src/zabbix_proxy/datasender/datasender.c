@@ -164,7 +164,10 @@ static int	proxy_data_sender(int *more, int now)
 				if (0 != (flags & ZBX_DATASENDER_TASKS_RECV))
 				{
 					zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+
+					DBbegin();
 					zbx_tm_save_tasks(&tasks);
+					DBcommit();
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
@@ -244,5 +247,9 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		if (ZBX_PROXY_DATA_MORE != more)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

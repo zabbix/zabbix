@@ -36,6 +36,7 @@
 #
 # LAST MODIFICATION
 #
+#   2017-09-26   modified version detection to detect PostgreSQL 10 (Zabbix)
 #   2006-07-16
 #
 # COPYLEFT
@@ -137,6 +138,9 @@ conn = PQsetdbLogin(NULL, NULL, NULL, NULL, NULL, NULL, NULL);
         postgresql_version_major=`expr $POSTGRESQL_VERSION : '\([[0-9]]*\)'`
         postgresql_version_minor=`expr $POSTGRESQL_VERSION : '[[0-9]]*\.\([[0-9]]*\)'`
         postgresql_version_micro=`expr $POSTGRESQL_VERSION : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
+        if test "x$postgresql_version_minor" = "x"; then
+            postgresql_version_minor="0"
+        fi
         if test "x$postgresql_version_micro" = "x"; then
             postgresql_version_micro="0"
         fi

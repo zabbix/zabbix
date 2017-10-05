@@ -245,22 +245,27 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 				" on a.alertid=c.alertid"
 			" where r.taskid=" ZBX_FS_UI64, taskid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[2]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(alertid, row[2]);
 		ZBX_STR2UINT64(parent_taskid, row[3]);
-		status = atoi(row[0]);
 
-		if (SUCCEED == status)
+		if (SUCCEED != DBis_null(row[2]))
 		{
-			DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64, ALERT_STATUS_SENT, alertid);
-		}
-		else
-		{
-			error = DBdyn_escape_string_len(row[1], ALERT_ERROR_LEN);
-			DBexecute("update alerts set error='%s',status=%d where alertid=" ZBX_FS_UI64,
-					error, ALERT_STATUS_FAILED, alertid);
-			zbx_free(error);
+			ZBX_STR2UINT64(alertid, row[2]);
+			status = atoi(row[0]);
+
+			if (SUCCEED == status)
+			{
+				DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64, ALERT_STATUS_SENT,
+						alertid);
+			}
+			else
+			{
+				error = DBdyn_escape_string_len(row[1], ALERT_ERROR_LEN);
+				DBexecute("update alerts set error='%s',status=%d where alertid=" ZBX_FS_UI64,
+						error, ALERT_STATUS_FAILED, alertid);
+				zbx_free(error);
+			}
 		}
 
 		ret = SUCCEED;
@@ -495,5 +500,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

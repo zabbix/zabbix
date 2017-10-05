@@ -2999,7 +2999,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dbsync_compare_item_preproc(const zbx_dc_item_preproc_t *preproc, const DB_ROW dbrow)
+static int	dbsync_compare_item_preproc(const zbx_dc_preproc_op_t *preproc, const DB_ROW dbrow)
 {
 	if (FAIL == dbsync_compare_uint64(dbrow[1], preproc->itemid))
 		return FAIL;
@@ -3036,7 +3036,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	zbx_hashset_t		ids;
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
-	zbx_dc_item_preproc_t	*preproc;
+	zbx_dc_preproc_op_t	*preproc;
 
 	if (NULL == (result = DBselect(
 			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step"
@@ -3069,7 +3069,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
 
-		if (NULL == (preproc = (zbx_dc_item_preproc_t *)zbx_hashset_search(&dbsync_env.cache->item_preproc,
+		if (NULL == (preproc = (zbx_dc_preproc_op_t *)zbx_hashset_search(&dbsync_env.cache->preprocops,
 				&rowid)))
 		{
 			tag = ZBX_DBSYNC_ROW_ADD;
@@ -3081,8 +3081,8 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 			dbsync_add_row(sync, rowid, tag, dbrow);
 	}
 
-	zbx_hashset_iter_reset(&dbsync_env.cache->item_preproc, &iter);
-	while (NULL != (preproc = (zbx_dc_item_preproc_t *)zbx_hashset_iter_next(&iter)))
+	zbx_hashset_iter_reset(&dbsync_env.cache->preprocops, &iter);
+	while (NULL != (preproc = (zbx_dc_preproc_op_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL == zbx_hashset_search(&ids, &preproc->item_preprocid))
 			dbsync_add_row(sync, preproc->item_preprocid, ZBX_DBSYNC_ROW_REMOVE, NULL);

@@ -736,22 +736,35 @@ static int	send_buffer(const char *host, unsigned short port)
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, el->host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, el->key, ZBX_JSON_TYPE_STRING);
+
 		if (NULL != el->value)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
+
 		if (ITEM_STATE_NOTSUPPORTED == el->state)
+		{
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_STATE, ITEM_STATE_NOTSUPPORTED);
-		if (0 != (ZBX_METRIC_FLAG_LOG & el->flags))
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
-		if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & el->flags))
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
+		}
+		else
+		{
+			/* add item meta information only for items in normal state */
+			if (0 != (ZBX_METRIC_FLAG_LOG & el->flags))
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
+			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & el->flags))
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
+		}
+
 		if (0 != el->timestamp)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
+
 		if (NULL != el->source)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, el->source, ZBX_JSON_TYPE_STRING);
+
 		if (0 != el->severity)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
+
 		if (0 != el->logeventid)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
+
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, el->ts.ns);
 		zbx_json_close(&json);
@@ -1882,7 +1895,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-
 		zbx_handle_log();
 
 		now = time(NULL);
@@ -1912,8 +1924,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("active checks #%d [processing active checks]", process_num);
 
 			process_active_checks(activechk_args.host, activechk_args.port);
+
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
-				continue;
+				goto next;
 
 			nextcheck = get_min_nextcheck();
 			if (FAIL == nextcheck)
@@ -1936,6 +1949,12 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 
 		lastcheck = now;
+next:
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#else
+		;
+#endif
 	}
 
 #ifdef _WINDOWS

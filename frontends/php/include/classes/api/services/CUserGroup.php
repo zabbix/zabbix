@@ -46,7 +46,6 @@ class CUserGroup extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
 
 		$sqlParts = [
 			'select'	=> ['usrgrp' => 'g.usrgrpid'],
@@ -69,7 +68,7 @@ class CUserGroup extends CApiService {
 			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'editable'					=> null,
+			'editable'					=> false,
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
 			'selectRights'				=> null,
@@ -83,7 +82,7 @@ class CUserGroup extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permissions
-		if ($userType != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			if (!$options['editable']) {
 				$sqlParts['where'][] = 'g.usrgrpid IN ('.
 					'SELECT uug.usrgrpid'.

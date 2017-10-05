@@ -68,7 +68,7 @@ class CMap extends CMapElement {
 		$defOptions = [
 			'sysmapids'					=> null,
 			'userids'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,

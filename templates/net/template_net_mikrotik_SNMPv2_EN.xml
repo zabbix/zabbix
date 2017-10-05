@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Mikrotik SNMPv2</template>
          <name>Template Net Mikrotik SNMPv2</name>
-         <description>Template Net Mikrotik version: 0.12
+         <description>Template Net Mikrotik version: 0.13
 MIBs used:
 HOST-RESOURCES-MIB
 MIKROTIK-MIB
@@ -239,7 +239,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                <name>Operating system</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>.1.3.6.1.4.1.14988.1.1.4.4.0</snmp_oid>
+               <snmp_oid>1.3.6.1.4.1.14988.1.1.4.4.0</snmp_oid>
                <key>system.sw.os</key>
                <delay>3600</delay>
                <history>14d</history>
@@ -281,7 +281,7 @@ Software version</description>
                <name>Hardware model name</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>.1.3.6.1.2.1.1.1.0</snmp_oid>
+               <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>system.hw.model</key>
                <delay>3600</delay>
                <history>14d</history>
@@ -683,7 +683,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <name>Storage Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},.1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},.1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
                <key>storage.discovery</key>
                <delay>3600</delay>
                <status>0</status>

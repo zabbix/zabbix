@@ -61,7 +61,7 @@ static size_t		max_buffer_len;	/* error message buffer size */
  * Purpose: check whether the character delimits a numeric token              *
  *                                                                            *
  ******************************************************************************/
-int	is_number_delimiter(char c)
+static int	is_number_delimiter(char c)
 {
 	return 0 == isdigit(c) && '.' != c && 0 == isalpha(c) ? SUCCEED : FAIL;
 }

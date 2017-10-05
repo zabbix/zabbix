@@ -283,7 +283,9 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	zbx_ipc_socket_t	alerter_socket;
 	zbx_ipc_message_t	message;
 	double			time_stat, time_idle, time_now, time_read;
-
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+	double			resolver_timestamp = 0.0;
+#endif
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
@@ -342,6 +344,15 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		/* handle /etc/resolv.conf update less often than once a second */
+
+		if (1.0 < time_now - resolver_timestamp)
+		{
+			resolver_timestamp = time_now;
+			zbx_update_resolver_conf();
+		}
+#endif
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
 

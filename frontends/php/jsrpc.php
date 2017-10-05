@@ -88,6 +88,7 @@ switch ($data['method']) {
 		}
 
 		$options = [
+			'monitored' => true,
 			'lastChangeSince' => max([$lastMsgTime, $msgsettings['last.clock'], $timeout]),
 			'value' => [TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE],
 			'priority' => array_keys($msgsettings['triggers.severities']),
@@ -203,7 +204,7 @@ switch ($data['method']) {
 		$result = [];
 
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'priority'],
+			'output' => ['triggerid', 'expression', 'priority'],
 			'triggerids' => $data['triggerids'],
 			'limit' => $config['search_limit']
 		]);
@@ -236,7 +237,7 @@ switch ($data['method']) {
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$hostGroups = API::HostGroup()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['groupid', 'name'],
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
 					'filter' => isset($data['filter']) ? $data['filter'] : null,
@@ -263,7 +264,7 @@ switch ($data['method']) {
 
 			case 'hosts':
 				$hosts = API::Host()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['hostid', 'name'],
 					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
@@ -290,7 +291,7 @@ switch ($data['method']) {
 
 			case 'templates':
 				$templates = API::Template()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['templateid', 'name'],
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
@@ -349,7 +350,7 @@ switch ($data['method']) {
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid', 'description'],
 					'selectHosts' => $host_fields,
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'monitored' => isset($data['monitored']) ? $data['monitored'] : null,
 					'search' => isset($data['search']) ? ['description' => $data['search']] : null,
 					'limit' => $config['search_limit']
@@ -396,7 +397,7 @@ switch ($data['method']) {
 
 			case 'users':
 				$users = API::User()->get([
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : null,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['userid', 'alias', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
 						? [
@@ -426,6 +427,29 @@ switch ($data['method']) {
 					}
 				}
 				break;
+
+			case 'usersGroups':
+				$groups = API::UserGroup()->get([
+					'output' => ['usrgrpid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($groups) {
+					CArrayHelper::sort($groups, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$groups = array_slice($groups, 0, $data['limit']);
+					}
+
+					foreach ($groups as $group) {
+						$result[] = CArrayHelper::renameKeys($group, ['usrgrpid' => 'id']);
+					}
+				}
+				break;
+
 		}
 		break;
 

@@ -546,7 +546,7 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.parseContent(content, parse_links);
 	this.text = this.element.add('text', attributes, this.lines);
 
-	size = this.text.element.getBBox();
+	size = this.ZBX_getBBox();
 	this.width = Math.ceil(size.width);
 	this.height = Math.ceil(size.height + size.y);
 
@@ -571,6 +571,31 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.element.element.setAttribute('transform', 'translate(' + this.x + ' ' + this.y + ')');
 
 	return this.element;
+};
+
+/**
+ * getBBox workaround for Firefox and probably also old versions of IE.
+ *
+ * Firefox is not able to get element dimensions using getBBox unless it is appended to the DOM.
+ * The workaround creates a SVG element and appends it to the DOM to be able get element dimensions using the getBBox.
+ *
+ * Read more about this bug here https://bugzilla.mozilla.org/show_bug.cgi?id=612118
+ */
+SVGTextArea.prototype.ZBX_getBBox = function() {
+	try {
+		return this.text.element.getBBox();
+	}
+	catch (err) {
+		var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+			ret;
+
+		svg.appendChild(this.text.element);
+		document.body.appendChild(svg);
+		ret = this.text.element.getBBox();
+		svg.parentNode.removeChild(svg);
+
+		return ret;
+	}
 };
 
 /**

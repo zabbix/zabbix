@@ -58,7 +58,7 @@ if (!empty($this->data['graphid'])) {
 	$screen = CScreenBuilder::getScreen([
 		'resourcetype' => SCREEN_RESOURCE_CHART,
 		'graphid' => $this->data['graphid'],
-		'profileIdx' => 'web.screens',
+		'profileIdx' => 'web.graphs',
 		'profileIdx2' => $this->data['graphid']
 	]);
 
@@ -70,7 +70,8 @@ if (!empty($this->data['graphid'])) {
 
 	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screen->timeline,
-		'profileIdx' => $screen->profileIdx
+		'profileIdx' => $screen->profileIdx,
+		'profileIdx2' => $screen->profileIdx2
 	]);
 }
 else {

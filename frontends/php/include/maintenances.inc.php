@@ -109,7 +109,7 @@ function shedule2str($timeperiod) {
 			$every = '';
 			switch ($timeperiod['every']) {
 				case 1: $every = _('First'); break;
-				case 2: $every = _('Second'); break;
+				case 2: $every = _x('Second', 'adjective'); break;
 				case 3: $every = _('Third'); break;
 				case 4: $every = _('Fourth'); break;
 				case 5: $every = _('Last'); break;

@@ -28,8 +28,8 @@
 
 typedef struct
 {
-	PERF_COUNTER_DATA	**cpu_counter;
-	PERF_COUNTER_DATA	*queue_counter;
+	zbx_perf_counter_data_t	**cpu_counter;
+	zbx_perf_counter_data_t	*queue_counter;
 	int			count;
 }
 ZBX_CPUS_STAT_DATA;

@@ -30,7 +30,7 @@ extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-void	zbx_dbconfig_sigusr_handler(int flags)
+static void	zbx_dbconfig_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
 	{
@@ -99,5 +99,9 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 				get_process_type_string(process_type), sec, CONFIG_CONFSYNCER_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

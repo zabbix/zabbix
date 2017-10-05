@@ -95,6 +95,7 @@ const char	*zbx_result_string(int result);
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	128
+#define MAX_ZBX_DNSNAME_LEN	255	/* maximum host DNS name length from RFC 1035 (without terminating '\0') */
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
@@ -1247,6 +1248,9 @@ void	zbx_alarm_flag_clear(void);
 #ifndef _WINDOWS
 unsigned int	zbx_alarm_on(unsigned int seconds);
 unsigned int	zbx_alarm_off(void);
+#if defined(HAVE_RESOLV_H)
+void	zbx_update_resolver_conf(void);		/* handle /etc/resolv.conf update */
+#endif
 #endif
 
 int	zbx_alarm_timed_out(void);

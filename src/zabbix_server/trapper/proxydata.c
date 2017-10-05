@@ -25,6 +25,13 @@
 #include "proxydata.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxtasks.h"
+#include "mutexs.h"
+
+extern unsigned char	program_type;
+static ZBX_MUTEX	proxy_lock = ZBX_MUTEX_NULL;
+
+#define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(&proxy_lock)
+#define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(&proxy_lock)
 
 int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info)
 {
@@ -168,6 +175,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 		goto out;
 	}
 
+	LOCK_PROXY_HISTORY;
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	get_host_availability_data(&j, &availability_ts);
@@ -217,7 +225,10 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
 			{
 				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+
+				DBbegin();
 				zbx_tm_save_tasks(&tasks);
+				DBcommit();
 			}
 		}
 
@@ -233,6 +244,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_vector_ptr_destroy(&tasks);
 
 	zbx_json_free(&j);
+	UNLOCK_PROXY_HISTORY;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -292,7 +304,10 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
 			{
 				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+
+				DBbegin();
 				zbx_tm_save_tasks(&tasks);
+				DBcommit();
 			}
 		}
 
@@ -310,5 +325,21 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_json_free(&j);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+void	init_proxy_history_lock(void)
+{
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE) &&
+			FAIL == zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, NULL))
+	{
+		zbx_error("Unable to create mutex for passive proxy history");
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	free_proxy_history_lock(void)
+{
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+		zbx_mutex_destroy(&proxy_lock);
 }
 

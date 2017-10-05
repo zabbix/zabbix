@@ -50,7 +50,8 @@
 #	define ZBX_MUTEX_VMWARE		10
 #	define ZBX_MUTEX_SQLITE3	11
 #	define ZBX_MUTEX_PROCSTAT	12
-#	define ZBX_MUTEX_COUNT		13
+#	define ZBX_MUTEX_PROXY_HISTORY	13
+#	define ZBX_MUTEX_COUNT		14
 
 #endif	/* _WINDOWS */
 

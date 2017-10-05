@@ -25,12 +25,6 @@
 #define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 
-#ifdef HAVE_IPV6
-#	define ZBX_SOCKADDR struct sockaddr_storage
-#else
-#	define ZBX_SOCKADDR struct sockaddr_in
-#endif
-
 #ifndef ZBX_SOCKLEN_T
 #	define ZBX_SOCKLEN_T socklen_t
 #endif
@@ -83,37 +77,46 @@ static void	__zbx_zbx_set_socket_strerror(const char *fmt, ...)
 	va_end(args);
 }
 
-static char	*zbx_get_ip_by_socket(zbx_socket_t *s)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_socket_peer_ip_save                                          *
+ *                                                                            *
+ * Purpose: get peer IP address info from a socket early while it is          *
+ *          connected. Connection can be terminated due to various errors at  *
+ *          any time and peer IP address will not be available anymore.       *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
 {
-	ZBX_SOCKADDR			sa;
-	ZBX_SOCKLEN_T			sz = sizeof(sa);
-	ZBX_THREAD_LOCAL static char	host[64];
-	char				*error_message = NULL;
+	ZBX_SOCKADDR	sa;
+	ZBX_SOCKLEN_T	sz = sizeof(sa);
+	char		*error_message = NULL;
 
 	if (ZBX_PROTO_ERROR == getpeername(s->socket, (struct sockaddr *)&sa, &sz))
 	{
 		error_message = strerror_from_system(zbx_socket_last_error());
 		zbx_set_socket_strerror("connection rejected, getpeername() failed: %s", error_message);
-		goto out;
+		return FAIL;
 	}
 
+	/* store getpeername() result to have IP address in numerical form for security check */
+	memcpy(&s->peer_info, &sa, (size_t)sz);
+
+	/* store IP address as a text string for error reporting */
+
 #ifdef HAVE_IPV6
-	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
+	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, s->peer, sizeof(s->peer), NULL, 0, NI_NUMERICHOST))
 	{
 		error_message = strerror_from_system(zbx_socket_last_error());
 		zbx_set_socket_strerror("connection rejected, getnameinfo() failed: %s", error_message);
+		return FAIL;
 	}
 #else
-	zbx_snprintf(host, sizeof(host), "%s", inet_ntoa(sa.sin_addr));
+	strscpy(s->peer, inet_ntoa(sa.sin_addr));
 #endif
-out:
-	if (NULL != error_message)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot get socket IP address: %s", error_message);
-		strscpy(host, "unknown IP");
-	}
-
-	return host;
+	return SUCCEED;
 }
 
 #ifndef _WINDOWS
@@ -1220,7 +1223,12 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	s->socket = accepted_socket;	/* replace socket to accepted */
 	s->accepted = 1;
 
-	zbx_strlcpy(s->peer, zbx_get_ip_by_socket(s), sizeof(s->peer));	/* save peer IP address */
+	if (SUCCEED != zbx_socket_peer_ip_save(s))
+	{
+		/* cannot get peer IP address */
+		zbx_tcp_unaccept(s);
+		goto out;
+	}
 
 	zbx_socket_timeout_set(s, CONFIG_TIMEOUT);
 
@@ -1874,16 +1882,14 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_check_security                                           *
+ * Function: zbx_tcp_check_allowed_peers                                      *
  *                                                                            *
  * Purpose: check if connection initiator is in list of peers                 *
  *                                                                            *
- * Parameters: s               - [IN] socket descriptor                       *
- *             peer_list       - [IN] comma-delimited list of allowed peers   *
- *             action_if_empty - [IN] action if there are no peers given,     *
- *                                 possible values are:                       *
- *                                   - ZBX_TCP_REJECT_IF_EMPTY - deny         *
- *                                   - ZBX_TCP_PERMIT_IF_EMPTY - allow        *
+ * Parameters: s         - [IN] socket descriptor                             *
+ *             peer_list - [IN] comma-delimited list of allowed peers.        *
+ *                              NULL not allowed. Empty string results in     *
+ *                              return value FAIL.                            *
  *                                                                            *
  * Return value: SUCCEED - connection allowed                                 *
  *               FAIL - connection is not allowed                             *
@@ -1894,47 +1900,28 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if_empty)
+int	zbx_tcp_check_allowed_peers(zbx_socket_t *s, const char *peer_list)
 {
-#ifdef HAVE_IPV6
-	struct addrinfo	hints, *ai = NULL, *current_ai;
-#else
-	struct hostent	*hp;
-	int		i;
-#endif
-	int		prefix_size;
-	ZBX_SOCKADDR	name;
-	ZBX_SOCKLEN_T	nlen;
+	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
 
-	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_sep;
-
-	if (NULL == peer_list || '\0' == *peer_list)
-	{
-		switch (action_if_empty)
-		{
-			case ZBX_TCP_REJECT_IF_EMPTY:
-				break;	/* no return, still need to zbx_set_socket_strerror() */
-			case ZBX_TCP_PERMIT_IF_EMPTY:
-				return SUCCEED;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
-	}
-
-	nlen = sizeof(name);
-
-	if (ZBX_PROTO_ERROR == getpeername(s->socket, (struct sockaddr *)&name, &nlen))
-	{
-		zbx_set_socket_strerror("connection rejected, getpeername() failed: %s",
-				strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
-	}
+	/* examine list of allowed peers which may include DNS names, IPv4/6 addresses and addresses in CIDR notation */
 
 	strscpy(tmp, peer_list);
 
 	for (start = tmp; '\0' != *start;)
 	{
-		prefix_size = -1;
+#ifdef HAVE_IPV6
+#ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
+		int	ai_family = s->peer_info.ss_family;
+#else
+		int	ai_family = s->peer_info.__ss_family;
+#endif
+		unsigned int	prefix_size = (ai_family == AF_INET ? IPV4_MAX_CIDR_PREFIX : IPV6_MAX_CIDR_PREFIX);
+		struct addrinfo	hints, *ai = NULL, *current_ai;
+#else
+		unsigned int	prefix_size = IPV4_MAX_CIDR_PREFIX;
+		struct hostent	*hp;
+#endif /* HAVE_IPV6 */
 
 		if (NULL != (end = strchr(start, ',')))
 			*end = '\0';
@@ -1943,11 +1930,10 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if
 		{
 			*cidr_sep = '\0';
 
+			/* validate_cidr() may overwrite 'prefix_size' */
 			if (SUCCEED != validate_cidr(start, cidr_sep + 1, &prefix_size))
 				*cidr_sep = '/';	/* CIDR is only supported for IP */
 		}
-
-		/* allow IP addresses or DNS names for authorization */
 
 		/* When adding IPv6 support it was decided to leave current implementation   */
 		/* (based on gethostbyname()) for handling non-IPv6-enabled components. In   */
@@ -1955,20 +1941,15 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if
 
 #ifdef HAVE_IPV6
 		memset(&hints, 0, sizeof(hints));
-		hints.ai_family = PF_UNSPEC;
+		hints.ai_family = ai_family;
+		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_protocol = IPPROTO_TCP;
+
 		if (0 == getaddrinfo(start, NULL, &hints, &ai))
 		{
 			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 			{
-				int	prefix_size_current = prefix_size;
-
-				if (-1 == prefix_size_current)
-				{
-					prefix_size_current = (current_ai->ai_family == AF_INET ?
-							IPV4_MAX_CIDR_PREFIX : IPV6_MAX_CIDR_PREFIX);
-				}
-
-				if (SUCCEED == zbx_ip_cmp(prefix_size_current, current_ai, name))
+				if (SUCCEED == zbx_ip_cmp(prefix_size, current_ai, s->peer_info))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;
@@ -1979,13 +1960,13 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if
 #else
 		if (NULL != (hp = gethostbyname(start)))
 		{
+			int	i;
+
 			for (i = 0; NULL != hp->h_addr_list[i]; i++)
 			{
-				if (-1 == prefix_size)
-					prefix_size = IPV4_MAX_CIDR_PREFIX;
-
 				if (SUCCEED == subnet_match(AF_INET, prefix_size,
-						&((struct in_addr *)hp->h_addr_list[i])->s_addr, &name.sin_addr.s_addr))
+						&((struct in_addr *)hp->h_addr_list[i])->s_addr,
+						&s->peer_info.sin_addr.s_addr))
 				{
 					return SUCCEED;
 				}
@@ -1993,26 +1974,13 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if
 		}
 #endif	/* HAVE_IPV6 */
 		if (NULL != end)
-		{
-			*end = ',';
 			start = end + 1;
-		}
 		else
 			break;
 	}
 
-	if (NULL != end)
-		*end = ',';
+	zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", s->peer, peer_list);
 
-#ifdef HAVE_IPV6
-	if (0 == zbx_getnameinfo((struct sockaddr *)&name, tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
-		zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, peer_list);
-	else
-		zbx_set_socket_strerror("connection rejected, allowed hosts: \"%s\"", peer_list);
-#else
-	zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"",
-			inet_ntoa(name.sin_addr), peer_list);
-#endif
 	return FAIL;
 }
 
@@ -2107,3 +2075,35 @@ void	zbx_udp_close(zbx_socket_t *s)
 	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
 }
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_resolver_conf                                         *
+ *                                                                            *
+ * Purpose: react to "/etc/resolv.conf" update                                *
+ *                                                                            *
+ * Comments: it is intended to call this function in the end of each process  *
+ *           main loop. The purpose of calling it at the end (instead of the  *
+ *           beginning of main loop) is to let the first initialization of    *
+ *           libc resolver proceed internally.                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_update_resolver_conf(void)
+{
+#define ZBX_RESOLV_CONF_FILE	"/etc/resolv.conf"
+
+	static time_t	mtime = 0;
+	zbx_stat_t	buf;
+
+	if (0 == zbx_stat(ZBX_RESOLV_CONF_FILE, &buf) && mtime != buf.st_mtime)
+	{
+		mtime = buf.st_mtime;
+
+		if (0 != res_init())
+			zabbix_log(LOG_LEVEL_WARNING, "zbx_update_resolver_conf(): res_init() failed");
+	}
+
+#undef ZBX_RESOLV_CONF_FILE
+}
+#endif

@@ -66,7 +66,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$resourceid = null;
 		$profileIdx = 'web.dashbrd';
 		$profileIdx2 = $dashboardid;
-		$update_profile = $dashboardid ? UPDATE_PROFILE_ON : UPDATE_PROFILE_OFF;
 		$unavailable_object = false;
 
 		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $fields['graphid']) {
@@ -92,9 +91,10 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$timeline = calculateTime([
 			'profileIdx' => $profileIdx,
 			'profileIdx2' => $profileIdx2,
-			'updateProfile' => $update_profile,
+			'updateProfile' => false,
 			'period' => null,
-			'stime' => null
+			'stime' => null,
+			'isNow' => null
 		]);
 
 		$time_control_data = [
@@ -117,7 +117,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'resourcetype' => $resource_type,
 			'profileIdx' => $profileIdx,
 			'profileIdx2' => $profileIdx2,
-			'updateProfile' => $update_profile
+			'updateProfile' => false
 		];
 
 		// Replace graph item by particular host item if dynamic items are used.
@@ -205,17 +205,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			if (!$resourceid) {
 				$unavailable_object = true;
 			}
-			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				$item = API::Item()->get([
-					'itemids' => $resourceid,
-					'output' => null
-				]);
-				$item = reset($item);
-
-				if (!$item) {
-					$unavailable_object = true;
-				}
-			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get graph, used below
 				$graph = API::Graph()->get([
@@ -227,6 +216,23 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				if (!$graph) {
 					$unavailable_object = true;
 				}
+			}
+		}
+
+		if (!$unavailable_object && $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			$item = API::Item()->get([
+				'itemids' => $resourceid,
+				'output' => ['type', 'name', 'hostid', 'key_'],
+				'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
+				'selectHosts' => ['name'],
+				'webitems' => true
+			]);
+
+			if ($item) {
+				$item = reset($item);
+			}
+			else {
+				$unavailable_object = true;
 			}
 		}
 
@@ -249,6 +255,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 				$graph_src->setArgument('period', $timeline['period']);
 				$graph_src->setArgument('stime', $timeline['stime']);
+				$graph_src->setArgument('isNow', $timeline['isNow']);
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';
@@ -304,13 +311,14 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$graph_src->setArgument('legend', $graph['show_legend']);
 				$graph_src->setArgument('period', $timeline['period']);
 				$graph_src->setArgument('stime', $timeline['stime']);
+				$graph_src->setArgument('isNow', $timeline['isNow']);
 
 				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 					$graph_src->setArgument('graph3d', $graph['show_3d']);
 				}
 			}
 
-			$graph_src->setArgument('updateProfile', $update_profile);
+			$graph_src->setArgument('updateProfile', false);
 			$graph_src->setArgument('profileIdx', $profileIdx);
 			$graph_src->setArgument('profileIdx2', $profileIdx2);
 

@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Huawei VRP SNMPv2</template>
          <name>Template Net Huawei VRP SNMPv2</name>
-         <description>Template Net Huawei VRP version: 0.12
+         <description>Template Net Huawei VRP version: 0.13
 Overview: Reference: https://www.slideshare.net/Huanetwork/huawei-s5700-naming-conventions-and-port-numbering-conventions
 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
 
@@ -520,7 +520,7 @@ Device serial number has changed. Ack to close</description>
                <name>Entity Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#ENT_CLASS},.1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]</snmp_oid>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]</snmp_oid>
                <key>entity.discovery</key>
                <delay>3600</delay>
                <status>0</status>

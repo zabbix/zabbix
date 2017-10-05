@@ -38,7 +38,7 @@ class CAlert extends CApiService {
 	 * @param array $options['alertids']
 	 * @param array $options['applicationids']
 	 * @param array $options['status']
-	 * @param array $options['editable']
+	 * @param bool  $options['editable']
 	 * @param array $options['extendoutput']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
@@ -49,8 +49,6 @@ class CAlert extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['alerts' => 'a.alertid'],
@@ -88,7 +86,7 @@ class CAlert extends CApiService {
 			'selectHosts'				=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
-			'editable'					=> null,
+			'editable'					=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -98,7 +96,7 @@ class CAlert extends CApiService {
 		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -109,7 +107,7 @@ class CAlert extends CApiService {
 					' FROM events e,functions f,items i,hosts_groups hgg'.
 					' JOIN rights r'.
 						' ON r.id=hgg.groupid'.
-						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
 					' WHERE a.eventid=e.eventid'.
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
@@ -129,7 +127,7 @@ class CAlert extends CApiService {
 					' FROM events e,items i,hosts_groups hgg'.
 					' JOIN rights r'.
 						' ON r.id=hgg.groupid'.
-						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
 					' WHERE a.eventid=e.eventid'.
 						' AND e.objectid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
