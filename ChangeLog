@@ -14,6 +14,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+.......PS. [ZBX-12725] improved task database operations to handle/prevent creation of tasks without corresponding data records (wiper)
 ..F....... [ZBX-12771] fixed {HOST.*} macro expansion for map trigger elements in map constructor (vjaceslavs)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
 .......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)

@@ -301,19 +301,48 @@ static int	tm_save_remote_command_result_tasks(zbx_tm_task_t **tasks, int tasks_
  *                                                                            *
  * Function: tm_save_tasks                                                    *
  *                                                                            *
- * Purpose: saves task metadata into database                                 *
+ * Purpose: saves tasks into database                                         *
  *                                                                            *
  * Parameters: tasks     - [IN] the tasks                                     *
  *             tasks_num - [IN] the number of tasks to process                *
  *                                                                            *
- * Return value: SUCCEED - the task metadata was saved successfully           *
+ * Return value: SUCCEED - the tasks were saved successfully                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 {
-	int		i, ret;
+	int		i, ret, remote_command_num = 0, remote_command_result_num = 0, ids_num = 0;
+	zbx_uint64_t	taskid;
 	zbx_db_insert_t	db_insert;
+
+	for (i = 0; i < tasks_num; i++)
+	{
+		if (0 == tasks[i]->taskid)
+			ids_num++;
+	}
+
+	if (0 != ids_num)
+		taskid = DBget_maxid_num("task", ids_num);
+
+	for (i = 0; i < tasks_num; i++)
+	{
+		switch (tasks[i]->type)
+		{
+			case ZBX_TM_TASK_REMOTE_COMMAND:
+				remote_command_num++;
+				break;
+			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
+				remote_command_result_num++;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+		}
+
+		if (0 == tasks[i]->taskid)
+			tasks[i]->taskid = taskid++;
+	}
 
 	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", "ttl", "proxy_hostid", NULL);
 
@@ -328,6 +357,12 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 
 	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
+
+	if (SUCCEED == ret && 0 != remote_command_num)
+		ret = tm_save_remote_command_tasks(tasks, tasks_num);
+
+	if (SUCCEED == ret && 0 != remote_command_result_num)
+		ret = tm_save_remote_command_result_tasks(tasks, tasks_num);
 
 	return ret;
 }
@@ -344,54 +379,12 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 {
 	const char	*__function_name = "zbx_tm_save_tasks";
-	int		i, rc, remote_command_num = 0, remote_command_result_num = 0, ids_num = 0;
-	zbx_uint64_t	taskid;
-	zbx_tm_task_t	*task;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, tasks->values_num);
 
-	for (i = 0; i < tasks->values_num; i++)
-	{
-		task = (zbx_tm_task_t *)tasks->values[i];
-
-		if (0 == task->taskid)
-			ids_num++;
-	}
-
-	if (0 != ids_num)
-		taskid = DBget_maxid_num("task", ids_num);
-
-	for (i = 0; i < tasks->values_num; i++)
-	{
-		task = (zbx_tm_task_t *)tasks->values[i];
-
-		switch (task->type)
-		{
-			case ZBX_TM_TASK_REMOTE_COMMAND:
-				remote_command_num++;
-				break;
-			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
-				remote_command_result_num++;
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-		}
-
-		if (0 == task->taskid)
-			task->taskid = taskid++;
-	}
-
-	rc = tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
-
-	if (SUCCEED == rc && 0 != remote_command_num)
-		rc = tm_save_remote_command_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
-
-	if (SUCCEED == rc && 0 != remote_command_result_num)
-		tm_save_remote_command_result_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
 }
 
 /******************************************************************************
@@ -410,28 +403,10 @@ int	zbx_tm_save_task(zbx_tm_task_t *task)
 {
 	const char	*__function_name = "zbx_tm_save_task";
 	int		ret;
-	int		(*save_task_data_func)(zbx_tm_task_t **tasks, int tasks_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	switch (task->type)
-	{
-		case ZBX_TM_TASK_REMOTE_COMMAND:
-			save_task_data_func = tm_save_remote_command_tasks;
-			break;
-		case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
-			save_task_data_func = tm_save_remote_command_result_tasks;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
-
-	if (0 == task->taskid)
-		task->taskid = DBget_maxid("task");
-
-	if (SUCCEED == (ret = tm_save_tasks(&task, 1)))
-		ret = save_task_data_func(&task, 1);
+	ret = tm_save_tasks(&task, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
