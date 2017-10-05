@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
 A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy cannot be deleted when used in actions (Sasha)
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
