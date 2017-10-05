@@ -440,13 +440,13 @@ void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result)
  *           result is needed for longer.                                     *
  *                                                                            *
  ******************************************************************************/
-static const const char	**zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
+static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 {
-	const char		*__function_name = "zbx_odbc_fetch";
-	char			*diag = NULL;
-	SQLRETURN		rc;
-	SQLSMALLINT		i;
-	const const char	**row = NULL;
+	const char	*__function_name = "zbx_odbc_fetch";
+	char		*diag = NULL;
+	SQLRETURN	rc;
+	SQLSMALLINT	i;
+	const char	*const *row = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -496,7 +496,7 @@ static const const char	**zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 		zabbix_log(LOG_LEVEL_DEBUG, "column #%d value:'%s'", (int)i + 1, ZBX_NULL2STR(query_result->row[i]));
 	}
 
-	row = (const const char **)query_result->row;
+	row = (const char *const *)query_result->row;
 out:
 	zbx_free(diag);
 
@@ -526,9 +526,9 @@ out:
  ******************************************************************************/
 int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char **string, char **error)
 {
-	const char		*__function_name = "zbx_odbc_query_result_to_string";
-	const const char	**row;
-	int			ret = FAIL;
+	const char	*__function_name = "zbx_odbc_query_result_to_string";
+	const char	*const *row;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -573,7 +573,7 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, char **lld_json, char **error)
 {
 	const char		*__function_name = "zbx_odbc_query_result_to_lld_json";
-	const const char	**row;
+	const char		*const *row;
 	struct zbx_json		json;
 	zbx_vector_str_t	macros;
 	int			ret = FAIL, i, j;
