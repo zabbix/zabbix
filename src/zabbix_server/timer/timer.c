@@ -90,6 +90,8 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		DBcommit();
 
+		DBupdate_itservices(&trigger_diff);
+
 		DCconfig_unlock_triggers(&triggerids);
 		zbx_vector_uint64_clear(&triggerids);
 

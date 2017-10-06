@@ -16,6 +16,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
 ........S. [ZBX-12791] fixed hanging of preprocessing manager process due to file descriptor limit exhaustion when too many data gathering processes are configured to start (gleb)
 ..F....... [ZBXNEXT-3732] fixed IE and Opera specific javascript bug; improved the depth control of navigation tree items; improved coding style and performance (miks)
 ..F....... [ZBX-12577] fixed simple graph widget item support: only supported dynamic items, only real hosts, show only hosts with items (gcalenko)
@@ -338,6 +339,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
 ........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
 .......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
@@ -850,6 +852,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
 ........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
 ..F....... [ZBX-12191] fixed start time and timeline period in events screen when switching to next pages (miks)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
