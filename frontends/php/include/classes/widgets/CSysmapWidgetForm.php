@@ -35,11 +35,10 @@ class CSysmapWidgetForm extends CWidgetForm {
 		$this->fields[] = $field_reference;
 
 		// select source type field
-		$source_types = [
+		$field_source_type = (new CWidgetFieldRadioButtonList('source_type', _('Source type'), [
 			WIDGET_SYSMAP_SOURCETYPE_MAP => _('Map'),
 			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree'),
-		];
-		$field_source_type = (new CWidgetFieldRadioButtonList('source_type', _('Source type'), $source_types))
+		]))
 			->setDefault(WIDGET_SYSMAP_SOURCETYPE_MAP)
 			->setAction('updateWidgetConfigDialogue()')
 			->setModern(true);
@@ -70,5 +69,31 @@ class CSysmapWidgetForm extends CWidgetForm {
 			}
 			$this->fields[] = $field_map;
 		}
+	}
+
+	/**
+	 * Validate form fields.
+	 *
+	 * @param bool $strict  Enables more strict validation of the form fields.
+	 *                      Must be enabled for validation of input parameters in the widget configuration form.
+	 *
+	 * @return array
+	 */
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
+
+		// In strict validation 'filter_widget_reference' key should exist.
+		$invalid = $strict
+			? (!array_key_exists('filter_widget_reference', $this->data)
+				|| $this->data['filter_widget_reference'] === '')
+			: (array_key_exists('filter_widget_reference', $this->data)
+				&& $this->data['filter_widget_reference'] === '');
+
+		if (!$errors && array_key_exists('source_type', $this->data)
+				&& $this->data['source_type'] == WIDGET_SYSMAP_SOURCETYPE_FILTER && $invalid) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Filter'), _('cannot be empty'));
+		}
+
+		return $errors;
 	}
 }

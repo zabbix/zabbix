@@ -225,7 +225,10 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
 			{
 				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+
+				DBbegin();
 				zbx_tm_save_tasks(&tasks);
+				DBcommit();
 			}
 		}
 
@@ -301,7 +304,10 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
 			{
 				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+
+				DBbegin();
 				zbx_tm_save_tasks(&tasks);
+				DBcommit();
 			}
 		}
 

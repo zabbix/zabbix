@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
 A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy cannot be deleted when used in actions (Sasha)
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
@@ -14,6 +15,12 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBXNEXT-3732] fixed IE and Opera specific javascript bug; improved the depth control of navigation tree items; improved coding style and performance (miks)
+..F....... [ZBX-12577] fixed simple graph widget item support: only supported dynamic items, only real hosts, show only hosts with items (gcalenko)
+..F....... [ZBX-12689] added 'filter field should not be empty' validation for sysmap widget form (gcalenko)
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
+.......PS. [ZBX-12725] improved task database operations to handle/prevent creation of tasks without corresponding data records (wiper)
+..F....... [ZBX-12771] fixed {HOST.*} macro expansion for map trigger elements in map constructor (vjaceslavs)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
 .......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
 ..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
@@ -329,6 +336,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
 .......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
 ..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
@@ -840,6 +848,8 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
+..F....... [ZBX-12191] fixed start time and timeline period in events screen when switching to next pages (miks)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
 .......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
 ..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)

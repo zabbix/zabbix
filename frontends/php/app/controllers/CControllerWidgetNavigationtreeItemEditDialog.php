@@ -100,7 +100,7 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 				)
 		]);
 
-		if ($depth >= WIDGET_NAVIGATION_TREE_MAX_DEPTH - 1) {
+		if ($depth >= WIDGET_NAVIGATION_TREE_MAX_DEPTH) {
 			$formList->addRow(null, _('Cannot add submaps. Max depth reached.'));
 		}
 		else {

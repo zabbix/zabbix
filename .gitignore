@@ -314,6 +314,9 @@ src/zabbix_server/httppoller/Makefile.in
 src/zabbix_server/ipmi/.deps
 src/zabbix_server/ipmi/Makefile
 src/zabbix_server/ipmi/Makefile.in
+src/zabbix_server/odbc/.deps
+src/zabbix_server/odbc/Makefile
+src/zabbix_server/odbc/Makefile.in
 src/zabbix_server/pinger/.deps
 src/zabbix_server/pinger/Makefile
 src/zabbix_server/pinger/Makefile.in
