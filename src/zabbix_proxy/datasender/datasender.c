@@ -164,10 +164,7 @@ static int	proxy_data_sender(int *more, int now)
 				if (0 != (flags & ZBX_DATASENDER_TASKS_RECV))
 				{
 					zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
-
-					DBbegin();
 					zbx_tm_save_tasks(&tasks);
-					DBcommit();
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
