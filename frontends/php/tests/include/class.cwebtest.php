@@ -741,7 +741,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			DBconnect($error);
 		}
 
-		// Perform parsing of test methid annotations.
+		// Perform parsing of test method annotations.
 		$annotations = PHPUnit_Util_Test::parseTestMethodAnnotations($class_name, $this->getName(false));
 
 		// Perform test case level backup.
