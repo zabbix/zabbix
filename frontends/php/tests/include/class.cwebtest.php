@@ -781,16 +781,12 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		global $DB;
 
 		if ($this->case_table !== null) {
-			if (!isset($DB['DB'])) {
-				DBconnect($error);
-			}
-
 			DBrestore_tables($this->case_table);
-			DBClose();
 		}
 
 		// Perform browser cleanup.
 		$this->cleanup();
+		DBclose();
 	}
 
 	/**
@@ -802,12 +798,9 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		global $DB;
 
 		if (self::$suite_table !== null) {
-			if (!isset($DB['DB'])) {
-				DBconnect($error);
-			}
-
+			DBconnect($error);
 			DBrestore_tables(self::$suite_table);
-			DBClose();
+			DBclose();
 		}
 
 		self::$suite_table = null;
