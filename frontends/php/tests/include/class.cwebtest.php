@@ -742,16 +742,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 
 		// Perform parsing of test methid annotations.
-		$annotations = PHPUnit_Util_Test::parseTestMethodAnnotations(
-			$class_name,
-			$this->getName(false)
-		);
+		$annotations = PHPUnit_Util_Test::parseTestMethodAnnotations($class_name, $this->getName(false));
 
 		// Perform test case level backup.
 		if (array_key_exists('method', $annotations) && is_array($annotations['method'])
 				&& array_key_exists('backup', $annotations['method']) && is_array($annotations['method']['backup'])
 				&& count($annotations['method']['backup']) === 1) {
-				$this->case_table = $annotations['method']['backup'][0];
+			$this->case_table = $annotations['method']['backup'][0];
 			DBsave_tables($this->case_table);
 		}
 
@@ -759,7 +756,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		if ($suite !== $class_name && array_key_exists('class', $annotations) && is_array($annotations['class'])
 				&& array_key_exists('backup', $annotations['class']) && is_array($annotations['class']['backup'])
 				&& count($annotations['class']['backup']) === 1) {
-				self::$suite_table = $annotations['class']['backup'][0];
+			self::$suite_table = $annotations['class']['backup'][0];
 			DBsave_tables(self::$suite_table);
 		}
 
