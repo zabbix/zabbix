@@ -875,23 +875,27 @@ static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
  * Parameters: service - [IN] the IPC service                                 *
  *                                                                            *
  ******************************************************************************/
-static int	ipc_service_accept(zbx_ipc_service_t *service)
+static void	ipc_service_accept(zbx_ipc_service_t *service)
 {
 	const char	*__function_name = "ipc_service_accept";
-	int		fd, ret = FAIL;
+	int		fd;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (fd = accept(service->fd, NULL, NULL)))
-		goto out;
+	while (-1 == (fd = accept(service->fd, NULL, NULL)))
+	{
+		if (EINTR != errno)
+		{
+			/* If there is unaccepted connection libevent will call registered callback function over and */
+			/* over again. It is better to exit straight away and cause all other processes to stop. */
+			zabbix_log(LOG_LEVEL_CRIT, "cannot accept incoming IPC connection: %s", zbx_strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+	}
 
 	ipc_service_add_client(service, fd);
 
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1629,7 +1633,7 @@ int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsig
 	zbx_ipc_message_t	*message;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() client:" ZBX_FS_UI64, __function_name, client, client->id);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clientid:" ZBX_FS_UI64, __function_name, client->id);
 
 	if (0 != client->tx_bytes)
 	{

@@ -402,7 +402,6 @@ int	zabbix_check_log_level(int level)
 
 void	__zbx_zabbix_log(int level, const char *fmt, ...)
 {
-	FILE		*log_file = NULL;
 	char		message[MAX_BUFFER_LEN];
 	va_list		args;
 #ifdef _WINDOWS
@@ -414,6 +413,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 	if (LOG_TYPE_FILE == log_type)
 	{
+		FILE	*log_file;
+
 		LOCK_LOG;
 
 		rotate_log(log_filename);
@@ -444,6 +445,16 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			fprintf(log_file, "\n");
 
 			zbx_fclose(log_file);
+		}
+		else
+		{
+			zbx_error("failed to open log file: %s", zbx_strerror(errno));
+
+			va_start(args, fmt);
+			zbx_vsnprintf(message, sizeof(message), fmt, args);
+			va_end(args);
+
+			zbx_error("failed to write [%s] into log file", message);
 		}
 
 		UNLOCK_LOG;

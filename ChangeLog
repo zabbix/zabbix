@@ -16,6 +16,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+........S. [ZBX-12791] fixed hanging of preprocessing manager process due to file descriptor limit exhaustion when too many data gathering processes are configured to start (gleb)
 ..F....... [ZBXNEXT-3732] fixed IE and Opera specific javascript bug; improved the depth control of navigation tree items; improved coding style and performance (miks)
 ..F....... [ZBX-12577] fixed simple graph widget item support: only supported dynamic items, only real hosts, show only hosts with items (gcalenko)
 ..F....... [ZBX-12689] added 'filter field should not be empty' validation for sysmap widget form (gcalenko)

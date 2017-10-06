@@ -13,7 +13,7 @@ zabbix_proxy_SOURCES = \
 	servercomms.c servercomms.h \
 	events.c \
 	preprocessing.c \
-	proxy.c 
+	proxy.c
 	
 	
 if PROXY_IPCSERVICE

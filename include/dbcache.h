@@ -683,10 +683,4 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess);
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
 
-/* item preprocessing support */
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
-		zbx_timespec_t *ts, unsigned char state, char *error);
-void	zbx_preprocessor_flush();
-zbx_uint64_t	zbx_preprocessor_get_queue_size();
-
 #endif
