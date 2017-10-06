@@ -80,7 +80,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	// Shared browser instance.
 	protected static $shared_browser = null;
 
-
 	protected function putBreak() {
 		fwrite(STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
 			while (fgets(STDIN, 1024) == '') {}
@@ -116,7 +115,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 				$this->current_url = $this->webDriver->getCurrentURL();
 				$this->screenshot = $this->webDriver->takeScreenshot();
 			}
-		} catch (Exception $ex) {
+		}
+		catch (Exception $ex) {
 			// Error handling is not missing here.
 		}
 	}
@@ -693,14 +693,16 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 							self::$shared_browser->switchTo()->window($window);
 							self::$shared_browser->close();
 						}
-					} catch (Exception $e) {
+					}
+					catch (Exception $e) {
 						// Error handling is not missing here.
 					}
 
 					if (count(self::$shared_browser->getWindowHandles()) >= 1) {
 						try {
 							self::$shared_browser->switchTo()->window($windows[0]);
-						} catch (Exception $e) {
+						}
+						catch (Exception $e) {
 							$error = true;
 						}
 					}
