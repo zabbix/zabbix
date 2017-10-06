@@ -50,15 +50,18 @@ extern int		server_num, process_num;
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
 		zbx_uint64_t userid, zbx_vector_uint64_t *locked_triggerids)
 {
-	const char	*__function_name = "tm_execute_task_close_problem";
+	const char		*__function_name = "tm_execute_task_close_problem";
 
-	DB_RESULT	result;
-	DC_TRIGGER	trigger;
-	int		errcode;
-	zbx_timespec_t	ts;
+	DB_RESULT		result;
+	DC_TRIGGER		trigger;
+	int			errcode;
+	zbx_timespec_t		ts;
+	zbx_vector_ptr_t	trigger_diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64, __function_name,
 			taskid, eventid);
+
+	zbx_vector_ptr_create(&trigger_diff);
 
 	DBbegin();
 
@@ -71,10 +74,6 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 		if (SUCCEED == errcode)
 		{
-			zbx_vector_ptr_t	trigger_diff;
-
-			zbx_vector_ptr_create(&trigger_diff);
-
 			zbx_append_trigger_diff(&trigger_diff, triggerid, trigger.priority,
 					ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT, trigger.value,
 					TRIGGER_STATE_NORMAL, 0, NULL);
@@ -89,9 +88,6 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 			process_trigger_events(&trigger_diff, locked_triggerids, ZBX_EVENTS_SKIP_CORRELATION);
 			DCconfig_triggers_apply_changes(&trigger_diff);
 			zbx_save_trigger_changes(&trigger_diff);
-
-			zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-			zbx_vector_ptr_destroy(&trigger_diff);
 		}
 
 		DCconfig_clean_triggers(&trigger, &errcode, 1);
@@ -101,6 +97,11 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
 	DBcommit();
+
+	DBupdate_itservices(&trigger_diff);
+
+	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
+	zbx_vector_ptr_destroy(&trigger_diff);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
