@@ -28,6 +28,7 @@
 #include "dbcache.h"
 #include "discovery.h"
 #include "zbxalgo.h"
+#include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
 /* the space reserved in json buffer to hold at least one record plus service data */

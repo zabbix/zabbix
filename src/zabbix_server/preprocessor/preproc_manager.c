@@ -172,6 +172,7 @@ static zbx_list_item_t	*preprocessor_get_queued_item(zbx_preprocessing_manager_t
 	const char			*__function_name = "preprocessor_get_queued_item";
 	zbx_list_iterator_t		iterator;
 	zbx_preprocessing_request_t	*request;
+	zbx_list_item_t			*item = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -180,17 +181,18 @@ static zbx_list_item_t	*preprocessor_get_queued_item(zbx_preprocessing_manager_t
 	{
 		zbx_list_iterator_peek(&iterator, (void **)&request);
 
-		if (REQUEST_STATE_QUEUED == request->state && (NULL == request->dependency ||
-				REQUEST_STATE_DONE == request->dependency->state))
+		if (REQUEST_STATE_QUEUED == request->state &&
+				(NULL == request->dependency || REQUEST_STATE_DONE == request->dependency->state))
 		{
 			/* queued item is found */
-			return iterator.current;
+			item = iterator.current;
+			break;
 		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
-	return NULL;
+	return item;
 }
 
 /******************************************************************************
