@@ -80,15 +80,9 @@ class testPageDiscoveryRules extends CWebTest {
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
+	 * @dataProvider data
+	 * @backup triggers
 	 */
-	public function testPageDiscoveryRules_Setup() {
-		DBsave_tables('triggers');
-	}
-
-	/**
-	* @dataProvider data
-	*/
 	public function testPageDiscoveryRules_SimpleDelete($data) {
 		$itemid = $data['itemid'];
 
@@ -107,20 +101,6 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 	}
 
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageDiscoveryRules_Teardown() {
-		DBrestore_tables('triggers');
-	}
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testPageDiscoveryRules_SetupMass() {
-		DBsave_tables('triggers');
-	}
-
 	// Returns all discovery rules
 	public static function rule() {
 		return DBdata(
@@ -133,14 +113,15 @@ class testPageDiscoveryRules extends CWebTest {
 
 
 	/**
-	* @dataProvider rule
-	*/
+	 * @dataProvider rule
+	 * @backup triggers
+	 */
 	public function testPageDiscoveryRules_MassDelete($rule) {
 		$hostids = DBdata(
 			'SELECT hostid'.
 			' FROM items'.
 			' WHERE hostid='.$rule['hostid'].
-				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE
+				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE, false
 		);
 		$hostids = zbx_objectValues($hostids, 'hostids');
 
@@ -157,12 +138,5 @@ class testPageDiscoveryRules extends CWebTest {
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('hostids', $hostids);
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageDiscoveryRules_TeardownMass() {
-		DBrestore_tables('triggers');
 	}
 }

@@ -20,15 +20,14 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup regexps
+ */
 class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	private $regexp = 'test_regexp1';
 	private $regexp2 = 'test_regexp2';
 	private $cloned_regexp = 'test_regexp1_clone';
-
-	public function testFormAdministrationGeneralRegexp_backup() {
-		DBsave_tables('regexps');
-	}
 
 	public function testFormAdministrationGeneralRegexp_Layout() {
 		$this->zbxTestLogin('adm.gui.php');
@@ -210,9 +209,5 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		$sql = 'SELECT * FROM expressions';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
-	}
-
-	public function testFormAdministrationGeneralRegexp_restore() {
-		DBrestore_tables('regexps');
 	}
 }

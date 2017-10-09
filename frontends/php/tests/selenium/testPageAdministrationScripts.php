@@ -72,9 +72,10 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->verifyHash();
 	}
 
+	/**
+	 * @backup scripts
+	 */
 	public function testPageAdministrationScripts_MassDeleteAll() {
-		DBsave_tables('scripts');
-
 		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('all_scripts');
 		$this->zbxTestClickButton('script.delete');
@@ -83,17 +84,12 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->zbxTestTextPresent('Scripts deleted');
 
 		$this->assertEquals(0, DBcount('SELECT NULL FROM scripts'));
-
-		DBrestore_tables('scripts');
-	}
-
-	public function testPageAdministrationScripts_backup() {
-		DBsave_tables('scripts');
 	}
 
 	/**
-	* @dataProvider allScripts
-	*/
+	 * @dataProvider allScripts
+	 * @backup scripts
+	 */
 	public function testPageAdministrationScripts_MassDelete($script) {
 		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('scriptids_'.$script['scriptid']);
@@ -104,9 +100,4 @@ class testPageAdministrationScripts extends CWebTest {
 
 		$this->assertEquals(0, DBcount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
 	}
-
-	public function testPageAdministrationScripts_restore() {
-		DBrestore_tables('scripts');
-	}
-
 }

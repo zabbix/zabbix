@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup items
  */
 class testInheritanceDiscoveryRule extends CWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
@@ -29,10 +31,6 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
-
-	public function testInheritanceDiscoveryRule_backup() {
-		DBsave_tables('items');
-	}
 
 	// returns list of discovery rules from a template
 	public static function update() {
@@ -138,9 +136,5 @@ class testInheritanceDiscoveryRule extends CWebTest {
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
-	}
-
-	public function testInheritanceDiscoveryRule_restore() {
-		DBrestore_tables('items');
 	}
 }

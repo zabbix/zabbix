@@ -21,6 +21,9 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+/**
+ * @backup httptest
+ */
 class testFormWeb extends CWebTest {
 
 	/**
@@ -43,10 +46,6 @@ class testFormWeb extends CWebTest {
 	 * @var int
 	 */
 	protected $hostid = 40001;
-
-	public function testFormWeb_backup() {
-		DBsave_tables('httptest');
-	}
 
 	// Returns layout data
 	public static function layout() {
@@ -1606,9 +1605,5 @@ class testFormWeb extends CWebTest {
 				"step.httptestid = test.httptestid ".
 				"WHERE test.name = '".$name."' AND step.name = '".$step."'"));
 		}
-	}
-
-	public function testFormWeb_restore() {
-		DBrestore_tables('httptest');
 	}
 }
