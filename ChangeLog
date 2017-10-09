@@ -852,6 +852,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBX-6669] fixed use of current host as filter when selecting items for graph forms and trigger forms (gcalenko)
 ........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
 ........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
 ..F....... [ZBX-12191] fixed start time and timeline period in events screen when switching to next pages (miks)
