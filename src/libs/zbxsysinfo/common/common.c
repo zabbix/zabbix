@@ -115,7 +115,8 @@ int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 
 	init_result(result);
 
-	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT,
+			ZBX_EXIT_CODE_CHECKS_DISABLED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		goto out;
