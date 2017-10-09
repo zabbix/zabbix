@@ -41,6 +41,13 @@ static int	DBpatch_3050001(void)
 	return DBmodify_field_type("media", &field, NULL);
 }
 
+static int	DBpatch_3050002(void)
+{
+	const ZBX_FIELD	field = {"sendto", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("alerts", &field, NULL);
+}
+
 
 DBPATCH_START(3050)
 
@@ -48,5 +55,6 @@ DBPATCH_START(3050)
 
 DBPATCH_ADD(3050000, 0, 1)
 DBPATCH_ADD(3050001, 0, 1)
+DBPATCH_ADD(3050002, 0, 1)
 
 DBPATCH_END()
