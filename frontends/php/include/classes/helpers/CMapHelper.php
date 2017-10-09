@@ -110,8 +110,7 @@ class CMapHelper {
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
-			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS),
-			'homepage' => ZABBIX_HOMEPAGE
+			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
 		];
 	}
 
@@ -145,7 +144,7 @@ class CMapHelper {
 		processAreasCoordinates($sysmap, $areas, $map_info);
 		add_elementNames($sysmap['selements']);
 
-		foreach ($sysmap['selements'] as $id => $element) {
+		foreach ($sysmap['selements'] as $id => &$element) {
 			switch ($element['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
 					$map_info[$id]['name'] = _('Image');
@@ -161,6 +160,14 @@ class CMapHelper {
 					} else {
 						$map_info[$id]['name'] = '';
 					}
+
+					// Order triggers by priority.
+					if (array_key_exists('elements', $element) && is_array($element['elements'])) {
+						CArrayHelper::sort($element['elements'], [
+							['field' => 'priority', 'order' => ZBX_SORT_DOWN]
+						]);
+					}
+
 					break;
 
 				default:
@@ -168,6 +175,7 @@ class CMapHelper {
 					break;
 			}
 		}
+		unset($element);
 
 		$labels = getMapLabels($sysmap, $map_info, true);
 		$highlights = getMapHighligts($sysmap, $map_info);

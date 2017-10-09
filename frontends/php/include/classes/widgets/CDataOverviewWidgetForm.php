@@ -41,12 +41,10 @@ class CDataOverviewWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_application;
 
-		$styles = [
+		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
 			STYLE_LEFT => _('Left'),
 			STYLE_TOP => _('Top')
-		];
-
-		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), $styles))
+		]))
 			->setDefault(STYLE_LEFT)
 			->setModern(true);
 

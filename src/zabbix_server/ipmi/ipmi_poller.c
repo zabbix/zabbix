@@ -170,6 +170,9 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	zbx_ipc_message_t	message;
 	int			polled_num;
 	double			time_stat, time_idle, time_now, time_read;
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+	double			resolver_timestamp = 0.0;
+#endif
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -233,6 +236,15 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		/* handle /etc/resolv.conf update less often than once a second */
+
+		if (1.0 < time_now - resolver_timestamp)
+		{
+			resolver_timestamp = time_now;
+			zbx_update_resolver_conf();
+		}
+#endif
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
 

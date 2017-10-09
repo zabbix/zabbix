@@ -65,7 +65,7 @@ class CScreenItem extends CApiService {
 		$this->getOptions = zbx_array_merge($this->getOptions, [
 			'screenitemids'	=> null,
 			'screenids'		=> null,
-			'editable'		=> null,
+			'editable'		=> false,
 			'sortfield'		=> '',
 			'sortorder'		=> '',
 			'preservekeys'	=> false,

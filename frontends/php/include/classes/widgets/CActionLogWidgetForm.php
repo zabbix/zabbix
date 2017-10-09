@@ -27,7 +27,7 @@ class CActionLogWidgetForm extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data);
 
-		$sort_types = [
+		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type').' ('._('descending').')',
@@ -36,9 +36,7 @@ class CActionLogWidgetForm extends CWidgetForm {
 			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient').' ('._('ascending').')'
-		];
-
-		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), $sort_types))
+		]))
 			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
 		if (array_key_exists('sort_triggers', $this->data)) {

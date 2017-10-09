@@ -527,8 +527,12 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 			script->authtype, script->username, script->password, script->publickey, script->privatekey,
 			taskid, host->hostid, alertid);
 
+	DBbegin();
+
 	if (FAIL == zbx_tm_save_task(task))
 		taskid = 0;
+
+	DBcommit();
 
 	zbx_tm_task_free(task);
 

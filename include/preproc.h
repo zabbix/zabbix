@@ -17,33 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXODBC_H
-#define ZABBIX_ZBXODBC_H
+#ifndef ZABBIX_PREPROC_H
+#define ZABBIX_PREPROC_H
 
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
+#include "common.h"
+#include "module.h"
 
-#define ZBX_ODBC_ROW	char **
-#define ZBX_ODBC_RESULT	ZBX_ODBC_DBH *
+/* the following functions are implemened differently for server and proxy */
 
-typedef struct
-{
-	SQLHENV		henv;
-	SQLHDBC		hdbc;
-	unsigned short	connected;
-	SQLHSTMT	hstmt;
-	SQLSMALLINT     col_num;
-	ZBX_ODBC_ROW	row_data;
-}
-ZBX_ODBC_DBH;
+void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
+		zbx_timespec_t *ts, unsigned char state, char *error);
+void	zbx_preprocessor_flush(void);
+zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 
-int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_name, char *user, char *pass, int login_timeout);
-void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
-
-ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query);
-ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
-
-const char	*get_last_odbc_strerror(void);
-
-#endif
+#endif /* ZABBIX_PREPROC_H */

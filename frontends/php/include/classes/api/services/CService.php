@@ -1349,8 +1349,7 @@ class CService extends CApiService {
 	 * @return string
 	 */
 	protected function addPermissionFilter($sqlParts) {
-		$userid = self::$userData['userid'];
-		$userGroups = getUserGroupsByUserId($userid);
+		$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 		$sqlParts['where'][] = '(EXISTS ('.
 									'SELECT NULL'.

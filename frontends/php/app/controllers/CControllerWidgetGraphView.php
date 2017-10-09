@@ -124,11 +124,14 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				$new_itemid = get_same_item_for_host($resourceid, $dynamic_hostid);
-				$resourceid = !empty($new_itemid) ? $new_itemid : null;
+				$items = get_same_item_for_host(['itemid' => $resourceid], [$dynamic_hostid]);
+				$item = reset($items);
+				$resourceid = ($item && array_key_exists('itemid', $item)) ? $item['itemid'] : null;
 
-				if ($resourceid === null) {
+				if ($resourceid === null
+						|| !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 					$unavailable_object = true;
+					$resourceid = null;
 				}
 			}
 			// Find requested host and change graph details.
@@ -205,18 +208,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			if (!$resourceid) {
 				$unavailable_object = true;
 			}
-			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				$item = API::Item()->get([
-					'itemids' => $resourceid,
-					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
-					'output' => null
-				]);
-				$item = reset($item);
-
-				if (!$item) {
-					$unavailable_object = true;
-				}
-			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get graph, used below
 				$graph = API::Graph()->get([
@@ -228,6 +219,23 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				if (!$graph) {
 					$unavailable_object = true;
 				}
+			}
+		}
+
+		if (!$unavailable_object && $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			$item = API::Item()->get([
+				'itemids' => $resourceid,
+				'output' => ['type', 'name', 'hostid', 'key_'],
+				'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
+				'selectHosts' => ['name'],
+				'webitems' => true
+			]);
+
+			if ($item) {
+				$item = reset($item);
+			}
+			else {
+				$unavailable_object = true;
 			}
 		}
 

@@ -50,15 +50,18 @@ extern int		server_num, process_num;
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
 		zbx_uint64_t userid, zbx_vector_uint64_t *locked_triggerids)
 {
-	const char	*__function_name = "tm_execute_task_close_problem";
+	const char		*__function_name = "tm_execute_task_close_problem";
 
-	DB_RESULT	result;
-	DC_TRIGGER	trigger;
-	int		errcode;
-	zbx_timespec_t	ts;
+	DB_RESULT		result;
+	DC_TRIGGER		trigger;
+	int			errcode;
+	zbx_timespec_t		ts;
+	zbx_vector_ptr_t	trigger_diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64, __function_name,
 			taskid, eventid);
+
+	zbx_vector_ptr_create(&trigger_diff);
 
 	DBbegin();
 
@@ -71,10 +74,6 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 		if (SUCCEED == errcode)
 		{
-			zbx_vector_ptr_t	trigger_diff;
-
-			zbx_vector_ptr_create(&trigger_diff);
-
 			zbx_append_trigger_diff(&trigger_diff, triggerid, trigger.priority,
 					ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT, trigger.value,
 					TRIGGER_STATE_NORMAL, 0, NULL);
@@ -89,9 +88,6 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 			process_trigger_events(&trigger_diff, locked_triggerids, ZBX_EVENTS_SKIP_CORRELATION);
 			DCconfig_triggers_apply_changes(&trigger_diff);
 			zbx_save_trigger_changes(&trigger_diff);
-
-			zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-			zbx_vector_ptr_destroy(&trigger_diff);
 		}
 
 		DCconfig_clean_triggers(&trigger, &errcode, 1);
@@ -101,6 +97,11 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
 	DBcommit();
+
+	DBupdate_itservices(&trigger_diff);
+
+	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
+	zbx_vector_ptr_destroy(&trigger_diff);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -245,22 +246,27 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 				" on a.alertid=c.alertid"
 			" where r.taskid=" ZBX_FS_UI64, taskid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[2]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(alertid, row[2]);
 		ZBX_STR2UINT64(parent_taskid, row[3]);
-		status = atoi(row[0]);
 
-		if (SUCCEED == status)
+		if (SUCCEED != DBis_null(row[2]))
 		{
-			DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64, ALERT_STATUS_SENT, alertid);
-		}
-		else
-		{
-			error = DBdyn_escape_string_len(row[1], ALERT_ERROR_LEN);
-			DBexecute("update alerts set error='%s',status=%d where alertid=" ZBX_FS_UI64,
-					error, ALERT_STATUS_FAILED, alertid);
-			zbx_free(error);
+			ZBX_STR2UINT64(alertid, row[2]);
+			status = atoi(row[0]);
+
+			if (SUCCEED == status)
+			{
+				DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64, ALERT_STATUS_SENT,
+						alertid);
+			}
+			else
+			{
+				error = DBdyn_escape_string_len(row[1], ALERT_ERROR_LEN);
+				DBexecute("update alerts set error='%s',status=%d where alertid=" ZBX_FS_UI64,
+						error, ALERT_STATUS_FAILED, alertid);
+				zbx_free(error);
+			}
 		}
 
 		ret = SUCCEED;
@@ -495,5 +501,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

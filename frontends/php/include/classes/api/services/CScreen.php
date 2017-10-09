@@ -57,7 +57,7 @@ class CScreen extends CApiService {
 			'screenids'					=> null,
 			'userids'					=> null,
 			'screenitemids'				=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,

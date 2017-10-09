@@ -124,18 +124,18 @@ $slideTable = (new CTable())
 $i = 1;
 
 foreach ($data['slideshow']['slides'] as $key => $slides) {
-	$delay = (new CTextBox('slides['.$key.'][delay]', $slides['delay']))
-		->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-		->setAttribute('placeholder', _('default'));
-
 	$slideTable->addRow(
 		(new CRow([
 			(new CCol(
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan($i++.':'))->addClass('rowNum')->setId('current_slide_'.$key),
+			(new CSpan($i++.':'))
+				->addClass('rowNum')
+				->setId('current_slide_'.$key),
 			$data['slideshow']['screens'][$slides['screenid']]['name'],
-			$delay,
+			(new CTextBox('slides['.$key.'][delay]', $slides['delay']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAttribute('placeholder', _('default')),
 			(new CCol(
 				(new CButton('remove_'.$key, _('Remove')))
 					->onClick('javascript: removeSlide(this);')

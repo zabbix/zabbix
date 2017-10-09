@@ -37,7 +37,7 @@ dnl *                     Checks for programs                       *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_PROG_CC
+AC_PROG_CC([cc c99 gcc clang])
 AM_PROG_CC_C_O
 
 dnl *****************************************************************
@@ -1645,6 +1645,7 @@ AC_OUTPUT([
 	src/zabbix_server/vmware/Makefile
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/ipmi/Makefile
+	src/zabbix_server/odbc/Makefile
 	src/zabbix_server/scripts/Makefile
 	src/zabbix_server/preprocessor/Makefile
 	src/zabbix_proxy/Makefile

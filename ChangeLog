@@ -1,14 +1,60 @@
 Changes for 4.0.0alpha1
 
 New features:
+....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
+A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy cannot be deleted when used in actions (Sasha)
+....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.3rc1
+
+New features:
+...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
+
+Bug fixes:
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
+........S. [ZBX-12791] fixed hanging of preprocessing manager process due to file descriptor limit exhaustion when too many data gathering processes are configured to start (gleb)
+..F....... [ZBXNEXT-3732] fixed IE and Opera specific javascript bug; improved the depth control of navigation tree items; improved coding style and performance (miks)
+..F....... [ZBX-12577] fixed simple graph widget item support: only supported dynamic items, only real hosts, show only hosts with items (gcalenko)
+..F....... [ZBX-12689] added 'filter field should not be empty' validation for sysmap widget form (gcalenko)
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
+.......PS. [ZBX-12725] improved task database operations to handle/prevent creation of tasks without corresponding data records (wiper)
+..F....... [ZBX-12771] fixed {HOST.*} macro expansion for map trigger elements in map constructor (vjaceslavs)
+....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
+.......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
+..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
+..F....... [ZBX-12576] fixed difference between item and web scenario item graphs on simple graph widget (gcalenko)
+A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
+.....J.... [ZBX-12705] fixed processing of MBean properties in jmx discovery (vjaceslavs)
+..F....... [ZBX-12633] added horizontal scrollbar to the map in view mode; removed homepage label in maps and graphs; made graph timestamp visible only if debug-mode is on (miks)
+..F....... [ZBX-12576] fixed error in simple graph widget for web scenario items (gcalenko)
+..F....... [ZBX-12715] fixed problem box stretching in navigation tree in IE11; fixed position of all navigation tree problem boxes in Edge (miks)
+..F....... [ZBX-12679] fixed escaping of translation strings with apostrophe in forms: dashboard sharing and monitoring, administration of housekeeper and trigger options, item edit and mass update, xml import, host edit, web scenario, trigger configuration. (gcalenko)
+........S. [ZBX-11426] fixed the housekeeper for not deleting events in open problem state (abs)
+.......PS. [ZBX-12691] moved item state,lastlogsize,mtime,lastclock configuration cache update from value reception to value processing (wiper)
+........S. [ZBX-12802] reduced memory used by pre-processor manager item cache (wiper)
+..F....... [ZBX-12619] fixed error displaying of zabbix server status widget (gcalenko)
+A......... [ZBX-12681] fixed SQL errors in event.get() method (Sasha)
+..F....... [ZBX-12709] fixed possibility to enter deleys with suffixes for new elements of slideshows (Sasha)
+A......... [ZBX-12482] fixed behavior for graph prototypes when item prototype is deleted (Sasha)
+A......... [ZBX-12727] fixed response for script.get() method with "editable" flag (Sasha)
+A......... [ZBX-12727] fixed dcheck.get(), dhost.get() and dservice.get() permission checks for admin users; related to ZBX-7238 (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.2
+
+3.4.2rc2 was released as 3.4.2 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.2rc2
 
 Bug fixes:
+..F....... [ZBX-12769] fixed XSS vulnerabilities in argument passing for popup forms and file import forms (gcalenko)
+A.F....... [ZBX-12768] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES (gcalenko, Sasha)
 ..F....... [ZBX-12572] fixed losing "now" on timeline (vmurzins)
 .......PS. [ZBX-12739] fixed data conversion for ssh checks of numeric value type (wiper)
 
@@ -237,7 +283,6 @@ A.F.I..... [ZBXNEXT-2694] implemented multiple triggers support for map elements
 A.F.I..... [ZBXNEXT-2031] implemented map shapes (vjaceslavs)
 ..F....... [ZBXNEXT-34] implemented vector graphics for maps (vjaceslavs)
 A.F....PS. [ZBXNEXT-936] implemented remote command execution via proxy (wiper)
-....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 ..F....... [ZBXNEXT-3654] implemented a feature to apply host group permissions to all existing subgroups (Ivo, Sasha)
 ..F....... [ZBXNEXT-3660] renamed "IT services" to "Services" (Ivo)
 ....I..... [ZBXNEXT-3568] decreased internal, discovery and auto registration default data storage period to 1 day (vso)
@@ -288,6 +333,30 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
+Changes for 3.2.9rc1
+
+New features:
+...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
+
+Bug fixes:
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
+....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
+.......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
+..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
+A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
+........S. [ZBX-11426] fixed the housekeeper for not deleting events in open problem state (abs)
+A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
+A......... [ZBX-12681] fixed SQL errors in event.get() method (Sasha)
+A......... [ZBX-12727] fixed response for script.get() method with "editable" flag (Sasha)
+A......... [ZBX-12727] fixed dcheck.get(), dhost.get() and dservice.get() permission checks for admin users; related to ZBX-7238 (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.8
+
+3.2.8rc1 was released as 3.2.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.2.8rc1
 
 New features:
@@ -296,6 +365,8 @@ A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, J
 ........S. [ZBX-12258] added bulk selections to improve performance in processing of escalations (Sergejs)
 
 Bug fixes:
+..F....... [ZBX-12769] fixed XSS vulnerabilities in argument passing for popup forms and file import forms (gcalenko)
+A.F....... [ZBX-12768] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES (gcalenko, Sasha)
 .......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
@@ -775,6 +846,29 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.12rc1
+
+New features:
+...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
+
+Bug fixes:
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
+..F....... [ZBX-12191] fixed start time and timeline period in events screen when switching to next pages (miks)
+....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
+.......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
+..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
+A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
+A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
+A......... [ZBX-12727] fixed response for script.get() method with "editable" flag (Sasha)
+A......... [ZBX-12727] fixed dcheck.get(), dhost.get() and dservice.get() permission checks for admin users; related to ZBX-7238 (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.11
+
+3.0.11rc1 was released as 3.0.11 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.11rc1
 
 New features:
@@ -782,6 +876,8 @@ A.F....... [ZBX-1357] enabled Turkish translation to be displayed by default (za
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Russian, Turkish translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-12769] fixed XSS vulnerabilities in argument passing for popup forms and file import forms (gcalenko)
+A.F....... [ZBX-12768] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES (gcalenko, Sasha)
 .......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
@@ -2515,9 +2611,23 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.21rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.20
+
+2.2.20rc1 was released as 2.2.20 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.20rc1
 
 Bug fixes:
+..F....... [ZBX-12769] fixed XSS vulnerabilities in argument passing for popup forms and file import forms (gcalenko)
+A.F....... [ZBX-12768] added schema validation for URL fields based on schemas whitelist in ZBX_URI_VALID_SCHEMES (gcalenko, Sasha)
 ........S. [ZBX-12696] fixed trigger not being calculated for newly received item values if last one of those is unsupported value (vso)
 .......PS. [ZBX-12493] fixed address and ports array size in zbx_init_ipmi_host() to match OpenIPMI internals (Andris, vso)
 ........S. [ZBX-12446] fixed discovery and auto registration to accept empty DNS names (vso)

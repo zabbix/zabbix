@@ -147,6 +147,7 @@ jQuery(function($) {
 						var $this = $(this);
 
 						options['map_options']['canvas']['useViewBox'] = !IE;
+						options['map_options']['show_timestamp'] = false;
 						widget_data['map_instance'] = new SVGMap(options['map_options']);
 						widget_data['is_refreshing'] = false;
 						$this.data('widgetData', widget_data);

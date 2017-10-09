@@ -385,7 +385,7 @@
 						});
 
 						bulkLabel.append(jQuery('<span>'));
-						bulkLabel.append('<?= _('Use bulk requests') ?>');
+						bulkLabel.append(<?= CJs::encodeJson(_('Use bulk requests')) ?>);
 
 						bulkItem.append(bulkLabel);
 						bulkList.append(bulkItem);
