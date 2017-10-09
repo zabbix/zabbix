@@ -20,11 +20,10 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup httptest
+ */
 class testFormWebStep extends CWebTest {
-
-	public function testFormWebStep_backup() {
-		DBsave_tables('httptest');
-	}
 
 	public static function steps() {
 		return [
@@ -987,9 +986,5 @@ class testFormWebStep extends CWebTest {
 				}
 			}
 		}
-	}
-
-	public function testFormWebStep_restore() {
-		DBrestore_tables('httptest');
 	}
 }

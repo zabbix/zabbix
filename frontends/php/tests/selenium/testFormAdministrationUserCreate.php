@@ -21,11 +21,10 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup users
+ */
 class testFormAdministrationUserCreate extends CWebTest {
-
-	public function testFormAdministrationUserCreate_backup() {
-		DBsave_tables('users');
-	}
 
 	public function testFormAdministrationUserCreate_CreateUser() {
 		$this->zbxTestLogin('users.php');
@@ -46,9 +45,5 @@ class testFormAdministrationUserCreate extends CWebTest {
 
 		$sql = 'SELECT * FROM users WHERE alias=\'User alias\'';
 		$this->assertEquals(1, DBcount($sql), 'User with such alias has not been added');
-	}
-
-	public function testFormAdministrationUserCreate_restore() {
-		DBrestore_tables('users');
 	}
 }

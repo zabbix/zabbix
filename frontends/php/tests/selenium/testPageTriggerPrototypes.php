@@ -39,7 +39,6 @@ class testPageTriggerPrototypes extends CWebTest {
 	/**
 	* @dataProvider data
 	*/
-
 	public function testPageTriggerPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
@@ -70,15 +69,9 @@ class testPageTriggerPrototypes extends CWebTest {
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
+	 * @dataProvider data
+	 * @backup triggers
 	 */
-	public function testPageTriggerPrototypes_Setup() {
-		DBsave_tables('triggers');
-	}
-
-	/**
-	* @dataProvider data
-	*/
 	public function testPageTriggerPrototypes_SimpleDelete($data) {
 		$triggerid = $data['triggerid'];
 
@@ -99,20 +92,6 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 	}
 
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageTriggerPrototypes_Teardown() {
-		DBrestore_tables('triggers');
-	}
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testPageTriggerPrototypes_SetupMass() {
-		DBsave_tables('triggers');
-	}
-
 	// Returns all discovery rules
 	public static function rule() {
 		return DBdata(
@@ -128,11 +107,16 @@ class testPageTriggerPrototypes extends CWebTest {
 	}
 
 	/**
-	* @dataProvider rule
-	*/
+	 * @dataProvider rule
+	 * @backup triggers
+	 */
 	public function testPageTriggerPrototypes_MassDelete($rule) {
 		$druleid = $rule['parent_itemid'];
-		$triggerids = DBdata('select i.itemid from item_discovery id, items i where parent_itemid='.$druleid.' and i.itemid = id.itemid');
+		$triggerids = DBdata(
+				'SELECT i.itemid'.
+				' FROM item_discovery id, items i'.
+				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid', false
+		);
 		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid);
@@ -148,12 +132,5 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerids', $triggerids);
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageTriggerPrototypes_TeardownMass() {
-		DBrestore_tables('triggers');
 	}
 }

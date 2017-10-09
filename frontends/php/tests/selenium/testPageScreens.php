@@ -98,13 +98,10 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestTextNotPresent(['Owner', 'Columns', 'Rows']);
 	}
 
-	public function testPageScreens_backup() {
-		DBsave_tables('screens');
-	}
-
 	/**
-	* @dataProvider allScreens
-	*/
+	 * @dataProvider allScreens
+	 * @backup screens
+	 */
 	public function testPageScreens_MassDelete($screen) {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
@@ -122,9 +119,5 @@ class testPageScreens extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 		$sql = 'SELECT NULL FROM slides WHERE screenid='.$screen['screenid'];
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	public function testPageScreens_restore() {
-		DBrestore_tables('screens');
 	}
 }

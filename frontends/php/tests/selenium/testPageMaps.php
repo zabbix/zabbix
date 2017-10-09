@@ -120,13 +120,10 @@ class testPageMaps extends CWebTest {
 		$this->assertEquals($oldHashLinkTriggers, DBhash($sqlLinkTriggers));
 	}
 
-	public function testPageMaps_backup() {
-		DBsave_tables('sysmaps');
-	}
-
 	/**
-	* @dataProvider allMaps
-	*/
+	 * @dataProvider allMaps
+	 * @backup sysmaps
+	 */
 	public function testPageMaps_MassDelete($map) {
 		$sysmapid = $map['sysmapid'];
 
@@ -150,10 +147,6 @@ class testPageMaps extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 		$sql = "select * from screens_items where resourcetype=".SCREEN_RESOURCE_MAP." and resourceid=$sysmapid;";
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	public function testPageMaps_restore() {
-		DBrestore_tables('sysmaps');
 	}
 
 	public function testPageMaps_CreateCancel() {
