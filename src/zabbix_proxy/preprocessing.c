@@ -18,8 +18,8 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "dbcache.h"
+#include "preproc.h"
 
 /******************************************************************************
  *                                                                            *
@@ -49,7 +49,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
  * Purpose: send flush command to preprocessing manager                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_flush()
+void	zbx_preprocessor_flush(void)
 {
 	dc_flush_history();
 }
@@ -63,7 +63,7 @@ void	zbx_preprocessor_flush()
  * Return value: enqueued item count                                          *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_preprocessor_get_queue_size()
+zbx_uint64_t	zbx_preprocessor_get_queue_size(void)
 {
 	return 0;
 }

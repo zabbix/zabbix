@@ -28,12 +28,11 @@ class CClockWidgetForm extends CWidgetForm {
 		parent::__construct($data);
 
 		// Time type field
-		$time_types = [
+		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), [
 			TIME_TYPE_LOCAL => _('Local time'),
 			TIME_TYPE_SERVER => _('Server time'),
 			TIME_TYPE_HOST => _('Host time')
-		];
-		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), $time_types))
+		]))
 			->setDefault(TIME_TYPE_LOCAL)
 			->setAction('updateWidgetConfigDialogue()');
 

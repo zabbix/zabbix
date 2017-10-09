@@ -28,6 +28,7 @@
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "preproc.h"
 
 #include "ipmi_manager.h"
 #include "ipmi_protocol.h"

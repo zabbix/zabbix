@@ -2348,7 +2348,6 @@ int	DCsync_history(int sync_type, int *total_num)
 
 			DCconfig_triggers_apply_changes(&trigger_diff);
 			zbx_save_trigger_changes(&trigger_diff);
-			zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		}
 		else
 		{
@@ -2359,7 +2358,11 @@ int	DCsync_history(int sync_type, int *total_num)
 		DBcommit();
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			DBupdate_itservices(&trigger_diff);
+			zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 			DCconfig_unlock_triggers(&triggerids);
+		}
 
 		LOCK_CACHE;
 

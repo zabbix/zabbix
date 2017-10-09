@@ -204,7 +204,7 @@ switch ($data['method']) {
 		$result = [];
 
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'priority'],
+			'output' => ['triggerid', 'expression', 'priority'],
 			'triggerids' => $data['triggerids'],
 			'limit' => $config['search_limit']
 		]);
@@ -427,6 +427,29 @@ switch ($data['method']) {
 					}
 				}
 				break;
+
+			case 'usersGroups':
+				$groups = API::UserGroup()->get([
+					'output' => ['usrgrpid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($groups) {
+					CArrayHelper::sort($groups, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$groups = array_slice($groups, 0, $data['limit']);
+					}
+
+					foreach ($groups as $group) {
+						$result[] = CArrayHelper::renameKeys($group, ['usrgrpid' => 'id']);
+					}
+				}
+				break;
+
 		}
 		break;
 
