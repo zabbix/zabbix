@@ -341,6 +341,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBX-12666] fixed ETag comparison check in jsLoader for web server with enabled compression (gcalenko)
 ........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
 ........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
