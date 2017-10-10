@@ -1961,7 +1961,9 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		unsigned int		flags = PROXY_HISTORY_FLAG_META;
+		unsigned int		flags;
+		zbx_uint64_t		lastlogsize;
+		int			mtime;
 		const ZBX_DC_HISTORY	*h = &history[i];
 
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
@@ -1974,16 +1976,29 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 		{
 			zbx_log_value_t *log = h->value.log;
 
+			if (0 != (h->flags & ZBX_DC_FLAG_META))
+			{
+				flags = PROXY_HISTORY_FLAG_META;
+				lastlogsize = h->lastlogsize;
+				mtime = h->mtime;
+			}
+			else
+			{
+				flags = 0;
+				lastlogsize = 0;
+				mtime = 0;
+			}
+
 			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, log->timestamp,
 					ZBX_NULL2EMPTY_STR(log->source), log->severity, log->value, log->logeventid,
-					h->lastlogsize, h->mtime, flags);
+					lastlogsize, mtime, flags);
 		}
 		else
 		{
 			/* sent to server only if not 0, see proxy_get_history_data() */
 			const int	unset_if_novalue = 0;
 
-			flags |= PROXY_HISTORY_FLAG_NOVALUE;
+			flags = PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE;
 
 			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, unset_if_novalue, "",
 					unset_if_novalue, "", unset_if_novalue, h->lastlogsize, h->mtime, flags);
@@ -2055,11 +2070,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_LOG:
-				/* if log item has no meta information it has no other information but value */
-				if (0 != (h->flags & ZBX_DC_FLAG_META))
-					hlog_num++;
-				else
-					h_num++;
+				hlog_num++;
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:

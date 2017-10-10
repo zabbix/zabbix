@@ -16,6 +16,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+.......P.. [ZBX-12838] fixed trap, snmptrap items of log type not being processed by proxy (wiper)
 ..F....... [ZBX-12777] fixed default value for JMX endpoint on item type change in edit form and mass update form (gcalenko)
 ...G...PS. [ZBX-12594] fixed system.run, user parameter and external check not to become unsupported when exit code is different than zero (vso)
 ........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
