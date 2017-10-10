@@ -50,7 +50,6 @@ $fields = [
 	'user_groups' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null],
 	'user_medias' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null],
 	'user_medias_to_del' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_groups' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'new_media' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'enable_media' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'disable_media' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
@@ -68,9 +67,7 @@ $fields = [
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'delete_selected' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'del_user_media' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'del_group_user' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'change_password' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	// form
@@ -136,14 +133,7 @@ if (hasRequest('action')) {
  */
 $config = select_config();
 
-if (isset($_REQUEST['new_groups'])) {
-	$_REQUEST['new_groups'] = getRequest('new_groups', []);
-	$_REQUEST['user_groups'] = getRequest('user_groups', []);
-	$_REQUEST['user_groups'] += $_REQUEST['new_groups'];
-
-	unset($_REQUEST['new_groups']);
-}
-elseif (isset($_REQUEST['new_media'])) {
+if (isset($_REQUEST['new_media'])) {
 	$_REQUEST['user_medias'] = getRequest('user_medias', []);
 
 	array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);

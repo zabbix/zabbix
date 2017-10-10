@@ -541,6 +541,7 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestTabSwitch('Media');
 		$this->zbxTestClickButtonText('Add');
 		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('type', $data)) {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);

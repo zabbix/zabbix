@@ -20,12 +20,11 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup groups
+ */
 class testFormHostGroup extends CWebTest {
 	private $hostGroup = 'Test Group';
-
-	public function testFormHostGroup_backup() {
-		DBsave_tables('groups');
-	}
 
 	public function testFormHostGroup_CheckLayout() {
 		$this->zbxTestLogin('hostgroups.php?form=Create+host+group');
@@ -135,9 +134,5 @@ class testFormHostGroup extends CWebTest {
 
 		$sql = "SELECT * FROM groups WHERE name='$this->hostGroup ". 2 ."'";
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	public function testFormHostGroup_restore() {
-		DBrestore_tables('groups');
 	}
 }
