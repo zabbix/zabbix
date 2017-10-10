@@ -33,7 +33,6 @@ Bug fixes:
 ..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
 ..F....... [ZBX-12576] fixed difference between item and web scenario item graphs on simple graph widget (gcalenko)
 A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
-.....J.... [ZBX-12705] fixed processing of MBean properties in jmx discovery (vjaceslavs)
 ..F....... [ZBX-12633] added horizontal scrollbar to the map in view mode; removed homepage label in maps and graphs; made graph timestamp visible only if debug-mode is on (miks)
 ..F....... [ZBX-12576] fixed error in simple graph widget for web scenario items (gcalenko)
 ..F....... [ZBX-12715] fixed problem box stretching in navigation tree in IE11; fixed position of all navigation tree problem boxes in Edge (miks)
