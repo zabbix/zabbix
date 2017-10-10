@@ -851,6 +851,12 @@ define('EVENT_OBJECT_AUTOREGHOST',		3);
 define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 
+// Problem and event tag constants.
+define('TAG_EVAL_TYPE_AND',		0);
+define('TAG_EVAL_TYPE_OR',		1);
+define('TAG_OPERATOR_LIKE',		0);
+define('TAG_OPERATOR_EQUAL',	1);
+
 define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
 define('GRAPH_YAXIS_TYPE_FIXED',		1);
 define('GRAPH_YAXIS_TYPE_ITEM_VALUE',	2);
