@@ -17,6 +17,7 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F.I..... [ZBX-12659] fixed missing information in "Status of Zabbix" widget with huge sessions table (Sasha)
 ..F....... [ZBX-12788] fixed error when template is added to hosts via mass update form (gcalenko, vmurzins)
 .......P.. [ZBX-12838] fixed trap, snmptrap items of log type not being processed by proxy (wiper)
 ..F....... [ZBX-12777] fixed default value for JMX endpoint on item type change in edit form and mass update form (gcalenko)
