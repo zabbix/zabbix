@@ -103,7 +103,7 @@ static const char	*get_startup_string(zbx_startup_type_t startup_type)
 	}
 }
 
-static int	check_trigger_start(SC_HANDLE h_srv, int *trigger_start)
+static int	check_trigger_start(SC_HANDLE h_srv, const char *service_name)
 {
 	SERVICE_TRIGGER_INFO	*sti = NULL;
 	DWORD			sz = 0;
@@ -117,21 +117,31 @@ static int	check_trigger_start(SC_HANDLE h_srv, int *trigger_start)
 
 		if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_TRIGGER_INFO, (LPBYTE)sti, sz, &sz))
 		{
-			*trigger_start = (0 < sti->cTriggers ? 1 : 0);
-			ret = SUCCEED;
+			if (0 < sti->cTriggers)
+				ret = SUCCEED;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain startup trigger information of service \"%s\": %s",
+						service_name, strerror_from_system(GetLastError()));
 		}
 
 		zbx_free(sti);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain startup trigger information of service \"%s\": %s",
+					service_name, strerror_from_system(GetLastError()));
 	}
 
 	return ret;
 }
 
-static int	check_delayed_start(SC_HANDLE h_srv)
+static int	check_delayed_start(SC_HANDLE h_srv, const char *service_name)
 {
 	SERVICE_DELAYED_AUTO_START_INFO	*sds = NULL;
 	DWORD				sz = 0;
-	int 				ret = FAIL;
+	int				ret = FAIL;
 
 	QueryServiceConfig2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, NULL, 0, &sz);
 
@@ -139,34 +149,46 @@ static int	check_delayed_start(SC_HANDLE h_srv)
 	{
 		sds = (SERVICE_DELAYED_AUTO_START_INFO *)zbx_malloc(sds, sz);
 
-		if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, (LPBYTE)sds, sz, &sz) &&
-				TRUE == sds->fDelayedAutostart)
+		if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, (LPBYTE)sds, sz, &sz))
 		{
-			ret = SUCCEED;
+			if (TRUE == sds->fDelayedAutostart)
+				ret = SUCCEED;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,
+					"cannot obtain  automatic delayed start information of service \"%s\": %s",
+					service_name, strerror_from_system(GetLastError()));
 		}
 
 		zbx_free(sds);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain  automatic delayed start information of service \"%s\": %s",
+				service_name, strerror_from_system(GetLastError()));
 	}
 
 	return ret;
 }
 
-static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc)
+static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc,
+		const char *service_name)
 {
-	int		trigger_start, delayed = 0;
+	int	trigger_start = 0, delayed_start = 0;
 
 	if (SERVICE_AUTO_START != qsc->dwStartType && SERVICE_DEMAND_START != qsc->dwStartType)
 		return STARTUP_TYPE_UNKNOWN;
 
-	if (SUCCEED == check_delayed_start(h_srv))
-		delayed = 1;
-
-	if (SUCCEED != check_trigger_start(h_srv, &trigger_start))
-		trigger_start = 0;
+	if (SUCCEED == check_trigger_start(h_srv, service_name))
+		trigger_start = 1;
 
 	if (SERVICE_AUTO_START == qsc->dwStartType)
 	{
-		if (delayed)
+		if (SUCCEED == check_delayed_start(h_srv, service_name))
+			delayed_start = 1;
+
+		if (delayed_start)
 		{
 			if (trigger_start)
 				return STARTUP_TYPE_AUTO_DELAYED_TRIGGER;
@@ -298,7 +320,8 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				zbx_startup_type_t	startup_type;
 
-				startup_type = get_service_startup_type(h_srv, qsc);
+				startup_type = get_service_startup_type(h_srv, qsc,
+						zbx_unicode_to_utf8(ssp[i].lpServiceName));
 
 				/* for LLD backwards compatibility startup types with trigger start are ignored */
 				if (STARTUP_TYPE_UNKNOWN < startup_type)
@@ -351,6 +374,8 @@ next:
 #define ZBX_SRV_PARAM_USER		0x04
 #define ZBX_SRV_PARAM_STARTUP		0x05
 #define ZBX_SRV_PARAM_DESCRIPTION	0x06
+
+#define ZBX_NON_EXISTING_SRV		255
 
 int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -417,7 +442,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ZBX_SRV_PARAM_STATE == param_type)
 		{
-			SET_UI64_RESULT(result, 255);
+			SET_UI64_RESULT(result, ZBX_NON_EXISTING_SRV);
 			ret = SYSINFO_RET_OK;
 		}
 		else
@@ -509,7 +534,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (SERVICE_DISABLED == qsc->dwStartType)
 					SET_UI64_RESULT(result, STARTUP_TYPE_DISABLED);
 				else
-					SET_UI64_RESULT(result, get_service_startup_type(h_srv, qsc));
+					SET_UI64_RESULT(result, get_service_startup_type(h_srv, qsc, name));
 				break;
 		}
 
