@@ -91,6 +91,7 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             trigger_correlation_mode    - [IN] trigger correlation mode    *
  *             trigger_correlation_tag     - [IN] trigger correlation tag     *
  *             trigger_value               - [IN] trigger value               *
+ *             error                       - [IN] error for internal events   *
  *                                                                            *
  ******************************************************************************/
 int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
@@ -98,9 +99,11 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value)
+		unsigned char trigger_value, const char *error)
 {
 	int	i;
+
+	ZBX_UNUSED(error);
 
 	if (events_num == events_alloc)
 	{
@@ -2032,7 +2035,7 @@ int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object
 
 	index = add_event(source, object, objectid, ts, TRIGGER_VALUE_OK, trigger_description, trigger_expression,
 			trigger_recovery_expression, trigger_priority, trigger_type, trigger_tags,
-			trigger_correlation_mode, trigger_correlation_tag, trigger_value);
+			trigger_correlation_mode, trigger_correlation_tag, trigger_value, NULL);
 
 	recovery_local.eventid = eventid;
 	recovery_local.objectid = objectid;
