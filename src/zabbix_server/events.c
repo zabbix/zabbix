@@ -130,9 +130,13 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		events[events_num].trigger.correlation_mode = trigger_correlation_mode;
 		events[events_num].trigger.correlation_tag = zbx_strdup(NULL, trigger_correlation_tag);
 		events[events_num].trigger.value = trigger_value;
+		events[events_num].name = zbx_strdup(NULL, trigger_description);
 
 		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&events[events_num].trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+
+		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				&events[events_num].name, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		zbx_vector_ptr_create(&events[events_num].tags);
 
@@ -1801,6 +1805,7 @@ static void	clean_events(void)
 		zbx_free(events[i].trigger.expression);
 		zbx_free(events[i].trigger.recovery_expression);
 		zbx_free(events[i].trigger.correlation_tag);
+		zbx_free(events[i].name);
 
 		zbx_vector_ptr_clear_ext(&events[i].tags, (zbx_clean_func_t)zbx_free_tag);
 		zbx_vector_ptr_destroy(&events[i].tags);
