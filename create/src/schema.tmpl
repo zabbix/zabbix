@@ -1304,7 +1304,7 @@ FIELD		|sessionid	|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
-INDEX		|1		|userid,status
+INDEX		|1		|userid,status,lastaccess
 
 TABLE|trigger_discovery|triggerid|0
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
@@ -1586,4 +1586,4 @@ INDEX		|6		|value_sysmapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3040000	|3040001
+ROW		|3040000	|3040005

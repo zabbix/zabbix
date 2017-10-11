@@ -209,8 +209,6 @@ struct	_DC_TRIGGER;
 					else					\
 						is_uint64(row, &uint)
 
-#define ZBX_MAX_SQL_LEN		65535
-
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
 typedef struct
