@@ -103,8 +103,6 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 {
 	int	i;
 
-	ZBX_UNUSED(error);
-
 	if (events_num == events_alloc)
 	{
 		events_alloc += 64;
@@ -175,6 +173,8 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 			}
 		}
 	}
+	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
+		events[events_num].name = zbx_strdup(NULL, error);
 
 	return events_num++;
 }
@@ -1801,6 +1801,8 @@ static void	clean_events(void)
 
 	for (i = 0; i < events_num; i++)
 	{
+		zbx_free(events[i].name);
+
 		if (EVENT_SOURCE_TRIGGERS != events[i].source)
 			continue;
 
@@ -1808,7 +1810,6 @@ static void	clean_events(void)
 		zbx_free(events[i].trigger.expression);
 		zbx_free(events[i].trigger.recovery_expression);
 		zbx_free(events[i].trigger.correlation_tag);
-		zbx_free(events[i].name);
 
 		zbx_vector_ptr_clear_ext(&events[i].tags, (zbx_clean_func_t)zbx_free_tag);
 		zbx_vector_ptr_destroy(&events[i].tags);
