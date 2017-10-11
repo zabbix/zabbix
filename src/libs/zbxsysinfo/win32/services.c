@@ -106,6 +106,7 @@ static const char	*get_startup_string(zbx_startup_type_t startup_type)
 static int	check_trigger_start(SC_HANDLE h_srv, const char *service_name)
 {
 	SERVICE_TRIGGER_INFO	*sti = NULL;
+	const OSVERSIONINFOEX	*version_info;
 	DWORD			sz = 0;
 	int			ret = FAIL;
 
@@ -119,19 +120,26 @@ static int	check_trigger_start(SC_HANDLE h_srv, const char *service_name)
 		{
 			if (0 < sti->cTriggers)
 				ret = SUCCEED;
+
+			zbx_free(sti);
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain startup trigger information of service \"%s\": %s",
-						service_name, strerror_from_system(GetLastError()));
+			zbx_free(sti);
+			goto error;
 		}
-
-		zbx_free(sti);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain startup trigger information of service \"%s\": %s",
+error:
+		version_info = zbx_win_getversion();
+
+		/* Windows 7, Server 2008 R2 and later */
+		if((6 <= version_info->dwMajorVersion) && (1 <= version_info->dwMinorVersion))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain startup trigger information of service \"%s\": %s",
 					service_name, strerror_from_system(GetLastError()));
+		}
 	}
 
 	return ret;
@@ -153,18 +161,18 @@ static int	check_delayed_start(SC_HANDLE h_srv, const char *service_name)
 		{
 			if (TRUE == sds->fDelayedAutostart)
 				ret = SUCCEED;
+
+			zbx_free(sds);
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,
-					"cannot obtain  automatic delayed start information of service \"%s\": %s",
-					service_name, strerror_from_system(GetLastError()));
+			zbx_free(sds);
+			goto error;
 		}
-
-		zbx_free(sds);
 	}
 	else
 	{
+error:
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain  automatic delayed start information of service \"%s\": %s",
 				service_name, strerror_from_system(GetLastError()));
 	}
