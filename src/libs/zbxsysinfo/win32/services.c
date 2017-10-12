@@ -22,6 +22,8 @@
 #include "log.h"
 #include "zbxjson.h"
 
+#define ZBX_QSC2_BUFSIZE	8192	/* QueryServiceConfig2() maximum output buffer size, documented by Microsoft */
+
 typedef enum
 {
 	STARTUP_TYPE_AUTO,
@@ -103,35 +105,48 @@ static const char	*get_startup_string(zbx_startup_type_t startup_type)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_service_config2                                          *
+ *                                                                            *
+ * Purpose: wrapper function around QueryServiceConfig2()                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     hService    - [IN] QueryServiceConfig2() parameter 'hService'          *
+ *     dwInfoLevel - [IN] QueryServiceConfig2() parameter 'dwInfoLevel'       *
+ *     buf         - [OUT] QueryServiceConfig2() parameter 'lpBuffer'.        *
+ *                   Pointer to a caller supplied buffer with size            *
+ *                   ZBX_QSC2_BUFSIZE bytes !                                 *
+ * Return value:                                                              *
+ *      SUCCEED - data were successfully copied into 'buf'                    *
+ *      FAIL    - use strerror_from_system(GetLastError() to see what failed  *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_get_service_config2(SC_HANDLE hService, DWORD dwInfoLevel, LPBYTE buf)
+{
+	DWORD	sz = 0;
+
+	if (0 != QueryServiceConfig2(hService, dwInfoLevel, buf, ZBX_QSC2_BUFSIZE, &sz))
+		return SUCCEED;
+	else
+		return FAIL;
+}
+
 static int	check_trigger_start(SC_HANDLE h_srv, const char *service_name)
 {
-	SERVICE_TRIGGER_INFO	*sti = NULL;
-	const OSVERSIONINFOEX	*version_info;
-	DWORD			sz = 0;
-	int			ret = FAIL;
+	BYTE	buf[ZBX_QSC2_BUFSIZE];
 
-	QueryServiceConfig2(h_srv, SERVICE_CONFIG_TRIGGER_INFO, NULL, 0, &sz);
-
-	if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+	if (SUCCEED == zbx_get_service_config2(h_srv, SERVICE_CONFIG_TRIGGER_INFO, buf))
 	{
-		sti = (SERVICE_TRIGGER_INFO *)zbx_malloc(sti, sz);
+		SERVICE_TRIGGER_INFO	*sti = (SERVICE_TRIGGER_INFO *)&buf;
 
-		if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_TRIGGER_INFO, (LPBYTE)sti, sz, &sz))
-		{
-			if (0 < sti->cTriggers)
-				ret = SUCCEED;
-
-			zbx_free(sti);
-		}
-		else
-		{
-			zbx_free(sti);
-			goto error;
-		}
+		if (0 < sti->cTriggers)
+			return SUCCEED;
 	}
 	else
 	{
-error:
+		const OSVERSIONINFOEX	*version_info;
+
 		version_info = zbx_win_getversion();
 
 		/* Windows 7, Server 2008 R2 and later */
@@ -142,42 +157,27 @@ error:
 		}
 	}
 
-	return ret;
+	return FAIL;
 }
 
 static int	check_delayed_start(SC_HANDLE h_srv, const char *service_name)
 {
-	SERVICE_DELAYED_AUTO_START_INFO	*sds = NULL;
-	DWORD				sz = 0;
-	int				ret = FAIL;
+	BYTE	buf[ZBX_QSC2_BUFSIZE];
 
-	QueryServiceConfig2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, NULL, 0, &sz);
-
-	if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+	if (SUCCEED == zbx_get_service_config2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, buf))
 	{
-		sds = (SERVICE_DELAYED_AUTO_START_INFO *)zbx_malloc(sds, sz);
+		SERVICE_DELAYED_AUTO_START_INFO	*sds = (SERVICE_DELAYED_AUTO_START_INFO *)&buf;
 
-		if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, (LPBYTE)sds, sz, &sz))
-		{
-			if (TRUE == sds->fDelayedAutostart)
-				ret = SUCCEED;
-
-			zbx_free(sds);
-		}
-		else
-		{
-			zbx_free(sds);
-			goto error;
-		}
+		if (TRUE == sds->fDelayedAutostart)
+			return SUCCEED;
 	}
 	else
 	{
-error:
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain  automatic delayed start information of service \"%s\": %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain automatic delayed start information of service \"%s\": %s",
 				service_name, strerror_from_system(GetLastError()));
 	}
 
-	return ret;
+	return FAIL;
 }
 
 static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc,
