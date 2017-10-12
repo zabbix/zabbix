@@ -33,7 +33,11 @@ class CWidgetFieldTags extends CWidgetField {
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 			'tag' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
+			'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'operator' => [
+				'type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL]),
+				'default' => TAG_OPERATOR_LIKE
+			]
 		]]);
 		$this->setDefault([]);
 	}
@@ -70,6 +74,11 @@ class CWidgetFieldTags extends CWidgetField {
 				'type' => $this->save_type,
 				'name' => $this->name.'.value.'.$index,
 				'value' => $val['value']
+			];
+			$widget_fields[] = [
+				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+				'name' => $this->name.'.operator.'.$index,
+				'value' => array_key_exists('operator', $val) ? $val['operator'] : TAG_OPERATOR_LIKE
 			];
 		}
 	}
