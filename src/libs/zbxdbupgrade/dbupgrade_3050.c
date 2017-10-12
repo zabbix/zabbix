@@ -40,6 +40,65 @@ static int	DBpatch_3050000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050001(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*description;
+	zbx_uint64_t	triggerid;
+	int		res;
+	char		*trdefault = "cannot calculate trigger expression";
+	char		*itdefault = "cannot obtain item value";
+
+	if (NULL == (result = DBselect("select triggerid,description from triggers")))
+		return FAIL;
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		description = row[1];
+		ZBX_STR2UINT64(triggerid, row[0]);
+
+		res = DBexecute("update events set name='%s' where objectid=%d and source=%d", description,
+				triggerid, EVENT_SOURCE_TRIGGERS);
+
+		if (ZBX_DB_OK > res)
+			return FAIL;
+
+		res = DBexecute("update problem set name='%s' where objectid=%d and source=%d", description,
+				triggerid, EVENT_SOURCE_TRIGGERS);
+
+		if (ZBX_DB_OK > res)
+			return FAIL;
+
+		res = DBexecute("update events set name='%s' where objectid=%d and source=%d "
+				"and value=%d", trdefault, triggerid, EVENT_SOURCE_INTERNAL,
+				EVENT_STATUS_PROBLEM);
+
+		if (ZBX_DB_OK > res)
+			return FAIL;
+
+		res = DBexecute("update problem set name='%s' where objectid=%d and source=%d ", trdefault,
+				triggerid, EVENT_SOURCE_INTERNAL, EVENT_STATUS_PROBLEM);
+
+		if (ZBX_DB_OK > res)
+			return FAIL;
+	}
+
+	res = DBexecute("update events set name='%s' where source=%d and object=%d and value = %d", itdefault,
+			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, EVENT_STATUS_PROBLEM);
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	res = DBexecute("update problem set name='%s' where source=%d and object=%d", itdefault,
+			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM);
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -47,5 +106,6 @@ DBPATCH_START(3050)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(3050000, 0, 1)
+DBPATCH_ADD(3050001, 0, 1)
 
 DBPATCH_END()
