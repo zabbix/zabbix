@@ -49,7 +49,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	int		i, ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
 	init_request(&request);
 
