@@ -209,7 +209,6 @@ if ($data['action'] == 'problem.view') {
 				->addValue(_('AND'), TAG_EVAL_TYPE_AND)
 				->addValue(_('OR'), TAG_EVAL_TYPE_OR)
 				->setModern(true)
-				->setAttribute('style', 'height: 21px')
 		))->setColSpan(4)
 	);
 
