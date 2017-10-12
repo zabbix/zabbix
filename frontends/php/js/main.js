@@ -107,10 +107,33 @@ var MMenu = {
 	timeout_reset:	null,
 	timeout_change:	null,
 
+	init: function() {
+		// Detects when non of the selected elements are focused.
+		var elems = jQuery('.top-nav a, .top-subnav a').on('keydown', function(event) {
+			clearTimeout(this.timeout_reset);
+
+			if (event.keyCode == 9) {
+				setTimeout(function() {
+					if (elems.toArray().indexOf(document.querySelector(':focus')) == -1) {
+						MMenu.timeout_reset = setTimeout('MMenu.showSubMenu("' + MMenu.def_label + '")', 2500);
+					}
+				});
+			}
+		});
+	},
+
 	mouseOver: function(show_label) {
 		clearTimeout(this.timeout_reset);
 		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 10);
 		PageRefresh.restart();
+	},
+
+	keyUp: function(show_label, event) {
+		if (event.keyCode == 13) {
+			clearTimeout(this.timeout_reset);
+			this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
+			PageRefresh.restart();
+		}
 	},
 
 	submenu_mouseOver: function() {
@@ -124,11 +147,17 @@ var MMenu = {
 		this.timeout_reset = setTimeout('MMenu.showSubMenu("' + this.def_label + '")', 2500);
 	},
 
-	showSubMenu: function(show_label) {
-		var sub_menu = $('sub_' + show_label);
+	showSubMenu: function(show_label, focus_subitem) {
+		var sub_menu = $('sub_' + show_label),
+			focus_subitem = focus_subitem || false;
+
 		if (sub_menu !== null) {
 			$(show_label).className = 'selected';
 			sub_menu.show();
+
+			if (focus_subitem) {
+				jQuery('li:first > a', sub_menu).focus();
+			}
 
 			for (var key in this.menus) {
 				if (key == show_label) {
