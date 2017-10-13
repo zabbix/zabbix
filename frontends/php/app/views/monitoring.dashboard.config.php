@@ -226,7 +226,10 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->addClass('form_row')
 			->toString();
 
-		$js_scripts[] = 'jQuery("#tags_table").dynamicRows({template: "#tag-row"});';
+		// Add dynamic row script and fix the distance between AND/OR buttons and tag inputs below them.
+		$js_scripts[] = 'var tags_table = jQuery("#tags_table");'.
+			'tags_table.dynamicRows({template: "#tag-row"});'.
+			'tags_table.parent().addClass("has-before");';
 	}
 }
 
