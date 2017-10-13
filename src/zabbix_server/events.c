@@ -2128,7 +2128,7 @@ void	get_db_events_info(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events)
 	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "eventid", eventids->values,
 			eventids->values_num);
 
-	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns"
+	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns,name"
 			" from events"
 			" where%s order by eventid",
 			filter);
@@ -2144,6 +2144,7 @@ void	get_db_events_info(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events)
 		event->value = atoi(row[5]);
 		event->acknowledged = atoi(row[6]);
 		event->ns = atoi(row[7]);
+		event->name = zbx_strdup(NULL, row[8]);
 
 		event->trigger.triggerid = 0;
 
@@ -2277,5 +2278,6 @@ void	free_db_event(DB_EVENT *event)
 		zbx_free(event->trigger.url);
 	}
 
+	zbx_free(event->name);
 	zbx_free(event);
 }
