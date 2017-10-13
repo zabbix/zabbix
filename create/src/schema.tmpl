@@ -91,6 +91,7 @@ FIELD		|tls_issuer	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|tls_subject	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|tls_psk_identity|t_varchar(128)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|proxy_address	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -1586,4 +1587,4 @@ INDEX		|6		|value_sysmapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3040000	|3040005
+ROW		|3050000	|3050000
