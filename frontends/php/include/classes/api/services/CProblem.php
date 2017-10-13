@@ -285,7 +285,15 @@ class CProblem extends CApiService {
 					' WHERE p.eventid=pt.eventid'.
 						' AND ';
 
+				if (!array_key_exists('value', $tag)) {
+					$tag['value'] = '';
+				}
+
 				if ($tag['value'] !== '') {
+					if (!array_key_exists('operator', $tag)) {
+						$tag['operator'] = TAG_OPERATOR_LIKE;
+					}
+
 					switch ($tag['operator']) {
 						case TAG_OPERATOR_EQUAL:
 							$tag['value'] = ' AND UPPER(pt.value)='.zbx_dbstr(mb_strtoupper($tag['value']));

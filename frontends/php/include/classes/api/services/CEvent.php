@@ -98,6 +98,7 @@ class CEvent extends CApiService {
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
+			'evaltype'					=> TAG_EVAL_TYPE_AND,
 			'tags'						=> null,
 			// filter
 			'filter'					=> null,
@@ -305,23 +306,70 @@ class CEvent extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			foreach ($options['tags'] as $tag) {
-				if ($tag['value'] !== '') {
-					$tag['value'] = str_replace('!', '!!', $tag['value']);
-					$tag['value'] = str_replace('%', '!%', $tag['value']);
-					$tag['value'] = str_replace('_', '!_', $tag['value']);
-					$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
-					$tag['value'] = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
-				}
+			$where = '';
+			$cnt = count($options['tags']);
 
-				$sqlParts['where'][] = 'EXISTS ('.
+			// Add opening parenthesis if there are more than one OR statements. Otherwise for AND, they are not required.
+			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
+				$where .= '(';
+			}
+
+			$i = 0;
+
+			foreach ($options['tags'] as $tag) {
+				$where .= 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM event_tag et'.
 					' WHERE e.eventid=et.eventid'.
-						' AND et.tag='.zbx_dbstr($tag['tag']).
-						$tag['value'].
-				')';
+						' AND ';
+
+				if (!array_key_exists('value', $tag)) {
+					$tag['value'] = '';
+				}
+
+				if ($tag['value'] !== '') {
+					if (!array_key_exists('operator', $tag)) {
+						$tag['operator'] = TAG_OPERATOR_LIKE;
+					}
+
+					switch ($tag['operator']) {
+						case TAG_OPERATOR_EQUAL:
+							$tag['value'] = ' AND UPPER(et.value)='.zbx_dbstr(mb_strtoupper($tag['value']));
+						break;
+
+						case TAG_OPERATOR_LIKE:
+						default:
+							$tag['value'] = str_replace('!', '!!', $tag['value']);
+							$tag['value'] = str_replace('%', '!%', $tag['value']);
+							$tag['value'] = str_replace('_', '!_', $tag['value']);
+							$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
+							$tag['value'] = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
+					}
+				}
+
+				$where .= 'et.tag='.zbx_dbstr($tag['tag']).$tag['value'].')';
+
+				if ($i + 1 != $cnt)  {
+					switch ($options['evaltype']) {
+						case TAG_EVAL_TYPE_OR:
+							$where .= ' OR ';
+							break;
+
+						case TAG_EVAL_TYPE_AND:
+						default:
+							$where .= ' AND ';
+					}
+				}
+
+				$i++;
 			}
+
+			// Add closing parenthesis if there are more than one OR statements. Otherwise for AND, they are not required.
+			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
+				$where .= ')';
+			}
+
+			$sqlParts['where'][] = $where;
 		}
 
 		// time_from
