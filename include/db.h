@@ -211,8 +211,6 @@ struct	_DC_TRIGGER;
 					else					\
 						is_uint64(row, &uint)
 
-#define ZBX_MAX_SQL_LEN		65535
-
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
 typedef struct
@@ -557,7 +555,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
-int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff);
+int	DBupdate_itservices(const zbx_vector_ptr_t *trigger_diff);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
 
 int	zbx_create_itservices_lock(char **error);
@@ -567,6 +565,8 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		const zbx_uint64_t *values, const int num);
 void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char **values, const int num);
+
+int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *recipient_userid);
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);

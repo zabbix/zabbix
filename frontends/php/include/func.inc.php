@@ -2076,14 +2076,28 @@ function parse_period($str) {
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
+	$status = [
+		'is_running' => false,
+		'has_status' => false
+	];
 
-	if ($server_status === false) {
-		return false;
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+	$status['is_running'] = $server->isRunning(get_cookie('zbx_sessionid'));
+
+	if ($status['is_running'] === false) {
+		return $status;
 	}
 
-	$status = [
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
+	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
+	$status['has_status'] = (bool) $server_status;
+
+	if ($server_status === false) {
+		error($server->getError());
+		return $status;
+	}
+
+	$status += [
 		'triggers_count_disabled' => 0,
 		'triggers_count_off' => 0,
 		'triggers_count_on' => 0,

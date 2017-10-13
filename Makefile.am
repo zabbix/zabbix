@@ -8,7 +8,7 @@ SUBDIRS = \
 	man \
 	misc \
 	upgrades
-	
+
 EXTRA_DIST = \
 	bin \
 	build \
@@ -28,7 +28,6 @@ dist-hook:
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java
 
 	rm -rf `find $(top_distdir) -name ".svn"`
-	rm -f $(top_distdir)/create/data/data_test.sql
 	rm -f $(top_distdir)/include/config.h
 	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
 	rm -rf $(top_distdir)/frontends/php/tests

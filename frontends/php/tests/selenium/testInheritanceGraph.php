@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup graphs
  */
 class testInheritanceGraph extends CWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
@@ -29,10 +31,6 @@ class testInheritanceGraph extends CWebTest {
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
-
-	public function testInheritanceGraph_backup() {
-		DBsave_tables('graphs');
-	}
 
 	// return list of graphs from a template
 	public static function update() {
@@ -132,9 +130,5 @@ class testInheritanceGraph extends CWebTest {
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
-	}
-
-	public function testInheritanceGraph_restore() {
-		DBrestore_tables('graphs');
 	}
 }

@@ -244,5 +244,9 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		if (ZBX_PROXY_DATA_MORE != more)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

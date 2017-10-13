@@ -539,6 +539,10 @@ if (isset($_REQUEST['form'])) {
 		}
 		unset($step);
 
+		if ($itemPrototype['type'] != ITEM_TYPE_JMX) {
+			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		}
+
 		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_prototype_options = [
 				'itemids' => $itemPrototype['master_itemid'],

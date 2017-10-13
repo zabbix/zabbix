@@ -24,6 +24,7 @@
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"
+#include "preproc.h"
 #include "../events.h"
 
 #include "poller.h"
@@ -35,9 +36,7 @@
 #include "checks_simple.h"
 #include "checks_snmp.h"
 #include "checks_db.h"
-#ifdef HAVE_SSH2
-#	include "checks_ssh.h"
-#endif
+#include "checks_ssh.h"
 #include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"
@@ -361,9 +360,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
-			zbx_alarm_on(CONFIG_TIMEOUT);
 			res = get_value_db(item, result);
-			zbx_alarm_off();
 #else
 			SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
@@ -793,6 +790,10 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 
 #undef STAT_INTERVAL

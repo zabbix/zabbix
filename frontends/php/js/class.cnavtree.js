@@ -638,6 +638,7 @@ jQuery(function($) {
 												add_submaps: $('[name="add_submaps"]', form).is(':checked') ? 1 : 0,
 												map_name: $('[name="map.name.' + id + '"]', form).val(),
 												map_mapid: +$('[name="linked_map_id"]', form).val(),
+												depth: depth || 1,
 												mapid: id
 											};
 
@@ -894,7 +895,7 @@ jQuery(function($) {
 						}
 
 						if (widget_data.max_depth > +depth) {
-							itemEditDialog($obj, 0, parentId, +depth);
+							itemEditDialog($obj, 0, parentId, +depth + 1);
 						}
 					});
 					tools.appendChild(btn1);
@@ -1004,6 +1005,7 @@ jQuery(function($) {
 					arrow.appendChild(arrow_btn);
 					arrow_btn.addEventListener('click', function(event) {
 						var widget_data = getWidgetData($obj),
+							widget_options = $obj.data('widgetData'),
 							branch = $(this).closest('[data-id]'),
 							button = $(this),
 							closed_state = '1';
@@ -1029,6 +1031,19 @@ jQuery(function($) {
 								'web.dashbrd.navtree-' + branch.data('id') + '.toggle',
 								closed_state, [widget_data['widgetid']]
 							);
+
+							var index = widget_options['navtree_items_opened'].indexOf(branch.data('id').toString());
+							if (index > -1) {
+								if (closed_state === '1') {
+									widget_options['navtree_items_opened'].splice(index, 1);
+								}
+								else {
+									widget_options['navtree_items_opened'].push(branch.data('id').toString());
+								}
+							}
+							else if (closed_state === '0' && index == -1) {
+								widget_options['navtree_items_opened'].push(branch.data('id').toString());
+							}
 						}
 					});
 				}
@@ -1340,8 +1355,7 @@ jQuery(function($) {
 				 * linked widgets, but avoid real data sharing.
 				 */
 				if (item_id && $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
-						send_data ? 'selected_mapid' : '', {mapid: $(selected_item).data('mapid')})
-				) {
+						send_data ? 'selected_mapid' : '', {mapid: $(selected_item).data('mapid')})) {
 					$('.selected', $obj).removeClass('selected');
 
 					while ($(step_in_path).length) {

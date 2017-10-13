@@ -20,14 +20,13 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup sysmaps
+ */
 class testFormSysmap extends CWebTest {
 
 	public $mapName = 'Test map 1';
 	public $edit_map_name = 'Local network';
-
-	public function testFormSysmap_backup() {
-		DBsave_tables('sysmaps');
-	}
 
 	public function testFormSysmap_Layout() {
 		$this->zbxTestLogin('sysmaps.php?form=Create+map');
@@ -361,9 +360,5 @@ class testFormSysmap extends CWebTest {
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map deleted');
 		$this->assertEquals(0, DBcount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
-	}
-
-	public function testFormSysmap_restore() {
-		DBrestore_tables('sysmaps');
 	}
 }

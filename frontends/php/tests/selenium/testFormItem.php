@@ -21,6 +21,9 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+/**
+ * @backup items
+ */
 class testFormItem extends CWebTest {
 
 	/**
@@ -36,14 +39,6 @@ class testFormItem extends CWebTest {
 	 * @var string
 	 */
 	protected $item = 'testFormItem1';
-
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormItem_Setup() {
-		DBsave_tables('items');
-	}
 
 	// Returns layout data
 	public static function layout() {
@@ -2729,12 +2724,5 @@ class testFormItem extends CWebTest {
 				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_1", $reg_exp[1]);
 			}
 		}
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormItem_Teardown() {
-		DBrestore_tables('items');
 	}
 }

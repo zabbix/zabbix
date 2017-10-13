@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup graphs
  */
 class testFormGraphPrototype extends CWebTest {
 
@@ -115,14 +117,6 @@ class testFormGraphPrototype extends CWebTest {
 	 * @var int
 	 */
 	protected $yaxismax = 500;
-
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormGraphPrototype_Setup() {
-		DBsave_tables('graphs');
-	}
 
 	// Returns layout data
 	public static function layout() {
@@ -1228,12 +1222,5 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
 			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormGraphPrototype_Teardown() {
-		DBrestore_tables('graphs');
 	}
 }

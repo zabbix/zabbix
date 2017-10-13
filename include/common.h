@@ -1248,6 +1248,9 @@ void	zbx_alarm_flag_clear(void);
 #ifndef _WINDOWS
 unsigned int	zbx_alarm_on(unsigned int seconds);
 unsigned int	zbx_alarm_off(void);
+#if defined(HAVE_RESOLV_H)
+void	zbx_update_resolver_conf(void);		/* handle /etc/resolv.conf update */
+#endif
 #endif
 
 int	zbx_alarm_timed_out(void);

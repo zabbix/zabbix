@@ -113,12 +113,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		));
 	}
 
-	public function testPageAdministrationMediaTypes_backup() {
-		DBsave_tables('media_type');
-	}
-
 	/**
 	 * @dataProvider allMediaTypes
+	 * @backup media_type
 	 */
 	public function testPageAdministrationMediaTypes_Delete($mediatype) {
 		$dbRow = DBfetch(DBselect(
@@ -146,9 +143,4 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				$this->assertEquals(0, DBcount($sql));
 		}
 	}
-
-	public function testPageAdministrationMediaTypes_restore() {
-		DBrestore_tables('media_type');
-	}
-
 }

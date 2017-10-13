@@ -59,28 +59,23 @@ if (!$data['is_profile']) {
 
 // append user groups to form list
 if (!$this->data['is_profile']) {
-	$userForm->addVar('user_groups', $this->data['user_groups']);
+	$user_groups = [];
 
-	$lstGroups = new CListBox('user_groups_to_del[]', null, 10);
-	$lstGroups->attributes['style'] = 'width: 320px';
 	foreach ($this->data['groups'] as $group) {
-		$lstGroups->addItem($group['usrgrpid'], $group['name']);
+		$user_groups[] = CArrayHelper::renameKeys($group, ['usrgrpid' => 'id']);
 	}
 
-	$userFormList->addRow(_('Groups'),
-		[
-			$lstGroups,
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('add_group', _('Add')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups");'),
-			BR(),
-			(count($this->data['user_groups']) > 0)
-				? (new CSimpleButton(_('Delete selected')))
-					->onClick('javascript: submitFormWithParam("'.$userForm->getName().'", "del_user_group", "1");')
-					->addClass(ZBX_STYLE_BTN_GREY)
-				: null
-		]
+	$userFormList->addRow(
+		_('Groups'),
+		(new CMultiSelect([
+			'name' => 'user_groups[]',
+			'objectName' => 'usersGroups',
+			'data' => $user_groups,
+			'popup' => [
+				'parameters' => 'srctbl=usrgrp&dstfrm='.$userForm->getName().'&dstfld1=user_groups_&srcfld1=usrgrpid'.
+					'&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 }
 

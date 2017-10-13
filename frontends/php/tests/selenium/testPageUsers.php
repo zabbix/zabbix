@@ -134,10 +134,9 @@ class testPageUsers extends CWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
-	public function testPageUsers_backup() {
-		DBsave_tables('users');
-	}
-
+	/**
+	 * @backup users
+	 */
 	public function testPageUsers_MassDelete() {
 		$result=DBselect("SELECT userid,alias FROM users");
 
@@ -172,9 +171,5 @@ class testPageUsers extends CWebTest {
 				$this->assertEquals(0, DBcount("select * from media where userid=$id"));
 			}
 		}
-	}
-
-	public function testPageUsers_restore() {
-		DBrestore_tables('users');
 	}
 }

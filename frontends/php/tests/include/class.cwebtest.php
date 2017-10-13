@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
+require_once dirname(__FILE__).'/class.cexceptionhelper.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
@@ -72,64 +73,52 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	// Failed test URL.
 	protected $current_url = null;
 
+	// Table that should be backed up at the test suite level.
+	protected static $suite_table = null;
+	// Table that should be backed up at the test case level.
+	protected $case_table = null;
+	// Shared browser instance.
+	protected static $shared_browser = null;
+
 	protected function putBreak() {
 		fwrite(STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
 			while (fgets(STDIN, 1024) == '') {}
 			fwrite(STDOUT, "\033[u");
 		return;
-		}
-
-	protected function setUp() {
-		global $DB;
-
-		$this->webDriver = RemoteWebDriver::create('http://localhost:4444/wd/hub', DesiredCapabilities::firefox());
-
-		if (!isset($DB['DB'])) {
-			DBconnect($error);
-		}
 	}
 
 	protected function onNotSuccessfulTest($e) {
-		if ($this->screenshot !== null && $e instanceof PHPUnit_Framework_AssertionFailedError) {
+		if ($this->screenshot !== null) {
 			$screenshot_name = md5(microtime(true)).'.png';
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
-				$message =
-					'URL: '.$this->current_url."\n".
-					'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
-					$e->getMessage();
-
-				switch (true) {
-					case $e instanceof PHPUnit_Framework_ExpectationFailedException:
-						$e = new PHPUnit_Framework_ExpectationFailedException($message, $e->getComparisonFailure(),
-							$e->getPrevious()
-						);
-						break;
-
-					case $e instanceof PHPUnit_Framework_SyntheticError:
-						$e = new PHPUnit_Framework_SyntheticError($message, $e->getCode(), $e->getSyntheticFile(),
-							$e->getSyntheticLine(), $e->getSyntheticTrace()
-						);
-						break;
-
-					default:
-						$e = new PHPUnit_Framework_AssertionFailedError($message, $e->getCode(), $e->getPrevious());
-				}
+				CExceptionHelper::setMessage($e, 'URL: '.$this->current_url."\n".
+						'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
+						$e->getMessage()
+				);
 
 				$this->screenshot = null;
 			}
+		}
+
+		if (self::$shared_browser !== null) {
+			self::$shared_browser->quit();
+			self::$shared_browser = null;
 		}
 
 		parent::onNotSuccessfulTest($e);
 	}
 
 	protected function tearDown() {
-		if ($this->capture_screenshot && $this->hasFailed()) {
-			$this->current_url = $this->webDriver->getCurrentURL();
-			$this->screenshot = $this->webDriver->takeScreenshot();
+		try {
+			if ($this->capture_screenshot && $this->hasFailed()) {
+				$this->current_url = $this->webDriver->getCurrentURL();
+				$this->screenshot = $this->webDriver->takeScreenshot();
+			}
 		}
-
-		$this->webDriver->quit();
+		catch (Exception $ex) {
+			// Error handling is not missing here.
+		}
 	}
 
 	public function authenticate() {
@@ -687,4 +676,139 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
+	/**
+	 * Perform browser cleanup.
+	 * Close all popup windows, switch to the initial window, remove cookies.
+	 */
+	protected function cleanup() {
+		$error = false;
+
+		if (self::$shared_browser !== null) {
+			try {
+				$windows = self::$shared_browser->getWindowHandles();
+
+				if (count($windows) > 1) {
+					try {
+						foreach (array_slice($windows, 1) as $window) {
+							self::$shared_browser->switchTo()->window($window);
+							self::$shared_browser->close();
+						}
+					}
+					catch (Exception $e) {
+						// Error handling is not missing here.
+					}
+
+					if (count(self::$shared_browser->getWindowHandles()) >= 1) {
+						try {
+							self::$shared_browser->switchTo()->window($windows[0]);
+						}
+						catch (Exception $e) {
+							$error = true;
+						}
+					}
+				}
+
+				self::$shared_browser->manage()->deleteAllCookies();
+			}
+			catch (Exception $e) {
+				$error = true;
+			}
+		}
+
+		if ($error) {
+			// Cleanup failed, browser will be terminated.
+			try {
+				self::$shared_browser->quit();
+				self::$shared_browser = null;
+			}
+			catch (Exception $e) {
+				// Error handling is not missing here.
+			}
+		}
+	}
+
+	/**
+	 * Callback executed before every test case.
+	 *
+	 * @before
+	 */
+	public function onBeforeTestCase() {
+		global $DB;
+		static $suite = null;
+		$class_name = get_class($this);
+
+		if (!isset($DB['DB'])) {
+			DBconnect($error);
+		}
+
+		// Perform parsing of test method annotations.
+		$annotations = PHPUnit_Util_Test::parseTestMethodAnnotations($class_name, $this->getName(false));
+
+		// Perform test case level backup.
+		if (array_key_exists('method', $annotations) && is_array($annotations['method'])
+				&& array_key_exists('backup', $annotations['method']) && is_array($annotations['method']['backup'])
+				&& count($annotations['method']['backup']) === 1) {
+			$this->case_table = $annotations['method']['backup'][0];
+			DBsave_tables($this->case_table);
+		}
+
+		// Perform test suite level backup.
+		if ($suite !== $class_name && array_key_exists('class', $annotations) && is_array($annotations['class'])
+				&& array_key_exists('backup', $annotations['class']) && is_array($annotations['class']['backup'])
+				&& count($annotations['class']['backup']) === 1) {
+			self::$suite_table = $annotations['class']['backup'][0];
+			DBsave_tables(self::$suite_table);
+		}
+
+		// Share browser when it is possible.
+		if (self::$shared_browser !== null) {
+			$this->webDriver = self::$shared_browser;
+		}
+		else {
+			$this->webDriver = RemoteWebDriver::create('http://localhost:4444/wd/hub', DesiredCapabilities::firefox());
+			self::$shared_browser = $this->webDriver;
+		}
+
+		$suite = $class_name;
+	}
+
+	/**
+	 * Callback executed after every test case.
+	 *
+	 * @after
+	 */
+	public function onAfterTestCase() {
+		global $DB;
+
+		if ($this->case_table !== null) {
+			DBrestore_tables($this->case_table);
+		}
+
+		// Perform browser cleanup.
+		$this->cleanup();
+		DBclose();
+	}
+
+	/**
+	 * Callback executed after every test suite.
+	 *
+	 * @afterClass
+	 */
+	public static function onAfterTestSuite() {
+		global $DB;
+
+		if (self::$suite_table !== null) {
+			DBconnect($error);
+			DBrestore_tables(self::$suite_table);
+			DBclose();
+		}
+
+		self::$suite_table = null;
+
+		// Browser is always terminated at the end of the test suite.
+		if (self::$shared_browser !== null) {
+			self::$shared_browser->quit();
+			self::$shared_browser = null;
+		}
+	}
 }

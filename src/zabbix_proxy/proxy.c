@@ -45,6 +45,7 @@
 #include "../zabbix_server/pinger/pinger.h"
 #include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/trapper/trapper.h"
+#include "../zabbix_server/trapper/proxydata.h"
 #include "../zabbix_server/snmptrapper/snmptrapper.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
@@ -952,6 +953,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+	init_proxy_history_lock();
 
 	if (SUCCEED != init_configuration_cache(&error))
 	{
@@ -1172,6 +1174,7 @@ void	zbx_on_exit(void)
 		zbx_vmware_destroy();
 
 	free_selfmon_collector();
+	free_proxy_history_lock();
 
 	zbx_unload_modules();
 

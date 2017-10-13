@@ -25,6 +25,7 @@
 #include "zbxicmpping.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "preproc.h"
 
 #include "pinger.h"
 
@@ -609,5 +610,9 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 				get_process_type_string(process_type), process_num, itc, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

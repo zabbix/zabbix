@@ -156,7 +156,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
 	}
 

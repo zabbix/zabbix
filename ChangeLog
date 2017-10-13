@@ -1,25 +1,47 @@
 Changes for 4.0.0alpha1
 
 New features:
+....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
 A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy cannot be deleted when used in actions (Sasha)
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
+....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.3rc1
 
 New features:
+...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F.I..... [ZBX-12659] fixed missing information in "Status of Zabbix" widget with huge sessions table (Sasha)
+..F....... [ZBX-12788] fixed error when template is added to hosts via mass update form (gcalenko, vmurzins)
+.......P.. [ZBX-12838] fixed trap, snmptrap items of log type not being processed by proxy (wiper)
+..F....... [ZBX-12777] fixed default value for JMX endpoint on item type change in edit form and mass update form (gcalenko)
+...G...PS. [ZBX-12594] fixed system.run, user parameter and external check not to become unsupported when exit code is different than zero (vso)
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
+........S. [ZBX-12791] fixed hanging of preprocessing manager process due to file descriptor limit exhaustion when too many data gathering processes are configured to start (gleb)
+..F....... [ZBXNEXT-3732] fixed IE and Opera specific javascript bug; improved the depth control of navigation tree items; improved coding style and performance (miks)
+..F....... [ZBX-12577] fixed simple graph widget item support: only supported dynamic items, only real hosts, show only hosts with items (gcalenko)
+..F....... [ZBX-12689] added 'filter field should not be empty' validation for sysmap widget form (gcalenko)
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
+.......PS. [ZBX-12725] improved task database operations to handle/prevent creation of tasks without corresponding data records (wiper)
+..F....... [ZBX-12771] fixed {HOST.*} macro expansion for map trigger elements in map constructor (vjaceslavs)
+....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
+.......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
+..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
+..F....... [ZBX-12576] fixed difference between item and web scenario item graphs on simple graph widget (gcalenko)
+A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
 ..F....... [ZBX-12633] added horizontal scrollbar to the map in view mode; removed homepage label in maps and graphs; made graph timestamp visible only if debug-mode is on (miks)
 ..F....... [ZBX-12576] fixed error in simple graph widget for web scenario items (gcalenko)
 ..F....... [ZBX-12715] fixed problem box stretching in navigation tree in IE11; fixed position of all navigation tree problem boxes in Edge (miks)
 ..F....... [ZBX-12679] fixed escaping of translation strings with apostrophe in forms: dashboard sharing and monitoring, administration of housekeeper and trigger options, item edit and mass update, xml import, host edit, web scenario, trigger configuration. (gcalenko)
 ........S. [ZBX-11426] fixed the housekeeper for not deleting events in open problem state (abs)
 .......PS. [ZBX-12691] moved item state,lastlogsize,mtime,lastclock configuration cache update from value reception to value processing (wiper)
-........S. [DEV-658] reduced memory used by pre-processor manager item cache (wiper)
+........S. [ZBX-12802] reduced memory used by pre-processor manager item cache (wiper)
 ..F....... [ZBX-12619] fixed error displaying of zabbix server status widget (gcalenko)
 A......... [ZBX-12681] fixed SQL errors in event.get() method (Sasha)
 ..F....... [ZBX-12709] fixed possibility to enter deleys with suffixes for new elements of slideshows (Sasha)
@@ -322,6 +344,14 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBX-12788] fixed error when template is added to hosts via mass update form (gcalenko, vmurzins)
+..F....... [ZBX-12666] fixed ETag comparison check in jsLoader for web server with enabled compression (gcalenko)
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
+....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
+.......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
+..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
+A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
 ........S. [ZBX-11426] fixed the housekeeper for not deleting events in open problem state (abs)
 A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
 A......... [ZBX-12681] fixed SQL errors in event.get() method (Sasha)
@@ -829,6 +859,17 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBX-12788] fixed error when template is added to hosts via mass update form (gcalenko, vmurzins)
+..F....... [ZBX-12666] fixed ETag comparison check in jsLoader for web server with enabled compression (gcalenko)
+..F....... [ZBX-6669] fixed use of current host as filter when selecting items for graph forms and trigger forms (gcalenko)
+........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
+........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
+..F....... [ZBX-12191] fixed start time and timeline period in events screen when switching to next pages (miks)
+....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
+.......P.. [ZBX-12281] fixed simultaneous sending of the same history data from passive proxy (gleb, vjaceslavs)
+..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
+A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
+A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
 A......... [ZBX-12727] fixed response for script.get() method with "editable" flag (Sasha)
 A......... [ZBX-12727] fixed dcheck.get(), dhost.get() and dservice.get() permission checks for admin users; related to ZBX-7238 (Sasha)
 

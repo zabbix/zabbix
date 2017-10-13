@@ -24,6 +24,7 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 
+#include "preproc.h"
 #include "preprocessing.h"
 
 #define PACKED_FIELD_RAW	0
@@ -39,10 +40,11 @@ typedef struct
 }
 zbx_packed_field_t;
 
-#define PACKED_FIELD(value, size) (zbx_packed_field_t){value, size, (0 == size)?PACKED_FIELD_STRING : PACKED_FIELD_RAW};
+#define PACKED_FIELD(value, size)	\
+		(zbx_packed_field_t){(value), (size), (0 == (size) ? PACKED_FIELD_STRING : PACKED_FIELD_RAW)};
 
-static zbx_ipc_message_t	message		= (zbx_ipc_message_t){0, 0, NULL};
-static int			values_num	= 0;
+static zbx_ipc_message_t	cached_message	= (zbx_ipc_message_t){0, 0, NULL};
+static int			cached_values	= 0;
 
 /******************************************************************************
  *                                                                            *
@@ -122,7 +124,7 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
  ******************************************************************************/
 static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_preproc_item_value_t *value)
 {
-	zbx_packed_field_t	fields[22], *offset = fields; /* 22 - max field count */
+	zbx_packed_field_t	fields[22], *offset = fields;	/* 22 - max field count */
 	unsigned char		ts_marker, result_marker, log_marker;
 
 	ts_marker = (NULL != value->ts);
@@ -665,10 +667,10 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
 	value.state = state;
 	value.ts = ts;
 
-	preprocessor_pack_value(&message, &value);
-	values_num++;
+	preprocessor_pack_value(&cached_message, &value);
+	cached_values++;
 
-	if (MAX_VALUES_LOCAL < values_num)
+	if (MAX_VALUES_LOCAL < cached_values)
 		zbx_preprocessor_flush();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -681,15 +683,15 @@ out:
  * Purpose: send flush command to preprocessing manager                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_flush()
+void	zbx_preprocessor_flush(void)
 {
-	if (0 < message.size)
+	if (0 < cached_message.size)
 	{
-		preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, message.data, message.size, NULL);
+		preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, cached_message.data, cached_message.size, NULL);
 
-		zbx_ipc_message_clean(&message);
-		zbx_ipc_message_init(&message);
-		values_num = 0;
+		zbx_ipc_message_clean(&cached_message);
+		zbx_ipc_message_init(&cached_message);
+		cached_values = 0;
 	}
 }
 
@@ -702,7 +704,7 @@ void	zbx_preprocessor_flush()
  * Return value: enqueued item count                                          *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_preprocessor_get_queue_size()
+zbx_uint64_t	zbx_preprocessor_get_queue_size(void)
 {
 	zbx_uint64_t		size;
 	zbx_ipc_message_t	message;
