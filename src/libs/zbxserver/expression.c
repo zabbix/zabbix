@@ -1692,7 +1692,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
 #define MVAR_ITEM_ID			"{ITEM.ID}"
 #define MVAR_ITEM_NAME			"{ITEM.NAME}"
-#define MVAR_ITEM_NAME_ORIG		"{ITEM.NAME.ORIG}"			/* deprecated */
+#define MVAR_ITEM_NAME_ORIG		"{ITEM.NAME.ORIG}"
 #define MVAR_ITEM_KEY			"{ITEM.KEY}"
 #define MVAR_ITEM_KEY_ORIG		"{ITEM.KEY.ORIG}"
 #define MVAR_ITEM_STATE			"{ITEM.STATE}"
@@ -1710,7 +1710,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_TRIGGER_COMMENT			"{TRIGGER.COMMENT}"		/* deprecated */
 #define MVAR_TRIGGER_ID				"{TRIGGER.ID}"
 #define MVAR_TRIGGER_NAME			"{TRIGGER.NAME}"
-#define MVAR_TRIGGER_NAME_ORIG			"{TRIGGER.NAME.ORIG}"		/* deprecated */
+#define MVAR_TRIGGER_NAME_ORIG			"{TRIGGER.NAME.ORIG}"
 #define MVAR_TRIGGER_EXPRESSION			"{TRIGGER.EXPRESSION}"
 #define MVAR_TRIGGER_EXPRESSION_RECOVERY	"{TRIGGER.EXPRESSION.RECOVERY}"
 #define MVAR_TRIGGER_SEVERITY			"{TRIGGER.SEVERITY}"
@@ -1733,7 +1733,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_LLDRULE_KEY			"{LLDRULE.KEY}"
 #define MVAR_LLDRULE_KEY_ORIG			"{LLDRULE.KEY.ORIG}"
 #define MVAR_LLDRULE_NAME			"{LLDRULE.NAME}"
-#define MVAR_LLDRULE_NAME_ORIG			"{LLDRULE.NAME.ORIG}"		/* deprecated */
+#define MVAR_LLDRULE_NAME_ORIG			"{LLDRULE.NAME.ORIG}"
 #define MVAR_LLDRULE_STATE			"{LLDRULE.STATE}"
 
 #define MVAR_INVENTORY				"{INVENTORY."			/* a prefix for all inventory macros */
@@ -2833,7 +2833,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 							N_functionid, ZBX_REQUEST_ITEM_LOG_TIME, c_event->clock,
 							c_event->ns);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_NAME) || 0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
+				else if (0 == strcmp(m, MVAR_ITEM_NAME))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_ITEM_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_NAME_ORIG);
@@ -2905,7 +2910,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, c_event->objectid);
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_NAME) || 0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
+				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
+					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
+							maxerrlen);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
 				}
@@ -3065,7 +3077,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_NAME) || 0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
+				else if (0 == strcmp(m, MVAR_ITEM_NAME))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_ITEM_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_NAME_ORIG);
@@ -3116,7 +3133,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, c_event->objectid);
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_NAME) || 0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
+				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
+					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
+							maxerrlen);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
 				}
@@ -3432,7 +3456,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_item_value(c_event->objectid, &replace_to,
 							ZBX_REQUEST_ITEM_KEY_ORIG);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_NAME) || 0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
+				else if (0 == strcmp(m, MVAR_ITEM_NAME))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_ITEM_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to,
 							ZBX_REQUEST_ITEM_NAME_ORIG);
@@ -3541,7 +3569,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_item_value(c_event->objectid, &replace_to,
 							ZBX_REQUEST_ITEM_KEY_ORIG);
 				}
-				else if (0 == strcmp(m, MVAR_LLDRULE_NAME) || 0 == strcmp(m, MVAR_LLDRULE_NAME_ORIG))
+				else if (0 == strcmp(m, MVAR_LLDRULE_NAME))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_ITEM_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_LLDRULE_NAME_ORIG))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to,
 							ZBX_REQUEST_ITEM_NAME_ORIG);
