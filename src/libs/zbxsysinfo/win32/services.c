@@ -22,8 +22,8 @@
 #include "log.h"
 #include "zbxjson.h"
 
-#define ZBX_QSC2_BUFSIZE	8192	/* QueryServiceConfig2() maximum output buffer size, documented by Microsoft */
-
+#define ZBX_QSC_BUFSIZE	8192	/* QueryServiceConfig() and QueryServiceConfig2() maximum output buffer size */
+				/* as documented by Microsoft */
 typedef enum
 {
 	STARTUP_TYPE_AUTO,
@@ -105,6 +105,45 @@ static const char	*get_startup_string(zbx_startup_type_t startup_type)
 	}
 }
 
+static void	log_if_buffer_too_small(const char *function_name, DWORD sz)
+{
+	/* although documentation says 8K buffer is maximum for QueryServiceConfig() and QueryServiceConfig2(), */
+	/* we want to notice if things change */
+
+	if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() required buffer size %u. Please report this to Zabbix developers",
+				function_name, (unsigned int)sz);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_service_config                                           *
+ *                                                                            *
+ * Purpose: wrapper function around QueryServiceConfig()                      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     hService - [IN] QueryServiceConfig() parameter 'hService'              *
+ *     buf      - [OUT] QueryServiceConfig() parameter 'lpServiceConfig'.     *
+ *                Pointer to a caller supplied buffer with size               *
+ *                ZBX_QSC_BUFSIZE bytes !                                     *
+ * Return value:                                                              *
+ *      SUCCEED - data were successfully copied into 'buf'                    *
+ *      FAIL    - use strerror_from_system(GetLastError() to see what failed  *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_get_service_config(SC_HANDLE hService, LPQUERY_SERVICE_CONFIG buf)
+{
+	DWORD	sz = 0;
+
+	if (0 != QueryServiceConfig(hService, buf, ZBX_QSC_BUFSIZE, &sz))
+		return SUCCEED;
+
+	log_if_buffer_too_small("QueryServiceConfig", sz);
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_get_service_config2                                          *
@@ -116,7 +155,7 @@ static const char	*get_startup_string(zbx_startup_type_t startup_type)
  *     dwInfoLevel - [IN] QueryServiceConfig2() parameter 'dwInfoLevel'       *
  *     buf         - [OUT] QueryServiceConfig2() parameter 'lpBuffer'.        *
  *                   Pointer to a caller supplied buffer with size            *
- *                   ZBX_QSC2_BUFSIZE bytes !                                 *
+ *                   ZBX_QSC_BUFSIZE bytes !                                 *
  * Return value:                                                              *
  *      SUCCEED - data were successfully copied into 'buf'                    *
  *      FAIL    - use strerror_from_system(GetLastError() to see what failed  *
@@ -126,15 +165,16 @@ static int	zbx_get_service_config2(SC_HANDLE hService, DWORD dwInfoLevel, LPBYTE
 {
 	DWORD	sz = 0;
 
-	if (0 != QueryServiceConfig2(hService, dwInfoLevel, buf, ZBX_QSC2_BUFSIZE, &sz))
+	if (0 != QueryServiceConfig2(hService, dwInfoLevel, buf, ZBX_QSC_BUFSIZE, &sz))
 		return SUCCEED;
-	else
-		return FAIL;
+
+	log_if_buffer_too_small("QueryServiceConfig2", sz);
+	return FAIL;
 }
 
 static int	check_trigger_start(SC_HANDLE h_srv, const char *service_name)
 {
-	BYTE	buf[ZBX_QSC2_BUFSIZE];
+	BYTE	buf[ZBX_QSC_BUFSIZE];
 
 	if (SUCCEED == zbx_get_service_config2(h_srv, SERVICE_CONFIG_TRIGGER_INFO, buf))
 	{
@@ -162,7 +202,7 @@ static int	check_trigger_start(SC_HANDLE h_srv, const char *service_name)
 
 static int	check_delayed_start(SC_HANDLE h_srv, const char *service_name)
 {
-	BYTE	buf[ZBX_QSC2_BUFSIZE];
+	BYTE	buf[ZBX_QSC_BUFSIZE];
 
 	if (SUCCEED == zbx_get_service_config2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, buf))
 	{
@@ -222,7 +262,6 @@ static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVIC
 int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
-	QUERY_SERVICE_CONFIG		*qsc = NULL;
 	SC_HANDLE			h_mgr;
 	DWORD				sz = 0, szn, i, services, resume_handle = 0;
 	char				*utf8;
@@ -244,38 +283,31 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SC_HANDLE		h_srv;
 			DWORD			current_state;
+			QUERY_SERVICE_CONFIG	*qsc;
 			SERVICE_DESCRIPTION	*scd;
-			BYTE			buf[ZBX_QSC2_BUFSIZE];
+			BYTE			buf_qsc[ZBX_QSC_BUFSIZE];
+			BYTE			buf_scd[ZBX_QSC_BUFSIZE];
 
 			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_CONFIG)))
 				continue;
 
-			QueryServiceConfig(h_srv, NULL, 0, &sz);
-
-			if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
+			if (SUCCEED != zbx_get_service_config(h_srv, (LPQUERY_SERVICE_CONFIG)buf_qsc))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain configuration of service \"%s\": %s",
 						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
 				goto next;
 			}
 
-			qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc(qsc, sz);
+			qsc = (QUERY_SERVICE_CONFIG *)&buf_qsc;
 
-			if (0 == QueryServiceConfig(h_srv, qsc, sz, &sz))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain configuration of service \"%s\": %s",
-						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
-				goto next;
-			}
-
-			if (SUCCEED != zbx_get_service_config2(h_srv, SERVICE_CONFIG_DESCRIPTION, buf))
+			if (SUCCEED != zbx_get_service_config2(h_srv, SERVICE_CONFIG_DESCRIPTION, buf_scd))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
 						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
 				goto next;
 			}
 
-			scd = (SERVICE_DESCRIPTION *)&buf;
+			scd = (SERVICE_DESCRIPTION *)&buf_scd;
 
 			zbx_json_addobject(&j, NULL);
 
@@ -339,8 +371,6 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			zbx_json_close(&j);
 next:
-			zbx_free(qsc);
-
 			CloseServiceHandle(h_srv);
 		}
 
@@ -378,7 +408,6 @@ next:
 
 int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	QUERY_SERVICE_CONFIG	*qsc = NULL;
 	SERVICE_STATUS		status;
 	SC_HANDLE		h_mgr, h_srv;
 	DWORD			sz = 0;
@@ -463,7 +492,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (ZBX_SRV_PARAM_DESCRIPTION == param_type)
 	{
 		SERVICE_DESCRIPTION	*scd;
-		BYTE			buf[ZBX_QSC2_BUFSIZE];
+		BYTE			buf[ZBX_QSC_BUFSIZE];
 
 		if (SUCCEED != zbx_get_service_config2(h_srv, SERVICE_CONFIG_DESCRIPTION, buf))
 		{
@@ -483,9 +512,10 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		QueryServiceConfig(h_srv, NULL, 0, &sz);
+		QUERY_SERVICE_CONFIG	*qsc;
+		BYTE			buf_qsc[ZBX_QSC_BUFSIZE];
 
-		if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
+		if (SUCCEED != zbx_get_service_config(h_srv, (LPQUERY_SERVICE_CONFIG)buf_qsc))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service configuration: %s",
 					strerror_from_system(GetLastError())));
@@ -494,17 +524,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 			return SYSINFO_RET_FAIL;
 		}
 
-		qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc(qsc, sz);
-
-		if (0 == QueryServiceConfig(h_srv, qsc, sz, &sz))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service configuration: %s",
-					strerror_from_system(GetLastError())));
-			zbx_free(qsc);
-			CloseServiceHandle(h_srv);
-			CloseServiceHandle(h_mgr);
-			return SYSINFO_RET_FAIL;
-		}
+		qsc = (QUERY_SERVICE_CONFIG *)&buf_qsc;
 
 		switch (param_type)
 		{
@@ -524,8 +544,6 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 					SET_UI64_RESULT(result, get_service_startup_type(h_srv, qsc, name));
 				break;
 		}
-
-		zbx_free(qsc);
 	}
 
 	CloseServiceHandle(h_srv);
@@ -598,39 +616,32 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 static int	check_service_starttype(SC_HANDLE h_srv, int start_type)
 {
 	int			ret = FAIL;
-	DWORD			sz;
-	QUERY_SERVICE_CONFIG	*qsc = NULL;
+	QUERY_SERVICE_CONFIG	*qsc;
+	BYTE			buf[ZBX_QSC_BUFSIZE];
 
 	if (ZBX_SRV_STARTTYPE_ALL == start_type)
 		return SUCCEED;
 
-	QueryServiceConfig(h_srv, NULL, 0, &sz);
-
-	if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
+	if (SUCCEED != zbx_get_service_config(h_srv, (LPQUERY_SERVICE_CONFIG)buf))
 		return FAIL;
 
-	qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc(qsc, sz);
+	qsc = (QUERY_SERVICE_CONFIG *)&buf;
 
-	if (0 != QueryServiceConfig(h_srv, qsc, sz, &sz))
+	switch (start_type)
 	{
-		switch (start_type)
-		{
-			case ZBX_SRV_STARTTYPE_AUTOMATIC:
-				if (SERVICE_AUTO_START == qsc->dwStartType)
-					ret = SUCCEED;
-				break;
-			case ZBX_SRV_STARTTYPE_MANUAL:
-				if (SERVICE_DEMAND_START == qsc->dwStartType)
-					ret = SUCCEED;
-				break;
-			case ZBX_SRV_STARTTYPE_DISABLED:
-				if (SERVICE_DISABLED == qsc->dwStartType)
-					ret = SUCCEED;
-				break;
-		}
+		case ZBX_SRV_STARTTYPE_AUTOMATIC:
+			if (SERVICE_AUTO_START == qsc->dwStartType)
+				ret = SUCCEED;
+			break;
+		case ZBX_SRV_STARTTYPE_MANUAL:
+			if (SERVICE_DEMAND_START == qsc->dwStartType)
+				ret = SUCCEED;
+			break;
+		case ZBX_SRV_STARTTYPE_DISABLED:
+			if (SERVICE_DISABLED == qsc->dwStartType)
+				ret = SUCCEED;
+			break;
 	}
-
-	zbx_free(qsc);
 
 	return ret;
 }
