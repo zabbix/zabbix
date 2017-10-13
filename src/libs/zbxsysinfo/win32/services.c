@@ -264,7 +264,6 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	SC_HANDLE			h_mgr;
 	DWORD				sz = 0, szn, i, services, resume_handle = 0;
-	char				*utf8;
 	struct zbx_json			j;
 
 	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
@@ -283,6 +282,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SC_HANDLE		h_srv;
 			DWORD			current_state;
+			char			*utf8, *service_name_utf8;
 			QUERY_SERVICE_CONFIG	*qsc;
 			SERVICE_DESCRIPTION	*scd;
 			BYTE			buf_qsc[ZBX_QSC_BUFSIZE];
@@ -291,10 +291,12 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_CONFIG)))
 				continue;
 
+			service_name_utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
+
 			if (SUCCEED != zbx_get_service_config(h_srv, (LPQUERY_SERVICE_CONFIG)buf_qsc))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain configuration of service \"%s\": %s",
-						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
+						service_name_utf8, strerror_from_system(GetLastError()));
 				goto next;
 			}
 
@@ -303,7 +305,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (SUCCEED != zbx_get_service_config2(h_srv, SERVICE_CONFIG_DESCRIPTION, buf_scd))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
-						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
+						service_name_utf8, strerror_from_system(GetLastError()));
 				goto next;
 			}
 
@@ -311,9 +313,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			zbx_json_addobject(&j, NULL);
 
-			utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
-			zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
+			zbx_json_addstring(&j, "{#SERVICE.NAME}", service_name_utf8, ZBX_JSON_TYPE_STRING);
 
 			utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
 			zbx_json_addstring(&j, "{#SERVICE.DISPLAYNAME}", utf8, ZBX_JSON_TYPE_STRING);
@@ -352,8 +352,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				zbx_startup_type_t	startup_type;
 
-				startup_type = get_service_startup_type(h_srv, qsc,
-						zbx_unicode_to_utf8(ssp[i].lpServiceName));
+				startup_type = get_service_startup_type(h_srv, qsc, service_name_utf8);
 
 				/* for LLD backwards compatibility startup types with trigger start are ignored */
 				if (STARTUP_TYPE_UNKNOWN < startup_type)
@@ -371,6 +370,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			zbx_json_close(&j);
 next:
+			zbx_free(service_name_utf8);
 			CloseServiceHandle(h_srv);
 		}
 
