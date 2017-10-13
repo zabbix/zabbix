@@ -67,6 +67,7 @@ class CProblem extends CApiService {
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
+			'evaltype'					=> TAG_EVAL_TYPE_AND,
 			'tags'						=> null,
 			'recent'					=> null,
 			// filter
@@ -267,23 +268,62 @@ class CProblem extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			foreach ($options['tags'] as $tag) {
-				if ($tag['value'] !== '') {
-					$tag['value'] = str_replace('!', '!!', $tag['value']);
-					$tag['value'] = str_replace('%', '!%', $tag['value']);
-					$tag['value'] = str_replace('_', '!_', $tag['value']);
-					$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
-					$tag['value'] = ' AND UPPER(pt.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
-				}
+			$where = '';
+			$cnt = count($options['tags']);
 
-				$sqlParts['where'][] = 'EXISTS ('.
+			// Add opening parenthesis if there are more than one OR statements. Otherwise for AND, they are not required.
+			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
+				$where .= '(';
+			}
+
+			$i = 0;
+
+			foreach ($options['tags'] as $tag) {
+				$where .= 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM problem_tag pt'.
 					' WHERE p.eventid=pt.eventid'.
-						' AND pt.tag='.zbx_dbstr($tag['tag']).
-						$tag['value'].
-				')';
+						' AND ';
+
+				if ($tag['value'] !== '') {
+					switch ($tag['operator']) {
+						case TAG_OPERATOR_EQUAL:
+							$tag['value'] = ' AND UPPER(pt.value)='.zbx_dbstr(mb_strtoupper($tag['value']));
+						break;
+
+						case TAG_OPERATOR_LIKE:
+						default:
+							$tag['value'] = str_replace('!', '!!', $tag['value']);
+							$tag['value'] = str_replace('%', '!%', $tag['value']);
+							$tag['value'] = str_replace('_', '!_', $tag['value']);
+							$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
+							$tag['value'] = ' AND UPPER(pt.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
+					}
+				}
+
+				$where .= 'pt.tag='.zbx_dbstr($tag['tag']).$tag['value'].')';
+
+				if ($i + 1 != $cnt)  {
+					switch ($options['evaltype']) {
+						case TAG_EVAL_TYPE_OR:
+							$where .= ' OR ';
+							break;
+
+						case TAG_EVAL_TYPE_AND:
+						default:
+							$where .= ' AND ';
+					}
+				}
+
+				$i++;
 			}
+
+			// Add closing parenthesis if there are more than one OR statements. Otherwise for AND, they are not required.
+			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
+				$where .= ')';
+			}
+
+			$sqlParts['where'][] = $where;
 		}
 
 		// recent
@@ -386,6 +426,13 @@ class CProblem extends CApiService {
 		$sourceObjectValidator = new CEventSourceObjectValidator();
 		if (!$sourceObjectValidator->validate(['source' => $options['source'], 'object' => $options['object']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $sourceObjectValidator->getError());
+		}
+
+		$evaltype_validator = new CLimitedSetValidator([
+			'values' => array_keys([TAG_EVAL_TYPE_AND, TAG_EVAL_TYPE_AND])
+		]);
+		if (!$evaltype_validator->validate($options['evaltype'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
 		}
 	}
 

@@ -308,6 +308,10 @@ class CScreenProblem extends CScreenBase {
 				$options['tags'] = $filter['tags'];
 			}
 
+			if (array_key_exists('evaltype', $filter)) {
+				$options['evaltype'] = $filter['evaltype'];
+			}
+
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
 				? self::getDataEvents($options)
 				: self::getDataProblems($options);
