@@ -205,6 +205,6 @@ class CWebUser {
 	 * @return string
 	 */
 	public static function getLang() {
-		return (self::$data) ? substr(self::$data['lang'], 0, strpos(self::$data['lang'], '_')) : '';
+		return (self::$data) ? substr(self::$data['lang'], 0, strpos(self::$data['lang'], '_')) : 'en';
 	}
 }
