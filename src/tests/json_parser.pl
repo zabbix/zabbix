@@ -39,6 +39,20 @@ sub hash_to_str($$$)
     return $str;
 }
 
+sub array_to_str2($$)
+{
+    my $array = shift;
+    my $prefix = shift;
+    my $str = "|" . uc($prefix) . "|";
+    
+    foreach my $v (@$array)
+    {
+        $str .= $v . "|";
+    }
+    
+    return $str;
+}
+
 sub array_to_str($$$)
 {
     my $str;
@@ -135,23 +149,76 @@ sub process_json($)
                     { 
                         die("ERROR: invalid json (in/out)") unless (ref($base_element) ne 'ARRAY');
                         
-                        $str .= hash_to_str($base_element, uc($key_case_data), uc($key_case_data) . "_VALUES");
+                        $str .= array_to_str2($base_element->{"names"}, uc($key_case_data) . "_NAMES") . "\n";
+                        $str .= array_to_str2($base_element->{"values"}, uc($key_case_data) . "_VALUES") . "\n";
                     }
                     elsif ($key_case_data eq "db_data")
                     {
                         die("ERROR: invalid json (db_data)") unless (ref($base_element) ne 'ARRAY');
 
-                        $str .= rows_to_str($base_element, uc($key_case_data));
-                    } 
+                        #print($base_element->{$key_case_data});
+                        
+                        #print  Dumper($base_element);
+                        
+                          print Dumper($base_element);
+                        
+                        my $db1 = $base_element->{$key_case_data};
+                    
+                        foreach my $db (@$db1)
+                        {
+                            print Dumper($base_element);
+                        }
+                    
+                        #foreach my $db (keys %$db1)
+                        #foreach my $db (keys %$db_data)
+                        #
+                             print("\n1\n");
+                        #    my $tables = $db_data->{$db};
+                        #    $str .= "|" . uc($key_case_data) . "|\n";
+                        #    foreach my $table (@$tables)
+                        #    {
+                        #        $str .= "|" . uc($key_case_data) . "|" . $table . "|\n";
+                        #    }
+                        #}
+                            #foreach my $key (@$array)
+                            #foreach my $key_value (keys %$key)
+                        
+                        #foreach my $data_src_name (keys %$data_src)
+                        
+                        #foreach my $data_src_name (keys %$data_src) #tablename
+                        #foreach my $data (keys %($base_element->{$key_case_data}))
+                        #{
+                        #}
+                        #$str .= rows_to_str($base_element, uc($key_case_data));
+                    }
                     elsif ($key_case_data eq "functions")
                     {
-                        die("ERROR: invalid json (functions)") unless (ref($base_element) ne 'ARRAY');
-
-                        $str .= functions_to_str($base_element, uc($key_case_data));
-                    }
-                    else
-                    {
-                        die("invalid json");
+                        my $db1 = $base_element->{"functions"};
+                        
+                        #print  Dumper($base_element);
+                        
+                        foreach my $db (keys %$db1)
+                        {
+                            print("\n1\n");
+                        }
+                        
+                                        #my $str;
+                                        #my $func = shift;
+                                        #my $func_title = shift;
+                                        
+                                        #foreach my $key_func (keys %$func)
+                                        #{
+                                        #    $str .= "|" . $func_title . "|" . $key_func . "|\n";
+                                        #    
+                                        #    my $func_data = $func->{$key_func};
+                                        #    
+                                        #    foreach my $key_data (keys %$func_data)
+                                        #    {
+                                        #        $str .= array_to_str($func_data->{$key_data}, "FUNC_" . uc($key_data), "FUNC_" . uc($key_data) . "_VALUES");
+                                        #    }
+                                        #}
+                    
+                                        #return $str;
                     }
                 }
             }
@@ -166,3 +233,4 @@ sub process_json($)
 #TODO: support multiple files
 die("Error in command line: Missing required argument \"file\"\n") unless GetOptions("file=s" => \$file);
 process_json(extract_json());
+
