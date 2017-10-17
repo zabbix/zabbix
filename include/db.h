@@ -92,6 +92,8 @@ struct	_DC_TRIGGER;
 #define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
 #define HOST_IPMI_PASSWORD_LEN		20
 #define HOST_IPMI_PASSWORD_LEN_MAX	(HOST_IPMI_PASSWORD_LEN + 1)
+#define HOST_PROXY_ADDRESS_LEN		255
+#define HOST_PROXY_ADDRESS_LEN_MAX	(HOST_PROXY_ADDRESS_LEN + 1)
 
 #define INTERFACE_DNS_LEN		64
 #define INTERFACE_DNS_LEN_MAX		(INTERFACE_DNS_LEN + 1)
@@ -208,8 +210,6 @@ struct	_DC_TRIGGER;
 						uint = 0;			\
 					else					\
 						is_uint64(row, &uint)
-
-#define ZBX_MAX_SQL_LEN		65535
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 

@@ -22,56 +22,24 @@
 #include "dbupgrade.h"
 
 /*
- * 3.4 maintenance database patches
+ * 4.0 development database patches
  */
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_3040000(void)
+static int	DBpatch_3050000(void)
 {
-	return SUCCEED;
-}
+	const ZBX_FIELD	field = {"proxy_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-extern int	DBpatch_3020001(void);
-
-static int	DBpatch_3040001(void)
-{
-	return DBpatch_3020001();
-}
-
-static int	DBpatch_3040002(void)
-{
-	return DBdrop_foreign_key("sessions", 1);
-}
-
-static int	DBpatch_3040003(void)
-{
-	return DBdrop_index("sessions", "sessions_1");
-}
-
-static int	DBpatch_3040004(void)
-{
-	return DBcreate_index("sessions", "sessions_1", "userid,status,lastaccess", 0);
-}
-
-static int	DBpatch_3040005(void)
-{
-	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("sessions", 1, &field);
+	return DBadd_field("hosts", &field);
 }
 
 #endif
 
-DBPATCH_START(3040)
+DBPATCH_START(3050)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(3040000, 0, 1)
-DBPATCH_ADD(3040001, 0, 0)
-DBPATCH_ADD(3040002, 0, 0)
-DBPATCH_ADD(3040003, 0, 0)
-DBPATCH_ADD(3040004, 0, 0)
-DBPATCH_ADD(3040005, 0, 0)
+DBPATCH_ADD(3050000, 0, 1)
 
 DBPATCH_END()

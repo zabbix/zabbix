@@ -295,6 +295,7 @@ typedef struct
 	const char	*tls_subject;
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
+	const char	*proxy_address;
 	const char	*error;
 	const char	*snmp_error;
 	const char	*ipmi_error;

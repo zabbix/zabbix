@@ -233,7 +233,7 @@ DC_TRIGGER;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	char            host[HOST_HOST_LEN_MAX];
+	char		host[HOST_HOST_LEN_MAX];
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
 	int		proxy_tasks_nextcheck;
@@ -252,6 +252,7 @@ typedef struct
 	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
+	char		proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
 }
 DC_PROXY;
 
