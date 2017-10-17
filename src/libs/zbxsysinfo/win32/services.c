@@ -223,7 +223,7 @@ static int	check_delayed_start(SC_HANDLE h_srv, const char *service_name)
 static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVICE_CONFIG *qsc,
 		const char *service_name)
 {
-	int	trigger_start = 0, delayed_start = 0;
+	int	trigger_start = 0;
 
 	if (SERVICE_AUTO_START != qsc->dwStartType && SERVICE_DEMAND_START != qsc->dwStartType)
 		return STARTUP_TYPE_UNKNOWN;
@@ -234,16 +234,13 @@ static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVIC
 	if (SERVICE_AUTO_START == qsc->dwStartType)
 	{
 		if (SUCCEED == check_delayed_start(h_srv, service_name))
-			delayed_start = 1;
-
-		if (delayed_start)
 		{
-			if (trigger_start)
+			if (0 != trigger_start)
 				return STARTUP_TYPE_AUTO_DELAYED_TRIGGER;
 			else
 				return STARTUP_TYPE_AUTO_DELAYED;
 		}
-		else if (trigger_start)
+		else if (0 != trigger_start)
 		{
 			return STARTUP_TYPE_AUTO_TRIGGER;
 		}
@@ -252,7 +249,7 @@ static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVIC
 	}
 	else
 	{
-		if (trigger_start)
+		if (0 != trigger_start)
 			return STARTUP_TYPE_MANUAL_TRIGGER;
 		else
 			return STARTUP_TYPE_MANUAL;
