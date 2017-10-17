@@ -1701,6 +1701,16 @@ footer {
 }
 
 label {
+	&.form-field-required {
+		&::before {
+			color: $form-field-required-asterisk;
+			display: inline-block;
+			content: '*';
+		}
+	}
+}
+
+label {
 	input[type="checkbox"] {
 		margin-right: 3px;
 	}

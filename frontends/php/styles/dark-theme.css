@@ -1195,6 +1195,11 @@ footer, .footer {
       -moz-transition: none;
       transition: none; }
 
+label.form-field-required::before {
+  color: #e45959;
+  display: inline-block;
+  content: '*'; }
+
 label input[type="checkbox"] {
   margin-right: 3px; }
 label input[type="radio"] {
