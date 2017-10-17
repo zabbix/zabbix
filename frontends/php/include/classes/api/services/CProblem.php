@@ -271,20 +271,7 @@ class CProblem extends CApiService {
 			$where = '';
 			$cnt = count($options['tags']);
 
-			// Add opening parenthesis if there are more than one OR statements. Otherwise for AND, they are not required.
-			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
-				$where .= '(';
-			}
-
-			$i = 0;
-
 			foreach ($options['tags'] as $tag) {
-				$where .= 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM problem_tag pt'.
-					' WHERE p.eventid=pt.eventid'.
-						' AND ';
-
 				if (!array_key_exists('value', $tag)) {
 					$tag['value'] = '';
 				}
@@ -297,7 +284,7 @@ class CProblem extends CApiService {
 					switch ($tag['operator']) {
 						case TAG_OPERATOR_EQUAL:
 							$tag['value'] = ' AND UPPER(pt.value)='.zbx_dbstr(mb_strtoupper($tag['value']));
-						break;
+							break;
 
 						case TAG_OPERATOR_LIKE:
 						default:
@@ -309,26 +296,21 @@ class CProblem extends CApiService {
 					}
 				}
 
-				$where .= 'pt.tag='.zbx_dbstr($tag['tag']).$tag['value'].')';
-
-				if ($i + 1 != $cnt)  {
-					switch ($options['evaltype']) {
-						case TAG_EVAL_TYPE_OR:
-							$where .= ' OR ';
-							break;
-
-						case TAG_EVAL_TYPE_AND:
-						default:
-							$where .= ' AND ';
-					}
+				if ($where !== '')  {
+					$where .= ($options['evaltype'] == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
 				}
 
-				$i++;
+				$where .= 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM problem_tag pt'.
+					' WHERE p.eventid=pt.eventid'.
+						' AND pt.tag='.zbx_dbstr($tag['tag']).$tag['value'].
+				')';
 			}
 
-			// Add closing parenthesis if there are more than one OR statements. Otherwise for AND, they are not required.
+			// Add closing parenthesis if there are more than one OR statements.
 			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
-				$where .= ')';
+				$where = '('.$where.')';
 			}
 
 			$sqlParts['where'][] = $where;
