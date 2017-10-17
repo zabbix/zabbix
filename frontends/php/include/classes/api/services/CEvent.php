@@ -348,7 +348,7 @@ class CEvent extends CApiService {
 
 			// Add closing parenthesis if there are more than one OR statements.
 			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
-				$where .= '('.$where.')';
+				$where = '('.$where.')';
 			}
 
 			$sqlParts['where'][] = $where;
