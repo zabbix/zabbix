@@ -166,7 +166,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$tags = $field->getValue();
 
 		if (!$tags) {
-			$tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+			$tags = [['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']];
 		}
 
 		$tags_table = (new CTable())->setId('tags_table');
@@ -177,9 +177,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-				(new CRadioButtonList($field->getName().'['.$i.'][operator]',
-					array_key_exists('operator', $tag) ? (int) $tag['operator'] : TAG_OPERATOR_LIKE
-				))
+				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
 					->addValue(_('Like'), TAG_OPERATOR_LIKE)
 					->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
 					->setModern(true),
