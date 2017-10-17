@@ -1393,6 +1393,13 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|eventid
 INDEX		|2		|tag,value
 
+TABLE|tag_filter|tag_filterid|0
+FIELD		|tag_filterid	|t_id		|	|NOT NULL	|0
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0 			|1|usrgrp	|usrgrpid
+FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|groups	|groupid
+FIELD		|tag	|t_varchar(255)	|'' |NOT NULL	|0
+FIELD		|value	|t_varchar(255)	|'' |NOT NULL	|0
+
 TABLE|event_recovery|eventid|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
 FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid
@@ -1587,4 +1594,4 @@ INDEX		|6		|value_sysmapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050000	|3050000
+ROW		|3050003	|3050003
