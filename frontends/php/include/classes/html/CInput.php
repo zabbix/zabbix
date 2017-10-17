@@ -21,6 +21,8 @@
 
 class CInput extends CTag {
 
+	protected $required = false;
+
 	public function __construct($type = 'text', $name = 'textbox', $value = '') {
 		parent::__construct('input');
 		$this->setType($type);
@@ -60,5 +62,27 @@ class CInput extends CTag {
 			$this->setAttribute('disabled', 'disabled');
 		}
 		return $this;
+	}
+
+	/**
+	 * Set field required attribute.
+	 *
+	 * @param bool $required
+	 *
+	 * @return object
+	 */
+	public function setRequired($required) {
+		$this->required = $required;
+
+		return $this;
+	}
+
+	/**
+	 * Check is field marked as required.
+	 *
+	 * @return bool
+	 */
+	public function isRequired() {
+		return $this->required;
 	}
 }

@@ -52,7 +52,11 @@ class CFormList extends CList {
 			}
 		}
 
-		$label = is_object($term) ? $term : new CLabel($term, $input_id);
+		$label_class = ($input instanceof CInput && $input->isRequired())
+			? ZBX_STYLE_FORM_FIELD_REQUIRED
+			: null;
+
+		$label = is_object($term) ? $term : (new CLabel($term, $input_id))->addClass($label_class);
 
 		if ($description === null) {
 			$this->addItem([
