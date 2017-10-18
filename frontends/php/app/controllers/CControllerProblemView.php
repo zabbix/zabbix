@@ -275,7 +275,7 @@ class CControllerProblemView extends CController {
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
 				'inventory' => $filter_inventory,
-				'evaltype' => CProfile::get('web.problem.filter.evaltype', TRIGGERS_OPTION_RECENT_PROBLEM),
+				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND),
 				'tags' => $filter_tags,
 				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),
 				'unacknowledged' => CProfile::get('web.problem.filter.unacknowledged', 0),
