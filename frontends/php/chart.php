@@ -32,10 +32,10 @@ $fields = [
 	'itemids' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
 	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
 	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
-	'from' =>			[T_ZBX_INT, O_OPT, null,	'{} >= 0',	null],
 	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
 	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
@@ -81,12 +81,13 @@ CArrayHelper::sort($items, ['name', 'hostname', 'itemid']);
 /*
  * Display
  */
-$timeline = CScreenBase::calculateTime([
+$timeline = calculateTime([
 	'profileIdx' => getRequest('profileIdx', 'web.screens'),
 	'profileIdx2' => getRequest('profileIdx2'),
-	'updateProfile' => getRequest('updateProfile', true),
+	'updateProfile' => (getRequest('updateProfile', '0') === '1'),
 	'period' => getRequest('period'),
-	'stime' => getRequest('stime')
+	'stime' => getRequest('stime'),
+	'isNow' => getRequest('isNow')
 ]);
 
 $graph = new CLineGraphDraw(getRequest('type'));
@@ -107,9 +108,6 @@ if (getRequest('batch')) {
 	$graph->showTriggers(false);
 }
 
-if (hasRequest('from')) {
-	$graph->setFrom(getRequest('from'));
-}
 if (hasRequest('width')) {
 	$graph->setWidth(getRequest('width'));
 }

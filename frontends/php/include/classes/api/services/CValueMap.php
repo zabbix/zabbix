@@ -36,7 +36,7 @@ class CValueMap extends CApiService {
 
 		$this->getOptions = array_merge($this->getOptions, [
 			'valuemapids'		=> null,
-			'editable'			=> null,
+			'editable'			=> false,
 			'selectMappings'	=> null,
 			'sortfield'			=> '',
 			'sortorder'			=> ''
@@ -53,7 +53,7 @@ class CValueMap extends CApiService {
 	public function get($options = []) {
 		$options = zbx_array_merge($this->getOptions, $options);
 
-		if ($options['editable'] !== null && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return ($options['countOutput'] && !$options['groupCount']) ? 0 : [];
 		}
 

@@ -1721,7 +1721,7 @@ out:
 #undef ZBX_TCP_EXPECT_XML_END
 }
 
-static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *address2)
+static int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)
 {
 	unsigned char	netmask[16] = {0};
 	int		i, j, bytes;
@@ -1747,8 +1747,11 @@ static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *
 	/* All hosts on a subnetwork have the same network prefix. */
 	for (i = 0; i < bytes; i++)
 	{
-		if ((((unsigned char *)address1)[i] & netmask[i]) != (((unsigned char *)address2)[i] & netmask[i]))
+		if ((((const unsigned char *)address1)[i] & netmask[i]) !=
+				(((const unsigned char *)address2)[i] & netmask[i]))
+		{
 			return FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -1900,7 +1903,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_allowed_peers(zbx_socket_t *s, const char *peer_list)
+int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 {
 	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
 
@@ -2075,3 +2078,35 @@ void	zbx_udp_close(zbx_socket_t *s)
 	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
 }
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_resolver_conf                                         *
+ *                                                                            *
+ * Purpose: react to "/etc/resolv.conf" update                                *
+ *                                                                            *
+ * Comments: it is intended to call this function in the end of each process  *
+ *           main loop. The purpose of calling it at the end (instead of the  *
+ *           beginning of main loop) is to let the first initialization of    *
+ *           libc resolver proceed internally.                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_update_resolver_conf(void)
+{
+#define ZBX_RESOLV_CONF_FILE	"/etc/resolv.conf"
+
+	static time_t	mtime = 0;
+	zbx_stat_t	buf;
+
+	if (0 == zbx_stat(ZBX_RESOLV_CONF_FILE, &buf) && mtime != buf.st_mtime)
+	{
+		mtime = buf.st_mtime;
+
+		if (0 != res_init())
+			zabbix_log(LOG_LEVEL_WARNING, "zbx_update_resolver_conf(): res_init() failed");
+	}
+
+#undef ZBX_RESOLV_CONF_FILE
+}
+#endif

@@ -39,7 +39,7 @@ class CTemplateScreenItem extends CApiService {
 			'screenitemids'	=> null,
 			'screenids'		=> null,
 			'hostids'		=> null,
-			'editable'		=> null,
+			'editable'		=> false,
 			'sortfield'		=> '',
 			'sortorder'		=> '',
 			'preservekeys'	=> false,

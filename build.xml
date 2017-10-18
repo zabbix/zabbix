@@ -24,7 +24,7 @@
 		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_URL}" value="${env.SCREENSHOT_URL}"/>
 
 		<!-- Create PHP config file -->
-		<copy overwrite="true" file="tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>
+		<copy overwrite="true" file="frontends/php/tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
@@ -87,7 +87,7 @@
 	</target>
 
 	<target name="init-frontend-postgresql" depends="init-postgresql">
-		<exec executable="psql" input="tests/data/data_test.sql" failonerror="on">
+		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
@@ -98,7 +98,7 @@
 	</target>
 
 	<target name="init-api-postgresql" depends="init-postgresql">
-		<exec executable="psql" input="tests/data/data_api_test.sql" failonerror="on">
+		<exec executable="psql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
@@ -143,7 +143,7 @@
 	</target>
 
 	<target name="init-frontend-mysql" depends="init-mysql">
-		<exec executable="mysql" input="tests/data/data_test.sql" failonerror="on">
+		<exec executable="mysql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
@@ -152,7 +152,7 @@
 	</target>
 
 	<target name="init-api-mysql" depends="init-mysql">
-		<exec executable="mysql" input="tests/data/data_api_test.sql" failonerror="on">
+		<exec executable="mysql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>

@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Ubiquiti AirOS SNMPv1</template>
          <name>Template Net Ubiquiti AirOS SNMPv1</name>
-         <description>Template Net Ubiquiti AirOS version: 0.12
+         <description>Template Net Ubiquiti AirOS version: 0.13
 MIBs used:
 FROGFOOT-RESOURCES-MIB
 IEEE802dot11-MIB
@@ -46,7 +46,7 @@ device : NanoStation, UAP-LR</description>
                <name>CPU utilization</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>.1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2</snmp_oid>
+               <snmp_oid>1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2</snmp_oid>
                <key>system.cpu.util[loadValue.2]</key>
                <delay>180</delay>
                <history>30d</history>
@@ -222,7 +222,7 @@ Total memory in Bytes</description>
                <name>Hardware model name</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>.1.2.840.10036.3.1.2.1.3.5</snmp_oid>
+               <snmp_oid>1.2.840.10036.3.1.2.1.3.5</snmp_oid>
                <key>system.hw.model</key>
                <delay>3600</delay>
                <history>14d</history>
@@ -264,7 +264,7 @@ A printable string used to identify the manufacturer's product name of the resou
                <name>Firmware version</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>.1.2.840.10036.3.1.2.1.4.5</snmp_oid>
+               <snmp_oid>1.2.840.10036.3.1.2.1.4.5</snmp_oid>
                <key>system.hw.firmware</key>
                <delay>3600</delay>
                <history>14d</history>

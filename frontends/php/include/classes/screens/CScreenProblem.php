@@ -44,19 +44,11 @@ class CScreenProblem extends CScreenBase {
 	 */
 	public function __construct(array $options = []) {
 		parent::__construct($options);
-
 		$this->data = array_key_exists('data', $options) ? $options['data'] : null;
 
 		if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-			CProfile::update('web.problem.timeline.period', $this->data['filter']['period'], PROFILE_TYPE_INT);
-			CProfile::update('web.problem.timeline.stime', $this->data['filter']['stime'], PROFILE_TYPE_STR);
-
-			$time = time();
-
-			$this->data['filter']['stime'] = zbxDateToTime($this->data['filter']['stime']);
-			if ($this->data['filter']['stime'] > $time - $this->data['filter']['period']) {
-				$this->data['filter']['stime'] = $time - $this->data['filter']['period'];
-			}
+			$this->data['filter']['period'] = $this->timeline['period'];
+			$this->data['filter']['stime'] = zbxDateToTime($this->timeline['stime']);
 		}
 
 		$config = select_config();

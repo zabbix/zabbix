@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Dell Force S-Series SNMPv2</template>
          <name>Template Net Dell Force S-Series SNMPv2</name>
-         <description>Template Dell Force S-Series version: 0.12
+         <description>Template Dell Force S-Series version: 0.13
 MIBs used:
 F10-S-SERIES-CHASSIS-MIB</description>
          <groups>
@@ -45,7 +45,7 @@ F10-S-SERIES-CHASSIS-MIB</description>
                <name>CPU and Memory and Flash Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.6027.3.10.1.2.9.1.1]</snmp_oid>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.9.1.1]</snmp_oid>
                <key>module.discovery</key>
                <delay>3600</delay>
                <status>0</status>
@@ -544,7 +544,7 @@ The temperature of the unit.</description>
                      <name>#{#SNMPVALUE}: Hardware model name</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid> 1.3.6.1.4.1.6027.3.10.1.2.2.1.7.{#SNMPINDEX}</snmp_oid>
+                     <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.2.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.model[chStackUnitModelID.{#SNMPINDEX}]</key>
                      <delay>3600</delay>
                      <history>14d</history>

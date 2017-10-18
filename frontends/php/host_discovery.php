@@ -407,6 +407,10 @@ if (isset($_REQUEST['form'])) {
 		['field' => 'main', 'order' => ZBX_SORT_DOWN]
 	]);
 
+	if ($data['type'] != ITEM_TYPE_JMX) {
+		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+	}
+
 	// render view
 	$itemView = new CView('configuration.host.discovery.edit', $data);
 	$itemView->render();

@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup items
  */
 class testFormItemPrototype extends CWebTest {
 
@@ -54,14 +56,6 @@ class testFormItemPrototype extends CWebTest {
 	 * @var string
 	 */
 	protected $discoveryRuleTemplate = 'testInheritanceDiscoveryRule';
-
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormItemPrototype_backup() {
-		DBsave_tables('items');
-	}
 
 	// Returns layout data
 	public static function layout() {
@@ -2799,12 +2793,5 @@ class testFormItemPrototype extends CWebTest {
 				$this->assertEquals(0, DBcount($sqlItem));
 				break;
 		}
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormItemPrototype_Teardown() {
-		DBrestore_tables('items');
 	}
 }

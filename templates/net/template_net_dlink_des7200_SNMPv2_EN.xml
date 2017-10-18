@@ -11,7 +11,7 @@
       <template>
          <template>Template Net D-Link DES 7200 SNMPv2</template>
          <name>Template Net D-Link DES 7200 SNMPv2</name>
-         <description>Template D-Link DES 7200 version: 0.12
+         <description>Template D-Link DES 7200 version: 0.13
 MIBs used:
 MY-PROCESS-MIB
 MY-MEMORY-MIB

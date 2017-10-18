@@ -21,16 +21,15 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+/**
+ * @backup httptest
+ */
 class testInheritanceWeb extends CWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
-
-	public function testInheritanceWeb_backup() {
-		DBsave_tables('httptest');
-	}
 
 	public static function update() {
 		return DBdata(
@@ -129,9 +128,5 @@ class testInheritanceWeb extends CWebTest {
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
-	}
-
-	public function testInheritanceWeb_restore() {
-		DBrestore_tables('httptest');
 	}
 }

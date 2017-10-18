@@ -41,7 +41,6 @@ abstract class CGraphDraw {
 		$this->colorsrgb = null;
 		$this->im = null;
 		$this->period = SEC_PER_HOUR;
-		$this->from = 0;
 		$this->sizeX = 900; // default graph size X
 		$this->sizeY = 200; // default graph size Y
 		$this->shiftXleft = 100;
@@ -110,10 +109,6 @@ abstract class CGraphDraw {
 		else {
 			$this->stime = $stime;
 		}
-	}
-
-	public function setFrom($from) {
-		$this->from = $from;
 	}
 
 	public function setWidth($value = null) {
@@ -213,15 +208,6 @@ abstract class CGraphDraw {
 
 	public function setHeader($header) {
 		$this->header = $header;
-	}
-
-	public function drawLogo() {
-		imagestringup($this->im, 1,
-			$this->fullSizeX - 10,
-			$this->fullSizeY - 50,
-			ZABBIX_HOMEPAGE,
-			$this->getColor('Gray')
-		);
 	}
 
 	public function getColor($color, $alfa = 50) {

@@ -2108,8 +2108,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			$is_default_msg = (array_key_exists('default_msg', $data['new_ack_operation']['opmessage'])
 				&& $data['new_ack_operation']['opmessage']['default_msg'] == 1);
 
+			if ($data['new_ack_operation']['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+				$new_operation_formlist->addRow(_('Default media type'), $mediatype_cbox);
+			}
+			else {
+				$new_operation_formlist->addRow(_('Send only to'), $mediatype_cbox);
+			}
+
 			$new_operation_formlist
-				->addRow(_('Send only to'), $mediatype_cbox)
 				->addRow(_('Default message'),
 					(new CCheckBox('new_ack_operation[opmessage][default_msg]'))
 						->setChecked($is_default_msg)

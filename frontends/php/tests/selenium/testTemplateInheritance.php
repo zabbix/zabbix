@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup items
  */
 class testTemplateInheritance extends CWebTest {
 
@@ -38,14 +40,6 @@ class testTemplateInheritance extends CWebTest {
 	 * @var string
 	 */
 	protected $hostName = 'Template inheritance test host';
-
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testTemplateInheritance_setup() {
-		DBsave_tables('items');
-	}
 
 	public function testTemplateInheritance_linkHost(){
 		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
@@ -542,12 +536,5 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestTextPresent('Parent graphs');
 		$this->zbxTestTextPresent($this->templateName);
 
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testTemplateInheritance_teardown() {
-		DBrestore_tables('items');
 	}
 }

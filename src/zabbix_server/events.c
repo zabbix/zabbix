@@ -1927,7 +1927,6 @@ int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *
 
 		processed_num = flush_events();
 		update_trigger_changes(trigger_diff);
-		DBupdate_itservices(trigger_diff);
 		clean_events();
 	}
 
@@ -1967,7 +1966,6 @@ int	flush_correlated_events(void)
 
 		flush_events();
 		update_trigger_changes(&trigger_diff);
-		DBupdate_itservices(&trigger_diff);
 
 		DCconfig_triggers_apply_changes(&trigger_diff);
 		zbx_save_trigger_changes(&trigger_diff);
@@ -1975,6 +1973,8 @@ int	flush_correlated_events(void)
 		DBcommit();
 
 		clean_events();
+
+		DBupdate_itservices(&trigger_diff);
 	}
 
 	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);

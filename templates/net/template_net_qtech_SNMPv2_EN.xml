@@ -11,7 +11,7 @@
       <template>
          <template>Template Net QTech QSW SNMPv2</template>
          <name>Template Net QTech QSW SNMPv2</name>
-         <description>Template Net QTech QSW version: 0.12
+         <description>Template Net QTech QSW version: 0.13
 MIBs used:
 QTECH-MIB
 ENTITY-MIB</description>

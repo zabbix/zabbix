@@ -167,8 +167,8 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
-				proxy.host, sock->peer, error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
+				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
 		goto out;
 	}
 
@@ -243,8 +243,8 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != (ret = zbx_proxy_check_permissions(&proxy, sock, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
-				proxy.host, sock->peer, error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
+				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
 		goto out;
 	}
 
@@ -570,10 +570,10 @@ out:
 
 /* auxiliary variables for status_stats_export() */
 
-zbx_entry_info_t	templates, hosts_monitored, hosts_not_monitored, items_active_normal, items_active_notsupported,
+static zbx_entry_info_t	templates, hosts_monitored, hosts_not_monitored, items_active_normal, items_active_notsupported,
 			items_disabled, triggers_enabled_ok, triggers_enabled_problem, triggers_disabled, users_online,
 			users_offline, required_performance;
-int			templates_res, users_res;
+static int		templates_res, users_res;
 
 static void	zbx_status_counters_init(void)
 {
@@ -1175,5 +1175,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
 					zbx_socket_strerror());
 		}
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

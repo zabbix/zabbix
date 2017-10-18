@@ -134,35 +134,33 @@ class CProfile {
 	/**
 	 * Return matched idx value for current user.
 	 *
-	 * @param string $idx           Search pattern.
-	 * @param mixed  $default_value Default value if no rows was found.
-	 * @param int    $idx2          Numerical index will be matched against idx2 index.
+	 * @param string    $idx           Search pattern.
+	 * @param mixed     $default_value Default value if no rows was found.
+	 * @param int|null  $idx2          Numerical index will be matched against idx2 index.
 	 *
 	 * @return mixed
 	 */
 	public static function get($idx, $default_value = null, $idx2 = 0) {
 		// no user data available, just return the default value
-		if (!CWebUser::$data || is_null($idx2)) {
+		if (!CWebUser::$data || $idx2 === null) {
 			return $default_value;
 		}
 
-		if (is_null(self::$profiles)) {
+		if (self::$profiles === null) {
 			self::init();
 		}
 
-		if (!array_key_exists($idx, self::$profiles)) {
-			self::$profiles[$idx] = [];
+		if (array_key_exists($idx, self::$profiles)) {
+			// When there is cached data for $idx but $idx2 was not found we should return default value.
+			return array_key_exists($idx2, self::$profiles[$idx]) ? self::$profiles[$idx][$idx2] : $default_value;
 		}
 
-		if (array_key_exists($idx2, self::$profiles[$idx])) {
-			return self::$profiles[$idx][$idx2];
-		}
-
+		self::$profiles[$idx] = [];
 		// Aggressive caching, cache all items matched $idx key.
 		$query = DBselect(
-			'SELECT type, value_id, value_int, value_str, idx2'.
+			'SELECT type,value_id,value_int,value_str,idx2'.
 			' FROM profiles'.
-			' WHERE userid='.zbx_dbstr(self::$userDetails['userid']).
+			' WHERE userid='.self::$userDetails['userid'].
 				' AND idx='.zbx_dbstr($idx)
 		);
 
@@ -202,7 +200,7 @@ class CProfile {
 			self::init();
 		}
 
-		$idx2 = is_array($idx2) ? $idx2 : [$idx2];
+		$idx2 = (array) $idx2;
 		self::deleteValues($idx, $idx2);
 
 		if (array_key_exists($idx, self::$profiles)) {

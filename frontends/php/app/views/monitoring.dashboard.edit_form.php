@@ -30,7 +30,7 @@ $multiselect = (new CMultiSelect([
 	'name' => 'userid',
 	'selectedLimit' => 1,
 	'objectName' => 'users',
-	'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN),
+	'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
 	'popup' => [
 		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
 	],

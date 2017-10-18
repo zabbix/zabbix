@@ -43,21 +43,17 @@ typedef struct
 }
 zbx_preproc_item_value_t;
 
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
-		zbx_timespec_t *ts, unsigned char state, char *error);
-void	zbx_preprocessor_flush();
-zbx_uint64_t	zbx_preprocessor_get_queue_size();
 zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemid, unsigned char value_type,
 		zbx_timespec_t *ts, zbx_variant_t *value, zbx_item_history_value_t *history_value,
-		int step_count, zbx_item_preproc_t *steps);
+		const zbx_preproc_op_t *steps, int steps_num);
 zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *value,
 		zbx_item_history_value_t *history_value, char *error);
 
 zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsigned char *data);
 void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_type, zbx_timespec_t **ts,
-		zbx_variant_t *value, zbx_item_history_value_t **history_value, int *step_count, 
-		zbx_item_preproc_t **steps, const unsigned char *data);
+		zbx_variant_t *value, zbx_item_history_value_t **history_value, zbx_preproc_op_t **steps,
+		int *steps_num, const unsigned char *data);
 void	zbx_preprocessor_unpack_result(zbx_variant_t *value, zbx_item_history_value_t **history_value,
 		char **error, const unsigned char *data);
 
-#endif /* ZABBIX_ZBXPREPROC_H */
+#endif /* ZABBIX_PREPROCESSING_H */
