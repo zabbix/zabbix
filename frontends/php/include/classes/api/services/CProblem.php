@@ -400,14 +400,14 @@ class CProblem extends CApiService {
 	 */
 	protected function validateGet(array $options) {
 		$sourceValidator = new CLimitedSetValidator([
-			'values' => array_keys([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL])
+			'values' => [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL]
 		]);
 		if (!$sourceValidator->validate($options['source'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
 		}
 
 		$objectValidator = new CLimitedSetValidator([
-			'values' => array_keys([EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])
+			'values' => [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE]
 		]);
 		if (!$objectValidator->validate($options['object'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));
@@ -419,7 +419,7 @@ class CProblem extends CApiService {
 		}
 
 		$evaltype_validator = new CLimitedSetValidator([
-			'values' => array_keys([TAG_EVAL_TYPE_AND, TAG_EVAL_TYPE_AND])
+			'values' => [TAG_EVAL_TYPE_AND, TAG_EVAL_TYPE_OR]
 		]);
 		if (!$evaltype_validator->validate($options['evaltype'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
