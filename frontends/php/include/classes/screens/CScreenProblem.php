@@ -956,9 +956,7 @@ class CScreenProblem extends CScreenBase {
 						: '',
 					$value_str,
 					implode(', ', $hosts),
-					CMacrosResolverHelper::resolveEventDescription(
-						$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-					),
+					$problem['name'],
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
