@@ -1,7 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
-...G...... [ZBXNEXT-3493] added Windows service configuration check to determin if service can be trigger started (andris, viktors)
+...G...... [ZBXNEXT-3493] added Windows service configuration check to determine if service can be trigger started (andris, viktors)
 A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (sasha, vso)
 .......P.. [ZBXNEXT-4181] fixed passive Zabbix proxy to accept Zabbix server requests only from allowed address (vso)
 ....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
