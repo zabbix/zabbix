@@ -89,9 +89,6 @@ zbx_test_case_t;
 
 zbx_test_case_t		*cases;
 int			case_num;
-char			*curr_tested_function;
-char			*curr_wrapped_function;
-char			*curr_case_name;
 
 char	*get_in_param_by_index(int idx);
 char	*get_out_param_by_index(int idx);

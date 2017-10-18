@@ -25,14 +25,11 @@ int	main(void)
 
 	if (SUCCEED == (result = load_data("parsed_data")))
 	{
-
-		debug_print_cases();
-
 		/* debug_print_cases(); */
 
 		const struct CMUnitTest tests[] =
 		{
-			/* cmocka_unit_test(test_try_task_closes_problem) */
+			cmocka_unit_test(test_try_task_closes_problem)
 			/* cmocka_unit_test(test_process_escalations) */
 		};
 

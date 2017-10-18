@@ -21,7 +21,7 @@
 
 #define		MAX_ROW_NUM	64
 
-char	*curr_case_name = NULL;
+extern char	*curr_case_name;
 
 char	*generate_data_source(char *sql)
 {

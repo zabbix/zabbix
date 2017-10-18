@@ -55,16 +55,16 @@ sub process_json($)
 
                     if ($key_case_data eq "tested_function")
                     {
-			die("ERROR: invalid json (tested_function)") unless (ref($base_element) ne 'HASH');
+                    	die("ERROR: invalid json (tested_function)") unless (ref($base_element) ne 'HASH');
 
-			$str .= "|" . uc($key_case_data) . "|" . $base_element . "|\n";
+						$str .= "|" . uc($key_case_data) . "|" . $base_element . "|\n";
                     }
                     elsif ($key_case_data eq "in" or $key_case_data eq "out")
                     {
                         die("ERROR: invalid json (in/out)") unless (ref($base_element) ne 'ARRAY');
 
-                        $str .= array_to_str2($base_element->{"names"}, uc($key_case_data)) . "\n";
-                        $str .= array_to_str2($base_element->{"values"}, uc($key_case_data)) . "\n";
+                        $str .= array_to_str2($base_element->{"names"}, uc($key_case_data) . "_NAMES") . "\n";
+                        $str .= array_to_str2($base_element->{"values"}, uc($key_case_data) . "_VALUES") . "\n";
                     }
                     elsif ($key_case_data eq "db_data")
                     {

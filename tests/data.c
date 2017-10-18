@@ -25,9 +25,10 @@
 #define	TEST_MAX_ROW_NUM		512
 #define	TEST_MAX_DATA_NUM		512
 
-extern char	*curr_tested_function;
-extern char	*curr_wrapped_function;
-extern char	*curr_case_name;
+char	*curr_tested_function = NULL;
+char	*curr_wrapped_function = NULL;
+char	*curr_case_name = NULL;
+int	curr_case_idx = -1;
 
 char	*get_in_param_by_index(int idx)
 {
@@ -38,7 +39,9 @@ char	*get_in_param_by_index(int idx)
 		if (0 == strcmp(cases[i].tested_function, curr_tested_function) &&
 				0 == strcmp(cases[i].case_name, curr_case_name))
 		{
-			if (cases[i].in_params.data_num < idx)
+
+			printf("_test %d %d\n", cases[i].in_params.data_num, idx);
+			if (cases[i].in_params.data_num > idx)
 				return cases[i].in_params.values[idx];
 			else
 				goto out;
@@ -57,7 +60,7 @@ char	*get_out_param_by_index(int idx)
 		if (0 == strcmp(cases[i].tested_function, curr_tested_function) &&
 				0 == strcmp(cases[i].case_name, curr_case_name))
 		{
-			if (cases[i].out_params.data_num < idx)
+			if (cases[i].out_params.data_num > idx)
 				return cases[i].out_params.values[idx];
 			else
 				goto out;
@@ -120,7 +123,7 @@ char	*get_out_func_param_by_idx(int idx)
 			{
 				if (0 == strcmp(cases[i].functions[n].name, curr_wrapped_function))
 				{
-					if (cases[i].functions[n].data.data_num < idx)
+					if (cases[i].functions[n].data.data_num > idx)
 						goto out;
 
 					return cases[i].functions[n].data.values[idx];
@@ -225,13 +228,13 @@ int	load_data(char *file_name)
 
 						line_type = ZBX_TEST_DATA_TYPE_FUNCTION;
 					}
-					else if (0 == strcmp(p, "IN"))
+					else if (0 == strcmp(p, "IN_NAMES"))
 					{
 						curr_data = &curr_case->in_params;
 
 						line_type = ZBX_TEST_DATA_TYPE_IN_PARAM;
 					}
-					else if (0 == strcmp(p, "OUT"))
+					else if (0 == strcmp(p, "OUT_NAMES"))
 					{
 						curr_data = &curr_case->out_params;
 

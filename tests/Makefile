@@ -58,20 +58,16 @@ LIBS=../src/zabbix_server/escalator/libzbxescalator.a \
 	../src/libs/zbxdb/libzbxdb.a \
 	../src/libs/zbxmodules/libzbxmodules.a \
 	../src/libs/zbxtasks/libzbxtasks.a
-INC=-I../../include -I../libs/zbxdbcache -I../zabbix_server/scripts -I../zabbix_server/escalator -I../zabbix_server -I/usr/include/mysql/
+INC=-I../include -I../src/libs/zbxdbcache -I../src/zabbix_server/scripts -I../src/zabbix_server/escalator -I../src/zabbix_server -I/usr/include/mysql/
 
-#C=	unresolved.c \
-	#data.c \
-	#db_simulation.c \
-	#../src/zabbix_server/actions.c \
-	#../src/zabbix_server/events.c \
-	#../src/zabbix_server/operations.c \
-	#../src/libs/zbxdb/db.c \
-	#main.c
-	
 C=	unresolved.c \
 	data.c \
 	db_simulation.c \
+	../src/libs/zbxdb/db.c \
+	../src/zabbix_server/actions.c \
+	../src/zabbix_server/events.c \
+	../src/zabbix_server/operations.c \
+	zabbix_server/taskmanager/try_task_closes_problem.c \
 	main.c
 
 WRAP_FUNCS=--wrap=zbx_db_vselect,--wrap=zbx_db_fetch,--wrap=__zbx_DBexecute,--wrap=DBbegin,--wrap=DBcommit,--wrap=DBexecute_multiple_query,--wrap=DBfree_result,--wrap=DCconfig_lock_triggers_by_triggerids,--wrap=DCconfig_unlock_triggers

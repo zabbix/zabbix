@@ -17,36 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../zbxtests.h"
+#include "../../zbxtests.h"
 
-#include "../zabbix_server/taskmanager/taskmanager.h"
+#include "../../../src/zabbix_server/taskmanager/taskmanager.h"
 
 int	CONFIG_PREPROCMAN_FORKS		= 1;
 int	CONFIG_PREPROCESSOR_FORKS	= 3;
 
-char	*curr_tested_function = NULL;
-char	*curr_wrapped_function = NULL;
-char	*curr_case_name = NULL;
+extern char	*curr_tested_function;
+extern char	*curr_wrapped_function;
+extern char	*curr_case_name;
+extern int	curr_case_idx;
 
 void	__wrap_DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in,
 		zbx_vector_uint64_t *triggerids_out)
 {
 	int		i;
-	zbx_uint64_t 	out_func_param1;
+	zbx_uint64_t 	triggerid;
 
 	curr_wrapped_function = "DCconfig_lock_triggers_by_triggerids";
 
-	for (i = 0; i < cases[curr_case_idx].function_num; i++)
-	{
-		if (0 == strcmp(cases[curr_case_idx].functions[i].name, "DCconfig_lock_triggers_by_triggerids") &&
-				cases[curr_case_idx].functions[i].data.data_num > 0)
-		{
-			ZBX_STR2UINT64(out_func_param1, cases[curr_case_idx].functions[i].data.values[0]);
-			zbx_vector_uint64_append(triggerids_out, out_func_param1);
-
-			break;
-		}
-	}
+	ZBX_STR2UINT64(triggerid, get_out_func_param_by_name("triggerids"));
+	zbx_vector_uint64_append(triggerids_out, triggerid);
 }
 
 void	__wrap_DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
@@ -55,7 +47,7 @@ void	__wrap_DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 
 void test_try_task_closes_problem()
 {
-	int	i, ret, param1, res, executed_num = 0;
+	int	i, ret, taskid, res, executed_num = 0;
 
 	curr_tested_function = "try_task_closes_problem";
 
@@ -63,13 +55,12 @@ void test_try_task_closes_problem()
 	{
 		if (0 == strcmp(cases[i].tested_function, curr_tested_function))
 		{
-			curr_case_name = cases[curr_case_idx].case_name;
+			curr_case_idx = i;
+			curr_case_name = cases[i].case_name;
 
-			param1 = atoi(get_in_param_by_index(0));
-
-			ret = tm_try_task_close_problem(param1);
-
-			res = atoi(get_out_param_by_index(0));
+			taskid = atoi(get_in_param_by_name("taskid"));
+			ret = tm_try_task_close_problem(taskid);
+			res = atoi(get_out_param_by_name("return"));
 
 			assert_int_equal(ret, res);
 
