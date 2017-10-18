@@ -17,6 +17,7 @@ Bug fixes:
 Changes for 3.4.4rc1
 
 New features:
+..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
 ..F....... [ZBX-12666] fixed ETag comparison check in jsLoader for web server with enabled compression (gcalenko)
