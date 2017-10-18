@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+...G...... [ZBXNEXT-3493] added Windows service configuration check to determin if service can be trigger started (andris, viktors)
 A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (sasha, vso)
 .......P.. [ZBXNEXT-4181] fixed passive Zabbix proxy to accept Zabbix server requests only from allowed address (vso)
 ....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
@@ -18,7 +19,6 @@ Changes for 3.4.4rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-12857] improved pre-processing manager performance when processing large number of values (wiper)
 ........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
 
 --------------------------------------------------------------------------------
