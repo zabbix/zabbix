@@ -92,6 +92,7 @@ class CEvent extends CApiService {
 			'severities'				=> null,
 			'nopermissions'				=> null,
 			// filter
+			'name'						=> null,
 			'value'						=> null,
 			'time_from'					=> null,
 			'time_till'					=> null,
@@ -99,7 +100,6 @@ class CEvent extends CApiService {
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
 			'tags'						=> null,
-			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
@@ -200,6 +200,18 @@ class CEvent extends CApiService {
 							')';
 				}
 			}
+		}
+
+		// name
+		if ($options['name'] !== null) {
+			$res = DBselect('SELECT eventid FROM events WHERE '.dbConditionString('name', [$options['name']]));
+
+			$eventids = [];
+			while ($event = DBfetch($res)) {
+				$eventids[] = $event['eventid'];
+			}
+
+			$sqlParts['where'][] = dbConditionInt('e.eventid', $eventids);
 		}
 
 		// eventids

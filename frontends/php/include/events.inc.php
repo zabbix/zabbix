@@ -171,18 +171,17 @@ function get_next_event($currentEvent, array $eventList = []) {
  * @param string $event['eventid']					Event ID.
  * @param string $event['correlationid']			OK Event correlation ID.
  * @param string $event['userid]					User ID who gerenerated the OK event.
- * @param array  $trigger							An array of trigger data.
  * @param string $backurl							A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
  */
-function make_event_details($event, $trigger, $backurl) {
+function make_event_details($event, $backurl) {
 	$config = select_config();
 
 	$table = (new CTableInfo())
 		->addRow([
 			_('Event'),
-			CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))
+			$event['name']
 		])
 		->addRow([
 			_('Time'),

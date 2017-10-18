@@ -35,7 +35,7 @@ class CControllerProblemView extends CController {
 
 		$fields = [
 			'action' =>					'string',
-			'sort' =>					'in clock,host,priority,problem',
+			'sort' =>					'in clock,host,priority,name',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>				'in 1',
 			'fullscreen' =>				'in 0,1',
@@ -47,7 +47,7 @@ class CControllerProblemView extends CController {
 			'filter_hostids' =>			'array_id',
 			'filter_application' =>		'string',
 			'filter_triggerids' =>		'array_id',
-			'filter_problem' =>			'string',
+			'filter_name' =>			'string',
 			'filter_severity' =>		'in '.implode(',', $severities),
 			'filter_age_state' =>		'in 1',
 			'filter_age' =>				'int32',
@@ -118,7 +118,7 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.triggerids', $this->getInput('filter_triggerids', []),
 				PROFILE_TYPE_ID
 			);
-			CProfile::update('web.problem.filter.problem', $this->getInput('filter_problem', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.problem.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.problem.filter.severity',
 				$this->getInput('filter_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED), PROFILE_TYPE_INT
 			);
@@ -162,7 +162,7 @@ class CControllerProblemView extends CController {
 			CProfile::deleteIdx('web.problem.filter.hostids');
 			CProfile::delete('web.problem.filter.application');
 			CProfile::deleteIdx('web.problem.filter.triggerids');
-			CProfile::delete('web.problem.filter.problem');
+			CProfile::delete('web.problem.filter.name');
 			CProfile::delete('web.problem.filter.severity');
 			CProfile::delete('web.problem.filter.age_state');
 			CProfile::delete('web.problem.filter.age');
@@ -256,7 +256,7 @@ class CControllerProblemView extends CController {
 				'application' => CProfile::get('web.problem.filter.application', ''),
 				'triggerids' => $filter_triggerids,
 				'triggers' => $filter_triggers,
-				'problem' => CProfile::get('web.problem.filter.problem', ''),
+				'name' => CProfile::get('web.problem.filter.name', ''),
 				'severity' => CProfile::get('web.problem.filter.severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 				'severities' => $severities,
 				'age_state' => CProfile::get('web.problem.filter.age_state', 0),

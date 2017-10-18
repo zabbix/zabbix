@@ -62,6 +62,7 @@ class CProblem extends CApiService {
 			'severities'				=> null,
 			'nopermissions'				=> null,
 			// filter
+			'name'						=> null,
 			'time_from'					=> null,
 			'time_till'					=> null,
 			'eventid_from'				=> null,
@@ -69,7 +70,6 @@ class CProblem extends CApiService {
 			'acknowledged'				=> null,
 			'tags'						=> null,
 			'recent'					=> null,
-			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
@@ -164,6 +164,11 @@ class CProblem extends CApiService {
 						')';
 				}
 			}
+		}
+
+		// name
+		if ($options['name'] !== null) {
+			$sqlParts['where'][] = dbConditionString('p.name', [$options['name']]);
 		}
 
 		// eventids

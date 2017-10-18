@@ -36,7 +36,7 @@ $options = [
 			'hostids' => $data['filter']['hostids'],
 			'application' => $data['filter']['application'],
 			'triggerids' => $data['filter']['triggerids'],
-			'problem' => $data['filter']['problem'],
+			'name' => $data['filter']['name'],
 			'severity' => $data['filter']['severity'],
 			'inventory' => $data['filter']['inventory'],
 			'tags' => $data['filter']['tags'],
@@ -142,7 +142,7 @@ if ($data['action'] == 'problem.view') {
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Problem'),
-			(new CTextBox('filter_problem', $data['filter']['problem']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Minimum trigger severity'),
 			new CComboBox('filter_severity', $data['filter']['severity'], null, $data['filter']['severities'])
