@@ -1701,11 +1701,13 @@ footer {
 }
 
 label {
-	&.form-field-required {
+	&.form-label-asterisk {
 		&::before {
-			color: $form-field-required-asterisk;
+			color: $form-label-asterisk-color;
 			display: inline-block;
 			content: '*';
+			position: absolute;
+			margin: -3px 0 0 -5px;
 		}
 	}
 }

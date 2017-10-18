@@ -52,7 +52,7 @@ class CFormList extends CList {
 			}
 		}
 
-		$label_class = ($input instanceof CInput && $input->isRequired())
+		$label_class = ($input instanceof CInput && $input->hasAsterisk())
 			? ZBX_STYLE_FORM_FIELD_REQUIRED
 			: null;
 

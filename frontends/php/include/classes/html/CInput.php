@@ -21,7 +21,7 @@
 
 class CInput extends CTag {
 
-	protected $required = false;
+	protected $asterisk = false;
 
 	public function __construct($type = 'text', $name = 'textbox', $value = '') {
 		parent::__construct('input');
@@ -65,24 +65,24 @@ class CInput extends CTag {
 	}
 
 	/**
-	 * Set field required attribute.
+	 * Field with asterisk attribute will have asterisk in front of it label when rendered in form row.
 	 *
-	 * @param bool $required
+	 * @param bool $asterisk    If true asterisk will be prepended to field label.
 	 *
 	 * @return object
 	 */
-	public function setRequired($required) {
-		$this->required = $required;
+	public function setAsterisk($asterisk) {
+		$this->asterisk = $asterisk;
 
 		return $this;
 	}
 
 	/**
-	 * Check is field marked as required.
+	 * Check is field marked as asterisk prefixed label field.
 	 *
 	 * @return bool
 	 */
-	public function isRequired() {
-		return $this->required;
+	public function hasAsterisk() {
+		return $this->asterisk;
 	}
 }

@@ -1169,10 +1169,12 @@ footer, .footer {
       -moz-transition: none;
       transition: none; }
 
-label.form-field-required::before {
+label.form-label-asterisk::before {
   color: #e33734;
   display: inline-block;
-  content: '*'; }
+  content: '*';
+  position: absolute;
+  margin: -3px 0 0 -5px; }
 
 label input[type="checkbox"] {
   margin-right: 3px; }
