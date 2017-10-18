@@ -333,6 +333,9 @@ class CEvent extends CApiService {
 							$tag['value'] = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
 					}
 				}
+				elseif ($tag['operator'] == TAG_OPERATOR_EQUAL) {
+					$tag['value'] = ' AND et.value='.zbx_dbstr($tag['value']);
+				}
 
 				if ($where !== '')  {
 					$where .= ($options['evaltype'] == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';

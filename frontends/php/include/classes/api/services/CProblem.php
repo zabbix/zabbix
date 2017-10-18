@@ -295,6 +295,9 @@ class CProblem extends CApiService {
 							$tag['value'] = ' AND UPPER(pt.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
 					}
 				}
+				elseif ($tag['operator'] == TAG_OPERATOR_EQUAL) {
+					$tag['value'] = ' AND pt.value='.zbx_dbstr($tag['value']);
+				}
 
 				if ($where !== '')  {
 					$where .= ($options['evaltype'] == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
