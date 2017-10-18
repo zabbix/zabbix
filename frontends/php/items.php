@@ -1179,6 +1179,10 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		}
 		unset($step);
 
+		if ($item['type'] != ITEM_TYPE_JMX) {
+			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		}
+
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_item_options = [
 				'itemids'	=> $item['master_itemid'],
@@ -1362,6 +1366,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	if (!$data['delay_flex']) {
 		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
 	}
+
+	$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 
 	// render view
 	$itemView = new CView('configuration.item.massupdate', $data);

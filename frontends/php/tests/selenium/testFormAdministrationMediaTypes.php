@@ -20,14 +20,13 @@
 
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
+/**
+ * @backup media_type
+ */
 class testFormAdministrationMediaTypes extends CWebTest {
 
 	public static function allMediaTypes() {
 		return DBdata('SELECT * FROM media_type');
-	}
-
-	public function testFormAdministrationMediaTypes_backup() {
-		DBsave_tables('media_type');
 	}
 
 	public static function layout() {
@@ -642,9 +641,5 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				}
 			}
 		}
-	}
-
-	public function testFormAdministrationMediaTypes_restore() {
-		DBrestore_tables('media_type');
 	}
 }

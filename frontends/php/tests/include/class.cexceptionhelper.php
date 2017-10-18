@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -17,14 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXEXEC_H
-#define ZABBIX_ZBXEXEC_H
+/**
+ * A class that allows changing message of an Exception without recreating it.
+ */
+class CExceptionHelper extends Exception {
 
-#define ZBX_EXIT_CODE_CHECKS_DISABLED	0
-#define ZBX_EXIT_CODE_CHECKS_ENABLED	1
-
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout,
-		unsigned char flag);
-int	zbx_execute_nowait(const char *command);
-
-#endif
+	/**
+	 * Set exception message.
+	 *
+	 * @param Exception $exception				Exception to be updated.
+	 * @param string    $message				Message to be set.
+	 */
+	public static function setMessage(Exception $exception, $message) {
+		$exception->message = $message;
+	}
+}

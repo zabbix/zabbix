@@ -567,7 +567,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	ZBX_METRIC	*command = NULL;
 	AGENT_REQUEST	request;
 
-	init_result(result);
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key((0 == (flags & PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),

@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup screens
+ */
 class testFormScreen extends CWebTest {
 	public $testscreen = 'Test screen (clock)';
 	public $new_screen_name = 'Changed screen name';
@@ -27,10 +30,6 @@ class testFormScreen extends CWebTest {
 	public $cloned_screen = 'Cloned screen';
 	public $testscreen_history = 'Test screen (history of actions)';
 	public $testscreen_ = 'Test screen (simple graph)';
-
-	public function testFormScreen_backup() {
-		DBsave_tables('screens');
-	}
 
 	public static function create() {
 		return [
@@ -242,9 +241,4 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Change');
 		$this->assertFalse($this->zbxTestCheckboxSelected('dynamic'));
 	}
-
-	public function testFormScreen_restore() {
-		DBrestore_tables('screens');
-	}
-
 }

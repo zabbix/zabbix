@@ -17,14 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXEXEC_H
-#define ZABBIX_ZBXEXEC_H
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
 
-#define ZBX_EXIT_CODE_CHECKS_DISABLED	0
-#define ZBX_EXIT_CODE_CHECKS_ENABLED	1
+/*
+ * 4.0 development database patches
+ */
 
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout,
-		unsigned char flag);
-int	zbx_execute_nowait(const char *command);
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_3050000(void)
+{
+	const ZBX_FIELD	field = {"proxy_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
 
 #endif
+
+DBPATCH_START(3050)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(3050000, 0, 1)
+
+DBPATCH_END()

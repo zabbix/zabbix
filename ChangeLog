@@ -1,13 +1,31 @@
 Changes for 4.0.0alpha1
 
 New features:
+...G...... [ZBXNEXT-3493] added Windows service configuration check to determine if service can be trigger started (andris, viktors)
+A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (sasha, vso)
+.......P.. [ZBXNEXT-4181] fixed passive Zabbix proxy to accept Zabbix server requests only from allowed address (vso)
 ....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
 A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy cannot be deleted when used in actions (Sasha)
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.4rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-12857] improved pre-processing manager performance when processing large number of values (wiper)
+........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.3
+
+3.4.3rc1 was released as 3.4.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.3rc1
@@ -16,6 +34,11 @@ New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F.I..... [ZBX-12659] fixed missing information in "Status of Zabbix" widget with huge sessions table (Sasha)
+..F....... [ZBX-12788] fixed error when template is added to hosts via mass update form (gcalenko, vmurzins)
+.......P.. [ZBX-12838] fixed trap, snmptrap items of log type not being processed by proxy (wiper)
+..F....... [ZBX-12777] fixed default value for JMX endpoint on item type change in edit form and mass update form (gcalenko)
+...G...PS. [ZBX-12594] fixed system.run, user parameter and external check not to become unsupported when exit code is different than zero (vso)
 ........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
 ........S. [ZBX-12791] fixed hanging of preprocessing manager process due to file descriptor limit exhaustion when too many data gathering processes are configured to start (gleb)
 ..F....... [ZBXNEXT-3732] fixed IE and Opera specific javascript bug; improved the depth control of navigation tree items; improved coding style and performance (miks)
@@ -29,7 +52,6 @@ Bug fixes:
 ..F....... [ZBX-12770] fixed links in select popup for user groups; updated group selection field in Administration->Users (gcalenko)
 ..F....... [ZBX-12576] fixed difference between item and web scenario item graphs on simple graph widget (gcalenko)
 A......... [ZBX-8277] improved performance of hostgeneral.unlink() method; fixed SQL statement (Sasha)
-.....J.... [ZBX-12705] fixed processing of MBean properties in jmx discovery (vjaceslavs)
 ..F....... [ZBX-12633] added horizontal scrollbar to the map in view mode; removed homepage label in maps and graphs; made graph timestamp visible only if debug-mode is on (miks)
 ..F....... [ZBX-12576] fixed error in simple graph widget for web scenario items (gcalenko)
 ..F....... [ZBX-12715] fixed problem box stretching in navigation tree in IE11; fixed position of all navigation tree problem boxes in Edge (miks)
@@ -333,12 +355,27 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
+Changes for 3.2.10rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.9
+
+3.2.9rc1 was released as 3.2.9 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.2.9rc1
 
 New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBX-12788] fixed error when template is added to hosts via mass update form (gcalenko, vmurzins)
+..F....... [ZBX-12666] fixed ETag comparison check in jsLoader for web server with enabled compression (gcalenko)
 ........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
 ........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
 ....I..... [ZBX-12779] fixed detection of PostgreSQL 10 (Andris)
@@ -846,12 +883,28 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.13rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.12
+
+3.0.12rc1 was released as 3.0.12 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.12rc1
 
 New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+..F....... [ZBX-12788] fixed error when template is added to hosts via mass update form (gcalenko, vmurzins)
+..F....... [ZBX-12666] fixed ETag comparison check in jsLoader for web server with enabled compression (gcalenko)
+..F....... [ZBX-6669] fixed use of current host as filter when selecting items for graph forms and trigger forms (gcalenko)
 ........S. [ZBX-10547] fixed IT services calculation in parallel transactions not seeing each other changes when calculating common parent service (vso)
 ........S. [ZBX-12441] fixed user permission check for macros containing user personal information in notification messages (viktors)
 ..F....... [ZBX-12191] fixed start time and timeline period in events screen when switching to next pages (miks)
