@@ -18,6 +18,7 @@ Changes for 3.4.4rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12857] improved pre-processing manager performance when processing large number of values (wiper)
 ........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
 
 --------------------------------------------------------------------------------
