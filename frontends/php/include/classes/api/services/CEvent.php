@@ -455,6 +455,13 @@ class CEvent extends CApiService {
 		if (!$sourceObjectValidator->validate(['source' => $options['source'], 'object' => $options['object']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $sourceObjectValidator->getError());
 		}
+
+		$evaltype_validator = new CLimitedSetValidator([
+			'values' => [TAG_EVAL_TYPE_AND, TAG_EVAL_TYPE_OR]
+		]);
+		if (!$evaltype_validator->validate($options['evaltype'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
+		}
 	}
 
 	/**
