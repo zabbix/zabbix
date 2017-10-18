@@ -321,7 +321,7 @@ class CEvent extends CApiService {
 
 					switch ($tag['operator']) {
 						case TAG_OPERATOR_EQUAL:
-							$tag['value'] = ' AND UPPER(et.value)='.zbx_dbstr(mb_strtoupper($tag['value']));
+							$tag['value'] = ' AND et.value='.zbx_dbstr($tag['value']);
 							break;
 
 						case TAG_OPERATOR_LIKE:
