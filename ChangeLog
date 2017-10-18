@@ -888,6 +888,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.13rc1
 
 New features:
+..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
 ........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
