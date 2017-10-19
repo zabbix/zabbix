@@ -20,6 +20,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-12710] fixed OS type detection logic (vjaceslavs)
 ..F....... [ZBX-12543] fixed problems with session management (vjaceslavs)
 ..F....... [ZBX-12670] fixed {HOST.*} macro support in map trigger elements (vjaceslavs)
 ..F....... [ZBX-12784] fixed advanced label support in map editing mode (vjaceslavs)
@@ -367,6 +368,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-12710] fixed OS type detection logic (vjaceslavs)
 ..F....... [ZBX-12543] fixed problems with session management (vjaceslavs)
 ........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
 
@@ -897,6 +899,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-12710] fixed OS type detection logic (vjaceslavs)
 ..F....... [ZBX-12543] fixed problems with session management (vjaceslavs)
 ..F....... [ZBX-12655] fixed action message visibility in event details when users belongs to different groups (gcalenko)
 ........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
