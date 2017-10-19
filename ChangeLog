@@ -20,6 +20,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-12784] fixed advanced label support in in map editing mode (vjaceslavs)
 ..F....... [ZBX-12666] fixed ETag comparison check in jsLoader for web server with enabled compression (gcalenko)
 ..F....... [ZBX-12775] fixed undefined index error in dashboard problems widget (miks)
 ........S. [ZBX-12857] improved pre-processing manager performance when processing large number of values (wiper)
