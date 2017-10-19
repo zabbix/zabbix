@@ -24,6 +24,19 @@ class CWebUser {
 	public static $data = null;
 
 	/**
+	 * Flag used to ignore setting authentication cookie performed checkAuthentication.
+	 */
+	static $set_cookie = true;
+
+	/**
+	 * Disable automatic cookie setting.
+	 * First checkAuthentication call (performed in initialization phase) will not be sending cookies.
+	 */
+	public static function disableSessionCookie() {
+		self::$set_cookie = false;
+	}
+
+	/**
 	 * Tries to login a user and populates self::$data on success.
 	 *
 	 * @param string $login			user login
@@ -112,7 +125,12 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			self::setSessionCookie($sessionId);
+			if (self::$set_cookie) {
+				self::setSessionCookie($sessionId);
+			}
+			else {
+				self::$set_cookie = true;
+			}
 
 			return $sessionId;
 		}
