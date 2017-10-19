@@ -907,7 +907,6 @@ Bug fixes:
 ..F....... [ZBX-12722] fixed scrollbar causing a JS error in "500 latest values" page due to unnecessarily initialization (Ivo)
 ..F....... [ZBX-12710] fixed OS type detection logic (vjaceslavs)
 ..F....... [ZBX-12543] fixed problems with session management (vjaceslavs)
-..F....... [ZBX-12655] fixed action message visibility in event details when users belongs to different groups (gcalenko)
 ........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
 
 --------------------------------------------------------------------------------
