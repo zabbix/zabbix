@@ -352,8 +352,11 @@ static void	preprocessor_assign_tasks(zbx_preprocessing_manager_t *manager)
 static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
 {
 	zbx_free(value->error);
-	free_result(value->result);
-	zbx_free(value->result);
+	if (NULL != value->result)
+	{
+		free_result(value->result);
+		zbx_free(value->result);
+	}
 	zbx_free(value->ts);
 }
 
