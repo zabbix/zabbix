@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-4134] added 'lang' attribute to page body (gcalenko)
 ...G...... [ZBXNEXT-3493] added Windows service configuration check to determine if service can be trigger started (andris, viktors)
 A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (sasha, vso)
 .......P.. [ZBXNEXT-4181] fixed passive Zabbix proxy to accept Zabbix server requests only from allowed address (vso)

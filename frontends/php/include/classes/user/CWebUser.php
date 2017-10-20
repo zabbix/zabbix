@@ -216,4 +216,13 @@ class CWebUser {
 	public static function getRefresh() {
 		return timeUnitToSeconds(self::$data['refresh']);
 	}
+
+	/**
+	 * Returns interface language attribute value for HTML lang tag.
+	 *
+	 * @return string
+	 */
+	public static function getLang() {
+		return (self::$data) ? substr(self::$data['lang'], 0, strpos(self::$data['lang'], '_')) : 'en';
+	}
 }
