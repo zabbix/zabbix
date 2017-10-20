@@ -173,7 +173,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 	$pageHeader->display();
 ?>
-<body>
+<body lang="<?= CWebUser::getLang() ?>">
 <div class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></div>
 <?php
 }
