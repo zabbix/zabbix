@@ -20,6 +20,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+........S. [ZBX-12853] fixed last access not being updated for passive proxies after getting historical data (wiper)
 ..F....... [ZBX-6669] fixed use of current host as filter when selecting items for graph forms and trigger forms (gcalenko)
 ..F....... [ZBX-12722] fixed scrollbar causing a JS error in "500 latest values" page due to unnecessarily initialization (Ivo)
 ..F....... [ZBX-12860] fixed problem counting in host groups in navigation tree widget (miks)
