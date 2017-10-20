@@ -147,14 +147,10 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 								0 == strcmp(arg3, "items_unsupported"))
 						{
 							ret = SUCCEED;
-							goto clean;
 						}
 					}
 					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
-					{
 						ret = SUCCEED;
-						goto clean;
-					}
 				}
 				else if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg3, "lastaccess"))
 					ret = SUCCEED;
@@ -1024,6 +1020,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		DCstrpool_replace(found, &host->proxy_address, row[35]);
 		DCstrpool_replace(found, &host->tls_issuer, row[31]);
 		DCstrpool_replace(found, &host->tls_subject, row[32]);
 
@@ -1213,6 +1210,8 @@ done:
 				zbx_hashset_insert(&psk_owners, &psk_owner_local, sizeof(psk_owner_local));
 			}
 		}
+#else
+		DCstrpool_replace(found, &host->proxy_address, row[31]);
 #endif
 		ZBX_STR2UCHAR(host->tls_connect, row[29]);
 		ZBX_STR2UCHAR(host->tls_accept, row[30]);
@@ -1410,6 +1409,8 @@ done:
 
 		zbx_strpool_release(host->host);
 		zbx_strpool_release(host->name);
+		zbx_strpool_release(host->proxy_address);
+
 		zbx_strpool_release(host->error);
 		zbx_strpool_release(host->snmp_error);
 		zbx_strpool_release(host->ipmi_error);
@@ -8280,6 +8281,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	if (NULL != (host = zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
 		strscpy(dst_proxy->host, host->host);
+		strscpy(dst_proxy->proxy_address, host->proxy_address);
 
 		dst_proxy->tls_connect = host->tls_connect;
 		dst_proxy->tls_accept = host->tls_accept;
@@ -8304,6 +8306,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 		/* DCget_proxy() is called only from DCconfig_get_proxypoller_hosts(), which is called only from */
 		/* process_proxy(). So, this branch should never happen. */
 		*dst_proxy->host = '\0';
+		*dst_proxy->proxy_address = '\0';
 		dst_proxy->tls_connect = ZBX_TCP_SEC_TLS_PSK;	/* set PSK to deliberately fail in this case */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		*dst_proxy->tls_psk_identity = '\0';

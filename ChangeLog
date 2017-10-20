@@ -1,6 +1,9 @@
 Changes for 4.0.0alpha1
 
 New features:
+...G...... [ZBXNEXT-3493] added Windows service configuration check to determine if service can be trigger started (andris, viktors)
+A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (sasha, vso)
+.......P.. [ZBXNEXT-4181] fixed passive Zabbix proxy to accept Zabbix server requests only from allowed address (vso)
 ....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
 A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy cannot be deleted when used in actions (Sasha)
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
@@ -11,12 +14,39 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.4rc1
+
+New features:
+..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
+
+Bug fixes:
+...G...... [ZBX-12260] fixed windows agent to support UTF-16LE, UCS-2, UCS-2LE encodings (vso)
+........S. [ZBX-12853] fixed last access not being updated for passive proxies after getting historical data (vso)
+..F....... [ZBX-6669] fixed use of current host as filter when selecting items for graph forms and trigger forms (gcalenko)
+..F....... [ZBX-12722] fixed scrollbar causing a JS error in "500 latest values" page due to unnecessarily initialization (Ivo)
+..F....... [ZBX-12860] fixed problem counting in host groups in navigation tree widget (miks)
+..F....... [ZBX-12710] fixed OS type detection logic (vjaceslavs)
+..F....... [ZBX-12543] fixed problems with session management (vjaceslavs)
+..F....... [ZBX-12670] fixed {HOST.*} macro support in map trigger elements (vjaceslavs)
+..F....... [ZBX-12784] fixed advanced label support in map editing mode (vjaceslavs)
+..F....... [ZBX-12666] fixed ETag comparison check in jsLoader for web server with enabled compression (gcalenko)
+..F....... [ZBX-12775] fixed undefined index error in dashboard problems widget (miks)
+........S. [ZBX-12857] improved pre-processing manager performance when processing large number of values (wiper)
+........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.3
+
+3.4.3rc1 was released as 3.4.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.4.3rc1
 
 New features:
 ...G...PS. [ZBXNEXT-1862] modified server, proxy and agent to follow changes in /etc/resolv.conf (Andris)
 
 Bug fixes:
+.......PS. [ZBX-12521] improved logging in external checks (valdis)
 ..F.I..... [ZBX-12659] fixed missing information in "Status of Zabbix" widget with huge sessions table (Sasha)
 ..F....... [ZBX-12788] fixed error when template is added to hosts via mass update form (gcalenko, vmurzins)
 .......P.. [ZBX-12838] fixed trap, snmptrap items of log type not being processed by proxy (wiper)
@@ -336,6 +366,25 @@ A.F.....S. [ZBX-11470] fixed unary minus and prefix extraction for trigger expre
 ..F....... [ZBX-11371] prevented executing client side script by changing value of $ZBX_SERVER_NAME from setup.php page (Cemeris)
 A......... [ZBX-5116] prevented escaping forward slashes while encoding API response to JSON text (Cemeris)
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.10rc1
+
+New features:
+..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
+
+Bug fixes:
+...G...... [ZBX-12260] fixed windows agent to support UTF-16LE, UCS-2, UCS-2LE encodings (vso)
+..F....... [ZBX-6669] fixed use of current host as filter when selecting items for graph forms and trigger forms (gcalenko)
+..F....... [ZBX-12722] fixed scrollbar causing a JS error in "500 latest values" page due to unnecessarily initialization (Ivo)
+..F....... [ZBX-12710] fixed OS type detection logic (vjaceslavs)
+..F....... [ZBX-12543] fixed problems with session management (vjaceslavs)
+........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.9
+
+3.2.9rc1 was released as 3.2.9 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.2.9rc1
@@ -851,6 +900,24 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.13rc1
+
+New features:
+..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
+
+Bug fixes:
+...G...... [ZBX-12260] fixed windows agent to support UTF-16LE, UCS-2, UCS-2LE encodings (vso)
+..F....... [ZBX-12722] fixed scrollbar causing a JS error in "500 latest values" page due to unnecessarily initialization (Ivo)
+..F....... [ZBX-12710] fixed OS type detection logic (vjaceslavs)
+..F....... [ZBX-12543] fixed problems with session management (vjaceslavs)
+........S. [ZBX-12259] added an informative warning about lack of data for macros used in LLD rule filter (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.12
+
+3.0.12rc1 was released as 3.0.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.12rc1

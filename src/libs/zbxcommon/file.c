@@ -44,14 +44,16 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 	{
 		if (0 == strcasecmp(encoding, "UNICODE") || 0 == strcasecmp(encoding, "UNICODELITTLE") ||
 				0 == strcasecmp(encoding, "UTF-16") || 0 == strcasecmp(encoding, "UTF-16LE") ||
-				0 == strcasecmp(encoding, "UTF16") || 0 == strcasecmp(encoding, "UTF16LE"))
+				0 == strcasecmp(encoding, "UTF16") || 0 == strcasecmp(encoding, "UTF16LE") ||
+				0 == strcasecmp(encoding, "UCS-2") || 0 == strcasecmp(encoding, "UCS-2LE"))
 		{
 			*cr = "\r\0";
 			*lf = "\n\0";
 			*szbyte = 2;
 		}
 		else if (0 == strcasecmp(encoding, "UNICODEBIG") || 0 == strcasecmp(encoding, "UNICODEFFFE") ||
-				0 == strcasecmp(encoding, "UTF-16BE") || 0 == strcasecmp(encoding, "UTF16BE"))
+				0 == strcasecmp(encoding, "UTF-16BE") || 0 == strcasecmp(encoding, "UTF16BE") ||
+				0 == strcasecmp(encoding, "UCS-2BE"))
 		{
 			*cr = "\0\r";
 			*lf = "\0\n";
@@ -83,17 +85,8 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
  *             buf      - [IN] buffer to read into                            *
  *             count    - [IN] buffer size in bytes                           *
  *             encoding - [IN] pointer to a text string describing encoding.  *
- *                        The following encodings are recognized:             *
- *                          "UNICODE"                                         *
- *                          "UNICODEBIG"                                      *
- *                          "UNICODEFFFE"                                     *
- *                          "UNICODELITTLE"                                   *
- *                          "UTF-16"   "UTF16"                                *
- *                          "UTF-16BE" "UTF16BE"                              *
- *                          "UTF-16LE" "UTF16LE"                              *
- *                          "UTF-32"   "UTF32"                                *
- *                          "UTF-32BE" "UTF32BE"                              *
- *                          "UTF-32LE" "UTF32LE".                             *
+ *                        See function find_cr_lf_szbyte() for supported      *
+ *                        encodings.                                          *
  *                        "" (empty string) means a single-byte character set.*
  *                                                                            *
  * Return value: On success, the number of bytes read is returned (0 (zero)   *
