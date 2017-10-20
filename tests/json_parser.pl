@@ -3,98 +3,446 @@
 use strict;
 use warnings;
 
-use Encode;
 use JSON::XS;
-use Data::Dumper;
-use Path::Tiny;
-use Getopt::Long;
+use Types::Serialiser;
 
-sub array_to_str2($$)
+########################
+#                      #
+# validation functions #
+#                      #
+########################
+
+use constant JSON_STRING	=> 0x01;
+use constant JSON_NUMBER	=> 0x02;
+use constant JSON_OBJECT	=> 0x04;
+use constant JSON_ARRAY		=> 0x08;
+use constant JSON_BOOLEAN	=> 0x10;
+use constant JSON_NULL		=> 0x20;
+
+use constant JSON_NUMBER_RE	=> qr/^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/;
+
+use constant SCHEMA_KEYS	=> {
+	'type'	=> undef,
+	'keys'	=> undef,
+	'elem'	=> undef,
+	'print'	=> undef
+};
+
+use constant KEY_KEYS	=> {
+	'mand'	=> undef,
+	'key'	=> undef,
+	'value'	=> undef,
+	'print'	=> undef
+};
+
+sub process_json($$$);
+
+sub process_json($$$)
 {
-	my $array = shift;
-	my $prefix = shift;
+	my $path = shift;
+	my $json = shift;
+	my $schema = shift;
 
-	return $str = "|" . uc($prefix) . "|" . join("|", @{$array});
+	croak("processing undefined JSON path") unless (defined($path));
+
+	# $json may be undefined if we are asked to process null
+
+	croak("undefined JSON schema for $path") unless (defined($schema));
+	croak("invalid JSON schema for $path") unless (ref($schema) eq 'HASH');
+
+	foreach my $schema_key (keys(%{$schema}))
+	{
+		croak("unexpected key '$schema_key' in schema for $path") unless(exists(SCHEMA_KEYS->{$schema_key}));
+	}
+
+	croak("missing 'type' in schema for $path") unless (exists($schema->{'type'}));
+
+	my $type = $schema->{'type'};
+
+	croak("undefined 'type' in schema for $path") unless (defined($type));
+
+	if (exists($schema->{'keys'}) && !($type & JSON_OBJECT))
+	{
+		croak("'keys' in schema for $path that cannot be an object");
+	}
+
+	if (exists($schema->{'elem'}) && !($type & JSON_ARRAY))
+	{
+		croak("'elem' in schema for $path that cannot be an array");
+	}
+
+	if (!defined($json))	# JSON null
+	{
+		die("$path cannot be null") unless ($type & JSON_NULL);
+	}
+	elsif (ref($json) eq '')
+	{
+		if (Types::Serialiser::is_bool($json))	# JSON true or JSON false
+		{
+			die("$path cannot be boolean") unless ($type & JSON_BOOLEAN);
+		}
+		else	# JSON string or JSON number
+		{
+			die("$path must be numeric") if ($type == JSON_NUMBER && $json !~ JSON_NUMBER_RE);
+
+			# quoted number passes validation even though it's not a JSON number but rather a JSON string
+		}
+	}
+	elsif (ref($json) eq 'HASH')	# JSON object
+	{
+		die("$path cannot be an object") unless ($type & JSON_OBJECT);
+		croak("missing 'keys' in schema for $path that can be an object") unless (exists($schema->{'keys'}));
+
+		my $keys = $schema->{'keys'};
+
+		croak("undefined 'keys' in schema for $path that can be an object") unless (defined($keys));
+
+		if (ref($keys) eq 'CODE')	# reference to process_*()
+		{
+			&{$keys}($path, $json)
+		}
+		elsif (ref($keys) eq 'ARRAY')	# schemas for keys
+		{
+			my %expected_keys = ();
+
+			foreach my $expected_key (@{$keys})
+			{
+				unless (ref($expected_key) eq 'HASH')
+				{
+					croak("unexpected type of one of 'keys' in schema for $path");
+				}
+
+				foreach my $key_key (keys(%{$expected_key}))
+				{
+					unless (exists(KEY_KEYS->{$key_key}))
+					{
+						croak("unexpected key '$key_key' in schema of key for $path");
+					}
+				}
+
+				croak("missing key name in schema for $path") unless (exists($expected_key->{'key'}));
+
+				my $key = $expected_key->{'key'};
+
+				croak("missing key 'value' in schema for $path") unless (exists($expected_key->{'value'}));
+
+				if (exists($json->{$key}))
+				{
+					process_json("$path.$key", $json->{$key}, $expected_key->{'value'});
+
+					if (exists($expected_key->{'print'}))
+					{
+						my $print = $expected_key->{'print'};
+
+						unless (ref($print) eq 'CODE')
+						{
+							croak("'print' of key $key for object $path is not a reference" .
+									" to subroutine");
+						}
+
+						&{$print}($json->{$key});
+					}
+				}
+				elsif (exists($expected_key->{'mand'}))
+				{
+					die("missing mandatory key $key in object $path");
+				}
+
+				$expected_keys{$key} = undef;
+			}
+
+			foreach my $key (keys(%{$json}))
+			{
+				die("unexpected key $key in $path object") unless (exists($expected_keys{$key}));
+			}
+		}
+		else
+		{
+			croak("unexpected type of 'keys' in schema for $path");
+		}
+	}
+	elsif (ref($json) eq 'ARRAY')	# JSON array
+	{
+		die("$path cannot be an array") unless ($type & JSON_ARRAY);
+		croak("missing 'elem' in schema for $path that can be an array") unless (exists($schema->{'elem'}));
+
+		my $elem = $schema->{'elem'};
+
+		croak("undefined 'elem' in schema for $path that can be an array") unless (defined($elem));
+
+		if (ref($elem) eq 'CODE')	# reference to process_*()
+		{
+			&{$elem}($path, $json)
+		}
+		elsif (ref($elem) eq 'HASH')	# schema for array element
+		{
+			for (my $i = 0; $i < scalar(@{$json}); $i++)
+			{
+				process_json("$path.[$i]", $json->[$i], $elem);
+			}
+		}
+		else
+		{
+			croak("unexpected type of 'elem' in schema for $path");
+		}
+	}
+	else
+	{
+		croak("processing unexpected JSON");
+	}
+
+	if (exists($schema->{'print'}))
+	{
+		my $print = $schema->{'print'};
+
+		croak("'print' in schema for $path is not a reference to subroutine") unless (ref($print) eq 'CODE');
+		&{$print}($json);
+	}
 }
 
-sub json2tmpl($)
+######################
+#                    #
+# printing functions #
+#                    #
+######################
+
+sub print_test_case($)
 {
-	my $json = shift;
+	my $test_case = shift;
 
-	die("JSON array expected") unless (ref($json) eq 'ARRAY');
+	print("|CASE|$test_case|\n");
+}
 
-	my $str;
+sub print_tested_function($)
+{
+	my $tested_function = shift;
 
-	foreach my $cases (@{$json})
-	{
-		foreach my $key_case (keys %{$cases})
+	print("|TESTED_FUNCTION|$tested_function|\n");
+}
+
+sub print_in($$)
+{
+	my $in = shift;
+
+	print("|IN_NAMES|" . join("|", @{$in->{'names'}}) . "|\n");
+	print("|IN_VALUES|" . join("|", @{$in->{'values'}}) . "|\n");
+}
+
+sub print_out($)
+{
+	my $out = shift;
+
+	print("|OUT_NAMES|" . join("|", @{$out->{'names'}}) . "|\n");
+	print("|OUT_VALUES|" . join("|", @{$out->{'values'}}) . "|\n");
+}
+
+sub print_db_data($)
+{
+	my $db_data = shift;
+
+	print("|DB_DATA|" . $db_data . "|\n");
+}
+
+sub print_fields($)
+{
+	my $fields = shift;
+
+	print("|FIELDS|" . join("|", @{$fields}) . "|\n");
+}
+
+sub print_row($)
+{
+	my $row = shift;
+
+	print("|ROW|" . join("|", @{$row}) . "|\n");
+}
+
+sub print_function($)
+{
+	my $function = shift;
+
+	print("|FUNCTION|" . $function . "|\n");
+}
+
+sub print_function_out($)
+{
+	my $function_out = shift;
+
+	print("|FUNC_OUT_PARAMS|" . join("|", @{$function_out->{'params'}}) . "|\n");
+	print("|FUNC_OUT_VALUES|" . join("|", @{$function_out->{'values'}}) . "|\n");
+}
+
+######################################################
+#                                                    #
+# validation schemas and custom processing functions #
+#                                                    #
+######################################################
+
+use constant STRING	=> {
+	'type'	=> JSON_STRING
+};
+
+use constant ARRAY_OF_STRINGS	=> {
+	'type'	=> JSON_ARRAY,
+	'elem'	=> STRING
+};
+
+use constant NAMES_AND_VALUES	=> {
+	'type'	=> JSON_OBJECT,
+	'keys'	=> [
 		{
-			my $case = $cases->{$key_case};
+			'mand'	=> undef,
+			'key'	=> "names",
+			'value'	=> ARRAY_OF_STRINGS
+		},
+		{
+			'mand'	=> undef,
+			'key'	=> "values",
+			'value'	=> ARRAY_OF_STRINGS
+		}
+	]
+};
 
-			$str .= "|CASE|" . $key_case . "|\n";
-
-			foreach my $key_case_data (keys %{$case})
-			{
-				my $base_element = $case->{$key_case_data};
-
-				if ($key_case_data eq "tested_function")
-				{
-					die("ERROR: invalid json (tested_function)") unless (ref($base_element) ne 'HASH');
-
-					$str .= "|" . uc($key_case_data) . "|" . $base_element . "|\n";
-				}
-				elsif ($key_case_data eq "in" or $key_case_data eq "out")
-				{
-					die("ERROR: invalid json (in/out)") unless (ref($base_element) ne 'ARRAY');
-
-					$str .= array_to_str2($base_element->{"names"}, uc($key_case_data) . "_NAMES") . "\n";
-					$str .= array_to_str2($base_element->{"values"}, uc($key_case_data) . "_VALUES") . "\n";
-				}
-				elsif ($key_case_data eq "db_data")
-				{
-					die("ERROR: invalid json (db_data)") unless (ref($base_element) ne 'ARRAY');
-
-					foreach my $source_name (keys %{$base_element})
-					{
-						my $source = $base_element->{$source_name};
-
-						$str .= "|" . uc($key_case_data) . "|" . $source_name . "|\n";
-
-						foreach my $row (@{$source->{"rows"}})
-						{
-							$str .= array_to_str2($source->{"fields"}, "FIELDS") . "\n";
-							$str .= array_to_str2($row, "ROW") . "\n";
-						}
-					}
-				}
-				elsif ($key_case_data eq "functions")
-				{
-					die("ERROR: invalid json (functions)") unless (ref($base_element) ne 'ARRAY');
-
-					foreach my $function_name (keys %{$base_element})
-					{
-						my $function = $base_element->{$function_name};
-
-						$str .= "|" . uc($key_case_data) . "|" . $function_name . "|\n";
-
-						foreach my $key_params (keys %{$function})
-						{
-							my $params = $function->{$key_params};
-
-							$str .= array_to_str2($params->{"params"}, "FUNC_" . uc($key_params) . "_PARAMS") . "\n";
-							$str .= array_to_str2($params->{"values"}, "FUNC_" . uc($key_params) . "_VALUES") . "\n";
-						}
-					}
+use constant DB_DATA	=> {
+	'type'	=> JSON_OBJECT,
+	'keys'	=> [
+		{
+			'mand'	=> undef,
+			'key'	=> "fields",
+			'value'	=> ARRAY_OF_STRINGS,
+			'print'	=> \&print_fields
+		},
+		{
+			'mand'	=> undef,
+			'key'	=> "rows",
+			'value'	=> {
+				'type'	=> JSON_ARRAY,
+				'elem'	=> {
+					'type'	=> JSON_ARRAY,
+					'elem'	=> {
+						'type'	=> JSON_STRING	# null is not supported
+					},
+					'print'	=> \&print_row
 				}
 			}
 		}
-	}
+	]
+};
 
-	return $str;
+sub process_db_data($$)
+{
+	my $path = shift;
+	my $db_data = shift;
+
+	while (my ($source_name, $source_data) = each(%{$db_data}))
+	{
+		print_db_data($source_name);
+		process_json("$path.$source_name", $source_data, DB_DATA);
+	}
 }
 
-my $file;
+use constant PARAMS_AND_VALUES	=> {
+	'type'	=> JSON_OBJECT,
+	'keys'	=> [
+		{
+			'mand'	=> undef,
+			'key'	=> "params",
+			'value'	=> ARRAY_OF_STRINGS
+		},
+		{
+			'mand'	=> undef,
+			'key'	=> "values",
+			'value'	=> ARRAY_OF_STRINGS
+		}
+	]
+};
 
-die("Error in command line: Missing required argument \"file\"\n") unless GetOptions("file=s" => \$file);
+use constant FUNCTION_DATA	=> {
+	'type'	=> JSON_OBJECT,
+	'keys'	=> [
+		{
+			'mand'	=> undef,
+			'key'	=> "out",
+			'value'	=> PARAMS_AND_VALUES,
+			'print'	=> \&print_function_out
+		}
+	]
+};
 
-path("parsed_data")->spew_utf8(json2tmpl(decode_json(path($file)->slurp_utf8())));
+sub process_functions($$)
+{
+	my $path = shift;
+	my $functions = shift;
+
+	while (my ($function_name, $function_data) = each(%{$functions}))
+	{
+		print_function($function_name);
+		process_json("$path.$function_name", $function_data, FUNCTION_DATA);
+	}
+}
+
+use constant SINGLE_TEST_CASE	=> {
+	'type'	=> JSON_OBJECT,
+	'keys'	=> [
+		{
+			'mand'	=> undef,
+			'key'	=> "test_case",
+			'value'	=> STRING,
+			'print'	=> \&print_test_case
+		},
+		{
+			'mand'	=> undef,
+			'key'	=> "tested_function",
+			'value'	=> STRING,
+			'print'	=> \&print_tested_function
+		},
+		{
+			'mand'	=> undef,
+			'key'	=> "in",
+			'value'	=> NAMES_AND_VALUES,
+			'print'	=> \&print_in
+		},
+		{
+			'mand'	=> undef,
+			'key'	=> "out",
+			'value'	=> NAMES_AND_VALUES,
+			'print'	=> \&print_out
+		},
+		{
+			'key'	=> "db_data",
+			'value'	=> {
+				'type'	=> JSON_OBJECT,
+				'keys'	=> \&process_db_data
+			}
+		},
+		{
+			'key'	=> "functions",
+			'value'	=> {
+				'type'	=> JSON_OBJECT,
+				'keys'	=> \&process_functions
+			}
+		}
+	]
+};
+
+use constant MULTIPLE_TEST_CASES	=> {
+	'type'	=> JSON_ARRAY,
+	'elem'	=> SINGLE_TEST_CASE
+};
+
+#############################
+#                           #
+# actual script starts here #
+#                           #
+#############################
+
+my $input = "";
+
+for my $line (<STDIN>)
+{
+	$input .= $line;
+}
+
+my $json = decode_json($input);
+
+process_json("\$", $json, (ref($json) eq 'ARRAY' ? MULTIPLE_TEST_CASES : SINGLE_TEST_CASE));
