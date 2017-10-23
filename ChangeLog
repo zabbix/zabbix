@@ -18,6 +18,7 @@ Bug fixes:
 Changes for 3.4.4rc1
 
 New features:
+..F....... [ZBXNEXT-4019] implemented default widget refresh interval (Ivo)
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:

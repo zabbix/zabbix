@@ -22,7 +22,7 @@
 class CGraphWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data);
+		parent::__construct($data, WIDGET_GRAPH);
 
 		// Select graph type field.
 		$field_source = (new CWidgetFieldRadioButtonList('source_type', _('Source'), [

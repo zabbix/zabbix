@@ -831,7 +831,7 @@
 				}
 				else if ('errors' in resp) {
 					// Error returned.
-					dashbaordAddMessages(resp.errors);
+					dashboardAddMessages(resp.errors);
 				}
 			},
 			complete: function() {
