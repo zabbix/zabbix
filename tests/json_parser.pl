@@ -13,18 +13,16 @@ use Types::Serialiser;
 ########################
 
 use constant JSON_STRING	=> 0x01;
-use constant JSON_NUMBER	=> 0x02;
-use constant JSON_OBJECT	=> 0x04;
-use constant JSON_ARRAY		=> 0x08;
-use constant JSON_BOOLEAN	=> 0x10;
-use constant JSON_NULL		=> 0x20;
-
-use constant JSON_NUMBER_RE	=> qr/^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/;
+use constant JSON_OBJECT	=> 0x02;
+use constant JSON_ARRAY		=> 0x04;
+use constant JSON_BOOLEAN	=> 0x08;
+use constant JSON_NULL		=> 0x10;
 
 use constant SCHEMA_KEYS	=> {
 	'type'	=> undef,
 	'keys'	=> undef,
 	'elem'	=> undef,
+	'rule'	=> undef,
 	'print'	=> undef
 };
 
@@ -61,6 +59,11 @@ sub process_json($$$)
 
 	croak("undefined 'type' in schema for $path") unless (defined($type));
 
+	if (exists($schema->{'rule'}) && !($type & JSON_STRING))
+	{
+		croak("'rule' in schema for $path that cannot be a string or a number");
+	}
+
 	if (exists($schema->{'keys'}) && !($type & JSON_OBJECT))
 	{
 		croak("'keys' in schema for $path that cannot be an object");
@@ -81,11 +84,13 @@ sub process_json($$$)
 		{
 			die("$path cannot be boolean") unless ($type & JSON_BOOLEAN);
 		}
-		else	# JSON string or JSON number
+		elsif (exists($schema->{'rule'}))	# JSON string and there is a rule given
 		{
-			die("$path must be numeric") if ($type == JSON_NUMBER && $json !~ JSON_NUMBER_RE);
+			my $rule = $schema->{'rule'};
 
-			# quoted number passes validation even though it's not a JSON number but rather a JSON string
+			croak("unexpected type of 'rule' in schema for $path") unless (ref($rule) eq 'Regexp');
+
+			die("$path does not pass validation rule") if ($json !~ $rule);
 		}
 	}
 	elsif (ref($json) eq 'HASH')	# JSON object
@@ -278,13 +283,11 @@ sub print_function_out($)
 #                                                    #
 ######################################################
 
-use constant STRING	=> {
-	'type'	=> JSON_STRING
-};
-
 use constant ARRAY_OF_STRINGS	=> {
 	'type'	=> JSON_ARRAY,
-	'elem'	=> STRING
+	'elem'	=> {
+		'type'	=> JSON_STRING
+	}
 };
 
 use constant NAMES_AND_VALUES	=> {
@@ -387,13 +390,19 @@ use constant SINGLE_TEST_CASE	=> {
 		{
 			'mand'	=> undef,
 			'key'	=> "test_case",
-			'value'	=> STRING,
+			'value'	=> {
+				'type'	=> JSON_STRING,
+				'rule'	=> qr/\w/
+			},
 			'print'	=> \&print_test_case
 		},
 		{
 			'mand'	=> undef,
 			'key'	=> "tested_function",
-			'value'	=> STRING,
+			'value'	=> {
+				'type'	=> JSON_STRING,
+				'rule'	=> qr/[_a-zA-Z][_a-zA-Z0-9]*/
+			},
 			'print'	=> \&print_tested_function
 		},
 		{

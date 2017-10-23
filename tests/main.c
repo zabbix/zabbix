@@ -21,7 +21,7 @@
 
 int	main(void)
 {
-	int 	result;
+	int	result;
 
 	if (SUCCEED == (result = load_data("parsed_data")))
 	{
