@@ -19,10 +19,9 @@
 
 #include "../../zbxtests.h"
 
-#include "../../../src/zabbix_server/taskmanager/taskmanager.h"
+#include "zbxmocktest.h"
 
-int	CONFIG_PREPROCMAN_FORKS		= 1;
-int	CONFIG_PREPROCESSOR_FORKS	= 3;
+#include "../../../src/zabbix_server/taskmanager/taskmanager.h"
 
 extern char	*curr_tested_function;
 extern char	*curr_wrapped_function;
@@ -45,7 +44,7 @@ void	__wrap_DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 {
 }
 
-void test_try_task_closes_problem()
+void	zbx_mock_test_entry(void **state)
 {
 	int	i, ret, taskid, res, executed_num = 0;
 

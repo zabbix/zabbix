@@ -17,19 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../zbxtests.h"
+#include "../../zbxtests.h"
 
-#include <scripts.h>
-#include <escalator.h>
-#include <actions.h>
+#include "zbxmocktest.h"
 
-#include "../zabbix_server/actions.h"
-#include "../zabbix_server/poller/checks_agent.h"
+#include "../../../src/zabbix_server/escalator/escalator.h"
 
-#define ZBX_ESCALATION_SOURCE_TRIGGER	2
+/* make sure that mock functions match unwrapped prototypes */
 
-int	CONFIG_PREPROCMAN_FORKS		= 0;
-int	CONFIG_PREPROCESSOR_FORKS	= 0;
+#define substitute_simple_macros	__wrap_substitute_simple_macros
+#define check_action_condition		__wrap_check_action_condition
+
+#include "zbxserver.h"
+#include "../../../src/zabbix_server/actions.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, DC_ITEM *dc_item,
@@ -43,7 +43,7 @@ int	__wrap_check_action_condition(const DB_EVENT *event, DB_CONDITION *condition
 	return SUCCEED;
 }
 
-void	test_process_escalations()
+void	zbx_mock_test_entry(void **state)
 {
 	int		c, ret, param1, param2, param3;
 

@@ -90,7 +90,16 @@ test:
 	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
 
 ## cmocka test support
+WRAP_DB_FUNCS = \
+	-Wl,--wrap=zbx_db_vselect \
+	-Wl,--wrap=zbx_db_fetch \
+	-Wl,--wrap=__zbx_DBexecute \
+	-Wl,--wrap=DBbegin \
+	-Wl,--wrap=DBcommit \
+	-Wl,--wrap=DBexecute_multiple_query \
+	-Wl,--wrap=DBfree_result
+
 tests:
-	cd tests && $(MAKE) $(AM_MAKEFLAGS)
+	cd tests && $(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS)" LIBS="$(LIBS) -lcmocka"
 
 .PHONY: test tests
