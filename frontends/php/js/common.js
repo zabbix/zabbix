@@ -203,6 +203,28 @@ function Confirm(msg) {
 	return confirm(msg);
 }
 
+function remove_vars_by_selector(form_name, selector) {
+	if (form_name !== null) {
+		var source = is_string(form_name) ? document.forms[form_name] : form_name;
+	}
+	else {
+		var source = document;
+	}
+
+	if (!source) {
+		return false;
+	}
+
+	var inputs = source.querySelectorAll(selector);
+	if (inputs.length) {
+		for (var i in inputs) {
+			if (typeof inputs[i] === 'object') {
+				inputs[i].parentNode.removeChild(inputs[i]);
+			}
+		}
+	}
+}
+
 function create_var(form_name, var_name, var_value, doSubmit) {
 	var objForm = is_string(form_name) ? document.forms[form_name] : form_name;
 	if (!objForm) {

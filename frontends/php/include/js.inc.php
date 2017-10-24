@@ -230,7 +230,15 @@ function insert_js_function($fnct_name) {
 						return false;
 					}
 					window.opener.create_var(form, media_name + "[mediatypeid]", mediatypeid);
-					window.opener.create_var(form, media_name + "[sendto]", sendto);
+					if (typeof sendto === "object") {
+						window.opener.remove_vars_by_selector(form, \'input[name^="\'+media_name+\'[sendto]"]\');
+						jQuery(sendto).each(function(i, st) {
+							window.opener.create_var(form, media_name + "[sendto]["+i+"]", st);
+						});
+					}
+					else {
+						window.opener.create_var(form, media_name + "[sendto]", sendto);
+					}
 					window.opener.create_var(form, media_name + "[period]", period);
 					window.opener.create_var(form, media_name + "[active]", active);
 					window.opener.create_var(form, media_name + "[severity]", severity);
