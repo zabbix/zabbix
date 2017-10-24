@@ -89,4 +89,8 @@ TESTDIR = src
 test:
 	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
 
-.PHONY: test
+## cmocka test support
+tests:
+	cd tests && $(MAKE) $(AM_MAKEFLAGS)
+
+.PHONY: test tests

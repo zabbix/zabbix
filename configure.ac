@@ -1657,6 +1657,10 @@ AC_OUTPUT([
 	src/zabbix_java/Makefile
 	upgrades/Makefile
 	man/Makefile
+	tests/Makefile
+	tests/zabbix_server/Makefile
+	tests/zabbix_server/escalator/Makefile
+	tests/zabbix_server/taskmanager/Makefile
 	])
 
 echo "
