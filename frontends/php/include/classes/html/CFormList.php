@@ -36,10 +36,21 @@ class CFormList extends CList {
 
 	public function addRow($term, $description = null, $id = null, $class = null) {
 		$input_id = null;
+		$label_class = null;
 
 		$input = $description;
 		if (is_array($input)) {
 			$input = reset($input);
+
+			foreach ($description as $element) {
+				if ($element instanceof CTag && $element->hasAsterisk()) {
+					$label_class = ZBX_STYLE_FIELD_LABEL_ASTERISK;
+					break;
+				}
+			}
+		}
+		else if ($input instanceof CTag && $input->hasAsterisk()) {
+			$label_class = ZBX_STYLE_FIELD_LABEL_ASTERISK;
 		}
 
 		if (is_object($input)) {
@@ -51,10 +62,6 @@ class CFormList extends CList {
 				}
 			}
 		}
-
-		$label_class = ($input instanceof CTag && $input->hasAsterisk())
-			? ZBX_STYLE_FIELD_LABEL_ASTERISK
-			: null;
 
 		$label = is_object($term) ? $term : (new CLabel($term, $input_id))->addClass($label_class);
 

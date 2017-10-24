@@ -47,20 +47,24 @@ foreach ($data['dialogue']['fields'] as $field) {
 		continue;
 	}
 
+	$has_asterisk = ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
+
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow($field->getLabel(),
-			new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues())
+			(new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
+				->setAsterisk($has_asterisk)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldTextBox || $field instanceof CWidgetFieldUrl) {
 		$form_list->addRow($field->getLabel(),
 			(new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAsterisk($has_asterisk)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldCheckBox) {
 		$form_list->addRow($field->getLabel(), [
 			new CVar($field->getName(), '0'),
-			(new CCheckBox($field->getName()))->setChecked((bool) $field->getValue())
+			(new CCheckBox($field->getName()))->setChecked((bool) $field->getValue())->setAsterisk($has_asterisk)
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldGroup) {
@@ -75,7 +79,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 					'&srcfld1=groupid&multiselect=1'
 			],
 			'add_post_js' => false
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk($has_asterisk);
 
 		$form_list->addRow($field->getLabel(), $field_groupids);
 
@@ -93,8 +97,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 					'&srcfld1=hostid&multiselect=1'
 			],
 			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk($has_asterisk);
 
 		$form_list->addRow($field->getLabel(), $field_hostids);
 
@@ -120,7 +123,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$form->addVar($field->getName(), $field->getValue());
 		$form_list->addRow($field->getLabel(), [
 			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAsterisk(($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK)),
+				->setAsterisk($has_asterisk),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -130,7 +133,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {
 		$form_list->addRow($field->getLabel(),
 			(new CComboBox($field->getName(), [], $field->getAction(), []))
-				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')->setAsterisk($has_asterisk)
 		);
 
 		$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
@@ -138,19 +141,19 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldNumericBox) {
 		$form_list->addRow($field->getLabel(),
 			(new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength()))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)->setAsterisk($has_asterisk)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldRadioButtonList) {
 		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue()))
-			->setModern($field->getModern());
+			->setModern($field->getModern())->setAsterisk($has_asterisk);
 		foreach ($field->getValues() as $key => $value) {
 			$radio_button_list->addValue($value, $key, null, $field->getAction());
 		}
 		$form_list->addRow($field->getLabel(), $radio_button_list);
 	}
 	elseif ($field instanceof CWidgetFieldSeverities) {
-		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO)->setAsterisk($has_asterisk);
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severities->addItem(
@@ -170,7 +173,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			$tags = [['tag' => '', 'value' => '']];
 		}
 
-		$tags_table = (new CTable())->setId('tags_table');
+		$tags_table = (new CTable())->setId('tags_table')->setAsterisk($has_asterisk);
 		$i = 0;
 
 		foreach ($tags as $tag) {
