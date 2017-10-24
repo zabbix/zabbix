@@ -350,7 +350,7 @@ src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
 tests/Makefile -text
-tests/zabbix_server/escalator/data.json -text
+tests/zabbix_server/escalator/process_escalations.json -text
 tests/zabbix_server/taskmanager/data.json -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
