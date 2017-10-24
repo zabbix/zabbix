@@ -52,8 +52,8 @@ class CFormList extends CList {
 			}
 		}
 
-		$label_class = ($input instanceof CInput && $input->hasAsterisk())
-			? ZBX_STYLE_FORM_FIELD_REQUIRED
+		$label_class = $input->hasAsterisk()
+			? ZBX_STYLE_FIELD_LABEL_ASTERISK
 			: null;
 
 		$label = is_object($term) ? $term : (new CLabel($term, $input_id))->addClass($label_class);

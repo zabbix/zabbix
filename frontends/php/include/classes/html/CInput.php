@@ -21,8 +21,6 @@
 
 class CInput extends CTag {
 
-	protected $asterisk = false;
-
 	public function __construct($type = 'text', $name = 'textbox', $value = '') {
 		parent::__construct('input');
 		$this->setType($type);
@@ -62,27 +60,5 @@ class CInput extends CTag {
 			$this->setAttribute('disabled', 'disabled');
 		}
 		return $this;
-	}
-
-	/**
-	 * Field with asterisk attribute will have asterisk in front of it label when rendered in form row.
-	 *
-	 * @param bool $asterisk    If true asterisk will be prepended to field label.
-	 *
-	 * @return object
-	 */
-	public function setAsterisk($asterisk) {
-		$this->asterisk = $asterisk;
-
-		return $this;
-	}
-
-	/**
-	 * Check is field marked as asterisk prefixed label field.
-	 *
-	 * @return bool
-	 */
-	public function hasAsterisk() {
-		return $this->asterisk;
 	}
 }
