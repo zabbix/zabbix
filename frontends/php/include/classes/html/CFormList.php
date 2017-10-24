@@ -52,7 +52,7 @@ class CFormList extends CList {
 			}
 		}
 
-		$label_class = $input->hasAsterisk()
+		$label_class = ($input instanceof CTag && $input->hasAsterisk())
 			? ZBX_STYLE_FIELD_LABEL_ASTERISK
 			: null;
 

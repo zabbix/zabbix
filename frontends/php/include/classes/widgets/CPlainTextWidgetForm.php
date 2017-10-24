@@ -26,7 +26,7 @@ class CPlainTextWidgetForm extends CWidgetForm {
 
 		// item field
 		$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
-			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
 		if (array_key_exists('itemid', $this->data)) {
 			$field_item->setValue($this->data['itemid']);
