@@ -124,8 +124,9 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 
 $frmMedia = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
-	->addRow(_('Send to'), (new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAsterisk(true)
+	->addRow(
+		(new CLabel(_('Send to')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('When active'), (new CTextBox('period', $period, false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Use if severity'), $frm_row)

@@ -34,13 +34,18 @@ $imageForm->addVar('imagetype', $this->data['imagetype']);
 
 // append form list
 $imageFormList = (new CFormList('imageFormList'))
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $this->data['imagename'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Upload'), (new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAsterisk(!array_key_exists('imageid', $data) || is_null($data['imageid']))
+	->addRow(
+		(new CLabel(_('Upload')))->addClass((!array_key_exists('imageid', $data) || is_null($data['imageid']))
+			? ZBX_STYLE_FIELD_LABEL_ASTERISK
+			: null
+		),
+		(new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 if (isset($this->data['imageid'])) {

@@ -57,10 +57,11 @@ $triggersFormList = new CFormList('triggersFormList');
 if (!empty($data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $data['templates']);
 }
-$triggersFormList->addRow(_('Name'),
+$triggersFormList->addRow(
+	(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('description', $data['description'], $data['limited']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+		->setAttribute('autofocus', 'autofocus')
 )
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
 
@@ -89,7 +90,7 @@ $expression_row = [
 		$data['expression_field_name'],
 		$data['expression_field_value'],
 		['readonly' => $data['expression_field_readonly']]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_expression_button
 ];
@@ -146,7 +147,11 @@ elseif ($data['expression_constructor'] != IM_FORCED) {
 	$expression_row[] = [BR(), $input_method_toggle];
 }
 
-$triggersFormList->addRow(_('Expression'), $expression_row, 'expression_row');
+$triggersFormList->addRow(
+	(new CLabel(_('Expression')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$expression_row,
+	'expression_row'
+);
 
 // Append expression table to form list.
 if ($data['expression_constructor'] == IM_TREE) {
@@ -284,7 +289,7 @@ $recovery_expression_row = [
 		$data['recovery_expression_field_name'],
 		$data['recovery_expression_field_value'],
 		['readonly' => $data['recovery_expression_field_readonly']]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_recovery_expression_button
 ];
@@ -333,7 +338,10 @@ elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
 	$recovery_expression_row[] = [BR(), $input_method_toggle];
 }
 
-$triggersFormList->addRow(_('Recovery expression'), $recovery_expression_row, null,
+$triggersFormList->addRow(
+	(new CLabel(_('Recovery expression')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$recovery_expression_row,
+	null,
 	'recovery_expression_constructor_row'
 );
 
@@ -461,9 +469,10 @@ $triggersFormList
 			->setEnabled(!$data['limited']),
 		'correlation_mode_row'
 	)
-	->addRow(_('Tag for matching'),
+	->addRow(
+		(new CLabel(_('Tag for matching')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('correlation_tag', $data['correlation_tag'], $data['limited']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'correlation_tag_row'
 	);
 

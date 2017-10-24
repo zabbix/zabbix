@@ -73,10 +73,11 @@ $frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
 $templateList = (new CFormList('hostlist'))
-	->addRow(_('Template name'), (new CTextBox('template_name', $host, false, 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
-		->setAsterisk(true)
+	->addRow(
+		(new CLabel(_('Template name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('template_name', $host, false, 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

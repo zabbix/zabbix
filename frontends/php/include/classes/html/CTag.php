@@ -45,13 +45,6 @@ class CTag extends CObject {
 	 */
 	protected $attrEncStrategy = self::ENC_ALL;
 
-	/**
-	 * When element is rendered in row this property allow to add "asterisk" to element label.
-	 *
-	 * @var bool
-	 */
-	protected $asterisk = false;
-
 	public function __construct($tagname, $paired = false, $body = null) {
 		parent::__construct();
 
@@ -295,27 +288,5 @@ class CTag extends CObject {
 	 */
 	public function getEncStrategy() {
 		return $this->encStrategy;
-	}
-
-	/**
-	 * Field with asterisk attribute will have asterisk in front of it label when rendered in form row.
-	 *
-	 * @param bool $asterisk    If true asterisk will be prepended to field label.
-	 *
-	 * @return object
-	 */
-	public function setAsterisk($asterisk) {
-		$this->asterisk = $asterisk;
-
-		return $this;
-	}
-
-	/**
-	 * Check is field marked as asterisk prefixed label field.
-	 *
-	 * @return bool
-	 */
-	public function hasAsterisk() {
-		return $this->asterisk;
 	}
 }

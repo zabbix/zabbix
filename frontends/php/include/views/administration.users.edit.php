@@ -45,9 +45,11 @@ if ($data['userid'] != 0) {
 $userFormList = new CFormList('userFormList');
 
 if (!$data['is_profile']) {
-	$userFormList->addRow(_('Alias'), (new CTextBox('alias', $this->data['alias']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+	$userFormList->addRow(
+		(new CLabel(_('Alias')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('alias', $this->data['alias']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
 	);
 	$userFormList->addRow(_x('Name', 'user first name'),
 		(new CTextBox('name', $this->data['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -66,7 +68,7 @@ if (!$this->data['is_profile']) {
 	}
 
 	$userFormList->addRow(
-		_('Groups'),
+		(new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CMultiSelect([
 			'name' => 'user_groups[]',
 			'objectName' => 'usersGroups',
@@ -75,7 +77,7 @@ if (!$this->data['is_profile']) {
 				'parameters' => 'srctbl=usrgrp&dstfrm='.$userForm->getName().'&dstfld1=user_groups_&srcfld1=usrgrpid'.
 					'&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 }
 
@@ -83,12 +85,12 @@ if (!$this->data['is_profile']) {
 if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
 		$userFormList->addRow(
-			_('Password'),
-			(new CPassBox('password1', $this->data['password1']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAsterisk(true)
+			(new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			(new CPassBox('password1', $this->data['password1']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 		$userFormList->addRow(
-			_('Password (once again)'),
-			(new CPassBox('password2', $this->data['password2']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAsterisk(true)
+			(new CLabel(_('Password (once again)')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			(new CPassBox('password2', $this->data['password2']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
 		if (isset($this->data['change_password'])) {

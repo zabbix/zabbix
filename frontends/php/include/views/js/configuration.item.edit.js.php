@@ -32,9 +32,10 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'i
 zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'row_inventory_link');
 ?>
 <script type="text/javascript">
-	function displayKeyButton() {
+	function typeChangeHandler() {
 		// selected item type
-		var type = parseInt(jQuery('#type').val());
+		var type = parseInt(jQuery('#type').val()),
+			asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
 
 		jQuery('#keyButton').prop('disabled',
 			type != <?php echo ITEM_TYPE_ZABBIX; ?>
@@ -46,6 +47,10 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 				&& type != <?php echo ITEM_TYPE_SNMPTRAP; ?>
 				&& type != <?php echo ITEM_TYPE_JMX; ?>
 		)
+
+		jQuery('label[for=username]').removeClass(asterisk).addClass(
+			(type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) ? asterisk : ''
+		);
 	}
 
 	jQuery(document).ready(function() {
@@ -57,7 +62,7 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 		<?php } ?>
 
 		jQuery('#type').change(function() {
-				displayKeyButton();
+			typeChangeHandler();
 			})
 			.trigger('change');
 

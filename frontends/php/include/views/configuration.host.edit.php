@@ -60,11 +60,11 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 }
 
-$hostList->addRow(_('Host name'),
+$hostList->addRow(
+	(new CLabel(_('Host name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
-		->setAsterisk(true)
 );
 
 $hostList->addRow(_('Visible name'),
@@ -87,7 +87,10 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		}
 	}
 
-	$hostList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
+	$hostList->addRow(
+		(new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		$groupsTB->get(_('In groups'), _('Other groups'))
+	);
 
 	$new_group = (new CTextBox('newgroup', $data['newgroup']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	$new_group_label = _('New group');
@@ -793,15 +796,15 @@ $encryption_form_list = (new CFormList('encryption'))
 				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			)
 	)
-	->addRow(_('PSK identity'),
+	->addRow(
+		(new CLabel(_('PSK identity')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAsterisk(true)
 	)
-	->addRow(_('PSK'),
+	->addRow(
+		(new CLabel(_('PSK')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAsterisk(true)
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))

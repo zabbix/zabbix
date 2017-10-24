@@ -51,9 +51,8 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 	}
 
 	$authenticationFormList->addRow(
-		_('LDAP host'),
+		(new CLabel(_('LDAP host')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('ldap_host', $this->data['config']['ldap_host']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAsterisk(true)
 	);
 	$authenticationFormList->addRow(
 		_('Port'),
@@ -61,12 +60,11 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
-		_('Base DN'),
+		(new CLabel(_('Base DN')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAsterisk(true)
 	);
 	$authenticationFormList->addRow(
-		_('Search attribute'),
+		(new CLabel(_('Search attribute')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox(
 			'ldap_search_attribute',
 			(zbx_empty($this->data['config']['ldap_search_attribute']) && $this->data['form_refresh'] == 0)
@@ -74,7 +72,7 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 				: $this->data['config']['ldap_search_attribute'],
 			false,
 			128
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Bind DN'),
@@ -102,8 +100,8 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 
 	$authenticationFormList->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']');
 	$authenticationFormList->addRow(_('Login'), $userComboBox);
-	$authenticationFormList->addRow(_('User password'), (new CPassBox('user_password'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAsterisk(true)
+	$authenticationFormList->addRow((new CLabel(_('User password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CPassBox('user_password'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 }
 

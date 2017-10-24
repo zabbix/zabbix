@@ -35,10 +35,11 @@ if ($data['valuemapid'] != 0) {
 }
 
 $form_list = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $data['name'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setAttribute('autofocus', 'autofocus')
 	);
 
 $table = (new CTable())
@@ -68,10 +69,11 @@ $table->addRow([
 	))->setColSpan(4)
 ]);
 
-$form_list->addRow(_('Mappings'),
+$form_list->addRow(
+	(new CLabel(_('Mappings')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CDiv($table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')->setAsterisk(true)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 );
 
 // append form list to tab

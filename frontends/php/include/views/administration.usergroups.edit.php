@@ -33,10 +33,11 @@ if ($data['usrgrpid'] != 0) {
  * User group tab
 */
 $userGroupFormList = (new CFormList())
-	->addRow(_('Group name'),
+	->addRow(
+		(new CLabel(_('Group name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('gname', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setAttribute('autofocus', 'autofocus')
 	);
 
 // append groups to form list

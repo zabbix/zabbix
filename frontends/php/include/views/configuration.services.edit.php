@@ -38,10 +38,11 @@ if (isset($this->data['service'])) {
 
 // create form list
 $servicesFormList = (new CFormList('servicesFormList'))
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $this->data['name'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setAttribute('autofocus', 'autofocus')
 	);
 
 // append parent link to form list
@@ -283,7 +284,7 @@ else {
 		->setAttribute('placeholder', _('mm'));
 
 	$serviceTimeTable->addRow([
-		_('From'),
+		(new CLabel(_('From')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		[
 			$weekFromComboBox,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -297,7 +298,7 @@ else {
 		]
 	]);
 	$serviceTimeTable->addRow([
-		_('Till'),
+		(new CLabel(_('Till')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		[
 			$weekToComboBox,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

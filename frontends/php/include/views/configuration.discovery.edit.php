@@ -33,10 +33,11 @@ if (!empty($this->data['druleid'])) {
 
 // create form list
 $discoveryFormList = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $this->data['drule']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setAttribute('autofocus', 'autofocus')
 	);
 
 // append proxy to form list
@@ -56,7 +57,8 @@ $discoveryFormList
 		(new CTextBox('delay', $data['drule']['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 
-$discoveryFormList->addRow(_('Checks'),
+$discoveryFormList->addRow(
+	(new CLabel(_('Checks')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CDiv(
 		(new CTable())
 			->setAttribute('style', 'width: 100%;')
@@ -70,7 +72,7 @@ $discoveryFormList->addRow(_('Checks'),
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('dcheckList')->setAsterisk(true)
+		->setId('dcheckList')
 );
 
 // append uniqueness criteria to form list

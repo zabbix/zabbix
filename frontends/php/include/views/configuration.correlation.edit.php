@@ -32,10 +32,11 @@ if ($data['correlationid']) {
 }
 
 $correlation_tab = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $data['correlation']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setAttribute('autofocus', 'autofocus')
 	);
 
 // Create condition table.
@@ -98,10 +99,11 @@ $correlation_tab
 			->setId('formula')
 			->setAttribute('placeholder', 'A or (B and C) &hellip;')
 	])
-	->addRow(_('Conditions'),
+	->addRow(
+		(new CLabel(_('Conditions')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CDiv($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')->setAsterisk(true)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
 $condition2 = null;
@@ -217,10 +219,11 @@ if ($data['correlation']['operations']) {
 }
 
 $operation_tab
-	->addRow(_('Operations'),
+	->addRow(
+		(new CLabel(_('Operations')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CDiv([$operations_table]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')->setAsterisk(true)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	)
 	->addRow(_('New operation'),
 		(new CDiv(

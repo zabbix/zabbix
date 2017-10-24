@@ -70,10 +70,11 @@ if ($discovered_graph) {
 }
 
 $graphFormList
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $this->data['name'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Width'),
 		(new CNumericBox('width', $this->data['width'], 5, $readonly))
@@ -149,12 +150,15 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 	]))->setEnabled(!$readonly)];
 
+	$class_asterisk = null;
+
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CTextBox('yaxismin', $this->data['yaxismin'], $readonly))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+		$class_asterisk = ZBX_STYLE_FIELD_LABEL_ASTERISK;
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
 
 		$ymin_name = '';
@@ -168,8 +172,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAsterisk(true);
+		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 		// Select item button.
@@ -206,7 +209,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
 	}
 
-	$graphFormList->addRow(_('Y axis MIN value'), $yaxisMinData);
+	$graphFormList->addRow((new CLabel(_('Y axis MIN value')))->addClass($class_asterisk), $yaxisMinData);
 
 	$yaxisMaxData = [(new CComboBox('ymax_type', $this->data['ymax_type'], null, [
 		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
@@ -214,12 +217,15 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 	]))->setEnabled(!$readonly)];
 
+	$class_asterisk = null;
+
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CTextBox('yaxismax', $this->data['yaxismax'], $readonly))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+		$class_asterisk = ZBX_STYLE_FIELD_LABEL_ASTERISK;
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
 
 		$ymax_name = '';
@@ -233,8 +239,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAsterisk(true);
+		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 		// Select item button.
@@ -273,7 +278,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
 	}
 
-	$graphFormList->addRow(_('Y axis MAX value'), $yaxisMaxData);
+	$graphFormList->addRow((new CLabel(_('Y axis MAX value')))->addClass($class_asterisk), $yaxisMaxData);
 }
 else {
 	$graphFormList->addRow(_('3D view'),
@@ -352,8 +357,9 @@ foreach ($this->data['items'] as $n => $item) {
 	);
 }
 
-$graphFormList->addRow(_('Items'), (new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAsterisk(true)
+$graphFormList->addRow(
+	(new CLabel(_('Items')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 // Append tabs to form.

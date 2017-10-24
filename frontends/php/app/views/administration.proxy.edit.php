@@ -69,10 +69,10 @@ foreach ($data['all_hosts'] as $host) {
 }
 
 $proxy_form_list = (new CFormList('proxyFormList'))
-	->addRow(_('Proxy name'),
+	->addRow((new CLabel(_('Proxy name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('host', $data['host'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Proxy mode'),
 		(new CRadioButtonList('status', (int) $data['status']))
@@ -108,13 +108,11 @@ $encryption_form_list = (new CFormList('encryption'))
 			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
 			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
 	)
-	->addRow(_('PSK identity'),
+	->addRow((new CLabel(_('PSK identity')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAsterisk(true)
 	)
-	->addRow(_('PSK'),
+	->addRow((new CLabel(_('PSK')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAsterisk(true)
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

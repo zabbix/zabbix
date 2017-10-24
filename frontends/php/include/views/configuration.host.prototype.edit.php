@@ -68,8 +68,8 @@ if (isset($hostPrototype['hostid'])) {
 $hostTB = (new CTextBox('host', $hostPrototype['host'], (bool) $hostPrototype['templateid']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 128)
-	->setAttribute('autofocus', 'autofocus')->setAsterisk(true);
-$hostList->addRow(_('Host name'), $hostTB);
+	->setAttribute('autofocus', 'autofocus');
+$hostList->addRow((new CLabel(_('Host name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $hostTB);
 
 $name = ($hostPrototype['name'] != $hostPrototype['host']) ? $hostPrototype['name'] : '';
 $visiblenameTB = (new CTextBox('name', $name, (bool) $hostPrototype['templateid']))
@@ -191,7 +191,8 @@ foreach ($data['groups'] as $group) {
 		'name' => $group['name']
 	];
 }
-$groupList->addRow(_('Groups'),
+$groupList->addRow(
+	(new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'objectName' => 'hostGroup',
@@ -205,7 +206,7 @@ $groupList->addRow(_('Groups'),
 			'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
 				'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
 		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // new group prototypes

@@ -79,6 +79,15 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 			});
 
 			$('#evaltype').trigger('change');
+
+			$('#type').change(function() {
+				var type = parseInt(jQuery('#type').val()),
+					asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
+
+				jQuery('label[for=username]').removeClass(asterisk).addClass(
+					(type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) ? asterisk : ''
+				);
+			}).trigger('change');
 		});
 	})(jQuery);
 </script>

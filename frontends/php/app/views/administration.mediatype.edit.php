@@ -38,9 +38,9 @@ $mediaTypeForm = (new CForm())
 // create form list
 $nameTextBox = (new CTextBox('description', $data['description'], false, 100))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAttribute('autofocus', 'autofocus')->setAsterisk(true);
+	->setAttribute('autofocus', 'autofocus');
 $mediaTypeFormList = (new CFormList())
-	->addRow(_('Name'), $nameTextBox);
+	->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $nameTextBox);
 
 // append type to form list
 $cmbType = new CComboBox('type', $data['type'], null, [
@@ -123,11 +123,11 @@ if ($data['passwd'] != '') {
 			->onClick('this.style.display="none"; $("passwd").show().focus();'),
 		(new CPassBox('passwd', $data['passwd']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->addStyle('display: none;')->setAsterisk(true)
+			->addStyle('display: none;')
 	];
 }
 else {
-	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAsterisk(true);
+	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // append password field to form list
@@ -138,7 +138,7 @@ $mediaTypeFormList
 	->addRow(_('Username'),
 		(new CTextBox('eztext_username', $data['eztext_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
-	->addRow(_('Password'), $passwdField)
+	->addRow((new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $passwdField)
 	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [
 		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')

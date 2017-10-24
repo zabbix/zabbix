@@ -35,11 +35,11 @@ if ($data['actionid']) {
 
 // Action tab.
 $action_tab = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $data['action']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAsterisk(true)
 	);
 
 // Create condition table.
@@ -527,7 +527,8 @@ if (empty($data['new_operation'])) {
 		->addClass(ZBX_STYLE_BTN_LINK);
 }
 
-$operation_tab->addRow(_('Operations'),
+$operation_tab->addRow(
+	(new CLabel(_('Operations')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CDiv([$operationsTable, $footer]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -830,7 +831,8 @@ if (!empty($data['new_operation'])) {
 			zbx_add_post_js($js_insert);
 
 			// target list
-			$new_operation_formlist->addRow(_('Target list'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Target list')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 				(new CDiv(
 					(new CTable())
 						->setAttribute('style', 'width: 100%;')
@@ -847,7 +849,7 @@ if (!empty($data['new_operation'])) {
 				))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-					->setId('opCmdList')->setAsterisk(true)
+					->setId('opCmdList')
 			);
 
 			// type
@@ -872,8 +874,9 @@ if (!empty($data['new_operation'])) {
 			];
 
 			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-			$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
-				->setAsterisk(true)
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Script name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+				(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
 			);
 
 			// script
@@ -897,7 +900,8 @@ if (!empty($data['new_operation'])) {
 			);
 
 			$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
-			$new_operation_formlist->addRow(_('User name'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('User name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 				(new CTextBox('new_operation[opcommand][username]', $data['new_operation']['opcommand']['username']))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			);
@@ -927,16 +931,16 @@ if (!empty($data['new_operation'])) {
 			);
 
 			// command
-			$new_operation_formlist->addRow(_('Commands'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 				(new CTextArea('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAsterisk(true)
 			);
-			$new_operation_formlist->addRow(_('Commands'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 				(new CTextBox('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setId('new_operation_opcommand_command_ipmi')
-					->setAsterisk(true)
 			);
 			break;
 
@@ -952,7 +956,8 @@ if (!empty($data['new_operation'])) {
 
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
-			$new_operation_formlist->addRow(_('Host groups'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Host groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 				(new CMultiSelect([
 					'name' => 'new_operation[groupids][]',
 					'objectName' => 'hostGroup',
@@ -962,13 +967,14 @@ if (!empty($data['new_operation'])) {
 						'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
 							'&dstfld1=new_operation_groupids_&srcfld1=groupid&writeonly=1&multiselect=1'
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			);
 			break;
 
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$new_operation_formlist->addRow(_('Templates'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Templates')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 				(new CMultiSelect([
 					'name' => 'new_operation[templateids][]',
 					'objectName' => 'templates',
@@ -978,7 +984,7 @@ if (!empty($data['new_operation'])) {
 						'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 							'&dstfld1=new_operation_templateids_&templated_hosts=1&multiselect=1&writeonly=1'
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			);
 			break;
 
@@ -1261,7 +1267,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			->addClass(ZBX_STYLE_BTN_LINK);
 	}
 
-	$recovery_tab->addRow(_('Operations'),
+	$recovery_tab->addRow(
+		(new CLabel(_('Operations')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CDiv([$operationsTable, $footer]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -1547,7 +1554,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				zbx_add_post_js($js_insert);
 
 				// target list
-				$new_operation_formlist->addRow(_('Target list'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Target list')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CDiv(
 						(new CTable())
 							->setAttribute('style', 'width: 100%;')
@@ -1564,7 +1572,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					))
 						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-						->setId('recOpCmdList')->setAsterisk(true)
+						->setId('recOpCmdList')
 				);
 
 				// type
@@ -1592,8 +1600,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				];
 
 				$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-				$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
-					->setAsterisk(true)
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Script name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+					(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
 				);
 
 				// script
@@ -1654,15 +1663,17 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				);
 
 				// command
-				$new_operation_formlist->addRow(_('Commands'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextArea('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				);
-				$new_operation_formlist->addRow(_('Commands'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('new_recovery_operation_opcommand_command_ipmi')
 				);
 				break;
@@ -1983,7 +1994,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			$js_insert .= 'addPopupValues('.$group_values.');';
 			zbx_add_post_js($js_insert);
 
-			$new_operation_formlist->addRow(_('Target list'),
+			$new_operation_formlist->addRow(
+					(new CLabel(_('Target list')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CDiv(
 						(new CTable())
 							->addStyle('width: 100%;')
@@ -2000,7 +2012,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-					->setId('ackOpCmdList')->setAsterisk(true)
+					->setId('ackOpCmdList')
 				)
 				->addRow(_('Type'),
 					new CComboBox('new_ack_operation[opcommand][type]', $data['new_ack_operation']['opcommand']['type'],
@@ -2012,7 +2024,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
 					])
 				)
-				->addRow(_('Script name'), (new CDiv([
+				->addRow(
+					(new CLabel(_('Script name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+					(new CDiv([
 						new CVar('new_ack_operation[opcommand][scriptid]',
 							$data['new_ack_operation']['opcommand']['scriptid']
 						),
@@ -2022,7 +2036,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton('select_ack_operation_opcommand_script', _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-					]))->addClass(ZBX_STYLE_NOWRAP)->setAsterisk(true)
+					]))->addClass(ZBX_STYLE_NOWRAP)
 				)
 				->addRow(_('Execute on'),
 					(new CRadioButtonList('new_ack_operation[opcommand][execute_on]',
@@ -2072,15 +2086,17 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						$data['new_ack_operation']['opcommand']['port']
 					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				)
-				->addRow(_('Commands'),
+				->addRow(
+					(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextArea('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				)
-				->addRow(_('Commands'),
+				->addRow(
+					(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('new_ack_operation_opcommand_command_ipmi')
 				);
 		}
@@ -2159,7 +2175,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		);
 	}
 	else {
-		$acknowledge_tab->addRow(_('Operations'),
+		$acknowledge_tab->addRow(
+			(new CLabel(_('Operations')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			(new CDiv([$operations_table,
 				(new CSimpleButton(_('New')))
 					->onClick('javascript: submitFormWithParam("'.$action_formname.'", "new_ack_operation", "1");')

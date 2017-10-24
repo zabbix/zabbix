@@ -109,10 +109,11 @@ if (!$data['screen']['templateid']) {
 	}
 }
 
-$screen_tab->addRow(_('Name'),
+$screen_tab->addRow(
+		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $data['screen']['name']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Columns'),
 		(new CNumericBox('hsize', $data['screen']['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)

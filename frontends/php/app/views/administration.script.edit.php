@@ -31,11 +31,11 @@ $scriptForm = (new CForm())
 	->addVar('scriptid', $data['scriptid']);
 
 $scriptFormList = (new CFormList())
-	->addRow(_('Name'),
+	->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))->setAsterisk(true)
+			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
 	)
 	->addRow(_('Type'),
 		(new CRadioButtonList('type', (int) $data['type']))
@@ -50,13 +50,13 @@ $scriptFormList = (new CFormList())
 			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
 			->setModern(true)
 	)
-	->addRow(_('Commands'),
+	->addRow((new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextArea('command', $data['command']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxLength(255)->setAsterisk(true)
+			->setMaxLength(255)
 	)
-	->addRow(_('Command'),
-		(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
+	->addRow((new CLabel(_('Command')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

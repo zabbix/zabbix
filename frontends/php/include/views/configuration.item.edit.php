@@ -58,10 +58,11 @@ if ($discovered_item) {
 	));
 }
 
-$itemFormList->addRow(_('Name'),
+$itemFormList->addRow(
+	(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('name', $data['name'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
+		->setAttribute('autofocus', 'autofocus')
 );
 
 // Append type to form list.
@@ -76,9 +77,7 @@ else {
 }
 
 // Append key to form list.
-$key_controls = [(new CTextBox('key', $data['key'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAsterisk(true)
-];
+$key_controls = [(new CTextBox('key', $data['key'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)];
 
 if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -88,11 +87,10 @@ if (!$readonly) {
 			'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());');
 }
 
-$itemFormList->addRow(_('Key'), $key_controls);
+$itemFormList->addRow((new CLabel(_('Key')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $key_controls);
 
 // Append master item select.
-$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAsterisk(true),
+$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
 ];
 
@@ -106,7 +104,11 @@ if (!$readonly) {
 		);
 }
 
-$itemFormList->addRow(_('Master item'), $master_item, 'row_master_item');
+$itemFormList->addRow(
+	(new CLabel(_('Master item')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$master_item,
+	'row_master_item'
+);
 
 // Append interface(s) to form list.
 if ($data['interfaces']) {
@@ -161,9 +163,9 @@ if ($data['interfaces']) {
 }
 
 // Append SNMP common fields fields.
-$itemFormList->addRow(_('SNMP OID'),
-	(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAsterisk(true),
+$itemFormList->addRow(
+	(new CLabel(_('SNMP OID')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
@@ -171,9 +173,10 @@ $itemFormList->addRow(_('Context name'),
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_snmpv3_contextname'
 );
-$itemFormList->addRow(_('SNMP community'),
+$itemFormList->addRow(
+	(new CLabel(_('SNMP community')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('snmp_community', $data['snmp_community'], $discovered_item, 64))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_snmp_community'
 );
 $itemFormList->addRow(_('Security name'),
@@ -253,9 +256,10 @@ $itemFormList->addRow(_('Port'),
 	(new CTextBox('port', $data['port'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_port'
 );
-$itemFormList->addRow(_('IPMI sensor'),
+$itemFormList->addRow(
+	(new CLabel(_('IPMI sensor')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_ipmi_sensor'
 );
 
@@ -281,27 +285,29 @@ $itemFormList->addRow(_('User name'),
 	(new CTextBox('username', $data['username'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_username'
 );
-$itemFormList->addRow(_('Public key file'),
-	(new CTextBox('publickey', $data['publickey'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAsterisk(true),
+$itemFormList->addRow(
+	(new CLabel(_('Public key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('publickey', $data['publickey'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_publickey'
 );
-$itemFormList->addRow(_('Private key file'),
-	(new CTextBox('privatekey', $data['privatekey'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAsterisk(true),
+$itemFormList->addRow(
+	(new CLabel(_('Private key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('privatekey', $data['privatekey'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_privatekey'
 );
 $itemFormList->addRow(_('Password'),
 	(new CTextBox('password', $data['password'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_password'
 );
-$itemFormList->addRow(_('Executed script'),
+$itemFormList->addRow(
+	(new CLabel(_('Executed script')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextArea('params_es', $data['params']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setReadonly($discovered_item)->setAsterisk(true),
+		->setReadonly($discovered_item),
 	'label_executed_script'
 );
-$itemFormList->addRow(_('SQL query'),
+$itemFormList->addRow(
+	(new CLabel(_('SQL query')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextArea('params_ap', $data['params']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($discovered_item),
