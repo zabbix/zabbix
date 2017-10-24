@@ -33,7 +33,7 @@ $iconMapTab = new CFormList();
 $name = (new CTextBox('iconmap[name]', $this->data['iconmap']['name']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 64)
-	->setAttribute('autofocus', 'autofocus');
+	->setAttribute('autofocus', 'autofocus')->setAsterisk(true);
 $iconMapTab->addRow(_('Name'), $name);
 
 $iconMapForm = (new CForm())
@@ -125,7 +125,7 @@ $iconMapTable->addRow([
 $iconMapTab->addRow(_('Mappings'),
 	(new CDiv($iconMapTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')->setAsterisk(true)
 );
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);

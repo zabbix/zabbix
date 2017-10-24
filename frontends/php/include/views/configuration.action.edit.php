@@ -39,6 +39,7 @@ $action_tab = (new CFormList())
 		(new CTextBox('name', $data['action']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAsterisk(true)
 	);
 
 // Create condition table.
@@ -846,7 +847,7 @@ if (!empty($data['new_operation'])) {
 				))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-					->setId('opCmdList')
+					->setId('opCmdList')->setAsterisk(true)
 			);
 
 			// type
@@ -871,7 +872,9 @@ if (!empty($data['new_operation'])) {
 			];
 
 			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-			$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP));
+			$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
+				->setAsterisk(true)
+			);
 
 			// script
 			$new_operation_formlist->addRow(_('Execute on'),
@@ -927,11 +930,13 @@ if (!empty($data['new_operation'])) {
 			$new_operation_formlist->addRow(_('Commands'),
 				(new CTextArea('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAsterisk(true)
 			);
 			$new_operation_formlist->addRow(_('Commands'),
 				(new CTextBox('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setId('new_operation_opcommand_command_ipmi')
+					->setAsterisk(true)
 			);
 			break;
 
@@ -957,7 +962,7 @@ if (!empty($data['new_operation'])) {
 						'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
 							'&dstfld1=new_operation_groupids_&srcfld1=groupid&writeonly=1&multiselect=1'
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 			);
 			break;
 
@@ -973,7 +978,7 @@ if (!empty($data['new_operation'])) {
 						'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 							'&dstfld1=new_operation_templateids_&templated_hosts=1&multiselect=1&writeonly=1'
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 			);
 			break;
 
@@ -1559,7 +1564,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					))
 						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-						->setId('recOpCmdList')
+						->setId('recOpCmdList')->setAsterisk(true)
 				);
 
 				// type
@@ -1587,7 +1592,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				];
 
 				$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-				$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP));
+				$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
+					->setAsterisk(true)
+				);
 
 				// script
 				$new_operation_formlist->addRow(_('Execute on'),
@@ -1650,13 +1657,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$new_operation_formlist->addRow(_('Commands'),
 					(new CTextArea('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 				);
 				$new_operation_formlist->addRow(_('Commands'),
 					(new CTextBox('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
-					))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 						->setId('new_recovery_operation_opcommand_command_ipmi')
 				);
 				break;
@@ -1994,7 +2000,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-					->setId('ackOpCmdList')
+					->setId('ackOpCmdList')->setAsterisk(true)
 				)
 				->addRow(_('Type'),
 					new CComboBox('new_ack_operation[opcommand][type]', $data['new_ack_operation']['opcommand']['type'],
@@ -2016,7 +2022,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton('select_ack_operation_opcommand_script', _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-					]))->addClass(ZBX_STYLE_NOWRAP)
+					]))->addClass(ZBX_STYLE_NOWRAP)->setAsterisk(true)
 				)
 				->addRow(_('Execute on'),
 					(new CRadioButtonList('new_ack_operation[opcommand][execute_on]',
@@ -2069,13 +2075,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				->addRow(_('Commands'),
 					(new CTextArea('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 				)
 				->addRow(_('Commands'),
 					(new CTextBox('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
-					))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 						->setId('new_ack_operation_opcommand_command_ipmi')
 				);
 		}

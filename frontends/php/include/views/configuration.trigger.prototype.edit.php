@@ -60,7 +60,7 @@ if (!empty($data['templates'])) {
 $triggersFormList->addRow(_('Name'),
 	(new CTextBox('description', $data['description'], $data['limited']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+		->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 )
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
 
@@ -89,7 +89,7 @@ $expression_row = [
 		$data['expression_field_name'],
 		$data['expression_field_value'],
 		['readonly' => $data['expression_field_readonly']]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_expression_button
 ];
@@ -284,7 +284,7 @@ $recovery_expression_row = [
 		$data['recovery_expression_field_name'],
 		$data['recovery_expression_field_value'],
 		['readonly' => $data['recovery_expression_field_readonly']]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_recovery_expression_button
 ];
@@ -463,7 +463,7 @@ $triggersFormList
 	)
 	->addRow(_('Tag for matching'),
 		(new CTextBox('correlation_tag', $data['correlation_tag'], $data['limited']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
 		'correlation_tag_row'
 	);
 

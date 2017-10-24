@@ -49,7 +49,7 @@ if ($data['limited']) {
 $itemFormList->addRow(_('Name'),
 	(new CTextBox('name', $this->data['name'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+		->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 );
 
 // append type to form list
@@ -65,7 +65,7 @@ else {
 
 // append key to form list
 $key_controls = [
-	(new CTextBox('key', $this->data['key'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextBox('key', $this->data['key'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 ];
 if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -79,7 +79,8 @@ if (!$readonly) {
 $itemFormList->addRow(_('Key'), $key_controls);
 
 // Append master item select.
-$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAsterisk(true),
 	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
 ];
 
@@ -132,7 +133,8 @@ if (!empty($this->data['interfaces'])) {
 	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
-	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $readonly, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $readonly, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAsterisk(true),
 	'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
@@ -140,7 +142,8 @@ $itemFormList->addRow(_('Context name'),
 	'row_snmpv3_contextname'
 );
 $itemFormList->addRow(_('SNMP community'),
-	(new CTextBox('snmp_community', $this->data['snmp_community'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('snmp_community', $this->data['snmp_community'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAsterisk(true),
 	'row_snmp_community'
 );
 $itemFormList->addRow(_('Security name'),
@@ -185,7 +188,7 @@ $itemFormList->addRow(_('Port'),
 );
 $itemFormList->addRow(_('IPMI sensor'),
 	(new CTextBox('ipmi_sensor', $this->data['ipmi_sensor'], $readonly, 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
 	'row_ipmi_sensor'
 );
 
@@ -205,11 +208,13 @@ $itemFormList->addRow(_('User name'),
 	'row_username'
 );
 $itemFormList->addRow(_('Public key file'),
-	(new CTextBox('publickey', $this->data['publickey'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	(new CTextBox('publickey', $this->data['publickey'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAsterisk(true),
 	'row_publickey'
 );
 $itemFormList->addRow(_('Private key file'),
-	(new CTextBox('privatekey', $this->data['privatekey'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	(new CTextBox('privatekey', $this->data['privatekey'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAsterisk(true),
 	'row_privatekey'
 );
 $itemFormList->addRow(_('Password'),
@@ -217,7 +222,7 @@ $itemFormList->addRow(_('Password'),
 	'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
-	(new CTextArea('params_es', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextArea('params_es', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true),
 	'label_executed_script'
 );
 $itemFormList->addRow(_('SQL query'),

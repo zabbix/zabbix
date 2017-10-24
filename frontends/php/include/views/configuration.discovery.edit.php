@@ -36,7 +36,7 @@ $discoveryFormList = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('name', $this->data['drule']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 	);
 
 // append proxy to form list
@@ -70,7 +70,7 @@ $discoveryFormList->addRow(_('Checks'),
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('dcheckList')
+		->setId('dcheckList')->setAsterisk(true)
 );
 
 // append uniqueness criteria to form list

@@ -37,9 +37,11 @@ $imageFormList = (new CFormList('imageFormList'))
 	->addRow(_('Name'),
 		(new CTextBox('name', $this->data['imagename'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 	)
-	->addRow(_('Upload'), (new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+	->addRow(_('Upload'), (new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAsterisk(!array_key_exists('imageid', $data) || is_null($data['imageid']))
+	);
 
 if (isset($this->data['imageid'])) {
 	if ($this->data['imagetype'] == IMAGE_TYPE_BACKGROUND) {

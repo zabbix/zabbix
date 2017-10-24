@@ -41,7 +41,7 @@ $servicesFormList = (new CFormList('servicesFormList'))
 	->addRow(_('Name'),
 		(new CTextBox('name', $this->data['name'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 	);
 
 // append parent link to form list

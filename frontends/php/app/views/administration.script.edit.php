@@ -35,7 +35,7 @@ $scriptFormList = (new CFormList())
 		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
+			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))->setAsterisk(true)
 	)
 	->addRow(_('Type'),
 		(new CRadioButtonList('type', (int) $data['type']))
@@ -53,10 +53,10 @@ $scriptFormList = (new CFormList())
 	->addRow(_('Commands'),
 		(new CTextArea('command', $data['command']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxLength(255)
+			->setMaxLength(255)->setAsterisk(true)
 	)
 	->addRow(_('Command'),
-		(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

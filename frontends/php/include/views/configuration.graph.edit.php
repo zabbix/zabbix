@@ -73,7 +73,7 @@ $graphFormList
 	->addRow(_('Name'),
 		(new CTextBox('name', $this->data['name'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 	)
 	->addRow(_('Width'),
 		(new CNumericBox('width', $this->data['width'], 5, $readonly))
@@ -168,7 +168,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAsterisk(true);
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 		// Select item button.
@@ -232,7 +233,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAsterisk(true);
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 		// Select item button.
@@ -350,7 +352,9 @@ foreach ($this->data['items'] as $n => $item) {
 	);
 }
 
-$graphFormList->addRow(_('Items'), (new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$graphFormList->addRow(_('Items'), (new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAsterisk(true)
+);
 
 // Append tabs to form.
 $graphTab = new CTabView();

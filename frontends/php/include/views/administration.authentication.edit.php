@@ -53,6 +53,7 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 	$authenticationFormList->addRow(
 		_('LDAP host'),
 		(new CTextBox('ldap_host', $this->data['config']['ldap_host']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAsterisk(true)
 	);
 	$authenticationFormList->addRow(
 		_('Port'),
@@ -62,6 +63,7 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 	$authenticationFormList->addRow(
 		_('Base DN'),
 		(new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAsterisk(true)
 	);
 	$authenticationFormList->addRow(
 		_('Search attribute'),
@@ -72,7 +74,7 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 				: $this->data['config']['ldap_search_attribute'],
 			false,
 			128
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 	);
 	$authenticationFormList->addRow(
 		_('Bind DN'),
@@ -100,7 +102,9 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 
 	$authenticationFormList->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']');
 	$authenticationFormList->addRow(_('Login'), $userComboBox);
-	$authenticationFormList->addRow(_('User password'), (new CPassBox('user_password'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH));
+	$authenticationFormList->addRow(_('User password'), (new CPassBox('user_password'))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAsterisk(true)
+	);
 }
 
 // append form list to tab

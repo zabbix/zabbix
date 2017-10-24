@@ -35,7 +35,7 @@ $correlation_tab = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('name', $data['correlation']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 	);
 
 // Create condition table.
@@ -101,7 +101,7 @@ $correlation_tab
 	->addRow(_('Conditions'),
 		(new CDiv($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')->setAsterisk(true)
 	);
 
 $condition2 = null;
@@ -220,7 +220,7 @@ $operation_tab
 	->addRow(_('Operations'),
 		(new CDiv([$operations_table]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')->setAsterisk(true)
 	)
 	->addRow(_('New operation'),
 		(new CDiv(

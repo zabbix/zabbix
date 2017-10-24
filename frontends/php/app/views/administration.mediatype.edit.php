@@ -38,7 +38,7 @@ $mediaTypeForm = (new CForm())
 // create form list
 $nameTextBox = (new CTextBox('description', $data['description'], false, 100))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAttribute('autofocus', 'autofocus');
+	->setAttribute('autofocus', 'autofocus')->setAsterisk(true);
 $mediaTypeFormList = (new CFormList())
 	->addRow(_('Name'), $nameTextBox);
 
@@ -123,11 +123,11 @@ if ($data['passwd'] != '') {
 			->onClick('this.style.display="none"; $("passwd").show().focus();'),
 		(new CPassBox('passwd', $data['passwd']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->addStyle('display: none;')
+			->addStyle('display: none;')->setAsterisk(true)
 	];
 }
 else {
-	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAsterisk(true);
 }
 
 // append password field to form list

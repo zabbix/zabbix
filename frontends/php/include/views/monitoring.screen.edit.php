@@ -112,7 +112,7 @@ if (!$data['screen']['templateid']) {
 $screen_tab->addRow(_('Name'),
 		(new CTextBox('name', $data['screen']['name']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+		->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 	)
 	->addRow(_('Columns'),
 		(new CNumericBox('hsize', $data['screen']['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)

@@ -64,6 +64,7 @@ $hostList->addRow(_('Host name'),
 	(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
+		->setAsterisk(true)
 );
 
 $hostList->addRow(_('Visible name'),
@@ -795,10 +796,12 @@ $encryption_form_list = (new CFormList('encryption'))
 	->addRow(_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAsterisk(true)
 	)
 	->addRow(_('PSK'),
 		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAsterisk(true)
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))

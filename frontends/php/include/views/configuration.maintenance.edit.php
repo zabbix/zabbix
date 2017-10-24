@@ -37,6 +37,7 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 		(new CTextBox('mname', $this->data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAsterisk(true)
 	)
 	->addRow(_('Maintenance type'),
 		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
@@ -140,7 +141,8 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 
 $periodsDiv = (new CDiv($maintenancePeriodTable))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	->setAsterisk(true);
 if (!isset($_REQUEST['new_timeperiod'])) {
 	$periodsDiv->addItem(
 		(new CSimpleButton(_('New')))

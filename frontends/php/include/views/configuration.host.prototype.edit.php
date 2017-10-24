@@ -68,7 +68,7 @@ if (isset($hostPrototype['hostid'])) {
 $hostTB = (new CTextBox('host', $hostPrototype['host'], (bool) $hostPrototype['templateid']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 128)
-	->setAttribute('autofocus', 'autofocus');
+	->setAttribute('autofocus', 'autofocus')->setAsterisk(true);
 $hostList->addRow(_('Host name'), $hostTB);
 
 $name = ($hostPrototype['name'] != $hostPrototype['host']) ? $hostPrototype['name'] : '';
@@ -205,7 +205,7 @@ $groupList->addRow(_('Groups'),
 			'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
 				'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
 		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAsterisk(true)
 );
 
 // new group prototypes

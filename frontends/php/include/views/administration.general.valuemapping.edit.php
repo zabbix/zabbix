@@ -38,7 +38,7 @@ $form_list = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('name', $data['name'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('autofocus', 'autofocus')->setAsterisk(true)
 	);
 
 $table = (new CTable())
@@ -71,7 +71,7 @@ $table->addRow([
 $form_list->addRow(_('Mappings'),
 	(new CDiv($table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')->setAsterisk(true)
 );
 
 // append form list to tab
