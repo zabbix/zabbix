@@ -22,6 +22,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+A......... [ZBX-12837] fixed error in action update when changing media type (gcalenko)
 ...G...... [ZBX-11902] fixed CPU count for LPAR partitions in IBM AIX (abs)
 A......... [ZBX-12778] fixed problem.get and event.get API methods when "selectTags" option contains extended output (Ivo)
 ...G...... [ZBX-12260] fixed windows agent to support UTF-16LE, UCS-2, UCS-2LE encodings (vso)
