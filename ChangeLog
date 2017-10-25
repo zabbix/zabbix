@@ -17,6 +17,7 @@ Bug fixes:
 Changes for 3.4.4rc1
 
 New features:
+..F....... [ZBXNEXT-1421] added service sorting by name if multiple services has same 'sortorder' value (miks)
 ...G...... [ZBXNEXT-3493] added Windows service configuration check to determine if service can be trigger started (andris, viktors)
 ..F....... [ZBXNEXT-4019] implemented default widget refresh interval (Ivo)
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
@@ -376,6 +377,7 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.10rc1
 
 New features:
+..F....... [ZBXNEXT-1421] added service sorting by name if multiple services has same 'sortorder' value (miks)
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
@@ -911,6 +913,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.13rc1
 
 New features:
+..F....... [ZBXNEXT-1421] added service sorting by name if multiple services has same 'sortorder' value (miks)
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
