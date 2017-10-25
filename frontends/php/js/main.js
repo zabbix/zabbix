@@ -112,7 +112,7 @@ var MMenu = {
 		var elems = jQuery('.top-nav a, .top-subnav a').on('keydown', function(event) {
 			clearTimeout(this.timeout_reset);
 
-			if (event.keyCode == 9) {
+			if (event.which == 9) {
 				setTimeout(function() {
 					if (elems.toArray().indexOf(document.querySelector(':focus')) == -1) {
 						MMenu.timeout_reset = setTimeout('MMenu.showSubMenu("' + MMenu.def_label + '")', 2500);
@@ -120,6 +120,27 @@ var MMenu = {
 				});
 			}
 		});
+
+		if (SF) {
+			var subnav_elems = jQuery('.top-subnav a').on('keydown', function(event) {
+				if (event.which == 9) {
+					subnav_elems = subnav_elems.filter(function() {
+						return jQuery(this).is(':visible');
+					});
+					var current = subnav_elems.toArray().indexOf(this);
+
+					if (event.shiftKey && current > 0) {
+						subnav_elems.get(current - 1).focus();
+					}
+					else if (subnav_elems.length > current + 1) {
+						subnav_elems.get(current + 1).focus();
+					}
+
+					event.preventDefault();
+					return false;
+				}
+			});
+		}
 	},
 
 	mouseOver: function(show_label) {
@@ -129,7 +150,7 @@ var MMenu = {
 	},
 
 	keyUp: function(show_label, event) {
-		if (event.keyCode == 13) {
+		if (event.which == 13) {
 			clearTimeout(this.timeout_reset);
 			this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
 			PageRefresh.restart();

@@ -91,7 +91,7 @@ foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 			->setArgument('ddreset', 1)
 			->removeArgument('sid');
 
-		$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl());
+		$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->setAttribute('tabindex', 0);
 		if ($sub_page['selected']) {
 			$sub_menu_item->addClass(ZBX_STYLE_SELECTED);
 		}
