@@ -132,7 +132,7 @@ var MMenu = {
 					if (event.shiftKey && current > 0) {
 						subnav_elems.get(current - 1).focus();
 					}
-					else if (subnav_elems.length > current + 1) {
+					else if (!event.shiftKey && subnav_elems.length > current + 1) {
 						subnav_elems.get(current + 1).focus();
 					}
 
