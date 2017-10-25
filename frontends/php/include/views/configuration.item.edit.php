@@ -313,7 +313,8 @@ $itemFormList->addRow(
 		->setReadonly($discovered_item),
 	'label_params'
 );
-$itemFormList->addRow(_('Formula'),
+$itemFormList->addRow(
+	(new CLabel(_('Formula')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextArea('params_f', $data['params'], $discovered_item))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($discovered_item),

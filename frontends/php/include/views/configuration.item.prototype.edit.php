@@ -236,7 +236,8 @@ $itemFormList->addRow(
 	(new CTextArea('params_ap', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'label_params'
 );
-$itemFormList->addRow(_('Formula'),
+$itemFormList->addRow(
+	(new CLabel(_('Formula')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextArea('params_f', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'label_formula'
 );
