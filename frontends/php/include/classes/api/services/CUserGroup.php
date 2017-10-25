@@ -72,6 +72,7 @@ class CUserGroup extends CApiService {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
 			'selectRights'				=> null,
+			'selectTagFilters'				=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
 			'sortfield'					=> '',
@@ -186,6 +187,7 @@ class CUserGroup extends CApiService {
 		unset($usrgrp);
 
 		$this->updateRights($usrgrps, __FUNCTION__);
+		$this->updateTagFilters($usrgrps, __FUNCTION__);
 		$this->updateUsersGroups($usrgrps, __FUNCTION__);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER_GROUP, $usrgrps);
@@ -211,6 +213,11 @@ class CUserGroup extends CApiService {
 			'rights' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
 				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
+			]],
+			'tag_filters' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag')],
+				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value')],
 			]],
 			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE]
 		]];
@@ -265,6 +272,7 @@ class CUserGroup extends CApiService {
 		}
 
 		$this->updateRights($usrgrps, __FUNCTION__);
+		$this->updateTagFilters($usrgrps, __FUNCTION__);
 		$this->updateUsersGroups($usrgrps, __FUNCTION__);
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
@@ -292,6 +300,11 @@ class CUserGroup extends CApiService {
 			'rights' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
 				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
+			]],
+			'tag_filters' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag')],
+				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value')],
 			]],
 			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE]
 		]];
@@ -404,6 +417,11 @@ class CUserGroup extends CApiService {
 			if (array_key_exists('rights', $usrgrp)) {
 				foreach ($usrgrp['rights'] as $right) {
 					$groupids[$right['id']] = true;
+				}
+			}
+			if (array_key_exists('tag_filters', $usrgrp)) {
+				foreach ($usrgrp['tag_filters'] as $tag_filter) {
+					$groupids[$tag_filter['groupid']] = true;
 				}
 			}
 		}
@@ -642,6 +660,62 @@ class CUserGroup extends CApiService {
 
 		if ($del_rightids) {
 			DB::delete('rights', ['rightid' => $del_rightids]);
+		}
+	}
+
+	/**
+	 * Update table "tag_filter".
+	 *
+	 * @param array  $usrgrps
+	 * @param string $method
+	 */
+	private function updateTagFilters(array $usrgrps, $method) {
+		$usrgrpids = [];
+		$ins_tag_filters = [];
+		$upd_tag_filters = [];
+		$del_tag_filterids = [];
+
+		foreach ($usrgrps as $usrgrp) {
+			$usrgrpids[$usrgrp['usrgrpid']] = true;
+
+			foreach ($usrgrp['tag_filters'] as $tag_filter) {
+				if ($method === 'create' || !array_key_exists('tag_filterid', $tag_filter)) {
+					$tag_filter['usrgrpid'] = $usrgrp['usrgrpid'];
+					$ins_tag_filters[] = $tag_filter;
+				}
+				elseif (array_key_exists('tag_filterid', $tag_filter)) {
+					$upd_tag_filters[$tag_filter['tag_filterid']] = $tag_filter;
+				}
+			}
+		}
+
+		if ($method === 'update') {
+			$db_tag_filters = DB::select('tag_filter', [
+				'output' => ['tag_filterid', 'groupid', 'groupid', 'tag', 'value'],
+				'filter' => ['usrgrpid' => array_keys($usrgrpids)]
+			]);
+
+			$db_tag_filter_to_diff = [];
+			foreach ($db_tag_filters as $db_tag_filter) {
+				$db_tag_filter_to_diff[$db_tag_filter['tag_filterid']] = $db_tag_filter;
+			}
+
+			if ($db_tag_filter_to_diff) {
+				$del_tag_filterids = array_diff(array_keys($db_tag_filter_to_diff), array_keys($upd_tag_filters));
+			}
+		}
+
+		if ($ins_tag_filters) {
+			$ins_tag_filters = array_map("unserialize", array_unique(array_map("serialize", $ins_tag_filters)));
+			DB::insertBatch('tag_filter', $ins_tag_filters);
+		}
+
+		if ($upd_tag_filters) {
+			DB::update('tag_filter', $upd_tag_filters);
+		}
+
+		if ($del_tag_filterids) {
+			DB::delete('tag_filter', ['tag_filterid' => $del_tag_filterids]);
 		}
 	}
 
@@ -1154,6 +1228,44 @@ class CUserGroup extends CApiService {
 			unset($db_right);
 
 			$result = $relationMap->mapMany($result, $db_rights, 'rights');
+		}
+
+		// adding usergroup tag filters
+		if ($options['selectTagFilters'] !== null && $options['selectTagFilters'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'groupid', 'tag_filterid', 'tag', 'value');
+
+			if (is_array($options['selectTagFilters'])) {
+				$pk_field = $this->pk('tag_filter');
+
+				$output_fields = [
+					$pk_field => $this->fieldId($pk_field, 't')
+				];
+
+				foreach ($options['selectTagFilters'] as $field) {
+					if ($this->hasField($field, 'tag_filter')) {
+						$output_fields[$field] = $this->fieldId($field, 't');
+					}
+				}
+
+				$output_fields = implode(',', $output_fields);
+			}
+			else {
+				$output_fields = 't.*';
+			}
+
+			$db_tag_filters = DBfetchArray(DBselect(
+				'SELECT '.$output_fields.
+				' FROM tag_filter t'.
+				' WHERE '.dbConditionInt('t.tag_filterid', $relationMap->getRelatedIds())
+			));
+			$db_tag_filters = zbx_toHash($db_tag_filters, 'tag_filterid');
+
+			foreach ($db_tag_filters as &$db_tag_filter) {
+				unset($db_tag_filter['tag_filterid'], $db_tag_filter['groupid']);
+			}
+			unset($db_tag_filter);
+
+			$result = $relationMap->mapMany($result, $db_tag_filters, 'tag_filters');
 		}
 
 		return $result;
