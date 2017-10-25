@@ -280,7 +280,7 @@ var colorPalette = (function() {
 		/**
 		 * Set theme specific color palette.
 		 *
-		 * @param array $colors
+		 * @param array colors  Array of hexadecimal color codes.
 		 */
 		setThemeColors: function(colors) {
 			palette = colors;
