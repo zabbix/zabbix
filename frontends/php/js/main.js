@@ -127,7 +127,8 @@ var MMenu = {
 					subnav_elems = subnav_elems.filter(function() {
 						return jQuery(this).is(':visible');
 					});
-					var current = subnav_elems.toArray().indexOf(this);
+					var current = subnav_elems.toArray().indexOf(this),
+						pd = false;
 
 					if (event.shiftKey && current > 0) {
 						subnav_elems.get(current - 1).focus();
@@ -135,9 +136,14 @@ var MMenu = {
 					else if (!event.shiftKey && subnav_elems.length > current + 1) {
 						subnav_elems.get(current + 1).focus();
 					}
+					else {
+						pd = true;
+					}
 
-					event.preventDefault();
-					return false;
+					if (!pd) {
+						event.preventDefault();
+						return false;
+					}
 				}
 			});
 		}
