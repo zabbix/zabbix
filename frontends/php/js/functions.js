@@ -278,6 +278,16 @@ var colorPalette = (function() {
 			this.incrementNextColor();
 
 			return color;
+		},
+
+		/**
+		 * Set theme specific color palette.
+		 *
+		 * @param array $colors
+		 */
+		setThemeColors: function(colors) {
+			palette = colors;
+			current_color = 0;
 		}
 	}
 }());
