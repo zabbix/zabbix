@@ -3140,6 +3140,11 @@ return [
 				'length' => 6,
 				'default' => '',
 			],
+			'themecolorpalette' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
 		],
 	],
 	'globalmacro' => [
