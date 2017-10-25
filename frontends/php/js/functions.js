@@ -255,10 +255,7 @@ var colorPalette = (function() {
 	'use strict';
 
 	var current_color = 0,
-		palette = [
-			'1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
-			'BB2A02', '5A2B57', '89ABF8', '7EC25C', '274482', '2B5429', '8048B4', 'FD5434', '790E1F', '87AC4D', 'E89DF4'
-		];
+		palette = [];
 
 	return {
 		incrementNextColor: function() {
