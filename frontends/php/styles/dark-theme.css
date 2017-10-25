@@ -1195,13 +1195,6 @@ footer, .footer {
       -moz-transition: none;
       transition: none; }
 
-label.form-label-asterisk::before {
-  color: #e45959;
-  display: inline-block;
-  content: '*';
-  position: absolute;
-  margin: -3px 0 0 -5px; }
-
 label input[type="checkbox"] {
   margin-right: 3px; }
 label input[type="radio"] {
