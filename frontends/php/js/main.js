@@ -127,8 +127,7 @@ var MMenu = {
 					subnav_elems = subnav_elems.filter(function() {
 						return jQuery(this).is(':visible');
 					});
-					var current = subnav_elems.toArray().indexOf(this),
-						pd = false;
+					var current = subnav_elems.toArray().indexOf(this);
 
 					if (event.shiftKey && current > 0) {
 						subnav_elems.get(current - 1).focus();
@@ -136,14 +135,32 @@ var MMenu = {
 					else if (!event.shiftKey && subnav_elems.length > current + 1) {
 						subnav_elems.get(current + 1).focus();
 					}
-					else {
-						pd = true;
+					else if (event.shiftKey && current == 0) {
+						// Find the previous :focusable element to focus.
+						var active_element_index = jQuery('*', 'body').toArray().indexOf(document.activeElement),
+							prev_element = null;
+
+						jQuery('*', 'body').each(function(i) {
+							if (active_element_index > i && jQuery(this).is(':focusable')) {
+								prev_element = this;
+							};
+						});
+
+						if (prev_element) {
+							prev_element.focus();
+						}
+					}
+					else if (current + 1 == subnav_elems.length) {
+						// If this is the last item in the sub-menu list, focus next :focusable element.
+						var active_element_index = jQuery('*', 'body').toArray().indexOf(document.activeElement);
+
+						jQuery('*', 'body').filter(function(i) {
+							return i > active_element_index && jQuery(this).is(':focusable');
+						}).get(0).focus();
 					}
 
-					if (!pd) {
-						event.preventDefault();
-						return false;
-					}
+					event.preventDefault();
+					return false;
 				}
 			});
 		}
