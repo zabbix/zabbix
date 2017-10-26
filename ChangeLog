@@ -24,6 +24,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+..F....... [ZBX-12904] added validation for groupid and hostid parameters in dashboard view (vmurzins)
 A......... [ZBX-12837] fixed error in action update when changing media type (gcalenko)
 ...G...... [ZBX-11902] fixed CPU count for LPAR partitions in IBM AIX (abs)
 A......... [ZBX-12778] fixed problem.get and event.get API methods when "selectTags" option contains extended output (Ivo)
