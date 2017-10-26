@@ -385,6 +385,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+........S. [ZBX-11658] fixed error message in case no items were found for aggregated check (gleb)
 .......PS. [ZBX-12854] fixed crash of VMware collector with DebugLog=4 (gleb)
 ...G...... [ZBX-11902] fixed CPU count for LPAR partitions in IBM AIX (abs)
 ...G...... [ZBX-12260] fixed windows agent to support UTF-16LE, UCS-2, UCS-2LE encodings (vso)
