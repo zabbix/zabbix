@@ -41,12 +41,12 @@ static int	DBpatch_3050001(void)
 #define ZBX_DEFAULT_COLOR_PALETTE	"1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,"
 		"5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4";
 
-	const ZBX_FIELD field = {"themecolorpalette", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"colorpalette", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	if (ZBX_DB_OK > DBadd_field("graph_theme", &field))
 		return FAIL;
 
-	if (ZBX_DB_OK > DBexecute("update graph_theme set themecolorpalette='" ZBX_DEFAULT_COLOR_PALETTE "'"))
+	if (ZBX_DB_OK > DBexecute("update graph_theme set colorpalette='" ZBX_DEFAULT_COLOR_PALETTE "'"))
 		return FAIL;
 
 	return SUCCEED;

@@ -3140,7 +3140,7 @@ return [
 				'length' => 6,
 				'default' => '',
 			],
-			'themecolorpalette' => [
+			'colorpalette' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
