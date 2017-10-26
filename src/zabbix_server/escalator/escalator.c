@@ -60,6 +60,21 @@ typedef struct
 }
 ZBX_USER_MSG;
 
+typedef struct
+{
+	zbx_uint64_t	hostgrouid;
+	char		*tag;
+	char		*value;
+}
+zbx_tag_filter_t;
+
+static void	zbx_tag_filter_free(zbx_tag_filter_t *tag_filter)
+{
+	zbx_free(tag_filter->tag);
+	zbx_free(tag_filter->value);
+	zbx_free(tag_filter);
+}
+
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
@@ -104,9 +119,25 @@ static int	check_perm2system(zbx_uint64_t userid)
 	return res;
 }
 
+static	int	get_user_type(zbx_uint64_t userid)
+{
+	int		user_type = -1;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select type from users where userid=" ZBX_FS_UI64, userid);
+
+	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+		user_type = atoi(row[0]);
+
+	DBfree_result(result);
+
+	return user_type;
+}
+
 /******************************************************************************
  *                                                                            *
- * Function: get_host_permission                                              *
+ * Function: get_hostgroups_permission                                        *
  *                                                                            *
  * Purpose: Return user permissions for access to the host                    *
  *                                                                            *
@@ -120,39 +151,28 @@ static int	check_perm2system(zbx_uint64_t userid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
+static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids)
 {
-	const char	*__function_name = "get_host_permission";
+	const char	*__function_name = "get_hostgroups_permission";
+	int		perm = PERM_DENY;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		user_type = -1, perm = PERM_DENY;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select type from users where userid=" ZBX_FS_UI64, userid);
-
-	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
-		user_type = atoi(row[0]);
-
-	DBfree_result(result);
-
-	if (-1 == user_type)
+	if (0 == hostgroupids->values_num)
 		goto out;
 
-	if (USER_TYPE_SUPER_ADMIN == user_type)
-	{
-		perm = PERM_READ_WRITE;
-		goto out;
-	}
-
-	result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select min(r.permission)"
-			" from rights r,hosts_groups hg,users_groups ug"
-			" where r.groupid=ug.usrgrpid"
-				" and r.id=hg.groupid"
-				" and hg.hostid=" ZBX_FS_UI64
-				" and ug.userid=" ZBX_FS_UI64,
-			hostid, userid);
+			" from rights r"
+			" join users_groups ug on ug.usrgrpid=r.groupid"
+				" where ug.userid=" ZBX_FS_UI64 " and", userid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.id",
+			hostgroupids->values, hostgroupids->values_num);
+	result = DBselect("%s", sql);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		perm = atoi(row[0]);
@@ -166,6 +186,130 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_tag_based_permission                                       *
+ *                                                                            *
+ * Purpose: Check user access to event by tags                                *
+ *                                                                            *
+ * Parameters: userid       - user id                                         *
+ *             hostgroupids - list of host groups in which trigger was to     *
+ *                            be found                                        *
+ *             event        - checked event for access                        *
+ *                                                                            *
+ * Return value: SUCCEED - user has access                                    *
+ *               FAIL    - user does not have access                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids,
+		const DB_EVENT *event)
+{
+	const char		*__function_name = "get_tag_based_permission";
+	char			*sql = NULL, tmp[ZBX_MAX_UINT64_LEN];
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = FAIL, i, n;
+	zbx_vector_ptr_t	tag_filters, conditions;
+	zbx_tag_filter_t	*tag_filter;
+	DB_CONDITION		*condition;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&conditions);
+	zbx_vector_ptr_create(&tag_filters);
+	zbx_vector_ptr_sort(&tag_filters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select tf.groupid,tf.tag,tf.value from tag_filter tf"
+			" join users_groups ug on ug.usrgrpid=tf.usrgrpid"
+				" where ug.userid=" ZBX_FS_UI64 " and", userid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "tf.groupid",
+			hostgroupids->values, hostgroupids->values_num);
+	result = DBselect("%s order by tf.groupid", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		tag_filter = (zbx_tag_filter_t *)zbx_malloc(NULL, sizeof(zbx_tag_filter_t));
+		ZBX_STR2UINT64(tag_filter->hostgrouid, row[0]);
+		tag_filter->tag = zbx_strdup(NULL, row[1]);
+		tag_filter->value = (SUCCEED != DBis_null(row[2]) ? zbx_strdup(NULL, row[2]) : NULL);
+		zbx_vector_ptr_append(&tag_filters, tag_filter);
+	}
+
+	/* check if the hostgroup does not have any tag filters, then the user has access to event */
+	for (i = 0; i < hostgroupids->values_num; i++)
+	{
+		for (n = 0; n < tag_filters.values_num; n++)
+		{
+			if (hostgroupids->values[i] == ((zbx_tag_filter_t *)tag_filters.values[n])->hostgrouid)
+				break;
+		}
+		if (tag_filters.values_num == n)
+		{
+			ret = SUCCEED;
+			goto out;
+		}
+	}
+
+	/* if all conditions at least one of tag filter is matched then user has access to event */
+	for (i = 0; i < tag_filters.values_num; i++)
+	{
+		tag_filter = (zbx_tag_filter_t *)tag_filters.values[i];
+		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
+		memset(condition, 0, sizeof(DB_CONDITION));
+		condition->conditiontype = CONDITION_TYPE_HOST_GROUP;
+		condition->operator = CONDITION_OPERATOR_EQUAL;
+		zbx_vector_ptr_append(&conditions, condition);
+
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_UI64, tag_filter->hostgrouid);
+		condition->value = zbx_strdup(NULL, tmp);
+
+		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
+		memset(condition, 0, sizeof(DB_CONDITION));
+		condition->conditiontype = CONDITION_TYPE_EVENT_TAG;
+		condition->operator = CONDITION_OPERATOR_EQUAL;
+		condition->value = zbx_strdup(NULL, tag_filter->tag);
+		zbx_vector_ptr_append(&conditions, condition);
+
+		if (NULL != tag_filter->value && 0 != strlen(tag_filter->value))
+		{
+			condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
+			memset(condition, 0, sizeof(DB_CONDITION));
+			condition->conditiontype = CONDITION_TYPE_EVENT_TAG_VALUE;
+			condition->operator = CONDITION_OPERATOR_EQUAL;
+			condition->value2 = zbx_strdup(NULL, tag_filter->tag);
+			condition->value = zbx_strdup(NULL, tag_filter->value);
+			zbx_vector_ptr_append(&conditions, condition);
+		}
+
+		for (n = 0; n < conditions.values_num; n++)
+		{
+			if (FAIL == check_action_condition(event, (DB_CONDITION *)conditions.values[n]))
+				break;
+		}
+
+		if (n == conditions.values_num)
+		{
+			ret = SUCCEED;
+			goto out;
+		}
+	}
+out:
+	DBfree_result(result);
+
+	zbx_vector_ptr_clear_ext(&tag_filters, (zbx_clean_func_t)zbx_tag_filter_free);
+	for (i = 0; i < conditions.values_num; i++)
+		zbx_db_condition_clean(((DB_CONDITION *)conditions.values[i]));
+
+	zbx_vector_ptr_destroy(&tag_filters);
+	zbx_vector_ptr_destroy(&conditions);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_trigger_permission                                           *
  *                                                                            *
  * Purpose: Return user permissions for access to trigger                     *
@@ -174,32 +318,49 @@ out:
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
+static int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
 {
-	const char	*__function_name = "get_trigger_permission";
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		perm = PERM_DENY, host_perm;
-	zbx_uint64_t	hostid;
+	const char		*__function_name = "get_trigger_permission";
+	int			perm = PERM_DENY;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	hostgroupids;
+	zbx_uint64_t		hostgroupid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	triggerid = event->objectid;
+
+	zbx_vector_uint64_create(&hostgroupids);
+	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (USER_TYPE_SUPER_ADMIN == get_user_type(userid))
+	{
+		perm = PERM_READ_WRITE;
+		goto out;
+	}
+
 	result = DBselect(
-			"select distinct i.hostid"
-			" from items i,functions f"
-			" where i.itemid=f.itemid"
+			"select distinct hg.groupid from items i"
+			" join functions f on i.itemid=f.itemid"
+			" join hosts_groups hg on hg.hostid = i.hostid"
 				" and f.triggerid=" ZBX_FS_UI64,
 			triggerid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(hostid, row[0]);
-		host_perm = get_host_permission(userid, hostid);
-
-		if (perm < host_perm)
-			perm = host_perm;
+		ZBX_STR2UINT64(hostgroupid, row[0]);
+		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
 	}
 	DBfree_result(result);
+
+	if (PERM_DENY < (perm = get_hostgroups_permission(userid, &hostgroupids)) &&
+			FAIL == check_tag_based_permission(userid, &hostgroupids, event))
+	{
+		perm = PERM_DENY;
+	}
+out:
+	zbx_vector_uint64_destroy(&hostgroupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_permission_string(perm));
 
@@ -218,22 +379,40 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
  ******************************************************************************/
 static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
 {
-	const char	*__function_name = "get_item_permission";
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		perm = PERM_DENY;
-	zbx_uint64_t	hostid;
+	const char		*__function_name = "get_item_permission";
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			perm = PERM_DENY;
+	zbx_vector_uint64_t	hostgroupids;
+	zbx_uint64_t		hostgroupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select hostid from items where itemid=" ZBX_FS_UI64, itemid);
+	zbx_vector_uint64_create(&hostgroupids);
+	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (NULL != (row = DBfetch(result)))
+	if (USER_TYPE_SUPER_ADMIN == get_user_type(userid))
 	{
-		ZBX_STR2UINT64(hostid, row[0]);
-		perm = get_host_permission(userid, hostid);
+		perm = PERM_READ_WRITE;
+		goto out;
+	}
+
+	result = DBselect(
+			"select hg.groupid from items i"
+			" join hosts_groups hg on hg.hostid = i.hostid"
+			" where i.utemid=" ZBX_FS_UI64,
+			itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostgroupid, row[0]);
+		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
 	}
 	DBfree_result(result);
+
+	perm = get_hostgroups_permission(userid, &hostgroupids);
+out:
+	zbx_vector_uint64_destroy(&hostgroupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_permission_string(perm));
 
@@ -331,7 +510,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event->objectid))
+				if (PERM_READ > get_trigger_permission(userid, event))
 					continue;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -434,7 +613,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 		switch (c_event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, c_event->objectid))
+				if (PERM_READ > get_trigger_permission(userid, c_event))
 					continue;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -507,7 +686,7 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 		if (ack->userid == userid)
 			continue;
 
-		if (SUCCEED != check_perm2system(userid) || PERM_READ > get_trigger_permission(userid, event->objectid))
+		if (SUCCEED != check_perm2system(userid) || PERM_READ > get_trigger_permission(userid, event))
 			continue;
 
 		subject_dyn = zbx_strdup(NULL, subject);
