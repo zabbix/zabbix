@@ -1886,7 +1886,6 @@ clean:
 	xmlFreeDoc(doc);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, disks);
-
 }
 
 /******************************************************************************
@@ -2787,7 +2786,8 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s event_session:'%s'", __function_name, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*event_session));
 
 	return ret;
 }
@@ -2896,7 +2896,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	char		tmp[MAX_STRING_LEN], *event_session = NULL, *event_session_esc;
 	int		err, o, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() event_session:'%s'", __function_name, event_session);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != vmware_service_get_event_session(service, easyhandle, &event_session, error))
 		goto out;
@@ -3476,7 +3476,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vector_str_t	hvs;
 	int			opt, err, i, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, service->username, service->url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
 	data = zbx_malloc(NULL, sizeof(zbx_vmware_data_t));
 	memset(data, 0, sizeof(zbx_vmware_data_t));
@@ -3780,7 +3780,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	zbx_hashset_iter_t		iter;
 	zbx_vector_ptr_t		perfdata;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, service->username, service->url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -3968,7 +3968,7 @@ static void	vmware_service_remove(zbx_vmware_service_t *service)
 	const char	*__function_name = "vmware_service_remove";
 	int		index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, service->username, service->url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
 	zbx_vmware_lock();
 
@@ -4016,7 +4016,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	int			i, now;
 	zbx_vmware_service_t	*service = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, username, url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, username, url);
 
 	if (NULL == vmware)
 		goto out;
