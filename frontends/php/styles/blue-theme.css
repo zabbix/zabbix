@@ -796,6 +796,9 @@ footer, .footer {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
 
+.table-forms .table-forms-td-right .small-cell-padding td {
+  padding: 0 5px 5px 0; }
+
 .multiselect-wrapper {
   position: relative;
   vertical-align: top;
