@@ -52,7 +52,33 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function checkPermissions() {
-		return  !($this->getUserType() < USER_TYPE_ZABBIX_USER);
+		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+			return false;
+		}
+
+		if ($this->hasInput('groupid') && $this->getInput('groupid') != 0) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => [$this->getInput('groupid')]
+			]);
+
+			if (!$groups) {
+				return false;
+			}
+		}
+
+		if ($this->hasInput('hostid') && $this->getInput('hostid') != 0) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => [$this->getInput('hostid')]
+			]);
+
+			if (!$hosts) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
