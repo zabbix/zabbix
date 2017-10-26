@@ -163,7 +163,8 @@ class testPageProblems extends CWebTest {
 
 		// Select trigger
 		$this->zbxTestClickAndSwitchToNewWindow('//div[@id="filter_triggerids_"]/..//button');
-		$this->zbxTestDropdownSelectWait('hostid', 'ЗАББИКС Сервер');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestDropdownSelect('hostid', 'ЗАББИКС Сервер');
 		$this->zbxTestCheckboxSelect("triggers_'99250'");
 		$this->zbxTestCheckboxSelect("triggers_'99251'");
 		$this->zbxTestClick('select');
