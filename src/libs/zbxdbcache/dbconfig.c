@@ -147,14 +147,10 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 								0 == strcmp(arg3, "items_unsupported"))
 						{
 							ret = SUCCEED;
-							goto clean;
 						}
 					}
 					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
-					{
 						ret = SUCCEED;
-						goto clean;
-					}
 				}
 				else if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg3, "lastaccess"))
 					ret = SUCCEED;

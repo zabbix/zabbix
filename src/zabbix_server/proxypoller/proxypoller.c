@@ -697,6 +697,8 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more, time_t *last_access)
 		goto out;
 	}
 
+	*last_access = time(NULL);
+
 	ret = proxy_process_proxy_data(proxy, answer, &ts, more);
 
 	zbx_free(answer);

@@ -25,7 +25,7 @@
 class CProblemsWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data);
+		parent::__construct($data, WIDGET_PROBLEMS);
 
 		$this->data = self::convertDottedKeys($this->data);
 
