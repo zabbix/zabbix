@@ -61,6 +61,7 @@ foreach ($data['expressions'] as $i => $expression) {
 			expression_type2str()
 		))->onChange('onChangeExpressionType(this, '.$i.')'),
 		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
+			->setAttribute('aria-required', 'true')
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 		$exp_delimiter,
 		(new CCheckBox('expressions['.$i.'][case_sensitive]', '1'))->setChecked($expression['case_sensitive'] == 1)
@@ -103,7 +104,6 @@ $exprTab = (new CFormList('exprTab'))
 		(new CDiv($exprTable))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-			->setAttribute('aria-required', 'true')
 	);
 
 /*

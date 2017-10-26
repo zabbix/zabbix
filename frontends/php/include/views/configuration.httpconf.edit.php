@@ -50,11 +50,12 @@ if (!empty($this->data['templates'])) {
 
 // Name
 $nameTextBox = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
+	->setAttribute('aria-required', 'true')
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if (!$this->data['templated']) {
 	$nameTextBox->setAttribute('autofocus', 'autofocus');
 }
-$httpFormList->addRow(_('Name'), $nameTextBox);
+$httpFormList->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $nameTextBox);
 
 // Application
 if ($this->data['application_list']) {
@@ -259,7 +260,7 @@ if (!$this->data['templated']) {
 	);
 }
 
-$httpStepFormList->addRow(_('Steps'),
+$httpStepFormList->addRow((new CLabel(_('Steps')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CDiv($stepsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 

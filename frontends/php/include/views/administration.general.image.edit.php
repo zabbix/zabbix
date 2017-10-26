@@ -47,6 +47,10 @@ $imageFormList = (new CFormList('imageFormList'))
 			: null
 		),
 		(new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', (!array_key_exists('imageid', $data) || is_null($data['imageid']))
+				? 'true'
+				: ''
+			)
 	);
 
 if (isset($this->data['imageid'])) {

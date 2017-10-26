@@ -503,6 +503,7 @@ jQuery(function($) {
 				});
 				if (obj.attr('aria-required')) {
 					input.attr('aria-required', obj.attr('aria-required'));
+					obj.removeAttr('aria-required');
 				}
 				obj.append(input);
 			}

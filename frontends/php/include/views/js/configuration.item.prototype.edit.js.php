@@ -40,9 +40,14 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'v
 				&& type != <?php echo ITEM_TYPE_JMX; ?>
 		)
 
-		jQuery('label[for=username]').removeClass(asterisk).addClass(
-			(type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) ? asterisk : ''
-		);
+		if ((type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>)) {
+			jQuery('label[for=username]').addClass(asterisk);
+			jQuery('input[name=username]').attr('aria-required', 'true');
+		}
+		else {
+			jQuery('label[for=username]').removeClass(asterisk);
+			jQuery('input[name=username]').removeAttr('aria-required');
+		}
 	}
 
 	jQuery(document).ready(function() {

@@ -2047,7 +2047,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						),
 						(new CTextBox('new_ack_operation[opcommand][script]',
 							$data['new_ack_operation']['opcommand']['script'], true
-						))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAttribute('aria-required', 'true'),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton('select_ack_operation_opcommand_script', _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)

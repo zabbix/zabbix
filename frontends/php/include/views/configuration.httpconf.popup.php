@@ -83,13 +83,15 @@ else {
 		->addVar('steps_names', getRequest('steps_names'));
 
 	$httpPopupFormList = (new CFormList())
-		->addRow(_('Name'),
+		->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			(new CTextBox('name', getRequest('name', ''), (bool) getRequest('templated'), 64))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('aria-required', 'true')
 		)
-		->addRow(_('URL'),
+		->addRow((new CLabel(_('URL')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			new CDiv([
 				(new CTextBox('url', getRequest('url', ''), false, null))
+					->setAttribute('aria-required', 'true')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('parse', _('Parse')))

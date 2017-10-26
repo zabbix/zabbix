@@ -118,7 +118,9 @@ else {
 	}
 }
 
-$templateList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
+$templateList->addRow((new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$groupsTB->get(_('In groups'), _('Other groups'))
+);
 
 // FORM ITEM : new group text box [  ]
 $new_group = (new CTextBox('newgroup', $newgroup))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
