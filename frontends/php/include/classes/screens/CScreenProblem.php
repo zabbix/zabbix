@@ -304,6 +304,9 @@ class CScreenProblem extends CScreenBase {
 					&& $config['event_ack_enable']) {
 				$options['acknowledged'] = false;
 			}
+			if (array_key_exists('evaltype', $filter)) {
+				$options['evaltype'] = $filter['evaltype'];
+			}
 			if (array_key_exists('tags', $filter) && $filter['tags']) {
 				$options['tags'] = $filter['tags'];
 			}
