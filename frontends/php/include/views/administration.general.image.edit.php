@@ -39,6 +39,7 @@ $imageFormList = (new CFormList('imageFormList'))
 		(new CTextBox('name', $this->data['imagename'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(
 		(new CLabel(_('Upload')))->addClass((!array_key_exists('imageid', $data) || is_null($data['imageid']))

@@ -127,6 +127,7 @@ $frmMedia = (new CFormList(_('Media')))
 	->addRow(
 		(new CLabel(_('Send to')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('When active'), (new CTextBox('period', $period, false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Use if severity'), $frm_row)

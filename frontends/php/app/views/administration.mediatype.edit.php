@@ -38,6 +38,7 @@ $mediaTypeForm = (new CForm())
 // create form list
 $nameTextBox = (new CTextBox('description', $data['description'], false, 100))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('aria-required', 'true')
 	->setAttribute('autofocus', 'autofocus');
 $mediaTypeFormList = (new CFormList())
 	->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $nameTextBox);
@@ -127,7 +128,7 @@ if ($data['passwd'] != '') {
 	];
 }
 else {
-	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAttribute('aria-required', 'true');
 }
 
 // append password field to form list

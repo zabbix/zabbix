@@ -34,6 +34,7 @@ $hostGroupFormList = new CFormList('hostgroupFormList');
 $nameTextBox = (new CTextBox('name', $this->data['name'],
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ))
+	->setAttribute('aria-required', 'true')
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 $nameTextBox->setAttribute('autofocus', 'autofocus');
 $hostGroupFormList->addRow((new CLabel(_('Group name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $nameTextBox);

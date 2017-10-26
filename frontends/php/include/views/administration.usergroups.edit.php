@@ -37,6 +37,7 @@ $userGroupFormList = (new CFormList())
 		(new CLabel(_('Group name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('gname', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	);
 

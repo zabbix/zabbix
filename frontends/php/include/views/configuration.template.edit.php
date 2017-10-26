@@ -77,6 +77,7 @@ $templateList = (new CFormList('hostlist'))
 		(new CLabel(_('Template name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('template_name', $host, false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))

@@ -37,6 +37,7 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('mname', $this->data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Maintenance type'),

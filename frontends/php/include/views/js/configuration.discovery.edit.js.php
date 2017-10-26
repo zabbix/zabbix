@@ -47,21 +47,21 @@
 					<td><label for="snmp_community" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('SNMP community') ?></label></td>
 					<td>
 						<input type="text" id="snmp_community" name="snmp_community" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255" aria-required="true">
 					</td>
 				</tr>
 				<tr id="newCheckKeyRow">
 					<td><label for="key_" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('Key') ?></label></td>
 					<td>
 						<input type="text" id="key_" name="key_" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255" aria-required="true">
 					</td>
 				</tr>
 				<tr id="new_check_snmp_oid_row">
 					<td><label for="snmp_oid" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('SNMP OID') ?></label></td>
 					<td>
 						<input type="text" id="snmp_oid" name="snmp_oid" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="512">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="512" aria-required="true">
 					</td>
 				</tr>
 				<tr id="newCheckContextRow">

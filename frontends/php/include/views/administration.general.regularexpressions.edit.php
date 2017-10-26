@@ -96,12 +96,14 @@ $exprTab = (new CFormList('exprTab'))
 		(new CTextBox('name', $data['name'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(
 		(new CLabel(_('Expressions')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CDiv($exprTable))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setAttribute('aria-required', 'true')
 	);
 
 /*

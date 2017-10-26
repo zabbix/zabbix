@@ -36,6 +36,7 @@ $correlation_tab = (new CFormList())
 		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $data['correlation']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -113,6 +114,7 @@ switch ($data['new_condition']['type']) {
 	case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 		$condition = (new CTextBox('new_condition[tag]'))
 			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('aria-required', 'true')
 			->setAttribute('placeholder', _('tag'));
 		break;
 

@@ -501,6 +501,9 @@ jQuery(function($) {
 					$(obj).removeClass('active');
 					cleanSearchInput(obj);
 				});
+				if (obj.attr('aria-required')) {
+					input.attr('aria-required', obj.attr('aria-required'));
+				}
 				obj.append(input);
 			}
 

@@ -46,15 +46,18 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$form->addVar($field->getName(), $field->getValue());
 		continue;
 	}
+	$aria_required = ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK) ? 'true' : '';
 
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow($field->getStyledLabel(),
 			(new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
+				->setAttribute('aria-required', $aria_required)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldTextBox || $field instanceof CWidgetFieldUrl) {
 		$form_list->addRow($field->getStyledLabel(),
 			(new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('aria-required', $aria_required)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldCheckBox) {
@@ -75,7 +78,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 					'&srcfld1=groupid&multiselect=1'
 			],
 			'add_post_js' => false
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', $aria_required);
 
 		$form_list->addRow($field->getStyledLabel(), $field_groupids);
 
@@ -93,7 +97,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 					'&srcfld1=hostid&multiselect=1'
 			],
 			'add_post_js' => false
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', $aria_required);
 
 		$form_list->addRow($field->getStyledLabel(), $field_hostids);
 
@@ -118,7 +123,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 		// Needed for popup script.
 		$form->addVar($field->getName(), $field->getValue());
 		$form_list->addRow($field->getStyledLabel(), [
-			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('aria-required', $aria_required),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -129,6 +135,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$form_list->addRow($field->getStyledLabel(),
 			(new CComboBox($field->getName(), [], $field->getAction(), []))
 				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+				->setAttribute('aria-required', $aria_required)
 		);
 
 		$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
@@ -137,6 +144,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$form_list->addRow($field->getStyledLabel(),
 			(new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength()))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->setAttribute('aria-required', $aria_required)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldRadioButtonList) {
@@ -201,9 +209,11 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 		$jq_templates['tag-row'] = (new CRow([
 			(new CTextBox($field->getName().'[#{rowNum}][tag]'))
+				->setAttribute('aria-required', $aria_required)
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CTextBox($field->getName().'[#{rowNum}][value]'))
+				->setAttribute('aria-required', $aria_required)
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(

@@ -42,6 +42,7 @@ $servicesFormList = (new CFormList('servicesFormList'))
 		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $this->data['name'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -268,18 +269,22 @@ else {
 	}
 	$timeFromHourTextBox = (new CTextBox('new_service_time[from_hour]', isset($_REQUEST['new_service_time']['from_hour'])
 			? $_REQUEST['new_service_time']['from_hour'] : '', false, 2))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('hh'));
 	$timeFromMinuteTextBox = (new CTextBox('new_service_time[from_minute]', isset($_REQUEST['new_service_time']['from_minute'])
 			? $_REQUEST['new_service_time']['from_minute'] : '', false, 2))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('mm'));
 	$timeToHourTextBox = (new CTextBox('new_service_time[to_hour]', isset($_REQUEST['new_service_time']['to_hour'])
 			? $_REQUEST['new_service_time']['to_hour'] : '', false, 2))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('hh'));
 	$timeToMinuteTextBox = (new CTextBox('new_service_time[to_minute]', isset($_REQUEST['new_service_time']['to_minute'])
 			? $_REQUEST['new_service_time']['to_minute'] : '', false, 2))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('mm'));
 

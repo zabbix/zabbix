@@ -68,6 +68,7 @@ if (isset($hostPrototype['hostid'])) {
 $hostTB = (new CTextBox('host', $hostPrototype['host'], (bool) $hostPrototype['templateid']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 128)
+	->setAttribute('aria-required', 'true')
 	->setAttribute('autofocus', 'autofocus');
 $hostList->addRow((new CLabel(_('Host name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $hostTB);
 
@@ -207,6 +208,7 @@ $groupList->addRow(
 				'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
 		]
 	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true')
 );
 
 // new group prototypes

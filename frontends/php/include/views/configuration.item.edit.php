@@ -62,6 +62,7 @@ $itemFormList->addRow(
 	(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('name', $data['name'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true')
 		->setAttribute('autofocus', 'autofocus')
 );
 
@@ -77,7 +78,9 @@ else {
 }
 
 // Append key to form list.
-$key_controls = [(new CTextBox('key', $data['key'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)];
+$key_controls = [(new CTextBox('key', $data['key'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('aria-required', 'true')
+];
 
 if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -90,7 +93,8 @@ if (!$readonly) {
 $itemFormList->addRow((new CLabel(_('Key')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $key_controls);
 
 // Append master item select.
-$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
 ];
 
@@ -165,7 +169,8 @@ if ($data['interfaces']) {
 // Append SNMP common fields fields.
 $itemFormList->addRow(
 	(new CLabel(_('SNMP OID')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
@@ -176,6 +181,7 @@ $itemFormList->addRow(_('Context name'),
 $itemFormList->addRow(
 	(new CLabel(_('SNMP community')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('snmp_community', $data['snmp_community'], $discovered_item, 64))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_snmp_community'
 );
@@ -259,6 +265,7 @@ $itemFormList->addRow(_('Port'),
 $itemFormList->addRow(
 	(new CLabel(_('IPMI sensor')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_ipmi_sensor'
 );
@@ -287,12 +294,14 @@ $itemFormList->addRow(_('User name'),
 );
 $itemFormList->addRow(
 	(new CLabel(_('Public key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('publickey', $data['publickey'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	(new CTextBox('publickey', $data['publickey'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	'row_publickey'
 );
 $itemFormList->addRow(
 	(new CLabel(_('Private key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('privatekey', $data['privatekey'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	(new CTextBox('privatekey', $data['privatekey'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	'row_privatekey'
 );
 $itemFormList->addRow(_('Password'),
@@ -302,6 +311,7 @@ $itemFormList->addRow(_('Password'),
 $itemFormList->addRow(
 	(new CLabel(_('Executed script')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextArea('params_es', $data['params']))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($discovered_item),
 	'label_executed_script'
@@ -309,6 +319,7 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	(new CLabel(_('SQL query')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextArea('params_ap', $data['params']))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($discovered_item),
 	'label_params'
@@ -316,6 +327,7 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	(new CLabel(_('Formula')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextArea('params_f', $data['params'], $discovered_item))
+		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($discovered_item),
 	'label_formula'

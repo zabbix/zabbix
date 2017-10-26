@@ -49,6 +49,7 @@ if (!$data['is_profile']) {
 		(new CLabel(_('Alias')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('alias', $this->data['alias']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	);
 	$userFormList->addRow(_x('Name', 'user first name'),
@@ -78,6 +79,7 @@ if (!$this->data['is_profile']) {
 					'&multiselect=1'
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 }
 
@@ -87,10 +89,12 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 		$userFormList->addRow(
 			(new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			(new CPassBox('password1', $this->data['password1']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('aria-required', 'true')
 		);
 		$userFormList->addRow(
 			(new CLabel(_('Password (once again)')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			(new CPassBox('password2', $this->data['password2']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('aria-required', 'true')
 		);
 
 		if (isset($this->data['change_password'])) {
