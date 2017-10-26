@@ -499,7 +499,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 		size_t	tmp_alloc = 0, tmp_offset = 0;
 
 		aggregate_quote_groups(&tmp, &tmp_alloc, &tmp_offset, groups);
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key \"%s\" in group(s) %s", itemkey, tmp));
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key \"%s\" in group(s) %s.", itemkey, tmp));
 		zbx_free(tmp);
 
 		goto clean2;
