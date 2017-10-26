@@ -24,6 +24,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+........S. [ZBX-12936] fixed update proxy lastaccess value when receiving data (valdis)
 .......PS. [ZBX-12854] fixed crash of VMware collector with DebugLog=4 (gleb)
 ........S. [ZBX-12903] added floating value range validation for metrics calculated by server (wiper)
 ..F....... [ZBX-12904] added validation for groupid and hostid parameters in dashboard view (vmurzins)
