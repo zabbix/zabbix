@@ -235,33 +235,16 @@ class CScreenDiscovery extends CScreenBase {
 				];
 
 				foreach ($services as $name => $foo) {
-					$class = null;
-					$time = SPACE;
-					$hint = (new CDiv(SPACE))->addClass($class);
-
-					$hint_table = null;
 					if (array_key_exists($name, $h_data['services'])) {
 						$class = $h_data['services'][$name]['class'];
-						$time = $h_data['services'][$name]['time'];
-
-						$hint_table = (new CTableInfo())->setAttribute('style', 'width: auto;');
-
-						if ($class == ZBX_STYLE_ACTIVE_BG) {
-							$hint_table->setHeader(_('Uptime'));
-						}
-						else {
-							$hint_table->setHeader(_('Downtime'));
-						}
-
-						$hint_table->addRow(
-							(new CCol(zbx_date2age($h_data['services'][$name]['time'])))->addClass($class)
-						);
+						$time = zbx_date2age($h_data['services'][$name]['time']);
 					}
-					$column = (new CCol($hint))->addClass($class);
-					if (!is_null($hint_table)) {
-						$column->setHint($hint_table);
+					else {
+						$class = null;
+						$time = SPACE;
 					}
-					$row[] = $column;
+
+					$row[] = (new CCol($time))->addClass($class);
 				}
 				$table->addRow($row);
 			}
