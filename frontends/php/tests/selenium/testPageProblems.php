@@ -162,8 +162,7 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestInputType('filter_application', 'Processes');
 
 		// Select trigger
-		$this->zbxTestClickXpath('//div[@id="filter_triggerids_"]/..//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestClickAndSwitchToNewWindow('//div[@id="filter_triggerids_"]/..//button');
 		$this->zbxTestDropdownSelectWait('hostid', 'ЗАББИКС Сервер');
 		$this->zbxTestCheckboxSelect("triggers_'99250'");
 		$this->zbxTestCheckboxSelect("triggers_'99251'");
