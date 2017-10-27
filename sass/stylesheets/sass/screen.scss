@@ -1517,6 +1517,10 @@ footer {
 		vertical-align: middle;
 		width: 85%;
 
+		&.has-before {
+			padding-top: 0px;
+		}
+
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
@@ -1643,6 +1647,8 @@ footer {
 		padding: 4px 11px;
 		border: 1px solid $form-border-color;
 		@include transition(background-color .2s ease-out);
+		line-height: 1.2em;
+		display: inline-block;
 	}
 
 	input[type="radio"] {

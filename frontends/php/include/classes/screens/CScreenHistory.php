@@ -279,10 +279,17 @@ class CScreenHistory extends CScreenBase {
 				}
 
 				$historyData = API::History()->get($options);
-				CArrayHelper::sort($historyData, [
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				]);
+				// TODO: For multiple
+
+				if ($this->plaintext) {
+					CArrayHelper::sort($historyData, [
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					]);
+				}
+				else {
+					$pagination = getPagingLine($historyData, ZBX_SORT_DOWN, new Curl(''));
+				}
 
 				foreach ($historyData as $data) {
 					$item = $items[$data['itemid']];
@@ -312,8 +319,11 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 
-				if (empty($this->plaintext)) {
-					$output[] = $historyTable;
+				if (!$this->plaintext) {
+					$output[] = [
+						$historyTable,
+						$pagination
+					];
 				}
 			}
 		}

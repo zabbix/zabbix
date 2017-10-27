@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha1');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050000);
+define('ZABBIX_DB_VERSION',		3050001);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -850,6 +850,12 @@ define('EVENT_OBJECT_DSERVICE',			2);
 define('EVENT_OBJECT_AUTOREGHOST',		3);
 define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
+
+// Problem and event tag constants.
+define('TAG_EVAL_TYPE_AND',		0);
+define('TAG_EVAL_TYPE_OR',		1);
+define('TAG_OPERATOR_LIKE',		0);
+define('TAG_OPERATOR_EQUAL',	1);
 
 define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
 define('GRAPH_YAXIS_TYPE_FIXED',		1);
