@@ -1579,6 +1579,13 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
+AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
+	tests/Makefile
+	tests/zabbix_server/Makefile
+	tests/zabbix_server/escalator/Makefile
+	tests/zabbix_server/taskmanager/Makefile
+)])
+
 AC_OUTPUT([
 	Makefile
 	database/Makefile
@@ -1657,10 +1664,6 @@ AC_OUTPUT([
 	src/zabbix_java/Makefile
 	upgrades/Makefile
 	man/Makefile
-	tests/Makefile
-	tests/zabbix_server/Makefile
-	tests/zabbix_server/escalator/Makefile
-	tests/zabbix_server/taskmanager/Makefile
 	])
 
 echo "
