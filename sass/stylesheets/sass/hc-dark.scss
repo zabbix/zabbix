@@ -1,0 +1,355 @@
+// NOTIFICATION & ALERT
+$red: #ff5050;
+$light-red: #ff3a3a;
+$lighter-red: #ff5050;
+
+$dark-yellow: #e99003;
+$yellow: #a78820;
+$light-yellow: #2f280a;
+$lighter-yellow: #222;
+
+$green: #23d545;
+$light-green: #23d545;
+$lighter-green: #44e763;
+
+$blue: #429ae3;
+
+$white: #000 !important;
+
+// MAIN
+$main-nav-bg-color: #000;
+$main-subnav-bg-color: #e0e0e0;
+$main-subnav-bg-selected-color: #000;
+$main-color: #fff;
+$font-color: #fff;
+$font-selected-color: #fff;
+$font-alt-color: #cacaca;
+$body-bg-color: #111;
+$overlay-bg-color: #222;
+
+
+// UI
+$ui-bg-color: #000;
+$ui-bg-selected-color: #ddd;
+$ui-hover-color: #222;
+$ui-border-color: #444;
+
+$action-hover-color: #454545;
+$action-border-color: #666;
+$action-shadow-color: rgba(#000, 0.5);
+
+$table-border-color: #333;
+
+$ui-tab-bg-selected-color: #fff;
+
+
+// FORMS
+$form-font-color: #e1e3ed;
+$form-bg-color: #383838;
+$form-border-color: #666;
+$form-border-focus-color: #bbb;
+
+$form-disabled-font-color: #7d7d7d;
+$form-disabled-bg-color: #000;
+$form-disabled-border-color: #5a5a5a;
+
+$scrollbar-track-color: #1f1f1f;
+$scrollbar-thumb-color: #999;
+$scrollbar-thumb-color-darken: 30%;
+
+// BUTTONS
+$btn-font-color: #333;
+$btn-bg-color: #e0e0e0;
+$btn-border-color: #333;
+
+$btn-alt-font-color: #fff;
+$btn-alt-bg-color: transparent;
+$btn-alt-border-color: $btn-border-color;
+
+$btn-form-font-color: #f2f2f2;
+$btn-form-bg-color: $form-bg-color;
+$btn-form-hover-color: #414141;
+$btn-form-border-color: $form-border-color;
+
+$btn-disabled-font-color: #7d7d7d;
+$btn-disabled-bg-color: transparent;
+$btn-disabled-border-color: #7d7d7d;
+
+$btn-back-map-background-color: rgba(0, 0, 0, 0.8);
+$btn-back-text-color: white;
+$btn-back-background-hover: #8f8f8f;
+
+// LINKS
+$link-color: #f8f8f8;
+$link-hover-color: #fff;
+$link-active-color: #f8f8f8;
+$link-visited-color: #f8f8f8;
+
+$link-main-nav-color: rgba(#fff, 0.8);
+$link-main-nav-hover-color: rgba(#fff, 1);
+$link-main-nav-active-color: rgba(#fff, 1);
+$link-main-nav-visited-color: rgba(#fff, 0.8);
+
+$link-main-subnav-color: rgba(#000, 0.8);
+$link-main-subnav-hover-color: rgba(#000, 1);
+$link-main-subnav-active-color: rgba(#000, 1);
+$link-main-subnav-visited-color: rgba(#000, 0.8);
+
+// ANALOG CLOCK
+$clock-face-color: #000;
+$clock-hand-color: #fff;
+$clock-hand-sec-color: #999;
+$clock-lines-color: #888;
+
+.top-nav-help {
+	background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important;
+}
+.top-nav-profile {
+	background: url(../img/icon-sprite.svg) no-repeat -84px -104px !important;
+}
+.top-nav-signout {
+	background: url(../img/icon-sprite.svg) no-repeat -84px -140px !important;
+}
+.top-nav-zbbshare {
+	background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important;
+}
+.btn-search {
+	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
+}
+.btn-back-map {
+	.btn-back-map-icon {
+		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
+	}
+}
+
+.btn-dashbrd-conf {
+	background: url(../img/icon-sprite.svg) no-repeat -354px -619px !important;
+}
+
+.list-table {
+	thead th {
+		border-color: lighten($table-border-color, 3%) !important;
+	}
+}
+
+.timeline-axis {
+	border-right-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
+
+	&::before {
+		background-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
+	}
+}
+
+.icon {
+	.center {
+		background: url(../img/icon-sprite.svg) no-repeat -325px -799px !important;
+	}
+}
+
+.status-dark-grey {
+	border: none !important;
+	background-color: #666 !important;
+}
+
+.btn-link {
+	font-weight: bold !important;
+	color: #fff !important;
+}
+
+.top-subnav a {
+	&.selected {
+		border-bottom: 4px solid #000 !important;
+	}
+}
+
+.na-bg:before {
+	position: relative;
+}
+
+.na-bg:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -106px -443px;
+	float: left;
+	width: 22px;
+	height: 20px;
+	position: relative;
+	margin: -1px 10px -4px 5px;
+}
+
+.normal-bg:before {
+	position: relative;
+}
+
+.normal-bg:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -76px -443px;
+	float: left;
+	width: 22px;
+	height: 20px;
+	position: relative;
+	margin: -1px 10px -4px 5px;
+}
+
+.info-bg {
+	input[type="radio"] {
+		&:checked + label {
+			@extend .radio-segmented;
+		}
+	}
+}
+
+.info-bg:before {
+	position: relative;
+	height: 20px;
+}
+
+.info-bg:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -136px -443px;
+	float: left;
+	width: 22px;
+	height: 20px;
+	position: relative;
+	margin: -1px 10px -4px 5px;
+}
+
+.average-bg:before {
+	position: relative;
+	height: 20px;
+}
+
+.average-bg:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -196px -443px;
+	float: left;
+	width: 22px;
+	height: 20px;
+	position: relative;
+	margin: 0px 10px -4px 5px;
+}
+
+.warning-bg:before {
+	position: relative;
+	height: 20px;
+}
+
+.warning-bg:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -166px -443px;
+	float: left;
+	width: 22px;
+	height: 20px;
+	position: relative;
+	margin: -1px 10px -4px 5px;
+}
+
+.high-bg:before {
+	position: relative;
+	height: 20px;
+}
+
+.high-bg:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -226px -443px;
+	float: left;
+	width: 22px;
+	height: 20px;
+	position: relative;
+	margin: 0px 10px -4px 5px;
+}
+
+.disaster-bg:before {
+	position: relative;
+	height: 20px;
+}
+
+.disaster-bg:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -256px -443px;
+	float: left;
+	width: 22px;
+	height: 20px;
+	position: relative;
+	margin: 0px 10px -4px 5px;
+}
+
+.filter-trigger {
+	.arrow-down {
+		border-top-color: #000 !important;
+	}
+}
+
+.top-subnav a {
+	&.selected {
+		font-weight: bold;
+	}
+}
+
+.subfilter-enabled {
+	background-color: #000 !important;
+}
+
+.subfilter-disable-btn {
+	background-color: #000 !important;
+
+	&:active {
+	background-color: red !important;
+	}
+}
+
+// Important! @import string should come after variables
+@import 'screen.scss';
+
+$form-icon-btn: (
+	help: url(../img/icon-sprite.svg) no-repeat -168px -726px,
+	cal: url(../img/icon-sprite.svg) no-repeat -204px -834px,
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -168px -617px
+);
+
+@each $form-icon-btn, $bgimage in $form-icon-btn {
+	.icon-#{$form-icon-btn} {
+		background: $transparent $bgimage;
+		@extend %form-icon-btn;
+
+		@if $form-icon-btn == 'wzrd-action' {
+			margin-top: -16px;
+		}
+	}
+}
+
+$icon-btn: (
+	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -187px,
+	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -223px,
+	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -259px,
+	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -295px,
+	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -329px,
+	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -367px,
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -403px,
+	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -439px
+);
+
+@each $icon-btn, $bgimage in $icon-btn {
+	.btn-#{$icon-btn} {
+		background: $bgimage;
+		@extend %button-icon-size;
+	}
+}
+
+$icon-widget-btn: (
+	widget-action: url(../img/icon-sprite.svg) no-repeat -317px -616px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -351px -617px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -351px -580px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
+);
+
+@each $icon-widget-btn, $bgimage in $icon-widget-btn {
+	.btn-#{$icon-widget-btn} {
+		background: $bgimage;
+		@extend %btn-widget;
+	}
+}
