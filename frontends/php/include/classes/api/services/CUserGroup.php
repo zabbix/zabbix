@@ -72,7 +72,7 @@ class CUserGroup extends CApiService {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
 			'selectRights'				=> null,
-			'selectTagFilters'				=> null,
+			'selectTagFilters'			=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
 			'sortfield'					=> '',
@@ -1232,7 +1232,7 @@ class CUserGroup extends CApiService {
 
 		// adding usergroup tag filters
 		if ($options['selectTagFilters'] !== null && $options['selectTagFilters'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'groupid', 'tag_filterid', 'tag', 'value');
+			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'tag_filterid', 'tag_filter');
 
 			if (is_array($options['selectTagFilters'])) {
 				$pk_field = $this->pk('tag_filter');
@@ -1261,7 +1261,7 @@ class CUserGroup extends CApiService {
 			$db_tag_filters = zbx_toHash($db_tag_filters, 'tag_filterid');
 
 			foreach ($db_tag_filters as &$db_tag_filter) {
-				unset($db_tag_filter['tag_filterid'], $db_tag_filter['groupid']);
+				unset($db_tag_filter['tag_filterid']);
 			}
 			unset($db_tag_filter);
 
