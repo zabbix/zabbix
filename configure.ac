@@ -1091,6 +1091,8 @@ esac],
 
 AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
 
+AM_CONDITIONAL([ZBXCMOCKA], [test -d tests/])
+
 have_db="no"
 have_unixodbc="no"
 have_web_monitoring="no"

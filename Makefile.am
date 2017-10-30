@@ -90,6 +90,7 @@ test:
 	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
 
 ## cmocka test support
+if ZBXCMOCKA
 WRAP_DB_FUNCS = \
 	-Wl,--wrap=zbx_db_vselect \
 	-Wl,--wrap=zbx_db_fetch \
@@ -103,5 +104,6 @@ tests:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
 	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS)" LIBS="$(LIBS) -lcmocka"
+endif
 
 .PHONY: test tests
