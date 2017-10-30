@@ -1863,14 +1863,14 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 	$ZBX_MESSAGES = [];
 
-	if (!ZBX_SHOW_SQL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$filtered_messages = [];
 		$generic_exists = false;
 
 		foreach ($messages as $message) {
-			if (array_key_exists('sql_error', $message) && $message['sql_error'] === true) {
+			if (array_key_exists('src', $message) && ($message['src'] === 'sql' || $message['src'] === 'php')) {
 				if (!$generic_exists) {
-					$message['message'] = _('SQL error. Please contact Zabbix administrator.');
+					$message['message'] = _('System error occurred. Please contact Zabbix administrator.');
 					$filtered_messages[] = $message;
 					$generic_exists = true;
 				}
@@ -1978,7 +1978,13 @@ function info($msgs) {
 	}
 }
 
-function error($msgs) {
+/*
+ * Add an error to global message array.
+ *
+ * @param string | array $msg	Error message text.
+ * @param string		 $src	The source of error message.
+ */
+function error($msgs, $src = '') {
 	global $ZBX_MESSAGES;
 
 	if (!isset($ZBX_MESSAGES)) {
@@ -1988,7 +1994,11 @@ function error($msgs) {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg];
+		$ZBX_MESSAGES[] = [
+			'type' => 'error',
+			'message' => $msg,
+			'src' => $src
+		];
 	}
 }
 
@@ -2003,21 +2013,6 @@ function error_group($data) {
 	foreach (zbx_toArray($data['msgs']) as $msg) {
 		error($data['header'] . ' ' . $msg);
 	}
-}
-
-/**
- * Add SQL error message to global messages array.
- *
- * @param string $msg		Error message text.
- */
-function sqlError($msg) {
-	global $ZBX_MESSAGES;
-
-	if (!isset($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = [];
-	}
-
-	$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg, 'sql_error' => true];
 }
 
 function clear_messages($count = null) {
@@ -2430,7 +2425,7 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	}
 
 	// Don't show the call to this handler function.
-	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
+	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
 }
 
 /**
