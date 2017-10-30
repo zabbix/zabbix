@@ -207,6 +207,38 @@ sub process_json($$$)
 
 ######################
 #                    #
+# escaping functions #
+#                    #
+######################
+
+sub escape_str($)
+{
+	my $str = shift;
+
+	$str =~ s/\\/\\\\/;	# replace '\' with '\\'
+	$str =~ s/\|/\\\|/;	# replace '|' with '\|'
+	$str =~ s/\n/\\n/;	# replace LF with '\n'
+	$str =~ s/\r/\\r/;	# replace CR with '\r'
+
+	return $str;
+}
+
+sub escape_arr($)
+{
+	my $arr = shift;
+
+	my $escaped = [];
+
+	foreach my $str (@{$arr})
+	{
+		push(@{$escaped}, escape_str($str));
+	}
+
+	return $escaped;
+}
+
+######################
+#                    #
 # printing functions #
 #                    #
 ######################
@@ -215,66 +247,66 @@ sub print_test_case($)
 {
 	my $test_case = shift;
 
-	print("|CASE|$test_case|\n");
+	print("|CASE|" . escape_str($test_case) . "|\n");
 }
 
 sub print_tested_function($)
 {
 	my $tested_function = shift;
 
-	print("|TESTED_FUNCTION|$tested_function|\n");
+	print("|TESTED_FUNCTION|" . escape_str($tested_function) . "|\n");
 }
 
 sub print_in($$)
 {
 	my $in = shift;
 
-	print("|IN_NAMES|" . join("|", @{$in->{'names'}}) . "|\n");
-	print("|IN_VALUES|" . join("|", @{$in->{'values'}}) . "|\n");
+	print("|IN_NAMES|" . join("|", @{escape_arr($in->{'names'})}) . "|\n");
+	print("|IN_VALUES|" . join("|", @{escape_arr($in->{'values'})}) . "|\n");
 }
 
 sub print_out($)
 {
 	my $out = shift;
 
-	print("|OUT_NAMES|" . join("|", @{$out->{'names'}}) . "|\n");
-	print("|OUT_VALUES|" . join("|", @{$out->{'values'}}) . "|\n");
+	print("|OUT_NAMES|" . join("|", @{escape_arr($out->{'names'})}) . "|\n");
+	print("|OUT_VALUES|" . join("|", @{escape_arr($out->{'values'})}) . "|\n");
 }
 
 sub print_db_data($)
 {
 	my $db_data = shift;
 
-	print("|DB_DATA|" . $db_data . "|\n");
+	print("|DB_DATA|" . escape_str($db_data) . "|\n");
 }
 
 sub print_fields($)
 {
 	my $fields = shift;
 
-	print("|FIELDS|" . join("|", @{$fields}) . "|\n");
+	print("|FIELDS|" . join("|", @{escape_arr($fields)}) . "|\n");
 }
 
 sub print_row($)
 {
 	my $row = shift;
 
-	print("|ROW|" . join("|", @{$row}) . "|\n");
+	print("|ROW|" . join("|", @{escape_arr($row)}) . "|\n");
 }
 
 sub print_function($)
 {
 	my $function = shift;
 
-	print("|FUNCTION|" . $function . "|\n");
+	print("|FUNCTION|" . escape_str($function) . "|\n");
 }
 
 sub print_function_out($)
 {
 	my $function_out = shift;
 
-	print("|FUNC_OUT_PARAMS|" . join("|", @{$function_out->{'params'}}) . "|\n");
-	print("|FUNC_OUT_VALUES|" . join("|", @{$function_out->{'values'}}) . "|\n");
+	print("|FUNC_OUT_PARAMS|" . join("|", @{escape_arr($function_out->{'params'})}) . "|\n");
+	print("|FUNC_OUT_VALUES|" . join("|", @{escape_arr($function_out->{'values'})}) . "|\n");
 }
 
 ######################################################
