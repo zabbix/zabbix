@@ -2631,7 +2631,6 @@ int	DCsync_history(int sync_type, int *total_num)
 					history_string, history_text, history_log);
 		}
 
-
 		now = time(NULL);
 
 		if (ZBX_SYNC_FULL == sync_type && now - sync_start >= 10)
