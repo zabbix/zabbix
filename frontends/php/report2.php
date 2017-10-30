@@ -420,7 +420,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	 */
 	$triggerTable = (new CTableInfo())
 		->setHeader([
-			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
+			_('Host'),
 			_('Name'),
 			_('Problems'),
 			_('Ok'),
@@ -429,17 +429,12 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	$triggers = API::Trigger()->get($triggerOptions);
 
-	if (getRequest('filter_hostid') == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-		foreach ($triggers as &$trigger) {
-			$trigger['host_name'] = $trigger['hosts'][0]['name'];
-		}
-		unset($trigger);
+	foreach ($triggers as &$trigger) {
+		$trigger['host_name'] = $trigger['hosts'][0]['name'];
+	}
+	unset($trigger);
 
-		CArrayHelper::sort($triggers, ['host_name', 'description']);
-	}
-	else {
-		CArrayHelper::sort($triggers, ['description']);
-	}
+	CArrayHelper::sort($triggers, ['host_name', 'description']);
 
 	$paging = getPagingLine($triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
@@ -449,8 +444,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		);
 
 		$triggerTable->addRow([
-			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
-				? $trigger['host_name'] : null,
+			$trigger['host_name'],
 			new CLink($trigger['description'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
