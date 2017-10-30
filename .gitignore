@@ -141,6 +141,7 @@ src/libs/zbxcunit/Makefile
 src/libs/zbxcunit/Makefile.in
 src/libs/zbxcunit/cu_modules.h
 src/libs/zbxdb/.deps
+src/libs/zbxdb/.dirstamp
 src/libs/zbxdb/Makefile
 src/libs/zbxdb/Makefile.in
 src/libs/zbxdbcache/.deps
@@ -288,6 +289,7 @@ src/zabbix_sender/Makefile
 src/zabbix_sender/Makefile.in
 src/zabbix_sender/zabbix_sender
 src/zabbix_server/.deps
+src/zabbix_server/.dirstamp
 src/zabbix_server/Makefile
 src/zabbix_server/Makefile.in
 src/zabbix_server/alerter/.deps
@@ -354,6 +356,7 @@ src/zabbix_server/vmware/Makefile.in
 src/zabbix_server/zabbix_server
 /tags
 tests/.deps
+tests/.dirstamp
 tests/Makefile
 tests/Makefile.in
 tests/zabbix_server/.deps
@@ -362,9 +365,11 @@ tests/zabbix_server/Makefile.in
 tests/zabbix_server/escalator/.deps
 tests/zabbix_server/escalator/Makefile
 tests/zabbix_server/escalator/Makefile.in
+tests/zabbix_server/escalator/process_escalations
 tests/zabbix_server/taskmanager/.deps
 tests/zabbix_server/taskmanager/Makefile
 tests/zabbix_server/taskmanager/Makefile.in
+tests/zabbix_server/taskmanager/try_task_closes_problem
 upgrades/Makefile
 upgrades/Makefile.in
 /zabbix-*.tar.gz
