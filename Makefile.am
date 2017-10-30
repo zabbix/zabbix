@@ -100,7 +100,8 @@ WRAP_DB_FUNCS = \
 	-Wl,--wrap=DBfree_result
 
 tests:
-	$(MAKE) $(AM_MAKEFLAGS)
-	cd tests && $(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS)" LIBS="$(LIBS) -lcmocka"
+	$(MAKE) $(AM_MAKEFLAGS) && \
+	cd tests && \
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS)" LIBS="$(LIBS) -lcmocka"
 
 .PHONY: test tests
