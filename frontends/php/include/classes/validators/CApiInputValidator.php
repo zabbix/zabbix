@@ -219,44 +219,6 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Validate if type of $data is one of API_STRING_UTF8, API_BOOLEAN, API_INT32 or API_OBJECT.
-	 *
-	 * @param mixed  $data
-	 * @param string $types		comma separated values of allowed types.
-	 *
-	 * @return bool
-	 */
-	private static function validateDataType($data, $types) {
-		foreach (explode(',', $types) as $type) {
-			$type_match = false;
-
-			switch ($type) {
-				case API_STRING_UTF8:
-					$type_match = (is_string($data) && mb_check_encoding($data, 'UTF-8'));
-					break;
-
-				case API_BOOLEAN:
-					$type_match = is_bool($data);
-					break;
-
-				case API_INT32:
-					$type_match = (is_int($data) || (is_string($data) && preg_match('/^\-?[0-9]+$/', strval($data))));
-					break;
-
-				case API_OBJECT:
-					$type_match = is_array($data);
-					break;
-			}
-
-			if ($type_match) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Myltiple data types validator.
 	 *
 	 * @param array  $rule
@@ -270,10 +232,7 @@ class CApiInputValidator {
 	 */
 	private static function validateMultiple($rule, &$data, $path, &$error, array $parent_data) {
 		foreach ($rule['rules'] as $field_rule) {
-			if ((array_key_exists('in', $field_rule['if'])
-					&& self::Int32In($parent_data[$field_rule['if']['field']], $field_rule['if']['in']))
-					|| (array_key_exists('typeof', $field_rule['if'])
-					&& self::validateDataType($parent_data[$field_rule['if']['field']], $field_rule['if']['typeof']))) {
+			if (self::Int32In($parent_data[$field_rule['if']['field']], $field_rule['if']['in'])) {
 				unset($field_rule['if']);
 
 				return self::validateData($field_rule, $data, $path, $error);
