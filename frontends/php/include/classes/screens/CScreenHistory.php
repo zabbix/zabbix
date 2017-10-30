@@ -134,22 +134,19 @@ class CScreenHistory extends CScreenBase {
 				'history' => $firstItem['value_type'],
 				'itemids' => $this->itemids,
 				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => ['clock'],
 				'sortorder' => ZBX_SORT_DOWN
 			];
 			if ($this->action == HISTORY_LATEST) {
-				$options += [
-					'sortfield' => ['itemid', 'clock'],
-					'limit' => 500
-				];
+				$options['limit'] = 500;
 			}
-			elseif ($this->action == HISTORY_VALUES) {
+			else {
 				$config = select_config();
 
 				// interval start value is non-inclusive, hence the + 1 second
 				$options += [
 					'time_from' => $stime + 1,
 					'time_till' => $stime + $this->timeline['period'],
-					'sortfield' => ['clock'],
 					'limit' => $config['search_limit']
 				];
 			}
@@ -286,7 +283,7 @@ class CScreenHistory extends CScreenBase {
 				$history_data = API::History()->get($options);
 
 				CArrayHelper::sort($history_data, [
-					['field' => 'itemid', 'order' => ZBX_SORT_DOWN],
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
 					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 				]);
 
@@ -306,6 +303,40 @@ class CScreenHistory extends CScreenBase {
 
 				// Return values as plain text.
 				return $output;
+			}
+			// Item render type: numeric, float. 500 latest values view.
+			elseif ($this->action === HISTORY_LATEST) {
+				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader([
+					(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
+					_('Value')
+				]);
+
+				$history_data = API::History()->get($options);
+				CArrayHelper::sort($history_data, [
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				]);
+
+				foreach ($history_data as $history_row) {
+					$item = $items[$history_row['itemid']];
+					$value = $history_row['value'];
+
+					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						sscanf($value, '%f', $value);
+					}
+
+					if ($item['valuemapid']) {
+						$value = applyValueMap($value, $item['valuemapid']);
+					}
+
+					$history_table->addRow([
+						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
+							->addClass(ZBX_STYLE_NOWRAP),
+						new CPre(zbx_nl2br($value))
+					]);
+				}
+
+				$output[] = $history_table;
 			}
 			// Item render type: numeric, float. HTML table view.
 			else {
@@ -361,8 +392,10 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 
+				$url = new CUrl('history.php');
+				$url->formatGetArguments();
 				// Array $table_rows will be modified according page and rows on page.
-				$pagination = getPagingLine($table_rows, [], new Curl());
+				$pagination = getPagingLine($table_rows, [], $url);
 				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
 
 				foreach ($table_rows as $table_row) {
@@ -443,6 +476,10 @@ class CScreenHistory extends CScreenBase {
 				'filterTask' => $this->filterTask,
 				'markColor' => $this->markColor
 			];
+
+			if ($this->action == HISTORY_VALUES) {
+				$flickerfreeData['page'] = getPageNumber();
+			}
 
 			return $this->getOutput($output, true, $flickerfreeData);
 		}

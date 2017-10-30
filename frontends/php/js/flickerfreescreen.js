@@ -168,10 +168,16 @@
 						}
 
 						ajaxUrl.setArgument('action', empty(screen.data.action) ? null : screen.data.action);
-						ajaxUrl.setArgument('filter', empty(screen.data.filter) ? null : screen.data.filter);
-						ajaxUrl.setArgument('filter_task', empty(screen.data.filterTask)
-							? null : screen.data.filterTask);
-						ajaxUrl.setArgument('mark_color', empty(screen.data.markColor) ? null : screen.data.markColor);
+						// HISTORY_VALUES
+						if (!empty(screen.data.action) && screen.data.action == 'showvalues') {
+							ajaxUrl.setArgument('page', screen.data.page);
+						}
+						else {
+							ajaxUrl.setArgument('filter', empty(screen.data.filter) ? null : screen.data.filter);
+							ajaxUrl.setArgument('filter_task', empty(screen.data.filterTask)
+								? null : screen.data.filterTask);
+							ajaxUrl.setArgument('mark_color', empty(screen.data.markColor) ? null : screen.data.markColor);
+						}
 
 						this.refreshHtml(id, ajaxUrl);
 					}
