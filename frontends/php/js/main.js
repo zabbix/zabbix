@@ -108,7 +108,7 @@ var MMenu = {
 	timeout_change:	null,
 
 	init: function() {
-		// Detects when non of the selected elements are focused.
+		// Detects when none of the selected elements are focused.
 		var elems = jQuery('.top-nav a, .top-subnav a').on('keydown', function(event) {
 			clearTimeout(this.timeout_reset);
 
@@ -155,11 +155,12 @@ var MMenu = {
 						var active_element_index = jQuery('*', 'body').toArray().indexOf(document.activeElement);
 
 						jQuery('*', 'body').filter(function(i) {
-							return i > active_element_index && jQuery(this).is(':focusable');
+							return (i > active_element_index && jQuery(this).is(':focusable'));
 						}).get(0).focus();
 					}
 
 					event.preventDefault();
+
 					return false;
 				}
 			});
