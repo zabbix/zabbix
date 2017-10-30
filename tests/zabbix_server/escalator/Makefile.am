@@ -67,4 +67,8 @@ process_escalations_LDADD = \
 
 process_escalations_LDADD += @SERVER_LIBS@
 
+process_escalations_LDFLAGS = \
+	-Wl,--wrap=substitute_simple_macros \
+	-Wl,--wrap=check_action_condition
+
 process_escalations_CFLAGS = -I@top_srcdir@/tests
