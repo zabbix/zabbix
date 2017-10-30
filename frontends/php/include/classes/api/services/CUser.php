@@ -593,7 +593,7 @@ class CUser extends CApiService {
 							$media['sendto'] = [$media['sendto']];
 						}
 
-						if ($this->validateEmail($media['sendto']) === false) {
+						if (validateEmail($media['sendto']) === false) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Invalid email address for media type with ID "%1$s".', $media['mediatypeid'])
 							);
@@ -608,29 +608,6 @@ class CUser extends CApiService {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Validate if each given string is valid email address.
-	 *
-	 * @param array	$emails
-	 *
-	 * @return boolean
-	 */
-	private function validateEmail(array $emails) {
-		$result = true;
-
-		foreach ($emails as $email) {
-			if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-				preg_match('/.*<(?<email>.*[^>])>/i', $email, $match);
-				if (!array_key_exists('email', $match) || !filter_var($match['email'], FILTER_VALIDATE_EMAIL)) {
-					$result = false;
-					break;
-				}
-			}
-		}
-
-		return $result;
 	}
 
 	/**

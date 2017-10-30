@@ -41,7 +41,7 @@ $fields = [
 
 	'media'=>		[T_ZBX_INT, O_OPT,	P_SYS,	null,			null],
 	'mediatypeid'=>	[T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({add})'],
-	'sendto'=>		[null,		O_OPT,	null,	NOT_EMPTY,		'isset({add})'],
+	'sendto'=>		[T_ZBX_STR,	O_OPT,	null,	NOT_EMPTY,		'isset({add})'],
 	'period' =>		[T_ZBX_TP,  O_OPT,  null,   null,  'isset({add})', _('When active')],
 	'active'=>		[T_ZBX_INT, O_OPT,	null,	IN([MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]), null],
 
@@ -54,7 +54,48 @@ $fields = [
 ];
 check_fields($fields);
 
+$mediatypes = API::MediaType()->get([
+	'output' => ['type', 'description'],
+	'preservekeys' => true
+]);
+CArrayHelper::sort($mediatypes, ['description']);
+
+$media_types = [];
+$default_mediatypeid = 0;
+foreach ($mediatypes as $mtid => &$mediatype) {
+	if ($default_mediatypeid == 0) {
+		$default_mediatypeid = $mtid;
+	}
+	$media_types[$mtid] = $mediatype['type'];
+	$mediatype = $mediatype['description'];
+}
+unset($mediatype);
+
+$send_to = getRequest('sendto', '');
+$mediatypeid = getRequest('mediatypeid', $default_mediatypeid);
+
+$email_send_to = $send_to;
+if (array_key_exists($mediatypeid, $media_types) && $media_types[$mediatypeid] == MEDIA_TYPE_EMAIL) {
+	if (!is_array($email_send_to)) {
+		$email_send_to = [$email_send_to];
+	}
+
+	if (isset($_REQUEST['add']) && !validateEmail($email_send_to)) {
+		error('Invalid email address.');
+	}
+
+	$send_to = '';
+}
+else {
+	$email_send_to = [''];
+}
+
 insert_js_function('add_media');
+
+$has_error_msgs = hasErrorMesssages();
+if ($has_error_msgs) {
+	show_messages(false, null, _('Page received incorrect data'));
+}
 
 if (isset($_REQUEST['add'])) {
 	$severity = 0;
@@ -63,15 +104,17 @@ if (isset($_REQUEST['add'])) {
 		$severity |= 1 << $id;
 	}
 
-	echo '<script type="text/javascript">
-			add_media('.CJs::encodeJson($_REQUEST['dstfrm']).','.
-			CJs::encodeJson($_REQUEST['media']).','.
-			CJs::encodeJson($_REQUEST['mediatypeid']).','.
-			CJs::encodeJson($_REQUEST['sendto']).','.
-			CJs::encodeJson($_REQUEST['period']).','.
-			CJs::encodeJson(getRequest('active', MEDIA_STATUS_DISABLED)).','.
-			$severity.');'.
-			'</script>';
+	if (!$has_error_msgs) {
+		echo '<script type="text/javascript">
+				add_media('.CJs::encodeJson($_REQUEST['dstfrm']).','.
+				CJs::encodeJson($_REQUEST['media']).','.
+				CJs::encodeJson($_REQUEST['mediatypeid']).','.
+				CJs::encodeJson($_REQUEST['sendto']).','.
+				CJs::encodeJson($_REQUEST['period']).','.
+				CJs::encodeJson(getRequest('active', MEDIA_STATUS_DISABLED)).','.
+				$severity.');'.
+				'</script>';
+	}
 }
 
 $config = select_config();
@@ -95,26 +138,7 @@ else {
 	$severities = getRequest('severity', array_keys($severityNames));
 }
 
-$mediatypes = API::MediaType()->get([
-	'output' => ['type', 'description'],
-	'preservekeys' => true
-]);
-CArrayHelper::sort($mediatypes, ['description']);
-
-$media_types = [];
-$default_mediatypeid = 0;
-foreach ($mediatypes as $mtid => &$mediatype) {
-	if ($default_mediatypeid == 0) {
-		$default_mediatypeid = $mtid;
-	}
-	$media_types[$mtid] = $mediatype['type'];
-	$mediatype = $mediatype['description'];
-}
-unset($mediatype);
-
 $media = getRequest('media', -1);
-$sendto = getRequest('sendto', '');
-$mediatypeid = getRequest('mediatypeid', $default_mediatypeid);
 $active = getRequest('active', MEDIA_STATUS_ACTIVE);
 $period = getRequest('period', ZBX_DEFAULT_INTERVAL);
 
@@ -133,18 +157,6 @@ $email_send_to_table = (new CTable())
 	->addClass('small-cell-padding')
 	->setId('email_send_to');
 
-$email_send_to = $sendto;
-if (array_key_exists($mediatypeid, $media_types) && $media_types[$mediatypeid] == MEDIA_TYPE_EMAIL) {
-	if (!is_array($email_send_to)) {
-		$email_send_to = [$email_send_to];
-	}
-
-	$sendto = '';
-}
-else {
-	$email_send_to = [''];
-}
-
 foreach ($email_send_to as $i => $email) {
 	$input_field = (new CTextBox('sendto[]', $email))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 	$button = (new CButton('sendto_remove_'.$i, _('Remove')))
@@ -161,7 +173,7 @@ $email_send_to_table->addRow([(new CButton('email_send_to_add', _('Add')))
 
 $frmMedia = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
-	->addRow(_('Send to'), (new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	->addRow(_('Send to'), (new CTextBox('sendto', $send_to, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'mediatype_send_to'
 	)
 	->addRow(_('Send to'), $email_send_to_table, 'mediatype_email_send_to')
