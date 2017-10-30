@@ -490,10 +490,16 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
+	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE && FAIL == is_supported_ip(CONFIG_SERVER) &&
+			FAIL == zbx_validate_hostname(CONFIG_SERVER))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter is not defined."
-				" This parameter is mandatory for active proxies.");
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Server\" configuration parameter: '%s'", CONFIG_SERVER);
+		err = 1;
+	}
+	else if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
+		zbx_free(ch_error);
 		err = 1;
 	}
 
@@ -561,7 +567,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"ProxyMode",			&CONFIG_PROXYMODE,			TYPE_INT,
 			PARM_OPT,	ZBX_PROXYMODE_ACTIVE,	ZBX_PROXYMODE_PASSIVE},
 		{"Server",			&CONFIG_SERVER,				TYPE_STRING,
-			PARM_OPT,	0,			0},
+			PARM_MAND,	0,			0},
 		{"ServerPort",			&CONFIG_SERVER_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,

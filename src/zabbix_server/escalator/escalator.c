@@ -869,19 +869,18 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		ZBX_STR2UINT64(host.hostid, row[0]);
 		ZBX_DBROW2UINT64(host.proxy_hostid, row[1]);
 
-		if (0 != host.hostid)
+		if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
 		{
-			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			if (0 != host.hostid)
 			{
-				goto skip;
-			}
+				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					goto skip;
+				}
 
-			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-			strscpy(host.host, row[2]);
-
-			if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
-			{
+				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+				strscpy(host.host, row[2]);
 				host.tls_connect = (unsigned char)atoi(row[13]);
 #ifdef HAVE_OPENIPMI
 				host.ipmi_authtype = (signed char)atoi(row[14]);
@@ -896,17 +895,17 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				strscpy(host.tls_psk, row[17 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
-		}
-		else if (SUCCEED == (rc = get_dynamic_hostid((NULL != r_event ? r_event : event), &host, error,
-					sizeof(error))))
-		{
-			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			else if (SUCCEED == (rc = get_dynamic_hostid((NULL != r_event ? r_event : event), &host, error,
+						sizeof(error))))
 			{
-				goto skip;
-			}
+				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					goto skip;
+				}
 
-			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+			}
 		}
 
 		alertid = DBget_maxid("alerts");

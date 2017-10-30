@@ -113,6 +113,10 @@ $expression_row = [
 			'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 				'&dstfld1='.$data['expression_field_name'].'&srctbl='.$data['expression_field_name'].
 				'&srcfld1='.$data['expression_field_name'].
+				(($data['groupid'] && $data['hostid'])
+					? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
+					: ''
+				).
 				'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()));'
 		)
 		->setEnabled(!$readonly)
@@ -300,6 +304,10 @@ $recovery_expression_row = [
 			'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 				'&dstfld1='.$data['recovery_expression_field_name'].
 				'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
+				(($data['groupid'] && $data['hostid'])
+					? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
+					: ''
+				).
 				'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].
 				'"]\').val()));'
 		)

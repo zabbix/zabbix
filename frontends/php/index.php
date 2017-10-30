@@ -19,6 +19,9 @@
 **/
 
 
+require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
+CWebUser::disableSessionCookie();
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
@@ -73,7 +76,16 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 			]);
 		}
 
-		$request = getRequest('request');
+		$request = getRequest('request', '');
+
+		if ($request) {
+			preg_match('/^\/?(?<filename>(?:[a-z0-9\_\.]+)\.php).*$/i', $request, $test_request);
+
+			$request = (array_key_exists('filename', $test_request) && file_exists('./'.$test_request['filename']))
+				? $test_request['filename']
+				: '';
+		}
+
 		if (!zbx_empty($request)) {
 			$url = $request;
 		}

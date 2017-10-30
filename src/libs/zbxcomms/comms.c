@@ -1721,7 +1721,7 @@ out:
 #undef ZBX_TCP_EXPECT_XML_END
 }
 
-static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *address2)
+static int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)
 {
 	unsigned char	netmask[16] = {0};
 	int		i, j, bytes;
@@ -1747,8 +1747,11 @@ static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *
 	/* All hosts on a subnetwork have the same network prefix. */
 	for (i = 0; i < bytes; i++)
 	{
-		if ((((unsigned char *)address1)[i] & netmask[i]) != (((unsigned char *)address2)[i] & netmask[i]))
+		if ((((const unsigned char *)address1)[i] & netmask[i]) !=
+				(((const unsigned char *)address2)[i] & netmask[i]))
+		{
 			return FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -1900,7 +1903,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_allowed_peers(zbx_socket_t *s, const char *peer_list)
+int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 {
 	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
 

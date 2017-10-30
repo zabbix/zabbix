@@ -37,7 +37,7 @@
 		<meta name="msapplication-config" content="none"/>
 		<link rel="stylesheet" type="text/css" href="styles/<?= ZBX_DEFAULT_THEME ?>.css" />
 	</head>
-	<body>
+	<body lang="en">
 		<div class="<?= ZBX_STYLE_ARTICLE ?>">
 			<div class="<?= ZBX_STYLE_BROWSER_WARNING_CONTAINER ?>">
 				<h2 class="<?= ZBX_STYLE_RED ?>">You are using an outdated browser.</h2>

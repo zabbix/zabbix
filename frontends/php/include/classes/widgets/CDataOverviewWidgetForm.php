@@ -25,7 +25,7 @@
 class CDataOverviewWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data);
+		parent::__construct($data, WIDGET_DATA_OVERVIEW);
 
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 

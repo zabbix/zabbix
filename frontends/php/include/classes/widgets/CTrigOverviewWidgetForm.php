@@ -25,7 +25,7 @@
 class CTrigOverviewWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data);
+		parent::__construct($data, WIDGET_TRIG_OVERVIEW);
 
 		// show
 		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [

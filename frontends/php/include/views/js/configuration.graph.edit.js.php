@@ -186,6 +186,10 @@
 						+ '&srcfld3=flags&dstfld3=items_' + i + '_flags'
 					: '&srctbl=items')
 				+ '<?= !empty($this->data['normal_only']) ? '&normal_only=1' : '' ?>'
+				+ '<?= ((!$data['parent_discoveryid'] && $data['groupid'] && $data['hostid'])
+							? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
+							: ''
+						) ?>'
 				+ '&srcfld1=itemid&srcfld2=name" + getOnlyHostParam())';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}

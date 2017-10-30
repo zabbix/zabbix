@@ -579,8 +579,21 @@ elseif (isset($_REQUEST['form'])) {
 		'tags' => getRequest('tags', []),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
-		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
+		'groupid' => getRequest('groupid', 0)
 	];
+
+	if (!$data['groupid']) {
+		$db_hostgroup = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'hostids' => $data['hostid'],
+			'templateids' => $data['hostid']
+		]);
+
+		if ($db_hostgroup) {
+			$data['groupid'] = $db_hostgroup[0]['groupid'];
+		}
+	}
 
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));
 	$triggersView->render();

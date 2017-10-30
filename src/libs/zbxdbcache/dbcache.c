@@ -1179,6 +1179,14 @@ static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 				logvalue = hdata->value.log->value;
 				logvalue[zbx_db_strlen_n(logvalue, HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl))
+				{
+					dc_history_set_error(hdata, zbx_strdup(NULL,
+							"Value is too small or too large."));
+					return FAIL;
+				}
+				break;
 		}
 		return SUCCEED;
 	}
