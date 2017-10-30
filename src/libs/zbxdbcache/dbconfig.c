@@ -8149,14 +8149,17 @@ static void	DCconfig_sort_triggers_topologically(void)
  * Function: DCconfig_triggers_apply_changes                                  *
  *                                                                            *
  * Purpose: apply trigger value,state,lastchange or error changes to          *
- *          configuration cache                                               *
+ *          configuration cache after committed to database                   *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 {
+	const char		*__function_name = "DCconfig_triggers_apply_changes";
 	int			i;
 	zbx_trigger_diff_t	*diff;
 	ZBX_DC_TRIGGER		*dc_trigger;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	LOCK_CACHE;
 
@@ -8181,6 +8184,8 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 	}
 
 	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -10727,6 +10732,9 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 	int			i;
 	const zbx_item_diff_t	*diff;
 	ZBX_DC_ITEM		*dc_item;
+
+	if (0 == item_diff->values_num)
+		return;
 
 	LOCK_CACHE;
 

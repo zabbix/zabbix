@@ -465,7 +465,7 @@ DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
 void		DBbegin(void);
-void		DBcommit(void);
+int		DBcommit(void);
 void		DBrollback(void);
 void		DBend(int ret);
 

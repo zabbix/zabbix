@@ -4066,7 +4066,6 @@ httpfield_t;
  *                                                                            *
  * Function: DBget_httptests                                                  *
  *                                                                            *
- * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
 static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *httptests)
@@ -4499,7 +4498,6 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
  *                                                                            *
  * Function: DBsave_httptests                                                 *
  *                                                                            *
- * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
 static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
@@ -4720,7 +4718,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
  *                                                                            *
  * Function: clean_httptests                                                  *
  *                                                                            *
- * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
 static void	clean_httptests(zbx_vector_ptr_t *httptests)
