@@ -52,6 +52,7 @@ $chartsWidget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addVar('fullscreen', $this->data['fullscreen'])
+		->addVar('page', 1)
 		->addItem($controls)
 	);
 
