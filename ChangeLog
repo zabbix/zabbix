@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-4145] fixed appearance of host column based on number of hosts specified in filter (miks)
 A.F.I..... [ZBXNEXT-4118] implemented advanced options for tag-based search of problems (Ivo, Sasha)
 ..F....... [ZBXNEXT-4134] added 'lang' attribute to page body (gcalenko)
 A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (Sasha, vso)
