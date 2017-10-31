@@ -203,7 +203,7 @@ class CEvent extends CApiService {
 		}
 
 		// name
-		if ($options['name'] !== null) {
+		if ($options['name'] !== null && (is_string($options['name']) || is_numeric($options['name']))) {
 			$res = DBselect('SELECT eventid FROM events WHERE '.dbConditionString('name', [$options['name']]));
 
 			$eventids = [];
