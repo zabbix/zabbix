@@ -1968,7 +1968,7 @@ int	flush_correlated_events(void)
 		update_trigger_changes(&trigger_diff);
 
 		DCconfig_triggers_apply_changes(&trigger_diff);
-		zbx_save_trigger_changes(&trigger_diff);
+		zbx_db_save_trigger_changes(&trigger_diff);
 
 		DBcommit();
 

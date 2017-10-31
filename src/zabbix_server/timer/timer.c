@@ -85,7 +85,7 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 			*events_count += events_num;
 
 			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_save_trigger_changes(&trigger_diff);
+			zbx_db_save_trigger_changes(&trigger_diff);
 		}
 
 		DBcommit();

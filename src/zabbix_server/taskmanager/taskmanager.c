@@ -87,7 +87,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 			process_trigger_events(&trigger_diff, locked_triggerids, ZBX_EVENTS_SKIP_CORRELATION);
 			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_save_trigger_changes(&trigger_diff);
+			zbx_db_save_trigger_changes(&trigger_diff);
 		}
 
 		DCconfig_clean_triggers(&trigger, &errcode, 1);
