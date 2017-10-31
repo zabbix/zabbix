@@ -2573,6 +2573,7 @@ int	DCsync_history(int sync_type, int *total_num)
 					process_trigger_events(&trigger_diff, &triggerids,
 							ZBX_EVENTS_PROCESS_CORRELATION);
 					zbx_db_save_trigger_changes(&trigger_diff);
+
 					if (ZBX_DB_OK == (txn_error = DBcommit()))
 					{
 						DCconfig_triggers_apply_changes(&trigger_diff);
