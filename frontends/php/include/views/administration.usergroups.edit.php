@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/administration.usergroups.edit.js.php';
+
 $widget = (new CWidget())->setTitle(_('User groups'));
 
 // create form
@@ -163,10 +165,76 @@ $permissionsFormList->addRow(null,
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
+/*
+ * Tag filter tab
+ */
+$tag_filter_form_list = new CFormList('tagFilterFormList');
+
+$tag_filter_table = (new CTable())
+	->setId('tag_filter_table')
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Host group'), _('Tags'), _('Action')]);
+
+foreach ($data['tag_filters'] as $key => $tag_filter) {
+	$action = (new CButton('tag_filter_remove', _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-remove');
+	$tag_filter_table->addRow([$tag_filter['name'], $tag_filter['value'].NAME_DELIMITER.$tag_filter['value'], $action]);
+	$userGroupForm->addVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']);
+	$userGroupForm->addVar('tag_filters['.$key.'][tag]', $tag_filter['tag']);
+	$userGroupForm->addVar('tag_filters['.$key.'][value]', $tag_filter['value']);
+}
+
+$tag_filter_form_list->addRow(_('Permissions'),
+	(new CDiv($tag_filter_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
+$new_permissions_table = (new CTable())
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'tag_filter_groupids[]',
+			'objectName' => 'hostGroup',
+			'styles' => ['margin-top' => '-.3em'],
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$userGroupForm->getName().
+					'&dstfld1=tag_filter_groupids_&srcfld1=groupid&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		new CCol(
+			(new CTextBox('tag', $data['tag']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('placeholder', _('tag'))
+		),
+		new CCol(
+			(new CTextBox('value', $data['value']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('placeholder', _('value'))
+		)
+	])
+	->addRow([[
+		(new CCheckBox('subgroups')),
+		SPACE,
+		_('Include subgroups')
+	]])
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$userGroupForm->getName().'", "add_tag_filter", "1");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
+
+$tag_filter_form_list->addRow(null,
+	(new CDiv($new_permissions_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
 // append form lists to tab
 $userGroupTab = (new CTabView())
 	->addTab('userGroupTab', _('User group'), $userGroupFormList)
-	->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
+	->addTab('permissionsTab', _('Permissions'), $permissionsFormList)
+	->addTab('tagFilterTab', _('Tag filter'), $tag_filter_form_list);
 if (!$data['form_refresh']) {
 	$userGroupTab->setSelected(0);
 }

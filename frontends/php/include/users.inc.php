@@ -267,6 +267,46 @@ function collapseHostGroupRights(array $groups_rights) {
 }
 
 /**
+ * Returns the sorted list of tag filter.
+ *
+ * @param array  $tag_filters
+ *
+ * @return array
+ */
+function collapseTagFilters(array $tag_filters) {
+	$groupids = [];
+
+	foreach ($tag_filters as $tag_filter) {
+		$groupids[$tag_filter['groupid']] = true;
+	}
+
+	if ($groupids) {
+		$host_groups = API::HostGroup()->get([
+			'groupids' => array_keys($groupids),
+			'output' => ['groupid', 'name'],
+			'preservekeys' => true
+		]);
+
+		foreach ($tag_filters as &$tag_filter) {
+			$tag_filter['name'] = $host_groups[$tag_filter['groupid']]['name'];
+		}
+		unset($tag_filter);
+
+		CArrayHelper::sort($tag_filters, [['field' => 'name', 'order' => ZBX_SORT_DOWN]]);
+
+		$pre_name = '';
+		foreach ($tag_filters as &$tag_filter) {
+			if ($pre_name === $tag_filter['name']) {
+				$tag_filter['name'] = '';
+			}
+		}
+		unset($tag_filter);
+	}
+
+	return $tag_filters;
+}
+
+/**
  * Applies new permissions to the host groups.
  *
  * @param array  $groups_rights

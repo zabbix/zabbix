@@ -59,6 +59,10 @@ $fields = [
 	'new_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'groupids' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'subgroups' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag_filter' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'add_tag_filter' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'value' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
 	// form
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		 null,	null],
@@ -81,8 +85,9 @@ $_REQUEST['debug_mode'] = getRequest('debug_mode', 0);
  */
 if (isset($_REQUEST['usrgrpid'])) {
 	$dbUserGroup = API::UserGroup()->get([
+		'output' => ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode'],
+		'selectTagFilters' => ['groupid', 'tag', 'value'],
 		'usrgrpids' => $_REQUEST['usrgrpid'],
-		'output' => API_OUTPUT_EXTEND
 	]);
 
 	if (!$dbUserGroup) {
@@ -252,7 +257,10 @@ if (hasRequest('form')) {
 		'gui_access' => getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM),
 		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
 		'group_users' => hasRequest('form_refresh') ? getRequest('group_users', []) : [],
-		'form_refresh' => getRequest('form_refresh', 0)
+		'form_refresh' => getRequest('form_refresh', 0),
+		'tag_filters' => getRequest('tag_filters', []),
+		'tag' => getRequest('tag', ''),
+		'value' => getRequest('value', '')
 	];
 
 	if ($data['usrgrpid'] != 0) {
@@ -282,6 +290,10 @@ if (hasRequest('form')) {
 		? getRequest('groups_rights', [])
 		: collapseHostGroupRights(getHostGroupsRights($data['usrgrpid'] == 0 ? [] : [$data['usrgrpid']]));
 
+	$data['tag_filters'] = hasRequest('form_refresh')
+		? getRequest('tag_filters', [])
+		: $data['usrgrpid'] == 0 ? [] : collapseTagFilters($db_user_group['tag_filters']);
+
 	if (hasRequest('add_permission')) {
 		// Add new permission with submit().
 		if (hasRequest('subgroups')) {
@@ -298,6 +310,21 @@ if (hasRequest('form')) {
 		$data['groups_rights'] = collapseHostGroupRights(
 			applyHostGroupRights($data['groups_rights'], $groupids, $groupids_subgroupids, $new_permission)
 		);
+	}
+
+	if (hasRequest('add_tag_filter')) {
+		// Add new tag filter with submit().
+		if (hasRequest('tag_filter_subgroups')) {
+			$tag_filter_groupids = [];
+			$tag_filter_subgroupids = getRequest('tag_filter_groupids', []);
+		}
+		else {
+			$groupids = getRequest('tag_filter_groupids', []);
+			$groupids_subgroupids = [];
+		}
+
+		$tag = getRequest('tag');
+		$value = getRequest('value');
 	}
 
 	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
