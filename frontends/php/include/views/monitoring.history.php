@@ -42,7 +42,7 @@ if (count($data['items']) == 1 || $same_host) {
 	$header['left'] = [
 		$host_name,
 		NAME_DELIMITER,
-		$same_host ? $header['left'] : $item['name_expanded']
+		count($data['items']) == 1 ? $item['name_expanded'] : $header['left']
 	];
 	$headerPlaintext[] = implode('', $header['left']);
 }
