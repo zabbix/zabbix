@@ -270,7 +270,7 @@ class CScreenBase {
 					'pageFile'			=> true,
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> false,
+					'updateProfile'		=> true,
 					'timeline'			=> true,
 					'page'				=> true
 				];
