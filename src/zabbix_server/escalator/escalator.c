@@ -214,7 +214,6 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&conditions);
 	zbx_vector_ptr_create(&tag_filters);
 	zbx_vector_ptr_sort(&tag_filters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -254,14 +253,16 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	for (i = 0; i < tag_filters.values_num; i++)
 	{
 		tag_filter = (zbx_tag_filter_t *)tag_filters.values[i];
+
+		zbx_vector_ptr_create(&conditions);
+
 		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
 		memset(condition, 0, sizeof(DB_CONDITION));
 		condition->conditiontype = CONDITION_TYPE_HOST_GROUP;
 		condition->operator = CONDITION_OPERATOR_EQUAL;
-		zbx_vector_ptr_append(&conditions, condition);
-
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_UI64, tag_filter->hostgrouid);
 		condition->value = zbx_strdup(NULL, tmp);
+		zbx_vector_ptr_append(&conditions, condition);
 
 		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
 		memset(condition, 0, sizeof(DB_CONDITION));
@@ -288,20 +289,21 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		}
 
 		if (n == conditions.values_num)
-		{
 			ret = SUCCEED;
-			goto out;
-		}
+
+		for (n = 0; n < conditions.values_num; n++)
+			zbx_db_condition_clean(((DB_CONDITION *)conditions.values[n]));
+
+		zbx_vector_ptr_destroy(&conditions);
+
+		if (SUCCEED == ret)
+			break;
 	}
 out:
 	DBfree_result(result);
 
 	zbx_vector_ptr_clear_ext(&tag_filters, (zbx_clean_func_t)zbx_tag_filter_free);
-	for (i = 0; i < conditions.values_num; i++)
-		zbx_db_condition_clean(((DB_CONDITION *)conditions.values[i]));
-
 	zbx_vector_ptr_destroy(&tag_filters);
-	zbx_vector_ptr_destroy(&conditions);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

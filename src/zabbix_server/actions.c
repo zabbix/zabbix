@@ -1344,7 +1344,7 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
 			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
-			condition->value, condition->value2);
+			ZBX_NULL2STR(condition->value), ZBX_NULL2STR(condition->value2));
 
 	switch (event->source)
 	{
