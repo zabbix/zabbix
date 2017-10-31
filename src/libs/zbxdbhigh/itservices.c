@@ -744,8 +744,6 @@ int	DBupdate_itservices(const zbx_vector_ptr_t *trigger_diff)
 
 	if (0 != updates.values_num)
 	{
-		int	txn_error;
-
 		LOCK_ITSERVICES;
 
 		do
@@ -754,7 +752,7 @@ int	DBupdate_itservices(const zbx_vector_ptr_t *trigger_diff)
 
 			ret = its_flush_updates(&updates);
 		}
-		while (ZBX_DB_DOWN == (txn_error = DBcommit()));
+		while (ZBX_DB_DOWN == DBcommit());
 
 		UNLOCK_ITSERVICES;
 
