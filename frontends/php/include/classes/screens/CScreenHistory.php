@@ -68,6 +68,20 @@ class CScreenHistory extends CScreenBase {
 	public $itemids;
 
 	/**
+	 * Graph id.
+	 *
+	 * @var int|null
+	 */
+	public $graphid = null;
+
+	/**
+	 * String containing page file name with extension.
+	 *
+	 * @var string
+	 */
+	public $page_file;
+
+	/**
 	 * Init screen data.
 	 *
 	 * @param array		$options
@@ -76,6 +90,8 @@ class CScreenHistory extends CScreenBase {
 	 * @param int		$options['markColor']
 	 * @param boolean	$options['plaintext']
 	 * @param array		$options['itemids']
+	 * @param array     $options['graphid']     When set defines graph id where item.
+	 * @param string    $options['pageFile']    Current page file, is used for pagination links.
 	 */
 	public function __construct(array $options = []) {
 		parent::__construct($options);
@@ -91,6 +107,16 @@ class CScreenHistory extends CScreenBase {
 		// optional
 		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : [];
 		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : false;
+		$this->page_file = array_key_exists('pageFile', $options) ? $options['pageFile'] : '';
+
+		if (!$this->itemids && array_key_exists('graphid', $options)) {
+			$itemids = API::Item()->get([
+				'output' => null,
+				'graphids' => [$options['graphid']]
+			]);
+			$this->itemids = zbx_objectValues($itemids, 'itemid');
+			$this->graphid = $options['graphid'];
+		}
 	}
 
 	/**
@@ -352,6 +378,7 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items as $item) {
 					$table_header[] = (new CColHeader($item['name_expanded']))->addClass('vertical_rotation');
 					$options['itemids'] = [$item['itemid']];
+					$options['history'] = $item['value_type'];
 					$history_data = array_merge($history_data, array_values(API::History()->get($options)));
 				}
 
@@ -392,7 +419,7 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 
-				$url = new CUrl('history.php');
+				$url = new CUrl($this->page_file);
 				$url->formatGetArguments();
 				// Array $table_rows will be modified according page and rows on page.
 				$pagination = getPagingLine($table_rows, [], $url);
@@ -411,7 +438,7 @@ class CScreenHistory extends CScreenBase {
 							sscanf($value, '%f', $value);
 						}
 
-						$row[] = $value ? new CPre($value) : '';
+						$row[] = $value === '' ? '' : new CPre($value);
 					}
 
 					$history_table->addRow($row);
@@ -479,6 +506,11 @@ class CScreenHistory extends CScreenBase {
 
 			if ($this->action == HISTORY_VALUES) {
 				$flickerfreeData['page'] = getPageNumber();
+			}
+
+			if ($this->graphid) {
+				unset($flickerfreeData['itemids']);
+				$flickerfreeData['graphid'] = $this->graphid;
 			}
 
 			return $this->getOutput($output, true, $flickerfreeData);
