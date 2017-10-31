@@ -36,7 +36,7 @@ static int	DBpatch_3050000(void)
 
 static int	DBpatch_3050001(void)
 {
-	const ZBX_FIELD field = {"colorpalette", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"colorpalette", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("graph_theme", &field);
 }
