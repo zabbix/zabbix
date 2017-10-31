@@ -128,16 +128,16 @@ var MMenu = {
 		if (SF) {
 			var subnav_elems = jQuery('.top-subnav a').on('keydown', function(event) {
 				if (event.which == 9) {
-					subnav_elems = subnav_elems.filter(function() {
+					var visible_subnav_elems = subnav_elems.filter(function() {
 						return jQuery(this).is(':visible');
 					});
-					var current = subnav_elems.toArray().indexOf(this);
+					var current = visible_subnav_elems.toArray().indexOf(this);
 
 					if (event.shiftKey && current > 0) {
-						subnav_elems.get(current - 1).focus();
+						visible_subnav_elems.get(current - 1).focus();
 					}
-					else if (!event.shiftKey && subnav_elems.length > current + 1) {
-						subnav_elems.get(current + 1).focus();
+					else if (!event.shiftKey && visible_subnav_elems.length > current + 1) {
+						visible_subnav_elems.get(current + 1).focus();
 					}
 					else if (event.shiftKey && current == 0) {
 						// Find the previous :focusable element to focus.
@@ -154,7 +154,7 @@ var MMenu = {
 							prev_element.focus();
 						}
 					}
-					else if (current + 1 == subnav_elems.length) {
+					else if (current + 1 == visible_subnav_elems.length) {
 						// If this is the last item in the sub-menu list, focus next :focusable element.
 						var active_element_index = jQuery('*', 'body').toArray().indexOf(document.activeElement);
 
