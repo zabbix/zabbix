@@ -1089,6 +1089,8 @@ AC_ARG_ENABLE(ipv6,[  --enable-ipv6           Turn on support of IPv6],
 esac],
 [ipv6=no])
 
+AM_CONDITIONAL([DBSCHEMA], [test -d create])
+
 AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
 
 have_db="no"
@@ -1582,6 +1584,11 @@ dnl *****************************************************************
 AC_OUTPUT([
 	Makefile
 	database/Makefile
+	database/ibm_db2/Makefile
+	database/mysql/Makefile
+	database/oracle/Makefile
+	database/postgresql/Makefile
+	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
 	src/libs/Makefile
