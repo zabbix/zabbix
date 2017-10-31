@@ -250,7 +250,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	}
 
 	/* if all conditions at least one of tag filter is matched then user has access to event */
-	for (i = 0; i < tag_filters.values_num; i++)
+	for (i = 0; i < tag_filters.values_num && SUCCEED != ret; i++)
 	{
 		tag_filter = (zbx_tag_filter_t *)tag_filters.values[i];
 
@@ -295,9 +295,6 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 			zbx_db_condition_clean(((DB_CONDITION *)conditions.values[n]));
 
 		zbx_vector_ptr_destroy(&conditions);
-
-		if (SUCCEED == ret)
-			break;
 	}
 out:
 	DBfree_result(result);
