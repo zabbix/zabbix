@@ -115,6 +115,7 @@ var MMenu = {
 			if (event.which == 9) {
 				setTimeout(function() {
 					if (elems.toArray().indexOf(document.querySelector(':focus')) == -1) {
+						clearTimeout(this.timeout_reset);
 						this.timeout_reset = setTimeout(function() {
 							if (elems.toArray().indexOf(document.querySelector(':focus')) == -1){
 								MMenu.showSubMenu(MMenu.def_label)
