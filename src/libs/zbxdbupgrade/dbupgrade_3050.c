@@ -34,8 +34,6 @@ static int	DBpatch_3050000(void)
 	return DBadd_field("hosts", &field);
 }
 
-#endif
-
 static int	DBpatch_3050001(void)
 {
 #define ZBX_DEFAULT_COLOR_PALETTE	"1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,"
@@ -52,6 +50,8 @@ static int	DBpatch_3050001(void)
 	return SUCCEED;
 #undef ZBX_DEFAULT_COLOR_PALETTE
 }
+
+#endif
 
 DBPATCH_START(3050)
 
