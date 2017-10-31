@@ -1,7 +1,6 @@
 [
 	{
 		"test_case": "case_1",
-		"tested_function": "process_escalations",
 		"in": {
 			"names": ["now", "nextcheck", "escalation_source"],
 			"values": [1504082776, 1504082776, 2]

@@ -243,20 +243,6 @@ sub escape_arr($)
 #                    #
 ######################
 
-sub print_test_case($)
-{
-	my $test_case = shift;
-
-	print("|CASE|" . escape_str($test_case) . "|\n");
-}
-
-sub print_tested_function($)
-{
-	my $tested_function = shift;
-
-	print("|TESTED_FUNCTION|" . escape_str($tested_function) . "|\n");
-}
-
 sub print_in($$)
 {
 	my $in = shift;
@@ -425,17 +411,7 @@ use constant SINGLE_TEST_CASE	=> {
 			'value'	=> {
 				'type'	=> JSON_STRING,
 				'rule'	=> qr/\w/
-			},
-			'print'	=> \&print_test_case
-		},
-		{
-			'mand'	=> undef,
-			'key'	=> "tested_function",
-			'value'	=> {
-				'type'	=> JSON_STRING,
-				'rule'	=> qr/[_a-zA-Z][_a-zA-Z0-9]*/
-			},
-			'print'	=> \&print_tested_function
+			}
 		},
 		{
 			'mand'	=> undef,

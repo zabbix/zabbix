@@ -1,7 +1,6 @@
 [
 	{
 		"test_case": "successfully close the problem",
-		"tested_function": "try_task_closes_problem",
 		"in": {
 			"names": ["taskid"],
 			"values": [1]
@@ -38,7 +37,6 @@
 	},
 	{
 		"test_case": "cannot find a task in the db",
-		"tested_function": "try_task_closes_problem",
 		"in": {
 			"names": ["taskid"],
 			"values": [1]
@@ -59,7 +57,6 @@
 	},
         {
 		"test_case": "fail close the problem if source trigger was not locked",
-		"tested_function": "try_task_closes_problem",
 		"in": {
 			"names": ["taskid"],
 			"values": [1]
