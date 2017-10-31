@@ -2137,7 +2137,7 @@ static int	dc_item_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_update_history                                            *
+ * Function: DCmass_prepare_history                                            *
  *                                                                            *
  * Purpose: prepare history data using items from configuration cache         *
  *                                                                            *
@@ -2147,10 +2147,10 @@ static int	dc_item_compare(const void *d1, const void *d2)
  *             history_num - [IN] number of history structures                *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_update_history(ZBX_DC_HISTORY *history, const DC_ITEM *items, const int *errcodes,
+static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const DC_ITEM *items, const int *errcodes,
 		int history_num)
 {
-	const char	*__function_name = "DCmass_update_history";
+	const char	*__function_name = "DCmass_prepare_history";
 	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, history_num);
@@ -2546,7 +2546,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 			zbx_vector_uint64_destroy(&itemids);
 
-			DCmass_update_history(history, items, errcodes, history_num);
+			DCmass_prepare_history(history, items, errcodes, history_num);
 
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
@@ -2562,6 +2562,8 @@ int	DCsync_history(int sync_type, int *total_num)
 					DBbegin();
 
 					DBmass_update_items(history, history_num, items, errcodes, &item_diff);
+					/* update items in cache for trigger calculation, local copy is not changed */
+					DCconfig_items_apply_changes(&item_diff);
 					DBmass_update_triggers(history, history_num, &trigger_diff);
 					DBmass_update_trends(trends, trends_num, &trends_diff);
 
@@ -2574,10 +2576,10 @@ int	DCsync_history(int sync_type, int *total_num)
 
 					if (ZBX_DB_OK == (txn_error = DBcommit()))
 					{
-						DCconfig_items_apply_changes(&item_diff);
 						DCconfig_triggers_apply_changes(&trigger_diff);
 						DCupdate_trends(&trends_diff);
 					}
+
 					zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
 					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
