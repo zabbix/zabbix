@@ -147,7 +147,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_save_trigger_changes                                         *
+ * Function: zbx_db_save_trigger_changes                                      *
  *                                                                            *
  * Purpose: save the trigger changes to database                              *
  *                                                                            *

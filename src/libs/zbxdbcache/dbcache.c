@@ -2557,8 +2557,6 @@ int	DCsync_history(int sync_type, int *total_num)
 
 				do
 				{
-					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-
 					DBbegin();
 
 					DBmass_update_items(history, history_num, items, errcodes, &item_diff);
@@ -2578,17 +2576,14 @@ int	DCsync_history(int sync_type, int *total_num)
 					{
 						DCconfig_triggers_apply_changes(&trigger_diff);
 						DCupdate_trends(&trends_diff);
+						DBupdate_itservices(&trigger_diff);
 					}
 
+					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 					zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
 					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
 				while (ZBX_DB_DOWN == txn_error);
-
-				if (ZBX_DB_OK == txn_error)
-					DBupdate_itservices(&trigger_diff);
-
-				zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 			}
 
 			DCconfig_unlock_triggers(&triggerids);
