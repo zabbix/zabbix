@@ -8154,12 +8154,12 @@ static void	DCconfig_sort_triggers_topologically(void)
  ******************************************************************************/
 void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 {
-	const char		*__function_name = "DCconfig_triggers_apply_changes";
 	int			i;
 	zbx_trigger_diff_t	*diff;
 	ZBX_DC_TRIGGER		*dc_trigger;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	if (0 == trigger_diff->values_num)
+		return;
 
 	LOCK_CACHE;
 
@@ -8184,8 +8184,6 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 	}
 
 	UNLOCK_CACHE;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
