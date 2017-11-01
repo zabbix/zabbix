@@ -384,7 +384,8 @@ class CScreenHistory extends CScreenBase {
 				// History data limit is defined for one item therefore querying history data should be done for every
 				// item separately.
 				foreach ($items as $item) {
-					$table_header[] = (new CColHeader($item['name_expanded']))->addClass('vertical_rotation');
+					$table_header[] = (new CColHeader($item['name_expanded']))->addClass('vertical_rotation')
+						->setAttribute('title', $item['name_expanded']);
 					$options['itemids'] = [$item['itemid']];
 					$options['history'] = $item['value_type'];
 					$history_data = array_merge($history_data, array_values(API::History()->get($options)));
