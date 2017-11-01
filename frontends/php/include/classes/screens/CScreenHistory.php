@@ -180,35 +180,72 @@ class CScreenHistory extends CScreenBase {
 			$numeric_items = true;
 
 			foreach ($items as $item) {
-				$numeric_items = ($numeric_items && !in_array($item['value_type'], $iv_string));
+				$numeric_items = ($numeric_items && !array_key_exists($item['value_type'], $iv_string));
 				if (!$numeric_items) {
 					break;
 				}
 			}
-			// Item render type: text, log
-			if (!$numeric_items) {
+
+			// View type: As plain text.
+			// Item type: numeric (unsigned, char), float, text, log.
+			if ($this->plaintext) {
+				if (!$numeric_items && $this->filter !== ''
+						&& in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {
+
+					$options['search'] = ['value' => $this->filter];
+
+					if ($this->filterTask == FILTER_TASK_HIDE) {
+						$options['excludeSearch'] = true;
+					}
+				}
+
+				$history_data = API::History()->get($options);
+
+				CArrayHelper::sort($history_data, [
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				]);
+
+				foreach ($history_data as $history_row) {
+					$value = $history_row['value'];
+
+					if ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						sscanf($value, '%f', $value);
+					}
+					else {
+						$value = rtrim($value, " \t\r\n");
+					}
+
+					$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
+						' '.htmlspecialchars($value);
+				}
+
+				// Return values as array of formatted strings.
+				return $output;
+			}
+			// View type: Values, 500 latest values
+			// Item type: text, log
+			elseif (!$numeric_items) {
 				$isManyItems = (count($items) > 1);
 				$useLogItem = ($firstItem['value_type'] == ITEM_VALUE_TYPE_LOG);
 				$useEventLogItem = (strpos($firstItem['key_'], 'eventlog[') === 0);
 
-				if (empty($this->plaintext)) {
-					$historyTable = (new CTableInfo())
-						->setHeader([
-							(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
-							$isManyItems ? _('Item') : null,
-							$useLogItem ? (new CColHeader(_('Local time')))->addClass(ZBX_STYLE_CELL_WIDTH) : null,
-							($useEventLogItem && $useLogItem)
-								? (new CColHeader(_('Source')))->addClass(ZBX_STYLE_CELL_WIDTH)
-								: null,
-							($useEventLogItem && $useLogItem)
-								? (new CColHeader(_('Severity')))->addClass(ZBX_STYLE_CELL_WIDTH)
-								: null,
-							($useEventLogItem && $useLogItem)
-								? (new CColHeader(_('Event ID')))->addClass(ZBX_STYLE_CELL_WIDTH)
-								: null,
-							_('Value')
-						]);
-				}
+				$historyTable = (new CTableInfo())
+					->setHeader([
+						(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
+						$isManyItems ? _('Item') : null,
+						$useLogItem ? (new CColHeader(_('Local time')))->addClass(ZBX_STYLE_CELL_WIDTH) : null,
+						($useEventLogItem && $useLogItem)
+							? (new CColHeader(_('Source')))->addClass(ZBX_STYLE_CELL_WIDTH)
+							: null,
+						($useEventLogItem && $useLogItem)
+							? (new CColHeader(_('Severity')))->addClass(ZBX_STYLE_CELL_WIDTH)
+							: null,
+						($useEventLogItem && $useLogItem)
+							? (new CColHeader(_('Event ID')))->addClass(ZBX_STYLE_CELL_WIDTH)
+							: null,
+						_('Value')
+					]);
 
 				if ($this->filter !== '' && in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {
 					$options['search'] = ['value' => $this->filter];
@@ -226,111 +263,78 @@ class CScreenHistory extends CScreenBase {
 				foreach ($historyData as $data) {
 					$data['value'] = rtrim($data['value'], " \t\r\n");
 
-					if (empty($this->plaintext)) {
-						$item = $items[$data['itemid']];
-						$host = reset($item['hosts']);
-						$color = null;
+					$item = $items[$data['itemid']];
+					$host = reset($item['hosts']);
+					$color = null;
 
-						if ($this->filter !== '') {
-							$haystack = mb_strtolower($data['value']);
-							$needle = mb_strtolower($this->filter);
-							$pos = mb_strpos($haystack, $needle);
+					if ($this->filter !== '') {
+						$haystack = mb_strtolower($data['value']);
+						$needle = mb_strtolower($this->filter);
+						$pos = mb_strpos($haystack, $needle);
 
-							if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
-								$color = $this->markColor;
-							}
-							elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
-								$color = $this->markColor;
-							}
-
-							switch ($color) {
-								case MARK_COLOR_RED:
-									$color = ZBX_STYLE_RED;
-									break;
-								case MARK_COLOR_GREEN:
-									$color = ZBX_STYLE_GREEN;
-									break;
-								case MARK_COLOR_BLUE:
-									$color = ZBX_STYLE_BLUE;
-									break;
-							}
+						if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
+							$color = $this->markColor;
+						}
+						elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
+							$color = $this->markColor;
 						}
 
-						$row = [];
+						switch ($color) {
+							case MARK_COLOR_RED:
+								$color = ZBX_STYLE_RED;
+								break;
+							case MARK_COLOR_GREEN:
+								$color = ZBX_STYLE_GREEN;
+								break;
+							case MARK_COLOR_BLUE:
+								$color = ZBX_STYLE_BLUE;
+								break;
+						}
+					}
 
-						$row[] = (new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock'])))
-							->addClass(ZBX_STYLE_NOWRAP)
+					$row = [];
+
+					$row[] = (new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock'])))
+						->addClass(ZBX_STYLE_NOWRAP)
+						->addClass($color);
+
+					if ($isManyItems) {
+						$row[] = (new CCol($host['name'].NAME_DELIMITER.$item['name_expanded']))
 							->addClass($color);
+					}
 
-						if ($isManyItems) {
-							$row[] = (new CCol($host['name'].NAME_DELIMITER.$item['name_expanded']))
+					if ($useLogItem) {
+						$row[] = ($data['timestamp'] != 0)
+							? (new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['timestamp'])))
+								->addClass(ZBX_STYLE_NOWRAP)
+								->addClass($color)
+							: '';
+
+						// if this is a eventLog item, showing additional info
+						if ($useEventLogItem) {
+							$row[] = (new CCol($data['source']))
+								->addClass(ZBX_STYLE_NOWRAP)
+								->addClass($color);
+							$row[] = ($data['severity'] != 0)
+								? (new CCol(get_item_logtype_description($data['severity'])))
+									->addClass(ZBX_STYLE_NOWRAP)
+									->addClass(get_item_logtype_style($data['severity']))
+								: '';
+							$row[] = (new CCol($data['logeventid']))
+								->addClass(ZBX_STYLE_NOWRAP)
 								->addClass($color);
 						}
-
-						if ($useLogItem) {
-							$row[] = ($data['timestamp'] != 0)
-								? (new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['timestamp'])))
-									->addClass(ZBX_STYLE_NOWRAP)
-									->addClass($color)
-								: '';
-
-							// if this is a eventLog item, showing additional info
-							if ($useEventLogItem) {
-								$row[] = (new CCol($data['source']))
-									->addClass(ZBX_STYLE_NOWRAP)
-									->addClass($color);
-								$row[] = ($data['severity'] != 0)
-									? (new CCol(get_item_logtype_description($data['severity'])))
-										->addClass(ZBX_STYLE_NOWRAP)
-										->addClass(get_item_logtype_style($data['severity']))
-									: '';
-								$row[] = (new CCol($data['logeventid']))
-									->addClass(ZBX_STYLE_NOWRAP)
-									->addClass($color);
-							}
-						}
-
-						$row[] = (new CCol(new CPre(zbx_nl2br($data['value']))))->addClass($color);
-
-						$historyTable->addRow($row);
 					}
-					else {
-						$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']).' '. $data['clock'].' '.
-							htmlspecialchars($data['value']);
-					}
+
+					$row[] = (new CCol(new CPre(zbx_nl2br($data['value']))))->addClass($color);
+
+					$historyTable->addRow($row);
 				}
 
-				if (empty($this->plaintext)) {
-					$output[] = $historyTable;
-				}
+				$output[] = $historyTable;
 			}
-			// Item render type: numeric, float. Plain text view.
-			elseif ($this->plaintext) {
-				$history_data = API::History()->get($options);
-
-				CArrayHelper::sort($history_data, [
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				]);
-
-				foreach ($history_data as $history_row) {
-					$value = '';
-
-					if ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-						sscanf($history_row['value'], '%f', $value);
-					}
-					else {
-						$value = rtrim($history_row['value'], " \t\r\n");
-					}
-
-					$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
-						' '.htmlspecialchars($value);
-				}
-
-				// Return values as plain text.
-				return $output;
-			}
-			// Item render type: numeric, float. 500 latest values view.
+			// View type: 500 latest values.
+			// Item type: numeric (unsigned, char), float.
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader([
 					(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
@@ -350,6 +354,9 @@ class CScreenHistory extends CScreenBase {
 					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($value, '%f', $value);
 					}
+					else {
+						$value = rtrim($value, " \t\r\n");
+					}
 
 					if ($item['valuemapid']) {
 						$value = applyValueMap($value, $item['valuemapid']);
@@ -364,7 +371,8 @@ class CScreenHistory extends CScreenBase {
 
 				$output[] = $history_table;
 			}
-			// Item render type: numeric, float. HTML table view.
+			// View type: Values.
+			// Item type: numeric (unsigned, char), float.
 			else {
 				CArrayHelper::sort($items, [
 					['field' => 'name_expanded', 'order' => ZBX_SORT_UP]
@@ -436,6 +444,9 @@ class CScreenHistory extends CScreenBase {
 
 						if ($value && $item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 							sscanf($value, '%f', $value);
+						}
+						else {
+							$value = rtrim($value, " \t\r\n");
 						}
 
 						$row[] = $value === '' ? '' : new CPre($value);
