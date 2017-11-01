@@ -7,6 +7,7 @@ use JSON::XS;
 use Path::Tiny;
 use IPC::Run3;
 use Time::HiRes qw(clock);
+use File::Basename qw(dirname);
 
 use constant TEST_SUITE_ATTRIBUTES	=> ('name', 'tests', 'skipped', 'errors', 'failures', 'time');
 use constant TEST_CASE_ATTRIBUTES	=> ('name', 'assertions', 'time');
@@ -53,7 +54,7 @@ sub launch($$$)
 		my $out;
 		my $err;
 
-		eval {run3("./json_parser.pl | $test_exec", \$in, \$out, \$err)};
+		eval {run3(dirname($0) . "/json_parser.pl", \$in, \$out, \$err)};
 
 		if ($@)	# something went wrong with run3()
 		{
@@ -62,19 +63,37 @@ sub launch($$$)
 		}
 		else	# run3() was successful
 		{
-			$test_case->{'system-out'} = $out;
-			$test_case->{'system-err'} = $err;
-
-			if ($?)	# something went wrong with either json_parser or test executable
+			if ($?)	# something went wrong with json_parser.pl
 			{
-				$test_case->{'error'} = "non-zero exit code";
+				$test_case->{'error'} = "json_parser.pl failed";
 				$test_suite->{'errors'}++;
+
+				$test_case->{'system-out'} = $out;
+				$test_case->{'system-err'} = $err;
 			}
-			elsif ($out =~ /FAILED/)	# test case failed
+			else
 			{
-				$test_case->{'failure'} = "test case failed";
-				$test_suite->{'failures'}++;
+				$in = $out;
+				$out = undef;
+				$err = undef;
+
+				eval {run3($test_exec, \$in, \$out, \$err)};
+
+				if ($@)	# something went wrong with run3()
+				{
+					$test_case->{'error'} = $!;
+					$test_suite->{'errors'}++;
+				}
+				elsif ($?)	# something went wrong with test executable
+				{
+					$test_case->{'failure'} = "test case failed";
+					$test_suite->{'failures'}++;
+
+					$test_case->{'system-out'} = $out;
+					$test_case->{'system-err'} = $err;
+				}
 			}
+
 		}
 	}
 	else
