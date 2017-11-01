@@ -79,7 +79,7 @@ int	get_db_rows(const char *case_name, char const *data_source, DB_ROW *rows)
 
 		for (d = 0; d < cases[c].datasource_num; d++)
 		{
-			if (0 != strcmp(cases[c].datasources[d].name, data_source))
+			if (0 != strcmp(cases[c].datasources[d].source_name, data_source))
 				continue;
 
 			row_num = cases[c].datasources[d].row_num;
@@ -93,8 +93,6 @@ int	get_db_rows(const char *case_name, char const *data_source, DB_ROW *rows)
 
 void	__wrap_DBfree_result(DB_RESULT result)
 {
-	int	i;
-
 	if (NULL == result)
 		return;
 
@@ -120,9 +118,7 @@ DB_RESULT __wrap_zbx_db_vselect(const char *fmt, va_list args)
 		result->rows_num = get_db_rows(case_name, data_source, result->rows);
 	}
 	else
-	{
 		fail_msg("Cannot generate data source from sql!\nSQL:%s", sql);
-	}
 
 	if (0 == result->rows_num)
 	{
@@ -138,25 +134,26 @@ DB_ROW __wrap_zbx_db_fetch(DB_RESULT result)
 {
 	DB_ROW	row = NULL;
 
-	if (NULL != result)
+	if (NULL == result)
+		goto out;
+
+	if (0 > result->rows_num)
 	{
-		if (0 > result->rows_num)
-		{
-			fail_msg("Cannot find test suite for \"%s\" data source!\nSQL:%s\n",
-					result->data_source, result->sql);
-		}
-		else
-		{
-			row = result->rows[result->cur_row_idx];
-			result->cur_row_idx++;
-		}
+		fail_msg("Cannot find test suite for \"%s\" data source!\nSQL:%s\n",
+				result->data_source, result->sql);
+		goto out;
 	}
 
+	row = result->rows[result->cur_row_idx];
+	result->cur_row_idx++;
+out:
 	return row;
 }
 
 int	__wrap___zbx_DBexecute(const char *fmt, ...)
 {
+	ZBX_UNUSED(fmt);
+
 	return 0;
 }
 
@@ -170,5 +167,9 @@ void	__wrap_DBcommit(void)
 
 int	__wrap_DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
 {
+	ZBX_UNUSED(query);
+	ZBX_UNUSED(field_name);
+	ZBX_UNUSED(ids);
+
 	return SUCCEED;
 }

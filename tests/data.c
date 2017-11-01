@@ -39,8 +39,6 @@ char	*get_in_param_by_index(int idx)
 		if (0 == strcmp(cases[i].tested_function, curr_tested_function) &&
 				0 == strcmp(cases[i].case_name, curr_case_name))
 		{
-
-			printf("_test %d %d\n", cases[i].in_params.data_num, idx);
 			if (cases[i].in_params.data_num > idx)
 				return cases[i].in_params.values[idx];
 			else
@@ -163,13 +161,14 @@ char	*get_out_func_param_by_name(const char *name)
 
 int	load_data(char *file_name)
 {
-	int			res = FAIL, lineno, found_case, idx_str, line_type = 0;
+	int			res = FAIL, lineno, idx_str, line_type = 0;
 	char			line[MAX_STRING_LEN], *tmp, *p;
 	FILE			*file;
 	zbx_test_case_t		*curr_case;
-	zbx_test_datasource_t	*curr_ds;
-	zbx_test_data_t		*curr_data;
-	zbx_test_function_t	*curr_func;
+	zbx_test_datasource_t	*curr_ds = NULL;
+	zbx_test_data_t		*curr_data = NULL;
+	zbx_test_function_t	*curr_func = NULL;
+	zbx_test_row_t		*curr_row = NULL;
 
 	case_num = 0;
 	cases = malloc(TEST_MAX_CASE_NUM * sizeof(zbx_test_case_t));
@@ -213,14 +212,14 @@ int	load_data(char *file_name)
 					else if (0 == strcmp(p, "DB_DATA"))
 					{
 						curr_ds = &curr_case->datasources[curr_case->datasource_num];
-						curr_ds->rows = malloc(TEST_MAX_ROW_NUM * sizeof(zbx_test_data_t));
-						curr_ds->rows->data_num = 0;
-						curr_ds->row_num = 0;
+						curr_ds->field_names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
+						curr_ds->field_num = 0;
+
 						curr_case->datasource_num++;
 
 						line_type = ZBX_TEST_DATA_TYPE_DB_DATA;
 					}
-					else if (0 == strcmp(p, "FUNCTIONS"))
+					else if (0 == strcmp(p, "FUNCTION"))
 					{
 						curr_func = &curr_case->functions[curr_case->function_num];
 						curr_func->data.data_num = 0;
@@ -231,48 +230,59 @@ int	load_data(char *file_name)
 					else if (0 == strcmp(p, "IN_NAMES"))
 					{
 						curr_data = &curr_case->in_params;
+						curr_data->names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
 
 						line_type = ZBX_TEST_DATA_TYPE_IN_PARAM;
 					}
 					else if (0 == strcmp(p, "OUT_NAMES"))
 					{
 						curr_data = &curr_case->out_params;
+						curr_data->names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
 
 						line_type = ZBX_TEST_DATA_TYPE_OUT_PARAM;
 					}
 					else if (0 == strcmp(p, "IN_VALUES"))
 					{
 						curr_data = &curr_case->in_params;
+						curr_data->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
 
 						line_type = ZBX_TEST_DATA_TYPE_IN_VALUE;
 					}
 					else if (0 == strcmp(p, "OUT_VALUES"))
 					{
 						curr_data = &curr_case->out_params;
+						curr_data->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
 
 						line_type = ZBX_TEST_DATA_TYPE_OUT_VALUE;
 					}
 					else if (0 == strcmp(p, "FIELDS"))
 					{
-						curr_data = &curr_ds->rows[curr_ds->row_num];
-						curr_data->data_num = 0;
-						curr_ds->row_num++;
+						curr_ds->rows =  malloc(TEST_MAX_ROW_NUM * sizeof(zbx_test_row_t *));
+						curr_ds->row_num = 0;
 
 						line_type = ZBX_TEST_DATA_TYPE_DB_FIELD;
 					}
 					else if (0 == strcmp(p, "ROW"))
 					{
+						curr_row = &curr_ds->rows[curr_ds->row_num];
+						curr_row->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
+						curr_row->value_num = 0;
+
+						curr_ds->row_num++;
+
 						line_type = ZBX_TEST_DATA_TYPE_DB_ROW;
 					}
 					else if (0 == strcmp(p, "FUNC_OUT_PARAMS"))
 					{
 						curr_data = &curr_func->data;
+						curr_data->names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
 
 						line_type = ZBX_TEST_DATA_TYPE_FUNC_OUT;
 					}
 					else if (0 == strcmp(p, "FUNC_OUT_VALUES"))
 					{
 						curr_data = &curr_func->data;
+						curr_data->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
 
 						line_type = ZBX_TEST_DATA_TYPE_FUNC_VALUE;
 					}
@@ -280,50 +290,55 @@ int	load_data(char *file_name)
 					{
 						line_type = ZBX_TEST_DATA_TYPE_UNKNOWN;
 					}
+
 				}
 				else if (0 < idx_str) /* filling in data */
 				{
 					switch (line_type)
 					{
 						case ZBX_TEST_DATA_TYPE_CASE:
-							if (1 == idx_str)
+							if (1 == idx_str && NULL != curr_case)
 								curr_case->case_name = strdup(p);
 							break;
 						case ZBX_TEST_DATA_TYPE_TESTED_FUNC:
-							if (1 == idx_str)
+							if (1 == idx_str && NULL != curr_case)
 								curr_case->tested_function = strdup(p);
 							break;
 						case ZBX_TEST_DATA_TYPE_DB_DATA:
-							if (1 == idx_str)
-								curr_ds->name = strdup(p);
+							if (1 == idx_str && NULL != curr_data)
+								curr_ds->source_name = strdup(p);
 							break;
 						case ZBX_TEST_DATA_TYPE_FUNCTION:
-							if (1 == idx_str)
+							if (1 == idx_str && NULL != curr_func)
 								curr_func->name = strdup(p);
 							break;
 						case ZBX_TEST_DATA_TYPE_IN_PARAM:
 						case ZBX_TEST_DATA_TYPE_OUT_PARAM:
-						case ZBX_TEST_DATA_TYPE_DB_FIELD:
 						case ZBX_TEST_DATA_TYPE_FUNC_OUT:
-							if (1 <= idx_str)
-							{
-								if (1 == idx_str)
-									curr_data->names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
-
+							if (NULL != curr_data && NULL != curr_data->names)
 								curr_data->names[idx_str - 1] = strdup(p);
-							}
 							break;
 						case ZBX_TEST_DATA_TYPE_IN_VALUE:
 						case ZBX_TEST_DATA_TYPE_OUT_VALUE:
-						case ZBX_TEST_DATA_TYPE_DB_ROW:
 						case ZBX_TEST_DATA_TYPE_FUNC_VALUE:
-							if (1 <= idx_str)
+							if (NULL != curr_data && NULL != curr_data->values)
 							{
-								if (1 == idx_str)
-									curr_data->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
-
 								curr_data->values[idx_str - 1] = strdup(p);
 								curr_data->data_num++;
+							}
+							break;
+						case ZBX_TEST_DATA_TYPE_DB_FIELD:
+							if (NULL != curr_ds && NULL != curr_ds->field_names)
+							{
+								curr_ds->field_names[idx_str - 1] = strdup(p);
+								curr_ds->field_num++;
+							}
+							break;
+						case ZBX_TEST_DATA_TYPE_DB_ROW:
+							if (NULL != curr_row && NULL != curr_row->values)
+							{
+								curr_row->values[idx_str - 1] = strdup(p);
+								curr_row->value_num++;
 							}
 							break;
 						default:
@@ -355,21 +370,18 @@ void	free_data()
 
 		for (d = 0; d < cases[i].datasource_num; d++)
 		{
-			free(cases[i].datasources[d].name);
+			free(cases[i].datasources[d].source_name);
+
+			for (n = 0; n < cases[i].datasources[d].field_num; n++)
+			{
+				free(cases[i].datasources[d].field_names[i]);
+			}
 
 			for (n = 0; n < cases[i].datasources[d].row_num; n++)
 			{
-				for (n2 = 0; n2 < cases[i].datasources[d].rows[n].data_num; n2++)
-				{
-					free(cases[i].datasources[d].rows[n].names[n2]);
+				for (n2 = 0; n2 < cases[i].datasources[d].rows[n].value_num; n2++)
 					free(cases[i].datasources[d].rows[n].values[n2]);
-				}
-
-				free(cases[i].datasources[d].rows[n].names);
-				free(cases[i].datasources[d].rows[n].values);
 			}
-
-			free(cases[i].datasources[d].rows);
 		}
 
 		free(cases[i].datasources);
@@ -414,7 +426,7 @@ void	free_data()
 
 void	debug_print_cases()
 {
-	int i, n, n2;
+	int i, n, n2, n3;
 
 	printf("case_num %d\n", case_num);
 
@@ -441,13 +453,16 @@ void	debug_print_cases()
 
 		for (n = 0; n < cases[i].datasource_num; n++)
 		{
-			printf(" datasource: %s (num %d)\n", cases[i].datasources[n].name,
-					cases[i].datasources[n].rows->data_num);
+			printf(" datasource: %s (num %d)\n", cases[i].datasources[n].source_name,
+					cases[i].datasources[n].field_num);
 
-			for (n2 = 0; n2 < cases[i].datasources[n].rows->data_num; n2++)
+			for (n2 = 0; n2 < cases[i].datasources[n].field_num; n2++)
+				printf("  datasource field: %s\n", cases[i].datasources[n].field_names[n2]);
+
+			for (n2 = 0; n2 < cases[i].datasources[n].row_num; n2++)
 			{
-				printf("  datasource field: %s\n", cases[i].datasources[n].rows->names[n2]);
-				printf("  datasource values: %s\n", cases[i].datasources[n].rows->values[n2]);
+				for (n3 = 0; n3 < cases[i].datasources[n].rows[n2].value_num; n3++)
+					printf("  datasource row value[%d]: %s\n", n3, cases[i].datasources[n].rows[n2].values[n3]);
 			}
 		}
 

@@ -60,8 +60,17 @@ zbx_test_data_t;
 
 typedef struct
 {
-	char			*name;
-	zbx_test_data_t		*rows;
+	char	**values;
+	int	value_num;
+}
+zbx_test_row_t;
+
+typedef struct
+{
+	char			*source_name;
+	char			**field_names;
+	int			field_num;
+	zbx_test_row_t		*rows;
 	int			row_num;
 }
 zbx_test_datasource_t;
@@ -110,11 +119,5 @@ struct zbx_db_result
 	int		rows_num;
 	int		cur_row_idx;
 };
-
-void	test_try_task_closes_problem();
-void	test_evaluate_function();
-void	test_exception();
-void	test_process_escalations();
-void	test_successful_tm_get_remote_tasks();
 
 #endif
