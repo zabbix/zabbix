@@ -176,8 +176,9 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
-$itemFormList->addRow(_('JMX endpoint'),
-	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+$itemFormList->addRow((new CLabel(_('JMX endpoint')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	'row_jmx_endpoint'
 );
 $itemFormList->addRow(_('User name'),
@@ -213,8 +214,8 @@ $itemFormList->addRow(
 	'label_params'
 );
 
-$itemFormList->addRow(_('Update interval'),
-	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+$itemFormList->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAttribute('aria-required', 'true'),
 	'row_delay'
 );
 
@@ -267,8 +268,9 @@ $itemFormList->addRow(_('Custom intervals'),
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 		'row_flex_intervals'
 	)
-	->addRow(_('Keep lost resources period'),
+	->addRow((new CLabel(_('Keep lost resources period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('lifetime', $data['lifetime']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Allowed hosts'),
 		(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

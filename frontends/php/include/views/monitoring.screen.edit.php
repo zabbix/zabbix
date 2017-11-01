@@ -85,16 +85,18 @@ if (!$data['screen']['templateid']) {
 		$multiselect_data['data'] = $owner_data;
 
 		// Append multiselect to screen tab.
-		$screen_tab->addRow(_('Owner'),
+		$screen_tab->addRow((new CLabel(_('Owner')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('aria-required', 'true')
 		);
 	}
 	else {
-		$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true');
 
 		// Administrators can change screen owner, but cannot see users from other groups.
 		if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-			$screen_tab->addRow(_('Owner'), $multiselect_userid)
+			$screen_tab->addRow((new CLabel(_('Owner')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $multiselect_userid)
 				->addRow('', _('Inaccessible user'), 'inaccessible_user');
 		}
 		else {

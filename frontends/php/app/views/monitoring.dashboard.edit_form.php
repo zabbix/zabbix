@@ -36,14 +36,16 @@ $multiselect = (new CMultiSelect([
 	],
 	'callPostEvent' => true
 ]))
+	->setAttribute('aria-required', 'true')
 	->setAttribute('data-default-owner', CJs::encodeJson($data['dashboard']['owner']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $form->addItem((new CFormList())
-	->addRow(_('Owner'), $multiselect)
-	->addRow(_('Name'),
+	->addRow((new CLabel(_('Owner')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $multiselect)
+	->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	)
 );

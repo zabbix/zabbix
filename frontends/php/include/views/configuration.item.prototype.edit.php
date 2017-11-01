@@ -209,8 +209,9 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
-$itemFormList->addRow(_('JMX endpoint'),
-	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+$itemFormList->addRow((new CLabel(_('JMX endpoint')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	'row_jmx_endpoint'
 );
 $itemFormList->addRow(_('User name'),
@@ -276,8 +277,8 @@ $itemFormList->addRow(_('Units'),
 	'row_units'
 );
 
-$itemFormList->addRow(_('Update interval'),
-	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+$itemFormList->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAttribute('aria-required', 'true'),
 	'row_delay'
 );
 
@@ -332,12 +333,18 @@ $itemFormList->addRow(_('Custom intervals'),
 );
 
 $keepHistory = [];
-$keepHistory[] = (new CTextBox('history', $data['history']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-$itemFormList->addRow(_('History storage period'), $keepHistory);
+$keepHistory[] = (new CTextBox('history', $data['history']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	->setAttribute('aria-required', 'true');
+$itemFormList->addRow((new CLabel(_('History storage period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$keepHistory
+);
 
 $keepTrend = [];
-$keepTrend[] = (new CTextBox('trends', $data['trends']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-$itemFormList->addRow(_('Trend storage period'), $keepTrend, 'row_trends');
+$keepTrend[] = (new CTextBox('trends', $data['trends']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	->setAttribute('aria-required', 'true');
+$itemFormList->addRow((new CLabel(_('Trend storage period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $keepTrend,
+	'row_trends'
+);
 
 $itemFormList->addRow(_('Log time format'),
 	(new CTextBox('logtimefmt', $this->data['logtimefmt'], $readonly, 64))

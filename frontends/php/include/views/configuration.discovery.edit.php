@@ -50,12 +50,14 @@ foreach ($this->data['proxies'] as $proxy) {
 
 $discoveryFormList
 	->addRow(_('Discovery by proxy'), $proxyComboBox)
-	->addRow(_('IP range'),
+	->addRow((new CLabel(_('IP range')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Update interval'),
+	->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('delay', $data['drule']['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 
 $discoveryFormList->addRow(

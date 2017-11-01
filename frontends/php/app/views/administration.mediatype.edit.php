@@ -59,14 +59,22 @@ $cmbTypeRow[] = $ez_texting_link;
 
 $mediaTypeFormList
 	->addRow(_('Type'), $cmbTypeRow)
-	->addRow(_('SMTP server'),
+	->addRow((new CLabel(_('SMTP server')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('SMTP server port'),
+	->addRow((new CLabel(_('SMTP server port')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('SMTP helo'), (new CTextBox('smtp_helo', $data['smtp_helo']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('SMTP email'), (new CTextBox('smtp_email', $data['smtp_email']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow((new CLabel(_('SMTP helo')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('smtp_helo', $data['smtp_helo']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
+	)
+	->addRow((new CLabel(_('SMTP email')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('smtp_email', $data['smtp_email']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
+	)
 	->addRow(_('Connection security'),
 		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
 			->addValue(_('None'), SMTP_CONNECTION_SECURITY_NONE)
@@ -83,7 +91,10 @@ $mediaTypeFormList
 			->setModern(true)
 	)
 	->addRow(_('Username'), (new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
-	->addRow(_('Script name'), (new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+	->addRow((new CLabel(_('Script name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
+	);
 
 $exec_params_table = (new CTable())
 	->setId('exec_params_table')
@@ -113,8 +124,9 @@ $mediaTypeFormList->addRow(_('Script parameters'),
 	'row_exec_params'
 );
 
-$mediaTypeFormList->addRow(_('GSM modem'),
+$mediaTypeFormList->addRow((new CLabel(_('GSM modem')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	(new CTextBox('gsm_modem', $data['gsm_modem']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true')
 );
 
 // create password field
@@ -133,11 +145,13 @@ else {
 
 // append password field to form list
 $mediaTypeFormList
-	->addRow(_('Jabber identifier'),
+	->addRow((new CLabel(_('Jabber identifier')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('jabber_username', $data['jabber_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Username'),
+	->addRow((new CLabel(_('Username')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('eztext_username', $data['eztext_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow((new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $passwdField)
 	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [

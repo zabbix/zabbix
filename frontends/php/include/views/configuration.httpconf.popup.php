@@ -173,9 +173,10 @@ else {
 	$httpPopupFormList
 		->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1))
 		->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1))
-		->addRow(_('Timeout'),
+		->addRow((new CLabel(_('Timeout')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			(new CTextBox('timeout', getRequest('timeout', DB::getDefault('httpstep', 'timeout'))))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('aria-required', 'true')
 		)
 		->addRow(_('Required string'),
 			(new CTextBox('required', getRequest('required', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

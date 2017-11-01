@@ -180,7 +180,7 @@ if (isset($_REQUEST['new_timeperiod'])) {
 /*
  * Hosts & groups tab
  */
-$hostsAndGroupsFormList = new CFormList('hostsAndGroupsFormList');
+$hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'));
 $hostTweenBox = new CTweenBox($maintenanceForm, 'hostids', $this->data['hostids'], 10);
 foreach ($this->data['hosts'] as $host) {
 	$hostTweenBox->addItem($host['hostid'], $host['name']);

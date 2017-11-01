@@ -284,8 +284,9 @@ else {
 }
 
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
-$itemFormList->addRow(_('JMX endpoint'),
-	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $discovered_item, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+$itemFormList->addRow((new CLabel(_('JMX endpoint')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $discovered_item, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	'row_jmx_endpoint'
 );
 $itemFormList->addRow(_('User name'),
@@ -356,8 +357,10 @@ $itemFormList->addRow(_('Units'),
 	'row_units'
 );
 
-$itemFormList->addRow(_('Update interval'),
-	(new CTextBox('delay', $data['delay'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_delay'
+$itemFormList->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('delay', $data['delay'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAttribute('aria-required', 'true'),
+	'row_delay'
 );
 
 // Append custom intervals to form list.
@@ -426,7 +429,8 @@ $itemFormList->addRow(_('Custom intervals'),
 
 // Append history storage to form list.
 $keepHistory = [];
-$keepHistory[] = (new CTextBox('history', $data['history'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+$keepHistory[] = (new CTextBox('history', $data['history'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	->setAttribute('aria-required', 'true');
 
 if ($data['config']['hk_history_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
@@ -444,11 +448,14 @@ if ($data['config']['hk_history_global']
 	$keepHistory[] = ' ('.$data['config']['hk_history'].')';
 }
 
-$itemFormList->addRow(_('History storage period'), $keepHistory);
+$itemFormList->addRow((new CLabel(_('History storage period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$keepHistory
+);
 
 // Append trend storage to form list.
 $keepTrend = [];
-$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	->setAttribute('aria-required', 'true');
 
 if ($data['config']['hk_trends_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
@@ -466,7 +473,9 @@ if ($data['config']['hk_trends_global']
 	$keepTrend[] = ' ('.$data['config']['hk_trends'].')';
 }
 
-$itemFormList->addRow(_('Trend storage period'), $keepTrend, 'row_trends');
+$itemFormList->addRow((new CLabel(_('Trend storage period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $keepTrend,
+	'row_trends'
+);
 
 $itemFormList->addRow(_('Log time format'),
 	(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

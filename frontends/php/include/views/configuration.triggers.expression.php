@@ -39,7 +39,8 @@ $expressionFormList = new CFormList();
 
 // append item to form list
 $item = [
-	(new CTextBox('description', $this->data['description'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('description', $this->data['description'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
@@ -57,7 +58,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');');
 }
 
-$expressionFormList->addRow(_('Item'), $item);
+$expressionFormList->addRow((new CLabel(_('Item')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $item);
 
 $functionComboBox = new CComboBox('expr_type', $this->data['expr_type'], 'submit()');
 foreach ($this->data['functions'] as $id => $f) {

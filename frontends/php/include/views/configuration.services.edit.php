@@ -89,8 +89,10 @@ $servicesFormList->addRow(_('Trigger'), [
 			'&with_triggers=1");'
 		)
 ]);
-$servicesFormList->addRow(_('Sort order (0->999)'), (new CTextBox('sortorder', $this->data['sortorder'], false, 3))
-	->setWidth(ZBX_TEXTAREA_TINY_WIDTH));
+$servicesFormList->addRow((new CLabel(_('Sort order (0->999)')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CTextBox('sortorder', $this->data['sortorder'], false, 3))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		->setAttribute('aria-required', 'true')
+);
 
 /*
  * Dependencies tab
@@ -269,27 +271,23 @@ else {
 	}
 	$timeFromHourTextBox = (new CTextBox('new_service_time[from_hour]', isset($_REQUEST['new_service_time']['from_hour'])
 			? $_REQUEST['new_service_time']['from_hour'] : '', false, 2))
-		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('hh'));
 	$timeFromMinuteTextBox = (new CTextBox('new_service_time[from_minute]', isset($_REQUEST['new_service_time']['from_minute'])
 			? $_REQUEST['new_service_time']['from_minute'] : '', false, 2))
-		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('mm'));
 	$timeToHourTextBox = (new CTextBox('new_service_time[to_hour]', isset($_REQUEST['new_service_time']['to_hour'])
 			? $_REQUEST['new_service_time']['to_hour'] : '', false, 2))
-		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('hh'));
 	$timeToMinuteTextBox = (new CTextBox('new_service_time[to_minute]', isset($_REQUEST['new_service_time']['to_minute'])
 			? $_REQUEST['new_service_time']['to_minute'] : '', false, 2))
-		->setAttribute('aria-required', 'true')
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('mm'));
 
 	$serviceTimeTable->addRow([
-		(new CLabel(_('From')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		_('From'),
 		[
 			$weekFromComboBox,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -303,7 +301,7 @@ else {
 		]
 	]);
 	$serviceTimeTable->addRow([
-		(new CLabel(_('Till')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		_('Till'),
 		[
 			$weekToComboBox,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

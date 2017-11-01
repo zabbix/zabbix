@@ -183,12 +183,14 @@ if ($this->data['alias'] != ZBX_GUEST_USER) {
 }
 
 $userFormList
-	->addRow(_('Refresh'),
+	->addRow((new CLabel(_('Refresh')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('refresh', $data['refresh']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Rows per page'),
+	->addRow((new CLabel(_('Rows per page')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('URL (after login)'),
 		(new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

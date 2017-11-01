@@ -75,8 +75,9 @@ $httpFormList
 			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 	)
-	->addRow(_('Update interval'),
+	->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Attempts'),
 		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
@@ -148,13 +149,15 @@ $httpAuthenticationFormList->addRow(_('HTTP authentication'),
 );
 
 $httpAuthenticationFormList
-	->addRow(_('User'),
+	->addRow((new CLabel(_('User')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('http_user', $this->data['http_user'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Password'),
+	->addRow((new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('http_password', $this->data['http_password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)

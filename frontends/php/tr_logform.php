@@ -333,8 +333,9 @@ if (hasRequest('sform')) {
 		(new CTabView())
 			->addTab('trigger_tab', null,
 				(new CFormList())
-					->addRow(_('Name'),
+					->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 						(new CTextBox('description', $description))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAttribute('aria-required', 'true')
 					)
 					->addRow(_('Item'), [
 						(new CTextBox('item', $item_name))
@@ -379,7 +380,7 @@ if (hasRequest('sform')) {
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 					)
-					->addRow(null,
+					->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 						(new CDiv($expression_table))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

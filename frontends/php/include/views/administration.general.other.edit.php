@@ -40,9 +40,10 @@ foreach ($data['alert_usrgrps'] as $usrgrp) {
 }
 
 $otherTab
-	->addRow(_('Refresh unsupported items'),
+	->addRow((new CLabel(_('Refresh unsupported items')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('refresh_unsupported', $data['refresh_unsupported']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Group for discovered hosts'), $discoveryGroup)
 	->addRow(_('Default host inventory mode'),

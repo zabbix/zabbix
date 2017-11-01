@@ -74,16 +74,18 @@ if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users
 	$multiselect_data['data'] = $owner_data;
 
 	// Append multiselect to map tab.
-	$map_tab->addRow(_('Owner'),
+	$map_tab->addRow((new CLabel(_('Owner')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 }
 else {
-	$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('aria-required', 'true');
 
 	// Administrators can change map owner, but cannot see users from other groups.
 	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-		$map_tab->addRow(_('Owner'), $multiselect_userid)
+		$map_tab->addRow((new CLabel(_('Owner')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $multiselect_userid)
 			->addRow('', _('Inaccessible user'), 'inaccessible_user');
 	}
 	else {

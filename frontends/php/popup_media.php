@@ -129,7 +129,10 @@ $frmMedia = (new CFormList(_('Media')))
 		(new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('When active'), (new CTextBox('period', $period, false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow((new CLabel(_('When active')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('period', $period, false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
+	)
 	->addRow(_('Use if severity'), $frm_row)
 	->addRow(_('Enabled'), (new CCheckBox('active', MEDIA_STATUS_ACTIVE))->setChecked($active == MEDIA_STATUS_ACTIVE));
 
