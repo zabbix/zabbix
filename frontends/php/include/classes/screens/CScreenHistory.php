@@ -378,67 +378,60 @@ class CScreenHistory extends CScreenBase {
 					['field' => 'name_expanded', 'order' => ZBX_SORT_UP]
 				]);
 				$table_header = [(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH)];
-				$table_rows = [];
 				$history_data = [];
 
-				// History data limit is defined for one item therefore querying history data should be done for every
-				// item separately.
 				foreach ($items as $item) {
-					$table_header[] = (new CColHeader($item['name_expanded']))->addClass('vertical_rotation')
-						->setAttribute('title', $item['name_expanded']);
 					$options['itemids'] = [$item['itemid']];
 					$options['history'] = $item['value_type'];
-					$history_data = array_merge($history_data, array_values(API::History()->get($options)));
-				}
+					$item_data = API::History()->get($options);
 
-				// Sort history data for all items.
-				CArrayHelper::sort($history_data, [
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				]);
+					CArrayHelper::sort($item_data, [
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					]);
 
-				// Iterate over every row and merge into previous when matches condition:
-				//	- Previous row clock equal current row clock and current row itemid not in previous row values.
-				$prev_row = [];
-				$table_rows = [];
-				$row_index = 0;
+					$table_header[] = (new CColHeader($item['name_expanded']))->addClass('vertical_rotation')
+						->setAttribute('title', $item['name_expanded']);
+					$history_data_index = 0;
 
-				foreach ($history_data as $history_row) {
-					if ($prev_row && $prev_row['clock'] == $history_row['clock']
-						&& !array_key_exists($history_row['itemid'], $prev_row['values'])) {
-						$prev_row['values'][$history_row['itemid']] = $history_row['value'];
-					}
-					// Do not process rows exceeding defined maximum rows count.
-					elseif ($row_index > $options['limit']) {
-						break;
-					}
-					else {
-						if ($prev_row) {
-							$table_rows[$row_index] = $prev_row;
-							++$row_index;
+					foreach ($item_data as $item_data_row) {
+						// Searching for starting 'insert before' index in results array.
+						while (array_key_exists($history_data_index, $history_data)) {
+							$history_row = $history_data[$history_data_index];
+
+							if ($history_row['clock'] <= $item_data_row['clock']
+									&& !array_key_exists($item['itemid'], $history_row['values'])) {
+								break;
+							}
+
+							++$history_data_index;
 						}
 
-						$prev_row = [
-							'clock' => $history_row['clock'],
-							'ns' => $history_row['ns'],
-							'values' => [
-								$history_row['itemid'] => $history_row['value']
-							]
-						];
+						if (array_key_exists($history_data_index, $history_data)
+								&& !array_key_exists($item['itemid'], $history_row['values'])
+								&& $history_data[$history_data_index]['clock'] === $item_data_row['clock']) {
+							$history_data[$history_data_index]['values'][$item['itemid']] = $item_data_row['value'];
+						}
+						else {
+							array_splice($history_data, $history_data_index, 0, [[
+								'clock' => $item_data_row['clock'],
+								'values' => [$item['itemid'] => $item_data_row['value']]
+							]]);
+						}
 					}
 				}
 
 				$url = new CUrl($this->page_file);
 				$url->formatGetArguments();
-				// Array $table_rows will be modified according page and rows on page.
-				$pagination = getPagingLine($table_rows, [], $url);
+				// Array $history_data will be modified according page and rows on page.
+				$pagination = getPagingLine($history_data, [], $url);
 				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
 
-				foreach ($table_rows as $table_row) {
-					$row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $table_row['clock'])))
+				foreach ($history_data as $history_data_row) {
+					$row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_data_row['clock'])))
 						->addClass(ZBX_STYLE_NOWRAP)
 					];
-					$values = $table_row['values'];
+					$values = $history_data_row['values'];
 
 					foreach ($items as $item) {
 						$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
@@ -450,7 +443,7 @@ class CScreenHistory extends CScreenBase {
 							$value = rtrim($value, " \t\r\n");
 						}
 
-						$row[] = $value === '' ? '' : new CPre($value);
+						$row[] = ($value === '') ? '' : new CPre($value);
 					}
 
 					$history_table->addRow($row);
