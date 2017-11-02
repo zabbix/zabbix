@@ -357,6 +357,13 @@ tests/.deps
 tests/.dirstamp
 tests/Makefile
 tests/Makefile.in
+tests/libs/.deps
+tests/libs/Makefile
+tests/libs/Makefile.in
+tests/libs/zbxdbhigh/.deps
+tests/libs/zbxdbhigh/Makefile
+tests/libs/zbxdbhigh/Makefile.in
+tests/libs/zbxdbhigh/dbselect_uint64
 tests/zabbix_server/.deps
 tests/zabbix_server/Makefile
 tests/zabbix_server/Makefile.in
