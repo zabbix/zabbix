@@ -353,6 +353,17 @@ src/zabbix_server/vmware/Makefile
 src/zabbix_server/vmware/Makefile.in
 src/zabbix_server/zabbix_server
 /tags
+tests/.deps
+tests/.dirstamp
+tests/Makefile
+tests/Makefile.in
+tests/zabbix_server/.deps
+tests/zabbix_server/Makefile
+tests/zabbix_server/Makefile.in
+tests/zabbix_server/taskmanager/.deps
+tests/zabbix_server/taskmanager/Makefile
+tests/zabbix_server/taskmanager/Makefile.in
+tests/zabbix_server/taskmanager/try_task_closes_problem
 upgrades/Makefile
 upgrades/Makefile.in
 /zabbix-*.tar.gz
