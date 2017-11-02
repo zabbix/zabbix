@@ -1091,6 +1091,8 @@ esac],
 
 AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
 
+AM_CONDITIONAL([ZBXCMOCKA], [test -d tests/])
+
 have_db="no"
 have_unixodbc="no"
 have_web_monitoring="no"
@@ -1578,6 +1580,13 @@ dnl *                                                               *
 dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
+
+AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
+	tests/Makefile
+	tests/zabbix_server/Makefile
+	tests/zabbix_server/escalator/Makefile
+	tests/zabbix_server/taskmanager/Makefile
+)])
 
 AC_OUTPUT([
 	Makefile
