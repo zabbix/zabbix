@@ -706,7 +706,7 @@ if (!empty($data['new_operation'])) {
 
 			$new_operation_formlist
 				->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-					_s('At least one %1$s must be selected.', 'user or user group')
+					_s('At least one %1$s must be selected.', _('user or user group'))
 				)
 				->addRow(_('Send to User groups'),
 					(new CDiv($usrgrpList))
@@ -2256,7 +2256,7 @@ $action_tabs->setFooter([
 			(new CDiv((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)))
 				->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 			(new CDiv(
-				_s('At least one %1$s must exist.', 'operation, recovery operation or acknowledge operation')
+				_s('At least one %1$s must exist.', _('operation, recovery operation or acknowledge operation'))
 			))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 		]),
 	makeFormFooter($form_buttons[0], $form_buttons[1])

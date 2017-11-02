@@ -126,7 +126,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$hostList->addRow(
 		(new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		_s('At least one %1$s must exist.', 'interface')
+		_s('At least one %1$s must exist.', _('interface'))
 	);
 	// Zabbix agent interfaces
 	$ifTab = (new CTable())

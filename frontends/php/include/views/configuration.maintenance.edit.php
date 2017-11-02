@@ -182,7 +182,7 @@ if (isset($_REQUEST['new_timeperiod'])) {
  */
 $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))->addRow(
 	(new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	_s('At least one %1$s must be selected.', 'host or host group')
+	_s('At least one %1$s must be selected.', _('host or host group'))
 );
 $hostTweenBox = new CTweenBox($maintenanceForm, 'hostids', $this->data['hostids'], 10);
 foreach ($this->data['hosts'] as $host) {
