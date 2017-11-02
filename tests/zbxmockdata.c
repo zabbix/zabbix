@@ -317,7 +317,10 @@ void	debug_print_cases(zbx_test_case_t *test_case)
 char	*get_in_param_by_index(int idx)
 {
 	if (idx >= test_case->in_params.data_num)
+	{
+		fail_msg("Cannot find in_param by index=%d", idx);
 		return NULL;
+	}
 
 	return test_case->in_params.values[idx];
 }
@@ -325,7 +328,10 @@ char	*get_in_param_by_index(int idx)
 char	*get_out_param_by_index(int idx)
 {
 	if (idx >= test_case->out_params.data_num)
+	{
+		fail_msg("Cannot find out_param by index=%d", idx);
 		return NULL;
+	}
 
 	return test_case->out_params.values[idx];
 }
@@ -340,7 +346,9 @@ char	*get_in_param_by_name(char *name)
 			return test_case->in_params.values[i];
 	}
 
-	return "1";
+	fail_msg("Cannot find in_param by name='%s'", name);
+
+	return NULL;
 }
 
 char	*get_out_param_by_name(char *name)
@@ -352,6 +360,8 @@ char	*get_out_param_by_name(char *name)
 		if (0 == strcmp(test_case->out_params.names[i], name))
 			return test_case->out_params.values[i];
 	}
+
+	fail_msg("Cannot find out_param by name='%s'", name);
 
 	return NULL;
 }
@@ -371,6 +381,8 @@ char	*get_out_func_param_by_index(int idx)
 		}
 	}
 out:
+	fail_msg("Cannot find out_func_param by index=%d", idx);
+
 	return NULL;
 }
 
@@ -389,6 +401,8 @@ char	*get_out_func_param_by_name(char *name)
 			}
 		}
 	}
+
+	fail_msg("Cannot find out_func_param by name='%s'", name);
 
 	return NULL;
 }

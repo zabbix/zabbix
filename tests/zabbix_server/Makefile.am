@@ -1,3 +1,3 @@
-SUBDIRS = \
-	taskmanager
+SUBDIRS =
+
 

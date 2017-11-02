@@ -83,7 +83,7 @@ DB_RESULT __wrap_zbx_db_vselect(const char *fmt, va_list args)
 			break;
 	}
 
-	if (i > test_case->datasource_num && 0 < test_case->datasources[i].row_num)
+	if (i < test_case->datasource_num && 0 < test_case->datasources[i].row_num)
 	{
 		result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 		result->rows = (DB_ROW *)zbx_malloc(NULL, sizeof(DB_ROW **) * TEST_MAX_ROW_NUM);
@@ -97,6 +97,9 @@ DB_RESULT __wrap_zbx_db_vselect(const char *fmt, va_list args)
 	}
 	else
 	{
+		if (i == test_case->datasource_num)
+			fail_msg("Cannot find test suite for \"%s\" data source!\nSQL:%s\n", data_source, sql);
+
 		zbx_free(sql);
 		zbx_free(data_source);
 	}
@@ -110,12 +113,6 @@ DB_ROW __wrap_zbx_db_fetch(DB_RESULT result)
 
 	if (NULL == result)
 		return NULL;
-
-	if (0 > result->rows_num)
-	{
-		fail_msg("Cannot find test suite for \"%s\" data source!\nSQL:%s\n",
-			result->data_source, result->sql);
-	}
 
 	row = result->rows[result->cur_row_idx];
 	result->cur_row_idx++;

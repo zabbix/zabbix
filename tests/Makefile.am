@@ -1,6 +1,6 @@
 if SERVER
 SERVER_SUBDIRS = \
-	zabbix_server
+	libs
 endif
 
 SUBDIRS = \
