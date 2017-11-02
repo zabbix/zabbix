@@ -362,10 +362,6 @@ tests/Makefile.in
 tests/zabbix_server/.deps
 tests/zabbix_server/Makefile
 tests/zabbix_server/Makefile.in
-tests/zabbix_server/escalator/.deps
-tests/zabbix_server/escalator/Makefile
-tests/zabbix_server/escalator/Makefile.in
-tests/zabbix_server/escalator/process_escalations
 tests/zabbix_server/taskmanager/.deps
 tests/zabbix_server/taskmanager/Makefile
 tests/zabbix_server/taskmanager/Makefile.in

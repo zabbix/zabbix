@@ -18,21 +18,18 @@
 **/
 
 #include "../../zbxtests.h"
-
 #include "zbxmocktest.h"
-
+#include "zbxmockdata.h"
 #include "../../../src/zabbix_server/taskmanager/taskmanager.h"
 
-extern char	*curr_tested_function;
 extern char	*curr_wrapped_function;
-extern char	*curr_case_name;
-extern int	curr_case_idx;
 
 void	__wrap_DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in,
 		zbx_vector_uint64_t *triggerids_out)
 {
-	int		i;
-	zbx_uint64_t 	triggerid;
+	zbx_uint64_t	triggerid;
+
+	ZBX_UNUSED(triggerids_in);
 
 	curr_wrapped_function = "DCconfig_lock_triggers_by_triggerids";
 
@@ -46,27 +43,13 @@ void	__wrap_DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 
 void	zbx_mock_test_entry(void **state)
 {
-	int	i, ret, taskid, res, executed_num = 0;
+	int	ret, taskid, res;
 
-	curr_tested_function = "try_task_closes_problem";
+	ZBX_UNUSED(state);
 
-	for (i = 0; i < case_num; i++)
-	{
-		if (0 == strcmp(cases[i].tested_function, curr_tested_function))
-		{
-			curr_case_idx = i;
-			curr_case_name = cases[i].case_name;
+	taskid = atoi(get_in_param_by_name("taskid"));
+	ret = tm_try_task_close_problem(taskid);
+	res = atoi(get_out_param_by_name("return"));
 
-			taskid = atoi(get_in_param_by_name("taskid"));
-			ret = tm_try_task_close_problem(taskid);
-			res = atoi(get_out_param_by_name("return"));
-
-			assert_int_equal(ret, res);
-
-			executed_num++;
-		}
-	}
-
-	if (0 == executed_num)
-		fail_msg("Test was not executed");
+	assert_int_equal(ret, res);
 }

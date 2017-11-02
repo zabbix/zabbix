@@ -118,7 +118,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	tm_try_task_close_problem(zbx_uint64_t taskid)
+static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 {
 	const char		*__function_name = "tm_try_task_close_problem";
 

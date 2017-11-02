@@ -159,12 +159,12 @@ void	zbx_on_exit(void)
 
 /* test itself */
 
-int	main(void)
+int	main ()
 {
 	const struct CMUnitTest tests[] =
 	{
-		cmocka_unit_test(zbx_mock_test_entry)
+		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
 
-	return cmocka_run_group_tests(tests, zbx_mock_data_init, zbx_mock_data_free);
+	return cmocka_run_group_tests(tests, NULL, NULL);
 }

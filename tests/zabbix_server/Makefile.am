@@ -1,3 +1,3 @@
 SUBDIRS = \
-	escalator \
 	taskmanager
+

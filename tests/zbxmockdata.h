@@ -23,4 +23,11 @@
 int	zbx_mock_data_init(void **state);
 int	zbx_mock_data_free(void **state);
 
+char	*get_out_param_by_index(int idx);
+char	*get_out_param_by_name(char *name);
+char	*get_in_param_by_index(int idx);
+char	*get_in_param_by_name(char *name);
+char	*get_out_func_param_by_index(int idx);
+char	*get_out_func_param_by_name(char *name);
+
 #endif	/* ZABBIX_MOCK_DATA_H */

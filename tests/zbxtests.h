@@ -35,20 +35,24 @@
 #undef strcpy
 
 #define ZBX_TEST_DATA_TYPE_UNKNOWN	0
-#define	ZBX_TEST_DATA_TYPE_CASE		1
-#define	ZBX_TEST_DATA_TYPE_PARAM_IN	2
-#define	ZBX_TEST_DATA_TYPE_PARAM_OUT	3
-#define	ZBX_TEST_DATA_TYPE_DB_DATA	4
-#define	ZBX_TEST_DATA_TYPE_FUNCTION	5
-#define	ZBX_TEST_DATA_TYPE_IN_PARAM	8
-#define	ZBX_TEST_DATA_TYPE_IN_VALUE	9
-#define	ZBX_TEST_DATA_TYPE_OUT_PARAM	10
-#define	ZBX_TEST_DATA_TYPE_OUT_VALUE	11
-#define	ZBX_TEST_DATA_TYPE_DB_FIELD	12
-#define	ZBX_TEST_DATA_TYPE_DB_ROW	13
-#define	ZBX_TEST_DATA_TYPE_FUNC_OUT	14
-#define	ZBX_TEST_DATA_TYPE_FUNC_VALUE	15
-#define	ZBX_TEST_DATA_TYPE_TESTED_FUNC	16
+#define	ZBX_TEST_DATA_TYPE_PARAM_IN	1
+#define	ZBX_TEST_DATA_TYPE_PARAM_OUT	2
+#define	ZBX_TEST_DATA_TYPE_DB_DATA	3
+#define	ZBX_TEST_DATA_TYPE_FUNCTION	4
+#define	ZBX_TEST_DATA_TYPE_IN_PARAM	5
+#define	ZBX_TEST_DATA_TYPE_IN_VALUE	6
+#define	ZBX_TEST_DATA_TYPE_OUT_PARAM	7
+#define	ZBX_TEST_DATA_TYPE_OUT_VALUE	8
+#define	ZBX_TEST_DATA_TYPE_DB_FIELD	9
+#define	ZBX_TEST_DATA_TYPE_DB_ROW	10
+#define	ZBX_TEST_DATA_TYPE_FUNC_OUT	11
+#define	ZBX_TEST_DATA_TYPE_FUNC_VALUE	12
+
+#define	TEST_MAX_CASE_NUM		512
+#define	TEST_MAX_DATASOURCE_NUM		1024
+#define	TEST_MAX_FUNCTION_NUM		1024
+#define	TEST_MAX_ROW_NUM		512
+#define	TEST_MAX_DATA_NUM		512
 
 typedef struct
 {
@@ -84,8 +88,6 @@ zbx_test_function_t;
 
 typedef struct
 {
-	char			*case_name;
-	char			*tested_function;
 	int			datasource_num;
 	int			function_num;
 	zbx_test_data_t		in_params;
@@ -96,24 +98,9 @@ typedef struct
 }
 zbx_test_case_t;
 
-zbx_test_case_t		*cases;
-int			case_num;
-
-char	*get_in_param_by_index(int idx);
-char	*get_out_param_by_index(int idx);
-char	*get_in_param_by_name(const char *name);
-char	*get_out_param_by_name(const char *name);
-char	*get_out_func_param_by_idx(int idx);
-char	*get_out_func_param_by_name(const char *name);
-
-int	load_data(char *file_name);
-void	free_data();
-void	debug_print_cases();
-
 struct zbx_db_result
 {
 	char		*data_source;	/* "<table name>_" + "<table name>" + ... */
-	char		*case_name;
 	char		*sql;
 	DB_ROW		*rows;
 	int		rows_num;
