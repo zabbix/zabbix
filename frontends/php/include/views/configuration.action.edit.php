@@ -530,7 +530,7 @@ if (empty($data['new_operation'])) {
 }
 
 $operation_tab->addRow(
-	(new CLabel(_('Operations')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Operations'))),
 	(new CDiv([$operationsTable, $footer]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -705,6 +705,9 @@ if (!empty($data['new_operation'])) {
 			zbx_add_post_js($js_insert);
 
 			$new_operation_formlist
+				->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+					_s('At least one %1$s must be selected.', 'user or user group')
+				)
 				->addRow(_('Send to User groups'),
 					(new CDiv($usrgrpList))
 						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -1276,7 +1279,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	}
 
 	$recovery_tab->addRow(
-		(new CLabel(_('Operations')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Operations'))),
 		(new CDiv([$operationsTable, $footer]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -1413,6 +1416,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				zbx_add_post_js($js_insert);
 
 				$new_operation_formlist
+					->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						_s('At least one %1$s must be selected.', 'user or user group')
+					)
 					->addRow(_('Send to User groups'),
 						(new CDiv($usrgrpList))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -2123,6 +2129,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				);
 		}
 
+		if ($usrgrp_list || $user_list) {
+			$new_operation_formlist->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+				_s('At least one %1$s must be selected.', 'user or user group')
+			);
+		}
+
 		if ($usrgrp_list) {
 			$new_operation_formlist->addRow(_('Send to User groups'),
 				(new CDiv($usrgrp_list))
@@ -2198,7 +2210,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	}
 	else {
 		$acknowledge_tab->addRow(
-			(new CLabel(_('Operations')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			(new CLabel(_('Operations'))),
 			(new CDiv([$operations_table,
 				(new CSimpleButton(_('New')))
 					->onClick('javascript: submitFormWithParam("'.$action_formname.'", "new_ack_operation", "1");')
@@ -2219,7 +2231,7 @@ if (!hasRequest('form_refresh')) {
 // Append buttons to form.
 $others = [];
 if ($data['actionid']) {
-	$action_tabs->setFooter(makeFormFooter(
+	$form_buttons = [
 		new CSubmit('update', _('Update')), [
 			new CButton('clone', _('Clone')),
 			new CButtonDelete(
@@ -2228,15 +2240,27 @@ if ($data['actionid']) {
 			),
 			new CButtonCancel(url_param('actiontype'))
 		]
-	));
+	];
 }
 else {
-	$action_tabs->setFooter(makeFormFooter(
+	$form_buttons = [
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel(url_param('actiontype'))]
-	));
+	];
 }
 
+$action_tabs->setFooter([
+	(new CList())
+		->addClass(ZBX_STYLE_TABLE_FORMS)
+		->addItem([
+			(new CDiv((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)))
+				->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+			(new CDiv(
+				_s('At least one %1$s must exist.', 'operation, recovery operation or acknowledge operation')
+			))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+		]),
+	makeFormFooter($form_buttons[0], $form_buttons[1])
+]);
 $actionForm->addItem($action_tabs);
 
 // Append form to widget.
