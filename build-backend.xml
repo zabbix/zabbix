@@ -75,9 +75,9 @@
 					<arg line="make"/>
 					<arg line="-s"/>
 					<arg line="-j5"/>
-<!--				</exec>
-			</sequential>-->
-		</for>
+				</exec>
+<!--			</sequential>
+		</for>-->
 	</target>
 
 	<!-- Static analysis container target -->
