@@ -235,16 +235,10 @@ class CScreenDiscovery extends CScreenBase {
 				];
 
 				foreach ($services as $name => $foo) {
-					if (array_key_exists($name, $h_data['services'])) {
-						$class = $h_data['services'][$name]['class'];
-						$time = zbx_date2age($h_data['services'][$name]['time']);
-					}
-					else {
-						$class = null;
-						$time = SPACE;
-					}
-
-					$row[] = (new CCol($time))->addClass($class);
+					$row[] = array_key_exists($name, $h_data['services'])
+						? (new CCol(zbx_date2age($h_data['services'][$name]['time'])))
+							->addClass($h_data['services'][$name]['class'])
+						: '';
 				}
 				$table->addRow($row);
 			}
