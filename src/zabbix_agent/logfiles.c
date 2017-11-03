@@ -1110,7 +1110,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	}
 
 	(*logfiles)[i].filename = zbx_strdup(NULL, filename);
-	(*logfiles)[i].mtime = st->st_mtime;
+	(*logfiles)[i].mtime = (int)st->st_mtime;
 	(*logfiles)[i].md5size = -1;
 	(*logfiles)[i].seq = 0;
 	(*logfiles)[i].incomplete = 0;

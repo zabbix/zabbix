@@ -146,7 +146,7 @@ static void	print_backtrace(CONTEXT *pctx)
 	if (0 != GetModuleFileNameEx(hProcess, NULL, szProcessName, ARRSIZE(szProcessName)))
 	{
 		char	*ptr;
-		int	path_alloc = 0, path_offset = 0;
+		size_t	path_alloc = 0, path_offset = 0;
 
 		process_name = zbx_unicode_to_utf8(szProcessName);
 

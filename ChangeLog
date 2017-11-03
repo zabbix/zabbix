@@ -12,6 +12,7 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+...G...PS. [ZBX-12983] fixed compilation warnings under Windows (valdis)
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
