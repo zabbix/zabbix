@@ -595,9 +595,9 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 int	zbx_get_log_type(const char *logtype)
 {
 	const char	*logtypes[] = {ZBX_OPTION_LOGTYPE_SYSTEM, ZBX_OPTION_LOGTYPE_FILE, ZBX_OPTION_LOGTYPE_CONSOLE};
-	size_t		i;
+	int		i;
 
-	for (i = 0; i < ARRSIZE(logtypes); i++)
+	for (i = 0; i < (int)ARRSIZE(logtypes); i++)
 	{
 		if (0 == strcmp(logtype, logtypes[i]))
 			return i + 1;
