@@ -1067,6 +1067,8 @@ footer, .footer {
     padding: 5px 0 5px 10px;
     vertical-align: middle;
     width: 85%; }
+    .table-forms .table-forms-td-right.has-before {
+      padding-top: 0px; }
     .table-forms .table-forms-td-right td {
       padding: 5px 5px 5px 0;
       position: relative; }
@@ -1153,7 +1155,9 @@ footer, .footer {
     border: 1px solid #4f4f4f;
     -webkit-transition: background-color 0.2s ease-out;
     -moz-transition: background-color 0.2s ease-out;
-    transition: background-color 0.2s ease-out; }
+    transition: background-color 0.2s ease-out;
+    line-height: 1.2em;
+    display: inline-block; }
   .radio-segmented input[type="radio"] {
     position: absolute !important;
     top: auto !important;

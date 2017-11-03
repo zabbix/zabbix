@@ -1,8 +1,10 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-4145] fixed appearance of host column based on number of hosts specified in filter (miks)
+A.F.I..... [ZBXNEXT-4118] implemented advanced options for tag-based search of problems (Ivo, Sasha)
 ..F....... [ZBXNEXT-4134] added 'lang' attribute to page body (gcalenko)
-A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (sasha, vso)
+A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (Sasha, vso)
 .......P.. [ZBXNEXT-4181] fixed passive Zabbix proxy to accept Zabbix server requests only from allowed address (vso)
 ....I..PS. [ZBX-10576] restructured unixODBC related code, moved it to a dedicated directory (gleb)
 A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy cannot be deleted when used in actions (Sasha)
@@ -17,11 +19,18 @@ Bug fixes:
 Changes for 3.4.4rc1
 
 New features:
+..F....... [ZBXNEXT-1421] added service sorting by name if multiple services has same 'sortorder' value (miks)
 ...G...... [ZBXNEXT-3493] added Windows service configuration check to determine if service can be trigger started (andris, viktors)
 ..F....... [ZBXNEXT-4019] implemented default widget refresh interval (Ivo)
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+..F....... [DEV-593] fixed multiple security issues (miks)
+........S. [ZBX-12874] fixed target list to be meaningless if custom set of commands is executed on zabbix server (vso)
+........S. [ZBX-12936] fixed update proxy lastaccess value when receiving data (valdis)
+.......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
+........S. [ZBX-12903] added floating value range validation for metrics calculated by server (wiper)
+..F....... [ZBX-12904] added validation for groupid and hostid parameters in dashboard view (vmurzins)
 A......... [ZBX-12837] fixed error in action update when changing media type (gcalenko)
 ...G...... [ZBX-11902] fixed CPU count for LPAR partitions in IBM AIX (abs)
 A......... [ZBX-12778] fixed problem.get and event.get API methods when "selectTags" option contains extended output (Ivo)
@@ -376,9 +385,13 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.10rc1
 
 New features:
+..F....... [ZBXNEXT-1421] added service sorting by name if multiple services has same 'sortorder' value (miks)
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+..F....... [DEV-593] fixed multiple security issues (miks)
+........S. [ZBX-11658] fixed error message in case no items were found for aggregated check (gleb)
+.......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
 ...G...... [ZBX-11902] fixed CPU count for LPAR partitions in IBM AIX (abs)
 ...G...... [ZBX-12260] fixed windows agent to support UTF-16LE, UCS-2, UCS-2LE encodings (vso)
 ..F....... [ZBX-6669] fixed use of current host as filter when selecting items for graph forms and trigger forms (gcalenko)
@@ -911,9 +924,12 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.13rc1
 
 New features:
+..F....... [ZBXNEXT-1421] added service sorting by name if multiple services has same 'sortorder' value (miks)
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
+..F....... [DEV-593] fixed multiple security issues (miks)
+.......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
 ...G...... [ZBX-11902] fixed CPU count for LPAR partitions in IBM AIX (abs)
 ...G...... [ZBX-12260] fixed windows agent to support UTF-16LE, UCS-2, UCS-2LE encodings (vso)
 ..F....... [ZBX-12722] fixed scrollbar causing a JS error in "500 latest values" page due to unnecessarily initialization (Ivo)
@@ -2700,6 +2716,8 @@ Changes for 2.2.21rc1
 New features:
 
 Bug fixes:
+..F....... [DEV-593] fixed multiple security issues (miks)
+.......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.20

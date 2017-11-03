@@ -89,4 +89,22 @@ TESTDIR = src
 test:
 	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
 
-.PHONY: test
+## cmocka test support
+if ZBXCMOCKA
+WRAP_DB_FUNCS = \
+	-Wl,--wrap=zbx_db_vselect \
+	-Wl,--wrap=zbx_db_fetch \
+	-Wl,--wrap=__zbx_DBexecute \
+	-Wl,--wrap=DBbegin \
+	-Wl,--wrap=DBcommit \
+	-Wl,--wrap=DBexecute_multiple_query \
+	-Wl,--wrap=DBfree_result
+
+tests:
+	$(MAKE) $(AM_MAKEFLAGS) && \
+	cd tests && \
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS)" LIBS="$(LIBS) -lcmocka" && \
+	./tests_run.pl
+endif
+
+.PHONY: test tests
