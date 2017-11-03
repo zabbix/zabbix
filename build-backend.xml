@@ -53,8 +53,9 @@
 	</target>
 
 	<!-- Clang Static Analyzer target with various configuration parameters -->
-	<target name="clang-static-analyzer" depends="init,init-conf-options">
+	<target name="clang-static-analyzer" depends="init-conf-options">
 		<delete dir="clang-scan-build-reports"/>
+		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 <!--		<for list="${conf.list}" param="name" delimiter=",">
