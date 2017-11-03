@@ -325,6 +325,11 @@ if (!empty($_REQUEST['form'])) {
 	$data['userid'] = $userId;
 	$data['form'] = getRequest('form');
 	$data['form_refresh'] = getRequest('form_refresh', 0);
+	$data['maxlength'] = [
+		'alias' => DB::getFieldLength('users', 'alias'),
+		'name' => DB::getFieldLength('users', 'name'),
+		'surname' => DB::getFieldLength('users', 'surname')
+	];
 
 	// render view
 	$usersView = new CView('administration.users.edit', $data);

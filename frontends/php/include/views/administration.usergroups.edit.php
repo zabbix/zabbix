@@ -37,6 +37,7 @@ $userGroupFormList = (new CFormList())
 		(new CTextBox('gname', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', $data['gname_maxlength'])
 	);
 
 // append groups to form list
