@@ -57,11 +57,12 @@
 		<delete dir="clang-scan-build-reports"/>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
-		<for list="${conf.list}" param="name" delimiter=",">
-			<sequential>
+<!--		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>-->
 				<exec executable="scan-build" failonerror="on">
 					<arg line="./configure"/>
-					<arg line="${@{name}}"/>
+<!--					<arg line="${@{name}}"/>-->
+					<arg line="--enable-agent"/>
 				</exec>
 				<exec executable="make" failonerror="on">
 					<arg line="-s"/>
@@ -74,8 +75,8 @@
 					<arg line="make"/>
 					<arg line="-s"/>
 					<arg line="-j5"/>
-				</exec>
-			</sequential>
+<!--				</exec>
+			</sequential>-->
 		</for>
 	</target>
 
