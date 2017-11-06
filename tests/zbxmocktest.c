@@ -159,7 +159,7 @@ void	zbx_on_exit(void)
 
 /* test itself */
 
-int	main ()
+int	main (void)
 {
 	const struct CMUnitTest tests[] =
 	{

@@ -17,14 +17,45 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxmocktest.h"
 #include "zbxtests.h"
 
-extern zbx_test_case_t		*test_case;
+extern zbx_test_case_t	*test_case;
 
-char	*generate_data_source(char *sql)
+/* make sure that __wrap_*() prototypes match unwrapped counterparts */
+
+#define zbx_db_vselect	__wrap_zbx_db_vselect
+#define zbx_db_fetch	__wrap_zbx_db_fetch
+#define DBfree_result	__wrap_DBfree_result
+#include "zbxdb.h"
+#undef zbx_db_vselect
+#undef zbx_db_fetch
+#undef DBfree_result
+
+#define __zbx_DBexecute			__wrap___zbx_DBexecute
+#define DBexecute_multiple_query	__wrap_DBexecute_multiple_query
+#define DBbegin				__wrap_DBbegin
+#define DBcommit			__wrap_DBcommit
+#include "db.h"
+#undef __zbx_DBexecute
+#undef DBexecute_multiple_query
+#undef DBbegin
+#undef DBcommit
+
+struct zbx_db_result
 {
-	int	found = 0;
-	char	*data_source = NULL, *ptr_sql = sql, *ptr_ds, *ptr_tmp;
+	char	*data_source;	/* "<table name>_" + "<table name>" + ... */
+	char	*sql;
+	DB_ROW	*rows;
+	int	rows_num;
+	int	cur_row_idx;
+};
+
+static char	*generate_data_source(const char *sql)
+{
+	int		found = 0;
+	char		*data_source = NULL, *ptr_ds;
+	const char	*ptr_sql = sql, *ptr_tmp;
 
 	data_source = zbx_calloc(NULL, 64, sizeof(char *));
 	ptr_ds = data_source;
@@ -53,9 +84,7 @@ char	*generate_data_source(char *sql)
 			found = 1;
 		}
 		else
-		{
 			break;
-		}
 	}
 
 	if (ptr_ds == data_source)
@@ -66,11 +95,11 @@ char	*generate_data_source(char *sql)
 	return data_source;
 }
 
-DB_RESULT __wrap_zbx_db_vselect(const char *fmt, va_list args)
+DB_RESULT	__wrap_zbx_db_vselect(const char *fmt, va_list args)
 {
-	DB_RESULT		result = NULL;
-	char			*sql = NULL, *data_source = NULL;
-	int			i, r;
+	DB_RESULT	result = NULL;
+	char		*sql = NULL, *data_source = NULL;
+	int		i, r;
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
@@ -86,11 +115,11 @@ DB_RESULT __wrap_zbx_db_vselect(const char *fmt, va_list args)
 	if (i < test_case->datasource_num && 0 < test_case->datasources[i].row_num)
 	{
 		result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
-		result->rows = (DB_ROW *)zbx_malloc(NULL, sizeof(DB_ROW **) * TEST_MAX_ROW_NUM);
 		result->data_source = data_source;
 		result->sql = sql;
 		result->cur_row_idx = 0;
 		result->rows_num = test_case->datasources[i].row_num;
+		result->rows = (DB_ROW *)zbx_malloc(NULL, sizeof(DB_ROW **) * result->rows_num);
 
 		for (r = 0; r < result->rows_num ; r++)
 			result->rows[r] = test_case->datasources[i].rows[r].values;
@@ -107,9 +136,9 @@ DB_RESULT __wrap_zbx_db_vselect(const char *fmt, va_list args)
 	return result;
 }
 
-DB_ROW __wrap_zbx_db_fetch(DB_RESULT result)
+DB_ROW	__wrap_zbx_db_fetch(DB_RESULT result)
 {
-	DB_ROW			row = NULL;
+	DB_ROW	row = NULL;
 
 	if (NULL == result)
 		return NULL;

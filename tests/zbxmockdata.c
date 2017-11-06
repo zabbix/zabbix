@@ -17,17 +17,42 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <stdio.h>
-#include "zbxtests.h"
+#include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxtests.h"
 
-char			*curr_wrapped_function = NULL;
-zbx_test_case_t		*test_case = NULL;
+#include "common.h"
+
+typedef enum
+{
+	ZBX_TEST_DATA_TYPE_UNKNOWN,
+	ZBX_TEST_DATA_TYPE_PARAM_IN,
+	ZBX_TEST_DATA_TYPE_PARAM_OUT,
+	ZBX_TEST_DATA_TYPE_DB_DATA,
+	ZBX_TEST_DATA_TYPE_FUNCTION,
+	ZBX_TEST_DATA_TYPE_IN_PARAM,
+	ZBX_TEST_DATA_TYPE_IN_VALUE,
+	ZBX_TEST_DATA_TYPE_OUT_PARAM,
+	ZBX_TEST_DATA_TYPE_OUT_VALUE,
+	ZBX_TEST_DATA_TYPE_DB_FIELD,
+	ZBX_TEST_DATA_TYPE_DB_ROW,
+	ZBX_TEST_DATA_TYPE_FUNC_OUT,
+	ZBX_TEST_DATA_TYPE_FUNC_VALUE
+}
+line_type_t;
+
+#define	TEST_MAX_DATASOURCE_NUM	1024
+#define	TEST_MAX_FUNCTION_NUM	1024
+#define	TEST_MAX_ROW_NUM	512
+#define	TEST_MAX_DATA_NUM	512
+
+char		*curr_wrapped_function = NULL;
+zbx_test_case_t	*test_case = NULL;
 
 int	zbx_mock_data_init(void **state)
 {
 	char 			line[MAX_STRING_LEN], *tmp, *p;
-	int			idx_str, line_type = ZBX_TEST_DATA_TYPE_UNKNOWN;
+	line_type_t		line_type = ZBX_TEST_DATA_TYPE_UNKNOWN;
 	zbx_test_datasource_t	*curr_ds = NULL;
 	zbx_test_data_t		*curr_data = NULL;
 	zbx_test_function_t	*curr_func = NULL;
@@ -48,14 +73,15 @@ int	zbx_mock_data_init(void **state)
 
 	while (fgets(line, MAX_STRING_LEN, stdin) != NULL)
 	{
-		idx_str = 0;
+		int	idx_str = 0;
+
 		tmp = strdup(line);
 		zbx_rtrim(tmp, "\r\n");
 
 		p = strtok(tmp,"|");
 		while (p != NULL)
 		{
-			if (0 == idx_str) /* data type identification */
+			if (0 == idx_str)	/* data type identification */
 			{
 				if (0 == strcmp(p, "DB_DATA"))
 				{
@@ -139,11 +165,9 @@ int	zbx_mock_data_init(void **state)
 					line_type = ZBX_TEST_DATA_TYPE_FUNC_VALUE;
 				}
 				else
-				{
 					line_type = ZBX_TEST_DATA_TYPE_UNKNOWN;
-				}
 			}
-			else if (0 < idx_str) /* filling in data */
+			else	/* filling in data */
 			{
 				switch (line_type)
 				{
@@ -183,9 +207,6 @@ int	zbx_mock_data_init(void **state)
 							curr_row->values[idx_str - 1] = strdup(p);
 							curr_row->value_num++;
 						}
-						break;
-					default:
-						break;
 				}
 			}
 
@@ -200,7 +221,7 @@ int	zbx_mock_data_init(void **state)
 
 int	zbx_mock_data_free(void **state)
 {
-	int			n1, n2, n3;
+	int	n1, n2, n3;
 
 	ZBX_UNUSED(state);
 
@@ -266,35 +287,32 @@ void	debug_print_cases(zbx_test_case_t *test_case)
 	printf("in_params.data_num %d\n", test_case->in_params.data_num);
 	for (n1 = 0; n1 < test_case->in_params.data_num; n1++)
 	{
-		printf("	in_params.name[%d]: %s\n", n1, test_case->in_params.names[n1]);
-		printf("	in_params.value[%d]: %s\n", n1, test_case->in_params.values[n1]);
+		printf("\tin_params.name[%d]: %s\n", n1, test_case->in_params.names[n1]);
+		printf("\tin_params.value[%d]: %s\n", n1, test_case->in_params.values[n1]);
 	}
 
 	printf("out_params.data_num %d\n", test_case->out_params.data_num);
 	for (n1 = 0; n1 <  test_case->out_params.data_num; n1++)
 	{
-		printf("	out_params.name[%d]: %s\n", n1, test_case->out_params.names[n1]);
-		printf("	out_params.value[%d]: %s\n", n1, test_case->out_params.values[n1]);
+		printf("\tout_params.name[%d]: %s\n", n1, test_case->out_params.names[n1]);
+		printf("\tout_params.value[%d]: %s\n", n1, test_case->out_params.values[n1]);
 	}
 
 	printf("datasource_num %d\n", test_case->datasource_num);
 	for (n1 = 0; n1 < test_case->datasource_num; n1++)
 	{
-		printf("	datasources[%d].source_name: %s\n", n1, test_case->datasources[n1].source_name);
-		printf("	datasources[%d].field_num: %d\n", n1, test_case->datasources[n1].field_num);
+		printf("\tdatasources[%d].source_name: %s\n", n1, test_case->datasources[n1].source_name);
+		printf("\tdatasources[%d].field_num: %d\n", n1, test_case->datasources[n1].field_num);
 
 		for (n2 = 0; n2 <  test_case->datasources[n1].field_num; n2++)
-		{
-			printf("		datasources.field_name[%d]: %s\n", n2,
-				test_case->datasources[n1].field_names[n2]);
-		}
+			printf("\t\tdatasources.field_name[%d]: %s\n", n2, test_case->datasources[n1].field_names[n2]);
 
 		for (n2 = 0; n2 < test_case->datasources[n1].row_num; n2++)
 		{
 			for (n3 = 0; n3 < test_case->datasources[n1].rows[n2].value_num; n3++)
 			{
-				printf("		datasources.row[%d].value[%d]: %s\n", n2, n3,
-					test_case->datasources[n1].rows[n2].values[n3]);
+				printf("\t\tdatasources.row[%d].value[%d]: %s\n", n2, n3,
+						test_case->datasources[n1].rows[n2].values[n3]);
 			}
 		}
 	}
@@ -302,14 +320,12 @@ void	debug_print_cases(zbx_test_case_t *test_case)
 	printf("function_num %d\n", test_case->function_num);
 	for (n1 = 0; n1 < test_case->function_num; n1++)
 	{
-		printf("	functions[%d]: %s\n", n1, test_case->functions[n1].name);
+		printf("\tfunctions[%d]: %s\n", n1, test_case->functions[n1].name);
 
 		for (n2 = 0; n2 < test_case->functions[n1].data.data_num; n2++)
 		{
-			printf("		functions.name[%d]: %s\n", n2,
-					test_case->functions[n1].data.names[n2]);
-			printf("		functions.value[%d]: %s\n", n2,
-					test_case->functions[n1].data.values[n2]);
+			printf("\t\tfunctions.name[%d]: %s\n", n2, test_case->functions[n1].data.names[n2]);
+			printf("\t\tfunctions.value[%d]: %s\n", n2, test_case->functions[n1].data.values[n2]);
 		}
 	}
 }
@@ -338,7 +354,7 @@ char	*get_out_param_by_index(int idx)
 
 char	*get_in_param_by_name(char *name)
 {
-	int		i;
+	int	i;
 
 	for (i = 0; i < test_case->in_params.data_num; i++)
 	{
@@ -353,7 +369,7 @@ char	*get_in_param_by_name(char *name)
 
 char	*get_out_param_by_name(char *name)
 {
-	int		i;
+	int	i;
 
 	for (i = 0; i < test_case->out_params.data_num; i++)
 	{
@@ -368,19 +384,19 @@ char	*get_out_param_by_name(char *name)
 
 char	*get_out_func_param_by_index(int idx)
 {
-	int		i;
+	int	i;
 
 	for (i = 0; i < test_case->function_num; i++)
 	{
 		if (0 == strcmp(test_case->functions[i].name, curr_wrapped_function))
 		{
 			if (test_case->functions[i].data.data_num > idx)
-				goto out;
+				break;
 
 			return test_case->functions[i].data.values[idx];
 		}
 	}
-out:
+
 	fail_msg("Cannot find out_func_param by index=%d", idx);
 
 	return NULL;
@@ -388,7 +404,7 @@ out:
 
 char	*get_out_func_param_by_name(char *name)
 {
-	int		i, n;
+	int	i, n;
 
 	for (i = 0; i < test_case->function_num; i++)
 	{

@@ -17,9 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../../zbxtests.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+
+#include "common.h"
+#include "zbxalgo.h"
+#include "db.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -48,7 +51,7 @@ void	zbx_mock_test_entry(void **state)
 		/* compare the received ID with expected */
 		test_result = (json_return_id != func_result_ids.values[i]);
 	}
-out:
+
 	zbx_vector_uint64_destroy(&func_result_ids);
 	/* check test result */
 	assert_int_equal(test_result, atoi(get_out_param_by_name("return")));
