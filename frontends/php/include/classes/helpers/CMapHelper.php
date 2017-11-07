@@ -82,7 +82,8 @@ class CMapHelper {
 					'font_size' => 11,
 					'font_color' => 'FF0000',
 					'text' => _('No permissions to referred object or it does not exist!')
-				]]
+				]],
+				'aria-label' => ''
 			];
 		}
 		else {
@@ -110,6 +111,7 @@ class CMapHelper {
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
+			'aria-label' => $map['aria-label'],
 			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
 		];
 	}
@@ -192,12 +194,31 @@ class CMapHelper {
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
 		$linktrigger_info = getMapLinktriggerInfo($sysmap, $options);
+		$problems_total = 0;
+		$problem_elements = 0;
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			$icon = null;
 
 			if (array_key_exists($id, $map_info) && array_key_exists('iconid', $map_info[$id])) {
 				$icon = $map_info[$id]['iconid'];
+			}
+
+			if (array_key_exists($id, $map_info)) {
+				$aria_label = sysmap_element_types($element['elementtype']).'. '.$map_info[$id]['name'].'. ';
+
+				if ($map_info[$id]['problems_total'] > 0) {
+					$problems_total += $map_info[$id]['problems_total'];
+					$problem_elements++;
+					$aria_label .= ($map_info[$id]['problems_total'] > 1)
+						? _n('%1$s problem', '%1$s problems', $map_info[$id]['problems_total'])
+						: $map_info[$id]['info']['problem']['msg'];
+				}
+				else {
+					$aria_label .= _('OK');
+				}
+
+				$element['aria-label'] = $aria_label;
 			}
 
 			unset($element['width'], $element['height']);
@@ -219,6 +240,11 @@ class CMapHelper {
 			}
 		}
 		unset($element);
+
+		$sysmap['aria-label'] = _n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
+			$problem_elements, count($sysmap['selements'])
+		)._n('%1$s problem total.', '%1$s problems total.', $problems_total);
+
 
 		foreach ($sysmap['shapes'] as &$shape) {
 			if (array_key_exists('text', $shape)) {

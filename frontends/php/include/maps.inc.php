@@ -1203,6 +1203,8 @@ function getSelementsInfo($sysmap, array $options = []) {
 				$info[$selementId] = getImagesInfo($selement);
 				break;
 		}
+
+		$info[$selementId]['problems_total'] = $i['problem'];
 	}
 
 	if ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {
