@@ -58,10 +58,6 @@
 		setAriaAttributes: function(screen) {
 			var container = $('#flickerfreescreen_'+screen.id), aria_elms = [];
 
-			if ('aria_label' in screen.data) {
-				container.attr('aria-label', screen.data['aria_label']);
-			}
-
 			container.children('div[aria-label]').remove();
 
 			$.each(screen.data.elements, function(_, elm_data) {
@@ -70,6 +66,10 @@
 						.attr('aria-label', elm_data['aria_label']));
 				}
 			});
+
+			if ('aria_label' in screen.data) {
+				aria_elms.unshift($('<div />').attr('aria-label', screen.data['aria_label']));
+			}
 
 			container.append(aria_elms);
 		},
