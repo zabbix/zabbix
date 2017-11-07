@@ -90,7 +90,8 @@ $servicesFormList->addRow(_('Trigger'), [
 		)
 ]);
 $servicesFormList->addRow((new CLabel(_('Sort order (0->999)')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('sortorder', $this->data['sortorder'], false, 3))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	(new CTextBox('sortorder', $this->data['sortorder'], false, 3))
+		->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		->setAttribute('aria-required', 'true')
 );
 

@@ -56,7 +56,8 @@ $discoveryFormList
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('delay', $data['drule']['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('delay', $data['drule']['delay']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('aria-required', 'true')
 	);
 

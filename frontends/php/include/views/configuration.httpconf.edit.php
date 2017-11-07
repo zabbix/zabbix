@@ -76,7 +76,8 @@ $httpFormList
 		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 	)
 	->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('delay', $data['delay']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Attempts'),

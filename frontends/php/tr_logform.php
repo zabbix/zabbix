@@ -334,7 +334,8 @@ if (hasRequest('sform')) {
 			->addTab('trigger_tab', null,
 				(new CFormList())
 					->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-						(new CTextBox('description', $description))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						(new CTextBox('description', $description))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAttribute('aria-required', 'true')
 					)
 					->addRow(_('Item'), [

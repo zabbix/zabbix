@@ -126,11 +126,13 @@ $frmMedia = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
 	->addRow(
 		(new CLabel(_('Send to')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('sendto', $sendto, false, 100))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow((new CLabel(_('When active')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('period', $period, false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('period', $period, false, 1024))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Use if severity'), $frm_row)

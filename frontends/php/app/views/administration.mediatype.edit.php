@@ -63,16 +63,17 @@ $mediaTypeFormList
 		(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
-	->addRow((new CLabel(_('SMTP server port')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow(_('SMTP server port'),
 		(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('aria-required', 'true')
 	)
 	->addRow((new CLabel(_('SMTP helo')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('smtp_helo', $data['smtp_helo']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('smtp_helo', $data['smtp_helo']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow((new CLabel(_('SMTP email')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('smtp_email', $data['smtp_email']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('smtp_email', $data['smtp_email']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Connection security'),
@@ -92,7 +93,8 @@ $mediaTypeFormList
 	)
 	->addRow(_('Username'), (new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
 	->addRow((new CLabel(_('Script name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('exec_path', $data['exec_path']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	);
 
@@ -125,7 +127,8 @@ $mediaTypeFormList->addRow(_('Script parameters'),
 );
 
 $mediaTypeFormList->addRow((new CLabel(_('GSM modem')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('gsm_modem', $data['gsm_modem']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextBox('gsm_modem', $data['gsm_modem']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('aria-required', 'true')
 );
 
@@ -140,7 +143,9 @@ if ($data['passwd'] != '') {
 	];
 }
 else {
-	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAttribute('aria-required', 'true');
+	$passwdField = (new CPassBox('passwd'))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAttribute('aria-required', 'true');
 }
 
 // append password field to form list
@@ -153,7 +158,7 @@ $mediaTypeFormList
 		(new CTextBox('eztext_username', $data['eztext_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
-	->addRow((new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $passwdField)
+	->addRow(_('Password'), $passwdField)
 	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [
 		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')

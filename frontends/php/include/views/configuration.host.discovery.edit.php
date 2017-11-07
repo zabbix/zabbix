@@ -177,7 +177,8 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
 $itemFormList->addRow((new CLabel(_('JMX endpoint')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('aria-required', 'true'),
 	'row_jmx_endpoint'
 );
@@ -215,7 +216,9 @@ $itemFormList->addRow(
 );
 
 $itemFormList->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAttribute('aria-required', 'true'),
+	(new CTextBox('delay', $data['delay']))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	'row_delay'
 );
 
@@ -260,7 +263,8 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 
 $delayFlexTable->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
-	->addClass('element-table-add')]);
+	->addClass('element-table-add')
+]);
 
 $itemFormList->addRow(_('Custom intervals'),
 		(new CDiv($delayFlexTable))
@@ -269,16 +273,17 @@ $itemFormList->addRow(_('Custom intervals'),
 		'row_flex_intervals'
 	)
 	->addRow((new CLabel(_('Keep lost resources period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('lifetime', $data['lifetime']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('lifetime', $data['lifetime']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Allowed hosts'),
 		(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	'row_trapper_hosts'
+		'row_trapper_hosts'
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
+	);
 
 // status
 $enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($this->data['status'] == ITEM_STATUS_ACTIVE);

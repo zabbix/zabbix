@@ -210,7 +210,8 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
 $itemFormList->addRow((new CLabel(_('JMX endpoint')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('aria-required', 'true'),
 	'row_jmx_endpoint'
 );
@@ -278,7 +279,9 @@ $itemFormList->addRow(_('Units'),
 );
 
 $itemFormList->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAttribute('aria-required', 'true'),
+	(new CTextBox('delay', $data['delay']))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAttribute('aria-required', 'true'),
 	'row_delay'
 );
 
@@ -333,14 +336,16 @@ $itemFormList->addRow(_('Custom intervals'),
 );
 
 $keepHistory = [];
-$keepHistory[] = (new CTextBox('history', $data['history']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+$keepHistory[] = (new CTextBox('history', $data['history']))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	->setAttribute('aria-required', 'true');
 $itemFormList->addRow((new CLabel(_('History storage period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 	$keepHistory
 );
 
 $keepTrend = [];
-$keepTrend[] = (new CTextBox('trends', $data['trends']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+$keepTrend[] = (new CTextBox('trends', $data['trends']))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	->setAttribute('aria-required', 'true');
 $itemFormList->addRow((new CLabel(_('Trend storage period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $keepTrend,
 	'row_trends'

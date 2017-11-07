@@ -40,24 +40,23 @@ $guiTab = (new CFormList())
 			->setLabel(_('remember selected'))
 			->setChecked($data['dropdown_first_remember'] == 1)
 	])
-	->addRow((new CLabel(_('Limit for search and filter results')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow(_('Limit for search and filter results'),
 		(new CNumericBox('search_limit', $data['search_limit'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
 	)
-	->addRow(
-		(new CLabel(_('Max count of elements to show inside table cell')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow(_('Max count of elements to show inside table cell'),
 		(new CNumericBox('max_in_table', $data['max_in_table'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Enable event acknowledgement'),
 		(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)
 	)
 	->addRow((new CLabel(_('Show events not older than')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('event_expire', $data['event_expire']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		(new CTextBox('event_expire', $data['event_expire']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow((new CLabel(_('Max count of events per trigger to show')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('event_show_max', $data['event_show_max']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		(new CTextBox('event_show_max', $data['event_show_max']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Show warning if Zabbix server is down'),

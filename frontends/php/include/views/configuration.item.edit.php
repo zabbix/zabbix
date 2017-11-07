@@ -285,7 +285,8 @@ else {
 
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
 $itemFormList->addRow((new CLabel(_('JMX endpoint')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $discovered_item, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $discovered_item, 255))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('aria-required', 'true'),
 	'row_jmx_endpoint'
 );
@@ -358,7 +359,8 @@ $itemFormList->addRow(_('Units'),
 );
 
 $itemFormList->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-	(new CTextBox('delay', $data['delay'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	(new CTextBox('delay', $data['delay'], $discovered_item))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->setAttribute('aria-required', 'true'),
 	'row_delay'
 );
@@ -429,7 +431,8 @@ $itemFormList->addRow(_('Custom intervals'),
 
 // Append history storage to form list.
 $keepHistory = [];
-$keepHistory[] = (new CTextBox('history', $data['history'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+$keepHistory[] = (new CTextBox('history', $data['history'], $discovered_item))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	->setAttribute('aria-required', 'true');
 
 if ($data['config']['hk_history_global']
@@ -454,7 +457,8 @@ $itemFormList->addRow((new CLabel(_('History storage period')))->addClass(ZBX_ST
 
 // Append trend storage to form list.
 $keepTrend = [];
-$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	->setAttribute('aria-required', 'true');
 
 if ($data['config']['hk_trends_global']

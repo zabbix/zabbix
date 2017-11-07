@@ -376,7 +376,8 @@ $operation_tab = new CFormList('operationlist');
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operation_tab->addRow((new CLabel(_('Default operation step duration')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('esc_period', $data['action']['esc_period']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('esc_period', $data['action']['esc_period']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('aria-required', 'true')
 	);
 }
