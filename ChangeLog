@@ -2728,12 +2728,9 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
-Changes for 2.2.21
-
-2.2.21rc1 was released as 2.2.21 without any changes
-
---------------------------------------------------------------------------------
 Changes for 2.2.21rc1
+
+New features:
 
 Bug fixes:
 ..F....... [DEV-593] fixed multiple security issues (miks)
