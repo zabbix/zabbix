@@ -489,7 +489,6 @@ if (!empty($data['form'])) {
 	$data['hosts'] = array_merge($data['hosts'], $hostsSelected);
 	$data['hosts'] = zbx_toHash($data['hosts'], 'hostid');
 	order_result($data['hosts'], 'name');
-	$data['mname_maxlength'] = DB::getFieldLength('maintenances', 'name');
 
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.edit', $data);
