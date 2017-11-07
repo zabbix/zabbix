@@ -40,6 +40,7 @@
 
 			// SCREEN_RESOURCE_MAP
 			if (screen.resourcetype == 2) {
+				this.setAriaAttributes(screen);
 				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
 			}
 
@@ -52,6 +53,25 @@
 					this.screens[screen.id].interval
 				);
 			}
+		},
+
+		setAriaAttributes: function(screen) {
+			var container = $('#flickerfreescreen_'+screen.id), aria_elms = [];
+
+			if ('aria_label' in screen.data) {
+				container.attr('aria-label', screen.data['aria_label']);
+			}
+
+			container.children('div[aria-label]').remove();
+
+			$.each(screen.data.elements, function(_, elm_data) {
+				if ('aria_label' in elm_data) {
+					aria_elms[(elm_data.in_problem_state ? 'unshift' : 'push')]($('<div />')
+						.attr('aria-label', elm_data['aria_label']));
+				}
+			});
+
+			container.append(aria_elms);
 		},
 
 		refresh: function(id, isSelfRefresh) {
@@ -316,7 +336,7 @@
 		},
 
 		refreshMap: function(id) {
-			var screen = this.screens[id];
+			var screen = this.screens[id], self = this;
 
 			if (screen.isRefreshing) {
 				this.calculateReRefresh(id);
@@ -342,6 +362,7 @@
 					data.show_timestamp = screen.data.options.show_timestamp;
 					screen.isRefreshing = false;
 					screen.data.update(data);
+					self.setAriaAttributes({id: id, data:data});
 					screen.timestamp = screen.timestampActual;
 					window.flickerfreeScreenShadow.end(id);
 				});

@@ -83,7 +83,7 @@ class CMapHelper {
 					'font_color' => 'FF0000',
 					'text' => _('No permissions to referred object or it does not exist!')
 				]],
-				'aria-label' => ''
+				'aria_label' => ''
 			];
 		}
 		else {
@@ -111,7 +111,7 @@ class CMapHelper {
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
-			'aria-label' => $map['aria-label'],
+			'aria_label' => $map['aria_label'],
 			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
 		];
 	}
@@ -210,6 +210,8 @@ class CMapHelper {
 				if ($map_info[$id]['problems_total'] > 0) {
 					$problems_total += $map_info[$id]['problems_total'];
 					$problem_elements++;
+					$element['in_problem_state'] = true;
+
 					$aria_label .= ($map_info[$id]['problems_total'] > 1)
 						? _n('%1$s problem', '%1$s problems', $map_info[$id]['problems_total'])
 						: $map_info[$id]['info']['problem']['msg'];
@@ -218,7 +220,7 @@ class CMapHelper {
 					$aria_label .= _('OK');
 				}
 
-				$element['aria-label'] = $aria_label;
+				$element['aria_label'] = $aria_label;
 			}
 
 			unset($element['width'], $element['height']);
@@ -241,9 +243,9 @@ class CMapHelper {
 		}
 		unset($element);
 
-		$sysmap['aria-label'] = _n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
+		$sysmap['aria_label'] = _n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
 			$problem_elements, count($sysmap['selements'])
-		)._n('%1$s problem total.', '%1$s problems total.', $problems_total);
+		).' '._n('%1$s problem total.', '%1$s problems total.', $problems_total);
 
 
 		foreach ($sysmap['shapes'] as &$shape) {
