@@ -60,6 +60,7 @@ $options = [
 	'links' => $map_data['links'],
 	'shapes' => $map_data['shapes'],
 	'aria_label' => $map_data['aria_label'],
+	'aria_description' => $map_data['aria_description'],
 	'label_location' => $map_data['label_location'],
 	'timestamp' => $map_data['timestamp']
 ];

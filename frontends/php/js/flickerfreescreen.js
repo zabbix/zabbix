@@ -41,7 +41,10 @@
 			// SCREEN_RESOURCE_MAP
 			if (screen.resourcetype == 2) {
 				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
-				this.setAriaAttributes(screen);
+				$(screen.data.container).find('svg').attr('aria-hidden', 'true');
+				this.setAriaDescription(screen.data.options.container, screen.data.options.aria_label,
+					screen.data.options.aria_description
+				);
 			}
 
 			// init refresh plan
@@ -55,28 +58,20 @@
 			}
 		},
 
-		setAriaAttributes: function(screen) {
-			var container = $('#flickerfreescreen_'+screen.id),
-				aria_elms_text = [];
+		setAriaDescription: function(elmid, aria_label, aria_description) {
+			var elm = $(elmid),
+				desc_elm = elm.attr('aria-describedby') ? $('#'+elm.attr('aria-describedby')) : null;
 
-			container.find('#aria_desc_'+screen.id).remove();
+			if (desc_elm === null) {
+				desc_elm = $('<div />').attr('id', 'aria_desc_'+(elmid.replace(/[#. ]+/g, ''))).hide();
+				elm.attr({
+					'tabindex': 0,
+					'aria-describedby': desc_elm.attr('id')
+				}).append(desc_elm);
+			}
 
-			// SCREEN_RESOURCE_MAP aria attributes.
-			$.each(screen.data.elements, function(_, elm_data) {
-				if ('aria_label' in elm_data) {
-					aria_elms_text[(elm_data.in_problem_state ? 'unshift' : 'push')](elm_data['aria_label']);
-				}
-			});
-
-			container.find('svg').attr('aria-hidden', 'true')
-				.parent().attr({
-					'tab-index': 0,
-					'aria-label': screen.data['aria_label'],
-					'aria-describedby': 'aria_desc_'+screen.id
-				})
-				.append(
-					$('<div />').attr('id', 'aria_desc_'+screen.id).hide().html(aria_elms_text.join("\n"))
-				);
+			elm.attr('aria-label', aria_label);
+			desc_elm.text(aria_description);
 		},
 
 		refresh: function(id, isSelfRefresh) {
@@ -367,7 +362,7 @@
 					data.show_timestamp = screen.data.options.show_timestamp;
 					screen.isRefreshing = false;
 					screen.data.update(data);
-					self.setAriaAttributes({id: id, data:data});
+					self.setAriaDescription(screen.data.container, data.aria_label, data.aria_description);
 					screen.timestamp = screen.timestampActual;
 					window.flickerfreeScreenShadow.end(id);
 				});
