@@ -330,9 +330,10 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			else {
 				$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
 			}
-			$item_graph_url->setArgument('period', $timeline['period']);
-			$item_graph_url->setArgument('stime', $timeline['stime']);
-			$item_graph_url->setArgument('isNow', $timeline['isNow']);
+			$item_graph_url
+				->setArgument('period', $timeline['period'])
+				->setArgument('stime', $timeline['stime'])
+				->setArgument('isNow', $timeline['isNow']);
 		}
 
 		$this->setResponse(new CControllerResponseData([
