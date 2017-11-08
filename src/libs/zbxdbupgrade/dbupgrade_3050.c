@@ -142,22 +142,21 @@ static int	DBpatch_3050006(void)
 
 		if (ZBX_DB_OK > res)
 			return FAIL;
-
-		res = DBexecute("update events set name='%s' where objectid=%d and source=%d "
-				"and value=%d", trdefault, triggerid, EVENT_SOURCE_INTERNAL,
-				EVENT_STATUS_PROBLEM);
-
-		if (ZBX_DB_OK > res)
-			return FAIL;
-
-		res = DBexecute("update problem set name='%s' where objectid=%d and source=%d ", trdefault,
-				triggerid, EVENT_SOURCE_INTERNAL, EVENT_STATUS_PROBLEM);
-
-		if (ZBX_DB_OK > res)
-			return FAIL;
 	}
 
-	res = DBexecute("update events set name='%s' where source=%d and object=%d and value = %d", itdefault,
+	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", trdefault,
+			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, EVENT_STATUS_PROBLEM);
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	res = DBexecute("update problem set name='%s' where source=%d and object=%d ", trdefault,
+			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER);
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, EVENT_STATUS_PROBLEM);
 
 	if (ZBX_DB_OK > res)
