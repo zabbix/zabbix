@@ -40,8 +40,8 @@
 
 			// SCREEN_RESOURCE_MAP
 			if (screen.resourcetype == 2) {
-				this.setAriaAttributes(screen);
 				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
+				this.setAriaAttributes(screen);
 			}
 
 			// init refresh plan
