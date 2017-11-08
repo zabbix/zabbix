@@ -145,7 +145,7 @@
 		$('#dashbrd-edit').click(showEditMode);
 	});
 
-	function dashbaordAddMessages(messages) {
+	function dashboardAddMessages(messages) {
 		var $message_div = jQuery('<div>').attr('id','dashbrd-messages');
 		$message_div.append(messages);
 		jQuery('.article').prepend($message_div);
@@ -156,7 +156,7 @@
 		jQuery('.msg-good').remove();
 	}
 
-	// Function is in global scope, because it should be accessable by html onchange() attribute.
+	// Function is in global scope, because it should be accessible by html onchange() attribute.
 	function updateWidgetConfigDialogue() {
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('updateWidgetConfigDialogue');
 	}

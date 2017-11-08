@@ -174,7 +174,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	const char	*tmp, *tmp1;
 	char		*error = NULL;
 
-	init_result(result);
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key(item->key, &request))

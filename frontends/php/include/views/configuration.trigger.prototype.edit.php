@@ -77,9 +77,13 @@ $add_expression_button = (new CButton('insert', ($data['expression_constructor']
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
 		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
-			'&dstfld1='.$data['expression_field_name'].'&srctbl='.$data['expression_field_name'].
-			url_param('parent_discoveryid').'&srcfld1='.$data['expression_field_name'].
-			'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()));'
+			'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
+			(($data['groupid'] && $data['hostid'])
+				? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
+				: ''
+			).
+			'&srcfld1=expression'.
+			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));'
 	);
 if ($data['limited']) {
 	$add_expression_button->setAttribute('disabled', 'disabled');

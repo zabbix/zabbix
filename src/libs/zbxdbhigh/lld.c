@@ -448,7 +448,39 @@ static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_par
 	return FAIL;
 }
 
-static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_check_received_data_for_filter                               *
+ *                                                                            *
+ * Purpose: Check if the LLD data contains a values for macros used in filter.*
+ *          Create an informative warning for every macro that has not        *
+ *          received any value.                                               *
+ *                                                                            *
+ * Parameters: filter     - [IN] the lld filter                               *
+ *             jp_row     - [IN] the lld data row                             *
+ *             info       - [OUT] the warning description                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+			char **info)
+{
+	int	i;
+
+	for (i = 0; i < filter->conditions.values_num; i++)
+	{
+		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+
+		if (NULL == zbx_json_pair_by_name(jp_row, condition->macro))
+		{
+			*info = zbx_strdcatf(*info,
+					"Cannot accurately apply filter: no value received for macro \"%s\".\n",
+					condition->macro);
+		}
+	}
+}
+
+static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows, char **info,
+		char **error)
 {
 	const char		*__function_name = "lld_rows_get";
 
@@ -483,6 +515,8 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 		/*          ^------------------^                          */
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			continue;
+
+		lld_check_received_data_for_filter(filter, &jp_row, info);
 
 		if (SUCCEED != filter_evaluate(filter, &jp_row))
 			continue;
@@ -530,7 +564,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		hostid;
-	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc;
+	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc, *info = NULL;
 	unsigned char		state;
 	int			lifetime;
 	zbx_vector_ptr_t	lld_rows;
@@ -597,7 +631,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &error))
 		goto error;
 
-	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &error))
+	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &info, &error))
 		goto error;
 
 	error = zbx_strdup(error, "");
@@ -640,6 +674,10 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);
 		sql_start = sql_continue;
 	}
+
+	/* add informative warning to the error message about lack of data for macros used in filter */
+	if (NULL != info)
+		error = zbx_strdcat(error, info);
 error:
 	if (NULL != error && 0 != strcmp(error, db_error))
 	{
@@ -664,6 +702,7 @@ error:
 clean:
 	DCconfig_unlock_lld_rule(lld_ruleid);
 
+	zbx_free(info);
 	zbx_free(error);
 	zbx_free(db_error);
 	zbx_free(discovery_key);

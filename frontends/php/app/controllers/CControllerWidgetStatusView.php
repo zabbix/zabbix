@@ -28,7 +28,8 @@ class CControllerWidgetStatusView extends CControllerWidget {
 
 		$this->setType(WIDGET_ZABBIX_STATUS);
 		$this->setValidationRules([
-			'name' => 'string'
+			'name' => 'string',
+			'fields' => 'json'
 		]);
 	}
 

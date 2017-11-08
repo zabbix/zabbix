@@ -28,7 +28,8 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 
 		$this->setType(WIDGET_FAVOURITE_SCREENS);
 		$this->setValidationRules([
-			'name' => 'string'
+			'name' => 'string',
+			'fields' => 'json'
 		]);
 	}
 

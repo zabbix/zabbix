@@ -307,6 +307,11 @@ class CProxy extends CApiService {
 			if ($status == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)) {
 				$proxy['interface']['main'] = INTERFACE_PRIMARY;
 			}
+
+			// Clean proxy address field.
+			if ($status == HOST_STATUS_PROXY_PASSIVE && !array_key_exists('proxy_address', $proxy)) {
+				$proxy['proxy_address'] = '';
+			}
 		}
 		unset($proxy);
 
@@ -603,12 +608,14 @@ class CProxy extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $proxies) {
-		$proxy_db_fields = ['host' => null];
+		$proxy_db_fields = ['host' => null, 'status' => null];
 		$names = [];
+
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
 
 		foreach ($proxies as $proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%1$s".', $proxy['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
@@ -633,10 +640,7 @@ class CProxy extends CApiService {
 		$hostids = [];
 
 		foreach ($proxies as $proxy) {
-			if (!array_key_exists('status', $proxy)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No status for proxy.'));
-			}
-			elseif ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
+			if ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value used for proxy status "%1$s".', $proxy['status'])
 				);
@@ -647,6 +651,26 @@ class CProxy extends CApiService {
 					&& (!array_key_exists('interface', $proxy)
 						|| !is_array($proxy['interface']) || !$proxy['interface'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
+			}
+
+			if (array_key_exists('proxy_address', $proxy)) {
+				switch ($proxy['status']) {
+					case HOST_STATUS_PROXY_PASSIVE:
+						if ($proxy['proxy_address'] !== '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'proxy_address', _('should be empty')
+							));
+						}
+						break;
+
+					case HOST_STATUS_PROXY_ACTIVE:
+						if ($proxy['proxy_address'] !== '' && !$ip_range_parser->parse($proxy['proxy_address'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'proxy_address', $ip_range_parser->getError()
+							));
+						}
+						break;
+				}
 			}
 
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
@@ -689,9 +713,11 @@ class CProxy extends CApiService {
 		$proxy_db_fields = ['proxyid' => null];
 		$names = [];
 
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+
 		foreach ($proxies as $proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%1$s".', $proxy['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
 			if (!array_key_exists($proxy['proxyid'], $db_proxies)) {
@@ -738,6 +764,26 @@ class CProxy extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value used for proxy status "%1$s".', $proxy['status'])
 				);
+			}
+
+			if (array_key_exists('proxy_address', $proxy)) {
+				switch (array_key_exists('status', $proxy) ? $proxy['status'] : $db_proxy['status']) {
+					case HOST_STATUS_PROXY_PASSIVE:
+						if ($proxy['proxy_address'] !== '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'proxy_address', _('should be empty')
+							));
+						}
+						break;
+
+					case HOST_STATUS_PROXY_ACTIVE:
+						if ($proxy['proxy_address'] !== '' && !$ip_range_parser->parse($proxy['proxy_address'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'proxy_address', $ip_range_parser->getError()
+							));
+						}
+						break;
+				}
 			}
 
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {

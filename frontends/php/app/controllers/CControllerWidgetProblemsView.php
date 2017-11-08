@@ -46,6 +46,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'hostids' => $fields['hostids'],
 			'problem' => $fields['problem'],
 			'severities' => $fields['severities'],
+			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
 			'maintenance' => $fields['maintenance'],
 			'unacknowledged' => $fields['unacknowledged']

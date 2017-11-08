@@ -390,9 +390,6 @@ $pageFilter = new CPageFilter([
 ]);
 
 if (empty($_REQUEST['parent_discoveryid'])) {
-	if ($pageFilter->groupid > 0) {
-		$groupId = $pageFilter->groupids;
-	}
 	if ($pageFilter->hostid > 0) {
 		$hostId = $pageFilter->hostid;
 	}
@@ -414,6 +411,7 @@ elseif (isset($_REQUEST['form'])) {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'group_gid' => getRequest('group_gid', []),
 		'hostid' => $hostId,
+		'groupid' => $groupId,
 		'normal_only' => getRequest('normal_only')
 	];
 
@@ -610,6 +608,20 @@ elseif (isset($_REQUEST['form'])) {
 
 	// is template
 	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
+
+	// Read groupid for selected host or template if groupid filter is set to 'All' (is equal 0).
+
+	if ($data['hostid'] && !$data['groupid']) {
+		$db_hostgroup = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'hostids' => $data['hostid'],
+			'templateids' => $data['hostid']
+		]);
+
+		if ($db_hostgroup) {
+			$data['groupid'] = $db_hostgroup[0]['groupid'];
+		}
+	}
 
 	// render view
 	$graphView = new CView('configuration.graph.edit', $data);

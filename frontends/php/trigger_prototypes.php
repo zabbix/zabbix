@@ -515,6 +515,16 @@ elseif (isset($_REQUEST['form'])) {
 
 	$data['hostid'] = $discoveryRule['hostid'];
 
+	$db_hostgroup = API::HostGroup()->get([
+		'output' => ['groupid'],
+		'hostids' => $data['hostid'],
+		'templateids' => $data['hostid']
+	]);
+
+	if ($db_hostgroup) {
+		$data['groupid'] = $db_hostgroup[0]['groupid'];
+	}
+
 	$triggersView = new CView('configuration.trigger.prototype.edit', $data);
 	$triggersView->render();
 	$triggersView->show();

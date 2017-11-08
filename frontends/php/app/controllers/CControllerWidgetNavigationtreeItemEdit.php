@@ -113,7 +113,7 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 										if (in_array($base_mapid, $list)) {
 											$base_mapid = $next_base_mapid;
 											$maps_depth++;
-											continue(2);
+											continue 2;
 										}
 									}
 

@@ -21,7 +21,6 @@ package com.zabbix.gateway;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.HashSet;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
@@ -260,25 +259,13 @@ class JMXItemChecker extends ItemChecker
 	{
 		try
 		{
-			HashSet<String> properties = new HashSet<String>();
 			JSONObject counter = new JSONObject();
 
 			counter.put("{#JMXOBJ}", name);
 			counter.put("{#JMXDOMAIN}", name.getDomain());
 
 			for (Map.Entry<String, String> property : name.getKeyPropertyList().entrySet())
-			{
-				String key = property.getKey().toUpperCase().replaceAll("[^A-Z0-9_\\.]", "_");
-				
-				// Property key should not be already added to attribute list.
-				if (!properties.contains(key))
-				{
-					counter.put("{#JMX_" + key + "}" , property.getValue());
-					properties.add(key);
-				}
-				else
-					logger.trace("bean '{}' property '{}' was ignored", name, property.getKey());
-			}
+				counter.put("{#JMX" + property.getKey().toUpperCase() + "}" , property.getValue());
 
 			counters.put(counter);
 		}
