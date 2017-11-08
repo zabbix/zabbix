@@ -34,10 +34,7 @@ elseif ($data['graph']['unavailable_object']) {
 	];
 }
 else {
-	$item = $data['item_graph_url'] ? new CLink(null, $data['item_graph_url']) : new CDiv();
-	$item->setId($data['graph']['containerid']);
-
-	$flickerfree_item = (new CDiv($item))
+	$flickerfree_item = (new CDiv((new CLink(null, $data['item_graph_url']))->setId($data['graph']['containerid'])))
 		->addClass('flickerfreescreen')
 		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
