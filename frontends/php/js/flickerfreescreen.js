@@ -58,12 +58,19 @@
 			}
 		},
 
-		setAriaDescription: function(elmid, aria_label, aria_description) {
-			var elm = $(elmid),
+		/**
+		 * Set aria-label and aria-description attribute to element identified by selector argument.
+		 *
+		 * @param {string} css_selector         CSS selector string.
+		 * @param {string} aria_label           Aria label text.
+		 * @param {string} aria_description     Aria description text.
+		 */
+		setAriaDescription: function(selector, aria_label, aria_description) {
+			var elm = $(selector),
 				desc_elm = elm.attr('aria-describedby') ? $('#'+elm.attr('aria-describedby')) : null;
 
 			if (desc_elm === null) {
-				desc_elm = $('<div />').attr('id', 'aria_desc_'+(elmid.replace(/[#. ]+/g, ''))).hide();
+				desc_elm = $('<div />').attr('id', 'aria_desc_'+(selector.replace(/[#. ]+/g, ''))).hide();
 				elm.attr({
 					'tabindex': 0,
 					'aria-describedby': desc_elm.attr('id')
