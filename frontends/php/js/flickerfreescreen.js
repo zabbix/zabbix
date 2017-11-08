@@ -56,22 +56,27 @@
 		},
 
 		setAriaAttributes: function(screen) {
-			var container = $('#flickerfreescreen_'+screen.id), aria_elms = [];
+			var container = $('#flickerfreescreen_'+screen.id),
+				aria_elms_text = [];
 
-			container.children('div[aria-label]').remove();
+			container.find('#aria_desc_'+screen.id).remove();
 
+			// SCREEN_RESOURCE_MAP aria attributes.
 			$.each(screen.data.elements, function(_, elm_data) {
 				if ('aria_label' in elm_data) {
-					aria_elms[(elm_data.in_problem_state ? 'unshift' : 'push')]($('<div />')
-						.attr('aria-label', elm_data['aria_label']));
+					aria_elms_text[(elm_data.in_problem_state ? 'unshift' : 'push')](elm_data['aria_label']);
 				}
 			});
 
-			if ('aria_label' in screen.data) {
-				aria_elms.unshift($('<div />').attr('aria-label', screen.data['aria_label']));
-			}
-
-			container.append(aria_elms);
+			container.find('svg').attr('aria-hidden', 'true')
+				.parent().attr({
+					'tab-index': 0,
+					'aria-label': screen.data['aria_label'],
+					'aria-describedby': 'aria_description_'+screen.id
+				})
+				.append(
+					$('<div />').attr('id', 'aria_desc_'+screen.id).hide().html(aria_elms_text.join("\n"))
+				);
 		},
 
 		refresh: function(id, isSelfRefresh) {
