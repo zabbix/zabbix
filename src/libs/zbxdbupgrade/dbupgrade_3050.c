@@ -100,13 +100,20 @@ static int	DBpatch_3050004(void)
 	if (SUCCEED != DBadd_field("events", &field))
 		return FAIL;
 
+	return SUCCEED;
+}
+
+static int	DBpatch_3050005(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
 	if (SUCCEED != DBadd_field("problem", &field))
 		return FAIL;
 
 	return SUCCEED;
 }
 
-static int	DBpatch_3050005(void)
+static int	DBpatch_3050006(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -177,5 +184,6 @@ DBPATCH_ADD(3050002, 0, 1)
 DBPATCH_ADD(3050003, 0, 1)
 DBPATCH_ADD(3050004, 0, 1)
 DBPATCH_ADD(3050005, 0, 1)
+DBPATCH_ADD(3050006, 0, 1)
 
 DBPATCH_END()
