@@ -131,14 +131,14 @@ static int	DBpatch_3050006(void)
 		description = row[1];
 		ZBX_STR2UINT64(triggerid, row[0]);
 
-		res = DBexecute("update events set name='%s' where objectid=%d and source=%d", description,
-				triggerid, EVENT_SOURCE_TRIGGERS);
+		res = DBexecute("update events set name='%s' where object=%d and objectid=%d and source=%d",
+				description, EVENT_OBJECT_TRIGGER, triggerid, EVENT_SOURCE_TRIGGERS);
 
 		if (ZBX_DB_OK > res)
 			return FAIL;
 
-		res = DBexecute("update problem set name='%s' where objectid=%d and source=%d", description,
-				triggerid, EVENT_SOURCE_TRIGGERS);
+		res = DBexecute("update problem set name='%s' where object=%d and objectid=%d and source=%d",
+				description, EVENT_OBJECT_TRIGGER, triggerid, EVENT_SOURCE_TRIGGERS);
 
 		if (ZBX_DB_OK > res)
 			return FAIL;
