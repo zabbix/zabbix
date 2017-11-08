@@ -72,7 +72,7 @@
 				.parent().attr({
 					'tab-index': 0,
 					'aria-label': screen.data['aria_label'],
-					'aria-describedby': 'aria_description_'+screen.id
+					'aria-describedby': 'aria_desc_'+screen.id
 				})
 				.append(
 					$('<div />').attr('id', 'aria_desc_'+screen.id).hide().html(aria_elms_text.join("\n"))
