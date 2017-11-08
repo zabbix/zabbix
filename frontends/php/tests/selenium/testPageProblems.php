@@ -175,8 +175,6 @@ class testPageProblems extends CWebTest {
 
 		// Change minimum severity to Average
 		$this->zbxTestDropdownSelect('filter_severity', 'Average');
-		// Chrck Age less than
-		$this->zbxTestCheckboxSelect('filter_age_state');
 		// Add tag
 		$this->zbxTestInputType('filter_tags_0_tag', 'service');
 		$this->zbxTestInputType('filter_tags_0_value', 'abc');
