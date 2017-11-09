@@ -120,8 +120,6 @@ static int	DBpatch_3050006(void)
 	char		*description;
 	zbx_uint64_t	triggerid;
 	int		res;
-	char		*trdefault = "cannot calculate trigger expression";
-	char		*itdefault = "cannot obtain item value";
 
 	if (NULL == (result = DBselect("select triggerid,description from triggers")))
 		return FAIL;
@@ -137,6 +135,27 @@ static int	DBpatch_3050006(void)
 		if (ZBX_DB_OK > res)
 			return FAIL;
 
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050007(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*description;
+	zbx_uint64_t	triggerid;
+	int		res;
+
+	if (NULL == (result = DBselect("select triggerid,description from triggers")))
+		return FAIL;
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		description = row[1];
+		ZBX_STR2UINT64(triggerid, row[0]);
+
 		res = DBexecute("update problem set name='%s' where object=%d and objectid=%d and source=%d",
 				description, EVENT_OBJECT_TRIGGER, triggerid, EVENT_SOURCE_TRIGGERS);
 
@@ -144,11 +163,27 @@ static int	DBpatch_3050006(void)
 			return FAIL;
 	}
 
+	return SUCCEED;
+}
+
+static int	DBpatch_3050008(void)
+{
+	int		res;
+	char		*trdefault = "cannot calculate trigger expression";
+
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", trdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, EVENT_STATUS_PROBLEM);
 
 	if (ZBX_DB_OK > res)
 		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050009(void)
+{
+	int		res;
+	char		*trdefault = "cannot calculate trigger expression";
 
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d ", trdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER);
@@ -156,11 +191,27 @@ static int	DBpatch_3050006(void)
 	if (ZBX_DB_OK > res)
 		return FAIL;
 
+	return SUCCEED;
+}
+
+static int	DBpatch_3050010(void)
+{
+	int		res;
+	char		*itdefault = "cannot obtain item value";
+
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, EVENT_STATUS_PROBLEM);
 
 	if (ZBX_DB_OK > res)
 		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050011(void)
+{
+	int		res;
+	char		*itdefault = "cannot obtain item value";
 
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM);
@@ -184,5 +235,10 @@ DBPATCH_ADD(3050003, 0, 1)
 DBPATCH_ADD(3050004, 0, 1)
 DBPATCH_ADD(3050005, 0, 1)
 DBPATCH_ADD(3050006, 0, 1)
+DBPATCH_ADD(3050007, 0, 1)
+DBPATCH_ADD(3050008, 0, 1)
+DBPATCH_ADD(3050009, 0, 1)
+DBPATCH_ADD(3050010, 0, 1)
+DBPATCH_ADD(3050011, 0, 1)
 
 DBPATCH_END()
