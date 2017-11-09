@@ -707,7 +707,7 @@ if (!empty($data['new_operation'])) {
 
 			$new_operation_formlist
 				->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-					_s('At least one %1$s must be selected.', _('user or user group'))
+					_s('At least one user or user group must be selected.')
 				)
 				->addRow(_('Send to User groups'),
 					(new CDiv($usrgrpList))
@@ -1194,8 +1194,11 @@ $action_tabs = (new CTabView())
 	->addTab('actionTab', _('Action'), $action_tab)
 	->addTab('operationTab', _('Operations'), $operation_tab);
 
+$bottom_note = _s('At least one operation must exist.');
+
 // Recovery operation tab.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
+	$bottom_note = _s('At least one operation or recovery operation must exist.');
 	$recovery_tab = (new CFormList('operationlist'))
 		->addRow(_('Default subject'),
 			(new CTextBox('r_shortdata', $data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -1418,7 +1421,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				$new_operation_formlist
 					->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-						_s('At least one %1$s must be selected.', 'user or user group')
+						_s('At least one user or user group must be selected.')
 					)
 					->addRow(_('Send to User groups'),
 						(new CDiv($usrgrpList))
@@ -1765,6 +1768,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 // Acknowledge operations
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	$bottom_note = _s('At least one operation, recovery operation or acknowledge operation must exist.');
 	$action_formname = $actionForm->getName();
 
 	$acknowledge_tab = (new CFormList('operationlist'))
@@ -2132,7 +2136,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 
 		if ($usrgrp_list || $user_list) {
 			$new_operation_formlist->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-				_s('At least one %1$s must be selected.', 'user or user group')
+				_s('At least one user or user group must be selected.')
 			);
 		}
 
@@ -2256,9 +2260,7 @@ $action_tabs->setFooter([
 		->addItem([
 			(new CDiv((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)))
 				->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-			(new CDiv(
-				_s('At least one %1$s must exist.', _('operation, recovery operation or acknowledge operation'))
-			))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+			(new CDiv($bottom_note))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 		]),
 	makeFormFooter($form_buttons[0], $form_buttons[1])
 ]);
