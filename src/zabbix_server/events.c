@@ -215,7 +215,8 @@ static int	save_events(void)
 			events[i].eventid = eventid++;
 
 		zbx_db_insert_add_values(&db_insert, events[i].eventid, events[i].source, events[i].object,
-				events[i].objectid, events[i].clock, events[i].ns, events[i].value, events[i].name);
+				events[i].objectid, events[i].clock, events[i].ns, events[i].value,
+				ZBX_NULL2EMPTY_STR(events[i].name));
 
 		num++;
 
@@ -322,7 +323,7 @@ static void	save_problems(void)
 			const DB_EVENT	*event = (const DB_EVENT *)problems.values[j];
 
 			zbx_db_insert_add_values(&db_insert, event->eventid, event->source, event->object,
-					event->objectid, event->clock, event->ns, event->name);
+					event->objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name));
 		}
 
 		zbx_db_insert_execute(&db_insert);
