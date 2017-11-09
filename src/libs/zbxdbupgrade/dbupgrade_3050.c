@@ -117,25 +117,31 @@ static int	DBpatch_3050006(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*description;
+	char		*description, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t	triggerid;
-	int		res;
 
 	if (NULL == (result = DBselect("select triggerid,description from triggers")))
 		return FAIL;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		description = row[1];
 		ZBX_STR2UINT64(triggerid, row[0]);
 
-		res = DBexecute("update events set name='%s' where object=%d and objectid=%d and source=%d",
-				description, EVENT_OBJECT_TRIGGER, triggerid, EVENT_SOURCE_TRIGGERS);
-
-		if (ZBX_DB_OK > res)
-			return FAIL;
-
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set name='%s' where object=%d"
+				" and objectid=%d and source=%d;\n", description, EVENT_OBJECT_TRIGGER,
+				triggerid, EVENT_SOURCE_TRIGGERS);
 	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		return FAIL;
+
+	zbx_free(sql);
 
 	return SUCCEED;
 }
@@ -144,24 +150,31 @@ static int	DBpatch_3050007(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*description;
+	char		*description, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t	triggerid;
-	int		res;
 
 	if (NULL == (result = DBselect("select triggerid,description from triggers")))
 		return FAIL;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		description = row[1];
 		ZBX_STR2UINT64(triggerid, row[0]);
 
-		res = DBexecute("update problem set name='%s' where object=%d and objectid=%d and source=%d",
-				description, EVENT_OBJECT_TRIGGER, triggerid, EVENT_SOURCE_TRIGGERS);
-
-		if (ZBX_DB_OK > res)
-			return FAIL;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update problem set name='%s' where object=%d"
+				" and objectid=%d and source=%d;\n", description, EVENT_OBJECT_TRIGGER,
+				triggerid, EVENT_SOURCE_TRIGGERS);
 	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		return FAIL;
+
+	zbx_free(sql);
 
 	return SUCCEED;
 }
