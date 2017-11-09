@@ -128,7 +128,7 @@ static int	DBpatch_3050006(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		description = row[1];
+		description = DBdyn_escape_string(row[1]);
 		ZBX_STR2UINT64(triggerid, row[0]);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set name='%s' where object=%d"
@@ -161,7 +161,7 @@ static int	DBpatch_3050007(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		description = row[1];
+		description = DBdyn_escape_string(row[1]);
 		ZBX_STR2UINT64(triggerid, row[0]);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update problem set name='%s' where object=%d"
