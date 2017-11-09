@@ -274,30 +274,34 @@ class CMapHelper {
 		unset($link);
 
 		$problems_total = 0;
-		$problem_elements = 0;
-		$aria_description = [];
+		$status_problems = [];
+		$status_other = [];
 
 		foreach ($sysmap['selements'] as $index => $element) {
 			if (array_key_exists($index, $map_info) && $element['label']) {
-				$aria_label = sysmap_element_types($element['elementtype']).'. '.
-					implode('. ', zbx_objectValues($element['label'], 'content')).'.';
-				$aria_label = str_replace("\r", '', $aria_label);
+				$aria_label = sysmap_element_types($element['elementtype']).'. '.$map_info[$index]['name'].'. ';
 
 				if ($map_info[$index]['problems_total'] > 0) {
 					$problems_total += $map_info[$index]['problems_total'];
-					$problem_elements++;
-					array_unshift($aria_description, $aria_label);
+					$aria_label .= $map_info[$index]['info']['problem']['msg'].'. ';
+					$status_problems[] = $aria_label._('Status problem.');
+				}
+				elseif (array_key_exists('maintenance', $map_info[$index]['info'])) {
+					$status_other[] = $aria_label._('Status maintenance.');
+				}
+				elseif (array_key_exists('status', $map_info[$index]['info'])) {
+					$status_other[] = $aria_label._('Status disabled.');
 				}
 				else {
-					$aria_description[] = $aria_label;
+					$status_other[] = $aria_label._('Status ok.');
 				}
 			}
 		}
 
 		$sysmap['aria_label'] = _n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
-			$problem_elements, count($sysmap['selements'])
-			).' '._n('%1$s problem total.', '%1$s problems total.', $problems_total).
-			"\n".implode("\n", $aria_description);
+				count($status_problems), count($sysmap['selements'])).
+			_n('%1$s problem total.', '%1$s problems total.', $problems_total).
+			"\n".implode("\n", array_merge($status_problems, $status_other));
 	}
 
 	/**
