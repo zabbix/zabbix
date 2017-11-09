@@ -83,8 +83,7 @@ class CMapHelper {
 					'font_color' => 'FF0000',
 					'text' => _('No permissions to referred object or it does not exist!')
 				]],
-				'aria_label' => '',
-				'aria_description' => ''
+				'aria_label' => ''
 			];
 		}
 		else {
@@ -113,7 +112,6 @@ class CMapHelper {
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
 			'aria_label' => $map['aria_label'],
-			'aria_description' => $map['aria_description'],
 			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
 		];
 	}
@@ -298,8 +296,8 @@ class CMapHelper {
 
 		$sysmap['aria_label'] = _n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
 			$problem_elements, count($sysmap['selements'])
-		).' '._n('%1$s problem total.', '%1$s problems total.', $problems_total);
-		$sysmap['aria_description'] = implode("\n", $aria_description);
+			).' '._n('%1$s problem total.', '%1$s problems total.', $problems_total).
+			"\n".implode("\n", $aria_description);
 	}
 
 	/**

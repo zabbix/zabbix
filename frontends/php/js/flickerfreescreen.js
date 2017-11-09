@@ -41,10 +41,8 @@
 			// SCREEN_RESOURCE_MAP
 			if (screen.resourcetype == 2) {
 				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
-				$(screen.data.container).find('svg').attr('aria-hidden', 'true');
-				this.setAriaDescription(screen.data.options.container, screen.data.options.aria_label,
-					screen.data.options.aria_description
-				);
+				$(screen.data.container).attr({'aria-label': screen.data.options.aria_label, 'tabindex': 0})
+					.find('svg').attr('aria-hidden', 'true');
 			}
 
 			// init refresh plan
@@ -56,29 +54,6 @@
 					this.screens[screen.id].interval
 				);
 			}
-		},
-
-		/**
-		 * Set aria-label and aria-description attribute to element identified by selector argument.
-		 *
-		 * @param {string} css_selector         CSS selector string.
-		 * @param {string} aria_label           Aria label text.
-		 * @param {string} aria_description     Aria description text.
-		 */
-		setAriaDescription: function(selector, aria_label, aria_description) {
-			var elm = $(selector),
-				desc_elm = elm.attr('aria-describedby') ? $('#'+elm.attr('aria-describedby')) : null;
-
-			if (desc_elm === null) {
-				desc_elm = $('<div />').attr('id', 'aria_desc_'+(selector.replace(/[#. ]+/g, ''))).hide();
-				elm.attr({
-					'tabindex': 0,
-					'aria-describedby': desc_elm.attr('id')
-				}).append(desc_elm);
-			}
-
-			elm.attr('aria-label', aria_label);
-			desc_elm.text(aria_description);
 		},
 
 		refresh: function(id, isSelfRefresh) {
@@ -369,7 +344,7 @@
 					data.show_timestamp = screen.data.options.show_timestamp;
 					screen.isRefreshing = false;
 					screen.data.update(data);
-					self.setAriaDescription(screen.data.container, data.aria_label, data.aria_description);
+					$(screen.data.container).attr('aria-label', data.aria_label);
 					screen.timestamp = screen.timestampActual;
 					window.flickerfreeScreenShadow.end(id);
 				});
