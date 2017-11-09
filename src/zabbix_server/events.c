@@ -93,10 +93,6 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             trigger_value               - [IN] trigger value               *
  *             error                       - [IN] error for internal events   *
  *                                                                            *
- * Comments: The error field must always be set to the empty string ("") in a *
- *           call of the function where the field is not meant to be used     *
- *           instead of NULL.                                                 *
- *                                                                            *
  ******************************************************************************/
 int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
@@ -2040,7 +2036,7 @@ int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object
 
 	index = add_event(source, object, objectid, ts, TRIGGER_VALUE_OK, trigger_description, trigger_expression,
 			trigger_recovery_expression, trigger_priority, trigger_type, trigger_tags,
-			trigger_correlation_mode, trigger_correlation_tag, trigger_value, "");
+			trigger_correlation_mode, trigger_correlation_tag, trigger_value, NULL);
 
 	recovery_local.eventid = eventid;
 	recovery_local.objectid = objectid;

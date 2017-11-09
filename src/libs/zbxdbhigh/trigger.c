@@ -125,7 +125,7 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 				&trigger->timespec, new_value, trigger->description,
 				trigger->expression_orig, trigger->recovery_expression_orig,
 				trigger->priority, trigger->type, &trigger->tags,
-				trigger->correlation_mode, trigger->correlation_tag, trigger->value, "");
+				trigger->correlation_mode, trigger->correlation_tag, trigger->value, NULL);
 	}
 
 	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
