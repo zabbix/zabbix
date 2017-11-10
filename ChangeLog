@@ -966,7 +966,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
-...G...... [ZBX-10710] fixed CPU guest time utilization accounting (valdis)
+...G...... [ZBX-10710] fixed CPU guest time utilization accounting in Linux (valdis)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.13
