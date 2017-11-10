@@ -86,7 +86,7 @@ class testPageSlideShows extends CWebTest {
 
 	/**
 	 * @dataProvider allSlideShows
-	 * @backup slideshows
+	 * @backup-once slideshows
 	 */
 	public function testPageSlideShows_MassDelete($slideshow) {
 		$slideshowid = $slideshow['slideshowid'];

@@ -301,7 +301,7 @@ class testPageActions extends CWebTest {
 
 	/**
 	 * @dataProvider allActions
-	 * @backup actions
+	 * @backup-once actions
 	 */
 	public function testPageActions_MassDelete($action) {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';

@@ -81,7 +81,7 @@ class testPageDiscoveryRules extends CWebTest {
 
 	/**
 	 * @dataProvider data
-	 * @backup triggers
+	 * @backup-once triggers
 	 */
 	public function testPageDiscoveryRules_SimpleDelete($data) {
 		$itemid = $data['itemid'];
@@ -114,7 +114,7 @@ class testPageDiscoveryRules extends CWebTest {
 
 	/**
 	 * @dataProvider rule
-	 * @backup triggers
+	 * @backup-once triggers
 	 */
 	public function testPageDiscoveryRules_MassDelete($rule) {
 		$hostids = DBdata(

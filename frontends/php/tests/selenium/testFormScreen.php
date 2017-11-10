@@ -139,7 +139,7 @@ class testFormScreen extends CWebTest {
 
 		if (isset($data['owner'])) {
 			$this->zbxTestClickXpathWait("//button[text()='Select']");
-			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+			$this->zbxTestSwitchToWindow('zbx_popup');
 			$this->zbxTestClickLinkTextWait($data['owner']);
 			$this->webDriver->switchTo()->window('');
 		}

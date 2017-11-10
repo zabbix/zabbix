@@ -88,7 +88,7 @@ class testPageAdministrationScripts extends CWebTest {
 
 	/**
 	 * @dataProvider allScripts
-	 * @backup scripts
+	 * @backup-once scripts
 	 */
 	public function testPageAdministrationScripts_MassDelete($script) {
 		$this->zbxTestLogin('zabbix.php?action=script.list');

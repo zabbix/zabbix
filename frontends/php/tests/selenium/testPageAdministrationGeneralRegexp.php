@@ -86,7 +86,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 	/**
 	 * @dataProvider allRegexps
-	 * @backup regexps
+	 * @backup-once regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
@@ -104,7 +104,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	}
 
 	/**
-	 * @backup regexps
+	 * @backup-once regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
 		$this->zbxTestLogin('adm.regexps.php');

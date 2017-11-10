@@ -70,7 +70,7 @@ class testPageTriggerPrototypes extends CWebTest {
 
 	/**
 	 * @dataProvider data
-	 * @backup triggers
+	 * @backup-once triggers
 	 */
 	public function testPageTriggerPrototypes_SimpleDelete($data) {
 		$triggerid = $data['triggerid'];
@@ -108,7 +108,7 @@ class testPageTriggerPrototypes extends CWebTest {
 
 	/**
 	 * @dataProvider rule
-	 * @backup triggers
+	 * @backup-once triggers
 	 */
 	public function testPageTriggerPrototypes_MassDelete($rule) {
 		$druleid = $rule['parent_itemid'];
