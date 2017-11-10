@@ -24,6 +24,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+.....J.... [ZBX-12705] added check for collisions and unsupported characters in macro names in jmx.discovery (vjaceslavs)
 ........S. [ZBX-12970] fixed processing of alerts when related event is removed (vso)
 ...G...... [ZBX-12544] fixed compilation warnings (valdis)
 
