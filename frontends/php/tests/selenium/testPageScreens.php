@@ -100,7 +100,7 @@ class testPageScreens extends CWebTest {
 
 	/**
 	 * @dataProvider allScreens
-	 * @backup screens
+	 * @backup-once screens
 	 */
 	public function testPageScreens_MassDelete($screen) {
 		$this->zbxTestLogin('screenconf.php');

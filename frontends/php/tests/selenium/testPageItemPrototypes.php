@@ -65,7 +65,7 @@ class testPageItemPrototypes extends CWebTest {
 
 	/**
 	 * @dataProvider data
-	 * @backup triggers
+	 * @backup-once triggers
 	 */
 	public function testPageItemPrototypes_SimpleDelete($data) {
 		$itemid = $data['itemid'];
@@ -100,7 +100,7 @@ class testPageItemPrototypes extends CWebTest {
 
 	/**
 	 * @dataProvider rule
-	 * @backup triggers
+	 * @backup-once triggers
 	 */
 	public function testPageItemPrototypes_MassDelete($rule) {
 		$itemid = $rule['itemid'];
