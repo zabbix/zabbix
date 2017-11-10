@@ -21,6 +21,7 @@ Bug fixes:
 Changes for 3.4.5rc1
 
 New features:
+..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
 ........S. [ZBX-12970] fixed processing of alerts when related event is removed (vso)
