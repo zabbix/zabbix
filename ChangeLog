@@ -24,6 +24,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+........S. [ZBX-12978] improved performance of preprocessor manager, alert manager/worker, IPMI manager/poller by reducing frequency of log rotation checks that handle stdout/stderr (vso)
 ........S. [ZBX-12936] improved SQL performance by updating proxy last access in bulks (vso)
 .....J.... [ZBX-12705] added check for collisions and unsupported characters in macro names in jmx.discovery (vjaceslavs)
 ........S. [ZBX-12970] fixed processing of alerts when related event is removed (vso)
