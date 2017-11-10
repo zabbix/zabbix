@@ -134,6 +134,7 @@ static int	DBpatch_3050006(void)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set name='%s' where object=%d"
 				" and objectid=%d and source=%d;\n", description, EVENT_OBJECT_TRIGGER,
 				triggerid, EVENT_SOURCE_TRIGGERS);
+		zbx_free(description);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -167,6 +168,7 @@ static int	DBpatch_3050007(void)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update problem set name='%s' where object=%d"
 				" and objectid=%d and source=%d;\n", description, EVENT_OBJECT_TRIGGER,
 				triggerid, EVENT_SOURCE_TRIGGERS);
+		zbx_free(description);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -179,10 +181,13 @@ static int	DBpatch_3050007(void)
 	return SUCCEED;
 }
 
+#define	ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME	"Cannot calculate trigger expression."
+#define	ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME	"Cannot obtain item value."
+
 static int	DBpatch_3050008(void)
 {
 	int		res;
-	char		*trdefault = "cannot calculate trigger expression";
+	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", trdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, EVENT_STATUS_PROBLEM);
@@ -196,7 +201,7 @@ static int	DBpatch_3050008(void)
 static int	DBpatch_3050009(void)
 {
 	int		res;
-	char		*trdefault = "cannot calculate trigger expression";
+	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d ", trdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER);
@@ -210,7 +215,7 @@ static int	DBpatch_3050009(void)
 static int	DBpatch_3050010(void)
 {
 	int		res;
-	char		*itdefault = "cannot obtain item value";
+	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, EVENT_STATUS_PROBLEM);
@@ -224,7 +229,7 @@ static int	DBpatch_3050010(void)
 static int	DBpatch_3050011(void)
 {
 	int		res;
-	char		*itdefault = "cannot obtain item value";
+	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM);
