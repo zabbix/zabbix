@@ -958,6 +958,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10710] fixed CPU guest time utilization accounting (valdis)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.13

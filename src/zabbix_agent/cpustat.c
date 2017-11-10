@@ -395,6 +395,10 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 				&counter[ZBX_CPU_STATE_SOFTIRQ], &counter[ZBX_CPU_STATE_STEAL],
 				&counter[ZBX_CPU_STATE_GCPU], &counter[ZBX_CPU_STATE_GNICE]);
 
+		/* Linux includes guest times in user and nice times */
+		counter[ZBX_CPU_STATE_USER] -= counter[ZBX_CPU_STATE_GCPU];
+		counter[ZBX_CPU_STATE_NICE] -= counter[ZBX_CPU_STATE_GNICE];
+
 		update_cpu_counters(&pcpus->cpu[idx], counter);
 		cpu_status[idx] = SYSINFO_RET_OK;
 	}
