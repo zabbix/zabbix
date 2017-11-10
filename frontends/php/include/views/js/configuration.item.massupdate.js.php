@@ -55,9 +55,36 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		// ZBX_STYLE_FIELD_LABEL_ASTERISK handling for CVisibilityBox objects.
-		$('input:checkbox.<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>').change(function(){
-			$(this).siblings('label').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-		}).filter(':checked').change();
+		$('input:checkbox,#type').change(function () {
+			var item_type=$('input#visible_type').is(':checked') ? parseInt($('#type').val(), 10) : '',
+				asterisk_fields = <?= CJs::encodeJson([
+					'' => ['update_interval', 'delay', 'history', 'trends'],
+					ITEM_TYPE_JMX => ['jmx_endpoint'],
+					ITEM_TYPE_TELNET => ['username'],
+					ITEM_TYPE_SSH => ['username'],
+					ITEM_TYPE_SNMPV1 => ['community', 'snmp_community'],
+					ITEM_TYPE_SNMPV2C => ['community', 'snmp_community'],
+					ITEM_TYPE_DEPENDENT => ['master_itemname', 'master_itemid']
+				]) ?>,
+				asterisk_filter = function () {
+					var elmid=$(this).attr('for').replace('visible_', '');
+
+					return $('#'+$(this).attr('for')).is(':checked') && ($.inArray(elmid, asterisk_fields['']) !== -1
+						|| (item_type && $.inArray(elmid, asterisk_fields[item_type]) !== -1));
+				},
+				aria_filter = function() {
+					var elmid=$(this).attr('id');
+
+					return $.inArray(elmid, asterisk_fields['']) !== -1
+						|| (item_type && $.inArray(elmid, asterisk_fields[item_type]) !== -1);
+				}
+
+			$('label').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')
+				.filter(asterisk_filter).addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+			$('input:visible').removeAttr('aria-required')
+				.filter(aria_filter).attr('aria-required', 'true');
+		});
+
 		$('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!$('#visible_type').is(':checked')) {
