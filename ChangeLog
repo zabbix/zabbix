@@ -958,7 +958,6 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-8049] fixed zabbix[java,,ping] to stay supported if java gateway is down (valdis)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.13
