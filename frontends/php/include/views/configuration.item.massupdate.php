@@ -426,6 +426,7 @@ $update_interval->addRow(
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[update_interval]', 'update_interval_div', _('Original')))
 		->setLabel(_('Update interval'))
+		->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 		->setChecked(isset($data['visible']['update_interval'])),
 	(new CDiv($update_interval))->setId('update_interval_div')
 );
@@ -434,12 +435,14 @@ $itemFormList
 	->addRow(
 		(new CVisibilityBox('visible[history]', 'history', _('Original')))
 			->setLabel(_('History storage period'))
+			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 			->setChecked(isset($data['visible']['history'])),
 		(new CTextBox('history', $data['history']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(
 		(new CVisibilityBox('visible[trends]', 'trends', _('Original')))
 			->setLabel(_('Trend storage period'))
+			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 			->setChecked(isset($data['visible']['trends'])),
 		(new CTextBox('trends', $data['trends']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);

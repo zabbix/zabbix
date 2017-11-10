@@ -54,6 +54,10 @@
 	</script>
 <script type="text/javascript">
 	jQuery(function($) {
+		// ZBX_STYLE_FIELD_LABEL_ASTERISK handling for CVisibilityBox objects.
+		$('input:checkbox.<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>').change(function(){
+			$(this).siblings('label').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+		});
 		$('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!$('#visible_type').is(':checked')) {
