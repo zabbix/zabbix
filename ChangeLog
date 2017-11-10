@@ -26,6 +26,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-12738] added missing key "vfs.dir.size" for active agent in item edit form (gcalenko)
 ..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
 ........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
