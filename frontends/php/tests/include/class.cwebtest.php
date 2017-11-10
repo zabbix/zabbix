@@ -386,7 +386,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			$values[] = $option->getText();
 		}
 
-		$this->assertTrue(count(array_diff($strings, $values) === 0));
+		$this->assertTrue(count(array_diff($strings, $values)) === 0);
 	}
 
 	public function zbxTestDropdownSelect($id, $string) {
