@@ -188,7 +188,10 @@ $fields = [
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
-check_fields($fields);
+// Do not validate single input fields for massupdate form.
+if (getRequest('action') !== 'item.massupdateform') {
+	check_fields($fields);
+}
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);

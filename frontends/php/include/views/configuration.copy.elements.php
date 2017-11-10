@@ -91,7 +91,7 @@ else {
 		);
 	}
 }
-$triggersFormList->addRow(_('Target'), $targets);
+$triggersFormList->addRow((new CLabel(_('Target')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $targets);
 
 // append tabs to form
 $triggersTab = (new CTabView())
