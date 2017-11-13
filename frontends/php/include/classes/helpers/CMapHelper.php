@@ -210,27 +210,35 @@ class CMapHelper {
 
 			$element['icon'] = $icon;
 			if ($element['permission'] >= PERM_READ) {
-				$label = str_replace("\n", ' ', CMacrosResolverHelper::resolveMapLabelMacrosAll($element));
-				$aria_label = sysmap_element_types($element['elementtype']).'.'.$label.'.';
+				$label = str_replace(['.', ','], ' ',
+					CMacrosResolverHelper::resolveMapLabelMacrosAll($element)
+				);
 
 				if ($map_info[$id]['problems_total'] > 0) {
 					$problems_total += $map_info[$id]['problems_total'];
-					$aria_label .= $map_info[$id]['info']['problem']['msg'].'.';
-					$status_problems[] = $aria_label._('Status problem.');
-				}
-				elseif (array_key_exists('info', $map_info[$id])) {
-					if (array_key_exists('maintenance', $map_info[$id]['info'])) {
-						$status_other[] = $aria_label._('Status maintenance.');
-					}
-					elseif (array_key_exists('status', $map_info[$id]['info'])) {
-						$status_other[] = $aria_label._('Status disabled.');
-					}
-					else {
-						$status_other[] = $aria_label._('Status ok.');
-					}
+					$problem_desc = ($map_info[$id]['problems_total'] > 1)
+						? _n('%1$s problem', '%1$s problems', $map_info[$id]['problems_total'])
+						: $map_info[$id]['info']['problem']['msg'];
+
+					$status_problems[] = sprintf('%1$s, %2$s, %3$s, %4$s. ',
+						sysmap_element_types($element['elementtype']), _('Status problem'), $label, $problem_desc
+					);
 				}
 				else {
-					$status_other[] = $aria_label;
+					$element_status = _('Status ok');
+
+					if (array_key_exists('info', $map_info[$id])
+						&& array_key_exists('maintenance', $map_info[$id]['info'])) {
+						$element_status = _('Status maintenance');
+					}
+					elseif (array_key_exists('info', $map_info[$id])
+						&& array_key_exists('status', $map_info[$id]['info'])) {
+						$element_status = _('Status disabled');
+					}
+
+					$status_other[] = sprintf('%1$s, %2$s, %3$s. ', sysmap_element_types($element['elementtype']),
+						$element_status, $label
+					);
 				}
 
 				$element['highlight'] = $highlights[$id];
@@ -249,10 +257,13 @@ class CMapHelper {
 		}
 		unset($element);
 
-		$sysmap['aria_label'] = _n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
+		$sysmap['aria_label'] = implode('', [
+			$sysmap['name'].', ',
+			_n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
 				count($status_problems), count($sysmap['selements'])).
-			_n('%1$s problem total.', '%1$s problems total.', $problems_total).
-			implode('', array_merge($status_problems, $status_other));
+			_n('%1$s problem in total.', '%1$s problems in total.', $problems_total).
+			implode('', array_merge($status_problems, $status_other))
+		]);
 
 		foreach ($sysmap['shapes'] as &$shape) {
 			if (array_key_exists('text', $shape)) {
