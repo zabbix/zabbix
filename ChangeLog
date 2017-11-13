@@ -971,6 +971,7 @@ New features:
 Bug fixes:
 A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
 ..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
+........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
 ..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
 ...G...... [ZBX-10710] fixed CPU guest time utilization accounting in Linux (valdis)
 
