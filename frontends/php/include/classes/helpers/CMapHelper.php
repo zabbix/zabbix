@@ -257,13 +257,11 @@ class CMapHelper {
 		}
 		unset($element);
 
-		$sysmap['aria_label'] = implode('', [
-			$sysmap['name'].', ',
+		$sysmap['aria_label'] = $sysmap['name'].', '.
 			_n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
 				count($status_problems), count($sysmap['selements'])).
 			_n('%1$s problem in total.', '%1$s problems in total.', $problems_total).
-			implode('', array_merge($status_problems, $status_other))
-		]);
+			implode('', array_merge($status_problems, $status_other));
 
 		foreach ($sysmap['shapes'] as &$shape) {
 			if (array_key_exists('text', $shape)) {
