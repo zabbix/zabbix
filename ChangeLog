@@ -14,7 +14,6 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 Bug fixes:
 A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
-..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
 ...G...PS. [ZBX-12983] fixed compilation warnings under Windows (valdis)
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
