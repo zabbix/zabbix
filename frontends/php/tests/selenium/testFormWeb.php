@@ -1598,7 +1598,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestCheckboxSelect("group_httptestid_$httptestid");
 			$this->zbxTestClickButton('httptest.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario deleted');
 			$this->assertEquals(0, DBcount("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".

@@ -1758,7 +1758,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
 			$this->zbxTestClickButton('discoveryrule.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;

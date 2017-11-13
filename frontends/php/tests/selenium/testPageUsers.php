@@ -151,7 +151,7 @@ class testPageUsers extends CWebTest {
 			$this->zbxTestCheckboxSelect('group_userid_' . $id);
 			$this->zbxTestClickButton('user.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 			$this->zbxTestCheckTitle('Configuration of users');
 			if ($alias === 'guest' || $alias === 'Admin') {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' ,'Cannot delete user');

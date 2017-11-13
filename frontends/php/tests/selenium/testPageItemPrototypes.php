@@ -76,7 +76,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
 		$this->zbxTestClickButton('itemprototype.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
@@ -116,7 +116,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('itemprototype.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');

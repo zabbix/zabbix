@@ -91,7 +91,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestCheckboxSelect('g_hostdruleid_'.$itemid);
 		$this->zbxTestClickButton('discoveryrule.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
@@ -130,7 +130,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('discoveryrule.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
