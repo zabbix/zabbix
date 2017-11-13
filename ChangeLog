@@ -417,6 +417,7 @@ Changes for 3.2.11rc1
 New features:
 
 Bug fixes:
+.......P.. [ZBX-12117] fixed proxy passing zeros to history export modules instead of actual numeric values (gleb)
 ..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
 ..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
