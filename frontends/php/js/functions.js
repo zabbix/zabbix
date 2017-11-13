@@ -517,6 +517,20 @@ function overlayDialogueDestroy(dialogueid) {
 }
 
 /**
+ * Get unused overlay dialog id.
+ *
+ * @return {string}
+ */
+function getOverlayDialogueId() {
+	var dialogueid = Math.random().toString(36).substring(7);
+	while (jQuery('[data-dialogueid="' + dialogueid + '"]').length) {
+		dialogueid = Math.random().toString(36).substring(7);
+	}
+
+	return dialogueid;
+}
+
+/**
  * Display modal window.
  *
  * @param {object} params						Modal window params.
@@ -547,10 +561,7 @@ function overlayDialogue(params) {
 		});
 
 	if (typeof params.dialogueid === 'undefined') {
-		params.dialogueid = Math.random().toString(36).substring(7);
-		while (jQuery('[data-dialogueid="' + params.dialogueid + '"]').length) {
-			params.dialogueid = Math.random().toString(36).substring(7);
-		}
+		params.dialogueid = getOverlayDialogueId();
 	}
 
 	if (typeof params.script_inline !== 'undefined') {

@@ -372,10 +372,26 @@ function openWinCentered(url, name, width, height, params) {
  * @returns false
  */
 function PopUp(url, dialogueid) {
+	var ovelay_properties = {
+		'title': '',
+		'content': jQuery('<div>')
+			.css({'height': '68px'})
+			.append(jQuery('<div>')
+				.addClass('preloader-container')
+				.append(jQuery('<div>').addClass('preloader'))
+			),
+		'class': 'modal-popup',
+		'buttons': [],
+		'dialogueid': (typeof dialogueid === 'undefined') ? getOverlayDialogueId() : dialogueid
+	};
+
 	jQuery.ajax({
 		url: url,
 		type: 'get',
 		dataType: 'json',
+		beforeSend: function() {
+			overlayDialogue(ovelay_properties);
+		},
 		success: function(resp) {
 			var buttons = resp.buttons !== null ? resp.buttons : [];
 
@@ -385,16 +401,11 @@ function PopUp(url, dialogueid) {
 				'action': function() {}
 			});
 
-			var ovelay_properties = {
-				'title': resp.header,
-				'content': resp.body,
-				'controls': resp.controls,
-				'class': 'modal-popup',
-				'buttons': buttons
-			};
-			if (typeof dialogueid !== 'undefined') {
-				ovelay_properties['dialogueid'] = dialogueid;
-			}
+			ovelay_properties['title'] = resp.header;
+			ovelay_properties['content'] = resp.body;
+			ovelay_properties['controls'] = resp.controls;
+			ovelay_properties['buttons'] = buttons;
+
 			if (typeof resp.script_inline !== 'undefined') {
 				ovelay_properties['script_inline'] = resp.script_inline;
 			}
