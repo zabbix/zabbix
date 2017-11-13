@@ -2258,9 +2258,9 @@ $action_tabs->setFooter([
 	(new CList())
 		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addItem([
-			(new CDiv((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)))
-				->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-			(new CDiv($bottom_note))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+			new CDiv(''),
+			(new CDiv((new CLabel($bottom_note))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)))
+				->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 		]),
 	makeFormFooter($form_buttons[0], $form_buttons[1])
 ]);
