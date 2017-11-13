@@ -593,14 +593,19 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestClickAndAcceptAlert($id) {
 		$this->zbxTestClickWait($id);
-			try {
-				$this->webDriver->wait(10, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::alertIsPresent());
-				$this->webDriver->switchTo()->alert()->accept();
-			}
-			catch (TimeoutException $ex) {
-				$this->zbxTestClickWait($id);
-				$this->webDriver->switchTo()->alert()->accept();
-			}
+		try {
+			$this->zbxTestAcceptAlert();
+		}
+		catch (TimeoutException $ex) {
+			$this->zbxTestClickWait($id);
+			$this->zbxTestAcceptAlert();
+		}
+	}
+
+	public function zbxTestAcceptAlert() {
+		$this->webDriver->wait(10, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::alertIsPresent());
+		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestWaitForPageToLoad();
 	}
 
 	public function zbxTestGetDropDownElements($dropdownId) {

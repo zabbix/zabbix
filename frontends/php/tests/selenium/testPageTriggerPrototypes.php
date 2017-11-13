@@ -81,7 +81,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
 		$this->zbxTestClickButton('triggerprototype.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
@@ -124,7 +124,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_triggers');
 		$this->zbxTestClickButton('triggerprototype.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
