@@ -258,9 +258,11 @@ class CMapHelper {
 		unset($element);
 
 		$sysmap['aria_label'] = str_replace(['.', ','], ' ', $sysmap['name']).', '.
-			_n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
+			_n('%1$s of %2$s element in problem state', '%1$s of %2$s elements in problem state',
 				count($status_problems), count($sysmap['selements'])).
-			_n('%1$s problem in total.', '%1$s problems in total.', $problems_total).
+			', '.
+			_n('%1$s problem in total', '%1$s problems in total', $problems_total).
+			'. '.
 			implode('', array_merge($status_problems, $status_other));
 
 		foreach ($sysmap['shapes'] as &$shape) {
