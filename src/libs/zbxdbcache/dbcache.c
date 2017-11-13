@@ -2162,10 +2162,7 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_float->itemid = h->itemid;
 				h_float->clock = h->ts.sec;
 				h_float->ns = h->ts.ns;
-				if (0 != (ZBX_PROGRAM_TYPE_SERVER & program_type))
-					h_float->value = h->value.dbl;
-				else
-					h_float->value = h->value_orig.dbl;
+				h_float->value = h->value.dbl;
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				if (NULL == history_integer_cbs)
@@ -2175,10 +2172,7 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_integer->itemid = h->itemid;
 				h_integer->clock = h->ts.sec;
 				h_integer->ns = h->ts.ns;
-				if (0 != (ZBX_PROGRAM_TYPE_SERVER & program_type))
-					h_integer->value = h->value.ui64;
-				else
-					h_integer->value = h->value_orig.ui64;
+				h_integer->value = h->value.ui64;
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				if (NULL == history_string_cbs)
