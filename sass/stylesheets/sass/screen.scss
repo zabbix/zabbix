@@ -3245,12 +3245,26 @@ $form-icon-btn: (
 			max-width: inherit;
 			margin: 0 0 10px 0;
 		}
+		.overlay-dialogue-controls {
+			text-align: right;
+			padding: 0px 0px 10px 0px;
+
+			li {
+				display: inline;
+				padding-left: 10px;
+			}
+		}
 		& > .overlay-close-btn {
 			position: relative;
 			float: right;
 			top: -12px;
 			right: -8px;
 		}
+	}
+
+	&.modal-popup {
+		max-width: 1024px;
+		min-width: 650px;
 	}
 
 	.list-table {

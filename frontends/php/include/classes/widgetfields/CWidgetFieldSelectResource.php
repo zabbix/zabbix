@@ -75,7 +75,8 @@ class CWidgetFieldSelectResource extends CWidgetField {
 	}
 
 	public function getPopupUrl() {
-		$url = (new CUrl('popup.php'))
+		$url = (new CUrl())
+			->setArgument('action', 'popup')
 			->setArgument('srctbl', $this->srctbl)
 			->setArgument('srcfld1', $this->srcfld1)
 			->setArgument('srcfld2', $this->srcfld2)

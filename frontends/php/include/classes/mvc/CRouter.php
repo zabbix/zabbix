@@ -117,6 +117,13 @@ class CRouter {
 		'widget.trigover.view'	=> ['CControllerWidgetTrigOverView',	'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view'],
 		'widget.plaintext.view'	=> ['CControllerWidgetPlainTextView',	'layout.widget',		'monitoring.widget.plaintext.view'],
+		'popup'					=> ['CControllerPopup',					'layout.json',			'layout.popup'],
+		'popup_httpstep'		=> ['CControllerPopupHttpStep',			'layout.json',			'layout.popuphttpstep'],
+		'popup_media'			=> ['CControllerPopupMedia',			'layout.json',			'layout.popupmedia'],
+		'popup_script_exec'		=> ['CControllerPopupScriptExec',		'layout.json',			'layout.popupscriptexec'],
+		'popup_trexpr'			=> ['CControllerPopupTriggerExpr',		'layout.json',			'layout.popuptriggerexpr'],
+		'popup_services'		=> ['CControllerPopupServices',			'layout.json',			'layout.popupservices'],
+		'popup_testtrexpr'		=> ['CControllerPopupTestTriggerExpr',	'layout.json',			'layout.popuptesttriggerexpr']
 	];
 
 	public function __construct($action) {

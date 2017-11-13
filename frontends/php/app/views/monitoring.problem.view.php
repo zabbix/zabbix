@@ -116,7 +116,8 @@ if ($data['action'] == 'problem.view') {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
 				->onClick('return PopUp("'.
-					(new CUrl('popup.php'))
+					(new CUrl())
+						->setArgument('action', 'popup')
 						->setArgument('srctbl', 'applications')
 						->setArgument('srcfld1', 'name')
 						->setArgument('dstfrm', 'zbx_filter')

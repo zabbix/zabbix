@@ -232,7 +232,7 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
+				->onClick('return PopUp("?action=popup&srctbl=drules&srcfld1=druleid&srcfld2=name'.
 					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");'
 				)
 		];
@@ -245,7 +245,7 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
+				->onClick('return PopUp("?action=popup&srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
 					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");'
 				)
 		];
@@ -259,7 +259,7 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp('.
-						'"popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
+						'"?action=popup&srctbl=proxies&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 						'&dstfld1=new_condition_value&dstfld2=proxy"'.
 					')'
 				)
@@ -637,7 +637,7 @@ if (!empty($data['new_operation'])) {
 
 			$addUsrgrpBtn = (new CButton(null, _('Add')))
 				->onClick('return PopUp("'.
-						'popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1'.
+						'?action=popup&dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1'.
 						'&dstfld1=opmsgUsrgrpListFooter"'.
 					')'
 				)
@@ -654,7 +654,7 @@ if (!empty($data['new_operation'])) {
 
 			$addUserBtn = (new CButton(null, _('Add')))
 				->onClick('return PopUp('.
-						'"popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1'.
+						'"?action=popup&dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1'.
 						'&dstfld1=opmsgUserListFooter"'.
 					')'
 				)
@@ -1329,7 +1329,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				$addUsrgrpBtn = (new CButton(null, _('Add')))
 					->onClick('return PopUp('.
-							'"popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name'.
+							'"?action=popup&dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name'.
 							'&multiselect=1&dstfld1=recOpmsgUsrgrpListFooter"'.
 						')'
 					)
@@ -1346,7 +1346,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				$addUserBtn = (new CButton(null, _('Add')))
 					->onClick('return PopUp('.
-							'"popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname'.
+							'"?action=popup&dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname'.
 							'&multiselect=1&dstfld1=recOpmsgUserListFooter"'.
 						')'
 					)
@@ -1833,7 +1833,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						(new CCol(
 							(new CButton(null, _('Add')))
 								->onClick('return PopUp('.
-									'"popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name'.
+									'"?action=popup&dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name'.
 									'&multiselect=1&dstfld1=ackOpmsgUsrgrpListFooter")'
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
@@ -1849,7 +1849,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						(new CCol(
 							(new CButton(null, _('Add')))
 								->onClick('return PopUp('.
-									'"popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname'.
+									'"?action=popup&dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname'.
 									'&multiselect=1&dstfld1=ackOpmsgUserListFooter")'
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)

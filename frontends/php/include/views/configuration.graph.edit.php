@@ -175,7 +175,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$yaxisMinData[] = (new CButton('yaxis_min', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('javascript: '.
-				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
+				'return PopUp("?action=popup'.
+					'&dstfrm='.$graphForm->getName().
 					'&dstfld1=ymin_itemid'.
 					'&dstfld2=ymin_name'.
 					'&srctbl=items'.
@@ -191,7 +192,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMinData[] = (new CButton('yaxis_min_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('javascript: '.
-					'return PopUp("popup.php?dstfrm='.$graphForm->getName().
+					'return PopUp("?action=popup'.
+						'&dstfrm='.$graphForm->getName().
 						'&parent_discoveryid='.$data['parent_discoveryid'].
 						'&dstfld1=ymin_itemid'.
 						'&dstfld2=ymin_name'.
@@ -239,7 +241,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$yaxisMaxData[] = (new CButton('yaxis_max', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('javascript: '.
-				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
+				'return PopUp("?action=popup'.
+					'&dstfrm='.$graphForm->getName().
 					'&dstfld1=ymax_itemid'.
 					'&dstfld2=ymax_name'.
 					'&srctbl=items'.
@@ -256,7 +259,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMaxData[] = (new CButton('yaxis_max_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('javascript: '.
-					'return PopUp("popup.php?dstfrm='.$graphForm->getName().
+					'return PopUp("?action=popup'.
+						'&dstfrm='.$graphForm->getName().
 						'&parent_discoveryid='.$data['parent_discoveryid'].
 						'&dstfld1=ymax_itemid'.
 						'&dstfld2=ymax_name'.
@@ -313,7 +317,7 @@ $itemsTable->addRow(
 			: (new CCol(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
-						->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
+						->onClick('return PopUp("?action=popup&writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 							($this->data['normal_only'] ? '&normal_only=1' : '').
 							(($data['groupid'] && $data['hostid'])
 								? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
@@ -324,7 +328,7 @@ $itemsTable->addRow(
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$this->data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
-							->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
+							->onClick('return PopUp("?action=popup&writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 								url_param($this->data['graphtype'], false, 'graphtype').
 								url_param('parent_discoveryid').($this->data['normal_only'] ? '&normal_only=1' : '').
 								'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");'

@@ -305,7 +305,7 @@
 					stepNames += '&steps_names[]=' + encodeURIComponent($(stepName).val());
 				});
 
-				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames);
+				return PopUp('?action=popup_httpstep&dstfrm=httpForm' + stepNames);
 			});
 		<?php endif ?>
 
@@ -319,7 +319,7 @@
 					stepNames += '&steps_names[]=' + encodeURIComponent($(stepName).val());
 				});
 
-				return PopUp('popup_httpstep.php?dstfrm=httpForm&templated=<?= $this->data['templated'] ?>'
+				return PopUp('?action=popup_httpstep&dstfrm=httpForm&templated=<?= $this->data['templated'] ? 1 : 0 ?>'
 					+ '&list_name=steps&stepid=' + jQuery(this).attr('name_step')
 					+ '<?= url_param($step['name'], false, 'name') ?>'
 					+ '<?= url_param($step['url'], false, 'url') ?>'

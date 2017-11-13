@@ -213,8 +213,8 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
 		}
 
-		$mediaUrl = 'popup_media.php'.
-			'?dstfrm='.$userForm->getName().
+		$mediaUrl = '?action=popup_media'.
+			'&dstfrm='.$userForm->getName().
 			'&media='.$id.
 			'&mediatypeid='.$media['mediatypeid'].
 			'&sendto='.urlencode($media['sendto']).
@@ -261,7 +261,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 		(new CDiv([
 			$mediaTableInfo,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");')
+				->onClick('return PopUp("?action=popup_media&dstfrm='.$userForm->getName().'");')
 				->addClass(ZBX_STYLE_BTN_LINK),
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

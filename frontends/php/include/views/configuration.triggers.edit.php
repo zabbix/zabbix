@@ -110,7 +110,7 @@ $expression_row = [
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick(
-			'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
+			'return PopUp("?action=popup_trexpr&dstfrm='.$triggersForm->getName().
 				'&dstfld1='.$data['expression_field_name'].'&srctbl='.$data['expression_field_name'].
 				'&srcfld1='.$data['expression_field_name'].
 				(($data['groupid'] && $data['hostid'])
@@ -249,9 +249,8 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('openWinCentered("tr_testexpr.php?expression="+'.
-			'encodeURIComponent(this.form.elements["expression"].value),'.
-			'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;'
+		->onClick('PopUp("?action=popup_testtrexpr&expression="+'.
+			'encodeURIComponent(this.form.elements["expression"].value)); return false;'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK);
 
@@ -301,7 +300,7 @@ $recovery_expression_row = [
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick(
-			'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
+			'return PopUp("?action=popup_trexpr&dstfrm='.$triggersForm->getName().
 				'&dstfld1='.$data['recovery_expression_field_name'].
 				'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
 				(($data['groupid'] && $data['hostid'])
@@ -439,9 +438,8 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('openWinCentered("tr_testexpr.php?expression="'.
-			'+encodeURIComponent(this.form.elements["recovery_expression"].value),'.
-			'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;'
+		->onClick('PopUp("?action=popup_testtrexpr&expression="'.
+			'+encodeURIComponent(this.form.elements["recovery_expression"].value)); return false;'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK);
 
@@ -601,7 +599,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		$discovered_trigger
 			? null
 			: (new CButton('bnt1', _('Add')))
-				->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
+				->onClick('return PopUp("?action=popup&srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
 					'&multiselect=1&with_triggers=1&noempty=1");'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)

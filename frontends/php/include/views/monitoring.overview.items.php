@@ -82,7 +82,7 @@ $column->addRow(_('Application'), [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('application_name', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
+		->onClick('return PopUp("?action=popup&srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
 			'&with_applications=1&dstfrm=zbx_filter");')
 ]);
 

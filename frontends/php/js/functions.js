@@ -508,8 +508,10 @@ function stripslashes(str) {
 	});
 }
 
-function overlayDialogueDestroy() {
-	jQuery('#overlay_bg, #overlay_dialogue').remove();
+function overlayDialogueDestroy(dialogueid) {
+	dialogueid = dialogueid || null;
+
+	jQuery('[data-dialogueid='+dialogueid+']').remove();
 	jQuery('body').css({'overflow': ''});
 	jQuery('body[style=""]').removeAttr('style');
 }
@@ -517,42 +519,81 @@ function overlayDialogueDestroy() {
 /**
  * Display modal window.
  *
- * @param {object} params                        Modal window params.
- * @param {string} params.title                  Modal window title.
- * @param {object} params.content                Window content.
- * @param {array}  params.buttons                Window buttons.
- * @param {string} params.buttons[]['title']     Text on the button.
- * @param {object} params.buttons[]['action']    Function object that will be called on click.
- * @param {string} params.buttons[]['class']     (optional) Button class.
- * @param {bool}   params.buttons[]['cancel']    (optional) It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']   (optional) Focus this button.
- * @param {bool}   params.buttons[]['enabled']   (optional) Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen']  (optional) Prevent dialogue closing, if button action returned false.
+ * @param {object} params						Modal window params.
+ * @param {string} params.title					Modal window title.
+ * @param {object} params.content				Window content.
+ * @param {object} params.controls				Window controls.
+ * @param {array}  params.buttons				Window buttons.
+ * @param {string} params.buttons[]['title']	Text on the button.
+ * @param {object}|{string} params.buttons[]['action']	Function object or executable string that will be executed on
+ *														click.
+ * @param {string} params.buttons[]['class']	(optional) Button class.
+ * @param {bool}   params.buttons[]['cancel']	(optional) It means what this button has cancel action.
+ * @param {bool}   params.buttons[]['focused']	(optional) Focus this button.
+ * @param {bool}   params.buttons[]['enabled']	(optional) Should the button be enabled? Default: true.
+ * @param {bool}   params.buttons[]['keepOpen']	(optional) Prevent dialogue closing, if button action returned false.
+ * @param string   params.dialogueid            (optional) Unique dialogue identifier to reuse existing overlay dialog
+ *												or create a new one if value is not set.
+ * @param string   params.script_inline         (optional) Custom javascript code to execute when initializing dialog.
  *
  * @return {bool}
  */
 function overlayDialogue(params) {
-	jQuery('<div>', {
-		id: 'overlay_bg',
-		class: 'overlay-bg'
-	})
-		.appendTo('body');
-
 	var button_focused = null,
 		cancel_action = null,
+		overlay_dialogue = null,
 		overlay_dialogue_footer = jQuery('<div>', {
 			class: 'overlay-dialogue-footer'
 		});
+
+	if (typeof params.dialogueid === 'undefined') {
+		params.dialogueid = Math.random().toString(36).substring(7);
+		while (jQuery('[data-dialogueid="' + params.dialogueid + '"]').length) {
+			params.dialogueid = Math.random().toString(36).substring(7);
+		}
+	}
+
+	if (typeof params.script_inline !== 'undefined') {
+		jQuery(overlay_dialogue_footer).append(jQuery('<script>').text(params.script_inline));
+	}
+
+	if (jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]').length) {
+		overlay_dialogue = jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]');
+
+		jQuery(overlay_dialogue)
+			.attr('class', 'overlay-dialogue modal')
+			.unbind('keydown')
+			.empty();
+	}
+	else {
+		overlay_dialogue = jQuery('<div>', {
+			'id': 'overlay_dialogue',
+			'class': 'overlay-dialogue modal',
+			'data-dialogueid': params.dialogueid
+		});
+
+		jQuery('<div>', {
+			'id': 'overlay_bg',
+			'class': 'overlay-bg',
+			'data-dialogueid': params.dialogueid
+		})
+			.appendTo('body');
+
+		jQuery(overlay_dialogue).appendTo('body');
+	}
 
 	jQuery.each(params.buttons, function(index, obj) {
 		var button = jQuery('<button>', {
 			type: 'button',
 			text: obj.title
 		}).click(function() {
+			if (typeof obj.action === 'string') {
+				obj.action = new Function(obj.action);
+			}
 			var res = obj.action();
 
 			if (res !== false && (!('keepOpen' in obj) || obj.keepOpen === false)) {
-				overlayDialogueDestroy();
+				overlayDialogueDestroy(params.dialogueid);
 			}
 
 			return false;
@@ -577,10 +618,7 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
-	var overlay_dialogue = jQuery('<div>', {
-		id: 'overlay_dialogue',
-		class: 'overlay-dialogue modal'
-	})
+	jQuery(overlay_dialogue)
 		.append(
 			jQuery('<button>', {
 				class: 'overlay-close-btn'
@@ -589,7 +627,7 @@ function overlayDialogue(params) {
 					if (cancel_action !== null) {
 						cancel_action();
 					}
-					overlayDialogueDestroy();
+					overlayDialogueDestroy(params.dialogueid);
 
 					return false;
 				})
@@ -599,6 +637,7 @@ function overlayDialogue(params) {
 				class: 'dashbrd-widget-head'
 			}).append(jQuery('<h4>').text(params.title))
 		)
+		.append(params.controls ? jQuery('<div>').addClass('overlay-dialogue-controls').html(params.controls) : null)
 		.append(
 			jQuery('<div>', {
 				class: 'overlay-dialogue-body',
@@ -611,12 +650,15 @@ function overlayDialogue(params) {
 				if (cancel_action !== null) {
 					cancel_action();
 				}
-				overlayDialogueDestroy();
+				overlayDialogueDestroy(params.dialogueid);
 
 				return false;
 			}
-		})
-		.appendTo('body');
+		});
+
+	if (typeof params.class !== 'undefined') {
+		overlay_dialogue.addClass(params.class);
+	}
 
 	var focusable = jQuery(':focusable', overlay_dialogue);
 
@@ -675,9 +717,7 @@ function overlayDialogueOnLoad(focus) {
 function executeScript(hostid, scriptid, confirmation) {
 	var execute = function() {
 		if (hostid !== null) {
-			openWinCentered('scripts_exec.php?hostid=' + hostid + '&scriptid=' + scriptid, 'Tools', 950, 470,
-				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
-			);
+			PopUp('?action=popup_script_exec&hostid=' + hostid + '&scriptid=' + scriptid);
 		}
 	};
 

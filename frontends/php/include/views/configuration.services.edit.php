@@ -50,7 +50,7 @@ $servicesFormList->addRow(_('Parent service'), [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select_parent', _x('Change', 'verb')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("services.php?pservices=1'.url_param('serviceid').
+		->onClick('return PopUp("?action=popup_services&pservices=1'.url_param('serviceid').
 			'&parentid="+this.form.parentid.value);'
 		)
 ]);
@@ -76,8 +76,8 @@ $servicesFormList->addRow(_('Trigger'), [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.php?'.
-			'dstfrm='.$servicesForm->getName().
+		->onClick('return PopUp("?action=popup'.
+			'&dstfrm='.$servicesForm->getName().
 			'&dstfld1=triggerid'.
 			'&dstfld2=trigger'.
 			'&srctbl=triggers'.
@@ -126,7 +126,7 @@ $servicesDependenciesFormList->addRow(
 	(new CDiv([
 		$servicesChildTable,
 		(new CButton('add_child_service', _('Add')))
-			->onClick('return PopUp("services.php?cservices=1'.url_param('serviceid').
+			->onClick('return PopUp("?action=popup_services&cservices=1'.url_param('serviceid').
 				'&parentid="+this.form.parentid.value);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)

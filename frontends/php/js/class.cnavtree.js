@@ -725,7 +725,7 @@ jQuery(function($) {
 															.removeClass('closed');
 													}
 
-													overlayDialogueDestroy();
+													overlayDialogueDestroy('navtreeitem');
 													setTreeHandlers($obj);
 												}
 											}
@@ -739,7 +739,8 @@ jQuery(function($) {
 									'class': 'btn-alt',
 									'action': function() {}
 								}
-							]
+							],
+							'dialogueid': 'navtreeitem'
 						});
 					}
 				});
@@ -907,9 +908,10 @@ jQuery(function($) {
 					btn2.setAttribute('class', 'import-items-btn');
 					btn2.setAttribute('title', t('Add multiple maps'));
 					btn2.addEventListener('click', function() {
-						var url = new Curl('popup.php'),
+						var url = new Curl(),
 							id = $(this).data('id');
 
+						url.setArgument('action', 'popup');
 						url.setArgument('srctbl', 'sysmaps');
 						url.setArgument('srcfld1', 'sysmapid');
 						url.setArgument('srcfld2', 'name');

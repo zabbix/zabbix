@@ -868,7 +868,7 @@ ZABBIX.apps.map = (function($) {
 				$('#application-select').click(function() {
 					var data = $('#elementNameHost').multiSelect('getData');
 
-					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
+					PopUp('?action=popup&srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
 						+ '&with_applications=1&dstfrm=selementForm'
 						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : '')
 					);

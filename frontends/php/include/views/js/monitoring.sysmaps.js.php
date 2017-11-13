@@ -181,7 +181,7 @@ function getFontComboBox($name) {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
+							->onClick('PopUp("?action=popup&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 								'&dstfrm=selementForm&dstfld1=sysmapid&dstfld2=elementNameMap'.
 								'&excludeids[]=#{sysmapid}")'
 							)
@@ -697,7 +697,7 @@ function getFontComboBox($name) {
 								->setId('linkTriggerscontainer'),
 							(new CButton(null, _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->onClick('PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1'.
+								->onClick('PopUp("?action=popup&srctbl=triggers&srcfld1=triggerid&real_hosts=1'.
 									'&reference=linktrigger&multiselect=1&with_triggers=1&noempty=1");'
 								)
 						]))

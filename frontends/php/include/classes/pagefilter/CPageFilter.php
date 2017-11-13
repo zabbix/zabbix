@@ -751,15 +751,18 @@ class CPageFilter {
 	/**
 	 * Get hosts combobox with selected item.
 	 *
+	 * @param array  $options
+	 * @param array  $options['action']		onChange action.
+	 *
 	 * @return CComboBox
 	 */
-	public function getHostsCB() {
+	public function getHostsCB(array $options = []) {
 		$items = $classes = [];
 		foreach ($this->hosts as $id => $host) {
 			$items[$id] = $host['name'];
 			$classes[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? ZBX_STYLE_RED : null;
 		}
-		$options = ['objectName' => 'hosts', 'classes' => $classes];
+		$options += ['objectName' => 'hosts', 'classes' => $classes];
 
 		return $this->_getCB('hostid', $this->hostid, $items, $options);
 	}
@@ -767,14 +770,22 @@ class CPageFilter {
 	/**
 	 * Get host groups combobox with selected item.
 	 *
+	 * @param array  $options
+	 * @param array  $options['action']		onChange action.
+	 *
 	 * @return CComboBox
 	 */
-	public function getGroupsCB() {
+	public function getGroupsCB(array $options = []) {
 		$items = [];
 		foreach ($this->groups as $id => $group) {
 			$items[$id] = $group['name'];
 		}
-		return $this->_getCB('groupid', $this->groupid, $items, ['objectName' => 'groups']);
+
+		$options += [
+			'objectName' => 'groups'
+		];
+
+		return $this->_getCB('groupid', $this->groupid, $items, $options);
 	}
 
 	/**
@@ -832,11 +843,16 @@ class CPageFilter {
 	 * @param array  $options
 	 * @param string $options['objectName']
 	 * @param array  $options['classes']	array of class names for the combobox options with item IDs as keys
+	 * @param array  $options['action']		onChange action. Default value is 'submit()'.
 	 *
 	 * @return CComboBox
 	 */
 	private function _getCB($name, $selectedId, $items, array $options = []) {
-		$comboBox = new CComboBox($name, $selectedId, 'javascript: submit();');
+		if (!array_key_exists('action', $options)) {
+			$options['action'] = 'javascript: submit();';
+		}
+
+		$comboBox = new CComboBox($name, $selectedId, $options['action']);
 
 		natcasesort($items);
 
