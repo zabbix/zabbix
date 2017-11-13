@@ -218,7 +218,7 @@ class CMapHelper {
 					$problems_total += $map_info[$id]['problems_total'];
 					$problem_desc = ($map_info[$id]['problems_total'] > 1)
 						? _n('%1$s problem', '%1$s problems', $map_info[$id]['problems_total'])
-						: $map_info[$id]['info']['problem']['msg'];
+						: str_replace(['.', ','], ' ', $map_info[$id]['info']['problem']['msg']);
 
 					$status_problems[] = sprintf('%1$s, %2$s, %3$s, %4$s. ',
 						sysmap_element_types($element['elementtype']), _('Status problem'), $label, $problem_desc
@@ -257,7 +257,7 @@ class CMapHelper {
 		}
 		unset($element);
 
-		$sysmap['aria_label'] = $sysmap['name'].', '.
+		$sysmap['aria_label'] = str_replace(['.', ','], ' ', $sysmap['name']).', '.
 			_n('%1$s of %2$s element in problem state.', '%1$s of %2$s elements in problem state.',
 				count($status_problems), count($sysmap['selements'])).
 			_n('%1$s problem in total.', '%1$s problems in total.', $problems_total).
