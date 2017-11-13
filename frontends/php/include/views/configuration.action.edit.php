@@ -706,8 +706,9 @@ if (!empty($data['new_operation'])) {
 			zbx_add_post_js($js_insert);
 
 			$new_operation_formlist
-				->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-					_('At least one user or user group must be selected.')
+				->addRow('',
+					(new CLabel(_('At least one user or user group must be selected.')))
+						->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 				)
 				->addRow(_('Send to User groups'),
 					(new CDiv($usrgrpList))
@@ -1420,8 +1421,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				zbx_add_post_js($js_insert);
 
 				$new_operation_formlist
-					->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-						_('At least one user or user group must be selected.')
+					->addRow('',
+						(new CLabel(_('At least one user or user group must be selected.')))
+							->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 					)
 					->addRow(_('Send to User groups'),
 						(new CDiv($usrgrpList))
@@ -2135,8 +2137,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		}
 
 		if ($usrgrp_list || $user_list) {
-			$new_operation_formlist->addRow((new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-				_('At least one user or user group must be selected.')
+			$new_operation_formlist->addRow('',
+				(new CLabel(_('At least one user or user group must be selected.')))
+					->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 			);
 		}
 

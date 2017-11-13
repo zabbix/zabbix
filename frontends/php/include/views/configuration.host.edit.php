@@ -124,9 +124,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
 		: 'hostInterfacesManager.addNew("agent");');
 
-	$hostList->addRow(
-		(new CLabel(''))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		_('At least one interface must exist.')
+	$hostList->addRow('',
+		(new CLabel(_('At least one interface must exist.')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 	);
 	// Zabbix agent interfaces
 	$ifTab = (new CTable())
