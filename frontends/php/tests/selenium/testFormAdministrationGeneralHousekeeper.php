@@ -325,7 +325,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_services_mode' => true,
 					'hk_services' => 0,
 					'errors' => [
-						'Invalid IT services data storage period: must be between "86400" and "788400000"',
+						'Invalid data storage period for services: must be between "86400" and "788400000"',
 					]
 				]
 			],
