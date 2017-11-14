@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+....I..... [ZBXNEXT-761] added rules to make dbschema.c, schema.sql and data.sql from schema.tmpl, data.tmpl and templates.tmpl if there is a need to (gleb)
 ..F.I..... [ZBXNEXT-4186] added ability to adjust colors for new graph items in graph creation form according selected theme (gcalenko, Sasha)
 ..F....... [ZBXNEXT-4145] fixed appearance of host column based on number of hosts specified in filter (miks)
 A.F.I..... [ZBXNEXT-4118] implemented advanced options for tag-based search of problems (Ivo, Sasha)
