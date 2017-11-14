@@ -256,6 +256,13 @@
 			</exec>
 		</sequential>
 	</target>
+        
+        <target name="cmocka-tests" depends="init">
+		<!-- Build Zabbix server and proxy with C mocka tests -->
+		<sequential>
+			<make args="--enable-server --enable-proxy --with-mysql --with-libxml2" target="tests"/>
+		</sequential>
+	</target>
 
 	<target name="make-dist" depends="init">
 		<!-- Create & build Zabbix distribution -->
