@@ -92,7 +92,6 @@ class CEvent extends CApiService {
 			'severities'				=> null,
 			'nopermissions'				=> null,
 			// filter
-			'name'						=> null,
 			'value'						=> null,
 			'time_from'					=> null,
 			'time_till'					=> null,
@@ -201,18 +200,6 @@ class CEvent extends CApiService {
 							')';
 				}
 			}
-		}
-
-		// name
-		if ($options['name'] !== null && (is_string($options['name']) || is_numeric($options['name']))) {
-			$res = DBselect('SELECT eventid FROM events WHERE '.dbConditionString('name', [$options['name']]));
-
-			$eventids = [];
-			while ($event = DBfetch($res)) {
-				$eventids[] = $event['eventid'];
-			}
-
-			$sqlParts['where'][] = dbConditionInt('e.eventid', $eventids);
 		}
 
 		// eventids
@@ -397,12 +384,28 @@ class CEvent extends CApiService {
 
 		// search
 		if (is_array($options['search'])) {
+			if (array_key_exists('name', $options['search'])) {
+				$options['fields_to_extract_results']['name'] = true;
+			}
+
 			zbx_db_search('events e', $options, $sqlParts);
+
+			if (array_key_exists('fields_to_extract_results', $options)) {
+				unset($options['fields_to_extract_results']);
+			}
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('name', $options['filter'])) {
+				$options['fields_to_extract_results']['name'] = true;
+			}
+
 			$this->dbFilter('events e', $options, $sqlParts);
+
+			if (array_key_exists('fields_to_extract_results', $options)) {
+				unset($options['fields_to_extract_results']);
+			}
 		}
 
 		// limit

@@ -683,6 +683,15 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	$exclude = $options['excludeSearch'] ? ' NOT ' : '';
 	$glue = (!$options['searchByAny']) ? ' AND ' : ' OR ';
 
+	/**
+	 * $options['fields_to_extract_results'] is a list of fields in which instead of making SQL subpart, the results will
+	 * be selected directly and subpart will be constructed from the results of key field. This helps to improve
+	 * performance on large installations.
+	 */
+	$fields_to_extract_results = array_key_exists('fields_to_extract_results', $options)
+		? $options['fields_to_extract_results']
+		: [];
+
 	$search = [];
 	foreach ($options['search'] as $field => $patterns) {
 		if (!isset($tableSchema['fields'][$field]) || zbx_empty($patterns)) {
@@ -705,7 +714,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			$pattern = str_replace("_", "!_", $pattern);
 
 			if (!$options['searchWildcardsEnabled']) {
-				$fieldSearch[] =
+				$field_query =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
 					zbx_dbstr($start.mb_strtoupper($pattern).'%').
@@ -713,11 +722,26 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			}
 			else {
 				$pattern = str_replace("*", "%", $pattern);
-				$fieldSearch[] =
+				$field_query =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
 					zbx_dbstr(mb_strtoupper($pattern)).
 					" ESCAPE '!'";
+			}
+
+			if (array_key_exists($field, $fields_to_extract_results)) {
+				$res = DBselect('SELECT '.$tableShort.'.'.$tableSchema['key'].' FROM '.$table.' '.$tableShort.' WHERE'.
+						$field_query);
+
+				$ids = [];
+				while ($row = DBfetch($res)) {
+					$ids[] = $row[$tableSchema['key']];
+				}
+
+				$fieldSearch[] = dbConditionInt($tableShort.'.'.$tableSchema['key'], $ids);
+			}
+			else {
+				$fieldSearch[] = $field_query;
 			}
 		}
 

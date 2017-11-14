@@ -261,12 +261,13 @@ class CScreenProblem extends CScreenBase {
 				'hostids' => $filter_hostids,
 				'applicationids' => $filter_applicationids,
 				'objectids' => $filter_triggerids,
-				'name' => (array_key_exists('name', $filter) && $filter['name'] !== '')
-					? $filter['name']
-					: null,
 				'eventid_till' => $eventid_till,
 				'limit' => $config['search_limit'] + 1
 			];
+
+			if (array_key_exists('name', $filter) && $filter['name'] !== '') {
+				$options['filter']['name'] = $filter['name'];
+			}
 
 			if ($filter['show'] == TRIGGERS_OPTION_ALL) {
 				if (array_key_exists('stime', $filter) && array_key_exists('period', $filter)) {

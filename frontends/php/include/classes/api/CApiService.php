@@ -865,6 +865,15 @@ class CApiService {
 
 		$tableSchema = DB::getSchema($table);
 
+		/**
+		 * $options['fields_to_extract_results'] is a list of fields in which instead of making SQL subpart, the results will
+		 * be selected directly and subpart will be constructed from the results of key field. This helps to improve
+		 * performance on large installations.
+		 */
+		$fields_to_extract_results = array_key_exists('fields_to_extract_results', $options)
+			? $options['fields_to_extract_results']
+			: [];
+
 		$filter = [];
 		foreach ($options['filter'] as $field => $value) {
 			// skip missing fields and text fields (not supported by Oracle)
@@ -877,9 +886,24 @@ class CApiService {
 			zbx_value2array($value);
 
 			$fieldName = $this->fieldId($field, $tableShort);
-			$filter[$field] = DB::isNumericFieldType($tableSchema['fields'][$field]['type'])
+			$field_query = DB::isNumericFieldType($tableSchema['fields'][$field]['type'])
 				? dbConditionInt($fieldName, $value)
 				: dbConditionString($fieldName, $value);
+
+			if (array_key_exists($field, $fields_to_extract_results)) {
+				$res = DBselect($a = 'SELECT '.$tableShort.'.'.$tableSchema['key'].' FROM '.$table.' '.$tableShort.
+						' WHERE '.$field_query);
+
+				$ids = [];
+				while ($row = DBfetch($res)) {
+					$ids[] = $row[$tableSchema['key']];
+				}
+
+				$filter[$field] = dbConditionInt($tableShort.'.'.$tableSchema['key'], $ids);
+			}
+			else {
+				$filter[$field] = $field_query;
+			}
 		}
 
 		if ($filter) {

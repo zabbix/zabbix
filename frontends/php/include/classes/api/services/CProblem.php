@@ -62,7 +62,6 @@ class CProblem extends CApiService {
 			'severities'				=> null,
 			'nopermissions'				=> null,
 			// filter
-			'name'						=> null,
 			'time_from'					=> null,
 			'time_till'					=> null,
 			'eventid_from'				=> null,
@@ -165,11 +164,6 @@ class CProblem extends CApiService {
 						')';
 				}
 			}
-		}
-
-		// name
-		if ($options['name'] !== null && (is_string($options['name']) || is_numeric($options['name']))) {
-			$sqlParts['where'][] = dbConditionString('p.name', [$options['name']]);
 		}
 
 		// eventids
@@ -357,12 +351,28 @@ class CProblem extends CApiService {
 
 		// search
 		if (is_array($options['search'])) {
+			if (array_key_exists('name', $options['search'])) {
+				$options['fields_to_extract_results']['name'] = true;
+			}
+
 			zbx_db_search('problem p', $options, $sqlParts);
+
+			if (array_key_exists('fields_to_extract_results', $options)) {
+				unset($options['fields_to_extract_results']);
+			}
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('name', $options['filter'])) {
+				$options['fields_to_extract_results']['name'] = true;
+			}
+
 			$this->dbFilter('problem p', $options, $sqlParts);
+
+			if (array_key_exists('fields_to_extract_results', $options)) {
+				unset($options['fields_to_extract_results']);
+			}
 		}
 
 		// limit
