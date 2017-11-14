@@ -70,9 +70,9 @@ class CScreenHistory extends CScreenBase {
 	/**
 	 * Graph id.
 	 *
-	 * @var int|null
+	 * @var int
 	 */
-	public $graphid = null;
+	public $graphid = 0;
 
 	/**
 	 * String containing page file name with extension.
@@ -111,7 +111,7 @@ class CScreenHistory extends CScreenBase {
 
 		if (!$this->itemids && array_key_exists('graphid', $options)) {
 			$itemids = API::Item()->get([
-				'output' => null,
+				'output' => ['itemid'],
 				'graphids' => [$options['graphid']]
 			]);
 			$this->itemids = zbx_objectValues($itemids, 'itemid');
@@ -169,7 +169,7 @@ class CScreenHistory extends CScreenBase {
 			else {
 				$config = select_config();
 
-				// interval start value is non-inclusive, hence the + 1 second
+				// Interval start value is non-inclusive, hence the + 1 second.
 				$options += [
 					'time_from' => $stime + 1,
 					'time_till' => $stime + $this->timeline['period'],
@@ -186,12 +186,13 @@ class CScreenHistory extends CScreenBase {
 				}
 			}
 
-			// View type: As plain text.
-			// Item type: numeric (unsigned, char), float, text, log.
+			/**
+			 * View type: As plain text.
+			 * Item type: numeric (unsigned, char), float, text, log.
+			 */
 			if ($this->plaintext) {
 				if (!$numeric_items && $this->filter !== ''
 						&& in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {
-
 					$options['search'] = ['value' => $this->filter];
 
 					if ($this->filterTask == FILTER_TASK_HIDE) {
@@ -223,14 +224,16 @@ class CScreenHistory extends CScreenBase {
 				// Return values as array of formatted strings.
 				return $output;
 			}
-			// View type: Values, 500 latest values
-			// Item type: text, log
+			/**
+			 * View type: Values, 500 latest values
+			 * Item type: text, log
+			 */
 			elseif (!$numeric_items) {
 				$isManyItems = (count($items) > 1);
 				$useLogItem = ($firstItem['value_type'] == ITEM_VALUE_TYPE_LOG);
 				$useEventLogItem = (strpos($firstItem['key_'], 'eventlog[') === 0);
 
-				$historyTable = (new CTableInfo())
+				$history_table = (new CTableInfo())
 					->setHeader([
 						(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
 						$isManyItems ? _('Item') : null,
@@ -254,13 +257,13 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 
-				$historyData = API::History()->get($options);
-				CArrayHelper::sort($historyData, [
+				$history_data = API::History()->get($options);
+				CArrayHelper::sort($history_data, [
 					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
 					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 				]);
 
-				foreach ($historyData as $data) {
+				foreach ($history_data as $data) {
 					$data['value'] = rtrim($data['value'], " \t\r\n");
 
 					$item = $items[$data['itemid']];
@@ -310,7 +313,7 @@ class CScreenHistory extends CScreenBase {
 								->addClass($color)
 							: '';
 
-						// if this is a eventLog item, showing additional info
+						// If this is a eventLog item, showing additional info.
 						if ($useEventLogItem) {
 							$row[] = (new CCol($data['source']))
 								->addClass(ZBX_STYLE_NOWRAP)
@@ -328,16 +331,19 @@ class CScreenHistory extends CScreenBase {
 
 					$row[] = (new CCol(new CPre(zbx_nl2br($data['value']))))->addClass($color);
 
-					$historyTable->addRow($row);
+					$history_table->addRow($row);
 				}
 
-				$output[] = $historyTable;
+				$output[] = $history_table;
 			}
-			// View type: 500 latest values.
-			// Item type: numeric (unsigned, char), float.
+			/**
+			 * View type: 500 latest values.
+			 * Item type: numeric (unsigned, char), float.
+			 */
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader([
-					(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
+					(new CColHeader(_('Timestamp')))
+						->addClass(ZBX_STYLE_CELL_WIDTH),
 					_('Value')
 				]);
 
@@ -371,8 +377,10 @@ class CScreenHistory extends CScreenBase {
 
 				$output[] = $history_table;
 			}
-			// View type: Values.
-			// Item type: numeric (unsigned, char), float.
+			/**
+			 * View type: Values.
+			 * Item type: numeric (unsigned, char), float.
+			 */
 			else {
 				CArrayHelper::sort($items, [
 					['field' => 'name_expanded', 'order' => ZBX_SORT_UP]
@@ -390,7 +398,8 @@ class CScreenHistory extends CScreenBase {
 						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 					]);
 
-					$table_header[] = (new CColHeader($item['name_expanded']))->addClass('vertical_rotation')
+					$table_header[] = (new CColHeader($item['name_expanded']))
+						->addClass('vertical_rotation')
 						->setAttribute('title', $item['name_expanded']);
 					$history_data_index = 0;
 
@@ -421,8 +430,7 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 
-				$url = new CUrl($this->page_file);
-				$url->formatGetArguments();
+				$url = (new CUrl($this->page_file))->formatGetArguments();
 				// Array $history_data will be modified according page and rows on page.
 				$pagination = getPagingLine($history_data, [], $url);
 				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
@@ -441,6 +449,10 @@ class CScreenHistory extends CScreenBase {
 						}
 						else {
 							$value = rtrim($value, " \t\r\n");
+						}
+
+						if ($item['valuemapid']) {
+							$value = applyValueMap($value, $item['valuemapid']);
 						}
 
 						$row[] = ($value === '') ? '' : new CPre($value);
@@ -513,7 +525,7 @@ class CScreenHistory extends CScreenBase {
 				$flickerfreeData['page'] = getPageNumber();
 			}
 
-			if ($this->graphid) {
+			if ($this->graphid != 0) {
 				unset($flickerfreeData['itemids']);
 				$flickerfreeData['graphid'] = $this->graphid;
 			}

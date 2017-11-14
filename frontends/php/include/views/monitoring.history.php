@@ -27,7 +27,7 @@ $header = [
 	'left' => _n('%1$s item', '%1$s items', count($this->data['items'])),
 	'right' => (new CForm('get'))->addVar('itemids', getRequest('itemids'))->addVar('page', 1)
 ];
-$headerPlaintext = [];
+$header_row = [];
 $first_item = reset($this->data['items']);
 $host_name = $first_item['hosts'][0]['name'];
 $same_host = true;
@@ -44,20 +44,20 @@ if (count($data['items']) == 1 || $same_host) {
 		NAME_DELIMITER,
 		count($data['items']) == 1 ? $item['name_expanded'] : $header['left']
 	];
-	$headerPlaintext[] = implode('', $header['left']);
+	$header_row[] = implode('', $header['left']);
 }
 else {
-	$headerPlaintext[] = $header['left'];
+	$header_row[] = $header['left'];
 }
 
-if (isset($_REQUEST['filter_task'])) {
-	$header['right']->addVar('filter_task', $_REQUEST['filter_task']);
+if (hasRequest('filter_task')) {
+	$header['right']->addVar('filter_task', getRequest('filter_task'));
 }
-if (isset($_REQUEST['filter'])) {
-	$header['right']->addVar('filter', $_REQUEST['filter']);
+if (hasRequest('filter')) {
+	$header['right']->addVar('filter', getRequest('filter'));
 }
-if (isset($_REQUEST['mark_color'])) {
-	$header['right']->addVar('mark_color', $_REQUEST['mark_color']);
+if (hasRequest('mark_color')) {
+	$header['right']->addVar('mark_color', getRequest('mark_color'));
 }
 
 $actions = [
@@ -199,7 +199,7 @@ $screen = CScreenBuilder::getScreen([
 
 // append plaintext to widget
 if ($this->data['plaintext']) {
-	foreach ($headerPlaintext as $text) {
+	foreach ($header_row as $text) {
 		$historyWidget->addItem([new CSpan($text), BR()]);
 	}
 
