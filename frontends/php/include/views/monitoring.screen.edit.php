@@ -121,11 +121,15 @@ $screen_tab->addRow(
 			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Columns'),
-		(new CNumericBox('hsize', $data['screen']['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Columns')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CNumericBox('hsize', $data['screen']['hsize'], 3))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Rows'),
-		(new CNumericBox('vsize', $data['screen']['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Rows')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CNumericBox('vsize', $data['screen']['vsize'], 3))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 
 // append tab to form

@@ -52,14 +52,18 @@ $itemFormList->addRow(
 // append type to form list
 if ($this->data['limited']) {
 	$itemForm->addVar('type', $this->data['type']);
-	$itemFormList->addRow(_('Type'),
-		(new CTextBox('typename', item_type2str($this->data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	$itemFormList->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('typename', item_type2str($this->data['type']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 }
 else {
-	$typeComboBox = (new CComboBox('type', $this->data['type']))
-		->addItems($this->data['types']);
-	$itemFormList->addRow(_('Type'), $typeComboBox);
+	$itemFormList->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CComboBox('type', $this->data['type']))
+			->addItems($this->data['types'])
+			->setAttribute('aria-required', 'true')
+	);
 }
 
 // append key to form list
@@ -71,7 +75,8 @@ $itemFormList->addRow(
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
-	$interfacesComboBox = new CComboBox('interfaceid', $data['interfaceid']);
+	$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))
+		->setAttribute('aria-required', 'true');
 
 	// Set up interface groups sorted by priority.
 	$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
@@ -102,7 +107,9 @@ if (!empty($this->data['interfaces'])) {
 		->setId('interface_not_defined')
 		->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], 'interface_row');
+	$itemFormList->addRow((new CLabel(_('Host interface')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		[$interfacesComboBox, $span], 'interface_row'
+	);
 	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $itemFormList->addRow(

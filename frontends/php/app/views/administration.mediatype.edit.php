@@ -51,14 +51,14 @@ $cmbType = new CComboBox('type', $data['type'], null, [
 	MEDIA_TYPE_JABBER => _('Jabber')
 ]);
 $cmbType->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]);
-$cmbTypeRow = [$cmbType];
+$cmbTypeRow = [$cmbType->setAttribute('aria-required', 'true')];
 $ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
 	->setId('eztext_link')
 	->setTarget('_blank');
 $cmbTypeRow[] = $ez_texting_link;
 
 $mediaTypeFormList
-	->addRow(_('Type'), $cmbTypeRow)
+	->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $cmbTypeRow)
 	->addRow((new CLabel(_('SMTP server')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
@@ -201,13 +201,15 @@ $mediaOptionsForm = (new CFormList('options'))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			])
 	)
-	->addRow(_('Attempts'),
+	->addRow((new CLabel(_('Attempts')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CNumericBox('maxattempts', $data['maxattempts'], 3, false, false, false))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Attempt interval'),
+	->addRow((new CLabel(_('Attempt interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('attempt_interval', $data['attempt_interval'], false, 12))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 $tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
 

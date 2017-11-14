@@ -77,16 +77,20 @@ $graphFormList
 			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Width'),
+	->addRow((new CLabel(_('Width')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CNumericBox('width', $this->data['width'], 5, $readonly))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Height'),
+	->addRow((new CLabel(_('Height')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CNumericBox('height', $this->data['height'], 5, $readonly))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Graph type'),
-		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))->setEnabled(!$readonly)
+	->addRow((new CLabel(_('Graph type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))
+			->setEnabled(!$readonly)
+			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))

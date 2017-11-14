@@ -42,15 +42,9 @@ $imageFormList = (new CFormList('imageFormList'))
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow(
-		(new CLabel(_('Upload')))->addClass((!array_key_exists('imageid', $data) || is_null($data['imageid']))
-			? ZBX_STYLE_FIELD_LABEL_ASTERISK
-			: null
-		),
+		(new CLabel(_('Upload')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', (!array_key_exists('imageid', $data) || is_null($data['imageid']))
-				? 'true'
-				: ''
-			)
+			->setAttribute('aria-required', 'true')
 	);
 
 if (isset($this->data['imageid'])) {

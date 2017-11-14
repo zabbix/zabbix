@@ -69,12 +69,16 @@ $itemFormList->addRow(
 // Append type to form list.
 if ($readonly) {
 	$itemForm->addVar('type', $data['type']);
-	$itemFormList->addRow(_('Type'),
-		(new CTextBox('type_name', item_type2str($data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	$itemFormList->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('type_name', item_type2str($data['type']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 }
 else {
-	$itemFormList->addRow(_('Type'), new CComboBox('type', $data['type'], null, $data['types']));
+	$itemFormList->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CComboBox('type', $data['type'], null, $data['types']))->setAttribute('aria-required', 'true')
+	);
 }
 
 // Append key to form list.
@@ -121,16 +125,20 @@ if ($data['interfaces']) {
 			$data['interfaces'] = zbx_toHash($data['interfaces'], 'interfaceid');
 			$interface = $data['interfaces'][$data['interfaceid']];
 
-			$itemFormList->addRow(_('Host interface'), new CTextBox('interface',
-				$interface['useip']
-					? $interface['ip'].' : '.$interface['port']
-					: $interface['dns'].' : '.$interface['port'],
-				true
-			), 'interface_row');
+			$itemFormList->addRow((new CLabel(_('Host interface')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+				(new CTextBox('interface',
+					$interface['useip']
+						? $interface['ip'].' : '.$interface['port']
+						: $interface['dns'].' : '.$interface['port'],
+					true
+				))->setAttribute('aria-required', 'true'),
+				'interface_row'
+			);
 		}
 	}
 	else {
-		$interfacesComboBox = new CComboBox('interfaceid', $data['interfaceid']);
+		$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))
+			->setAttribute('aria-required', 'true');
 
 		// Set up interface groups sorted by priority.
 		$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
@@ -161,7 +169,9 @@ if ($data['interfaces']) {
 			->setId('interface_not_defined')
 			->setAttribute('style', 'display: none;');
 
-		$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], 'interface_row');
+		$itemFormList->addRow((new CLabel(_('Host interface')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			[$interfacesComboBox, $span], 'interface_row'
+		);
 		$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 	}
 }
@@ -338,19 +348,21 @@ $itemFormList->addRow(
 // Append value type to form list.
 if ($readonly) {
 	$itemForm->addVar('value_type', $data['value_type']);
-	$itemFormList->addRow(_('Type of information'),
+	$itemFormList->addRow((new CLabel(_('Type of information')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('value_type_name', itemValueTypeString($data['value_type']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 }
 else {
-	$itemFormList->addRow(_('Type of information'), new CComboBox('value_type', $data['value_type'], null, [
-		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-		ITEM_VALUE_TYPE_STR => _('Character'),
-		ITEM_VALUE_TYPE_LOG => _('Log'),
-		ITEM_VALUE_TYPE_TEXT => _('Text')
-	]));
+	$itemFormList->addRow((new CLabel(_('Type of information')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CComboBox('value_type', $data['value_type'], null, [
+			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+			ITEM_VALUE_TYPE_STR => _('Character'),
+			ITEM_VALUE_TYPE_LOG => _('Log'),
+			ITEM_VALUE_TYPE_TEXT => _('Text')
+		]))->setAttribute('aria-required', 'true')
+	);
 }
 
 $itemFormList->addRow(_('Units'),

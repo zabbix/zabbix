@@ -81,7 +81,9 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 			->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
 			->setModern(true)
 	)
-	->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
+	->addRow((new CLabel(_('Interface')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	)
 	->addRow(_('Proxy address'),
 		(new CTextBox('proxy_address', $data['proxy_address'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)

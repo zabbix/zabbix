@@ -108,13 +108,15 @@ $map_tab->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERIS
 			->setAttribute('aria-required', 'true')
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Width'),
+	->addRow((new CLabel(_('Width')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CNumericBox('width', $data['sysmap']['width'], 5))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	)
-	->addRow(_('Height'),
+	->addRow((new CLabel(_('Height')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CNumericBox('height', $data['sysmap']['height'], 5))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 
 // Append background image to form list.

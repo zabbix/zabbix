@@ -57,12 +57,17 @@ $itemFormList->addRow(
 // append type to form list
 if ($readonly) {
 	$itemForm->addVar('type', $this->data['type']);
-	$itemFormList->addRow(_('Type'),
-		(new CTextBox('typename', item_type2str($this->data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	$itemFormList->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CTextBox('typename', item_type2str($this->data['type']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 }
 else {
-	$itemFormList->addRow(_('Type'), new CComboBox('type', $this->data['type'], null, $this->data['types']));
+	$itemFormList->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CComboBox('type', $this->data['type'], null, $this->data['types']))
+			->setAttribute('aria-required', 'true')
+	);
 }
 
 // append key to form list
@@ -105,7 +110,8 @@ $itemFormList->addRow(
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
-	$interfacesComboBox = new CComboBox('interfaceid', $data['interfaceid']);
+	$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))
+		->setAttribute('aria-required', 'true');
 
 	// Set up interface groups sorted by priority.
 	$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
@@ -136,7 +142,9 @@ if (!empty($this->data['interfaces'])) {
 		->setId('interface_not_defined')
 		->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], 'interface_row');
+	$itemFormList->addRow((new CLabel(_('Host interface')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		[$interfacesComboBox, $span], 'interface_row'
+	);
 	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $itemFormList->addRow(
@@ -258,19 +266,22 @@ $itemFormList->addRow(
 // append value type to form list
 if ($readonly) {
 	$itemForm->addVar('value_type', $this->data['value_type']);
-	$itemFormList->addRow(_('Type of information'),
+	$itemFormList->addRow((new CLabel(_('Type of information')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('value_type_name', itemValueTypeString($this->data['value_type']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 }
 else {
-	$itemFormList->addRow(_('Type of information'), new CComboBox('value_type', $this->data['value_type'], null, [
-		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-		ITEM_VALUE_TYPE_STR => _('Character'),
-		ITEM_VALUE_TYPE_LOG => _('Log'),
-		ITEM_VALUE_TYPE_TEXT => _('Text')
-	]));
+	$itemFormList->addRow((new CLabel(_('Type of information')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CComboBox('value_type', $this->data['value_type'], null, [
+			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+			ITEM_VALUE_TYPE_STR => _('Character'),
+			ITEM_VALUE_TYPE_LOG => _('Log'),
+			ITEM_VALUE_TYPE_TEXT => _('Text')
+		]))->setAttribute('aria-required', 'true')
+	);
 }
 
 $itemFormList->addRow(_('Units'),

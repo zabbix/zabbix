@@ -33,18 +33,24 @@
 			<table>
 				<tbody>
 				<tr>
-					<td><label for="type"><?= _('Check type') ?></label></td>
-					<td><select id="type" name="type"></select></td>
+					<td>
+						<label for="type" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('Check type') ?></label>
+					</td>
+					<td><select id="type" name="type" aria-required="true"></select></td>
 				</tr>
 				<tr id="newCheckPortsRow">
-					<td><label for="ports"><?= _('Port range') ?></label></td>
+					<td>
+						<label for="ports" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('Port range') ?></label>
+					</td>
 					<td>
 						<input type="text" id="ports" name="ports" value=""
-							style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="255">
+							style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="255" aria-required="true">
 					</td>
 				</tr>
 				<tr id="newCheckCommunityRow">
-					<td><label for="snmp_community" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('SNMP community') ?></label></td>
+					<td><label for="snmp_community" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>">
+						<?= _('SNMP community') ?></label>
+					</td>
 					<td>
 						<input type="text" id="snmp_community" name="snmp_community" value=""
 							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255" aria-required="true">
@@ -58,7 +64,9 @@
 					</td>
 				</tr>
 				<tr id="new_check_snmp_oid_row">
-					<td><label for="snmp_oid" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('SNMP OID') ?></label></td>
+					<td>
+						<label for="snmp_oid" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('SNMP OID') ?></label>
+					</td>
 					<td>
 						<input type="text" id="snmp_oid" name="snmp_oid" value=""
 							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="512" aria-required="true">

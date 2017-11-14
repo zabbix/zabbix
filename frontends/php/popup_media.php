@@ -123,7 +123,9 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 $frmMedia = (new CFormList(_('Media')))
-	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
+	->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))->setAttribute('aria-required', 'true')
+	)
 	->addRow(
 		(new CLabel(_('Send to')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('sendto', $sendto, false, 100))

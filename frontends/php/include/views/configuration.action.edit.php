@@ -579,7 +579,7 @@ if (!empty($data['new_operation'])) {
 	// if only one operation is available - show only the label
 	if (count($data['allowedOperations'][ACTION_OPERATION]) == 1) {
 		$operation = $data['allowedOperations'][ACTION_OPERATION][0];
-		$new_operation_formlist->addRow(_('Operation type'),
+		$new_operation_formlist->addRow((new CLabel(_('Operation type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			[operation_type2str($operation), new CVar('new_operation[operationtype]', $operation)]
 		);
 	}
@@ -591,7 +591,9 @@ if (!empty($data['new_operation'])) {
 		foreach ($data['allowedOperations'][ACTION_OPERATION] as $operation) {
 			$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 		}
-		$new_operation_formlist->addRow(_('Operation type'), $operationTypeComboBox);
+		$new_operation_formlist->addRow((new CLabel(_('Operation type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			$operationTypeComboBox->setAttribute('aria-required', 'true')
+		);
 	}
 
 	switch ($data['new_operation']['operationtype']) {
@@ -1312,7 +1314,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		// if only one operation is available - show only the label
 		if (count($data['allowedOperations'][ACTION_RECOVERY_OPERATION]) == 1) {
 			$operation = $data['allowedOperations'][ACTION_RECOVERY_OPERATION][0];
-			$new_operation_formlist->addRow(_('Operation type'),
+			$new_operation_formlist->addRow((new CLabel(_('Operation type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 				[operation_type2str($operation), new CVar('new_recovery_operation[operationtype]', $operation)]
 			);
 		}
@@ -1324,7 +1326,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			foreach ($data['allowedOperations'][ACTION_RECOVERY_OPERATION] as $operation) {
 				$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 			}
-			$new_operation_formlist->addRow(_('Operation type'), $operationTypeComboBox);
+			$new_operation_formlist->addRow((new CLabel(_('Operation type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+				$operationTypeComboBox->setAttribute('aria-required', 'true')
+			);
 		}
 
 		switch ($data['new_recovery_operation']['operationtype']) {
@@ -1865,7 +1869,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			$operationtype->addItem($operation, operation_type2str($operation));
 		}
 
-		$new_operation_formlist->addRow(_('Operation type'), $operationtype);
+		$new_operation_formlist->addRow((new CLabel(_('Operation type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			$operationtype->setAttribute('aria-required', 'true')
+		);
 
 		$usrgrp_list = null;
 		$user_list = null;
