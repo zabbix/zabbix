@@ -33,6 +33,7 @@ class CClockWidgetForm extends CWidgetForm {
 			TIME_TYPE_SERVER => _('Server time'),
 			TIME_TYPE_HOST => _('Host time')
 		]))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			->setDefault(TIME_TYPE_LOCAL)
 			->setAction('updateWidgetConfigDialogue()');
 

@@ -215,11 +215,9 @@ class CWidgetField {
 	 * @return object
 	 */
 	public function getStyledLabel() {
-		$label = (new CLabel($this->label))->addClass(($this->getFlags() & self::FLAG_LABEL_ASTERISK)
+		return (new CLabel($this->label))->addClass(($this->getFlags() & self::FLAG_LABEL_ASTERISK)
 			? ZBX_STYLE_FIELD_LABEL_ASTERISK
 			: null
 		);
-
-		return $label;
 	}
 }
