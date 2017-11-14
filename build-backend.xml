@@ -257,8 +257,8 @@
 		</sequential>
 	</target>
         
-        <target name="cmocka-tests" depends="init">
-		<!-- Build Zabbix server and proxy with C mocka tests -->
+        <target name="mock-tests" depends="init">
+		<!-- Build Zabbix server and proxy with C mock tests -->
 		<sequential>
 			<make args="--enable-server --enable-proxy --with-mysql --with-libxml2" target="tests"/>
 		</sequential>
