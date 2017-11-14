@@ -32,6 +32,8 @@ define('TEST_ERROR', 2);
 
 class CWebTest extends PHPUnit_Framework_TestCase {
 
+	const WAIT_ITERATION = 50;
+
 	// List of strings that should NOT appear on any page
 	public $failIfExists = [
 		'pg_query',
@@ -74,11 +76,25 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	protected $current_url = null;
 
 	// Table that should be backed up at the test suite level.
-	protected static $suite_table = null;
+	protected static $suite_backup = null;
 	// Table that should be backed up at the test case level.
-	protected $case_table = null;
+	protected $case_backup = null;
+	// Table that should be backed up at the test case level once (for multiple case executions).
+	protected static $case_backup_once = null;
 	// Shared browser instance.
 	protected static $shared_browser = null;
+	// Name of the last executed test.
+	protected static $last_test_case = null;
+	// Shared cookie value.
+	protected static $cookie = null;
+	// Enable supressing of browser errors on test case level.
+	protected $supress_case_errors = false;
+	// Enable supressing of browser errors on test suite level.
+	protected static $supress_suite_errors = false;
+	// Test case data key.
+	protected $data_key = null;
+	// Lists of test case data set keys.
+	protected static $test_data_sets = [];
 
 	protected function putBreak() {
 		fwrite(STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
@@ -88,7 +104,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	protected function onNotSuccessfulTest($e) {
-		if ($this->screenshot !== null) {
+		if ($this->screenshot !== null && $e instanceof Exception) {
 			$screenshot_name = md5(microtime(true)).'.png';
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
@@ -101,54 +117,57 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			}
 		}
 
-		if (self::$shared_browser !== null) {
-			self::$shared_browser->quit();
-			self::$shared_browser = null;
+		if (($e instanceof PHPUnit_Framework_SkippedTestError) === false) {
+			self::closeBrowser();
 		}
 
 		parent::onNotSuccessfulTest($e);
 	}
 
 	protected function tearDown() {
-		try {
-			if ($this->capture_screenshot && $this->hasFailed()) {
-				$this->current_url = $this->webDriver->getCurrentURL();
-				$this->screenshot = $this->webDriver->takeScreenshot();
+		// Check for JS errors.
+		if (!$this->hasFailed()) {
+			if (!$this->supress_case_errors) {
+				$errors = [];
+
+				foreach ($this->webDriver->manage()->getLog('browser') as $log) {
+					$errors[] = $log['message'];
+				}
+
+				if ($errors) {
+					$this->captureScreenshot();
+					$this->fail("Severe browser errors:\n" . implode("\n", array_unique($errors)));
+				}
 			}
 		}
-		catch (Exception $ex) {
-			// Error handling is not missing here.
+		else {
+			$this->captureScreenshot();
 		}
 	}
 
 	public function authenticate() {
-		$this->webDriver->get(PHPUNIT_URL);
-		$row = DBfetch(DBselect("select null from sessions where sessionid='09e7d4286dfdca4ba7be15e0f3b2b55a'"));
-
-		if (!$row) {
-			DBexecute("insert into sessions (sessionid, userid) values ('09e7d4286dfdca4ba7be15e0f3b2b55a', 1)");
-		}
-
-		$domain = parse_url(PHPUNIT_URL, PHP_URL_HOST);
-		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
-
-		$cookie  = ['name' => 'zbx_sessionid', 'value' => '09e7d4286dfdca4ba7be15e0f3b2b55a', 'domain' => $domain, 'path' => $path];
-		$this->webDriver->manage()->addCookie($cookie);
+		$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55a', 1);
 	}
 
 	public function authenticateUser($sessionid, $userId) {
-		$this->webDriver->get(PHPUNIT_URL);
 		$row = DBfetch(DBselect("select null from sessions where sessionid='$sessionid'"));
 
 		if (!$row) {
 			DBexecute("insert into sessions (sessionid, userid) values ('$sessionid', $userId)");
 		}
 
-		$domain = parse_url(PHPUNIT_URL, PHP_URL_HOST);
-		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
+		if (self::$cookie === null || $sessionid !== self::$cookie['value']) {
+			self::$cookie = [
+				'name' => 'zbx_sessionid',
+				'value' => $sessionid,
+				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
+				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
+			];
 
-		$cookie  = ['name' => 'zbx_sessionid', 'value' => $sessionid, 'domain' => $domain, 'path' => $path];
-		$this->webDriver->manage()->addCookie($cookie);
+			$this->webDriver->get(PHPUNIT_URL);
+		}
+
+		$this->webDriver->manage()->addCookie(self::$cookie);
 	}
 
 	public function zbxTestOpen($url) {
@@ -292,7 +311,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestDoubleClickBeforeMessage($click_id, $id) {
-		$this->webDriver->wait(30)->until(WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id($click_id)));
+		$this->webDriver->wait(30, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id($click_id)));
 		$this->zbxTestClickWait($click_id);
 		$msg = count($this->webDriver->findElements(WebDriverBy::className('msg-bad')));
 		if (!$this->zbxTestElementPresentId($id) and $msg === 0){
@@ -362,41 +381,57 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestDropdownHasOptions($id, array $strings) {
-		$attribute = $this->zbxTestIsElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
-		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']");
-
-		foreach ($strings as $string) {
-			$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+		$values = [];
+		foreach ($this->getDropdownOptions($id) as $option) {
+			$values[] = $option->getText();
 		}
+
+		$this->assertTrue(count(array_diff($strings, $values)) === 0);
 	}
 
 	public function zbxTestDropdownSelect($id, $string) {
-		$attribute = $this->zbxTestIsElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
-		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']");
+		// Simplified escaping of xpath string.
+		if (strpos($string, '"') !== false) {
+			$string = '\''.$string.'\'';
+		}
+		else {
+			$string = '"'.$string.'"';
+		}
 
-		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
-		$this->webDriver->findElement(WebDriverBy::xpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']"))->click();
+		$option = $this->getDropdown($id)->findElement(WebDriverBy::xpath('.//option[text()='.$string.']'));
+
+		if (!$option->isSelected()) {
+			$option->click();
+
+			return $option;
+		}
+
+		return null;
 	}
 
 	public function zbxTestDropdownSelectWait($id, $string) {
-		$attribute = $this->zbxTestIsElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
-		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']");
-		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+		$option = $this->zbxTestDropdownSelect($id, $string);
 
-		$selected = $this->webDriver->findElement(WebDriverBy::xpath("//select[@".$attribute."='".$id."']/option[@selected='selected']"))->getText();
-
-		if ($selected != $string) {
-			$this->webDriver->findElement(WebDriverBy::xpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']"))->click();
-			$this->zbxTestWaitUntil(WebDriverExpectedCondition::elementToBeSelected(WebDriverBy::xpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']")), 'element not selected');
+		if ($option !== null) {
+			try {
+				$this->zbxTestWaitUntil(WebDriverExpectedCondition::elementToBeSelected($option), null);
+			} catch (StaleElementReferenceException $e) {
+				// Element not found in the cache, looks like page changed.
+				$this->zbxTestWaitForPageToLoad();
+			}
 		}
 	}
 
 	public function zbxTestDropdownAssertSelected($name, $text) {
-		$this->zbxTestAssertElementPresentXpath("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
+		$this->assertEquals($text, $this->zbxTestGetSelectedLabel($name));
 	}
 
-	public function zbxTestGetSelectedLabel ($id) {
-		return $this->webDriver->findElement(WebDriverBy::xpath("//select[@id='".$id."']//option[@selected='selected']"))->getText();
+	public function zbxTestGetSelectedLabel($id) {
+		foreach ($this->getDropdownOptions($id) as $option) {
+			if ($option->isSelected()) {
+				return $option->getText();
+			}
+		}
 	}
 
 	public function zbxTestElementPresentId($id) {
@@ -459,12 +494,12 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitUntil($condition, $message) {
-		$this->webDriver->wait(60)->until($condition, $message);
+		$this->webDriver->wait(60, self::WAIT_ITERATION)->until($condition, $message);
 		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestWaitUntilElementVisible($by) {
-		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
+		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
 	}
 
 	public function zbxTestWaitUntilElementNotVisible($by) {
@@ -472,16 +507,16 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitUntilElementClickable($by) {
-		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::elementToBeClickable($by));
+		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::elementToBeClickable($by));
 	}
 
 	public function zbxTestWaitUntilElementPresent($by) {
-		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::presenceOfElementLocated($by));
+		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::presenceOfElementLocated($by));
 	}
 
 	public function zbxTestWaitUntilMessageTextPresent($css, $string) {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::className($css));
-		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
+		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
 	}
 
 	public function zbxTestTabSwitch($tab) {
@@ -502,113 +537,87 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	// zbx_popup is the default opened window id if none is passed
 	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
 		$this->zbxTestClickWait($buttonId);
-		$this->zbxTestWaitWindowAndSwitchToIt($windowId);
+		$this->zbxTestSwitchToWindow($windowId);
 	}
 
-	public function zbxTestWaitWindowAndSwitchToIt($id) {
-		$this->webDriver->wait(90)->until(function () use ($id) {
-			try {
-				$handles = count($this->webDriver->getWindowHandles());
-					if ($handles > 1) {
-						return $this->webDriver->switchTo()->window($id);
-				}
-			}
-			catch (NoSuchElementException $ex) {
-				return false;
-			}
-		});
+	public function zbxTestSwitchToWindow($id) {
+		// No need to wait for default window
+		if ($id !== '') {
+			$this->webDriver->wait(60, self::WAIT_ITERATION)->until(function () use ($id) {
+				$handle = $this->webDriver->getWindowHandle();
+				return ($handle !== $this->webDriver->switchTo()->window($id)->getWindowHandle());
+			});
+		}
+		else {
+			$this->webDriver->switchTo()->window($id);
+		}
 	}
 
 	public function zbxTestSwitchToNewWindow() {
-		$this->webDriver->wait(60)->until(function () {
-			try {
-				$handles = count($this->webDriver->getWindowHandles());
-					if ($handles > 1) {
-						$all = $this->webDriver->getWindowHandles();
-						return $this->webDriver->switchTo()->window(end($all));
-				}
-			}
-			catch (NoSuchElementException $ex) {
-				return false;
-			}
-		});
+		$handles = $this->webDriver->getWindowHandles();
+		if (count($handles) <= 1) {
+			$this->webDriver->wait(60, self::WAIT_ITERATION)->until(function () {
+				return count($this->webDriver->getWindowHandles()) > 1;
+			});
+
+			$handles = $this->webDriver->getWindowHandles();
+		}
+
+		$this->webDriver->switchTo()->window(end($handles));
 	}
 
 	public function zbxTestClickAndSwitchToNewWindow($xpath) {
+		$handles = count($this->webDriver->getWindowHandles());
 		$this->zbxTestClickXpathWait($xpath);
-			try {
-				$this->webDriver->wait(30)->until(function () {
-					$handles = count($this->webDriver->getWindowHandles());
-						if ($handles > 1) {
-							$all = $this->webDriver->getWindowHandles();
-							return $this->webDriver->switchTo()->window(end($all));
-						}
-					}
-				);
-			}
-			catch (TimeoutException $ex) {
-				$this->zbxTestClickXpathWait($xpath);
-				$this->webDriver->switchTo()->window('zbx_popup');
-			}
+
+		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(function () use ($handles) {
+			return count($this->webDriver->getWindowHandles()) > $handles;
+		});
+
+		$this->zbxTestSwitchToNewWindow();
 	}
 
 	public function zbxTestWaitWindowClose() {
-		$this->webDriver->wait(10)->until(function () {
-			try {
-				$handles = count($this->webDriver->getWindowHandles());
-					if ($handles == 1) {
-						return $this->webDriver->switchTo()->window('');
-				}
-			}
-			catch (NoSuchElementException $ex) {
-				return false;
-			}
+		$this->webDriver->wait(10, self::WAIT_ITERATION)->until(function () {
+			return count($this->webDriver->getWindowHandles()) === 1;
 		});
 
+		$this->webDriver->switchTo()->window('');
 		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestClickLinkAndWaitWindowClose($link) {
 		$this->zbxTestClickLinkTextWait($link);
-		try {
-			$this->webDriver->wait(10)->until(function () {
-				$handles = count($this->webDriver->getWindowHandles());
-					if ($handles == 1) {
-						return $this->webDriver->switchTo()->window('');
-					}
-				}
-			);
-		}
-		catch (TimeoutException $ex) {
-			$this->zbxTestClickLinkTextWait($link);
-			return $this->webDriver->switchTo()->window('');
-		}
-
-		$this->zbxTestCheckFatalErrors();
+		$this->zbxTestWaitWindowClose();
 	}
 
 	public function zbxTestClickAndAcceptAlert($id) {
 		$this->zbxTestClickWait($id);
-			try {
-				$this->webDriver->wait(10)->until(WebDriverExpectedCondition::alertIsPresent());
-				$this->webDriver->switchTo()->alert()->accept();
-			}
-			catch (TimeoutException $ex) {
-				$this->zbxTestClickWait($id);
-				$this->webDriver->switchTo()->alert()->accept();
-			}
+		try {
+			$this->zbxTestAcceptAlert();
+		}
+		catch (TimeoutException $ex) {
+			$this->zbxTestClickWait($id);
+			$this->zbxTestAcceptAlert();
+		}
+	}
+
+	public function zbxTestAcceptAlert() {
+		$this->webDriver->wait(10, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::alertIsPresent());
+		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestWaitForPageToLoad();
 	}
 
 	public function zbxTestGetDropDownElements($dropdownId) {
-		$optionCount = count($this->webDriver->findElements(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option')));
-		$optionList = [];
-		for ($i = 1; $i <= $optionCount; $i++) {
-			$optionList[] = [
-				'id' => $this->webDriver->findElement(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option['.$i.']'))->getAttribute('value'),
-				'content' => $this->webDriver->findElement(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option['.$i.']'))->getText()
+		$elements = [];
+		foreach ($this->getDropdownOptions($dropdownId) as $option) {
+			$elements[] = [
+				'id' => $option->getAttribute('value'),
+				'content' => $option->getText()
 			];
 		}
-		return $optionList;
+
+		return $elements;
 	}
 
 	public function zbxTestAssertElementValue($id, $value) {
@@ -670,7 +679,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitForPageToLoad() {
-		$this->webDriver->wait(10, 2000)->until(function () {
+		$this->webDriver->wait(10, self::WAIT_ITERATION)->until(function () {
 			return $this->webDriver->executeScript("return document.readyState;") == "complete";
 			}
 		);
@@ -685,6 +694,15 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 		if (self::$shared_browser !== null) {
 			try {
+				if (self::$cookie !== null) {
+					$session_id = self::$shared_browser->manage()->getCookieNamed('zbx_sessionid');
+
+					if ($session_id === null || !array_key_exists('value', $session_id)
+							|| $session_id['value'] !== self::$cookie['value']) {
+						self::$cookie = null;
+					}
+				}
+
 				$windows = self::$shared_browser->getWindowHandles();
 
 				if (count($windows) > 1) {
@@ -717,13 +735,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 		if ($error) {
 			// Cleanup failed, browser will be terminated.
-			try {
-				self::$shared_browser->quit();
-				self::$shared_browser = null;
-			}
-			catch (Exception $e) {
-				// Error handling is not missing here.
-			}
+			self::closeBrowser();
 		}
 	}
 
@@ -736,28 +748,109 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		global $DB;
 		static $suite = null;
 		$class_name = get_class($this);
+		$case_name = $this->getName(false);
+		$backup = [];
 
 		if (!isset($DB['DB'])) {
 			DBconnect($error);
 		}
 
-		// Perform parsing of test method annotations.
-		$annotations = PHPUnit_Util_Test::parseTestMethodAnnotations($class_name, $this->getName(false));
+		$annotations = $this->getAnnotations();
 
-		// Perform test case level backup.
-		if (array_key_exists('method', $annotations) && is_array($annotations['method'])
-				&& array_key_exists('backup', $annotations['method']) && is_array($annotations['method']['backup'])
-				&& count($annotations['method']['backup']) === 1) {
-			$this->case_table = $annotations['method']['backup'][0];
-			DBsave_tables($this->case_table);
+		// Restore data from backup if test case changed
+		if (self::$case_backup_once !== null && self::$last_test_case !== $case_name) {
+			DBrestore_tables(self::$case_backup_once);
+			self::$case_backup_once = null;
 		}
 
-		// Perform test suite level backup.
-		if ($suite !== $class_name && array_key_exists('class', $annotations) && is_array($annotations['class'])
-				&& array_key_exists('backup', $annotations['class']) && is_array($annotations['class']['backup'])
-				&& count($annotations['class']['backup']) === 1) {
-			self::$suite_table = $annotations['class']['backup'][0];
-			DBsave_tables(self::$suite_table);
+		// Test case level annotations.
+		$method_annotations = $this->getAnnotationsByType($annotations, 'method');
+
+		if ($method_annotations !== null) {
+			// Backup performed before every test case execution.
+			$case_backup = $this->getAnnotationsByType($method_annotations, 'backup');
+
+			if ($case_backup !== null && count($case_backup) === 1) {
+				$backup['case'] = $case_backup[0];
+			}
+
+			if (self::$last_test_case !== $case_name) {
+				if (array_key_exists($case_name, self::$test_data_sets)) {
+					// Check for data data set limit.
+					$limit = $this->getAnnotationsByType($method_annotations, 'data-limit');
+
+					if ($limit !== null && count($limit) === 1 && is_numeric($limit[0]) && $limit[0] >= 1
+							&& count(self::$test_data_sets[$case_name]) > $limit[0]) {
+						$sets = self::$test_data_sets[$case_name];
+						shuffle($sets);
+						self::$test_data_sets[$case_name] = array_slice($sets, 0, (int)$limit[0]);
+					}
+				}
+
+				// Backup performed once before first test case execution.
+				$case_backup_once = $this->getAnnotationsByType($method_annotations, 'backup-once');
+
+				if ($case_backup_once !== null && count($case_backup_once) === 1) {
+					$backup['case-once'] = $case_backup_once[0];
+				}
+			}
+
+			// Supress browser error on a test case level.
+			$supress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignore-browser-errors');
+			$this->supress_case_errors = ($supress_case_errors !== null);
+		}
+
+		// Class name change is used to determine suite change.
+		if ($suite !== $class_name) {
+			// Browser errors are not ignored by default.
+			self::$supress_suite_errors = false;
+
+			// Test suite level annotations.
+			$class_annotations = $this->getAnnotationsByType($annotations, 'class');
+
+			// Backup performed before test suite execution.
+			$suite_backup = $this->getAnnotationsByType($class_annotations, 'backup');
+
+			if ($suite_backup !== null && count($suite_backup) === 1) {
+				$backup['suite'] = $suite_backup[0];
+			}
+
+			// Supress browser error on a test case level.
+			$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignore-browser-errors');
+			self::$supress_suite_errors = ($supress_suite_errors !== null);
+		}
+
+		// Errors on a test case level should be supressed if suite level error supression is enabled.
+		if (self::$supress_suite_errors) {
+			$this->supress_case_errors = self::$supress_suite_errors;
+		}
+
+		$suite = $class_name;
+		self::$last_test_case = $case_name;
+
+		// Mark excessive test cases as skipped.
+		if (array_key_exists($case_name, self::$test_data_sets)
+				&& !in_array($this->data_key, self::$test_data_sets[$case_name])) {
+			self::markTestSkipped('Test case skipped by data provider limit check.');
+		}
+
+		// Backup is performed only for non-skipped tests.
+		foreach ($backup as $level => $table) {
+			switch ($level) {
+				case 'suite':
+					self::$suite_backup = $table;
+					break;
+
+				case 'case-once':
+					self::$case_backup_once = $table;
+					break;
+
+				case 'case':
+					$this->case_backup = $table;
+					break;
+			}
+
+			DBsave_tables($table);
 		}
 
 		// Share browser when it is possible.
@@ -765,11 +858,11 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			$this->webDriver = self::$shared_browser;
 		}
 		else {
-			$this->webDriver = RemoteWebDriver::create('http://localhost:4444/wd/hub', DesiredCapabilities::firefox());
+			$this->webDriver = RemoteWebDriver::create('http://localhost:4444/wd/hub',
+					DesiredCapabilities::firefox()->setCapability('loggingPrefs', ["browser" => "SEVERE"])
+			);
 			self::$shared_browser = $this->webDriver;
 		}
-
-		$suite = $class_name;
 	}
 
 	/**
@@ -778,10 +871,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
-		global $DB;
-
-		if ($this->case_table !== null) {
-			DBrestore_tables($this->case_table);
+		if ($this->case_backup !== null) {
+			DBrestore_tables($this->case_backup);
 		}
 
 		// Perform browser cleanup.
@@ -797,18 +888,121 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	public static function onAfterTestSuite() {
 		global $DB;
 
-		if (self::$suite_table !== null) {
+		if (self::$suite_backup !== null || self::$case_backup_once !== null) {
 			DBconnect($error);
-			DBrestore_tables(self::$suite_table);
+
+			// Restore suite level backups.
+			if (self::$suite_backup !== null) {
+				DBrestore_tables(self::$suite_backup);
+				self::$suite_backup = null;
+			}
+
+			// Restore case level backups.
+			if (self::$case_backup_once !== null) {
+				DBrestore_tables(self::$case_backup_once);
+				self::$case_backup_once = null;
+			}
+
 			DBclose();
 		}
 
-		self::$suite_table = null;
-
 		// Browser is always terminated at the end of the test suite.
-		if (self::$shared_browser !== null) {
-			self::$shared_browser->quit();
-			self::$shared_browser = null;
+		self::closeBrowser();
+	}
+
+	/**
+	 * Close shared browser instance.
+	 */
+	protected static function closeBrowser() {
+		try {
+			if (self::$shared_browser !== null) {
+				self::$shared_browser->quit();
+				self::$shared_browser = null;
+				self::$cookie = null;
+			}
+		}
+		catch (Exception $e) {
+			// Error handling is not missing here.
+		}
+	}
+
+	/**
+	 * Get dropdown element by id or name.
+	 *
+	 * @param string $id    dropdown id or name
+	 *
+	 * @return WebDriverElement
+	 */
+	protected function getDropdown($id) {
+		foreach (['id', 'name'] as $type) {
+			$by = call_user_func(['WebDriverBy', $type], $id);
+			$elements = $this->webDriver->findElements($by);
+
+			foreach ($elements as $element) {
+				if ($element->getTagName() === 'select') {
+					return $element;
+				}
+			}
+		}
+
+		$this->fail('Dropdown element "' . $id . '" was not found!');
+	}
+
+	/**
+	 * Get dropdown option elements by dropdown id or name.
+	 *
+	 * @param string $id    dropdown id or name
+	 *
+	 * @return array of WebDriverElement
+	 */
+	protected function getDropdownOptions($id) {
+		return $this->getDropdown($id)->findElements(WebDriverBy::tagName('option'));
+	}
+
+	/**
+	 * Capture screenshot if screenshot capturing is enabled.
+	 */
+	protected function captureScreenshot() {
+		try {
+			if ($this->capture_screenshot && $this->webDriver !== null) {
+				$this->current_url = $this->webDriver->getCurrentURL();
+				$this->screenshot = $this->webDriver->takeScreenshot();
+			}
+		}
+		catch (Exception $ex) {
+			// Error handling is not missing here.
+		}
+	}
+
+	/**
+	 * Get annotations by type name.
+	 * Helper function for method / class annotation processing.
+	 *
+	 * @param array  $annotations    annotations
+	 * @param string $type	         type name
+	 *
+	 * @return array or null
+	 */
+	protected function getAnnotationsByType($annotations, $type) {
+		return (array_key_exists($type, $annotations) && is_array($annotations[$type]))
+				? $annotations[$type]
+				: null;
+	}
+
+	/**
+	 * Overriden constructor for collecting data on data sets from dataProvider annotations.
+	 *
+	 * @param string $name
+	 * @param array  $data
+	 * @param string $data_name
+	 */
+	public function __construct($name = null, array $data = [], $data_name = '') {
+		parent::__construct($name, $data, $data_name);
+
+		// If data limits are enabled and test case uses data.
+		if (defined('PHPUNIT_ENABLE_DATA_LIMITS') && PHPUNIT_ENABLE_DATA_LIMITS && $data) {
+			$this->data_key = $data_name;
+			self::$test_data_sets[$name][] = $data_name;
 		}
 	}
 }

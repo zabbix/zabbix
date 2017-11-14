@@ -138,7 +138,7 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButton('host.massenable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts enabled');
@@ -162,7 +162,7 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
 		$this->zbxTestClickButton('host.massenable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host enabled');
@@ -180,7 +180,7 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButton('host.massdisable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts disabled');
@@ -204,7 +204,7 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
 		$this->zbxTestClickButton('host.massdisable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host disabled');
