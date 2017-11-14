@@ -188,10 +188,12 @@ $fields = [
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
-// Do not validate single input fields for massupdate form.
-if (getRequest('action') !== 'item.massupdateform') {
-	check_fields($fields);
+// Allow to pass empty 'delay' field to stay in mass update form.
+if (hasRequest('massupdate')) {
+	$fields['delay'][2] |= P_UNSET_EMPTY;
 }
+
+check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
