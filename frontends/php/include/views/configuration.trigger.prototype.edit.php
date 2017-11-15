@@ -573,7 +573,9 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		new CHorList([
 			(new CButton('add_dep_trigger', _('Add')))
 				->onClick('return PopUp("?action=popup&srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
-					'&multiselect=1&with_triggers=1&normal_only=1&noempty=1");')
+					'&hostid='.$data['hostid'].'&groupid='.$data['groupid'].'&multiselect=1&with_triggers=1'.
+					'&normal_only=1&noempty=1");'
+				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
 				->onClick('return PopUp("?action=popup&srctbl=trigger_prototypes&srcfld1=triggerid'.

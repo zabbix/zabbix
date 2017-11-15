@@ -144,7 +144,7 @@ static int	zbx_get_cpu_num(void)
 
 	rc = perfstat_partition_config(NULL, &part_cfg, sizeof(perfstat_partition_config_t), 1);
 
-	if (-1 == rc || 1 != rc)
+	if (1 != rc)
 		goto return_one;
 
 	return (int)part_cfg.lcpus;

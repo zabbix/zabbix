@@ -4018,10 +4018,12 @@ typedef struct
 	char			*required;
 	char			*status_codes;
 	zbx_vector_ptr_t	httpstepitems;
-	int			no;
-	char			*timeout;
-	int			post_type;
 	zbx_vector_ptr_t	fields;
+	char			*timeout;
+	int			no;
+	int			follow_redirects;
+	int			retrieve_mode;
+	int			post_type;
 }
 httpstep_t;
 
@@ -4189,7 +4191,8 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select httpstepid,httptestid,name,no,url,timeout,posts,required,status_codes,post_type"
+				"select httpstepid,httptestid,name,no,url,timeout,posts,required,status_codes,"
+					"follow_redirects,retrieve_mode,post_type"
 				" from httpstep"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
@@ -4224,7 +4227,9 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			httpstep->posts = zbx_strdup(NULL, row[6]);
 			httpstep->required = zbx_strdup(NULL, row[7]);
 			httpstep->status_codes = zbx_strdup(NULL, row[8]);
-			httpstep->post_type = atoi(row[9]);
+			httpstep->follow_redirects = atoi(row[9]);
+			httpstep->retrieve_mode = atoi(row[10]);
+			httpstep->post_type = atoi(row[11]);
 			zbx_vector_ptr_create(&httpstep->httpstepitems);
 			zbx_vector_ptr_create(&httpstep->fields);
 
@@ -4567,7 +4572,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 		httpstepid = DBget_maxid_num("httpstep", num_httpsteps);
 
 		zbx_db_insert_prepare(&db_insert_hstep, "httpstep", "httpstepid", "httptestid", "name", "no", "url",
-				"timeout", "posts", "required", "status_codes", "post_type", NULL);
+				"timeout", "posts", "required", "status_codes", "follow_redirects", "retrieve_mode",
+				"post_type", NULL);
 	}
 
 	if (0 != num_httptestitems)
@@ -4627,6 +4633,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 				zbx_db_insert_add_values(&db_insert_hstep, httpstepid, httptest->httptestid,
 						httpstep->name, httpstep->no, httpstep->url, httpstep->timeout,
 						httpstep->posts, httpstep->required, httpstep->status_codes,
+						httpstep->follow_redirects, httpstep->retrieve_mode,
 						httpstep->post_type);
 
 				for (k = 0; k < httpstep->fields.values_num; k++)

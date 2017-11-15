@@ -1218,7 +1218,7 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestCheckboxSelect('group_graphid_'.$graphid);
 			$this->zbxTestClickButton('graph.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
 			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}

@@ -21,6 +21,7 @@ package com.zabbix.gateway;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashSet;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
@@ -156,7 +157,7 @@ class JMXItemChecker extends ItemChecker
 
 			JSONArray counters = new JSONArray();
 			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
-			
+
 			int mode = DISCOVERY_MODE_ATTRIBUTES;
 			if (0 != argumentCount)
 			{
@@ -259,13 +260,28 @@ class JMXItemChecker extends ItemChecker
 	{
 		try
 		{
+			HashSet<String> properties = new HashSet<String>();
 			JSONObject counter = new JSONObject();
 
+			// Default properties are added.
 			counter.put("{#JMXOBJ}", name);
 			counter.put("{#JMXDOMAIN}", name.getDomain());
+			properties.add("OBJ");
+			properties.add("DOMAIN");
 
 			for (Map.Entry<String, String> property : name.getKeyPropertyList().entrySet())
-				counter.put("{#JMX" + property.getKey().toUpperCase() + "}" , property.getValue());
+			{
+				String key = property.getKey().toUpperCase();
+
+				// Property key should only contain valid characters and should not be already added to attribute list.
+				if (key.matches("^[A-Z0-9_\\.]+$") && !properties.contains(key))
+				{
+					counter.put("{#JMX" + key + "}" , property.getValue());
+					properties.add(key);
+				}
+				else
+					logger.trace("bean '{}' property '{}' was ignored", name, property.getKey());
+			}
 
 			counters.put(counter);
 		}

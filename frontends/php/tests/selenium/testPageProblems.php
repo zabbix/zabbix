@@ -147,14 +147,14 @@ class testPageProblems extends CWebTest {
 
 		// Select host group
 		$this->zbxTestClickXpath('//div[@id="filter_groupids_"]/..//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToWindow('zbx_popup');
 		$this->zbxTestCheckboxSelect('hostGroups_4');
 		$this->zbxTestClick('select');
 		$this->zbxTestWaitWindowClose();
 
 		// Select host
 		$this->zbxTestClickXpath('//div[@id="filter_hostids_"]/..//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToWindow('zbx_popup');
 		$this->zbxTestClickWait('spanid10084');
 		$this->zbxTestWaitWindowClose();
 
@@ -175,8 +175,6 @@ class testPageProblems extends CWebTest {
 
 		// Change minimum severity to Average
 		$this->zbxTestDropdownSelect('filter_severity', 'Average');
-		// Chrck Age less than
-		$this->zbxTestCheckboxSelect('filter_age_state');
 		// Add tag
 		$this->zbxTestInputType('filter_tags_0_tag', 'service');
 		$this->zbxTestInputType('filter_tags_0_value', 'abc');

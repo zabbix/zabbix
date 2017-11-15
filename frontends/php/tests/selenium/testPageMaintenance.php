@@ -91,7 +91,7 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestCheckboxSelect('maintenanceids_'.$maintenanceid);
 		$this->zbxTestClickButton('maintenance.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestTextPresent('Maintenance deleted');
 

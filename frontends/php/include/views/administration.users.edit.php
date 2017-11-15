@@ -48,12 +48,17 @@ if (!$data['is_profile']) {
 	$userFormList->addRow(_('Alias'), (new CTextBox('alias', $this->data['alias']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
+		->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
 	);
 	$userFormList->addRow(_x('Name', 'user first name'),
-		(new CTextBox('name', $this->data['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('name', $this->data['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
 	);
 	$userFormList->addRow(_('Surname'),
-		(new CTextBox('surname', $this->data['surname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('surname', $this->data['surname']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))
 	);
 }
 

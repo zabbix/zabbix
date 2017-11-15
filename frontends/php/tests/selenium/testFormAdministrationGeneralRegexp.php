@@ -94,7 +94,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive', false);
 		}
 
-		$this->zbxTestClick('tab_test');
+		$this->zbxTestTabSwitchById('tab_test', 'Test');
 		$this->zbxTestInputTypeWait('test_string', $test_string);
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('Regular expression added');
@@ -133,7 +133,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 
-		$this->zbxTestClickWait('tab_test');
+		$this->zbxTestTabSwitchById('tab_test', 'Test');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='green']"));
 		$this->zbxTestTextPresent('TRUE');
 	}
@@ -142,7 +142,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestClickWait('tab_test');
+		$this->zbxTestTabSwitchById('tab_test', 'Test');
 
 		$this->zbxTestInputType('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');
@@ -181,7 +181,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->regexp2);
 
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
@@ -200,7 +200,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_regexps');
 		$this->zbxTestClickButton('regexp.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestTextPresent('Regular expressions deleted');
 

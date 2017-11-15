@@ -185,7 +185,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_cloned_visible);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
@@ -214,7 +214,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_fullcloned_visible);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
@@ -243,7 +243,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_tmp);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 

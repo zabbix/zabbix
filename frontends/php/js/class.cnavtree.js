@@ -707,8 +707,8 @@ jQuery(function($) {
 																				parent: +itemid
 																			};
 
-																		root.appendChild(createTreeItem($obj, new_item, 1,
-																			true, true
+																		root.appendChild(createTreeItem($obj, new_item,
+																			1, true, true
 																		));
 																		add_child_levels($obj, +submapid,
 																			submap_itemid

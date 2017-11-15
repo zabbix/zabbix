@@ -70,13 +70,13 @@ jQuery(function($) {
 			var ms = this.first().data('multiSelect');
 
 			var data = [];
-			for (var key in ms.values.selected) {
-				var item = ms.values.selected[key];
+			for (var id in ms.values.selected) {
+				var item = ms.values.selected[id];
 
 				data[data.length] = {
-					id: item.id,
+					id: id,
 					name: item.name,
-					prefix: item.prefix === 'undefined' ? '' : item.prefix
+					prefix: (item.prefix === 'undefined') ? '' : item.prefix
 				};
 			}
 
@@ -111,8 +111,8 @@ jQuery(function($) {
 
 				// clean input if selectedLimit == 1
 				if (ms.options.selectedLimit == 1) {
-					for (var name in ms.values.selected) {
-						removeSelected(ms.values.selected[name], obj, ms.values, ms.options);
+					for (var id in ms.values.selected) {
+						removeSelected(id, obj, ms.values, ms.options);
 					}
 
 					cleanAvailable(item, ms.values);
@@ -131,8 +131,8 @@ jQuery(function($) {
 				var obj = $(this);
 				var ms = $(this).data('multiSelect');
 
-				for (var name in ms.values.selected) {
-					removeSelected(ms.values.selected[name], obj, ms.values, ms.options);
+				for (var id in ms.values.selected) {
+					removeSelected(id, obj, ms.values, ms.options);
 				}
 
 				cleanAvailable(obj, ms.values);
@@ -336,10 +336,13 @@ jQuery(function($) {
 							if (!empty(input.val())) {
 								var selected = $('.available li.suggest-hover', obj);
 
-								select(selected.data('name'), obj, values, options);
+								if (selected.length > 0) {
+									select(selected.data('id'), obj, values, options);
+								}
 
 								// stop form submit
 								cancelEvent(e);
+
 								return false;
 							}
 							break;
@@ -349,12 +352,9 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									var prev = selected.prev(),
-										item = {
-										id: selected.data('id'),
-										name: selected.data('name')
-									};
-									removeSelected(item, obj, values, options);
+									var prev = selected.prev();
+
+									removeSelected(selected.data('id'), obj, values, options);
 
 									if (prev.length > 0) {
 										prev.addClass('selected');
@@ -368,6 +368,7 @@ jQuery(function($) {
 								}
 
 								cancelEvent(e);
+
 								return false;
 							}
 							break;
@@ -377,12 +378,9 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									var next = selected.next(),
-										item = {
-										id: selected.data('id'),
-										name: selected.data('name')
-									};
-									removeSelected(item, obj, values, options);
+									var next = selected.next();
+
+									removeSelected(selected.data('id'), obj, values, options);
 
 									if (next.length > 0) {
 										next.addClass('selected');
@@ -393,6 +391,7 @@ jQuery(function($) {
 								}
 
 								cancelEvent(e);
+
 								return false;
 							}
 							break;
@@ -428,60 +427,58 @@ jQuery(function($) {
 						case KEY.ARROW_UP:
 							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
 								var selected = $('.available li.suggest-hover', obj);
+									prev = null;
 
 								if (selected.length === 0) {
 									// Select last element.
-									var prev = $('ul.multiselect-suggest li:last-child', obj);
-
-									prev.addClass('suggest-hover');
-									$('input[type="text"]', obj).val(prev.attr('data-name'));
+									prev = $('ul.multiselect-suggest li:last-child', obj);
 								}
 								else {
 									selected.removeClass('suggest-hover');
+									prev = selected.prev();
+								}
 
-									var prev = selected.prev();
-
-									if (prev.length > 0) {
-										prev.addClass('suggest-hover');
-										$('input[type="text"]', obj).val(prev.attr('data-name'));
-									}
-									else {
-										// Select search input.
-										$('input[type="text"]', obj).val(values.search);
-									}
+								if (prev.length === 0) {
+									// Select search input.
+									$('input[type="text"]', obj).val(values.search);
+								}
+								else {
+									prev.addClass('suggest-hover');
+									$('input[type="text"]', obj).val(values.available[prev.data('id')]['name']);
 								}
 
 								// Position cursor at the end of search input.
 								cancelEvent(e);
-								$('input[type="text"]', obj).focus();
+
+								scrollAvailable(obj);
 							}
 							break;
 
 						case KEY.ARROW_DOWN:
 							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj);
+								var selected = $('.available li.suggest-hover', obj),
+									next;
 
 								if (selected.length === 0) {
 									// Select first element.
-									var next = $('ul.multiselect-suggest li:first-child', obj);
-
-									$('input[type="text"]', obj).val(next.attr('data-name'));
-									next.addClass('suggest-hover');
+									next = $('ul.multiselect-suggest li:first-child', obj);
 								}
 								else {
 									selected.removeClass('suggest-hover');
 
-									var next = selected.next();
-
-									if (next.length > 0) {
-										next.addClass('suggest-hover');
-										$('input[type="text"]', obj).val(next.attr('data-name'));
-									}
-									else {
-										// Select search input.
-										$('input[type="text"]', obj).val(values.search);
-									}
+									next = selected.next();
 								}
+
+								if (next.length === 0) {
+									// Select search input.
+									$('input[type="text"]', obj).val(values.search);
+								}
+								else {
+									next.addClass('suggest-hover');
+									$('input[type="text"]', obj).val(values.available[next.data('id')]['name']);
+								}
+
+								scrollAvailable(obj);
 							}
 							break;
 
@@ -610,7 +607,7 @@ jQuery(function($) {
 							names[item.name.toUpperCase()] = true;
 						});
 
-						if (typeof(names[value.toUpperCase()]) == 'undefined') {
+						if (typeof names[value.toUpperCase()] === 'undefined') {
 							addNew = true;
 						}
 					}
@@ -620,7 +617,7 @@ jQuery(function($) {
 						var names = {};
 
 						$.each(values.selected, function(i, item) {
-							if (typeof(item.isNew) == 'undefined') {
+							if (typeof item.isNew === 'undefined') {
 								names[item.name.toUpperCase()] = true;
 							}
 							else {
@@ -628,7 +625,7 @@ jQuery(function($) {
 							}
 						});
 
-						if (typeof(names[value.toUpperCase()]) == 'undefined') {
+						if (typeof names[value.toUpperCase()] === 'undefined') {
 							addNew = true;
 						}
 					}
@@ -651,10 +648,10 @@ jQuery(function($) {
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
 				if (options.limit != 0 && objectLength(values.available) < options.limit) {
-					if (typeof values.available[item.name] === 'undefined'
-							&& typeof values.selected[item.name] === 'undefined'
-							&& typeof values.ignored[item.name] === 'undefined') {
-						values.available[item.name] = item;
+					if (typeof values.available[item.id] === 'undefined'
+							&& typeof values.selected[item.id] === 'undefined'
+							&& typeof values.ignored[item.id] === 'undefined') {
+						values.available[item.id] = item;
 					}
 				}
 				else {
@@ -709,11 +706,11 @@ jQuery(function($) {
 	}
 
 	function addSelected(item, obj, values, options) {
-		if (typeof(values.selected[item.name]) == 'undefined') {
+		if (typeof values.selected[item.id] === 'undefined') {
 			removeDefaultValue(obj, options);
-			values.selected[item.name] = item;
+			values.selected[item.id] = item;
 
-			var prefix = typeof(item.prefix) == 'undefined' ? '' : item.prefix;
+			var prefix = (typeof item.prefix === 'undefined') ? '' : item.prefix;
 
 			// add hidden input
 			obj.append($('<input>', {
@@ -730,12 +727,11 @@ jQuery(function($) {
 
 			if (!options.disabled) {
 				close_btn.click(function() {
-					removeSelected(item, obj, values, options);
+					removeSelected(item.id, obj, values, options);
 				});
 			}
 
 			var li = $('<li>', {
-				'data-name': item.name,
 				'data-id': item.id
 			}).append(
 				$('<span>', {
@@ -762,12 +758,12 @@ jQuery(function($) {
 		}
 	}
 
-	function removeSelected(item, obj, values, options) {
+	function removeSelected(id, obj, values, options) {
 		// remove
-		$('.selected li[data-id="' + item.id + '"]', obj).remove();
-		$('input[value="' + item.id + '"]', obj).remove();
+		$('.selected li[data-id="' + id + '"]', obj).remove();
+		$('input[value="' + id + '"]', obj).remove();
 
-		delete values.selected[item.name];
+		delete values.selected[id];
 
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
@@ -785,11 +781,10 @@ jQuery(function($) {
 
 	function addAvailable(item, obj, values, options) {
 		var li = $('<li>', {
-			'data-id': item.id,
-			'data-name': item.name
+			'data-id': item.id
 		})
 		.click(function() {
-			select(item.name, obj, values, options);
+			select(item.id, obj, values, options);
 		})
 		.hover(function() {
 			$('.available li.suggest-hover', obj).removeClass('suggest-hover');
@@ -837,9 +832,9 @@ jQuery(function($) {
 		$('.available ul', obj).append(li);
 	}
 
-	function select(name, obj, values, options) {
+	function select(id, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[name], obj, values, options);
+			addSelected(values.available[id], obj, values, options);
 
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
@@ -918,20 +913,12 @@ jQuery(function($) {
 	function resizeAllSelectedTexts(obj, options, values) {
 		$('.selected li', obj).each(function() {
 			var li = $(this),
+				id = li.data('id'),
 				span = $('span.subfilter-enabled', li),
 				text = $('span:first-child', span),
-				key = '';
-
-			$.each(values.selected, function(i, item) {
-				if (item.id == li.data('id')) {
-					key = item.name;
-					return false;
-				}
-			});
-
-			var t = empty(values.selected[key].prefix)
-				? values.selected[key].name
-				: values.selected[key].prefix + values.selected[key].name;
+				t = empty(values.selected[id].prefix)
+					? values.selected[id].name
+					: values.selected[id].prefix + values.selected[id].name;
 
 			// rewrite previous text to original
 			text.text(t);
@@ -941,12 +928,11 @@ jQuery(function($) {
 	}
 
 	function scrollAvailable(obj) {
-		var selected = $('.available li.suggest-hover', obj);
+		var	selected = $('.available li.suggest-hover', obj),
+			available = $('.available', obj);
 
 		if (selected.length > 0) {
-
-			var available = $('.available', obj),
-				available_height = available.height();
+			var	available_height = available.height(),
 				selected_top = 0,
 				selected_height = selected.outerHeight(true);
 
@@ -970,6 +956,9 @@ jQuery(function($) {
 			else if (selected_top + selected_height > available.scrollTop() + available_height) {
 				available.scrollTop(selected_top - available_height + selected_height);
 			}
+		}
+		else {
+			available.scrollTop(0);
 		}
 	}
 
