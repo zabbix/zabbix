@@ -203,7 +203,16 @@ function Confirm(msg) {
 	return confirm(msg);
 }
 
-function remove_vars_by_selector(form_name, selector) {
+/**
+ * Function removes input elements in specified form that matches given selector.
+ *
+ * @param object|string form_name  form element in which input elements will be selected. If given value is 'null', the
+ *                                 DOM document object will be used.
+ * @param string selector          string containing one or more commas separated CSS selectors.
+ *
+ * @returns bool|void
+ */
+function removeVarsBySelector(form_name, selector) {
 	if (form_name !== null) {
 		var source = is_string(form_name) ? document.forms[form_name] : form_name;
 	}

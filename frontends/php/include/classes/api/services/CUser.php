@@ -300,7 +300,7 @@ class CUser extends CApiService {
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
 		$this->checkUserGroups($users);
 		$this->checkMediaTypes($users);
-		$this->checkMediaReceivers($users);
+		$this->validateMediaRecipients($users);
 	}
 
 	/**
@@ -443,7 +443,7 @@ class CUser extends CApiService {
 		}
 		$this->checkUserGroups($users);
 		$this->checkMediaTypes($users);
-		$this->checkMediaReceivers($users);
+		$this->validateMediaRecipients($users);
 		$this->checkHimself($users);
 	}
 
@@ -549,13 +549,13 @@ class CUser extends CApiService {
 	/**
 	 * Validate if passed ['sendto'] value is valid input according the mediatype.
 	 *
-	 * @param array				$users
-	 * @param array				$users[]['user_medias'][]['mediatypeid']
-	 * @param array | string	$users[]['user_medias'][]['sendto']
+	 * @param array         $users
+	 * @param int           $users[]['user_medias'][]['mediatypeid']
+	 * @param array|string  $users[]['user_medias'][]['sendto']
 	 *
 	 * @throws APIException
 	 */
-	private function checkMediaReceivers(array $users) {
+	private function validateMediaRecipients(array $users) {
 		$mediatypeids = [];
 
 		foreach ($users as $user) {
@@ -593,7 +593,15 @@ class CUser extends CApiService {
 							$media['sendto'] = [$media['sendto']];
 						}
 
-						if (validateEmail($media['sendto']) === false) {
+						$are_emails_valid = true;
+						foreach ($media['sendto'] as $sendto) {
+							if ((new CEmailValidator())->validate($sendto) === false) {
+								$are_emails_valid = false;
+								break;
+							}
+						}
+
+						if ($are_emails_valid === false) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Invalid email address for media type with ID "%1$s".', $media['mediatypeid'])
 							);
@@ -601,8 +609,7 @@ class CUser extends CApiService {
 						elseif (strlen(implode('\n', $media['sendto'])) > $max_length) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
-									$media['mediatypeid'])
-							);
+									$media['mediatypeid']));
 						}
 					}
 				}
@@ -1709,7 +1716,8 @@ class CUser extends CApiService {
 			$relationMap = $this->createRelationMap($db_medias, 'userid', 'mediaid');
 
 			$db_medias = $this->unsetExtraFields($db_medias, ['userid', 'mediaid', 'mediatypeid'],
-				$options['selectMedias']);
+				$options['selectMedias']
+			);
 			$result = $relationMap->mapMany($result, $db_medias, 'medias');
 		}
 

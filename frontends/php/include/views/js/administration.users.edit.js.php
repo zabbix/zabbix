@@ -8,7 +8,7 @@
 		jQuery('#user_medias_' + index + '_mediatypeid').remove();
 		jQuery('#user_medias_' + index + '_period').remove();
 		jQuery('#user_medias_' + index + '_sendto').remove();
-		remove_vars_by_selector(null, 'input[id^="user_medias_' + index + '_sendto_"]');
+		removeVarsBySelector(null, 'input[id^="user_medias_' + index + '_sendto_"]');
 		jQuery('#user_medias_' + index + '_severity').remove();
 		jQuery('#user_medias_' + index + '_active').remove();
 		jQuery('#user_medias_' + index + '_description').remove();

@@ -213,7 +213,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
 		}
 
-		$mediaUrl = 'popup_media.php'.
+		$media_url = 'popup_media.php'.
 			'?dstfrm='.$userForm->getName().
 			'&media='.$id.
 			'&mediatypeid='.$media['mediatypeid'].
@@ -225,11 +225,11 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$media['sendto'] = array_filter($media['sendto']);
 
 			foreach ($media['sendto'] as $email) {
-				$mediaUrl .= '&sendto[]='.urlencode($email);
+				$media_url .= '&sendto[]='.urlencode($email);
 			}
 		}
 		else {
-			$mediaUrl .= '&sendto='.urlencode($media['sendto']);
+			$media_url .= '&sendto='.urlencode($media['sendto']);
 		}
 
 		$mediaSeverity = [];
@@ -264,7 +264,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("'.$mediaUrl.'");'),
+							->onClick('return PopUp("'.$media_url.'");'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$id.');')

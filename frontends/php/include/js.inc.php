@@ -231,7 +231,7 @@ function insert_js_function($fnct_name) {
 					}
 					window.opener.create_var(form, media_name + "[mediatypeid]", mediatypeid);
 					if (typeof sendto === "object") {
-						window.opener.remove_vars_by_selector(form, \'input[name^="\'+media_name+\'[sendto]"]\');
+						window.opener.removeVarsBySelector(form, \'input[name^="\'+media_name+\'[sendto]"]\');
 						jQuery(sendto).each(function(i, st) {
 							window.opener.create_var(form, media_name + "[sendto]["+i+"]", st);
 						});

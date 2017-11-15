@@ -41,7 +41,7 @@ $fields = [
 
 	'media'=>		[T_ZBX_INT, O_OPT,	P_SYS,	null,			null],
 	'mediatypeid'=>	[T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({add})'],
-	'sendto'=>		[T_ZBX_STR,	O_OPT,	null,	NOT_EMPTY,		'isset({add})'],
+	'sendto'=>		[T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({add})'],
 	'period' =>		[T_ZBX_TP,  O_OPT,  null,   null,  'isset({add})', _('When active')],
 	'active'=>		[T_ZBX_INT, O_OPT,	null,	IN([MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]), null],
 
@@ -62,14 +62,14 @@ CArrayHelper::sort($mediatypes, ['description']);
 
 $media_types = [];
 $default_mediatypeid = 0;
-foreach ($mediatypes as $mtid => &$mediatype) {
+foreach ($mediatypes as $mediatypeid => &$media_type) {
 	if ($default_mediatypeid == 0) {
-		$default_mediatypeid = $mtid;
+		$default_mediatypeid = $mediatypeid;
 	}
-	$media_types[$mtid] = $mediatype['type'];
-	$mediatype = $mediatype['description'];
+	$media_types[$mediatypeid] = $media_type['type'];
+	$media_type = $media_type['description'];
 }
-unset($mediatype);
+unset($media_type);
 
 $send_to = getRequest('sendto', '');
 $mediatypeid = getRequest('mediatypeid', $default_mediatypeid);
@@ -80,7 +80,15 @@ if (array_key_exists($mediatypeid, $media_types) && $media_types[$mediatypeid] =
 		$email_send_to = [$email_send_to];
 	}
 
-	if (isset($_REQUEST['add']) && !validateEmail($email_send_to)) {
+	$are_emails_valid = true;
+	foreach ($email_send_to as $sendto) {
+		if ((new CEmailValidator())->validate($sendto) === false) {
+			$are_emails_valid = false;
+			break;
+		}
+	}
+
+	if (getRequest('add', false) && $are_emails_valid === false) {
 		error('Invalid email address.');
 	}
 
@@ -153,9 +161,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // Create table of email addresses.
-$email_send_to_table = (new CTable())
-	->addClass('small-cell-padding')
-	->setId('email_send_to');
+$email_send_to_table = (new CTable())->setId('email_send_to');
 
 foreach ($email_send_to as $i => $email) {
 	$input_field = (new CTextBox('sendto[]', $email))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -168,8 +174,8 @@ foreach ($email_send_to as $i => $email) {
 
 $email_send_to_table->addRow([(new CButton('email_send_to_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
-	->addStyle('padding-top: 5px;')
-	->addClass('element-table-add')]);
+	->addClass('element-table-add')]
+);
 
 $frmMedia = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
@@ -202,57 +208,60 @@ $widget = (new CWidget())
 
 ?>
 <script type="text/x-jquery-tmpl" id="email_send_to_table_row">
-<?php
-echo (new CTag('tr', true, [
-		(new CTag('td', true, (new CTextBox('sendto[]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))),
-		(new CTag('td', true, (new CButton('sendto_remove_#{rowNum}', _('Remove')))
+<?= (new CRow([
+		(new CCol((new CTextBox('sendto[]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))),
+		(new CCol((new CButton('sendto_remove_#{rowNum}', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 		)),
 	]))
 		->addClass('form_row')
-		->toString();
+		->toString()
 ?>
 </script>
 <script type="text/javascript">
-jQuery(document).ready(function() {
+jQuery(document).ready(function($) {
+	/**
+	 * Function to switch between different input fields based on the select media type.
+	 *
+	 * @param int mediatypeid  Media type id to switch on.
+	 */
 	function switchSendToFields(mediatypeid) {
-		var mediatypes_by_type = <?php echo json_encode($media_types); ?>;
+		var mediatypes_by_type = <?= (new CJson())->encode($media_types) ?>;
 
 		if (typeof mediatypes_by_type[mediatypeid] !== 'undefined'
-				&& mediatypes_by_type[mediatypeid] == <?php echo MEDIA_TYPE_EMAIL; ?>) {
-			jQuery('#mediatype_send_to').hide();
-			jQuery('#mediatype_email_send_to').show();
+				&& mediatypes_by_type[mediatypeid] == <?= MEDIA_TYPE_EMAIL ?>) {
+			$('#mediatype_send_to').hide();
+			$('#mediatype_email_send_to').show();
 
-			jQuery('#mediatype_send_to input').prop('disabled', true);
-			jQuery('#mediatype_email_send_to input').prop('disabled', false);
+			$('#mediatype_send_to input').prop('disabled', true);
+			$('#mediatype_email_send_to input').prop('disabled', false);
 		}
 		else {
-			jQuery('#mediatype_send_to').show();
-			jQuery('#mediatype_email_send_to').hide();
+			$('#mediatype_send_to').show();
+			$('#mediatype_email_send_to').hide();
 
-			jQuery('#mediatype_send_to input').prop('disabled', false);
-			jQuery('#mediatype_email_send_to input').prop('disabled', true);
+			$('#mediatype_send_to input').prop('disabled', false);
+			$('#mediatype_email_send_to input').prop('disabled', true);
 		}
 	}
 
-	jQuery('#mediatypeid').on('change', function() {
-		switchSendToFields(jQuery(this).val());
+	$('#mediatypeid').on('change', function() {
+		switchSendToFields($(this).val());
 	});
 
-	var email_send_to_table_tpl = new Template(jQuery('#email_send_to_table_row').html()),
-		email_send_to_table = jQuery('#email_send_to');
+	var email_send_to_row_tpl = new Template($('#email_send_to_table_row').html()),
+		emails_table = $('#email_send_to');
 
-	email_send_to_table
+	emails_table
 		.on('click', '.element-table-add', function() {
-			var row = jQuery(this).closest('tr');
-			row.before(email_send_to_table_tpl.evaluate({rowNum: email_send_to_table.find('tr').length}));
+			$(this).closest('tr').before(email_send_to_row_tpl.evaluate({rowNum: emails_table.find('tr').length}));
 		})
 		.on('click', '.element-table-remove', function() {
-			jQuery(this).closest('tr').remove();
+			$(this).closest('tr').remove();
 		});
 
-	switchSendToFields(jQuery('#mediatypeid').val());
+	switchSendToFields($('#mediatypeid').val());
 });
 </script>
 <?php

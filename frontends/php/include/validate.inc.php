@@ -510,26 +510,3 @@ function validateTimeUnit($value, $min, $max, $allow_zero, &$error, array $optio
 
 	return true;
 }
-
-/**
- * Validate if each given string is valid email address.
- *
- * @param array	$emails
- *
- * @return boolean
- */
-function validateEmail(array $emails) {
-	$result = true;
-
-	foreach ($emails as $email) {
-		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			preg_match('/.*<(?<email>.*[^>])>/i', $email, $match);
-			if (!array_key_exists('email', $match) || !filter_var($match['email'], FILTER_VALIDATE_EMAIL)) {
-				$result = false;
-				break;
-			}
-		}
-	}
-
-	return $result;
-}
