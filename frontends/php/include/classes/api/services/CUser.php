@@ -606,7 +606,7 @@ class CUser extends CApiService {
 								_s('Invalid email address for media type with ID "%1$s".', $media['mediatypeid'])
 							);
 						}
-						elseif (strlen(implode('\n', $media['sendto'])) > $max_length) {
+						elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
 									$media['mediatypeid']));
@@ -776,7 +776,7 @@ class CUser extends CApiService {
 
 				foreach ($user['user_medias'] as $media) {
 					if (is_array($media['sendto'])) {
-						$media['sendto'] = implode('\n', $media['sendto']);
+						$media['sendto'] = implode("\n", $media['sendto']);
 					}
 
 					$medias[$user['userid']][] = $media;
@@ -1707,7 +1707,7 @@ class CUser extends CApiService {
 
 				foreach ($db_medias as &$db_media) {
 					if (array_key_exists($db_media['mediatypeid'], $db_email_medias)) {
-						$db_media['sendto'] = explode('\n', $db_media['sendto']);
+						$db_media['sendto'] = explode("\n", $db_media['sendto']);
 					}
 				}
 				unset($db_media);
