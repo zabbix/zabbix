@@ -129,7 +129,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->hostGroup.' 2');
 
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group deleted');
 
 		$sql = "SELECT * FROM groups WHERE name='$this->hostGroup ". 2 ."'";
