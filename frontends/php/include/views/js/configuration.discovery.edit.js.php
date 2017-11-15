@@ -48,8 +48,10 @@
 					</td>
 				</tr>
 				<tr id="newCheckCommunityRow">
-					<td><label for="snmp_community" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>">
-						<?= _('SNMP community') ?></label>
+					<td>
+						<label for="snmp_community" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>">
+							<?= _('SNMP community') ?>
+						</label>
 					</td>
 					<td>
 						<input type="text" id="snmp_community" name="snmp_community" value=""

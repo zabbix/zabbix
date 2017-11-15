@@ -88,12 +88,14 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
 		$userFormList->addRow(
 			(new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-			(new CPassBox('password1', $this->data['password1']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			(new CPassBox('password1', $this->data['password1']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAttribute('aria-required', 'true')
 		);
 		$userFormList->addRow(
 			(new CLabel(_('Password (once again)')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-			(new CPassBox('password2', $this->data['password2']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			(new CPassBox('password2', $this->data['password2']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAttribute('aria-required', 'true')
 		);
 

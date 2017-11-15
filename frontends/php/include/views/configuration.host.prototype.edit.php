@@ -207,7 +207,8 @@ $groupList->addRow(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
 				'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
 		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('aria-required', 'true')
 );
 

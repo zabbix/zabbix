@@ -91,8 +91,8 @@ else {
 		->addRow((new CLabel(_('URL')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 			new CDiv([
 				(new CTextBox('url', getRequest('url', ''), false, null))
-					->setAttribute('aria-required', 'true')
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('aria-required', 'true'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('parse', _('Parse')))
 					->onClick('javascript: parseUrl();')

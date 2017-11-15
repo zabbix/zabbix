@@ -36,9 +36,9 @@ $multiselect = (new CMultiSelect([
 	],
 	'callPostEvent' => true
 ]))
-	->setAttribute('aria-required', 'true')
 	->setAttribute('data-default-owner', CJs::encodeJson($data['dashboard']['owner']))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('aria-required', 'true');
 
 $form->addItem((new CFormList())
 	->addRow((new CLabel(_('Owner')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $multiselect)

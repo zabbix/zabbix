@@ -134,7 +134,8 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 
 	$form->addVar('resourceid', $id);
 	$screenFormList->addRow((new CLabel(_('Graph')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('caption', $caption, true))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
@@ -182,7 +183,8 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 
 	$form->addVar('resourceid', $id);
 	$screenFormList->addRow((new CLabel(_('Graph prototype')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('caption', $caption, true))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
@@ -235,7 +237,8 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 
 	$form->addVar('resourceid', $id);
 	$screenFormList->addRow((new CLabel(_('Item')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('caption', $caption, true))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
@@ -283,7 +286,8 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 
 	$form->addVar('resourceid', $id);
 	$screenFormList->addRow((new CLabel(_('Item prototype')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('caption', $caption, true))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
@@ -314,7 +318,8 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 
 	$form->addVar('resourceid', $id);
 	$screenFormList->addRow((new CLabel(_('Map')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('caption', $caption, true))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
@@ -367,7 +372,8 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 
 	$screenFormList
 		->addRow((new CLabel(_('Item')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextBox('caption', $caption, true))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('aria-required', 'true'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
@@ -513,7 +519,8 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=resourceid'.
 					'&srcfld1=groupid'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	);
 	$screenFormList->addRow(_('Application'),
@@ -550,7 +557,8 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 
 	$form->addVar('resourceid', $id);
 	$screenFormList->addRow((new CLabel(_('Screen')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('caption', $caption, true))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
@@ -639,7 +647,8 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
 		}
 		$screenFormList->addRow((new CLabel(_('Item')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextBox('caption', $caption, true))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('aria-required', 'true'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton

@@ -60,7 +60,8 @@ $cmbTypeRow[] = $ez_texting_link;
 $mediaTypeFormList
 	->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $cmbTypeRow)
 	->addRow((new CLabel(_('SMTP server')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('smtp_server', $data['smtp_server']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('SMTP server port'),
@@ -143,19 +144,19 @@ if ($data['passwd'] != '') {
 	];
 }
 else {
-	$passwdField = (new CPassBox('passwd'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAttribute('aria-required', 'true');
+	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // append password field to form list
 $mediaTypeFormList
 	->addRow((new CLabel(_('Jabber identifier')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('jabber_username', $data['jabber_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('jabber_username', $data['jabber_username']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow((new CLabel(_('Username')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('eztext_username', $data['eztext_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('eztext_username', $data['eztext_username']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('aria-required', 'true')
 	)
 	->addRow(_('Password'), $passwdField)

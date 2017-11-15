@@ -54,8 +54,8 @@ foreach ($data['mappings'] as $i => $mapping) {
 			->setAttribute('aria-required', 'true'),
 		'&rArr;',
 		(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))
-			->setAttribute('aria-required', 'true')
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true'),
 		(new CButton('mappings['.$i.'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')

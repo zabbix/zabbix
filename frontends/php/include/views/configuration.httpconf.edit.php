@@ -50,8 +50,8 @@ if (!empty($this->data['templates'])) {
 
 // Name
 $nameTextBox = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
-	->setAttribute('aria-required', 'true')
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('aria-required', 'true');
 if (!$this->data['templated']) {
 	$nameTextBox->setAttribute('autofocus', 'autofocus');
 }

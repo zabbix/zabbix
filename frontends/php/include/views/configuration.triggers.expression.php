@@ -39,7 +39,8 @@ $expressionFormList = new CFormList();
 
 // append item to form list
 $item = [
-	(new CTextBox('description', $this->data['description'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextBox('description', $this->data['description'], true))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('aria-required', 'true'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))

@@ -61,8 +61,8 @@ foreach ($data['expressions'] as $i => $expression) {
 			expression_type2str()
 		))->onChange('onChangeExpressionType(this, '.$i.')'),
 		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
-			->setAttribute('aria-required', 'true')
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAttribute('aria-required', 'true'),
 		$exp_delimiter,
 		(new CCheckBox('expressions['.$i.'][case_sensitive]', '1'))->setChecked($expression['case_sensitive'] == 1)
 	];

@@ -52,7 +52,8 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 
 	$authenticationFormList->addRow(
 		(new CLabel(_('LDAP host')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('ldap_host', $this->data['config']['ldap_host']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('ldap_host', $this->data['config']['ldap_host']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	);
 	$authenticationFormList->addRow(
@@ -62,7 +63,8 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 	);
 	$authenticationFormList->addRow(
 		(new CLabel(_('Base DN')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	);
 	$authenticationFormList->addRow(
@@ -74,7 +76,8 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 				: $this->data['config']['ldap_search_attribute'],
 			false,
 			128
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true')
 	);
 	$authenticationFormList->addRow(
@@ -104,7 +107,9 @@ if ($this->data['ldap_extension_enabled'] && $this->data['config']['authenticati
 	$authenticationFormList->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']');
 	$authenticationFormList->addRow(_('Login'), $userComboBox);
 	$authenticationFormList->addRow((new CLabel(_('User password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CPassBox('user_password'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setAttribute('aria-required', 'true')
+		(new CPassBox('user_password'))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('aria-required', 'true')
 	);
 }
 

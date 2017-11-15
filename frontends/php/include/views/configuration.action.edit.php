@@ -530,8 +530,7 @@ if (empty($data['new_operation'])) {
 		->addClass(ZBX_STYLE_BTN_LINK);
 }
 
-$operation_tab->addRow(
-	(new CLabel(_('Operations'))),
+$operation_tab->addRow(_('Operations'),
 	(new CDiv([$operationsTable, $footer]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -579,7 +578,7 @@ if (!empty($data['new_operation'])) {
 	// if only one operation is available - show only the label
 	if (count($data['allowedOperations'][ACTION_OPERATION]) == 1) {
 		$operation = $data['allowedOperations'][ACTION_OPERATION][0];
-		$new_operation_formlist->addRow((new CLabel(_('Operation type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		$new_operation_formlist->addRow(_('Operation type'),
 			[operation_type2str($operation), new CVar('new_operation[operationtype]', $operation)]
 		);
 	}
@@ -875,9 +874,9 @@ if (!empty($data['new_operation'])) {
 
 			$userScript = [
 				new CVar('new_operation[opcommand][scriptid]', $data['new_operation']['opcommand']['scriptid']),
-				(new CTextBox(
-					'new_operation[opcommand][script]', $data['new_operation']['opcommand']['script'], true
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)->setAttribute('aria-required', 'true'),
+				(new CTextBox('new_operation[opcommand][script]', $data['new_operation']['opcommand']['script'], true))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('aria-required', 'true'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('select_operation_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 			];
@@ -1285,8 +1284,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			->addClass(ZBX_STYLE_BTN_LINK);
 	}
 
-	$recovery_tab->addRow(
-		(new CLabel(_('Operations'))),
+	$recovery_tab->addRow(_('Operations'),
 		(new CDiv([$operationsTable, $footer]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -1314,7 +1312,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		// if only one operation is available - show only the label
 		if (count($data['allowedOperations'][ACTION_RECOVERY_OPERATION]) == 1) {
 			$operation = $data['allowedOperations'][ACTION_RECOVERY_OPERATION][0];
-			$new_operation_formlist->addRow((new CLabel(_('Operation type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			$new_operation_formlist->addRow(_('Operation type'),
 				[operation_type2str($operation), new CVar('new_recovery_operation[operationtype]', $operation)]
 			);
 		}
@@ -1617,7 +1615,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					),
 					(new CTextBox('new_recovery_operation[opcommand][script]',
 						$data['new_recovery_operation']['opcommand']['script'], true
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('aria-required', 'true'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('select_recovery_operation_opcommand_script', _('Select')))
@@ -1654,21 +1653,24 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$new_operation_formlist->addRow((new CLabel(_('User name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_recovery_operation[opcommand][username]',
 						$data['new_recovery_operation']['opcommand']['username']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAttribute('aria-required', 'true')
 				);
 				$new_operation_formlist->addRow(
 					(new CLabel(_('Public key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_recovery_operation[opcommand][publickey]',
 						$data['new_recovery_operation']['opcommand']['publickey']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAttribute('aria-required', 'true')
 				);
 				$new_operation_formlist->addRow(
 					(new CLabel(_('Private key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_recovery_operation[opcommand][privatekey]',
 						$data['new_recovery_operation']['opcommand']['privatekey']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAttribute('aria-required', 'true')
 				);
 				$new_operation_formlist->addRow(_('Password'),
@@ -1697,14 +1699,16 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextArea('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('aria-required', 'true')
 				);
 				$new_operation_formlist->addRow(
 					(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('new_recovery_operation_opcommand_command_ipmi')
 						->setAttribute('aria-required', 'true')
 				);
@@ -2067,7 +2071,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						),
 						(new CTextBox('new_ack_operation[opcommand][script]',
 							$data['new_ack_operation']['opcommand']['script'], true
-						))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAttribute('aria-required', 'true'),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton('select_ack_operation_opcommand_script', _('Select')))
@@ -2094,19 +2099,22 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				->addRow((new CLabel(_('User name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_ack_operation[opcommand][username]',
 						$data['new_ack_operation']['opcommand']['username']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAttribute('aria-required', 'true')
 				)
 				->addRow((new CLabel(_('Public key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_ack_operation[opcommand][publickey]',
 						$data['new_ack_operation']['opcommand']['publickey']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAttribute('aria-required', 'true')
 				)
 				->addRow((new CLabel(_('Private key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_ack_operation[opcommand][privatekey]',
 						$data['new_ack_operation']['opcommand']['privatekey']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAttribute('aria-required', 'true')
 				)
 				->addRow(_('Password'),
@@ -2117,7 +2125,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				->addRow(_('Key passphrase'),
 					(new CTextBox('new_ack_operation[opcommand][password]',
 						$data['new_ack_operation']['opcommand']['password']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setId('new_ack_operation_opcommand_passphrase')
 				)
 				->addRow(_('Port'),
@@ -2129,14 +2138,16 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextArea('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('aria-required', 'true')
 				)
 				->addRow(
 					(new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 					(new CTextBox('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('new_ack_operation_opcommand_command_ipmi')
 						->setAttribute('aria-required', 'true')
 				);
@@ -2223,8 +2234,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		);
 	}
 	else {
-		$acknowledge_tab->addRow(
-			(new CLabel(_('Operations'))),
+		$acknowledge_tab->addRow(_('Operations'),
 			(new CDiv([$operations_table,
 				(new CSimpleButton(_('New')))
 					->onClick('javascript: submitFormWithParam("'.$action_formname.'", "new_ack_operation", "1");')

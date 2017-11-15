@@ -55,8 +55,8 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		// ZBX_STYLE_FIELD_LABEL_ASTERISK handling for CVisibilityBox objects.
-		$('input:checkbox,#type').change(function () {
-			var item_type=$('input#visible_type').is(':checked') ? parseInt($('#type').val(), 10) : '',
+		$('input:checkbox, #type').change(function () {
+			var item_type = $('input#visible_type').is(':checked') ? parseInt($('#type').val(), 10) : '',
 				asterisk_fields = <?= CJs::encodeJson([
 					'' => ['update_interval', 'delay', 'history', 'trends'],
 					ITEM_TYPE_JMX => ['jmx_endpoint'],

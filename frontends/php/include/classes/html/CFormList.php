@@ -52,7 +52,7 @@ class CFormList extends CList {
 			}
 		}
 
-		$label = is_object($term) ? $term : (new CLabel($term, $input_id));
+		$label = is_object($term) ? $term : new CLabel($term, $input_id);
 
 		if ($description === null) {
 			$this->addItem([

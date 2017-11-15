@@ -91,7 +91,8 @@ $expression_row = [
 		$data['expression_field_name'],
 		$data['expression_field_value'],
 		['readonly' => $data['expression_field_readonly']]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('aria-required', 'true'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_expression_button
@@ -291,7 +292,8 @@ $recovery_expression_row = [
 		$data['recovery_expression_field_name'],
 		$data['recovery_expression_field_value'],
 		['readonly' => $data['recovery_expression_field_readonly']]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('aria-required', 'true'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_recovery_expression_button
@@ -475,8 +477,8 @@ $triggersFormList
 	->addRow(
 		(new CLabel(_('Tag for matching')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 		(new CTextBox('correlation_tag', $data['correlation_tag'], $data['limited']))
-			->setAttribute('aria-required', 'true')
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('aria-required', 'true'),
 		'correlation_tag_row'
 	);
 

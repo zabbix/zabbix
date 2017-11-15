@@ -176,10 +176,10 @@ function getFontComboBox($name) {
 					)
 					->addRow((new CLabel(_('Map')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
 						(new CTextBox('elementName'))
-							->setAttribute('aria-required', 'true')
 							->setReadonly(true)
 							->setId('elementNameMap')
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAttribute('aria-required', 'true'),
 						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))

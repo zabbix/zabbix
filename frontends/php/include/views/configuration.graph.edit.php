@@ -155,15 +155,12 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 	]))->setEnabled(!$readonly)];
 
-	$class_asterisk = null;
-
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CTextBox('yaxismin', $this->data['yaxismin'], $readonly))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$class_asterisk = ZBX_STYLE_FIELD_LABEL_ASTERISK;
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
 
 		$ymin_name = '';
@@ -177,7 +174,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true');
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
@@ -215,7 +213,12 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
 	}
 
-	$graphFormList->addRow((new CLabel(_('Y axis MIN value')))->addClass($class_asterisk), $yaxisMinData);
+	$yaxismin_label = new CLabel(_('Y axis MIN value'));
+	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+		$yaxismin_label->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK);
+	}
+
+	$graphFormList->addRow($yaxismin_label, $yaxisMinData);
 
 	$yaxisMaxData = [(new CComboBox('ymax_type', $this->data['ymax_type'], null, [
 		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
@@ -223,15 +226,12 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 	]))->setEnabled(!$readonly)];
 
-	$class_asterisk = null;
-
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CTextBox('yaxismax', $this->data['yaxismax'], $readonly))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$class_asterisk = ZBX_STYLE_FIELD_LABEL_ASTERISK;
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
 
 		$ymax_name = '';
@@ -245,7 +245,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('aria-required', 'true');
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
@@ -285,7 +286,12 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
 	}
 
-	$graphFormList->addRow((new CLabel(_('Y axis MAX value')))->addClass($class_asterisk), $yaxisMaxData);
+	$yaxismax_label = new CLabel(_('Y axis MAX value'));
+	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+		$yaxismax_label->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK);
+	}
+
+	$graphFormList->addRow($yaxismax_label, $yaxisMaxData);
 }
 else {
 	$graphFormList->addRow(_('3D view'),
