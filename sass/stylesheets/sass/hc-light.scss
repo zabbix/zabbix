@@ -279,6 +279,23 @@ $clock-lines-color: #555;
 	}
 }
 
+.action-menu-item {
+	&::before {
+		background: url(../img/icon-sprite.svg) no-repeat -164px -835px !important;
+	}
+}
+
+ul.top-nav-icons {
+	input {
+		border: 1px solid $form-border-color !important;
+		background-color: $form-bg-color !important;
+
+		&:focus {
+			border: 1px solid $main-subnav-bg-color !important;
+		}
+	}
+}
+
 // Important! @import string should come after variables
 @import 'screen.scss';
 
