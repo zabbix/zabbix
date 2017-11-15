@@ -101,6 +101,7 @@ $map_tab->addRow(_('Name'),
 		(new CTextBox('name', $data['sysmap']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'name'))
 	)
 	->addRow(_('Width'),
 		(new CNumericBox('width', $data['sysmap']['width'], 5))

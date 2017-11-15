@@ -280,13 +280,11 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 				/* once in STAT_INTERVAL seconds */
 
 	char			*error = NULL;
-	int			success_num, fail_num;
+	int			success_num = 0, fail_num = 0;
 	zbx_ipc_socket_t	alerter_socket;
 	zbx_ipc_message_t	message;
-	double			time_stat, time_idle, time_now, time_read;
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-	double			resolver_timestamp = 0.0;
-#endif
+	double			time_stat, time_idle = 0, time_now, time_read, time_file = 0;
+
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
@@ -307,11 +305,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	alerter_register(&alerter_socket);
 
-	/* initialize statistics */
 	time_stat = zbx_time();
-	time_idle = 0;
-	success_num = 0;
-	fail_num = 0;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -333,8 +327,6 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			fail_num = 0;
 		}
 
-		zbx_handle_log();
-
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
@@ -345,15 +337,16 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		/* handle /etc/resolv.conf update less often than once a second */
-
-		if (1.0 < time_now - resolver_timestamp)
+		/* handle /etc/resolv.conf update and log rotate less often than once a second */
+		if (1.0 < time_now - time_file)
 		{
-			resolver_timestamp = time_now;
+			time_file = time_now;
+			zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
 			zbx_update_resolver_conf();
-		}
 #endif
+		}
+
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
 

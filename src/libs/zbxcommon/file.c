@@ -99,20 +99,19 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
  ******************************************************************************/
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 {
-	size_t		i, szbyte;
+	size_t		i, szbyte, nbytes;
 	const char	*cr, *lf;
-	int		nbytes;
 	zbx_offset_t	offset;
 
 	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		return -1;
 
-	if (0 >= (nbytes = (int)read(fd, buf, count)))
-		return nbytes;
+	if (0 >= (nbytes = read(fd, buf, (unsigned int)count)))
+		return (int)nbytes;
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
-	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
+	for (i = 0; i <= nbytes - szbyte; i += szbyte)
 	{
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 		{
@@ -123,7 +122,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		{
 			/* CR+LF (Windows) ? */
-			if (i < (size_t)nbytes - szbyte && 0 == memcmp(&buf[i + szbyte], lf, szbyte))
+			if (i < nbytes - szbyte && 0 == memcmp(&buf[i + szbyte], lf, szbyte))
 				i += szbyte;
 
 			i += szbyte;

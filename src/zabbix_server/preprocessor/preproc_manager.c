@@ -1003,10 +1003,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	zbx_ipc_message_t		*message;
 	zbx_preprocessing_manager_t	manager;
 	int				ret;
-	double				time_stat, time_idle, time_now, time_flush;
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-	double				resolver_timestamp = 0.0;
-#endif
+	double				time_stat, time_idle = 0, time_now, time_flush, time_file = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1033,7 +1030,6 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	time_stat = zbx_time();
 	time_now = time_stat;
 	time_flush = time_stat;
-	time_idle = 0;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -1054,20 +1050,20 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			manager.processed_num = 0;
 		}
 
-		zbx_handle_log();
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, ZBX_PREPROCESSING_MANAGER_DELAY, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		/* handle /etc/resolv.conf update less often than once a second */
-
-		if (1.0 < time_now - resolver_timestamp)
+		/* handle /etc/resolv.conf update and log rotate less often than once a second */
+		if (1.0 < time_now - time_file)
 		{
-			resolver_timestamp = time_now;
+			time_file = time_now;
+			zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
 			zbx_update_resolver_conf();
-		}
 #endif
+		}
+
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += zbx_time() - time_now;
 

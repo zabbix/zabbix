@@ -3286,7 +3286,8 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length)
 {
 	const char	*ptr;
-	int		macro_r, context_l, context_r, len;
+	int		macro_r, context_l, context_r;
+	size_t		len;
 
 	if (SUCCEED != zbx_user_macro_parse(macro, &macro_r, &context_l, &context_r))
 		return FAIL;
@@ -3410,7 +3411,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 	if (0 == force_quote)
 		return zbx_strdup(NULL, context);
 
-	len = strlen(context) + 2 + quotes;
+	len = (int)strlen(context) + 2 + quotes;
 	ptr_buffer = buffer = zbx_malloc(NULL, len + 1);
 
 	*ptr_buffer++ = '"';
@@ -3933,7 +3934,8 @@ int	zbx_strcmp_natural(const char *s1, const char *s2)
  ******************************************************************************/
 static int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
-	int			macro_r, context_l, context_r, offset;
+	size_t			offset;
+	int			macro_r, context_l, context_r;
 	zbx_token_user_macro_t	*data;
 
 	if (SUCCEED != zbx_user_macro_parse(macro, &macro_r, &context_l, &context_r))
@@ -3994,7 +3996,7 @@ static int	zbx_token_parse_user_macro(const char *expression, const char *macro,
 static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
 	const char		*ptr;
-	int			offset;
+	size_t			offset;
 	zbx_token_macro_t	*data;
 
 	/* find the end of lld macro by validating its name until the closing bracket } */
@@ -4047,7 +4049,7 @@ static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, 
 static int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token)
 {
 	const char		*ptr;
-	int			offset;
+	size_t			offset;
 	zbx_token_macro_t	*data;
 
 	/* find the end of object id by checking if it contains digits until the closing bracket } */
@@ -4101,7 +4103,7 @@ static int	zbx_token_parse_objectid(const char *expression, const char *macro, z
 static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
 	const char		*ptr;
-	int			offset;
+	size_t			offset;
 	zbx_token_macro_t	*data;
 
 	/* find the end of simple macro by validating its name until the closing bracket } */
@@ -4192,7 +4194,7 @@ static int	zbx_token_parse_func_macro(const char *expression, const char *macro,
 	zbx_strloc_t		func_loc, func_param;
 	zbx_token_func_macro_t	*data;
 	const char		*ptr;
-	int			offset;
+	size_t			offset;
 
 	if ('\0' == *func)
 		return FAIL;
@@ -4255,7 +4257,7 @@ static int	zbx_token_parse_func_macro(const char *expression, const char *macro,
 static int	zbx_token_parse_simple_macro_key(const char *expression, const char *macro, const char *key,
 		zbx_token_t *token)
 {
-	int				offset;
+	size_t				offset;
 	zbx_token_simple_macro_t	*data;
 	const char			*ptr;
 	zbx_strloc_t			key_loc, func_loc, func_param;
@@ -4706,7 +4708,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
 		const char *from, size_t sz_from)
 {
-	int	sz_changed = sz_from - sz_to;
+	size_t	sz_changed = sz_from - sz_to;
 
 	if (0 != sz_changed)
 	{
@@ -4728,5 +4730,5 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 
 	memcpy(*data + offset, from, sz_from);
 
-	return sz_changed;
+	return (int)sz_changed;
 }

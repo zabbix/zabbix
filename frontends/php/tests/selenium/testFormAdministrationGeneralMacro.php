@@ -84,7 +84,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private function saveGlobalMacros($confirmation = false) {
 		$this->zbxTestClick('update');
 		if ($confirmation) {
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 		}
 			$this->zbxTestCheckHeader('Macros');
 			$this->zbxTestTextPresent('Macros');

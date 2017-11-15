@@ -86,7 +86,7 @@ class testPageSlideShows extends CWebTest {
 
 	/**
 	 * @dataProvider allSlideShows
-	 * @backup slideshows
+	 * @backup-once slideshows
 	 */
 	public function testPageSlideShows_MassDelete($slideshow) {
 		$slideshowid = $slideshow['slideshowid'];
@@ -96,7 +96,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestCheckboxSelect('shows_'.$slideshowid);
 		$this->zbxTestClickButton('slideshow.massdelete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestTextPresent('Slide show deleted');
