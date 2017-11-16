@@ -35,45 +35,46 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	// group
-	'usrgrpid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
-	'group_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'selusrgrp' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'gname' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
-	'gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
-	'users_status' =>		[T_ZBX_INT, O_OPT, null,	IN([GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),	null],
-	'debug_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
-	'group_users' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'groups_rights' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'set_gui_access' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
+	'usrgrpid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
+	'group_groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'selusrgrp' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'gname' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
+	'gui_access' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
+	'users_status' =>			[T_ZBX_INT, O_OPT, null,	IN([GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),	null],
+	'debug_mode' =>				[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
+	'group_users' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'groups_rights' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'set_gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
 	// actions
-	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.
-									'"usergroup.massenable","usergroup.massenabledebug","usergroup.set_gui_access"'
-								),
-								null
-							],
-	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'new_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'groupids' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'subgroups' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'tag_filter' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'add_tag_filter' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'tag' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'value' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+									IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.
+										'"usergroup.massenable","usergroup.massenabledebug","usergroup.set_gui_access"'
+									),
+									null
+								],
+	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_permission' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'new_permission' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'groupids' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag_filter_groupids' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'subgroups' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag_filters' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'add_tag_filter' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag' =>					[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'value' =>					[T_ZBX_STR, O_OPT, null,		 null,	null],
 	// form
-	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
-	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		 null,	null],
+	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,		 null,	null],
 	// filter
-	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_name' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_users_status' =>[T_ZBX_INT, O_OPT, null,	IN([-1, GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),		null],
+	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_users_status' =>	[T_ZBX_INT, O_OPT, null,	IN([-1, GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),		null],
 	// sort and sortorder
-	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
-	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
+	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -121,7 +122,8 @@ if (hasRequest('add') || hasRequest('update')) {
 		'gui_access' => getRequest('gui_access'),
 		'debug_mode' => getRequest('debug_mode'),
 		'userids' => getRequest('group_users', []),
-		'rights' => [],
+		'tag_filters' => getRequest('tag_filters', []),
+		'rights' => []
 	];
 
 	$groups_rights = applyHostGroupRights(getRequest('groups_rights', []));
@@ -290,10 +292,6 @@ if (hasRequest('form')) {
 		? getRequest('groups_rights', [])
 		: collapseHostGroupRights(getHostGroupsRights($data['usrgrpid'] == 0 ? [] : [$data['usrgrpid']]));
 
-	$data['tag_filters'] = hasRequest('form_refresh')
-		? getRequest('tag_filters', [])
-		: $data['usrgrpid'] == 0 ? [] : collapseTagFilters($db_user_group['tag_filters']);
-
 	if (hasRequest('add_permission')) {
 		// Add new permission with submit().
 		if (hasRequest('subgroups')) {
@@ -312,20 +310,39 @@ if (hasRequest('form')) {
 		);
 	}
 
+	if (hasRequest('tag_filters')) {
+		$data['tag_filters'] = getRequest('tag_filters', []);
+	}
+	else {
+		$data['tag_filters'] = $data['usrgrpid'] == 0 ? [] : $db_user_group['tag_filters'];
+	}
+
 	if (hasRequest('add_tag_filter')) {
 		// Add new tag filter with submit().
-		if (hasRequest('tag_filter_subgroups')) {
-			$tag_filter_groupids = [];
-			$tag_filter_subgroupids = getRequest('tag_filter_groupids', []);
-		}
-		else {
-			$groupids = getRequest('tag_filter_groupids', []);
-			$groupids_subgroupids = [];
-		}
+		$new_groupids = getRequest('tag_filter_groupids');
+		if ($new_groupids) {
+			$host_groups = API::HostGroup()->get([
+				'groupids' => $new_groupids,
+				'output' => ['groupid', 'name']
+			]);
 
-		$tag = getRequest('tag');
-		$value = getRequest('value');
+			foreach ($host_groups as $host_group) {
+				$new_element = [
+					'groupid' => $host_group['groupid'],
+					'tag' => getRequest('tag'),
+					'value' => getRequest('value'),
+					'name' => $host_group['name']
+				];
+
+				array_push($data['tag_filters'], $new_element);
+			}
+
+			$data['tag'] = '';
+			$data['value'] = '';
+		}
 	}
+
+	$data['tag_filters'] = collapseTagFilters($data['tag_filters']);
 
 	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
 

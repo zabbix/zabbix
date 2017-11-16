@@ -175,11 +175,24 @@ $tag_filter_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Host group'), _('Tags'), _('Action')]);
 
+$pre_name = '';
 foreach ($data['tag_filters'] as $key => $tag_filter) {
 	$action = (new CButton('tag_filter_remove', _('Remove')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-remove');
-	$tag_filter_table->addRow([$tag_filter['name'], $tag_filter['value'].NAME_DELIMITER.$tag_filter['value'], $action]);
+	if ($pre_name === $tag_filter['name']) {
+		$tag_filter['name'] = '';
+	}
+	else {
+		$pre_name = $tag_filter['name'];
+	}
+	if ($tag_filter['tag'] || $tag_filter['value']) {
+		$tag_value = $tag_filter['tag'].NAME_DELIMITER.$tag_filter['value'];
+	}
+	else {
+		$tag_value = _('All tags');
+	}
+	$tag_filter_table->addRow([$tag_filter['name'], $tag_value, $action]);
 	$userGroupForm->addVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']);
 	$userGroupForm->addVar('tag_filters['.$key.'][tag]', $tag_filter['tag']);
 	$userGroupForm->addVar('tag_filters['.$key.'][value]', $tag_filter['value']);

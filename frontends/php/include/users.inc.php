@@ -292,7 +292,7 @@ function collapseTagFilters(array $tag_filters) {
 		}
 		unset($tag_filter);
 
-		CArrayHelper::sort($tag_filters, [['field' => 'name', 'order' => ZBX_SORT_DOWN]]);
+		CArrayHelper::sort($tag_filters, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
 		$pre_name = '';
 		foreach ($tag_filters as &$tag_filter) {
