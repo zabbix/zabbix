@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/administration.usergroups.edit.js.php';
-
 $widget = (new CWidget())->setTitle(_('User groups'));
 
 // create form
@@ -177,9 +175,11 @@ $tag_filter_table = (new CTable())
 
 $pre_name = '';
 foreach ($data['tag_filters'] as $key => $tag_filter) {
-	$action = (new CButton('tag_filter_remove', _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-remove');
+	$action = (new CSimpleButton(_('Remove')))
+		->onClick('javascript: submitFormWithParam('.
+			'"'.$userGroupForm->getName().'", "remove_tag_filter['.$key.']", "1"'.
+		');')
+		->addClass(ZBX_STYLE_BTN_LINK);
 	if ($pre_name === $tag_filter['name']) {
 		$tag_filter['name'] = '';
 	}
@@ -227,7 +227,7 @@ $new_permissions_table = (new CTable())
 		)
 	])
 	->addRow([[
-		(new CCheckBox('subgroups')),
+		(new CCheckBox('tag_filter_subgroups')),
 		SPACE,
 		_('Include subgroups')
 	]])
