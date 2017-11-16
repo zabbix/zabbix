@@ -2173,10 +2173,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 		processed_num = flush_events();
 
 		if (0 != trigger_events.values_num)
-		{
 			update_trigger_changes(trigger_diff);
-			DBupdate_itservices(trigger_diff);
-		}
 
 		zbx_vector_ptr_destroy(&trigger_events);
 		zbx_vector_ptr_destroy(&internal_ok_events);
