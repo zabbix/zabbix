@@ -255,10 +255,7 @@ var colorPalette = (function() {
 	'use strict';
 
 	var current_color = 0,
-		palette = [
-			'1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
-			'BB2A02', '5A2B57', '89ABF8', '7EC25C', '274482', '2B5429', '8048B4', 'FD5434', '790E1F', '87AC4D', 'E89DF4'
-		];
+		palette = [];
 
 	return {
 		incrementNextColor: function() {
@@ -278,6 +275,16 @@ var colorPalette = (function() {
 			this.incrementNextColor();
 
 			return color;
+		},
+
+		/**
+		 * Set theme specific color palette.
+		 *
+		 * @param array colors  Array of hexadecimal color codes.
+		 */
+		setThemeColors: function(colors) {
+			palette = colors;
+			current_color = 0;
 		}
 	}
 }());
@@ -552,6 +559,7 @@ function overlayDialogue(params) {
 			var res = obj.action();
 
 			if (res !== false && (!('keepOpen' in obj) || obj.keepOpen === false)) {
+				body_mutation_observer.disconnect();
 				overlayDialogueDestroy();
 			}
 
@@ -577,6 +585,17 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
+	var center_overlay_dialog = function() {
+			overlay_dialogue.css({
+				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).width()) / 2) + 'px',
+				'top': Math.round((jQuery(window).height() - jQuery(overlay_dialogue).height()) / 2) + 'px'
+			});
+		},
+		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
+		body_mutation_observer = new body_mutation_observer(function(mutation) {
+			center_overlay_dialog();
+		});
+
 	var overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
 		class: 'overlay-dialogue modal'
@@ -586,9 +605,12 @@ function overlayDialogue(params) {
 				class: 'overlay-close-btn'
 			})
 				.click(function() {
+					body_mutation_observer.disconnect();
+
 					if (cancel_action !== null) {
 						cancel_action();
 					}
+
 					overlayDialogueDestroy();
 
 					return false;
@@ -602,12 +624,17 @@ function overlayDialogue(params) {
 		.append(
 			jQuery('<div>', {
 				class: 'overlay-dialogue-body',
-			}).append(params.content)
+			})
+				.append(params.content)
+				.each(function() {
+					body_mutation_observer.observe(this, {childList: true, subtree: true});
+				})
 		)
 		.append(overlay_dialogue_footer)
 		.on('keydown', function(e) {
 			// ESC
 			if (e.which == 27) {
+				body_mutation_observer.disconnect();
 				if (cancel_action !== null) {
 					cancel_action();
 				}
@@ -618,6 +645,14 @@ function overlayDialogue(params) {
 		})
 		.appendTo('body');
 
+	center_overlay_dialog();
+
+	jQuery(window).resize(function() {
+		if (jQuery('#overlay_dialogue').length) {
+			center_overlay_dialog();
+		}
+	});
+
 	var focusable = jQuery(':focusable', overlay_dialogue);
 
 	if (focusable.length > 0) {
@@ -626,7 +661,7 @@ function overlayDialogue(params) {
 
 		first_focusable.on('keydown', function(e) {
 			// TAB and SHIFT
-			if (e.keyCode == 9 && e.shiftKey) {
+			if (e.which == 9 && e.shiftKey) {
 				last_focusable.focus();
 
 				return false;
@@ -635,7 +670,7 @@ function overlayDialogue(params) {
 
 		last_focusable.on('keydown', function(e) {
 			// TAB and not SHIFT
-			if (e.keyCode == 9 && !e.shiftKey) {
+			if (e.which == 9 && !e.shiftKey) {
 				first_focusable.focus();
 
 				return false;

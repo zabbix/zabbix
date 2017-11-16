@@ -1308,9 +1308,9 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 
 			object = (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags) ?
 					EVENT_OBJECT_LLDRULE : EVENT_OBJECT_ITEM);
-			add_event(EVENT_SOURCE_INTERNAL, object, item->itemid, &h->ts, h->state, NULL, NULL, NULL, 0,
-					0, NULL, 0, NULL, 0);
 
+			zbx_add_event(EVENT_SOURCE_INTERNAL, object, item->itemid, &h->ts, h->state, NULL, NULL, NULL,
+					0, 0, NULL, 0, NULL, 0);
 
 			if (0 != strcmp(item->error, h->value.err))
 				item_error = h->value.err;
@@ -1322,7 +1322,7 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 			/* supported is handled in lld_process_discovery_rule()        */
-			add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
+			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
 					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0);
 
 			item_error = "";
@@ -2459,8 +2459,9 @@ int	DCsync_history(int sync_type, int *total_num)
 
 	if (0 == cache->history_num)
 	{
-		/* even with no history there might be events queued to be closed, flush them */
-		flush_correlated_events();
+		/* try flushing correlated event queue in the case      */
+		/* some OK events are queued from the last history sync */
+		zbx_flush_correlated_events();
 		goto finish;
 	}
 
@@ -2568,9 +2569,8 @@ int	DCsync_history(int sync_type, int *total_num)
 					/* processing of events, generated in functions: */
 					/* DBmass_update_items() */
 					/* DBmass_update_triggers() */
-					process_trigger_events(&trigger_diff, &triggerids,
-							ZBX_EVENTS_PROCESS_CORRELATION);
-					zbx_db_save_trigger_changes(&trigger_diff);
+					if (0 != zbx_process_events(&trigger_diff, &triggerids))
+						zbx_db_save_trigger_changes(&trigger_diff);
 
 					if (ZBX_DB_OK == (txn_error = DBcommit()))
 					{
@@ -2676,7 +2676,8 @@ finish:
 
 		UNLOCK_CACHE;
 
-		while (0 != flush_correlated_events())
+		/* try flushing correlated event queue until it's empty */
+		while (0 != zbx_flush_correlated_events())
 			;
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");

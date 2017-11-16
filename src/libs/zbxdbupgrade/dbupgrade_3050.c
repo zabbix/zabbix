@@ -75,6 +75,24 @@ clean:
 	return ret;
 }
 
+static int	DBpatch_3050002(void)
+{
+	const ZBX_FIELD field = {"colorpalette", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("graph_theme", &field);
+}
+
+static int	DBpatch_3050003(void)
+{
+	const char	*colorpalette = "1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,"
+			"5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4";
+
+	if (ZBX_DB_OK > DBexecute("update graph_theme set colorpalette='%s'", colorpalette))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -83,5 +101,7 @@ DBPATCH_START(3050)
 
 DBPATCH_ADD(3050000, 0, 1)
 DBPATCH_ADD(3050001, 0, 1)
+DBPATCH_ADD(3050002, 0, 1)
+DBPATCH_ADD(3050003, 0, 1)
 
 DBPATCH_END()

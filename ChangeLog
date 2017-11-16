@@ -1,6 +1,9 @@
 Changes for 4.0.0alpha1
 
 New features:
+....I..... [ZBXNEXT-761] added rules to make dbschema.c, schema.sql and data.sql from schema.tmpl, data.tmpl and templates.tmpl if there is a need to (gleb)
+..F.I..... [ZBXNEXT-4186] added ability to adjust colors for new graph items in graph creation form according selected theme (gcalenko, Sasha)
+..F....... [ZBXNEXT-4145] fixed appearance of host column based on number of hosts specified in filter (miks)
 A.F.I..... [ZBXNEXT-4118] implemented advanced options for tag-based search of problems (Ivo, Sasha)
 ..F....... [ZBXNEXT-4134] added 'lang' attribute to page body (gcalenko)
 A.F....PS. [ZBXNEXT-4181] fixed Zabbix server to accept active Zabbix proxy requests only from allowed address if specified (Sasha, vso)
@@ -10,9 +13,41 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
+..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
+...G...PS. [ZBX-12983] fixed compilation warnings under Windows (valdis)
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.5rc1
+
+New features:
+..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
+
+Bug fixes:
+....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
+........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
+.......P.. [ZBX-12971] fixed Zabbix proxy not to send same host availability more than once (vso)
+........S. [ZBX-12800] fixed incorrect trigger dependency calculation when processing dependent triggers in the same history syncer batch (wiper)
+A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
+..F....... [ZBX-12926] fixed translation string on administration general housekeeping page (gcalenko)
+..F....... [ZBX-12738] added missing key "vfs.dir.size" for active agent in item edit form (gcalenko)
+..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
+..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
+........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
+..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
+........S. [ZBX-12978] improved performance of preprocessor manager, alert manager/worker, IPMI manager/poller by reducing frequency of log rotation checks that handle stdout/stderr (vso)
+........S. [ZBX-12936] improved SQL performance by updating proxy last access in bulks (vso)
+.....J.... [ZBX-12705] added check for collisions and unsupported characters in macro names in jmx.discovery (vjaceslavs)
+........S. [ZBX-12970] fixed processing of alerts when related event is removed (vso)
+...G...... [ZBX-12544] fixed compilation warnings (valdis)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.4
+
+3.4.4rc1 was released as 3.4.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.4rc1
@@ -379,6 +414,23 @@ A.F.....S. [ZBX-11470] fixed unary minus and prefix extraction for trigger expre
 ..F....... [ZBX-11371] prevented executing client side script by changing value of $ZBX_SERVER_NAME from setup.php page (Cemeris)
 A......... [ZBX-5116] prevented escaping forward slashes while encoding API response to JSON text (Cemeris)
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.11rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-12800] fixed incorrect trigger dependency calculation when processing dependent triggers in the same history syncer batch (wiper)
+.......P.. [ZBX-12117] fixed proxy passing zeros to history export modules instead of actual numeric values (gleb)
+..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
+..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
+..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.10
+
+3.2.10rc1 was released as 3.2.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.2.10rc1
@@ -918,6 +970,24 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.14rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
+A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
+..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
+........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
+..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
+...G...... [ZBX-10710] fixed CPU guest time utilization accounting in Linux (valdis)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.13
+
+3.0.13rc1 was released as 3.0.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.13rc1
