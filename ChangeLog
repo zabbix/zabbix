@@ -26,6 +26,8 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
+.......P.. [ZBX-12971] fixed Zabbix proxy not to send same host availability more than once (vso)
 ........S. [ZBX-12800] fixed incorrect trigger dependency calculation when processing dependent triggers in the same history syncer batch (wiper)
 A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
 ..F....... [ZBX-12926] fixed translation string on administration general housekeeping page (gcalenko)
@@ -973,6 +975,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
 A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
 ..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
 ........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
