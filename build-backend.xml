@@ -65,24 +65,18 @@
 <!--					<arg line="${@{name}}"/>-->
 					<arg line="--enable-agent"/>
 				</exec>
-				<trycatch>
-					<try>
-						<exec executable="scan-build" failonerror="on">
-							<arg line="-o"/>
-							<arg line="./clang-scan-build-reports"/>
-							<arg line="make"/>
-							<arg line="-s"/>
-							<arg line="-j5"/>
-						</exec>
-					</try>
-					<finally>
-						<exec executable="make" failonerror="on">
-							<arg line="-s"/>
-							<arg line="-j5"/>
-							<arg line="clean"/>
-						</exec>
-					</finally>
-				</trycatch>
+				<exec executable="make" failonerror="on">
+					<arg line="-s"/>
+					<arg line="-j5"/>
+					<arg line="clean"/>
+				</exec>
+				<exec executable="scan-build" failonerror="on">
+					<arg line="-o"/>
+					<arg line="./clang-scan-build-reports"/>
+					<arg line="make"/>
+					<arg line="-s"/>
+					<arg line="-j5"/>
+				</exec>
 <!--			</sequential>
 		</for>-->
 	</target>
@@ -130,22 +124,16 @@
 				<arg line="--prefix=$(pwd)/install"/>
 				<arg line="CFLAGS=&quot;${common.cflags} ${cc.cflags}&quot;"/>
 			</exec>
-			<trycatch>
-				<try>
-					<exec executable="make" failonerror="on">
-						<arg line="-s"/>
-						<arg line="-j5"/>
-						<arg line="@{target}"/>
-					</exec>
-				</try>
-				<finally>
-					<exec executable="make" failonerror="on">
-						<arg line="-s"/>
-						<arg line="-j5"/>
-						<arg line="clean"/>
-					</exec>
-				</finally>
-			</trycatch>
+			<exec executable="make" failonerror="on">
+				<arg line="-s"/>
+				<arg line="-j5"/>
+				<arg line="clean"/>
+			</exec>
+			<exec executable="make" failonerror="on">
+				<arg line="-s"/>
+				<arg line="-j5"/>
+				<arg line="@{target}"/>
+			</exec>
 		</sequential>
 	</macrodef>
 
@@ -226,18 +214,18 @@
 			<make cc="clang" args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
-	
-	<target name="make-db-mysql" unless="${with.mysql}">
-		<!-- Build Zabbix with postgresql database -->
-		<sequential>
-			<make args="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		</sequential>
-	</target>
 
 	<target name="make-db-postgresql" unless="${with.postgresql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
 			<make args="--enable-server --enable-agent --enable-proxy --with-postgresql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
+		</sequential>
+	</target>
+
+	<target name="make-db-mysql" unless="${with.mysql}">
+		<!-- Build Zabbix with postgresql database -->
+		<sequential>
+			<make args="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
 
@@ -275,8 +263,6 @@
 			<make args="--enable-server --enable-proxy --with-mysql --with-libxml2" target="tests"/>
 		</sequential>
 	</target>
-	
-	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
 	<target name="make-dist" depends="init">
 		<!-- Create & build Zabbix distribution -->
@@ -296,6 +282,8 @@
 			<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true" />
 		</sequential>
 	</target>
+
+	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
 	<target name="build" depends="init,make-clang,make-dist"/>
 </project>
