@@ -95,8 +95,8 @@ AC_DEFUN([AX_LIB_MYSQL],
                         _client_lib_name="perconaserverclient"
 
                 ;;
-                    -lmariadb)
-                        _client_lib_name="mariadb"
+                    -lmariadbclient)
+                        _client_lib_name="mariadbclient"
                 ;;
                     -L*)
                         MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"
