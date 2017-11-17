@@ -2296,7 +2296,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 	}
 
-	if (0 == cache->history_num)
+	if (0 == cache->history_num && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		/* try flushing correlated event queue in the case      */
 		/* some OK events are queued from the last history sync */
