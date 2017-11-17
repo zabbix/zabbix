@@ -892,20 +892,20 @@ static int	housekeeping_events(int now)
 	static zbx_hk_rule_t 	rules[] = {
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			" and not exists (select null from problem where events.eventid = problem.eventid)",
-			0, &cfg.hk.events_trigger},
+			" and not exists (select null from problem where events.eventid=problem.eventid"
+			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_trigger},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			" and not exists (select null from problem where events.eventid = problem.eventid)",
-			0, &cfg.hk.events_internal},
+			" and not exists (select null from problem where events.eventid=problem.eventid"
+			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
-			" and not exists (select null from problem where events.eventid = problem.eventid)",
-			0, &cfg.hk.events_internal},
+			" and not exists (select null from problem where events.eventid=problem.eventid"
+			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
-			" and not exists (select null from problem where events.eventid = problem.eventid)",
-			0, &cfg.hk.events_internal},
+			" and not exists (select null from problem where events.eventid=problem.eventid"
+			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
@@ -1014,11 +1014,11 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
 		d_cleanup = housekeeping_cleanup();
 
-		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
-		d_events = housekeeping_events(now);
-
 		zbx_setproctitle("%s [removing old problems]", get_process_type_string(process_type));
 		d_problems = housekeeping_problems(now);
+
+		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
+		d_events = housekeeping_events(now);
 
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
 		d_sessions = housekeeping_sessions(now);
