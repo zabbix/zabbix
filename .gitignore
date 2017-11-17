@@ -288,6 +288,7 @@ src/zabbix_sender/Makefile
 src/zabbix_sender/Makefile.in
 src/zabbix_sender/zabbix_sender
 src/zabbix_server/.deps
+src/zabbix_server/.dirstamp
 src/zabbix_server/Makefile
 src/zabbix_server/Makefile.in
 src/zabbix_server/alerter/.deps
