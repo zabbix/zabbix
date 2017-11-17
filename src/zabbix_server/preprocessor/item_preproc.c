@@ -157,11 +157,6 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
 	{
 		case ZBX_VARIANT_DBL:
 			value_dbl = value_num.data.dbl * atof(params);
-			if (FAIL == zbx_validate_value_dbl(value_dbl))
-			{
-				*errmsg = zbx_strdup(*errmsg, "value is too small or too large");
-				return FAIL;
-			}
 			zbx_variant_clear(value);
 			zbx_variant_set_dbl(value, value_dbl);
 			break;
