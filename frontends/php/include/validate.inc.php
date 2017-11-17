@@ -311,6 +311,10 @@ function check_field(&$fields, &$field, $checks) {
 		}
 	}
 
+	if ($flags & P_CRLF) {
+		$_REQUEST[$field] = CRLFtoLF($_REQUEST[$field]);
+	}
+
 	if (!($flags & P_NO_TRIM)) {
 		check_trim($_REQUEST[$field]);
 	}
