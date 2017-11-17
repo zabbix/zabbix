@@ -329,6 +329,14 @@ zbx_config_t;
 
 typedef struct
 {
+	zbx_uint64_t	hostid;
+	const char	*field_name;
+	char		*value;
+}
+zbx_inventory_value_t;
+
+typedef struct
+{
 	char	*tag;
 }
 zbx_corr_condition_tag_t;

@@ -111,13 +111,7 @@ typedef struct
 }
 ZBX_DC_HISTORY;		/* structure for copying data about one item from history cache to temporary array */
 
-typedef struct
-{
-	zbx_uint64_t	hostid;
-	const char	*field_name;
-	char		*value_esc;
-}
-zbx_inventory_value_t;
+
 
 /* value_avg_t structure is used for item average value trend calculations. */
 /*                                                                          */
@@ -948,7 +942,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 
 	inventory_value->hostid = item->host.hostid;
 	inventory_value->field_name = inventory_field;
-	inventory_value->value_esc = DBdyn_escape_field("host_inventory", inventory_field, value);
+	inventory_value->value = DBdyn_escape_field("host_inventory", inventory_field, value);
 
 	zbx_vector_ptr_append(inventory_values, inventory_value);
 }
@@ -963,7 +957,7 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, zbx_vector_ptr_t *inv
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
-				inventory_value->field_name, inventory_value->value_esc, inventory_value->hostid);
+				inventory_value->field_name, inventory_value->value, inventory_value->hostid);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, sql_offset);
 	}
@@ -971,7 +965,7 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, zbx_vector_ptr_t *inv
 
 static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
 {
-	zbx_free(inventory_value->value_esc);
+	zbx_free(inventory_value->value);
 	zbx_free(inventory_value);
 }
 
