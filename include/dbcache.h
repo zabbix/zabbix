@@ -330,6 +330,7 @@ zbx_config_t;
 typedef struct
 {
 	zbx_uint64_t	hostid;
+	unsigned char	link;
 	const char	*field_name;
 	char		*value;
 }
@@ -567,6 +568,8 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff);
 
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
+
+void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2

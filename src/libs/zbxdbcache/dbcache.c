@@ -941,8 +941,9 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 	inventory_value = zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
 
 	inventory_value->hostid = item->host.hostid;
+	inventory_value->link = item->inventory_link;
 	inventory_value->field_name = inventory_field;
-	inventory_value->value = DBdyn_escape_field("host_inventory", inventory_field, value);
+	inventory_value->value = zbx_strdup(NULL, value);
 
 	zbx_vector_ptr_append(inventory_values, inventory_value);
 }
@@ -950,16 +951,21 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 static void	DCadd_update_inventory_sql(size_t *sql_offset, zbx_vector_ptr_t *inventory_values)
 {
 	int	i;
+	char	*value;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
 		zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
 
+		value = DBdyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
-				inventory_value->field_name, inventory_value->value, inventory_value->hostid);
+				inventory_value->field_name, value, inventory_value->hostid);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, sql_offset);
+
+		zbx_free(value);
 	}
 }
 
@@ -1463,6 +1469,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
+
+		DCconfig_update_inventory_values(&inventory_values);
 	}
 
 	if (0 != item_diff.values_num)

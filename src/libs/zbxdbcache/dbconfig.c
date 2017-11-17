@@ -10790,3 +10790,28 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 
 	UNLOCK_CACHE;
 }
+
+void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
+{
+	ZBX_DC_HOST_INVENTORY	*host_inventory = NULL;
+	int			i;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < inventory_values->values_num; i++)
+	{
+		zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+
+		if (NULL == host_inventory || inventory_value->hostid != host_inventory->hostid)
+		{
+			host_inventory = zbx_hashset_search(&config->host_inventories, &inventory_value->hostid);
+
+			if (NULL == host_inventory)
+				continue;
+		}
+
+		DCstrpool_replace(1, &(host_inventory->fields[inventory_value->link]), inventory_value->value);
+	}
+
+	UNLOCK_CACHE;
+}
