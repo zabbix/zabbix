@@ -222,10 +222,8 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			'&active='.$media['active'];
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
-			$media['sendto'] = array_filter($media['sendto']);
-
 			foreach ($media['sendto'] as $email) {
-				$media_url .= '&sendto[]='.urlencode($email);
+				$media_url .= '&sendto_emails[]='.urlencode($email);
 			}
 		}
 		else {

@@ -206,11 +206,11 @@ function Confirm(msg) {
 /**
  * Function removes input elements in specified form that matches given selector.
  *
- * @param object|string form_name  form element in which input elements will be selected. If given value is 'null', the
- *                                 DOM document object will be used.
- * @param string selector          string containing one or more commas separated CSS selectors.
+ * @param {object}|{string}  form_name  Form element in which input elements will be selected. If given value is 'null',
+ *                                      the DOM document object will be used.
+ * @param {string} selector             String containing one or more commas separated CSS selectors.
  *
- * @returns bool|void
+ * @returns {bool}
  */
 function removeVarsBySelector(form_name, selector) {
 	if (form_name !== null) {
@@ -225,6 +225,7 @@ function removeVarsBySelector(form_name, selector) {
 	}
 
 	var inputs = source.querySelectorAll(selector);
+
 	if (inputs.length) {
 		for (var i in inputs) {
 			if (typeof inputs[i] === 'object') {

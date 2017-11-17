@@ -21,30 +21,56 @@
 
 class CEmailValidatorTest extends PHPUnit_Framework_TestCase {
 
-	public function providerValidateEmail() {
+	/**
+	 * An array of e-mails, results and error messages.
+	 */
+	public function testProvider() {
 		return [
-			['admin@example.com',					true],
-			['Administrator <admin@example.com>',	true],
-			['cool.admin@example.com',				true],
-			['cool.admin@just.example.com',			true],
-			['cool+admin@example.com',				true],
-			['cool-admin@example.com',				true],
-			['___-___@example.com',					true],
-			['noemailaddresshere',					false],
-			['cool@admin@example.com',				false],
-			['@example.com',						false],
-			['Administrator (admin@example.com)',	false],
-			['example.com',							false],
-			['admin@localhost',						false],
-			['admin@localhost',						false],
-			['admin@127.0.0.1',						false],
+			// Valid e-mails.
+			['email@example.com', true, null],
+			['email@subdomain.example.com', true, null],
+			['firstname.lastname@example.com', true, null],
+			['firstname+lastname@example.com', true, null],
+			['firstname-lastname@example.com', true, null],
+			['1234567890@example.com', true, null],
+			['email@[127.0.0.1]', true, null],
+			['"email"@example.com', true, null],
+			['___-___@example.com', true, null],
+			['admin@another-example.com', true, null],
+			['Administrator <admin@example.com>', true, null],
+			['much."more\ unusual"@example.com', true, null],
+			['very."(),:;<>[]".VERY."very@\\very".unusual@strange.example.com', true, null],
+			// Invalid e-mails.
+			['plainaddress', false, 'Invalid email address "plainaddress".'],
+			['email@example', false, 'Invalid email address "email@example".'],
+			['example.com', false, 'Invalid email address "example.com".'],
+			['.email@example.com', false, 'Invalid email address ".email@example.com".'],
+			['email.@example.com', false, 'Invalid email address "email.@example.com".'],
+			['email..email@example.com', false, 'Invalid email address "email..email@example.com".'],
+			['email@example..com', false, 'Invalid email address "email@example..com".'],
+			['email@example@example.com', false, 'Invalid email address "email@example@example.com".'],
+			['email@example.com (John Doe)', false, 'Invalid email address "email@example.com (John Doe)".'],
+			['Administrator (email@example.com)', false, 'Invalid email address "Administrator (email@example.com)".'],
+			['@example.com', false, 'Invalid email address "@example.com".'],
+			['email@-example.com', false, 'Invalid email address "email@-example.com".'],
+			['Abc..123@example.com', false, 'Invalid email address "Abc..123@example.com".'],
+			['#@%^%#$@#$@#.com', false, 'Invalid email address "#@%^%#$@#$@#.com".'],
+			['あいうえお@example.com', false, 'Invalid email address "あいうえお@example.com".'],
+			['admin@localhost', false, 'Invalid email address "admin@localhost".'],
+			['admin@127.0.0.1', false, 'Invalid email address "admin@127.0.0.1".'],
+			['"(),:;<>[\]@example.com', false, 'Invalid email address ""(),:;<>[\]@example.com".'],
+			['just"not"right@example.com', false, 'Invalid email address "just"not"right@example.com".'],
+			['this\ is"really"not\allowed@example.com', false, 'Invalid email address "this\ is"really"not\allowed@example.com".']
 		];
 	}
 
 	/**
-	 * @dataProvider providerValidateEmail
+	 * @dataProvider testProvider
 	 */
-	public function test_validateURL($email, $expected) {
-		$this->assertEquals((new CEmailValidator())->validate($email), $expected);
+	public function testValidateEmail($email, $expected, $error) {
+		$email_validator = new CEmailValidator();
+		$result = $email_validator->validate($email);
+		$this->assertSame($result, $expected);
+		$this->assertSame($email_validator->getError(), $error);
 	}
 }

@@ -299,8 +299,8 @@ class CUser extends CApiService {
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
 		$this->checkUserGroups($users);
-		$this->checkMediaTypes($users);
-		$this->validateMediaRecipients($users);
+		$db_mediatypes = $this->checkMediaTypes($users);
+		$this->validateMediaRecipients($users, $db_mediatypes);
 	}
 
 	/**
@@ -442,8 +442,8 @@ class CUser extends CApiService {
 			$this->checkDuplicates($aliases);
 		}
 		$this->checkUserGroups($users);
-		$this->checkMediaTypes($users);
-		$this->validateMediaRecipients($users);
+		$db_mediatypes = $this->checkMediaTypes($users);
+		$this->validateMediaRecipients($users, $db_mediatypes);
 		$this->checkHimself($users);
 	}
 
@@ -509,10 +509,12 @@ class CUser extends CApiService {
 	/**
 	 * Check for valid media types.
 	 *
-	 * @param array $users
-	 * @param array $users[]['user_medias']  (optional)
+	 * @param array $users                               Array of users.
+	 * @param array $users[]['user_medias']  (optional)  Array of user medias.
 	 *
-	 * @throws APIException  if user media type is not exists.
+	 * @throws APIException if user media type does not exist.
+	 *
+	 * @return array                                     Returns valid media types.
 	 */
 	private function checkMediaTypes(array $users) {
 		$mediatypeids = [];
@@ -526,13 +528,13 @@ class CUser extends CApiService {
 		}
 
 		if (!$mediatypeids) {
-			return;
+			return [];
 		}
 
 		$mediatypeids = array_keys($mediatypeids);
 
 		$db_mediatypes = DB::select('media_type', [
-			'output' => [],
+			'output' => ['mediatypeid', 'type'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
@@ -544,72 +546,61 @@ class CUser extends CApiService {
 				);
 			}
 		}
+
+		return $db_mediatypes;
 	}
 
 	/**
-	 * Validate if passed ['sendto'] value is valid input according the mediatype.
+	 * Check if the passed 'sendto' value is a valid input according to the mediatype. Currently validates
+	 * only e-mail media types.
 	 *
-	 * @param array         $users
-	 * @param int           $users[]['user_medias'][]['mediatypeid']
-	 * @param array|string  $users[]['user_medias'][]['sendto']
+	 * @param array         $users                                    Array of users.
+	 * @param string        $users[]['user_medias'][]['mediatypeid']  Media type ID.
+	 * @param array|string  $users[]['user_medias'][]['sendto']       Address where to send the alert.
+	 * @param array         $db_mediatypes                            List of available media types.
 	 *
-	 * @throws APIException
+	 * @throws APIException if e-mail is not valid or exeeds maximum DB field length.
 	 */
-	private function validateMediaRecipients(array $users) {
-		$mediatypeids = [];
+	private function validateMediaRecipients(array $users, array $db_mediatypes) {
+		if ($db_mediatypes) {
+			$email_mediatypes = [];
 
-		foreach ($users as $user) {
-			if (array_key_exists('user_medias', $user)) {
-				foreach ($user['user_medias'] as $media) {
-					$mediatypeids[$media['mediatypeid']] = true;
+			foreach ($db_mediatypes as $db_mediatype) {
+				if ($db_mediatype['type'] == MEDIA_TYPE_EMAIL) {
+					$email_mediatypes[$db_mediatype['mediatypeid']] = true;
 				}
 			}
-		}
 
-		if (!$mediatypeids) {
-			return;
-		}
+			// Validate e-mails for all users.
+			if ($email_mediatypes) {
+				$max_length = DB::getFieldLength('media', 'sendto');
+				$email_validator = new CEmailValidator();
 
-		$db_email_medias = DB::select('media_type', [
-			'output' => [],
-			'filter' => [
-				'mediatypeid' => array_keys($mediatypeids),
-				'type' => MEDIA_TYPE_EMAIL
-			],
-			'preservekeys' => true
-		]);
+				foreach ($users as $user) {
+					if (array_key_exists('user_medias', $user)) {
+						foreach ($user['user_medias'] as $media) {
+							if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
+								if (!is_array($media['sendto'])) {
+									$media['sendto'] = [$media['sendto']];
+								}
 
-		if (!$db_email_medias) {
-			return;
-		}
-
-		$max_length = DB::getFieldLength('media', 'sendto');
-
-		foreach ($users as $user) {
-			if (array_key_exists('user_medias', $user)) {
-				foreach ($user['user_medias'] as $media) {
-					if (array_key_exists($media['mediatypeid'], $db_email_medias)) {
-						if (!is_array($media['sendto'])) {
-							$media['sendto'] = [$media['sendto']];
-						}
-
-						$are_emails_valid = true;
-						foreach ($media['sendto'] as $sendto) {
-							if ((new CEmailValidator())->validate($sendto) === false) {
-								$are_emails_valid = false;
-								break;
+								foreach ($media['sendto'] as $sendto) {
+									if (!$email_validator->validate($sendto)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Invalid email address for media type with ID "%1$s".',
+												$media['mediatypeid']
+											)
+										);
+									}
+									elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
+												$media['mediatypeid']
+											)
+										);
+									}
+								}
 							}
-						}
-
-						if ($are_emails_valid === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid email address for media type with ID "%1$s".', $media['mediatypeid'])
-							);
-						}
-						elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
-									$media['mediatypeid']));
 						}
 					}
 				}
