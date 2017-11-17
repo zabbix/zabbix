@@ -1066,11 +1066,19 @@ static void	dc_history_set_error(ZBX_DC_HISTORY *hdata, char *errmsg)
 static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type, zbx_variant_t *value)
 {
 	int	ret;
+	char	*errmsg = NULL;
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			ret = zbx_variant_convert(value, ZBX_VARIANT_DBL);
+			if (SUCCEED == (ret = zbx_variant_convert(value, ZBX_VARIANT_DBL)))
+			{
+				if (FAIL == (ret = zbx_validate_value_dbl(value->data.dbl)))
+				{
+					errmsg = zbx_dsprintf(NULL, "Value " ZBX_FS_DBL " is too small or too large.",
+							value->data.dbl);
+				}
+			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			ret = zbx_variant_convert(value, ZBX_VARIANT_UI64);
@@ -1087,11 +1095,12 @@ static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type,
 
 	if (FAIL == ret)
 	{
-		char	*errmsg;
-
-		errmsg = zbx_dsprintf(NULL, "Value \"%s\" of type \"%s\" is not suitable for"
-			" value type \"%s\"", zbx_variant_value_desc(value),
-			zbx_variant_type_desc(value), zbx_item_value_type_string(value_type));
+		if (NULL == errmsg)
+		{
+			errmsg = zbx_dsprintf(NULL, "Value \"%s\" of type \"%s\" is not suitable for"
+				" value type \"%s\"", zbx_variant_value_desc(value),
+				zbx_variant_type_desc(value), zbx_item_value_type_string(value_type));
+		}
 
 		dc_history_set_error(hdata, errmsg);
 		return FAIL;
@@ -1182,8 +1191,8 @@ static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 			case ITEM_VALUE_TYPE_FLOAT:
 				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl))
 				{
-					dc_history_set_error(hdata, zbx_strdup(NULL,
-							"Value is too small or too large."));
+					dc_history_set_error(hdata, zbx_dsprintf(NULL, "Value " ZBX_FS_DBL
+							" is too small or too large.", hdata->value.dbl));
 					return FAIL;
 				}
 				break;

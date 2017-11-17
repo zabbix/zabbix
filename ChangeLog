@@ -27,6 +27,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+........S. [ZBX-13027] fixed floating range validation during conversion from uint64 to float (wiper)
 ........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
 ........S. [ZBX-11426] fixed potentially incorrect delete procedure for problems and events (abs)
 ....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
