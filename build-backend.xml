@@ -140,7 +140,7 @@
 					</exec>
 					<if>
 						<not >
-							<equals arg1="${post-action}" arg2=""/>
+							<equals arg1="@{post-action}" arg2=""/>
 						</not>
 						<then>
 							<antcall target="@{post-action}"/>
