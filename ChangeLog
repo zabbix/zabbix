@@ -27,6 +27,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
 ........S. [ZBX-11426] fixed potentially incorrect delete procedure for problems and events (abs)
 ....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
 ........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
@@ -422,6 +423,7 @@ Changes for 3.2.11rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
 ........S. [ZBX-11426] fixed potentially incorrect delete procedure for problems and events (abs)
 ........S. [ZBX-12800] fixed incorrect trigger dependency calculation when processing dependent triggers in the same history syncer batch (wiper)
 .......P.. [ZBX-12117] fixed proxy passing zeros to history export modules instead of actual numeric values (gleb)

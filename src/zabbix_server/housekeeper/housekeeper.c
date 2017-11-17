@@ -678,11 +678,11 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_events_cleanup                                                *
+ * Function: hk_problem_cleanup                                              *
  *                                                                            *
- * Purpose: perform events or problems table cleanup                          *
+ * Purpose: perform problem table cleanup                                     *
  *                                                                            *
- * Parameters: table    - [IN] the table name                                 *
+ * Parameters: table    - [IN] the problem table name                         *
  * Parameters: source   - [IN] the event source                               *
  *             object   - [IN] the event object type                          *
  *             objectid - [IN] the event object identifier                    *
@@ -692,7 +692,7 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
  * Return value: number of rows deleted                                       *
  *                                                                            *
  ******************************************************************************/
-static int	hk_events_cleanup(const char *table, int source, int object, zbx_uint64_t objectid, int *more)
+static int	hk_problem_cleanup(const char *table, int source, int object, zbx_uint64_t objectid, int *more)
 {
 	char	filter[MAX_STRING_LEN];
 	int	ret;
@@ -801,25 +801,25 @@ static int	housekeeping_cleanup()
 		ZBX_STR2UINT64(housekeeperid, row[0]);
 		ZBX_STR2UINT64(objectid, row[3]);
 
-		if (0 == strcmp(row[1], "events"))
+		if (0 == strcmp(row[1], "events")) /* events name is used for backwards compatibility with frontend */
 		{
-			const char	*table_name = ZBX_HK_OPTION_ENABLED == cfg.hk.events_mode ? "events" : "problem";
+			const char	*table_name = "problem";
 
 			if (0 == strcmp(row[2], "triggerid"))
 			{
-				deleted += hk_events_cleanup(table_name, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
+				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
 						objectid, &more);
-				deleted += hk_events_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER,
+				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER,
 						objectid, &more);
 			}
 			else if (0 == strcmp(row[2], "itemid"))
 			{
-				deleted += hk_events_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM,
+				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM,
 						objectid, &more);
 			}
 			else if (0 == strcmp(row[2], "lldruleid"))
 			{
-				deleted += hk_events_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE,
+				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE,
 						objectid, &more);
 			}
 		}
@@ -1011,9 +1011,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sec = zbx_time();
 		d_history_and_trends = housekeeping_history_and_trends(now);
 
-		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
-		d_cleanup = housekeeping_cleanup();
-
 		zbx_setproctitle("%s [removing old problems]", get_process_type_string(process_type));
 		d_problems = housekeeping_problems(now);
 
@@ -1028,6 +1025,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
 		d_audit = housekeeping_audit(now);
+
+		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
+		d_cleanup = housekeeping_cleanup();
 
 		sec = zbx_time() - sec;
 

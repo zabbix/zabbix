@@ -1085,6 +1085,7 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	DBexecute("%s", sql);
 
+	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
 	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));
 
 	zbx_vector_uint64_destroy(&selementids);
@@ -1388,6 +1389,8 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBdelete_triggers_by_itemids(itemids);
 
 	DBadd_to_housekeeper(itemids, "itemid", history_tables, ARRSIZE(history_tables));
+
+	/* add housekeeper task to delete problems associated with item, this allows old events to be deleted */
 	DBadd_to_housekeeper(itemids, "itemid", event_tables, ARRSIZE(event_tables));
 	DBadd_to_housekeeper(itemids, "lldruleid", event_tables, ARRSIZE(event_tables));
 
