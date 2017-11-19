@@ -13,6 +13,7 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
 ....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
 ...G...PS. [ZBX-12983] fixed compilation warnings under Windows (valdis)
