@@ -98,7 +98,7 @@ if ($httptestid = getRequest('httptestid', false)) {
 	$name = getRequest('name', '');
 }
 elseif ($items = getRequest('items', [])) {
-	asort_by_key($items, 'sortorder');
+	CArrayHelper::sort($items, ['sortorder']);
 
 	$dbItems = API::Item()->get([
 		'itemids' => zbx_objectValues($items, 'itemid'),
