@@ -1065,17 +1065,6 @@ function natksort(&$array) {
 	return true;
 }
 
-function asort_by_key(&$array, $key) {
-	if (!is_array($array)) {
-		error(_('Incorrect type of asort_by_key.'));
-		return [];
-	}
-	$key = htmlspecialchars($key);
-	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-
-	return $array;
-}
-
 // recursively sort an array by key
 function zbx_rksort(&$array, $flags = null) {
 	if (is_array($array)) {
