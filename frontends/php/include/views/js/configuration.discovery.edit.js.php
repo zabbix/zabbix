@@ -28,75 +28,90 @@
 	?>
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
-	<div id="new_check_form">
-		<div class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
-			<table>
-				<tbody>
-				<tr>
-					<td>
-						<label for="type" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('Check type') ?></label>
-					</td>
-					<td><select id="type" name="type" aria-required="true"></select></td>
-				</tr>
-				<tr id="newCheckPortsRow">
-					<td>
-						<label for="ports" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('Port range') ?></label>
-					</td>
-					<td>
-						<input type="text" id="ports" name="ports" value=""
-							style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="255" aria-required="true">
-					</td>
-				</tr>
-				<tr id="newCheckCommunityRow">
-					<td>
-						<label for="snmp_community" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('SNMP community') ?></label>
-					</td>
-					<td>
-						<input type="text" id="snmp_community" name="snmp_community" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255" aria-required="true">
-					</td>
-				</tr>
-				<tr id="newCheckKeyRow">
-					<td><label for="key_" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('Key') ?></label></td>
-					<td>
-						<input type="text" id="key_" name="key_" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255" aria-required="true">
-					</td>
-				</tr>
-				<tr id="new_check_snmp_oid_row">
-					<td>
-						<label for="snmp_oid" class="<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>"><?= _('SNMP OID') ?></label>
-					</td>
-					<td>
-						<input type="text" id="snmp_oid" name="snmp_oid" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="512" aria-required="true">
-					</td>
-				</tr>
-				<tr id="newCheckContextRow">
-					<td><label for="snmpv3_contextname"><?= _('Context name') ?></label></td>
-					<td>
-						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255">
-					</td>
-				</tr>
-				<tr id="newCheckSecNameRow">
-					<td><label for="snmpv3_securityname"><?= _('Security name') ?></label></td>
-					<td>
-						<input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="64">
-					</td>
-				</tr>
-				<tr id="newCheckSecLevRow">
-					<td><label for="snmpv3_securitylevel"><?= _('Security level') ?></label></td>
-					<td>
-						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel">
-							<option value="0"><?= 'noAuthNoPriv' ?> </option>
-							<option value="1"><?= 'authNoPriv' ?> </option>
-							<option value="2"><?= 'authPriv' ?> </option>
-						</select>
-					</td>
-				</tr>
-				<?= (new CRow([
+<?=
+	(new CDiv(
+		(new CDiv([
+			(new CTable())
+				->addRow(
+					(new CRow([
+						(new CLabel(_('Check type'), 'type'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CTag('select', true))
+							->setAttribute('aria-required', 'true')
+							->setName('type')
+							->setId('type')
+					]))
+				)
+				->addRow(
+					(new CRow([
+						(new CLabel(_('Port range'), 'ports'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CTextBox('ports'))
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAttribute('aria-required', 'true')
+							->setAttribute('maxlength', 255)
+					]))
+						->setId('newCheckPortsRow')
+				)
+				->addRow(
+					(new CRow([
+						(new CLabel(_('SNMP community'), 'snmp_community'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CTextBox('snmp_community'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('aria-required', 'true')
+							->setAttribute('maxlength', 255)
+					]))
+						->setId('newCheckCommunityRow')
+				)
+				->addRow(
+					(new CRow([
+						(new CLabel(_('Key'), 'key_'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CTextBox('key_'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('aria-required', 'true')
+							->setAttribute('maxlength', 255)
+					]))
+						->setId('newCheckKeyRow')
+				)
+				->addRow(
+					(new CRow([
+						(new CLabel(_('SNMP OID'), 'snmp_oid'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CTextBox('snmp_oid'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('aria-required', 'true')
+							->setAttribute('maxlength', 512)
+					]))
+						->setId('new_check_snmp_oid_row')
+				)
+				->addRow(
+					(new CRow([
+						(new CLabel(_('Context name'), 'snmpv3_contextname')),
+						(new CTextBox('snmpv3_contextname'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('maxlength', 255)
+					]))
+						->setId('newCheckContextRow')
+				)
+				->addRow(
+					(new CRow([
+						(new CLabel(_('Security name'), 'snmpv3_securityname')),
+						(new CTextBox('snmpv3_securityname'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('maxlength', 64)
+					]))
+						->setId('newCheckSecNameRow')
+				)
+				->addRow(
+					(new CRow([
+						new CLabel(_('Security level'), 'snmpv3_securitylevel'),
+						new CComboBox('snmpv3_securitylevel', null, null, [
+							ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+						])
+					]))
+						->setId('newCheckSecLevRow')
+				)
+				->addRow(
+					(new CRow([
 						_('Authentication protocol'),
 						(new CRadioButtonList('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5))
 							->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
@@ -104,16 +119,18 @@
 							->setModern(true)
 					]))
 						->setId('newCheckAuthProtocolRow')
-						->toString()
-				?>
-				<tr id="newCheckAuthPassRow">
-					<td><label for="snmpv3_authpassphrase"><?= _('Authentication passphrase') ?></label></td>
-					<td>
-						<input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="64">
-					</td>
-				</tr>
-				<?= (new CRow([
+				)
+				->addRow(
+					(new CRow([
+						(new CLabel(_('Authentication passphrase'), 'snmpv3_authpassphrase')),
+						(new CTextBox('snmpv3_authpassphrase'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('maxlength', 64)
+					]))
+						->setId('newCheckAuthPassRow')
+				)
+				->addRow(
+					(new CRow([
 						_('Privacy protocol'),
 						(new CRadioButtonList('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES))
 							->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
@@ -121,24 +138,28 @@
 							->setModern(true)
 					]))
 						->setId('newCheckPrivProtocolRow')
-						->toString()
-				?>
-				<tr id="newCheckPrivPassRow">
-					<td><label for="snmpv3_privpassphrase"><?= _('Privacy passphrase') ?></label></td>
-					<td>
-						<input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value=""
-							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="64">
-					</td>
-				</tr>
-				</tbody>
-			</table>
-			<?= (new CHorList([
-					(new CButton('add_new_dcheck', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-					(new CButton('cancel_new_dcheck', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
-				]))->toString()
-			?>
-		</div>
-	</div>
+				)
+				->addRow(
+					(new CRow([
+						(new CLabel(_('Privacy passphrase'), 'snmpv3_privpassphrase')),
+						(new CTextBox('snmpv3_privpassphrase'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('aria-required', 'true')
+							->setAttribute('maxlength', 64)
+					]))
+						->setId('newCheckPrivPassRow')
+				)
+			->addClass('ZBX_STYLE_TABLE_FORMS_SEPARATOR')
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+			,
+			(new CHorList([
+				(new CButton('add_new_dcheck', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
+				(new CButton('cancel_new_dcheck', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+			]))
+		]))
+	))
+		->setId('new_check_form')
+?>
 </script>
 <script type="text/javascript">
 	var ZBX_SVC = {

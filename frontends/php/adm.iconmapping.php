@@ -109,6 +109,9 @@ foreach ($iconList as $icon) {
 	$data['iconList'][$icon['imageid']] = $icon['name'];
 }
 
+reset($iconList);
+$data['default_imageid'] = key($iconList);
+
 $inventoryFields = getHostInventories();
 foreach ($inventoryFields as $field) {
 	$data['inventoryList'][$field['nr']] = $field['title'];
