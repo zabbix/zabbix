@@ -68,6 +68,9 @@ $actions = [
 if (!$items_numeric) {
 	unset($actions[HISTORY_GRAPH]);
 }
+elseif (count($this->data['items']) > 1) {
+	unset($actions[HISTORY_LATEST]);
+}
 
 $action_list = new CList();
 $view_type = [
