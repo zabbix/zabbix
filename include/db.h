@@ -536,7 +536,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t length);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
-int	DBhost_exists(char *server);
 int	DBadd_templates_to_host(int hostid, int host_templateid);
 
 int	DBadd_template_linkage(int hostid, int templateid, int items, int triggers, int graphs);
