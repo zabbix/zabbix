@@ -35,10 +35,7 @@
 				->addRow(
 					(new CRow([
 						(new CLabel(_('Check type'), 'type'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-						(new CTag('select', true))
-							->setAttribute('aria-required', 'true')
-							->setName('type')
-							->setId('type')
+						(new CComboBox('type'))->setAttribute('aria-required', 'true')
 					]))
 				)
 				->addRow(
