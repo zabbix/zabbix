@@ -306,8 +306,6 @@ typedef struct
 }
 ZBX_DC_HOST;
 
-#define ZBX_SYNC_INVENTORY_FIELDS	70
-
 typedef struct
 {
 	zbx_uint64_t	hostid;

@@ -10791,6 +10791,13 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_update_inventory_values                                 *
+ *                                                                            *
+ * Purpose: update host inventory informations in configuration cache         *
+ *                                                                            *
+ ******************************************************************************/
 void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 {
 	ZBX_DC_HOST_INVENTORY	*host_inventory = NULL;
@@ -10814,4 +10821,36 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 	}
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_host_inventory_by_hostid                                   *
+ *                                                                            *
+ * Purpose: get the host inventory from the hostid                            *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_host_inventory_by_hostid(DC_HOST_INVENTORY *dst, zbx_uint64_t hostid)
+{
+	ZBX_DC_HOST_INVENTORY	*src;
+	int			ret = FAIL, i;
+
+	LOCK_CACHE;
+
+	src = zbx_hashset_search(&config->host_inventories, &hostid);
+
+	if (NULL != src)
+	{
+		dst->hostid = src->hostid;
+		dst->inventory_mode = src->inventory_mode;
+
+		for (i = 0; i < ZBX_SYNC_INVENTORY_FIELDS; i++)
+			dst->fields[i] = zbx_strdup(NULL, src->fields[i]);
+
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
 }

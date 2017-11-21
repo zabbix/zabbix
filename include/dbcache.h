@@ -134,6 +134,16 @@ typedef struct
 }
 DC_HOST;
 
+#define ZBX_SYNC_INVENTORY_FIELDS	70
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	unsigned char	inventory_mode;
+	char		*fields[ZBX_SYNC_INVENTORY_FIELDS];
+}
+DC_HOST_INVENTORY;
+
 typedef struct
 {
 	DC_HOST			host;
@@ -570,6 +580,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 		int maintenance_type, int maintenance_from);
 
 void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values);
+int	DCget_host_inventory_by_hostid(DC_HOST_INVENTORY *dst, zbx_uint64_t hostid);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2
