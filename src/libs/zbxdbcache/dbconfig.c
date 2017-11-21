@@ -7981,8 +7981,7 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 	{
 		ha = (zbx_host_availability_t *)availabilities->values[i];
 
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &ha->hostid)) ||
-				HOST_STATUS_MONITORED != dc_host->status)
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &ha->hostid)))
 		{
 			int	j;
 

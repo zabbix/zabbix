@@ -13,6 +13,8 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
+....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
 ...G...PS. [ZBX-12983] fixed compilation warnings under Windows (valdis)
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
@@ -26,6 +28,14 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-13016] fixed warning message shown by deprecated PHP 7.2 function create_function() (Sasha)
+..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
+........S. [ZBX-13027] fixed floating range validation during conversion from uint64 to float (wiper)
+........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
+........S. [ZBX-11426] fixed potentially incorrect delete procedure for problems and events (abs)
+....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
+........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
+.......P.. [ZBX-12971] fixed Zabbix proxy not to send same host availability more than once (vso)
 ........S. [ZBX-12800] fixed incorrect trigger dependency calculation when processing dependent triggers in the same history syncer batch (wiper)
 A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
 ..F....... [ZBX-12926] fixed translation string on administration general housekeeping page (gcalenko)
@@ -340,7 +350,7 @@ Changes for 3.4.0alpha1
 New features:
 A.F.I..... [ZBXNEXT-2102] added support of multiple dashboards; implemented API for dashboards (pavels, maximt, miks, Sasha, vmurzins)
 ..F..J.... [ZBXNEXT-1223] implemented jmx discovery item (vjaceslavs)
-A.F.....S. [ZBXNEXT-2442] implemented parallel alert processing (gcalenko, wiper)
+A.F.....S. [ZBXNEXT-2442] implemented parallel alert processing, removed database watchdog process, moved its tasks to alerter process (gcalenko, wiper)
 A.F.....S. [ZBXNEXT-3863] added jsonpath based item pre-processing option (Ivo, wiper)
 A.F.....S. [ZBXNEXT-3864] added xmlpath based item pre-processing option (Ivo, wiper)
 ...G...... [ZBXNEXT-3930] improved log monitoring by adjusting formula to process 10 times more new lines than set in MaxLinesPerSecond (vso)
@@ -417,6 +427,9 @@ Changes for 3.2.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
+........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
+........S. [ZBX-11426] fixed potentially incorrect delete procedure for problems and events (abs)
 ........S. [ZBX-12800] fixed incorrect trigger dependency calculation when processing dependent triggers in the same history syncer batch (wiper)
 .......P.. [ZBX-12117] fixed proxy passing zeros to history export modules instead of actual numeric values (gleb)
 ..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
@@ -973,6 +986,10 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13016] fixed warning message shown by deprecated PHP 7.2 function create_function() (Sasha)
+..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
+........S. [ZBX-8049] fixed zabbix[java,,ping] to stay supported when java gateway is down (valdis)
+........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
 A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
 ..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
 ........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
