@@ -1,12 +1,10 @@
 noinst_PROGRAMS = dbselect_uint64
 
 dbselect_uint64_SOURCES = \
-	dbselect_uint64.json \
 	dbselect_uint64.c \
 	../../../src/zabbix_server/actions.c \
 	../../../src/zabbix_server/events.c \
 	../../../src/zabbix_server/operations.c \
-	../../zbxmocktest.c \
 	../../zbxmocktest.h
 
 dbselect_uint64_LDADD = \
@@ -66,6 +64,7 @@ dbselect_uint64_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 dbselect_uint64_LDADD += @SERVER_LIBS@
