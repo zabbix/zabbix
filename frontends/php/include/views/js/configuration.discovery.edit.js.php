@@ -141,7 +141,8 @@
 				)
 				->addRow(
 					(new CRow([
-						(new CLabel(_('Privacy passphrase'), 'snmpv3_privpassphrase')),
+						(new CLabel(_('Privacy passphrase'), 'snmpv3_privpassphrase'))
+							->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
 						(new CTextBox('snmpv3_privpassphrase'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAttribute('aria-required', 'true')
