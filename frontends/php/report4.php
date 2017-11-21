@@ -137,7 +137,10 @@ else {
 	]);
 
 	foreach ($db_users as $user_data) {
-		$header[] = (new CColHeader(getUserFullname($user_data)))->addClass('vertical_rotation');
+		$full_name = getUserFullname($user_data);
+		$header[] = (new CColHeader($full_name))
+			->addClass('vertical_rotation')
+			->setAttribute('title', $full_name);
 		$users[] = $user_data['userid'];
 	}
 
