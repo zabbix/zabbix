@@ -72,7 +72,11 @@ var PageRefresh = {
 
 		this.delayLeft -= 1000;
 		if (this.delayLeft < 0) {
-			location.replace(location.href);
+			if (IE || ED) {
+				sessionStorage.scrollTop = jQuery(window).scrollTop();
+			}
+
+			location.reload();
 		}
 		else {
 			this.timeout = setTimeout('PageRefresh.check()', 1000);
@@ -968,4 +972,8 @@ jQuery(function ($) {
 			verticalHeaderTables[table.attr('id')] = table;
 		});
 	};
+
+	if ((IE || ED) && typeof sessionStorage.scrollTop !== 'undefined') {
+		$(window).scrollTop(sessionStorage.scrollTop);
+	}
 });

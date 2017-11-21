@@ -13,6 +13,7 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+..F....... [ZBX-12663] fixed retaining the scrollbar position on page reload (Ivo)
 ..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
 ..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
 ....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
@@ -29,6 +30,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-12663] fixed retaining the scrollbar position on page reload (Ivo)
 ..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
 ..F....... [ZBX-13016] fixed warning message shown by deprecated PHP 7.2 function create_function() (Sasha)
 ..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
