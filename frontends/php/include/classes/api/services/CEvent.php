@@ -384,28 +384,12 @@ class CEvent extends CApiService {
 
 		// search
 		if (is_array($options['search'])) {
-			if (array_key_exists('name', $options['search'])) {
-				$options['fields_to_extract_results']['name'] = true;
-			}
-
 			zbx_db_search('events e', $options, $sqlParts);
-
-			if (array_key_exists('fields_to_extract_results', $options)) {
-				unset($options['fields_to_extract_results']);
-			}
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			if (array_key_exists('name', $options['filter'])) {
-				$options['fields_to_extract_results']['name'] = true;
-			}
-
 			$this->dbFilter('events e', $options, $sqlParts);
-
-			if (array_key_exists('fields_to_extract_results', $options)) {
-				unset($options['fields_to_extract_results']);
-			}
 		}
 
 		// limit
