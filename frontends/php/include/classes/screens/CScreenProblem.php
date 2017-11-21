@@ -266,7 +266,7 @@ class CScreenProblem extends CScreenBase {
 			];
 
 			if (array_key_exists('name', $filter) && $filter['name'] !== '') {
-				$options['filter']['name'] = $filter['name'];
+				$options['search']['name'] = $filter['name'];
 			}
 
 			if ($filter['show'] == TRIGGERS_OPTION_ALL) {
