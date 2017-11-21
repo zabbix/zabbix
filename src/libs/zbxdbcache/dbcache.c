@@ -1006,13 +1006,13 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 	zbx_vector_ptr_append(inventory_values, inventory_value);
 }
 
-static void	DCadd_update_inventory_sql(size_t *sql_offset, zbx_vector_ptr_t *inventory_values)
+static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
 {
 	int	i;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
-		zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+		const zbx_inventory_value_t	*inventory_value = inventory_values->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
@@ -1420,82 +1420,45 @@ static void	db_save_item_changes(size_t *sql_offset, const zbx_vector_ptr_t *ite
  *                                                                            *
  * Function: DCmass_update_items                                              *
  *                                                                            *
- * Purpose: update item states to supported/not supported, update inventory   *
+ * Purpose: update item data and inventory in database                        *
  *                                                                            *
- * Parameters: history     - array of history data                            *
- *             history_num - number of history structures                     *
- *             items       - items that are used by history data              *
- *             item_diff   - item changes                                     *
- *                                                                            *
- * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
+ * Parameters: item_diff        - item changes                                *
+ *             inventory_values - inventory values                            *
  *                                                                            *
  ******************************************************************************/
-static void	DBmass_update_items(const ZBX_DC_HISTORY *history, int history_num, const DC_ITEM *items,
-		const int *errcodes, zbx_vector_ptr_t *item_diff)
+static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
 {
 	const char		*__function_name = "DCmass_update_items";
 
 	size_t			sql_offset = 0;
-	int			i, update_items_db = 0;
-	zbx_vector_ptr_t	inventory_values;
+	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&inventory_values);
-
-	for (i = 0; i < history_num; i++)
+	for (i = 0; i < item_diff->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h;
-		zbx_item_diff_t		*diff;
-		int			j;
+		zbx_item_diff_t	*diff;
 
-		if (SUCCEED != errcodes[i])
-			continue;
-
-		if (ITEM_STATUS_ACTIVE != items[i].status && HOST_STATUS_MONITORED != items[i].host.status)
-			continue;
-
-		for (j = 0; j < history_num; j++)
-		{
-			if (items[i].itemid == history[j].itemid)
-				break;
-		}
-
-		if (history_num == j)
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		h = &history[j];
-
-		diff = calculate_item_update(&items[i], h);
-		zbx_vector_ptr_append(item_diff, diff);
-		update_items_db |= (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags);
-		DCinventory_value_add(&inventory_values, &items[i], h);
+		diff = item_diff->values[i];
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags))
+			break;
 	}
 
-	if (0 != update_items_db || 0 != inventory_values.values_num)
+	if (i != item_diff->values_num  || 0 != inventory_values->values_num)
 	{
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		if (0 != update_items_db)
+		if (i != item_diff->values_num)
 			db_save_item_changes(&sql_offset, item_diff);
 
-		if (0 != inventory_values.values_num)
-		{
-			zbx_vector_ptr_sort(&inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-			DCadd_update_inventory_sql(&sql_offset, &inventory_values);
-		}
+		if (0 != inventory_values->values_num)
+			DCadd_update_inventory_sql(&sql_offset, inventory_values);
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
 	}
-
-	zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
-	zbx_vector_ptr_destroy(&inventory_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2137,18 +2100,22 @@ static int	dc_item_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_prepare_history                                            *
+ * Function: DCmass_prepare_history                                           *
  *                                                                            *
- * Purpose: prepare history data using items from configuration cache         *
+ * Purpose: prepare history data using items from configuration cache and     *
+ *          generate item changes to be applied and host inventory values to  *
+ *          be added                                                          *
  *                                                                            *
- * Parameters: history     - [IN/OUT] array of history data                   *
- *             items       - [IN] the items                                   *
- *             errcodes    - [IN] item error codes                            *
- *             history_num - [IN] number of history structures                *
+ * Parameters: history          - [IN/OUT] array of history data              *
+ *             items            - [IN] the items                              *
+ *             errcodes         - [IN] item error codes                       *
+ *             history_num      - [IN] number of history structures           *
+ *             item_diff        - [OUT] the changes in item data              *
+ *             inventory_values - [OUT] the inventory values to add           *
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const DC_ITEM *items, const int *errcodes,
-		int history_num)
+		int history_num, zbx_vector_ptr_t *item_diff, zbx_vector_ptr_t *inventory_values)
 {
 	const char	*__function_name = "DCmass_prepare_history";
 	int		i;
@@ -2160,6 +2127,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const DC_ITEM *items
 		ZBX_DC_HISTORY	*h = &history[i];
 		const DC_ITEM	*item;
 		DC_ITEM		item_local;
+		zbx_item_diff_t	*diff;
 
 		item_local.itemid = h->itemid;
 
@@ -2191,7 +2159,13 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const DC_ITEM *items
 		}
 
 		normalize_item_value(item, h);
+
+		diff = calculate_item_update(item, h);
+		zbx_vector_ptr_append(item_diff, diff);
+		DCinventory_value_add(inventory_values, item, h);
 	}
+
+	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2413,7 +2387,7 @@ int	DCsync_history(int sync_type, int *total_num)
 					txn_error;
 	time_t				sync_start, now;
 	zbx_vector_uint64_t		triggerids;
-	zbx_vector_ptr_t		history_items, trigger_diff, item_diff;
+	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff;
 	zbx_binary_heap_t		tmp_history_queue;
 
@@ -2487,6 +2461,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
+		zbx_vector_ptr_create(&inventory_values);
 		zbx_vector_ptr_create(&item_diff);
 		zbx_vector_ptr_create(&trigger_diff);
 		zbx_vector_uint64_pair_create(&trends_diff);
@@ -2547,12 +2522,14 @@ int	DCsync_history(int sync_type, int *total_num)
 
 			zbx_vector_uint64_destroy(&itemids);
 
-			DCmass_prepare_history(history, items, errcodes, history_num);
+			DCmass_prepare_history(history, items, errcodes, history_num, &item_diff, &inventory_values);
 
+			/* process values only if they were successfully stored by the history backend */
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
-				/* process values only if they were successfully stored by the history backend */
-
+				/* trigger calculation requires up to date information */
+				/* in configuration and value caches                   */
+				DCconfig_items_apply_changes(&item_diff);
 				DCmass_add_history(history, history_num);
 				DCmass_update_trends(history, history_num, &trends, &trends_num);
 
@@ -2560,9 +2537,7 @@ int	DCsync_history(int sync_type, int *total_num)
 				{
 					DBbegin();
 
-					DBmass_update_items(history, history_num, items, errcodes, &item_diff);
-					/* update items in cache for trigger calculation, local copy is not changed */
-					DCconfig_items_apply_changes(&item_diff);
+					DBmass_update_items(&item_diff, &inventory_values);
 					DBmass_update_triggers(history, history_num, &trigger_diff);
 					DBmass_update_trends(trends, trends_num, &trends_diff);
 
@@ -2580,7 +2555,7 @@ int	DCsync_history(int sync_type, int *total_num)
 					}
 
 					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-					zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
+
 					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
 				while (ZBX_DB_DOWN == txn_error);
@@ -2588,6 +2563,9 @@ int	DCsync_history(int sync_type, int *total_num)
 
 			DCconfig_unlock_triggers(&triggerids);
 			zbx_free(trends);
+
+			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
+			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
 
 			DCconfig_clean_items(items, errcodes, history_num);
 			zbx_free(errcodes);
@@ -2660,6 +2638,7 @@ int	DCsync_history(int sync_type, int *total_num)
 	zbx_vector_ptr_destroy(&history_items);
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
+		zbx_vector_ptr_destroy(&inventory_values);
 		zbx_vector_ptr_destroy(&item_diff);
 		zbx_vector_ptr_destroy(&trigger_diff);
 		zbx_vector_uint64_pair_destroy(&trends_diff);
