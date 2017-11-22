@@ -1418,7 +1418,7 @@ static void	db_save_item_changes(size_t *sql_offset, const zbx_vector_ptr_t *ite
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_update_items                                              *
+ * Function: DBmass_update_items                                              *
  *                                                                            *
  * Purpose: update item data and inventory in database                        *
  *                                                                            *
@@ -1428,10 +1428,10 @@ static void	db_save_item_changes(size_t *sql_offset, const zbx_vector_ptr_t *ite
  ******************************************************************************/
 static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
 {
-	const char		*__function_name = "DCmass_update_items";
+	const char	*__function_name = "DBmass_update_items";
 
-	size_t			sql_offset = 0;
-	int			i;
+	size_t		sql_offset = 0;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1444,7 +1444,7 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 			break;
 	}
 
-	if (i != item_diff->values_num  || 0 != inventory_values->values_num)
+	if (i != item_diff->values_num || 0 != inventory_values->values_num)
 	{
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
