@@ -4062,7 +4062,11 @@ td.inactive-bg {
 	color: $font-color;
 	border: 2px solid $light-green;
 	background-color: $ui-bg-color;
-	min-height: 21px;
+	text-align: left;
+	right: 0;
+	left: 0;
+	bottom: 0;
+
 	@extend %msg;
 
 	.link-action {
@@ -4089,28 +4093,33 @@ td.inactive-bg {
 	background-color: $light-green;
 	float: left;
 	width: 60px;
-	min-height: 39px;
-	position: relative;
-	margin: -11px 15px 0 -15px;
-
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	position: absolute;
 }
 
 .msg-good:after {
 	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -154px -241px;
-	float: left;
-	width: 40px;
-	min-height: 39px;
-	position: relative;
-	margin: -8px 0 0 -69px;
-
+	background: url(../img/icon-sprite.svg) no-repeat -162px -242px;
+	width: 31px;
+	height: 31px;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	position: absolute;
+	margin-left: 14px;
+	margin-top: 5px;
 }
 
 .msg-bad {
 	color: $font-color;
 	border: 2px solid $light-red;
 	background-color: $ui-bg-color;
-	min-height: 21px;
+	text-align: left;
+	right: 0;
+	left: 0;
+	bottom: 0;
 	@extend %msg;
 
 	.link-action {
@@ -4137,22 +4146,25 @@ td.inactive-bg {
 	background-color: $light-red;
 	float: left;
 	width: 60px;
-	min-height: 39px;
-	position: relative;
-	margin: -11px 15px 0 -15px;
-
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	position: absolute;
 }
 
 .msg-bad:after {
 	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -154px -321px;
-	float: left;
-	width: 40px;
-	min-height: 39px;
-	position: relative;
-	margin: -8px 0 0 -69px;
-
+	background: url(../img/icon-sprite.svg) no-repeat -162px -321px;
+	width: 31px;
+	height: 31px;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	position: absolute;
+	margin-left: 14px;
+	margin-top: 5px;
 }
+
 
 .msg-details {
 	font-size: $font-form-size;
@@ -4173,7 +4185,7 @@ td.inactive-bg {
 		@extend %webkit-scrollbar;
 
 		li {
-			margin: .5em 0 .5em 1em;
+			margin: .5em 0 0 1em;
 
 			&::before {
 				content: '\2013';
@@ -4206,10 +4218,11 @@ td.inactive-bg {
 %msg {
 	font-size: $font-top-nav-size;
 	font-weight: bold;
-	padding: 11px 20px 7px 15px;
-	margin: 0 0 12px 0;
+	padding: 12px 10px 12px 75px;
 	text-align: left;
+	vertical-align: middle;
 	position: relative;
+	margin-bottom: 10px;
 	@include border-radius(2px);
 
 	.overlay-close-btn {
@@ -4220,17 +4233,19 @@ td.inactive-bg {
 .msg-bad-global {
 	display: none;
 	position: fixed;
-	bottom: 0;
 	z-index: 10000;
-	width: 100%;
 	text-align: left;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	vertical-align: middle;
 	font-size: $font-top-nav-size;
 	font-weight: bold;
 	color: $font-color;
 	border: 2px solid $alt-yellow;
 	background-color: $ui-bg-color;
-	min-height: 21px;
 	margin: 0px 10px 0px 10px;
+	padding: 12px 10px 12px 75px;
 }
 
 .msg-bad-global:before {
@@ -4238,21 +4253,23 @@ td.inactive-bg {
 	background-color: $alt-yellow;
 	float: left;
 	width: 60px;
-	min-height: 39px;
-	position: relative;
-	margin: 0px 15px 0 0px;
-
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	position: absolute;
 }
 
 .msg-bad-global:after {
 	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -154px -319px;
-	float: left;
-	width: 40px;
-	min-height: 39px;
-	position: relative;
-	margin: 0 0 0 -70px;
-
+	background: url(../img/icon-sprite.svg) no-repeat -162px -321px;
+	width: 31px;
+	height: 31px;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	position: absolute;
+	margin-left: 14px;
+	margin-top: 3px;
 }
 
 .msg-global {
