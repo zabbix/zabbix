@@ -785,7 +785,9 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 		foreach ($data as $trigger_name => $trigger_data) {
 			foreach ($trigger_data as $trigger_hosts) {
-				$header[] = (new CColHeader($trigger_name))->addClass('vertical_rotation');
+				$header[] = (new CColHeader($trigger_name))
+					->addClass('vertical_rotation')
+					->setTitle($trigger_name);
 			}
 		}
 

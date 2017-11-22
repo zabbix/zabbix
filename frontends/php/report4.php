@@ -140,7 +140,7 @@ else {
 		$full_name = getUserFullname($user_data);
 		$header[] = (new CColHeader($full_name))
 			->addClass('vertical_rotation')
-			->setAttribute('title', $full_name);
+			->setTitle($full_name);
 		$users[] = $user_data['userid'];
 	}
 

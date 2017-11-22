@@ -1003,7 +1003,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 		foreach ($host_names as $host_name) {
 			$header[] = (new CColHeader($host_name))
 				->addClass('vertical_rotation')
-				->setAttribute('title', $host_name);
+				->setTitle($host_name);
 		}
 		$table->setHeader($header);
 
@@ -1023,7 +1023,9 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 		$header = [_('Hosts')];
 		foreach ($items as $item_name => $item_data) {
 			foreach ($item_data as $ithosts) {
-				$header[] = (new CColHeader($item_name))->addClass('vertical_rotation');
+				$header[] = (new CColHeader($item_name))
+					->addClass('vertical_rotation')
+					->setTitle($item_name);
 			}
 		}
 		$table->setHeader($header);
