@@ -1,13 +1,13 @@
-noinst_PROGRAMS = dbselect_uint64
+noinst_PROGRAMS = DBselect_uint64
 
-dbselect_uint64_SOURCES = \
-	dbselect_uint64.c \
+DBselect_uint64_SOURCES = \
+	DBselect_uint64.c \
 	../../../src/zabbix_server/actions.c \
 	../../../src/zabbix_server/events.c \
 	../../../src/zabbix_server/operations.c \
 	../../zbxmocktest.h
 
-dbselect_uint64_LDADD = \
+DBselect_uint64_LDADD = \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
@@ -67,6 +67,6 @@ dbselect_uint64_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-dbselect_uint64_LDADD += @SERVER_LIBS@
+DBselect_uint64_LDADD += @SERVER_LIBS@
 
-dbselect_uint64_CFLAGS = -I@top_srcdir@/tests
+DBselect_uint64_CFLAGS = -I@top_srcdir@/tests

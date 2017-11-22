@@ -12,9 +12,10 @@ noinst_LIBRARIES = \
 	libzbxmockdata.a
 
 libzbxmocktest_a_SOURCES = \
-	zbxmocktest.c
+	zbxmocktest.c \
+	zbxmocktest.h
 
 libzbxmockdata_a_SOURCES = \
-	db_simulation.c \
+	zbxmockdb.c \
 	zbxmockdata.c \
 	zbxmockdata.h
