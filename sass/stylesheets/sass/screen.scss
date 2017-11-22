@@ -1702,7 +1702,7 @@ footer {
 
 label {
 	&.form-label-asterisk {
-		&::before {
+		&:before {
 			color: $form-label-asterisk-color;
 			display: inline-block;
 			content: '*';
