@@ -1482,10 +1482,10 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		if (NULL == (host_inventory = zbx_hashset_search(&config->host_inventories, &rowid)))
 			continue;
 
-		zbx_hashset_remove_direct(&config->host_inventories, host_inventory);
-
-		for (i = 0; ZBX_SYNC_INVENTORY_FIELDS > i;  i++)
+		for (i = 0; ZBX_SYNC_INVENTORY_FIELDS > i; i++)
 			zbx_strpool_release(host_inventory->fields[i]);
+
+		zbx_hashset_remove_direct(&config->host_inventories, host_inventory);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
