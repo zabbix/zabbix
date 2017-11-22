@@ -88,8 +88,8 @@ AC_DEFUN([AX_LIB_MYSQL],
 
             for i in $_full_libmysql_libs; do
                 case $i in
-                    -lmariadb)
-                        _client_lib_name="mariadb"
+                    -lmysqlclient)
+                        _client_lib_name="mysqlclient"
                 ;;
                     -lperconaserverclient)
                         _client_lib_name="perconaserverclient"
