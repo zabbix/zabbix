@@ -771,6 +771,22 @@ out:
 #endif
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mailaddr_free                                                *
+ *                                                                            *
+ * Purpose: frees the mail address object                                     *
+ *                                                                            *
+ * Parameters: mailaddr - [IN] the mail address                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_mailaddr_free(zbx_mailaddr_t *mailaddr)
+{
+	zbx_free(mailaddr->addr);
+	zbx_free(mailaddr->disp_name);
+	zbx_free(mailaddr);
+}
+
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		const char *smtp_email, const char *mailto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
@@ -812,10 +828,10 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 
 clean:
 
-	zbx_vector_ptr_clear_ext(&from_mails, zbx_ptr_free);
+	zbx_vector_ptr_clear_ext(&from_mails, (zbx_clean_func_t)zbx_mailaddr_free);
 	zbx_vector_ptr_destroy(&from_mails);
 
-	zbx_vector_ptr_clear_ext(&to_mails, zbx_ptr_free);
+	zbx_vector_ptr_clear_ext(&to_mails, (zbx_clean_func_t)zbx_mailaddr_free);
 	zbx_vector_ptr_destroy(&to_mails);
 
 	if ('\0' != *error)
