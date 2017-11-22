@@ -1791,10 +1791,19 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 
 	if ($messages) {
 		if ($title !== null) {
-			$link_details = (new CSpan(_('Details')))
+			$link_details = (new CSpan())
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->onClick('javascript: showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
-					'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));');
+				->addItem(_('Details'))
+				->addItem(' ') // space
+				->addItem((new CSpan())
+					->setId('details-arrow')
+					->addClass($show_details ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP)
+				)
+				->onClick('javascript: '.
+					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
+						'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));'.
+					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'
+				);
 		}
 
 		$list = new CList();

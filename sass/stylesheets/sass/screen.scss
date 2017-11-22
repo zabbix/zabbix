@@ -4071,6 +4071,13 @@ td.inactive-bg {
 
 	.link-action {
 		color: darken(desaturate($green, 10%), 20%);
+
+		.arrow-up {
+			border-bottom-color: darken(desaturate($green, 10%), 20%);
+		}
+		.arrow-down {
+			border-top-color: darken(desaturate($green, 10%), 20%);
+		}
 	}
 
 	.overlay-close-btn {
@@ -4124,6 +4131,13 @@ td.inactive-bg {
 
 	.link-action {
 		color: darken(desaturate($red, 10%), 20%);
+
+		.arrow-up {
+			border-bottom-color: darken(desaturate($red, 10%), 20%);
+		}
+		.arrow-down {
+			border-top-color: darken(desaturate($red, 10%), 20%);
+		}
 	}
 
 	.overlay-close-btn {
