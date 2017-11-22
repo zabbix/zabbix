@@ -1066,11 +1066,19 @@ static void	dc_history_set_error(ZBX_DC_HISTORY *hdata, char *errmsg)
 static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type, zbx_variant_t *value)
 {
 	int	ret;
+	char	*errmsg = NULL;
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			ret = zbx_variant_convert(value, ZBX_VARIANT_DBL);
+			if (SUCCEED == (ret = zbx_variant_convert(value, ZBX_VARIANT_DBL)))
+			{
+				if (FAIL == (ret = zbx_validate_value_dbl(value->data.dbl)))
+				{
+					errmsg = zbx_dsprintf(NULL, "Value " ZBX_FS_DBL " is too small or too large.",
+							value->data.dbl);
+				}
+			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			ret = zbx_variant_convert(value, ZBX_VARIANT_UI64);
@@ -1087,11 +1095,12 @@ static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type,
 
 	if (FAIL == ret)
 	{
-		char	*errmsg;
-
-		errmsg = zbx_dsprintf(NULL, "Value \"%s\" of type \"%s\" is not suitable for"
-			" value type \"%s\"", zbx_variant_value_desc(value),
-			zbx_variant_type_desc(value), zbx_item_value_type_string(value_type));
+		if (NULL == errmsg)
+		{
+			errmsg = zbx_dsprintf(NULL, "Value \"%s\" of type \"%s\" is not suitable for"
+				" value type \"%s\"", zbx_variant_value_desc(value),
+				zbx_variant_type_desc(value), zbx_item_value_type_string(value_type));
+		}
 
 		dc_history_set_error(hdata, errmsg);
 		return FAIL;
@@ -1179,6 +1188,14 @@ static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 				logvalue = hdata->value.log->value;
 				logvalue[zbx_db_strlen_n(logvalue, HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl))
+				{
+					dc_history_set_error(hdata, zbx_dsprintf(NULL, "Value " ZBX_FS_DBL
+							" is too small or too large.", hdata->value.dbl));
+					return FAIL;
+				}
+				break;
 		}
 		return SUCCEED;
 	}
@@ -1247,9 +1264,9 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 
 			object = (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags) ?
 					EVENT_OBJECT_LLDRULE : EVENT_OBJECT_ITEM);
-			add_event(EVENT_SOURCE_INTERNAL, object, item->itemid, &h->ts, h->state, NULL, NULL, NULL, 0,
-					0, NULL, 0, NULL, 0);
 
+			zbx_add_event(EVENT_SOURCE_INTERNAL, object, item->itemid, &h->ts, h->state, NULL, NULL, NULL,
+					0, 0, NULL, 0, NULL, 0);
 
 			if (0 != strcmp(item->error, h->value.err))
 				item_error = h->value.err;
@@ -1261,7 +1278,7 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 			/* supported is handled in lld_process_discovery_rule()        */
-			add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
+			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
 					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0);
 
 			item_error = "";
@@ -2279,10 +2296,11 @@ int	DCsync_history(int sync_type, int *total_num)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 	}
 
-	if (0 == cache->history_num)
+	if (0 == cache->history_num && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		/* even with no history there might be events queued to be closed, flush them */
-		flush_correlated_events();
+		/* try flushing correlated event queue in the case      */
+		/* some OK events are queued from the last history sync */
+		zbx_flush_correlated_events();
 		goto finish;
 	}
 
@@ -2355,10 +2373,11 @@ int	DCsync_history(int sync_type, int *total_num)
 			/* processing of events, generated in functions: */
 			/*   DCmass_update_items() */
 			/*   DCmass_update_triggers() */
-			process_trigger_events(&trigger_diff, &triggerids, ZBX_EVENTS_PROCESS_CORRELATION);
-
-			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_save_trigger_changes(&trigger_diff);
+			if (0 != zbx_process_events(&trigger_diff, &triggerids))
+			{
+				DCconfig_triggers_apply_changes(&trigger_diff);
+				zbx_save_trigger_changes(&trigger_diff);
+			}
 		}
 		else
 		{
@@ -2509,7 +2528,8 @@ finish:
 
 		UNLOCK_CACHE;
 
-		while (0 != flush_correlated_events())
+		/* try flushing correlated event queue until it's empty */
+		while (0 != zbx_flush_correlated_events())
 			;
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");

@@ -29,20 +29,24 @@ typedef long	ssize_t;
 #endif
 
 #ifdef _WINDOWS
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
-#	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
-#	define zbx_socket_last_error()	WSAGetLastError()
+#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
+#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)recv((s), (b), (int)(bl), 0))
+#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
+#	define zbx_socket_last_error()		WSAGetLastError()
+#	define zbx_bind(s, a, l)		(bind((s), (a), (int)(l)))
+#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (int)(n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN		WSAEINTR
-#	define ZBX_PROTO_ERROR		SOCKET_ERROR
-#	define ZBX_SOCKET_ERROR		INVALID_SOCKET
-#	define ZBX_SOCKET_TO_INT(s)	((int)(s))
+#	define ZBX_PROTO_AGAIN			WSAEINTR
+#	define ZBX_PROTO_ERROR			SOCKET_ERROR
+#	define ZBX_SOCKET_ERROR			INVALID_SOCKET
+#	define ZBX_SOCKET_TO_INT(s)		((int)(s))
 #else
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
-#	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) close(s)
-#	define zbx_socket_last_error()	errno
+#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)write((s), (b), (bl)))
+#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)read((s), (b), (bl)))
+#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) close(s)
+#	define zbx_socket_last_error()		errno
+#	define zbx_bind(s, a, l)		(bind((s), (a), (l)))
+#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (n), (f), (a), (l)))
 
 #	define ZBX_PROTO_AGAIN		EINTR
 #	define ZBX_PROTO_ERROR		-1

@@ -166,7 +166,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$tags = $field->getValue();
 
 		if (!$tags) {
-			$tags = [['tag' => '', 'value' => '']];
+			$tags = [['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']];
 		}
 
 		$tags_table = (new CTable())->setId('tags_table');
@@ -177,6 +177,10 @@ foreach ($data['dialogue']['fields'] as $field) {
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
+					->addValue(_('Like'), TAG_OPERATOR_LIKE)
+					->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+					->setModern(true),
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
@@ -204,6 +208,10 @@ foreach ($data['dialogue']['fields'] as $field) {
 			(new CTextBox($field->getName().'[#{rowNum}][tag]'))
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList($field->getName().'[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
+				->addValue(_('Like'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
 			(new CTextBox($field->getName().'[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
@@ -216,7 +224,10 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->addClass('form_row')
 			->toString();
 
-		$js_scripts[] = 'jQuery("#tags_table").dynamicRows({template: "#tag-row"});';
+		// Add dynamic row script and fix the distance between AND/OR buttons and tag inputs below them.
+		$js_scripts[] = 'var tags_table = jQuery("#tags_table");'.
+			'tags_table.dynamicRows({template: "#tag-row"});'.
+			'tags_table.parent().addClass("has-before");';
 	}
 }
 

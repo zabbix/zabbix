@@ -331,6 +331,17 @@ function zbxAddSecondsToUnixtime($sec, $unixtime) {
 }
 
 /*************** CONVERTING ******************/
+/**
+ * Convert the Windows new line (CR+LF) to Linux style line feed (LF).
+ *
+ * @param string $string  Input string that will be converted.
+ *
+ * @return string
+ */
+function CRLFtoLF($string) {
+	return str_replace("\r\n", "\n", $string);
+}
+
 function rgb2hex($color) {
 	$HEX = [
 		dechex($color[0]),
@@ -1052,17 +1063,6 @@ function natksort(&$array) {
 	$array = $new_array;
 
 	return true;
-}
-
-function asort_by_key(&$array, $key) {
-	if (!is_array($array)) {
-		error(_('Incorrect type of asort_by_key.'));
-		return [];
-	}
-	$key = htmlspecialchars($key);
-	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-
-	return $array;
 }
 
 // recursively sort an array by key
@@ -1863,14 +1863,14 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 	$ZBX_MESSAGES = [];
 
-	if (!ZBX_SHOW_SQL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$filtered_messages = [];
 		$generic_exists = false;
 
 		foreach ($messages as $message) {
-			if (array_key_exists('sql_error', $message) && $message['sql_error'] === true) {
+			if (array_key_exists('src', $message) && ($message['src'] === 'sql' || $message['src'] === 'php')) {
 				if (!$generic_exists) {
-					$message['message'] = _('SQL error. Please contact Zabbix administrator.');
+					$message['message'] = _('System error occurred. Please contact Zabbix administrator.');
 					$filtered_messages[] = $message;
 					$generic_exists = true;
 				}
@@ -1978,7 +1978,13 @@ function info($msgs) {
 	}
 }
 
-function error($msgs) {
+/*
+ * Add an error to global message array.
+ *
+ * @param string | array $msg	Error message text.
+ * @param string		 $src	The source of error message.
+ */
+function error($msgs, $src = '') {
 	global $ZBX_MESSAGES;
 
 	if (!isset($ZBX_MESSAGES)) {
@@ -1988,7 +1994,11 @@ function error($msgs) {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg];
+		$ZBX_MESSAGES[] = [
+			'type' => 'error',
+			'message' => $msg,
+			'src' => $src
+		];
 	}
 }
 
@@ -2003,21 +2013,6 @@ function error_group($data) {
 	foreach (zbx_toArray($data['msgs']) as $msg) {
 		error($data['header'] . ' ' . $msg);
 	}
-}
-
-/**
- * Add SQL error message to global messages array.
- *
- * @param string $msg		Error message text.
- */
-function sqlError($msg) {
-	global $ZBX_MESSAGES;
-
-	if (!isset($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = [];
-	}
-
-	$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg, 'sql_error' => true];
 }
 
 function clear_messages($count = null) {
@@ -2411,7 +2406,9 @@ function getUserGraphTheme() {
 		'gridbordercolor' => 'ACBBC2',
 		'nonworktimecolor' => 'EBEBEB',
 		'leftpercentilecolor' => '429E47',
-		'righttpercentilecolor' => 'E33734'
+		'righttpercentilecolor' => 'E33734',
+		'colorpalette' => '1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,'.
+			'89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4'
 	];
 }
 
@@ -2430,7 +2427,7 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	}
 
 	// Don't show the call to this handler function.
-	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
+	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
 }
 
 /**

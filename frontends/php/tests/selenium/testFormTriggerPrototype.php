@@ -922,7 +922,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
 			$this->zbxTestClickButton('triggerprototype.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototypes deleted');
 			$this->assertEquals(0, DBcount("SELECT triggerid FROM triggers where description = '".$description."'"));

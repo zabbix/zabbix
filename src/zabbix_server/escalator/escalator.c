@@ -30,7 +30,6 @@
 #include "../actions.h"
 #include "../events.h"
 #include "../scripts/scripts.h"
-#include "../events.h"
 #include "../../libs/zbxcrypto/tls.h"
 #include "comms.h"
 
@@ -869,19 +868,18 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		ZBX_STR2UINT64(host.hostid, row[0]);
 		ZBX_DBROW2UINT64(host.proxy_hostid, row[1]);
 
-		if (0 != host.hostid)
+		if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
 		{
-			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			if (0 != host.hostid)
 			{
-				goto skip;
-			}
+				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					goto skip;
+				}
 
-			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-			strscpy(host.host, row[2]);
-
-			if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
-			{
+				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+				strscpy(host.host, row[2]);
 				host.tls_connect = (unsigned char)atoi(row[13]);
 #ifdef HAVE_OPENIPMI
 				host.ipmi_authtype = (signed char)atoi(row[14]);
@@ -896,17 +894,17 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				strscpy(host.tls_psk, row[17 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
-		}
-		else if (SUCCEED == (rc = get_dynamic_hostid((NULL != r_event ? r_event : event), &host, error,
-					sizeof(error))))
-		{
-			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			else if (SUCCEED == (rc = get_dynamic_hostid((NULL != r_event ? r_event : event), &host, error,
+						sizeof(error))))
 			{
-				goto skip;
-			}
+				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					goto skip;
+				}
 
-			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+			}
 		}
 
 		alertid = DBget_maxid("alerts");
@@ -1799,7 +1797,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 
 	if (0 != skip)
 	{
-		/* dependable trigger in PROBLEM state, process escalation later */
+		/* one of trigger dependencies is in PROBLEM state, process escalation later */
 		ret = ZBX_ESCALATION_SKIP;
 		goto out;
 	}
@@ -2060,7 +2058,7 @@ static void	add_ack_escalation_r_eventids(zbx_vector_ptr_t *escalations, zbx_vec
 
 	if (0 < ack_eventids.values_num)
 	{
-		get_db_eventid_r_eventid_pairs(&ack_eventids, event_pairs, &r_eventids);
+		zbx_db_get_eventid_r_eventid_pairs(&ack_eventids, event_pairs, &r_eventids);
 
 		zbx_vector_uint64_append_array(eventids, r_eventids.values, r_eventids.values_num);
 	}
@@ -2087,7 +2085,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	add_ack_escalation_r_eventids(escalations, eventids, &event_pairs);
 
 	get_db_actions_info(actionids, &actions);
-	get_db_events_info(eventids, &events);
+	zbx_db_get_events_by_eventids(eventids, &events);
 
 	for (i = 0; i < escalations->values_num; i++)
 	{
@@ -2318,7 +2316,7 @@ out:
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)free_db_action);
 	zbx_vector_ptr_destroy(&actions);
 
-	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)free_db_event);
+	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
 	zbx_vector_ptr_destroy(&events);
 
 	zbx_vector_uint64_pair_destroy(&event_pairs);

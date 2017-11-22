@@ -292,7 +292,6 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
 #define ZBX_FLAGS_DB_EVENT_NO_ACTION		0x0002
-#define ZBX_FLAGS_DB_EVENT_LINKED		0x0004
 	zbx_uint64_t		flags;
 }
 DB_EVENT;
@@ -537,7 +536,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t length);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
-int	DBhost_exists(char *server);
 int	DBadd_templates_to_host(int hostid, int host_templateid);
 
 int	DBadd_template_linkage(int hostid, int templateid, int items, int triggers, int graphs);
@@ -707,5 +705,12 @@ typedef struct
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE	(ZBX_FLAGS_ITEM_DIFF_UPDATE_DB | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK)
 }
 zbx_item_diff_t;
+
+/* event support */
+void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
+void	zbx_db_free_event(DB_EVENT *event);
+void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
+		zbx_vector_uint64_t *r_eventids);
+
 
 #endif

@@ -39,6 +39,7 @@ $options = [
 			'problem' => $data['filter']['problem'],
 			'severity' => $data['filter']['severity'],
 			'inventory' => $data['filter']['inventory'],
+			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
 			'maintenance' => $data['filter']['maintenance'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
@@ -196,17 +197,31 @@ if ($data['action'] == 'problem.view') {
 
 	$filter_tags = $data['filter']['tags'];
 	if (!$filter_tags) {
-		$filter_tags = [['tag' => '', 'value' => '']];
+		$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 	}
 
 	$filter_tags_table = new CTable();
 	$filter_tags_table->setId('filter-tags');
+
+	$filter_tags_table->addRow(
+		(new CCol(
+			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
+				->addValue(_('AND'), TAG_EVAL_TYPE_AND)
+				->addValue(_('OR'), TAG_EVAL_TYPE_OR)
+				->setModern(true)
+		))->setColSpan(4)
+	);
+
 	$i = 0;
 	foreach ($filter_tags as $tag) {
 		$filter_tags_table->addRow([
 			(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
+				->addValue(_('Like'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
 			(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),

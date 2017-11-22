@@ -830,11 +830,7 @@ static int	process_proxy(void)
 		}
 network_error:
 		if (0 != last_access)
-		{
-			DBbegin();
 			update_proxy_lastaccess(proxy.hostid, last_access);
-			DBcommit();
-		}
 
 		DCrequeue_proxy(proxy.hostid, update_nextcheck);
 	}

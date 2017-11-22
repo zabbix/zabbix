@@ -29,6 +29,7 @@
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
+#define ZBX_TASKMANAGER_TIMEOUT		5
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -39,69 +40,30 @@ extern int		server_num, process_num;
  *                                                                            *
  * Purpose: close the specified problem event and remove task                 *
  *                                                                            *
- * Parameters: taskid            - [IN] the task identifier                   *
- *             triggerid         - [IN] the source trigger id                 *
+ * Parameters: triggerid         - [IN] the source trigger id                 *
  *             eventid           - [IN] the problem eventid to close          *
  *             userid            - [IN] the user that requested to close the  *
  *                                      problem                               *
- *             locked_triggerids - [IN] the locked trigger identifiers        *
  *                                                                            *
  ******************************************************************************/
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
-		zbx_uint64_t userid, zbx_vector_uint64_t *locked_triggerids)
+		zbx_uint64_t userid)
 {
 	const char		*__function_name = "tm_execute_task_close_problem";
 
-	DB_RESULT		result;
-	DC_TRIGGER		trigger;
-	int			errcode;
-	zbx_timespec_t		ts;
-	zbx_vector_ptr_t	trigger_diff;
+	DB_RESULT	result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64, __function_name,
-			taskid, eventid);
-
-	zbx_vector_ptr_create(&trigger_diff);
-
-	DBbegin();
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, eventid);
 
 	result = DBselect("select null from problem where eventid=" ZBX_FS_UI64 " and r_eventid is null", eventid);
 
 	/* check if the task hasn't been already closed by another process */
 	if (NULL != DBfetch(result))
-	{
-		DCconfig_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
+		zbx_close_problem(triggerid, eventid, userid);
 
-		if (SUCCEED == errcode)
-		{
-			zbx_append_trigger_diff(&trigger_diff, triggerid, trigger.priority,
-					ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT, trigger.value,
-					TRIGGER_STATE_NORMAL, 0, NULL);
-
-			zbx_timespec(&ts);
-
-			close_event(eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
-					&ts, userid, 0, 0, trigger.description, trigger.expression_orig,
-					trigger.recovery_expression_orig, trigger.priority, trigger.type, NULL,
-					ZBX_TRIGGER_CORRELATION_NONE, "", trigger.value);
-
-			process_trigger_events(&trigger_diff, locked_triggerids, ZBX_EVENTS_SKIP_CORRELATION);
-			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_save_trigger_changes(&trigger_diff);
-		}
-
-		DCconfig_clean_triggers(&trigger, &errcode, 1);
-	}
 	DBfree_result(result);
 
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
-
-	DBcommit();
-
-	DBupdate_itservices(&trigger_diff);
-
-	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-	zbx_vector_ptr_destroy(&trigger_diff);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -152,7 +114,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 		{
 			ZBX_STR2UINT64(userid, row[0]);
 			ZBX_STR2UINT64(eventid, row[1]);
-			tm_execute_task_close_problem(taskid, triggerid, eventid, userid, &locked_triggerids);
+			tm_execute_task_close_problem(taskid, triggerid, eventid, userid);
 
 			DCconfig_unlock_triggers(&locked_triggerids);
 
