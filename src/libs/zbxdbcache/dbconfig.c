@@ -1472,7 +1472,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(host_inventory->inventory_mode, row[1]);
 
 		/* store new information in host_inventory structure */
-		for (i = 0; ZBX_SYNC_INVENTORY_FIELDS > i;  i++)
+		for (i = 0; ZBX_SYNC_INVENTORY_FIELDS > i; i++)
 			DCstrpool_replace(found, &(host_inventory->fields[i]), row[i + 2]);
 	}
 
