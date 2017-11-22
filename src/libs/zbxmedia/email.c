@@ -143,8 +143,8 @@ static int	smtp_readln(zbx_socket_t *s, const char **buf)
  ********************************************************************************/
 static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error_len, zbx_vector_ptr_t *mailaddrs)
 {
-	const char	*p, *pstart, *angle_addr_start = NULL, *domain_start = NULL, *utf8_end = NULL;
-	const char	*base64_like_start = NULL, *base64_like_end = NULL, *token;
+	const char	*p, *pstart, *angle_addr_start, *domain_start, *utf8_end;
+	const char	*base64_like_start, *base64_like_end, *token;
 	char		*base64_buf = NULL, *tmp_mailbox;
 	size_t		size_angle_addr = 0, offset_angle_addr = 0, len, i;
 	int		ret = FAIL;
@@ -155,6 +155,12 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 	token = strtok(tmp_mailbox, "\n");
 	while (token != NULL)
 	{
+		angle_addr_start = NULL;
+		domain_start = NULL;
+		utf8_end = NULL;
+		base64_like_start = NULL;
+		base64_like_end = NULL;
+
 		p = token;
 
 		while (' ' == *p || '\t' == *p)
@@ -515,8 +521,6 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 			zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO \"%s\"", response);
 			goto close;
 		}
-
-		zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", "<sergejs.paskevics@zabbix.com>");
 
 		if (-1 == write(s.socket, cmd, strlen(cmd)))
 		{
