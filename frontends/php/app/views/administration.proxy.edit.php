@@ -47,7 +47,9 @@ $interfaceTable = (new CTable())
 			->addValue(_('IP'), INTERFACE_USE_IP)
 			->addValue(_('DNS'), INTERFACE_USE_DNS)
 			->setModern(true),
-		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+		(new CTextBox('port', $data['port'], false, 64))
+			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			->setAttribute('aria-required', 'true')
 	]);
 
 // append hosts to form list

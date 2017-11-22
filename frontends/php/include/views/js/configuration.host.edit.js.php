@@ -68,7 +68,8 @@
 				jQuery('.interface-bulk', domRow).remove();
 			}
 
-			jQuery('#interfaces_' + hostInterface.interfaceid + '_useip_' + hostInterface.useip).prop('checked', true);
+			jQuery('#interfaces_' + hostInterface.interfaceid + '_useip_' + hostInterface.useip).prop('checked', true)
+				.trigger('click');
 
 			if (hostInterface.locked > 0) {
 				addNotDraggableIcon(domRow);
@@ -334,6 +335,12 @@
 		jQuery('#hostlist').on('click', 'input[type=radio][id*="_useip_"]', function() {
 			var interfaceId = jQuery(this).attr('id').match(/\d+/);
 			hostInterfacesManager.setUseipForInterface(interfaceId[0], jQuery(this).val());
+
+			jQuery('[name^="interfaces['+interfaceId[0]+']["]')
+				.filter('[name$="[ip]"],[name$="[dns]"]')
+				.removeAttr('aria-required')
+				.filter((jQuery(this).val() == <?= INTERFACE_USE_IP ?>) ? '[name$="[ip]"]' : '[name$="[dns]"]')
+				.attr('aria-required', true);
 		});
 
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
