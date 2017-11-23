@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha1');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050001);
+define('ZABBIX_DB_VERSION',		3050003);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -111,6 +111,8 @@ define('ZBX_SHOW_SQL_ERRORS',	true);
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
+define('ZBX_SHOW_TECHNICAL_ERRORS', false);
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_XML',					2);
@@ -145,6 +147,7 @@ define('O_NO',		2);
 
 define('P_SYS',					0x0001);
 define('P_UNSET_EMPTY',			0x0002);
+define('P_CRLF',				0x0004);
 define('P_ACT',					0x0010);
 define('P_NZERO',				0x0020);
 define('P_NO_TRIM',				0x0040);
@@ -1505,3 +1508,15 @@ if (function_exists('bcscale')) {
 
 // Maximum number of tags to display in events list.
 define('EVENTS_LIST_TAGS_COUNT', 3);
+
+// HTTP headers
+/*
+ * Value of HTTP X-Frame-options header.
+ *
+ * Supported options:
+ *  - SAMEORIGIN (string) - compatible with rfc7034.
+ *  - DENY (string) - compatible with rfc7034.
+ *  - a list (string) of comma-separated hostnames. If hostname is not between allowed, the SAMEORIGIN option is used.
+ *  - null - disable X-Frame-options header.
+ */
+define('X_FRAME_OPTIONS', 'SAMEORIGIN');

@@ -161,7 +161,7 @@ int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 			if (SUCCEED == (ret = zbx_udp_recv(&s, timeout)))
 			{
 				*value_int = (SUCCEED == unpack_ntp(&data, (unsigned char *)request,
-						(unsigned char *)s.buffer, s.read_bytes));
+						(unsigned char *)s.buffer, (int)s.read_bytes));
 			}
 		}
 

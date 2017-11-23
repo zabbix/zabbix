@@ -1324,7 +1324,7 @@ class testFormAction extends CWebTest {
 		if ($new_operation_opcommand_type != null) {
 			$this->zbxTestTextPresent ('Type');
 			$this->zbxTestAssertVisibleXpath('//select[@id=\'new_operation_opcommand_type\']');
-			$this->zbxTestDropdownAssertSelected('new_operation[opcommand][type]', 'Custom script');
+			$this->zbxTestDropdownAssertSelected('new_operation[opcommand][type]', $new_operation_opcommand_type);
 			$this->zbxTestDropdownHasOptions('new_operation_opcommand_type', [
 					'IPMI',
 					'Custom script',
@@ -1393,7 +1393,9 @@ class testFormAction extends CWebTest {
 						'Password',
 						'Public key'
 				]);
-				$this->zbxTestDropdownAssertSelected('new_operation[opcommand][authtype]', 'Password');
+				$this->zbxTestDropdownAssertSelected('new_operation[opcommand][authtype]',
+						$new_operation_opcommand_authtype
+				);
 				break;
 			case 'IPMI':
 			case 'Custom script':
@@ -1941,7 +1943,7 @@ class testFormAction extends CWebTest {
 				switch ($operation['type']) {
 					case 'Send message':
 						$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
-						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+						$this->zbxTestSwitchToWindow('zbx_popup');
 						$this->zbxTestCheckboxSelect('all_usrgrps');
 						$this->zbxTestClick('select');
 						$this->zbxTestWaitWindowClose();
