@@ -289,4 +289,20 @@ class CTag extends CObject {
 	public function getEncStrategy() {
 		return $this->encStrategy;
 	}
+
+	/**
+	 * Set or reset element 'aria-required' attribute.
+	 *
+	 * @param bool $is_required     Define aria-required attribute for element.
+	 */
+	public function setAriaRequired($is_required = true) {
+		if ($is_required) {
+			$this->setAttribute('aria-required', 'true');
+		}
+		else {
+			$this->removeAttribute('aria-required');
+		}
+
+		return $this;
+	}
 }

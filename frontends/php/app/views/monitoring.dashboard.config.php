@@ -29,7 +29,7 @@ $js_scripts = [];
 $form_list = new CFormList();
 
 // common fields
-$form_list->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+$form_list->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(),
 	(new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $data['known_widget_types']))
 		->setAttribute('aria-required', 'true')
 );
@@ -56,7 +56,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			$field_object->setAttribute('aria-required', 'true');
 		}
 
-		$form_list->addRow($field->getStyledLabel(), $field_object);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$field_object
+		);
 	}
 	elseif ($field instanceof CWidgetFieldTextBox || $field instanceof CWidgetFieldUrl) {
 		$field_object = (new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
@@ -65,10 +67,12 @@ foreach ($data['dialogue']['fields'] as $field) {
 			$field_object->setAttribute('aria-required', 'true');
 		}
 
-		$form_list->addRow($field->getStyledLabel(), $field_object);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$field_object
+		);
 	}
 	elseif ($field instanceof CWidgetFieldCheckBox) {
-		$form_list->addRow($field->getStyledLabel(), [
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required), [
 			new CVar($field->getName(), '0'),
 			(new CCheckBox($field->getName()))->setChecked((bool) $field->getValue())
 		]);
@@ -91,7 +95,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			$field_groupids->setAttribute('aria-required', 'true');
 		}
 
-		$form_list->addRow($field->getStyledLabel(), $field_groupids);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$field_groupids
+		);
 
 		$js_scripts[] = $field_groupids->getPostJS();
 	}
@@ -113,7 +119,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			$field_hostids->setAttribute('aria-required', 'true');
 		}
 
-		$form_list->addRow($field->getStyledLabel(), $field_hostids);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$field_hostids
+		);
 
 		$js_scripts[] = $field_hostids->getPostJS();
 	}
@@ -141,7 +149,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 		// Needed for popup script.
 		$form->addVar($field->getName(), $field->getValue());
-		$form_list->addRow($field->getStyledLabel(), [
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required), [
 			$field_object,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
@@ -157,7 +165,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			$field_object->setAttribute('aria-required', 'true');
 		}
 
-		$form_list->addRow($field->getStyledLabel(), $field_object);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$field_object
+		);
 
 		$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
 	}
@@ -169,7 +179,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			$field_object->setAttribute('aria-required', 'true');
 		}
 
-		$form_list->addRow($field->getStyledLabel(), $field_object);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$field_object
+		);
 	}
 	elseif ($field instanceof CWidgetFieldRadioButtonList) {
 		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue()))
@@ -177,7 +189,14 @@ foreach ($data['dialogue']['fields'] as $field) {
 		foreach ($field->getValues() as $key => $value) {
 			$radio_button_list->addValue($value, $key, null, $field->getAction());
 		}
-		$form_list->addRow($field->getStyledLabel(), $radio_button_list);
+
+		if ($aria_required) {
+			$radio_button_list->setAttribute('aria-required', 'true');
+		}
+
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$radio_button_list
+		);
 	}
 	elseif ($field instanceof CWidgetFieldSeverities) {
 		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
@@ -191,7 +210,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			);
 		}
 
-		$form_list->addRow($field->getStyledLabel(), $severities);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$severities
+		);
 	}
 	elseif ($field instanceof CWidgetFieldTags) {
 		$tags = $field->getValue();
@@ -229,7 +250,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			))->setColSpan(3)
 		);
 
-		$form_list->addRow($field->getStyledLabel(), $tags_table);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$tags_table
+		);
 
 		$tag_box = (new CTextBox($field->getName().'[#{rowNum}][tag]'))
 			->setAttribute('placeholder', _('tag'))
