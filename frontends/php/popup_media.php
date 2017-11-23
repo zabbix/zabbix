@@ -57,8 +57,7 @@ $fields = [
 check_fields($fields);
 
 $sendto = getRequest('sendto', '');
-$sendto_emails = getRequest('sendto_emails', []);
-$sendto_emails = is_array($sendto_emails) ? array_values($sendto_emails) : [];
+$sendto_emails = array_values(getRequest('sendto_emails', []));
 
 if (getRequest('add') && getRequest('type') == MEDIA_TYPE_EMAIL) {
 	$email_validator = new CEmailValidator();
