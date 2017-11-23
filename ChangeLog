@@ -30,6 +30,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+........S. [ZBX-13061] fixed memory leak in preprocessing manager (wiper)
 ....I..... [ZBX-12232] fixed mysql m4 configuration script for mariadb C connector (abs)
 ..F....... [ZBX-12663] fixed retaining the scrollbar position on page reload (Ivo)
 ..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)

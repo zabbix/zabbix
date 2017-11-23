@@ -744,8 +744,12 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 	if (ZBX_VARIANT_NONE == value->type)
 	{
-		/* value is removed as there is none */
-		request->value.result->type &= (AR_MESSAGE | AR_META);
+		UNSET_UI64_RESULT(request->value.result);
+		UNSET_DBL_RESULT(request->value.result);
+		UNSET_STR_RESULT(request->value.result);
+		UNSET_TEXT_RESULT(request->value.result);
+		UNSET_LOG_RESULT(request->value.result);
+		UNSET_MSG_RESULT(request->value.result);
 		ret = FAIL;
 
 		goto out;
