@@ -31,6 +31,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
 ..F....... [ZBX-12912] fixed error handling on graph form for preview image (gcalenko)
 ..F....... [ZBX-12948] fixed percentile visibility in dashboard graph widgets (gcalenko)
 A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
