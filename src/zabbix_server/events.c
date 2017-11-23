@@ -2230,7 +2230,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 		processed_num = flush_events();
 		update_trigger_changes(&trigger_diff);
-		zbx_save_trigger_changes(&trigger_diff);
+		zbx_db_save_trigger_changes(&trigger_diff);
 
 		DBcommit();
 
@@ -2283,7 +2283,7 @@ int	zbx_flush_correlated_events(void)
 		flush_events();
 		update_trigger_changes(&trigger_diff);
 		DCconfig_triggers_apply_changes(&trigger_diff);
-		zbx_save_trigger_changes(&trigger_diff);
+		zbx_db_save_trigger_changes(&trigger_diff);
 
 		DBcommit();
 
