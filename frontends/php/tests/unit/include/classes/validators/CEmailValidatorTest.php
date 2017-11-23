@@ -60,7 +60,8 @@ class CEmailValidatorTest extends PHPUnit_Framework_TestCase {
 			['admin@127.0.0.1', false, 'Invalid email address "admin@127.0.0.1".'],
 			['"(),:;<>[\]@example.com', false, 'Invalid email address ""(),:;<>[\]@example.com".'],
 			['just"not"right@example.com', false, 'Invalid email address "just"not"right@example.com".'],
-			['this\ is"really"not\allowed@example.com', false, 'Invalid email address "this\ is"really"not\allowed@example.com".']
+			['this\ is"really"not\allowed@example.com', false, 'Invalid email address "this\ is"really"not\allowed@example.com".'],
+			['Administrator <admin@example.com>, a, b, c', false, 'Invalid email address "Administrator <admin@example.com>, a, b, c".'],
 		];
 	}
 
