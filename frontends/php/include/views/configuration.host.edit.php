@@ -114,7 +114,7 @@ else {
 			);
 		}
 	}
-	$hostList->addRow(_('Groups'), $groupBox);
+	$hostList->addRow((new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $groupBox);
 	$hostList->addVar('groups', $data['groups']);
 }
 
