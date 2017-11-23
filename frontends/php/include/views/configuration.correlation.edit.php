@@ -33,10 +33,10 @@ if ($data['correlationid']) {
 
 $correlation_tab = (new CFormList())
 	->addRow(
-		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['correlation']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -101,7 +101,7 @@ $correlation_tab
 			->setAttribute('placeholder', 'A or (B and C) &hellip;')
 	])
 	->addRow(
-		(new CLabel(_('Conditions')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Conditions')))->setAsteriskMark(),
 		(new CDiv($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -221,7 +221,7 @@ if ($data['correlation']['operations']) {
 
 $operation_tab
 	->addRow(
-		(new CLabel(_('Operations')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Operations')))->setAsteriskMark(),
 		(new CDiv([$operations_table]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

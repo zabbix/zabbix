@@ -31,35 +31,39 @@ $scriptForm = (new CForm())
 	->addVar('scriptid', $data['scriptid']);
 
 $scriptFormList = (new CFormList())
-	->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow(_('Type'),
+	->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(),
 		(new CRadioButtonList('type', (int) $data['type']))
 			->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
 			->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
+			->setAttribute('role', 'radiogroup')
+			->setAriaRequired()
 			->setModern(true)
 	)
-	->addRow(_('Execute on'),
+	->addRow((new CLabel(_('Execute on'), 'execute_on'))->setAsteriskMark(),
 		(new CRadioButtonList('execute_on', (int) $data['execute_on']))
 			->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 			->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+			->setAttribute('role', 'radiogroup')
+			->setAriaRequired()
 			->setModern(true)
 	)
-	->addRow((new CLabel(_('Commands')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Commands'), 'command'))->setAsteriskMark(),
 		(new CTextArea('command', $data['command']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxLength(255)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Command')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Command'), 'commandipmi'))->setAsteriskMark(),
 		(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

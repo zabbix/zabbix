@@ -83,16 +83,16 @@ else {
 		->addVar('steps_names', getRequest('steps_names'));
 
 	$httpPopupFormList = (new CFormList())
-		->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 			(new CTextBox('name', getRequest('name', ''), (bool) getRequest('templated'), 64))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('aria-required', 'true')
+				->setAriaRequired()
 		)
-		->addRow((new CLabel(_('URL')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		->addRow((new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 			new CDiv([
 				(new CTextBox('url', getRequest('url', ''), false, null))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAttribute('aria-required', 'true'),
+					->setAriaRequired(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('parse', _('Parse')))
 					->onClick('javascript: parseUrl();')
@@ -173,10 +173,10 @@ else {
 	$httpPopupFormList
 		->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1))
 		->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1))
-		->addRow((new CLabel(_('Timeout')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 			(new CTextBox('timeout', getRequest('timeout', DB::getDefault('httpstep', 'timeout'))))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('aria-required', 'true')
+				->setAriaRequired()
 		)
 		->addRow(_('Required string'),
 			(new CTextBox('required', getRequest('required', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

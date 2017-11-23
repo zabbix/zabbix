@@ -47,25 +47,25 @@ if ($data['limited']) {
 }
 
 $itemFormList->addRow(
-	(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Name')))->setAsteriskMark(),
 	(new CTextBox('name', $this->data['name'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 );
 
 // append type to form list
 if ($readonly) {
 	$itemForm->addVar('type', $this->data['type']);
-	$itemFormList->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$itemFormList->addRow((new CLabel(_('Type')))->setAsteriskMark(),
 		(new CTextBox('typename', item_type2str($this->data['type']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 }
 else {
-	$itemFormList->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CComboBox('type', $this->data['type'], null, $this->data['types']))->setAttribute('aria-required', 'true')
+	$itemFormList->addRow((new CLabel(_('Type')))->setAsteriskMark(),
+		(new CComboBox('type', $this->data['type'], null, $this->data['types']))->setAriaRequired()
 	);
 }
 
@@ -73,7 +73,7 @@ else {
 $key_controls = [
 	(new CTextBox('key', $this->data['key'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 ];
 if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -84,12 +84,12 @@ if (!$readonly) {
 
 }
 
-$itemFormList->addRow((new CLabel(_('Key')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $key_controls);
+$itemFormList->addRow((new CLabel(_('Key')))->setAsteriskMark(), $key_controls);
 
 // Append master item select.
 $master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
 ];
 
@@ -104,14 +104,14 @@ if (!$readonly) {
 }
 
 $itemFormList->addRow(
-	(new CLabel(_('Master item')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Master item')))->setAsteriskMark(),
 	$master_item,
 	'row_master_item'
 );
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
-	$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))->setAttribute('aria-required', 'true');
+	$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))->setAriaRequired();
 
 	// Set up interface groups sorted by priority.
 	$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
@@ -142,16 +142,16 @@ if (!empty($this->data['interfaces'])) {
 		->setId('interface_not_defined')
 		->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow((new CLabel(_('Host interface')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$itemFormList->addRow((new CLabel(_('Host interface')))->setAsteriskMark(),
 		[$interfacesComboBox, $span], 'interface_row'
 	);
 	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $itemFormList->addRow(
-	(new CLabel(_('SNMP OID')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('SNMP OID')))->setAsteriskMark(),
 	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $readonly, 512))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
@@ -159,10 +159,10 @@ $itemFormList->addRow(_('Context name'),
 	'row_snmpv3_contextname'
 );
 $itemFormList->addRow(
-	(new CLabel(_('SNMP community')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('SNMP community')))->setAsteriskMark(),
 	(new CTextBox('snmp_community', $this->data['snmp_community'], false, 64))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'row_snmp_community'
 );
 $itemFormList->addRow(_('Security name'),
@@ -206,10 +206,10 @@ $itemFormList->addRow(_('Port'),
 	(new CTextBox('port', $this->data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
 );
 $itemFormList->addRow(
-	(new CLabel(_('IPMI sensor')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('IPMI sensor')))->setAsteriskMark(),
 	(new CTextBox('ipmi_sensor', $this->data['ipmi_sensor'], $readonly, 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'row_ipmi_sensor'
 );
 
@@ -219,10 +219,10 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 ]);
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
-$itemFormList->addRow((new CLabel(_('JMX endpoint')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+$itemFormList->addRow((new CLabel(_('JMX endpoint')))->setAsteriskMark(),
 	(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], false, 255))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'row_jmx_endpoint'
 );
 $itemFormList->addRow(_('User name'),
@@ -230,17 +230,17 @@ $itemFormList->addRow(_('User name'),
 	'row_username'
 );
 $itemFormList->addRow(
-	(new CLabel(_('Public key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Public key file')))->setAsteriskMark(),
 	(new CTextBox('publickey', $this->data['publickey'], false, 64))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'row_publickey'
 );
 $itemFormList->addRow(
-	(new CLabel(_('Private key file')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Private key file')))->setAsteriskMark(),
 	(new CTextBox('privatekey', $this->data['privatekey'], false, 64))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'row_privatekey'
 );
 $itemFormList->addRow(_('Password'),
@@ -248,45 +248,45 @@ $itemFormList->addRow(_('Password'),
 	'row_password'
 );
 $itemFormList->addRow(
-	(new CLabel(_('Executed script')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Executed script')))->setAsteriskMark(),
 	(new CTextArea('params_es', $this->data['params']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'label_executed_script'
 );
 $itemFormList->addRow(
-	(new CLabel(_('SQL query')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('SQL query')))->setAsteriskMark(),
 	(new CTextArea('params_ap', $this->data['params']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'label_params'
 );
 $itemFormList->addRow(
-	(new CLabel(_('Formula')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Formula')))->setAsteriskMark(),
 	(new CTextArea('params_f', $this->data['params']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'label_formula'
 );
 
 // append value type to form list
 if ($readonly) {
 	$itemForm->addVar('value_type', $this->data['value_type']);
-	$itemFormList->addRow((new CLabel(_('Type of information')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$itemFormList->addRow((new CLabel(_('Type of information')))->setAsteriskMark(),
 		(new CTextBox('value_type_name', itemValueTypeString($this->data['value_type']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 }
 else {
-	$itemFormList->addRow((new CLabel(_('Type of information')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$itemFormList->addRow((new CLabel(_('Type of information')))->setAsteriskMark(),
 		(new CComboBox('value_type', $this->data['value_type'], null, [
 			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 			ITEM_VALUE_TYPE_STR => _('Character'),
 			ITEM_VALUE_TYPE_LOG => _('Log'),
 			ITEM_VALUE_TYPE_TEXT => _('Text')
-		]))->setAttribute('aria-required', 'true')
+		]))->setAriaRequired()
 	);
 }
 
@@ -295,10 +295,10 @@ $itemFormList->addRow(_('Units'),
 	'row_units'
 );
 
-$itemFormList->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+$itemFormList->addRow((new CLabel(_('Update interval')))->setAsteriskMark(),
 	(new CTextBox('delay', $data['delay']))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	'row_delay'
 );
 
@@ -355,16 +355,16 @@ $itemFormList->addRow(_('Custom intervals'),
 $keepHistory = [];
 $keepHistory[] = (new CTextBox('history', $data['history']))
 	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAttribute('aria-required', 'true');
-$itemFormList->addRow((new CLabel(_('History storage period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->setAriaRequired();
+$itemFormList->addRow((new CLabel(_('History storage period')))->setAsteriskMark(),
 	$keepHistory
 );
 
 $keepTrend = [];
 $keepTrend[] = (new CTextBox('trends', $data['trends']))
 	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAttribute('aria-required', 'true');
-$itemFormList->addRow((new CLabel(_('Trend storage period')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $keepTrend,
+	->setAriaRequired();
+$itemFormList->addRow((new CLabel(_('Trend storage period')))->setAsteriskMark(), $keepTrend,
 	'row_trends'
 );
 

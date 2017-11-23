@@ -38,10 +38,10 @@ $mediaTypeForm = (new CForm())
 // create form list
 $nameTextBox = (new CTextBox('description', $data['description'], false, 100))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAttribute('aria-required', 'true')
+	->setAriaRequired()
 	->setAttribute('autofocus', 'autofocus');
 $mediaTypeFormList = (new CFormList())
-	->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $nameTextBox);
+	->addRow((new CLabel(_('Name'), 'description'))->setAsteriskMark(), $nameTextBox);
 
 // append type to form list
 $cmbType = new CComboBox('type', $data['type'], null, [
@@ -51,31 +51,31 @@ $cmbType = new CComboBox('type', $data['type'], null, [
 	MEDIA_TYPE_JABBER => _('Jabber')
 ]);
 $cmbType->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]);
-$cmbTypeRow = [$cmbType->setAttribute('aria-required', 'true')];
+$cmbTypeRow = [$cmbType->setAriaRequired()];
 $ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
 	->setId('eztext_link')
 	->setTarget('_blank');
 $cmbTypeRow[] = $ez_texting_link;
 
 $mediaTypeFormList
-	->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $cmbTypeRow)
-	->addRow((new CLabel(_('SMTP server')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(), $cmbTypeRow)
+	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
 		(new CTextBox('smtp_server', $data['smtp_server']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('SMTP server port'),
 		(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
-	->addRow((new CLabel(_('SMTP helo')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('SMTP helo'), 'smtp_helo'))->setAsteriskMark(),
 		(new CTextBox('smtp_helo', $data['smtp_helo']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('SMTP email')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('SMTP email'), 'smtp_email'))->setAsteriskMark(),
 		(new CTextBox('smtp_email', $data['smtp_email']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Connection security'),
 		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
@@ -93,10 +93,10 @@ $mediaTypeFormList
 			->setModern(true)
 	)
 	->addRow(_('Username'), (new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
-	->addRow((new CLabel(_('Script name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Script name'), 'exec_path'))->setAsteriskMark(),
 		(new CTextBox('exec_path', $data['exec_path']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 
 $exec_params_table = (new CTable())
@@ -127,10 +127,10 @@ $mediaTypeFormList->addRow(_('Script parameters'),
 	'row_exec_params'
 );
 
-$mediaTypeFormList->addRow((new CLabel(_('GSM modem')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+$mediaTypeFormList->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteriskMark(),
 	(new CTextBox('gsm_modem', $data['gsm_modem']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 );
 
 // create password field
@@ -140,6 +140,7 @@ if ($data['passwd'] != '') {
 			->onClick('this.style.display="none"; $("passwd").show().focus();'),
 		(new CPassBox('passwd', $data['passwd']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
 			->addStyle('display: none;')
 	];
 }
@@ -149,17 +150,17 @@ else {
 
 // append password field to form list
 $mediaTypeFormList
-	->addRow((new CLabel(_('Jabber identifier')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Jabber identifier'), 'jabber_username'))->setAsteriskMark(),
 		(new CTextBox('jabber_username', $data['jabber_username']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Username')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Username'), 'eztext_username'))->setAsteriskMark(),
 		(new CTextBox('eztext_username', $data['eztext_username']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow(_('Password'), $passwdField)
+	->addRow((new CLabel(_('Password'), 'passwd'))->setAsteriskMark($data['passwd'] != ''), $passwdField)
 	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [
 		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
@@ -202,15 +203,15 @@ $mediaOptionsForm = (new CFormList('options'))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			])
 	)
-	->addRow((new CLabel(_('Attempts')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Attempts'), 'maxattempts'))->setAsteriskMark(),
 		(new CNumericBox('maxattempts', $data['maxattempts'], 3, false, false, false))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Attempt interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Attempt interval'), 'attempt_interval'))->setAsteriskMark(),
 		(new CTextBox('attempt_interval', $data['attempt_interval'], false, 12))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 $tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
 

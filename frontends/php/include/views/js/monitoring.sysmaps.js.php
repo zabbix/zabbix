@@ -123,23 +123,23 @@ function getFontComboBox($name) {
 							MAP_LABEL_LOC_TOP => _('Top')
 						])
 					)
-					->addRow((new CLabel(_('Host group')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHostGroup',
 							'objectName' => 'hostGroup'
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-							->setAttribute('aria-required', 'true'),
+							->setAriaRequired(),
 						'hostGroupSelectRow'
 					)
-					->addRow((new CLabel(_('Host')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+					->addRow((new CLabel(_('Host'), 'elementNameHost'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHost',
 							'objectName' => 'hosts'
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-							->setAttribute('aria-required', 'true'),
+							->setAriaRequired(),
 						'hostSelectRow'
 					)
-					->addRow((new CLabel(_('Triggers')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+					->addRow((new CLabel(_('Triggers')))->setAsteriskMark(), [
 						(new CDiv([
 							(new CTable())
 								->setHeader(['', _('Name'), (new CColHeader(_('Action')))->addStyle('padding: 0 5px;')])
@@ -174,12 +174,12 @@ function getFontComboBox($name) {
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 						'triggerSelectRow'
 					)
-					->addRow((new CLabel(_('Map')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+					->addRow((new CLabel(_('Map'), 'elementName')))->setAsteriskMark(), [
 						(new CTextBox('elementName'))
 							->setReadonly(true)
 							->setId('elementNameMap')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-							->setAttribute('aria-required', 'true'),
+							->setAriaRequired(),
 						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))

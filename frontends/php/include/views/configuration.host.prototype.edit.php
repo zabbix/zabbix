@@ -68,9 +68,9 @@ if (isset($hostPrototype['hostid'])) {
 $hostTB = (new CTextBox('host', $hostPrototype['host'], (bool) $hostPrototype['templateid']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 128)
-	->setAttribute('aria-required', 'true')
+	->setAriaRequired()
 	->setAttribute('autofocus', 'autofocus');
-$hostList->addRow((new CLabel(_('Host name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $hostTB);
+$hostList->addRow((new CLabel(_('Host name'), 'host'))->setAsteriskMark(), $hostTB);
 
 $name = ($hostPrototype['name'] != $hostPrototype['host']) ? $hostPrototype['name'] : '';
 $visiblenameTB = (new CTextBox('name', $name, (bool) $hostPrototype['templateid']))
@@ -193,7 +193,7 @@ foreach ($data['groups'] as $group) {
 	];
 }
 $groupList->addRow(
-	(new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Groups'), 'group_links[]'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'objectName' => 'hostGroup',
@@ -209,7 +209,7 @@ $groupList->addRow(
 		]
 	]))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 );
 
 // new group prototypes

@@ -62,7 +62,7 @@ foreach ($data['expressions'] as $i => $expression) {
 		))->onChange('onChangeExpressionType(this, '.$i.')'),
 		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('aria-required', 'true'),
+			->setAriaRequired(),
 		$exp_delimiter,
 		(new CCheckBox('expressions['.$i.'][case_sensitive]', '1'))->setChecked($expression['case_sensitive'] == 1)
 	];
@@ -93,14 +93,14 @@ $exprTable->setFooter(
 
 $exprTab = (new CFormList('exprTab'))
 	->addRow(
-		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Expressions')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Expressions')))->setAsteriskMark(),
 		(new CDiv($exprTable))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

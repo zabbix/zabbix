@@ -35,34 +35,34 @@ $houseKeeperTab = (new CFormList())
 		(new CCheckBox('hk_events_mode'))->setChecked($data['hk_events_mode'] == 1)
 	)
 	->addRow(
-		(new CLabel(_('Trigger data storage period'), 'hk_events_trigger'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Trigger data storage period'), 'hk_events_trigger'))->setAsteriskMark(),
 		(new CTextBox('hk_events_trigger', $data['hk_events_trigger']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Internal data storage period'), 'hk_events_internal'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Internal data storage period'), 'hk_events_internal'))->setAsteriskMark(),
 		(new CTextBox('hk_events_internal', $data['hk_events_internal']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Network discovery data storage period'), 'hk_events_discovery'))
-			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			->setAsteriskMark(),
 		(new CTextBox('hk_events_discovery', $data['hk_events_discovery']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Auto-registration data storage period'), 'hk_events_autoreg'))
-			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			->setAsteriskMark(),
 		(new CTextBox('hk_events_autoreg', $data['hk_events_autoreg']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(null)
 	->addRow(new CTag('h4', true, _('Services')))
@@ -72,11 +72,11 @@ $houseKeeperTab = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_services'))
-			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			->setAsteriskMark(),
 		(new CTextBox('hk_services', $data['hk_services']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_services_mode'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(null)
 	->addRow(new CTag('h4', true, _('Audit')))
@@ -86,11 +86,11 @@ $houseKeeperTab = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_audit'))
-			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			->setAsteriskMark(),
 		(new CTextBox('hk_audit', $data['hk_audit']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_audit_mode'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(null)
 	->addRow(new CTag('h4', true, _('User sessions')))
@@ -100,11 +100,11 @@ $houseKeeperTab = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_sessions'))
-			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			->setAsteriskMark(),
 		(new CTextBox('hk_sessions', $data['hk_sessions']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_sessions_mode'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(null)
 	->addRow(new CTag('h4', true, _('History')))
@@ -118,11 +118,11 @@ $houseKeeperTab = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_history'))
-			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			->setAsteriskMark(),
 		(new CTextBox('hk_history', $data['hk_history']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_history_global'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(null)
 	->addRow(new CTag('h4', true, _('Trends')))
@@ -136,11 +136,11 @@ $houseKeeperTab = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_trends'))
-			->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			->setAsteriskMark(),
 		(new CTextBox('hk_trends', $data['hk_trends']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_trends_global'] == 1)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 
 $houseKeeperView = (new CTabView())

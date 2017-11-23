@@ -49,15 +49,15 @@ $guiTab = (new CFormList())
 	->addRow(_('Enable event acknowledgement'),
 		(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)
 	)
-	->addRow((new CLabel(_('Show events not older than')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Show events not older than'), 'event_expire'))->setAsteriskMark(),
 		(new CTextBox('event_expire', $data['event_expire']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Max count of events per trigger to show')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Max count of events per trigger to show'), 'event_show_max'))->setAsteriskMark(),
 		(new CTextBox('event_show_max', $data['event_show_max']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Show warning if Zabbix server is down'),
 		(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))

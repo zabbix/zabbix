@@ -35,16 +35,16 @@ $imageForm->addVar('imagetype', $this->data['imagetype']);
 // append form list
 $imageFormList = (new CFormList('imageFormList'))
 	->addRow(
-		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $this->data['imagename'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Upload')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Upload'), 'image'))->setAsteriskMark(),
 		(new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 
 if (isset($this->data['imageid'])) {

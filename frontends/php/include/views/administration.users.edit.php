@@ -46,10 +46,10 @@ $userFormList = new CFormList('userFormList');
 
 if (!$data['is_profile']) {
 	$userFormList->addRow(
-		(new CLabel(_('Alias')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Alias'), 'alias'))->setAsteriskMark(),
 		(new CTextBox('alias', $this->data['alias']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 	$userFormList->addRow(_x('Name', 'user first name'),
@@ -69,7 +69,7 @@ if (!$this->data['is_profile']) {
 	}
 
 	$userFormList->addRow(
-		(new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Groups'), 'user_groups[]'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'user_groups[]',
 			'objectName' => 'usersGroups',
@@ -79,7 +79,7 @@ if (!$this->data['is_profile']) {
 					'&multiselect=1'
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 }
 
@@ -87,16 +87,16 @@ if (!$this->data['is_profile']) {
 if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
 		$userFormList->addRow(
-			(new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			(new CLabel(_('Password'), 'password1'))->setAsteriskMark(),
 			(new CPassBox('password1', $this->data['password1']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('aria-required', 'true')
+				->setAriaRequired()
 		);
 		$userFormList->addRow(
-			(new CLabel(_('Password (once again)')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+			(new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $this->data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('aria-required', 'true')
+				->setAriaRequired()
 		);
 
 		if (isset($this->data['change_password'])) {
@@ -185,10 +185,10 @@ if ($this->data['alias'] != ZBX_GUEST_USER) {
 }
 
 $userFormList
-	->addRow((new CLabel(_('Refresh')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Rows per page'),
 		(new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))

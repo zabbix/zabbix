@@ -34,46 +34,46 @@
 			(new CTable())
 				->addRow(
 					(new CRow([
-						(new CLabel(_('Check type'), 'type'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-						(new CComboBox('type'))->setAttribute('aria-required', 'true')
+						(new CLabel(_('Check type'), 'type'))->setAsteriskMark(),
+						(new CComboBox('type'))->setAriaRequired()
 					]))
 				)
 				->addRow(
 					(new CRow([
-						(new CLabel(_('Port range'), 'ports'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
 						(new CTextBox('ports'))
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-							->setAttribute('aria-required', 'true')
+							->setAriaRequired()
 							->setAttribute('maxlength', 255)
 					]))
 						->setId('newCheckPortsRow')
 				)
 				->addRow(
 					(new CRow([
-						(new CLabel(_('SNMP community'), 'snmp_community'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CLabel(_('SNMP community'), 'snmp_community'))->setAsteriskMark(),
 						(new CTextBox('snmp_community'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setAttribute('aria-required', 'true')
+							->setAriaRequired()
 							->setAttribute('maxlength', 255)
 					]))
 						->setId('newCheckCommunityRow')
 				)
 				->addRow(
 					(new CRow([
-						(new CLabel(_('Key'), 'key_'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CLabel(_('Key'), 'key_'))->setAsteriskMark(),
 						(new CTextBox('key_'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setAttribute('aria-required', 'true')
+							->setAriaRequired()
 							->setAttribute('maxlength', 255)
 					]))
 						->setId('newCheckKeyRow')
 				)
 				->addRow(
 					(new CRow([
-						(new CLabel(_('SNMP OID'), 'snmp_oid'))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+						(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
 						(new CTextBox('snmp_oid'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setAttribute('aria-required', 'true')
+							->setAriaRequired()
 							->setAttribute('maxlength', 512)
 					]))
 						->setId('new_check_snmp_oid_row')
@@ -139,10 +139,10 @@
 				->addRow(
 					(new CRow([
 						(new CLabel(_('Privacy passphrase'), 'snmpv3_privpassphrase'))
-							->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+							->setAsteriskMark(),
 						(new CTextBox('snmpv3_privpassphrase'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setAttribute('aria-required', 'true')
+							->setAriaRequired()
 							->setAttribute('maxlength', 64)
 					]))
 						->setId('newCheckPrivPassRow')

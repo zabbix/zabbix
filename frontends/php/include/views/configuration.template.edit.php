@@ -74,10 +74,10 @@ $frmHost->addVar('clear_templates', $clear_templates);
 // TEMPLATE WIDGET {
 $templateList = (new CFormList('hostlist'))
 	->addRow(
-		(new CLabel(_('Template name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
 		(new CTextBox('template_name', $host, false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
@@ -118,7 +118,7 @@ else {
 	}
 }
 
-$templateList->addRow((new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+$templateList->addRow((new CLabel(_('Groups')))->setAsteriskMark(),
 	$groupsTB->get(_('In groups'), _('Other groups'))
 );
 

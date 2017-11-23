@@ -34,10 +34,10 @@ if ($data['usrgrpid'] != 0) {
 */
 $userGroupFormList = (new CFormList())
 	->addRow(
-		(new CLabel(_('Group name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Group name'), 'gname'))->setAsteriskMark(),
 		(new CTextBox('gname', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 

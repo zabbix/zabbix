@@ -51,11 +51,11 @@ if (!empty($this->data['templates'])) {
 // Name
 $nameTextBox = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAttribute('aria-required', 'true');
+	->setAriaRequired();
 if (!$this->data['templated']) {
 	$nameTextBox->setAttribute('autofocus', 'autofocus');
 }
-$httpFormList->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $nameTextBox);
+$httpFormList->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), $nameTextBox);
 
 // Application
 if ($this->data['application_list']) {
@@ -75,10 +75,10 @@ $httpFormList
 			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 	)
-	->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
 		(new CTextBox('delay', $data['delay']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Attempts'),
 		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
@@ -150,15 +150,15 @@ $httpAuthenticationFormList->addRow(_('HTTP authentication'),
 );
 
 $httpAuthenticationFormList
-	->addRow((new CLabel(_('User')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('User'), 'http_user'))->setAsteriskMark(),
 		(new CTextBox('http_user', $this->data['http_user'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Password')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
 		(new CTextBox('http_password', $this->data['http_password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
@@ -264,7 +264,7 @@ if (!$this->data['templated']) {
 	);
 }
 
-$httpStepFormList->addRow((new CLabel(_('Steps')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+$httpStepFormList->addRow((new CLabel(_('Steps')))->setAsteriskMark(),
 	(new CDiv($stepsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 

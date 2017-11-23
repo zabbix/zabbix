@@ -16,7 +16,7 @@
 		new CCol((
 			(new CTextBox('iconmap[mappings][#{iconmappingid}][expression]', '', false, 64))
 				->setId('iconmap_mappings_#{iconmappingid}_expression')
-				->setAttribute('aria-required', 'true')
+				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		)),
 		new CCol(

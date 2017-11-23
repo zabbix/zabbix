@@ -61,10 +61,10 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 }
 
 $hostList->addRow(
-	(new CLabel(_('Host name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
 	(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 );
 
@@ -89,7 +89,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	}
 
 	$hostList->addRow(
-		(new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Groups')))->setAsteriskMark(),
 		$groupsTB->get(_('In groups'), _('Other groups'))
 	);
 
@@ -114,7 +114,7 @@ else {
 			);
 		}
 	}
-	$hostList->addRow((new CLabel(_('Groups')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $groupBox);
+	$hostList->addRow((new CLabel(_('Groups')))->setAsteriskMark(), $groupBox);
 	$hostList->addVar('groups', $data['groups']);
 }
 
@@ -125,7 +125,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		: 'hostInterfacesManager.addNew("agent");');
 
 	$hostList->addRow('',
-		(new CLabel(_('At least one interface must exist.')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
+		(new CLabel(_('At least one interface must exist.')))->setAsteriskMark()
 	);
 	// Zabbix agent interfaces
 	$ifTab = (new CTable())
@@ -801,16 +801,16 @@ $encryption_form_list = (new CFormList('encryption'))
 			)
 	)
 	->addRow(
-		(new CLabel(_('PSK identity')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('PSK')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))

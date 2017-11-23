@@ -33,9 +33,9 @@ $iconMapTab = new CFormList();
 $name = (new CTextBox('iconmap[name]', $this->data['iconmap']['name']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 64)
-	->setAttribute('aria-required', 'true')
+	->setAriaRequired()
 	->setAttribute('autofocus', 'autofocus');
-$iconMapTab->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $name);
+$iconMapTab->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
 
 $iconMapForm = (new CForm())
 	->addVar('form', 1);
@@ -60,7 +60,7 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 	$expressionTextBox = [
 		(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', 64)
 	];
 
@@ -125,7 +125,7 @@ $iconMapTable->addRow([
 // </default icon row>
 
 $iconMapTab->addRow(
-	(new CLabel(_('Mappings')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Mappings')))->setAsteriskMark(),
 	(new CDiv($iconMapTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

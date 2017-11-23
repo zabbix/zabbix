@@ -29,50 +29,50 @@ $widget = (new CWidget())
 	);
 
 $severityTab = (new CFormList())
-	->addRow((new CLabel(_('Not classified')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+	->addRow((new CLabel(_('Not classified'), 'severity_name_0'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_0', $data['severity_name_0']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_0', $data['severity_color_0'])
 	])
-	->addRow((new CLabel(_('Information')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+	->addRow((new CLabel(_('Information'), 'severity_name_1'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_1', $data['severity_name_1']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_1', $data['severity_color_1'])
 	])
-	->addRow((new CLabel(_('Warning')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+	->addRow((new CLabel(_('Warning'), 'severity_name_2'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_2', $data['severity_name_2']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_2', $data['severity_color_2'])
 	])
-	->addRow((new CLabel(_('Average')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+	->addRow((new CLabel(_('Average'), 'severity_name_3'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_3', $data['severity_name_3']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_3', $data['severity_color_3'])
 	])
-	->addRow((new CLabel(_('High')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+	->addRow((new CLabel(_('High'), 'severity_name_4'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_4', $data['severity_name_4']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_4', $data['severity_color_4'])
 	])
-	->addRow((new CLabel(_('Disaster')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+	->addRow((new CLabel(_('Disaster'), 'severity_name_5'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_5', $data['severity_name_5']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_5', $data['severity_color_5'])

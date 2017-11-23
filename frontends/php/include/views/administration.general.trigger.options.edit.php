@@ -29,45 +29,45 @@ $widget = (new CWidget())
 	);
 
 $triggerDOFormList = (new CFormList())
-	->addRow((new CLabel(_('Unacknowledged PROBLEM events')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CColor('problem_unack_color', $data['problem_unack_color']))->setAttribute('aria-required', 'true'),
+	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
+		(new CColor('problem_unack_color', $data['problem_unack_color']))->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_unack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['problem_unack_style'] == 1)
 	])
-	->addRow((new CLabel(_('Acknowledged PROBLEM events')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CColor('problem_ack_color', $data['problem_ack_color']))->setAttribute('aria-required', 'true'),
+	->addRow((new CLabel(_('Acknowledged PROBLEM events'), 'problem_ack_color'))->setAsteriskMark(), [
+		(new CColor('problem_ack_color', $data['problem_ack_color']))->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_ack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['problem_ack_style'] == 1)
 	])
-	->addRow((new CLabel(_('Unacknowledged OK events')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CColor('ok_unack_color', $data['ok_unack_color']))->setAttribute('aria-required', 'true'),
+	->addRow((new CLabel(_('Unacknowledged OK events'), 'ok_unack_color'))->setAsteriskMark(), [
+		(new CColor('ok_unack_color', $data['ok_unack_color']))->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_unack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['ok_unack_style'] == 1)
 	])
-	->addRow((new CLabel(_('Acknowledged OK events')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
-		(new CColor('ok_ack_color', $data['ok_ack_color']))->setAttribute('aria-required', 'true'),
+	->addRow((new CLabel(_('Acknowledged OK events'), 'ok_ack_color'))->setAsteriskMark(), [
+		(new CColor('ok_ack_color', $data['ok_ack_color']))->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_ack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['ok_ack_style'] == 1)
 	])
 	->addRow(null)
-	->addRow((new CLabel(_('Display OK triggers for')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+	->addRow((new CLabel(_('Display OK triggers for'), 'ok_period'))->setAsteriskMark(), [
 		(new CTextBox('ok_period', $data['ok_period']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', '6')
 	])
-	->addRow((new CLabel(_('On status change triggers blink for')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), [
+	->addRow((new CLabel(_('On status change triggers blink for'), 'blink_period'))->setAsteriskMark(), [
 		(new CTextBox('blink_period', $data['blink_period']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('maxlength', '6')
 	]);
 

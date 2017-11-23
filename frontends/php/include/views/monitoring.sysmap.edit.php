@@ -74,21 +74,21 @@ if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users
 	$multiselect_data['data'] = $owner_data;
 
 	// Append multiselect to map tab.
-	$map_tab->addRow((new CLabel(_('Owner')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	$map_tab->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
 		(new CMultiSelect($multiselect_data))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 }
 else {
 	$multiselect_userid = (new CMultiSelect($multiselect_data))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true');
+		->setAriaRequired();
 
 	// Administrators can change map owner, but cannot see users from other groups.
 	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
 		$map_tab
-			->addRow((new CLabel(_('Owner')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $multiselect_userid)
+			->addRow((new CLabel(_('Owner')))->setAsteriskMark(), $multiselect_userid)
 			->addRow('', _('Inaccessible user'), 'inaccessible_user');
 	}
 	else {
@@ -102,21 +102,21 @@ else {
 	}
 }
 
-$map_tab->addRow((new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+$map_tab->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['sysmap']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow((new CLabel(_('Width')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Width'), 'width'))->setAsteriskMark(),
 		(new CNumericBox('width', $data['sysmap']['width'], 5))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Height')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Height'), 'height'))->setAsteriskMark(),
 		(new CNumericBox('height', $data['sysmap']['height'], 5))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 
 // Append background image to form list.

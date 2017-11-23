@@ -58,10 +58,10 @@ if (!empty($data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $data['templates']);
 }
 $triggersFormList->addRow(
-	(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
 	(new CTextBox('description', $data['description'], $data['limited']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 )
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
@@ -93,7 +93,7 @@ $expression_row = [
 		['readonly' => $data['expression_field_readonly']]
 	))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_expression_button
 ];
@@ -151,7 +151,7 @@ elseif ($data['expression_constructor'] != IM_FORCED) {
 }
 
 $triggersFormList->addRow(
-	(new CLabel(_('Expression')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Expression'), $data['expression_field_name']))->setAsteriskMark(),
 	$expression_row,
 	'expression_row'
 );
@@ -294,7 +294,7 @@ $recovery_expression_row = [
 		['readonly' => $data['recovery_expression_field_readonly']]
 	))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('aria-required', 'true'),
+		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_recovery_expression_button
 ];
@@ -344,7 +344,7 @@ elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
 }
 
 $triggersFormList->addRow(
-	(new CLabel(_('Recovery expression')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Recovery expression'), $data['recovery_expression_field_name']))->setAsteriskMark(),
 	$recovery_expression_row,
 	null,
 	'recovery_expression_constructor_row'
@@ -475,10 +475,10 @@ $triggersFormList
 		'correlation_mode_row'
 	)
 	->addRow(
-		(new CLabel(_('Tag for matching')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Tag for matching'), 'correlation_tag'))->setAsteriskMark(),
 		(new CTextBox('correlation_tag', $data['correlation_tag'], $data['limited']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true'),
+			->setAriaRequired(),
 		'correlation_tag_row'
 	);
 

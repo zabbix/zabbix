@@ -34,10 +34,10 @@ if (!empty($this->data['druleid'])) {
 // create form list
 $discoveryFormList = (new CFormList())
 	->addRow(
-		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $this->data['drule']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -50,19 +50,19 @@ foreach ($this->data['proxies'] as $proxy) {
 
 $discoveryFormList
 	->addRow(_('Discovery by proxy'), $proxyComboBox)
-	->addRow((new CLabel(_('IP range')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('IP range'), 'iprange'))->setAsteriskMark(),
 		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Update interval')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
 		(new CTextBox('delay', $data['drule']['delay']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	);
 
 $discoveryFormList->addRow(
-	(new CLabel(_('Checks')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Checks')))->setAsteriskMark(),
 	(new CDiv(
 		(new CTable())
 			->setAttribute('style', 'width: 100%;')

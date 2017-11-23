@@ -49,7 +49,7 @@ $interfaceTable = (new CTable())
 			->setModern(true),
 		(new CTextBox('port', $data['port'], false, 64))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	]);
 
 // append hosts to form list
@@ -71,19 +71,19 @@ foreach ($data['all_hosts'] as $host) {
 }
 
 $proxy_form_list = (new CFormList('proxyFormList'))
-	->addRow((new CLabel(_('Proxy name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Proxy name'), 'host'))->setAsteriskMark(),
 		(new CTextBox('host', $data['host'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow(_('Proxy mode'),
+	->addRow((new CLabel(_('Proxy mode'), 'status'))->setAsteriskMark(),
 		(new CRadioButtonList('status', (int) $data['status']))
 			->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
 			->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
 			->setModern(true)
 	)
-	->addRow((new CLabel(_('Interface')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Interface')))->setAsteriskMark(),
 		(new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
 	->addRow(_('Proxy address'),
@@ -113,13 +113,13 @@ $encryption_form_list = (new CFormList('encryption'))
 			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
 			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
 	)
-	->addRow((new CLabel(_('PSK identity')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('PSK')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

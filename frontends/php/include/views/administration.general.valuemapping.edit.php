@@ -36,10 +36,10 @@ if ($data['valuemapid'] != 0) {
 
 $form_list = (new CFormList())
 	->addRow(
-		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -51,11 +51,11 @@ $table = (new CTable())
 foreach ($data['mappings'] as $i => $mapping) {
 	$table->addRow([
 		(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true'),
+			->setAriaRequired(),
 		'&rArr;',
 		(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('aria-required', 'true'),
+			->setAriaRequired(),
 		(new CButton('mappings['.$i.'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
@@ -73,7 +73,7 @@ $table->addRow([
 ]);
 
 $form_list->addRow(
-	(new CLabel(_('Mappings')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Mappings')))->setAsteriskMark(),
 	(new CDiv($table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

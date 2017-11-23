@@ -31,7 +31,7 @@ $form_list = new CFormList();
 // common fields
 $form_list->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(),
 	(new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $data['known_widget_types']))
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 );
 
 $form_list->addRow(_('Name'),
@@ -53,7 +53,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$field_object = new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues());
 
 		if ($aria_required) {
-			$field_object->setAttribute('aria-required', 'true');
+			$field_object->setAriaRequired();
 		}
 
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -64,7 +64,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$field_object = (new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 		if ($aria_required) {
-			$field_object->setAttribute('aria-required', 'true');
+			$field_object->setAriaRequired();
 		}
 
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -92,7 +92,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 		if ($aria_required) {
-			$field_groupids->setAttribute('aria-required', 'true');
+			$field_groupids->setAriaRequired();
 		}
 
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -116,7 +116,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 		if ($aria_required) {
-			$field_hostids->setAttribute('aria-required', 'true');
+			$field_hostids->setAriaRequired();
 		}
 
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -144,7 +144,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 		if ($aria_required) {
-			$field_object->setAttribute('aria-required', 'true');
+			$field_object->setAriaRequired();
 		}
 
 		// Needed for popup script.
@@ -162,7 +162,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px');
 
 		if ($aria_required) {
-			$field_object->setAttribute('aria-required', 'true');
+			$field_object->setAriaRequired();
 		}
 
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -176,7 +176,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 
 		if ($aria_required) {
-			$field_object->setAttribute('aria-required', 'true');
+			$field_object->setAriaRequired();
 		}
 
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -191,7 +191,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		}
 
 		if ($aria_required) {
-			$radio_button_list->setAttribute('aria-required', 'true');
+			$radio_button_list->setAriaRequired();
 		}
 
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -262,8 +262,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 		if ($aria_required) {
-			$tag_box->setAttribute('aria-required', 'true');
-			$value_box->setAttribute('aria-required', 'true');
+			$tag_box->setAriaRequired();
+			$value_box->setAriaRequired();
 		}
 
 		$jq_templates['tag-row'] = (new CRow([

@@ -34,10 +34,10 @@ if (isset($this->data['maintenanceid'])) {
  */
 $maintenanceFormList = (new CFormList('maintenanceFormList'))
 	->addRow(
-		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
 		(new CTextBox('mname', $this->data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Maintenance type'),
@@ -150,7 +150,7 @@ if (!isset($_REQUEST['new_timeperiod'])) {
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 }
-$maintenancePeriodFormList->addRow((new CLabel(_('Periods')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK), $periodsDiv);
+$maintenancePeriodFormList->addRow((new CLabel(_('Periods')))->setAsteriskMark(), $periodsDiv);
 
 if (isset($_REQUEST['new_timeperiod'])) {
 	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {
@@ -181,7 +181,7 @@ if (isset($_REQUEST['new_timeperiod'])) {
  * Hosts & groups tab
  */
 $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))->addRow('',
-	(new CLabel(_('At least one host or host group must be selected.')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
+	(new CLabel(_('At least one host or host group must be selected.')))->setAsteriskMark()
 );
 $hostTweenBox = new CTweenBox($maintenanceForm, 'hostids', $this->data['hostids'], 10);
 foreach ($this->data['hosts'] as $host) {

@@ -71,26 +71,26 @@ if ($discovered_graph) {
 
 $graphFormList
 	->addRow(
-		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $this->data['name'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow((new CLabel(_('Width')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Width'), 'width'))->setAsteriskMark(),
 		(new CNumericBox('width', $this->data['width'], 5, $readonly))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Height')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Height'), 'height'))->setAsteriskMark(),
 		(new CNumericBox('height', $this->data['height'], 5, $readonly))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Graph type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('Graph type'), 'graphtype'))->setAsteriskMark(),
 		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))
 			->setEnabled(!$readonly)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -176,7 +176,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true');
+			->setAriaRequired();
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 		// Select item button.
@@ -215,7 +215,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$yaxismin_label = new CLabel(_('Y axis MIN value'));
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$yaxismin_label->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK);
+		$yaxismin_label->setAsteriskMark();
 	}
 
 	$graphFormList->addRow($yaxismin_label, $yaxisMinData);
@@ -247,7 +247,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true');
+			->setAriaRequired();
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 		// Select item button.
@@ -288,7 +288,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$yaxismax_label = new CLabel(_('Y axis MAX value'));
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$yaxismax_label->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK);
+		$yaxismax_label->setAsteriskMark();
 	}
 
 	$graphFormList->addRow($yaxismax_label, $yaxisMaxData);
@@ -371,7 +371,7 @@ foreach ($this->data['items'] as $n => $item) {
 }
 
 $graphFormList->addRow(
-	(new CLabel(_('Items')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	(new CLabel(_('Items')))->setAsteriskMark(),
 	(new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 

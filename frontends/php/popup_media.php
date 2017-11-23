@@ -123,19 +123,19 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 $frmMedia = (new CFormList(_('Media')))
-	->addRow((new CLabel(_('Type')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
-		(new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))->setAttribute('aria-required', 'true')
+	->addRow((new CLabel(_('Type'), 'mediatypeid'))->setAsteriskMark(),
+		(new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Send to')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
 		(new CTextBox('sendto', $sendto, false, 100))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('When active')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+	->addRow((new CLabel(_('When active'), 'period'))->setAsteriskMark(),
 		(new CTextBox('period', $period, false, 1024))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 	)
 	->addRow(_('Use if severity'), $frm_row)
 	->addRow(_('Enabled'), (new CCheckBox('active', MEDIA_STATUS_ACTIVE))->setChecked($active == MEDIA_STATUS_ACTIVE));

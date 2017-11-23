@@ -39,10 +39,10 @@ if (isset($this->data['service'])) {
 // create form list
 $servicesFormList = (new CFormList('servicesFormList'))
 	->addRow(
-		(new CLabel(_('Name')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $this->data['name'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('aria-required', 'true')
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -58,7 +58,9 @@ $servicesFormList->addRow(_('Parent service'), [
 ]);
 
 // append algorithm to form list
-$servicesFormList->addRow(_('Status calculation algorithm'),
+$servicesFormList->addRow(
+	(new CLabel(_('Status calculation algorithm', 'algorithm')))
+		->setAsteriskMark(),
 	new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorithm())
 );
 
@@ -89,10 +91,10 @@ $servicesFormList->addRow(_('Trigger'), [
 			'&with_triggers=1");'
 		)
 ]);
-$servicesFormList->addRow((new CLabel(_('Sort order (0->999)')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+$servicesFormList->addRow((new CLabel(_('Sort order (0->999)')))->setAsteriskMark(),
 	(new CTextBox('sortorder', $this->data['sortorder'], false, 3))
 		->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 );
 
 /*
@@ -273,26 +275,26 @@ else {
 	$timeFromHourTextBox = (new CTextBox('new_service_time[from_hour]', isset($_REQUEST['new_service_time']['from_hour'])
 			? $_REQUEST['new_service_time']['from_hour'] : '', false, 2))
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 		->setAttribute('placeholder', _('hh'));
 	$timeFromMinuteTextBox = (new CTextBox('new_service_time[from_minute]', isset($_REQUEST['new_service_time']['from_minute'])
 			? $_REQUEST['new_service_time']['from_minute'] : '', false, 2))
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 		->setAttribute('placeholder', _('mm'));
 	$timeToHourTextBox = (new CTextBox('new_service_time[to_hour]', isset($_REQUEST['new_service_time']['to_hour'])
 			? $_REQUEST['new_service_time']['to_hour'] : '', false, 2))
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 		->setAttribute('placeholder', _('hh'));
 	$timeToMinuteTextBox = (new CTextBox('new_service_time[to_minute]', isset($_REQUEST['new_service_time']['to_minute'])
 			? $_REQUEST['new_service_time']['to_minute'] : '', false, 2))
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-		->setAttribute('aria-required', 'true')
+		->setAriaRequired()
 		->setAttribute('placeholder', _('mm'));
 
 	$serviceTimeTable->addRow([
-		(new CLabel(_('From')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('From')))->setAsteriskMark(),
 		[
 			$weekFromComboBox,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -306,7 +308,7 @@ else {
 		]
 	]);
 	$serviceTimeTable->addRow([
-		(new CLabel(_('Till')))->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK),
+		(new CLabel(_('Till')))->setAsteriskMark(),
 		[
 			$weekToComboBox,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
