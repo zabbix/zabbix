@@ -999,6 +999,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
 ..F....... [ZBX-12912] fixed error handling on graph form for preview image (gcalenko)
 ....I..... [ZBX-12232] fixed mysql m4 configuration script for mariadb C connector (abs)
 ..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
