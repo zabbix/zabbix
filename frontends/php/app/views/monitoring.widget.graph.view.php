@@ -52,7 +52,7 @@ if ($data['widget']['initial_load'] == 1) {
 				'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
 					'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
 					'new_width = content.width(),'.
-					'new_height = content.height() - 10,'.
+					'new_height = content.height() - 4,'.
 					'src = jQuery("#"+img_id).attr("src");'.
 
 				'if (typeof src === "undefined") {'.
