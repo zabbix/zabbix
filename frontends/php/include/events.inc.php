@@ -171,6 +171,7 @@ function get_next_event($currentEvent, array $eventList = []) {
  * @param string $event['eventid']					Event ID.
  * @param string $event['correlationid']			OK Event correlation ID.
  * @param string $event['userid]					User ID who gerenerated the OK event.
+ * @param string $event['name']						Event name.
  * @param string $backurl							A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
