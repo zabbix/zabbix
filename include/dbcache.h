@@ -134,13 +134,13 @@ typedef struct
 }
 DC_HOST;
 
-#define ZBX_SYNC_INVENTORY_FIELDS	70
+#define ZBX_MAX_INVENTORY_FIELDS	70
 
 typedef struct
 {
 	zbx_uint64_t	hostid;
 	unsigned char	inventory_mode;
-	char		*fields[ZBX_SYNC_INVENTORY_FIELDS];
+	char		*fields[ZBX_MAX_INVENTORY_FIELDS];
 }
 DC_HOST_INVENTORY;
 

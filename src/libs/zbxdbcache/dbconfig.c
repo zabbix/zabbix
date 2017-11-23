@@ -1472,7 +1472,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(host_inventory->inventory_mode, row[1]);
 
 		/* store new information in host_inventory structure */
-		for (i = 0; ZBX_SYNC_INVENTORY_FIELDS > i; i++)
+		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
 			DCstrpool_replace(found, &(host_inventory->fields[i]), row[i + 2]);
 	}
 
@@ -1482,7 +1482,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		if (NULL == (host_inventory = zbx_hashset_search(&config->host_inventories, &rowid)))
 			continue;
 
-		for (i = 0; ZBX_SYNC_INVENTORY_FIELDS > i; i++)
+		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
 			zbx_strpool_release(host_inventory->fields[i]);
 
 		zbx_hashset_remove_direct(&config->host_inventories, host_inventory);
@@ -10844,7 +10844,7 @@ int	DCget_host_inventory_by_hostid(DC_HOST_INVENTORY *dst, zbx_uint64_t hostid)
 		dst->hostid = src->hostid;
 		dst->inventory_mode = src->inventory_mode;
 
-		for (i = 0; i < ZBX_SYNC_INVENTORY_FIELDS; i++)
+		for (i = 0; i < ZBX_MAX_INVENTORY_FIELDS; i++)
 			dst->fields[i] = zbx_strdup(NULL, src->fields[i]);
 
 		ret = SUCCEED;

@@ -2021,7 +2021,7 @@ static void	free_host_inventory(DC_HOST_INVENTORY *inventory)
 {
 	int	i;
 
-	for (i = 0; i < ZBX_SYNC_INVENTORY_FIELDS; i++)
+	for (i = 0; i < ZBX_MAX_INVENTORY_FIELDS; i++)
 		zbx_free(inventory->fields[i]);
 }
 

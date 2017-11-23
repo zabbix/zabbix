@@ -1683,8 +1683,6 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
 	return buf[n];
 }
 
-#define ZBX_MAX_INVENTORY_FIELDS	70
-
 /******************************************************************************
  *                                                                            *
  * Function: DBget_inventory_field                                            *
@@ -1720,8 +1718,6 @@ const char	*DBget_inventory_field(unsigned char inventory_link)
 
 	return inventory_fields[inventory_link - 1];
 }
-
-#undef ZBX_MAX_INVENTORY_FIELDS
 
 int	DBtxn_status(void)
 {
