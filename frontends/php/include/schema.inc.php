@@ -4331,7 +4331,7 @@ return [
 			'sendto' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
+				'length' => 1024,
 				'default' => '',
 			],
 			'subject' => [
