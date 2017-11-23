@@ -1797,7 +1797,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 				->addItem(' ') // space
 				->addItem((new CSpan())
 					->setId('details-arrow')
-					->addClass($show_details ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP)
+					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
 				)
 				->onClick('javascript: '.
 					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
@@ -1824,7 +1824,6 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 
 	$msg_box = (new CDiv())->addClass($class)
 		->addItem($link_details) // Details link should be in front of title
-		->addItem(($link_details === null) ? null : ' ') // Followed by space
 		->addItem($title)
 		->addItem($msg_details);
 
