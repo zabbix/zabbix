@@ -144,16 +144,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_save_trigger_changes                                         *
+ * Function: zbx_db_save_trigger_changes                                      *
  *                                                                            *
  * Purpose: save the trigger changes to database                              *
  *                                                                            *
  * Parameters:trigger_diff - [IN] the trigger changeset                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
+void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 {
-	const char			*__function_name = "zbx_save_trigger_changes";
+	const char			*__function_name = "zbx_db_save_trigger_changes";
 
 	int				i;
 	char				*sql = NULL;
