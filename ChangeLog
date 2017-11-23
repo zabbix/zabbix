@@ -430,6 +430,7 @@ Changes for 3.2.11rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
 ..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
 ..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
 ........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
