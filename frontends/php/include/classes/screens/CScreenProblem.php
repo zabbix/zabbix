@@ -559,8 +559,18 @@ class CScreenProblem extends CScreenBase {
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
 			}
 			unset($trigger);
+
+			$data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
+				'html' => true,
+				'resolve_usermacros' => true,
+				'resolve_macros' => true,
+				'sources' => ['expression_html', 'recovery_expression_html']
+			]);
 		}
 		$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
+		if ($get_comments) {
+			$data['triggers'] = CMacrosResolverHelper::resolveTriggerDescriptions($data['triggers']);
+		}
 
 		// get additional data
 		$eventids = array_keys($data['problems']);
