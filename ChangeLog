@@ -31,6 +31,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
 ..F....... [ZBXNEXT-1421] added sortorder parameter for service dependencies for sorting purposes (miks)
 ..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
 ..F....... [ZBX-12912] fixed error handling on graph form for preview image (gcalenko)
@@ -439,6 +440,7 @@ Changes for 3.2.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
 ..F....... [ZBXNEXT-1421] added sortorder parameter for service dependencies for sorting purposes (miks)
 ..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
 ..F....... [ZBX-12912] fixed error handling on graph form for preview image (gcalenko)
@@ -1003,6 +1005,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
 ..F....... [ZBXNEXT-1421] added sortorder parameter for service dependencies for sorting purposes (miks)
 ..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
 ..F....... [ZBX-12912] fixed error handling on graph form for preview image (gcalenko)
@@ -2819,6 +2822,7 @@ Changes for 2.2.21rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
 ..F....... [DEV-593] fixed multiple security issues (miks)
 .......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
 
