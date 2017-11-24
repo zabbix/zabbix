@@ -30,7 +30,7 @@ out:
   uint64:
     - &1 7
 db data:
-  tablename1_tablename2:
+  tablename1 tablename2:
     # test_2
     - [*1]
 ---
@@ -41,7 +41,7 @@ out:
   uint64:
     - &1 7
 db data:
-  tablename1_tablename2:
+  tablename1 tablename2:
     # test_2
     - [*1]
 ...

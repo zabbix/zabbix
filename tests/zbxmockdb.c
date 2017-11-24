@@ -68,7 +68,7 @@ static char	*generate_data_source(const char *sql)
 			if (' ' == *ptr_sql || ';' == *ptr_sql)
 			{
 				found = 0;
-				*(ptr_ds++) = '_';
+				*(ptr_ds++) = ' ';
 			}
 			else
 				*(ptr_ds++) = *ptr_sql;
@@ -144,7 +144,7 @@ DB_ROW	__wrap_zbx_db_fetch(DB_RESULT result)
 		if (ZBX_MOCK_DB_RESULT_COLUMNS_MAX <= column)
 			fail_msg("Too many columns for data source \"%s\".", result->data_source);
 
-		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(field, &result->row[column])))
+		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(field, (const char **)&result->row[column])))
 			break;
 
 		column++;
