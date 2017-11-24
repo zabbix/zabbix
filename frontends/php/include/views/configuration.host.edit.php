@@ -89,7 +89,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	}
 
 	$hostList->addRow(
-		(new CLabel(_('Groups')))->setAsteriskMark(),
+		(new CLabel(_('Groups'), 'id'))->setAsteriskMark(),
 		$groupsTB->get(_('In groups'), _('Other groups'))
 	);
 
@@ -114,7 +114,7 @@ else {
 			);
 		}
 	}
-	$hostList->addRow((new CLabel(_('Groups')))->setAsteriskMark(), $groupBox);
+	$hostList->addRow((new CLabel(_('Groups'), 'host_groups'))->setAsteriskMark(), $groupBox->setId('host_groups'));
 	$hostList->addVar('groups', $data['groups']);
 }
 

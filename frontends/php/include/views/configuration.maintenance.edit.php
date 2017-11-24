@@ -105,7 +105,9 @@ $maintenanceFormList->addRow(_('Description'),
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
 $maintenancePeriodTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]);
+	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')])
+	->setId('maintenance_periods')
+	->setAriaRequired();
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow([
@@ -151,7 +153,7 @@ if (!isset($_REQUEST['new_timeperiod'])) {
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 }
-$maintenancePeriodFormList->addRow((new CLabel(_('Periods')))->setAsteriskMark(), $periodsDiv);
+$maintenancePeriodFormList->addRow((new CLabel(_('Periods'), 'maintenance_periods'))->setAsteriskMark(), $periodsDiv);
 
 if (isset($_REQUEST['new_timeperiod'])) {
 	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {

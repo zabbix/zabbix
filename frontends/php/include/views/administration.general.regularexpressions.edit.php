@@ -102,7 +102,7 @@ $exprTab = (new CFormList('exprTab'))
 			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Expressions')))->setAsteriskMark(),
+		(new CLabel(_('Expressions'), 'tbl_expr'))->setAsteriskMark(),
 		(new CDiv($exprTable))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

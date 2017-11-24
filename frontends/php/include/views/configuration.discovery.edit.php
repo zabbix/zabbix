@@ -62,7 +62,7 @@ $discoveryFormList
 	);
 
 $discoveryFormList->addRow(
-	(new CLabel(_('Checks')))->setAsteriskMark(),
+	(new CLabel(_('Checks'), 'dcheckList'))->setAsteriskMark(),
 	(new CDiv(
 		(new CTable())
 			->setAttribute('style', 'width: 100%;')

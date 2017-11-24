@@ -36,7 +36,7 @@ if ($data['actionid']) {
 // Action tab.
 $action_tab = (new CFormList())
 	->addRow(
-		(new CLabel(_('Name')))->setAsteriskMark(),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['action']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -375,7 +375,7 @@ $action_tab->addRow(_('Enabled'),
 $operation_tab = new CFormList('operationlist');
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$operation_tab->addRow((new CLabel(_('Default operation step duration')))->setAsteriskMark(),
+	$operation_tab->addRow((new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
 		(new CTextBox('esc_period', $data['action']['esc_period']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
@@ -590,7 +590,8 @@ if (!empty($data['new_operation'])) {
 		foreach ($data['allowedOperations'][ACTION_OPERATION] as $operation) {
 			$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 		}
-		$new_operation_formlist->addRow((new CLabel(_('Operation type')))->setAsteriskMark(),
+		$new_operation_formlist->addRow(
+			(new CLabel(_('Operation type'), 'new_operation[operationtype]'))->setAsteriskMark(),
 			$operationTypeComboBox->setAriaRequired()
 		);
 	}
@@ -840,7 +841,7 @@ if (!empty($data['new_operation'])) {
 
 			// target list
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Target list')))->setAsteriskMark(),
+				(new CLabel(_('Target list'), 'opCmdList'))->setAsteriskMark(),
 				(new CDiv(
 					(new CTable())
 						->setAttribute('style', 'width: 100%;')
@@ -886,7 +887,7 @@ if (!empty($data['new_operation'])) {
 				$typeComboBox->setAriaRequired()
 			);
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Script name')))->setAsteriskMark(),
+				(new CLabel(_('Script name'), 'new_operation_opcommand_script'))->setAsteriskMark(),
 				(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
 			);
 
@@ -913,19 +914,20 @@ if (!empty($data['new_operation'])) {
 			);
 
 			$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
-			$new_operation_formlist->addRow((new CLabel(_('User name')))->setAsteriskMark(),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('User name'), 'new_operation[opcommand][username]'))->setAsteriskMark(),
 				(new CTextBox('new_operation[opcommand][username]', $data['new_operation']['opcommand']['username']))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setAriaRequired()
 			);
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Public key file')))->setAsteriskMark(),
+				(new CLabel(_('Public key file'), 'new_operation[opcommand][publickey]'))->setAsteriskMark(),
 				(new CTextBox('new_operation[opcommand][publickey]', $data['new_operation']['opcommand']['publickey']))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setAriaRequired()
 			);
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Private key file')))->setAsteriskMark(),
+				(new CLabel(_('Private key file'), 'new_operation[opcommand][privatekey]'))->setAsteriskMark(),
 				(new CTextBox('new_operation[opcommand][privatekey]', $data['new_operation']['opcommand']['privatekey']))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setAriaRequired()
@@ -949,13 +951,13 @@ if (!empty($data['new_operation'])) {
 
 			// command
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Commands')))->setAsteriskMark(),
+				(new CLabel(_('Commands'), 'new_operation[opcommand][command]'))->setAsteriskMark(),
 				(new CTextArea('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
 			);
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Commands')))->setAsteriskMark(),
+				(new CLabel(_('Commands'), 'new_operation[opcommand][command]'))->setAsteriskMark(),
 				(new CTextBox('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setId('new_operation_opcommand_command_ipmi')
@@ -976,7 +978,7 @@ if (!empty($data['new_operation'])) {
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Host groups')))->setAsteriskMark(),
+				(new CLabel(_('Host groups'), 'new_operation[groupids][]'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[groupids][]',
 					'objectName' => 'hostGroup',
@@ -995,7 +997,7 @@ if (!empty($data['new_operation'])) {
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Templates')))->setAsteriskMark(),
+				(new CLabel(_('Templates'), 'new_operation[templateids][]'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[templateids][]',
 					'objectName' => 'templates',
@@ -1335,7 +1337,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			foreach ($data['allowedOperations'][ACTION_RECOVERY_OPERATION] as $operation) {
 				$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 			}
-			$new_operation_formlist->addRow((new CLabel(_('Operation type')))->setAsteriskMark(),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Operation type'), 'new_recovery_operation[operationtype]'))->setAsteriskMark(),
 				$operationTypeComboBox->setAriaRequired()
 			);
 		}
@@ -1588,7 +1591,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				// target list
 				$new_operation_formlist->addRow(
-					(new CLabel(_('Target list')))->setAsteriskMark(),
+					(new CLabel(_('Target list'), 'recOpCmdList'))->setAsteriskMark(),
 					(new CDiv(
 						(new CTable())
 							->setAttribute('style', 'width: 100%;')
@@ -1639,7 +1642,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					$typeComboBox->setAriaRequired()
 				);
 				$new_operation_formlist->addRow(
-					(new CLabel(_('Script name')))->setAsteriskMark(),
+					(new CLabel(_('Script name'), 'new_recovery_operation[opcommand][script]'))->setAsteriskMark(),
 					(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
 				);
 
@@ -1666,7 +1669,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				);
 
 				$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
-				$new_operation_formlist->addRow((new CLabel(_('User name')))->setAsteriskMark(),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('User name'), 'new_recovery_operation[opcommand][username]'))->setAsteriskMark(),
 					(new CTextBox('new_recovery_operation[opcommand][username]',
 						$data['new_recovery_operation']['opcommand']['username']
 					))
@@ -1674,7 +1678,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						->setAriaRequired()
 				);
 				$new_operation_formlist->addRow(
-					(new CLabel(_('Public key file')))->setAsteriskMark(),
+					(new CLabel(_('Public key file'), 'new_recovery_operation[opcommand][publickey]'))
+						->setAsteriskMark(),
 					(new CTextBox('new_recovery_operation[opcommand][publickey]',
 						$data['new_recovery_operation']['opcommand']['publickey']
 					))
@@ -1682,7 +1687,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						->setAriaRequired()
 				);
 				$new_operation_formlist->addRow(
-					(new CLabel(_('Private key file')))->setAsteriskMark(),
+					(new CLabel(_('Private key file'), 'new_recovery_operation[opcommand][privatekey]'))
+						->setAsteriskMark(),
 					(new CTextBox('new_recovery_operation[opcommand][privatekey]',
 						$data['new_recovery_operation']['opcommand']['privatekey']
 					))
@@ -1712,7 +1718,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				// command
 				$new_operation_formlist->addRow(
-					(new CLabel(_('Commands')))->setAsteriskMark(),
+					(new CLabel(_('Commands'), 'new_recovery_operation[opcommand][command]'))->setAsteriskMark(),
 					(new CTextArea('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
 					))
@@ -1720,7 +1726,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						->setAriaRequired()
 				);
 				$new_operation_formlist->addRow(
-					(new CLabel(_('Commands')))->setAsteriskMark(),
+					(new CLabel(_('Commands'), 'new_recovery_operation_opcommand_command_ipmi'))->setAsteriskMark(),
 					(new CTextBox('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
 					))
@@ -1889,7 +1895,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			$operationtype->addItem($operation, operation_type2str($operation));
 		}
 
-		$new_operation_formlist->addRow((new CLabel(_('Operation type')))->setAsteriskMark(),
+		$new_operation_formlist->addRow(
+			(new CLabel(_('Operation type'), 'new_ack_operation[operationtype]'))->setAsteriskMark(),
 			$operationtype->setAriaRequired()
 		);
 
@@ -2050,7 +2057,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			zbx_add_post_js($js_insert);
 
 			$new_operation_formlist->addRow(
-					(new CLabel(_('Target list')))->setAsteriskMark(),
+					(new CLabel(_('Target list'), 'ackOpCmdList'))->setAsteriskMark(),
 					(new CDiv(
 						(new CTable())
 							->addStyle('width: 100%;')
@@ -2082,7 +2089,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						->setAriaRequired()
 				)
 				->addRow(
-					(new CLabel(_('Script name')))->setAsteriskMark(),
+					(new CLabel(_('Script name'), 'new_ack_operation[opcommand][script]'))->setAsteriskMark(),
 					(new CDiv([
 						new CVar('new_ack_operation[opcommand][scriptid]',
 							$data['new_ack_operation']['opcommand']['scriptid']
@@ -2116,21 +2123,23 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 							ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 					])
 				)
-				->addRow((new CLabel(_('User name')))->setAsteriskMark(),
+				->addRow((new CLabel(_('User name'), 'new_ack_operation[opcommand][username]'))->setAsteriskMark(),
 					(new CTextBox('new_ack_operation[opcommand][username]',
 						$data['new_ack_operation']['opcommand']['username']
 					))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAriaRequired()
 				)
-				->addRow((new CLabel(_('Public key file')))->setAsteriskMark(),
+				->addRow(
+					(new CLabel(_('Public key file'), 'new_ack_operation[opcommand][publickey]'))->setAsteriskMark(),
 					(new CTextBox('new_ack_operation[opcommand][publickey]',
 						$data['new_ack_operation']['opcommand']['publickey']
 					))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAriaRequired()
 				)
-				->addRow((new CLabel(_('Private key file')))->setAsteriskMark(),
+				->addRow(
+					(new CLabel(_('Private key file'), 'new_ack_operation[opcommand][privatekey]'))->setAsteriskMark(),
 					(new CTextBox('new_ack_operation[opcommand][privatekey]',
 						$data['new_ack_operation']['opcommand']['privatekey']
 					))
@@ -2155,7 +2164,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				)
 				->addRow(
-					(new CLabel(_('Commands')))->setAsteriskMark(),
+					(new CLabel(_('Commands'), 'new_ack_operation[opcommand][command]'))->setAsteriskMark(),
 					(new CTextArea('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
 					))
@@ -2163,7 +2172,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						->setAriaRequired()
 				)
 				->addRow(
-					(new CLabel(_('Commands')))->setAsteriskMark(),
+					(new CLabel(_('Commands'), 'new_ack_operation[opcommand][command]'))->setAsteriskMark(),
 					(new CTextBox('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
 					))

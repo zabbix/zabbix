@@ -30,7 +30,10 @@
 		))->toString()
 	?>
 	<td class="interface-port">
-		<input name="interfaces[#{iface.interfaceid}][port]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_PORT_WIDTH ?>px" maxlength="64" value="#{iface.port}">
+		<?= (new CTextBox('interfaces[#{iface.interfaceid}][port]', '#{iface.port}', false, 64))
+				->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+				->setAriaRequired()
+		?>
 	</td>
 	<td class="interface-default">
 		<input class="mainInterface <?= ZBX_STYLE_CHECKBOX_RADIO ?>" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">

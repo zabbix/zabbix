@@ -43,11 +43,14 @@ $triggersFormList = new CFormList('triggersFormList');
 
 // append copy types to form list
 
-$triggersFormList->addRow(_('Target type'), new CComboBox('copy_type', $this->data['copy_type'], 'submit()', [
-	COPY_TYPE_TO_HOST => _('Hosts'),
-	COPY_TYPE_TO_TEMPLATE => _('Templates'),
-	COPY_TYPE_TO_HOST_GROUP => _('Host groups')
-]));
+$triggersFormList->addRow((new CLabel(_('Target type'), 'copy_type'))->setAsteriskMark(),
+	(new CComboBox('copy_type', $this->data['copy_type'], 'submit()', [
+		COPY_TYPE_TO_HOST => _('Hosts'),
+		COPY_TYPE_TO_TEMPLATE => _('Templates'),
+		COPY_TYPE_TO_HOST_GROUP => _('Host groups')
+	]))
+		->setAriaRequired()
+);
 
 // append groups to form list
 if ($this->data['copy_type'] == COPY_TYPE_TO_HOST || $this->data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
@@ -62,7 +65,7 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST || $this->data['copy_type'] ==
 }
 
 // append targets to form list
-$targets = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+$targets = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO)->setId('copy_targets');
 
 if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 	foreach ($this->data['hosts'] as $host) {
@@ -91,7 +94,7 @@ else {
 		);
 	}
 }
-$triggersFormList->addRow((new CLabel(_('Target')))->setAsteriskMark(), $targets);
+$triggersFormList->addRow((new CLabel(_('Target'), 'copy_targets'))->setAsteriskMark(), $targets);
 
 // append tabs to form
 $triggersTab = (new CTabView())

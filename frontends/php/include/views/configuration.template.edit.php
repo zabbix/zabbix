@@ -118,7 +118,7 @@ else {
 	}
 }
 
-$templateList->addRow((new CLabel(_('Groups')))->setAsteriskMark(),
+$templateList->addRow((new CLabel(_('Groups'), 'groups_left'))->setAsteriskMark(),
 	$groupsTB->get(_('In groups'), _('Other groups'))
 );
 

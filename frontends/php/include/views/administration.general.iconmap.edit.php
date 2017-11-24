@@ -125,10 +125,11 @@ $iconMapTable->addRow([
 // </default icon row>
 
 $iconMapTab->addRow(
-	(new CLabel(_('Mappings')))->setAsteriskMark(),
+	(new CLabel(_('Mappings'), 'iconmap_list'))->setAsteriskMark(),
 	(new CDiv($iconMapTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->setId('iconmap_list')
 );
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);

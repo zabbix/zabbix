@@ -371,7 +371,7 @@ foreach ($this->data['items'] as $n => $item) {
 }
 
 $graphFormList->addRow(
-	(new CLabel(_('Items')))->setAsteriskMark(),
+	(new CLabel(_('Items'), $itemsTable->getId()))->setAsteriskMark(),
 	(new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 

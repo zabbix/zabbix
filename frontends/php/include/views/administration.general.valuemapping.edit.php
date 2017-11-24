@@ -73,7 +73,7 @@ $table->addRow([
 ]);
 
 $form_list->addRow(
-	(new CLabel(_('Mappings')))->setAsteriskMark(),
+	(new CLabel(_('Mappings'), $table->getId()))->setAsteriskMark(),
 	(new CDiv($table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

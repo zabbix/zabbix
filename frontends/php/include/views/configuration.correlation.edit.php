@@ -101,10 +101,11 @@ $correlation_tab
 			->setAttribute('placeholder', 'A or (B and C) &hellip;')
 	])
 	->addRow(
-		(new CLabel(_('Conditions')))->setAsteriskMark(),
+		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
 		(new CDiv($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setAriaRequired()
 	);
 
 $condition2 = null;
@@ -221,8 +222,8 @@ if ($data['correlation']['operations']) {
 
 $operation_tab
 	->addRow(
-		(new CLabel(_('Operations')))->setAsteriskMark(),
-		(new CDiv([$operations_table]))
+		(new CLabel(_('Operations'), 'operations_table'))->setAsteriskMark(),
+		(new CDiv([$operations_table->setId('operations_table')]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	)

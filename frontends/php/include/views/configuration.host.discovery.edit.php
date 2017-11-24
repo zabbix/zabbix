@@ -108,7 +108,7 @@ if (!empty($this->data['interfaces'])) {
 		->setId('interface_not_defined')
 		->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow((new CLabel(_('Host interface')))->setAsteriskMark(),
+	$itemFormList->addRow((new CLabel(_('Host interface'), $interfacesComboBox->getId()))->setAsteriskMark(),
 		[$interfacesComboBox, $span], 'interface_row'
 	);
 	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);

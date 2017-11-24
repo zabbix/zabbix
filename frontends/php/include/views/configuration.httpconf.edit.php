@@ -264,8 +264,10 @@ if (!$this->data['templated']) {
 	);
 }
 
-$httpStepFormList->addRow((new CLabel(_('Steps')))->setAsteriskMark(),
-	(new CDiv($stepsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+$httpStepFormList->addRow((new CLabel(_('Steps'), $stepsTable->getId()))->setAsteriskMark(),
+	(new CDiv($stepsTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAriaRequired()
 );
 
 // append tabs to form

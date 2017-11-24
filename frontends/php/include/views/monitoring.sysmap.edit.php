@@ -88,7 +88,7 @@ else {
 	// Administrators can change map owner, but cannot see users from other groups.
 	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
 		$map_tab
-			->addRow((new CLabel(_('Owner')))->setAsteriskMark(), $multiselect_userid)
+			->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect_userid)
 			->addRow('', _('Inaccessible user'), 'inaccessible_user');
 	}
 	else {

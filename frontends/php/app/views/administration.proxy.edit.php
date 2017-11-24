@@ -84,8 +84,10 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 			->setAriaRequired()
 			->setModern(true)
 	)
-	->addRow((new CLabel(_('Interface')))->setAsteriskMark(),
-		(new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->addRow((new CLabel(_('Interface'), 'proxy_interface'))->setAsteriskMark(),
+		(new CDiv($interfaceTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setId('proxy_interface')
 	)
 	->addRow(_('Proxy address'),
 		(new CTextBox('proxy_address', $data['proxy_address'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
