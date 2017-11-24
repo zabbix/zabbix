@@ -365,6 +365,10 @@ tests/libs/zbxdbhigh/.deps
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxdbhigh/Makefile
 tests/libs/zbxdbhigh/Makefile.in
+tests/libs/zbxsysinfo/.deps
+tests/libs/zbxsysinfo/Makefile
+tests/libs/zbxsysinfo/Makefile.in
+tests/libs/zbxsysinfo/parse_item_key
 upgrades/Makefile
 upgrades/Makefile.in
 /zabbix-*.tar.gz
