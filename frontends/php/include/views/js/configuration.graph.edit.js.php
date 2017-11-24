@@ -371,19 +371,19 @@
 				}
 			});
 
-			$('#previewChar').attr('class', 'preloader').children().remove();
+			var image = $('#previewChar img');
+
+			if (image.length != 0) {
+				image.remove();
+			}
+
+			$('#previewChar')
+				.attr('class', 'preloader');
 
 			$('<img />').attr('src', name + '?period=3600' + src).load(function() {
 				$('#previewChar')
 					.removeAttr('class')
 					.append($(this));
-			}).error(function() {
-				$('#previewChar').removeAttr('class').append(
-				<?=
-					CJs::encodeJson(makeMessageBox(false, [['message' => _('Cannot load graph preview image.')]], null,
-						false)->toString()
-					)
-				?>);
 			});
 		});
 
