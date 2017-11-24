@@ -312,17 +312,18 @@ class CControllerPopup extends CController {
 				]
 			]
 		];
+	}
 
+	protected function checkInput() {
 		// This must be done before standard validation.
 		if (array_key_exists('srctbl', $_REQUEST) && array_key_exists($_REQUEST['srctbl'], $this->popup_properties)) {
 			$this->source_table = $_REQUEST['srctbl'];
 		}
 		else {
 			$this->setResponse(new CControllerResponseFatal());
+			return false;
 		}
-	}
 
-	protected function checkInput() {
 		$fields = [
 			'dstfrm' =>						'string|fatal',
 			'dstfld1' =>					'string|not_empty',
@@ -436,7 +437,7 @@ class CControllerPopup extends CController {
 		if ($this->getInput('group', '') !== '') {
 			$groups = API::HostGroup()->get([
 				'output' => [],
-				'search' => [
+				'filter' => [
 					'name' => $this->getInput('group')
 				],
 				'preservekeys' => true
@@ -448,14 +449,14 @@ class CControllerPopup extends CController {
 		}
 
 		if ($groupids === null) {
-			$groupids = $this->getInput('groupid', null);
+			$groupids = $this->hasInput('groupid') ? $this->getInput('groupid') : null;
 		}
 
 		$hostids = null;
 		if ($this->getInput('host', '') !== '') {
 			$hosts = API::HostGroup()->get([
 				'output' => [],
-				'search' => [
+				'filter' => [
 					'name' => $this->getInput('host')
 				],
 				'preservekeys' => true
@@ -467,7 +468,7 @@ class CControllerPopup extends CController {
 		}
 
 		if ($hostids === null) {
-			$hostids = $this->getInput('hostid', null);
+			$hostids = $this->getInput('hostid') ? $this->getInput('hostid') : null;
 		}
 
 		$options = [
@@ -540,18 +541,6 @@ class CControllerPopup extends CController {
 		else {
 			$hostid = 0;
 		}
-		if ($this->getInput('only_hostid', 0)) {
-			$hostid = $this->getInput('only_hostid');
-
-			$only_hosts = API::Host()->get([
-				'hostids' => $hostid,
-				'templated_hosts' => true,
-				'output' => ['hostid', 'host', 'name'],
-				'limit' => 1
-			]);
-
-			$page_options['only_hostid'] = $only_hosts[0];
-		}
 
 		// Gather options.
 		$page_options = [
@@ -568,6 +557,18 @@ class CControllerPopup extends CController {
 			'excludeids' => $excludeids
 		];
 
+		if ($this->getInput('only_hostid', 0)) {
+			$hostid = $this->getInput('only_hostid');
+
+			$only_hosts = API::Host()->get([
+				'hostids' => $hostid,
+				'templated_hosts' => true,
+				'output' => ['hostid', 'host', 'name'],
+				'limit' => 1
+			]);
+
+			$page_options['only_hostid'] = $only_hosts[0];
+		}
 		if ($monitored_hosts) {
 			$page_options['monitored_hosts'] = true;
 		}
@@ -1012,9 +1013,7 @@ class CControllerPopup extends CController {
 				: null,
 			'options' => $page_options,
 			'multiselect' => $this->getInput('multiselect', 0),
-			'table_columns' => array_key_exists('table_columns', $this->popup_properties[$this->source_table])
-				? $this->popup_properties[$this->source_table]['table_columns']
-				: null,
+			'table_columns' => $this->popup_properties[$this->source_table]['table_columns'],
 			'table_records' => $records,
 			'allowed_item_types' => $this->allowed_item_types
 		];

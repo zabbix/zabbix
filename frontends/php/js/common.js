@@ -437,6 +437,7 @@ function reloadPopup(form, action) {
 
 	PopUp(url.getUrl(), dialogueid);
 }
+
 /**
  * Pass value to add.popup trigger.
  *
@@ -482,14 +483,14 @@ function addValues(frame, values, submit_parent) {
 		frm_storage = null;
 
 	for (var key in values) {
-		if (is_null(values[key])) {
+		if (values[key] === null) {
 			continue;
 		}
 
-		if (typeof forms !== 'unfedined') {
+		if (typeof forms !== 'undefined') {
 			frm_storage = jQuery(forms).find('#' + key).get(0);
 		}
-		if (typeof frm_storage === 'undefined' || is_null(frm_storage)) {
+		if (typeof frm_storage === 'undefined' || frm_storage === null) {
 			frm_storage = document.getElementById(key);
 		}
 
@@ -501,7 +502,7 @@ function addValues(frame, values, submit_parent) {
 		}
 	}
 
-	if (!is_null(frm_storage) && !is_null(frm_storage) && submit_parent) {
+	if (frm_storage !== null && submit_parent) {
 		frm_storage.form.submit();
 	}
 }
@@ -622,7 +623,7 @@ function validate_trigger_expression(formname, dialogueid) {
 			}
 			else {
 				var form = window.document.forms[ret.dstfrm];
-				var obj = (typeof form !== 'unfedined')
+				var obj = (typeof form !== 'undefined')
 					? jQuery(form).find('#' + ret.dstfld1).get(0)
 					: document.getElementById(ret.dstfld1);
 
