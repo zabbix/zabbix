@@ -27,7 +27,7 @@ class CIcon extends CSpan {
 		$this->addClass('menu_icon');
 		$this->addClass('shadow');
 		if ($title !== null) {
-			$this->setAttribute('title', $title);
+			$this->setTitle($title);
 		}
 	}
 }

@@ -267,7 +267,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'))
 			))
 				->addClass(ZBX_STYLE_PROGRESS_BAR_CONTAINER)
-				->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
+				->setTitle(_s('Only the last 20%% of the indicator is displayed.'));
 
 			$sla2 = (new CSpan(sprintf('%.4f', $sla_bad)))
 				->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
