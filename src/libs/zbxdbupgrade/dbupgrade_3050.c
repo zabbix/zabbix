@@ -240,6 +240,18 @@ static int	DBpatch_3050011(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050012(void)
+{
+	int		res;
+
+	res = DBexecute("update profiles set idx='web.problem.filter.name' where idx='web.problem.filter.problem'");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -258,5 +270,6 @@ DBPATCH_ADD(3050008, 0, 1)
 DBPATCH_ADD(3050009, 0, 1)
 DBPATCH_ADD(3050010, 0, 1)
 DBPATCH_ADD(3050011, 0, 1)
+DBPATCH_ADD(3050012, 0, 1)
 
 DBPATCH_END()
