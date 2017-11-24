@@ -47,8 +47,10 @@ $servicesFormList = (new CFormList('servicesFormList'))
 	);
 
 // append parent link to form list
-$servicesFormList->addRow(_('Parent service'), [
-	(new CTextBox('parent_name', $this->data['parentname'], true, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+$servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setAsteriskMark(), [
+	(new CTextBox('parent_name', $this->data['parentname'], true, 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select_parent', _x('Change', 'verb')))
 		->addClass(ZBX_STYLE_BTN_GREY)
@@ -59,9 +61,10 @@ $servicesFormList->addRow(_('Parent service'), [
 
 // append algorithm to form list
 $servicesFormList->addRow(
-	(new CLabel(_('Status calculation algorithm', 'algorithm')))
+	(new CLabel(_('Status calculation algorithm'), 'algorithm'))
 		->setAsteriskMark(),
-	new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorithm())
+	(new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorithm()))
+		->setAriaRequired()
 );
 
 // append SLA to form list
@@ -198,12 +201,13 @@ $servicesTimeFormList->addRow(_('Service times'),
 // create service time table
 $serviceTimeTable = (new CTable())
 	->addRow([
-		_('Period type'),
-		new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'submit()', [
+		(new CLabel(_('Period type'), 'new_service_time[type]'))->setAsteriskMark(),
+		(new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'submit()', [
 			SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
 			SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
 			SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
-		])
+		]))
+			->setAriaRequired()
 	]);
 
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {

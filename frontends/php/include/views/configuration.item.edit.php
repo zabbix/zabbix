@@ -240,7 +240,10 @@ else {
 		->setModern(true);
 }
 
-$itemFormList->addRow(_('Authentication protocol'), $snmpv3_authprotocol, 'row_snmpv3_authprotocol');
+$itemFormList->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'))->setAsteriskMark(),
+	$snmpv3_authprotocol->setAriaRequired(),
+	'row_snmpv3_authprotocol'
+);
 
 // Append snmpv3 authentication passphrase to form list.
 $itemFormList->addRow(_('Authentication passphrase'),
@@ -264,7 +267,10 @@ else {
 		->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
 		->setModern(true);
 }
-$itemFormList->addRow(_('Privacy protocol'), $snmpv3_privprotocol, 'row_snmpv3_privprotocol');
+$itemFormList->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'))->setAsteriskMark(),
+	$snmpv3_privprotocol->setAriaRequired(),
+	'row_snmpv3_privprotocol'
+);
 
 // Append snmpv3 privacy passphrase to form list.
 $itemFormList->addRow(_('Privacy passphrase'),

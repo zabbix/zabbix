@@ -64,6 +64,7 @@
 					ITEM_TYPE_SSH => ['username'],
 					ITEM_TYPE_SNMPV1 => ['community', 'snmp_community'],
 					ITEM_TYPE_SNMPV2C => ['community', 'snmp_community'],
+					ITEM_TYPE_SNMPV3 => ['privprotocol', 'authprotocol'],
 					ITEM_TYPE_DEPENDENT => ['master_itemname', 'master_itemid']
 				]) ?>,
 				asterisk_filter = function () {

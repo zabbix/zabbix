@@ -77,19 +77,21 @@ $mediaTypeFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(_('Connection security'),
+	->addRow((new CLabel(_('Connection security'), 'smtp_security'))->setAsteriskMark(),
 		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
 			->addValue(_('None'), SMTP_CONNECTION_SECURITY_NONE)
 			->addValue(_('STARTTLS'), SMTP_CONNECTION_SECURITY_STARTTLS)
 			->addValue(_('SSL/TLS'), SMTP_CONNECTION_SECURITY_SSL_TLS)
+			->setAriaRequired()
 			->setModern(true)
 	)
 	->addRow(_('SSL verify peer'), (new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer']))
 	->addRow(_('SSL verify host'), (new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host']))
-	->addRow(_('Authentication'),
+	->addRow((new CLabel(_('Authentication'), 'smtp_authentication'))->setAsteriskMark(),
 		(new CRadioButtonList('smtp_authentication', (int) $data['smtp_authentication']))
 			->addValue(_('None'), SMTP_AUTHENTICATION_NONE)
 			->addValue(_('Username and password'), SMTP_AUTHENTICATION_NORMAL)
+			->setAriaRequired()
 			->setModern(true)
 	)
 	->addRow(_('Username'), (new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
@@ -188,7 +190,7 @@ switch ($data['maxsessions']) {
 }
 
 $mediaOptionsForm = (new CFormList('options'))
-	->addRow(_('Concurrent sessions'),
+	->addRow((new CLabel(_('Concurrent sessions'), 'maxsessions_type'))->setAsteriskMark(),
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addItem([
@@ -197,9 +199,11 @@ $mediaOptionsForm = (new CFormList('options'))
 						->addValue(_('One'), 'one')
 						->addValue(_('Unlimited'), 'unlimited')
 						->addValue(_('Custom'), 'custom')
+						->setAriaRequired()
 						->setModern(true)
 				))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CNumericBox('maxsessions', $max_sessions, 3, false, false, false))
+					->setAriaRequired()
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			])
 	)

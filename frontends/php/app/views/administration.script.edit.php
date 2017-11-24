@@ -91,10 +91,11 @@ $scriptFormList
 			'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
 		]]))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
-	->addRow(_('Required host permissions'),
+	->addRow((new CLabel(_('Required host permissions'), 'host_access'))->setAsteriskMark(),
 		(new CRadioButtonList('host_access', (int) $data['host_access']))
 			->addValue(_('Read'), PERM_READ)
 			->addValue(_('Write'), PERM_READ_WRITE)
+			->setAriaRequired()
 			->setModern(true)
 	)
 	->addRow(_('Enable confirmation'),

@@ -881,20 +881,25 @@ if (!empty($data['new_operation'])) {
 				(new CButton('select_operation_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 			];
 
-			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Type'), $typeComboBox->getId()))->setAsteriskMark(),
+				$typeComboBox->setAriaRequired()
+			);
 			$new_operation_formlist->addRow(
 				(new CLabel(_('Script name')))->setAsteriskMark(),
 				(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
 			);
 
 			// script
-			$new_operation_formlist->addRow(_('Execute on'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Execute on'), 'new_operation[opcommand][execute_on]'))->setAsteriskMark(),
 				(new CRadioButtonList('new_operation[opcommand][execute_on]',
 					(int) $data['new_operation']['opcommand']['execute_on']
 				))
 					->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 					->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 					->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+					->setAriaRequired()
 					->setModern(true)
 			);
 
@@ -981,7 +986,9 @@ if (!empty($data['new_operation'])) {
 						'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
 							'&dstfld1=new_operation_groupids_&srcfld1=groupid&writeonly=1&multiselect=1'
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))
+					->setAriaRequired()
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			);
 			break;
 
@@ -998,17 +1005,21 @@ if (!empty($data['new_operation'])) {
 						'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 							'&dstfld1=new_operation_templateids_&templated_hosts=1&multiselect=1&writeonly=1'
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))
+					->setAriaRequired()
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			);
 			break;
 
 		case OPERATION_TYPE_HOST_INVENTORY:
-			$new_operation_formlist->addRow(_('Inventory mode'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Inventory mode'), 'new_operation[opinventory][inventory_mode]'))->setAsteriskMark(),
 				(new CRadioButtonList('new_operation[opinventory][inventory_mode]',
 					(int) $data['new_operation']['opinventory']['inventory_mode']
 				))
 					->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 					->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+					->setAriaRequired()
 					->setModern(true)
 			);
 			break;
@@ -1623,20 +1634,25 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						->addClass(ZBX_STYLE_BTN_GREY)
 				];
 
-				$new_operation_formlist->addRow(_('Type'), $typeComboBox);
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Type'), $typeComboBox->getId()))->setAsteriskMark(),
+					$typeComboBox->setAriaRequired()
+				);
 				$new_operation_formlist->addRow(
 					(new CLabel(_('Script name')))->setAsteriskMark(),
 					(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
 				);
 
 				// script
-				$new_operation_formlist->addRow(_('Execute on'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Execute on'), 'new_recovery_operation[opcommand][execute_on]'))->setAsteriskMark(),
 					(new CRadioButtonList('new_recovery_operation[opcommand][execute_on]',
 						(int) $data['new_recovery_operation']['opcommand']['execute_on']
 					))
 						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 						->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+						->setAriaRequired()
 						->setModern(true)
 				);
 
@@ -2053,15 +2069,17 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->setId('ackOpCmdList')
 				)
-				->addRow(_('Type'),
-					new CComboBox('new_ack_operation[opcommand][type]', $data['new_ack_operation']['opcommand']['type'],
+				->addRow(
+					(new CLabel(_('Type'), 'new_ack_operation[opcommand][type]'))->setAsteriskMark(),
+					(new CComboBox('new_ack_operation[opcommand][type]', $data['new_ack_operation']['opcommand']['type'],
 						'showOpTypeForm('.ACTION_ACKNOWLEDGE_OPERATION.')', [
 							ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 							ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
 							ZBX_SCRIPT_TYPE_SSH => _('SSH'),
 							ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-					])
+					]))
+						->setAriaRequired()
 				)
 				->addRow(
 					(new CLabel(_('Script name')))->setAsteriskMark(),
@@ -2079,13 +2097,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 							->addClass(ZBX_STYLE_BTN_GREY)
 					]))->addClass(ZBX_STYLE_NOWRAP)
 				)
-				->addRow(_('Execute on'),
+				->addRow(
+					(new CLabel(_('Execute on'), 'new_ack_operation[opcommand][execute_on]'))->setAsteriskMark(),
 					(new CRadioButtonList('new_ack_operation[opcommand][execute_on]',
 						(int) $data['new_ack_operation']['opcommand']['execute_on']
 					))
 						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 						->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+						->setAriaRequired()
 						->setModern(true)
 				)
 				->addRow(_('Authentication method'),

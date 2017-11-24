@@ -81,9 +81,9 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			$numSpan,
-			$profileLinksComboBox,
+			$profileLinksComboBox->setAriaRequired(),
 			$expressionTextBox,
-			$iconsComboBox,
+			$iconsComboBox->setAriaRequired(),
 			(new CCol($iconPreviewImage))->setAttribute('style', 'vertical-align: middle;'),
 			(new CCol(
 				(new CButton('remove', _('Remove')))
@@ -119,7 +119,7 @@ $iconPreviewImage = (new CImg('imgstore.php?iconid='.$this->data['iconmap']['def
 
 $iconMapTable->addRow([
 	(new CCol(_('Default')))->setColSpan(4),
-	$iconsComboBox,
+	$iconsComboBox->setAriaRequired(),
 	(new CCol($iconPreviewImage))->setAttribute('style', 'vertical-align: middle;')
 ]);
 // </default icon row>

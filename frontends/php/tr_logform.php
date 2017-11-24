@@ -338,11 +338,12 @@ if (hasRequest('sform')) {
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired()
 					)
-					->addRow(_('Item'), [
+					->addRow((new CLabel(_('Item'), 'item'))->setAsteriskMark(), [
 						(new CTextBox('item', $item_name))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setId('item')
-							->setAttribute('disabled', 'disabled'),
+							->setAttribute('disabled', 'disabled')
+							->setAriaRequired(),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
@@ -351,10 +352,11 @@ if (hasRequest('sform')) {
 							)
 					])
 					->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $priority]))
-					->addRow(_('Expression'),
+					->addRow((new CLabel(_('Expression'), 'expression'))->setAsteriskMark(),
 						(new CTextBox('expression'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setId('logexpr')
+							->setAriaRequired()
 					)
 					->addRow(null, [
 						(new CCheckBox('iregexp'))->setLabel('iregexp'),
@@ -381,7 +383,7 @@ if (hasRequest('sform')) {
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 					)
-					->addRow((new CLabel(''))->setAsteriskMark(),
+					->addRow('',
 						(new CDiv($expression_table))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

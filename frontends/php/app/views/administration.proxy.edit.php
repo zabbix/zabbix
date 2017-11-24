@@ -81,6 +81,7 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 		(new CRadioButtonList('status', (int) $data['status']))
 			->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
 			->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+			->setAriaRequired()
 			->setModern(true)
 	)
 	->addRow((new CLabel(_('Interface')))->setAsteriskMark(),

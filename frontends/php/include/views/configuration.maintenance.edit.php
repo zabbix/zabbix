@@ -40,10 +40,11 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Maintenance type'),
+	->addRow((new CLabel(_('Maintenance type'), 'maintenance_type'))->setAsteriskMark(),
 		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
 			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
+			->setAriaRequired()
 			->setModern(true)
 	);
 
