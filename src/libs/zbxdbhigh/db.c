@@ -171,9 +171,11 @@ void	DBbegin(void)
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit(void)
+int	DBcommit(void)
 {
 	DBtxn_operation(zbx_db_commit);
+
+	return zbx_db_txn_end_error();
 }
 
 /******************************************************************************

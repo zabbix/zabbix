@@ -1,6 +1,8 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-4156] added option to view graphs items data and multiple items graph data as table (gcalenko, Ivo)
+..F....... [ZBXNEXT-4160] reworked monitoring Discovery screen to show hint info right in the table cell (miks)
 ....I..... [ZBXNEXT-761] added rules to make dbschema.c, schema.sql and data.sql from schema.tmpl, data.tmpl and templates.tmpl if there is a need to (gleb)
 ..F.I..... [ZBXNEXT-4186] added ability to adjust colors for new graph items in graph creation form according selected theme (gcalenko, Sasha)
 ..F....... [ZBXNEXT-4145] fixed appearance of host column based on number of hosts specified in filter (miks)
@@ -13,6 +15,7 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+.......PS. [ZBX-12251] fixed possibility of trigger status getting stuck in PROBLEM or OK state due to transaction error in history synchronization, added deadlock to a list of recoverable errors (vso, wiper)
 ..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
 ....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
@@ -28,6 +31,13 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+....I..... [ZBX-12798] added --with-libpcre-lib configure option (valdis)
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
+..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
+..F....... [ZBX-12948] fixed percentile visibility in dashboard graph widgets (gcalenko)
+A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
+........S. [ZBX-13061] fixed memory leak in preprocessing manager (wiper)
+....I..... [ZBX-12232] fixed mysql m4 configuration script for mariadb C connector (abs)
 ..F....... [ZBX-12663] fixed retaining the scrollbar position on page reload (Ivo)
 ..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
 ..F....... [ZBX-13016] fixed warning message shown by deprecated PHP 7.2 function create_function() (Sasha)
@@ -429,6 +439,9 @@ Changes for 3.2.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
+..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
+A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
 ..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
 ..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
 ........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
@@ -989,6 +1002,9 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
+..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
+....I..... [ZBX-12232] fixed mysql m4 configuration script for mariadb C connector (abs)
 ..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
 ..F....... [ZBX-13016] fixed warning message shown by deprecated PHP 7.2 function create_function() (Sasha)
 ..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
@@ -2801,6 +2817,7 @@ Changes for 2.2.21rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
 ..F....... [DEV-593] fixed multiple security issues (miks)
 .......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
 

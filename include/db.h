@@ -464,7 +464,7 @@ DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
 void		DBbegin(void);
-void		DBcommit(void);
+int		DBcommit(void);
 void		DBrollback(void);
 void		DBend(int ret);
 
@@ -522,7 +522,7 @@ typedef struct
 zbx_trigger_diff_t;
 
 void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
-void	zbx_save_trigger_changes(const zbx_vector_ptr_t *diffs);
+void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *diffs);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);

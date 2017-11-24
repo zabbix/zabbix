@@ -73,6 +73,7 @@ int	zbx_db_commit(void);
 int	zbx_db_rollback(void);
 int	zbx_db_txn_level(void);
 int	zbx_db_txn_error(void);
+int	zbx_db_txn_end_error(void);
 
 #ifdef HAVE_ORACLE
 
