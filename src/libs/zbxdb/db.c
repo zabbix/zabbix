@@ -242,6 +242,53 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_error                                                     *
+ *                                                                            *
+ * Purpose: get database error message from any supported database            *
+ *                                                                            *
+ * Parameters: error_str - [OUT] database error                               *
+ *                                                                            *
+ * Comments: It is expected that caller is passing NULL pointer for           *
+ *           error_str.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_error(char **error_str)
+{
+#if defined(HAVE_IBM_DB2)
+	SQLCHAR		tmp_error[SQL_MAX_MESSAGE_LENGTH + 1], sqlstate[SQL_SQLSTATE_SIZE + 1];
+	char		db_error[SQL_MAX_MESSAGE_LENGTH + SQL_SQLSTATE_SIZE + 2];
+	SQLINTEGER	db_errno;
+	SQLSMALLINT	length, i = 1;
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+	char		*db_error = NULL;
+#elif defined(HAVE_ORACLE)
+	char		db_error[512];
+	sb4		errcode;
+#endif
+
+#if defined(HAVE_IBM_DB2)
+	while (SQL_SUCCESS == SQLGetDiagRec(SQL_HANDLE_DBC, ibm_db2.hdbc, i++, sqlstate, &db_errno, tmp_error,
+			sizeof(tmp_error), &length))
+	{
+		zbx_snprintf(db_error, sizeof(db_error), "%s", tmp_error);
+		zbx_rtrim(db_error, ZBX_WHITESPACE);
+	}
+#elif defined(HAVE_MYSQL)
+	db_error = (char *)mysql_error(conn);
+#elif defined(HAVE_ORACLE)
+	OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode, (text *)db_error, (ub4)sizeof(db_error),
+			OCI_HTYPE_ERROR);
+#elif defined(HAVE_POSTGRESQL)
+	db_error = PQerrorMessage(conn);
+#endif
+	zbx_rtrim(db_error, ZBX_WHITESPACE);
+	zbx_rtrim(db_error, ".");
+
+	*error_str = zbx_dsprintf(*error_str, "%s", db_error);
+}
+
 #if defined(HAVE_MYSQL)
 static int	is_recoverable_mysql_error(void)
 {

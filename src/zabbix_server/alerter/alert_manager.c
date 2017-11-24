@@ -19,6 +19,7 @@
 
 #include "common.h"
 
+#include "db.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
@@ -896,6 +897,52 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 
 /******************************************************************************
  *                                                                            *
+ * Function: am_create_db_alert_message                                       *
+ *                                                                            *
+ * Purpose: get and format error message from database when it is unavailable *
+ *                                                                            *
+ * Return value: full database error message                                  *
+ *                                                                            *
+ ******************************************************************************/
+static char	*am_create_db_alert_message()
+{
+	char	*db_error = NULL, *alert_message = NULL;
+	size_t	alert_message_alloc = MAX_STRING_LEN, alert_message_offset = 0;
+#if defined(HAVE_IBM_DB2)
+	const char	*db_type = "IBM DB2";
+#elif defined(HAVE_MYSQL)
+	const char	*db_type = "MySQL";
+#elif defined(HAVE_ORACLE)
+	const char	*db_type = "Oracle";
+#elif defined(HAVE_POSTGRESQL)
+	const char	*db_type = "PostgreSQL";
+#endif
+
+	alert_message = zbx_malloc(alert_message, alert_message_alloc);
+
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s database \"%s\" on %s",
+			db_type, CONFIG_DBNAME, CONFIG_DBHOST);
+
+	if (0 != CONFIG_DBPORT)
+	{
+		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s:%d",
+				alert_message, CONFIG_DBPORT);
+	}
+
+	zbx_db_error(&db_error);
+
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s is not available: %s.",
+			alert_message, db_error);
+
+	alert_message[alert_message_offset] = '\0';
+
+	zbx_free(db_error);
+
+	return alert_message;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: am_queue_watchdog_alerts                                         *
  *                                                                            *
  * Purpose: queues 'database down' watchdog alerts                            *
@@ -914,7 +961,8 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 	zbx_am_alertpool_t	*alertpool;
 	zbx_am_alert_t		*alert;
 	zbx_hashset_iter_t	iter;
-	const char		*message = "Zabbix database is down.";
+	const char		*alert_subject = "Zabbix database is not available.";
+	char			*alert_message;
 
 	if ((now = time(NULL)) < lastsent + ZBX_WATCHDOG_ALERT_FREQUENCY)
 		return;
@@ -928,7 +976,11 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 			continue;
 
 		mediatype->refcount++;
-		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, message, message, 0, 0, 0);
+
+		alert_message = am_create_db_alert_message();
+
+		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject, alert_message, 0,
+				0, 0);
 
 		alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
 		alertpool->refcount++;
@@ -936,6 +988,8 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 		am_push_alert(alertpool, alert);
 		am_push_alertpool(mediatype, alertpool);
 		am_push_mediatype(manager, mediatype);
+
+		zbx_free(alert_message);
 	}
 
 	lastsent = now;
