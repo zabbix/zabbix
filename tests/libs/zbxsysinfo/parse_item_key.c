@@ -29,7 +29,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	in_key, out_key, out_parameters;
 	AGENT_REQUEST		request;
 	const char		*item_key, *expected_key;
-	int			expected_result, actual_result;
+	int			expected_result = 123, actual_result;
 
 	ZBX_UNUSED(state);
 
@@ -72,7 +72,7 @@ void	zbx_mock_test_entry(void **state)
 		int			i;
 
 		if (0 != strcmp(expected_key, request.key))
-			fail_msg("Got %s instead of %s as a key.", request.key, expected_key);
+			fail_msg("Got '%s' instead of '%s' as a key.", request.key, expected_key);
 
 		for (i = 0; ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(out_parameters, &out_parameter)); i++)
 		{
@@ -84,7 +84,7 @@ void	zbx_mock_test_entry(void **state)
 
 			if (0 != strcmp(expected_parameter, request.params[i]))
 			{
-				fail_msg("Unexpected parameter #%d: %s instead of %s.", i + 1, request.params[i],
+				fail_msg("Unexpected parameter #%d: '%s' instead of '%s'.", i + 1, request.params[i],
 						expected_parameter);
 			}
 		}
