@@ -95,7 +95,7 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('javascript: return PopUp("?action=popup&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
+				->onClick('javascript: return PopUp("?action=popup.generic&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 					'&dstfrm='.$form->getName().'&dstfld1=linked_map_id&dstfld2=caption");'
 				)
 		]);

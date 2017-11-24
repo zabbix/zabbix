@@ -22,7 +22,7 @@
 // Create form.
 $expression_form = (new CForm())
 	->setName('expression')
-	->addVar('action', 'popup_trexpr')
+	->addVar('action', 'popup.triggerexpr')
 	->addVar('dstfrm', $data['dstfrm'])
 	->addVar('dstfld1', $data['dstfld1'])
 	->addVar('hostid', $data['hostid'])
@@ -37,7 +37,7 @@ if ($data['parent_discoveryid'] !== '') {
 $expression_form_list = new CFormList();
 
 // Append item to form list.
-$action = '?action=popup&writeonly=1&dstfrm='.$expression_form->getName();
+$action = '?action=popup.generic&writeonly=1&dstfrm='.$expression_form->getName();
 $action .= ($data['groupid'] && $data['hostid'])
 				? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
 				: '';
@@ -54,7 +54,7 @@ $item = [
 ];
 
 if ($data['parent_discoveryid'] !== '') {
-	$action = '?action=popup&dstfrm='.$expression_form->getName().
+	$action = '?action=popup.generic&dstfrm='.$expression_form->getName().
 		'&dstfld1=itemid&dstfld2=description'.url_param('parent_discoveryid', true).
 		'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name';
 
@@ -66,7 +66,7 @@ if ($data['parent_discoveryid'] !== '') {
 
 $expression_form_list->addRow(_('Item'), $item);
 
-$function_combo_box = new CComboBox('expr_type', $data['expr_type'], 'reloadPopup(this.form, "popup_trexpr")');
+$function_combo_box = new CComboBox('expr_type', $data['expr_type'], 'reloadPopup(this.form, "popup.triggerexpr")');
 foreach ($data['functions'] as $id => $f) {
 	$function_combo_box->addItem($id, $f['description']);
 }

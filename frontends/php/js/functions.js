@@ -763,7 +763,7 @@ function overlayDialogueOnLoad(focus) {
 function executeScript(hostid, scriptid, confirmation) {
 	var execute = function() {
 		if (hostid !== null) {
-			PopUp('?action=popup_script_exec&hostid=' + hostid + '&scriptid=' + scriptid);
+			PopUp('?action=popup.scriptexec&hostid=' + hostid + '&scriptid=' + scriptid);
 		}
 	};
 

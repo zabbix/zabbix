@@ -550,7 +550,7 @@ jQuery(function($) {
 				}
 				else {
 					popupButton.click(function() {
-						return PopUp('?action=popup&' + urlParameters, options.popup.width, options.popup.height);
+						return PopUp('?action=popup.generic&' + urlParameters, options.popup.width, options.popup.height);
 					});
 				}
 

@@ -421,13 +421,13 @@ function PopUp(url, dialogueid) {
  * Reload content of Modal Overlay dialogue without closing it.
  *
  * @param {object} form		Filter form in which element has been changed. Assumed that form is inside Overlay Dialogue.
- * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup'.
+ * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
  *
  * @returns {unresolved}
  */
 function reloadPopup(form, action) {
 	var dialogueid = jQuery(form).closest('[data-dialogueid]').attr('data-dialogueid'),
-		action = action || 'popup',
+		action = action || 'popup.generic',
 		url = new Curl();
 
 	url.setArgument('action', action);

@@ -21,7 +21,7 @@
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/layout.popuphttpstep.js.php'
+	'script_inline' => require 'app/views/popup.httpstep.js.php'
 ];
 
 $options = $data['options'];
@@ -34,7 +34,7 @@ $http_popup_form = (new CForm())
 	->addVar('templated', $options['templated'])
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
-	->addVar('action', 'popup_httpstep');
+	->addVar('action', 'popup.httpstep');
 
 $http_popup_form_list = (new CFormList())
 	->addRow(_('Name'),

@@ -344,7 +344,7 @@ if (hasRequest('sform')) {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick("javascript: return PopUp('?action=popup&dstfrm=".$form->getName().
+							->onClick("javascript: return PopUp('?action=popup.generic&dstfrm=".$form->getName().
 								"&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name');"
 							)
 					])

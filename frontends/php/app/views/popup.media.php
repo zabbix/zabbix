@@ -44,7 +44,7 @@ $media_form = (new CFormList(_('Media')))
 	);
 
 $body_html = (new CForm())
-		->addVar('action', 'popup_media')
+		->addVar('action', 'popup.media')
 		->addVar('add', '1')
 		->addVar('media', $options['media'])
 		->addVar('dstfrm', $options['dstfrm'])

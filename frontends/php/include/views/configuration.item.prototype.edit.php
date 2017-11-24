@@ -71,7 +71,7 @@ if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("?action=popup&srctbl=help_items&srcfld1=key&dstfrm='.$itemForm->getName().
+		->onClick('return PopUp("?action=popup.generic&srctbl=help_items&srcfld1=key&dstfrm='.$itemForm->getName().
 			'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());');
 
 }
@@ -87,7 +87,7 @@ if (!$readonly) {
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("?action=popup&srctbl=item_prototypes&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
+		->onClick('return PopUp("?action=popup.generic&srctbl=item_prototypes&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
 			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&parent_discoveryid='.$data['parent_discoveryid'].
 			'&excludeids[]='.$data['itemid'].'");'
 		);

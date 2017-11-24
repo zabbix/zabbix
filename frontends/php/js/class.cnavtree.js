@@ -911,7 +911,7 @@ jQuery(function($) {
 						var url = new Curl(),
 							id = $(this).data('id');
 
-						url.setArgument('action', 'popup');
+						url.setArgument('action', 'popup.generic');
 						url.setArgument('srctbl', 'sysmaps');
 						url.setArgument('srcfld1', 'sysmapid');
 						url.setArgument('srcfld2', 'name');

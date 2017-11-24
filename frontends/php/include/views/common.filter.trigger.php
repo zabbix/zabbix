@@ -96,7 +96,7 @@ $column1->addRow(_('Name'),
 	(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 
-$application_name_url = '?action=popup&srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
+$application_name_url = '?action=popup.generic&srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
 		'&with_applications=1&dstfrm=zbx_filter';
 
 // application

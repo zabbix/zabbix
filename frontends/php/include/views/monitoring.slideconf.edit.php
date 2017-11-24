@@ -150,7 +150,7 @@ foreach ($data['slideshow']['slides'] as $key => $slides) {
 
 $addButtonColumn = (new CCol(
 		(new CButton('add', _('Add')))
-			->onClick('return PopUp("?action=popup&srctbl=screens&srcfld1=screenid&dstfrm='.$form->getName().
+			->onClick('return PopUp("?action=popup.generic&srctbl=screens&srcfld1=screenid&dstfrm='.$form->getName().
 					'&multiselect=1")')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	))->setColSpan(5);
@@ -173,7 +173,7 @@ $user_group_shares_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 $add_user_group_btn = ([(new CButton(null, _('Add')))
-	->onClick('return PopUp("?action=popup&dstfrm='.$form->getName().
+	->onClick('return PopUp("?action=popup.generic&dstfrm='.$form->getName().
 		'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
@@ -205,7 +205,7 @@ $user_shares_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 $add_user_btn = ([(new CButton(null, _('Add')))
-	->onClick('return PopUp("?action=popup&dstfrm='.$form->getName().
+	->onClick('return PopUp("?action=popup.generic&dstfrm='.$form->getName().
 		'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);

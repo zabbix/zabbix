@@ -117,7 +117,7 @@ if ($data['action'] == 'problem.view') {
 			(new CButton('filter_application_select', _('Select')))
 				->onClick('return PopUp("'.
 					(new CUrl())
-						->setArgument('action', 'popup')
+						->setArgument('action', 'popup.generic')
 						->setArgument('srctbl', 'applications')
 						->setArgument('srcfld1', 'name')
 						->setArgument('dstfrm', 'zbx_filter')

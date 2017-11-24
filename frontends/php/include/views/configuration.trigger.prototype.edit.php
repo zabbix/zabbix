@@ -76,7 +76,7 @@ if ($data['recovery_expression_field_readonly']) {
 $add_expression_button = (new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
-		'return PopUp("?action=popup_trexpr&dstfrm='.$triggersForm->getName().
+		'return PopUp("?action=popup.triggerexpr&dstfrm='.$triggersForm->getName().
 			'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
 			(($data['groupid'] && $data['hostid'])
 				? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
@@ -228,7 +228,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('PopUp("?action=popup_testtrexpr&expression="+'.
+		->onClick('PopUp("?action=popup.testtriggerexpr&expression="+'.
 			'encodeURIComponent(this.form.elements["expression"].value)); return false;'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK);
@@ -272,7 +272,7 @@ $add_recovery_expression_button = (new CButton('insert',
 	)
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
-		'return PopUp("?action=popup_trexpr&dstfrm='.$triggersForm->getName().
+		'return PopUp("?action=popup.triggerexpr&dstfrm='.$triggersForm->getName().
 			'&dstfld1='.$data['recovery_expression_field_name'].url_param('parent_discoveryid').
 			'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
 			'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
@@ -417,7 +417,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('PopUp("?action=popup_testtrexpr&expression="'.
+		->onClick('PopUp("?action=popup.testtriggerexpr&expression="'.
 			'+encodeURIComponent(this.form.elements["recovery_expression"].value)); return false;')
 		->addClass(ZBX_STYLE_BTN_LINK);
 	if (!$allowed_testing) {
@@ -572,13 +572,13 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		$dependenciesTable,
 		new CHorList([
 			(new CButton('add_dep_trigger', _('Add')))
-				->onClick('return PopUp("?action=popup&srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
+				->onClick('return PopUp("?action=popup.generic&srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
 					'&hostid='.$data['hostid'].'&groupid='.$data['groupid'].'&multiselect=1&with_triggers=1'.
 					'&normal_only=1&noempty=1");'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
-				->onClick('return PopUp("?action=popup&srctbl=trigger_prototypes&srcfld1=triggerid'.
+				->onClick('return PopUp("?action=popup.generic&srctbl=trigger_prototypes&srcfld1=triggerid'.
 					'&reference=deptrigger'.url_param('parent_discoveryid').'&multiselect=1");')
 				->addClass(ZBX_STYLE_BTN_LINK)
 		])

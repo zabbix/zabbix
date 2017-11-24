@@ -35,7 +35,7 @@ $table_user_groups = (new CTable())
 		(new CRow(
 			(new CCol(
 				(new CButton(null, _('Add')))
-					->onClick("return PopUp('?action=popup&dstfrm=".$form->getName().
+					->onClick("return PopUp('?action=popup.generic&dstfrm=".$form->getName().
 						"&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1')"
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -50,7 +50,7 @@ $table_users = (new CTable())
 		(new CRow(
 			(new CCol(
 				(new CButton(null, _('Add')))
-					->onClick("return PopUp('?action=popup&dstfrm=".$form->getName().
+					->onClick("return PopUp('?action=popup.generic&dstfrm=".$form->getName().
 						"&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1')"
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)

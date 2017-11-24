@@ -87,12 +87,12 @@ $dependenciesDiv = (new CDiv([
 	$dependenciesTable,
 	new CHorList([
 		(new CButton('add_dep_trigger', _('Add')))
-			->onClick('return PopUp("?action=popup&dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+			->onClick('return PopUp("?action=popup.generic&dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
 				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
 				'&with_triggers=1&normal_only=1&noempty=1");')
 			->addClass(ZBX_STYLE_BTN_LINK),
 		(new CButton('add_dep_trigger_prototype', _('Add prototype')))
-			->onClick('return PopUp("?action=popup&dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+			->onClick('return PopUp("?action=popup.generic&dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
 				'&dstfld1=new_dependency&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.
 				url_param('parent_discoveryid').'&multiselect=1");')
 			->addClass(ZBX_STYLE_BTN_LINK)

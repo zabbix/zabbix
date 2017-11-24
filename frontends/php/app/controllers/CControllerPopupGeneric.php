@@ -40,7 +40,7 @@ function get_window_opener($frame, $field, $value) {
 		'}'."\n";
 }
 
-class CControllerPopup extends CController {
+class CControllerPopupGeneric extends CController {
 	private $popup_properties;
 	private $allowed_item_types;
 	private $source_table;
