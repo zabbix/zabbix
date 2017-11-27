@@ -288,10 +288,17 @@ if (hasRequest('form')) {
 			}
 		}
 	}
-
-	$data['groups_rights'] = hasRequest('form_refresh')
-		? getRequest('groups_rights', [])
-		: collapseHostGroupRights(getHostGroupsRights($data['usrgrpid'] == 0 ? [] : [$data['usrgrpid']]));
+	if (hasRequest('form_refresh')) {
+		$data['groups_rights'] = getRequest('groups_rights', []);
+		$data['tag_filters'] = getRequest('tag_filters', []);
+	}
+	else {
+		$data['tag_filters'] = ($data['usrgrpid'] == 0) ? [] : $db_user_group['tag_filters'];
+		$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights(($data['usrgrpid'] == 0)
+			? []
+			: [$data['usrgrpid']]
+		));
+	}
 
 	if (hasRequest('add_permission')) {
 		// Add new permission with submit().
@@ -309,20 +316,6 @@ if (hasRequest('form')) {
 		$data['groups_rights'] = collapseHostGroupRights(
 			applyHostGroupRights($data['groups_rights'], $groupids, $groupids_subgroupids, $new_permission)
 		);
-	}
-
-	if (hasRequest('tag_filters')) {
-		$data['tag_filters'] = getRequest('tag_filters', []);
-
-		if (hasRequest('remove_tag_filter')) {
-			$remove_tag_filter = getRequest('remove_tag_filter');
-			if (is_array($remove_tag_filter) && array_key_exists(key($remove_tag_filter), $data['tag_filters'])) {
-				unset($data['tag_filters'][key($remove_tag_filter)]);
-			}
-		}
-	}
-	else {
-		$data['tag_filters'] = $data['usrgrpid'] == 0 ? [] : $db_user_group['tag_filters'];
 	}
 
 	if (hasRequest('add_tag_filter')) {
@@ -372,6 +365,12 @@ if (hasRequest('form')) {
 
 			$data['tag'] = '';
 			$data['value'] = '';
+		}
+	}
+	elseif (hasRequest('remove_tag_filter')) {
+		$remove_tag_filter = getRequest('remove_tag_filter');
+		if (is_array($remove_tag_filter) && array_key_exists(key($remove_tag_filter), $data['tag_filters'])) {
+			unset($data['tag_filters'][key($remove_tag_filter)]);
 		}
 	}
 
