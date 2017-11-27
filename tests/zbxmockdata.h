@@ -44,6 +44,7 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error);
 zbx_mock_error_t	zbx_mock_in_parameter(const char *name, zbx_mock_handle_t *parameter);
 zbx_mock_error_t	zbx_mock_out_parameter(const char *name, zbx_mock_handle_t *parameter);
 zbx_mock_error_t	zbx_mock_db_rows(const char *data_source, zbx_mock_handle_t *rows);
+zbx_mock_error_t	zbx_mock_file(const char *path, zbx_mock_handle_t *file);
 zbx_mock_error_t	zbx_mock_object_member(zbx_mock_handle_t object, const char *name, zbx_mock_handle_t *member);
 zbx_mock_error_t	zbx_mock_vector_element(zbx_mock_handle_t vector, zbx_mock_handle_t *element);
 zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value);

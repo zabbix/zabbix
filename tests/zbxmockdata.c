@@ -31,6 +31,7 @@ static yaml_document_t		test_case;		/* parsed YAML document with test case data 
 static const yaml_node_t	*in = NULL;		/* pointer to "in" section of test case document */
 static const yaml_node_t	*out = NULL;		/* pointer to "out" section of test case document */
 static const yaml_node_t	*db_data = NULL;	/* pointer to "db data" section of test case document */
+static const yaml_node_t	*files = NULL;		/* pointer to "files" section of test case document */
 
 typedef struct
 {
@@ -43,7 +44,8 @@ typedef enum
 {
 	ZBX_MOCK_IN,		/* parameter from "in" section of test case data */
 	ZBX_MOCK_OUT,		/* parameter from "out" section of test case data */
-	ZBX_MOCK_DB_DATA	/* data source from "db data" section of test case data */
+	ZBX_MOCK_DB_DATA,	/* data source from "db data" section of test case data */
+	ZBX_MOCK_FILES		/* file contents from "files" section of test case data */
 }
 zbx_mock_parameter_t;
 
@@ -145,6 +147,17 @@ int	zbx_mock_data_init(void **state)
 									if (YAML_MAPPING_NODE != db_data->type)
 									{
 										printf("\"db data\" is not a mapping.\n");
+										break;
+									}
+								}
+								else if (0 == zbx_yaml_scalar_cmp("files", key))
+								{
+									files = yaml_document_get_node(&test_case,
+											pair->value);
+
+									if (YAML_MAPPING_NODE != files->type)
+									{
+										printf("\"files\" is not a mapping.\n");
 										break;
 									}
 								}
@@ -267,6 +280,9 @@ static zbx_mock_error_t	zbx_mock_parameter(zbx_mock_parameter_t type, const char
 		case ZBX_MOCK_DB_DATA:
 			source = db_data;
 			break;
+		case ZBX_MOCK_FILES:
+			source = files;
+			break;
 		default:
 			return ZBX_MOCK_INTERNAL_ERROR;
 	}
@@ -309,6 +325,11 @@ zbx_mock_error_t	zbx_mock_out_parameter(const char *name, zbx_mock_handle_t *par
 zbx_mock_error_t	zbx_mock_db_rows(const char *data_source, zbx_mock_handle_t *rows)
 {
 	return zbx_mock_parameter(ZBX_MOCK_DB_DATA, data_source, rows);
+}
+
+zbx_mock_error_t	zbx_mock_file(const char *path, zbx_mock_handle_t *file)
+{
+	return zbx_mock_parameter(ZBX_MOCK_FILES, path, file);
 }
 
 zbx_mock_error_t	zbx_mock_object_member(zbx_mock_handle_t object, const char *name, zbx_mock_handle_t *member)

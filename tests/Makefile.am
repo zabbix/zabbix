@@ -17,5 +17,6 @@ libzbxmocktest_a_SOURCES = \
 
 libzbxmockdata_a_SOURCES = \
 	zbxmockdb.c \
+	zbxmockfile.c \
 	zbxmockdata.c \
 	zbxmockdata.h

@@ -100,10 +100,15 @@ WRAP_DB_FUNCS = \
 	-Wl,--wrap=DBexecute_multiple_query \
 	-Wl,--wrap=DBfree_result
 
+WRAP_IO_FUNCS = \
+	-Wl,--wrap=fopen \
+	-Wl,--wrap=fclose \
+	-Wl,--wrap=fgets
+
 tests:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS) $(WRAP_IO_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
 	./tests_run.pl
 endif
 
