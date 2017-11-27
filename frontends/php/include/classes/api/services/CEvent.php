@@ -539,6 +539,10 @@ class CEvent extends CApiService {
 			}
 		}
 
+		if ($options['countOutput']) {
+			return $result;
+		}
+
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['object', 'objectid'], $options['output']);
