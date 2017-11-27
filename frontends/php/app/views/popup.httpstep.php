@@ -148,7 +148,7 @@ $http_popup_tab->addTab('scenarioStepTab', _('Step of web scenario'), $http_popu
 
 $output['buttons'] = [
 	[
-		'title' => array_key_exists('stepid', $options) ? _('Update') : _('Add'),
+		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
 		'class' => '',
 		'keepOpen' => true,
 		'action' => 'return validate_httpstep("http_step", '.

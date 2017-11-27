@@ -344,8 +344,15 @@ if (hasRequest('sform')) {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick("javascript: return PopUp('?action=popup.generic&dstfrm=".$form->getName().
-								"&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name');"
+							->onClick('return PopUp("popup.generic",'.
+								CJs::encodeJson([
+									'srctbl' => 'items',
+									'srcfld1' => 'itemid',
+									'srcfld2' => 'name',
+									'dstfrm' => $form->getName(),
+									'dstfld1' => 'itemid',
+									'dstfld2' => 'item'
+								]).');'
 							)
 					])
 					->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $priority]))

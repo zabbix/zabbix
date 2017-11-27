@@ -37,31 +37,46 @@ if ($data['parent_discoveryid'] !== '') {
 $expression_form_list = new CFormList();
 
 // Append item to form list.
-$action = '?action=popup.generic&writeonly=1&dstfrm='.$expression_form->getName();
-$action .= ($data['groupid'] && $data['hostid'])
-				? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
-				: '';
-$action .= '&dstfld1=itemid&dstfld2=description';
-$action .= ($data['parent_discoveryid'] !== '') ? '&normal_only=1' : '';
-$action .= '&srctbl=items&srcfld1=itemid&srcfld2=name';
+$popup_options = [
+	'srctbl' => 'items',
+	'srcfld1' => 'itemid',
+	'srcfld2' => 'name',
+	'dstfrm' => $expression_form->getName(),
+	'dstfld1' => 'itemid',
+	'dstfld2' => 'description',
+	'writeonly' => '1'
+];
+if ($data['groupid'] && $data['hostid']) {
+	$popup_options['groupid'] = $data['groupid'];
+	$popup_options['hostid'] = $data['hostid'];
+}
+if ($data['parent_discoveryid'] !== '') {
+	$popup_options['normal_only'] = '1';
+}
 
 $item = [
 	(new CTextBox('description', $data['description'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick(('javascript: PopUp("'.$action.'");'))
+		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).');')
 ];
 
 if ($data['parent_discoveryid'] !== '') {
-	$action = '?action=popup.generic&dstfrm='.$expression_form->getName().
-		'&dstfld1=itemid&dstfld2=description'.url_param('parent_discoveryid', true).
-		'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name';
+	$popup_options = [
+		'srctbl' => 'item_prototypes',
+		'srcfld1' => 'itemid',
+		'srcfld2' => 'name',
+		'dstfrm' => $expression_form->getName(),
+		'dstfld1' => 'itemid',
+		'dstfld2' => 'description',
+		'parent_discoveryid' => $data['parent_discoveryid']
+	];
 
 	$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$item[] = (new CButton('select', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('javascript: PopUp("'.$action.'");');
+		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).');');
 }
 
 $expression_form_list->addRow(_('Item'), $item);

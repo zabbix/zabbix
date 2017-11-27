@@ -181,9 +181,16 @@ function getFontComboBox($name) {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('PopUp("?action=popup.generic&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
-								'&dstfrm=selementForm&dstfld1=sysmapid&dstfld2=elementNameMap'.
-								'&excludeids[]=#{sysmapid}")'
+							->onClick('return PopUp("popup.generic",jQuery.extend('.
+								CJs::encodeJson([
+									'srctbl' => 'sysmaps',
+									'srcfld1' => 'sysmapid',
+									'srcfld2' => 'name',
+									'dstfrm' => 'selementForm',
+									'dstfld1' => 'sysmapid',
+									'dstfld2' => 'elementNameMap'
+								]).
+									',{excludeids: [#{sysmapid}]}));'
 							)
 					], 'mapSelectRow')
 					->addRow(_('Application'), [
@@ -697,8 +704,16 @@ function getFontComboBox($name) {
 								->setId('linkTriggerscontainer'),
 							(new CButton(null, _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->onClick('PopUp("?action=popup.generic&srctbl=triggers&srcfld1=triggerid&real_hosts=1'.
-									'&reference=linktrigger&multiselect=1&with_triggers=1&noempty=1");'
+								->onClick('return PopUp("popup.generic",'.
+									CJs::encodeJson([
+										'srctbl' => 'triggers',
+										'srcfld1' => 'triggerid',
+										'reference' => 'linktrigger',
+										'multiselect' => '1',
+										'real_hosts' => '1',
+										'with_triggers' => '1',
+										'noempty' => '1'
+									]).');'
 								)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

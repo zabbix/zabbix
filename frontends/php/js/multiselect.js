@@ -550,7 +550,11 @@ jQuery(function($) {
 				}
 				else {
 					popupButton.click(function() {
-						return PopUp('?action=popup.generic&' + urlParameters, options.popup.width, options.popup.height);
+						// TODO: urlParameters should be passed to multiselect as an object, not as string
+						var popup_url = (new Curl('?' + urlParameters)),
+							popup_options = popup_url.getArguments();
+
+						return PopUp('popup.generic', popup_options);
 					});
 				}
 

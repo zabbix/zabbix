@@ -123,7 +123,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getName().'");')
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson($field->getPopupOptions($form->getName())).');')
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {

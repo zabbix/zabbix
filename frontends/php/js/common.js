@@ -366,12 +366,13 @@ function openWinCentered(url, name, width, height, params) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} url			Url containing popup parameters.
+ * @param {string} action		Popup controller related action.
+ * @param {array} options		Array with key/value pairs that will be used as query for popup request.
  * @param {string} dialogueid	(optional) id of overlay dialogue.
  *
  * @returns false
  */
-function PopUp(url, dialogueid) {
+function PopUp(action, options, dialogueid) {
 	var ovelay_properties = {
 		'title': '',
 		'content': jQuery('<div>')
@@ -384,9 +385,15 @@ function PopUp(url, dialogueid) {
 		'buttons': [],
 		'dialogueid': (typeof dialogueid === 'undefined') ? getOverlayDialogueId() : dialogueid
 	};
+	var url = new Curl('zabbix.php');
+
+	url.setArgument('action', action);
+	jQuery.each(options, function(key, value) {
+		url.setArgument(key, value);
+	});
 
 	jQuery.ajax({
-		url: url,
+		url: url.getUrl(),
 		type: 'get',
 		dataType: 'json',
 		beforeSend: function() {
@@ -428,14 +435,13 @@ function PopUp(url, dialogueid) {
 function reloadPopup(form, action) {
 	var dialogueid = jQuery(form).closest('[data-dialogueid]').attr('data-dialogueid'),
 		action = action || 'popup.generic',
-		url = new Curl();
+		options = {};
 
-	url.setArgument('action', action);
 	jQuery(form.elements).each(function() {
-		url.setArgument(this.name, this.value);
+		options[this.name] = this.value;
 	});
 
-	PopUp(url.getUrl(), dialogueid);
+	PopUp(action, options, dialogueid);
 }
 
 /**

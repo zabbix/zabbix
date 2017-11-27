@@ -115,17 +115,16 @@ if ($data['action'] == 'problem.view') {
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
-				->onClick('return PopUp("'.
-					(new CUrl())
-						->setArgument('action', 'popup.generic')
-						->setArgument('srctbl', 'applications')
-						->setArgument('srcfld1', 'name')
-						->setArgument('dstfrm', 'zbx_filter')
-						->setArgument('dstfld1', 'filter_application')
-						->setArgument('with_applications', '1')
-						->setArgument('real_hosts', '1')
-						->getUrl().
-					'");'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'srcfld2' => 'name',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_application',
+						'with_applications' => '1',
+						'real_hosts' => '1'
+					]).');'
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])

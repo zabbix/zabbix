@@ -418,12 +418,19 @@ function getItemFilterForm(&$items) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton(null, _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick(
-					'return PopUp("?action=popup.generic&srctbl=applications&srcfld1=name'.
-						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-						'&with_applications=1'.
-						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
-						.', 0, 0, "application");')
+				->onClick('return PopUp("popup.generic",jQuery.extend('.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'filter_application',
+						'with_applications' => '1',
+					]).
+					',(jQuery("input[name=\'filter_hostid\']").length > 0)'.
+						' ? {hostid: jQuery("input[name=\'filter_hostid\']").val()}'.
+						' : {}'.
+					'));'
+				)
 		]
 	);
 	$filterColumn2->addRow(_('SNMP community'),

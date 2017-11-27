@@ -866,12 +866,21 @@ ZABBIX.apps.map = (function($) {
 
 				// application selection pop up
 				$('#application-select').click(function() {
-					var data = $('#elementNameHost').multiSelect('getData');
+					var data = $('#elementNameHost').multiSelect('getData'),
+						popup_options = {
+							srctbl: 'applications',
+							srcfld1: 'name',
+							dstfrm: 'selementForm',
+							dstfld1: 'application',
+							real_hosts: '1',
+							with_applications: '1'
+						};
 
-					PopUp('?action=popup.generic&srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
-						+ '&with_applications=1&dstfrm=selementForm'
-						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : '')
-					);
+					if (data.length > 0 && $('#elementType').val() == '4') {
+						popup_options['hostid'] = data[0].id;
+					}
+
+					PopUp('popup.generic', popup_options);
 				});
 
 				// mass update form

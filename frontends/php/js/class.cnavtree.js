@@ -908,14 +908,7 @@ jQuery(function($) {
 					btn2.setAttribute('class', 'import-items-btn');
 					btn2.setAttribute('title', t('Add multiple maps'));
 					btn2.addEventListener('click', function() {
-						var url = new Curl(),
-							id = $(this).data('id');
-
-						url.setArgument('action', 'popup.generic');
-						url.setArgument('srctbl', 'sysmaps');
-						url.setArgument('srcfld1', 'sysmapid');
-						url.setArgument('srcfld2', 'name');
-						url.setArgument('multiselect', '1');
+						var id = $(this).data('id');
 
 						if (typeof addPopupValues === 'function') {
 							old_addPopupValues = addPopupValues;
@@ -949,7 +942,12 @@ jQuery(function($) {
 							}
 						};
 
-						return PopUp(url.getUrl());
+						return PopUp('popup.generic', {
+							srctbl: 'sysmaps',
+							srcfld1: 'sysmapid',
+							srcfld2: 'name',
+							multiselect: '1',
+						});
 					});
 					tools.appendChild(btn2);
 

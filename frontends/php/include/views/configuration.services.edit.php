@@ -50,8 +50,12 @@ $servicesFormList->addRow(_('Parent service'), [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select_parent', _x('Change', 'verb')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("?action=popup.services&pservices=1'.url_param('serviceid').
-			'&parentid="+this.form.parentid.value);'
+		->onClick('return PopUp("popup.services",jQuery.extend('.
+			CJs::encodeJson([
+				'pservices' => '1',
+				'serviceid' => $this->data['service']['serviceid']
+			]).
+				',{parentid: this.form.parentid.value}));'
 		)
 ]);
 
@@ -76,15 +80,17 @@ $servicesFormList->addRow(_('Trigger'), [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("?action=popup.generic'.
-			'&dstfrm='.$servicesForm->getName().
-			'&dstfld1=triggerid'.
-			'&dstfld2=trigger'.
-			'&srctbl=triggers'.
-			'&srcfld1=triggerid'.
-			'&srcfld2=description'.
-			'&real_hosts=1'.
-			'&with_triggers=1");'
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'triggers',
+				'srcfld1' => 'triggerid',
+				'srcfld2' => 'description',
+				'dstfrm' => $servicesForm->getName(),
+				'dstfld1' => 'triggerid',
+				'dstfld2' => 'trigger',
+				'real_hosts' => '1',
+				'with_triggers' => '1'
+			]).');'
 		)
 ]);
 $servicesFormList->addRow(_('Sort order (0->999)'), (new CTextBox('sortorder', $this->data['sortorder'], false, 3))
@@ -126,8 +132,12 @@ $servicesDependenciesFormList->addRow(
 	(new CDiv([
 		$servicesChildTable,
 		(new CButton('add_child_service', _('Add')))
-			->onClick('return PopUp("?action=popup.services&cservices=1'.url_param('serviceid').
-				'&parentid="+this.form.parentid.value);'
+			->onClick('return PopUp("popup.services",jQuery.extend('.
+				CJs::encodeJson([
+					'cservices' => '1',
+					'serviceid' => $this->data['service']['serviceid']
+				]).
+					',{parentid: this.form.parentid.value}));'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]))

@@ -585,9 +585,18 @@ $master_item = (new CDiv([
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("?action=popup.generic&srctbl=items&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
-			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&only_hostid='.$data['hostid'].
-			'&with_webitems=0&'.http_build_query(['excludeids' => $data['itemids']]).'");'
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'master_itemname',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'dstfld2' => 'master_itemname',
+				'only_hostid' => $data['hostid'],
+				'with_webitems' => '0',
+				'excludeids' => $data['itemids']
+			]).');'
 		)
 ]))->setId('master_item');
 

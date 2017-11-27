@@ -677,21 +677,36 @@
 		showOpTypeForm(<?= ACTION_ACKNOWLEDGE_OPERATION ?>);
 
 		jQuery('#select_operation_opcommand_script').click(function() {
-			PopUp('?action=popup.generic&srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
-				+ '&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script'
-			);
+			PopUp('popup.generic', {
+				srctbl: 'scripts',
+				srcfld1: 'scriptid',
+				srcfld2: 'name',
+				dstfrm: 'action.edit',
+				dstfld1: 'new_operation_opcommand_scriptid',
+				dstfld2: 'new_operation_opcommand_script',
+			});
 		});
 
 		jQuery('#select_recovery_operation_opcommand_script').click(function() {
-			PopUp('?action=popup.generic&srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
-				+ '&dstfld1=new_recovery_operation_opcommand_scriptid&dstfld2=new_recovery_operation_opcommand_script'
-			);
+			PopUp('popup.generic', {
+				srctbl: 'scripts',
+				srcfld1: 'scriptid',
+				srcfld2: 'name',
+				dstfrm: 'action.edit',
+				dstfld1: 'new_recovery_operation_opcommand_scriptid',
+				dstfld2: 'new_recovery_operation_opcommand_script',
+			});
 		});
 
 		jQuery('#select_ack_operation_opcommand_script').click(function() {
-			PopUp('?action=popup.generic&srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
-				+ '&dstfld1=new_ack_operation_opcommand_scriptid&dstfld2=new_ack_operation_opcommand_script'
-			);
+			PopUp('popup.generic', {
+				srctbl: 'scripts',
+				srcfld1: 'scriptid',
+				srcfld2: 'name',
+				dstfrm: 'action.edit',
+				dstfld1: 'new_ack_operation_opcommand_scriptid',
+				dstfld2: 'new_ack_operation_opcommand_script',
+			});
 		});
 
 		processTypeOfCalculation();

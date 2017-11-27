@@ -232,8 +232,15 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("?action=popup.generic&srctbl=drules&srcfld1=druleid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'drules',
+						'srcfld1' => 'druleid',
+						'srcfld2' => 'name',
+						'dstfrm' => $actionForm->getName(),
+						'dstfld1' => 'new_condition_value',
+						'dstfld2' => 'drule'
+					]).');'
 				)
 		];
 		break;
@@ -245,8 +252,16 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("?action=popup.generic&srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'dchecks',
+						'srcfld1' => 'dcheckid',
+						'srcfld2' => 'name',
+						'dstfrm' => $actionForm->getName(),
+						'dstfld1' => 'new_condition_value',
+						'dstfld2' => 'dcheck',
+						'writeonly' => '1'
+					]).');'
 				)
 		];
 		break;
@@ -258,10 +273,15 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp('.
-						'"?action=popup.generic&srctbl=proxies&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-						'&dstfld1=new_condition_value&dstfld2=proxy"'.
-					')'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'proxies',
+						'srcfld1' => 'hostid',
+						'srcfld2' => 'host',
+						'dstfrm' => $actionForm->getName(),
+						'dstfld1' => 'new_condition_value',
+						'dstfld2' => 'proxy'
+					]).');'
 				)
 		];
 		break;
@@ -636,10 +656,15 @@ if (!empty($data['new_operation'])) {
 				->setHeader([_('User group'), _('Action')]);
 
 			$addUsrgrpBtn = (new CButton(null, _('Add')))
-				->onClick('return PopUp("'.
-						'?action=popup.generic&dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1'.
-						'&dstfld1=opmsgUsrgrpListFooter"'.
-					')'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'usrgrp',
+						'srcfld1' => 'usrgrpid',
+						'srcfld2' => 'name',
+						'dstfrm' => $actionForm->getName(),
+						'dstfld1' => 'opmsgUsrgrpListFooter',
+						'multiselect' => '1'
+					]).');'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$usrgrpList->addRow(
@@ -653,10 +678,15 @@ if (!empty($data['new_operation'])) {
 				->setHeader([_('User'), _('Action')]);
 
 			$addUserBtn = (new CButton(null, _('Add')))
-				->onClick('return PopUp('.
-						'"?action=popup.generic&dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1'.
-						'&dstfld1=opmsgUserListFooter"'.
-					')'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'users',
+						'srcfld1' => 'userid',
+						'srcfld2' => 'fullname',
+						'dstfrm' => $actionForm->getName(),
+						'dstfld1' => 'opmsgUserListFooter',
+						'multiselect' => '1'
+					]).');'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$userList->addRow(
@@ -1328,10 +1358,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					->setHeader([_('User group'), _('Action')]);
 
 				$addUsrgrpBtn = (new CButton(null, _('Add')))
-					->onClick('return PopUp('.
-							'"?action=popup.generic&dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name'.
-							'&multiselect=1&dstfld1=recOpmsgUsrgrpListFooter"'.
-						')'
+					->onClick('return PopUp("popup.generic",'.
+						CJs::encodeJson([
+							'srctbl' => 'usrgrp',
+							'srcfld1' => 'usrgrpid',
+							'srcfld2' => 'name',
+							'dstfrm' => $actionForm->getName(),
+							'dstfld1' => 'recOpmsgUsrgrpListFooter',
+							'multiselect' => '1'
+						]).');'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$usrgrpList->addRow(
@@ -1345,10 +1380,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					->setHeader([_('User'), _('Action')]);
 
 				$addUserBtn = (new CButton(null, _('Add')))
-					->onClick('return PopUp('.
-							'"?action=popup.generic&dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname'.
-							'&multiselect=1&dstfld1=recOpmsgUserListFooter"'.
-						')'
+					->onClick('return PopUp("popup.generic",'.
+						CJs::encodeJson([
+							'srctbl' => 'users',
+							'srcfld1' => 'userid',
+							'srcfld2' => 'fullname',
+							'dstfrm' => $actionForm->getName(),
+							'dstfld1' => 'recOpmsgUserListFooter',
+							'multiselect' => '1'
+						]).');'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$userList->addRow(
@@ -1832,9 +1872,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					(new CRow(
 						(new CCol(
 							(new CButton(null, _('Add')))
-								->onClick('return PopUp('.
-									'"?action=popup.generic&dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name'.
-									'&multiselect=1&dstfld1=ackOpmsgUsrgrpListFooter")'
+								->onClick('return PopUp("popup.generic",'.
+									CJs::encodeJson([
+										'srctbl' => 'usrgrp',
+										'srcfld1' => 'usrgrpid',
+										'srcfld2' => 'name',
+										'dstfrm' => $actionForm->getName(),
+										'dstfld1' => 'ackOpmsgUsrgrpListFooter',
+										'multiselect' => '1'
+									]).');'
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(2)
@@ -1848,9 +1894,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					(new CRow(
 						(new CCol(
 							(new CButton(null, _('Add')))
-								->onClick('return PopUp('.
-									'"?action=popup.generic&dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname'.
-									'&multiselect=1&dstfld1=ackOpmsgUserListFooter")'
+								->onClick('return PopUp("popup.generic",'.
+									CJs::encodeJson([
+										'srctbl' => 'users',
+										'srcfld1' => 'userid',
+										'srcfld2' => 'fullname',
+										'dstfrm' => $actionForm->getName(),
+										'dstfld1' => 'ackOpmsgUserListFooter',
+										'multiselect' => '1'
+									]).');'
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(2)

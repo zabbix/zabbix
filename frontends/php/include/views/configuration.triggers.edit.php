@@ -109,15 +109,14 @@ $expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick(
-			'return PopUp("?action=popup.triggerexpr&dstfrm='.$triggersForm->getName().
-				'&dstfld1='.$data['expression_field_name'].'&srctbl='.$data['expression_field_name'].
-				'&srcfld1='.$data['expression_field_name'].
-				(($data['groupid'] && $data['hostid'])
-					? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
-					: ''
-				).
-				'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()));'
+		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
+			CJs::encodeJson([
+				'srctbl' => $data['expression_field_name'],
+				'srcfld1' => $data['expression_field_name'],
+				'dstfrm' => $triggersForm->getName(),
+				'dstfld1' => $data['expression_field_name']
+			]).
+			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}));'
 		)
 		->setEnabled(!$readonly)
 ];
@@ -249,9 +248,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('PopUp("?action=popup.testtriggerexpr&expression="+'.
-			'encodeURIComponent(this.form.elements["expression"].value)); return false;'
-		)
+		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value});')
 		->addClass(ZBX_STYLE_BTN_LINK);
 
 	if (!$allowed_testing) {
@@ -290,6 +287,17 @@ $triggersFormList->addRow(_('OK event generation'),
 		->setEnabled(!$readonly)
 );
 
+$popup_options = [
+	'srctbl' => $data['recovery_expression_field_name'],
+	'srcfld1' => $data['recovery_expression_field_name'],
+	'dstfrm' => $triggersForm->getName(),
+	'dstfld1' => $data['recovery_expression_field_name']
+];
+if ($data['groupid'] && $data['hostid']) {
+	$popup_options['groupid'] = $data['groupid'];
+	$popup_options['hostid'] = $data['hostid'];
+}
+
 $recovery_expression_row = [
 	(new CTextArea(
 		$data['recovery_expression_field_name'],
@@ -299,16 +307,9 @@ $recovery_expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick(
-			'return PopUp("?action=popup.triggerexpr&dstfrm='.$triggersForm->getName().
-				'&dstfld1='.$data['recovery_expression_field_name'].
-				'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
-				(($data['groupid'] && $data['hostid'])
-					? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
-					: ''
-				).
-				'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].
-				'"]\').val()));'
+		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
+			CJs::encodeJson($popup_options).
+				',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}));'
 		)
 		->setEnabled(!$readonly)
 ];
@@ -438,9 +439,8 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('PopUp("?action=popup.testtriggerexpr&expression="'.
-			'+encodeURIComponent(this.form.elements["recovery_expression"].value)); return false;'
-		)
+		->onClick('return PopUp("popup.testtriggerexpr",'.
+			'{expression: this.form.elements["recovery_expression"].value});')
 		->addClass(ZBX_STYLE_BTN_LINK);
 
 	if (!$allowed_testing) {
@@ -599,8 +599,17 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		$discovered_trigger
 			? null
 			: (new CButton('bnt1', _('Add')))
-				->onClick('return PopUp("?action=popup.generic&srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
-					'&hostid='.$data['hostid'].'&groupid='.$data['groupid'].'&multiselect=1&with_triggers=1&noempty=1");'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'triggers',
+						'srcfld1' => 'triggerid',
+						'reference' => 'deptrigger',
+						'hostid' => $data['hostid'],
+						'groupid' => $data['groupid'],
+						'multiselect' => '1',
+						'with_triggers' => '1',
+						'noempty' => '1'
+					]).');'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 	]))
