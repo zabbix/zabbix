@@ -223,19 +223,19 @@ static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *re
 }
 
 /* Directory Entry Types */
-#define DET_FILE	1
-#define DET_DIR		2
-#define DET_SYM		4
-#define DET_SOCK	8
-#define DET_BDEV	16
-#define DET_CDEV	32
-#define DET_FIFO	64
-#define DET_ALL		128
-#define DET_DEV		256
-#define DET_OVERFLOW	512
+#define DET_FILE	0x001
+#define DET_DIR		0x002
+#define DET_SYM		0x004
+#define DET_SOCK	0x008
+#define DET_BDEV	0x010
+#define DET_CDEV	0x020
+#define DET_FIFO	0x040
+#define DET_ALL		0x080
+#define DET_DEV		0x100
+#define DET_OVERFLOW	0x200
 #define DET_TEMPLATE	"file\0dir\0sym\0sock\0bdev\0cdev\0fifo\0all\0dev\0"
-#define DET_MASK	127
-#define DET_DEV2	DET_BDEV + DET_CDEV
+#define DET_ALLMASK	(DET_FILE + DET_DIR + DET_SYM + DET_SOCK + DET_BDEV + DET_CDEV + DET_FIFO)
+#define DET_DEV2	(DET_BDEV + DET_CDEV)
 
 static int	etype_to_mask(char *etype)
 {
@@ -251,15 +251,7 @@ static int	etype_to_mask(char *etype)
 		ret <<= 1;
 	}
 
-	switch (ret)
-	{
-		case DET_ALL:
-			return DET_MASK;
-		case DET_DEV:
-			return DET_DEV2;
-		default:
-			return ret;
-	}
+	return ret;
 }
 
 static int	etypes_to_mask(char *etypes, AGENT_RESULT *result)
@@ -289,35 +281,17 @@ static int	etypes_to_mask(char *etypes, AGENT_RESULT *result)
 		ret |= DET_DEV2;
 
 	if (DET_ALL & ret)
-		ret |= DET_MASK;
+		ret |= DET_ALLMASK;
 
 	return ret;
 }
 
 static int	parse_size_parameter(char *text, zbx_uint64_t *size_out)
 {
-	size_t	ndigits;
-
 	if (NULL == text || '\0' == *text)
 		return SUCCEED;
 
-	if ((ndigits = strcspn(text, "KMGT")) < strlen(text) && '\0' == text[ndigits + 1])
-	{
-		char		*tmp = zbx_strdup(NULL, text);
-		zbx_uint64_t	mul = suffix2factor(text[ndigits]);
-		int		result;
-
-		tmp[ndigits] = '\0';
-		result = is_uint64(tmp, size_out);
-
-		if (SUCCEED == result)
-			*size_out *= mul;
-
-		zbx_free(tmp);
-		return result;
-	}
-
-	return is_uint64(text, size_out);
+	return str2uint64(text, "KMGT", size_out);
 }
 
 static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *result, int *types_out,
@@ -332,9 +306,9 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 		return FAIL;
 
 	if (0 == types_incl)
-		types_incl = DET_MASK;
+		types_incl = DET_ALLMASK;
 
-	*types_out = types_incl & (~types_excl) & DET_MASK;
+	*types_out = types_incl & (~types_excl) & DET_ALLMASK;
 
 	/* min/max sizes/times must be already initialized to default values */
 
@@ -713,8 +687,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_stat_t		status;
 	regex_t			*regex_incl = NULL, *regex_excl = NULL;
 	zbx_directory_item_t	*item;
-	zbx_uint64_t		min_size = 0, max_size = 0x7FFFffffFFFFffff;
-	time_t			min_time = 0, max_time = 0x7FFFffff;
+	zbx_uint64_t		min_size = 0, max_size = 0x7fffffffffffffff;
 
 	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
 		return ret;
@@ -806,7 +779,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (SUCCEED != queue_directory(&list, path, item->depth, max_depth))
 					zbx_free(path);
 
-				if ((DET_DIR & types) && match)
+				if (0 != (types & DET_DIR) && 0 != match)
 					++count;
 			}
 
@@ -896,16 +869,15 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 == lstat(path, &status))
 			{
 				if (0 != filename_matches(entry->d_name, regex_incl, regex_excl) && (
-						(S_ISREG(status.st_mode)  && DET_FILE & types) ||
-						(S_ISDIR(status.st_mode)  && DET_DIR  & types) ||
-						(S_ISLNK(status.st_mode)  && DET_SYM  & types) ||
-						(S_ISSOCK(status.st_mode) && DET_SOCK & types) ||
-						(S_ISBLK(status.st_mode)  && DET_BDEV & types) ||
-						(S_ISCHR(status.st_mode)  && DET_CDEV & types) ||
-						(S_ISFIFO(status.st_mode) && DET_FIFO & types)) &&
-						(min_size <= status.st_size && status.st_size <= max_size) &&
-						(min_time <= status.st_ctim.tv_sec &&
-								status.st_ctim.tv_sec <= max_time))
+						(S_ISREG(status.st_mode)  && 0 != (types & DET_FILE)) ||
+						(S_ISDIR(status.st_mode)  && 0 != (types & DET_DIR)) ||
+						(S_ISLNK(status.st_mode)  && 0 != (types & DET_SYM)) ||
+						(S_ISSOCK(status.st_mode) && 0 != (types & DET_SOCK)) ||
+						(S_ISBLK(status.st_mode)  && 0 != (types & DET_BDEV)) ||
+						(S_ISCHR(status.st_mode)  && 0 != (types & DET_CDEV)) ||
+						(S_ISFIFO(status.st_mode) && 0 != (types & DET_FIFO))) &&
+						(min_size <= (zbx_uint64_t)status.st_size
+								&& (zbx_uint64_t)status.st_size <= max_size))
 				{
 					++count;
 				}
