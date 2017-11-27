@@ -405,14 +405,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 
 	/* set autocommit on */
-  	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
 			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
 	{
 		ret = ZBX_DB_DOWN;
 	}
 
 	/* we do not generate vendor escape clause sequences */
-  	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_NOSCAN,
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_NOSCAN,
 			(SQLPOINTER)SQL_NOSCAN_ON, SQL_NTS)))
 	{
 		ret = ZBX_DB_DOWN;
