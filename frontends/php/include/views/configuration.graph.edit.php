@@ -315,6 +315,10 @@ $itemsTable->addRow(
 					(new CButton('add_item', _('Add')))
 						->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 							($this->data['normal_only'] ? '&normal_only=1' : '').
+							(($data['groupid'] && $data['hostid'])
+								? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
+								: ''
+							).
 							'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),

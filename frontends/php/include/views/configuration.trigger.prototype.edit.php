@@ -77,9 +77,13 @@ $add_expression_button = (new CButton('insert', ($data['expression_constructor']
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
 		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
-			'&dstfld1='.$data['expression_field_name'].'&srctbl='.$data['expression_field_name'].
-			url_param('parent_discoveryid').'&srcfld1='.$data['expression_field_name'].
-			'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()));'
+			'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
+			(($data['groupid'] && $data['hostid'])
+				? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
+				: ''
+			).
+			'&srcfld1=expression'.
+			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));'
 	);
 if ($data['limited']) {
 	$add_expression_button->setAttribute('disabled', 'disabled');
@@ -571,7 +575,9 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		new CHorList([
 			(new CButton('add_dep_trigger', _('Add')))
 				->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
-					'&multiselect=1&with_triggers=1&normal_only=1&noempty=1");')
+					'&hostid='.$data['hostid'].'&groupid='.$data['groupid'].'&multiselect=1&with_triggers=1'.
+					'&normal_only=1&noempty=1");'
+				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
 				->onClick('return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.

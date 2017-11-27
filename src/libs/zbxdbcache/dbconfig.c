@@ -147,14 +147,10 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 								0 == strcmp(arg3, "items_unsupported"))
 						{
 							ret = SUCCEED;
-							goto clean;
 						}
 					}
 					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
-					{
 						ret = SUCCEED;
-						goto clean;
-					}
 				}
 				else if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg3, "lastaccess"))
 					ret = SUCCEED;
@@ -4874,6 +4870,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
+	config->proxy_lastaccess_ts = time(NULL);
 
 	FINISH_SYNC;
 out:
@@ -7984,8 +7981,7 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 	{
 		ha = (zbx_host_availability_t *)availabilities->values[i];
 
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &ha->hostid)) ||
-				HOST_STATUS_MONITORED != dc_host->status)
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &ha->hostid)))
 		{
 			int	j;
 
@@ -8007,10 +8003,31 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 
 /******************************************************************************
  *                                                                            *
- * Comments: helper function for DCconfig_check_trigger_dependencies()        *
+ * Comments: helper function for trigger dependency checking                  *
+ *                                                                            *
+ * Parameters: trigdep        - [IN] the trigger dependency data              *
+ *             level          - [IN] the trigger dependency level             *
+ *             triggerids     - [IN] the currently processing trigger ids     *
+ *                                   for bulk trigger operations              *
+ *                                   (optional, can be NULL)                  *
+ *             master_triggerids - [OUT] unresolved master trigger ids        *
+ *                                   for bulk trigger operations              *
+ *                                   (optional together with triggerids       *
+ *                                   parameter)                               *
+ *                                                                            *
+ * Return value: SUCCEED - trigger dependency check succeed / was unresolved  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: With bulk trigger processing a master trigger can be in the same *
+ *           batch as dependent trigger. In this case it might be impossible  *
+ *           to perform dependency check based on cashed trigger values. The  *
+ *           unresolved master trigger ids will be added to master_triggerids *
+ *           vector, so the dependency check can be performed after a new     *
+ *           master trigger value has been calculated.                        *
  *                                                                            *
  ******************************************************************************/
-static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
+static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level,
+		const zbx_vector_uint64_t *triggerids, zbx_vector_uint64_t *master_triggerids)
 {
 	int				i;
 	const ZBX_DC_TRIGGER		*next_trigger;
@@ -8030,15 +8047,25 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 			next_trigdep = (const ZBX_DC_TRIGGER_DEPLIST *)trigdep->dependencies.values[i];
 
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
-					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
 					TRIGGER_STATUS_ENABLED == next_trigger->status &&
 					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
 			{
-				return FAIL;
+
+				if (NULL == triggerids || FAIL == zbx_vector_uint64_bsearch(triggerids,
+						next_trigger->triggerid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					if (TRIGGER_VALUE_PROBLEM == next_trigger->value)
+						return FAIL;
+				}
+				else
+					zbx_vector_uint64_append(master_triggerids, next_trigger->triggerid);
 			}
 
-			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1))
+			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1, triggerids,
+					master_triggerids))
+			{
 				return FAIL;
+			}
 		}
 	}
 
@@ -8065,7 +8092,7 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
 	LOCK_CACHE;
 
 	if (NULL != (trigdep = zbx_hashset_search(&config->trigdeps, &triggerid)))
-		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0);
+		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0, NULL, NULL);
 
 	UNLOCK_CACHE;
 
@@ -8153,7 +8180,7 @@ static void	DCconfig_sort_triggers_topologically(void)
  * Function: DCconfig_triggers_apply_changes                                  *
  *                                                                            *
  * Purpose: apply trigger value,state,lastchange or error changes to          *
- *          configuration cache                                               *
+ *          configuration cache after committed to database                   *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
@@ -8161,6 +8188,9 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 	int			i;
 	zbx_trigger_diff_t	*diff;
 	ZBX_DC_TRIGGER		*dc_trigger;
+
+	if (0 == trigger_diff->values_num)
+		return;
 
 	LOCK_CACHE;
 
@@ -10639,18 +10669,47 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
  *                                                                            *
  * Parameter: hostid     - [IN] the proxy identifier (hostid)                 *
  *            lastaccess - [IN] the last time proxy data was received/sent    *
+ *            proxy_diff - [OUT] last access updates for proxies that need    *
+ *                               to be synced with database                   *
  *                                                                            *
  ******************************************************************************/
-void zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess)
+void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess, zbx_vector_uint64_pair_t *proxy_diff)
 {
 	ZBX_DC_PROXY	*proxy;
+	int		now;
 
 	LOCK_CACHE;
 
 	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		proxy->lastaccess = lastaccess;
+	{
+		if (lastaccess < config->proxy_lastaccess_ts)
+			proxy->lastaccess = config->proxy_lastaccess_ts;
+		else
+			proxy->lastaccess = lastaccess;
+	}
+
+	if (ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY < (now = time(NULL)) - config->proxy_lastaccess_ts)
+	{
+		zbx_hashset_iter_t	iter;
+
+		zbx_hashset_iter_reset(&config->proxies, &iter);
+
+		while (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
+		{
+			if (proxy->lastaccess >= config->proxy_lastaccess_ts)
+			{
+				zbx_uint64_pair_t	pair = {proxy->hostid, proxy->lastaccess};
+
+				zbx_vector_uint64_pair_append(proxy_diff, pair);
+			}
+		}
+
+		config->proxy_lastaccess_ts = now;
+	}
 
 	UNLOCK_CACHE;
+
+	zbx_vector_uint64_pair_sort(proxy_diff, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -10732,6 +10791,9 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 	const zbx_item_diff_t	*diff;
 	ZBX_DC_ITEM		*dc_item;
 
+	if (0 == item_diff->values_num)
+		return;
+
 	LOCK_CACHE;
 
 	for (i = 0; i < item_diff->values_num; i++)
@@ -10759,3 +10821,69 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 
 	UNLOCK_CACHE;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_trigger_dependencies                                  *
+ *                                                                            *
+ * Purpose: checks/returns trigger dependencies for a set of triggers         *
+ *                                                                            *
+ * Parameter: triggerids  - [IN] the currently processing trigger ids         *
+ *            deps        - [OUT] list of dependency check results for failed *
+ *                                or unresolved dependencies                  *
+ *                                                                            *
+ * Comments: This function returns list of zbx_trigger_dep_t structures       *
+ *           for failed or unresolved dependency checks.                      *
+ *           Dependency check is failed if any of the master triggers that    *
+ *           are not being processed in this batch (present in triggerids     *
+ *           vector) has a problem value.                                     *
+ *           Dependency check is unresolved if a master trigger is being      *
+ *           processed in this batch (present in triggerids vector) and no    *
+ *           other master triggers have problem value.                        *
+ *           Dependency check is successful if all master triggers (if any)   *
+ *           have OK value and are not being processed in this batch.         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps)
+{
+	int				i, ret;
+	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
+	zbx_vector_uint64_t		masterids;
+	zbx_trigger_dep_t		*dep;
+
+	zbx_vector_uint64_create(&masterids);
+	zbx_vector_uint64_reserve(&masterids, 64);
+
+	LOCK_CACHE;
+
+	for (i = 0; i < triggerids->values_num; i++)
+	{
+		if (NULL == (trigdep = zbx_hashset_search(&config->trigdeps, &triggerids->values[i])))
+			continue;
+
+		if (FAIL == (ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0, triggerids, &masterids)) ||
+				0 != masterids.values_num)
+		{
+			dep = (zbx_trigger_dep_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_t));
+			dep->triggerid = triggerids->values[i];
+			zbx_vector_uint64_create(&dep->masterids);
+
+			if (SUCCEED == ret)
+			{
+				dep->status = ZBX_TRIGGER_DEPENDENCY_UNRESOLVED;
+				zbx_vector_uint64_append_array(&dep->masterids, masterids.values, masterids.values_num);
+			}
+			else
+				dep->status = ZBX_TRIGGER_DEPENDENCY_FAIL;
+
+			zbx_vector_ptr_append(deps, dep);
+		}
+
+		zbx_vector_uint64_clear(&masterids);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&masterids);
+}
+

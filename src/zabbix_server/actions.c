@@ -2029,7 +2029,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 
 	zbx_vector_ptr_create(&events);
 
-	get_db_events_info(&eventids, &events);
+	zbx_db_get_events_by_eventids(&eventids, &events);
 
 	for (i = 0; i < eventids.values_num; i++)
 	{
@@ -2100,7 +2100,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 		processed_num = ack_escalations.values_num;
 	}
 
-	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)free_db_event);
+	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
 	zbx_vector_ptr_destroy(&events);
 
 	zbx_vector_uint64_destroy(&eventids);

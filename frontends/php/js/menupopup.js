@@ -471,7 +471,7 @@ function getMenuPopupRefresh(options) {
 	});
 
 	return [{
-		label: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
+		label: options.multiplier ? t('Refresh interval multiplier') : t('Refresh interval'),
 		items: items
 	}];
 }

@@ -96,6 +96,8 @@
 </tr>
 </script>
 <script type="text/javascript">
+	colorPalette.setThemeColors(<?= CJs::encodeJson(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
+
 	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
 		var item = {
 				number: number,
@@ -186,6 +188,10 @@
 						+ '&srcfld3=flags&dstfld3=items_' + i + '_flags'
 					: '&srctbl=items')
 				+ '<?= !empty($this->data['normal_only']) ? '&normal_only=1' : '' ?>'
+				+ '<?= ((!$data['parent_discoveryid'] && $data['groupid'] && $data['hostid'])
+							? '&groupid='.$data['groupid'].'&hostid='.$data['hostid']
+							: ''
+						) ?>'
 				+ '&srcfld1=itemid&srcfld2=name" + getOnlyHostParam())';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}

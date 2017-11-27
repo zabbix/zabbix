@@ -36,6 +36,65 @@ static int	DBpatch_3050000(void)
 
 static int	DBpatch_3050001(void)
 {
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	/* type : 'problem' - WIDGET_PROBLEMS */
+	result = DBselect(
+			"select wf.widgetid,wf.name"
+			" from widget w,widget_field wf"
+			" where w.widgetid=wf.widgetid"
+				" and w.type='problems'"
+				" and wf.name like 'tags.tag.%%'");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		const char	*p;
+		int		index;
+		zbx_uint64_t	widget_fieldid;
+
+		if (NULL == (p = strrchr(row[1], '.')) || SUCCEED != is_uint31(p + 1, &index))
+			continue;
+
+		widget_fieldid = DBget_maxid_num("widget_field", 1);
+
+		/* type      : 0 - ZBX_WIDGET_FIELD_TYPE_INT32 */
+		/* value_int : 0 - TAG_OPERATOR_LIKE */
+		if (ZBX_DB_OK > DBexecute(
+				"insert into widget_field (widget_fieldid,widgetid,type,name,value_int)"
+				"values (" ZBX_FS_UI64 ",%s,0,'tags.operator.%d',0)", widget_fieldid, row[0], index)) {
+			goto clean;
+		}
+	}
+
+	ret = SUCCEED;
+clean:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_3050002(void)
+{
+	const ZBX_FIELD field = {"colorpalette", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("graph_theme", &field);
+}
+
+static int	DBpatch_3050003(void)
+{
+	const char	*colorpalette = "1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,"
+			"5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4";
+
+	if (ZBX_DB_OK > DBexecute("update graph_theme set colorpalette='%s'", colorpalette))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050004(void)
+{
 	const ZBX_TABLE table =
 			{"tag_filter", "tag_filterid", 0,
 				{
@@ -52,14 +111,14 @@ static int	DBpatch_3050001(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050002(void)
+static int	DBpatch_3050005(void)
 {
 	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("tag_filter", 1, &field);
 }
 
-static int	DBpatch_3050003(void)
+static int	DBpatch_3050006(void)
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -76,5 +135,8 @@ DBPATCH_ADD(3050000, 0, 1)
 DBPATCH_ADD(3050001, 0, 1)
 DBPATCH_ADD(3050002, 0, 1)
 DBPATCH_ADD(3050003, 0, 1)
+DBPATCH_ADD(3050004, 0, 1)
+DBPATCH_ADD(3050005, 0, 1)
+DBPATCH_ADD(3050006, 0, 1)
 
 DBPATCH_END()

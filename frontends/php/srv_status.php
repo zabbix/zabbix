@@ -96,14 +96,14 @@ else {
 
 	// fetch services
 	$services = API::Service()->get([
-		'output' => ['name', 'serviceid', 'showsla', 'goodsla', 'algorithm'],
+		'output' => ['name', 'serviceid', 'showsla', 'goodsla', 'algorithm', 'sortorder'],
 		'selectParent' => ['serviceid'],
 		'selectDependencies' => ['servicedownid', 'soft', 'linkid'],
 		'selectTrigger' => ['description', 'triggerid', 'expression'],
-		'preservekeys' => true,
-		'sortfield' => 'sortorder',
-		'sortorder' => ZBX_SORT_UP
+		'preservekeys' => true
 	]);
+
+	sortServices($services);
 
 	// expand trigger descriptions
 	$triggers = zbx_objectValues(
