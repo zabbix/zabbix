@@ -352,7 +352,7 @@ class CControllerPopupGeneric extends CController {
 			'with_triggers' =>				'in 0,1',
 			'with_monitored_triggers' =>	'in 0,1',
 			'itemtype' =>					'in '.implode(',', $this->allowed_item_types),
-			'value_types' =>				'ge 0|le 15',
+			'value_types' =>				'array',
 			'numeric' =>					'in 0,1',
 			'reference' =>					'string',
 			'writeonly' =>					'in 1',
