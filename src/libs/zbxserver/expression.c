@@ -2017,14 +2017,6 @@ static int	get_action_value(const char *macro, zbx_uint64_t actionid, char **rep
 	return ret;
 }
 
-static void	free_host_inventory(DC_HOST_INVENTORY *inventory)
-{
-	int	i;
-
-	for (i = 0; i < ZBX_MAX_INVENTORY_FIELDS; i++)
-		zbx_free(inventory->fields[i]);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: get_host_inventory                                               *
@@ -2038,32 +2030,20 @@ static void	free_host_inventory(DC_HOST_INVENTORY *inventory)
 static int	get_host_inventory(const char *macro, const char *expression, char **replace_to,
 		int N_functionid)
 {
-	int			i;
-	DC_HOST			host;
-	DC_HOST_INVENTORY	inventory;
+	int	i;
 
 	for (i = 0; NULL != inventory_fields[i].macro; i++)
 	{
 		if (0 == strcmp(macro, inventory_fields[i].macro))
 		{
 			zbx_uint64_t	itemid;
-			int		ret = FAIL, idx = inventory_fields[i].idx;
+			int		idx = inventory_fields[i].idx;
 
 			if (SUCCEED != get_N_itemid(expression, N_functionid, &itemid))
 				return FAIL;
 
-			DCconfig_get_hosts_by_itemids(&host, &itemid, &ret, 1);
-
-			if (FAIL == ret)
+			if (NULL == (*replace_to = DCget_host_inventory_value_by_itemid(itemid, idx)))
 				return FAIL;
-
-			ret = DCget_host_inventory_by_hostid(&inventory, host.hostid);
-
-			if (FAIL == ret)
-				return FAIL;
-
-			*replace_to = zbx_strdup(NULL, inventory.fields[idx]);
-			free_host_inventory(&inventory);
 
 			return SUCCEED;
 		}
@@ -2084,28 +2064,16 @@ static int	get_host_inventory(const char *macro, const char *expression, char **
  ******************************************************************************/
 static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, char **replace_to)
 {
-	int			i;
-	DC_HOST			host;
-	DC_HOST_INVENTORY	inventory;
+	int	i;
 
 	for (i = 0; NULL != inventory_fields[i].macro; i++)
 	{
 		if (0 == strcmp(macro, inventory_fields[i].macro))
 		{
-			int	ret = FAIL, idx = inventory_fields[i].idx;
+			int	idx = inventory_fields[i].idx;
 
-			DCconfig_get_hosts_by_itemids(&host, &itemid, &ret, 1);
-
-			if (FAIL == ret)
+			if (NULL == (*replace_to = DCget_host_inventory_value_by_itemid(itemid, idx)))
 				return FAIL;
-
-			ret = DCget_host_inventory_by_hostid(&inventory, host.hostid);
-
-			if (FAIL == ret)
-				return FAIL;
-
-			*replace_to = zbx_strdup(NULL, inventory.fields[idx]);
-			free_host_inventory(&inventory);
 
 			return SUCCEED;
 		}

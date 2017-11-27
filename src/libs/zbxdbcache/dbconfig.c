@@ -10823,34 +10823,32 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 	UNLOCK_CACHE;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DCget_host_inventory_by_hostid                                   *
- *                                                                            *
- * Purpose: get the host inventory from the hostid                            *
- *                                                                            *
- ******************************************************************************/
-int	DCget_host_inventory_by_hostid(DC_HOST_INVENTORY *dst, zbx_uint64_t hostid)
+char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 {
-	ZBX_DC_HOST_INVENTORY	*src;
-	int			ret = FAIL, i;
+	ZBX_DC_HOST		*dc_host;
+	ZBX_DC_ITEM		*dc_item;
+	ZBX_DC_HOST_INVENTORY	*dc_inventory;
+	char			*dst = NULL;
 
 	LOCK_CACHE;
 
-	src = zbx_hashset_search(&config->host_inventories, &hostid);
+	dc_item = zbx_hashset_search(&config->items, &itemid);
 
-	if (NULL != src)
+	if (NULL != dc_item)
 	{
-		dst->hostid = src->hostid;
-		dst->inventory_mode = src->inventory_mode;
+		dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid);
 
-		for (i = 0; i < ZBX_MAX_INVENTORY_FIELDS; i++)
-			dst->fields[i] = zbx_strdup(NULL, src->values[i]);
+		if (NULL != dc_host)
+		{
 
-		ret = SUCCEED;
+			dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid);
+
+			if (NULL != dc_inventory)
+				dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
+		}
 	}
 
 	UNLOCK_CACHE;
 
-	return ret;
+	return dst;
 }
