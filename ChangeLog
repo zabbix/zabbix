@@ -1004,6 +1004,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-8054] relieved windows agent of dependency on MFC (valdis)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
 ..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
 ..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
