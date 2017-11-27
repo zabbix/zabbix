@@ -93,6 +93,41 @@ static int	DBpatch_3050003(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050004(void)
+{
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("interface", &field, NULL);
+}
+
+static int	DBpatch_3050005(void)
+{
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_dhistory", &field, NULL);
+}
+
+static int	DBpatch_3050006(void)
+{
+	const ZBX_FIELD	field = {"listen_dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("autoreg_host", &field, NULL);
+}
+
+static int	DBpatch_3050007(void)
+{
+	const ZBX_FIELD	field = {"listen_dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_autoreg_host", &field, NULL);
+}
+
+static int	DBpatch_3050008(void)
+{
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("dservices", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -103,5 +138,10 @@ DBPATCH_ADD(3050000, 0, 1)
 DBPATCH_ADD(3050001, 0, 1)
 DBPATCH_ADD(3050002, 0, 1)
 DBPATCH_ADD(3050003, 0, 1)
+DBPATCH_ADD(3050004, 0, 1)
+DBPATCH_ADD(3050005, 0, 1)
+DBPATCH_ADD(3050006, 0, 1)
+DBPATCH_ADD(3050007, 0, 1)
+DBPATCH_ADD(3050008, 0, 1)
 
 DBPATCH_END()
