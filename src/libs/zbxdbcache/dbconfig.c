@@ -1473,7 +1473,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 
 		/* store new information in host_inventory structure */
 		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
-			DCstrpool_replace(found, &(host_inventory->fields[i]), row[i + 2]);
+			DCstrpool_replace(found, &(host_inventory->values[i]), row[i + 2]);
 	}
 
 	/* remove deleted host inventory from cache */
@@ -1483,7 +1483,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 			continue;
 
 		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
-			zbx_strpool_release(host_inventory->fields[i]);
+			zbx_strpool_release(host_inventory->values[i]);
 
 		zbx_hashset_remove_direct(&config->host_inventories, host_inventory);
 	}
@@ -10817,7 +10817,7 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 				continue;
 		}
 
-		DCstrpool_replace(1, &(host_inventory->fields[inventory_value->link]), inventory_value->value);
+		DCstrpool_replace(1, &(host_inventory->values[inventory_value->link]), inventory_value->value);
 	}
 
 	UNLOCK_CACHE;
@@ -10845,7 +10845,7 @@ int	DCget_host_inventory_by_hostid(DC_HOST_INVENTORY *dst, zbx_uint64_t hostid)
 		dst->inventory_mode = src->inventory_mode;
 
 		for (i = 0; i < ZBX_MAX_INVENTORY_FIELDS; i++)
-			dst->fields[i] = zbx_strdup(NULL, src->fields[i]);
+			dst->fields[i] = zbx_strdup(NULL, src->values[i]);
 
 		ret = SUCCEED;
 	}

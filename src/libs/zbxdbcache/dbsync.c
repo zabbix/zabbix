@@ -710,7 +710,7 @@ static int	dbsync_compare_host_inventory(const ZBX_DC_HOST_INVENTORY *hi, const 
 
 	for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
 	{
-		if (FAIL == dbsync_compare_str(dbrow[i + 2], hi->fields[i]))
+		if (FAIL == dbsync_compare_str(dbrow[i + 2], hi->values[i]))
 			return FAIL;
 	}
 
