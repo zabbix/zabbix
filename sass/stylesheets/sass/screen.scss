@@ -4069,6 +4069,7 @@ td.inactive-bg {
 	.link-action {
 		color: darken(desaturate($green, 10%), 20%);
 		margin-right: 10px;
+		font-size: $font-msg-reset-size;
 
 		.arrow-up {
 			border-bottom-color: darken(desaturate($green, 10%), 20%);
@@ -4097,7 +4098,7 @@ td.inactive-bg {
 	content: "";
 	background-color: $light-green;
 	float: left;
-	width: 60px;
+	width: 61px;
 	top: 0;
 	left: 0;
 	bottom: 0;
@@ -4106,8 +4107,8 @@ td.inactive-bg {
 
 .msg-good:after {
 	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -123px -244px;
-	width: 25px;
+	background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
+	width: 27px;
 	height: 25px;
 	top: 0;
 	left: 0;
@@ -4127,6 +4128,7 @@ td.inactive-bg {
 	.link-action {
 		color: darken(desaturate($red, 10%), 20%);
 		margin-right: 10px;
+		font-size: $font-msg-reset-size;
 
 		.arrow-up {
 			border-bottom-color: darken(desaturate($red, 10%), 20%);
@@ -4155,7 +4157,7 @@ td.inactive-bg {
 	content: "";
 	background-color: $light-red;
 	float: left;
-	width: 60px;
+	width: 61px;
 	top: 0;
 	left: 0;
 	bottom: 0;
@@ -4164,13 +4166,13 @@ td.inactive-bg {
 
 .msg-bad:after {
 	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -121px -325px;
+	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
 	width: 27px;
 	height: 25px;
 	top: 0;
 	left: 0;
 	position: absolute;
-	margin-left: 15px;
+	margin-left: 16px;
 	margin-top: 2px;
 }
 
@@ -4228,7 +4230,6 @@ td.inactive-bg {
 
 %msg {
 	font-size: $font-top-nav-size;
-	font-weight: bold;
 	padding: 6px 10px 6px 75px;
 	text-align: left;
 	vertical-align: middle;
@@ -4251,7 +4252,6 @@ td.inactive-bg {
 	bottom: 0;
 	vertical-align: middle;
 	font-size: $font-top-nav-size;
-	font-weight: bold;
 	color: $font-color;
 	border: 2px solid $alt-yellow;
 	background-color: $ui-bg-color;
@@ -4263,7 +4263,7 @@ td.inactive-bg {
 	content: "";
 	background-color: $alt-yellow;
 	float: left;
-	width: 60px;
+	width: 61px;
 	top: 0;
 	left: 0;
 	bottom: 0;
@@ -4272,13 +4272,13 @@ td.inactive-bg {
 
 .msg-bad-global:after {
 	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -121px -325px;
+	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
 	width: 27px;
 	height: 25px;
 	top: 0;
 	left: 0;
 	position: absolute;
-	margin-left: 15px;
+	margin-left: 16px;
 	margin-top: 2px;
 }
 
