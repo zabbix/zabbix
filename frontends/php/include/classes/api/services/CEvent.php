@@ -168,8 +168,8 @@ class CEvent extends CApiService {
 						' FROM tag_filter tf'.
 						' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
 							' AND '.dbConditionInt('tf.groupid', array_keys($group_triggers)).
-							' AND tf.tag != ""'.
-							' AND tf.value != ""'
+							' AND tf.tag != \'\''.
+							' AND tf.value != \'\''
 					);
 
 					$tag_filter = [];
@@ -216,8 +216,8 @@ class CEvent extends CApiService {
 						' FROM tag_filter tf'.
 						' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
 							' AND '.dbConditionInt('tf.groupid', array_keys($host_groups)).
-							' AND tf.tag != ""'.
-							' AND tf.value != ""'
+							' AND tf.tag != \'\''.
+							' AND tf.value != \'\''
 					);
 
 					$tag_filter = [];
@@ -271,8 +271,8 @@ class CEvent extends CApiService {
 							' FROM tag_filter tf'.
 							' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
 								' AND '.dbConditionInt('tf.groupid', array_keys($group_triggers)).
-								' AND tf.tag != ""'.
-								' AND tf.value != ""'
+								' AND tf.tag != \'\''.
+								' AND tf.value != \'\''
 						);
 
 						$tag_filter = [];
