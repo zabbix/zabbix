@@ -433,7 +433,7 @@ int	zbx_day_in_month(int year, int mon)
  * Author: Eugene Grigorjev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
+void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -472,7 +472,7 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -512,7 +512,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -532,7 +532,7 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 	exit(EXIT_FAILURE);
 }
 
-char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
+char	*zbx_strdup2(const char *filename, int line, char *old, const char *str)
 {
 	int	retry;
 	char	*ptr = NULL;
