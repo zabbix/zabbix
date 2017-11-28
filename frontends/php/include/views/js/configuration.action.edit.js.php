@@ -683,7 +683,7 @@
 				srcfld2: 'name',
 				dstfrm: 'action.edit',
 				dstfld1: 'new_operation_opcommand_scriptid',
-				dstfld2: 'new_operation_opcommand_script',
+				dstfld2: 'new_operation_opcommand_script'
 			});
 		});
 
@@ -694,7 +694,7 @@
 				srcfld2: 'name',
 				dstfrm: 'action.edit',
 				dstfld1: 'new_recovery_operation_opcommand_scriptid',
-				dstfld2: 'new_recovery_operation_opcommand_script',
+				dstfld2: 'new_recovery_operation_opcommand_script'
 			});
 		});
 
@@ -705,7 +705,7 @@
 				srcfld2: 'name',
 				dstfrm: 'action.edit',
 				dstfld1: 'new_ack_operation_opcommand_scriptid',
-				dstfld2: 'new_ack_operation_opcommand_script',
+				dstfld2: 'new_ack_operation_opcommand_script'
 			});
 		});
 

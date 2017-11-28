@@ -153,8 +153,14 @@ switch ($data['new_condition']['conditiontype']) {
 			],
 			'defaultValue' => 0,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=groupid&writeonly=1&multiselect=1'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'host_groups',
+					'dstfrm' => $actionForm->getName(),
+					'dstfld1' => 'new_condition_value_',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				])
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
@@ -168,8 +174,16 @@ switch ($data['new_condition']['conditiontype']) {
 			],
 			'defaultValue' => 0,
 			'popup' => [
-				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'templates',
+					'srcfld1' => 'hostid',
+					'srcfld2' => 'host',
+					'dstfrm' => $actionForm->getName(),
+					'dstfld1' => 'new_condition_value_',
+					'templated_hosts' => '1',
+					'multiselect' => '1',
+					'writeonly' => '1'
+				])
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
@@ -183,8 +197,14 @@ switch ($data['new_condition']['conditiontype']) {
 			],
 			'defaultValue' => 0,
 			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=hostid&writeonly=1&multiselect=1'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'hosts',
+					'dstfrm' => $actionForm->getName(),
+					'dstfld1' => 'new_condition_value_',
+					'srcfld1' => 'hostid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				])
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
@@ -198,8 +218,15 @@ switch ($data['new_condition']['conditiontype']) {
 			],
 			'defaultValue' => 0,
 			'popup' => [
-				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'triggers',
+					'dstfrm' => $actionForm->getName(),
+					'dstfld1' => 'new_condition_value_',
+					'srcfld1' => 'triggerid',
+					'writeonly' => '1',
+					'multiselect' => '1',
+					'noempty' => '1'
+				])
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
@@ -984,8 +1011,14 @@ if (!empty($data['new_operation'])) {
 					'objectOptions' => ['editable' => true],
 					'data' => $data['new_operation']['groups'],
 					'popup' => [
-						'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
-							'&dstfld1=new_operation_groupids_&srcfld1=groupid&writeonly=1&multiselect=1'
+						'parameters' => CJs::encodeJson([
+							'srctbl' => 'host_groups',
+							'dstfrm' => $actionForm->getName(),
+							'dstfld1' => 'new_operation_groupids_',
+							'srcfld1' => 'groupid',
+							'writeonly' => '1',
+							'multiselect' => '1'
+						])
 					]
 				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			);
@@ -1000,8 +1033,16 @@ if (!empty($data['new_operation'])) {
 					'objectOptions' => ['editable' => true],
 					'data' => $data['new_operation']['templates'],
 					'popup' => [
-						'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-							'&dstfld1=new_operation_templateids_&templated_hosts=1&multiselect=1&writeonly=1'
+						'parameters' => CJs::encodeJson([
+							'srctbl' => 'templates',
+							'srcfld1' => 'hostid',
+							'srcfld2' => 'host',
+							'dstfrm' => $actionForm->getName(),
+							'dstfld1' => 'new_operation_templateids_',
+							'templated_hosts' => '1',
+							'multiselect' => '1',
+							'writeonly' => '1'
+						])
 					]
 				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			);

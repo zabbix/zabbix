@@ -100,6 +100,18 @@ if ($data['recovery_expression_field_readonly']) {
 	$triggersForm->addVar('recovery_expression', $data['recovery_expression']);
 }
 
+$popup_options = [
+	'srctbl' => $data['expression_field_name'],
+	'srcfld1' => $data['expression_field_name'],
+	'dstfrm' => $triggersForm->getName(),
+	'dstfld1' => $data['expression_field_name']
+];
+
+if ($data['groupid'] && $data['hostid']) {
+	$popup_options['groupid'] = $data['groupid'];
+	$popup_options['hostid'] = $data['hostid'];
+}
+
 $expression_row = [
 	(new CTextArea(
 		$data['expression_field_name'],
@@ -109,13 +121,7 @@ $expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
-			CJs::encodeJson([
-				'srctbl' => $data['expression_field_name'],
-				'srcfld1' => $data['expression_field_name'],
-				'dstfrm' => $triggersForm->getName(),
-				'dstfld1' => $data['expression_field_name']
-			]).
+		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.CJs::encodeJson($popup_options).
 			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}));'
 		)
 		->setEnabled(!$readonly)

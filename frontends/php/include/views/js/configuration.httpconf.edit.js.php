@@ -299,15 +299,15 @@
 			$('#add_step').click(function() {
 				var form = $(this).parents('form');
 
-				// append existing step names
-				var stepNames = [];
-				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, stepName) {
-					stepNames.push($(stepName).val());
+				// Append existing step names.
+				var step_names = [];
+				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, step) {
+					step_names.push($(step).val());
 				});
 
 				var popup_options = {dstfrm: 'httpForm'};
-				if (stepNames.length > 0) {
-					popup_options['stepNames'] = stepNames;
+				if (step_names.length > 0) {
+					popup_options['stepNames'] = step_names;
 				}
 
 				return PopUp('popup.httpstep', popup_options);
@@ -318,10 +318,10 @@
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
 			$('#name_<?= $i ?>').click(function() {
 				// append existing step names
-				var stepNames = [];
+				var step_names = [];
 				var form = $(this).parents('form');
-				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, stepName) {
-					stepNames.push($(stepName).val());
+				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, step) {
+					step_names.push($(step).val());
 				});
 
 				var popup_options = <?= CJs::encodeJson([
@@ -338,11 +338,11 @@
 					'status_codes' => $step['status_codes'],
 					'old_name' => $step['name'],
 					'retrieve_mode' => $step['retrieve_mode'],
-					'follow_redirects' => $step['follow_redirects'],
+					'follow_redirects' => $step['follow_redirects']
 				]) ?>
 
-				if (stepNames.length > 0) {
-					popup_options['steps_names'] = stepNames;
+				if (step_names.length > 0) {
+					popup_options['steps_names'] = step_names;
 				}
 
 				return PopUp('popup.httpstep',jQuery.extend(popup_options,{

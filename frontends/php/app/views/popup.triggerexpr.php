@@ -63,20 +63,20 @@ $item = [
 ];
 
 if ($data['parent_discoveryid'] !== '') {
-	$popup_options = [
-		'srctbl' => 'item_prototypes',
-		'srcfld1' => 'itemid',
-		'srcfld2' => 'name',
-		'dstfrm' => $expression_form->getName(),
-		'dstfld1' => 'itemid',
-		'dstfld2' => 'description',
-		'parent_discoveryid' => $data['parent_discoveryid']
-	];
-
 	$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$item[] = (new CButton('select', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).');');
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'item_prototypes',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'name',
+				'dstfrm' => $expression_form->getName(),
+				'dstfld1' => 'itemid',
+				'dstfld2' => 'description',
+				'parent_discoveryid' => $data['parent_discoveryid']
+			]).');'
+		);
 }
 
 $expression_form_list->addRow(_('Item'), $item);

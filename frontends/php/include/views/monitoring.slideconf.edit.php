@@ -53,7 +53,13 @@ $multiselect_data = [
 	'objectName' => 'users',
 	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 	'popup' => [
-		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+		'parameters' => CJs::encodeJson([
+			'srctbl' => 'users',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid',
+			'srcfld1' => 'userid',
+			'srcfld2' => 'fullname'
+		])
 	]
 ];
 

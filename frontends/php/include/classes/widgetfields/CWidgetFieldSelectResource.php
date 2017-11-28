@@ -81,7 +81,7 @@ class CWidgetFieldSelectResource extends CWidgetField {
 			'srcfld2' => $this->srcfld2,
 			'dstfld1' => $this->dstfld1,
 			'dstfld2' => $this->dstfld2,
-			'dstfrm' => $dstfrm,
+			'dstfrm' => $dstfrm
 		];
 
 		switch ($this->getResourceType()) {

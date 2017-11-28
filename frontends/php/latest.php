@@ -330,8 +330,13 @@ $filterColumn1 = (new CFormList())
 			'objectName' => 'hostGroup',
 			'data' => $multiSelectHostGroupData,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
-					'&srcfld1=groupid&multiselect=1'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'host_groups',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'groupids_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
+				])
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
@@ -341,8 +346,14 @@ $filterColumn1 = (new CFormList())
 			'objectName' => 'hosts',
 			'data' => $multiSelectHostData,
 			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
-					'&real_hosts=1&multiselect=1'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'hosts',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'hostids_',
+					'srcfld1' => 'hostid',
+					'real_hosts' => '1',
+					'multiselect' => '1'
+				])
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)

@@ -94,8 +94,13 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hostGroup',
 				'data' => $data['filter']['groups'],
 				'popup' => [
-					'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=filter_groupids_'.
-						'&srcfld1=groupid&multiselect=1'
+					'parameters' => CJs::encodeJson([
+						'srctbl' => 'host_groups',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_groupids_',
+						'srcfld1' => 'groupid',
+						'multiselect' => '1'
+					])
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -105,8 +110,14 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
-					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=filter_hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1'
+					'parameters' => CJs::encodeJson([
+						'srctbl' => 'hosts',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_hostids_',
+						'srcfld1' => 'hostid',
+						'real_hosts' => '1',
+						'multiselect' => '1'
+					])
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -119,7 +130,6 @@ if ($data['action'] == 'problem.view') {
 					CJs::encodeJson([
 						'srctbl' => 'applications',
 						'srcfld1' => 'name',
-						'srcfld2' => 'name',
 						'dstfrm' => 'zbx_filter',
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1',
@@ -137,8 +147,16 @@ if ($data['action'] == 'problem.view') {
 				],
 				'data' => $data['filter']['triggers'],
 				'popup' => [
-					'parameters' => 'srctbl=triggers&srcfld1=triggerid&dstfrm=zbx_filter&dstfld1=filter_triggerids_'.
-						'&monitored_hosts=1&with_monitored_triggers=1&multiselect=1&noempty=1'
+					'parameters' => CJs::encodeJson([
+						'srctbl' => 'triggers',
+						'srcfld1' => 'triggerid',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_triggerids_',
+						'monitored_hosts' => '1',
+						'with_monitored_triggers' => '1',
+						'multiselect' => '1',
+						'noempty' => '1'
+					])
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)

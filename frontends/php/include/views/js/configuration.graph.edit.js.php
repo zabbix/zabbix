@@ -169,8 +169,8 @@
 	}
 
 	function getOnlyHostParam() {
-		<?php if ($this->data['is_template']): ?>
-			return {'only_hostid':'<?= $this->data['hostid'] ?>'};
+		<?php if ($data['is_template']): ?>
+			return {'only_hostid':'<?= $data['hostid'] ?>'};
 		<?php else: ?>
 			return {'real_hosts':'1'};
 		<?php endif ?>
@@ -194,17 +194,17 @@
 				popup_options['srctbl'] = 'item_prototypes',
 				popup_options['srcfld3'] = 'flags',
 				popup_options['dstfld3'] = 'items_' + i + '_flags',
-				popup_options['parent_discoveryid'] = '<?= $this->data['parent_discoveryid'] ?>'
+				popup_options['parent_discoveryid'] = '<?= $data['parent_discoveryid'] ?>';
 			}
 			else {
-				popup_options['srctbl'] = 'items'
+				popup_options['srctbl'] = 'items';
 			}
-			<?php if (!empty($this->data['normal_only'])): ?>
-				popup_options['normal_only'] = '1'
+			<?php if ($data['normal_only'] !== ''): ?>
+				popup_options['normal_only'] = '1';
 			<?php endif ?>
 			<?php if (!$data['parent_discoveryid'] && $data['groupid'] && $data['hostid']): ?>
 				popup_options['groupid'] = '<?= $data['groupid'] ?>',
-				popup_options['hostid'] = '<?= $data['hostid'] ?>'
+				popup_options['hostid'] = '<?= $data['hostid'] ?>';
 			<?php endif ?>
 
 			var nameLink = 'PopUp("popup.generic",'

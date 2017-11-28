@@ -531,12 +531,14 @@ jQuery(function($) {
 
 			// draw popup link
 			if (options.popup.parameters != null) {
-				var urlParameters = options.popup.parameters;
+				var popup_options = JSON.parse(options.popup.parameters);
 
 				if (options.ignored) {
+					var excludeids = [];
 					$.each(options.ignored, function(i, value) {
-						urlParameters = urlParameters + '&excludeids[]=' + i;
+						excludeids.push(i);
 					});
+					popup_options['excludeids'] = excludeids;
 				}
 
 				var popupButton = $('<button>', {
@@ -550,10 +552,6 @@ jQuery(function($) {
 				}
 				else {
 					popupButton.click(function() {
-						// TODO: urlParameters should be passed to multiselect as an object, not as string
-						var popup_url = (new Curl('?' + urlParameters)),
-							popup_options = popup_url.getArguments();
-
 						return PopUp('popup.generic', popup_options);
 					});
 				}

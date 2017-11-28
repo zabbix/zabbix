@@ -159,8 +159,15 @@ function getFontComboBox($name) {
 									'real_hosts' => true
 								],
 								'popup' => [
-									'parameters' => 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers'.
-										'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
+									'parameters' => CJs::encodeJson([
+										'dstfrm' => 'selementForm',
+										'dstfld1' => 'elementNameTriggers',
+										'srctbl' => 'triggers',
+										'srcfld1' => 'triggerid',
+										'with_triggers' => '1',
+										'real_hosts' => '1',
+										'multiselect' => '1'
+									])
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 							new CDiv(

@@ -77,7 +77,7 @@ class CControllerPopupHttpStep extends CController {
 			'steps_names' => $this->getInput('steps_names', [])
 		];
 
-		if (array_key_exists('stepid', $page_options)) {
+		if ($page_options['stepid'] >= 0) {
 			$page_options['follow_redirects'] = $this->getInput('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON);
 			$page_options['retrieve_mode'] = $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
 		}

@@ -128,7 +128,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
-					'only_hostid' => $this->data['screen']['templateid']
+					'only_hostid' => $data['screen']['templateid']
 				]).');'
 			);
 	}
@@ -192,7 +192,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
-					'only_hostid' => $this->data['screen']['templateid']
+					'only_hostid' => $data['screen']['templateid']
 				]).');'
 			);
 	}
@@ -260,7 +260,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
-					'only_hostid' => $this->data['screen']['templateid'],
+					'only_hostid' => $data['screen']['templateid'],
 					'numeric' => '1'
 				]).');'
 			);
@@ -326,7 +326,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
-					'only_hostid' => $this->data['screen']['templateid'],
+					'only_hostid' => $data['screen']['templateid'],
 					'numeric' => '1'
 				]).');'
 			);
@@ -435,7 +435,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
-					'only_hostid' => $this->data['screen']['templateid']
+					'only_hostid' => $data['screen']['templateid']
 				]).');'
 			);
 	}
@@ -493,8 +493,12 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 				'defaultValue' => 0,
 				'selectedLimit' => 1,
 				'popup' => [
-					'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=resourceid'.
-						'&srcfld1=groupid'
+					'parameters' => CJs::encodeJson([
+						'srctbl' => 'host_groups',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'resourceid',
+						'srcfld1' => 'groupid'
+					])
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
@@ -521,8 +525,12 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 				'defaultValue' => 0,
 				'selectedLimit' => 1,
 				'popup' => [
-					'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1=resourceid'.
-						'&srcfld1=hostid'
+					'parameters' => CJs::encodeJson([
+						'srctbl' => 'hosts',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'resourceid',
+						'srcfld1' => 'hostid'
+					])
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
@@ -599,8 +607,12 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
 			'selectedLimit' => 1,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=resourceid'.
-					'&srcfld1=groupid'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'resourceid',
+					'srcfld1' => 'groupid'
+				])
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
@@ -650,7 +662,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
-					'screenid' => $_REQUEST['screenid']
+					'screenid' => getRequest('screenid')
 				]).');'
 			)
 	]);
@@ -681,8 +693,12 @@ elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RE
 			'defaultValue' => 0,
 			'selectedLimit' => 1,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=resourceid'.
-					'&srcfld1=groupid'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'resourceid',
+					'srcfld1' => 'groupid'
+				])
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
@@ -732,7 +748,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'dstfld1' => 'resourceid',
 						'dstfld2' => 'caption',
 						'templated_hosts' => '1',
-						'only_hostid' => $this->data['screen']['templateid']
+						'only_hostid' => $data['screen']['templateid']
 					]).');'
 				);
 		}

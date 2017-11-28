@@ -71,8 +71,13 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'hostGroup',
 			'data' => $data['captions']['ms']['groups'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
-					'&srcfld1=groupid&multiselect=1'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => $field->getName().'_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
+				])
 			],
 			'add_post_js' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
@@ -89,8 +94,13 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'hosts',
 			'data' => $data['captions']['ms']['hosts'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
-					'&srcfld1=hostid&multiselect=1'
+				'parameters' => CJs::encodeJson([
+					'srctbl' => 'hosts',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => $field->getName().'_',
+					'srcfld1' => 'hostid',
+					'multiselect' => '1'
+				])
 			],
 			'add_post_js' => false
 		]))

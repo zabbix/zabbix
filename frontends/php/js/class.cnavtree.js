@@ -946,7 +946,7 @@ jQuery(function($) {
 							srctbl: 'sysmaps',
 							srcfld1: 'sysmapid',
 							srcfld2: 'name',
-							multiselect: '1',
+							multiselect: '1'
 						});
 					});
 					tools.appendChild(btn2);

@@ -327,7 +327,7 @@ $popup_options_add = [
 	'writeonly' => '1',
 	'multiselect' => '1'
 ];
-if ($this->data['normal_only']) {
+if ($data['normal_only']) {
 	$popup_options_add['normal_only'] = '1';
 }
 if ($data['groupid'] && $data['hostid']) {
@@ -343,13 +343,13 @@ $popup_options_add_prototype = [
 	'numeric' => '1',
 	'writeonly' => '1',
 	'multiselect' => '1',
-	'graphtype' => $this->data['graphtype']
+	'graphtype' => $data['graphtype']
 ];
-if ($this->data['normal_only']) {
+if ($data['normal_only']) {
 	$popup_options_add_prototype['normal_only'] = '1';
 }
-if ($this->data['parent_discoveryid']) {
-	$popup_options_add_prototype['parent_discoveryid'] = $this->data['parent_discoveryid'];
+if ($data['parent_discoveryid']) {
+	$popup_options_add_prototype['parent_discoveryid'] = $data['parent_discoveryid'];
 }
 
 $itemsTable->addRow(
@@ -363,7 +363,7 @@ $itemsTable->addRow(
 							CJs::encodeJson($popup_options_add).',getOnlyHostParam()));'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
-					$this->data['parent_discoveryid']
+					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
 							->onClick('return PopUp("popup.generic",'.
 								CJs::encodeJson($popup_options_add_prototype).');'
