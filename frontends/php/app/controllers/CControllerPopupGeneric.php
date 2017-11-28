@@ -938,7 +938,8 @@ class CControllerPopupGeneric extends CController {
 				require_once dirname(__FILE__).'/../../include/screens.inc.php';
 
 				$options = [
-					'output' => ['screenid', 'name']
+					'output' => ['screenid', 'name'],
+					'preservekeys' => true
 				];
 
 				if ($this->getInput('writeonly', 0)) {
@@ -946,14 +947,14 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::Screen()->get($options);
-				CArrayHelper::sort($records, ['name']);
 
-				foreach ($records as &$item) {
+				foreach ($records as $item) {
 					if (check_screen_recursion($this->getInput('screenid'), $item['screenid'])) {
-						unset($item);
+						unset($records[$item['screenid']]);
 					}
 				}
-				unset($item);
+
+				CArrayHelper::sort($records, ['name']);
 				break;
 
 			case 'drules':
