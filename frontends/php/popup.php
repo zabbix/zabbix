@@ -489,7 +489,7 @@ if (isset($onlyHostid)) {
 		(new CComboBox('hostid', $hostid))
 			->addItem($hostid, $host['name'])
 			->setEnabled(false)
-			->setAttribute('title', _('You can not switch hosts for current selection.'))
+			->setTitle(_('You can not switch hosts for current selection.'))
 	];
 }
 else {
