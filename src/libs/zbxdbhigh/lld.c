@@ -667,9 +667,9 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became supported", zbx_host_key_string(lld_ruleid));
 
-		add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
+		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
 				NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0);
-		process_events();
+		zbx_process_events(NULL, NULL);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);
 		sql_start = sql_continue;
