@@ -2855,7 +2855,8 @@ void	zbx_vc_destroy(void)
  *           value(s) to keep the value cache updated.                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *timestamp, history_value_t *value)
+int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *timestamp,
+		const history_value_t *value)
 {
 	const char	*__function_name = "zbx_vc_add_value";
 

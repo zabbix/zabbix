@@ -1922,7 +1922,7 @@ function get_timeperiod_form() {
 
 		$tblPeriod->addRow([_('Date'),
 			(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
-				->addValue(_('Day'), 0, null, 'submit()')
+				->addValue(_('Day of month'), 0, null, 'submit()')
 				->addValue(_('Day of week'), 1, null, 'submit()')
 				->setModern(true)
 		]);
