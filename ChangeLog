@@ -33,6 +33,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
+...G...... [ZBX-8054] relieved windows agent of dependency on MFC (valdis)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
 ....I..... [ZBX-12798] added --with-libpcre-lib configure option (valdis)
 ..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
