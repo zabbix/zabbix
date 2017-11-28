@@ -62,6 +62,7 @@ A......... [ZBX-10754] fixed inheritance of template properties in web scenarios
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
 ........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
 ..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
+...G...... [ZBX-10710] fixed CPU guest time utilization accounting in Linux (valdis)
 ........S. [ZBX-12978] improved performance of preprocessor manager, alert manager/worker, IPMI manager/poller by reducing frequency of log rotation checks that handle stdout/stderr (vso)
 ........S. [ZBX-12936] improved SQL performance by updating proxy last access in bulks (vso)
 .....J.... [ZBX-12705] added check for collisions and unsupported characters in macro names in jmx.discovery (vjaceslavs)
