@@ -164,7 +164,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$description_style = getSeverityStyle($trigger['priority']);
 
-	if ($value) {
+	if ($value == TRIGGER_VALUE_TRUE) {
 		$description->addClass($description_style);
 	}
 
