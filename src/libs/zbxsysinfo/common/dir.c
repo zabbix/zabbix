@@ -234,8 +234,8 @@ static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *re
 #define DET_DEV		0x100
 #define DET_OVERFLOW	0x200
 #define DET_TEMPLATE	"file\0dir\0sym\0sock\0bdev\0cdev\0fifo\0all\0dev\0"
-#define DET_ALLMASK	(DET_FILE + DET_DIR + DET_SYM + DET_SOCK + DET_BDEV + DET_CDEV + DET_FIFO)
-#define DET_DEV2	(DET_BDEV + DET_CDEV)
+#define DET_ALLMASK	(DET_FILE | DET_DIR | DET_SYM | DET_SOCK | DET_BDEV | DET_CDEV | DET_FIFO)
+#define DET_DEV2	(DET_BDEV | DET_CDEV)
 
 static int	etype_to_mask(char *etype)
 {
