@@ -282,8 +282,8 @@ function collapseTagFilters(array $tag_filters) {
 
 	if ($groupids) {
 		$host_groups = API::HostGroup()->get([
-			'groupids' => array_keys($groupids),
 			'output' => ['groupid', 'name'],
+			'groupids' => array_keys($groupids),
 			'preservekeys' => true
 		]);
 
