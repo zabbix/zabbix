@@ -769,7 +769,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (0 == (data.attrib & _A_SUBDIR))	/* not a directory => regular file */
 			{
-				if ((DET_FILE & types) && match)
+				if ((DET_FILE & types) && 0 != match)
 					++count;
 
 				zbx_free(path);
