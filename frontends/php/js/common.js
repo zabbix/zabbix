@@ -429,8 +429,6 @@ function PopUp(action, options, dialogueid) {
  *
  * @param {object} form		Filter form in which element has been changed. Assumed that form is inside Overlay Dialogue.
  * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
- *
- * @returns {unresolved}
  */
 function reloadPopup(form, action) {
 	var dialogueid = jQuery(form).closest('[data-dialogueid]').attr('data-dialogueid'),
@@ -450,8 +448,6 @@ function reloadPopup(form, action) {
  * @param {string} object			refers to destination object
  * @param {string} single_value		value passed to destination object
  * @param {string} parentid			parent id
- *
- * @returns {unresolved}
  */
 function addValue(object, single_value, parentid) {
 	var value = {};
@@ -480,8 +476,6 @@ function addValue(object, single_value, parentid) {
  * @param {string} frame			refers to destination form
  * @param {object} values			values added to destination form
  * @param {boolean} submit_parent	indicates that after adding values, form must be submitted
- *
- * @returns {unresolved}
  */
 function addValues(frame, values, submit_parent) {
 	var forms = document.getElementsByTagName('FORM')[frame],
@@ -519,8 +513,6 @@ function addValues(frame, values, submit_parent) {
  * @param {string} form			source form where checkbox are collected
  * @param {string} object		refers to object that is selected from popup
  * @param {string} parentid		parent id
- *
- * @returns {unresolved}
  */
 function addSelectedValues(form, object, parentid) {
 	form = $(form);
@@ -579,8 +571,6 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
  * Send media form data to server for validation before adding them to user media tab.
  *
  * @param {string} formname		form name that is sent to server for validation
- *
- * @returns {unresolved}
  */
 function validate_media(formname) {
 	var form = window.document.forms[formname];
@@ -608,8 +598,6 @@ function validate_media(formname) {
  *
  * @param {string} formname		form name that is sent to server for validation
  * @param {string} dialogueid	(optional) id of overlay dialogue.
- *
- * @returns {unresolved}
  */
 function validate_trigger_expression(formname, dialogueid) {
 	var form = window.document.forms[formname],
@@ -655,8 +643,6 @@ function validate_trigger_expression(formname, dialogueid) {
  *
  * @param {string} formname		form name that is sent to server for validation
  * @param {string} dialogueid	(optional) id of overlay dialogue.
- *
- * @returns {unresolved}
  */
 function validate_httpstep(formname, dialogueid) {
 	var form = window.document.forms[formname],

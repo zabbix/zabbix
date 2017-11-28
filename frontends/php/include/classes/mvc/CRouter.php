@@ -123,7 +123,8 @@ class CRouter {
 		'popup.scriptexec'		=> ['CControllerPopupScriptExec',		'layout.json',			'popup.scriptexec'],
 		'popup.triggerexpr'		=> ['CControllerPopupTriggerExpr',		'layout.json',			'popup.triggerexpr'],
 		'popup.services'		=> ['CControllerPopupServices',			'layout.json',			'popup.services'],
-		'popup.testtriggerexpr'	=> ['CControllerPopupTestTriggerExpr',	'layout.json',			'popup.testtriggerexpr']
+		'popup.testtriggerexpr'	=> ['CControllerPopupTestTriggerExpr',	'layout.json',			'popup.testtriggerexpr'],
+		'popup.triggerwizard'	=> ['CControllerPopupTriggerWizard',	'layout.json',			'popup.triggerwizard']
 	];
 
 	public function __construct($action) {
