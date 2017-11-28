@@ -29,7 +29,7 @@ class CControllerPopupHttpStep extends CController {
 		$fields = [
 			'dstfrm' =>				'string|fatal',
 			'stepid' =>				'int32',
-			'list_name' =>			'string|not_empty',
+			'list_name' =>			'string',
 			'name' =>				'string|not_empty',
 			'url' =>				'string|not_empty',
 			'post_type' =>			'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_FORM]),

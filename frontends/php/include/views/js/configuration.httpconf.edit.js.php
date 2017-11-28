@@ -307,7 +307,7 @@
 
 				var popup_options = {dstfrm: 'httpForm'};
 				if (step_names.length > 0) {
-					popup_options['stepNames'] = step_names;
+					popup_options['steps_names'] = step_names;
 				}
 
 				return PopUp('popup.httpstep', popup_options);
@@ -317,7 +317,7 @@
 		// http step edit pop up
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
 			$('#name_<?= $i ?>').click(function() {
-				// append existing step names
+				// Append existing step names.
 				var step_names = [];
 				var form = $(this).parents('form');
 				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, step) {
