@@ -44,7 +44,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'groupids' => getSubGroups($fields['groupids']),
 			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
 			'hostids' => $fields['hostids'],
-			'problem' => $fields['problem'],
+			'name' => $fields['problem'],
 			'severities' => $fields['severities'],
 			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
