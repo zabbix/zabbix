@@ -210,9 +210,7 @@ class CMapHelper {
 
 			$element['icon'] = $icon;
 			if ($element['permission'] >= PERM_READ) {
-				$label = str_replace(['.', ','], ' ',
-					CMacrosResolverHelper::resolveMapLabelMacrosAll($element)
-				);
+				$label = str_replace(['.', ','], ' ', CMacrosResolverHelper::resolveMapLabelMacrosAll($element));
 
 				if ($map_info[$id]['problems_total'] > 0) {
 					$problems_total += $map_info[$id]['problems_total'];
@@ -228,11 +226,11 @@ class CMapHelper {
 					$element_status = _('Status ok');
 
 					if (array_key_exists('info', $map_info[$id])
-						&& array_key_exists('maintenance', $map_info[$id]['info'])) {
+							&& array_key_exists('maintenance', $map_info[$id]['info'])) {
 						$element_status = _('Status maintenance');
 					}
 					elseif (array_key_exists('info', $map_info[$id])
-						&& array_key_exists('status', $map_info[$id]['info'])) {
+							&& array_key_exists('status', $map_info[$id]['info'])) {
 						$element_status = _('Status disabled');
 					}
 
