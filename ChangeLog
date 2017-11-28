@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-4146] added icons for error and success messages (Andzs)
 ..F....... [ZBXNEXT-4156] added option to view graphs items data and multiple items graph data as table (gcalenko, Ivo)
 ..F....... [ZBXNEXT-4160] reworked monitoring Discovery screen to show hint info right in the table cell (miks)
 ....I..... [ZBXNEXT-761] added rules to make dbschema.c, schema.sql and data.sql from schema.tmpl, data.tmpl and templates.tmpl if there is a need to (gleb)
