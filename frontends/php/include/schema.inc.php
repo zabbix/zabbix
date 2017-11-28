@@ -1246,7 +1246,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'port' => [
@@ -4712,7 +4712,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 		],
@@ -5058,7 +5058,7 @@ return [
 			'listen_dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'host_metadata' => [
@@ -5104,7 +5104,7 @@ return [
 			'listen_dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'host_metadata' => [
@@ -5211,7 +5211,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 		],
