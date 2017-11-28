@@ -295,7 +295,7 @@ static int	parse_size_parameter(char *text, zbx_uint64_t *size_out)
 }
 
 static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *result, int *types_out,
-		zbx_uint64_t *min_size, zbx_uint64_t *max_size, time_t *min_time, time_t *max_time)
+		zbx_uint64_t *min_size, zbx_uint64_t *max_size)
 {
 	int	types_incl = etypes_to_mask(get_rparam(request, 3), result);
 	int	types_excl = etypes_to_mask(get_rparam(request, 4), result);
@@ -323,8 +323,6 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid maximum size \"%s\".", max_size_str));
 		return FAIL;
 	}
-
-	/* here we will parse datetimes */
 
 	return SUCCEED;
 }
@@ -689,7 +687,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_directory_item_t	*item;
 	zbx_uint64_t		min_size = 0, max_size = 0x7fffffffffffffff;
 
-	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
+	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size))
 		return ret;
 
 	if (SUCCEED != prepare_common_parameters(request, result, &regex_incl, &regex_excl, &max_depth, &dir, &status,
@@ -821,9 +819,8 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR 			*directory;
 	struct dirent 		*entry;
 	zbx_uint64_t		min_size = 0, max_size = 0x7FFFffffFFFFffff;
-	time_t			min_time = 0, max_time = 0x7FFFffff;
 
-	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
+	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size))
 		return ret;
 
 	if (SUCCEED != prepare_common_parameters(request, result, &regex_incl, &regex_excl, &max_depth, &dir, &status,
