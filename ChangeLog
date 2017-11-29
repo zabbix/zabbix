@@ -33,7 +33,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
-........S. [ZBX-12887] hide alert error details from unrelated users (valdis)
+........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
 ...G...... [ZBX-8054] relieved windows agent of dependency on MFC (valdis)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
@@ -1012,7 +1012,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-12887] hide alert error details from unrelated users (valdis)
+........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
 ...G...... [ZBX-8054] relieved windows agent of dependency on MFC (valdis)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
