@@ -125,7 +125,9 @@ class CScreenDiscovery extends CScreenBase {
 		];
 
 		foreach ($services as $name => $foo) {
-			$header[] = (new CColHeader($name))->addClass('vertical_rotation');
+			$header[] = (new CColHeader($name))
+				->addClass('vertical_rotation')
+				->setTitle($name);
 		}
 
 		// create table
