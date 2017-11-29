@@ -51,7 +51,8 @@
 #	define ZBX_MUTEX_SQLITE3	11
 #	define ZBX_MUTEX_PROCSTAT	12
 #	define ZBX_MUTEX_PROXY_HISTORY	13
-#	define ZBX_MUTEX_COUNT		14
+#	define ZBX_MUTEX_INVENTORY	14
+#	define ZBX_MUTEX_COUNT		15
 
 #endif	/* _WINDOWS */
 

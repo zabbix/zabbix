@@ -44,6 +44,10 @@ static int	sync_in_progress = 0;
 
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
 #define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_unlock(&config_lock)
+
+#define	LOCK_INVENTORIES	if (0 == sync_in_progress) zbx_mutex_lock(&inventories_lock)
+#define	UNLOCK_INVENTORIES	if (0 == sync_in_progress) zbx_mutex_unlock(&inventories_lock)
+
 #define START_SYNC	LOCK_CACHE; sync_in_progress = 1
 #define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE
 
@@ -82,6 +86,7 @@ typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, 
 
 static ZBX_DC_CONFIG	*config = NULL;
 static ZBX_MUTEX	config_lock = ZBX_MUTEX_NULL;
+static ZBX_MUTEX	inventories_lock = ZBX_MUTEX_NULL;
 static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	program_type;
@@ -1448,14 +1453,11 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 {
 	const char		*__function_name = "DCsync_host_inventory";
 
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
-
-	ZBX_DC_HOST_INVENTORY	*host_inventory;
-
+	ZBX_DC_HOST_INVENTORY	*host_inventory, *host_inventory_dyn;
+	zbx_uint64_t		rowid, hostid;
 	int			found, ret, i;
-	zbx_uint64_t		hostid;
+	char			**row;
+	unsigned char		tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1474,6 +1476,28 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		/* store new information in host_inventory structure */
 		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
 			DCstrpool_replace(found, &(host_inventory->values[i]), row[i + 2]);
+
+		host_inventory_dyn = DCfind_id(&config->host_inventories_dyn, hostid, sizeof(ZBX_DC_HOST_INVENTORY),
+				&found);
+
+		if (1 == found)
+		{
+			for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
+			{
+				if (NULL == host_inventory_dyn->values[i])
+					continue;
+
+				zbx_strpool_release(host_inventory_dyn->values[i]);
+				host_inventory_dyn->values[i] = NULL;
+			}
+		}
+		else
+		{
+			host_inventory_dyn->inventory_mode = host_inventory->inventory_mode;
+
+			for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
+				host_inventory_dyn->values[i] = NULL;
+		}
 	}
 
 	/* remove deleted host inventory from cache */
@@ -1486,6 +1510,14 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 			zbx_strpool_release(host_inventory->values[i]);
 
 		zbx_hashset_remove_direct(&config->host_inventories, host_inventory);
+
+		if (NULL == (host_inventory_dyn = zbx_hashset_search(&config->host_inventories_dyn, &rowid)))
+			continue;
+
+		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
+			zbx_strpool_release(host_inventory_dyn->values[i]);
+
+		zbx_hashset_remove_direct(&config->host_inventories_dyn, host_inventory_dyn);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -4472,9 +4504,11 @@ void	DCsync_configuration(unsigned char mode)
 	DCsync_hosts(&hosts_sync);
 	hsec2 = zbx_time() - sec;
 
+	LOCK_INVENTORIES;
 	sec = zbx_time();
 	DCsync_host_inventory(&hi_sync);
 	hisec2 = zbx_time() - sec;
+	UNLOCK_INVENTORIES;
 	FINISH_SYNC;
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
@@ -5216,6 +5250,9 @@ int	init_configuration_cache(char **error)
 	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG, error)))
 		goto out;
 
+	if (SUCCEED != (ret = zbx_mutex_create(&inventories_lock, ZBX_MUTEX_INVENTORY, error)))
+		goto out;
+
 	if (SUCCEED != (ret = zbx_mem_create(&config_mem, config_size, "configuration cache", "CacheSize", 0, error)))
 		goto out;
 
@@ -5256,6 +5293,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->hosts, 10);
 	CREATE_HASHSET(config->proxies, 0);
 	CREATE_HASHSET(config->host_inventories, 0);
+	CREATE_HASHSET(config->host_inventories_dyn, 0);
 	CREATE_HASHSET(config->ipmihosts, 0);
 	CREATE_HASHSET(config->htmpls, 0);
 	CREATE_HASHSET(config->gmacros, 0);
@@ -5376,6 +5414,7 @@ void	free_configuration_cache(void)
 	UNLOCK_CACHE;
 
 	zbx_mutex_destroy(&config_lock);
+	zbx_mutex_destroy(&inventories_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -10803,24 +10842,27 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 	ZBX_DC_HOST_INVENTORY	*host_inventory = NULL;
 	int			i;
 
-	LOCK_CACHE;
+	LOCK_INVENTORIES;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
 		zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+		const char		**value;
 
 		if (NULL == host_inventory || inventory_value->hostid != host_inventory->hostid)
 		{
-			host_inventory = zbx_hashset_search(&config->host_inventories, &inventory_value->hostid);
+			host_inventory = zbx_hashset_search(&config->host_inventories_dyn, &inventory_value->hostid);
 
 			if (NULL == host_inventory)
 				continue;
 		}
 
-		DCstrpool_replace(1, &(host_inventory->values[inventory_value->link]), inventory_value->value);
+		value = &host_inventory->values[inventory_value->link];
+
+		DCstrpool_replace((NULL != *value), value, inventory_value->value);
 	}
 
-	UNLOCK_CACHE;
+	UNLOCK_INVENTORIES;
 }
 
 char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
@@ -10830,7 +10872,7 @@ char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 	ZBX_DC_HOST_INVENTORY	*dc_inventory;
 	char			*dst = NULL;
 
-	LOCK_CACHE;
+	LOCK_INVENTORIES;
 
 	dc_item = zbx_hashset_search(&config->items, &itemid);
 
@@ -10841,14 +10883,25 @@ char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 		if (NULL != dc_host)
 		{
 
-			dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid);
+			dc_inventory = zbx_hashset_search(&config->host_inventories_dyn, &dc_item->hostid);
 
-			if (NULL != dc_inventory)
+			if (NULL != dc_inventory && NULL != dc_inventory->values[value_idx])
 				dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
+			else
+			{
+				LOCK_CACHE;
+
+				dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid);
+
+				if (NULL != dc_inventory)
+					dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
+
+				UNLOCK_CACHE;
+			}
 		}
 	}
 
-	UNLOCK_CACHE;
+	UNLOCK_INVENTORIES;
 
 	return dst;
 }
