@@ -32,6 +32,7 @@ static const yaml_node_t	*in = NULL;		/* pointer to "in" section of test case do
 static const yaml_node_t	*out = NULL;		/* pointer to "out" section of test case document */
 static const yaml_node_t	*db_data = NULL;	/* pointer to "db data" section of test case document */
 static const yaml_node_t	*files = NULL;		/* pointer to "files" section of test case document */
+static const yaml_node_t	*exit_code = NULL;	/* pointer to "exit code" section of test case document */
 
 typedef struct
 {
@@ -161,6 +162,27 @@ int	zbx_mock_data_init(void **state)
 										break;
 									}
 								}
+								else if (0 == zbx_yaml_scalar_cmp("exit code", key))
+								{
+									exit_code = yaml_document_get_node(&test_case,
+											pair->value);
+
+									if (YAML_SCALAR_NODE != exit_code->type)
+									{
+										printf("\"exit code\" is not a scalar.\n");
+										break;
+									}
+
+									if (0 != zbx_yaml_scalar_cmp("success", exit_code) &&
+											0 != zbx_yaml_scalar_cmp("failure", exit_code))
+									{
+										printf("Invalid value \"%.*s\" of"
+												" \"exit code\".\n",
+												(int)exit_code->data.scalar.length,
+												exit_code->data.scalar.value);
+										break;
+									}
+								}
 								else if (0 != zbx_yaml_scalar_cmp("test case", key))
 								{
 									printf("Unexpected key \"%.*s\" in mapping.\n",
@@ -247,6 +269,8 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Provided handle wasn't created properly or its lifetime has expired.";
 		case ZBX_MOCK_NO_PARAMETER:
 			return "No parameter with a given name available in test case data.";
+		case ZBX_MOCK_NO_EXIT_CODE:
+			return "No exit code provided in test case data.";
 		case ZBX_MOCK_NOT_AN_OBJECT:
 			return "Provided handle is not an object handle.";
 		case ZBX_MOCK_NO_SUCH_MEMBER:
@@ -330,6 +354,21 @@ zbx_mock_error_t	zbx_mock_db_rows(const char *data_source, zbx_mock_handle_t *ro
 zbx_mock_error_t	zbx_mock_file(const char *path, zbx_mock_handle_t *file)
 {
 	return zbx_mock_parameter(ZBX_MOCK_FILES, path, file);
+}
+
+zbx_mock_error_t	zbx_mock_exit_code(int *status)
+{
+	if (NULL == exit_code)
+		return ZBX_MOCK_NO_EXIT_CODE;
+
+	if (0 == zbx_yaml_scalar_cmp("success", exit_code))
+		*status = EXIT_SUCCESS;
+	else if (0 == zbx_yaml_scalar_cmp("failure", exit_code))
+		*status = EXIT_FAILURE;
+	else
+		return ZBX_MOCK_INTERNAL_ERROR;
+
+	return ZBX_MOCK_SUCCESS;
 }
 
 zbx_mock_error_t	zbx_mock_object_member(zbx_mock_handle_t object, const char *name, zbx_mock_handle_t *member)

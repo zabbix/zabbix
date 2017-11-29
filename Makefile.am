@@ -105,10 +105,18 @@ WRAP_IO_FUNCS = \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=fgets
 
+WRAP_EXIT = \
+	-Wl,--wrap=exit
+
+COMMON_WRAP_FUNCS = \
+	$(WRAP_DB_FUNCS) \
+	$(WRAP_IO_FUNCS) \
+	$(WRAP_EXIT)
+
 tests:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS) $(WRAP_IO_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
 	./tests_run.pl
 endif
 
