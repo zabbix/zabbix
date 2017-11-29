@@ -1475,6 +1475,8 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		host_inventory_auto = DCfind_id(&config->host_inventories_auto, hostid, sizeof(ZBX_DC_HOST_INVENTORY),
 				&found);
 
+		host_inventory_auto->inventory_mode = host_inventory->inventory_mode;
+
 		if (1 == found)
 		{
 			for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
@@ -1488,8 +1490,6 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		}
 		else
 		{
-			host_inventory_auto->inventory_mode = host_inventory->inventory_mode;
-
 			for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
 				host_inventory_auto->values[i] = NULL;
 		}
@@ -1507,7 +1507,10 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->host_inventories, host_inventory);
 
 		if (NULL == (host_inventory_auto = zbx_hashset_search(&config->host_inventories_auto, &rowid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
+		}
 
 		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
 		{
