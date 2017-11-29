@@ -531,7 +531,7 @@ jQuery(function($) {
 
 			// draw popup link
 			if (options.popup.parameters != null) {
-				var popup_options = JSON.parse(options.popup.parameters);
+				var popup_options = options.popup.parameters;
 
 				if (options.ignored) {
 					var excludeids = [];

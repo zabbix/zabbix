@@ -493,12 +493,12 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 				'defaultValue' => 0,
 				'selectedLimit' => 1,
 				'popup' => [
-					'parameters' => CJs::encodeJson([
+					'parameters' => [
 						'srctbl' => 'host_groups',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
 						'srcfld1' => 'groupid'
-					])
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
@@ -525,12 +525,12 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 				'defaultValue' => 0,
 				'selectedLimit' => 1,
 				'popup' => [
-					'parameters' => CJs::encodeJson([
+					'parameters' => [
 						'srctbl' => 'hosts',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
 						'srcfld1' => 'hostid'
-					])
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
@@ -607,12 +607,12 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
 			'selectedLimit' => 1,
 			'popup' => [
-				'parameters' => CJs::encodeJson([
+				'parameters' => [
 					'srctbl' => 'host_groups',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
 					'srcfld1' => 'groupid'
-				])
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
@@ -693,12 +693,12 @@ elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RE
 			'defaultValue' => 0,
 			'selectedLimit' => 1,
 			'popup' => [
-				'parameters' => CJs::encodeJson([
+				'parameters' => [
 					'srctbl' => 'host_groups',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
 					'srcfld1' => 'groupid'
-				])
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
