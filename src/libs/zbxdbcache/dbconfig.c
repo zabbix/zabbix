@@ -10829,10 +10829,10 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
  *                                                                            *
  * Function: DCconfig_update_inventory_values                                 *
  *                                                                            *
- * Purpose: update host inventory informations in configuration cache         *
+ * Purpose: update automatic inventory in configuration cache                 *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
+void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
 {
 	ZBX_DC_HOST_INVENTORY	*host_inventory = NULL;
 	int			i;
@@ -10841,8 +10841,8 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
-		zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
-		const char		**value;
+		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+		const char			**value;
 
 		if (NULL == host_inventory || inventory_value->hostid != host_inventory->hostid)
 		{
@@ -10868,21 +10868,14 @@ char	*DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 
 	LOCK_CACHE;
 
-	dc_item = zbx_hashset_search(&config->items, &itemid);
-
-	if (NULL != dc_item)
+	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)))
 	{
 		dc_inventory = zbx_hashset_search(&config->host_inventories_auto, &dc_item->hostid);
 
 		if (NULL != dc_inventory && NULL != dc_inventory->values[value_idx])
 			dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
-		else
-		{
-			dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid);
-
-			if (NULL != dc_inventory)
-				dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
-		}
+		else if (NULL != (dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid)))
+			dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
 	}
 
 	UNLOCK_CACHE;

@@ -111,8 +111,6 @@ typedef struct
 }
 ZBX_DC_HISTORY;		/* structure for copying data about one item from history cache to temporary array */
 
-
-
 /* value_avg_t structure is used for item average value trend calculations. */
 /*                                                                          */
 /* For double values the average value is calculated on the fly with the    */
