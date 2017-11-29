@@ -271,10 +271,12 @@ static int	etypes_to_mask(char *etypes, AGENT_RESULT *result)
 		if (DET_OVERFLOW & (type = etype_to_mask(etype)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid directory entry type \"%s\".", etype));
+			zbx_free(etype);
 			return type;
 		}
 
 		ret |= type;
+		zbx_free(etype);
 	}
 
 	if (DET_DEV & ret)
@@ -310,7 +312,7 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 
 	*types_out = types_incl & (~types_excl) & DET_ALLMASK;
 
-	/* min/max sizes/times must be already initialized to default values */
+	/* min/max variables must be already initialized to default values */
 
 	if (SUCCEED != parse_size_parameter(min_size_str, min_size))
 	{
@@ -765,20 +767,26 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (max_size < data.size)
 				match = 0;
 
-			if (0 == (data.attrib & _A_SUBDIR))	/* not a directory => regular file */
+			switch (data.attrib & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
 			{
-				if ((DET_FILE & types) && 0 != match)
-					++count;
+				case FILE_ATTRIBUTE_REPARSE_POINT:
+				case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
+					if (0 != (types & DET_SYM) && 0 != match)
+						++count;
 
-				zbx_free(path);
-			}
-			else
-			{
-				if (SUCCEED != queue_directory(&list, path, item->depth, max_depth))
+					goto free_path;
+				case FILE_ATTRIBUTE_DIRECTORY:
+					if (SUCCEED != queue_directory(&list, path, item->depth, max_depth))
+						zbx_free(path);
+
+					if (0 != (types & DET_DIR) && 0 != match)
+						++count;
+					break;
+				default:	/* not a directory => regular file */
+					if (0 != (types & DET_FILE) && 0 != match)
+						++count;
+free_path:
 					zbx_free(path);
-
-				if (0 != (types & DET_DIR) && 0 != match)
-					++count;
 			}
 
 			zbx_free(name);
