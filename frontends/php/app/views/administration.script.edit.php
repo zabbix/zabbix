@@ -83,7 +83,7 @@ $scriptFormList
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'host_groups',
-				'dstfrm' => ''.$scriptForm->getName(),
+				'dstfrm' => $scriptForm->getName(),
 				'dstfld1' => 'groupid',
 				'srcfld1' => 'groupid'
 			]
