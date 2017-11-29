@@ -127,8 +127,8 @@ var MMenu = {
 		});
 
 		if (SF) {
-			var nav_elems = jQuery('.top-subnav a,.search,.btn-search,.top-nav-zbbshare,.top-nav-help,'+
-					'.top-nav-profile,.top-nav-signout').on('keydown', function(event) {
+			var nav_elems = jQuery('.top-subnav a, .search, .btn-search, .top-nav-zbbshare, .top-nav-help, .top-nav-profile, .top-nav-signout')
+					.on('keydown', function(event) {
 				if (event.which == 9) {
 					var visible_subnav_elems = nav_elems.filter(function() {
 						return jQuery(this).is(':visible');
