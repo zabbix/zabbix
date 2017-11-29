@@ -10860,9 +10860,8 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 	UNLOCK_CACHE;
 }
 
-char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
+char	*DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 {
-	ZBX_DC_HOST		*dc_host;
 	ZBX_DC_ITEM		*dc_item;
 	ZBX_DC_HOST_INVENTORY	*dc_inventory;
 	char			*dst = NULL;
@@ -10873,22 +10872,16 @@ char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 
 	if (NULL != dc_item)
 	{
-		dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid);
+		dc_inventory = zbx_hashset_search(&config->host_inventories_auto, &dc_item->hostid);
 
-		if (NULL != dc_host)
+		if (NULL != dc_inventory && NULL != dc_inventory->values[value_idx])
+			dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
+		else
 		{
+			dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid);
 
-			dc_inventory = zbx_hashset_search(&config->host_inventories_auto, &dc_item->hostid);
-
-			if (NULL != dc_inventory && NULL != dc_inventory->values[value_idx])
+			if (NULL != dc_inventory)
 				dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
-			else
-			{
-				dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid);
-
-				if (NULL != dc_inventory)
-					dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
-			}
 		}
 	}
 
