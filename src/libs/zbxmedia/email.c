@@ -145,7 +145,7 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 {
 	const char	*p, *pstart, *angle_addr_start, *domain_start, *utf8_end;
 	const char	*base64_like_start, *base64_like_end, *token;
-	char		*base64_buf = NULL, *tmp_mailbox;
+	char		*base64_buf, *tmp_mailbox;
 	size_t		size_angle_addr = 0, offset_angle_addr = 0, len, i;
 	int		ret = FAIL;
 	zbx_mailaddr_t	*mailaddr = NULL;
@@ -160,6 +160,7 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 		utf8_end = NULL;
 		base64_like_start = NULL;
 		base64_like_end = NULL;
+		base64_buf = NULL;
 
 		p = token;
 
