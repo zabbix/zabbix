@@ -44,7 +44,6 @@ static int	sync_in_progress = 0;
 
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
 #define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_unlock(&config_lock)
-
 #define START_SYNC	LOCK_CACHE; sync_in_progress = 1
 #define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE
 
@@ -10852,7 +10851,7 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 
 		value = &host_inventory->values[inventory_value->link];
 
-		DCstrpool_replace((NULL != *value), value, inventory_value->value);
+		DCstrpool_replace((NULL != *value ? 1 : 0), value, inventory_value->value);
 	}
 
 	UNLOCK_CACHE;

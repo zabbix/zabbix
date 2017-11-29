@@ -579,7 +579,7 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff);
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 
-char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx);
+char	*DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx);
 void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
