@@ -45,9 +45,6 @@ static int	sync_in_progress = 0;
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
 #define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_unlock(&config_lock)
 
-#define	LOCK_INVENTORIES	if (0 == sync_in_progress) zbx_mutex_lock(&inventories_lock)
-#define	UNLOCK_INVENTORIES	if (0 == sync_in_progress) zbx_mutex_unlock(&inventories_lock)
-
 #define START_SYNC	LOCK_CACHE; sync_in_progress = 1
 #define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE
 
@@ -86,7 +83,6 @@ typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, 
 
 static ZBX_DC_CONFIG	*config = NULL;
 static ZBX_MUTEX	config_lock = ZBX_MUTEX_NULL;
-static ZBX_MUTEX	inventories_lock = ZBX_MUTEX_NULL;
 static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	program_type;
@@ -4504,11 +4500,9 @@ void	DCsync_configuration(unsigned char mode)
 	DCsync_hosts(&hosts_sync);
 	hsec2 = zbx_time() - sec;
 
-	LOCK_INVENTORIES;
 	sec = zbx_time();
 	DCsync_host_inventory(&hi_sync);
 	hisec2 = zbx_time() - sec;
-	UNLOCK_INVENTORIES;
 	FINISH_SYNC;
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
@@ -5250,9 +5244,6 @@ int	init_configuration_cache(char **error)
 	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_mutex_create(&inventories_lock, ZBX_MUTEX_INVENTORY, error)))
-		goto out;
-
 	if (SUCCEED != (ret = zbx_mem_create(&config_mem, config_size, "configuration cache", "CacheSize", 0, error)))
 		goto out;
 
@@ -5414,7 +5405,6 @@ void	free_configuration_cache(void)
 	UNLOCK_CACHE;
 
 	zbx_mutex_destroy(&config_lock);
-	zbx_mutex_destroy(&inventories_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -10842,7 +10832,7 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 	ZBX_DC_HOST_INVENTORY	*host_inventory = NULL;
 	int			i;
 
-	LOCK_INVENTORIES;
+	LOCK_CACHE;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
@@ -10862,7 +10852,7 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 		DCstrpool_replace((NULL != *value), value, inventory_value->value);
 	}
 
-	UNLOCK_INVENTORIES;
+	UNLOCK_CACHE;
 }
 
 char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
@@ -10872,7 +10862,7 @@ char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 	ZBX_DC_HOST_INVENTORY	*dc_inventory;
 	char			*dst = NULL;
 
-	LOCK_INVENTORIES;
+	LOCK_CACHE;
 
 	dc_item = zbx_hashset_search(&config->items, &itemid);
 
@@ -10889,19 +10879,15 @@ char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 				dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
 			else
 			{
-				LOCK_CACHE;
-
 				dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid);
 
 				if (NULL != dc_inventory)
 					dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
-
-				UNLOCK_CACHE;
 			}
 		}
 	}
 
-	UNLOCK_INVENTORIES;
+	UNLOCK_CACHE;
 
 	return dst;
 }
