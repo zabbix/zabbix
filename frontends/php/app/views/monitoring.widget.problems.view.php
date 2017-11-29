@@ -171,7 +171,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
 			$description->addClass('blink');
 			$description->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration);
-			$description->setAttribute('data-toggle-class', $description_style);
+			$description->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 	}
 
