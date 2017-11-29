@@ -76,6 +76,8 @@ struct zbx_db_result
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_error = 0;	/* failed transaction */
 
+static char	*last_db_strerror = NULL;	/* last database error message */
+
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
 #if defined(HAVE_IBM_DB2)
@@ -124,7 +126,66 @@ static ZBX_MUTEX		sqlite_access = ZBX_MUTEX_NULL;
 
 #if defined(HAVE_ORACLE)
 static void	OCI_DBclean_result(DB_RESULT result);
+#endif
 
+void	zabbix_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *db_error, const char *context)
+{
+	char		*s = NULL;
+
+	zbx_free(last_db_strerror);
+	last_db_strerror = zbx_strdup(NULL, db_error);
+
+	switch (zbx_errno)
+	{
+		case ERR_Z3001:
+			s = zbx_dsprintf(s, "connection to database '%s' failed: [%d] %s", context, db_errno, db_error);
+			break;
+		case ERR_Z3002:
+			s = zbx_dsprintf(s, "cannot create database '%s': [%d] %s", context, db_errno, db_error);
+			break;
+		case ERR_Z3003:
+			s = zbx_strdup(NULL, "no connection to the database");
+			break;
+		case ERR_Z3004:
+			s = zbx_dsprintf(s, "cannot close database: [%d] %s", db_errno, db_error);
+			break;
+		case ERR_Z3005:
+			s = zbx_dsprintf(s, "query failed: [%d] %s [%s]", db_errno, db_error, context);
+			break;
+		case ERR_Z3006:
+			s = zbx_dsprintf(s, "fetch failed: [%d] %s", db_errno, db_error);
+			break;
+		case ERR_Z3007:
+			s = zbx_dsprintf(s, "query failed: [%d] %s", db_errno, db_error);
+			break;
+		default:
+			s = zbx_strdup(NULL, "unknown error");
+	}
+
+	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", zbx_errno, s);
+
+	zbx_free(s);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_db_last_strerr                                           *
+ *                                                                            *
+ * Purpose: get last error set by database                                    *
+ *                                                                            *
+ * Parameters: db_error_str - [OUT] database error                            *
+ *                                                                            *
+ * Comments: It is expected that caller is passing NULL pointer for           *
+ *           db_strerror.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+
+void	zbx_get_db_last_strerr(char **db_strerror)
+{
+	*db_strerror = zbx_strdup(NULL, last_db_strerror);
+}
+
+#if defined(HAVE_ORACLE)
 static const char	*zbx_oci_error(sword status, sb4 *err)
 {
 	static char	errbuf[512];
@@ -240,53 +301,6 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 	va_end(args);
 
 	return result;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_db_error                                                     *
- *                                                                            *
- * Purpose: get database error message from any supported database            *
- *                                                                            *
- * Parameters: error_str - [OUT] database error                               *
- *                                                                            *
- * Comments: It is expected that caller is passing NULL pointer for           *
- *           error_str.                                                       *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_error(char **error_str)
-{
-#if defined(HAVE_IBM_DB2)
-	SQLCHAR		tmp_error[SQL_MAX_MESSAGE_LENGTH + 1], sqlstate[SQL_SQLSTATE_SIZE + 1];
-	char		db_error[SQL_MAX_MESSAGE_LENGTH + SQL_SQLSTATE_SIZE + 2];
-	SQLINTEGER	db_errno;
-	SQLSMALLINT	length, i = 1;
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-	char		*db_error = NULL;
-#elif defined(HAVE_ORACLE)
-	char		db_error[512];
-	sb4		errcode;
-#endif
-
-#if defined(HAVE_IBM_DB2)
-	while (SQL_SUCCESS == SQLGetDiagRec(SQL_HANDLE_DBC, ibm_db2.hdbc, i++, sqlstate, &db_errno, tmp_error,
-			sizeof(tmp_error), &length))
-	{
-		zbx_snprintf(db_error, sizeof(db_error), "%s", tmp_error);
-		zbx_rtrim(db_error, ZBX_WHITESPACE);
-	}
-#elif defined(HAVE_MYSQL)
-	db_error = (char *)mysql_error(conn);
-#elif defined(HAVE_ORACLE)
-	OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode, (text *)db_error, (ub4)sizeof(db_error),
-			OCI_HTYPE_ERROR);
-#elif defined(HAVE_POSTGRESQL)
-	db_error = PQerrorMessage(conn);
-#endif
-	zbx_rtrim(db_error, ZBX_WHITESPACE);
-	zbx_rtrim(db_error, ".");
-
-	*error_str = zbx_dsprintf(*error_str, "%s", db_error);
 }
 
 #if defined(HAVE_MYSQL)
@@ -448,7 +462,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
 	{
-		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
+		zabbix_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -467,13 +481,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
-		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
+		zabbix_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
-		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
+		zabbix_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -524,7 +538,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		}
 		else
 		{
-			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
+			zabbix_errlog(ERR_Z3001, err, zbx_oci_error(err, NULL), connect);
 			ret = ZBX_DB_FAIL;
 		}
 	}
@@ -554,7 +568,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 		if (OCI_SUCCESS != err)
 		{
-			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
+			zabbix_errlog(ERR_Z3001, err, zbx_oci_error(err, NULL), connect);
 			ret = ZBX_DB_DOWN;
 		}
 	}
@@ -567,7 +581,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 		if (OCI_SUCCESS != err)
 		{
-			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
+			zabbix_errlog(ERR_Z3001, err, zbx_oci_error(err, NULL), connect);
 			ret = ZBX_DB_DOWN;
 		}
 	}
@@ -590,7 +604,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* check to see that the backend connection was successfully made */
 	if (CONNECTION_OK != PQstatus(conn))
 	{
-		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
+		zabbix_errlog(ERR_Z3001, 0, PQerrorMessage(conn), dbname);
 		ret = ZBX_DB_DOWN;
 		goto out;
 	}
@@ -661,7 +675,7 @@ out:
 	if (SQLITE_OK != sqlite3_open(dbname, &conn))
 #endif
 	{
-		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
+		zabbix_errlog(ERR_Z3001, 0, sqlite3_errmsg(conn), dbname);
 		ret = ZBX_DB_DOWN;
 		goto out;
 	}
@@ -715,7 +729,7 @@ int	zbx_db_init(const char *dbname, const char *const db_schema, char **error)
 
 		if (SQLITE_OK != sqlite3_open(dbname, &conn))
 		{
-			zabbix_errlog(ERR_Z3002, dbname, 0, sqlite3_errmsg(conn));
+			zabbix_errlog(ERR_Z3002, 0, sqlite3_errmsg(conn), dbname);
 			*error = zbx_strdup(*error, "cannot open database");
 			return FAIL;
 		}
@@ -1369,7 +1383,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 #elif defined(HAVE_MYSQL)
 	if (NULL == conn)
 	{
-		zabbix_errlog(ERR_Z3003);
+		zabbix_errlog(ERR_Z3003, 0, NULL, NULL);
 		ret = ZBX_DB_FAIL;
 	}
 	else
@@ -1593,7 +1607,7 @@ error:
 
 	if (NULL == conn)
 	{
-		zabbix_errlog(ERR_Z3003);
+		zabbix_errlog(ERR_Z3003, 0, NULL, NULL);
 
 		DBfree_result(result);
 		result = NULL;
@@ -1940,7 +1954,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
 				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
 		{
-			zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL));
+			zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL), NULL);
 			return NULL;
 		}
 
@@ -1950,7 +1964,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			case 2396:	/* ORA-02396: exceeded maximum idle time */
 			case 3113:	/* ORA-03113: end-of-file on communication channel */
 			case 3114:	/* ORA-03114: not connected to ORACLE */
-				zabbix_errlog(ERR_Z3006, errcode, errbuf);
+				zabbix_errlog(ERR_Z3006, errcode, errbuf, NULL);
 				return NULL;
 		}
 	}
@@ -1970,7 +1984,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			/* In this case the function returns OCI_INVALID_HANDLE. */
 			if (OCI_INVALID_HANDLE != rc2)
 			{
-				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL));
+				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
 				return NULL;
 			}
 			else
@@ -1978,7 +1992,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		}
 		else if (OCI_SUCCESS != (rc2 = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm)))
 		{
-			zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL));
+			zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
 			return NULL;
 		}
 
@@ -1994,7 +2008,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 					(ub4)1, (dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
 					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm)))
 			{
-				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL));
+				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
 				return NULL;
 			}
 		}
@@ -2211,17 +2225,7 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 		zbx_snprintf(message, sizeof(message), "%s %s", sqlstate, tmp_message);
 		zbx_rtrim(message, ZBX_WHITESPACE);
 
-		switch(err)
-		{
-			case ERR_Z3001:
-				zabbix_errlog(err, context, (int)sqlcode, message);
-				break;
-			case ERR_Z3005:
-				zabbix_errlog(err, (int)sqlcode, message, context);
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
+		zabbix_errlog(err, (int)sqlcode, message, context);
 	}
 }
 #endif

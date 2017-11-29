@@ -906,7 +906,7 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
  ******************************************************************************/
 static char	*am_create_db_alert_message()
 {
-	char	*db_error = NULL, *alert_message = NULL;
+	char	*db_strerror = NULL, *alert_message = NULL;
 	size_t	alert_message_alloc = MAX_STRING_LEN, alert_message_offset = 0;
 #if defined(HAVE_IBM_DB2)
 	const char	*db_type = "IBM DB2";
@@ -924,19 +924,14 @@ static char	*am_create_db_alert_message()
 			db_type, CONFIG_DBNAME, CONFIG_DBHOST);
 
 	if (0 != CONFIG_DBPORT)
-	{
-		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s:%d",
-				alert_message, CONFIG_DBPORT);
-	}
+		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d", CONFIG_DBPORT);
 
-	zbx_db_error(&db_error);
+	zbx_get_db_last_strerr(&db_strerror);
 
-	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s is not available: %s.",
-			alert_message, db_error);
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " is not available: %s",
+			db_strerror);
 
-	alert_message[alert_message_offset] = '\0';
-
-	zbx_free(db_error);
+	zbx_free(db_strerror);
 
 	return alert_message;
 }
