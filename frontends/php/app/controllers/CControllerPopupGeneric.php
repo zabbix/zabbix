@@ -426,7 +426,11 @@ class CControllerPopupGeneric extends CController {
 
 		$value_types = null;
 		if ($this->getInput('value_types', false) !== false) {
-			$value_types = $this->getInput('value_types');
+			foreach ($this->getInput('value_types') as $value_type) {
+				if (is_numeric($value_type) && $value_type >= 0 && $value_type <= 15) {
+					$value_types[] = $value_type;
+				}
+			}
 		}
 		elseif ($this->getInput('numeric', 0)) {
 			$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
