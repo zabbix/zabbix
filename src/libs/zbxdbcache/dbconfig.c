@@ -1449,7 +1449,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 {
 	const char		*__function_name = "DCsync_host_inventory";
 
-	ZBX_DC_HOST_INVENTORY	*host_inventory, *host_inventory_dyn;
+	ZBX_DC_HOST_INVENTORY	*host_inventory, *host_inventory_auto;
 	zbx_uint64_t		rowid, hostid;
 	int			found, ret, i;
 	char			**row;
@@ -1473,26 +1473,26 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
 			DCstrpool_replace(found, &(host_inventory->values[i]), row[i + 2]);
 
-		host_inventory_dyn = DCfind_id(&config->host_inventories_dyn, hostid, sizeof(ZBX_DC_HOST_INVENTORY),
+		host_inventory_auto = DCfind_id(&config->host_inventories_auto, hostid, sizeof(ZBX_DC_HOST_INVENTORY),
 				&found);
 
 		if (1 == found)
 		{
 			for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
 			{
-				if (NULL == host_inventory_dyn->values[i])
+				if (NULL == host_inventory_auto->values[i])
 					continue;
 
-				zbx_strpool_release(host_inventory_dyn->values[i]);
-				host_inventory_dyn->values[i] = NULL;
+				zbx_strpool_release(host_inventory_auto->values[i]);
+				host_inventory_auto->values[i] = NULL;
 			}
 		}
 		else
 		{
-			host_inventory_dyn->inventory_mode = host_inventory->inventory_mode;
+			host_inventory_auto->inventory_mode = host_inventory->inventory_mode;
 
 			for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
-				host_inventory_dyn->values[i] = NULL;
+				host_inventory_auto->values[i] = NULL;
 		}
 	}
 
@@ -1507,13 +1507,16 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 
 		zbx_hashset_remove_direct(&config->host_inventories, host_inventory);
 
-		if (NULL == (host_inventory_dyn = zbx_hashset_search(&config->host_inventories_dyn, &rowid)))
+		if (NULL == (host_inventory_auto = zbx_hashset_search(&config->host_inventories_auto, &rowid)))
 			continue;
 
 		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
-			zbx_strpool_release(host_inventory_dyn->values[i]);
+		{
+			if (NULL != host_inventory_auto->values[i])
+				zbx_strpool_release(host_inventory_auto->values[i]);
+		}
 
-		zbx_hashset_remove_direct(&config->host_inventories_dyn, host_inventory_dyn);
+		zbx_hashset_remove_direct(&config->host_inventories_auto, host_inventory_auto);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -5284,7 +5287,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->hosts, 10);
 	CREATE_HASHSET(config->proxies, 0);
 	CREATE_HASHSET(config->host_inventories, 0);
-	CREATE_HASHSET(config->host_inventories_dyn, 0);
+	CREATE_HASHSET(config->host_inventories_auto, 0);
 	CREATE_HASHSET(config->ipmihosts, 0);
 	CREATE_HASHSET(config->htmpls, 0);
 	CREATE_HASHSET(config->gmacros, 0);
@@ -10841,7 +10844,7 @@ void	DCconfig_update_inventory_values(zbx_vector_ptr_t *inventory_values)
 
 		if (NULL == host_inventory || inventory_value->hostid != host_inventory->hostid)
 		{
-			host_inventory = zbx_hashset_search(&config->host_inventories_dyn, &inventory_value->hostid);
+			host_inventory = zbx_hashset_search(&config->host_inventories_auto, &inventory_value->hostid);
 
 			if (NULL == host_inventory)
 				continue;
@@ -10873,7 +10876,7 @@ char *	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, int value_idx)
 		if (NULL != dc_host)
 		{
 
-			dc_inventory = zbx_hashset_search(&config->host_inventories_dyn, &dc_item->hostid);
+			dc_inventory = zbx_hashset_search(&config->host_inventories_auto, &dc_item->hostid);
 
 			if (NULL != dc_inventory && NULL != dc_inventory->values[value_idx])
 				dst = zbx_strdup(NULL, dc_inventory->values[value_idx]);
