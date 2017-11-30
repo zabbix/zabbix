@@ -213,4 +213,5 @@ void	__wrap_DBbegin(void)
 
 int	__wrap_DBcommit(void)
 {
+	return ZBX_DB_OK;
 }
