@@ -224,10 +224,7 @@ static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
 	zbx_hashset_iter_reset(&config->host_inventories, &iter);
 
 	while (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_iter_next(&iter)))
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "searchin'");
 		zbx_vector_ptr_append(&index, host_inventory);
-	}
 
 	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
