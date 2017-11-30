@@ -1014,6 +1014,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
 ..F....... [ZBX-12884] fixed misleading permissions visualization in user form for host groups and hosts lists (gcalenko)
 ........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
