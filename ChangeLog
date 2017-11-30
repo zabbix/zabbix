@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+...G...... [ZBXNEXT-1567] added item "vfs.dir.count" for counting directory entries (valdis)
 ..F....... [ZBXNEXT-4135] added tooltips for vertical labels (Oleg)
 ..F....... [ZBXNEXT-4146] added icons for error and success messages (Andzs)
 ..F....... [ZBXNEXT-4156] added option to view graphs items data and multiple items graph data as table (gcalenko, Ivo)
