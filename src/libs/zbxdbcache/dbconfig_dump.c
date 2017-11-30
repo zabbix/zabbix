@@ -233,6 +233,12 @@ static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
 		host_inventory = (ZBX_DC_HOST_INVENTORY *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " inventory_mode:%u", host_inventory->hostid,
 				host_inventory->inventory_mode);
+
+		for (i = 0; ZBX_MAX_INVENTORY_FIELDS > i; i++)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", DBget_inventory_field(i + 1),
+					host_inventory->values[i]);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);
