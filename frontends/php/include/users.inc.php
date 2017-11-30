@@ -287,10 +287,14 @@ function collapseTagFilters(array $tag_filters) {
 			'preservekeys' => true
 		]);
 
-		foreach ($tag_filters as &$tag_filter) {
-			$tag_filter['name'] = $host_groups[$tag_filter['groupid']]['name'];
+		foreach ($tag_filters as $key => $tag_filter) {
+			if (array_key_exists($tag_filter['groupid'], $host_groups)) {
+				$tag_filters[$key]['name'] = $host_groups[$tag_filter['groupid']]['name'];
+			}
+			else {
+				unset($tag_filters[$key]);
+			}
 		}
-		unset($tag_filter);
 
 		CArrayHelper::sort($tag_filters, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
