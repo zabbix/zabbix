@@ -84,7 +84,7 @@ css_hc_light:
 
 css_hc_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-dark.scss frontends/php/styles/hc-dark.css
-	cp frontends/php/styles/hc-light.css sass/stylesheets/hc-dark.css
+	cp frontends/php/styles/hc-dark.css sass/stylesheets/hc-dark.css
 
 css_icons:
 	cp sass/img/icon-sprite.svg frontends/php/img/

@@ -3913,6 +3913,11 @@ a.teal {
 		}
 	}
 }
+
+.na-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.na-bg {
 	border-left: none;
 
@@ -3925,6 +3930,7 @@ td.na-bg {
 	color: darken($alt-blue-grey,45%);
 	background-color: $alt-blue-grey;
 }
+
 td.log-na-bg {
 	@extend td.na-bg;
 }
@@ -3933,6 +3939,11 @@ td.log-na-bg {
 	color: darken($alt-green,45%);
 	@extend .green-bg;
 }
+
+.normal-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.normal-bg {
 	@extend td.na-bg;
 }
@@ -3956,6 +3967,11 @@ td.active-bg {
 		}
 	}
 }
+
+.info-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.info-bg {
 	@extend td.na-bg;
 }
@@ -3977,6 +3993,11 @@ td.log-info-bg {
 		}
 	}
 }
+
+.average-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -3990,6 +4011,11 @@ td.average-bg {
 		}
 	}
 }
+
+.warning-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.warning-bg {
 	@extend td.na-bg;
 }
@@ -4012,6 +4038,11 @@ td.log-warning-bg {
 		}
 	}
 }
+
+.high-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.high-bg {
 	@extend td.na-bg;
 }
@@ -4033,6 +4064,11 @@ td.log-high-bg {
 		}
 	}
 }
+
+.disaster-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.disaster-bg {
 	@extend td.na-bg;
 }
