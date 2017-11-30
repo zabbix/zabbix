@@ -706,7 +706,8 @@ class CUserGroup extends CApiService {
 		}
 
 		if ($ins_tag_filters) {
-			$ins_tag_filters = array_map("unserialize", array_unique(array_map("serialize", $ins_tag_filters)));
+			// Remove duplicates from multidimensional array.
+			$ins_tag_filters = array_map('unserialize', array_unique(array_map('serialize', $ins_tag_filters)));
 			DB::insertBatch('tag_filter', $ins_tag_filters);
 		}
 
@@ -1261,7 +1262,7 @@ class CUserGroup extends CApiService {
 			$db_tag_filters = zbx_toHash($db_tag_filters, 'tag_filterid');
 
 			foreach ($db_tag_filters as &$db_tag_filter) {
-				unset($db_tag_filter['tag_filterid']);
+				unset($db_tag_filter['tag_filterid'], $db_tag_filter['usrgrpid']);
 			}
 			unset($db_tag_filter);
 
