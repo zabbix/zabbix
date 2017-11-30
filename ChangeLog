@@ -35,6 +35,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
 ........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
 ...G...... [ZBX-8054] relieved windows agent of dependency on MFC (valdis)
