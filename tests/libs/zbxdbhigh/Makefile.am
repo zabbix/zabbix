@@ -1,3 +1,4 @@
+if SERVER
 noinst_PROGRAMS = DBselect_uint64
 
 DBselect_uint64_SOURCES = \
@@ -70,3 +71,4 @@ DBselect_uint64_LDADD = \
 DBselect_uint64_LDADD += @SERVER_LIBS@
 
 DBselect_uint64_CFLAGS = -I@top_srcdir@/tests
+endif

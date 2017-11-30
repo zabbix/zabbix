@@ -1,11 +1,6 @@
-if SERVER
-SERVER_SUBDIRS = \
-	libs
-endif
-
 SUBDIRS = \
 	. \
-	$(SERVER_SUBDIRS)
+	libs
 
 noinst_LIBRARIES = \
 	libzbxmocktest.a \
