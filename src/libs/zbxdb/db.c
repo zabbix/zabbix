@@ -74,7 +74,8 @@ struct zbx_db_result
 };
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
-static int	txn_error = 0;	/* failed transaction */
+static int	txn_error = ZBX_DB_OK;	/* failed transaction */
+static int	txn_end_error = ZBX_DB_OK;	/* transaction result */
 
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
@@ -258,8 +259,20 @@ static int	is_recoverable_mysql_error(void)
 		case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
 		case ER_TABLEACCESS_DENIED_ERROR:	/* user without some privilege */
 		case ER_UNKNOWN_ERROR:
+		case ER_LOCK_DEADLOCK:
 			return SUCCEED;
 	}
+
+	return FAIL;
+}
+#elif defined(HAVE_POSTGRESQL)
+static int	is_recoverable_postgresql_error(const PGconn *conn, const PGresult *pg_result)
+{
+	if (CONNECTION_OK != PQstatus(conn))
+		return SUCCEED;
+
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "40P01"))
+		return SUCCEED;
 
 	return FAIL;
 }
@@ -301,12 +314,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 	/* Allow executing statements during a connection initialization. Make sure to mark transaction as failed. */
 	if (0 != txn_level)
-		txn_error = 1;
+		txn_error = ZBX_DB_DOWN;
 
 	last_txn_error = txn_error;
 	last_txn_level = txn_level;
 
-	txn_error = 0;
+	txn_error = ZBX_DB_OK;
 	txn_level = 0;
 
 #if defined(HAVE_IBM_DB2)
@@ -856,7 +869,7 @@ int	zbx_db_commit(void)
 		assert(0);
 	}
 
-	if (1 == txn_error)
+	if (ZBX_DB_OK != txn_error)
 		goto rollback;
 
 #if defined(HAVE_IBM_DB2)
@@ -891,7 +904,10 @@ rollback:
 #endif
 
 	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_OK or number of changes */
+	{
 		txn_level--;
+		txn_end_error = ZBX_DB_OK;
+	}
 
 	return rc;
 }
@@ -922,7 +938,7 @@ int	zbx_db_rollback(void)
 	last_txn_error = txn_error;
 
 	/* allow rollback of failed transaction */
-	txn_error = 0;
+	txn_error = ZBX_DB_OK;
 
 #if defined(HAVE_IBM_DB2)
 
@@ -952,7 +968,19 @@ int	zbx_db_rollback(void)
 #endif
 
 	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
+	{
 		txn_level--;
+
+		if (ZBX_DB_FAIL == rc)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot perform rollback");
+			txn_end_error = ZBX_DB_FAIL;
+		}
+		else
+			txn_end_error = last_txn_error;	/* error that caused rollback */
+
+		txn_error = ZBX_DB_OK;
+	}
 	else
 		txn_error = last_txn_error;	/* in case of DB down we will repeat this operation */
 
@@ -967,6 +995,11 @@ int	zbx_db_txn_level(void)
 int	zbx_db_txn_error(void)
 {
 	return txn_error;
+}
+
+int	zbx_db_txn_end_error(void)
+{
+	return txn_end_error;
 }
 
 #ifdef HAVE_ORACLE
@@ -1001,7 +1034,7 @@ int	zbx_db_statement_prepare(const char *sql)
 	if (0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
-	if (1 == txn_error)
+	if (ZBX_DB_OK != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
 		return ZBX_DB_FAIL;
@@ -1015,7 +1048,7 @@ int	zbx_db_statement_prepare(const char *sql)
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
-		txn_error = 1;
+		txn_error = ZBX_DB_FAIL;
 	}
 
 	return ret;
@@ -1167,7 +1200,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 		if (ZBX_DB_FAIL == ret && 0 < txn_level)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
-			txn_error = 1;
+			txn_error = ZBX_DB_FAIL;
 		}
 
 		goto out;
@@ -1182,7 +1215,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 		if (ZBX_DB_FAIL == ret && 0 < txn_level)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
-			txn_error = 1;
+			txn_error = ZBX_DB_FAIL;
 		}
 
 		goto out;
@@ -1207,7 +1240,7 @@ int	zbx_db_statement_execute(int iters)
 	ub4	nrows;
 	int	ret;
 
-	if (1 == txn_error)
+	if (ZBX_DB_OK != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
 		ret = ZBX_DB_FAIL;
@@ -1222,7 +1255,7 @@ int	zbx_db_statement_execute(int iters)
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
-		txn_error = 1;
+		txn_error = ZBX_DB_FAIL;
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "%s():%d", __function_name, ret);
@@ -1271,7 +1304,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	if (0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
-	if (1 == txn_error)
+	if (ZBX_DB_OK != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
 		ret = ZBX_DB_FAIL;
@@ -1383,7 +1416,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
-		ret = (CONNECTION_OK == PQstatus(conn) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+		ret = (SUCCEED == is_recoverable_postgresql_error(conn, result) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 	}
 
 	if (ZBX_DB_OK == ret)
@@ -1436,7 +1469,7 @@ lbl_exec:
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
-		txn_error = 1;
+		txn_error = ZBX_DB_FAIL;
 	}
 clean:
 	zbx_free(sql);
@@ -1476,7 +1509,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	if (1 == txn_error)
+	if (ZBX_DB_OK != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
 		goto clean;
@@ -1726,7 +1759,8 @@ error:
 		zbx_free(error);
 
 		DBfree_result(result);
-		result = (CONNECTION_OK == PQstatus(conn) ? NULL : (DB_RESULT)ZBX_DB_DOWN);
+		result = (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result) ? (DB_RESULT)ZBX_DB_DOWN :
+				NULL);
 	}
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
@@ -1776,7 +1810,7 @@ lbl_get_table:
 	if (NULL == result && 0 < txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
-		txn_error = 1;
+		txn_error = ZBX_DB_FAIL;
 	}
 clean:
 	zbx_free(sql);

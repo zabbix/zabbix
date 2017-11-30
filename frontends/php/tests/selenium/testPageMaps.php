@@ -74,7 +74,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestClickWait('edit');
 		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('sysmap_update');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestTextPresent($name);
@@ -132,7 +132,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckboxSelect('maps_'.$sysmapid);
 		$this->zbxTestClickButton('map.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map deleted');
 		$this->zbxTestCheckFatalErrors();

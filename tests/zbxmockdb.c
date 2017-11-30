@@ -211,6 +211,6 @@ void	__wrap_DBbegin(void)
 {
 }
 
-void	__wrap_DBcommit(void)
+int	__wrap_DBcommit(void)
 {
 }

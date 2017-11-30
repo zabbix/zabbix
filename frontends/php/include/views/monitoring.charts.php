@@ -33,6 +33,11 @@ $controls = (new CList())
 		new CLabel(_('Graph'), 'graphid'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$this->data['pageFilter']->getGraphsCB()
+	])
+	->addItem([
+		new CLabel(_('View as'), 'action'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CComboBox('action', $data['action'], 'submit()', $data['actions']))->setEnabled((bool) $data['graphid'])
 	]);
 
 if ($this->data['graphid']) {
@@ -47,6 +52,7 @@ $chartsWidget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addVar('fullscreen', $this->data['fullscreen'])
+		->addVar('page', 1)
 		->addItem($controls)
 	);
 
@@ -55,12 +61,28 @@ $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget
-	$screen = CScreenBuilder::getScreen([
-		'resourcetype' => SCREEN_RESOURCE_CHART,
-		'graphid' => $this->data['graphid'],
-		'profileIdx' => 'web.graphs',
-		'profileIdx2' => $this->data['graphid']
-	]);
+
+	if ($data['action'] === HISTORY_VALUES) {
+		$screen = CScreenBuilder::getScreen([
+			'resourcetype' => SCREEN_RESOURCE_HISTORY,
+			'action' => HISTORY_VALUES,
+			'graphid' => $data['graphid'],
+			'profileIdx' => 'web.graphs',
+			'profileIdx2' => $data['graphid'],
+			'updateProfile' => false,
+			'period' => $data['period'],
+			'stime' => $data['stime'],
+			'isNow' => $data['isNow']
+		]);
+	}
+	else {
+		$screen = CScreenBuilder::getScreen([
+			'resourcetype' => SCREEN_RESOURCE_CHART,
+			'graphid' => $this->data['graphid'],
+			'profileIdx' => 'web.graphs',
+			'profileIdx2' => $this->data['graphid']
+		]);
+	}
 
 	$chartTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')

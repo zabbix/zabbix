@@ -260,6 +260,22 @@ class CScreenBase {
 				];
 				break;
 
+			case SCREEN_RESOURCE_HISTORY:
+				$this->required_parameters += [
+					'isTemplatedScreen'	=> true,
+					'screenid'			=> true,
+					'action'			=> true,
+					'groupid'			=> false,
+					'hostid'			=> false,
+					'pageFile'			=> true,
+					'profileIdx'		=> true,
+					'profileIdx2'		=> true,
+					'updateProfile'		=> true,
+					'timeline'			=> true,
+					'page'				=> true
+				];
+			break;
+
 			default:
 				$this->required_parameters += [
 					'isTemplatedScreen'	=> true,

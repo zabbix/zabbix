@@ -41,6 +41,8 @@
 #define ZBX_VMWARE_COUNTER_READY	0x01
 #define ZBX_VMWARE_COUNTER_UPDATING	0x10
 
+#define ZBX_VMWARE_EVENT_KEY_UNINITIALIZED	__UINT64_C(0xffffffffffffffff)
+
 /* performance counter data */
 typedef struct
 {
@@ -148,15 +150,24 @@ typedef struct
 }
 zbx_vmware_cluster_t;
 
+/* the vmware event data */
+typedef struct
+{
+	zbx_uint64_t	key;		/* event's key, used to fill logeventid */
+	char		*message;	/* event's fullFormattedMessage */
+	int		timestamp;	/* event's time stamp */
+}
+zbx_vmware_event_t;
+
 /* the vmware service data object */
 typedef struct
 {
 	char	*error;
-	char	*events;
 
 	zbx_hashset_t		hvs;
 	zbx_hashset_t		vms_index;
 	zbx_vector_ptr_t	clusters;
+	zbx_vector_ptr_t	events;		/* vector of pointers to zbx_vmware_event_t structures */
 }
 zbx_vmware_data_t;
 
@@ -190,6 +201,9 @@ typedef struct
 
 	/* the service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t	*data;
+
+	/* lastlogsize when vmware.eventlog[] item was polled last time */
+	zbx_uint64_t		eventlog_last_key;
 }
 zbx_vmware_service_t;
 

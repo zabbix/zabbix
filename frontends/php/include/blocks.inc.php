@@ -436,7 +436,7 @@ function make_status_of_zbx() {
 			: ''
 	]);
 	$title = (new CSpan(_('Number of items (enabled/disabled/not supported)')))
-		->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
+		->setTitle(_('Only items assigned to enabled hosts are counted'));
 	$table->addRow([$title, $status['has_status'] ? $status['items_count'] : '',
 		$status['has_status']
 			? [
@@ -447,7 +447,7 @@ function make_status_of_zbx() {
 			: ''
 	]);
 	$title = (new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
-		->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
+		->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
 	$table->addRow([$title, $status['has_status'] ? $status['triggers_count'] : '',
 		$status['has_status']
 			? [

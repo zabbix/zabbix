@@ -140,18 +140,21 @@ class testPageUsers extends CWebTest {
 	public function testPageUsers_MassDelete() {
 		$result=DBselect("SELECT userid,alias FROM users");
 
+		$this->zbxTestLogin('users.php');
+		$this->zbxTestCheckTitle('Configuration of users');
+		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
+
 		while ($user = DBfetch($result)) {
 			$id = $user['userid'];
 			$alias = $user['alias'];
 
-			$this->zbxTestLogin('users.php');
-			$this->zbxTestCheckTitle('Configuration of users');
-			$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
+			$this->zbxTestClickButtonText('Reset');
+			$this->zbxTestWaitForPageToLoad();
 
 			$this->zbxTestCheckboxSelect('group_userid_' . $id);
 			$this->zbxTestClickButton('user.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 			$this->zbxTestCheckTitle('Configuration of users');
 			if ($alias === 'guest' || $alias === 'Admin') {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' ,'Cannot delete user');

@@ -745,11 +745,15 @@ int	DBupdate_itservices(const zbx_vector_ptr_t *trigger_diff)
 	if (0 != updates.values_num)
 	{
 		LOCK_ITSERVICES;
-		DBbegin();
 
-		ret = its_flush_updates(&updates);
+		do
+		{
+			DBbegin();
 
-		DBcommit();
+			ret = its_flush_updates(&updates);
+		}
+		while (ZBX_DB_DOWN == DBcommit());
+
 		UNLOCK_ITSERVICES;
 
 		zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
