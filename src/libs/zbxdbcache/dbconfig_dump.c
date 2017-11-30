@@ -960,11 +960,7 @@ void	DCdump_configuration(ZBX_DC_CONFIG *config)
 	DCdump_hosts(config);
 	DCdump_proxies(config);
 	DCdump_ipmihosts(config);
-	zabbix_increase_log_level();
-	zabbix_increase_log_level();
 	DCdump_host_inventories(config);
-	zabbix_decrease_log_level();
-	zabbix_decrease_log_level();
 	DCdump_htmpls(config);
 	DCdump_gmacros(config);
 	DCdump_hmacros(config);
