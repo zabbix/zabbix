@@ -113,12 +113,19 @@ WRAP_IO_FUNCS = \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=fgets
 
+WRAP_FS_FUNCS = \
+	-Wl,--wrap=opendir \
+	-Wl,--wrap=readdir \
+	-Wl,--wrap=stat \
+	-Wl,--wrap=__xstat
+
 WRAP_EXIT = \
 	-Wl,--wrap=exit
 
 COMMON_WRAP_FUNCS = \
 	$(WRAP_DB_FUNCS) \
 	$(WRAP_IO_FUNCS) \
+	$(WRAP_FS_FUNCS) \
 	$(WRAP_EXIT)
 
 tests:
