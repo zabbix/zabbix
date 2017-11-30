@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,15 +19,29 @@
 **/
 
 
-class CIcon extends CSpan {
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-	public function __construct($title = null) {
-		parent::__construct();
+class testFormLoginWithRequest extends CWebTest {
+	// Returns layout data
+	public static function provider() {
+		return [
+			[
+				[
+					'request' => 'zabbix.php?action=proxy.list&ddreset=1',
+					'header' => 'Proxies'
+				]
+			]
+		];
+	}
 
-		$this->addClass('menu_icon');
-		$this->addClass('shadow');
-		if ($title !== null) {
-			$this->setAttribute('title', $title);
-		}
+	/**
+	 * @dataProvider provider
+	 */
+	public function testFormLoginWithRequest_test($data) {
+		// Log in.
+		$this->zbxTestLogin($data['request']);
+
+		// Test page title.
+		$this->zbxTestCheckHeader($data['header']);
 	}
 }

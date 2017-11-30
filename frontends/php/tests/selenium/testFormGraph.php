@@ -937,7 +937,7 @@ class testFormGraph extends CWebTest {
 
 		if (isset($data['ymax_name'])) {
 			$this->zbxTestClickWait('yaxis_max');
-			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup_item');
+			$this->zbxTestSwitchToWindow('zbx_popup_item');
 
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');

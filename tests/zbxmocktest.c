@@ -153,13 +153,32 @@ const char	*help_message[] = {NULL};
 const char	*progname = NULL;
 const char	syslog_app_name[] = "";
 
+char	*CONFIG_HOSTS_ALLOWED		= NULL;
+char	*CONFIG_HOSTNAME		= NULL;
+char	*CONFIG_HOSTNAME_ITEM		= NULL;
+char	*CONFIG_HOST_METADATA		= NULL;
+char	*CONFIG_HOST_METADATA_ITEM	= NULL;
+
+int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
+
+int	CONFIG_BUFFER_SIZE		= 100;
+int	CONFIG_BUFFER_SEND		= 5;
+
+int	CONFIG_MAX_LINES_PER_SECOND	= 20;
+
+char	**CONFIG_ALIASES		= NULL;
+char	**CONFIG_USER_PARAMETERS	= NULL;
+#if defined(_WINDOWS)
+char	**CONFIG_PERF_COUNTERS		= NULL;
+#endif
+
 void	zbx_on_exit(void)
 {
 }
 
 /* test itself */
 
-int	main ()
+int	main (void)
 {
 	const struct CMUnitTest tests[] =
 	{

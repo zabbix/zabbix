@@ -44,7 +44,7 @@ class CSession {
 			$path = substr($path, 0, strrpos($path, '/') + 1);
 
 			ob_start();
-			session_set_cookie_params(0, $path, null, HTTPS);
+			session_set_cookie_params(0, $path, null, HTTPS, true);
 
 			if (!session_start()) {
 				throw new Exception('Cannot start session.');

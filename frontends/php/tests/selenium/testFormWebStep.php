@@ -767,7 +767,7 @@ class testFormWebStep extends CWebTest {
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 		$this->zbxTestClickWait('add_step');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToWindow('zbx_popup');
 
 		if (array_key_exists('step_name', $data)) {
 			$this->zbxTestInputTypeWait('name',$data['step_name']);
@@ -874,7 +874,7 @@ class testFormWebStep extends CWebTest {
 		if (array_key_exists('check_raw', $data)) {
 			$this->zbxTestWaitWindowClose();
 			$this->zbxTestClickLinkText($data['step_name']);
-			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+			$this->zbxTestSwitchToWindow('zbx_popup');
 			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('posts'));
 			$raw = $this->zbxTestGetText("//textarea[@id='posts']");
 			$this->assertEquals($raw, $data['check_raw']);
@@ -884,7 +884,7 @@ class testFormWebStep extends CWebTest {
 		if (array_key_exists('parse_query', $data)) {
 			$this->zbxTestWaitWindowClose();
 			$this->zbxTestClickLinkText($data['step_name']);
-			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+			$this->zbxTestSwitchToWindow('zbx_popup');
 			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('posts'));
 			$i = 1;
 			foreach($data['parse_query'] as $item) {
@@ -907,7 +907,7 @@ class testFormWebStep extends CWebTest {
 		if (array_key_exists('check_post', $data)) {
 			$this->zbxTestWaitWindowClose();
 			$this->zbxTestClickLinkText($data['step_name']);
-			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+			$this->zbxTestSwitchToWindow('zbx_popup');
 			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('posts'));
 			$i = 2;
 			foreach($data['check_post'] as $item) {

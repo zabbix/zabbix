@@ -1505,7 +1505,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 			foreach($data['add_step'] as $item) {
 				$this->zbxTestClickWait('add_step');
-				$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+				$this->zbxTestSwitchToWindow('zbx_popup');
 				$this->zbxTestCheckFatalErrors();
 				$step = $item['step']." step";
 				$this->zbxTestInputTypeWait('name',$step);
@@ -1598,7 +1598,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestCheckboxSelect("group_httptestid_$httptestid");
 			$this->zbxTestClickButton('httptest.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario deleted');
 			$this->assertEquals(0, DBcount("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".

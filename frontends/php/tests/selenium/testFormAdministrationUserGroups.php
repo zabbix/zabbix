@@ -341,7 +341,7 @@ class testFormAdministrationUserGroups extends CWebTest {
 		$this->zbxTestCheckHeader('User groups');
 
 		$this->zbxTestClickXpath("//button[@id='cancel']/../button[@id='delete']");
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

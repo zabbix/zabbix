@@ -394,13 +394,63 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 
 /******************************************************************************
  *                                                                            *
+ * Function: db_update_proxies_lastaccess                                     *
+ *                                                                            *
+ * Purpose: updates proxy last access timestamp in database                   *
+ *                                                                            *
+ * Parameter: proxy_diff - [IN] last access updates for proxies               *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_update_proxies_lastaccess(const zbx_vector_uint64_pair_t *proxy_diff)
+{
+	char	*sql;
+	size_t	sql_alloc = 256, sql_offset = 0;
+	int	i;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	DBbegin();
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < proxy_diff->values_num; i++)
+	{
+		zbx_uint64_pair_t	pair = proxy_diff->values[i];
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts"
+				" set lastaccess=%d"
+				" where hostid=" ZBX_FS_UI64 ";\n",
+				pair.second, pair.first);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	DBcommit();
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: update_proxy_lastaccess                                          *
  *                                                                            *
  ******************************************************************************/
 void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access)
 {
-	DBexecute("update hosts set lastaccess=%d where hostid=" ZBX_FS_UI64, last_access, hostid);
-	zbx_dc_update_proxy_lastaccess(hostid, last_access);
+	zbx_vector_uint64_pair_t	proxy_diff;
+
+	zbx_vector_uint64_pair_create(&proxy_diff);
+
+	zbx_dc_update_proxy_lastaccess(hostid, last_access, &proxy_diff);
+
+	if (0 != proxy_diff.values_num)
+		db_update_proxies_lastaccess(&proxy_diff);
+
+	zbx_vector_uint64_pair_destroy(&proxy_diff);
 }
 
 /******************************************************************************

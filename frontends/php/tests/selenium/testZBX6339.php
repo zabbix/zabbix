@@ -59,7 +59,7 @@ class testZBX6339 extends CWebTest {
 		$this->zbxTestCheckboxSelect('screens_'.$screenid);
 		$this->zbxTestClickButton('screen.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestCheckHeader('Screens');

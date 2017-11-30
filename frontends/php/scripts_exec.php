@@ -52,9 +52,14 @@ $scripts = API::Script()->get([
 	'output' => ['name', 'command']
 ]);
 
+$db_host = API::Host()->get([
+	'output' => [],
+	'hostids' => $hostid
+]);
+
 $error_exist = false;
 
-if ($scripts) {
+if ($scripts && $db_host) {
 	$script = $scripts[0];
 
 	$macros_data = CMacrosResolverHelper::resolve([
