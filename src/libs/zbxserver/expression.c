@@ -2037,15 +2037,11 @@ static int	get_host_inventory(const char *macro, const char *expression, char **
 		if (0 == strcmp(macro, inventory_fields[i].macro))
 		{
 			zbx_uint64_t	itemid;
-			int		idx = inventory_fields[i].idx;
 
 			if (SUCCEED != get_N_itemid(expression, N_functionid, &itemid))
 				return FAIL;
 
-			if (NULL == (*replace_to = DCget_host_inventory_value_by_itemid(itemid, idx)))
-				return FAIL;
-
-			return SUCCEED;
+			return DCget_host_inventory_value_by_itemid(itemid, replace_to, inventory_fields[i].idx);
 		}
 	}
 
@@ -2069,14 +2065,7 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 	for (i = 0; NULL != inventory_fields[i].macro; i++)
 	{
 		if (0 == strcmp(macro, inventory_fields[i].macro))
-		{
-			int	idx = inventory_fields[i].idx;
-
-			if (NULL == (*replace_to = DCget_host_inventory_value_by_itemid(itemid, idx)))
-				return FAIL;
-
-			return SUCCEED;
-		}
+			return DCget_host_inventory_value_by_itemid(itemid, replace_to, inventory_fields[i].idx);
 	}
 
 	return FAIL;
