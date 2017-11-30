@@ -1689,7 +1689,7 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
  *                                                                            *
  * Purpose: get corresponding host_inventory field name                       *
  *                                                                            *
- * Parameters: inventory_link - [IN] field link 1..HOST_INVENTORY_FIELD_COUNT *                            *
+ * Parameters: inventory_link - [IN] field link 1..HOST_INVENTORY_FIELD_COUNT *
  *                                                                            *
  * Return value: field name or NULL if value of inventory_link is incorrect   *
  *                                                                            *
