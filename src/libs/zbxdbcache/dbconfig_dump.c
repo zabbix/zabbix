@@ -216,7 +216,7 @@ static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
 	ZBX_DC_HOST_INVENTORY		*host_inventory;
 	zbx_hashset_iter_t		iter;
 	zbx_vector_ptr_t		index;
-	int				i;
+	int				i, j;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
 
@@ -224,7 +224,10 @@ static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
 	zbx_hashset_iter_reset(&config->host_inventories, &iter);
 
 	while (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "searchin'");
 		zbx_vector_ptr_append(&index, host_inventory);
+	}
 
 	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -234,10 +237,10 @@ static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " inventory_mode:%u", host_inventory->hostid,
 				host_inventory->inventory_mode);
 
-		for (i = 0; i < ZBX_MAX_INVENTORY_FIELDS; i++)
+		for (j = 0; j < ZBX_MAX_INVENTORY_FIELDS; j++)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", DBget_inventory_field(i + 1),
-					host_inventory->values[i]);
+			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", DBget_inventory_field(j + 1),
+					host_inventory->values[j]);
 		}
 	}
 
@@ -960,7 +963,11 @@ void	DCdump_configuration(ZBX_DC_CONFIG *config)
 	DCdump_hosts(config);
 	DCdump_proxies(config);
 	DCdump_ipmihosts(config);
+	zabbix_increase_log_level();
+	zabbix_increase_log_level();
 	DCdump_host_inventories(config);
+	zabbix_decrease_log_level();
+	zabbix_decrease_log_level();
 	DCdump_htmpls(config);
 	DCdump_gmacros(config);
 	DCdump_hmacros(config);
