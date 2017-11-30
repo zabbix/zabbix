@@ -10860,6 +10860,14 @@ void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_host_inventory_value_by_itemid                             *
+ *                                                                            *
+ * Purpose: find inventory value in automatically populated cache, if not     *
+ *          found then look in main inventory cache                           *
+ *                                                                            *
+ ******************************************************************************/
 int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx)
 {
 	ZBX_DC_ITEM		*dc_item;
