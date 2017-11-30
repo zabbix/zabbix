@@ -30,6 +30,7 @@ Bug fixes:
 Changes for 3.4.5rc1
 
 New features:
+..F.....S. [ZBXNEXT-4002] implemented support for elasticsearch as history storage (abs, vjaceslavs, wiper)
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
