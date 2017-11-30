@@ -310,7 +310,7 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	unsigned char	inventory_mode;
-	const char	*values[ZBX_MAX_INVENTORY_FIELDS];
+	const char	*values[HOST_INVENTORY_FIELD_COUNT];
 }
 ZBX_DC_HOST_INVENTORY;
 

@@ -1689,7 +1689,7 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
  *                                                                            *
  * Purpose: get corresponding host_inventory field name                       *
  *                                                                            *
- * Parameters: inventory_link - [IN] field number; 1..ZBX_MAX_INVENTORY_FIELDS*
+ * Parameters: inventory_link - [IN] field link 1..HOST_INVENTORY_FIELD_COUNT *                            *
  *                                                                            *
  * Return value: field name or NULL if value of inventory_link is incorrect   *
  *                                                                            *
@@ -1698,7 +1698,7 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
  ******************************************************************************/
 const char	*DBget_inventory_field(unsigned char inventory_link)
 {
-	static const char	*inventory_fields[ZBX_MAX_INVENTORY_FIELDS] =
+	static const char	*inventory_fields[HOST_INVENTORY_FIELD_COUNT] =
 	{
 		"type", "type_full", "name", "alias", "os", "os_full", "os_short", "serialno_a", "serialno_b", "tag",
 		"asset_tag", "macaddress_a", "macaddress_b", "hardware", "hardware_full", "software", "software_full",
@@ -1713,7 +1713,7 @@ const char	*DBget_inventory_field(unsigned char inventory_link)
 		"poc_2_screen", "poc_2_notes"
 	};
 
-	if (1 > inventory_link || inventory_link > ZBX_MAX_INVENTORY_FIELDS)
+	if (1 > inventory_link || inventory_link > HOST_INVENTORY_FIELD_COUNT)
 		return NULL;
 
 	return inventory_fields[inventory_link - 1];
