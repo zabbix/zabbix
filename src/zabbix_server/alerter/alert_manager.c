@@ -894,51 +894,45 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 	return *alerter;
 }
 
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_DATABASE_TYPE "IBM DB2"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_DATABASE_TYPE "MySQL"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_DATABASE_TYPE "Oracle"
+#elif defined(HAVE_POSTGRESQL)
+#	define ZBX_DATABASE_TYPE "PostgreSQL"
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: am_create_db_alert_message                                       *
  *                                                                            *
  * Purpose: get and format error message from database when it is unavailable *
  *                                                                            *
- * Return value: full database error message                                  *
+ * Return value: full database error message is allocated                     *
  *                                                                            *
  ******************************************************************************/
-static char	*am_create_db_alert_message()
+static char	*am_create_db_alert_message(void)
 {
-	char	*db_strerror, *alert_message = NULL;
-	size_t	alert_message_alloc = MAX_STRING_LEN, alert_message_offset = 0;
-#if defined(HAVE_IBM_DB2)
-	const char	*db_type = "IBM DB2";
-#elif defined(HAVE_MYSQL)
-	const char	*db_type = "MySQL";
-#elif defined(HAVE_ORACLE)
-	const char	*db_type = "Oracle";
-#elif defined(HAVE_POSTGRESQL)
-	const char	*db_type = "PostgreSQL";
-#endif
-
-	alert_message = zbx_malloc(alert_message, alert_message_alloc);
+	char	*error, *alert_message = NULL;
+	size_t	alert_message_alloc = 0, alert_message_offset = 0;
 
 	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s database \"%s\" on %s",
-			db_type, CONFIG_DBNAME, CONFIG_DBHOST);
+			ZBX_DATABASE_TYPE, CONFIG_DBNAME, CONFIG_DBHOST);
 
 	if (0 != CONFIG_DBPORT)
 		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d", CONFIG_DBPORT);
 
+	if (NULL == (error = zbx_db_last_strerr()) || '\0' == *error)
+		error = "unknown error";
 
-	if (NULL != (db_strerror = zbx_db_last_strerr()) && '\0' != *db_strerror)
-	{
-		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " is not available: %s",
-				db_strerror);
-	}
-	else
-	{
-		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset,
-				" is not available: unknown error");
-	}
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " is not available: %s", error);
 
 	return alert_message;
 }
+
+#undef ZBX_DATABASE_TYPE
 
 /******************************************************************************
  *                                                                            *
