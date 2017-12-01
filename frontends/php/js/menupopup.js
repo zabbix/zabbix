@@ -71,17 +71,18 @@ function getMenuPopupHistory(options) {
  * @param bool   options['showScreens']		link to host screen page
  * @param bool   options['showTriggers']	link to Monitoring->Triggers page
  * @param bool   options['hasGoTo']			"Go to" block in popup
+ * @param {object} trigger_elmnt			UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupHost(options) {
+function getMenuPopupHost(options, trigger_elmnt) {
 	var sections = [];
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
 		sections[sections.length] = {
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, options.hostid)
+			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
 		};
 	}
 
@@ -170,17 +171,18 @@ function getMenuPopupHost(options) {
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
+ * @param {object} trigger_elmnt					UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupMap(options) {
+function getMenuPopupMap(options, trigger_elmnt) {
 	var sections = [];
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
 		sections[sections.length] = {
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, options.hostid)
+			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
 		};
 	}
 
@@ -496,7 +498,7 @@ function getMenuPopupDashboard(options) {
 									var form = jQuery('form[name="dashboard_sharing_form"]');
 
 									showDialogForm(form, {"title": t('Dashboard sharing'), "action_title": t('Update')},
-										response.data
+										response.data, jQuery('#dashbrd-actions')
 									);
 								}
 								else if (typeof response === 'string' && response.indexOf(t('Access denied')) !== -1) {
@@ -538,7 +540,7 @@ function getMenuPopupDashboard(options) {
 	return [{label: options.label, items: options.items}];
 }
 
-function showDialogForm(form, options, formData) {
+function showDialogForm(form, options, formData, trigger_elmnt) {
 	var oldFormParent = form.parent(),
 		errorBlockId = 'dialog-form-error-container';
 
@@ -598,11 +600,12 @@ function showDialogForm(form, options, formData) {
 					oldFormParent.append(form);
 				}
 			}
-		]
-	});
+		],
+		'dialogueid': 'dashbrdShare'
+	}, trigger_elmnt);
 
 	form.css('visibility', 'visible');
-	overlayDialogueOnLoad(true);
+	overlayDialogueOnLoad(true, jQuery('[data-dialogueid="dashbrdShare"]'));
 }
 
 /**
@@ -833,12 +836,13 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param array scripts		scripts names
- * @param array hostId		host id
+ * @param array scripts				Scripts names.
+ * @param array hostId				Host id.
+ * @param {object} trigger_elmnt	UI element which triggered opening of overlay dialogue.
  *
  * @returns array
  */
-function getMenuPopupScriptData(scripts, hostId) {
+function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 	var tree = {};
 
 	var appendTreeItem = function(tree, name, items, params) {
@@ -876,7 +880,7 @@ function getMenuPopupScriptData(scripts, hostId) {
 	}
 
 	// build menu items from tree
-	var getMenuPopupScriptItems = function(tree) {
+	var getMenuPopupScriptItems = function(tree, trigger_elm) {
 		var items = [];
 
 		if (objectSize(tree) > 0) {
@@ -889,7 +893,7 @@ function getMenuPopupScriptData(scripts, hostId) {
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
 					item.clickCallback = function(e) {
-						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation);
+						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
 						jQuery(this).closest('.action-menu-top').fadeOut(100);
 					};
@@ -902,7 +906,7 @@ function getMenuPopupScriptData(scripts, hostId) {
 		return items;
 	};
 
-	return getMenuPopupScriptItems(tree);
+	return getMenuPopupScriptItems(tree, trigger_elmnt);
 }
 
 jQuery(function($) {
@@ -917,116 +921,154 @@ jQuery(function($) {
 	 *
 	 * @see createMenuItem()
 	 */
-	$.fn.menuPopup = function(sections, event) {
-		if (!event) {
-			event = window.event;
-		}
-
-		var opener = $(this),
-			id = opener.data('menu-popup-id'),
-			menuPopup = $('#' + id),
-			mapContainer = null;
-
-		if (menuPopup.length > 0) {
-			var display = menuPopup.css('display');
-
-			// hide all menu popups
-			jQuery('.action-menu').css('display', 'none');
-
-			if (display === 'block') {
-				menuPopup.fadeOut(0);
-			}
-			else {
-				menuPopup.fadeIn(50);
-			}
-
-			menuPopup.position({
-				of: event,
-				my: 'left top',
-				at: 'left bottom'
-			});
+	$.fn.menuPopup = function(method) {
+		if (methods[method]) {
+			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
 		else {
-			id = new Date().getTime();
+			return methods.init.apply(this, arguments);
+		}
+	};
 
-			menuPopup = $('<ul>', {
-				id: id,
-				'class': 'action-menu action-menu-top'
+	function closeMenuPopup(event, menuPopup) {
+		if (!menuPopup.is(event.target) && menuPopup.has(event.target).length === 0) {
+			menuPopup.data('is-active', false);
+			menuPopup.fadeOut(0);
+
+			var menu = null,
+				indx;
+			$(overlays_stack).each(function(i, item) {
+				if (item.dialogueid === 'contextmenu') {
+					menu = item,
+					indx = i;
+					return;
+				}
 			});
 
-			// create sections
-			if (sections.length > 0) {
-				$.each(sections, function(i, section) {
-					if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
-						var h3 = $('<h3>').text(section.label);
-						var sectionItem = $('<li>').append(h3);
-					}
+			if (menu) {
+				// Focus UI element that was clicked to open an overlay.
+				jQuery(menu.element).focus();
 
-					// add section delimited for all sections except first one
-					if (i > 0) {
-						menuPopup.append($('<li>').append($('<div>')));
-					}
-					menuPopup.append(sectionItem);
+				// Remove dialogue from the stack.
+				overlays_stack.splice(indx, 1);
+			}
+		}
+	}
 
-					$.each(section.items, function(i, item) {
-						menuPopup.append(createMenuItem(item));
-					});
-				});
+	var methods = {
+		init: function(sections, event) {
+			if (!event) {
+				event = window.event;
 			}
 
-			// skip displaying empty menu sections
-			if (menuPopup.children().length == 0) {
-				return;
-			}
+			var opener = $(this),
+				id = opener.data('menu-popup-id'),
+				menuPopup = $('#' + id),
+				mapContainer = null;
 
-			// set menu popup for map area
-			if (opener.prop('tagName') === 'AREA') {
-				$('.menuPopupContainer').remove();
+			if (menuPopup.length > 0) {
+				var display = menuPopup.css('display');
 
-				mapContainer = jQuery('<div>', {
-					'class': 'menuPopupContainer',
-					css: {
-						position: 'absolute',
-						top: event.pageY,
-						left: event.pageX
-					}
-				})
-				.append(menuPopup);
+				// hide all menu popups
+				$('.action-menu').css('display', 'none');
 
-				$('body').append(mapContainer);
-			}
-			// set menu popup for common html elements
-			else {
-				opener.data('menu-popup-id', id);
+				if (display === 'block') {
+					menuPopup.fadeOut(0);
+				}
+				else {
+					menuPopup.fadeIn(50);
+				}
 
-				$('body').append(menuPopup);
-			}
-
-			// hide all menu popups
-			jQuery('.action-menu').css('display', 'none');
-
-			// display
-			menuPopup
-				.fadeIn(50)
-				.data('is-active', false)
-				.mouseenter(function() {
-					menuPopup.data('is-active', true);
-
-					clearTimeout(window.menuPopupTimeoutHandler);
-				})
-				.position({
-					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
+				menuPopup.position({
+					of: event,
 					my: 'left top',
 					at: 'left bottom'
 				});
-		}
-
-		$(document).click(function(e) {
-			if (!menuPopup.is(e.target) && menuPopup.has(e.target).length === 0) {
-				menuPopup.data('is-active', false);
-				menuPopup.fadeOut(0);
 			}
-		});
+			else {
+				id = new Date().getTime();
+
+				menuPopup = $('<ul>', {
+					id: id,
+					'class': 'action-menu action-menu-top'
+				});
+
+				// create sections
+				if (sections.length > 0) {
+					$.each(sections, function(i, section) {
+						if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
+							var h3 = $('<h3>').text(section.label);
+							var sectionItem = $('<li>').append(h3);
+						}
+
+						// add section delimited for all sections except first one
+						if (i > 0) {
+							menuPopup.append($('<li>').append($('<div>')));
+						}
+						menuPopup.append(sectionItem);
+
+						$.each(section.items, function(i, item) {
+							menuPopup.append(createMenuItem(item));
+						});
+					});
+				}
+
+				// skip displaying empty menu sections
+				if (menuPopup.children().length == 0) {
+					return;
+				}
+
+				// set menu popup for map area
+				if (opener.prop('tagName') === 'AREA') {
+					$('.menuPopupContainer').remove();
+
+					mapContainer = $('<div>', {
+						'class': 'menuPopupContainer',
+						css: {
+							position: 'absolute',
+							top: event.pageY,
+							left: event.pageX
+						}
+					})
+					.append(menuPopup);
+
+					$('body').append(mapContainer);
+				}
+				// set menu popup for common html elements
+				else {
+					opener.data('menu-popup-id', id);
+
+					$('body').append(menuPopup);
+				}
+
+				// hide all menu popups
+				$('.action-menu').css('display', 'none');
+
+				// display
+				menuPopup
+					.fadeIn(50)
+					.data('is-active', false)
+					.mouseenter(function() {
+						menuPopup.data('is-active', true);
+
+						clearTimeout(window.menuPopupTimeoutHandler);
+					})
+					.position({
+						of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
+						my: 'left top',
+						at: 'left bottom'
+					});
+			}
+
+			addToOverlaysStack('contextmenu', event.target, 'contextmenu');
+
+			$(document).click(function(e) {
+				closeMenuPopup(e, menuPopup);
+			});
+		},
+		close: function() {
+			closeMenuPopup(window.event, jQuery(this));
+		}
 	};
 
 	/**

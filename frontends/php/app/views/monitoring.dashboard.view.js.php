@@ -74,7 +74,8 @@
 			{
 				'name': form.data('data').name,
 				'owner': form.data('data').owner
-			}
+			},
+			this
 		);
 	};
 

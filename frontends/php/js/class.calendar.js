@@ -116,6 +116,25 @@ calendar.prototype = {
 		}
 		this.clndr_calendar.hide();
 		this.visible = 0;
+
+		var clndrid = this.id.toString(),
+			overlay = null,
+			indx;
+		jQuery(overlays_stack).each(function(i, item) {
+			if (item.dialogueid === clndrid) {
+				overlay = item,
+				indx = i;
+				return;
+			}
+		});
+
+		if (overlay) {
+			// Focus UI element that was clicked to open an overlay.
+			jQuery(overlay.element).focus();
+
+			// Remove dialogue from the stack.
+			overlays_stack.splice(indx, 1);
+		}
 	},
 
 	clndrshow: function(top, left) {
@@ -136,6 +155,8 @@ calendar.prototype = {
 			}
 			this.clndr_calendar.show();
 			this.visible = 1;
+
+			addToOverlaysStack(this.id, window.event.target, 'clndr');
 		}
 	},
 

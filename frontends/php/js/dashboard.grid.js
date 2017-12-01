@@ -714,7 +714,7 @@
 				}
 			],
 			'dialogueid': 'widgetConfg'
-		});
+		}, jQuery('.btn-widget-edit', widget['content_header']));
 
 		var overlay_dialogue = $('#overlay_dialogue');
 		data.dialogue.div = overlay_dialogue;
@@ -1335,7 +1335,7 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
-						overlayDialogueOnLoad(true);
+						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});
 			});

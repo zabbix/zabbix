@@ -598,6 +598,7 @@ jQuery(function($) {
 			 */
 			var itemEditDialog = function($obj, id, parent, depth) {
 				var url = new Curl('zabbix.php'),
+					trigger_elmnt = window.event.target,
 					item_edit = !!id,
 					ajax_data = {
 						map_name: '',
@@ -741,7 +742,7 @@ jQuery(function($) {
 								}
 							],
 							'dialogueid': 'navtreeitem'
-						});
+						}, trigger_elmnt);
 					}
 				});
 			};

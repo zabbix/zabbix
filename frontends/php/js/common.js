@@ -20,6 +20,8 @@
 
 jQuery.noConflict();
 
+var overlays_stack = [];
+
 function isset(key, obj) {
 	return (is_null(key) || is_null(obj)) ? false : (typeof(obj[key]) != 'undefined');
 }
@@ -366,24 +368,29 @@ function openWinCentered(url, name, width, height, params) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action		Popup controller related action.
- * @param {array} options		Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid	(optional) id of overlay dialogue.
+ * @param {string} action			Popup controller related action.
+ * @param {array} options			Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid		(optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt	(optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns false
  */
-function PopUp(action, options, dialogueid) {
+function PopUp(action, options, dialogueid, trigger_elmnt) {
+	if (typeof trigger_elmnt === 'undefined') {
+		trigger_elmnt = window.event.target;
+	}
+
 	var ovelay_properties = {
-		'title': '',
-		'content': jQuery('<div>')
-			.css({'height': '68px'})
-			.append(jQuery('<div>')
-				.addClass('preloader-container')
-				.append(jQuery('<div>').addClass('preloader'))
-			),
-		'class': 'modal-popup',
-		'buttons': [],
-		'dialogueid': (typeof dialogueid === 'undefined') ? getOverlayDialogueId() : dialogueid
+			'title': '',
+			'content': jQuery('<div>')
+				.css({'height': '68px'})
+				.append(jQuery('<div>')
+					.addClass('preloader-container')
+					.append(jQuery('<div>').addClass('preloader'))
+				),
+			'class': 'modal-popup',
+			'buttons': [],
+		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
 	};
 	var url = new Curl('zabbix.php');
 
@@ -397,7 +404,7 @@ function PopUp(action, options, dialogueid) {
 		type: 'get',
 		dataType: 'json',
 		beforeSend: function() {
-			overlayDialogue(ovelay_properties);
+			overlayDialogue(ovelay_properties, trigger_elmnt);
 		},
 		success: function(resp) {
 			var buttons = resp.buttons !== null ? resp.buttons : [];
@@ -422,6 +429,86 @@ function PopUp(action, options, dialogueid) {
 	});
 
 	return false;
+}
+
+/**
+ * Function to add details about overlay UI elements in global overlays_stack variable.
+ *
+ * @param {string} dialogueid	Unique overlay element identifier.
+ * @param {object} element		UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type			Type of overlay UI element.
+ */
+function addToOverlaysStack(id, element, type) {
+	var indx = null,
+		id = id.toString();
+	jQuery(overlays_stack).each(function(i, item) {
+		if (item.dialogueid === id) {
+			indx = i;
+			return;
+		}
+	});
+
+	if (indx === null) {
+		// Add new overlay.
+		overlays_stack.push({
+			dialogueid: id,
+			element: element,
+			type: type
+		});
+	}
+	else {
+		overlays_stack[indx]['element'] = element;
+
+		// Move existing overlay to the end of array.
+		overlays_stack.push(overlays_stack[indx]);
+		overlays_stack.splice(indx, 1);
+	}
+
+	processDialogStack();
+}
+
+// Function add document 'keydown' listener to close overlay UI elements when ESC button is pressed.
+function processDialogStack() {
+	if (overlays_stack.length == 1 && typeof jQuery._data(document, 'events')['keydown'] === 'undefined') {
+		jQuery(document).on('keydown', function(event) {
+			if (event.which == 27) {
+				var dialog = overlays_stack[overlays_stack.length - 1];
+				if (typeof dialog !== 'undefined') {
+					switch (dialog.type) {
+						// Close overlay popup.
+						case 'popup':
+							overlayDialogueDestroy(dialog.dialogueid);
+							break;
+
+						// Close overlay hintbox.
+						case 'hintbox':
+							hintBox.hideHint(window.event, dialog.element, true);
+							break;
+
+						// Close context menu overlays.
+						case 'contextmenu':
+							jQuery('.action-menu.action-menu-top:visible').menuPopup('close');
+							break;
+
+						// Close overlay time picker.
+						case 'clndr':
+							CLNDR[dialog.dialogueid].clndr.clndrhide();
+							break;
+
+						// Close overlay color picker.
+						case 'color_picker':
+							hide_color_picker();
+							break;
+					}
+				}
+			}
+		});
+	}
+
+	// Remove event listener.
+	if (overlays_stack.length == 0 && typeof jQuery._data(document, 'events')['keydown'] !== 'undefined') {
+		jQuery(document).off('keydown');
+	}
 }
 
 /**

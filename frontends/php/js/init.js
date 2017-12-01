@@ -62,11 +62,11 @@ jQuery(function($) {
 				break;
 
 			case 'host':
-				data = getMenuPopupHost(data);
+				data = getMenuPopupHost(data, obj);
 				break;
 
 			case 'map':
-				data = getMenuPopupMap(data);
+				data = getMenuPopupMap(data, obj);
 				break;
 
 			case 'refresh':
