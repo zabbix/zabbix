@@ -962,7 +962,7 @@ int	zbx_db_rollback(void)
 
 	/* There is no way to recover from rollback errors, so there is no need to preserve transaction level / error. */
 	txn_level = 0;
-	txn_error = 0;
+	txn_error = ZBX_DB_OK;
 
 	if (ZBX_DB_FAIL == rc)
 		txn_end_error = ZBX_DB_FAIL;
