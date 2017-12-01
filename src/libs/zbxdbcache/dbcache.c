@@ -2664,9 +2664,12 @@ finish:
 
 		UNLOCK_CACHE;
 
-		/* try flushing correlated event queue until it's empty */
-		while (0 != zbx_flush_correlated_events())
-			;
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			/* try flushing correlated event queue until it's empty */
+			while (0 != zbx_flush_correlated_events())
+				;
+		}
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 	}
