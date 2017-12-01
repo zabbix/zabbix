@@ -173,7 +173,7 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_db_last_strerr                                           *
+ * Function: zbx_db_last_strerr                                               *
  *                                                                            *
  * Purpose: get last error set by database                                    *
  *                                                                            *
@@ -181,7 +181,7 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
  *                                                                            *
  ******************************************************************************/
 
-char	*zbx_get_db_last_strerr(void)
+char	*zbx_db_last_strerr(void)
 {
 	return last_db_strerror;
 }

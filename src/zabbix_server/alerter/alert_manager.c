@@ -926,7 +926,7 @@ static char	*am_create_db_alert_message()
 		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d", CONFIG_DBPORT);
 
 
-	if (NULL != (db_strerror = zbx_get_db_last_strerr()) && '\0' != *db_strerror)
+	if (NULL != (db_strerror = zbx_db_last_strerr()) && '\0' != *db_strerror)
 	{
 		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " is not available: %s",
 				db_strerror);
