@@ -111,22 +111,21 @@ elseif (array_key_exists('db_cservices', $data)) {
 			'chkbxRange.init();'.
 		'});'.
 
-		'var addSelectedServices = function(dialogueid) {'.
+		'var addSelectedServices = function() {'.
 			'var e;'.
 			'jQuery(".service-select:checked").each(function(key, cb) {'.
 				'e = jQuery("#service-name-" + jQuery(cb).val());'.
 				'window.add_child_service(e.data("name"), e.data("serviceid"), e.data("trigger"));'.
 			'});'.
-			'overlayDialogueDestroy(dialogueid);'.
-			'return false;'.
+
+			'return true;'.
 		'};';
 
 	$output['buttons'] = [
 		[
 			'title' => _('Select'),
 			'class' => '',
-			'action' => 'return addSelectedServices(jQuery(window.event.target).closest("[data-dialogueid]")'.
-							'.attr("data-dialogueid"));'
+			'action' => 'return addSelectedServices();'
 		]
 	];
 }

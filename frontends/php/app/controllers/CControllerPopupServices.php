@@ -27,8 +27,8 @@ class CControllerPopupServices extends CController {
 	protected function checkInput() {
 		$fields = [
 			'serviceid' =>	'db services.serviceid',
-			'pservices' =>	'db services.serviceid',
-			'cservices' =>	'db services.serviceid',
+			'pservices' =>	'in 1',
+			'cservices' =>	'in 1',
 			'parentid' =>	'int32'
 		];
 

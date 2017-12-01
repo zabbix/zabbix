@@ -45,16 +45,19 @@ $servicesFormList = (new CFormList('servicesFormList'))
 	);
 
 // append parent link to form list
+$parent_service_popup_options = [
+	'pservices' => '1'
+];
+if ($this->data['service']['serviceid']) {
+	$parent_service_popup_options['serviceid'] = $this->data['service']['serviceid'];
+}
 $servicesFormList->addRow(_('Parent service'), [
 	(new CTextBox('parent_name', $this->data['parentname'], true, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select_parent', _x('Change', 'verb')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.services",jQuery.extend('.
-			CJs::encodeJson([
-				'pservices' => '1',
-				'serviceid' => $this->data['service']['serviceid']
-			]).
+			CJs::encodeJson($parent_service_popup_options).
 				',{parentid: this.form.parentid.value}));'
 		)
 ]);
@@ -127,16 +130,21 @@ foreach ($this->data['children'] as $child) {
 	);
 }
 $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
+
+$dep_service_popup_options = [
+	'cservices' => '1'
+];
+if ($this->data['service']['serviceid']) {
+	$dep_service_popup_options['serviceid'] = $this->data['service']['serviceid'];
+}
+
 $servicesDependenciesFormList->addRow(
 	_('Depends on'),
 	(new CDiv([
 		$servicesChildTable,
 		(new CButton('add_child_service', _('Add')))
 			->onClick('return PopUp("popup.services",jQuery.extend('.
-				CJs::encodeJson([
-					'cservices' => '1',
-					'serviceid' => $this->data['service']['serviceid']
-				]).
+				CJs::encodeJson($dep_service_popup_options).
 					',{parentid: this.form.parentid.value}));'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
