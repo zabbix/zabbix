@@ -672,6 +672,10 @@ ul.top-nav-icons {
 			border-top-color: $light-red;
 		}
 	}
+
+	button {
+		color: $btn-alt-font-color;
+	}
 }
 
 .msg-good {
@@ -684,6 +688,10 @@ ul.top-nav-icons {
 		.arrow-down {
 			border-top-color: $light-green;
 		}
+	}
+
+	button {
+		color: $btn-alt-font-color;
 	}
 }
 
