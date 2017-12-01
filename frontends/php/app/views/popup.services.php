@@ -125,7 +125,8 @@ elseif (array_key_exists('db_cservices', $data)) {
 		[
 			'title' => _('Select'),
 			'class' => '',
-			'action' => 'return addSelectedServices(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));'
+			'action' => 'return addSelectedServices(jQuery(window.event.target).closest("[data-dialogueid]")'.
+							'.attr("data-dialogueid"));'
 		]
 	];
 }
