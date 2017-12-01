@@ -37,6 +37,7 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 		(new CTextBox('mname', $this->data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
 	)
 	->addRow(_('Maintenance type'),
 		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))

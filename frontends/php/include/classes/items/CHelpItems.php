@@ -270,7 +270,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
-					'description' => _('Directory size (in bytes), dir - absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - mode used to get directory size ("apparent" or "disk"), <max_depth> - maximal traversal depth for directories. Returns integer.')
+					'description' => _('Directory size (in bytes). Returns integer')
 				],
 				[
 					'key' => 'vfs.file.cksum[file]',
@@ -565,6 +565,10 @@ class CHelpItems {
 				[
 					'key' => 'vfs.dev.write[<device>,<type>,<mode>]',
 					'description' => _('Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
+				],
+				[
+					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
+					'description' => _('Directory size (in bytes). Returns integer')
 				],
 				[
 					'key' => 'vfs.file.cksum[file]',

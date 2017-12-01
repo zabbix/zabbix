@@ -70,7 +70,8 @@ class CValidationRule {
 									&& !$this->parseDB($buffer, $pos, $rule)			// db
 									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
 									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
-									&& !$this->parseArray($buffer, $pos, $rule)) {		// array
+									&& !$this->parseArray($buffer, $pos, $rule)			// array
+									&& !$this->parseFlags($buffer, $pos, $rule)) {		// flags
 								// incorrect validation rule
 								break 3;
 							}
@@ -450,6 +451,32 @@ class CValidationRule {
 			'table' => $table,
 			'field' => $field
 		];
+
+		return true;
+	}
+
+	/**
+	 * flags <value1> | <value2> | ... | <valueN>
+	 *
+	 * 'flags' => <value1> | <value2> | ... | <valueN>
+	 */
+	private function parseFlags($buffer, &$pos, &$rules) {
+		$i = $pos;
+
+		if (0 != strncmp(substr($buffer, $i), 'flags ', 6)) {
+			return false;
+		}
+
+		$i += 6;
+
+		$value = 0x00;
+
+		if (!$this->parseValue($buffer, $i, $value)) {
+			return false;
+		}
+
+		$pos = $i;
+		$rules['flags'] = $value;
 
 		return true;
 	}

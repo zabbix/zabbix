@@ -295,6 +295,7 @@ typedef struct
 	const char	*tls_subject;
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
+	const char	*proxy_address;
 	const char	*error;
 	const char	*snmp_error;
 	const char	*ipmi_error;
@@ -598,6 +599,7 @@ typedef struct
 {
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
+	int			proxy_lastaccess_ts;
 	int			sync_ts;
 
 	zbx_hashset_t		items;

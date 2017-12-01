@@ -181,15 +181,10 @@ function get_icon($type, $params = []) {
 
 			return $icon;
 
-		case 'action':
-			return (new CRedirectButton(SPACE, null))
-				->addClass(ZBX_STYLE_BTN_ACTION)
-				->setTitle(_('Actions'));
-
 		case 'screenconf':
 			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_CONF)
-				->setTitle(_('Refresh time'));
+				->setTitle(_('Refresh interval'));
 
 		case 'overviewhelp':
 			return (new CRedirectButton(SPACE, null))
@@ -201,8 +196,6 @@ function get_icon($type, $params = []) {
 				->setTitle(_('Reset'))
 				->onClick('timeControl.objectReset();');
 	}
-
-	return null;
 }
 
 /**

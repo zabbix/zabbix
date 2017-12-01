@@ -3153,8 +3153,7 @@ class CAction extends CApiService {
 		if ($mediatypeids) {
 			$count = API::MediaType()->get([
 				'countOutput' => true,
-				'mediatypeids' => array_keys($mediatypeids),
-				'editable' => true
+				'mediatypeids' => array_keys($mediatypeids)
 			]);
 
 			if ($count != count($mediatypeids)) {

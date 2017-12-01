@@ -34,9 +34,7 @@ elseif ($data['graph']['unavailable_object']) {
 	];
 }
 else {
-	$item = (new CDiv())->setId($data['graph']['containerid']);
-
-	$flickerfree_item = (new CDiv($item))
+	$flickerfree_item = (new CDiv((new CLink(null, $data['item_graph_url']))->setId($data['graph']['containerid'])))
 		->addClass('flickerfreescreen')
 		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
@@ -54,7 +52,7 @@ if ($data['widget']['initial_load'] == 1) {
 				'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
 					'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
 					'new_width = content.width(),'.
-					'new_height = content.height() - 10,'.
+					'new_height = content.height() - 4,'.
 					'src = jQuery("#"+img_id).attr("src");'.
 
 				'if (typeof src === "undefined") {'.

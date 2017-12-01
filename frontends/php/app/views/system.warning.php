@@ -27,7 +27,7 @@ $buttons = [
 		->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"'
 )];
 
-echo '<body>';
+echo '<body lang="'.CWebUser::getLang().'">';
 
 (new CDiv(
 	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons), ZBX_STYLE_ARTICLE

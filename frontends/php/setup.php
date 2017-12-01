@@ -114,6 +114,7 @@ $link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
 $sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_LINKS);
 
 (new CTag('body', true, [(new CDiv([$ZBX_SETUP_WIZARD, $sub_footer]))->addClass(ZBX_STYLE_ARTICLE), makePageFooter()]))
+	->setAttribute('lang', CWebUser::getLang())
 	->show();
 ?>
 </html>

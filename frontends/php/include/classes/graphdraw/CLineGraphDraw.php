@@ -2562,7 +2562,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->fullSizeY = $this->sizeY;
 
 		if ($this->drawLegend) {
-			$h_legend_items = 14 * ($this->num + 1) + 8;
+			// Reserve N+1 item rows, last row is used as padding for legend.
+			$h_legend_items = 14 * $this->num + 14;
 			$h_legend_triggers = 14 * count($this->triggers);
 			$h_legend_percentile = 0;
 
@@ -2582,7 +2583,7 @@ class CLineGraphDraw extends CGraphDraw {
 					$this->sizeY -= $h_legend_items;
 					$this->drawItemsLegend = true;
 
-					if ($this->sizeY - $h_legend_triggers - $h_legend_percentile >= ZBX_GRAPH_LEGEND_HEIGHT) {
+					if ($this->sizeY - $h_legend_triggers - $h_legend_percentile >= self::GRAPH_HEIGHT_MIN) {
 						$this->sizeY -= $h_legend_triggers + $h_legend_percentile;
 						$this->drawExLegend = true;
 					}

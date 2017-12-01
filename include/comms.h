@@ -29,20 +29,24 @@ typedef long	ssize_t;
 #endif
 
 #ifdef _WINDOWS
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
-#	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
-#	define zbx_socket_last_error()	WSAGetLastError()
+#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
+#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)recv((s), (b), (int)(bl), 0))
+#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
+#	define zbx_socket_last_error()		WSAGetLastError()
+#	define zbx_bind(s, a, l)		(bind((s), (a), (int)(l)))
+#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (int)(n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN		WSAEINTR
-#	define ZBX_PROTO_ERROR		SOCKET_ERROR
-#	define ZBX_SOCKET_ERROR		INVALID_SOCKET
-#	define ZBX_SOCKET_TO_INT(s)	((int)(s))
+#	define ZBX_PROTO_AGAIN			WSAEINTR
+#	define ZBX_PROTO_ERROR			SOCKET_ERROR
+#	define ZBX_SOCKET_ERROR			INVALID_SOCKET
+#	define ZBX_SOCKET_TO_INT(s)		((int)(s))
 #else
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
-#	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) close(s)
-#	define zbx_socket_last_error()	errno
+#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)write((s), (b), (bl)))
+#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)read((s), (b), (bl)))
+#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) close(s)
+#	define zbx_socket_last_error()		errno
+#	define zbx_bind(s, a, l)		(bind((s), (a), (l)))
+#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (n), (f), (a), (l)))
 
 #	define ZBX_PROTO_AGAIN		EINTR
 #	define ZBX_PROTO_ERROR		-1
@@ -150,7 +154,7 @@ ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
 int	zbx_validate_peer_list(const char *peer_list, char **error);
-int	zbx_tcp_check_allowed_peers(zbx_socket_t *s, const char *peer_list);
+int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
 int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout);

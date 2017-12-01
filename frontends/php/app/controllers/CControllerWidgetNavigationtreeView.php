@@ -145,10 +145,10 @@ class CControllerWidgetNavigationtreeView extends CControllerWidget {
 				]);
 
 				foreach ($triggers as $trigger) {
-					if (($host_group = reset($trigger['groups'])) !== false) {
+					foreach ($trigger['groups'] as $host_group) {
 						$triggers_per_host_groups[$host_group['groupid']][$trigger['triggerid']] = true;
-						$problems_per_trigger[$trigger['triggerid']] = $this->problems_per_severity_tpl;
 					}
+					$problems_per_trigger[$trigger['triggerid']] = $this->problems_per_severity_tpl;
 				}
 
 				unset($host_groups);
