@@ -3238,6 +3238,9 @@ tr.cursor-move td * {
 .clock-lines {
   fill: #4f4f4f; }
 
+svg {
+  overflow: hidden; }
+
 .sysmap {
   height: 100%;
   width: auto;
