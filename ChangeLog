@@ -35,6 +35,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+.......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 ..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
 ........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
@@ -450,6 +451,7 @@ Changes for 3.2.11rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
 ..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
@@ -1015,6 +1017,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 ..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
 ..F....... [ZBX-12884] fixed misleading permissions visualization in user form for host groups and hosts lists (gcalenko)
 ........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
