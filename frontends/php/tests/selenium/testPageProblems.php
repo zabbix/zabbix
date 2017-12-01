@@ -171,7 +171,7 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestWaitWindowClose();
 
 		// Type problem name
-		$this->zbxTestInputType('filter_problem', 'Test trigger');
+		$this->zbxTestInputType('filter_name', 'Test trigger');
 
 		// Change minimum severity to Average
 		$this->zbxTestDropdownSelect('filter_severity', 'Average');
