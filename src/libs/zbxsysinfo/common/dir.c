@@ -203,7 +203,9 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 
 static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *result, int *mode)
 {
-	char	*mode_str = get_rparam(request, 3);
+	char	*mode_str;
+
+	mode_str = get_rparam(request, 3);
 
 	if (NULL == mode_str || '\0' == *mode_str || 0 == strcmp(mode_str, "apparent"))	/* <mode> default value */
 	{
@@ -314,13 +316,16 @@ static int	parse_age_parameter(char *text, time_t *time_out, time_t now)
 static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *result, int *types_out,
 		zbx_uint64_t *min_size, zbx_uint64_t *max_size, time_t *min_time, time_t *max_time)
 {
-	int	types_incl = etypes_to_mask(get_rparam(request, 3), result);
-	int	types_excl = etypes_to_mask(get_rparam(request, 4), result);
-	char	*min_size_str = get_rparam(request, 6);
-	char	*max_size_str = get_rparam(request, 7);
-	char	*min_age_str = get_rparam(request, 8);
-	char	*max_age_str = get_rparam(request, 9);
-	time_t	now = time(NULL);
+	int	types_incl;
+	int	types_excl;
+	char	*min_size_str;
+	char	*max_size_str;
+	char	*min_age_str;
+	char	*max_age_str;
+	time_t	now;
+
+	types_incl = etypes_to_mask(get_rparam(request, 3), result);
+	types_excl = etypes_to_mask(get_rparam(request, 4), result);
 
 	if (DET_OVERFLOW & (types_incl | types_excl))
 		return FAIL;
@@ -330,7 +335,10 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 
 	*types_out = types_incl & (~types_excl) & DET_ALLMASK;
 
-	/* min/max variables must be already initialized to default values */
+	/* min/max output variables must be already initialized to default values */
+
+	min_size_str = get_rparam(request, 6);
+	max_size_str = get_rparam(request, 7);
 
 	if (SUCCEED != parse_size_parameter(min_size_str, min_size))
 	{
@@ -343,6 +351,10 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid maximum size \"%s\".", max_size_str));
 		return FAIL;
 	}
+
+	now = time(NULL);
+	min_age_str = get_rparam(request, 8);
+	max_age_str = get_rparam(request, 9);
 
 	if (SUCCEED != parse_age_parameter(min_age_str, max_time, now))
 	{
