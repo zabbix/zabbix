@@ -181,7 +181,7 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
  *                                                                            *
  ******************************************************************************/
 
-char	*zbx_db_last_strerr(void)
+const char	*zbx_db_last_strerr(void)
 {
 	return last_db_strerror;
 }

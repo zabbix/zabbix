@@ -915,8 +915,9 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
  ******************************************************************************/
 static char	*am_create_db_alert_message(void)
 {
-	char	*error, *alert_message = NULL;
-	size_t	alert_message_alloc = 0, alert_message_offset = 0;
+	const char	*error;
+	char		*alert_message = NULL;
+	size_t		alert_message_alloc = 0, alert_message_offset = 0;
 
 	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s database \"%s\" on %s",
 			ZBX_DATABASE_TYPE, CONFIG_DBNAME, CONFIG_DBHOST);
