@@ -340,13 +340,13 @@ function getItemFilterForm(&$items) {
 			],
 			'data' => $groupFilter,
 			'popup' => [
-				'parameters' => CJs::encodeJson([
+				'parameters' => [
 					'srctbl' => 'host_groups',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'filter_groupid',
 					'srcfld1' => 'groupid',
 					'writeonly' => '1'
-				])
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
@@ -398,13 +398,13 @@ function getItemFilterForm(&$items) {
 			],
 			'data' => $hostFilterData,
 			'popup' => [
-				'parameters' => CJs::encodeJson([
+				'parameters' => [
 					'srctbl' => 'host_templates',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'filter_hostid',
 					'srcfld1' => 'hostid',
 					'writeonly' => '1'
-				])
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);

@@ -412,9 +412,6 @@
 
 			opCmdTarget.parent().append(opCmdTargetObject);
 
-			var srctbl = (opCmdTargetVal == 'host') ? 'hosts' : 'host_groups',
-				srcfld1 = (opCmdTargetVal == 'host') ? 'hostid' : 'groupid';
-
 			jQuery(opCmdTargetObject).multiSelectHelper({
 				id: 'opCmdTargetObject',
 				objectName: (opCmdTargetVal == 'host') ? 'hosts' : 'hostGroup',
@@ -423,8 +420,14 @@
 					editable: true
 				},
 				popup: {
-					parameters: 'srctbl=' + srctbl + '&dstfrm=action.edit&dstfld1=opCmdTargetObject&srcfld1=' +
-						srcfld1 + '&writeonly=1&multiselect=1'
+					parameters: {
+						srctbl: (opCmdTargetVal == 'host') ? 'hosts' : 'host_groups',
+						srcfld1: (opCmdTargetVal == 'host') ? 'hostid' : 'groupid',
+						dstfrm: 'action.edit',
+						dstfld1: 'opCmdTargetObject',
+						writeonly: '1',
+						multiselect: '1'
+					}
 				}
 			});
 		}

@@ -513,7 +513,7 @@ if ($this->data['displayApplications']) {
 			'objectOptions' => ['hostid' => $this->data['hostid']],
 			'data' => $appToReplace,
 			'popup' => [
-				'parameters' => CJs::encodeJson([
+				'parameters' => [
 					'srctbl' => 'applications',
 					'dstfrm' => $itemForm->getName(),
 					'dstfld1' => 'applications_',
@@ -521,7 +521,7 @@ if ($this->data['displayApplications']) {
 					'multiselect' => '1',
 					'noempty' => '1',
 					'hostid' => $this->data['hostid']
-				])
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	))->setId('replaceApp');
@@ -571,7 +571,7 @@ if ($this->data['displayApplications']) {
 			'data' => $appToAdd,
 			'addNew' => true,
 			'popup' => [
-				'parameters' => CJs::encodeJson([
+				'parameters' => [
 					'srctbl' => 'applications',
 					'dstfrm' => $itemForm->getName(),
 					'dstfld1' => 'new_applications_',
@@ -579,7 +579,7 @@ if ($this->data['displayApplications']) {
 					'multiselect' => '1',
 					'noempty' => '1',
 					'hostid' => $this->data['hostid']
-				])
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	))->setId('newApp');

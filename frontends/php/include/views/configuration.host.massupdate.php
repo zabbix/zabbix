@@ -59,14 +59,14 @@ $replaceGroups = (new CDiv(
 		'objectOptions' => ['editable' => true],
 		'data' => $hostGroupsToReplace,
 		'popup' => [
-			'parameters' => CJs::encodeJson([
+			'parameters' => [
 				'srctbl' => 'host_groups',
 				'dstfrm' => $hostView->getName(),
 				'dstfld1' => 'groups_',
 				'srcfld1' => 'groupid',
 				'writeonly' => '1',
 				'multiselect' => '1'
-			])
+			]
 		]
 	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 ))->setId('replaceGroups');
@@ -120,14 +120,14 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				'data' => $hostGroupsToAdd,
 				'addNew' => true,
 				'popup' => [
-					'parameters' => CJs::encodeJson([
+					'parameters' => [
 						'srctbl' => 'host_groups',
 						'dstfrm' => $hostView->getName(),
 						'dstfld1' => 'new_groups_',
 						'srcfld1' => 'groupid',
 						'writeonly' => '1',
 						'multiselect' => '1'
-					])
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('newGroups')
@@ -145,14 +145,14 @@ else {
 				'objectOptions' => ['editable' => true],
 				'data' => $hostGroupsToAdd,
 				'popup' => [
-					'parameters' => CJs::encodeJson([
+					'parameters' => [
 						'srctbl' => 'host_groups',
 						'dstfrm' => $hostView->getName(),
 						'dstfld1' => 'new_groups_',
 						'srcfld1' => 'groupid',
 						'writeonly' => '1',
 						'multiselect' => '1'
-					])
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('newGroups')
@@ -201,7 +201,7 @@ $newTemplateTable = (new CTable())
 			'objectName' => 'templates',
 			'data' => $data['linkedTemplates'],
 			'popup' => [
-				'parameters' => CJs::encodeJson([
+				'parameters' => [
 					'srctbl' => 'templates',
 					'srcfld1' => 'hostid',
 					'srcfld2' => 'host',
@@ -209,7 +209,7 @@ $newTemplateTable = (new CTable())
 					'dstfld1' => 'templates_',
 					'templated_hosts' => '1',
 					'multiselect' => '1'
-				])
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])

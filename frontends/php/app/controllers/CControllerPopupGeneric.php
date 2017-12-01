@@ -376,6 +376,14 @@ class CControllerPopupGeneric extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret && $this->getInput('value_types', [])) {
+			foreach ($this->getInput('value_types') as $value_type) {
+				if (!is_numeric($value_type) || $value_type < 0 || $value_type > 15) {
+					$ret = false;
+				}
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -426,11 +434,7 @@ class CControllerPopupGeneric extends CController {
 
 		$value_types = null;
 		if ($this->getInput('value_types', false) !== false) {
-			foreach ($this->getInput('value_types') as $value_type) {
-				if (is_numeric($value_type) && $value_type >= 0 && $value_type <= 15) {
-					$value_types[] = $value_type;
-				}
-			}
+			$value_types = $this->getInput('value_types');
 		}
 		elseif ($this->getInput('numeric', 0)) {
 			$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];

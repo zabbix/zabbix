@@ -94,13 +94,13 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hostGroup',
 				'data' => $data['filter']['groups'],
 				'popup' => [
-					'parameters' => CJs::encodeJson([
+					'parameters' => [
 						'srctbl' => 'host_groups',
 						'dstfrm' => 'zbx_filter',
 						'dstfld1' => 'filter_groupids_',
 						'srcfld1' => 'groupid',
 						'multiselect' => '1'
-					])
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -110,14 +110,14 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
-					'parameters' => CJs::encodeJson([
+					'parameters' => [
 						'srctbl' => 'hosts',
 						'dstfrm' => 'zbx_filter',
 						'dstfld1' => 'filter_hostids_',
 						'srcfld1' => 'hostid',
 						'real_hosts' => '1',
 						'multiselect' => '1'
-					])
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -147,7 +147,7 @@ if ($data['action'] == 'problem.view') {
 				],
 				'data' => $data['filter']['triggers'],
 				'popup' => [
-					'parameters' => CJs::encodeJson([
+					'parameters' => [
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
 						'dstfrm' => 'zbx_filter',
@@ -156,7 +156,7 @@ if ($data['action'] == 'problem.view') {
 						'with_monitored_triggers' => '1',
 						'multiselect' => '1',
 						'noempty' => '1'
-					])
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)

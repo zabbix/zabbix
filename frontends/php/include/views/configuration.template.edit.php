@@ -455,7 +455,7 @@ $newTemplateTable = (new CTable())
 			'objectName' => 'templates',
 			'ignored' => $ignoredTemplates,
 			'popup' => [
-				'parameters' => CJs::encodeJson([
+				'parameters' => [
 					'srctbl' => 'templates',
 					'srcfld1' => 'hostid',
 					'srcfld2' => 'host',
@@ -464,7 +464,7 @@ $newTemplateTable = (new CTable())
 					'templated_hosts' => '1',
 					'multiselect' => '1',
 					'templateid' => $data['templateid']
-				])
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
