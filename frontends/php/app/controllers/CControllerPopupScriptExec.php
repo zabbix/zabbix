@@ -21,10 +21,6 @@
 
 class CControllerPopupScriptExec extends CController {
 
-	protected function init() {
-		$this->disableSIDvalidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'hostid' =>			'db hosts.hostid',
@@ -41,7 +37,12 @@ class CControllerPopupScriptExec extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		$db_host = API::Host()->get([
+			'output' => [],
+			'hostids' => $this->getInput('hostid')
+		]);
+
+		return (bool) $db_host;
 	}
 
 	protected function doAction() {

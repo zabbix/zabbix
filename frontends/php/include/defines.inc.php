@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha1');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050003);
+define('ZABBIX_DB_VERSION',		3050001);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -147,6 +147,7 @@ define('O_NO',		2);
 
 define('P_SYS',					0x0001);
 define('P_UNSET_EMPTY',			0x0002);
+define('P_CRLF',				0x0004);
 define('P_ACT',					0x0010);
 define('P_NZERO',				0x0020);
 define('P_NO_TRIM',				0x0040);

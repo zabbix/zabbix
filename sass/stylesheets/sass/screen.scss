@@ -4074,13 +4074,24 @@ td.inactive-bg {
 }
 
 .msg-good {
-	color: darken(desaturate($green, 10%), 20%);
-	border: 1px solid $light-green;
-	background-color: $lighter-green;
+	color: $font-color;
+	border: 2px solid $light-green;
+	background-color: $ui-bg-color;
+	text-align: left;
+
 	@extend %msg;
 
 	.link-action {
 		color: darken(desaturate($green, 10%), 20%);
+		margin-right: 10px;
+		font-size: $font-msg-reset-size;
+
+		.arrow-up {
+			border-bottom-color: darken(desaturate($green, 10%), 20%);
+		}
+		.arrow-down {
+			border-top-color: darken(desaturate($green, 10%), 20%);
+		}
 	}
 
 	.overlay-close-btn {
@@ -4098,14 +4109,48 @@ td.inactive-bg {
 	}
 }
 
+.msg-good:before {
+	content: "";
+	background-color: $light-green;
+	float: left;
+	width: 61px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	position: absolute;
+}
+
+.msg-good:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
+	width: 27px;
+	height: 25px;
+	top: 0;
+	left: 0;
+	position: absolute;
+	margin-left: 16px;
+	margin-top: 2px;
+}
+
 .msg-bad {
-	color: darken(desaturate($red, 10%), 20%);
-	border: 1px solid $light-red;
-	background-color: $lighter-red;
+	color: $font-color;
+	border: 2px solid $light-red;
+	background-color: $ui-bg-color;
+	text-align: left;
+
 	@extend %msg;
 
 	.link-action {
 		color: darken(desaturate($red, 10%), 20%);
+		margin-right: 10px;
+		font-size: $font-msg-reset-size;
+
+		.arrow-up {
+			border-bottom-color: darken(desaturate($red, 10%), 20%);
+		}
+		.arrow-down {
+			border-top-color: darken(desaturate($red, 10%), 20%);
+		}
 	}
 
 	.overlay-close-btn {
@@ -4123,9 +4168,34 @@ td.inactive-bg {
 	}
 }
 
+.msg-bad:before {
+	content: "";
+	background-color: $light-red;
+	float: left;
+	width: 61px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	position: absolute;
+}
+
+.msg-bad:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+	width: 27px;
+	height: 25px;
+	top: 0;
+	left: 0;
+	position: absolute;
+	margin-left: 16px;
+	margin-top: 2px;
+}
+
+
 .msg-details {
 	font-size: $font-form-size;
 	text-align: left;
+	font-weight: normal;
 
 	.link-action {
 		position: absolute;
@@ -4142,7 +4212,7 @@ td.inactive-bg {
 		@extend %webkit-scrollbar;
 
 		li {
-			margin: .5em 0 .5em 1em;
+			margin: 0 0 0 1em;
 
 			&::before {
 				content: '\2013';
@@ -4159,6 +4229,7 @@ td.inactive-bg {
 			margin: 8px 0 0 0;
 			border-top-width: 1px;
 			border-top-style: dashed;
+			padding-top: 0.5em;
 		}
 	}
 }
@@ -4174,10 +4245,11 @@ td.inactive-bg {
 
 %msg {
 	font-size: $font-top-nav-size;
-	padding: 7px 20px 7px 15px;
-	margin: 0 0 12px 0;
-	text-align: center;
+	padding: 6px 10px 6px 75px;
+	text-align: left;
+	vertical-align: middle;
 	position: relative;
+	margin-bottom: 10px;
 	@include border-radius(2px);
 
 	.overlay-close-btn {
@@ -4188,14 +4260,41 @@ td.inactive-bg {
 .msg-bad-global {
 	display: none;
 	position: fixed;
-	bottom: 0;
 	z-index: 10000;
-	width: 100%;
-	padding: 5px 5px;
-	text-align: center;
-	color: darken($alt-yellow,50%);
+	text-align: left;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	vertical-align: middle;
+	font-size: $font-top-nav-size;
+	color: $font-color;
+	border: 2px solid $alt-yellow;
+	background-color: $ui-bg-color;
+	margin: 0 10px 0 10px;
+	padding: 6px 10px 6px 75px;
+}
+
+.msg-bad-global:before {
+	content: "";
 	background-color: $alt-yellow;
-	border-top: 1px solid darken($alt-yellow,5%);
+	float: left;
+	width: 61px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	position: absolute;
+}
+
+.msg-bad-global:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+	width: 27px;
+	height: 25px;
+	top: 0;
+	left: 0;
+	position: absolute;
+	margin-left: 16px;
+	margin-top: 2px;
 }
 
 .msg-global {
@@ -4577,6 +4676,10 @@ tr.cursor-move {
 
 .clock-lines {
 	fill: $clock-lines-color;
+}
+
+svg {
+	overflow: hidden;
 }
 
 .sysmap {

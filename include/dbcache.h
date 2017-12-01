@@ -43,6 +43,9 @@
 
 #define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
 
+#define ZBX_TRIGGER_DEPENDENCY_FAIL		1
+#define ZBX_TRIGGER_DEPENDENCY_UNRESOLVED	2
+
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
 extern int	CONFIG_TIMEOUT;
@@ -683,5 +686,15 @@ zbx_agent_value_t;
 void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
 void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess, zbx_vector_uint64_pair_t *proxy_diff);
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
+
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	unsigned char		status;
+	zbx_vector_uint64_t	masterids;
+}
+zbx_trigger_dep_t;
+
+void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
 #endif
