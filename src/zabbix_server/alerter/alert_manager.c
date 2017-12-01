@@ -19,7 +19,6 @@
 
 #include "common.h"
 
-#include "db.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
