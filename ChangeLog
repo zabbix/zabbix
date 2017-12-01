@@ -36,6 +36,8 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-12714] fixed overflow property of svg (vjaceslavs)
+.......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 ..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
 ........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
