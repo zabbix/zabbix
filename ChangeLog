@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F.....S. [ZBXNEXT-4108] implemented search of problems by trigger name (abs, miks)
 ..F....... [ZBXNEXT-4143] implemented keybord interaction in top navigation (miks)
 ...G...... [ZBXNEXT-1567] added item "vfs.dir.count" for counting directory entries (valdis)
 ..F....... [ZBXNEXT-4135] added tooltips for vertical labels (Oleg)
