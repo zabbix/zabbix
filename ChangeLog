@@ -1,6 +1,8 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F.....S. [ZBXNEXT-4108] implemented search of problems by trigger name (abs, miks)
+..F....... [ZBXNEXT-4143] implemented keybord interaction in top navigation (miks)
 ...G...... [ZBXNEXT-1567] added item "vfs.dir.count" for counting directory entries (valdis)
 ..F....... [ZBXNEXT-4135] added tooltips for vertical labels (Oleg)
 ..F....... [ZBXNEXT-4146] added icons for error and success messages (Andzs)
@@ -35,6 +37,9 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+.........T [ZBXNEXT-4223] performed network templates cleanup (vitaly)
+........S. [ZBX-12974] fixed TLS connection to passive proxy error handling (gleb, valdis)
+..F....... [ZBX-12714] fixed overflow property of svg (vjaceslavs)
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 ..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
 ........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
@@ -176,8 +181,8 @@ Changes for 3.4.2rc1
 
 New features:
 A.F....... [ZBXNEXT-4091] improved permission schema of the dashboards for normal administrators (Sasha)
-.........T [ZBXNEXT-4099] removed starting point from all OIDs; shortened old IOS Cisco templates names (vso, vzhuravlev)
-.........T [ZBXNEXT-4067] added preprocessing_queue item/graph/screen widget in Template App Zabbix Server (vso, vzhuravlev)
+.........T [ZBXNEXT-4099] removed starting point from all OIDs; shortened old IOS Cisco templates names (vso, vitaly)
+.........T [ZBXNEXT-4067] added preprocessing_queue item/graph/screen widget in Template App Zabbix Server (vso, vitaly)
 A.F....... [ZBXNEXT-4084] renamed action acknowledgment operation 'Notify all who left acknowledgement and comments' to 'Notify all involved' (gcalenko)
 ........S. [ZBXNEXT-4084] added users who received notifications regarding the problem to 'Notify all involved' acknowledgment operation recipient list (wiper)
 A.F....... [ZBX-1357] enabled Turkish translation to be displayed by default (zalex_ua)
@@ -190,7 +195,7 @@ Bug fixes:
 ...G...PS. [ZBX-12718] fixed crash when using item of log value type as master item for dependent items (wiper)
 .......P.. [ZBX-12720] fixed processing of log keys with non log value types for items monitored by proxies (wiper)
 ..F....... [ZBX-12530] fixed non well formed numeric value encaunteration in slideshow; implemented getBBox workaround for Firefox (miks)
-.........T [ZBX-12688] fixed false positives on 'High bandwidth usage' trigger in Template_Module_Interfaces_* templates (vso, vzhuravlev)
+.........T [ZBX-12688] fixed false positives on 'High bandwidth usage' trigger in Template_Module_Interfaces_* templates (vso, vitaly)
 .......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 A......... [ZBX-12699] added support of strings in "sortfield" and "sortorder" parameters, and added sorting by "name" for dashboard.get() (Sasha)
@@ -266,7 +271,7 @@ Bug fixes:
 ..F....... [ZBXNEXT-3987] fixed wrong response and error message when invalid or unavailable dashboardid has been requested (miks)
 ..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andžs, Ivo)
 A.F....... [ZBX-12430] fixed error when linking one template to another in template edit form (gcalenko)
-.........T [ZBXNEXT-3920] fixed extra new lines in Templates (vso, vzhuravlev)
+.........T [ZBXNEXT-3920] fixed extra new lines in Templates (vso, vitaly)
 ..F....... [ZBX-12588] fixed clock and map widget scaling on Safari (Ivo)
 .......PS. [ZBX-12574] fixed crash when linking templates with web scenarios during auto registration (vso)
 ..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
@@ -294,7 +299,7 @@ Changes for 3.4.0rc1
 
 New features:
 A......... [ZBXNEXT-2102] improved performance of event.get() and problem.get() methods with "selectTags" option (Sasha)
-....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vzhuravlev, vso)
+....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vso, vitaly)
 ..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
@@ -328,7 +333,7 @@ New features:
 ..F....... [ZBXNEXT-2102] implemented validation for empty fields in widget configuration forms (Sasha)
 ..F....... [ZBXNEXT-2102] added placeholder on empty dashboard (vmurzins)
 A.FG...PS. [ZBXNEXT-3006] implemented support of bulk metric collection for dependent items data population (gcalenko, vjaceslavs, wiper)
-....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta) (vzhuravlev)
+....I....T [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta) (vitaly)
 
 Bug fixes:
 ....I..... [ZBXNEXT-3006] fixed libevent build depenedencies (wiper)
@@ -425,7 +430,7 @@ A.F....... [ZBXNEXT-3570] removed the deprecated "isReadable" and "isWritable" m
 ..F....... [ZBX-10777] made checkboxes and radio buttons look the same across all browsers (asaveljevs, Pavel)
 A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 bytes; thanks to Patrick Hemmer for patch (Cemeris, Gunars, Oleg, Sasha, viktors)
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
-....I..... [ZBXNEXT-3725] added templates for network devices (internal version 0.8beta) (vzhuravlev)
+....I....T [ZBXNEXT-3725] added templates for network devices (internal version 0.8beta) (vitaly)
 
 Bug fixes:
 ........S. [ZBX-12296] added type hinting for item preprocessor numeric conversions based on item value type (wiper)
@@ -1017,6 +1022,7 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13042] fixed unclickable template link on host items list page (gcalenko)
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 ..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
 ..F....... [ZBX-12884] fixed misleading permissions visualization in user form for host groups and hosts lists (gcalenko)

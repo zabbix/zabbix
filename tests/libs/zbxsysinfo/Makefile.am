@@ -1,6 +1,14 @@
 if SERVER
-noinst_PROGRAMS = parse_item_key
+SERVER_tests = parse_item_key
+endif
 
+if AGENT
+AGENT_tests = process
+endif
+
+noinst_PROGRAMS = $(SERVER_tests) $(AGENT_tests)
+
+if SERVER
 parse_item_key_SOURCES = \
 	parse_item_key.c \
 	../../../src/zabbix_server/actions.c \
@@ -73,8 +81,6 @@ parse_item_key_CFLAGS = -I@top_srcdir@/tests
 endif
 
 if AGENT
-noinst_PROGRAMS = process
-
 process_SOURCES = \
 	process.c \
 	../../../src/zabbix_agent/active.c ./../../src/zabbix_agent/active.h\

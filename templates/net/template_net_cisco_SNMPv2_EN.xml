@@ -14,7 +14,7 @@
       <template>
          <template>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-MEMORY-POOL-MIB version: 0.13
+         <description>Template Cisco CISCO-MEMORY-POOL-MIB version: 0.14
 MIBs used:
 CISCO-MEMORY-POOL-MIB</description>
          <groups>
@@ -60,7 +60,7 @@ CISCO-MEMORY-POOL-MIB</description>
                </filter>
                <lifetime>30d</lifetime>
                <description>Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
-                http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
+http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Used memory</name>
@@ -257,7 +257,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-PROCESS-MIB version: 0.13
+         <description>Template Cisco CISCO-PROCESS-MIB version: 0.14
 MIBs used:
 CISCO-PROCESS-MIB</description>
          <groups>
@@ -303,10 +303,10 @@ CISCO-PROCESS-MIB</description>
                </filter>
                <lifetime>30d</lifetime>
                <description>If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable ,
-	                  indexed with cpmCPUTotalIndex .
-	                  This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
-	                  like different CPU chips, group of CPUs, or CPUs in different modules/cards.
-	                  In case of a single CPU, cpmCPUTotalTable has only one entry.</description>
+indexed with cpmCPUTotalIndex .
+This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
+like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+In case of a single CPU, cpmCPUTotalTable has only one entry.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
@@ -417,7 +417,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</template>
          <name>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
-         <description>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 version: 0.13
+         <description>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 version: 0.14
 MIBs used:
 CISCO-PROCESS-MIB</description>
          <groups>
@@ -463,10 +463,10 @@ CISCO-PROCESS-MIB</description>
                </filter>
                <lifetime>30d</lifetime>
                <description>If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable ,
-		                     indexed with cpmCPUTotalIndex .
-		                     This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
-		                     like different CPU chips, group of CPUs, or CPUs in different modules/cards.
-		                     In case of a single CPU, cpmCPUTotalTable has only one entry.</description>
+indexed with cpmCPUTotalIndex .
+This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
+like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+In case of a single CPU, cpmCPUTotalTable has only one entry.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPVALUE}: CPU utilization</name>
@@ -581,7 +581,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</template>
          <name>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</name>
-         <description>Template Cisco OLD-CISCO-CPU-MIB version: 0.13
+         <description>Template Cisco OLD-CISCO-CPU-MIB version: 0.14
 MIBs used:
 OLD-CISCO-CPU-MIB</description>
          <groups>
@@ -648,7 +648,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
       <template>
          <template>Template Module Cisco Inventory SNMPv2</template>
          <name>Template Module Cisco Inventory SNMPv2</name>
-         <description>Template Cisco Inventory version: 0.13
+         <description>Template Cisco Inventory version: 0.14
 MIBs used:
 ENTITY-MIB
 SNMPv2-MIB</description>
@@ -915,7 +915,7 @@ Device serial number has changed. Ack to close</description>
       <template>
          <template>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</template>
          <name>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</name>
-         <description>Template Cisco CISCO-ENVMON-MIB version: 0.13
+         <description>Template Cisco CISCO-ENVMON-MIB version: 0.14
 MIBs used:
 CISCO-ENVMON-MIB</description>
          <groups>
@@ -981,7 +981,7 @@ maintained by the environmental monitor.</description>
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -1172,7 +1172,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -1209,7 +1209,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"shutdown"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SENSOR_INFO}: Power supply is in critical state</name>
@@ -1223,6 +1223,29 @@ Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"notFunctioning"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SENSOR_INFO}: Power supply is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_INFO}: Power supply is in critical state</name>
+                           <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"shutdown"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -1272,7 +1295,7 @@ Please check the power supply unit for errors</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -1309,7 +1332,7 @@ Please check the power supply unit for errors</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"shutdown"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SENSOR_INFO}: Fan is in critical state</name>
@@ -1323,6 +1346,29 @@ Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"notFunctioning"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SENSOR_INFO}: Fan is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_INFO}: Fan is in critical state</name>
+                           <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"shutdown"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -1354,20 +1400,36 @@ Please check the fan unit</description>
                <value>4</value>
             </macro>
             <macro>
-               <macro>{$PSU_CRIT_STATUS}</macro>
+               <macro>{$PSU_CRIT_STATUS:"critical"}</macro>
                <value>3</value>
             </macro>
             <macro>
-               <macro>{$PSU_OK_STATUS}</macro>
-               <value>1</value>
+               <macro>{$PSU_CRIT_STATUS:"shutdown"}</macro>
+               <value>4</value>
             </macro>
             <macro>
-               <macro>{$FAN_CRIT_STATUS}</macro>
+               <macro>{$PSU_WARN_STATUS:"warning"}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_WARN_STATUS:"notFunctioning"}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"critical"}</macro>
                <value>3</value>
             </macro>
             <macro>
-               <macro>{$FAN_OK_STATUS}</macro>
-               <value>1</value>
+               <macro>{$FAN_CRIT_STATUS:"shutdown"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_WARN_STATUS:"warning"}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_WARN_STATUS:"notFunctioning"}</macro>
+               <value>6</value>
             </macro>
          </macros>
          <templates/>
@@ -1376,7 +1438,7 @@ Please check the fan unit</description>
       <template>
          <template>Template Net Cisco IOS SNMPv2</template>
          <name>Template Net Cisco IOS SNMPv2</name>
-         <description>Template Cisco IOS Software releases 12.2(3.5) or later version: 0.13
+         <description>Template Cisco IOS Software releases 12.2(3.5) or later version: 0.14
 Known Issues:
 description : no if(in|out)(Errors|Discards) are available for vlan ifType
 version : IOS for example: 	12.1(22)EA11, 15.4(3)M2
@@ -1448,7 +1510,7 @@ device : C2911, C7600</description>
       <template>
          <template>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMPv2</template>
          <name>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
-         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.13</description>
+         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.14</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -1513,7 +1575,7 @@ device : C2911, C7600</description>
       <template>
          <template>Template Net Cisco IOS prior to 12.0_3_T SNMPv2</template>
          <name>Template Net Cisco IOS prior to 12.0_3_T SNMPv2</name>
-         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.13</description>
+         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.14</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>

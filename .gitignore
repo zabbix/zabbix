@@ -261,6 +261,7 @@ src/libs/zbxtasks/.deps
 src/libs/zbxtasks/Makefile
 src/libs/zbxtasks/Makefile.in
 src/zabbix_agent/.deps
+src/zabbix_agent/.dirstamp
 src/zabbix_agent/Makefile
 src/zabbix_agent/Makefile.in
 src/zabbix_agent/zabbix_agent
@@ -371,6 +372,10 @@ tests/Makefile.in
 tests/libs/.deps
 tests/libs/Makefile
 tests/libs/Makefile.in
+tests/libs/zbxconf/.deps
+tests/libs/zbxconf/Makefile
+tests/libs/zbxconf/Makefile.in
+tests/libs/zbxconf/parse_cfg_file
 tests/libs/zbxdbhigh/.deps
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxdbhigh/Makefile
@@ -379,6 +384,7 @@ tests/libs/zbxsysinfo/.deps
 tests/libs/zbxsysinfo/Makefile
 tests/libs/zbxsysinfo/Makefile.in
 tests/libs/zbxsysinfo/parse_item_key
+tests/libs/zbxsysinfo/process
 upgrades/Makefile
 upgrades/Makefile.in
 /zabbix-*.tar.gz

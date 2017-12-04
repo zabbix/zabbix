@@ -953,7 +953,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-	init_proxy_history_lock();
+
+	if (SUCCEED != init_proxy_history_lock(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize lock for passive proxy history: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (SUCCEED != init_configuration_cache(&error))
 	{

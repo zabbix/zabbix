@@ -11,7 +11,7 @@
       <template>
          <template>Template Net HP Comware HH3C SNMPv2</template>
          <name>Template Net HP Comware HH3C SNMPv2</name>
-         <description>Template Net HP Comware (HH3C) version: 0.13
+         <description>Template Net HP Comware (HH3C) version: 0.14
 Overview: http://certifiedgeek.weebly.com/blog/hp-comware-snmp-mib-for-cpu-memory-and-temperature
 http://www.h3c.com.hk/products___solutions/technology/system_management/configuration_example/200912/656451_57_0.htm
 
@@ -355,7 +355,7 @@ percent of memory are used.</description>
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -498,7 +498,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -537,7 +537,7 @@ fanError(41) means that the fan stops working.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"fanError"} or {Template Net HP Comware HH3C SNMPv2:sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"hardwareFaulty"}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"fanError"},eq)}=1 or {Template Net HP Comware HH3C SNMPv2:sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"hardwareFaulty"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: Fan is in critical state</name>
@@ -607,7 +607,7 @@ Please check the fan unit</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -647,7 +647,7 @@ rpsError(61) means the Redundant Power Supply is in the state of fault.</descrip
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"psuError"} or {Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"rpsError"} or {Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"hardwareFaulty"}</expression>
+                     <expression>{Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"psuError"},eq)}=1 or {Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"rpsError"},eq)}=1 or {Template Net HP Comware HH3C SNMPv2:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"hardwareFaulty"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: Power supply is in critical state</name>
