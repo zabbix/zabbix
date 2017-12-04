@@ -171,8 +171,25 @@ class CEvent extends CApiService {
 					);
 
 					$tag_filter = [];
+					$used_groups = [];
+					$pre_usrgrpid = 0;
 
 					while ($db_tag_filter = DBfetch($db_tag_filters)) {
+						if ($pre_usrgrpid != $db_tag_filter['usrgrpid']) {
+							$pre_usrgrpid = $db_tag_filter['usrgrpid'];
+
+							$unused_groups = array_diff_key($tag_filter, $used_groups);
+
+							foreach ($unused_groups as $unused_group) {
+								unset($tag_filter[$unused_group]);
+							}
+
+							$used_groups = [$db_tag_filter['groupid'] => true];
+						}
+						else {
+							$used_groups[$db_tag_filter['groupid']] = true;
+						}
+
 						$tag_filter[$db_tag_filter['groupid']][] = [
 							'tag' => $db_tag_filter['tag'],
 							'value' => $db_tag_filter['value']
@@ -255,7 +272,7 @@ class CEvent extends CApiService {
 					$host_groups_to_check = array_intersect_key($tag_filter, $host_groups);
 
 					$allowed_triggerids = [];
-
+var_dump($host_groups_to_check);
 					if ($host_groups_to_check) {
 						$triggers = API::Trigger()->get([
 							'output' => ['triggerid'],
@@ -291,12 +308,30 @@ class CEvent extends CApiService {
 							'SELECT tf.groupid,tf.tag,tf.value,tf.usrgrpid'.
 							' FROM tag_filter tf'.
 							' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
-								' AND '.dbConditionInt('tf.groupid', array_keys($group_triggers))
+								' AND '.dbConditionInt('tf.groupid', array_keys($group_triggers)).
+							' ORDER BY tf.usrgrpid'
 						);
 
 						$tag_filter = [];
+						$used_groups = [];
+						$pre_usrgrpid = 0;
 
 						while ($db_tag_filter = DBfetch($db_tag_filters)) {
+							if ($pre_usrgrpid != $db_tag_filter['usrgrpid']) {
+								$pre_usrgrpid = $db_tag_filter['usrgrpid'];
+
+								$unused_groups = array_diff_key($tag_filter, $used_groups);
+								var_dump($unused_groups);
+								foreach ($unused_groups as $unused_group) {
+									unset($tag_filter[$unused_group]);
+								}
+
+								$used_groups = [$db_tag_filter['groupid'] => true];
+							}
+							else {
+								$used_groups[$db_tag_filter['groupid']] = true;
+							}
+
 							$tag_filter[$db_tag_filter['groupid']][] = [
 								'tag' => $db_tag_filter['tag'],
 								'value' => $db_tag_filter['value']
