@@ -371,8 +371,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	txn_error = 0;
 	txn_level = 0;
 
-	zbx_free(last_db_strerror);
-
 #if defined(HAVE_IBM_DB2)
 	connect = zbx_strdup(connect, "PROTOCOL=TCPIP;");
 	if ('\0' != *host)
@@ -938,7 +936,7 @@ int	zbx_db_commit(void)
 	}
 #elif defined(HAVE_ORACLE)
 	if (OCI_SUCCESS != (err = OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
-		rc = OCI_handle_sql_error(ERR_Z3005, err, NULL);
+		rc = OCI_handle_sql_error(ERR_Z3005, err, "commit failed");
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
 #endif
@@ -1009,7 +1007,7 @@ int	zbx_db_rollback(void)
 	rc = zbx_db_execute("%s", "rollback;");
 #elif defined(HAVE_ORACLE)
 	if (OCI_SUCCESS != (err = OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
-		rc = OCI_handle_sql_error(ERR_Z3005, err, NULL);
+		rc = OCI_handle_sql_error(ERR_Z3005, err, "rollback failed");
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
 	zbx_mutex_unlock(&sqlite_access);
