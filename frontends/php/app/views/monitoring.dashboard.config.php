@@ -134,7 +134,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson($field->getPopupOptions($form->getName())).');')
+					CJs::encodeJson($field->getPopupOptions($form->getName())).', null, this);')
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {

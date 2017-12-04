@@ -59,7 +59,7 @@ $item = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).');')
+		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).', null, this);')
 ];
 
 if ($data['parent_discoveryid'] !== '') {
@@ -75,7 +75,7 @@ if ($data['parent_discoveryid'] !== '') {
 				'dstfld1' => 'itemid',
 				'dstfld2' => 'description',
 				'parent_discoveryid' => $data['parent_discoveryid']
-			]).');'
+			]).', null, this);'
 		);
 }
 

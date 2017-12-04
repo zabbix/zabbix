@@ -610,7 +610,7 @@ $master_item = (new CDiv([
 				'only_hostid' => $data['hostid'],
 				'with_webitems' => '0',
 				'excludeids' => $data['itemids']
-			]).');'
+			]).', null, this);'
 		)
 ]))->setId('master_item');
 

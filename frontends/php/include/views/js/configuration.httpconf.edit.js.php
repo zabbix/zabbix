@@ -296,7 +296,7 @@
 
 		// http step add pop up
 		<?php if (!$this->data['templated']) : ?>
-			$('#add_step').click(function() {
+			$('#add_step').click(function(event) {
 				var form = $(this).parents('form');
 
 				// Append existing step names.
@@ -310,13 +310,13 @@
 					popup_options['steps_names'] = step_names;
 				}
 
-				return PopUp('popup.httpstep', popup_options);
+				return PopUp('popup.httpstep', popup_options, null, event.target);
 			});
 		<?php endif ?>
 
 		// http step edit pop up
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
-			$('#name_<?= $i ?>').click(function() {
+			$('#name_<?= $i ?>').click(function(event) {
 				// Append existing step names.
 				var step_names = [];
 				var form = $(this).parents('form');
@@ -347,7 +347,7 @@
 
 				return PopUp('popup.httpstep',jQuery.extend(popup_options,{
 					stepid: jQuery(this).attr('name_step')
-				}));
+				}), null, event.target);
 			});
 		<?php endforeach ?>
 

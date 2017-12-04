@@ -725,12 +725,12 @@ function getMenuPopupTriggerLog(options) {
 	// create
 	items[items.length] = {
 		label: t('Create trigger'),
-		clickCallback: function() {
+		clickCallback: function(event) {
 			jQuery(this).closest('.action-menu').fadeOut(100);
 
 			return PopUp('popup.triggerwizard', {
 				itemid: options.itemid
-			});
+			}, null, event.target);
 		}
 	};
 
@@ -745,13 +745,13 @@ function getMenuPopupTriggerLog(options) {
 		jQuery.each(options.triggers, function(i, trigger) {
 			triggers[triggers.length] = {
 				label: trigger.name,
-				clickCallback: function() {
+				clickCallback: function(event) {
 					jQuery(this).closest('.action-menu').fadeOut(100);
 
 					return PopUp('popup.triggerwizard', {
 						itemid: options.itemid,
 						triggerid: trigger.id
-					});
+					}, null, event.target);
 				}
 			};
 		});

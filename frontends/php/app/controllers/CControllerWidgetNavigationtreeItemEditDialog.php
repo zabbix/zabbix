@@ -103,7 +103,7 @@ class CControllerWidgetNavigationtreeItemEditDialog extends CController {
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'linked_map_id',
 						'dstfld2' => 'caption'
-					]).');'
+					]).', null, this);'
 				)
 		]);
 

@@ -25,7 +25,7 @@ class CColor extends CDiv {
 		parent::__construct([
 			(new CColorCell('lbl_'.$name, $value))
 				->setTitle('#'.$value)
-				->onClick('javascript: show_color_picker("'.zbx_formatDomId($name).'")'),
+				->onClick('javascript: show_color_picker("'.zbx_formatDomId($name).'", this)'),
 			(new CTextBox($name, $value))
 				->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
 				->setAttribute('maxlength', 6)

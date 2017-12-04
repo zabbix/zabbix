@@ -134,7 +134,7 @@ if ($data['action'] == 'problem.view') {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1',
 						'real_hosts' => '1'
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])

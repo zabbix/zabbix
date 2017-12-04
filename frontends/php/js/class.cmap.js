@@ -207,6 +207,8 @@ ZABBIX.apps.map = (function($) {
 					containment: [0, 0, 3200, 3200]
 				});
 
+			addToOverlaysStack('map-window', jQuery('sysmap_update'), 'map-window')
+
 			this.updateImage();
 			this.form = new SelementForm(this.formContainer, this);
 			this.massForm = new MassForm(this.formContainer, this);
@@ -865,7 +867,7 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// application selection pop up
-				$('#application-select').click(function() {
+				$('#application-select').click(function(event) {
 					var data = $('#elementNameHost').multiSelect('getData'),
 						popup_options = {
 							srctbl: 'applications',
@@ -880,7 +882,7 @@ ZABBIX.apps.map = (function($) {
 						popup_options['hostid'] = data[0].id;
 					}
 
-					PopUp('popup.generic', popup_options);
+					PopUp('popup.generic', popup_options, null, event.target);
 				});
 
 				// mass update form

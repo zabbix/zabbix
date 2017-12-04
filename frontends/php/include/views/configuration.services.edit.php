@@ -55,7 +55,7 @@ $servicesFormList->addRow(_('Parent service'), [
 				'pservices' => '1',
 				'serviceid' => $this->data['service']['serviceid']
 			]).
-				',{parentid: this.form.parentid.value}));'
+				',{parentid: this.form.parentid.value}), null, this);'
 		)
 ]);
 
@@ -90,7 +90,7 @@ $servicesFormList->addRow(_('Trigger'), [
 				'dstfld2' => 'trigger',
 				'real_hosts' => '1',
 				'with_triggers' => '1'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 $servicesFormList->addRow(_('Sort order (0->999)'), (new CTextBox('sortorder', $this->data['sortorder'], false, 3))
@@ -137,7 +137,7 @@ $servicesDependenciesFormList->addRow(
 					'cservices' => '1',
 					'serviceid' => $this->data['service']['serviceid']
 				]).
-					',{parentid: this.form.parentid.value}));'
+					',{parentid: this.form.parentid.value}), null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]))

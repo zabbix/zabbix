@@ -679,7 +679,7 @@
 		showOpTypeForm(<?= ACTION_RECOVERY_OPERATION ?>);
 		showOpTypeForm(<?= ACTION_ACKNOWLEDGE_OPERATION ?>);
 
-		jQuery('#select_operation_opcommand_script').click(function() {
+		jQuery('#select_operation_opcommand_script').click(function(event) {
 			PopUp('popup.generic', {
 				srctbl: 'scripts',
 				srcfld1: 'scriptid',
@@ -687,10 +687,10 @@
 				dstfrm: 'action.edit',
 				dstfld1: 'new_operation_opcommand_scriptid',
 				dstfld2: 'new_operation_opcommand_script'
+			}, null, event.target);
 			});
-		});
 
-		jQuery('#select_recovery_operation_opcommand_script').click(function() {
+		jQuery('#select_recovery_operation_opcommand_script').click(function(event) {
 			PopUp('popup.generic', {
 				srctbl: 'scripts',
 				srcfld1: 'scriptid',
@@ -698,10 +698,10 @@
 				dstfrm: 'action.edit',
 				dstfld1: 'new_recovery_operation_opcommand_scriptid',
 				dstfld2: 'new_recovery_operation_opcommand_script'
+			}, null, event.target);
 			});
-		});
 
-		jQuery('#select_ack_operation_opcommand_script').click(function() {
+		jQuery('#select_ack_operation_opcommand_script').click(function(event) {
 			PopUp('popup.generic', {
 				srctbl: 'scripts',
 				srcfld1: 'scriptid',
@@ -709,8 +709,8 @@
 				dstfrm: 'action.edit',
 				dstfld1: 'new_ack_operation_opcommand_scriptid',
 				dstfld2: 'new_ack_operation_opcommand_script'
+			}, event.target);
 			});
-		});
 
 		processTypeOfCalculation();
 		processOperationTypeOfCalculation();

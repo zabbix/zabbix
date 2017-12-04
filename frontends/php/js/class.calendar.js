@@ -137,7 +137,7 @@ calendar.prototype = {
 		}
 	},
 
-	clndrshow: function(top, left) {
+	clndrshow: function(top, left, trigger_elmnt) {
 		if (this.visible == 1) {
 			this.clndrhide();
 		}
@@ -156,7 +156,7 @@ calendar.prototype = {
 			this.clndr_calendar.show();
 			this.visible = 1;
 
-			addToOverlaysStack(this.id, window.event.target, 'clndr');
+			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
 		}
 	},
 

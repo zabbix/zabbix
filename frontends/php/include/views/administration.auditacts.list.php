@@ -37,7 +37,7 @@ $filterColumn->addRow(_('Recipient'), [
 				'srcfld1' => 'alias',
 				'dstfrm' => 'zbx_filter',
 				'dstfld1' => 'alias'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 

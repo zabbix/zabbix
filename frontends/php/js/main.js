@@ -618,7 +618,7 @@ function hide_color_picker() {
 	}
 }
 
-function show_color_picker(id) {
+function show_color_picker(id, event) {
 	if (!color_picker) {
 		return;
 	}
@@ -635,7 +635,7 @@ function show_color_picker(id) {
 	color_picker.style.top = color_picker.y + 'px';
 	color_picker.style.display = 'block';
 
-	addToOverlaysStack('color_picker', window.event.target, 'color_picker');
+	addToOverlaysStack('color_picker', event.target, 'color_picker');
 }
 
 function create_color_picker() {

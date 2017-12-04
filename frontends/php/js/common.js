@@ -376,10 +376,6 @@ function openWinCentered(url, name, width, height, params) {
  * @returns false
  */
 function PopUp(action, options, dialogueid, trigger_elmnt) {
-	if (typeof trigger_elmnt === 'undefined') {
-		trigger_elmnt = window.event.target;
-	}
-
 	var ovelay_properties = {
 		'title': '',
 		'content': jQuery('<div>')

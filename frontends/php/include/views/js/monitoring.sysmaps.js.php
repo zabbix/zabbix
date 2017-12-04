@@ -197,7 +197,7 @@ function getFontComboBox($name) {
 									'dstfld1' => 'sysmapid',
 									'dstfld2' => 'elementNameMap'
 								]).
-									',{excludeids: [#{sysmapid}]}));'
+									',{excludeids: [#{sysmapid}]}), null, this);'
 							)
 					], 'mapSelectRow')
 					->addRow(_('Application'), [
@@ -720,7 +720,7 @@ function getFontComboBox($name) {
 										'real_hosts' => '1',
 										'with_triggers' => '1',
 										'noempty' => '1'
-									]).');'
+									]).', null, this);'
 								)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
