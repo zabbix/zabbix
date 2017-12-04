@@ -36,6 +36,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+........S. [ZBX-12974] fixed TLS connection to passive proxy error handling (gleb, valdis)
 ..F....... [ZBX-12714] fixed overflow property of svg (vjaceslavs)
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 ..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
