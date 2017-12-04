@@ -381,15 +381,15 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 	}
 
 	var ovelay_properties = {
-			'title': '',
-			'content': jQuery('<div>')
-				.css({'height': '68px'})
-				.append(jQuery('<div>')
-					.addClass('preloader-container')
-					.append(jQuery('<div>').addClass('preloader'))
-				),
-			'class': 'modal-popup',
-			'buttons': [],
+		'title': '',
+		'content': jQuery('<div>')
+			.css({'height': '68px'})
+			.append(jQuery('<div>')
+				.addClass('preloader-container')
+				.append(jQuery('<div>').addClass('preloader'))
+			),
+		'class': 'modal-popup',
+		'buttons': [],
 		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
 	};
 	var url = new Curl('zabbix.php');
@@ -439,16 +439,17 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
  * @param {object} type			Type of overlay UI element.
  */
 function addToOverlaysStack(id, element, type) {
-	var indx = null,
+	var index = null,
 		id = id.toString();
+
 	jQuery(overlays_stack).each(function(i, item) {
 		if (item.dialogueid === id) {
-			indx = i;
+			index = i;
 			return;
 		}
 	});
 
-	if (indx === null) {
+	if (index === null) {
 		// Add new overlay.
 		overlays_stack.push({
 			dialogueid: id,
@@ -457,57 +458,56 @@ function addToOverlaysStack(id, element, type) {
 		});
 	}
 	else {
-		overlays_stack[indx]['element'] = element;
+		overlays_stack[index]['element'] = element;
 
 		// Move existing overlay to the end of array.
-		overlays_stack.push(overlays_stack[indx]);
-		overlays_stack.splice(indx, 1);
+		overlays_stack.push(overlays_stack[index]);
+		overlays_stack.splice(index, 1);
 	}
 
-	processDialogStack();
+	// Only one instance of handler should be present at any time.
+	jQuery(document)
+		.unbind('keydown', closeDialogHandler)
+		.bind('keydown', closeDialogHandler);
 }
 
-// Function add document 'keydown' listener to close overlay UI elements when ESC button is pressed.
-function processDialogStack() {
-	if (overlays_stack.length == 1 && typeof jQuery._data(document, 'events')['keydown'] === 'undefined') {
-		jQuery(document).on('keydown', function(event) {
-			if (event.which == 27) {
-				var dialog = overlays_stack[overlays_stack.length - 1];
-				if (typeof dialog !== 'undefined') {
-					switch (dialog.type) {
-						// Close overlay popup.
-						case 'popup':
-							overlayDialogueDestroy(dialog.dialogueid);
-							break;
+// Keydown handler. Closes last opened overlay UI element.
+function closeDialogHandler(event) {
+	if (event.which == 27) { // ESC
+		var dialog = overlays_stack[overlays_stack.length - 1];
+		if (typeof dialog !== 'undefined') {
+			switch (dialog.type) {
+				// Close overlay popup.
+				case 'popup':
+					overlayDialogueDestroy(dialog.dialogueid);
+					break;
 
-						// Close overlay hintbox.
-						case 'hintbox':
-							hintBox.hideHint(window.event, dialog.element, true);
-							break;
+				// Close overlay hintbox.
+				case 'hintbox':
+					hintBox.hideHint(null, dialog.element, true);
+					break;
 
-						// Close context menu overlays.
-						case 'contextmenu':
-							jQuery('.action-menu.action-menu-top:visible').menuPopup('close');
-							break;
+				// Close context menu overlays.
+				case 'contextmenu':
+					jQuery('.action-menu.action-menu-top:visible').menuPopup('close');
+					break;
 
-						// Close overlay time picker.
-						case 'clndr':
-							CLNDR[dialog.dialogueid].clndr.clndrhide();
-							break;
+				// Close overlay time picker.
+				case 'clndr':
+					CLNDR[dialog.dialogueid].clndr.clndrhide();
+					break;
 
-						// Close overlay color picker.
-						case 'color_picker':
-							hide_color_picker();
-							break;
-					}
-				}
+				// Close overlay color picker.
+				case 'color_picker':
+					hide_color_picker();
+					break;
 			}
-		});
-	}
 
-	// Remove event listener.
-	if (overlays_stack.length == 0 && typeof jQuery._data(document, 'events')['keydown'] !== 'undefined') {
-		jQuery(document).off('keydown');
+			// Remove event listener.
+			if (overlays_stack.length == 0) {
+				jQuery(document).unbind('keydown', closeDialogHandler);
+			}
+		}
 	}
 }
 
