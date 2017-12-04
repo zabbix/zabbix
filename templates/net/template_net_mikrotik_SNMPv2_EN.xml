@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Mikrotik SNMPv2</template>
          <name>Template Net Mikrotik SNMPv2</name>
-         <description>Template Net Mikrotik version: 0.13
+         <description>Template Net Mikrotik version: 0.14
 MIBs used:
 HOST-RESOURCES-MIB
 MIKROTIK-MIB
@@ -199,7 +199,7 @@ might be modified.</description>
                <status>0</status>
                <value_type>0</value_type>
                <allowed_hosts/>
-               <units>°С</units>
+               <units>°C</units>
                <snmpv3_contextname/>
                <snmpv3_securityname/>
                <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -580,7 +580,7 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>

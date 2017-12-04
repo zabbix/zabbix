@@ -11,7 +11,7 @@
       <template>
          <template>Template OS Windows SNMPv2</template>
          <name>Template OS Windows SNMPv2</name>
-         <description>Template OS Windows version: 0.13
+         <description>Template OS Windows version: 0.14
 Known Issues:
 description : Doesn't support In/Out 64 bit counters even thoug1h IfxTable is present:
 Currently, Windows gets it’s interface status from MIB-2. Since these 64bit SNMP counters (ifHCInOctets, ifHCOutOctets, etc.) are defined as an extension to IF-MIB, Microsoft has not implemented it.

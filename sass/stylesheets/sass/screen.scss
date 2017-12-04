@@ -4698,6 +4698,10 @@ tr.cursor-move {
 	fill: $clock-lines-color;
 }
 
+svg {
+	overflow: hidden;
+}
+
 .sysmap {
 	height: 100%;
 	width: auto;

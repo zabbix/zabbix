@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Interfaces Windows SNMPv2</template>
          <name>Template Module Interfaces Windows SNMPv2</name>
-         <description>Template Module Interfaces Windows version: 0.13
+         <description>Template Module Interfaces Windows version: 0.14
 Overview: Special version of interfaces template that is required for Windows OS. Since MS doesn't support 64 bit counters but supports ifAlias.
 
 MIBs used:
@@ -459,7 +459,7 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                      <privatekey/>
                      <port/>
                      <description>MIB: IF-MIB
-The type of interface.  
+The type of interface.
 Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
 through updating the syntax of the IANAifType textual convention.</description>
                      <inventory_link>0</inventory_link>
